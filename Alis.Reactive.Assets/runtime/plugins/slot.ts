@@ -1,22 +1,24 @@
 // alis.slot (grammar.md 6.5), keyed by the container element's id, which is looked up at every call so
 // a slot can sit inside content that appears after boot.
-// S1 load(html), in order: take the plan scripts out of the HTML; release the owners of the slots
-//    inside the old content, innermost first; raise alis:unmount on the old content; replace it;
-//    re-create the inserted <script> nodes in document order so vendor scripts run; raise
-//    alis:mount; release the previous owner; start a new owner with the plans found. HTML with no
-//    plan only unloads.
-// S2 unload() releases the owners of the slots inside the content, then the slot's own owner.
+// S1 load(html), in order: take the plan scripts out of the HTML; raise alis:unmount on the old
+//    content, which releases the owners of the slots inside it, innermost first, and the slot's own;
+//    replace it; re-create the inserted <script> nodes in document order so vendor scripts run; raise
+//    alis:mount; start a new owner with the plans found. HTML with no plan only unloads.
+// S2 unload() raises alis:unmount on the content, releasing the same owners, and empties the slot.
+// S3 Wired HTML that anything else removes (a drawer closing on content a plan loaded into it) is
+//    announced the same way, alis:unmount on its root, and the owners inside it are released alike.
 
 import type { Plugin } from "../objects/plugins";
 import { Owner } from "../objects/owner";
 import { discoverPlans } from "../plans/discover";
-import { announceMount, announceUnmount } from "../plans/mount-events";
+import { announceMount, announceUnmount, UNMOUNT_EVENT, type MountEventDetail } from "../plans/mount-events";
 import { startOwner } from "../plans/start";
 import { logger } from "../diagnostics/trace";
 
 const log = logger("boot");
 
 const owners = new Map<string, Owner>();
+let unmountsListened = false;
 
 export interface SlotObject {
   load(html: unknown): void;
@@ -31,20 +33,18 @@ function container(id: string): HTMLElement {
 
 function load(id: string, html: unknown): void {
   if (typeof html !== "string") throw new Error(`[alis] slot #${id} expects HTML text, got ${typeof html}`);
+  listenForUnmounts();
   const target = container(id);
 
   const host = document.createElement("div");
   host.innerHTML = html;
   const plans = discoverPlans(host, true);
 
-  unloadInside(target);
   announceUnmount(target);
   target.innerHTML = "";
   target.append(...Array.from(host.childNodes));
   runInsertedScripts(target);
   announceMount(target);
-
-  unload(id);
   if (plans.length === 0) return;
 
   const owner = Owner.slot(id);
@@ -54,8 +54,24 @@ function load(id: string, html: unknown): void {
 }
 
 function unload(id: string): void {
-  const container = document.getElementById(id);
-  if (container !== null) unloadInside(container);
+  listenForUnmounts();
+  const target = container(id);
+  announceUnmount(target);
+  target.innerHTML = "";
+}
+
+// Wired HTML about to go: the owners of the slots inside it go first, innermost first, then the owner
+// of the slot it is, when it is one.
+function releaseWithin(root: HTMLElement): void {
+  const inside = [...owners.keys()].filter(id => {
+    const element = document.getElementById(id);
+    return element !== null && element !== root && root.contains(element);
+  });
+  for (const id of inside.reverse()) release(id);
+  release(root.id);
+}
+
+function release(id: string): void {
   const owner = owners.get(id);
   if (!owner) return;
   owners.delete(id);
@@ -63,14 +79,10 @@ function unload(id: string): void {
   log.info("partial-slot.unload", { slotId: id });
 }
 
-// A slot loaded inside content that is going away is released with it; a slot inside that one goes
-// first, so disposers run innermost first.
-function unloadInside(container: HTMLElement): void {
-  const nested = [...owners.keys()].filter(id => {
-    const element = document.getElementById(id);
-    return element !== null && element !== container && container.contains(element);
-  });
-  for (const id of nested.reverse()) unload(id);
+function listenForUnmounts(): void {
+  if (unmountsListened) return;
+  unmountsListened = true;
+  document.addEventListener(UNMOUNT_EVENT, event => releaseWithin((event as CustomEvent<MountEventDetail>).detail.root));
 }
 
 // Scripts inserted through innerHTML do not run. Re-creating each one in document order runs it the

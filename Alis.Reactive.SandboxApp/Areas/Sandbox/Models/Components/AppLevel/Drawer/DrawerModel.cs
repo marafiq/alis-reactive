@@ -2,6 +2,12 @@ using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
+    /// <summary>The events the drawer page raises for the notes it loads: the round is called from the desk.</summary>
+    public static class DrawerEvents
+    {
+        public static readonly AppEvent RoundCalled = AppEvent.Declare();
+    }
+
     public class DrawerModel
     {
     }

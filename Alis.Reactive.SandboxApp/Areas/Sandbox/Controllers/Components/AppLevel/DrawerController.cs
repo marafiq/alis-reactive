@@ -25,6 +25,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
             return PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_CarePlanNotesPartial.cshtml");
         }
 
+        [HttpGet("NightNotes")]
+        public IActionResult NightNotes()
+        {
+            return PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_NightNotesPartial.cshtml", new DrawerModel());
+        }
+
         [HttpGet("AddResidentForm")]
         public IActionResult AddResidentForm()
         {

@@ -210,5 +210,18 @@ namespace Alis.Reactive.Builders
             Context.AddStep(new InjectStep(elementId, responseBody));
             return this;
         }
+
+        /// <summary>
+        /// Unloads a slot a partial was loaded into: what the partial brought (its components, rules and
+        /// behavior) is released, the slot is emptied, and what the page booted with stays.
+        /// </summary>
+        /// <param name="elementId">The slot's element id, the one <see cref="Into"/> loaded.</param>
+        /// <returns>This pipeline builder.</returns>
+        public PipelineBuilder<TModel> Unload(string elementId)
+        {
+            Context.DeclareElement(elementId);
+            Context.AddStep(new UnloadStep(elementId));
+            return this;
+        }
     }
 }

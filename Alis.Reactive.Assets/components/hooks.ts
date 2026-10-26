@@ -28,6 +28,15 @@ export function onUnmount(selector: string, destroy: (element: HTMLElement) => v
 }
 
 /**
+ * Announces wired HTML a component is about to remove itself, under the given root: the runtime
+ * releases what the plans loaded into it brought, and other components destroy their widgets in it.
+ */
+export function announceUnmount(root: HTMLElement): void {
+  const detail: MountEventDetail = { root };
+  root.ownerDocument.dispatchEvent(new CustomEvent<MountEventDetail>("alis:unmount", { detail }));
+}
+
+/**
  * Runs once the document is parsed and before the runtime boots: the runtime starts on the same
  * event, and this module is imported before it.
  */

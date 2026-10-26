@@ -3,7 +3,7 @@
 // component's: open(), close() and the size property. It also wires the close button, the Escape key
 // and the reset after the close transition, through the drawer's well-known DOM IDs.
 
-import { onMount } from "../hooks";
+import { announceUnmount, onMount } from "../hooks";
 
 const SIZES = ["sm", "md", "lg"] as const;
 type DrawerSize = (typeof SIZES)[number];
@@ -45,11 +45,16 @@ function declareMembers(container: HTMLElement): void {
   });
 }
 
+// The content a plan loaded into the drawer goes with the close: announced first, so what it brought
+// (its components, rules and behavior) is released before the HTML is emptied.
 function resetAfterClose(container: HTMLElement): void {
   container.setAttribute("aria-hidden", "true");
   container.classList.remove(...SIZES.map(sizeClass));
   const content = document.getElementById("alis-drawer-content");
-  if (content) content.innerHTML = "";
+  if (content) {
+    announceUnmount(content);
+    content.innerHTML = "";
+  }
   const title = document.getElementById("alis-drawer-title");
   if (title) title.textContent = "";
 }

@@ -153,6 +153,20 @@ namespace Alis.Reactive.PlanModel
             }));
     }
 
+    /// <summary>Unloads a slot: what the partial loaded into it brought is released, and the slot is emptied.</summary>
+    internal sealed class UnloadStep : Step
+    {
+        private readonly string _slot;
+
+        internal UnloadStep(string slot)
+        {
+            _slot = slot ?? throw new ArgumentNullException(nameof(slot));
+        }
+
+        internal override void WriteTo(List<Statement> block, Scope scope) =>
+            block.Add(G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "unload")));
+    }
+
     /// <summary>In an error route, the form shows the problems the server sent (grammar.md F8).</summary>
     internal sealed class ShowErrorsStep : Step
     {

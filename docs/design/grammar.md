@@ -555,16 +555,20 @@ no key (H2) and no entry (H4).
 
 - **S1 Load order.** `load` works in this order:
   1. take the plan scripts out of the HTML;
-  2. raise `alis:unmount` on the old content;
+  2. raise `alis:unmount` on the old content, which releases the owners of the slots inside it,
+     innermost first, and the slot's own (3.5);
   3. replace the content;
   4. re-create the inserted `<script>` nodes in document order, so that vendor scripts run (this
      replaces `ej.base.append`);
   5. raise `alis:mount`;
-  6. unload the previous owner;
-  7. start a new owner for the slot with the plans it found (3.5).
+  6. start a new owner for the slot with the plans it found (3.5).
 
   HTML with no plan only unloads.
-- **S2 Unload.** `unload` releases the slot's owner (3.5).
+- **S2 Unload.** `unload` raises `alis:unmount` on the content, releasing the same owners, and
+  empties the slot. The DSL writes it as `p.Unload(elementId)`.
+- **S4 Removed by a component.** Wired HTML a component removes itself is announced the same way,
+  `alis:unmount` on its root (the drawer on the content it empties when it closes), and the owners
+  inside it are released alike.
 - **S3 Element.** The container is found with `getElementById` at every call, so a slot can sit
   inside content that appears after boot.
 
@@ -604,8 +608,8 @@ no key (H2) and no entry (H4).
   - L2: `hide()` cancels the timer, returns the loader to `<body>` hidden, and clears `target` and
     `timeout`. It also returns there, hidden, when its target leaves the page.
 - **Drawer** (Native):
-  - W1: Closing empties its content element without unloading the slot loaded into it
-    (`Alis.Reactive.Assets/components/native/drawer.ts:51-52`).
+  - W1: Closing announces `alis:unmount` on its content element and empties it, so what a plan
+    loaded into it is released with it (6.5 S4).
 - **Toast** (Fusion): its declared members, and no obligation beyond them.
 - **Native CheckList and RadioGroup:** the native plugin defines `value` and `isInteracted` on the
   element (`Alis.Reactive.Assets/components/native/check-list.ts`, `radio-group.ts`), replacing the
