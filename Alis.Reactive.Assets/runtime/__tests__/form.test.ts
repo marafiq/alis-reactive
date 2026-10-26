@@ -170,7 +170,7 @@ describe("live", () => {
     };
     const model: ModelPluginData = {
       kind: "model",
-      inputs: { Rating: { name: "Rating", body: ["Rating"], value: scored.value, shape: s.number, committed: "valueChanged" } },
+      inputs: { Rating: { name: "Rating", body: ["Rating"], value: scored.value, shape: s.number, committed: "valueChanged", list: false } },
     };
     const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [scored] };
     startOwner(Owner.page(), [plan({
@@ -202,7 +202,7 @@ describe("live", () => {
     };
     const model: ModelPluginData = {
       kind: "model",
-      inputs: { Phone: { name: "Phone", body: ["Phone"], value: required.value, shape: s.string, committed: "valueChanged" } },
+      inputs: { Phone: { name: "Phone", body: ["Phone"], value: required.value, shape: s.string, committed: "valueChanged", list: false } },
     };
     const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [required] };
     startOwner(Owner.page(), [plan({

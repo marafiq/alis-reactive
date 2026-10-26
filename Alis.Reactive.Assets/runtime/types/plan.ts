@@ -164,6 +164,7 @@ export interface InputBinding {
   value: Expr;
   shape: Shape;
   committed: string;
+  list: boolean;
 }
 
 export interface NoPluginData {

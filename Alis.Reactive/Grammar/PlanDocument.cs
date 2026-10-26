@@ -191,6 +191,7 @@ namespace Alis.Reactive.Grammar
             Value = value ?? throw new ArgumentNullException(nameof(value));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
             Committed = committed;
+            List = shape.DescribesArray;
         }
 
         public string Name { get; }
@@ -203,6 +204,9 @@ namespace Alis.Reactive.Grammar
 
         /// <summary>The component's event that commits a value; the model re-raises it as <c>alis:commit</c>.</summary>
         public string Committed { get; }
+
+        /// <summary>Whether the input binds a list, so a request repeats its key per item and sends nothing when it is missing.</summary>
+        public bool List { get; }
     }
 
     /// <summary><c>alis.form</c> data: the fields a validation container checks (grammar.md 6.4).</summary>

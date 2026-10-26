@@ -44,8 +44,9 @@ That is the whole document. The grammar names no feature.
   declaration of each module states its data type, so the generated contract types it too.
 - **Inputs and forms are module data.**
   - The inputs of a view are `alis.model` data: `{ inputs: { id: { name, body, value, shape,
-    committed } } }`: the MVC binding name, the JSON body path, the value as an expression of the
-    located object, the shape it reads as, and the event that commits a value (M4).
+    committed, list } } }`: the MVC binding name, the JSON body path, the value as an expression of
+    the located object, the shape it reads as, the event that commits a value (M4), and whether the
+    input binds a list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value,
     tests: [{ rule, check: fn(v), when, message }] }] }`. `rule` names the declaration a test came
     from, for traces only. An input

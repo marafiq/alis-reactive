@@ -14,7 +14,7 @@
 //    field any plan of the composition rendered: what validation checks, so the browser judges what
 //    the server will; missing when no plan rendered it.
 
-import type { InputBinding, Shape } from "../types/index";
+import type { InputBinding } from "../types/index";
 import type { Contribution, Module } from "../objects/modules";
 import type { PlanWorld } from "../objects/world";
 import { Environment } from "../grammar/environment";
@@ -78,11 +78,6 @@ function mountedInput(planId: string, id: string): ModelInput | undefined {
   return input !== undefined && isMounted(input) ? input : undefined;
 }
 
-function describesArray(shape: Shape): boolean {
-  if (shape.kind === "nullable") return describesArray(shape.inner);
-  return shape.kind === "array";
-}
-
 function modelObject(planId: string): ModelObject {
   const mounted = (): ModelInput[] => [...inputsOf(planId).values()].filter(isMounted);
   const fill = (record: Record<string, unknown>): Record<string, unknown> => {
@@ -101,7 +96,7 @@ function modelObject(planId: string): ModelObject {
     },
     get arrays() {
       return [...inputsOf(planId).values()]
-        .filter(input => describesArray(input.binding.shape))
+        .filter(input => input.binding.list)
         .map(input => input.binding.name);
     },
     inputs: () => [...inputsOf(planId).values()],
