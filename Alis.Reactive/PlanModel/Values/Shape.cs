@@ -37,6 +37,10 @@ namespace Alis.Reactive.PlanModel
         internal static readonly Shape Any = new Shape("any");
         internal static readonly Shape None = new Shape("none");
 
+        /// <summary>Every kind a shape can be, as the contract declares them; array wraps an item, nullable an inner shape, object its fields.</summary>
+        internal static readonly IReadOnlyList<string> Kinds =
+            new[] { "any", "array", "boolean", "date", "instant", "none", "nullable", "number", "object", "string" };
+
         // The item of an array or the inner shape of a nullable: one shape for those two kinds, none for
         // the others. A list, not a None sentinel, because None is itself built by these constructors.
         private readonly IReadOnlyList<Shape> _wrapped;
