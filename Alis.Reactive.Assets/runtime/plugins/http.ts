@@ -13,7 +13,7 @@
 // H6 The body is read by Content-Type: JSON parsed, text and HTML kept as text, anything else missing.
 // H7 Status 0 means no usable response: the network failed, or a JSON body could not be parsed.
 
-import type { Module } from "../objects/modules";
+import type { Plugin } from "../objects/plugins";
 import { asText, isMissing } from "../grammar/shape";
 import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
@@ -192,7 +192,7 @@ async function readBody(response: Response): Promise<unknown> {
   return undefined;
 }
 
-export const httpModule: Module = {
+export const httpPlugin: Plugin = {
   object: () => httpObject,
 };
 

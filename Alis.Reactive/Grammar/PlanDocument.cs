@@ -109,7 +109,7 @@ namespace Alis.Reactive.Grammar
         internal override bool SameAs(VendorListening other) => other is AssignmentListening;
     }
 
-    /// <summary>How the runtime finds an object: on an element, or made by a registered module.</summary>
+    /// <summary>How the runtime finds an object: on an element, or made by a registered plugin.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ObjectLocator>))]
     internal abstract class ObjectLocator
     {
@@ -132,7 +132,7 @@ namespace Alis.Reactive.Grammar
         public string Vendor { get; }
     }
 
-    /// <summary><c>plugin(name, key, data)</c>: an object of the module a bundle registered under the name.</summary>
+    /// <summary><c>plugin(name, key, data)</c>: an object of the plugin a bundle registered under the name.</summary>
     internal sealed class PluginLocator : ObjectLocator
     {
         internal PluginLocator(string name, string key, PluginData data)
@@ -149,7 +149,7 @@ namespace Alis.Reactive.Grammar
         public PluginData Data { get; }
     }
 
-    /// <summary>What a plan contributes to a module, under its owner.</summary>
+    /// <summary>What a plan contributes to a plugin, under its owner.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<PluginData>))]
     internal abstract class PluginData
     {
@@ -158,7 +158,7 @@ namespace Alis.Reactive.Grammar
         internal static PluginData None { get; } = new NoPluginData();
     }
 
-    /// <summary>A module object that takes no data from the plan.</summary>
+    /// <summary>A plugin object that takes no data from the plan.</summary>
     internal sealed class NoPluginData : PluginData
     {
         public string Kind => "none";

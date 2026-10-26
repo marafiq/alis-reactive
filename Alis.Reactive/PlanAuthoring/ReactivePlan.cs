@@ -63,7 +63,7 @@ namespace Alis.Reactive
         {
             var plugin = new TPlugin();
             _context.RegisterPlugin(plugin.Name);
-            plugin.BindTo(new ModuleBinding(Receiver.Plugin(plugin.Name), _context));
+            plugin.BindTo(new ModuleBinding(Target.Plugin(plugin.Name), _context));
             return plugin;
         }
 

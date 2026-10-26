@@ -1,11 +1,11 @@
 // The located objects of one plan: an element through its vendor's data, or a plugin through the
-// module registered under its name (grammar.md 1.1). Elements are looked up at every use and never
+// plugin registered under its name (grammar.md 1.1). Elements are looked up at every use and never
 // cached, so a slot's content can change underneath a plan (grammar.md E1).
 
 import type { ElementLocator, ObjectLocator, PlanDocument, Vendor } from "../types/index";
 import type { World } from "../grammar/evaluate";
 import { read } from "../grammar/paths";
-import { moduleNamed } from "./modules";
+import { pluginNamed } from "./plugins";
 import type { Owner } from "./owner";
 import { subscribeVendor, vendorObject, type Listener } from "./vendor-driver";
 
@@ -14,7 +14,7 @@ export class PlanWorld implements World {
 
   object(id: string): unknown {
     const locator = this.locator(id);
-    if (locator.kind === "plugin") return moduleNamed(locator.name).object(locator.key);
+    if (locator.kind === "plugin") return pluginNamed(locator.name).object(locator.key);
     return vendorObject(this.requireElement(locator), locator.vendor, this.vendor(locator));
   }
 
@@ -28,9 +28,9 @@ export class PlanWorld implements World {
     const locator = this.locator(id);
     if (locator.kind === "plugin") {
       if (path.length > 0) throw new Error(`[alis] plugin "${locator.name}" has no object at ${path.join(".")}`);
-      const module = moduleNamed(locator.name);
-      if (!module.subscribe) throw new Error(`[alis] plugin "${locator.name}" has no events`);
-      module.subscribe(locator.key, event, listener, owner);
+      const plugin = pluginNamed(locator.name);
+      if (!plugin.subscribe) throw new Error(`[alis] plugin "${locator.name}" has no events`);
+      plugin.subscribe(locator.key, event, listener, owner);
       return;
     }
 

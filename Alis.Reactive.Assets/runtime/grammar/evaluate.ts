@@ -24,7 +24,7 @@ export function childScope(scope: Scope): Scope {
   return { env: scope.env.child(), world: scope.world };
 }
 
-/** The scope a module evaluates a plan's own expressions in: nothing bound, the plan's objects. */
+/** The scope a plugin evaluates a plan's own expressions in: nothing bound, the plan's objects. */
 export function rootScope(world: World): Scope {
   return { env: Environment.root(), world };
 }

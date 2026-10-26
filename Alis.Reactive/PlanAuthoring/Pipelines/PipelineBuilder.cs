@@ -159,7 +159,7 @@ namespace Alis.Reactive.Builders
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             var live = new TStream();
-            live.BindTo(new ModuleBinding(Receiver.Stream(stream.Url), Context));
+            live.BindTo(new ModuleBinding(Target.Stream(stream.Url), Context));
             return live;
         }
 
@@ -175,7 +175,7 @@ namespace Alis.Reactive.Builders
         {
             if (hub == null) throw new ArgumentNullException(nameof(hub));
             var live = new THub();
-            live.BindTo(new ModuleBinding(Receiver.Hub(hub.Url), Context));
+            live.BindTo(new ModuleBinding(Target.Hub(hub.Url), Context));
             return live;
         }
 
@@ -206,7 +206,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.DeclareElement(elementId);
-            var responseBody = ValueExpression.Get(Receiver.Response(ResponseHandle.Innermost), Shape.None);
+            var responseBody = ValueExpression.Get(Target.Response(ResponseHandle.Innermost), Shape.None);
             Context.AddStep(new InjectStep(elementId, responseBody));
             return this;
         }

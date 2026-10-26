@@ -2,8 +2,8 @@
 
 Root CLAUDE.md is authoritative. This directory runs the plans C# renders. The plan is a small
 grammar (`docs/design/grammar.md`, normative): objects located on elements or made by registered
-modules, handlers of their events, six statements and nine expressions. The interpreter names no
-feature; every feature is a module.
+plugins, handlers of their events, six statements and nine expressions. The interpreter names no
+feature; every feature is a plugin.
 
 ## Layout and import directions
 
@@ -11,12 +11,12 @@ feature; every feature is a module.
   statements (`execute.ts`). It imports nothing outside `grammar/`, `types/`, `shared/` and
   `diagnostics/` (traces). The architecture test enforces every layer's import direction.
 - `objects/` locates objects (element locators through a vendor's data, plugin locators through a
-  registered module), and holds owners (the page, a slot) with their disposers.
-- `plans/` discovers plan scripts, starts an owner (contribute module data, subscribe handlers,
+  registered plugin), and holds owners (the page, a slot) with their disposers.
+- `plans/` discovers plan scripts, starts an owner (contribute plugin data, subscribe handlers,
   run `ready`), and announces `alis:mount` / `alis:unmount`.
-- `modules/` are the framework's built-in objects: `alis.document`, `alis.http`, `alis.model`,
+- `plugins/` are the framework's built-in objects: `alis.document`, `alis.http`, `alis.model`,
   `alis.form`, `alis.slot`. `realtime/` holds `alis.stream` and `alis.hub`.
-- `root.ts` registers the modules, drains `window.__alisPlugins`, announces `alis:mount`, and boots
+- `root.ts` registers the plugins, drains `window.__alisPlugins`, announces `alis:mount`, and boots
   the page.
 - The framework's own component code (Native and Fusion widgets, Confirm, Drawer, Loader) is not
   here: it lives in `../components/`, constructs on `alis:mount` and queues plugins, as an app's

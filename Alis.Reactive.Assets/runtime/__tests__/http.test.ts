@@ -1,7 +1,7 @@
 // alis.http (grammar.md 6.2): the wire rules a request sentence relies on.
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { send, type HttpRequest } from "../modules/http";
+import { send, type HttpRequest } from "../plugins/http";
 import { shaped } from "../grammar/shape";
 
 interface Captured {

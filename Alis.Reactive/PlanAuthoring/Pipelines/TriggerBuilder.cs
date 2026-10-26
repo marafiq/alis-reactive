@@ -135,7 +135,7 @@ namespace Alis.Reactive.Builders
 
         private TriggerBuilder<TModel> On<TPayload>(Func<ObjectTable, string> on, string eventName, Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
         {
-            var payload = new Data<TPayload>(Receiver.Event);
+            var payload = new Data<TPayload>(Target.Event);
             _context.On(on, G.NoPath, eventName, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
             return this;
         }

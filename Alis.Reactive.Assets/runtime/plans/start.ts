@@ -7,7 +7,7 @@ import type { Handler, PlanDocument } from "../types/index";
 import { Environment } from "../grammar/environment";
 import { isPromise } from "../grammar/evaluate";
 import { executeBlock } from "../grammar/execute";
-import { moduleNamed } from "../objects/modules";
+import { pluginNamed } from "../objects/plugins";
 import type { Owner } from "../objects/owner";
 import { PlanWorld } from "../objects/world";
 import { logger } from "../diagnostics/trace";
@@ -26,9 +26,9 @@ export function startOwner(owner: Owner, plans: readonly PlanDocument[]): void {
 function contribute(world: PlanWorld, owner: Owner): void {
   for (const [id, locator] of Object.entries(world.plan.objects)) {
     if (locator.kind !== "plugin" || locator.data.kind === "none") continue;
-    const module = moduleNamed(locator.name);
-    if (!module.contribute) throw new Error(`[alis] plugin "${locator.name}" takes no data (object "${id}")`);
-    module.contribute({ key: locator.key, data: locator.data, owner, plan: world.plan, world });
+    const plugin = pluginNamed(locator.name);
+    if (!plugin.contribute) throw new Error(`[alis] plugin "${locator.name}" takes no data (object "${id}")`);
+    plugin.contribute({ key: locator.key, data: locator.data, owner, plan: world.plan, world });
   }
 }
 

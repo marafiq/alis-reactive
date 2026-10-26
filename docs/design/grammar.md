@@ -22,7 +22,7 @@ listen    := method(subscribe, unsubscribe)   object[subscribe](event, fn) adds 
            | assignment                       object[event] = fn; a function already there runs first, and is put back on unload
 object    := id -> locator
 locator   := element(id, vendor)            found on an element, through its vendor's data
-           | plugin(name, key, data)        made by the module a bundle registered under `name`
+           | plugin(name, key, data)        made by the plugin a bundle registered under `name`
 handler   := { on: object, path, event, do: block }     the block reads the payload as `e`
 ```
 
@@ -32,17 +32,17 @@ That is the whole document. The grammar names no feature.
   `event` is heard: empty for the object itself, the holding member's path for an object it holds
   (`Object<T>()` on a property). The vendor subscribes on the object at that path; a plugin has no
   path.
-- **Plugins.** A module is registered by name by a JavaScript bundle:
+- **Plugins.** A plugin is registered by name by a JavaScript bundle:
   - the framework's own bundle registers `alis.document`, `alis.http`, `alis.model`, `alis.form`,
     `alis.slot`, `alis.stream` and `alis.hub`;
   - an app registers its own plugins.
 
-  `key` picks one object of the module (empty for a singleton): a form's container ID, a slot's
+  `key` picks one object of the plugin (empty for a singleton): a form's container ID, a slot's
   container ID, a stream's URL. The framework's features use the same extension point an app does.
-- **Plugin data.** `data` is JSON the module defines, and it may contain expressions. Each plan
-  contributes its data under its owner, and the module joins the contributions per key. The C#
-  declaration of each module states its data type, so the generated contract types it too.
-- **Inputs and forms are module data.**
+- **Plugin data.** `data` is JSON the plugin defines, and it may contain expressions. Each plan
+  contributes its data under its owner, and the plugin joins the contributions per key. The C#
+  declaration of each plugin states its data type, so the generated contract types it too.
+- **Inputs and forms are plugin data.**
   - The inputs of a view are `alis.model` data: `{ inputs: { id: { name, body, value, shape,
     committed, list } } }`: the MVC binding name, the JSON body path, the value as an expression of
     the located object, the shape it reads as, the event that commits a value (M4), and whether the
@@ -97,7 +97,7 @@ A member read followed by a data read is two nested `get` nodes.
   member fails loudly instead of reading `undefined`. The items a `[]` reads are checked the same
   way, so an upload whose files lost `rawFile` fails at the item instead of posting nothing.
 - **Every other path is optional.** This covers paths off a handler's payload, a response, a record,
-  a module's data (`document.query`, `model.values`) or a returned object. A missing link reads as
+  a plugin's data (`document.query`, `model.values`) or a returned object. A missing link reads as
   missing, and a call on a missing receiver returns missing. This is JavaScript's `?.`.
 - **Writes.**
   - A `set` rooted at `obj(id)` needs every segment, the final member included, so a write to a
@@ -346,7 +346,7 @@ A failing handler is logged and stops no other handler.
    `window.__alisReactiveBoot` is set to `{ booted, planId }`, and the document raises `alis:booted`
    with `detail.planId` (`Alis.Reactive.Assets/runtime/root.ts:58-60`). The Playwright tests wait on these.
 4. **Unloading a slot** runs its owner's disposers, and the boot-owned ones stay. A block that is
-   already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/modules/slot.ts:54-60`
+   already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:54-60`
    disposes the owner and nothing else).
 5. **Mount events.** The app hears `alis:unmount` and `alis:mount` on the document, with
    `detail.root`, around every change of content. This is the public contract with app bundles
@@ -445,13 +445,13 @@ A button inside a vendor template (`FusionTemplate.Create<TRow>()` … `.EventBu
 `Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml:17` writes
 `.EventButton("Start review", WingReviewEvents.StartReview, e => e.ResidentId, m => m.ResidentId, "e-small")`)
 raises a declared `AppEvent<T>` and fills one payload member from the row. It renders
-`data-alis-raise="name"` and its detail as attributes, not an inline `onclick`. The document module raises the event when it
+`data-alis-raise="name"` and its detail as attributes, not an inline `onclick`. The document plugin raises the event when it
 is clicked (6.1), and handlers hear it with `on(document, name)`.
 
 ## 6. The vocabulary: built-in objects and what each must do
 
 Each built-in object is a plugin, declared in C# through the object contract like any component,
-with its data type, and implemented once as a module of its package's bundle. The interpreter
+with its data type, and implemented once as a plugin of its package's bundle. The interpreter
 imports none of them. The obligations are numbered so that tests and code can cite them.
 
 ### 6.1 `document` (`plugin("alis.document")`)
@@ -461,7 +461,7 @@ imports none of them. The obligations are numbered so that tests and code can ci
 - **D2 `raise(name, detail)`.** Synchronous. It dispatches a non-bubbling `CustomEvent` carrying the
   detail the plan gives it; a dispatch without a payload gives an empty record. A listener's payload
   is `detail`, or the event itself when the detail is missing
-  (`Alis.Reactive.Assets/runtime/modules/document.ts`).
+  (`Alis.Reactive.Assets/runtime/plugins/document.ts`).
 - **D3 `query`.** The query string as a record, read the way MVC binds `[FromQuery]`:
   - keys match case-insensitively;
   - an array member reads every value;
@@ -483,15 +483,15 @@ no key (H2) and no entry (H4).
   - An array becomes repeated keys.
   - A missing scalar is sent empty (`name=`).
   - A missing array sends no key, because `name=` binds as a collection holding one null
-    (`Alis.Reactive.Assets/runtime/modules/http.ts:112-128`).
+    (`Alis.Reactive.Assets/runtime/plugins/http.ts:112-128`).
   - A `File` cannot be sent in a GET; it is a boundary error.
 - **H3 JSON.** `values` is the body. It is a binding read (2.1): dates serialize as their local text, and `""`
-  is sent as `null` (`Alis.Reactive.Assets/runtime/modules/http.ts:168-178`). An empty record sends no body.
+  is sent as `null` (`Alis.Reactive.Assets/runtime/plugins/http.ts:168-178`). An empty record sends no body.
 - **H4 Form data.** One entry per key.
   - Arrays repeat the key.
   - A `File` is appended with its name, and a date is its local text.
   - A missing scalar is sent empty.
-  - A missing array sends no entry (`Alis.Reactive.Assets/runtime/modules/http.ts:136-153`).
+  - A missing array sends no entry (`Alis.Reactive.Assets/runtime/plugins/http.ts:136-153`).
 - **H5 Headers.** A header whose value is missing is omitted.
 - **H6 Body.** The body is read by Content-Type: JSON is parsed, text and HTML stay text, and an
   empty or other body is missing.
@@ -544,7 +544,7 @@ no key (H2) and no entry (H4).
     and shows nothing: the server said nothing the form can place.
 - **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
   unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
-  plans it touched (the form module's contribution in `Alis.Reactive.Assets/runtime/modules/form/form.ts`). Content rendered with the page belongs to the page even inside
+  plans it touched (the form plugin's contribution in `Alis.Reactive.Assets/runtime/plugins/form/form.ts`). Content rendered with the page belongs to the page even inside
   a slot's container: when a load replaces it, its tests stay, and its fields, no longer rendered,
   are checked as missing values (F5). A form whose steps replace each other in one slot therefore
   loads its first step into the slot too (the intake journey, `Validation/IntakeSteps`).
@@ -590,7 +590,7 @@ no key (H2) and no entry (H4).
   async; `state` and `connectionId` are properties; `reconnecting`, `reconnected` and `close` are
   events.
 
-### 6.8 App objects (each its package's runtime module, located as a plugin: `plugin("alis.confirm")`)
+### 6.8 App objects (each its package's runtime plugin: `plugin("alis.confirm")`)
 
 - **Confirm** (Fusion):
   - C1: `ask(message)` is async and resolves true on OK, and false on Cancel, close or Escape.
@@ -607,7 +607,7 @@ no key (H2) and no entry (H4).
   - W1: Closing empties its content element without unloading the slot loaded into it
     (`Alis.Reactive.Assets/components/native/drawer.ts:51-52`).
 - **Toast** (Fusion): its declared members, and no obligation beyond them.
-- **Native CheckList and RadioGroup:** the native module defines `value` and `isInteracted` on the
+- **Native CheckList and RadioGroup:** the native plugin defines `value` and `isInteracted` on the
   element (`Alis.Reactive.Assets/components/native/check-list.ts`, `radio-group.ts`), replacing the
   inline view scripts.
 
@@ -745,10 +745,10 @@ It reads the rules by their classes, not the plan.
 **TypeScript** (`Alis.Reactive.Assets`)
 - `runtime/grammar`: `evaluate` (the nine expressions), `execute` (the six statements, await),
   `operators`, `paths`, `shape` and `environment`. It imports nothing below.
-- `runtime/objects`: the two locators (`world`), the vendor driver, the modules registered by name,
+- `runtime/objects`: the two locators (`world`), the vendor driver, the plugins registered by name,
   and owners.
 - `runtime/plans`: discovery, start and the mount events.
-- `runtime/modules`: `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`;
+- `runtime/plugins`: `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`;
   `runtime/realtime`: `alis.stream`, `alis.hub` and the retry indicator. The framework bundle
   registers all seven; they receive the evaluator and do not import the executor.
 - `components/` (beside `runtime/`, in the same shipped bundle): the framework's own component code,

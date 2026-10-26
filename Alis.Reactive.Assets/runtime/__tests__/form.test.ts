@@ -2,17 +2,17 @@
 
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import type { FormField, FormPluginData, ModelPluginData } from "../types/index";
-import { registerModule, resetModulesForTests } from "../objects/modules";
+import { registerPlugin, resetPluginsForTests } from "../objects/plugins";
 import { Owner } from "../objects/owner";
 import { startOwner } from "../plans/start";
-import { formModule, resetFormsForTests, type FormObject } from "../modules/form/form";
-import { modelModule, resetModelForTests } from "../modules/model";
+import { formPlugin, resetFormsForTests, type FormObject } from "../plugins/form/form";
+import { modelPlugin, resetModelForTests } from "../plugins/model";
 import { e, element, fakeWidget, plan, plugin, s } from "./support/plan";
 
 beforeAll(() => {
-  resetModulesForTests();
-  registerModule("alis.form", formModule);
-  registerModule("alis.model", modelModule);
+  resetPluginsForTests();
+  registerPlugin("alis.form", formPlugin);
+  registerPlugin("alis.model", modelPlugin);
 });
 
 afterEach(() => {
@@ -49,7 +49,7 @@ function startForm(
   const objects: Record<string, ReturnType<typeof element>> = { form: plugin("alis.form", containerId, data) };
   for (const id of [...fields.map(f => f.id), ...others]) objects[id] = element(id, "native");
   startOwner(Owner.page(), [plan(objects, [])]);
-  return formModule.object(containerId) as FormObject;
+  return formPlugin.object(containerId) as FormObject;
 }
 
 const errorText = (id: string) => document.getElementById(`${id}_error`)?.textContent;

@@ -20,7 +20,7 @@ namespace Alis.Reactive
         internal PlanBuildContext Context { get; }
 
         /// <summary>The object, found when the step runs.</summary>
-        internal abstract Receiver Locate();
+        internal abstract Target Locate();
 
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
         {
@@ -62,10 +62,10 @@ namespace Alis.Reactive
             _vendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
         }
 
-        internal override Receiver Locate()
+        internal override Target Locate()
         {
             Context.DeclareComponent(_componentId, _vendor);
-            return Receiver.Element(_componentId);
+            return Target.Element(_componentId);
         }
     }
 
@@ -80,21 +80,21 @@ namespace Alis.Reactive
         {
         }
 
-        internal override Receiver Locate() => Receiver.Event;
+        internal override Target Locate() => Target.Event;
     }
 
-    /// <summary>An object a registered module makes: a plugin by its name, a stream or a hub by its URL.</summary>
+    /// <summary>An object a registered plugin makes: a plugin by its name, a stream or a hub by its URL.</summary>
     internal sealed class ModuleBinding : ObjectBinding
     {
-        private readonly Receiver _object;
+        private readonly Target _object;
 
-        internal ModuleBinding(Receiver @object, PlanBuildContext context)
+        internal ModuleBinding(Target @object, PlanBuildContext context)
             : base(context)
         {
             _object = @object ?? throw new ArgumentNullException(nameof(@object));
         }
 
-        internal override Receiver Locate() => _object;
+        internal override Target Locate() => _object;
     }
 
     /// <summary>
@@ -111,6 +111,6 @@ namespace Alis.Reactive
 
         internal ValueExpression Result { get; }
 
-        internal override Receiver Locate() => Receiver.Returned(Result);
+        internal override Target Locate() => Target.Returned(Result);
     }
 }

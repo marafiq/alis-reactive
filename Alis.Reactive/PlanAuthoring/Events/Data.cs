@@ -23,9 +23,9 @@ namespace Alis.Reactive
     /// <typeparam name="TData">The data's type, typically the server's own class.</typeparam>
     public sealed class Data<TData> : TypedSource<TData>
     {
-        private readonly Receiver _data;
+        private readonly Target _data;
 
-        internal Data(Receiver data)
+        internal Data(Target data)
         {
             _data = data ?? throw new ArgumentNullException(nameof(data));
         }

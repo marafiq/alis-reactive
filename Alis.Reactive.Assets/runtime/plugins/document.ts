@@ -8,7 +8,7 @@
 //    absent key reads as missing.
 // D4 A click on an element carrying data-alis-raise raises that event with the element's detail.
 
-import type { Module } from "../objects/modules";
+import type { Plugin } from "../objects/plugins";
 import { logger } from "../diagnostics/trace";
 import { isMissing } from "../grammar/shape";
 
@@ -80,7 +80,7 @@ function wireMarkupRaise(): void {
   }, true);
 }
 
-export const documentModule: Module = {
+export const documentPlugin: Plugin = {
   object: () => {
     wireMarkupRaise();
     return documentObject;

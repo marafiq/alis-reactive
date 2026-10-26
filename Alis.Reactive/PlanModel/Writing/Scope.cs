@@ -267,27 +267,27 @@ namespace Alis.Reactive.PlanModel
             return id;
         }
 
-        internal string Document() => Module(DocumentId, "alis.document", "", PluginData.None);
+        internal string Document() => PluginObject(DocumentId, "alis.document", "", PluginData.None);
 
-        internal string Http() => Module(HttpId, "alis.http", "", PluginData.None);
+        internal string Http() => PluginObject(HttpId, "alis.http", "", PluginData.None);
 
-        internal string Confirm() => Module(ConfirmId, "alis.confirm", "", PluginData.None);
+        internal string Confirm() => PluginObject(ConfirmId, "alis.confirm", "", PluginData.None);
 
-        internal string Model(PluginData data) => Module(ModelId, "alis.model", _planId, data);
+        internal string Model(PluginData data) => PluginObject(ModelId, "alis.model", _planId, data);
 
-        internal string Model() => Module(ModelId, "alis.model", _planId, PluginData.None);
+        internal string Model() => PluginObject(ModelId, "alis.model", _planId, PluginData.None);
 
-        internal string Form(string containerId, PluginData data) => Module("$form:" + containerId, "alis.form", containerId, data);
+        internal string Form(string containerId, PluginData data) => PluginObject("$form:" + containerId, "alis.form", containerId, data);
 
-        internal string Form(string containerId) => Module("$form:" + containerId, "alis.form", containerId, PluginData.None);
+        internal string Form(string containerId) => PluginObject("$form:" + containerId, "alis.form", containerId, PluginData.None);
 
-        internal string Slot(string containerId) => Module("$slot:" + containerId, "alis.slot", containerId, PluginData.None);
+        internal string Slot(string containerId) => PluginObject("$slot:" + containerId, "alis.slot", containerId, PluginData.None);
 
-        internal string Stream(string url) => Module("$stream:" + url, "alis.stream", url, PluginData.None);
+        internal string Stream(string url) => PluginObject("$stream:" + url, "alis.stream", url, PluginData.None);
 
-        internal string Hub(string url) => Module("$hub:" + url, "alis.hub", url, PluginData.None);
+        internal string Hub(string url) => PluginObject("$hub:" + url, "alis.hub", url, PluginData.None);
 
-        internal string Plugin(string name) => Module("$plugin:" + name, name, "", PluginData.None);
+        internal string Plugin(string name) => PluginObject("$plugin:" + name, name, "", PluginData.None);
 
         internal IReadOnlyDictionary<string, ObjectLocator> Snapshot()
         {
@@ -301,7 +301,7 @@ namespace Alis.Reactive.PlanModel
 
         // A module object is declared once, with its data where it has any: the plan writes the model's
         // inputs and each form's rules before any step names them.
-        private string Module(string id, string name, string key, PluginData data)
+        private string PluginObject(string id, string name, string key, PluginData data)
         {
             if (!_objects.ContainsKey(id))
                 Add(id, new PluginLocator(name, key, data));

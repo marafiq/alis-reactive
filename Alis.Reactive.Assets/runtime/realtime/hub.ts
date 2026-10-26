@@ -7,7 +7,7 @@
 //    properties; reconnecting, reconnected and close are events.
 
 import * as signalR from "@microsoft/signalr";
-import type { Module } from "../objects/modules";
+import type { Plugin } from "../objects/plugins";
 import type { Listener } from "../objects/vendor-driver";
 import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
 import { logger } from "../diagnostics/trace";
@@ -114,7 +114,7 @@ function release(url: string, managed: Managed): void {
 
 const LIFECYCLE_EVENTS = new Set(["reconnecting", "reconnected", "close"]);
 
-export const hubModule: Module = {
+export const hubPlugin: Plugin = {
   object: url => {
     const managed = managedFor(url);
     return {

@@ -56,6 +56,7 @@ namespace Alis.Reactive.PlanModel
             });
     }
 
+    /// <summary>The authored unit of a pipeline; it writes the grammar's statements where it is used.</summary>
     internal abstract class Step
     {
         private protected Step() { }
@@ -66,12 +67,12 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Writes a property: of an element or a component, of a plugin, or of data the event handed its callback.</summary>
     internal sealed class SetStep : Step
     {
-        private readonly Receiver _target;
+        private readonly Target _target;
         private readonly IReadOnlyList<string> _path;
         private readonly Shape _shape;
         private readonly ValueExpression _value;
 
-        internal SetStep(Receiver target, IReadOnlyList<string> path, Shape shape, ValueExpression value)
+        internal SetStep(Target target, IReadOnlyList<string> path, Shape shape, ValueExpression value)
         {
             _target = target ?? throw new ArgumentNullException(nameof(target));
             _path = path ?? throw new ArgumentNullException(nameof(path));
@@ -91,13 +92,13 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Calls a method; one declared to return a promise holds the steps after it until it settles.</summary>
     internal sealed class CallStep : Step
     {
-        private readonly Receiver _target;
+        private readonly Target _target;
         private readonly IReadOnlyList<string> _path;
         private readonly IReadOnlyList<ValueExpression> _args;
         private readonly IReadOnlyList<Shape> _argShapes;
         private readonly bool _awaits;
 
-        internal CallStep(Receiver target, IReadOnlyList<string> path, IReadOnlyList<ValueExpression> args, IReadOnlyList<Shape> argShapes, bool awaits)
+        internal CallStep(Target target, IReadOnlyList<string> path, IReadOnlyList<ValueExpression> args, IReadOnlyList<Shape> argShapes, bool awaits)
         {
             _target = target ?? throw new ArgumentNullException(nameof(target));
             _path = path ?? throw new ArgumentNullException(nameof(path));

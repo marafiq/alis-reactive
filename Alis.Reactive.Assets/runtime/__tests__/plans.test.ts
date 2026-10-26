@@ -1,17 +1,17 @@
 // Owners, handlers, the document's ready and raise, and slots (grammar.md 3.5, 6.1, 6.5).
 
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { registerModule, resetModulesForTests } from "../objects/modules";
+import { registerPlugin, resetPluginsForTests } from "../objects/plugins";
 import { Owner } from "../objects/owner";
 import { startOwner } from "../plans/start";
-import { documentModule } from "../modules/document";
-import { slotModule, resetSlotsForTests } from "../modules/slot";
+import { documentPlugin } from "../plugins/document";
+import { slotPlugin, resetSlotsForTests } from "../plugins/slot";
 import { e, element, fakeWidget, on, plan, plugin, s, st } from "./support/plan";
 
 beforeAll(() => {
-  resetModulesForTests();
-  registerModule("alis.document", documentModule);
-  registerModule("alis.slot", slotModule);
+  resetPluginsForTests();
+  registerPlugin("alis.document", documentPlugin);
+  registerPlugin("alis.slot", slotPlugin);
 });
 
 afterEach(() => {
@@ -150,7 +150,7 @@ describe("slots", () => {
     )]);
     expect(pageRuns.textContent).toBe("1");
 
-    const slot = slotModule.object("panel") as { load(html: string): void };
+    const slot = slotPlugin.object("panel") as { load(html: string): void };
     slot.load(slotPlanHtml("from the slot"));
     expect(document.getElementById("inside")?.textContent).toBe("loaded");
     expect(panel.querySelector("[data-reactive-plan]")).toBeNull();
@@ -171,7 +171,7 @@ describe("slots", () => {
     document.addEventListener("alis:unmount", onUnmount);
     document.addEventListener("alis:mount", onMount);
 
-    (slotModule.object("panel") as { load(html: string): void }).load("<p>new</p>");
+    (slotPlugin.object("panel") as { load(html: string): void }).load("<p>new</p>");
     document.removeEventListener("alis:unmount", onUnmount);
     document.removeEventListener("alis:mount", onMount);
     expect(seen).toEqual(["unmount:<p>old</p>", "mount:<p>new</p>"]);
@@ -182,7 +182,7 @@ describe("slots", () => {
     outer.id = "outer";
     document.body.appendChild(outer);
     const status = paragraph("status");
-    const slots = (id: string) => slotModule.object(id) as { load(html: string): void; unload(): void };
+    const slots = (id: string) => slotPlugin.object(id) as { load(html: string): void; unload(): void };
     const innerPlan = plan(
       { document: plugin("alis.document"), status: element("status") },
       [on("document", "shiftChanged", setText("status", e.get(e.ref("e"), ["shift"])))],
@@ -216,7 +216,7 @@ describe("slots", () => {
     const grid = fakeWidget("roster");
     const slotPlan = plan({ roster: element("roster", "fake") }, [on("roster", "rowSelected")]);
     const html = `<script type="application/json" data-reactive-plan>${JSON.stringify(slotPlan)}</script>`;
-    const slot = slotModule.object("panel") as { load(html: string): void; unload(): void };
+    const slot = slotPlugin.object("panel") as { load(html: string): void; unload(): void };
 
     slot.load(html);
     slot.load(html);

@@ -2,16 +2,16 @@
 // event names. The method style is covered by the handler tests in plans.test.ts.
 
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { registerModule, resetModulesForTests } from "../objects/modules";
+import { registerPlugin, resetPluginsForTests } from "../objects/plugins";
 import { Owner } from "../objects/owner";
 import { startOwner } from "../plans/start";
-import { documentModule } from "../modules/document";
+import { documentPlugin } from "../plugins/document";
 import { subscribeVendor } from "../objects/vendor-driver";
 import { e, element, fakeWidget, on, plan, s, st, vendors } from "./support/plan";
 
 beforeAll(() => {
-  resetModulesForTests();
-  registerModule("alis.document", documentModule);
+  resetPluginsForTests();
+  registerPlugin("alis.document", documentPlugin);
 });
 
 afterEach(() => {

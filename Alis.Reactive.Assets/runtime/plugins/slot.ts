@@ -7,7 +7,7 @@
 //    plan only unloads.
 // S2 unload() releases the owners of the slots inside the content, then the slot's own owner.
 
-import type { Module } from "../objects/modules";
+import type { Plugin } from "../objects/plugins";
 import { Owner } from "../objects/owner";
 import { discoverPlans } from "../plans/discover";
 import { announceMount, announceUnmount } from "../plans/mount-events";
@@ -86,7 +86,7 @@ function runInsertedScripts(root: HTMLElement): void {
   }
 }
 
-export const slotModule: Module = {
+export const slotPlugin: Plugin = {
   object: (id): SlotObject => ({
     load: html => load(id, html),
     unload: () => unload(id),

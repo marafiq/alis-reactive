@@ -1,20 +1,20 @@
-// The runtime's entry. It registers the framework's own modules, takes the plugins queued in
+// The runtime's entry. It registers the framework's own plugins, takes the plugins queued in
 // window.__alisPlugins (the app's, and the framework's own components'), announces the page's HTML
 // with alis:mount so every component is constructed, then starts the page's owner with every plan
 // script on the page (grammar.md 3.5) and marks the page booted.
 
-import { registerModule, registerPlugin } from "./objects/modules";
+import { pluginOf, registerPlugin } from "./objects/plugins";
 import { Owner } from "./objects/owner";
 import { discoverPlans } from "./plans/discover";
 import { announceMount } from "./plans/mount-events";
 import { startOwner } from "./plans/start";
-import { documentModule } from "./modules/document";
-import { httpModule } from "./modules/http";
-import { modelModule } from "./modules/model";
-import { formModule } from "./modules/form/form";
-import { slotModule } from "./modules/slot";
-import { streamModule } from "./realtime/stream";
-import { hubModule } from "./realtime/hub";
+import { documentPlugin } from "./plugins/document";
+import { httpPlugin } from "./plugins/http";
+import { modelPlugin } from "./plugins/model";
+import { formPlugin } from "./plugins/form/form";
+import { slotPlugin } from "./plugins/slot";
+import { streamPlugin } from "./realtime/stream";
+import { hubPlugin } from "./realtime/hub";
 import { logger } from "./diagnostics/trace";
 
 const log = logger("boot");
@@ -29,13 +29,13 @@ interface RuntimeWindow extends Window {
   __alisReactiveBoot?: { readonly booted: true };
 }
 
-registerModule("alis.document", documentModule);
-registerModule("alis.http", httpModule);
-registerModule("alis.model", modelModule);
-registerModule("alis.form", formModule);
-registerModule("alis.slot", slotModule);
-registerModule("alis.stream", streamModule);
-registerModule("alis.hub", hubModule);
+registerPlugin("alis.document", documentPlugin);
+registerPlugin("alis.http", httpPlugin);
+registerPlugin("alis.model", modelPlugin);
+registerPlugin("alis.form", formPlugin);
+registerPlugin("alis.slot", slotPlugin);
+registerPlugin("alis.stream", streamPlugin);
+registerPlugin("alis.hub", hubPlugin);
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", start, { once: true });
@@ -45,7 +45,7 @@ if (document.readyState === "loading") {
 
 function start(): void {
   const runtimeWindow = window as RuntimeWindow;
-  for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, plugin.instance);
+  for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, pluginOf(plugin.name, plugin.instance));
   delete runtimeWindow.__alisPlugins;
 
   announceMount(document.body);

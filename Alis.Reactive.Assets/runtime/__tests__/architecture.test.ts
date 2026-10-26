@@ -55,7 +55,7 @@ describe("architecture: plan-driven IDs, no DOM scanning", () => {
   // author, and cleanup by an attribute the runtime itself stamped.
   const wideQueryBoundaries = new Set([
     "plans/discover.ts", // plan scripts in the page and in loaded HTML
-    "modules/slot.ts", // the scripts of loaded HTML, run the way a parsed page runs them
+    "plugins/slot.ts", // the scripts of loaded HTML, run the way a parsed page runs them
     "realtime/retry-indicator.ts", // self-stamped retry markers inside the developer-owned container
   ]);
 
@@ -79,12 +79,12 @@ describe("architecture: vendor isolation", () => {
 
 describe("architecture: import directions", () => {
   // The interpreter is the core and imports nothing that knows a feature: grammar evaluates and
-  // executes, objects locate, plans start owners, and the modules are the vocabulary on top.
+  // executes, objects locate, plans start owners, and the plugins are the vocabulary on top.
   const allowed: Record<string, readonly string[]> = {
     grammar: ["grammar", "types", "shared", "diagnostics"],
     objects: ["objects", "grammar", "types", "shared", "diagnostics"],
     plans: ["plans", "objects", "grammar", "types", "shared", "diagnostics"],
-    modules: ["modules", "plans", "objects", "grammar", "types", "shared", "diagnostics"],
+    plugins: ["plugins", "plans", "objects", "grammar", "types", "shared", "diagnostics"],
     realtime: ["realtime", "objects", "types", "shared", "diagnostics"],
     diagnostics: ["diagnostics", "shared"],
     shared: ["shared"],

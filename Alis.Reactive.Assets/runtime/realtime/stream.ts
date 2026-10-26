@@ -5,7 +5,7 @@
 // R3 A permanent close adds a marker to the retry indicator; one click retries every dropped
 //    connection, and the retried subscriptions keep their owners.
 
-import type { Module } from "../objects/modules";
+import type { Plugin } from "../objects/plugins";
 import type { Listener } from "../objects/vendor-driver";
 import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
 import { logger } from "../diagnostics/trace";
@@ -78,7 +78,7 @@ function release(url: string, managed: Managed, subscription: Subscription): voi
   log.debug("connection.closed", { url });
 }
 
-export const streamModule: Module = {
+export const streamPlugin: Plugin = {
   object: url => ({
     // A URL no handler listens to has no source: it reads as closed.
     get readyState() {

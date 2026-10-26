@@ -141,13 +141,13 @@ namespace Alis.Reactive.Builders.Arrays
             {
                 var shape = Shape.FromClrType(node.Type);
                 return path.IsNone
-                    ? ValueExpression.Get(Receiver.Item, shape)
-                    : ValueExpression.Get(Receiver.Item, path.Text, shape);
+                    ? ValueExpression.Get(Target.Item, shape)
+                    : ValueExpression.Get(Target.Item, path.Text, shape);
             }
 
-            // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the receiver must
+            // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the target must
             // be rooted at the element and the method must be deterministic. Reuses the RuntimePath.call engine.
-            if (node is MethodCallExpression call && call.Object != null && ExpressionPathHelper.TryJsonPath(call.Object, element, out var receiverPath))
+            if (node is MethodCallExpression call && call.Object != null && ExpressionPathHelper.TryJsonPath(call.Object, element, out var targetPath))
             {
                 var methodName = JsonMemberName.Of(call.Method.Name);
                 if (!PureElementMethods.Contains(methodName))
@@ -162,7 +162,7 @@ namespace Alis.Reactive.Builders.Arrays
 
                 var unconverted = methodArgs.Select(_ => Shape.None).ToList();
                 return ValueExpression.Call(
-                    Receiver.Item, receiverPath.Then(methodName).TargetText, methodArgs, unconverted, Shape.FromClrType(node.Type), methodName);
+                    Target.Item, targetPath.Then(methodName).TargetText, methodArgs, unconverted, Shape.FromClrType(node.Type), methodName);
             }
 
             if (ReferencesParameter(node, element))

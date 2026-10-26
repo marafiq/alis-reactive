@@ -66,21 +66,21 @@ namespace Alis.Reactive.PlanModel
         // ── reads ────────────────────────────────────────────────────────────────
 
         /// <summary>A property of an object, or a path into data; with no path, the object or data itself.</summary>
-        internal static ValueExpression Get(Receiver receiver, IReadOnlyList<string> path, Shape shape) =>
-            new GetExpression(receiver, path, shape);
+        internal static ValueExpression Get(Target target, IReadOnlyList<string> path, Shape shape) =>
+            new GetExpression(target, path, shape);
 
-        internal static ValueExpression Get(Receiver receiver, Shape shape) =>
-            new GetExpression(receiver, G.NoPath, shape);
+        internal static ValueExpression Get(Target target, Shape shape) =>
+            new GetExpression(target, G.NoPath, shape);
 
         /// <summary>What a method of an object returns.</summary>
         internal static CallExpression Call(
-            Receiver receiver,
+            Target target,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
             Shape shape,
             string member) =>
-            new CallExpression(receiver, path, args, argShapes, shape, member);
+            new CallExpression(target, path, args, argShapes, shape, member);
 
         internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits) =>
             new MethodResultExpression(call, member, awaits);
@@ -169,13 +169,13 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class GetExpression : ValueExpression
     {
-        private readonly Receiver _receiver;
+        private readonly Target _target;
         private readonly IReadOnlyList<string> _path;
         private readonly Shape _shape;
 
-        internal GetExpression(Receiver receiver, IReadOnlyList<string> path, Shape shape)
+        internal GetExpression(Target target, IReadOnlyList<string> path, Shape shape)
         {
-            _receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
+            _target = target ?? throw new ArgumentNullException(nameof(target));
             _path = path ?? throw new ArgumentNullException(nameof(path));
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
@@ -185,11 +185,11 @@ namespace Alis.Reactive.PlanModel
         // Data a callback received is shown as the server or the event sent it; an object's member, the URL
         // and a method read keep their type, which decides how they are read.
         internal override ValueExpression AsArrived() =>
-            _receiver.IsData ? new GetExpression(_receiver, _path, Shape.None) : this;
+            _target.IsData ? new GetExpression(_target, _path, Shape.None) : this;
 
         internal override Expr Write(Scope scope)
         {
-            var (root, prefix) = _receiver.Write(scope);
+            var (root, prefix) = _target.Write(scope);
             var path = prefix.Concat(_path).ToList();
             return path.Count == 0 ? G.As(root, _shape) : G.Get(root, path, _shape);
         }
@@ -197,7 +197,7 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class CallExpression : ValueExpression
     {
-        private readonly Receiver _receiver;
+        private readonly Target _target;
         private readonly IReadOnlyList<string> _path;
         private readonly IReadOnlyList<ValueExpression> _args;
         private readonly IReadOnlyList<Shape> _argShapes;
@@ -205,14 +205,14 @@ namespace Alis.Reactive.PlanModel
         private readonly string _member;
 
         internal CallExpression(
-            Receiver receiver,
+            Target target,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
             Shape shape,
             string member)
         {
-            _receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
+            _target = target ?? throw new ArgumentNullException(nameof(target));
             _path = path ?? throw new ArgumentNullException(nameof(path));
             _args = args ?? throw new ArgumentNullException(nameof(args));
             _argShapes = argShapes ?? throw new ArgumentNullException(nameof(argShapes));
@@ -231,7 +231,7 @@ namespace Alis.Reactive.PlanModel
 
         private Expr WriteCall(Scope scope, Shape shape)
         {
-            var (root, prefix) = _receiver.Write(scope);
+            var (root, prefix) = _target.Write(scope);
             var args = _args.Select(arg => arg.Write(scope)).ToList();
             return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, shape);
         }

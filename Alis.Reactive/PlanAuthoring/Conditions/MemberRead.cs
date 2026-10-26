@@ -11,10 +11,10 @@ namespace Alis.Reactive
     /// <typeparam name="TProp">The C# type of the member.</typeparam>
     internal sealed class MemberRead<TProp> : TypedSource<TProp>
     {
-        private readonly Func<Receiver> _locate;
+        private readonly Func<Target> _locate;
         private readonly Path _path;
 
-        internal MemberRead(Func<Receiver> locate, Path path)
+        internal MemberRead(Func<Target> locate, Path path)
         {
             _locate = locate ?? throw new ArgumentNullException(nameof(locate));
             _path = path ?? throw new ArgumentNullException(nameof(path));

@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders.Requests
             Action<Data<TResponse>, PipelineBuilder<TModel>> pipeline)
             where TResponse : class
         {
-            var body = new Data<TResponse>(Receiver.Response(Routes.Handle));
+            var body = new Data<TResponse>(Target.Response(Routes.Handle));
             Routes.OnSuccess(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
@@ -80,7 +80,7 @@ namespace Alis.Reactive.Builders.Requests
             Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var body = new Data<TError>(Receiver.Response(Routes.Handle));
+            var body = new Data<TError>(Target.Response(Routes.Handle));
             Routes.OnError(PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
@@ -99,7 +99,7 @@ namespace Alis.Reactive.Builders.Requests
             Action<Data<TError>, PipelineBuilder<TModel>> pipeline)
             where TError : class
         {
-            var body = new Data<TError>(Receiver.Response(Routes.Handle));
+            var body = new Data<TError>(Target.Response(Routes.Handle));
             Routes.OnError(statusCode, PipelineBuilder<TModel>.Build(_context, p => pipeline(body, p)));
             return this;
         }
@@ -135,7 +135,7 @@ namespace Alis.Reactive.Builders.Requests
             where TResponse : class
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            var body = new Data<TResponse>(Receiver.Response(Routes.Handle));
+            var body = new Data<TResponse>(Target.Response(Routes.Handle));
             return Chained(start => request(body, start));
         }
     }

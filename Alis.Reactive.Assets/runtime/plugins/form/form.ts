@@ -16,7 +16,7 @@
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the summary.
 
 import type { FormField, FormTest } from "../../types/index";
-import type { Contribution, Module } from "../../objects/modules";
+import type { Contribution, Plugin } from "../../objects/plugins";
 import type { Owner } from "../../objects/owner";
 import type { PlanWorld } from "../../objects/world";
 import { evaluate, rootScope } from "../../grammar/evaluate";
@@ -259,7 +259,7 @@ function listenForMounts(): void {
   document.addEventListener(MOUNT_EVENT, wireMountedFields);
 }
 
-export const formModule: Module = {
+export const formPlugin: Plugin = {
   object: (containerId): FormObject => ({
     validate: () => validate(containerId),
     showErrors: problem => showErrors(containerId, problem),

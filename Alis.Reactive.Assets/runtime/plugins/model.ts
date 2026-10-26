@@ -15,7 +15,7 @@
 //    the server will; missing when no plan rendered it.
 
 import type { InputBinding } from "../types/index";
-import type { Contribution, Module } from "../objects/modules";
+import type { Contribution, Plugin } from "../objects/plugins";
 import type { PlanWorld } from "../objects/world";
 import { Environment } from "../grammar/environment";
 import { evaluate } from "../grammar/evaluate";
@@ -125,7 +125,7 @@ function assignAt(root: Record<string, unknown>, path: readonly (string | number
   parent[path[path.length - 1]!] = value;
 }
 
-export const modelModule: Module = {
+export const modelPlugin: Plugin = {
   object: planId => modelObject(planId),
   contribute({ key, data, owner, world }: Contribution) {
     if (data.kind !== "model") return;

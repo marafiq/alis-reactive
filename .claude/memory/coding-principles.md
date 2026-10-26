@@ -108,7 +108,7 @@ a missing secret, mention the possibility without reading the secret store.
 
 ### Live Re-Validation
 - Industry standard: clear on input, re-validate on blur and on the input's commit event.
-- Submit, blur and commit use the same rule evaluation (`runtime/modules/form/form.ts`, `wireLive`).
+- Submit, blur and commit use the same rule evaluation (`runtime/plugins/form/form.ts`, `wireLive`).
 - Typing clears the message in the capture phase, before the component hears the keystroke, so a commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks after the clear and its message stays.
 
 ## Validation Session Mistake Patterns
