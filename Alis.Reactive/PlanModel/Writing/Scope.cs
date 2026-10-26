@@ -64,7 +64,29 @@ namespace Alis.Reactive.PlanModel
             var name = Fresh(stem);
             _plan.Hoist(G.Let(name, call(), awaits), member);
             _results.Add(result, name);
+            _plan.Written(result);
             return G.Ref(name);
+        }
+
+        /// <summary>
+        /// A promise's own line: written at the end of the block, at <paramref name="index"/>, unless a
+        /// statement of the block or of a block inside it bound the result first (grammar.md 3.1).
+        /// </summary>
+        internal void DeferOwnLine(object result, int index, Func<IReadOnlyList<Statement>> write)
+        {
+            if (_results == null)
+                throw new InvalidOperationException($"Plan '{PlanId}' calls a method outside a reaction.");
+            _results.Defer(result, index, write);
+        }
+
+        internal void WriteDeferred(List<Statement> block)
+        {
+            if (_results == null) return;
+            foreach (var (result, index, write) in _results.Deferred)
+            {
+                if (_plan.WasWritten(result)) continue;
+                block.InsertRange(index, write());
+            }
         }
 
         /// <summary>The binding of the response the handle names; the innermost one for <see cref="ResponseHandle.Innermost"/>.</summary>
@@ -91,6 +113,8 @@ namespace Alis.Reactive.PlanModel
         private sealed class ResultFrame
         {
             private readonly Dictionary<object, string> _bound = new Dictionary<object, string>();
+            private readonly List<(object Result, int Index, Func<IReadOnlyList<Statement>> Write)> _deferred =
+                new List<(object, int, Func<IReadOnlyList<Statement>>)>();
 
             internal ResultFrame(ResultFrame? outer)
             {
@@ -102,6 +126,12 @@ namespace Alis.Reactive.PlanModel
             internal bool TryGet(object result, out string name) => _bound.TryGetValue(result, out name!);
 
             internal void Add(object result, string name) => _bound.Add(result, name);
+
+            internal void Defer(object result, int index, Func<IReadOnlyList<Statement>> write) => _deferred.Add((result, index, write));
+
+            // Later lines first, so an insertion never moves an earlier line's index.
+            internal IEnumerable<(object Result, int Index, Func<IReadOnlyList<Statement>> Write)> Deferred =>
+                _deferred.OrderByDescending(deferred => deferred.Index);
         }
 
         private sealed class ResponseFrame
@@ -135,6 +165,9 @@ namespace Alis.Reactive.PlanModel
     {
         private int _names;
 
+        // The method results a let has bound anywhere in the plan being written.
+        private readonly HashSet<object> _written = new HashSet<object>();
+
         // The statements hoisted before the statement being written, such as the let that binds a method's
         // result; null where no statement can run before a value is read, as in an array operation.
         private List<Statement>? _hoisted;
@@ -150,6 +183,10 @@ namespace Alis.Reactive.PlanModel
         internal ObjectTable Objects { get; }
 
         internal string Fresh(string stem) => stem + (++_names).ToString(CultureInfo.InvariantCulture);
+
+        internal void Written(object result) => _written.Add(result);
+
+        internal bool WasWritten(object result) => _written.Contains(result);
 
         internal IReadOnlyList<Statement> WithHoisted(Func<IReadOnlyList<Statement>> write)
         {

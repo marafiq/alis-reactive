@@ -20,13 +20,16 @@ namespace Alis.Reactive.PlanModel
             var block = new List<Statement>();
             var inner = scope.ForBlock();
             foreach (var step in _steps) step.WriteTo(block, inner);
+            inner.WriteDeferred(block);
             return block;
         }
     }
 
     /// <summary>
-    /// The line a method that returns a value is written on. The method runs here when no earlier
-    /// statement of the block read its result; otherwise it already ran before that statement.
+    /// The line a method that returns a value is written on. A method that returns its value runs here,
+    /// in the order the C# wrote it. A method that returns a promise is awaited by the statement that
+    /// first reads its result, wherever in the block or its branches that is, so a condition that waits
+    /// for it asks only when it is reached; it runs here only when no statement reads it.
     /// </summary>
     internal sealed class MethodResultStep : Step
     {
@@ -37,12 +40,20 @@ namespace Alis.Reactive.PlanModel
             _result = result ?? throw new ArgumentNullException(nameof(result));
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithHoisted(() =>
+        internal override void WriteTo(List<Statement> block, Scope scope)
+        {
+            if (_result.ReadsAwaited)
+                scope.DeferOwnLine(_result, block.Count, () => OwnLine(scope));
+            else
+                block.AddRange(OwnLine(scope));
+        }
+
+        private IReadOnlyList<Statement> OwnLine(Scope scope) =>
+            scope.WithHoisted(() =>
             {
                 _result.Write(scope);
                 return G.NoStatements;
-            }));
+            });
     }
 
     internal abstract class Step
