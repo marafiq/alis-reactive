@@ -17,7 +17,9 @@ the grammar says so explicitly instead of inheriting JavaScript's answer.
 
 ```
 plan      := { version, planId, vendors, objects, handlers }
-vendor    := name -> { objectPath, subscribe, unsubscribe, payload: argument | element }
+vendor    := name -> { objectPath, listen, payload: argument | element }
+listen    := method(subscribe, unsubscribe)   object[subscribe](event, fn) adds a listener, object[unsubscribe](event, fn) removes it
+           | assignment                       object[event] = fn; a function already there runs first, and is put back on unload
 object    := id -> locator
 locator   := element(id, vendor)            found on an element, through its vendor's data
            | plugin(name, key, data)        made by the module a bundle registered under `name`
@@ -605,6 +607,16 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - `element`: the element itself, for native inputs whose values are read after an `await`, or a
     `CustomEvent`'s `detail`.
 - **E3 Writes.** A write converts by the member's shape: a date member receives a `Date`.
+- **E4 Listening.** The vendor's `listen` decides how a handler attaches to the object, or to the
+  nested object the handler's path names:
+  - `method`: `object[subscribe](event, fn)` adds the handler and `object[unsubscribe](event, fn)`
+    removes it when its owner unloads;
+  - `assignment`: `object[event] = fn`, for a callback property such as a chart's `options.onClick`.
+    The property must exist on the object (a checked member, 1.3). Assigning adds a listener as
+    `method` would: the function the property already held runs first, with the same `this` and
+    arguments, and keeps running, so a widget's own callback and an earlier handler both stay and two
+    handlers of one event run in plan order. When the handler's owner unloads, the property gets back
+    what it held, skipping handlers whose owners unloaded before it, whatever order owners unload in.
 
 ## 7. Validation projection
 

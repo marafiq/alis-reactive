@@ -34,7 +34,7 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<Handler> Handlers { get; }
     }
 
-    /// <summary>Where a vendor's objects live on an element and how they raise events.</summary>
+    /// <summary>Where a vendor's objects live on an element, how they take a listener, and what a listener receives.</summary>
     internal sealed class Vendor
     {
         /// <summary>What a vendor's listener receives, as the plan names it: one name per declared kind.</summary>
@@ -45,26 +45,68 @@ namespace Alis.Reactive.Grammar
             _ => throw new ArgumentOutOfRangeException(nameof(payload), payload, "A vendor payload the plan has no name for."),
         };
 
-        internal Vendor(IReadOnlyList<string> objectPath, string subscribe, string unsubscribe, string payload)
+        internal Vendor(IReadOnlyList<string> objectPath, VendorListening listen, string payload)
         {
             ObjectPath = objectPath ?? throw new ArgumentNullException(nameof(objectPath));
-            Subscribe = subscribe ?? throw new ArgumentNullException(nameof(subscribe));
-            Unsubscribe = unsubscribe ?? throw new ArgumentNullException(nameof(unsubscribe));
+            Listen = listen ?? throw new ArgumentNullException(nameof(listen));
             Payload = payload ?? throw new ArgumentNullException(nameof(payload));
         }
 
         public IReadOnlyList<string> ObjectPath { get; }
-        public string Subscribe { get; }
-        public string Unsubscribe { get; }
+        public VendorListening Listen { get; }
 
         [ContractType("VendorPayload")]
         public string Payload { get; }
 
         internal bool SameAs(Vendor other) =>
             string.Join(".", ObjectPath) == string.Join(".", other.ObjectPath)
-            && Subscribe == other.Subscribe
-            && Unsubscribe == other.Unsubscribe
+            && Listen.SameAs(other.Listen)
             && Payload == other.Payload;
+    }
+
+    /// <summary>
+    /// How a vendor's objects take a listener (grammar.md 1.1): through a pair of methods, or by
+    /// assignment to the property the event names. These two are the whole set; the method pair
+    /// carries its names and the assignment has nothing to carry, so a vendor cannot name half of each.
+    /// </summary>
+    [JsonConverter(typeof(PlanNodeDiscriminator<VendorListening>))]
+    internal abstract class VendorListening
+    {
+        private protected VendorListening() { }
+
+        internal abstract bool SameAs(VendorListening other);
+    }
+
+    /// <summary><c>method(subscribe, unsubscribe)</c>: <c>object.on(event, fn)</c> adds a listener and <c>object.off(event, fn)</c> removes it.</summary>
+    internal sealed class MethodListening : VendorListening
+    {
+        internal MethodListening(string subscribe, string unsubscribe)
+        {
+            if (string.IsNullOrEmpty(subscribe)) throw new ArgumentException("Subscribe method required.", nameof(subscribe));
+            if (string.IsNullOrEmpty(unsubscribe)) throw new ArgumentException("Unsubscribe method required.", nameof(unsubscribe));
+            Subscribe = subscribe;
+            Unsubscribe = unsubscribe;
+        }
+
+        public string Kind => "method";
+        public string Subscribe { get; }
+        public string Unsubscribe { get; }
+
+        internal override bool SameAs(VendorListening other) =>
+            other is MethodListening method && method.Subscribe == Subscribe && method.Unsubscribe == Unsubscribe;
+    }
+
+    /// <summary>
+    /// <c>assignment</c>: <c>object.onEvent = fn</c> adds the listener after the function the property
+    /// already holds, and what the property held is put back when the handler's owner unloads.
+    /// </summary>
+    internal sealed class AssignmentListening : VendorListening
+    {
+        internal AssignmentListening() { }
+
+        public string Kind => "assignment";
+
+        internal override bool SameAs(VendorListening other) => other is AssignmentListening;
     }
 
     /// <summary>How the runtime finds an object: on an element, or made by a registered module.</summary>

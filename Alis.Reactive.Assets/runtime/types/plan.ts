@@ -20,9 +20,22 @@ export interface PlanDocument {
 
 export interface Vendor {
   objectPath: string[];
+  listen: VendorListening;
+  payload: VendorPayload;
+}
+
+export type VendorListening =
+  | AssignmentListening
+  | MethodListening;
+
+export interface AssignmentListening {
+  kind: "assignment";
+}
+
+export interface MethodListening {
+  kind: "method";
   subscribe: string;
   unsubscribe: string;
-  payload: VendorPayload;
 }
 
 export type ObjectLocator =

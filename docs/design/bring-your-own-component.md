@@ -40,8 +40,9 @@ components. The plan a page renders is specified in [`grammar.md`](grammar.md).
    and views carry no JavaScript.
 
 6. **The core names no vendor.** A vendor is data its package declares (`ComponentVendor`): where
-   the object lives on the element, how to subscribe and unsubscribe, and what an event hands the
-   listener. The plan carries it; the runtime has one driver. An input declares its value (a
+   the object lives on the element, how its objects take a listener (a pair of methods, or
+   assignment to the property the event names), and what an event hands the listener. The plan
+   carries it; the runtime has one driver. An input declares its value (a
    property, which may belong to an object the component holds, such as Tom Select's `Input.Value`,
    declared with `Object<T>()`) and the event that commits it
    (`ComponentInput.Of(Value, committedBy: ...)`). The model re-raises that event as `alis:commit`
@@ -85,6 +86,13 @@ public sealed class Thermostat : Component, IInputComponent
         payload: VendorEventPayload.Argument); // a listener receives the payload itself
     public override ComponentVendor Vendor => ThermostatVendor;
 ```
+
+A widget that takes each listener as a property named for the event, as a chart takes
+`options.onClick`, declares `ComponentVendor.DefineCallbackProperties("callbell", objectPath: "callBell",
+payload: VendorEventPayload.Argument)` and names each callback as an event by the property's name
+(`public Event<CallBellCallArgs> OnPressed => Event<CallBellCallArgs>();` assigns `onPressed`); the
+sandbox's call bell (`BroughtComponents/CallBell/CallBell.cs`) is one, and the Call Bell page's desk
+partial shows its listeners leaving with the partial.
 
 The app constructs and destroys the widget as it would anyway, in listeners for `alis:mount` and
 `alis:unmount` (`Alis.Reactive.SandboxApp/Scripts/sandbox-components.ts`); the framework raises them
@@ -271,8 +279,10 @@ is `{"kind":"call","target":{"kind":"obj","id":"..RoomComfortModel__Target"},"pa
 a result read is a `let` before the statement that reads it and a `ref` in it, a handler of the
 schedule's event carries `"path":["schedule"]`, the thermostat is
 `{"kind":"element","id":"..RoomComfortModel__Target","vendor":"thermostat"}`, and the vendor entry
-`{"objectPath":["thermostat"],"subscribe":"on","unsubscribe":"off","payload":"argument"}` tells the
-runtime where the object is and how to listen. The runtime names neither the thermostat nor any vendor.
+`{"objectPath":["thermostat"],"listen":{"kind":"method","subscribe":"on","unsubscribe":"off"},"payload":"argument"}`
+tells the runtime where the object is and how to listen (the call bell's is
+`{"objectPath":["callBell"],"listen":{"kind":"assignment"},"payload":"argument"}`). The runtime names
+neither the thermostat nor any vendor.
 
 **Step 4: prove it in a browser.** `WhenSettingRoomComfort`
 (`tests/Alis.Reactive.PlaywrightTests/Components/Brought/Thermostat/`) drives one kind of member per
@@ -384,9 +394,11 @@ one with a native `<dialog>`.
 Confirm, FileUpload, SmartTextArea, SmartPasteButton and Mention's element bridge. Their helpers
 render data attributes, never an inline `<script>`. The architecture test
 (`Alis.Reactive.Assets/runtime/__tests__/architecture.test.ts`) fails if either side imports the
-other. The brought components the sandbox carries, Tom Select and a visit planner and a thermostat it wrote
-itself (`Alis.Reactive.SandboxApp/BroughtComponents/`), prove the method with zero runtime changes; the
-thermostat has every kind of member once, and `WhenSettingRoomComfort` drives each through the page.
+other. The brought components the sandbox carries, Tom Select, and a visit planner, a thermostat and
+a call bell it wrote itself (`Alis.Reactive.SandboxApp/BroughtComponents/`), prove the method with no
+runtime change of their own: the thermostat has every kind of member once, and `WhenSettingRoomComfort`
+drives each through the page; the call bell takes its listeners as properties, which its vendor entry
+says and the one driver follows, and `WhenAnsweringACallBell` drives them.
 
 ## Limits
 

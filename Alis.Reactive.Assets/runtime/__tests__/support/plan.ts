@@ -48,8 +48,14 @@ export const st = {
 };
 
 export const vendors: Record<string, Vendor> = {
-  native: { objectPath: [], subscribe: "addEventListener", unsubscribe: "removeEventListener", payload: "element" },
-  fake: { objectPath: ["widget"], subscribe: "on", unsubscribe: "off", payload: "argument" },
+  native: {
+    objectPath: [],
+    listen: { kind: "method", subscribe: "addEventListener", unsubscribe: "removeEventListener" },
+    payload: "element",
+  },
+  fake: { objectPath: ["widget"], listen: { kind: "method", subscribe: "on", unsubscribe: "off" }, payload: "argument" },
+  // The same fake widget, listened to by assignment: its events are callback properties (`widget.onPressed = fn`).
+  assigned: { objectPath: ["widget"], listen: { kind: "assignment" }, payload: "argument" },
 };
 
 export function element(id: string, vendor = "native"): ObjectLocator {
@@ -100,6 +106,12 @@ export class FakeWidget {
 
   trigger(event: string, arg: unknown): void {
     for (const listener of this.listeners.get(event) ?? []) listener(arg);
+  }
+
+  /** Calls the function assigned to a callback property, the way a widget calls its `onPressed`. */
+  invoke(callback: string, arg: unknown): void {
+    const assigned = this[callback];
+    if (typeof assigned === "function") assigned.call(this, arg);
   }
 
   listenerCount(event: string): number {
