@@ -1,10 +1,11 @@
 // alis.slot (grammar.md 6.5), keyed by the container element's id, which is looked up at every call so
 // a slot can sit inside content that appears after boot.
-// S1 load(html), in order: take the plan scripts out of the HTML; raise alis:unmount on the old
-//    content; replace it; re-create the inserted <script> nodes in document order so vendor scripts
-//    run; raise alis:mount; unload the previous owner; start a new owner with the plans found.
-//    HTML with no plan only unloads.
-// S2 unload() releases the slot's owner.
+// S1 load(html), in order: take the plan scripts out of the HTML; release the owners of the slots
+//    inside the old content, innermost first; raise alis:unmount on the old content; replace it;
+//    re-create the inserted <script> nodes in document order so vendor scripts run; raise
+//    alis:mount; release the previous owner; start a new owner with the plans found. HTML with no
+//    plan only unloads.
+// S2 unload() releases the owners of the slots inside the content, then the slot's own owner.
 
 import type { Module } from "../objects/modules";
 import { Owner } from "../objects/owner";
@@ -36,6 +37,7 @@ function load(id: string, html: unknown): void {
   host.innerHTML = html;
   const plans = discoverPlans(host, true);
 
+  unloadInside(target);
   announceUnmount(target);
   target.innerHTML = "";
   target.append(...Array.from(host.childNodes));
@@ -52,11 +54,23 @@ function load(id: string, html: unknown): void {
 }
 
 function unload(id: string): void {
+  const container = document.getElementById(id);
+  if (container !== null) unloadInside(container);
   const owner = owners.get(id);
   if (!owner) return;
   owners.delete(id);
   owner.dispose();
   log.info("partial-slot.unload", { slotId: id });
+}
+
+// A slot loaded inside content that is going away is released with it; a slot inside that one goes
+// first, so disposers run innermost first.
+function unloadInside(container: HTMLElement): void {
+  const nested = [...owners.keys()].filter(id => {
+    const element = document.getElementById(id);
+    return element !== null && element !== container && container.contains(element);
+  });
+  for (const id of nested.reverse()) unload(id);
 }
 
 // Scripts inserted through innerHTML do not run. Re-creating each one in document order runs it the

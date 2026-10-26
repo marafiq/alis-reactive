@@ -177,6 +177,38 @@ describe("slots", () => {
     expect(seen).toEqual(["unmount:<p>old</p>", "mount:<p>new</p>"]);
   });
 
+  it("release the owners of the slots nested inside content that is replaced or unloaded", () => {
+    const outer = document.createElement("div");
+    outer.id = "outer";
+    document.body.appendChild(outer);
+    const status = paragraph("status");
+    const slots = (id: string) => slotModule.object(id) as { load(html: string): void; unload(): void };
+    const innerPlan = plan(
+      { document: plugin("alis.document"), status: element("status") },
+      [on("document", "shiftChanged", setText("status", e.get(e.ref("e"), ["shift"])))],
+    );
+    const innerHtml = `<p>card</p><script type="application/json" data-reactive-plan>${JSON.stringify(innerPlan)}</script>`;
+    const shiftChanged = (shift: string) => document.dispatchEvent(new CustomEvent("shiftChanged", { detail: { shift } }));
+
+    slots("outer").load(`<div id="inner"></div>`);
+    slots("inner").load(innerHtml);
+    shiftChanged("night");
+    expect(status.textContent).toBe("night");
+
+    slots("outer").load("<p>replaced</p>");
+    shiftChanged("day");
+    expect(status.textContent).toBe("night");
+
+    slots("outer").load(`<div id="inner"></div>`);
+    slots("inner").load(innerHtml);
+    shiftChanged("evening");
+    expect(status.textContent).toBe("evening");
+
+    slots("outer").unload();
+    shiftChanged("late");
+    expect(status.textContent).toBe("evening");
+  });
+
   it("unload the previous load's handlers when the slot loads again", () => {
     const panel = document.createElement("div");
     panel.id = "panel";
