@@ -4,7 +4,11 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
 {
-    /// <summary>A declared property: its path from the object a page holds, and the shape of its value.</summary>
+    /// <summary>
+    /// A declared property: its path from the object a page holds, and the one shape of its value, which a
+    /// read converts to and a write converts from: a class of the app's own data is an object of its members
+    /// by their JSON names, so a date member is a Date on both sides.
+    /// </summary>
     /// <typeparam name="TValue">The C# type of the value.</typeparam>
     internal sealed class ComponentProperty<TValue>
     {
@@ -13,7 +17,7 @@ namespace Alis.Reactive
             if (path.IsNone) throw new ArgumentException("Property path required.", nameof(path));
 
             Path = path;
-            Shape = Shape.FromClrType(typeof(TValue));
+            Shape = Shape.OfArgument(typeof(TValue));
         }
 
         internal Path Path { get; }

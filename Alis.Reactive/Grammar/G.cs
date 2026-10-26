@@ -28,8 +28,17 @@ namespace Alis.Reactive.Grammar
 
         internal static Expr Get(Expr target, params string[] path) => new GetExpr(target, path);
 
-        /// <summary>The value converted to a shape; a shape that converts nothing adds nothing.</summary>
-        internal static Expr As(Expr value, Shape shape) => IsUnconverted(shape) ? value : new AsExpr(value, shape);
+        /// <summary>
+        /// The value converted to a shape; a shape that converts nothing adds nothing, and a list read as a list
+        /// of anything converts once, under the list shape it is then written as.
+        /// </summary>
+        internal static Expr As(Expr value, Shape shape)
+        {
+            if (IsUnconverted(shape)) return value;
+            if (value is AsExpr inner && shape.Kind == "array" && inner.Shape.TryGetArrayItemShape(out var item) && IsUnconverted(item))
+                return new AsExpr(inner.Expr, shape);
+            return new AsExpr(value, shape);
+        }
 
         /// <summary>A call whose arguments convert to their declared shapes, one per argument, and whose result converts to a shape.</summary>
         internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, IReadOnlyList<Shape> argShapes, Shape shape)
