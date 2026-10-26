@@ -9,6 +9,8 @@ import { VisitPlanner, visitPlannerHosts } from "./visit-planner";
 import { Thermostat, thermostatHosts } from "./thermostat";
 import { CallBell, callBellHosts } from "./call-bell";
 import { Whiteboard, whiteboardHosts } from "./whiteboard";
+import { IntakeSheet, intakeSheetHosts } from "./intake-sheet";
+import { MedicationList, medicationListHosts } from "./medication-list";
 import "./house-confirm";
 
 interface MountEventDetail {
@@ -42,6 +44,12 @@ document.addEventListener("alis:mount", event => {
   for (const host of whiteboardHosts(root)) {
     if (host.whiteboard === undefined) new Whiteboard(host);
   }
+  for (const host of intakeSheetHosts(root)) {
+    if (host.intakeSheet === undefined) new IntakeSheet(host);
+  }
+  for (const host of medicationListHosts(root)) {
+    if (host.medicationList === undefined) new MedicationList(host);
+  }
 });
 
 document.addEventListener("alis:unmount", event => {
@@ -60,5 +68,11 @@ document.addEventListener("alis:unmount", event => {
   }
   for (const host of whiteboardHosts(root)) {
     host.whiteboard?.destroy();
+  }
+  for (const host of intakeSheetHosts(root)) {
+    host.intakeSheet?.destroy();
+  }
+  for (const host of medicationListHosts(root)) {
+    host.medicationList?.destroy();
   }
 });

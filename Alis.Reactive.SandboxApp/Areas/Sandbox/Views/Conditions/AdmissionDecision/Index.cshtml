@@ -1,0 +1,216 @@
+@model AdmissionDecisionModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Conditions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionDecision
+@using Microsoft.AspNetCore.Mvc.Rendering
+@functions {
+    // A rule's line: what it says when the rule holds, and when it does not.
+    private static void Line(GuardBuilder<AdmissionDecisionModel> rule, string id, string holds, string fails) =>
+        rule.Then(then => then.Element(id).Text.Set(holds))
+            .Else(otherwise => otherwise.Element(id).Text.Set(fails));
+
+    private static void Line(AllGuard<AdmissionDecisionModel> rule, string id, string holds, string fails) =>
+        rule.Then(then => then.Element(id).Text.Set(holds))
+            .Else(otherwise => otherwise.Element(id).Text.Set(fails));
+
+    private static void Line(AnyGuard<AdmissionDecisionModel> rule, string id, string holds, string fails) =>
+        rule.Then(then => then.Element(id).Text.Set(holds))
+            .Else(otherwise => otherwise.Element(id).Text.Set(fails));
+
+    // The rules that decide the stay from what the page holds, with no one asked: how they combine, and the
+    // first reason that fits.
+    private static void DecideTheStay(PipelineBuilder<AdmissionDecisionModel> p)
+    {
+        var sheet = p.Component<IntakeSheet>(AdmissionDecisionModel.SheetId);
+        var approved = p.Component<NativeCheckBox>(m => m.DirectorApproved).Checked;
+        var bed = p.Component<NativeDropDown>(m => m.Bed).Value;
+
+        Line(p.When(sheet.Age).Gte(62).And(bed).NotEmpty().And(sheet.CareLevel).NotEq(CareLevel.MemoryCare),
+            "decision-and", "Approved: of age, a bed is free, and the Garden wing can care for her.", "Not yet approved.");
+        Line(p.When(approved).Truthy().Or(sheet.Waitlist).Eq(1),
+            "decision-or", "Admit now: approved, or first on the list.", "Wait: neither approved nor first on the list.");
+        Line(p.When(sheet.Veteran).Truthy().And(g => g.When(sheet.Age).Gte(90).Or(sheet.CareLevel).Eq(CareLevel.MemoryCare)),
+            "decision-group-in-and", "A veteran with priority needs.", "No veteran priority.");
+        Line(p.When(approved).Truthy().Or(g => g.When(sheet.Age).Gte(62).And(bed).NotEmpty()),
+            "decision-group-in-or", "Cleared to admit.", "Not cleared.");
+        // A bed suits her unless it is a Garden bed and she needs the secured wing.
+        Line(p.When(bed).NotEmpty().And(g => g.Not(n => n.When(sheet.CareLevel).Eq(CareLevel.MemoryCare).And(bed).Eq(Beds.Garden))),
+            "decision-not-group", "The bed suits her care level.", "The bed does not suit her care level.");
+        Line(p.When(sheet.Age).Gte(62).And(g => g.When(approved).Truthy().Or(h => h.When(bed).NotEmpty().And(sheet.Waitlist).Lte(3))),
+            "decision-nested", "Can be placed: approved, or a bed with a place near the top of the list.", "Cannot be placed yet.");
+        Line(p.When(bed).StartsWith("Garden").And(g => g.When(sheet.CareLevel).Eq(CareLevel.MemoryCare).Not()),
+            "decision-garden", "A Garden bed for a resident the Garden wing can care for.", "Not a Garden bed, or needs the secured wing.");
+
+        // The first reason that fits decides; an applicant of 95 with approval fits all three.
+        p.When(sheet.Age).Gte(90)
+            .Then(priority => priority.Element("decision-reason").Text.Set("Priority: 90 and over."))
+            .ElseIf(sheet.Age).Gte(62).And(approved).Truthy()
+            .Then(cleared => cleared.Element("decision-reason").Text.Set("Approved by the director."))
+            .ElseIf(sheet.Age).Gte(62)
+            .Then(eligible => eligible.Element("decision-reason").Text.Set("Eligible: awaiting the director."))
+            .Else(under => under.Element("decision-reason").Text.Set("Under age."));
+    }
+}
+@{
+    ViewData["Title"] = "Admission Decision";
+
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string Check = "flex justify-between gap-4 border-b border-border/60 py-1";
+
+    var plan = Html.ReactivePlan<AdmissionDecisionModel>();
+    var beds = new List<SelectListItem>
+    {
+        new SelectListItem(Beds.Garden, Beds.Garden),
+        new SelectListItem(Beds.Maple, Beds.Maple),
+    };
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Admission decision</native-heading>
+        <native-text color="Secondary">
+            The director decides Margaret Hale's respite stay. The rules combine, the first reason that fits decides, and where the waiting list or a question must be asked, the page waits for the answer.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Intake sheet</native-heading>
+        <div class="mt-3">
+            @(plan.IntakeSheet(AdmissionDecisionModel.SheetId, Model.Applicant, waitlist: Model.WaitlistPosition))
+        </div>
+        <native-grid cols="C2" gap="Base" class="mt-3">
+            @{ Html.InputField(plan, m => m.DirectorApproved, o => o.Label("The director has approved the stay"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.Bed, o => o.Label("Bed offered"))
+                .NativeDropDown(b => b.Items(beds).Placeholder("-- No bed --").CssClass(Field)); }
+        </native-grid>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">The decision</native-heading>
+        @(Html.NativeButton("decide", "Decide the stay")
+            .CssClass(Button + " mt-3")
+            .Reactive(plan, evt => evt.Click, (args, p) => DecideTheStay(p)))
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Reason</dt><dd id="decision-reason"></dd></div>
+            <div class="@Check"><dt>Age, bed and care</dt><dd id="decision-and"></dd></div>
+            <div class="@Check"><dt>Approval or first on the list</dt><dd id="decision-or"></dd></div>
+            <div class="@Check"><dt>Veteran priority</dt><dd id="decision-group-in-and"></dd></div>
+            <div class="@Check"><dt>Cleared</dt><dd id="decision-group-in-or"></dd></div>
+            <div class="@Check"><dt>Bed and care level</dt><dd id="decision-not-group"></dd></div>
+            <div class="@Check"><dt>Placement</dt><dd id="decision-nested"></dd></div>
+            <div class="@Check"><dt>Garden bed</dt><dd id="decision-garden"></dd></div>
+        </dl>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">The waiting list</native-heading>
+        <native-text color="Secondary">The list answers a moment after it is asked; the sheet counts each time it is asked.</native-text>
+        <native-hstack gap="Sm" class="flex-wrap mt-3">
+            @(Html.NativeButton("decide-top-three", "Admit the top three")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var sheet = p.Component<IntakeSheet>(AdmissionDecisionModel.SheetId);
+                    var approved = p.Component<NativeCheckBox>(m => m.DirectorApproved).Checked;
+                    Line(p.When(approved).Truthy().Or(sheet.WaitlistPosition()).Lte(3),
+                        "waitlist-or", "Admit now: approved, or in the top three.", "Wait for the list.");
+                }))
+            @(Html.NativeButton("decide-list-depth", "Assign a bed near the top of the list")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var sheet = p.Component<IntakeSheet>(AdmissionDecisionModel.SheetId);
+                    var bed = p.Component<NativeDropDown>(m => m.Bed).Value;
+                    Line(p.When(bed).NotEmpty().And(g => g.Not(n => n.When(sheet.WaitlistPosition()).Gt(10))),
+                        "waitlist-not", "A bed, and not far down the list.", "No bed, or far down the list.");
+                }))
+            @(Html.NativeButton("decide-ladder-list", "Decide, asking the list if need be")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var sheet = p.Component<IntakeSheet>(AdmissionDecisionModel.SheetId);
+                    var approved = p.Component<NativeCheckBox>(m => m.DirectorApproved).Checked;
+                    p.When(approved).Truthy()
+                        .Then(admit => admit.Element("waitlist-ladder").Text.Set("Approved: admit."))
+                        .ElseIf(sheet.WaitlistPosition()).Lte(3)
+                        .Then(soon => soon.Element("waitlist-ladder").Text.Set("Top three on the list: admit soon."))
+                        .Else(wait => wait.Element("waitlist-ladder").Text.Set("Wait for the list."));
+                }))
+        </native-hstack>
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Top three</dt><dd id="waitlist-or"></dd></div>
+            <div class="@Check"><dt>List depth</dt><dd id="waitlist-not"></dd></div>
+            <div class="@Check"><dt>Decision</dt><dd id="waitlist-ladder"></dd></div>
+        </dl>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Asking the director</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap mt-3">
+            @(Html.NativeButton("decide-ask", "Admit, asking if unapproved")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var approved = p.Component<NativeCheckBox>(m => m.DirectorApproved).Checked;
+                    Line(p.When(approved).Truthy().Or(g => g.Confirm("Admit without the director's approval?")),
+                        "ask-or", "Admitted.", "Not admitted.");
+                }))
+            @(Html.NativeButton("assign-bed", "Assign the bed")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var bed = p.Component<NativeDropDown>(m => m.Bed).Value;
+                    Line(p.When(bed).NotEmpty().And(g => g.Not(n => n.Confirm("Hold this bed for someone else instead?"))),
+                        "ask-not", "Bed assigned to Margaret.", "Bed held for someone else, or no bed.");
+                }))
+            @(Html.NativeButton("decide-provisional", "Decide, provisional if need be")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var approved = p.Component<NativeCheckBox>(m => m.DirectorApproved).Checked;
+                    var bed = p.Component<NativeDropDown>(m => m.Bed).Value;
+                    p.When(approved).Truthy()
+                        .Then(admit => admit.Element("ask-ladder").Text.Set("Approved: admit."))
+                        .ElseIf(bed).NotEmpty().And(g => g.Confirm("Admit on a provisional basis?"))
+                        .Then(provisional => provisional.Element("ask-ladder").Text.Set("Admitted provisionally."))
+                        .Else(declined => declined.Element("ask-ladder").Text.Set("Declined for now."));
+                }))
+        </native-hstack>
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Admission</dt><dd id="ask-or"></dd></div>
+            <div class="@Check"><dt>Bed</dt><dd id="ask-not"></dd></div>
+            <div class="@Check"><dt>Decision</dt><dd id="ask-ladder"></dd></div>
+        </dl>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">The letter</native-heading>
+        <native-text color="Secondary">The summary and the waiting list's answer each appear twice in the letter, asked of the sheet once.</native-text>
+        @(Html.NativeButton("write-letter", "Write the letter")
+            .CssClass(Button + " mt-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var sheet = p.Component<IntakeSheet>(AdmissionDecisionModel.SheetId);
+                var summary = sheet.Summary();
+                p.Element("summary-line").Text.Set(summary);
+                p.Element("letter-opening").Text.Set(summary);
+                var position = sheet.WaitlistPosition();
+                p.When(position).Lte(3)
+                    .Then(near => near.Element("letter-near").Text.Set("Near the top of the list."))
+                    .Else(far => far.Element("letter-near").Text.Set("Further down the list."));
+                p.Element("letter-position").Text.Set(position);
+            }))
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Summary</dt><dd id="summary-line"></dd></div>
+            <div class="@Check"><dt>Letter opens with</dt><dd id="letter-opening"></dd></div>
+            <div class="@Check"><dt>Waiting list</dt><dd id="letter-near"></dd></div>
+            <div class="@Check"><dt>Number on the list</dt><dd id="letter-position"></dd></div>
+        </dl>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

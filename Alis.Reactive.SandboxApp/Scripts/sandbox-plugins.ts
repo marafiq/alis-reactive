@@ -171,3 +171,29 @@ const pager = {
 };
 
 registeredPlugins.push({ name: "pager", instance: pager });
+
+// The move-in letter the wing's desk reads: each line is written only from facts that arrive as their
+// declared kind (text, a number, a Date, a boolean, a number or null, an object, a list), so a fact
+// sent in the wrong kind reads "?".
+const ymd = (day: Date): string => `${day.getFullYear()}-${twoDigits(day.getMonth() + 1)}-${twoDigits(day.getDate())}`;
+const text = (value: unknown): string => (typeof value === "string" ? value : "?");
+
+registeredPlugins.push({
+  name: "moveInLetter",
+  instance: {
+    opening: (applicant: unknown, wing: unknown, moveIn: unknown) =>
+      `${text(applicant)} moves into the ${text(wing)} wing on ${moveIn instanceof Date ? ymd(moveIn) : "?"}.`,
+    standing: (age: unknown, veteran: unknown, position: unknown) => {
+      const service = veteran === true ? "a veteran" : veteran === false ? "a civilian" : "?";
+      const number = typeof position === "number" ? `number ${position}` : position === null ? "no number yet" : "?";
+      return `Aged ${typeof age === "number" ? age : "?"}, ${service}, ${number} on the waiting list.`;
+    },
+    contact: (phone: unknown, onFile: unknown, summary: unknown) => {
+      const file = onFile !== null && typeof onFile === "object" ? (onFile as { relation?: unknown; phone?: unknown }) : undefined;
+      return `Call ${text(phone)}; on file: ${file === undefined ? "?" : `${text(file.relation)} ${text(file.phone)}`}; ${text(summary)}.`;
+    },
+    allergies: (allergies: unknown, source: unknown) =>
+      `Allergies: ${Array.isArray(allergies) ? allergies.map(String).join(", ") : "?"} (from ${text(source)}).`,
+    notice: (applicant: unknown, relation: unknown) => `Notice for ${text(applicant)} (${text(relation)}).`,
+  },
+});
