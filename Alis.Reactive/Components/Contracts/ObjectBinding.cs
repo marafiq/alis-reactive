@@ -20,7 +20,7 @@ namespace Alis.Reactive
         internal PlanBuildContext Context { get; }
 
         /// <summary>The object, found when the step runs.</summary>
-        protected abstract Receiver Locate();
+        internal abstract Receiver Locate();
 
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
         {
@@ -28,12 +28,8 @@ namespace Alis.Reactive
             Context.AddStep(new SetStep(target, property.Path.TargetText, target.IsData ? Shape.None : property.Shape, value));
         }
 
-        internal ValueExpression Read<TValue>(ComponentProperty<TValue> property, Shape shape) =>
-            ValueExpression.Read(Locate(), property.Path.Text, shape);
-
-        /// <summary>Reads a member of the property's value, which is data.</summary>
-        internal ValueExpression ReadPath<TValue>(ComponentProperty<TValue> property, Path path, Shape shape) =>
-            ValueExpression.Read(Locate(), property.Path.Append(path).Text, shape);
+        /// <summary>Reads the member at <paramref name="path"/>: a declared property, or a member of the data it holds.</summary>
+        internal ValueExpression Read(Path path, Shape shape) => ValueExpression.Read(Locate(), path.Text, shape);
 
         internal void Call(ComponentMethod method, IReadOnlyList<ValueExpression> args)
         {
@@ -66,7 +62,7 @@ namespace Alis.Reactive
             _vendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
         }
 
-        protected override Receiver Locate()
+        internal override Receiver Locate()
         {
             Context.DeclareComponent(_componentId, _vendor);
             return Receiver.Element(_componentId);
@@ -84,7 +80,7 @@ namespace Alis.Reactive
         {
         }
 
-        protected override Receiver Locate() => Receiver.Event;
+        internal override Receiver Locate() => Receiver.Event;
     }
 
     /// <summary>A plugin the plan registered, found by its name.</summary>
@@ -98,7 +94,7 @@ namespace Alis.Reactive
             _plugin = plugin ?? throw new ArgumentNullException(nameof(plugin));
         }
 
-        protected override Receiver Locate() => Receiver.Plugin(_plugin);
+        internal override Receiver Locate() => Receiver.Plugin(_plugin);
     }
 
     /// <summary>
@@ -115,6 +111,6 @@ namespace Alis.Reactive
 
         internal ValueExpression Result { get; }
 
-        protected override Receiver Locate() => Receiver.Returned(Result);
+        internal override Receiver Locate() => Receiver.Returned(Result);
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -23,7 +22,7 @@ namespace Alis.Reactive
 
         internal ComponentProperty<TValue> Member { get; }
 
-        internal override ValueExpression Expression => Owner.Binding.Read(Member, Shape);
+        internal override ValueExpression Expression => Owner.Binding.Read(Member.Path, Shape);
 
         /// <summary>Reads a member of the value, for a value that is data: <c>args.Slot.Get(s =&gt; s.Label)</c>.</summary>
         /// <typeparam name="TResult">The C# type of the member.</typeparam>
@@ -34,22 +33,7 @@ namespace Alis.Reactive
             var dataPath = ExpressionPathHelper.ToJsonPath(path);
             if (dataPath.IsNone)
                 throw new ArgumentException("Select a member of the value, for example s => s.Label.", nameof(path));
-            return new MemberPathRead<TResult>(this, dataPath);
-        }
-
-        private sealed class MemberPathRead<TResult> : TypedSource<TResult>
-        {
-            private readonly ReadOnly<TValue> _property;
-            private readonly Path _path;
-
-            internal MemberPathRead(ReadOnly<TValue> property, Path path)
-            {
-                _property = property;
-                _path = path;
-            }
-
-            internal override ValueExpression Expression =>
-                _property.Owner.Binding.ReadPath(_property.Member, _path, Shape);
+            return new MemberRead<TResult>(Owner.Binding.Locate, Member.Path.Append(dataPath));
         }
     }
 

@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -39,7 +38,7 @@ namespace Alis.Reactive
         public TypedSource<TResult> Get<TResult>(Expression<Func<TData, TResult>> path)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
-            return new PayloadTypedSource<TData, TResult>(_data, path);
+            return new MemberRead<TResult>(() => _data, ExpressionPathHelper.ToJsonPath(path));
         }
     }
 }
