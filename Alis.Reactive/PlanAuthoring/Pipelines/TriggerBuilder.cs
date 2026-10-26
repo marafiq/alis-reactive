@@ -63,72 +63,68 @@ namespace Alis.Reactive.Builders
             return On(objects => objects.Document(), appEvent.Name, pipeline);
         }
 
-        /// <summary>Runs a pipeline for each message of one kind a declared server-sent event stream sends.</summary>
+        /// <summary>Runs a pipeline each time a declared server-sent event stream sends an event, reading its data.</summary>
+        /// <typeparam name="TStream">The stream's declaration.</typeparam>
+        /// <typeparam name="TArgs">The declaration of the event's data, whose members are read by their camel-case JSON names.</typeparam>
+        /// <param name="stream">The stream at its URL: <c>ServerPushStream.At&lt;TStream&gt;(url)</c>.</param>
+        /// <param name="eventSelector">Selects the declared event, for example <c>s =&gt; s.Alert</c>.</param>
+        /// <param name="pipeline">Builds the reaction graph, given the event's data, live, and the pipeline.</param>
+        public TriggerBuilder<TModel> ServerPush<TStream, TArgs>(ServerPushSource<TStream> stream,
+            Func<TStream, Event<TArgs>> eventSelector,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
+            where TStream : ServerPushStream, new()
+            where TArgs : JsObject
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (eventSelector == null) throw new ArgumentNullException(nameof(eventSelector));
+            var url = stream.Url;
+            return On(objects => objects.Stream(url), eventSelector(stream.Stream), pipeline);
+        }
+
+        /// <summary>Runs a pipeline each time a declared server-sent event stream sends an event that carries no data the page reads.</summary>
         /// <typeparam name="TStream">The stream's declaration.</typeparam>
         /// <param name="stream">The stream at its URL: <c>ServerPushStream.At&lt;TStream&gt;(url)</c>.</param>
-        /// <param name="message">Selects the declared message, for example <c>s =&gt; s.Alert</c>.</param>
-        /// <param name="pipeline">Builds the reaction graph for each message.</param>
+        /// <param name="eventSelector">Selects the declared event, for example <c>s =&gt; s.AllClear</c>.</param>
+        /// <param name="pipeline">Builds the reaction graph for each event.</param>
         public TriggerBuilder<TModel> ServerPush<TStream>(ServerPushSource<TStream> stream,
-            Func<TStream, ServerPushMessage> message,
+            Func<TStream, Event> eventSelector,
             Action<PipelineBuilder<TModel>> pipeline)
             where TStream : ServerPushStream, new()
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            var url = stream.Url;
-            return On(objects => objects.Stream(url), message(stream.Stream).Name, pipeline);
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            return ServerPush<TStream, NoPayload>(stream, eventSelector, (_, p) => pipeline(p));
         }
 
-        /// <summary>Runs a pipeline for each message of one kind a declared server-sent event stream sends, reading its data.</summary>
-        /// <typeparam name="TStream">The stream's declaration.</typeparam>
-        /// <typeparam name="TPayload">The message's data, read by camel-case JSON names, so the server writes it with that naming.</typeparam>
-        /// <param name="stream">The stream at its URL: <c>ServerPushStream.At&lt;TStream&gt;(url)</c>.</param>
-        /// <param name="message">Selects the declared message, for example <c>s =&gt; s.Alert</c>.</param>
-        /// <param name="pipeline">Builds the reaction graph, given the message's data and the pipeline.</param>
-        public TriggerBuilder<TModel> ServerPush<TStream, TPayload>(ServerPushSource<TStream> stream,
-            Func<TStream, ServerPushMessage<TPayload>> message,
-            Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
-            where TStream : ServerPushStream, new()
-            where TPayload : class, new()
+        /// <summary>Runs a pipeline each time a declared hub's server calls one of its client methods, reading the argument, or each time the connection reconnects.</summary>
+        /// <typeparam name="THub">The hub's declaration.</typeparam>
+        /// <typeparam name="TArgs">The declaration of the argument, whose members are read by their camel-case JSON names.</typeparam>
+        /// <param name="hub">The hub at its URL: <c>SignalRHub.At&lt;THub&gt;(url)</c>.</param>
+        /// <param name="eventSelector">Selects the declared event, for example <c>h =&gt; h.StatusChanged</c> or <c>h =&gt; h.Reconnected</c>.</param>
+        /// <param name="pipeline">Builds the reaction graph, given the argument, live, and the pipeline.</param>
+        public TriggerBuilder<TModel> SignalR<THub, TArgs>(SignalRSource<THub> hub,
+            Func<THub, Event<TArgs>> eventSelector,
+            Action<TArgs, PipelineBuilder<TModel>> pipeline)
+            where THub : SignalRHub, new()
+            where TArgs : JsObject
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            var url = stream.Url;
-            return On(objects => objects.Stream(url), message(stream.Stream).Name, pipeline);
+            if (hub == null) throw new ArgumentNullException(nameof(hub));
+            if (eventSelector == null) throw new ArgumentNullException(nameof(eventSelector));
+            var url = hub.Url;
+            return On(objects => objects.Hub(url), eventSelector(hub.Hub), pipeline);
         }
 
-        /// <summary>Runs a pipeline each time a declared hub's server calls one of its client methods.</summary>
+        /// <summary>Runs a pipeline each time a declared hub's server calls one of its client methods with no argument, or each time the connection drops or closes.</summary>
         /// <typeparam name="THub">The hub's declaration.</typeparam>
         /// <param name="hub">The hub at its URL: <c>SignalRHub.At&lt;THub&gt;(url)</c>.</param>
-        /// <param name="message">Selects the declared method, for example <c>h =&gt; h.StatusChanged</c>.</param>
+        /// <param name="eventSelector">Selects the declared event, for example <c>h =&gt; h.BoardCleared</c> or <c>h =&gt; h.Reconnecting</c>.</param>
         /// <param name="pipeline">Builds the reaction graph for each call.</param>
         public TriggerBuilder<TModel> SignalR<THub>(SignalRSource<THub> hub,
-            Func<THub, SignalRMessage> message,
+            Func<THub, Event> eventSelector,
             Action<PipelineBuilder<TModel>> pipeline)
             where THub : SignalRHub, new()
         {
-            if (hub == null) throw new ArgumentNullException(nameof(hub));
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            var url = hub.Url;
-            return On(objects => objects.Hub(url), message(hub.Hub).Name, pipeline);
-        }
-
-        /// <summary>Runs a pipeline each time a declared hub's server calls one of its client methods, reading the argument.</summary>
-        /// <typeparam name="THub">The hub's declaration.</typeparam>
-        /// <typeparam name="TPayload">The method's argument, read by camel-case JSON names, the names SignalR's default protocol writes.</typeparam>
-        /// <param name="hub">The hub at its URL: <c>SignalRHub.At&lt;THub&gt;(url)</c>.</param>
-        /// <param name="message">Selects the declared method, for example <c>h =&gt; h.StatusChanged</c>.</param>
-        /// <param name="pipeline">Builds the reaction graph, given the argument and the pipeline.</param>
-        public TriggerBuilder<TModel> SignalR<THub, TPayload>(SignalRSource<THub> hub,
-            Func<THub, SignalRMessage<TPayload>> message,
-            Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
-            where THub : SignalRHub, new()
-            where TPayload : class, new()
-        {
-            if (hub == null) throw new ArgumentNullException(nameof(hub));
-            if (message == null) throw new ArgumentNullException(nameof(message));
-            var url = hub.Url;
-            return On(objects => objects.Hub(url), message(hub.Hub).Name, pipeline);
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            return SignalR<THub, NoPayload>(hub, eventSelector, (_, p) => pipeline(p));
         }
 
         private TriggerBuilder<TModel> On(Func<ObjectTable, string> on, string eventName, Action<PipelineBuilder<TModel>> pipeline)
@@ -141,6 +137,18 @@ namespace Alis.Reactive.Builders
         {
             var payload = new Data<TPayload>(Receiver.Event);
             _context.On(on, G.NoPath, eventName, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
+            return this;
+        }
+
+        // A declared event of a stream or a hub: its payload is live inside the callback, as a component's is.
+        private TriggerBuilder<TModel> On<TArgs>(Func<ObjectTable, string> on, Event<TArgs> declaredEvent, Action<TArgs, PipelineBuilder<TModel>> pipeline)
+            where TArgs : JsObject
+        {
+            if (declaredEvent == null) throw new ArgumentException("Select one of the declared events, for example s => s.Alert.", nameof(declaredEvent));
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
+            var args = declaredEvent.Args;
+            args.BindTo(new EventPayloadBinding(_context));
+            _context.On(on, declaredEvent.ObjectPath, declaredEvent.Name, PipelineBuilder<TModel>.Build(_context, p => pipeline(args, p)));
             return this;
         }
     }

@@ -267,6 +267,15 @@ namespace Alis.Reactive
         protected TypedSource<TResult> MethodAsync<TResult>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Result<TResult>(name, declaredBy, awaits: true, first);
 
+        /// <summary>Declares a method that returns a promise of a value, for two arguments; the step that first uses the result waits for the promise.</summary>
+        /// <typeparam name="TResult">The C# type of the settled value.</typeparam>
+        /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
+        /// <param name="second">The second argument.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
+        /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
+        protected TypedSource<TResult> MethodAsync<TResult>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
+            Result<TResult>(name, declaredBy, awaits: true, first, second);
+
         // ── events ───────────────────────────────────────────────────────────────
 
         /// <summary>

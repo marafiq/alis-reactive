@@ -43,7 +43,7 @@ namespace Alis.Reactive
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (committedBy == null) throw new ArgumentNullException(nameof(committedBy));
-            return new ComponentInput(value.Member.Path, EventName.Of(committedBy.ObjectEvent));
+            return new ComponentInput(value.Member.Path, EventName.Of(committedBy.Name));
         }
 
         internal bool Matches(ComponentInput other) =>

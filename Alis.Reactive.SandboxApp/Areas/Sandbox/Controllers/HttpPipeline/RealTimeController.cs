@@ -107,15 +107,6 @@ public class RealTimeController : Controller
         return Ok();
     }
 
-    // Called with no argument, on this page's connections only.
-    [HttpPost("ClearResidentBoard")]
-    public async Task<IActionResult> ClearResidentBoard([FromBody] OutageDrillRequest payload)
-    {
-        await _residentHub.Clients.Clients(ResidentStatusHub.ConnectionsOf(payload.DrillId))
-            .SendAsync(new ResidentStatusFeed().BoardCleared.Name);
-        return Ok();
-    }
-
     // Outage drill state is scoped per page load: the view embeds a fresh drill id in the
     // SSE URL and both drill buttons, so every page (and every test) breaks only its own
     // stream world. Nothing is process-global — a reload is always a fresh, healthy drill.

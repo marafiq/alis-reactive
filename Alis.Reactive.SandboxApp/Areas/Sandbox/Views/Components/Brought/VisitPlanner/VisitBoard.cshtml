@@ -48,39 +48,38 @@
     Html.On(plan, t => t.ServerPush(board, s => s.SlotTaken, (taken, p) =>
     {
         var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
-        var slot = taken.Get(x => x.Slot);
 
         void TellTheLog(PipelineBuilder<VisitBoardModel> branch, bool releasedHere, int released) =>
             branch.Dispatch<BoardChange>(VisitBoardEvents.BoardChanged, change => change
-                .Set(x => x.Summary, taken.Get(x => x.Message))
+                .Set(x => x.Summary, taken.Message)
                 .Set(x => x.Booked, planner.Count)
                 .Set(x => x.Desk, slugify.Slug(planner.Wing))
                 .Set(x => x.ReleasedHere, releasedHere)
                 .Set(x => x.Released, released));
 
-        p.When(planner.IsBooked(slot)).Truthy()
+        p.When(planner.IsBooked(taken.Slot)).Truthy()
             .Then(mine =>
             {
-                mine.Component<VisitPlanner>(m => m.VisitSlots).Release(taken.Get(x => x.Slot));
-                mine.Element("board-alert").Text.Set(taken.Get(x => x.Message));
+                mine.Component<VisitPlanner>(m => m.VisitSlots).Release(taken.Slot);
+                mine.Element("board-alert").Text.Set(taken.Message);
                 mine.Element("board-alert").ClassList.Add("text-danger");
                 TellTheLog(mine, releasedHere: true, released: 1);
             })
             .Else(other =>
             {
-                other.Element("board-alert").Text.Set(taken.Get(x => x.Message));
+                other.Element("board-alert").Text.Set(taken.Message);
                 other.Element("board-alert").ClassList.Remove("text-danger");
                 TellTheLog(other, releasedHere: false, released: 0);
             });
-        planner.MarkTaken(slot, taken.Get(x => x.Family));
-        visitLog.Record(taken.Get(x => x.Message));
+        planner.MarkTaken(taken.Slot, taken.Family);
+        visitLog.Record(taken.Message);
         p.Element("board-activity-count").Text.Set(visitLog.Entries);
-        announcer.Say(taken.Get(x => x.Message));
+        announcer.Say(taken.Message);
     }));
 
     // The same stream says how many desks watch the week; this trigger hears only that event.
     Html.On(plan, t => t.ServerPush(board, s => s.DesksWatching, (desks, p) =>
-        p.Element("board-desks").Text.Set(desks.Get(x => x.Summary))));
+        p.Element("board-desks").Text.Set(desks.Summary)));
 
     Html.On(plan, t => t.CustomEvent<BoardChange>(VisitBoardEvents.BoardChanged, (change, p) =>
     {

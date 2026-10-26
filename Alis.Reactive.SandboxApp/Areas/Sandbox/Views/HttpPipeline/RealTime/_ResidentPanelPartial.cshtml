@@ -12,12 +12,12 @@
     // The page's summary line is written first: once the panel is closed, its handler is gone and
     // the line keeps saying so.
     Html.On(plan, t => t.SignalR(SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}"), h => h.StatusChanged,
-        (payload, p) =>
+        (status, p) =>
     {
         p.Element("panel-summary").Text.Set("Resident panel updated live.");
-        p.Element("panel-resident-name").Text.Set(payload.Get(x => x.ResidentName));
-        p.Element("panel-resident-status").Text.Set(payload.Get(x => x.Status));
-        p.Element("panel-connections").Text.Set(payload.Get(x => x.Connections));
+        p.Element("panel-resident-name").Text.Set(status.ResidentName);
+        p.Element("panel-resident-status").Text.Set(status.Status);
+        p.Element("panel-connections").Text.Set(status.Connections);
     }));
 }
 

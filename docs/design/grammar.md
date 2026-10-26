@@ -381,7 +381,10 @@ form lowers to fixed productions.
 | `.Reactive(evt => evt.E, (args, p) => …)`, on a rendered component | `on(o, "e", args) { … }` |
 | `t.DomReady(p => …)` | `on(document, "ready", _)` |
 | `t.CustomEvent(appEvent, (e, p) => …)` | `on(document, name, e)`; the payload is `detail`, or the event when it has none |
-| `t.ServerPush(ServerPushStream.At<S>(url), s => s.M, …)`, `t.SignalR(SignalRHub.At<H>(url), h => h.M, …)` | `on(stream, name, e)`, `on(hub, name, e)` |
+| `t.ServerPush(ServerPushStream.At<S>(url), s => s.E, (args, p) => …)`, `t.SignalR(SignalRHub.At<H>(url), h => h.E, (args, p) => …)`, an `Event<TArgs>` of the stream or hub declaration | `on(stream, "e", args)`, `on(hub, "e", args)`; the hub's `reconnecting`, `reconnected` and `close` are declared the same way |
+| `p.Stream(source).Close()`, `p.Stream(source).ReadyState`; `p.Hub(source).State`, `.ConnectionId` | `do(call(stream, ["close"], []))`, `get(stream, ["readyState"], number)`; `get(hub, ["state"], string)`, `get(hub, ["connectionId"], string)` |
+| `h.M(a)`, a hub method declared with `Send(a)` | `do await call(hub, ["send"], [lit "m", a])` |
+| `h.M(a)`, declared with `Invoke(a)`; `Invoke<T>(a)` | `do await call(hub, ["invoke"], [lit "m", a])`; `let t = await call(hub, ["invoke"], [lit "m", a], shape)` where it is called, and the value is `ref t` |
 | `var c = p.Component<C>(…); c.P.Set(v)`, a `Property<T>` or `WriteOnly<T>` | `set(o, ["p"], as(v, shape))` |
 | `c.M(a, b)`, a method declared with `Method(a, b)` | `do(call(o, ["m"], [a, b]))` |
 | `c.P`, a `ReadOnly<T>` or `Property<T>` read | `as(get(o, ["p"]), shape)` |
@@ -573,6 +576,8 @@ no key (H2) and no entry (H4).
   payload is `JSON.parse(data)`.
 - **R3 Retry.** A permanent close adds a marker to `#alis-realtime-connection-retry-container`. One
   click retries every dropped connection, and the retried subscriptions keep their owners.
+- **R4 Members.** `readyState` is the `EventSource`'s (0 connecting, 1 open, 2 closed); `close()`
+  closes it, and a close is not a drop: nothing is retried.
 
 ### 6.7 `hub` (`plugin("alis.hub", url)`)
 

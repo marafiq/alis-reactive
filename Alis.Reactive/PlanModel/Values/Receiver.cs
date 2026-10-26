@@ -14,7 +14,25 @@ namespace Alis.Reactive.PlanModel
 
         internal static Receiver Element(string id) => new ElementReceiver(id);
 
-        internal static Receiver Plugin(string name) => new PluginReceiver(name);
+        internal static Receiver Plugin(string name)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            return new ModuleReceiver(objects => objects.Plugin(name));
+        }
+
+        /// <summary>The stream object at a URL: <c>alis.stream</c> keyed by it.</summary>
+        internal static Receiver Stream(string url)
+        {
+            if (url == null) throw new ArgumentNullException(nameof(url));
+            return new ModuleReceiver(objects => objects.Stream(url));
+        }
+
+        /// <summary>The hub object at a URL: <c>alis.hub</c> keyed by it.</summary>
+        internal static Receiver Hub(string url)
+        {
+            if (url == null) throw new ArgumentNullException(nameof(url));
+            return new ModuleReceiver(objects => objects.Hub(url));
+        }
 
         internal static Receiver Event { get; } = new EventReceiver();
 
@@ -43,16 +61,17 @@ namespace Alis.Reactive.PlanModel
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(scope.Objects.Element(_id)), G.NoPath);
         }
 
-        private sealed class PluginReceiver : Receiver
+        // An object a registered module makes: a plugin by its name, a stream or a hub by its URL.
+        private sealed class ModuleReceiver : Receiver
         {
-            private readonly string _name;
+            private readonly Func<ObjectTable, string> _object;
 
-            internal PluginReceiver(string name)
+            internal ModuleReceiver(Func<ObjectTable, string> @object)
             {
-                _name = name ?? throw new ArgumentNullException(nameof(name));
+                _object = @object;
             }
 
-            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(scope.Objects.Plugin(_name)), G.NoPath);
+            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(_object(scope.Objects)), G.NoPath);
         }
 
         private sealed class EventReceiver : Receiver

@@ -5,8 +5,8 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// Data a callback receives: a response body, a custom event's payload, a server-sent message or a
-    /// hub call's argument. <see cref="Get{TResult}"/> reads a member of it; the data itself is a value too.
+    /// Data a callback receives: a response body or a custom event's payload. <see cref="Get{TResult}"/>
+    /// reads a member of it; the data itself is a value too.
     /// </summary>
     /// <remarks>
     /// <code>
@@ -17,8 +17,8 @@ namespace Alis.Reactive
     ///     grid.DataSource.Set(week.Get(x =&gt; x.Rows));
     /// })
     /// </code>
-    /// A member reads by its camel-case JSON name, the name ASP.NET Core, SignalR and <c>Dispatch</c>
-    /// write it under (System.Text.Json): <c>x =&gt; x.MRN</c> reads <c>mrn</c>.
+    /// A member reads by its camel-case JSON name, the name ASP.NET Core and <c>Dispatch</c> write it
+    /// under (System.Text.Json): <c>x =&gt; x.MRN</c> reads <c>mrn</c>.
     /// </remarks>
     /// <typeparam name="TData">The data's type, typically the server's own class.</typeparam>
     public sealed class Data<TData> : TypedSource<TData>

@@ -1,50 +1,56 @@
-using System.Runtime.CompilerServices;
-
 namespace Alis.Reactive
 {
     /// <summary>
-    /// A server-sent event stream (an <c>EventSource</c>), declared once: the events it sends, each named
-    /// by its member, with the payloads they carry.
+    /// A server-sent event stream, declared once like any JavaScript object: the events it sends, each
+    /// named by its member with the payload it carries, and the stream's own members.
     /// </summary>
     /// <remarks>
     /// <code>
     /// public sealed class FacilityAlerts : ServerPushStream
     /// {
-    ///     public ServerPushMessage&lt;FacilityAlert&gt; Alert =&gt; Message&lt;FacilityAlert&gt;();
+    ///     public Event&lt;FacilityAlert&gt; Alert =&gt; Event&lt;FacilityAlert&gt;();   // an event with data the page reads
+    ///     public Event AllClear =&gt; Event();                               // an event with no data the page reads
     /// }
     ///
-    /// Html.On(plan, t =&gt; t.ServerPush(ServerPushStream.At&lt;FacilityAlerts&gt;(url), s =&gt; s.Alert, (alert, p) =&gt; ...));
+    /// public sealed class FacilityAlert : JsObject
+    /// {
+    ///     public ReadOnly&lt;string&gt; Message =&gt; ReadOnly&lt;string&gt;();
+    /// }
+    ///
+    /// var alerts = ServerPushStream.At&lt;FacilityAlerts&gt;(url);
+    /// Html.On(plan, t =&gt; t.ServerPush(alerts, s =&gt; s.Alert, (alert, p) =&gt; p.Element("alert").Text.Set(alert.Message)));
+    /// p.Stream(alerts).Close();
     /// </code>
     /// An event's SSE name is its member's name camel-cased (<c>Alert</c> is <c>alert</c>) unless <c>name:</c>
-    /// gives another; messages the server sends with no event name are <c>Message(name: "message")</c>. The
-    /// server writes each event under its declared <c>Name</c>, so the stream and the page cannot disagree on it.
+    /// gives another; messages the server sends with no event name are <c>Event(name: "message")</c>. The
+    /// server writes each event under its declared <c>Name</c>, so the stream and the page cannot disagree
+    /// on it. The data line is read as JSON, so an event with no data the page reads still writes one
+    /// (<c>data: {}</c>): a browser drops an event that has no data. The payload's members are read by
+    /// their camel-case JSON names.
     /// </remarks>
-    public abstract class ServerPushStream
+    public abstract class ServerPushStream : JsObject
     {
-        /// <summary>The stream at a URL, for a <c>ServerPush</c> trigger.</summary>
+        /// <summary><see cref="ReadyState"/> while the stream connects: <c>EventSource.CONNECTING</c>.</summary>
+        public const int Connecting = 0;
+
+        /// <summary><see cref="ReadyState"/> while the stream is open: <c>EventSource.OPEN</c>.</summary>
+        public const int Open = 1;
+
+        /// <summary><see cref="ReadyState"/> once the stream is closed: <c>EventSource.CLOSED</c>.</summary>
+        public const int Closed = 2;
+
+        /// <summary>The stream at a URL, for a <c>ServerPush</c> trigger and for <c>p.Stream(..)</c>.</summary>
         /// <typeparam name="TStream">The stream's declaration.</typeparam>
         /// <param name="url">The stream's URL.</param>
         public static ServerPushSource<TStream> At<TStream>(string url)
             where TStream : ServerPushStream, new() =>
             new ServerPushSource<TStream>(DeclaredName.RequiredUrl(url), new TStream());
 
-        /// <summary>Declares an event the stream sends with no payload the page reads.</summary>
-        /// <remarks>
-        /// The server still writes a data line, as JSON (<c>data: {}</c>): a browser drops an event that
-        /// has no data, and the page reads every event's data as JSON.
-        /// </remarks>
-        /// <param name="name">The SSE event name, when it is not the declaring member's name camel-cased.</param>
-        /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected static ServerPushMessage Message(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new ServerPushMessage(DeclaredName.Of(name, declaredBy));
+        /// <summary>The connection's state: <see cref="Connecting"/>, <see cref="Open"/> or <see cref="Closed"/>.</summary>
+        public ReadOnly<int> ReadyState => ReadOnly<int>();
 
-        /// <summary>Declares an event the stream sends with a JSON <typeparamref name="TPayload"/>.</summary>
-        /// <typeparam name="TPayload">The event's data, read by camel-case JSON names.</typeparam>
-        /// <param name="name">The SSE event name, when it is not the declaring member's name camel-cased.</param>
-        /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected static ServerPushMessage<TPayload> Message<TPayload>(string? name = null, [CallerMemberName] string declaredBy = "")
-            where TPayload : class, new() =>
-            new ServerPushMessage<TPayload>(DeclaredName.Of(name, declaredBy));
+        /// <summary>Closes the connection; no further event reaches the page.</summary>
+        public void Close() => Method();
     }
 
     /// <summary>A declared stream at a URL; see <see cref="ServerPushStream.At{TStream}"/>.</summary>
@@ -58,31 +64,7 @@ namespace Alis.Reactive
         }
 
         internal string Url { get; }
+
         internal TStream Stream { get; }
-    }
-
-    /// <summary>An event a <see cref="ServerPushStream"/> sends, with no payload the page reads.</summary>
-    public sealed class ServerPushMessage
-    {
-        internal ServerPushMessage(string eventType) => Name = eventType;
-
-        /// <summary>The SSE event name, for the server that writes the stream.</summary>
-        public string Name { get; }
-
-        /// <inheritdoc />
-        public override string ToString() => Name;
-    }
-
-    /// <summary>An event a <see cref="ServerPushStream"/> sends, with its payload.</summary>
-    /// <typeparam name="TPayload">The event's data.</typeparam>
-    public sealed class ServerPushMessage<TPayload> where TPayload : class, new()
-    {
-        internal ServerPushMessage(string eventType) => Name = eventType;
-
-        /// <summary>The SSE event name, for the server that writes the stream.</summary>
-        public string Name { get; }
-
-        /// <inheritdoc />
-        public override string ToString() => Name;
     }
 }

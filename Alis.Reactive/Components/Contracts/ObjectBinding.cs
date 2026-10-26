@@ -83,18 +83,18 @@ namespace Alis.Reactive
         internal override Receiver Locate() => Receiver.Event;
     }
 
-    /// <summary>A plugin the plan registered, found by its name.</summary>
-    internal sealed class PluginBinding : ObjectBinding
+    /// <summary>An object a registered module makes: a plugin by its name, a stream or a hub by its URL.</summary>
+    internal sealed class ModuleBinding : ObjectBinding
     {
-        private readonly string _plugin;
+        private readonly Receiver _object;
 
-        internal PluginBinding(string plugin, PlanBuildContext context)
+        internal ModuleBinding(Receiver @object, PlanBuildContext context)
             : base(context)
         {
-            _plugin = plugin ?? throw new ArgumentNullException(nameof(plugin));
+            _object = @object ?? throw new ArgumentNullException(nameof(@object));
         }
 
-        internal override Receiver Locate() => Receiver.Plugin(_plugin);
+        internal override Receiver Locate() => _object;
     }
 
     /// <summary>

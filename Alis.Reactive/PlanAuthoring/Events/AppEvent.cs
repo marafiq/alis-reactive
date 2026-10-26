@@ -67,7 +67,7 @@ namespace Alis.Reactive
             if (name != null) return Required(name);
             if (string.IsNullOrWhiteSpace(declaredBy))
                 throw new ArgumentException(
-                    "Declare an event or a message as a member of a class, for example public static readonly AppEvent Saved = AppEvent.Declare();",
+                    "Declare an event or a hub method as a member of a class, for example public static readonly AppEvent Saved = AppEvent.Declare();",
                     nameof(declaredBy));
             return JsonMemberName.Of(declaredBy);
         }

@@ -26,6 +26,8 @@ public class WhenLiveConnectionDrops : PlaywrightTestBase
     private ILocator BreakHubButton => Page.Locator("#btn-break-hub");
     private ILocator RestoreHubButton => Page.Locator("#btn-restore-hub");
     private ILocator PushStatusButton => Page.Locator("#btn-push-status");
+    private ILocator HubState => Page.Locator("#resident-hub-state");
+    private ILocator BoardNote => Page.Locator("#resident-board-note");
 
     [Test]
     public async Task retry_indicator_stays_hidden_while_live_updates_flow()
@@ -86,17 +88,20 @@ public class WhenLiveConnectionDrops : PlaywrightTestBase
     }
 
     // One test covers the full SignalR lifecycle: the client's automatic reconnect
-    // schedule (~40s) must be exhausted before the indicator appears, and that wait
-    // is paid once instead of once per criterion.
+    // schedule (~40s of refused negotiates) must be exhausted before the connection
+    // closes and the indicator appears, and that wait is paid once instead of once
+    // per criterion. The board's link line reads the hub's own state at the close.
     [Test]
     public async Task losing_the_hub_connection_shows_the_retry_indicator_and_clicking_it_restores_live_updates()
     {
         await NavigateAndSeeLiveAlerts();
 
-        // The client's reconnect schedule plus handshake overhead was observed at ~64s
+        // The client's reconnect schedule plus negotiate overhead was observed at ~64s
         // in a real browser before onclose fires — 90s keeps headroom without masking.
         await ClickWhenStable(BreakHubButton);
         await Expect(RetryIndicator).ToBeVisibleAsync(new() { Timeout = 90000 });
+        await Expect(HubState).ToHaveTextAsync("Disconnected");
+        await Expect(BoardNote).ToHaveTextAsync("Live updates stopped: reconnect from the banner at the top of the page.");
 
         await ClickWhenStable(RestoreHubButton);
         await ClickWhenStable(RetryIndicator);
@@ -107,6 +112,7 @@ public class WhenLiveConnectionDrops : PlaywrightTestBase
         await ClickWhenStable(PushStatusButton);
         await Expect(ResidentName).ToContainTextAsync("Helen Martinez (Manual)",
             new() { Timeout = 15000 });
+        await Expect(HubState).ToHaveTextAsync("Connected");
         AssertNoConsoleErrorsExcept(
             "connection.disconnected", "start.failed", "WebSocket", "Failed to load resource");
     }

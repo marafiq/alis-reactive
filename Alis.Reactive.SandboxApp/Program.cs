@@ -82,6 +82,19 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
+// A broken outage drill refuses the resident hub's negotiate, as an unreachable server would, so the
+// page's automatic reconnect runs its schedule instead of being accepted and then closed by the hub.
+app.Use(async (context, next) =>
+{
+    if (ResidentStatusHub.RefusesNegotiate(context.Request))
+    {
+        context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+        return;
+    }
+
+    await next(context);
+});
+
 app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHub<ResidentStatusHub>("/hubs/resident-status");
 

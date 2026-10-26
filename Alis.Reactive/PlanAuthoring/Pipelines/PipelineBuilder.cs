@@ -148,6 +148,38 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
+        /// The server-sent event stream a trigger listens to, by the declaration and URL the page handed
+        /// <c>t.ServerPush(..)</c>: <c>p.Stream(alerts).Close()</c>, <c>p.When(p.Stream(alerts).ReadyState).Eq(ServerPushStream.Closed)</c>.
+        /// </summary>
+        /// <typeparam name="TStream">The stream's declaration.</typeparam>
+        /// <param name="stream">The stream at its URL: <c>ServerPushStream.At&lt;TStream&gt;(url)</c>.</param>
+        /// <returns>The stream, whose members the page uses directly.</returns>
+        public TStream Stream<TStream>(ServerPushSource<TStream> stream)
+            where TStream : ServerPushStream, new()
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            var live = new TStream();
+            live.BindTo(new ModuleBinding(Receiver.Stream(stream.Url), Context));
+            return live;
+        }
+
+        /// <summary>
+        /// The hub a trigger listens to, by the declaration and URL the page handed <c>t.SignalR(..)</c>:
+        /// <c>p.Hub(residents).ClearBoard()</c>, <c>p.Element("link").Text.Set(p.Hub(residents).State)</c>.
+        /// </summary>
+        /// <typeparam name="THub">The hub's declaration.</typeparam>
+        /// <param name="hub">The hub at its URL: <c>SignalRHub.At&lt;THub&gt;(url)</c>.</param>
+        /// <returns>The hub, whose members the page uses directly.</returns>
+        public THub Hub<THub>(SignalRSource<THub> hub)
+            where THub : SignalRHub, new()
+        {
+            if (hub == null) throw new ArgumentNullException(nameof(hub));
+            var live = new THub();
+            live.BindTo(new ModuleBinding(Receiver.Hub(hub.Url), Context));
+            return live;
+        }
+
+        /// <summary>
         /// Reads the page's URL query string through <typeparamref name="TQuery"/>, the class the page's action
         /// binds with <c>[FromQuery]</c>: <c>p.Url&lt;CensusQuery&gt;().Get(q =&gt; q.FacilityId)</c>.
         /// </summary>

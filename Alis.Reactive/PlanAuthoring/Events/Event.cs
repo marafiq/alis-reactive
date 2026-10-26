@@ -6,14 +6,15 @@ namespace Alis.Reactive
     /// <summary>
     /// An event a declaration has, whose listener receives a payload declared as its own class:
     /// <c>public Event&lt;FusionGridRowSelectedArgs&gt; RowSelected =&gt; Event&lt;FusionGridRowSelectedArgs&gt;();</c>.
-    /// A page handles it with <c>.Reactive(evt =&gt; evt.RowSelected, (args, p) =&gt; ..)</c>.
+    /// A page handles it with <c>.Reactive(evt =&gt; evt.RowSelected, (args, p) =&gt; ..)</c>; a stream's or a
+    /// hub's with <c>t.ServerPush(..)</c> or <c>t.SignalR(..)</c>.
     /// </summary>
     /// <typeparam name="TArgs">The declaration of the payload.</typeparam>
     public class Event<TArgs>
         where TArgs : JsObject
     {
-        /// <summary>The event's JavaScript name.</summary>
-        public string ObjectEvent { get; }
+        /// <summary>The event's JavaScript name: what the object raises, the SSE event a stream sends, the client method a hub's server calls.</summary>
+        public string Name { get; }
 
         internal TArgs Args { get; }
 
@@ -22,7 +23,7 @@ namespace Alis.Reactive
 
         internal Event(string jsEvent, TArgs args, IReadOnlyList<string> objectPath)
         {
-            ObjectEvent = jsEvent ?? throw new ArgumentNullException(nameof(jsEvent));
+            Name = jsEvent ?? throw new ArgumentNullException(nameof(jsEvent));
             Args = args ?? throw new ArgumentNullException(nameof(args));
             ObjectPath = objectPath ?? throw new ArgumentNullException(nameof(objectPath));
         }

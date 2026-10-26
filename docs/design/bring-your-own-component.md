@@ -388,6 +388,54 @@ the `alis.confirm` plugin: the Fusion confirm on a page whose layout renders its
 (`Alis.Reactive.Assets/components/fusion/confirm.ts`), or a page's own, as the Room Holds page gives
 one with a native `<dialog>`.
 
+**A stream and a hub are objects too.** A server-sent event stream and a SignalR hub are declared
+with the same vocabulary, by what the browser object has. The events are the stream's SSE events and
+the hub's client methods, each an `Event<TArgs>()` whose payload is a declaration of the JSON the
+server writes (`FacilityAlert : JsObject`, `ResidentStatusArgs : JsObject`), or an `Event()` when
+the page reads nothing of it; the server names each event by the declaration's `Name`, so the two
+cannot disagree. The object's own members are declared once on the base class: a stream has
+`ReadyState` and `Close()`; a hub has `State`, `ConnectionId`, the `Reconnecting`, `Reconnected`
+and `Close` events, and the hub methods the page calls, each declared on the hub by its C# name
+with `Send(..)` (the steps after it wait until it is sent) or `Invoke(..)` / `Invoke<T>(..)` (they
+wait until the server completes it; the answer is a source). A page hears an event through the
+trigger builder and reaches the object inside a callback by the declaration and URL it handed the
+trigger, the way `p.Component<T>(id)` names a component by its id
+(`HttpPipeline/RealTime/Index.cshtml`, `Alis.Reactive.SandboxApp/Hubs/ResidentStatusHub.cs`):
+
+```csharp
+public sealed class ResidentStatusFeed : SignalRHub
+{
+    public Event<ResidentStatusArgs> StatusChanged => Event<ResidentStatusArgs>();   // the server calls it with one argument
+    public Event BoardCleared => Event();                                          // the server calls it with none
+    public void ClearBoard() => Send();                                            // hub.send("clearBoard")
+    public TypedSource<string> Acknowledge(Arg<string> acknowledgedBy) => Invoke<string>(acknowledgedBy); // hub.invoke("acknowledge", ..)
+}
+
+var residents = SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}");
+Html.On(plan, t => t.SignalR(residents, h => h.StatusChanged, (status, p) =>
+{
+    var hub = p.Hub(residents);
+    p.Element("resident-name").Text.Set(status.ResidentName);
+    p.Element("resident-hub-state").Text.Set(hub.State);
+    p.Element("resident-connection").Text.Set(hub.ConnectionId);
+}));
+Html.On(plan, t => t.SignalR(residents, h => h.Reconnected, (link, p) =>
+    p.Element("resident-connection").Text.Set(link.ConnectionId)));
+p.Hub(residents).ClearBoard();
+p.Element("resident-board-note").Text.Set(p.Hub(residents).Acknowledge(p.Component<NativeTextBox>(m => m.AcknowledgedBy).Value));
+
+var alerts = ServerPushStream.At<FacilityAlertStream>($"/api/facility-alerts?drill={drillId}");
+Html.On(plan, t => t.ServerPush(alerts, s => s.Alert, (alert, p) => p.Element("alert-message").Text.Set(alert.Message)));
+var stream = p.Stream(alerts);
+stream.Close();
+p.When(stream.ReadyState).Eq(ServerPushStream.Closed).Then(stopped => stopped.Element("alert-status").Text.Set("Stopped"));
+```
+
+The plan carries a stream or a hub as the plugin object it already was (`alis.stream`, `alis.hub`,
+keyed by URL); a handler on it is `on: $hub:url, event: "reconnected"`, and a hub method is a call
+of the object's `send` or `invoke` with the method's name as its first argument. The runtime is
+unchanged.
+
 **The framework's own components are built like brought ones.** Their JavaScript lives in
 `Alis.Reactive.Assets/components/`, beside the runtime, and reaches it only through `alis:mount`,
 `alis:unmount` and `window.__alisPlugins`: CheckList, RadioGroup, HiddenField, Drawer, Loader,

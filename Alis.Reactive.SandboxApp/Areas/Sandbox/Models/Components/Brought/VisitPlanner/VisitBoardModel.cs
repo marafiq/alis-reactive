@@ -117,9 +117,27 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     /// </summary>
     public sealed class VisitBoardStream : ServerPushStream
     {
-        public ServerPushMessage<SlotTaken> SlotTaken => Message<SlotTaken>();
+        public Event<SlotTakenArgs> SlotTaken => Event<SlotTakenArgs>();
 
-        public ServerPushMessage<DesksWatching> DesksWatching => Message<DesksWatching>();
+        public Event<DesksWatchingArgs> DesksWatching => Event<DesksWatchingArgs>();
+    }
+
+    /// <summary>What a desk reads of a <see cref="SlotTaken"/> push.</summary>
+    public sealed class SlotTakenArgs : JsObject
+    {
+        public ReadOnly<string> Slot => ReadOnly<string>();
+
+        public ReadOnly<string> Family => ReadOnly<string>();
+
+        public ReadOnly<string> Message => ReadOnly<string>();
+    }
+
+    /// <summary>What a desk reads of a <see cref="DesksWatching"/> push.</summary>
+    public sealed class DesksWatchingArgs : JsObject
+    {
+        public ReadOnly<int> Watching => ReadOnly<int>();
+
+        public ReadOnly<string> Summary => ReadOnly<string>();
     }
 
     /// <summary>The document events the VisitBoard page raises and hears.</summary>
