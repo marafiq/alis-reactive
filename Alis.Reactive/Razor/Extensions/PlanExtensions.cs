@@ -126,40 +126,22 @@ namespace Alis.Reactive
         /// <param name="plan">Reactive Plan whose generated JSON should be embedded.</param>
         /// <returns>HTML content containing the plan JSON consumed by the runtime.</returns>
 #if NET48
-        public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html,
-            ReactivePlan<TModel> plan) where TModel : class
-        {
-            var planJson = plan.Render();
-            var elementId = PlanElementId.For(plan.PlanId);
-            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan>{planJson}</script>";
-
-            // Root views emit a fallback summary for errors that cannot bind to
-            // generated field spans: hidden fields, unloaded partial fields, or
-            // unmatched server fields.
-            var planRendersValidationSummary = plan.RendersValidationSummary;
-            if (!planRendersValidationSummary)
-                return new MvcHtmlString(planScript);
-
-            return new MvcHtmlString(planScript + ValidationSummaryFor(plan.PlanId));
-        }
+        public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan)
+            where TModel : class =>
+            new MvcHtmlString(PlanMarkup(plan));
 #else
-        public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html,
-            ReactivePlan<TModel> plan) where TModel : class
-        {
-            var planJson = plan.Render();
-            var elementId = PlanElementId.For(plan.PlanId);
-            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan>{planJson}</script>";
-
-            // Root views emit a fallback summary for errors that cannot bind to
-            // generated field spans: hidden fields, unloaded partial fields, or
-            // unmatched server fields.
-            var planRendersValidationSummary = plan.RendersValidationSummary;
-            if (!planRendersValidationSummary)
-                return new HtmlString(planScript);
-
-            return new HtmlString(planScript + ValidationSummaryFor(plan.PlanId));
-        }
+        public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan)
+            where TModel : class =>
+            new HtmlString(PlanMarkup(plan));
 #endif
+
+        // The plan's script, and for a root view the summary that takes the errors no field's own slot can
+        // show: a hidden field's, an unloaded partial's, a member the page never rendered.
+        private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan) where TModel : class
+        {
+            var script = $"<script type=\"application/json\" id=\"alis-plan-{PlanElementId.For(plan.PlanId)}\" data-reactive-plan>{plan.Render()}</script>";
+            return plan.RendersValidationSummary ? script + ValidationSummaryFor(plan.PlanId) : script;
+        }
 
         // The runtime finds the summary by this id, the same one native-validation-summary writes.
         private static string ValidationSummaryFor(string planId)
