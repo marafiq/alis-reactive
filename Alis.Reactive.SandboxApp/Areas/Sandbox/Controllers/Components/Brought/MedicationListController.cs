@@ -11,7 +11,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         private const string ViewBase = "~/Areas/Sandbox/Views/Components/Brought/MedicationList/";
 
         [HttpGet("")]
-        public IActionResult Index() => View(ViewBase + "Index.cshtml", new MedicationReconciliationModel());
+        public IActionResult Index() => View(ViewBase + "Index.cshtml", new MedicationListModel());
 
         // Maple Grove Pharmacy delivered four of the five lines: no lidocaine patch, and its warfarin label
         // carries a trailing space. The empty delivery is what the pharmacy sends when nothing was ordered.
@@ -25,10 +25,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             {
                 Lines =
                 [
-                    MedicationReconciliationModel.Line("Metoprolol 25 mg", units: 1, cost: 0.40m, hours: 12, MedicationRoute.Oral, hour: 8),
-                    MedicationReconciliationModel.Line("Warfarin 2 mg ", units: 2, cost: 1.25m, hours: 24, MedicationRoute.Oral, hour: 18),
-                    MedicationReconciliationModel.Line("Lorazepam 0.5 mg", units: 1, cost: 2.10m, hours: 8, MedicationRoute.Oral, hour: 8, controlled: true),
-                    MedicationReconciliationModel.Line("Insulin glargine", units: 20, cost: 12.75m, hours: 24, MedicationRoute.Injection, hour: 7),
+                    MedicationListModel.Line("Metoprolol 25 mg", units: 1, cost: 0.40m, hours: 12, MedicationRoute.Oral, hour: 8),
+                    MedicationListModel.Line("Warfarin 2 mg ", units: 2, cost: 1.25m, hours: 24, MedicationRoute.Oral, hour: 18),
+                    MedicationListModel.Line("Lorazepam 0.5 mg", units: 1, cost: 2.10m, hours: 8, MedicationRoute.Oral, hour: 8, controlled: true),
+                    MedicationListModel.Line("Insulin glargine", units: 20, cost: 12.75m, hours: 24, MedicationRoute.Injection, hour: 7),
                 ],
                 Deliveries =
                 [

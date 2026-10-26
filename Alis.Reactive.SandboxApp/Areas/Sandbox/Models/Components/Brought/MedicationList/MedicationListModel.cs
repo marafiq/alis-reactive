@@ -5,7 +5,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
     // Journey: the admitting nurse reconciles a new resident's medication list, line by line, against the
     // pharmacy's delivery. The list is a widget the sandbox wrote itself (BroughtComponents/MedicationList):
     // a list of objects with members of their own; the delivery is the pharmacy's answer.
-    public class MedicationReconciliationModel
+    public class MedicationListModel
     {
         /// <summary>The id of the resident's medication list on the page.</summary>
         public const string ListId = "medications";

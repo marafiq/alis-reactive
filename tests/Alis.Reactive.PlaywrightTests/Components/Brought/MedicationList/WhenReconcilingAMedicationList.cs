@@ -26,7 +26,7 @@ public class WhenReconcilingAMedicationList : PlaywrightTestBase
     private const string ListNamesAtoZ = "Insulin glargine,Lidocaine patch,Lorazepam 0.5 mg,Metoprolol 25 mg,Warfarin 2 mg";
     private const string DeliveryNamesAtoZ = "Insulin glargine,Lorazepam 0.5 mg,Metoprolol 25 mg,Warfarin 2 mg ";
 
-    private ILocator List => Page.Locator($"#{MedicationReconciliationModel.ListId}");
+    private ILocator List => Page.Locator($"#{MedicationListModel.ListId}");
     private ILocator ReconcileAll => Page.Locator("#reconcile-all");
     private ILocator AddTheAspirin => Page.Locator("#add-aspirin");
     private ILocator RecordTheEmptyDelivery => Page.Locator("#load-empty-delivery");

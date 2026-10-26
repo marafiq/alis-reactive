@@ -1,4 +1,4 @@
-@model MedicationReconciliationModel
+@model MedicationListModel
 @using Alis.Reactive.Builders
 @using Alis.Reactive.Builders.Arrays
 @using Alis.Reactive.Builders.Conditions
@@ -6,12 +6,12 @@
 @using Alis.Reactive.SandboxApp.BroughtComponents
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
 @functions {
-    private static void Line(GuardBuilder<MedicationReconciliationModel> rule, string id, string holds, string fails) =>
+    private static void Line(GuardBuilder<MedicationListModel> rule, string id, string holds, string fails) =>
         rule.Then(then => then.Element(id).Text.Set(holds))
             .Else(otherwise => otherwise.Element(id).Text.Set(fails));
 
     // The figures the nurse reads off a list of lines, the resident's or the pharmacy's alike.
-    private static void Figures(PipelineBuilder<MedicationReconciliationModel> p, ReactiveArray<MedicationItem> lines, string of)
+    private static void Figures(PipelineBuilder<MedicationListModel> p, ReactiveArray<MedicationItem> lines, string of)
     {
         var noon = new DateTime(2026, 6, 2, 12, 0, 0);
         const string prefix = "L";
@@ -45,9 +45,9 @@
     }
 
     // The resident's list: its lines as data for the figures, and as objects with members of their own.
-    private static void ListFigures(PipelineBuilder<MedicationReconciliationModel> p)
+    private static void ListFigures(PipelineBuilder<MedicationListModel> p)
     {
-        var list = p.Component<MedicationList>(MedicationReconciliationModel.ListId);
+        var list = p.Component<MedicationList>(MedicationListModel.ListId);
         Figures(p, p.From(list.Items), "list");
         p.Element("list-size").Text.Set(list.Count);
         Line(p.When(list.Lines.Each(l => l.Name)).ArrayContains("Lorazepam 0.5 mg"), "list-lorazepam", "A benzodiazepine on the list: lock it in the cart.", "No benzodiazepine on the list.");
@@ -56,9 +56,9 @@
     }
 
     // The pharmacy's delivery: its lines as the response carries them, recorded on the list.
-    private static void RecordTheDelivery(Data<DeliveryResponse> delivery, PipelineBuilder<MedicationReconciliationModel> s)
+    private static void RecordTheDelivery(Data<DeliveryResponse> delivery, PipelineBuilder<MedicationListModel> s)
     {
-        var list = s.Component<MedicationList>(MedicationReconciliationModel.ListId);
+        var list = s.Component<MedicationList>(MedicationListModel.ListId);
         list.Deliveries.Set(delivery.Get(x => x.Deliveries));
         Figures(s, s.From(delivery.Get(x => x.Lines)), "delivery");
         Line(s.When(list.Deliveries.Each(d => d.Pharmacy)).ArrayContains("Maple Grove Pharmacy"), "delivery-pharmacy", "Maple Grove Pharmacy delivered.", "No delivery from Maple Grove Pharmacy.");
@@ -71,9 +71,9 @@
     const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
     const string Figure = "flex justify-between gap-4 border-b border-border/60 py-1";
 
-    var plan = Html.ReactivePlan<MedicationReconciliationModel>();
+    var plan = Html.ReactivePlan<MedicationListModel>();
 
-    void LoadDelivery(PipelineBuilder<MedicationReconciliationModel> p, string pharmacy) =>
+    void LoadDelivery(PipelineBuilder<MedicationListModel> p, string pharmacy) =>
         p.Get(Url.SandboxRoute("Delivery", "MedicationList", new { pharmacy }))
             .Response(r => r.OnSuccess<DeliveryResponse>((delivery, s) => RecordTheDelivery(delivery, s)));
 
@@ -95,7 +95,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">The resident's list</native-heading>
         <div class="mt-3">
-            @(plan.MedicationList(MedicationReconciliationModel.ListId, Model.Lines)
+            @(plan.MedicationList(MedicationListModel.ListId, Model.Lines)
                 .Reactive(evt => evt.Changed, (args, p) =>
                 {
                     ListFigures(p);
@@ -107,11 +107,11 @@
         <native-hstack gap="Sm" class="flex-wrap mt-3">
             @(Html.NativeButton("reconcile-all", "Mark every line reconciled")
                 .CssClass(Button)
-                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<MedicationList>(MedicationReconciliationModel.ListId).ReconcileAll()))
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<MedicationList>(MedicationListModel.ListId).ReconcileAll()))
             @(Html.NativeButton("add-aspirin", "Add the daily aspirin")
                 .CssClass(Button)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
-                    p.Component<MedicationList>(MedicationReconciliationModel.ListId).Add("Aspirin 81 mg", 1, MedicationRoute.Oral)))
+                    p.Component<MedicationList>(MedicationListModel.ListId).Add("Aspirin 81 mg", 1, MedicationRoute.Oral)))
             @(Html.NativeButton("load-empty-delivery", "Record the empty delivery")
                 .CssClass(Button)
                 .Reactive(plan, evt => evt.Click, (args, p) => LoadDelivery(p, "none")))
