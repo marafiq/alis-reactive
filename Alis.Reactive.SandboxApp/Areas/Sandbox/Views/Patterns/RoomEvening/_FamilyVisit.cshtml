@@ -1,0 +1,60 @@
+@model RoomEveningModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.RoomEvening
+@using Microsoft.AspNetCore.Html
+@{
+    // The visit card composes with the page: its inputs join the evening log's form, its rule joins the
+    // form's checks, and both leave with the card.
+    const string FormId = "evening-form";
+    const string EscortSlotId = "escort-slot";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var relationships = new List<SelectListItem>
+    {
+        new("Daughter", "Daughter"),
+        new("Son", "Son"),
+        new("Friend", "Friend"),
+    };
+
+    var plan = Html.ResolvePlan<RoomEveningModel>();
+
+    // The bell is on the page already, so the card writes no markup for it: its plan joins the bell by id
+    // and hears it only while the card is loaded.
+    plan.Render<CallBell>(RoomEveningModel.BellId, HtmlString.Empty)
+        .Reactive(evt => evt.OnPressed, (call, p) =>
+        {
+            p.Element("visit-bell-count").Text.Set(call.Presses);
+            p.Element("visit-bell-line").Show();
+        });
+}
+
+<native-vstack gap="Base">
+    <native-heading level="H3">Family visit</native-heading>
+    <native-grid cols="C2" gap="Base">
+        @{ Html.InputField(plan, m => m.Visitor, o => o.Required().Label("Visitor"))
+            .NativeTextBox(b => b.Placeholder("Ruth Hale").CssClass(Field)); }
+        @{ Html.InputField(plan, m => m.Relationship, o => o.Label("Relationship"))
+            .NativeDropDown(b => b.Items(relationships).Placeholder("Choose").CssClass(Field)); }
+    </native-grid>
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("sign-in", "Sign the visitor in")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Post(Url.SandboxRoute("SignIn", "RoomEvening")).Gather(g => g.Form())
+                    .Validate<FamilyVisitValidator>(FormId)
+                    .Response(r => r.OnSuccess<VisitSigned>((signed, s) =>
+                        s.Element("visit-status").Text.Set(signed.Get(x => x.Confirmation))))))
+        @(Html.NativeButton("request-escort", "Request an escort")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Get(Url.SandboxRoute("EscortCard", "RoomEvening"))
+                    .Response(r => r.OnSuccess(s => s.Into(EscortSlotId)))))
+    </native-hstack>
+    <native-text><span id="visit-status">No visitor signed in.</span></native-text>
+    <p id="visit-bell-line" class="text-sm text-warning" hidden>The visitor heard the bell: call <span id="visit-bell-count"></span> tonight.</p>
+    <div id="@EscortSlotId"></div>
+</native-vstack>
+
+@Html.RenderPlan(plan)

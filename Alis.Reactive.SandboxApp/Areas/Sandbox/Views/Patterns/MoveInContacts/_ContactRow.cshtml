@@ -1,0 +1,35 @@
+@model MoveInContactsModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInContacts
+@{
+    // One emergency contact: the row partial is rendered once per item of the list, and each input binds
+    // the item at its position. The Call button carries a plan of its own, so it works wherever the row
+    // lands, with or without the page's plan.
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var index = (int)ViewData["Index"]!;
+    var callId = $"call-contact-{index}";
+    var plan = Html.ResolvePlan<MoveInContactsModel>();
+    var callPlan = Html.ElementPlan<MoveInContactsModel>(callId);
+}
+
+<native-grid cols="C3" gap="Base">
+    @{ Html.InputField(plan, m => m.Contacts[index].Name, o => o.Label($"Contact {index + 1} name"))
+        .NativeTextBox(b => b.CssClass(Field)); }
+    @{ Html.InputField(plan, m => m.Contacts[index].Phone, o => o.Label($"Contact {index + 1} phone"))
+        .NativeTextBox(b => b.CssClass(Field)); }
+    <native-vstack gap="Xs">
+        @(Html.NativeButton(callId, "Call")
+            .CssClass(ButtonSecondary)
+            .Reactive(callPlan, evt => evt.Click, (args, p) =>
+            {
+                p.Element($"calling-{index}").Text.Set(p.Component<NativeTextBox>(m => m.Contacts[index].Name).Value);
+                p.Element($"calling-line-{index}").Show();
+            }))
+        <p id="calling-line-@index" class="text-sm" hidden>Calling <span id="calling-@index"></span>.</p>
+    </native-vstack>
+</native-grid>
+
+@Html.RenderPlan(callPlan)
+@Html.RenderPlan(plan)

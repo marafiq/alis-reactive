@@ -1,0 +1,107 @@
+@model WingPagerModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Plugins.Pager
+@{
+    ViewData["Title"] = "Wing Pager";
+
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<WingPagerModel>();
+    var pager = plan.RegisterPlugin<PagerPlugin>();
+    var initials = plan.RegisterPlugin<InitialsPlugin>();
+
+    // The desk opens with the pager as it is: its channel, its status, and the pagers on the wing.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Element("channel").Text.Set(pager.Channel);
+        p.Element("status").Text.Set(pager.Status.Label());
+        p.Element("device-count").Text.Set(pager.Devices.Count);
+        p.Element("first-device").Text.Set(pager.Devices.At(0).Name);
+        p.Element("first-battery").Text.Set(pager.Devices.At(0).Battery);
+        p.When(pager.Status.Online).Truthy()
+            .Then(online => online.Element("online").Show())
+            .Else(offline => offline.Element("offline").Show());
+        p.When(pager.Devices.Each(device => device.Name)).ArrayContains("Charge nurse")
+            .Then(carried => carried.Element("charge-nurse-carries").Show());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Wing Pager</native-heading>
+        <native-text color="Secondary">
+            The night desk pages the Garden wing's staff through the community's pager system.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-vstack gap="Xs">
+                <native-text>Channel <span id="channel"></span> · System <span id="status"></span></native-text>
+                <p id="online" class="text-sm text-success" hidden>The pager system is online.</p>
+                <p id="offline" class="text-sm text-warning" hidden>The pager system is offline.</p>
+                <native-text color="Secondary"><span id="device-count"></span> pagers on the wing; the first is carried by <span id="first-device"></span> at <span id="first-battery"></span>% battery.</native-text>
+                <p id="charge-nurse-carries" class="text-sm text-text-secondary" hidden>The charge nurse carries a pager tonight.</p>
+                <native-text color="Secondary"><span id="priority">Priority paging is locked.</span></native-text>
+            </native-vstack>
+
+            <native-grid cols="C3" gap="Base">
+                @{ Html.InputField(plan, m => m.Message, o => o.Label("Message"))
+                    .NativeTextBox(b => b.CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.Sender, o => o.Label("Signed by"))
+                    .NativeTextBox(b => b.CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.AccessCode, o => o.Label("Priority access code"))
+                    .NativeTextBox(b => b.Placeholder("Four digits").CssClass(Field)); }
+            </native-grid>
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("night-channel", "Switch to the night channel")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        pager.Channel.Set("night");
+                        p.Element("channel").Text.Set(pager.Channel);
+                    }))
+                @(Html.NativeButton("unlock-priority", "Unlock priority paging")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        pager.AccessCode.Set(p.Component<NativeTextBox>(m => m.AccessCode).Value);
+                        p.When(pager.PriorityUnlocked).Truthy()
+                            .Then(unlocked => unlocked.Element("priority").Text.Set("Priority paging is unlocked."))
+                            .Else(locked => locked.Element("priority").Text.Set("Priority paging stays locked: check the code."));
+                    }))
+                @(Html.NativeButton("send-page", "Send the page")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // The send is a promise: the delivered count is read once it settles.
+                        pager.Send(p.Component<NativeTextBox>(m => m.Message).Value);
+                        p.Element("delivered").Text.Set(pager.Delivered);
+                        p.Element("signed").Text.Set(initials.Of(p.Component<NativeTextBox>(m => m.Sender).Value));
+                        p.Element("sent-line").Show();
+                    }))
+                @(Html.NativeButton("send-receipt", "Send with a receipt")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Element("receipt").Text.Set(pager.SendWithReceipt(p.Component<NativeTextBox>(m => m.Message).Value))))
+                @(Html.NativeButton("estimate", "How long to reach everyone?")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Element("estimate-seconds").Text.Set(pager.Estimate(pager.Devices.Count, true));
+                        p.Element("estimate-line").Show();
+                    }))
+            </native-hstack>
+
+            <native-vstack gap="Xs">
+                <p id="sent-line" class="text-sm" hidden><span id="delivered"></span> pages delivered tonight, signed <span id="signed"></span>.</p>
+                <native-text><span id="receipt"></span></native-text>
+                <p id="estimate-line" class="text-sm text-text-secondary" hidden>An urgent page reaches every pager in <span id="estimate-seconds"></span> seconds.</p>
+            </native-vstack>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

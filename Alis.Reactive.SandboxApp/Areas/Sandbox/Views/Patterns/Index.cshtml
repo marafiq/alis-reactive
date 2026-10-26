@@ -65,6 +65,19 @@
                 See how element IDs are auto-generated from model expressions — inspect DOM to verify deterministic IDs
             </p>
         </a>
+
+        <a asp-area="Sandbox" asp-controller="MoveInContacts" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Move-in Contacts
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                A nested name, two list items rendered by one row partial, a contact card under a field prefix, and a Call button with a plan of its own: every input carries the id the framework derives and the name the server binds
+            </p>
+        </a>
     </native-grid>
 </section>
 
@@ -123,6 +136,19 @@
             </native-hstack>
             <p class="mt-2 text-sm text-text-secondary leading-relaxed">
                 Server-loaded step workflow with partial replacement, draft persistence, per-step validation, and final server-side cross-step submission.
+            </p>
+        </a>
+
+        <a asp-area="Sandbox" asp-controller="RoomEvening" asp-action="Index"
+           class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+            <native-hstack justify="Between" align="Start">
+                <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                    Room 12 Evening
+                </h3>
+                <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+            </native-hstack>
+            <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                A family visit loaded into the evening log as a card with inputs, a rule, buttons, the room's bell and an escort card of its own; ending the visit takes all of it away and leaves the room's bell, buttons and rule working
             </p>
         </a>
     </native-grid>

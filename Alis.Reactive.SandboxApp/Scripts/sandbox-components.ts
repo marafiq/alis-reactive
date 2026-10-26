@@ -8,6 +8,7 @@ import "tom-select/dist/css/tom-select.css";
 import { VisitPlanner, visitPlannerHosts } from "./visit-planner";
 import { Thermostat, thermostatHosts } from "./thermostat";
 import { CallBell, callBellHosts } from "./call-bell";
+import { Whiteboard, whiteboardHosts } from "./whiteboard";
 import "./house-confirm";
 
 interface MountEventDetail {
@@ -38,6 +39,9 @@ document.addEventListener("alis:mount", event => {
   for (const host of callBellHosts(root)) {
     if (host.callBell === undefined) new CallBell(host);
   }
+  for (const host of whiteboardHosts(root)) {
+    if (host.whiteboard === undefined) new Whiteboard(host);
+  }
 });
 
 document.addEventListener("alis:unmount", event => {
@@ -53,5 +57,8 @@ document.addEventListener("alis:unmount", event => {
   }
   for (const host of callBellHosts(root)) {
     host.callBell?.destroy();
+  }
+  for (const host of whiteboardHosts(root)) {
+    host.whiteboard?.destroy();
   }
 });

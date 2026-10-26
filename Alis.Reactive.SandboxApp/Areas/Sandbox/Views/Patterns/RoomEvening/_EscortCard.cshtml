@@ -1,0 +1,13 @@
+@model RoomEveningModel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.RoomEvening
+@{
+    var plan = Html.ResolvePlan<RoomEveningModel>();
+
+    // The escort hears the shift change the page announces, for as long as the card is on the page.
+    Html.On(plan, t => t.CustomEvent(RoomEveningEvents.ShiftChanged, p =>
+        p.Element("escort-status").Text.Set("Escort handed to the night staff.")));
+}
+
+<native-text>Escort: <span id="escort-status">Aide Reyes is on the way.</span></native-text>
+
+@Html.RenderPlan(plan)

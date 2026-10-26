@@ -1,0 +1,66 @@
+/* The room whiteboard the sandbox wrote itself (whiteboard.ts). */
+.whiteboard {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 24rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d6dde6;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  font-size: 0.875rem;
+}
+
+.whiteboard .wb-rows,
+.whiteboard .wb-notes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.whiteboard .wb-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.whiteboard .wb-row-label {
+  min-width: 6.5rem;
+  color: #64748b;
+}
+
+.whiteboard .wb-row-value {
+  font-weight: 600;
+}
+
+.whiteboard .wb-row.wb-effect-pulse .wb-row-value {
+  color: #b45309;
+  animation: wb-pulse 1.2s ease-in-out infinite;
+}
+
+.whiteboard .wb-row.wb-effect-plain .wb-row-value {
+  text-decoration: underline;
+}
+
+@keyframes wb-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.whiteboard .wb-notes {
+  display: grid;
+  gap: 0.25rem;
+  color: #334155;
+}
+
+.whiteboard .wb-foot {
+  display: flex;
+  justify-content: space-between;
+  color: #64748b;
+}
+
+.whiteboard .wb-status {
+  min-height: 1.25rem;
+  margin: 0;
+  color: #b45309;
+}

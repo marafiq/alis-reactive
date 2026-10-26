@@ -106,3 +106,68 @@ registeredPlugins.push({
     if (region !== null) region.textContent = String(line ?? "");
   },
 });
+
+// A person's initials: the plugin is itself the function, and returns a value.
+registeredPlugins.push({
+  name: "initials",
+  instance: (name: unknown) =>
+    String(name ?? "")
+      .split(/\s+/)
+      .filter(part => part !== "")
+      .map(part => part[0]!.toUpperCase())
+      .join(""),
+});
+
+// The wing's staff pager: an object with every kind of member a plugin can have. The channel is read
+// and written; the access code is written only and unlocks priority paging; send() returns a promise
+// that settles once the page is delivered, and only then counts it; status is an object with members
+// of its own; devices is a list of objects.
+interface PagerDevice {
+  readonly name: string;
+  readonly battery: number;
+}
+
+const pagerDevices: PagerDevice[] = [
+  { name: "Desk", battery: 80 },
+  { name: "Charge nurse", battery: 55 },
+  { name: "Night aide", battery: 95 },
+];
+
+const DELIVERY_MS = 150;
+const PAGER_ACCESS_CODE = "4321";
+
+const pager = {
+  channel: "day",
+  delivered: 0,
+  priorityUnlocked: false,
+  set accessCode(code: string) {
+    this.priorityUnlocked = code === PAGER_ACCESS_CODE;
+  },
+  status: {
+    online: true,
+    queued: 0,
+    label(): string {
+      return `${this.online ? "online" : "offline"}, ${this.queued} queued`;
+    },
+  },
+  devices: pagerDevices,
+  estimate(count: unknown, urgent: unknown): number {
+    const perDevice = urgent === true ? 2 : 5;
+    return (typeof count === "number" ? count : 0) * perDevice;
+  },
+  send(message: unknown): Promise<void> {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        pager.delivered += 1;
+        pager.lastMessage = String(message ?? "");
+        resolve();
+      }, DELIVERY_MS);
+    });
+  },
+  sendWithReceipt(message: unknown): Promise<string> {
+    return pager.send(message).then(() => `Delivered to ${pagerDevices.length} pagers: ${pager.lastMessage}`);
+  },
+  lastMessage: "",
+};
+
+registeredPlugins.push({ name: "pager", instance: pager });
