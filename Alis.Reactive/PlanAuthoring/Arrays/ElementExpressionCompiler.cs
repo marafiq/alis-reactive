@@ -34,13 +34,13 @@ namespace Alis.Reactive.Builders.Arrays
         };
 
         private static MethodInfo MethodOf<T>(Expression<Func<T, object?>> call) =>
-            ((MethodCallExpression)Unwrap(call.Body)).Method;
+            ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
 
         internal static ConditionGraph CompilePredicate(LambdaExpression predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            return CompileCondition(Unwrap(predicate.Body), predicate.Parameters[0]);
+            return CompileCondition(Expressions.StripConvert(predicate.Body), predicate.Parameters[0]);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Alis.Reactive.Builders.Arrays
         {
             if (projection == null) throw new ArgumentNullException(nameof(projection));
 
-            return CompileValue(Unwrap(projection.Body), projection.Parameters[0]);
+            return CompileValue(Expressions.StripConvert(projection.Body), projection.Parameters[0]);
         }
 
         private static ConditionGraph CompileCondition(Expression body, ParameterExpression element)
@@ -63,12 +63,12 @@ namespace Alis.Reactive.Builders.Arrays
                 {
                     case ExpressionType.AndAlso:
                         return ConditionGraph.All(
-                            CompileCondition(Unwrap(binary.Left), element),
-                            CompileCondition(Unwrap(binary.Right), element));
+                            CompileCondition(Expressions.StripConvert(binary.Left), element),
+                            CompileCondition(Expressions.StripConvert(binary.Right), element));
                     case ExpressionType.OrElse:
                         return ConditionGraph.Any(
-                            CompileCondition(Unwrap(binary.Left), element),
-                            CompileCondition(Unwrap(binary.Right), element));
+                            CompileCondition(Expressions.StripConvert(binary.Left), element),
+                            CompileCondition(Expressions.StripConvert(binary.Right), element));
                     case ExpressionType.Equal:
                     case ExpressionType.NotEqual:
                     case ExpressionType.GreaterThan:
@@ -80,17 +80,17 @@ namespace Alis.Reactive.Builders.Arrays
             }
 
             if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Not)
-                return ConditionGraph.Not(CompileCondition(Unwrap(unary.Operand), element));
+                return ConditionGraph.Not(CompileCondition(Expressions.StripConvert(unary.Operand), element));
 
             if (body is MethodCallExpression call && call.Object != null && TryTextTest(call, out var textTest))
             {
-                var argument = Unwrap(call.Arguments[0]);
-                if (ReferencesParameter(argument, element))
+                var argument = Expressions.StripConvert(call.Arguments[0]);
+                if (Expressions.Reads(argument, element))
                     throw new InvalidOperationException(
                         "String operation arguments (Contains/StartsWith/EndsWith) must be constants or captured " +
                         "values, not element-scope reads — the runtime text operand requires a literal. Got: " + argument);
 
-                return ConditionGraph.Text(textTest, CompileValue(Unwrap(call.Object), element), FixedText(argument), Shape.String);
+                return ConditionGraph.Text(textTest, CompileValue(Expressions.StripConvert(call.Object), element), FixedText(argument), Shape.String);
             }
 
             if (body.Type == typeof(bool))
@@ -104,8 +104,8 @@ namespace Alis.Reactive.Builders.Arrays
 
         private static ConditionGraph CompileComparison(BinaryExpression binary, ParameterExpression element)
         {
-            var left = Unwrap(binary.Left);
-            var right = Unwrap(binary.Right);
+            var left = Expressions.StripConvert(binary.Left);
+            var right = Expressions.StripConvert(binary.Right);
 
             // Runtime coerces BOTH operands to one Shape before comparing (sync-condition
             // applies condition.shape to each side, then ===), so the comparison Shape must come
@@ -115,8 +115,8 @@ namespace Alis.Reactive.Builders.Arrays
             // comparisons, so this keeps a literal-on-left predicate (e.g. 65 < x.Age) shaped by
             // the member, not the literal.
             Expression memberOperand;
-            if (ReferencesParameter(left, element)) memberOperand = left;
-            else if (ReferencesParameter(right, element)) memberOperand = right;
+            if (Expressions.Reads(left, element)) memberOperand = left;
+            else if (Expressions.Reads(right, element)) memberOperand = right;
             else throw new InvalidOperationException(
                 "Array predicate comparison must reference the element on at least one side; " +
                 "comparing two constants is a developer mistake. Got: " + binary);
@@ -136,16 +136,16 @@ namespace Alis.Reactive.Builders.Arrays
         private static ValueExpression CompileOperand(Expression operand, ParameterExpression element, Type memberType)
         {
             var enumType = Nullable.GetUnderlyingType(memberType) ?? memberType;
-            if (!enumType.IsEnum || ReferencesParameter(operand, element)) return CompileValue(operand, element);
+            if (!enumType.IsEnum || Expressions.Reads(operand, element)) return CompileValue(operand, element);
 
-            var value = Expression.Lambda(operand).Compile().DynamicInvoke();
+            var value = Expressions.Evaluate(operand);
             var member = value == null || value is Enum ? value : Enum.ToObject(enumType, value);
             return ValueExpression.LiteralFor(member, Shape.FromClrType(memberType));
         }
 
         private static ValueExpression CompileValue(Expression expression, ParameterExpression element)
         {
-            var node = Unwrap(expression);
+            var node = Expressions.StripConvert(expression);
 
             if (ExpressionPathHelper.TryJsonPath(node, element, out var path))
             {
@@ -167,44 +167,22 @@ namespace Alis.Reactive.Builders.Arrays
 
                 var methodArgs = new List<ValueExpression>();
                 foreach (var methodArgument in call.Arguments)
-                    methodArgs.Add(CompileValue(Unwrap(methodArgument), element));
+                    methodArgs.Add(CompileValue(Expressions.StripConvert(methodArgument), element));
 
                 var unconverted = methodArgs.Select(_ => Shape.None).ToList();
                 return ValueExpression.Call(
                     Target.Item, targetPath.Then(methodName).TargetText, methodArgs, unconverted, Shape.FromClrType(node.Type), methodName);
             }
 
-            if (ReferencesParameter(node, element))
+            if (Expressions.Reads(node, element))
                 throw new InvalidOperationException(
                     "Element selector must be a member access (x => x.Field, x => x.A.B) or the element " +
                     "itself (x => x). Object-init and arithmetic projections are not supported in v1. Got: " + node);
 
             // Parameter-free: a constant or captured value, evaluated once and written as every literal is
             // (an enum by its JSON name, a date as text).
-            var value = Expression.Lambda(node).Compile().DynamicInvoke();
+            var value = Expressions.Evaluate(node);
             return ValueExpression.LiteralFor(value, Shape.FromValue(value));
-        }
-
-        private static bool ReferencesParameter(Expression expression, ParameterExpression element)
-        {
-            var finder = new ParameterUsageVisitor(element);
-            finder.Visit(expression);
-            return finder.Found;
-        }
-
-        private sealed class ParameterUsageVisitor : ExpressionVisitor
-        {
-            private readonly ParameterExpression _parameter;
-
-            internal ParameterUsageVisitor(ParameterExpression parameter) => _parameter = parameter;
-
-            internal bool Found { get; private set; }
-
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                if (node == _parameter) Found = true;
-                return base.VisitParameter(node);
-            }
         }
 
         private static CompareOperator CompareOperatorFor(ExpressionType nodeType) =>
@@ -237,19 +215,8 @@ namespace Alis.Reactive.Builders.Arrays
 
         // The text a string test compares with: a constant or a captured value, evaluated once here.
         private static string FixedText(Expression argument) =>
-            Expression.Lambda(argument).Compile().DynamicInvoke() as string
+            Expressions.Evaluate(argument) as string
             ?? throw new InvalidOperationException("String operation arguments must be text. Got: " + argument);
-
-        private static Expression Unwrap(Expression expression)
-        {
-            while (expression is UnaryExpression unary &&
-                   (unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked))
-            {
-                expression = unary.Operand;
-            }
-
-            return expression;
-        }
 
     }
 }

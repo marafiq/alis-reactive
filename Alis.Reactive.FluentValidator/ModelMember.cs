@@ -63,7 +63,7 @@ namespace Alis.Reactive.FluentValidator
         internal static ModelMember<T> Of<TValue>(Expression<Func<T, TValue>> expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            var body = StripConvert(expression.Body);
+            var body = Expressions.StripConvert(expression.Body);
             var path = PathOf(body, expression.Parameters[0]);
             var name = body is MemberExpression member ? member.Member.Name : "";
             var read = path == null ? Reader(expression) : PathReaders.GetOrAdd(path, _ => Reader(expression));
@@ -84,17 +84,9 @@ namespace Alis.Reactive.FluentValidator
             while (current is MemberExpression member && member.Expression != null)
             {
                 names.Insert(0, member.Member.Name);
-                current = StripConvert(member.Expression);
+                current = Expressions.StripConvert(member.Expression);
             }
             return current == model && names.Count > 0 ? string.Join(".", names) : null;
-        }
-
-        private static Expression StripConvert(Expression expression)
-        {
-            while (expression is UnaryExpression unary
-                   && (unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked))
-                expression = unary.Operand;
-            return expression;
         }
     }
 }

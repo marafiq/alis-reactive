@@ -100,7 +100,7 @@ namespace Alis.Reactive.Validation
         {
             var field = FieldReference.Of(member);
             var op = OperatorOf(comparison);
-            var fixedValue = LiteralOf(field.Type, ConditionValue.Evaluate(value)
+            var fixedValue = LiteralOf(field.Type, Expressions.Evaluate(value)
                 ?? throw new ArgumentNullException(nameof(value), "Test a missing value with ClientValueTest.Null."));
             return new FieldTest(field, (left, shape) => ConditionGraph.Ordered(op, left, ValueExpression.LiteralFor(fixedValue, shape), shape));
         }
@@ -111,7 +111,7 @@ namespace Alis.Reactive.Validation
         public static ClientCondition In(LambdaExpression member, Expression values)
         {
             var field = FieldReference.Of(member);
-            var fixedValues = ConditionValue.Evaluate(values) as IEnumerable
+            var fixedValues = Expressions.Evaluate(values) as IEnumerable
                 ?? throw new ArgumentException("The values must be a collection.", nameof(values));
             var members = fixedValues.Cast<object?>().Select(value => LiteralOf(field.Type, value)).ToArray();
             return new FieldTest(field, (left, shape) =>
@@ -135,9 +135,9 @@ namespace Alis.Reactive.Validation
         public static ClientCondition Holds(LambdaExpression collection, Expression item)
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
-            var itemType = ConditionValue.TypeOf(item);
+            var itemType = Expressions.TypeOf(item);
             var itemShape = Shape.FromClrType(itemType);
-            var fixedItem = LiteralOf(itemType, ConditionValue.Evaluate(item));
+            var fixedItem = LiteralOf(itemType, Expressions.Evaluate(item));
             return new FieldTest(FieldReference.Of(collection), (left, shape) =>
                 ConditionGraph.ArrayContains(left, ValueExpression.LiteralFor(fixedItem, itemShape), shape, itemShape));
         }
@@ -336,7 +336,7 @@ namespace Alis.Reactive.Validation
         internal static FieldReference Of(LambdaExpression member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-            var body = ConditionValue.StripConvert(member.Body);
+            var body = Expressions.StripConvert(member.Body);
             if (member.Parameters.Count != 1
                 || !ExpressionPathHelper.TryMemberName(body, member.Parameters[0], out var name)
                 || name.Length == 0)
@@ -365,26 +365,6 @@ namespace Alis.Reactive.Validation
                 if (candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     return candidate.GetGenericArguments()[0];
             return null;
-        }
-    }
-
-    // A value a condition fixes: a constant, or a variable the lambda captured, evaluated once at render.
-    internal static class ConditionValue
-    {
-        internal static object? Evaluate(Expression value)
-        {
-            if (value == null) throw new ArgumentNullException(nameof(value));
-            return Expression.Lambda<Func<object?>>(Expression.Convert(value, typeof(object))).Compile()();
-        }
-
-        internal static Type TypeOf(Expression value) => StripConvert(value).Type;
-
-        internal static Expression StripConvert(Expression expression)
-        {
-            while (expression is UnaryExpression unary
-                   && (unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked))
-                expression = unary.Operand;
-            return expression;
         }
     }
 }

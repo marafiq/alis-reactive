@@ -97,7 +97,7 @@ namespace Alis.Reactive.FluentValidator
 
                 var member = fieldOnLeft ? expression.Left : expression.Right;
                 var operand = fieldOnLeft ? expression.Right : expression.Left;
-                var value = Evaluate(operand);
+                var value = Expressions.Evaluate(operand);
                 var op = fieldOnLeft ? expression.NodeType : Mirrored(expression.NodeType);
 
                 if (value == null)
@@ -149,7 +149,7 @@ namespace Alis.Reactive.FluentValidator
                 {
                     field = call.Arguments[0];
                     test = ClientTextTest.Matches;
-                    operand = (string)Evaluate(call.Arguments[1])!;
+                    operand = (string)Expressions.Evaluate(call.Arguments[1])!;
                     return true;
                 }
 
@@ -166,7 +166,7 @@ namespace Alis.Reactive.FluentValidator
                 }
 
                 field = call.Object!;
-                operand = (string)Evaluate(call.Arguments[0])!;
+                operand = (string)Expressions.Evaluate(call.Arguments[0])!;
                 return true;
             }
 
@@ -230,14 +230,14 @@ namespace Alis.Reactive.FluentValidator
 
             // The default comparer, which C# passes as null when the overload takes one.
             private static bool IsNullComparer(Expression comparer) =>
-                StripConvert(comparer) is ConstantExpression constant && constant.Value == null;
+                Expressions.StripConvert(comparer) is ConstantExpression constant && constant.Value == null;
 
             // The array or collection under an implicit conversion to a span.
             private static Expression WithoutSpanConversion(Expression expression)
             {
                 if (expression is MethodCallExpression conversion && conversion.Method.Name == "op_Implicit" && conversion.Arguments.Count == 1)
                     return conversion.Arguments[0];
-                return StripConvert(expression);
+                return Expressions.StripConvert(expression);
             }
 
             private static bool IsStringMethod(MethodCallExpression call, string name) =>
@@ -253,7 +253,7 @@ namespace Alis.Reactive.FluentValidator
                 while (current is MemberExpression member && member.Expression != null)
                 {
                     if (IsValueMember(member.Member)) return false;
-                    current = StripConvert(member.Expression);
+                    current = Expressions.StripConvert(member.Expression);
                 }
                 return current == _model;
             }
@@ -275,28 +275,17 @@ namespace Alis.Reactive.FluentValidator
             // x.Score.Value reads x.Score: the browser's value is the number or nothing.
             private static Expression ModelMember(Expression expression)
             {
-                var current = StripConvert(expression);
+                var current = Expressions.StripConvert(expression);
                 return current is MemberExpression member
                        && member.Expression != null
                        && member.Member.Name == nameof(Nullable<int>.Value)
                        && Nullable.GetUnderlyingType(member.Expression.Type) != null
-                    ? StripConvert(member.Expression)
+                    ? Expressions.StripConvert(member.Expression)
                     : current;
             }
 
             // An expression that reads nothing of the model: a constant, or a captured variable.
-            private bool IsFixed(Expression expression) => !new ModelReads(_model).Find(expression);
-
-            private static object? Evaluate(Expression expression) =>
-                Expression.Lambda(expression).Compile().DynamicInvoke();
-
-            private static Expression StripConvert(Expression expression)
-            {
-                while (expression is UnaryExpression unary
-                       && (unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked))
-                    expression = unary.Operand;
-                return expression;
-            }
+            private bool IsFixed(Expression expression) => !Expressions.Reads(expression, _model);
 
             private static ExpressionType Mirrored(ExpressionType op) => op switch
             {
@@ -316,30 +305,6 @@ namespace Alis.Reactive.FluentValidator
                 ExpressionType.LessThan => ClientComparison.LessThan,
                 _ => ClientComparison.LessThanOrEqual,
             };
-        }
-
-        // Whether an expression reads the model parameter anywhere.
-        private sealed class ModelReads : ExpressionVisitor
-        {
-            private readonly ParameterExpression _model;
-            private bool _found;
-
-            internal ModelReads(ParameterExpression model)
-            {
-                _model = model;
-            }
-
-            internal bool Find(Expression expression)
-            {
-                Visit(expression);
-                return _found;
-            }
-
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                if (node == _model) _found = true;
-                return node;
-            }
         }
     }
 }

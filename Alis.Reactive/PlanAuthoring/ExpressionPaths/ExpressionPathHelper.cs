@@ -73,7 +73,7 @@ namespace Alis.Reactive
         internal static Type ToPropertyType(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return UnwrapConvert(expression.Body).Type;
+            return Expressions.TypeOf(expression.Body);
         }
 
         // A gathered model member: its MVC binding name, and its body path read from the member's types.
@@ -119,13 +119,13 @@ namespace Alis.Reactive
             if (TrySteps(expr, out var steps, out _)) return steps;
             throw new InvalidOperationException(
                 "ExpressionPathHelper only supports property-access chains and MVC indexer paths " +
-                $"(e.g. m => m.Address.City or m => m.Items[0].Sku). Got unsupported expression node: {UnwrapConvert(expr).NodeType}.");
+                $"(e.g. m => m.Address.City or m => m.Items[0].Sku). Got unsupported expression node: {Expressions.StripConvert(expr).NodeType}.");
         }
 
         // The steps from the parameter the chain starts at; false when the expression is not such a chain.
         private static bool TrySteps(Expression expr, out List<AccessStep> steps, out ParameterExpression? parameter)
         {
-            expr = UnwrapConvert(expr);
+            expr = Expressions.StripConvert(expr);
 
             if (expr is ParameterExpression root)
             {
@@ -201,23 +201,8 @@ namespace Alis.Reactive
             return false;
         }
 
-        private static int EvaluateIndex(Expression expression)
-        {
-            var value = Expression.Lambda(UnwrapConvert(expression)).Compile().DynamicInvoke();
-            return Convert.ToInt32(value, CultureInfo.InvariantCulture);
-        }
-
-        private static Expression UnwrapConvert(Expression expr)
-        {
-            while (expr is UnaryExpression unary &&
-                   (unary.NodeType == ExpressionType.Convert ||
-                    unary.NodeType == ExpressionType.ConvertChecked))
-            {
-                expr = unary.Operand;
-            }
-
-            return expr;
-        }
+        private static int EvaluateIndex(Expression expression) =>
+            Convert.ToInt32(Expressions.Evaluate(expression), CultureInfo.InvariantCulture);
 
         // One step of a member chain: a member by name, a list item by position, or a dictionary entry by key.
         private readonly struct AccessStep
