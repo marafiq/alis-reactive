@@ -47,3 +47,7 @@ directory, the plan is missing information: make the C# side carry it.
 `npm run typecheck` (regenerates `types/plan.ts` from the C# grammar first) and `npm test` are
 feedback while coding. Playwright is the only verification: rebuild the bundle, then run
 `scripts/playwright.sh`. Never hand-edit `types/plan.ts`.
+
+The console log shows errors and warnings by default; a page raises the level once, with
+`data-alis-trace="info|debug|trace"` on `<html>`. The sandbox layout sets `trace`, and the Playwright
+base waits for the info-level `[alis:boot] booted` line.

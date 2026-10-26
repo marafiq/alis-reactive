@@ -131,7 +131,7 @@ namespace Alis.Reactive
         {
             var planJson = plan.Render();
             var elementId = PlanElementId.For(plan.PlanId);
-            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{planJson}</script>";
+            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan>{planJson}</script>";
 
             // Root views emit a fallback summary for errors that cannot bind to
             // generated field spans: hidden fields, unloaded partial fields, or
@@ -148,7 +148,7 @@ namespace Alis.Reactive
         {
             var planJson = plan.Render();
             var elementId = PlanElementId.For(plan.PlanId);
-            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan data-trace=\"trace\">{planJson}</script>";
+            var planScript = $"<script type=\"application/json\" id=\"alis-plan-{elementId}\" data-reactive-plan>{planJson}</script>";
 
             // Root views emit a fallback summary for errors that cannot bind to
             // generated field spans: hidden fields, unloaded partial fields, or

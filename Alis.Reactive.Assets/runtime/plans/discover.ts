@@ -2,7 +2,6 @@
 // it did not author, at boot and in injected partials.
 
 import type { PlanDocument } from "../types/index";
-import { setLevel, type TraceLevel } from "../diagnostics/trace";
 
 const PLAN_SELECTOR = "[data-reactive-plan]";
 
@@ -10,8 +9,6 @@ const PLAN_SELECTOR = "[data-reactive-plan]";
 export function discoverPlans(root: ParentNode, remove: boolean): PlanDocument[] {
   const plans: PlanDocument[] = [];
   for (const script of Array.from(root.querySelectorAll<HTMLElement>(PLAN_SELECTOR))) {
-    const traceLevel = script.dataset.trace as TraceLevel | undefined;
-    if (traceLevel) setLevel(traceLevel);
     plans.push(parsePlan(script));
     if (remove) script.remove();
   }

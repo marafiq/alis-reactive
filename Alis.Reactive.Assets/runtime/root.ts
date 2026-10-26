@@ -15,7 +15,7 @@ import { formPlugin } from "./plugins/form/form";
 import { slotPlugin } from "./plugins/slot";
 import { streamPlugin } from "./realtime/stream";
 import { hubPlugin } from "./realtime/hub";
-import { logger } from "./diagnostics/trace";
+import { levelOf, logger, setLevel } from "./diagnostics/trace";
 
 const log = logger("boot");
 
@@ -44,6 +44,7 @@ if (document.readyState === "loading") {
 }
 
 function start(): void {
+  setLevel(levelOf(document.documentElement));
   const runtimeWindow = window as RuntimeWindow;
   for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, pluginOf(plugin.name, plugin.instance));
   delete runtimeWindow.__alisPlugins;
