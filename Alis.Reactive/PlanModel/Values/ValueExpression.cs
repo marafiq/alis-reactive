@@ -299,8 +299,10 @@ namespace Alis.Reactive.PlanModel
 
         internal override Shape OutputShape => _shape;
 
+        // The model hands the value back as MVC binds it, already in the input's shape (grammar.md M5): the
+        // plan converts it no second time.
         internal override Expr Write(Scope scope) =>
-            G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, _shape);
+            G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, Shape.None);
     }
 
     internal sealed class RecordExpression : ValueExpression
