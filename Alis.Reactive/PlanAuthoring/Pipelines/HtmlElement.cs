@@ -54,7 +54,7 @@ namespace Alis.Reactive
         /// <summary>Hides the element: sets its <c>hidden</c> attribute.</summary>
         public void Hide() => Set(BrowserElementMembers.Hidden, ValueExpression.Literal(true));
 
-        internal ValueExpression Read(string member) => ValueExpression.Read(Receiver.Element(_id), new[] { member }, Shape.None);
+        internal ValueExpression Read(string member) => ValueExpression.Get(Receiver.Element(_id), new[] { member }, Shape.None);
 
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value) =>
             _context.AddStep(new SetStep(Receiver.Element(_id), property.Path.TargetText, property.Shape, value));

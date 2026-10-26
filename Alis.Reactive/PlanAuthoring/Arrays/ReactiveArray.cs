@@ -108,7 +108,7 @@ namespace Alis.Reactive.Builders.Arrays
         /// <param name="predicate">The test every element passes.</param>
         /// <returns>Whether every element passes, read when the step runs.</returns>
         public ReactiveValue<bool> All(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<bool>(ValueExpression.ArrayAll(_source, Predicate(predicate)));
+            new ReactiveValue<bool>(ValueExpression.ArrayEvery(_source, Predicate(predicate)));
 
         /// <summary>Sums an integer per-element selector.</summary>
         /// <param name="selector">The number each element adds, for example <c>r =&gt; r.OpenTasks</c>.</param>

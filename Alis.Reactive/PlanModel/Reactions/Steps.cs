@@ -72,7 +72,7 @@ namespace Alis.Reactive.PlanModel
             block.AddRange(scope.WithHoisted(() =>
             {
                 var value = _value.Write(scope);
-                var (root, prefix) = _target.Locate(scope);
+                var (root, prefix) = _target.Write(scope);
                 return new[] { G.Set(root, prefix.Concat(_path).ToList(), _shape, value) };
             }));
     }
@@ -99,7 +99,7 @@ namespace Alis.Reactive.PlanModel
             block.AddRange(scope.WithHoisted(() =>
             {
                 var args = _args.Select(arg => arg.Write(scope)).ToList();
-                var (root, prefix) = _target.Locate(scope);
+                var (root, prefix) = _target.Write(scope);
                 return new[] { G.Do(G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, Shape.None), _awaits) };
             }));
     }

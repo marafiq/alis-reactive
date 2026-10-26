@@ -69,21 +69,21 @@ namespace Alis.Reactive.PlanModel
         // ── reads ────────────────────────────────────────────────────────────────
 
         /// <summary>A property of an object, or a path into data; with no path, the object or data itself.</summary>
-        internal static ValueExpression Read(Receiver receiver, IReadOnlyList<string> path, Shape shape) =>
-            new ReadExpression(receiver, path, shape);
+        internal static ValueExpression Get(Receiver receiver, IReadOnlyList<string> path, Shape shape) =>
+            new GetExpression(receiver, path, shape);
 
-        internal static ValueExpression ReadWhole(Receiver receiver, Shape shape) =>
-            new ReadExpression(receiver, G.NoPath, shape);
+        internal static ValueExpression Get(Receiver receiver, Shape shape) =>
+            new GetExpression(receiver, G.NoPath, shape);
 
         /// <summary>What a method of an object returns.</summary>
-        internal static ValueExpression Invoke(
+        internal static ValueExpression Call(
             Receiver receiver,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
             Shape shape,
             string member) =>
-            new InvokeExpression(receiver, path, args, argShapes, shape, member);
+            new CallExpression(receiver, path, args, argShapes, shape, member);
 
         internal static ValueExpression MethodResult(ValueExpression call, string member, bool awaits) =>
             new MethodResultExpression(call, member, awaits);
@@ -96,7 +96,7 @@ namespace Alis.Reactive.PlanModel
 
         // ── records and lists ────────────────────────────────────────────────────
 
-        internal static ValueExpression Object(IReadOnlyDictionary<string, ValueExpression> fields)
+        internal static ValueExpression Record(IReadOnlyDictionary<string, ValueExpression> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             var snapshot = new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
@@ -109,14 +109,14 @@ namespace Alis.Reactive.PlanModel
                 shapes[field.Key] = field.Value.OutputShape;
             }
 
-            return new ObjectExpression(snapshot, Shape.ObjectOf(shapes));
+            return new RecordExpression(snapshot, Shape.ObjectOf(shapes));
         }
 
-        internal static ValueExpression Array(IReadOnlyList<ValueExpression> items, Shape shape)
+        internal static ValueExpression List(IReadOnlyList<ValueExpression> items, Shape shape)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
             if (items.Any(item => item == null)) throw new ArgumentException("Array item must not be null.", nameof(items));
-            return new ArrayExpression(items.ToList(), shape);
+            return new ListExpression(items.ToList(), shape);
         }
 
         // ── array operations ─────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph predicate) =>
             new SomeOperation(source, predicate);
 
-        internal static ValueExpression ArrayAll(ValueExpression source, ConditionGraph predicate) =>
+        internal static ValueExpression ArrayEvery(ValueExpression source, ConditionGraph predicate) =>
             new EveryOperation(source, predicate);
 
         internal static ValueExpression ArrayFind(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
@@ -170,13 +170,13 @@ namespace Alis.Reactive.PlanModel
         internal override Expr WriteAs(Shape shape, Scope scope) => G.Lit(Value, shape);
     }
 
-    internal sealed class ReadExpression : ValueExpression
+    internal sealed class GetExpression : ValueExpression
     {
         private readonly Receiver _receiver;
         private readonly IReadOnlyList<string> _path;
         private readonly Shape _shape;
 
-        internal ReadExpression(Receiver receiver, IReadOnlyList<string> path, Shape shape)
+        internal GetExpression(Receiver receiver, IReadOnlyList<string> path, Shape shape)
         {
             _receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
             _path = path ?? throw new ArgumentNullException(nameof(path));
@@ -188,17 +188,17 @@ namespace Alis.Reactive.PlanModel
         // Data a callback received is shown as the server or the event sent it; an object's member, the URL
         // and a method read keep their type, which decides how they are read.
         internal override ValueExpression AsArrived() =>
-            _receiver.IsData ? new ReadExpression(_receiver, _path, Shape.None) : this;
+            _receiver.IsData ? new GetExpression(_receiver, _path, Shape.None) : this;
 
         internal override Expr Write(Scope scope)
         {
-            var (root, prefix) = _receiver.Locate(scope);
+            var (root, prefix) = _receiver.Write(scope);
             var path = prefix.Concat(_path).ToList();
             return path.Count == 0 ? G.As(root, _shape) : G.Get(root, path, _shape);
         }
     }
 
-    internal sealed class InvokeExpression : ValueExpression
+    internal sealed class CallExpression : ValueExpression
     {
         private readonly Receiver _receiver;
         private readonly IReadOnlyList<string> _path;
@@ -207,7 +207,7 @@ namespace Alis.Reactive.PlanModel
         private readonly Shape _shape;
         private readonly string _member;
 
-        internal InvokeExpression(
+        internal CallExpression(
             Receiver receiver,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
@@ -229,7 +229,7 @@ namespace Alis.Reactive.PlanModel
 
         internal override Expr Write(Scope scope)
         {
-            var (root, prefix) = _receiver.Locate(scope);
+            var (root, prefix) = _receiver.Write(scope);
             var args = _args.Select(arg => arg.Write(scope)).ToList();
             return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, _shape);
         }
@@ -299,12 +299,12 @@ namespace Alis.Reactive.PlanModel
             G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, G.NoShapes, _shape);
     }
 
-    internal sealed class ObjectExpression : ValueExpression
+    internal sealed class RecordExpression : ValueExpression
     {
         private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
         private readonly Shape _shape;
 
-        internal ObjectExpression(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
+        internal RecordExpression(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
         {
             _fields = fields;
             _shape = shape;
@@ -318,9 +318,9 @@ namespace Alis.Reactive.PlanModel
             G.Record(_fields.Select(field => (RecordEntry)new FieldEntry(field.Key, field.Value.Write(scope))));
     }
 
-    internal sealed class ArrayExpression : ValueExpression
+    internal sealed class ListExpression : ValueExpression
     {
-        internal ArrayExpression(IReadOnlyList<ValueExpression> items, Shape shape)
+        internal ListExpression(IReadOnlyList<ValueExpression> items, Shape shape)
         {
             Items = items;
             Shape = shape;

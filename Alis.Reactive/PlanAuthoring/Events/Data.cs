@@ -30,7 +30,7 @@ namespace Alis.Reactive
             _data = data ?? throw new ArgumentNullException(nameof(data));
         }
 
-        internal override ValueExpression Expression => ValueExpression.ReadWhole(_data, Shape);
+        internal override ValueExpression Expression => ValueExpression.Get(_data, Shape);
 
         /// <summary>Reads a member of the data, for example <c>x =&gt; x.Address.City</c> or <c>x =&gt; x.Items[0].Name</c>.</summary>
         /// <typeparam name="TResult">The member's type.</typeparam>

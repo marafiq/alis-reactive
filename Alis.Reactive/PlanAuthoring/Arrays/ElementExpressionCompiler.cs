@@ -124,8 +124,8 @@ namespace Alis.Reactive.Builders.Arrays
             {
                 var shape = Shape.FromClrType(node.Type);
                 return path.IsNone
-                    ? ValueExpression.ReadWhole(Receiver.Item, shape)
-                    : ValueExpression.Read(Receiver.Item, path.Text, shape);
+                    ? ValueExpression.Get(Receiver.Item, shape)
+                    : ValueExpression.Get(Receiver.Item, path.Text, shape);
             }
 
             // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the receiver must
@@ -143,7 +143,7 @@ namespace Alis.Reactive.Builders.Arrays
                 foreach (var methodArgument in call.Arguments)
                     methodArgs.Add(CompileValue(Unwrap(methodArgument), element));
 
-                return ValueExpression.Invoke(
+                return ValueExpression.Call(
                     Receiver.Item, receiverPath.Then(methodName).TargetText, methodArgs, G.NoShapes, Shape.FromClrType(node.Type), methodName);
             }
 

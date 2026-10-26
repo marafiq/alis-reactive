@@ -29,7 +29,7 @@ namespace Alis.Reactive.PlanModel
         internal virtual bool IsData => false;
 
         /// <summary>The expression for the object, and the path from it to where its members start.</summary>
-        internal abstract (Expr Root, IReadOnlyList<string> Path) Locate(Scope scope);
+        internal abstract (Expr Root, IReadOnlyList<string> Path) Write(Scope scope);
 
         private sealed class ElementReceiver : Receiver
         {
@@ -40,7 +40,7 @@ namespace Alis.Reactive.PlanModel
                 _id = id ?? throw new ArgumentNullException(nameof(id));
             }
 
-            internal override (Expr, IReadOnlyList<string>) Locate(Scope scope) => (G.Obj(scope.Objects.Element(_id)), G.NoPath);
+            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(scope.Objects.Element(_id)), G.NoPath);
         }
 
         private sealed class PluginReceiver : Receiver
@@ -52,14 +52,14 @@ namespace Alis.Reactive.PlanModel
                 _name = name ?? throw new ArgumentNullException(nameof(name));
             }
 
-            internal override (Expr, IReadOnlyList<string>) Locate(Scope scope) => (G.Obj(scope.Objects.Plugin(_name)), G.NoPath);
+            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(scope.Objects.Plugin(_name)), G.NoPath);
         }
 
         private sealed class EventReceiver : Receiver
         {
             internal override bool IsData => true;
 
-            internal override (Expr, IReadOnlyList<string>) Locate(Scope scope) => (G.Ref(scope.EventParam), G.NoPath);
+            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Ref(scope.EventParam), G.NoPath);
         }
 
         private sealed class ResponseReceiver : Receiver
@@ -74,7 +74,7 @@ namespace Alis.Reactive.PlanModel
 
             internal override bool IsData => true;
 
-            internal override (Expr, IReadOnlyList<string>) Locate(Scope scope)
+            internal override (Expr, IReadOnlyList<string>) Write(Scope scope)
             {
                 return (G.Ref(scope.Response(_handle)), Body);
             }
@@ -84,7 +84,7 @@ namespace Alis.Reactive.PlanModel
         {
             internal override bool IsData => true;
 
-            internal override (Expr, IReadOnlyList<string>) Locate(Scope scope) => (G.Ref(scope.Item), G.NoPath);
+            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Ref(scope.Item), G.NoPath);
         }
 
         private sealed class ReturnedReceiver : Receiver
@@ -96,7 +96,7 @@ namespace Alis.Reactive.PlanModel
                 _call = call ?? throw new ArgumentNullException(nameof(call));
             }
 
-            internal override (Expr, IReadOnlyList<string>) Locate(Scope scope) => (_call.Write(scope), G.NoPath);
+            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (_call.Write(scope), G.NoPath);
         }
     }
 }

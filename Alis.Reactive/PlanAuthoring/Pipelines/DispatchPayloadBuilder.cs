@@ -93,7 +93,7 @@ namespace Alis.Reactive.Builders
         }
 
         internal ValueExpression ToValueExpression() =>
-            ValueExpression.Object(ToFields());
+            ValueExpression.Record(ToFields());
 
         private DispatchPayloadDraft GetOrCreateObject(string segment, string fullPath)
         {

@@ -29,7 +29,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Reads the member at <paramref name="path"/>: a declared property, or a member of the data it holds.</summary>
-        internal ValueExpression Read(Path path, Shape shape) => ValueExpression.Read(Locate(), path.Text, shape);
+        internal ValueExpression Read(Path path, Shape shape) => ValueExpression.Get(Locate(), path.Text, shape);
 
         internal void Call(ComponentMethod method, IReadOnlyList<ValueExpression> args)
         {
@@ -39,7 +39,7 @@ namespace Alis.Reactive
 
         internal ValueExpression Invoke(ComponentMethod method, IReadOnlyList<ValueExpression> args, Shape returns) =>
             ValueExpression.MethodResult(
-                ValueExpression.Invoke(Locate(), method.Path.TargetText, args, method.ArgumentShapes, returns, method.Name),
+                ValueExpression.Call(Locate(), method.Path.TargetText, args, method.ArgumentShapes, returns, method.Name),
                 method.Name,
                 method.Awaits);
 
