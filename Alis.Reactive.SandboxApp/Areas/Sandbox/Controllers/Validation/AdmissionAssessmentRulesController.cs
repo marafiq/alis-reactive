@@ -9,7 +9,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/AdmissionAssessment")]
-    public class AdmissionAssessmentController : Controller
+    public class AdmissionAssessmentRulesController : Controller
     {
         [HttpGet("")]
         public IActionResult Index() =>
