@@ -43,6 +43,9 @@ namespace Alis.Reactive.PlanModel
 
         internal static ConditionGraph Confirm(string message) => new ConfirmCondition(message);
 
+        /// <summary>A condition that always holds.</summary>
+        internal static ConditionGraph True { get; } = new TrueCondition();
+
         internal virtual bool IsSynchronous => true;
 
         internal abstract Expr Write(Scope scope);
@@ -224,6 +227,11 @@ namespace Alis.Reactive.PlanModel
 
         internal override Expr Write(Scope scope) =>
             G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.None), G.Lit(_length));
+    }
+
+    internal sealed class TrueCondition : ConditionGraph
+    {
+        internal override Expr Write(Scope scope) => G.True;
     }
 
     internal sealed class AllCondition : ConditionGraph

@@ -120,33 +120,30 @@ namespace Alis.Reactive.Fusion.Components
 
         private static void Add(Dictionary<string, object> rules, ClientRule rule)
         {
-            switch (rule.Kind)
+            switch (rule)
             {
-                case ClientRuleKind.Required:
+                case NotEmptyRule:
+                case NotNullRule:
                     rules["required"] = new object[] { true, rule.Message };
                     break;
-                case ClientRuleKind.MinLength:
-                    if (rule.Length is int min) rules["minLength"] = new object[] { min, rule.Message };
+                case MinLengthRule min:
+                    rules["minLength"] = new object[] { min.Length, rule.Message };
                     break;
-                case ClientRuleKind.MaxLength:
-                    if (rule.Length is int max) rules["maxLength"] = new object[] { max, rule.Message };
+                case MaxLengthRule max:
+                    rules["maxLength"] = new object[] { max.Length, rule.Message };
                     break;
-                // EJ2 tests one pattern per column, with no flags; a second pattern is the server's.
-                case ClientRuleKind.Pattern:
-                case ClientRuleKind.Email:
-                case ClientRuleKind.Url:
-                    if (rule.TextPattern is string pattern && !rules.ContainsKey("regex"))
-                        rules["regex"] = new object[] { pattern, rule.Message };
+                // EJ2 tests one pattern per column, with no flags; a second pattern, or one with flags, is the server's.
+                case PatternRule pattern when pattern.Flags.Length == 0 && !rules.ContainsKey("regex"):
+                    rules["regex"] = new object[] { pattern.Pattern, rule.Message };
                     break;
-                case ClientRuleKind.Comparison:
-                    if (rule.Number is decimal number && rule.Comparison == ClientComparison.GreaterThanOrEqual)
+                case FixedComparisonRule comparison when comparison.Number is decimal number:
+                    if (comparison.Comparison == ClientComparison.GreaterThanOrEqual)
                         rules["min"] = new object[] { number, rule.Message };
-                    else if (rule.Number is decimal maximum && rule.Comparison == ClientComparison.LessThanOrEqual)
-                        rules["max"] = new object[] { maximum, rule.Message };
+                    else if (comparison.Comparison == ClientComparison.LessThanOrEqual)
+                        rules["max"] = new object[] { number, rule.Message };
                     break;
-                case ClientRuleKind.Range:
-                    if (rule.NumericRange is { } bounds)
-                        rules["range"] = new object[] { new[] { bounds.From, bounds.To }, rule.Message };
+                case RangeRule range when range.Inclusive && range.NumericBounds is { } bounds:
+                    rules["range"] = new object[] { new[] { bounds.From, bounds.To }, rule.Message };
                     break;
                 // Other comparisons, exclusive ranges, credit card, at-least-one and empty have no EJ2
                 // FormValidator equivalent, so the server checks them on save.

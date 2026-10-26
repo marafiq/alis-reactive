@@ -147,7 +147,7 @@ namespace Alis.Reactive.Validation
 
         private void AddRule(FieldReference field, ClientRule rule)
         {
-            if (rule.Peer != null) Ensure(rule.Peer);
+            Ensure(rule.Fields);
             Ensure(field).Rules.Add(rule);
         }
 

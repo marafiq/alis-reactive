@@ -155,7 +155,7 @@ namespace Alis.Reactive.FluentValidator
             }
 
             public IEnumerable<ClientRule> ForBrowser(string message) =>
-                new[] { ClientRule.Pattern(_regex.ToString(), JavaScriptPattern.Flags(_regex), message) };
+                new[] { ClientRule.Matches(_regex.ToString(), JavaScriptPattern.Flags(_regex), message) };
         }
     }
 

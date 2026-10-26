@@ -231,8 +231,7 @@ namespace Alis.Reactive.Validation
 
             internal override IEnumerable<FieldReference> Fields => Array.Empty<FieldReference>();
 
-            internal override ConditionGraph ToGraph(FormFieldValues fields) =>
-                throw new InvalidOperationException("A rule that always applies has no condition.");
+            internal override ConditionGraph ToGraph(FormFieldValues fields) => ConditionGraph.True;
         }
 
         // A test of one member: when the form is written, the member is read as MVC binds it and tested in
