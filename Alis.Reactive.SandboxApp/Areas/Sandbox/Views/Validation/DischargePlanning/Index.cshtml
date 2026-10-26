@@ -1,0 +1,111 @@
+@model DischargePlanModel
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Discharge Planning";
+    var plan = Html.ReactivePlan<DischargePlanModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string Box = "h-4 w-4 rounded border-border text-accent";
+    var destinations = new[]
+    {
+        new SelectListItem("Home", nameof(DischargeDestination.Home)),
+        new SelectListItem("Skilled nursing", nameof(DischargeDestination.SkilledNursing)),
+        new SelectListItem("Hospice", nameof(DischargeDestination.Hospice)),
+        new SelectListItem("Hospital", nameof(DischargeDestination.Hospital)),
+    };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Discharge Plan</native-heading>
+    <native-text color="Secondary">
+        Helen Park, Room 214. What the plan must say depends on the answers around it: where she goes,
+        who is there, what she takes and what she needs.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="discharge-plan-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+                .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Destination, o => o.Label("Destination"))
+                .NativeDropDown(b => b.Items(destinations).Placeholder("-- Choose a destination --").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.BedConfirmation, o => o.Label("Bed confirmation (skilled nursing)"))
+                .NativeTextBox(b => b.Placeholder("Confirmation number").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.TransferSummary, o => o.Label("Nursing summary for a transfer"))
+                .NativeTextBox(b => b.Placeholder("Summary sent with the resident").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.ReceivingNurse, o => o.Label("Nurse receiving the resident"))
+                .NativeTextBox(b => b.Placeholder("At the facility the resident goes to").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.HomeHealthAgency, o => o.Label("Home health agency"))
+                .NativeTextBox(b => b.Placeholder("Agency visiting at home").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.GoingHome, o => o.Label("Going home"))
+                .NativeCheckBox(b => b.CssClass(Box)); }
+            @{ Html.InputField(plan, m => m.HomeAddress, o => o.Label("Home address"))
+                .NativeTextBox(b => b.Placeholder("Street, town").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.LivesAlone, o => o.Label("Lives alone"))
+                .NativeCheckBox(b => b.CssClass(Box)); }
+            @{ Html.InputField(plan, m => m.DailyCheckInBy, o => o.Label("Daily check-in by"))
+                .NativeTextBox(b => b.Placeholder("Who calls or visits every day").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.HasPets, o => o.Label("Has pets"))
+                .NativeCheckBox(b => b.CssClass(Box)); }
+            @{ Html.InputField(plan, m => m.PetCarePlan, o => o.Label("Pet care plan"))
+                .NativeTextBox(b => b.Placeholder("Who cares for the pets").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.FollowUpDays, o => o.Label("Follow-up in (days)"))
+                .NativeTextBox(b => b.Type("number").Placeholder("Blank when no follow-up is due").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.FollowUpClinic, o => o.Label("Follow-up clinic"))
+                .NativeTextBox(b => b.Placeholder("Clinic name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.VaCaseNumber, o => o.Label("VA case number"))
+                .NativeTextBox(b => b.Placeholder("For a VA clinic").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.PrimaryCaregiver, o => o.Label("Primary caregiver"))
+                .NativeTextBox(b => b.Placeholder("Family member or friend").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.CaregiverPhone, o => o.Label("Caregiver phone"))
+                .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.NeedsTransport, o => o.Label("Needs transport"))
+                .NativeCheckBox(b => b.CssClass(Box)); }
+            @{ Html.InputField(plan, m => m.TransportCompany, o => o.Label("Transport company"))
+                .NativeTextBox(b => b.Placeholder("Company booked").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.StairsAtHome, o => o.Label("Flights of stairs at home"))
+                .NativeTextBox(b => b.Type("number").Placeholder("0").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.StairPlan, o => o.Label("Stair plan"))
+                .NativeTextBox(b => b.Placeholder("How the resident manages the stairs").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.FallsLast90Days, o => o.Label("Falls in the last 90 days"))
+                .NativeTextBox(b => b.Type("number").Placeholder("0").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.HomeSafetyVisit, o => o.Label("Home safety visit"))
+                .NativeTextBox(b => b.Type("date").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Medications, o => o.Label("Medications"))
+                .NativeTextBox(b => b.Placeholder("As listed on the discharge summary").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.PharmacistReviewed, o => o.Label("Pharmacist reviewed the list"))
+                .NativeCheckBox(b => b.CssClass(Box)); }
+            @{ Html.InputField(plan, m => m.InrCheckDate, o => o.Label("Next INR check"))
+                .NativeTextBox(b => b.Type("date").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.DiagnosisCode, o => o.Label("Diagnosis code"))
+                .NativeTextBox(b => b.Placeholder("ICD-10, like F03").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.MemorySupportPlan, o => o.Label("Memory support plan"))
+                .NativeTextBox(b => b.Placeholder("For a dementia diagnosis").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.RoomCode, o => o.Label("Room"))
+                .NativeTextBox(b => b.Placeholder("MA-214, or MA-214-ISO in isolation").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.IsolationClearedBy, o => o.Label("Isolation cleared by"))
+                .NativeTextBox(b => b.Placeholder("Infection control nurse").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Equipment, o => o.Label("Equipment going with the resident"))
+                .NativeCheckList(b => b
+                    .Option("Walker", "Walker")
+                    .Option("Oxygen", "Oxygen")
+                    .Option("Hospital bed", "Hospital bed")); }
+            @{ Html.InputField(plan, m => m.OxygenVendor, o => o.Label("Oxygen vendor"))
+                .NativeTextBox(b => b.Placeholder("Who delivers the oxygen").CssClass(Field)); }
+        </form>
+        @(Html.NativeButton("save-discharge-plan-btn", "Save discharge plan")
+            .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Save", "DischargePlanning")).Gather(g => g.Form())
+                 .Validate<DischargePlanValidator>("discharge-plan-form")
+                 .Response(r => r
+                    .OnSuccess<DischargePlanConfirmation>((json, s) =>
+                    {
+                        s.Element("discharge-plan-status").Text.Set(json.Get(x => x.Confirmation));
+                    })
+                    .OnError(400, e => e.ValidationErrors("discharge-plan-form")));
+            }))
+        <p id="discharge-plan-status" class="mt-3 text-sm text-text-muted">No plan saved yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

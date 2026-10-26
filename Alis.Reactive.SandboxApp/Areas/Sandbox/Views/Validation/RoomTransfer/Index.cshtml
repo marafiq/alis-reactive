@@ -1,0 +1,85 @@
+@model RoomTransferModel
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Room Transfer";
+    var plan = Html.ReactivePlan<RoomTransferModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Room Transfer</native-heading>
+    <native-text color="Secondary">
+        Move a resident to another room on the same wing. The room book, housekeeping's calendar and the
+        weekend approval are the server's to check.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="transfer-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+                .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.FromRoom, o => o.Required().Label("Current room"))
+                .NativeTextBox(b => b.Placeholder("MA-214").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.ToRoom, o => o.Required().Label("Room to move to"))
+                .NativeTextBox(b => b.Placeholder("MA-216").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.TransferDate, o => o.Required().Label("Transfer day"))
+                .NativeTextBox(b => b.Type("date").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Reason, o => o.Label("Reason"))
+                .NativeTextBox(b => b.Placeholder("Why the resident moves").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes for housekeeping"))
+                .NativeTextBox(b => b.Placeholder("Short notes").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.WeekendApprover, o => o.Label("Weekend approver"))
+                .NativeTextBox(b => b.Placeholder("Administrator on call").CssClass(Field)); }
+        </form>
+        <native-hstack gap="Base" class="mt-4">
+            @(Html.NativeButton("request-transfer-btn", "Request transfer")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("RequestTransfer", "RoomTransfer")).Gather(g => g.Form())
+                     .Validate<RoomTransferValidator>("transfer-form")
+                     .Response(r => r
+                        .OnSuccess<RoomTransferConfirmation>((json, s) =>
+                        {
+                            s.Element("transfer-status").Text.Set(json.Get(x => x.Confirmation));
+                        })
+                        .OnError(400, e => e.ValidationErrors("transfer-form")));
+                }))
+            @* The urgent request checks the same form with the same rules before it goes to the server. *@
+            @(Html.NativeButton("request-urgent-btn", "Request urgent transfer")
+                .CssClass("rounded-md bg-danger px-4 py-2 text-sm font-medium text-white hover:bg-danger/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("RequestUrgentTransfer", "RoomTransfer")).Gather(g => g.Form())
+                     .Validate<RoomTransferValidator>("transfer-form")
+                     .Response(r => r
+                        .OnSuccess<RoomTransferConfirmation>((json, s) =>
+                        {
+                            s.Element("transfer-status").Text.Set(json.Get(x => x.Confirmation));
+                        })
+                        .OnError(400, e => e.ValidationErrors("transfer-form")));
+                }))
+            @* Housekeeping's desk answers in a note, not a record of field errors. *@
+            @(Html.NativeButton("ask-housekeeping-btn", "Ask housekeeping")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("Housekeeping", "RoomTransfer")).Gather(g => g.Form())
+                     .Validate<RoomTransferValidator>("transfer-form")
+                     .Response(r => r
+                        .OnSuccess<RoomTransferConfirmation>((json, s) =>
+                        {
+                            s.Element("housekeeping-status").Text.Set(json.Get(x => x.Confirmation));
+                        })
+                        .OnError(400, e =>
+                        {
+                            e.Element("housekeeping-status").Text.Set("Housekeeping did not take the request.");
+                            e.ValidationErrors("transfer-form");
+                        }));
+                }))
+        </native-hstack>
+        <p id="transfer-status" class="mt-3 text-sm text-text-muted">No transfer requested yet.</p>
+        <p id="housekeeping-status" class="mt-1 text-sm text-text-muted">Housekeeping not asked yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

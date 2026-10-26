@@ -37,6 +37,7 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await ClickWhenStable(BookStay);
 
         await Expect(_plan.ErrorFor(m => m.DailyRate)).ToHaveTextAsync("Daily rate is required.");
+        await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
         AssertNoConsoleErrors();
     }
 
@@ -50,6 +51,7 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await ClickWhenStable(BookStay);
 
         await Expect(_plan.ErrorFor(m => m.CommunityId)).ToHaveTextAsync("Choose a community.");
+        await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
         AssertNoConsoleErrors();
     }
 

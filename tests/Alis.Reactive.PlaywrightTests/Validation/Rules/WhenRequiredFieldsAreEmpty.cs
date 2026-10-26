@@ -27,13 +27,15 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(AllRulesBtn);
 
-        await Expect(ErrorFor("AllRules_Name")).ToContainTextAsync("required");
-        await Expect(ErrorFor("AllRules_Email")).ToContainTextAsync("required");
+        await Expect(ErrorFor("AllRules_Name")).ToHaveTextAsync("Name is required.");
+        await Expect(ErrorFor("AllRules_Email")).ToHaveTextAsync("Email is required.");
         await Expect(Input("AllRules_Name")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(AllRulesResult).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
 
+    // Seven characters are one short; eight are the minimum.
     [Test]
     public async Task password_minlength_validates_on_blur()
     {
@@ -42,12 +44,12 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(AllRulesBtn);
 
-        await Input("AllRules_Password").FillAsync("abc");
+        await Input("AllRules_Password").FillAsync("abcdefg");
         await Input("AllRules_Password").BlurAsync();
 
-        await Expect(ErrorFor("AllRules_Password")).ToContainTextAsync("at least 8", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AllRules_Password")).ToHaveTextAsync("Password must be at least 8 characters.", new() { Timeout = 2000 });
 
-        await Input("AllRules_Password").FillAsync("securepassword");
+        await Input("AllRules_Password").FillAsync("abcdefgh");
         await Input("AllRules_Password").BlurAsync();
 
         await Expect(ErrorFor("AllRules_Password")).ToBeHiddenAsync(new() { Timeout = 2000 });
@@ -62,7 +64,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await ClickWhenStable(AllRulesBtn);
-        await Expect(ErrorFor("AllRules_Name")).ToContainTextAsync("required");
+        await Expect(ErrorFor("AllRules_Name")).ToHaveTextAsync("Name is required.");
 
         await Input("AllRules_Name").FillAsync("Margaret Thompson");
         await Input("AllRules_Name").BlurAsync();
@@ -79,12 +81,12 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await ClickWhenStable(AllRulesBtn);
-        await Expect(ErrorFor("AllRules_Email")).ToContainTextAsync("required");
+        await Expect(ErrorFor("AllRules_Email")).ToHaveTextAsync("Email is required.");
 
         await Input("AllRules_Email").FillAsync("notanemail");
         await Input("AllRules_Email").BlurAsync();
 
-        await Expect(ErrorFor("AllRules_Email")).ToContainTextAsync("valid email", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AllRules_Email")).ToHaveTextAsync("Email must be a valid email address.", new() { Timeout = 2000 });
 
         await Input("AllRules_Email").FillAsync("margaret@care.com");
         await Input("AllRules_Email").BlurAsync();
@@ -102,12 +104,12 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(AllRulesBtn);
 
-        await Input("AllRules_Age").FillAsync("150");
+        await Input("AllRules_Age").FillAsync("121");
         await Input("AllRules_Age").BlurAsync();
 
-        await Expect(ErrorFor("AllRules_Age")).ToContainTextAsync("between", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AllRules_Age")).ToHaveTextAsync("Age must be between 0 and 120.", new() { Timeout = 2000 });
 
-        await Input("AllRules_Age").FillAsync("75");
+        await Input("AllRules_Age").FillAsync("120");
         await Input("AllRules_Age").BlurAsync();
 
         await Expect(ErrorFor("AllRules_Age")).ToBeHiddenAsync(new() { Timeout = 2000 });
@@ -138,7 +140,8 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(ConditionalBtn);
 
-        await Expect(ErrorFor("Conditional_JobTitle")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Conditional_JobTitle")).ToHaveTextAsync("Job title is required when employed.", new() { Timeout = 2000 });
+        await Expect(ConditionalResult).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
@@ -151,7 +154,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await Input("Conditional_IsEmployed").CheckAsync();
         await ClickWhenStable(ConditionalBtn);
-        await Expect(ErrorFor("Conditional_JobTitle")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Conditional_JobTitle")).ToHaveTextAsync("Job title is required when employed.", new() { Timeout = 2000 });
 
         await Input("Conditional_IsEmployed").UncheckAsync();
         await ClickWhenStable(ConditionalBtn);
@@ -187,7 +190,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await Input("AllRules_Phone").FillAsync("badphone");
         await Input("AllRules_Phone").BlurAsync();
 
-        await Expect(ErrorFor("AllRules_Phone")).ToContainTextAsync("123-456-7890", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AllRules_Phone")).ToHaveTextAsync("Phone must match format 123-456-7890.", new() { Timeout = 2000 });
 
         await Input("AllRules_Phone").FillAsync("123-456-7890");
         await Input("AllRules_Phone").BlurAsync();
@@ -205,12 +208,12 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(AllRulesBtn);
 
-        await Input("AllRules_Salary").FillAsync("600000");
+        await Input("AllRules_Salary").FillAsync("500001");
         await Input("AllRules_Salary").BlurAsync();
 
-        await Expect(ErrorFor("AllRules_Salary")).ToContainTextAsync("500,000", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AllRules_Salary")).ToHaveTextAsync("Salary must be at most 500,000.", new() { Timeout = 2000 });
 
-        await Input("AllRules_Salary").FillAsync("75000");
+        await Input("AllRules_Salary").FillAsync("500000");
         await Input("AllRules_Salary").BlurAsync();
 
         await Expect(ErrorFor("AllRules_Salary")).ToBeHiddenAsync(new() { Timeout = 2000 });
@@ -233,7 +236,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(AllRulesBtn);
 
-        await Expect(AllRulesResult).ToContainTextAsync("passed", new() { Timeout = 5000 });
+        await Expect(AllRulesResult).ToHaveTextAsync("All fields passed client-side validation!", new() { Timeout = 5000 });
         await Expect(AllRulesResult).ToHaveClassAsync(new Regex("text-green-600"));
 
         AssertNoConsoleErrors();
@@ -266,16 +269,18 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(ServerBtn);
 
-        await Expect(ErrorFor("Server_Name")).ToContainTextAsync("required", new() { Timeout = 2000 });
-        await Expect(ErrorFor("Server_Email")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Server_Name")).ToHaveTextAsync("Name is required.", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Server_Email")).ToHaveTextAsync("Email is required.", new() { Timeout = 2000 });
+        await Expect(Page.Locator("#server-result")).ToHaveTextAsync("Not submitted yet");
 
         AssertNoConsoleErrors();
     }
 
+    // The page checks only the server section, so the server, checking the whole model, refuses the
+    // sections the page did not send: their messages have no field on this form and go to the summary.
     [Test]
     public async Task server_rejects_incomplete_data_and_shows_errors()
     {
-        // Client rules pass first; OnError(400) must map full-model server errors inline.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -285,8 +290,13 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await ClickWhenStable(ServerBtn);
 
         var serverResult = Page.Locator("#server-result");
-        await Expect(serverResult).ToContainTextAsync("Server returned validation errors", new() { Timeout = 5000 });
+        await Expect(serverResult).ToHaveTextAsync("Server returned validation errors", new() { Timeout = 5000 });
         await Expect(serverResult).ToHaveClassAsync(new Regex("text-red-600"));
+        await Expect(ValidationSummary).ToBeVisibleAsync();
+        await Expect(ValidationSummary.Locator("[data-valmsg-summary-for='AllRules.Name']")).ToHaveTextAsync("Name is required.");
+        await Expect(ValidationSummary.Locator("[data-valmsg-summary-for='Db.Email']")).ToHaveTextAsync("Email is required.");
+        await Expect(ErrorFor("Server_Name")).ToHaveTextAsync("");
+        await Expect(ErrorFor("Server_Email")).ToHaveTextAsync("");
 
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
@@ -302,7 +312,8 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(ServerBtn);
 
-        await Expect(ErrorFor("Server_Email")).ToContainTextAsync("valid email", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Server_Email")).ToHaveTextAsync("Email must be a valid email address.", new() { Timeout = 2000 });
+        await Expect(Page.Locator("#server-result")).ToHaveTextAsync("Not submitted yet");
 
         AssertNoConsoleErrors();
     }
@@ -315,7 +326,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await Input("Conditional_IsEmployed").CheckAsync();
         await ClickWhenStable(ConditionalBtn);
-        await Expect(ErrorFor("Conditional_JobTitle")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Conditional_JobTitle")).ToHaveTextAsync("Job title is required when employed.", new() { Timeout = 2000 });
 
         await Input("Conditional_JobTitle").FillAsync("Activities Director");
         await Input("Conditional_JobTitle").BlurAsync();
@@ -333,7 +344,8 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(HiddenBtn);
 
-        await Expect(ErrorFor("Hidden_Name")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Hidden_Name")).ToHaveTextAsync("Name is required.", new() { Timeout = 2000 });
+        await Expect(Page.Locator("#hidden-result")).ToHaveTextAsync("Click to validate or submit");
 
         AssertNoConsoleErrors();
     }
@@ -429,8 +441,9 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(DbBtn);
 
-        await Expect(ErrorFor("Db_Name")).ToContainTextAsync("required", new() { Timeout = 2000 });
-        await Expect(ErrorFor("Db_Email")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Db_Name")).ToHaveTextAsync("Name is required.", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Db_Email")).ToHaveTextAsync("Email is required.", new() { Timeout = 2000 });
+        await Expect(Page.Locator("#db-result")).ToHaveTextAsync("Not submitted yet");
 
         AssertNoConsoleErrors();
     }
@@ -449,7 +462,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         var dbResult = Page.Locator("#db-result");
         await Expect(dbResult).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
 
-        await Expect(ErrorFor("Db_Name")).ToContainTextAsync("reserved", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Db_Name")).ToHaveTextAsync("This username is reserved by the system.", new() { Timeout = 2000 });
 
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
@@ -468,7 +481,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         var dbResult = Page.Locator("#db-result");
         await Expect(dbResult).ToContainTextAsync("Database validation failed", new() { Timeout = 5000 });
 
-        await Expect(ErrorFor("Db_Email")).ToContainTextAsync("already registered", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Db_Email")).ToHaveTextAsync("This email address is already registered.", new() { Timeout = 2000 });
 
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
@@ -485,7 +498,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await ClickWhenStable(DbBtn);
 
         var dbResult = Page.Locator("#db-result");
-        await Expect(dbResult).ToContainTextAsync("Saved to database", new() { Timeout = 5000 });
+        await Expect(dbResult).ToHaveTextAsync("Saved to database!", new() { Timeout = 5000 });
         await Expect(dbResult).ToHaveClassAsync(new Regex("text-green-600"));
 
         AssertNoConsoleErrors();

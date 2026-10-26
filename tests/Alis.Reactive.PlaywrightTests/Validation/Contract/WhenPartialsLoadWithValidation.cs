@@ -35,10 +35,11 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Name")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' is required.");
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
-        await Expect(ErrorFor("Email")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Email")).ToHaveTextAsync("'Email' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         AssertNoConsoleErrors();
     }
@@ -51,11 +52,12 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
-        await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.City")).ToHaveTextAsync("'City' is required.");
+        await Expect(ErrorFor("Address.ZipCode")).ToHaveTextAsync("'Zip Code' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         AssertNoConsoleErrors();
     }
@@ -91,8 +93,9 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(ErrorFor("VeteranId")).ToHaveTextAsync("'Veteran ID' is required when veteran.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -107,8 +110,9 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("5 digits");
+        await Expect(ErrorFor("Address.ZipCode")).ToHaveTextAsync("'Zip Code' must be 5 digits.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -124,8 +128,9 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
+        await Expect(ErrorFor("ConfirmEmail")).ToHaveTextAsync("'Confirm Email' must match 'Email'.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 

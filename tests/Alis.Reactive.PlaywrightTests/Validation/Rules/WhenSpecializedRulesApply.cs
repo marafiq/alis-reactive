@@ -47,7 +47,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("CardNumber").FillAsync("1234567890123");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("CardNumber")).ToContainTextAsync("not valid", new() { Timeout = 2000 });
+        await Expect(ErrorFor("CardNumber")).ToHaveTextAsync("Card number is not valid.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
@@ -60,7 +61,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("CardNumber").FillAsync("1234567890123");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("CardNumber")).ToContainTextAsync("not valid", new() { Timeout = 2000 });
+        await Expect(ErrorFor("CardNumber")).ToHaveTextAsync("Card number is not valid.", new() { Timeout = 2000 });
         AssertNothingSent();
 
         await Input("CardNumber").FillAsync("4111111111111111");
@@ -79,7 +80,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Score").FillAsync("0");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Score")).ToHaveTextAsync("Score must be between 0 and 100 (exclusive).", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
@@ -93,11 +95,13 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Score").FillAsync("100");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Score")).ToHaveTextAsync("Score must be between 0 and 100 (exclusive).", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
 
+    // The bounds are excluded; the scores just inside them, 1 and 99, pass in the page and on the server.
     [Test]
     public async Task when_nurse_enters_valid_score_within_range_error_clears()
     {
@@ -106,13 +110,16 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("Score").FillAsync("0");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Score")).ToHaveTextAsync("Score must be between 0 and 100 (exclusive).", new() { Timeout = 2000 });
         AssertNothingSent();
 
-        await Input("Score").FillAsync("50");
+        await Input("Score").FillAsync("1");
         await Input("Score").BlurAsync();
-
         await Expect(ErrorFor("Score")).ToBeHiddenAsync(new() { Timeout = 2000 });
+
+        await Input("Score").FillAsync("99");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All new rule types passed!", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -125,13 +132,16 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("MonthlyRate").FillAsync("0");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("MonthlyRate")).ToContainTextAsync("greater than zero", new() { Timeout = 2000 });
+        await Expect(ErrorFor("MonthlyRate")).ToHaveTextAsync("Monthly rate must be greater than zero.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
 
+    // The rate is a plain decimal: the server binds an empty input as 0, and 0 is not above 0. The
+    // page reads the empty input the same way.
     [Test]
-    public async Task when_monthly_rate_is_empty_gt_still_fails_because_gt_implies_required()
+    public async Task a_monthly_rate_left_empty_is_refused_as_the_zero_the_server_binds()
     {
         await NavigateAndBoot();
         await FillEveryRuleValidly();
@@ -139,11 +149,13 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("MonthlyRate")).ToContainTextAsync("greater than zero", new() { Timeout = 2000 });
+        await Expect(ErrorFor("MonthlyRate")).ToHaveTextAsync("Monthly rate must be greater than zero.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
 
+    // One is the smallest whole rate above zero: the page lets it through and the server accepts it.
     [Test]
     public async Task when_monthly_rate_is_positive_gt_passes()
     {
@@ -152,13 +164,14 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("MonthlyRate").FillAsync("0");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("MonthlyRate")).ToContainTextAsync("greater than zero", new() { Timeout = 2000 });
+        await Expect(ErrorFor("MonthlyRate")).ToHaveTextAsync("Monthly rate must be greater than zero.", new() { Timeout = 2000 });
         AssertNothingSent();
 
-        await Input("MonthlyRate").FillAsync("4250");
-        await Input("MonthlyRate").BlurAsync();
+        await Input("MonthlyRate").FillAsync("1");
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("MonthlyRate")).ToBeHiddenAsync(new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("All new rule types passed!", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -171,7 +184,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("MaxDeposit").FillAsync("1000000");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("MaxDeposit")).ToContainTextAsync("less than", new() { Timeout = 2000 });
+        await Expect(ErrorFor("MaxDeposit")).ToHaveTextAsync("Max deposit must be less than 1,000,000.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
@@ -184,13 +198,14 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("MaxDeposit").FillAsync("1000000");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("MaxDeposit")).ToContainTextAsync("less than", new() { Timeout = 2000 });
+        await Expect(ErrorFor("MaxDeposit")).ToHaveTextAsync("Max deposit must be less than 1,000,000.", new() { Timeout = 2000 });
         AssertNothingSent();
 
         await Input("MaxDeposit").FillAsync("999999");
-        await Input("MaxDeposit").BlurAsync();
+        await ClickWhenStable(ValidateBtn);
 
         await Expect(ErrorFor("MaxDeposit")).ToBeHiddenAsync(new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("All new rule types passed!", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -203,7 +218,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Status").FillAsync("deleted");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("Status")).ToContainTextAsync("must not be", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Status")).ToHaveTextAsync("Status must not be 'deleted'.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
@@ -216,7 +232,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("Status").FillAsync("deleted");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("Status")).ToContainTextAsync("must not be", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Status")).ToHaveTextAsync("Status must not be 'deleted'.", new() { Timeout = 2000 });
         AssertNothingSent();
 
         await Input("Status").FillAsync("active");
@@ -236,7 +252,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("AlternateEmail").FillAsync("nurse@facility.com");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("AlternateEmail")).ToContainTextAsync("differ", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AlternateEmail")).ToHaveTextAsync("Alternate email must differ from primary email.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
@@ -250,7 +267,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Email").FillAsync("nurse@facility.com");
         await Input("AlternateEmail").FillAsync("nurse@facility.com");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("AlternateEmail")).ToContainTextAsync("differ", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AlternateEmail")).ToHaveTextAsync("Alternate email must differ from primary email.", new() { Timeout = 2000 });
         AssertNothingSent();
 
         await Input("AlternateEmail").FillAsync("backup@facility.com");
@@ -269,7 +286,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Website").FillAsync("not-a-url");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("Website")).ToContainTextAsync("valid URL", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Website")).ToHaveTextAsync("Website must be a valid URL.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
@@ -282,7 +300,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("Website").FillAsync("not-a-url");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("Website")).ToContainTextAsync("valid URL", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Website")).ToHaveTextAsync("Website must be a valid URL.", new() { Timeout = 2000 });
         AssertNothingSent();
 
         await Input("Website").FillAsync("https://sunnyacres.com");
@@ -301,7 +319,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input("Nickname").FillAsync("Maggie");
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("Nickname")).ToContainTextAsync("must be empty", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Nickname")).ToHaveTextAsync("Nickname must be empty.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNothingSent();
         AssertNoConsoleErrors();
     }
@@ -314,7 +333,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await Input("Nickname").FillAsync("Maggie");
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("Nickname")).ToContainTextAsync("must be empty", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Nickname")).ToHaveTextAsync("Nickname must be empty.", new() { Timeout = 2000 });
         AssertNothingSent();
 
         await Input("Nickname").FillAsync("");
@@ -346,7 +365,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("Score")).ToContainTextAsync("exclusive", new() { Timeout = 2000 });
+        await Expect(ErrorFor("Score")).ToHaveTextAsync("Score must be between 0 and 100 (exclusive).", new() { Timeout = 2000 });
         AssertNothingSent();
         await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNoConsoleErrors();
@@ -362,7 +381,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("CardNumber")).ToContainTextAsync("not valid", new() { Timeout = 2000 });
+        await Expect(ErrorFor("CardNumber")).ToHaveTextAsync("Card number is not valid.", new() { Timeout = 2000 });
         AssertNothingSent();
         await Expect(Result).ToHaveTextAsync("Click to validate");
         AssertNoConsoleErrors();
@@ -379,7 +398,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(Result).ToContainTextAsync("passed", new() { Timeout = 5000 });
+        await Expect(Result).ToHaveTextAsync("All new rule types passed!", new() { Timeout = 5000 });
         await Expect(ErrorFor("CardNumber")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
@@ -400,7 +419,7 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(Result).ToContainTextAsync("passed", new() { Timeout = 5000 });
+        await Expect(Result).ToHaveTextAsync("All new rule types passed!", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 }

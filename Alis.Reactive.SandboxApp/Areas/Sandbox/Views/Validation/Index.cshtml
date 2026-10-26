@@ -153,6 +153,71 @@
             Specialized input validation: email format, phone pattern, credit card (Luhn), URL format — type invalid values to see immediate feedback
         </p>
     </a>
+
+    <a asp-area="Sandbox" asp-controller="AdmissionAssessment" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Admission Assessment
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Every rule kind on native inputs, each at its boundary: text lengths, email, web address, equal and not equal, comparisons and ranges on numbers and dates, a care level, a residency and a yes/no answer. Save checks the page first; Print for the chart sends the assessment as it is and the server answers in the same words
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="DischargePlanning" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Discharge Planning
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Every form a condition can take, each gating one rule: a yes/no read as it is and negated, both and either of two answers, a blank or given number, text empty, given, containing, starting or ending with something, a choice equal to, among or anything but a value, a list holding an item, a condition inside a condition, Unless with Otherwise, and a condition after a rule's checks
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="MedicationReconciliation" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Medication Reconciliation
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Rules on each line of a list: a line's own checks, rules included on a controlled line only, a nested prescriber inside each line, a check on each allergy line itself, and at least one administration check ticked. Print the MAR sends the list as it is
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="RoomTransfer" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Room Transfer
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            What stays on the server, and how its answer reaches the page: a C# check of the room book, a lookup that waits, a message written from the model, a rule kept server-only on purpose, a condition only C# decides; two messages joined beside one field, a message in the summary, two requests checking one form, and a desk that answers in plain text and places nothing
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="OutingCompanion" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Outing Companion
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            A companion is a partial loaded into a slot of the outing form: its rules arrive with it, check the form while it is on the page, and leave with it when it is removed
+        </p>
+    </a>
 </native-grid>
 </section>
 

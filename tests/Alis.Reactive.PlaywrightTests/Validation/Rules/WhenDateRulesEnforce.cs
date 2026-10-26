@@ -29,12 +29,14 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
-        await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AdmissionDate")).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
+        await Expect(ErrorFor("DischargeDate")).ToHaveTextAsync("Discharge date is required.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
 
+    // The last day of 2019 is before the earliest admission day; the first day of 2020 is it.
     [Test]
     public async Task admission_date_before_2020_shows_min_error()
     {
@@ -42,15 +44,18 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AdmissionDate")).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
 
-        // Set date before 2020 using text input instead of calendar navigation.
-        // Calendar navigation to 2019 would require 80+ month clicks from 2026.
-        await DatePicker("AdmissionDate").FillAndBlur("06/15/2019");
+        // Typed dates reach 2019 without paging the calendar back from 2026.
+        await DatePicker("AdmissionDate").FillAndBlur("12/31/2019");
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("2020", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AdmissionDate")).ToHaveTextAsync("Admission date must be on or after January 1, 2020.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker("AdmissionDate").FillAndBlur("01/01/2020");
+        await Expect(ErrorFor("AdmissionDate")).ToBeHiddenAsync(new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
     }
@@ -62,7 +67,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor("AdmissionDate")).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
 
         await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
 
@@ -84,7 +89,8 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("after admission", new() { Timeout = 2000 });
+        await Expect(ErrorFor("DischargeDate")).ToHaveTextAsync("Discharge date must be after admission date.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
@@ -100,7 +106,8 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("after admission", new() { Timeout = 2000 });
+        await Expect(ErrorFor("DischargeDate")).ToHaveTextAsync("Discharge date must be after admission date.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
@@ -116,7 +123,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(Result).ToContainTextAsync("valid", new() { Timeout = 5000 });
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
@@ -257,7 +264,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(Result).ToContainTextAsync("valid", new() { Timeout = 5000 });
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }

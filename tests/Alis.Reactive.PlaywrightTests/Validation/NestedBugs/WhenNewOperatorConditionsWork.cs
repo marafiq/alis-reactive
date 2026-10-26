@@ -9,8 +9,22 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
 
     private ILocator Input(string field) => Page.Locator($"#{ModelIdPrefix}{field}");
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
+    private ILocator Result => Page.Locator("#result");
     private ILocator ErrorFor(string field) =>
         Page.Locator($"#op-form span[data-valmsg-for='{field}']");
+
+    // An adult with a job title: every other condition is off, so a "skips" test can end in a save.
+    private async Task EnterAnEmployedAdult()
+    {
+        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
+        await Input("JobTitle").FillAsync("Care Coordinator");
+    }
+
+    private async Task AssertSaved()
+    {
+        await Expect(Result).ToHaveTextAsync("Saved");
+        AssertNoConsoleErrors();
+    }
 
     [Test]
     public async Task gte_condition_fires_when_age_is_adult()
@@ -20,7 +34,8 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("JobTitle")).ToContainTextAsync("Adults must provide job title");
+        await Expect(ErrorFor("JobTitle")).ToHaveTextAsync("Adults must provide job title.");
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -30,10 +45,11 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await NavigateToAndWaitForBoot(Path);
 
         await Input("Age").FillAsync("15");
+        await Input("Name").FillAsync("Jane Smith");
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("JobTitle")).Not.ToContainTextAsync("Adults");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        await Expect(ErrorFor("JobTitle")).ToHaveTextAsync("");
+        await AssertSaved();
     }
 
     [Test]
@@ -44,7 +60,8 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await Input("Age").FillAsync("15");
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Name")).ToContainTextAsync("Guardian name required");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("Guardian name required for minors.");
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -57,7 +74,8 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Name")).ToContainTextAsync("Guardian name required");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("Guardian name required for minors.");
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -66,11 +84,11 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
+        await EnterAnEmployedAdult();
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Name")).Not.ToContainTextAsync("Guardian");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("");
+        await AssertSaved();
     }
 
     [Test]
@@ -78,10 +96,12 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
+        await EnterAnEmployedAdult();
         await Input("CareLevel").SelectOptionAsync("memory-care");
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Notes")).ToContainTextAsync("Notes required for high-acuity");
+        await Expect(ErrorFor("Notes")).ToHaveTextAsync("Notes required for high-acuity care.");
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -90,11 +110,12 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
+        await EnterAnEmployedAdult();
         await Input("CareLevel").SelectOptionAsync("independent");
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Notes")).Not.ToContainTextAsync("high-acuity");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        await Expect(ErrorFor("Notes")).ToHaveTextAsync("");
+        await AssertSaved();
     }
 
     [Test]
@@ -102,10 +123,12 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
+        await EnterAnEmployedAdult();
         await Input("Notes").FillAsync("This is an urgent matter");
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Phone")).ToContainTextAsync("Phone required for urgent");
+        await Expect(ErrorFor("Phone")).ToHaveTextAsync("Phone required for urgent cases.");
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -114,11 +137,12 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
+        await EnterAnEmployedAdult();
         await Input("Notes").FillAsync("routine checkup");
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Phone")).Not.ToContainTextAsync("urgent");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        await Expect(ErrorFor("Phone")).ToHaveTextAsync("");
+        await AssertSaved();
     }
 
     [Test]
@@ -126,11 +150,12 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
+        await EnterAnEmployedAdult();
         await Input("Email").FillAsync("jane@care.com");
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Name")).ToContainTextAsync("Name required when email provided");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("Name required when email provided.");
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -139,9 +164,10 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
+        await EnterAnEmployedAdult();
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Name")).Not.ToContainTextAsync("email provided");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("");
+        await AssertSaved();
     }
 }

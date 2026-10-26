@@ -35,14 +35,14 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
         await NavigateAndBoot();
 
         await ClickWhenStable(ValidateLines);
-        await Expect(Error(0, "Sku")).ToContainTextAsync("Line SKU is required.");
-        await Expect(Error(1, "Sku")).ToContainTextAsync("Line SKU is required.");
+        await Expect(Error(0, "Sku")).ToHaveTextAsync("Line SKU is required.");
+        await Expect(Error(1, "Sku")).ToHaveTextAsync("Line SKU is required.");
         await Expect(Result).ToHaveTextAsync("Click to validate");
 
         await Input(0, "Sku").FillAsync("RX-100");
         await Input(0, "Sku").BlurAsync();
         await Expect(Error(0, "Sku")).ToBeHiddenAsync(new() { Timeout = 2000 });
-        await Expect(Error(1, "Sku")).ToContainTextAsync("Line SKU is required.");
+        await Expect(Error(1, "Sku")).ToHaveTextAsync("Line SKU is required.");
         AssertNoConsoleErrors();
     }
 
@@ -55,8 +55,9 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
 
         await ClickWhenStable(ValidateLines);
 
-        await Expect(Error(1, "ConfirmSku")).ToContainTextAsync("Line SKU confirmation must match.");
+        await Expect(Error(1, "ConfirmSku")).ToHaveTextAsync("Line SKU confirmation must match.");
         await Expect(Error(0, "ConfirmSku")).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         await Input(1, "ConfirmSku").FillAsync("RX-200");
         await Input(1, "ConfirmSku").BlurAsync();
@@ -70,14 +71,15 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
         await NavigateAndBoot();
 
         await ClickWhenStable(ValidateLines);
-        await Expect(Error(0, "Sku")).ToContainTextAsync("Line SKU is required.");
+        await Expect(Error(0, "Sku")).ToHaveTextAsync("Line SKU is required.");
         await Expect(Error(0, "GiftNote")).ToBeHiddenAsync();
         await Expect(Error(1, "GiftNote")).ToBeHiddenAsync();
 
         await Input(1, "GiftWrapped").CheckAsync();
         await ClickWhenStable(ValidateLines);
-        await Expect(Error(1, "GiftNote")).ToContainTextAsync("Gift note is required when gift wrapped.");
+        await Expect(Error(1, "GiftNote")).ToHaveTextAsync("Gift note is required when gift wrapped.");
         await Expect(Error(0, "GiftNote")).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         await Input(1, "GiftNote").FillAsync("Rush wrap");
         await Input(1, "GiftNote").BlurAsync();
@@ -91,13 +93,14 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
         await NavigateAndBoot();
 
         await ClickWhenStable(ValidateLines);
-        await Expect(DeliveryError(0, "LocationCode")).ToContainTextAsync("Delivery location is required.");
-        await Expect(DeliveryError(1, "LocationCode")).ToContainTextAsync("Delivery location is required.");
+        await Expect(DeliveryError(0, "LocationCode")).ToHaveTextAsync("Delivery location is required.");
+        await Expect(DeliveryError(1, "LocationCode")).ToHaveTextAsync("Delivery location is required.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         await DeliveryInput(0, "LocationCode").FillAsync("MED-CART");
         await DeliveryInput(0, "LocationCode").BlurAsync();
         await Expect(DeliveryError(0, "LocationCode")).ToBeHiddenAsync(new() { Timeout = 2000 });
-        await Expect(DeliveryError(1, "LocationCode")).ToContainTextAsync("Delivery location is required.");
+        await Expect(DeliveryError(1, "LocationCode")).ToHaveTextAsync("Delivery location is required.");
         AssertNoConsoleErrors();
     }
 
@@ -107,14 +110,15 @@ public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
         await NavigateAndBoot();
 
         await ClickWhenStable(ValidateLines);
-        await Expect(DeliveryError(0, "LocationCode")).ToContainTextAsync("Delivery location is required.");
+        await Expect(DeliveryError(0, "LocationCode")).ToHaveTextAsync("Delivery location is required.");
         await Expect(DeliveryError(0, "AccessCode")).ToBeHiddenAsync();
         await Expect(DeliveryError(1, "AccessCode")).ToBeHiddenAsync();
 
         await DeliveryInput(1, "RequiresAccessCode").CheckAsync();
         await ClickWhenStable(ValidateLines);
-        await Expect(DeliveryError(1, "AccessCode")).ToContainTextAsync("Access code is required when delivery requires it.");
+        await Expect(DeliveryError(1, "AccessCode")).ToHaveTextAsync("Access code is required when delivery requires it.");
         await Expect(DeliveryError(0, "AccessCode")).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         await DeliveryInput(1, "AccessCode").FillAsync("A-42");
         await DeliveryInput(1, "AccessCode").BlurAsync();

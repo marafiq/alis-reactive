@@ -14,9 +14,10 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await Page.Locator($"#{R1}Name").FillAsync("Jane");
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
-        await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']"))
-            .Not.ToContainTextAsync("required when city");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        // With no city there is nothing to confirm: the page sends the form and the server saves it.
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("Saved");
+        await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']")).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -29,7 +30,8 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
         await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']"))
-            .ToContainTextAsync("required when city");
+            .ToHaveTextAsync("Confirm city is required when city is set.");
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -44,9 +46,10 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await Page.Locator($"#{R2}Child_ChildFlag").CheckAsync();
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
-        await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']"))
-            .Not.ToContainTextAsync("required");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        // The child's condition holds, but the parent's does not: nothing is asked for and the form is saved.
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("Saved");
+        await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']")).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -57,9 +60,9 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await Page.Locator($"#{R2}ParentFlag").CheckAsync();
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
-        await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']"))
-            .Not.ToContainTextAsync("required");
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("Saved");
+        await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']")).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -72,7 +75,8 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
         await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']"))
-            .ToContainTextAsync("required");
+            .ToHaveTextAsync("Child name required when child flag is checked.");
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -87,7 +91,8 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
         await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']"))
-            .ToContainTextAsync("must match");
+            .ToHaveTextAsync("Confirm city must match city.");
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -101,9 +106,8 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await Page.Locator($"#{R1}Address_ConfirmCity").FillAsync("Springfield");
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
-        await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']"))
-            .Not.ToContainTextAsync("must match");
-        await Expect(Page.Locator("#result")).ToContainTextAsync("Saved");
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("Saved");
+        await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']")).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -117,11 +121,9 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
 
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
-        await Expect(Page.Locator($"#include-form span[data-valmsg-for='JobTitle']"))
-            .Not.ToContainTextAsync("required");
-        await Expect(Page.Locator($"#include-form span[data-valmsg-for='Department']"))
-            .Not.ToContainTextAsync("required");
-        await Expect(Page.Locator("#result")).ToContainTextAsync("Saved");
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("Saved");
+        await Expect(Page.Locator($"#include-form span[data-valmsg-for='JobTitle']")).ToHaveTextAsync("");
+        await Expect(Page.Locator($"#include-form span[data-valmsg-for='Department']")).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -134,9 +136,10 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
         await Expect(Page.Locator($"#include-form span[data-valmsg-for='JobTitle']"))
-            .ToContainTextAsync("required");
+            .ToHaveTextAsync("Job title is required.");
         await Expect(Page.Locator($"#include-form span[data-valmsg-for='Department']"))
-            .ToContainTextAsync("required");
+            .ToHaveTextAsync("Department is required.");
+        await Expect(Page.Locator("#result")).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 }

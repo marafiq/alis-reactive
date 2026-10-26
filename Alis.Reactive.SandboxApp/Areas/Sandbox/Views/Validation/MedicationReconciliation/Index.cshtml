@@ -1,0 +1,99 @@
+@model MedicationReconciliationModel
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Medication Reconciliation";
+    var plan = Html.ReactivePlan<MedicationReconciliationModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string Box = "h-4 w-4 rounded border-border text-accent";
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Medication Reconciliation</native-heading>
+    <native-text color="Secondary">
+        Helen Park, Room 214. Each line is checked on its own; a controlled substance needs its count
+        verified. Save checks the page first; Print the MAR sends it as it is.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="reconciliation-form" class="flex flex-col gap-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+                .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+
+            @for (var i = 0; i < Model.Medications.Count; i++)
+            {
+                var line = i;
+                var lineNumber = i + 1;
+                <native-heading level="H2">Medication @lineNumber</native-heading>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    @{ Html.InputField(plan, m => m.Medications[line].Name, o => o.Required().Label($"Medication {lineNumber}"))
+                        .NativeTextBox(b => b.Placeholder("Name").CssClass(Field)); }
+                    @{ Html.InputField(plan, m => m.Medications[line].DoseMg, o => o.Label("Dose (mg)"))
+                        .NativeTextBox(b => b.Type("number").Placeholder("mg").CssClass(Field)); }
+                    @{ Html.InputField(plan, m => m.Medications[line].Hours, o => o.Label("Hours given"))
+                        .NativeTextBox(b => b.Placeholder("8,20").CssClass(Field)); }
+                    @{ Html.InputField(plan, m => m.Medications[line].Controlled, o => o.Label("Controlled substance"))
+                        .NativeCheckBox(b => b.CssClass(Box)); }
+                    @{ Html.InputField(plan, m => m.Medications[line].CountVerifiedBy, o => o.Label("Count verified by"))
+                        .NativeTextBox(b => b.Placeholder("Second nurse").CssClass(Field)); }
+                    @{ Html.InputField(plan, m => m.Medications[line].Prescriber.Npi, o => o.Label("Prescriber NPI"))
+                        .NativeTextBox(b => b.Placeholder("Ten digits").CssClass(Field)); }
+                </div>
+            }
+
+            <native-heading level="H2">Allergies</native-heading>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                @{ Html.InputField(plan, m => m.HasAllergies, o => o.Label("The resident has allergies"))
+                    .NativeCheckBox(b => b.CssClass(Box)); }
+                @for (var i = 0; i < Model.Allergies.Count; i++)
+                {
+                    var allergy = i;
+                    var allergyNumber = i + 1;
+                    Html.InputField(plan, m => m.Allergies[allergy], o => o.Label($"Allergy {allergyNumber}"))
+                        .NativeTextBox(b => b.Placeholder("Allergy").CssClass(Field));
+                }
+            </div>
+
+            @{ Html.InputField(plan, m => m.AdministrationChecks, o => o.Required().Label("Administration checks"))
+                .NativeCheckList(b => b
+                    .Option("Identity checked", "Identity checked")
+                    .Option("Allergies checked", "Allergies checked")
+                    .Option("Dose double-checked", "Dose double-checked")); }
+        </form>
+        <native-hstack gap="Base" class="mt-4">
+            @(Html.NativeButton("save-reconciliation-btn", "Save reconciliation")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("Save", "MedicationReconciliation")).Gather(g => g.Form())
+                     .Validate<MedicationReconciliationValidator>("reconciliation-form")
+                     .Response(r => r
+                        .OnSuccess<MedicationReconciliationConfirmation>((json, s) =>
+                        {
+                            s.Element("reconciliation-status").Text.Set(json.Get(x => x.Confirmation));
+                        })
+                        .OnError(400, e => e.ValidationErrors("reconciliation-form")));
+                }))
+            @* The MAR takes the reconciliation as it is: the server alone decides, with the same rules. *@
+            @(Html.NativeButton("print-mar-btn", "Print the MAR")
+                .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("Print", "MedicationReconciliation")).Gather(g => g.Form())
+                     .Response(r => r
+                        .OnSuccess<MedicationReconciliationConfirmation>((json, s) =>
+                        {
+                            s.Element("mar-status").Text.Set(json.Get(x => x.Confirmation));
+                        })
+                        .OnError(400, e =>
+                        {
+                            e.Element("mar-status").Text.Set("The MAR was not printed.");
+                            e.ValidationErrors("reconciliation-form");
+                        }));
+                }))
+        </native-hstack>
+        <p id="reconciliation-status" class="mt-3 text-sm text-text-muted">Not saved yet.</p>
+        <p id="mar-status" class="mt-1 text-sm text-text-muted">Not printed yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

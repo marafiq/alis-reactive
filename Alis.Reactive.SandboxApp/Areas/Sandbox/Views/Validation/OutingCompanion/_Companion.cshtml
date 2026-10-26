@@ -1,0 +1,33 @@
+@model OutingModel
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ResolvePlan<OutingModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+}
+
+<native-heading level="H2">Companion</native-heading>
+
+<native-grid cols="C2" gap="Base">
+    @{ Html.InputField(plan, m => m.Companion!.Name, o => o.Required().Label("Companion name"))
+        .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+    @{ Html.InputField(plan, m => m.Companion!.Phone, o => o.Required().Label("Companion phone"))
+        .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
+</native-grid>
+
+@* The companion's rules belong to this partial: they check the form while the companion is on it. *@
+@(Html.NativeButton("confirm-companion-btn", "Confirm companion")
+    .CssClass("self-start rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post(Url.SandboxRoute("ConfirmCompanion", "OutingCompanion")).Gather(g => g.Form())
+         .Validate<OutingCompanionRules>("outing-form")
+         .Response(r => r
+            .OnSuccess<OutingConfirmation>((json, s) =>
+            {
+                s.Element("companion-status").Text.Set(json.Get(x => x.Confirmation));
+            })
+            .OnError(400, e => e.ValidationErrors("outing-form")));
+    }))
+<p id="companion-status" class="text-sm text-text-muted">Companion not confirmed yet.</p>
+
+@Html.RenderPlan(plan)

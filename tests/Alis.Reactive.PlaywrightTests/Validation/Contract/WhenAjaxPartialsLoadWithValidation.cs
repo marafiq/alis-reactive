@@ -57,25 +57,27 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("Name")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' is required.");
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
-        await Expect(ErrorFor("Email")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Email")).ToHaveTextAsync("'Email' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         await Input("AddressType").SelectOptionAsync("Facility Address");
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("Name")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         await FillParentFields();
         await SelectCustomAddress();
 
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
-        await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.City")).ToHaveTextAsync("'City' is required.");
+        await Expect(ErrorFor("Address.ZipCode")).ToHaveTextAsync("'Zip Code' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         await FillParentFields();
         await Input("Address_Street").FillAsync("123 Sunrise Blvd");
@@ -110,12 +112,14 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         Assert.That(streetVal, Is.EqualTo(""));
 
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         AssertNoConsoleErrors();
     }
 
+    // With no address chosen the address rules do not apply, so the corrected form is saved.
     [Test]
     public async Task confirm_email_mismatch_shows_inline_error()
     {
@@ -128,15 +132,17 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
+        await Expect(ErrorFor("ConfirmEmail")).ToHaveTextAsync("'Confirm Email' must match 'Email'.");
         await Expect(ErrorFor("ConfirmEmail")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         await Input("ConfirmEmail").FillAsync("a@b.com");
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync();
+        await Expect(Result).ToHaveTextAsync("Admission saved", new() { Timeout = 5000 });
 
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -149,7 +155,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await SelectCustomAddress();
 
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
 
         await Input("Address_Street").FillAsync("123 Sunrise Blvd");
         await Expect(ErrorFor("Address.Street")).ToBeHiddenAsync();
@@ -159,7 +165,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await SelectCustomAddress();
 
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
 
         await Input("Address_Street").FillAsync("456 Palm Ave");
         await Expect(ErrorFor("Address.Street")).ToBeHiddenAsync();
