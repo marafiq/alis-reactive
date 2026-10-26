@@ -654,7 +654,8 @@ A rule reaches the browser unless something in it only the server can do. No lis
 - A message with nothing left to say once the sentence naming the entered value is dropped.
 - `Matches` with an option JavaScript lacks or syntax it reads differently (`\A`, `\z`, `\G`,
   inline `(?i)`, atomic and comment groups, `\p{..}`, class subtraction).
-- A condition that reads anything but model members and fixed values (a method call, `.Length`).
+- A condition declared `WhenOnServer` or `UnlessOnServer`: one the server alone decides (a method call,
+  a service, a query over a collection).
 - A rule on a computed value (`x => x.Name.Trim()`), which has no input.
 - `.ServerOnly()`, which keeps the checks written before it on the server, for a member the page has
   no input for.
@@ -666,10 +667,14 @@ A rule reaches the browser unless something in it only the server can do. No lis
   `BrowserCondition` translates it into a `ClientCondition` when every part has a browser form:
   comparisons of members with fixed values, `string.IsNullOrEmpty`, `Contains`, `StartsWith`,
   `EndsWith`, `Regex.IsMatch`, membership in a fixed set, joined by `&&`, `||` and `!`.
+  `WhenOnServer(predicate, rules)`, `UnlessOnServer(...)`, `.WhenOnServer(predicate)` and
+  `.UnlessOnServer(predicate)` declare a condition the server alone decides.
 - A condition after a rule's checks applies to every check written before it, as in
   FluentValidation.
 - Blocks nest: a check's browser condition is the AND of its blocks' conditions and its own.
-- A condition with no browser form keeps the checks under it on the server.
+- A condition declared the server's keeps the checks under it on the server. A condition the translator
+  cannot read that is not declared so is refused when a page describes the rules, naming the
+  expression: no rule changes sides in silence.
 
 ### 7.4 The vocabulary
 

@@ -40,7 +40,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
             // A long mobility plan goes to a therapist. A condition on a length has no browser form,
             // so the server alone checks this rule.
-            When(x => x.MobilityNotes != null && x.MobilityNotes.Length > 60, () =>
+            WhenOnServer(x => x.MobilityNotes != null && x.MobilityNotes.Length > 60, () =>
                 RuleFor(x => x.TherapistReviewer).NotEmpty().WithMessage("A mobility plan this long needs a therapist to review it."));
 
             // Either need means someone must help the resident out in an evacuation.
@@ -87,7 +87,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.CarePlanSummary).MaximumLength(500).WithMessage("Keep the care plan summary under 500 characters.");
 
             // A condition that calls a method: only the server can run it, so the browser does not run the rule.
-            When(x => IsReturningResident(x), () =>
+            WhenOnServer(x => IsReturningResident(x), () =>
                 RuleFor(x => x.PreviousRoom).NotEmpty().WithMessage("A returning resident's previous room is required."));
 
             // The server fills this in; the page has no input for it.

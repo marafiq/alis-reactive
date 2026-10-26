@@ -56,8 +56,10 @@ namespace Alis.Reactive.FluentValidator
     /// <para>
     /// Some rules only the server can check, and they stay there by what they are: <c>Must</c> and
     /// <c>MustAsync</c> (C# code, a database lookup), a message built from the model, a pattern with .NET-only
-    /// syntax, and a rule under a condition the browser cannot test. <c>.ServerOnly()</c> keeps any other
-    /// rule on the server, for a member the page has no input for.
+    /// syntax, and a rule under a condition declared the server's (<c>WhenOnServer</c>, <c>UnlessOnServer</c>).
+    /// <c>.ServerOnly()</c> keeps any other rule on the server, for a member the page has no input for. A
+    /// condition the browser cannot read that is not declared the server's is refused when a page describes
+    /// the rules, so no rule changes sides in silence.
     /// </para>
     /// <para>
     /// A condition, <c>When</c> or <c>Unless</c> around a block of rules or after a rule's checks, runs in the
@@ -125,6 +127,24 @@ namespace Alis.Reactive.FluentValidator
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
         public IConditionBuilder Unless(Expression<Func<T, bool>> predicate, Action rules) =>
             Branch(Condition<T>.Unless(predicate), rules);
+
+        /// <summary>
+        /// Applies the rules only when <paramref name="predicate"/> holds, decided by the server alone: for a
+        /// test the browser cannot make (a method, a service, a query over a collection). The rules under it
+        /// stay with the server.
+        /// </summary>
+        /// <param name="predicate">The condition over the model.</param>
+        /// <param name="rules">Declares the rules.</param>
+        /// <returns>Its <c>Otherwise</c> declares the rules for when the condition does not hold.</returns>
+        public IConditionBuilder WhenOnServer(Expression<Func<T, bool>> predicate, Action rules) =>
+            Branch(Condition<T>.OnServer(predicate), rules);
+
+        /// <summary>Applies the rules only when <paramref name="predicate"/> does not hold, decided by the server alone.</summary>
+        /// <param name="predicate">The condition over the model.</param>
+        /// <param name="rules">Declares the rules.</param>
+        /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
+        public IConditionBuilder UnlessOnServer(Expression<Func<T, bool>> predicate, Action rules) =>
+            Branch(Condition<T>.OnServer(predicate).Negated(), rules);
 
         /// <inheritdoc />
         public ValidationResult Validate(T instance)

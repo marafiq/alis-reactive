@@ -37,7 +37,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.Notes).MaximumLength(20).WithMessage(transfer => $"{transfer.ResidentName}'s notes run over 20 characters.");
 
             // A condition only C# can evaluate keeps its rule on the server.
-            When(x => FallsOnAWeekend(x.TransferDate), () =>
+            WhenOnServer(x => FallsOnAWeekend(x.TransferDate), () =>
                 RuleFor(x => x.WeekendApprover).NotEmpty().WithMessage("A weekend transfer needs the administrator on call to approve it."));
         }
 

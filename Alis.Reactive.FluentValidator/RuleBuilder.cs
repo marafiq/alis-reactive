@@ -36,7 +36,8 @@ namespace Alis.Reactive.FluentValidator
 
         /// <summary>
         /// Runs the checks written so far only when the condition holds. A condition that tests model members
-        /// against fixed values runs in the browser too; any other is the server's, and so are its checks.
+        /// against fixed values runs in the browser too; one the browser cannot read is refused when a page
+        /// describes the rules: declare it with <see cref="WhenOnServer"/>.
         /// </summary>
         /// <param name="predicate">The condition.</param>
         IRuleBuilderOptions<T, TProperty> When(Expression<Func<T, bool>> predicate);
@@ -44,6 +45,18 @@ namespace Alis.Reactive.FluentValidator
         /// <summary>Runs the checks written so far only when the condition does not hold.</summary>
         /// <param name="predicate">The condition.</param>
         IRuleBuilderOptions<T, TProperty> Unless(Expression<Func<T, bool>> predicate);
+
+        /// <summary>
+        /// Runs the checks written so far only when the condition holds, decided by the server alone: for a test
+        /// the browser cannot make (a method, a service, a query over a collection). The checks stay with the
+        /// server too.
+        /// </summary>
+        /// <param name="predicate">The condition.</param>
+        IRuleBuilderOptions<T, TProperty> WhenOnServer(Expression<Func<T, bool>> predicate);
+
+        /// <summary>Runs the checks written so far only when the condition does not hold, decided by the server alone.</summary>
+        /// <param name="predicate">The condition.</param>
+        IRuleBuilderOptions<T, TProperty> UnlessOnServer(Expression<Func<T, bool>> predicate);
 
         /// <summary>
         /// Runs the member's rules on the server alone: for a member the page has no input for, or a check the

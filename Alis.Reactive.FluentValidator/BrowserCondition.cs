@@ -16,7 +16,7 @@ namespace Alis.Reactive.FluentValidator
     /// </summary>
     internal static class BrowserCondition
     {
-        /// <summary>The condition's browser form, or null when part of it has none (it stays server-only).</summary>
+        /// <summary>The condition's browser form, or null when part of it has none; the condition then says so where it is described.</summary>
         internal static ClientCondition? From(LambdaExpression predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));

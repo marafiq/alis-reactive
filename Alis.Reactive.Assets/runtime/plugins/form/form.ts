@@ -34,7 +34,6 @@ const log = logger("validation");
 interface Entry {
   readonly field: FormField;
   readonly world: PlanWorld;
-  readonly summary: string;
   readonly owner: Owner;
 }
 
@@ -44,6 +43,9 @@ export interface FormObject {
 }
 
 const formsByContainer = new Map<string, Entry[]>();
+// The summary element of each validated container, from the form's data: a form with no browser
+// check of its own still shows the server's answers there.
+const summaries = new Map<string, string>();
 // The elements wired for live validation. A partial that reloads brings new elements under the same
 // ids, so wiring is remembered per element, not per id.
 let liveWiredElements = new WeakSet<HTMLElement>();
@@ -60,9 +62,9 @@ function entriesOf(containerId: string): Entry[] {
 
 // ── summary ────────────────────────────────────────────────────────────────
 
-function summaryElement(entries: readonly Entry[]): HTMLElement | null {
-  const first = entries[0];
-  return first ? document.getElementById(first.summary) : null;
+function summaryElement(containerId: string): HTMLElement | null {
+  const id = summaries.get(containerId);
+  return id === undefined ? null : document.getElementById(id);
 }
 
 function addSummaryError(summary: HTMLElement | null, key: string, message: string): void {
@@ -147,7 +149,7 @@ function validate(containerId: string): boolean {
     return false;
   }
 
-  const summary = summaryElement(entries);
+  const summary = summaryElement(containerId);
   for (const entry of entries) clearInline(entry.field.id);
   clearAndHide(summary);
 
@@ -173,7 +175,7 @@ function holdersOf(field: HTMLElement): Holder[] {
     const own = entries.filter(entry => entry.field.id === field.id);
     const container = own.length > 0 ? document.getElementById(containerId) : null;
     if (container === null || !container.contains(field)) continue;
-    holders.push({ container, summary: summaryElement(entries), entries: own });
+    holders.push({ container, summary: summaryElement(containerId), entries: own });
   }
   return holders;
 }
@@ -197,7 +199,7 @@ function showErrors(containerId: string, problem: unknown): void {
   }
 
   const entries = entriesOf(containerId);
-  const summary = summaryElement(entries);
+  const summary = summaryElement(containerId);
   for (const entry of entries) clearInline(entry.field.id);
   clearAndHide(summary);
 
@@ -267,7 +269,8 @@ export const formPlugin: Plugin = {
   contribute({ key, data, owner, world }: Contribution) {
     if (data.kind !== "form") return;
     const entries = entriesOf(key);
-    const added = data.fields.map(field => ({ field, world, summary: data.summary, owner }));
+    if (!summaries.has(key)) summaries.set(key, data.summary);
+    const added = data.fields.map(field => ({ field, world, owner }));
     entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
     for (const entry of added) wireLive(entry);
@@ -276,6 +279,7 @@ export const formPlugin: Plugin = {
     owner.onDispose(() => {
       const remaining = entriesOf(key).filter(entry => !added.includes(entry));
       formsByContainer.set(key, remaining);
+      if (remaining.length === 0 && summaries.get(key) === data.summary) summaries.delete(key);
       clearAndHide(document.getElementById(data.summary));
     });
   },
@@ -283,5 +287,6 @@ export const formPlugin: Plugin = {
 
 export function resetFormsForTests(): void {
   formsByContainer.clear();
+  summaries.clear();
   liveWiredElements = new WeakSet<HTMLElement>();
 }

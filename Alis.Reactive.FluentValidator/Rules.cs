@@ -8,35 +8,62 @@ using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
-    /// <summary>A <c>When</c> or <c>Unless</c>: the server's test, and the browser's form of it when it has one.</summary>
+    /// <summary>
+    /// A <c>When</c> or <c>Unless</c>: the server's test, and the browser's form of it when it has one. A
+    /// condition the browser cannot read is either declared the server's (<c>WhenOnServer</c>) or refused
+    /// where a page describes the rules, so no rule changes sides in silence.
+    /// </summary>
     internal sealed class Condition<T>
     {
         private readonly Func<T, bool> _holds;
+        private readonly ClientCondition? _browser;
+        private readonly string? _unreadable;
 
-        private Condition(Func<T, bool> holds, ClientCondition? browser)
+        private Condition(Func<T, bool> holds, ClientCondition? browser, string? unreadable)
         {
             _holds = holds;
-            Browser = browser;
+            _browser = browser;
+            _unreadable = unreadable;
         }
-
-        /// <summary>The browser's form; null when part of the condition is a test only C# can make.</summary>
-        internal ClientCondition? Browser { get; }
 
         internal bool Holds(T instance) => _holds(instance);
 
         internal static Condition<T> When(Expression<Func<T, bool>> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return new Condition<T>(predicate.Compile(), BrowserCondition.From(predicate));
+            var browser = BrowserCondition.From(predicate);
+            return new Condition<T>(predicate.Compile(), browser, browser == null ? predicate.Body.ToString() : null);
         }
 
         internal static Condition<T> Unless(Expression<Func<T, bool>> predicate) => When(predicate).Negated();
 
+        /// <summary>A condition the server alone decides, by the developer's word: <c>WhenOnServer</c>, <c>UnlessOnServer</c>.</summary>
+        internal static Condition<T> OnServer(Expression<Func<T, bool>> predicate)
+        {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            return new Condition<T>(predicate.Compile(), null, null);
+        }
+
         /// <summary>Holds always, with no browser form: what <c>.ServerOnly()</c> writes after a rule's checks.</summary>
-        internal static Condition<T> ServerOnly { get; } = new Condition<T>(_ => true, null);
+        internal static Condition<T> ServerOnly { get; } = new Condition<T>(_ => true, null, null);
 
         internal Condition<T> Negated() =>
-            new Condition<T>(instance => !_holds(instance), Browser == null ? null : ClientCondition.Not(Browser));
+            new Condition<T>(instance => !_holds(instance), _browser == null ? null : ClientCondition.Not(_browser), _unreadable);
+
+        /// <summary>
+        /// The browser's form, or false when the server alone decides. A condition the browser cannot read that
+        /// was not declared the server's is refused here, where a page describes the rules.
+        /// </summary>
+        internal bool TryForBrowser(out ClientCondition browser)
+        {
+            if (_unreadable != null)
+                throw new InvalidOperationException(
+                    $"The condition '{_unreadable}' has no browser form. Write it as tests of model members against fixed " +
+                    "values (==, !=, <, <=, >, >=, string.IsNullOrEmpty, Contains, StartsWith, EndsWith, Regex.IsMatch, HasValue, " +
+                    "joined by &&, || and !), or declare that the server alone decides it: WhenOnServer or UnlessOnServer.");
+            browser = _browser!;
+            return _browser != null;
+        }
     }
 
     /// <summary>Every condition a rule is written under, outermost first.</summary>
@@ -59,8 +86,16 @@ namespace Alis.Reactive.FluentValidator
         internal bool TryForBrowser(out ClientCondition condition)
         {
             condition = ClientCondition.Always;
-            if (_all.Any(each => each.Browser == null)) return false;
-            if (_all.Count > 0) condition = BrowserCondition.AllOf(_all.Select(each => each.Browser!).ToArray());
+            var forms = new List<ClientCondition>();
+            var onServer = false;
+            foreach (var each in _all)
+            {
+                if (each.TryForBrowser(out var form)) forms.Add(form);
+                else onServer = true;
+            }
+
+            if (onServer) return false;
+            if (forms.Count > 0) condition = BrowserCondition.AllOf(forms);
             return true;
         }
     }
@@ -170,6 +205,10 @@ namespace Alis.Reactive.FluentValidator
         public IRuleBuilderOptions<T, TValue> When(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.When(predicate));
 
         public IRuleBuilderOptions<T, TValue> Unless(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.Unless(predicate));
+
+        public IRuleBuilderOptions<T, TValue> WhenOnServer(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.OnServer(predicate));
+
+        public IRuleBuilderOptions<T, TValue> UnlessOnServer(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.OnServer(predicate).Negated());
 
         public IRuleBuilderOptions<T, TValue> ServerOnly() => Conditioned(Condition<T>.ServerOnly);
 
