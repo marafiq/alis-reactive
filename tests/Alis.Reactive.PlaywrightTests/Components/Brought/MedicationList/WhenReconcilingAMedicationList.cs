@@ -76,7 +76,6 @@ public class WhenReconcilingAMedicationList : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: an enum constant captured inside an array lambda (l.Route == MedicationRoute.Injection) is written as its integer, lit 1 under shape string, while the lines hold the enum's JavaScript text \"injection\", so the predicate never matches (ElementExpressionCompiler.cs:156-157 writes it with LiteralFromValue, which skips LiteralFor's enum case at ValueExpression.cs:50).")]
     public async Task an_injection_on_the_list_means_a_nurse_gives_it_until_it_is_removed()
     {
         await OpenTheList();
@@ -105,7 +104,6 @@ public class WhenReconcilingAMedicationList : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: an enum constant captured inside an array lambda (l.Route == MedicationRoute.Injection) is written as its integer, lit 1 under shape string, while the lines hold the enum's JavaScript text \"injection\", so the predicate never matches (ElementExpressionCompiler.cs:156-157 writes it with LiteralFromValue, which skips LiteralFor's enum case at ValueExpression.cs:50).")]
     public async Task the_first_injection_is_named_and_none_leaves_the_line_blank()
     {
         await OpenTheList();

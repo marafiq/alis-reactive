@@ -136,7 +136,6 @@ public class WhenTheCoordinatorRecordsMoveInContacts : PlaywrightTestBase
     // The alternate page renders the contact card twice, under two prefixes. The server binds the alternate
     // contact apart from the next of kin, by the names the alternate card's inputs carry.
     [Test]
-    [Ignore("Framework defect: an input's id ignores HtmlFieldPrefix (InputIdentity.For derives it with IdGenerator.For(expression) alone), so two prefixed renders of one card share one id, alis.model keeps one input per id, and the alternate card's save posts the next of kin's values under the alternate's names.")]
     public async Task an_alternate_contact_is_saved_apart_from_the_next_of_kin()
     {
         await NavigateToAndWaitForBoot($"{Path}/Alternate");
@@ -152,7 +151,6 @@ public class WhenTheCoordinatorRecordsMoveInContacts : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: an input's id ignores HtmlFieldPrefix (InputIdentity.For derives it with IdGenerator.For(expression) alone), so two prefixed renders of one card share one id, alis.model keeps one input per id, and the next of kin card's save posts its values under the alternate's names.")]
     public async Task the_next_of_kin_beside_an_alternate_contact_is_still_saved_as_the_next_of_kin()
     {
         await NavigateToAndWaitForBoot($"{Path}/Alternate");

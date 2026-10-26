@@ -210,7 +210,6 @@ public class WhenTheAideHostsAFamilyVisit : PlaywrightTestBase
 
     // The escort card sits in the visit card's own slot: ending the visit takes it along, listeners included.
     [Test]
-    [Ignore("Framework defect: replacing a slot disposes only that slot's owner (runtime/modules/slot.ts load → unload(id)), never the owners of slots nested in the content it removes, so the escort card's shiftChanged listener outlives the card and fails with '#escort-status is not on the page'.")]
     public async Task ending_the_visit_takes_the_escort_card_and_its_listeners_with_it()
     {
         await OpenTheRoom();

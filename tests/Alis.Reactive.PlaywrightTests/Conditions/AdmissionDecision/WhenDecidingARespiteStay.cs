@@ -253,7 +253,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
     // ── the waiting list: a term that waits ─────────────────────────────────
 
     [Test]
-    [Ignore("Framework defect: a MethodAsync result written as a term after Or is awaited before the branch, so the list is asked (Waitlist checks: 1) although the approval already decided; JsObject.cs:321-325 Result() adds a MethodResultStep where the call is written, before Then adds the BranchStep, so Steps.cs:31-46 settles the promise ahead of the lazy guard AnyCondition.AnyOf writes at ConditionGraph.cs:276-287.")]
     public async Task an_approved_applicant_is_admitted_without_asking_the_waiting_list()
     {
         await OpenTheDecision();
@@ -302,7 +301,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
     }
 
     [Test]
-    [Ignore("Framework defect: a MethodAsync result inside a negated group after And is awaited before the branch, so the list is asked (Waitlist checks: 1) although no bed already decided; JsObject.cs:321-325 Result() adds a MethodResultStep where the call is written, before Then adds the BranchStep, so Steps.cs:31-46 settles the promise ahead of the lazy guard AllCondition.AllOf writes at ConditionGraph.cs:245-257.")]
     public async Task without_a_bed_the_list_is_not_asked_how_far_down_she_is()
     {
         await OpenTheDecision();

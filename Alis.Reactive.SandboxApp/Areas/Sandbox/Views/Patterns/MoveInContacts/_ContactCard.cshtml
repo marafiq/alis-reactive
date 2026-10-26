@@ -4,13 +4,15 @@
 @{
     // A contact card of its own model, rendered under a field prefix (NextOfKin, Alternate): its inputs
     // bind under the prefix, and the card's own save posts them under it, so the server binds the
-    // contact where the packet keeps it.
+    // contact where the packet keeps it. The card's plan is its save button's own, composing with no
+    // other card's: a resolved plan would share the model's plan with the other card, and Form() would
+    // post both cards.
     const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
     const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
 
     var heading = (string)ViewData["Heading"]!;
     var slug = ViewData.TemplateInfo.HtmlFieldPrefix.ToLowerInvariant();
-    var plan = Html.ResolvePlan<MoveInContact>();
+    var plan = Html.ElementPlan<MoveInContact>($"save-{slug}");
 }
 
 <native-vstack gap="Base">
