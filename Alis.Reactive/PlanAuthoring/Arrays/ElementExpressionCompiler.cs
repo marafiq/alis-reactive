@@ -154,9 +154,10 @@ namespace Alis.Reactive.Builders.Arrays
                     "Element selector must be a member access (x => x.Field, x => x.A.B) or the element " +
                     "itself (x => x). Object-init and arithmetic projections are not supported in v1. Got: " + node);
 
-            // Parameter-free: a constant or captured value — evaluate it to a literal.
+            // Parameter-free: a constant or captured value, evaluated once and written as every literal is
+            // (an enum by its JSON name, a date as text).
             var value = Expression.Lambda(node).Compile().DynamicInvoke();
-            return ValueExpression.LiteralFromValue(value);
+            return ValueExpression.LiteralFor(value, Shape.FromValue(value));
         }
 
         private static bool ReferencesParameter(Expression expression, ParameterExpression element)

@@ -51,9 +51,6 @@ namespace Alis.Reactive.PlanModel
             return LiteralRaw(value, shape);
         }
 
-        internal static ValueExpression LiteralFromValue(object? value) =>
-            value == null ? Null() : LiteralRaw(value, Shape.FromValue(value));
-
         // An option is its member name ("Descending"), unless the enum names the JavaScript text the
         // way System.Text.Json does: [JsonStringEnumMemberName("notequal")] NotEqual.
         private static string JavaScriptTextOf(Enum option)
