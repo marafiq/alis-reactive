@@ -93,7 +93,7 @@ namespace Alis.Reactive.Validation
             if (closingBracket < 0) return false;
 
             var prefix = renderedPath.Substring(0, closingBracket + 1);
-            var renderedItemFieldPath = prefix + "." + itemFieldPath;
+            var renderedItemFieldPath = itemFieldPath.Length == 0 ? prefix : prefix + "." + itemFieldPath;
             isDirectField = string.Equals(renderedPath, renderedItemFieldPath, StringComparison.Ordinal);
             var nestedField =
                 renderedPath.StartsWith(renderedItemFieldPath + ".", StringComparison.Ordinal) ||

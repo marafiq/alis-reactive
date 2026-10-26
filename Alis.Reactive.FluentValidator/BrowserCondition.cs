@@ -199,15 +199,17 @@ namespace Alis.Reactive.FluentValidator
                 return true;
             }
 
-            // Enumerable.Contains(source, item), MemoryExtensions.Contains(span, item) (C# 14 binds an
-            // array's Contains to a span), or an instance Contains on a collection (List<T>, a set).
+            // Enumerable.Contains(source, item), MemoryExtensions.Contains(span, item) or (span, item, null)
+            // (C# 14 binds an array's Contains to a span, through the comparer overload for an item type that
+            // is not IEquatable), or an instance Contains on a collection (List<T>, a set).
             private static bool TryContains(MethodCallExpression call, out Expression source, out Expression item)
             {
                 source = null!;
                 item = null!;
                 if (call.Method.Name != "Contains") return false;
 
-                var isStaticContains = call.Object == null && call.Arguments.Count == 2
+                var isStaticContains = call.Object == null
+                    && (call.Arguments.Count == 2 || (call.Arguments.Count == 3 && IsNullComparer(call.Arguments[2])))
                     && (call.Method.DeclaringType == typeof(Enumerable) || call.Method.DeclaringType?.FullName == "System.MemoryExtensions");
                 if (isStaticContains)
                 {
@@ -225,6 +227,10 @@ namespace Alis.Reactive.FluentValidator
                 item = call.Arguments[0];
                 return true;
             }
+
+            // The default comparer, which C# passes as null when the overload takes one.
+            private static bool IsNullComparer(Expression comparer) =>
+                StripConvert(comparer) is ConstantExpression constant && constant.Value == null;
 
             // The array or collection under an implicit conversion to a span.
             private static Expression WithoutSpanConversion(Expression expression)

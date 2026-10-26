@@ -232,12 +232,18 @@ namespace Alis.Reactive.FluentValidator
             }
         }
 
-        // The browser validates an item through the item's own validator, at each item the page renders.
+        // The browser validates an item through the item's own validator, or by the checks written on the
+        // item itself, at each item the page renders.
         public override void DescribeFor(ClientRuleSet browser)
         {
-            foreach (var component in Components.OfType<ChildComponent<T, TElement>>())
-                if (TryBrowserCondition(component, out var when) && component.TryItemFields(out var itemFields))
+            foreach (var component in Components)
+            {
+                if (!TryBrowserCondition(component, out var when)) continue;
+                if (component is ChildComponent<T, TElement> child && child.TryItemFields(out var itemFields))
                     browser.AddItems(Member.Expression, itemFields, when);
+                if (component is CheckComponent<T, TElement> check)
+                    check.DescribeForItems(browser, Member, FieldDisplayName, when);
+            }
         }
     }
 
@@ -309,12 +315,23 @@ namespace Alis.Reactive.FluentValidator
         // model exists.
         internal override void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, ClientCondition when)
         {
-            if (!(_check is IBrowserCheck term)) return;
+            foreach (var rule in BrowserRules(displayName))
+                browser.Add(member.Expression, rule.When(when));
+        }
+
+        // The same check on each item of a collection member.
+        internal void DescribeForItems(ClientRuleSet browser, ModelMember<T> member, string displayName, ClientCondition when)
+        {
+            var rules = BrowserRules(displayName).ToList();
+            if (rules.Count > 0) browser.AddItemRules(member.Expression, rules, when);
+        }
+
+        private IEnumerable<ClientRule> BrowserRules(string displayName)
+        {
+            if (!(_check is IBrowserCheck term)) return Array.Empty<ClientRule>();
             var arguments = new MessageArguments(displayName);
             _check.NameRenderArguments(arguments);
-            if (!Message.TryForBrowser(arguments, out var text)) return;
-            foreach (var rule in term.ForBrowser(text))
-                browser.Add(member.Expression, rule.When(when));
+            return Message.TryForBrowser(arguments, out var text) ? term.ForBrowser(text) : Array.Empty<ClientRule>();
         }
     }
 

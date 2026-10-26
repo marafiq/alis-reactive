@@ -131,8 +131,8 @@ namespace Alis.Reactive.Validation
         /// <summary>The other members the rule reads, besides the one it is on.</summary>
         internal virtual IEnumerable<FieldReference> Fields => Array.Empty<FieldReference>();
 
-        /// <summary>The rule as the field's shape makes it; false when the shape leaves the rule to the server.</summary>
-        internal virtual bool TryFor(Shape fieldShape, out ClientRule rule)
+        /// <summary>The rule as the member makes it; false when the member leaves the rule to the server.</summary>
+        internal virtual bool TryFor(FieldReference field, out ClientRule rule)
         {
             rule = this;
             return true;
@@ -158,8 +158,9 @@ namespace Alis.Reactive.Validation
         private const string EmailPattern = "^[^@]+@[^@]+$";
 
         // The scheme the server's absolute URL lower-cases, written without a flag so that a component
-        // testing a pattern with no flags tests the same one.
-        private const string UrlPattern = "^[Hh][Tt][Tt][Pp][Ss]?://.+";
+        // testing a pattern with no flags tests the same one; an authority with no whitespace, which an
+        // absolute URI never holds. The server checks the rest.
+        private const string UrlPattern = "^[Hh][Tt][Tt][Pp][Ss]?://[^\\s/?#]+[^\\s]*$";
 
         // 0001-01-02T00:00:00Z: a date before it is DateTime.MinValue, in whatever zone it was read.
         private const long DayAfterEarliestDate = -62135510400000;
@@ -170,6 +171,9 @@ namespace Alis.Reactive.Validation
         private protected static Expr Matches(Expr v, string pattern) => G.Op(Operator.Matches, v, G.Lit(pattern), G.Lit(""));
 
         private protected static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.None);
+
+        // Nothing bound: nothing entered, or text of only whitespace, which MVC binds as null.
+        private protected static Expr Blank(Expr v) => G.Or(NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$"));
 
         // What NotEmpty rejects, as far as the field's shape tells: nothing entered, text of only
         // whitespace, and the type's default: false, 0, or 0001-01-01 for a date.

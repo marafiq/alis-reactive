@@ -675,12 +675,12 @@ A rule reaches the browser unless something in it only the server can do. No lis
 
 | Term | Server | Browser check `(v)` |
 |---|---|---|
-| `NotNull` | `v != null` | `v != null` |
-| `NotEmpty` | not null, blank text, an empty list or the type's default | by the property's type: text `v != null && v.trim() !== ""`; number `v != null && v !== 0`; collection `v != null && v.length > 0`; otherwise `v != null && v != default` |
+| `NotNull` | `v != null` | text or a nullable: not blank (blank text binds as null); a number, a boolean, a date or an enum that cannot be null always binds, so no browser check |
+| `NotEmpty` | not null, blank text, an empty list or the type's default | by the property's type: text not blank; number not blank and not 0; boolean not blank and not false; date not blank and not 0001-01-01; enum not blank and not the member its default binds as; collection at least one item |
 | `Empty` | the negation of `NotEmpty` | the negation of the row above |
 | `MinimumLength`, `MaximumLength`, `Length` | null passes; the length is within bounds | `v == null` or the length is within bounds |
 | `EmailAddress` | null passes; exactly one `@`, neither first nor last | the same |
-| `Url` | null or empty passes; an absolute `http` or `https` address | the same |
+| `Url` | null or empty passes; an absolute `http` or `https` address | null or empty passes; an `http` or `https` scheme and an authority with no whitespace; the server checks the rest |
 | `CreditCard` | null passes; dashes and spaces dropped, every other character a digit, then Luhn | the same, written with `call` and `fn` |
 | `Matches` | null passes; the regex matches | `v == null` or `matches(v, pattern, flags)`, flags from `RegexOptions`, when JavaScript reads the pattern the same way |
 | comparison with a literal | ordered: null passes; equality: no null skip | ordered: `v == null` or `v op literal`; equality: `v op literal` |
@@ -701,7 +701,8 @@ A rule reaches the browser unless something in it only the server can do. No lis
   the rest, with `{Name:format}`); the browser fills those known at render and drops a sentence that
   names the entered value (`{PropertyValue}`, `{TotalLength}`).
 - **Collections.** `RuleForEach(x => x.Lines).SetValidator(V)` emits V's tests once per rendered item
-  index; the index is literal in the field ID and in every model path.
+  index, and a check written on the items themselves (`RuleForEach(x => x.Tags).NotEmpty()`) is a test of
+  each rendered item; the index is literal in the field ID and in every model path.
 
 ### 7.5 Which rules reach the browser
 

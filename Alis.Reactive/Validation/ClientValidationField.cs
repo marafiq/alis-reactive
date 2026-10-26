@@ -94,10 +94,28 @@ namespace Alis.Reactive.Validation
         {
             if (rule == null) throw new ArgumentNullException(nameof(rule));
             var reference = FieldReference.Of(member);
-            if (!rule.TryFor(reference.Shape, out var resolved)) return;
+            if (!rule.TryFor(reference, out var resolved)) return;
             Ensure(resolved.Condition.Fields);
             Ensure(reference);
             AddRule(reference, resolved);
+        }
+
+        /// <summary>Adds rules written on each item of a collection member itself: <c>RuleForEach(x =&gt; x.Tags).NotEmpty()</c>.</summary>
+        /// <param name="collection">The collection member, as a path from the validator's model.</param>
+        /// <param name="rules">The rules each item is checked by.</param>
+        /// <param name="when">The condition the collection's rule is declared under.</param>
+        public void AddItemRules(LambdaExpression collection, IEnumerable<ClientRule> rules, ClientCondition when)
+        {
+            if (rules == null) throw new ArgumentNullException(nameof(rules));
+            if (when == null) throw new ArgumentNullException(nameof(when));
+            Ensure(when.Fields);
+            var member = FieldReference.Of(collection);
+            var item = FieldReference.ItemOf(member);
+            var itemRules = new List<ClientRule>();
+            foreach (var rule in rules)
+                if (rule.TryFor(item, out var resolved)) itemRules.Add(resolved);
+            if (itemRules.Count == 0) return;
+            Ensure(member).ItemFields.Add(new ClientValidationField(item, itemRules, Array.Empty<ClientValidationField>()).ScopedBy(when));
         }
 
         /// <summary>Adds the rules of each item of a collection member: a validator applied to every item.</summary>

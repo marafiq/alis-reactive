@@ -5,7 +5,10 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>A value is entered: not blank, and not the type's default. On a list, at least one item.</summary>
+    /// <summary>
+    /// A value is entered: not blank, and not the type's default. On a list, at least one item; on an
+    /// enum, a member other than the default one.
+    /// </summary>
     public sealed class NotEmptyRule : ClientRule
     {
         internal NotEmptyRule(string message, ClientCondition condition)
@@ -15,10 +18,19 @@ namespace Alis.Reactive.Validation
 
         internal override string Name => "required";
 
-        internal override bool TryFor(Shape fieldShape, out ClientRule rule)
+        internal override bool TryFor(FieldReference field, out ClientRule rule)
         {
-            rule = fieldShape.Kind == "array" ? new AtLeastOneRule(Message, Condition) : this;
+            rule = field.Shape.Kind == "array" ? new AtLeastOneRule(Message, Condition)
+                : DefaultMemberOf(field.Type) is string member ? new NotDefaultMemberRule(member, Message, Condition)
+                : this;
             return true;
+        }
+
+        // The member an enum's default binds as (its member with value 0), which the server's NotEmpty refuses.
+        private static string? DefaultMemberOf(Type memberType)
+        {
+            var enumType = Nullable.GetUnderlyingType(memberType) ?? memberType;
+            return enumType.IsEnum && Enum.IsDefined(enumType, Enum.ToObject(enumType, 0)) ? Enum.ToObject(enumType, 0).ToString() : null;
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
@@ -27,7 +39,11 @@ namespace Alis.Reactive.Validation
         private protected override ClientRule Under(ClientCondition condition) => new NotEmptyRule(Message, condition);
     }
 
-    /// <summary>A value is bound. A list is never null in the browser, so on a list the rule stays with the server.</summary>
+    /// <summary>
+    /// A value is bound: text that is not blank, or a nullable with a value. A list is never null in the
+    /// browser, and a number, a boolean, a date or an enum that cannot be null always binds, so on those
+    /// the rule stays with the server, which always passes it.
+    /// </summary>
     public sealed class NotNullRule : ClientRule
     {
         internal NotNullRule(string message, ClientCondition condition)
@@ -37,16 +53,35 @@ namespace Alis.Reactive.Validation
 
         internal override string Name => "required";
 
-        internal override bool TryFor(Shape fieldShape, out ClientRule rule)
+        internal override bool TryFor(FieldReference field, out ClientRule rule)
         {
             rule = this;
-            return fieldShape.Kind != "array";
+            return field.Shape.Kind != "array" && (!field.Type.IsValueType || Nullable.GetUnderlyingType(field.Type) != null);
         }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Not(BlankOrDefault(value, fieldShape));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) => G.Not(Blank(value));
 
         private protected override ClientRule Under(ClientCondition condition) => new NotNullRule(Message, condition);
+    }
+
+    /// <summary>An enum member other than the type's default one: what <see cref="ClientRule.NotEmpty"/> asks of an enum.</summary>
+    public sealed class NotDefaultMemberRule : ClientRule
+    {
+        internal NotDefaultMemberRule(string defaultMember, string message, ClientCondition condition)
+            : base(message, condition)
+        {
+            DefaultMember = defaultMember;
+        }
+
+        /// <summary>The member the type's default binds as, which the rule refuses.</summary>
+        public string DefaultMember { get; }
+
+        internal override string Name => "required";
+
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
+            G.Not(G.Or(Blank(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember))));
+
+        private protected override ClientRule Under(ClientCondition condition) => new NotDefaultMemberRule(DefaultMember, Message, condition);
     }
 
     /// <summary>A list has at least one item: what <see cref="ClientRule.NotEmpty"/> asks of a list.</summary>

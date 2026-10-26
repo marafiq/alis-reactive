@@ -345,8 +345,27 @@ namespace Alis.Reactive.Validation
             return new FieldReference(name, body.Type, Shape.FromClrType(body.Type));
         }
 
+        /// <summary>The item of a collection member itself, with no path of its own: the member's element.</summary>
+        internal static FieldReference ItemOf(FieldReference collection)
+        {
+            var itemType = ItemTypeOf(collection.Type)
+                ?? throw new ArgumentException($"'{collection.Path}' is not a collection.", nameof(collection));
+            return new FieldReference("", itemType, Shape.FromClrType(itemType));
+        }
+
         internal FieldReference PrefixedBy(string prefix) =>
-            prefix.Length == 0 ? this : new FieldReference(prefix + "." + Path, Type, Shape);
+            prefix.Length == 0 ? this
+            : Path.Length == 0 ? new FieldReference(prefix, Type, Shape)
+            : new FieldReference(prefix + "." + Path, Type, Shape);
+
+        private static Type? ItemTypeOf(Type type)
+        {
+            if (type.IsArray) return type.GetElementType();
+            foreach (var candidate in new[] { type }.Concat(type.GetInterfaces()))
+                if (candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    return candidate.GetGenericArguments()[0];
+            return null;
+        }
     }
 
     // A value a condition fixes: a constant, or a variable the lambda captured, evaluated once at render.
