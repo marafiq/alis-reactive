@@ -11,7 +11,7 @@ export type JsonValue =
   | { [key: string]: JsonValue };
 
 export interface PlanDocument {
-  version: 4;
+  version: 5;
   planId: string;
   vendors: Record<string, Vendor>;
   objects: Record<string, ObjectLocator>;
@@ -74,6 +74,7 @@ export interface FormField {
 }
 
 export type Expr =
+  | AsExpr
   | CallExpr
   | FnExpr
   | GetExpr
@@ -84,13 +85,17 @@ export type Expr =
   | RecordExpr
   | RefExpr;
 
+export interface AsExpr {
+  kind: "as";
+  expr: Expr;
+  shape: Shape;
+}
+
 export interface CallExpr {
   kind: "call";
   target: Expr;
   path: string[];
   args: Expr[];
-  argShapes: Shape[];
-  shape: Shape;
 }
 
 export interface FnExpr {
@@ -103,7 +108,6 @@ export interface GetExpr {
   kind: "get";
   target: Expr;
   path: string[];
-  shape: Shape;
 }
 
 export interface ListExpr {
@@ -114,7 +118,6 @@ export interface ListExpr {
 export interface LitExpr {
   kind: "lit";
   value: JsonValue;
-  shape: Shape;
 }
 
 export interface ObjExpr {
@@ -130,21 +133,11 @@ export interface OpExpr {
 
 export interface RecordExpr {
   kind: "record";
-  entries: RecordEntry[];
+  fields: RecordField[];
 }
 
-export type RecordEntry =
-  | FieldEntry
-  | SpreadEntry;
-
-export interface FieldEntry {
-  kind: "field";
+export interface RecordField {
   name: string;
-  value: Expr;
-}
-
-export interface SpreadEntry {
-  kind: "spread";
   value: Expr;
 }
 
@@ -181,7 +174,6 @@ export interface Handler {
   on: string;
   path: string[];
   event: string;
-  param: string;
   do: Statement[];
 }
 
@@ -226,7 +218,6 @@ export interface SetStatement {
   kind: "set";
   target: Expr;
   path: string[];
-  shape: Shape;
   value: Expr;
 }
 
@@ -267,7 +258,8 @@ export type Operator =
   | "toText"
   | "toArray"
   | "finite"
-  | "order";
+  | "order"
+  | "merge";
 
 export type Shape =
   | AnyShape

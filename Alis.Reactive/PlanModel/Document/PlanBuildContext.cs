@@ -13,7 +13,6 @@ namespace Alis.Reactive.PlanModel
     /// </summary>
     internal sealed class PlanBuildContext
     {
-        private const string EventParam = "e";
 
         private readonly string _planId;
         private readonly RenderedInputs _inputs;
@@ -156,8 +155,8 @@ namespace Alis.Reactive.PlanModel
             var handlers = _handlers
                 .Select(handler =>
                 {
-                    var body = handler.Body.Write(Scope.ForHandler(plan, EventParam));
-                    return new Handler(handler.On(objects), handler.Path, handler.Event, EventParam, body);
+                    var body = handler.Body.Write(Scope.ForHandler(plan, Handler.Payload));
+                    return new Handler(handler.On(objects), handler.Path, handler.Event, body);
                 })
                 .ToList();
 

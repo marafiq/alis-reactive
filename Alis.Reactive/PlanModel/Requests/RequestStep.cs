@@ -52,7 +52,7 @@ namespace Alis.Reactive.PlanModel
             // A gathered value that returns a promise settles just before the request is sent.
             var exchange = scope.WithHoisted(() => new[]
             {
-                G.Let(response, G.CallTyped(G.Obj(scope.Objects.Http()), "send", Shape.None, SendArgument(method, input, scope)), awaits: true),
+                G.Let(response, G.Call(G.Obj(scope.Objects.Http()), "send", SendArgument(method, input, scope)), awaits: true),
             }).ToList();
             exchange.AddRange(Routes.Write(response, routeScope));
 
@@ -70,7 +70,7 @@ namespace Alis.Reactive.PlanModel
 
             if (Validation is { } validation)
             {
-                var valid = G.CallTyped(G.Obj(scope.Objects.Form(validation.Form)), "validate", Shape.Boolean);
+                var valid = G.Call(G.Obj(scope.Objects.Form(validation.Form)), "validate");
                 return new[] { G.If(valid, sentence, G.NoStatements) };
             }
 
@@ -92,11 +92,11 @@ namespace Alis.Reactive.PlanModel
             Expr body = G.Record(values);
 
             // Form() writes each input at its own key: nested, leaf by leaf into the authored record
-            // (model.fill), so an authored value beside an input survives; flat, by binding name.
+            // (model.fill), so an authored value beside an input survives; flat, merged in by binding name.
             if (input.IncludesForm && nested)
-                body = G.Call(G.Obj(scope.Objects.Model()), new[] { "fill" }, new[] { body }, G.NoShapes, Shape.None);
+                body = G.Call(G.Obj(scope.Objects.Model()), "fill", body);
             else if (input.IncludesForm)
-                body = G.Record(values.Append(new SpreadEntry(G.Get(G.Obj(scope.Objects.Model()), new[] { "fields" }, Shape.None))));
+                body = G.Op(Operator.Merge, body, G.Get(G.Obj(scope.Objects.Model()), "fields"));
 
             Expr arrays = G.List(input.Payload
                 .Where(member => member.Value.OutputShape.DescribesArray)
@@ -115,14 +115,14 @@ namespace Alis.Reactive.PlanModel
         }
 
         private static Expr Named(IReadOnlyList<(string Name, ValueExpression Value)> members, Scope scope) =>
-            G.Record(members.Select(member => (RecordEntry)new FieldEntry(member.Name, member.Value.Write(scope))));
+            G.Record(members.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
 
         // A query string or form data is flat, keyed by MVC binding name.
-        private static List<RecordEntry> FlatValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope) =>
-            payload.Select(member => (RecordEntry)new FieldEntry(member.Name.Value, member.Value.Write(scope))).ToList();
+        private static List<RecordField> FlatValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope) =>
+            payload.Select(member => new RecordField(member.Name.Value, member.Value.Write(scope))).ToList();
 
         // A JSON body nests each value at its body path; an index segment (Lines[0]) makes an array.
-        private static List<RecordEntry> NestedValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope)
+        private static List<RecordField> NestedValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope)
         {
             var root = new BodyNode();
             foreach (var member in payload)
@@ -156,8 +156,8 @@ namespace Alis.Reactive.PlanModel
                 child.Assign(segments, at + 1, value);
             }
 
-            internal List<RecordEntry> Entries() =>
-                _order.Select(key => (RecordEntry)new FieldEntry(key, _children[key].ToExpr())).ToList();
+            internal List<RecordField> Entries() =>
+                _order.Select(key => new RecordField(key, _children[key].ToExpr())).ToList();
 
             private BodyNode ChildNamed(string name)
             {
@@ -188,9 +188,9 @@ namespace Alis.Reactive.PlanModel
             }
 
             // A node with both names and positions is an object; its positions are entries named by their digits.
-            private IEnumerable<RecordEntry> ItemEntries() =>
+            private IEnumerable<RecordField> ItemEntries() =>
                 _items.OrderBy(item => item.Key)
-                    .Select(item => (RecordEntry)new FieldEntry(item.Key.ToString(CultureInfo.InvariantCulture), item.Value.ToExpr()));
+                    .Select(item => new RecordField(item.Key.ToString(CultureInfo.InvariantCulture), item.Value.ToExpr()));
         }
     }
 

@@ -139,7 +139,7 @@ namespace Alis.Reactive.PlanModel
             var value = scope.Fresh("v");
             var item = scope.Fresh("i");
             var items = G.List(_items.Select(candidate => candidate.WriteAs(Shape, scope)).ToList());
-            var some = G.Call(items, new[] { "some" }, new Expr[] { G.Fn(G.Eq(G.Ref(item), G.Ref(value)), item) }, G.NoShapes, Shape.Boolean);
+            var some = G.Call(items, new[] { "some" }, new Expr[] { G.Fn(G.Eq(G.Ref(item), G.Ref(value)), item) }, Shape.Boolean);
             var among = G.Apply(G.Fn(some, value), left);
             return _negated ? G.Not(among) : among;
         }
@@ -190,7 +190,7 @@ namespace Alis.Reactive.PlanModel
             var items = scope.Fresh("c");
             var item = scope.Fresh("i");
             var matches = G.Fn(G.Eq(G.As(G.Ref(item), _itemShape), _item.WriteAs(_itemShape, scope)), item);
-            var some = G.Call(G.Ref(items), new[] { "some" }, new Expr[] { matches }, G.NoShapes, Shape.None);
+            var some = G.Call(G.Ref(items), new[] { "some" }, new Expr[] { matches }, Shape.None);
             return G.Apply(G.Fn(G.Op(Operator.Truthy, some), items), left);
         }
     }
@@ -211,7 +211,7 @@ namespace Alis.Reactive.PlanModel
         {
             var left = Left(scope);
             if (_test.IsPattern) return G.Op(Operator.Matches, left, G.Lit(_text), G.Lit(""));
-            return G.Op(Operator.Truthy, G.Call(G.Op(Operator.ToText, left), new[] { _test.Method }, new Expr[] { G.Lit(_text) }, G.NoShapes, Shape.None));
+            return G.Op(Operator.Truthy, G.Call(G.Op(Operator.ToText, left), new[] { _test.Method }, new Expr[] { G.Lit(_text) }, Shape.None));
         }
     }
 
@@ -332,7 +332,7 @@ namespace Alis.Reactive.PlanModel
             var accepted = scope.Fresh("ok");
             return new[]
             {
-                G.Let(accepted, G.CallTyped(G.Obj(scope.Objects.Confirm()), "ask", Shape.Boolean, G.Lit(_message)), awaits: true),
+                G.Let(accepted, G.Call(G.Obj(scope.Objects.Confirm()), "ask", G.Lit(_message)), awaits: true),
                 G.If(G.Ref(accepted), then, otherwise),
             };
         }

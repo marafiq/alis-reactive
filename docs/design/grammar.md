@@ -23,7 +23,7 @@ listen    := method(subscribe, unsubscribe)   object[subscribe](event, fn) adds 
 object    := id -> locator
 locator   := element(id, vendor)            found on an element, through its vendor's data
            | plugin(name, key, data)        made by the module a bundle registered under `name`
-handler   := { on: object, path, event, param, do: block }
+handler   := { on: object, path, event, do: block }     the block reads the payload as `e`
 ```
 
 That is the whole document. The grammar names no feature.
@@ -58,25 +58,27 @@ That is the whole document. The grammar names no feature.
 
 ```
 block   := stmt*
-stmt    := set(target: expr, path, shape, value: expr)
+stmt    := set(target: expr, path, value: expr)
          | do(expr, await)
          | let(name, expr, await)
          | if(arm+, else: block)            arm := (expr, block)
          | all(block+)
          | try(block, finally: block)
 
-expr    := lit(json, shape)
+expr    := lit(json)
          | obj(id)
          | ref(name)
-         | get(expr, path, shape)
-         | call(expr, path, args: expr*, argShapes: shape*, shape)
+         | get(expr, path)
+         | as(expr, shape)                   the value converted to the shape (2.1)
+         | call(expr, path, args: expr*)
          | fn(param+, expr)
-         | record(entry*)                    entry := (name, expr) | spread(expr)
+         | record(field*)                    field := (name, expr)
          | list(expr*)
          | op(operator, expr+)
 ```
 
-Six statements, nine expressions. JSON names each node by `kind` with exactly these names.
+Six statements, ten expressions. JSON names each node by `kind` with exactly these names, and
+carries nothing else: a node has exactly the members its production lists.
 
 ### 1.3 Paths
 
@@ -127,11 +129,17 @@ kinds:
 
 ### 2.1 Conversion happens at the boundary, by shape
 
-A value changes type in exactly two places, and only by the declared shape:
-- **Reading:** a `get` or `call` result is converted to the node's shape.
-- **Writing:** a `set` value and each `call` argument are converted to the target member's shape.
+A value changes type in exactly one place: `as(expr, shape)`, by the declared shape. The C# writes
+it where a conversion is due and nowhere else:
+- **Reading:** a member read (`get`) or a method's result is wrapped in `as` with the member's shape;
+  a method result bound by a `let` is wrapped where the name is read.
+- **Writing:** a `set` value and each `call` argument are wrapped in `as` with the target member's
+  shape.
+- **Literals:** a literal is wrapped only when it is not already a value of its shape: a date or an
+  instant written as text, a list or a record with members to convert. Text under `string`, a boolean
+  under `boolean`, a number under `number`, and a missing value are written bare.
 
-Literals are emitted already in their shape. Nothing else converts.
+A shape that converts nothing (`any`, `none`) is never written. Nothing else converts.
 
 | Shape | From | Result |
 |---|---|---|
@@ -196,6 +204,7 @@ expression over the converted values.
 | `&&`, `\|\|`, `!` | Short-circuit, left to right. |
 | `+ - * / %` | C# arithmetic over numbers; `+` over texts concatenates. |
 | `??`, `?:` | As in C#. |
+| `merge` | The fields of every record operand, left to right, in one record (a gathered request's values with the model's). |
 | `-x` | C#'s unary minus over a number (`neg`). |
 | `truthy` | JavaScript's truthiness, applied after conversion. It is used by `Truthy()` and `Falsy()`. |
 | `empty` | True for `""`, missing, and an empty array. Nothing is trimmed. It is used by `IsEmpty()` and `NotEmpty()` in conditions. |
@@ -251,7 +260,7 @@ nothing uses yet (`First`, `Distinct`, `Skip`, `Take`, `SelectMany`, `Min`, `Max
 ### 3.1 Bindings
 
 A block runs in an environment of names:
-- a handler binds its `param`;
+- a handler binds its payload as `e`;
 - `let` binds a name for the rest of its block;
 - `fn` binds its parameters for its body.
 
@@ -270,7 +279,7 @@ at render: a handle used outside the block that binds it throws, and names the h
 
 | Statement | Behavior |
 |---|---|
-| `set` | Evaluates the target, converts the value to the target's shape, and writes it (1.3). |
+| `set` | Evaluates the target and the value, and writes it (1.3); the value's conversion is its own `as`. |
 | `do` | Evaluates the call for its effect. |
 | `let` | Binds the value. |
 | `if` | Takes the first arm whose condition is truthy, else the `else` block. |
@@ -372,12 +381,12 @@ form lowers to fixed productions.
 | `t.DomReady(p => …)` | `on(document, "ready", _)` |
 | `t.CustomEvent(appEvent, (e, p) => …)` | `on(document, name, e)`; the payload is `detail`, or the event when it has none |
 | `t.ServerPush(ServerPushStream.At<S>(url), s => s.M, …)`, `t.SignalR(SignalRHub.At<H>(url), h => h.M, …)` | `on(stream, name, e)`, `on(hub, name, e)` |
-| `var c = p.Component<C>(…); c.P.Set(v)`, a `Property<T>` or `WriteOnly<T>` | `set(o, ["p"], shape, v)` |
+| `var c = p.Component<C>(…); c.P.Set(v)`, a `Property<T>` or `WriteOnly<T>` | `set(o, ["p"], as(v, shape))` |
 | `c.M(a, b)`, a method declared with `Method(a, b)` | `do(call(o, ["m"], [a, b]))` |
-| `c.P`, a `ReadOnly<T>` or `Property<T>` read | `get(o, ["p"], shape)` |
-| `c.F(a)`, a method declared with `Method<T>(a)` or `Object<T>(a)` | `let t = call(o, ["f"], [a], shape)` before the statement that first reads it; the value is `ref t` (3.1) |
+| `c.P`, a `ReadOnly<T>` or `Property<T>` read | `as(get(o, ["p"]), shape)` |
+| `c.F(a)`, a method declared with `Method<T>(a)` or `Object<T>(a)` | `let t = call(o, ["f"], [a])` before the statement that first reads it; the value is `as(ref t` (3.1) |
 | a method declared with `MethodAsync()` or `MethodAsync<T>()` | `do await call(…)`; a read is `let t = await call(…)` before the statement that first reads it, and the value is `ref t` |
-| `args.A.Get(x => x.B)`, `json.Get(x => x.A.B)` | `get(v, ["a", "b"], shape)` |
+| `args.A.Get(x => x.B)`, `json.Get(x => x.A.B)` | `as(get(v, ["a", "b"]), shape)` |
 | `args.Cancel.Set(true)`, `args.UpdateData(items)` | `set(v, ["cancel"], ..)`, `do(call(v, ["updateData"], [..]))` on the handler's parameter |
 | `p.Element(id).Text.Set(v)` | `set(el, ["textContent"], text, v)` |
 | `Html.Set(v)` | `set(el, ["innerHTML"], text, v)` |
@@ -390,8 +399,8 @@ form lowers to fixed productions.
 | `.Into(elementId)` | `do(call(slot, ["load"], [ref res.body]))`, for the response of the request it follows |
 | `p.ValidationErrors(container)` | inside an error route only: `do(call(form, ["showErrors"], [get(ref res, ["body"])]))` |
 | `p.Parallel(a, b).OnAllSettled(c)` | `all(a, b); c` |
-| `p.Url<TQuery>().Get(q => q.X)` | `get(get(document, ["query"]), ["X"], shape)`, keyed by the member's binding name; an array member reads `queryAll` |
-| `tools.Count(items, "status")`, a member of a plugin from `plan.RegisterPlugin<T>()` | `call(plugin, ["count"], [..], shape)` |
+| `p.Url<TQuery>().Get(q => q.X)` | `as(get(get(document, ["query"]), ["X"]), shape)`, keyed by the member's binding name; an array member reads `queryAll` |
+| `tools.Count(items, "status")`, a member of a plugin from `plan.RegisterPlugin<T>()` | `as(call(plugin, ["count"], [..]), shape)` |
 | `Html.NativeActionLink(id, text, url, link => link.Post()…)` | the anchor plus its own plan script: `on(link, "click", e) { if (!modified(e)) { e.preventDefault(); … } }` |
 
 ### 5.1 A request
@@ -606,7 +615,7 @@ no key (H2) and no entry (H4).
     `preventDefault`);
   - `element`: the element itself, for native inputs whose values are read after an `await`, or a
     `CustomEvent`'s `detail`, or the event itself when it has none.
-- **E3 Writes.** A write converts by the member's shape: a date member receives a `Date`.
+- **E3 Writes.** A write's value is converted by the member's shape (`as`): a date member receives a `Date`.
 - **E4 Listening.** The vendor's `listen` decides how a handler attaches to the object, or to the
   nested object the handler's path names:
   - `method`: `object[subscribe](event, fn)` adds the handler and `object[unsubscribe](event, fn)`

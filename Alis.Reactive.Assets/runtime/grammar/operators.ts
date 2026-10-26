@@ -131,6 +131,11 @@ export function toArray(value: unknown): unknown[] {
   throw new Error(`[alis] an array method needs an array, got ${describe(value)}`);
 }
 
+/** The fields of every record, left to right, in one record: the gathered values with the model's. */
+export function merge(records: readonly unknown[]): Record<string, unknown> {
+  return Object.assign({}, ...(records as object[]));
+}
+
 /** Sum's per-item value: the number if finite, else 0, so text never concatenates. */
 export function finite(value: unknown): number {
   const number = typeof value === "number" ? value : Number(value);

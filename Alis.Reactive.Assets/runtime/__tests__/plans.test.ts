@@ -27,7 +27,7 @@ function paragraph(id: string): HTMLElement {
 }
 
 const setText = (id: string, value: Parameters<typeof st.set>[2]) =>
-  st.set(e.obj(id), ["textContent"], value, s.string);
+  st.set(e.obj(id), ["textContent"], e.as(value, s.string));
 
 describe("handlers", () => {
   it("run when the vendor raises the event, with the vendor's argument as the payload", () => {
@@ -35,7 +35,7 @@ describe("handlers", () => {
     const status = paragraph("status");
     startOwner(Owner.page(), [plan(
       { roster: element("roster", "fake"), status: element("status") },
-      [on("roster", "rowSelected", "args", setText("status", e.get(e.ref("args"), ["data", "name"])))],
+      [on("roster", "rowSelected", setText("status", e.get(e.ref("e"), ["data", "name"])))],
     )]);
 
     grid.widget.trigger("rowSelected", { data: { name: "Margaret Hill" } });
@@ -46,7 +46,7 @@ describe("handlers", () => {
     const grid = fakeWidget("roster");
     startOwner(Owner.page(), [plan(
       { roster: element("roster", "fake") },
-      [on("roster", "actionBegin", "args", st.set(e.ref("args"), ["cancel"], e.lit(true), s.boolean))],
+      [on("roster", "actionBegin", st.set(e.ref("e"), ["cancel"], e.lit(true)))],
     )]);
 
     const args: { cancel?: boolean } = {};
@@ -57,7 +57,7 @@ describe("handlers", () => {
   it("stop listening when their owner is disposed", () => {
     const grid = fakeWidget("roster");
     const owner = Owner.slot("panel");
-    startOwner(owner, [plan({ roster: element("roster", "fake") }, [on("roster", "rowSelected", "args")])]);
+    startOwner(owner, [plan({ roster: element("roster", "fake") }, [on("roster", "rowSelected")])]);
     expect(grid.widget.listenerCount("rowSelected")).toBe(1);
     owner.dispose();
     expect(grid.widget.listenerCount("rowSelected")).toBe(0);
@@ -69,8 +69,8 @@ describe("handlers", () => {
     startOwner(Owner.page(), [plan(
       { save: element("save"), status: element("status"), missing: element("missing") },
       [
-        on("save", "click", "e", setText("missing", e.lit("never"))),
-        on("save", "click", "e", setText("status", e.lit("saved"))),
+        on("save", "click", setText("missing", e.lit("never"))),
+        on("save", "click", setText("status", e.lit("saved"))),
       ],
     )]);
     button.click();
@@ -84,8 +84,8 @@ describe("the document", () => {
     startOwner(Owner.page(), [plan(
       { document: plugin("alis.document"), status: element("status") },
       [
-        on("document", "ready", "_", st.do(e.call(e.obj("document"), ["raise"], [e.lit("loaded"), e.record({ who: e.lit("ready") })]))),
-        on("document", "loaded", "detail", setText("status", e.get(e.ref("detail"), ["who"]))),
+        on("document", "ready", st.do(e.call(e.obj("document"), ["raise"], [e.lit("loaded"), e.record({ who: e.lit("ready") })]))),
+        on("document", "loaded", setText("status", e.get(e.ref("e"), ["who"]))),
       ],
     )]);
     expect(status.textContent).toBe("ready");
@@ -95,7 +95,7 @@ describe("the document", () => {
     const status = paragraph("status");
     startOwner(Owner.page(), [plan(
       { document: plugin("alis.document"), status: element("status") },
-      [on("document", "plain", "evt", setText("status", e.get(e.ref("evt"), ["type"])))],
+      [on("document", "plain", setText("status", e.get(e.ref("e"), ["type"])))],
     )]);
     document.dispatchEvent(new CustomEvent("plain"));
     expect(status.textContent).toBe("plain");
@@ -107,9 +107,9 @@ describe("the document", () => {
     const all = paragraph("all");
     startOwner(Owner.page(), [plan(
       { document: plugin("alis.document"), status: element("status"), all: element("all") },
-      [on("document", "ready", "_",
-        setText("status", e.get(e.get(e.obj("document"), ["query"]), ["tab"], s.string)),
-        setText("all", e.get(e.get(e.obj("document"), ["queryAll"]), ["WING"], s.array(s.string))),
+      [on("document", "ready",
+        setText("status", e.as(e.get(e.get(e.obj("document"), ["query"]), ["tab"]), s.string)),
+        setText("all", e.as(e.get(e.get(e.obj("document"), ["queryAll"]), ["WING"]), s.array(s.string))),
       )],
     )]);
     expect(status.textContent).toBe("medications");
@@ -121,7 +121,7 @@ describe("the document", () => {
     document.body.insertAdjacentHTML("beforeend", `<button id="row-edit" data-alis-raise="edit-row" data-alis-detail='{"id":4}'>Edit</button>`);
     startOwner(Owner.page(), [plan(
       { document: plugin("alis.document"), status: element("status") },
-      [on("document", "edit-row", "row", setText("status", e.get(e.ref("row"), ["id"])))],
+      [on("document", "edit-row", setText("status", e.get(e.ref("e"), ["id"])))],
     )]);
     document.getElementById("row-edit")!.click();
     expect(status.textContent).toBe("4");
@@ -132,7 +132,7 @@ describe("slots", () => {
   function slotPlanHtml(statusText: string): string {
     const slotPlan = plan(
       { document: plugin("alis.document"), status: element("status") },
-      [on("document", "ready", "_", setText("status", e.lit(statusText)))],
+      [on("document", "ready", setText("status", e.lit(statusText)))],
     );
     return `<p id="inside">loaded</p><script type="application/json" data-reactive-plan>${JSON.stringify(slotPlan)}</script>`;
   }
@@ -145,8 +145,8 @@ describe("slots", () => {
     const pageRuns = paragraph("page-runs");
     startOwner(Owner.page(), [plan(
       { document: plugin("alis.document"), pageRuns: element("page-runs") },
-      [on("document", "ready", "_", st.set(e.obj("pageRuns"), ["textContent"],
-        e.op("add", e.get(e.obj("pageRuns"), ["textContent"], s.number), e.lit(1)), s.string))],
+      [on("document", "ready", st.set(e.obj("pageRuns"), ["textContent"],
+        e.as(e.op("add", e.as(e.get(e.obj("pageRuns"), ["textContent"]), s.number), e.lit(1)), s.string)))],
     )]);
     expect(pageRuns.textContent).toBe("1");
 
@@ -182,7 +182,7 @@ describe("slots", () => {
     panel.id = "panel";
     document.body.appendChild(panel);
     const grid = fakeWidget("roster");
-    const slotPlan = plan({ roster: element("roster", "fake") }, [on("roster", "rowSelected", "args")]);
+    const slotPlan = plan({ roster: element("roster", "fake") }, [on("roster", "rowSelected")]);
     const html = `<script type="application/json" data-reactive-plan>${JSON.stringify(slotPlan)}</script>`;
     const slot = slotModule.object("panel") as { load(html: string): void; unload(): void };
 

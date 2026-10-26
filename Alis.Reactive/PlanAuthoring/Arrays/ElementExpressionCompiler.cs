@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
@@ -143,8 +144,9 @@ namespace Alis.Reactive.Builders.Arrays
                 foreach (var methodArgument in call.Arguments)
                     methodArgs.Add(CompileValue(Unwrap(methodArgument), element));
 
+                var unconverted = methodArgs.Select(_ => Shape.None).ToList();
                 return ValueExpression.Call(
-                    Receiver.Item, receiverPath.Then(methodName).TargetText, methodArgs, G.NoShapes, Shape.FromClrType(node.Type), methodName);
+                    Receiver.Item, receiverPath.Then(methodName).TargetText, methodArgs, unconverted, Shape.FromClrType(node.Type), methodName);
             }
 
             if (ReferencesParameter(node, element))

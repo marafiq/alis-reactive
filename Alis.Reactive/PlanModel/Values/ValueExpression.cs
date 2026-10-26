@@ -76,7 +76,7 @@ namespace Alis.Reactive.PlanModel
             new GetExpression(receiver, G.NoPath, shape);
 
         /// <summary>What a method of an object returns.</summary>
-        internal static ValueExpression Call(
+        internal static CallExpression Call(
             Receiver receiver,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
@@ -85,7 +85,7 @@ namespace Alis.Reactive.PlanModel
             string member) =>
             new CallExpression(receiver, path, args, argShapes, shape, member);
 
-        internal static ValueExpression MethodResult(ValueExpression call, string member, bool awaits) =>
+        internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits) =>
             new MethodResultExpression(call, member, awaits);
 
         /// <summary>A query string key, as MVC binds it: a scalar from its first value, an array from all of them.</summary>
@@ -227,25 +227,31 @@ namespace Alis.Reactive.PlanModel
 
         internal override bool ReadsAwaited => _args.Any(arg => arg.ReadsAwaited);
 
-        internal override Expr Write(Scope scope)
+        internal override Expr Write(Scope scope) => WriteCall(scope, _shape);
+
+        /// <summary>The call with its result as it arrives: what a <c>let</c> binds, converted where the name is read.</summary>
+        internal Expr WriteUnconverted(Scope scope) => WriteCall(scope, Shape.None);
+
+        private Expr WriteCall(Scope scope, Shape shape)
         {
             var (root, prefix) = _receiver.Write(scope);
             var args = _args.Select(arg => arg.Write(scope)).ToList();
-            return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, _shape);
+            return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, shape);
         }
     }
 
     /// <summary>
     /// What a method returned: bound once per block, by a <c>let</c> hoisted before the statement that
-    /// first reads it, and read by name after. A promise is awaited by that <c>let</c> (grammar.md 3.1).
+    /// first reads it, and read by name after, converted to the method's shape where it is read. A promise
+    /// is awaited by that <c>let</c> (grammar.md 3.1).
     /// </summary>
     internal sealed class MethodResultExpression : ValueExpression
     {
-        private readonly ValueExpression _call;
+        private readonly CallExpression _call;
         private readonly string _member;
         private readonly bool _awaits;
 
-        internal MethodResultExpression(ValueExpression call, string member, bool awaits)
+        internal MethodResultExpression(CallExpression call, string member, bool awaits)
         {
             _call = call ?? throw new ArgumentNullException(nameof(call));
             _member = member ?? throw new ArgumentNullException(nameof(member));
@@ -257,7 +263,7 @@ namespace Alis.Reactive.PlanModel
         internal override bool ReadsAwaited => _awaits || _call.ReadsAwaited;
 
         internal override Expr Write(Scope scope) =>
-            scope.Result(this, JsonMemberName.Of(_member), _awaits, _member, () => _call.Write(scope));
+            G.As(scope.Result(this, JsonMemberName.Of(_member), _awaits, _member, () => _call.WriteUnconverted(scope)), OutputShape);
     }
 
     internal sealed class UrlRead : ValueExpression
@@ -296,7 +302,7 @@ namespace Alis.Reactive.PlanModel
         internal override Shape OutputShape => _shape;
 
         internal override Expr Write(Scope scope) =>
-            G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, G.NoShapes, _shape);
+            G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, _shape);
     }
 
     internal sealed class RecordExpression : ValueExpression
@@ -315,7 +321,7 @@ namespace Alis.Reactive.PlanModel
         internal override bool ReadsAwaited => _fields.Values.Any(value => value.ReadsAwaited);
 
         internal override Expr Write(Scope scope) =>
-            G.Record(_fields.Select(field => (RecordEntry)new FieldEntry(field.Key, field.Value.Write(scope))));
+            G.Record(_fields.Select(field => new RecordField(field.Key, field.Value.Write(scope))));
     }
 
     internal sealed class ListExpression : ValueExpression
@@ -397,7 +403,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "filter" }, new Expr[] { PerItem(_predicate, scope) }, G.NoShapes, OutputShape);
+            G.Call(items, new[] { "filter" }, new Expr[] { PerItem(_predicate, scope) }, OutputShape);
     }
 
     internal sealed class MapOperation : ArrayOperation
@@ -410,7 +416,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, G.NoShapes, OutputShape);
+            G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, OutputShape);
     }
 
     /// <summary>Sum adds each selected value as a finite number, so text never concatenates.</summary>
@@ -429,7 +435,7 @@ namespace Alis.Reactive.PlanModel
             var item = scope.Fresh("x");
             var term = _projection.Write(scope.WithItem(item));
             var add = G.Fn(G.Op(Operator.Add, G.Ref(total), G.Op(Operator.Finite, term)), total, item);
-            return G.Call(items, new[] { "reduce" }, new Expr[] { add, G.Lit(0) }, G.NoShapes, Shape.Number);
+            return G.Call(items, new[] { "reduce" }, new Expr[] { add, G.Lit(0) }, Shape.Number);
         }
     }
 
@@ -450,7 +456,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "some" }, new Expr[] { PerItem(_predicate, scope) }, G.NoShapes, Shape.Boolean);
+            G.Call(items, new[] { "some" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
     }
 
     internal sealed class EveryOperation : ArrayOperation
@@ -463,7 +469,7 @@ namespace Alis.Reactive.PlanModel
         }
 
         private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, G.NoShapes, Shape.Boolean);
+            G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
     }
 
     /// <summary>Find gives null when nothing matches.</summary>
@@ -480,7 +486,7 @@ namespace Alis.Reactive.PlanModel
             G.As(Found(items, _predicate, scope), OutputShape);
 
         internal static Expr Found(Expr items, ConditionGraph predicate, Scope scope) =>
-            G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, G.NoShapes, Shape.None), G.Null);
+            G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.None), G.Null);
     }
 
     /// <summary>Find gives null when nothing matches, then applies the selector to what it found.</summary>
@@ -523,7 +529,7 @@ namespace Alis.Reactive.PlanModel
             var right = scope.Fresh("b");
             Expr compare = G.Op(Operator.Order, _key.Write(scope.WithItem(left)), _key.Write(scope.WithItem(right)));
             if (_descending) compare = G.Op(Operator.Neg, compare);
-            return G.Call(items, new[] { "toSorted" }, new Expr[] { G.Fn(compare, left, right) }, G.NoShapes, OutputShape);
+            return G.Call(items, new[] { "toSorted" }, new Expr[] { G.Fn(compare, left, right) }, OutputShape);
         }
     }
 }

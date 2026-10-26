@@ -8,7 +8,6 @@ import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 import { childScope, evaluate, evaluateStatement, isPromise, labelOf, modeOf, type Scope } from "./evaluate";
 import { write } from "./paths";
-import { shaped } from "./shape";
 
 const log = logger("execute");
 
@@ -39,7 +38,7 @@ function execute(statement: Statement, scope: Scope): Completion {
 
 function set(statement: SetStatement, scope: Scope): void {
   const target = evaluate(statement.target, scope);
-  const value = shaped(evaluate(statement.value, scope), statement.shape);
+  const value = evaluate(statement.value, scope);
   log.trace("set", { target: traceName(statement.target), path: statement.path, value });
   write(target, statement.path, value, modeOf(statement.target), labelOf(statement.target));
 }

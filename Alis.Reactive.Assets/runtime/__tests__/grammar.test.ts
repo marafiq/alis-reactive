@@ -26,32 +26,32 @@ afterEach(() => {
 
 describe("values convert at the boundary, by shape", () => {
   it("reads text as a number the way MVC binds a number, and keeps what cannot convert", () => {
-    expect(value(e.lit("42", s.number))).toBe(42);
-    expect(value(e.lit("", s.number))).toBe(0);
-    expect(value(e.lit("abc", s.number))).toBe("abc");
+    expect(value(e.as(e.lit("42"), s.number))).toBe(42);
+    expect(value(e.as(e.lit(""), s.number))).toBe(0);
+    expect(value(e.as(e.lit("abc"), s.number))).toBe("abc");
   });
 
   it("reads a nullable number's blank text as null", () => {
-    expect(value(e.lit("  ", s.nullable(s.number)))).toBeNull();
-    expect(value(e.lit(undefined, s.nullable(s.string)))).toBeNull();
+    expect(value(e.as(e.lit("  "), s.nullable(s.number)))).toBeNull();
+    expect(value(e.as(e.lit(undefined), s.nullable(s.string)))).toBeNull();
   });
 
   it("reads a date-only text as local midnight", () => {
-    const date = value(e.lit("2026-06-01", s.date)) as Date;
+    const date = value(e.as(e.lit("2026-06-01"), s.date)) as Date;
     expect(date).toBeInstanceOf(Date);
     expect([date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()]).toEqual([2026, 5, 1, 0]);
   });
 
   it("reads an instant as the exact moment its text names, and writes it back in UTC", () => {
-    const arrives = value(e.lit("2026-10-11T10:30:00+05:00", s.instant)) as Date;
+    const arrives = value(e.as(e.lit("2026-10-11T10:30:00+05:00"), s.instant)) as Date;
     expect(arrives.toISOString()).toBe("2026-10-11T05:30:00.000Z");
-    expect(value(e.op("toText", e.lit("2026-10-11T10:30:00+05:00", s.instant)))).toBe("2026-10-11T05:30:00.000Z");
-    expect(value(e.op("eq", e.lit("2026-10-11T05:30:00Z", s.instant), e.lit(Date.UTC(2026, 9, 11, 5, 30), s.date)))).toBe(true);
+    expect(value(e.op("toText", e.as(e.lit("2026-10-11T10:30:00+05:00"), s.instant)))).toBe("2026-10-11T05:30:00.000Z");
+    expect(value(e.op("eq", e.as(e.lit("2026-10-11T05:30:00Z"), s.instant), e.as(e.lit(Date.UTC(2026, 9, 11, 5, 30)), s.date)))).toBe(true);
   });
 
   it("keeps a missing value missing", () => {
-    expect(value(e.lit(null, s.number))).toBeNull();
-    expect(value(e.lit(undefined, s.string))).toBeUndefined();
+    expect(value(e.as(e.lit(null), s.number))).toBeNull();
+    expect(value(e.as(e.lit(undefined), s.string))).toBeUndefined();
   });
 
   // A server's class handed to a method: its date members become Dates, the rest stays as it arrived.
@@ -61,7 +61,7 @@ describe("values convert at the boundary, by shape", () => {
     const schedule = { saveEvent: (data: Record<string, unknown>) => { received = data; } };
     const shiftShape = s.object({ id: s.number, subject: s.string, startTime: s.date });
 
-    value(e.call(e.obj("schedule"), ["saveEvent"], [e.lit(shift)], s.none, [shiftShape]), scopeWith({ schedule }));
+    value(e.call(e.obj("schedule"), ["saveEvent"], [e.as(e.lit(shift), shiftShape)]), scopeWith({ schedule }));
 
     expect(received!["startTime"]).toBeInstanceOf(Date);
     expect((received!["startTime"] as Date).getHours()).toBe(16);
@@ -76,7 +76,7 @@ describe("values convert at the boundary, by shape", () => {
     const kanban = { addCard: (data: unknown) => { received = data; } };
     const cardShape = s.object({ id: s.number, summary: s.string, isEscalated: s.boolean });
 
-    value(e.call(e.obj("kanban"), ["addCard"], [e.lit(card)], s.none, [cardShape]), scopeWith({ kanban }));
+    value(e.call(e.obj("kanban"), ["addCard"], [e.as(e.lit(card), cardShape)]), scopeWith({ kanban }));
 
     expect(received).toBe(card);
   });
@@ -96,10 +96,10 @@ describe("operators answer as C#'s lifted operators do", () => {
   });
 
   it("orders dates by their time and compares them for equality by time", () => {
-    const earlier = e.lit("2026-01-01", s.date);
-    const later = e.lit("2026-02-01", s.date);
+    const earlier = e.as(e.lit("2026-01-01"), s.date);
+    const later = e.as(e.lit("2026-02-01"), s.date);
     expect(value(e.op("lt", earlier, later))).toBe(true);
-    expect(value(e.op("eq", e.lit("2026-01-01", s.date), e.lit("2026-01-01", s.date)))).toBe(true);
+    expect(value(e.op("eq", e.as(e.lit("2026-01-01"), s.date), e.as(e.lit("2026-01-01"), s.date)))).toBe(true);
   });
 
   it("short-circuits && and || left to right", () => {
@@ -151,7 +151,7 @@ describe("paths", () => {
   it("creates a payload member that is absent, but never a member a located object lacks", () => {
     const args: Record<string, unknown> = {};
     const scope = scopeWith({ widget: {} }, { args });
-    executeBlock([st.set(e.ref("args"), ["cancel"], e.lit(true), s.boolean)], scope);
+    executeBlock([st.set(e.ref("args"), ["cancel"], e.lit(true))], scope);
     expect(args.cancel).toBe(true);
     expect(() => executeBlock([st.set(e.obj("widget"), ["value"], e.lit(1))], scope)).toThrow(/has no member "value"/);
   });
@@ -181,7 +181,7 @@ describe("statements", () => {
   it("writes the value converted to the member's shape", () => {
     const el = document.createElement("p");
     const scope = scopeWith({ status: el });
-    executeBlock([st.set(e.obj("status"), ["textContent"], e.lit(5), s.string)], scope);
+    executeBlock([st.set(e.obj("status"), ["textContent"], e.as(e.lit(5), s.string))], scope);
     expect(el.textContent).toBe("5");
   });
 
@@ -264,17 +264,22 @@ describe("statements", () => {
     expect(events).toEqual(["second", "completed"]);
   });
 
-  it("shapes an awaited result when it arrives", async () => {
+  it("converts an awaited result where it is read", async () => {
     const seen: unknown[] = [];
     const scope = scopeWith({}, {
       census: () => Promise.resolve("12"),
       record: (v: unknown) => seen.push(v),
     });
     await executeBlock([
-      st.let("count", e.call(e.ref("census"), [], [], s.number), true),
-      st.do(e.call(e.ref("record"), [], [e.ref("count")])),
+      st.let("count", e.call(e.ref("census"), []), true),
+      st.do(e.call(e.ref("record"), [], [e.as(e.ref("count"), s.number)])),
     ], scope);
     expect(seen).toEqual([12]);
+  });
+
+  it("merges records left to right, later fields winning", () => {
+    const merged = e.op("merge", e.record({ a: e.lit(1), b: e.lit(2) }), e.record({ b: e.lit(3), c: e.lit(4) }));
+    expect(value(merged)).toEqual({ a: 1, b: 3, c: 4 });
   });
 
   it("refuses a promise from a member the plan reads as a value, naming the member", () => {

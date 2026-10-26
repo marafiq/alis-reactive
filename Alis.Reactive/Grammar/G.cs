@@ -9,39 +9,44 @@ namespace Alis.Reactive.Grammar
     internal static class G
     {
         internal static readonly IReadOnlyList<string> NoPath = Array.Empty<string>();
-        internal static readonly IReadOnlyList<Shape> NoShapes = Array.Empty<Shape>();
         internal static readonly IReadOnlyList<Statement> NoStatements = Array.Empty<Statement>();
 
-        internal static LitExpr Lit(object? value) => new LitExpr(value, Shape.None);
-        internal static LitExpr Lit(object? value, Shape shape) => new LitExpr(value, shape);
-        internal static LitExpr Null => new LitExpr(null, Shape.None);
-        internal static LitExpr True => new LitExpr(true, Shape.None);
-        internal static LitExpr False => new LitExpr(false, Shape.None);
+        internal static LitExpr Lit(object? value) => new LitExpr(value);
+
+        /// <summary>A literal read in a shape: converted when it is read, unless it is already a value of that shape.</summary>
+        internal static Expr Lit(object? value, Shape shape) => AlreadyIn(value, shape) ? new LitExpr(value) : As(new LitExpr(value), shape);
+
+        internal static LitExpr Null => new LitExpr(null);
+        internal static LitExpr True => new LitExpr(true);
+        internal static LitExpr False => new LitExpr(false);
 
         internal static ObjExpr Obj(string id) => new ObjExpr(id);
         internal static RefExpr Ref(string name) => new RefExpr(name);
 
-        internal static Expr Get(Expr target, IReadOnlyList<string> path, Shape shape) =>
-            new GetExpr(target, path, shape);
+        /// <summary>A member read, converted to the member's shape.</summary>
+        internal static Expr Get(Expr target, IReadOnlyList<string> path, Shape shape) => As(new GetExpr(target, path), shape);
 
-        internal static Expr Get(Expr target, params string[] path) => new GetExpr(target, path, Shape.None);
+        internal static Expr Get(Expr target, params string[] path) => new GetExpr(target, path);
 
-        /// <summary>The value converted to a shape: a read with no path.</summary>
-        internal static Expr As(Expr value, Shape shape) =>
-            IsUnconverted(shape) ? value : new GetExpr(value, NoPath, shape);
+        /// <summary>The value converted to a shape; a shape that converts nothing adds nothing.</summary>
+        internal static Expr As(Expr value, Shape shape) => IsUnconverted(shape) ? value : new AsExpr(value, shape);
 
-        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, IReadOnlyList<Shape> argShapes, Shape shape) =>
-            new CallExpr(target, path, args, argShapes, shape);
+        /// <summary>A call whose arguments convert to their declared shapes, one per argument, and whose result converts to a shape.</summary>
+        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, IReadOnlyList<Shape> argShapes, Shape shape)
+        {
+            if (argShapes.Count != args.Count)
+                throw new ArgumentException("A call declares one shape per argument.", nameof(argShapes));
+            return As(new CallExpr(target, path, args.Select((arg, index) => As(arg, argShapes[index])).ToList()), shape);
+        }
 
-        internal static Expr Call(Expr target, string member, params Expr[] args) =>
-            new CallExpr(target, new[] { member }, args, NoShapes, Shape.None);
+        /// <summary>A call whose arguments pass as they are (a lambda, a literal, a record the plan wrote) and whose result converts to a shape.</summary>
+        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, Shape shape) =>
+            As(new CallExpr(target, path, args), shape);
 
-        internal static Expr CallTyped(Expr target, string member, Shape shape, params Expr[] args) =>
-            new CallExpr(target, new[] { member }, args, NoShapes, shape);
+        internal static Expr Call(Expr target, string member, params Expr[] args) => new CallExpr(target, new[] { member }, args);
 
         /// <summary>Applies a lambda to arguments: binds each value once, as a <c>let</c> inside an expression.</summary>
-        internal static Expr Apply(FnExpr fn, params Expr[] args) =>
-            new CallExpr(fn, NoPath, args, NoShapes, Shape.None);
+        internal static Expr Apply(FnExpr fn, params Expr[] args) => new CallExpr(fn, NoPath, args);
 
         internal static FnExpr Fn(Expr body, params string[] parameters) => new FnExpr(parameters, body);
 
@@ -58,15 +63,16 @@ namespace Alis.Reactive.Grammar
         internal static Expr Not(Expr term) => new OpExpr(Operator.Not, new[] { term });
         internal static Expr Eq(Expr left, Expr right) => new OpExpr(Operator.Eq, new[] { left, right });
 
-        internal static Expr Record(IEnumerable<RecordEntry> entries) => new RecordExpr(entries.ToList());
+        internal static Expr Record(IEnumerable<RecordField> fields) => new RecordExpr(fields.ToList());
 
         internal static Expr Record(params (string Name, Expr Value)[] fields) =>
-            new RecordExpr(fields.Select(f => (RecordEntry)new FieldEntry(f.Name, f.Value)).ToList());
+            new RecordExpr(fields.Select(f => new RecordField(f.Name, f.Value)).ToList());
 
         internal static Expr List(IEnumerable<Expr> items) => new ListExpr(items.ToList());
 
+        /// <summary>Writes a member, with the value converted to the member's shape.</summary>
         internal static Statement Set(Expr target, IReadOnlyList<string> path, Shape shape, Expr value) =>
-            new SetStatement(target, path, shape, value);
+            new SetStatement(target, path, As(value, shape));
 
         internal static Statement Do(Expr expr, bool awaits = false) => new DoStatement(expr, awaits);
         internal static Statement Let(string name, Expr expr, bool awaits = false) => new LetStatement(name, expr, awaits);
@@ -82,7 +88,23 @@ namespace Alis.Reactive.Grammar
 
         internal static Statement All(IReadOnlyList<IReadOnlyList<Statement>> blocks) => new AllStatement(blocks);
 
-
         internal static bool IsUnconverted(Shape shape) => shape.Kind == "none" || shape.Kind == "any";
+
+        // A value the conversion would hand back as it is: a missing value, or text, a boolean or a number
+        // under its own scalar shape, nullable or not (grammar.md 2.1).
+        private static bool AlreadyIn(object? value, Shape shape)
+        {
+            if (value == null) return true;
+            var kind = shape.TryGetNullableInnerShape(out var inner) ? inner.Kind : shape.Kind;
+            switch (kind)
+            {
+                case "string": return value is string;
+                case "boolean": return value is bool;
+                case "number":
+                    return value is byte || value is sbyte || value is short || value is ushort || value is int || value is uint
+                        || value is long || value is ulong || value is float || value is double || value is decimal;
+                default: return false;
+            }
+        }
     }
 }

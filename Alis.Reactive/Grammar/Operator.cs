@@ -38,6 +38,7 @@ namespace Alis.Reactive.Grammar
         internal static readonly Operator ToArray = Define("toArray", 1, 1);
         internal static readonly Operator Finite = Define("finite", 1, 1);
         internal static readonly Operator Order = Define("order", 2, 2);
+        internal static readonly Operator Merge = Define("merge", 2, int.MaxValue);
 
         private readonly int _minArity;
         private readonly int _maxArity;

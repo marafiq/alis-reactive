@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.Grammar
@@ -16,14 +15,13 @@ namespace Alis.Reactive.Grammar
         private protected Statement() { }
     }
 
-    /// <summary><c>set(target, path, shape, value)</c>: writes a member, converting the value to its shape.</summary>
+    /// <summary><c>set(target, path, value)</c>: writes a member; the value is converted where it is read (<c>as</c>).</summary>
     internal sealed class SetStatement : Statement
     {
-        internal SetStatement(Expr target, IReadOnlyList<string> path, Shape shape, Expr value)
+        internal SetStatement(Expr target, IReadOnlyList<string> path, Expr value)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target));
             Path = path ?? throw new ArgumentNullException(nameof(path));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
             Value = value ?? throw new ArgumentNullException(nameof(value));
             if (path.Count == 0) throw new ArgumentException("A set needs the member it writes.", nameof(path));
         }
@@ -31,7 +29,6 @@ namespace Alis.Reactive.Grammar
         public string Kind => "set";
         public Expr Target { get; }
         public IReadOnlyList<string> Path { get; }
-        public Shape Shape { get; }
         public Expr Value { get; }
     }
 

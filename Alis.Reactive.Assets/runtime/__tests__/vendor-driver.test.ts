@@ -26,7 +26,7 @@ function paragraph(id: string): HTMLElement {
 }
 
 const setText = (id: string, value: Parameters<typeof st.set>[2]) =>
-  st.set(e.obj(id), ["textContent"], value, s.string);
+  st.set(e.obj(id), ["textContent"], e.as(value, s.string));
 
 const bellObjects = () => ({ bell: element("bell", "assigned"), status: element("status"), desk: element("desk") });
 
@@ -35,7 +35,7 @@ describe("a listener assigned to a callback property", () => {
     const bell = fakeWidget("bell", { onPressed: null });
     const status = paragraph("status");
     startOwner(Owner.page(), [plan(bellObjects(), [
-      on("bell", "onPressed", "call", setText("status", e.get(e.ref("call"), ["room"]))),
+      on("bell", "onPressed", setText("status", e.get(e.ref("e"), ["room"]))),
     ])]);
 
     bell.widget.invoke("onPressed", { room: "12" });
@@ -50,7 +50,7 @@ describe("a listener assigned to a callback property", () => {
     const bell = fakeWidget("bell", { onPressed: own });
     const status = paragraph("status");
     startOwner(Owner.page(), [plan(bellObjects(), [
-      on("bell", "onPressed", "call", setText("status", e.get(e.ref("call"), ["room"]))),
+      on("bell", "onPressed", setText("status", e.get(e.ref("e"), ["room"]))),
     ])]);
 
     bell.widget.invoke("onPressed", { room: "12" });
@@ -63,8 +63,8 @@ describe("a listener assigned to a callback property", () => {
     const status = paragraph("status");
     const desk = paragraph("desk");
     startOwner(Owner.page(), [plan(bellObjects(), [
-      on("bell", "onPressed", "call", setText("status", e.get(e.ref("call"), ["room"]))),
-      on("bell", "onPressed", "call", setText("desk", e.get(e.obj("status"), ["textContent"], s.string))),
+      on("bell", "onPressed", setText("status", e.get(e.ref("e"), ["room"]))),
+      on("bell", "onPressed", setText("desk", e.as(e.get(e.obj("status"), ["textContent"]), s.string))),
     ])]);
 
     bell.widget.invoke("onPressed", { room: "12" });
@@ -78,7 +78,7 @@ describe("a listener assigned to a callback property", () => {
     const status = paragraph("status");
     const owner = Owner.slot("desk");
     startOwner(owner, [plan(bellObjects(), [
-      on("bell", "onPressed", "call", setText("status", e.get(e.ref("call"), ["room"]))),
+      on("bell", "onPressed", setText("status", e.get(e.ref("e"), ["room"]))),
     ])]);
     expect(bell.widget.onPressed).not.toBe(own);
 
@@ -96,8 +96,8 @@ describe("a listener assigned to a callback property", () => {
       const desk = paragraph("desk");
       const page = Owner.page();
       const slot = Owner.slot("desk");
-      startOwner(page, [plan(bellObjects(), [on("bell", "onPressed", "call", setText("status", e.lit("page")))])]);
-      startOwner(slot, [plan(bellObjects(), [on("bell", "onPressed", "call", setText("desk", e.lit("slot")))])]);
+      startOwner(page, [plan(bellObjects(), [on("bell", "onPressed", setText("status", e.lit("page")))])]);
+      startOwner(slot, [plan(bellObjects(), [on("bell", "onPressed", setText("desk", e.lit("slot")))])]);
 
       (firstToGo === "page" ? page : slot).dispose();
       bell.widget.invoke("onPressed", { room: "12" });

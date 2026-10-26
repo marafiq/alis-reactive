@@ -18,27 +18,23 @@ export const s = {
 };
 
 export const e = {
-  lit: (value: unknown, shape: Shape = s.any): Expr => ({ kind: "lit", value: value as never, shape }),
+  lit: (value: unknown): Expr => ({ kind: "lit", value: value as never }),
+  as: (expr: Expr, shape: Shape): Expr => ({ kind: "as", expr, shape }),
   obj: (id: string): Expr => ({ kind: "obj", id }),
   ref: (name: string): Expr => ({ kind: "ref", name }),
-  get: (target: Expr, path: string[], shape: Shape = s.any): Expr => ({ kind: "get", target, path, shape }),
-  call: (target: Expr, path: string[], args: Expr[] = [], shape: Shape = s.any, argShapes: Shape[] = []): Expr =>
-    ({ kind: "call", target, path, args, argShapes, shape }),
+  get: (target: Expr, path: string[]): Expr => ({ kind: "get", target, path }),
+  call: (target: Expr, path: string[], args: Expr[] = []): Expr => ({ kind: "call", target, path, args }),
   fn: (params: string[], body: Expr): FnExpr => ({ kind: "fn", params, body }),
-  record: (fields: Record<string, Expr>, spreads: Expr[] = []): Expr => ({
+  record: (fields: Record<string, Expr>): Expr => ({
     kind: "record",
-    entries: [
-      ...spreads.map(value => ({ kind: "spread" as const, value })),
-      ...Object.entries(fields).map(([name, value]) => ({ kind: "field" as const, name, value })),
-    ],
+    fields: Object.entries(fields).map(([name, value]) => ({ name, value })),
   }),
   list: (...items: Expr[]): Expr => ({ kind: "list", items }),
   op: (op: Operator, ...args: Expr[]): Expr => ({ kind: "op", op, args }),
 };
 
 export const st = {
-  set: (target: Expr, path: string[], value: Expr, shape: Shape = s.any): Statement =>
-    ({ kind: "set", target, path, shape, value }),
+  set: (target: Expr, path: string[], value: Expr): Statement => ({ kind: "set", target, path, value }),
   do: (expr: Expr, awaits = false): Statement => ({ kind: "do", expr, await: awaits }),
   let: (name: string, expr: Expr, awaits = false): Statement => ({ kind: "let", name, expr, await: awaits }),
   if: (arms: [Expr, Statement[]][], otherwise: Statement[] = []): Statement =>
@@ -71,11 +67,12 @@ export function plan(
   handlers: Handler[],
   planId = "Test.Plan",
 ): PlanDocument {
-  return { version: 4, planId, vendors, objects, handlers };
+  return { version: 5, planId, vendors, objects, handlers };
 }
 
-export function on(object: string, event: string, param: string, ...statements: Statement[]): Handler {
-  return { on: object, path: [], event, param, do: statements };
+/** A handler; its block reads the payload as `e`. */
+export function on(object: string, event: string, ...statements: Statement[]): Handler {
+  return { on: object, path: [], event, do: statements };
 }
 
 /** An element whose vendor object is a tiny event emitter under `widget`, like a Syncfusion instance. */

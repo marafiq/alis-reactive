@@ -3,7 +3,7 @@
 // promise, which that statement settles or lets run; the result is shaped when it arrives. A promise
 // anywhere else is a member the plan reads as sync, so the call fails at the object (3.4).
 
-import type { CallExpr, Expr, OpExpr, RecordExpr, Shape } from "../types/index";
+import type { CallExpr, Expr, OpExpr, RecordExpr } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { Environment } from "./environment";
 import { call, read, type PathMode } from "./paths";
@@ -31,10 +31,11 @@ export function rootScope(world: World): Scope {
 
 export function evaluate(expr: Expr, scope: Scope): unknown {
   switch (expr.kind) {
-    case "lit":    return shaped(expr.value, expr.shape);
+    case "lit":    return expr.value;
     case "obj":    return scope.world.object(expr.id);
     case "ref":    return scope.env.lookup(expr.name);
-    case "get":    return shaped(read(evaluate(expr.target, scope), expr.path, modeOf(expr.target), labelOf(expr.target)), expr.shape);
+    case "get":    return read(evaluate(expr.target, scope), expr.path, modeOf(expr.target), labelOf(expr.target));
+    case "as":     return shaped(evaluate(expr.expr, scope), expr.shape);
     case "call":   return evaluateCall(expr, scope, false);
     case "fn":     return closure(expr.params, expr.body, scope);
     case "record": return record(expr, scope);
@@ -60,21 +61,16 @@ export function evaluateStatement(expr: Expr, scope: Scope): unknown {
 
 function evaluateCall(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknown {
   const receiver = evaluate(expr.target, scope);
-  const args = expr.args.map((arg, index) => shapeArgument(evaluate(arg, scope), expr.argShapes[index]));
+  const args = expr.args.map(arg => evaluate(arg, scope));
   const label = labelOf(expr.target);
   const result = call(receiver, expr.path, args, modeOf(expr.target), label);
-  if (!isPromise(result)) return shaped(result, expr.shape);
-  if (!mayReturnPromise) throw unawaitedPromise(label, expr.path);
-  return result.then(value => shaped(value, expr.shape));
+  if (isPromise(result) && !mayReturnPromise) throw unawaitedPromise(label, expr.path);
+  return result;
 }
 
 function unawaitedPromise(label: string, path: readonly string[]): Error {
   const member = path.length === 0 ? label : `${label}.${path.join(".")}`;
   return new Error(`[alis] ${member} returned a promise where the plan reads a value; declare it with MethodAsync`);
-}
-
-function shapeArgument(value: unknown, shape: Shape | undefined): unknown {
-  return shape === undefined ? value : shaped(value, shape);
 }
 
 function closure(params: readonly string[], body: Expr, scope: Scope): (...args: unknown[]) => unknown {
@@ -87,13 +83,7 @@ function closure(params: readonly string[], body: Expr, scope: Scope): (...args:
 
 function record(expr: RecordExpr, scope: Scope): Record<string, unknown> {
   const output: Record<string, unknown> = {};
-  for (const entry of expr.entries) {
-    if (entry.kind === "field") {
-      output[entry.name] = evaluate(entry.value, scope);
-      continue;
-    }
-    Object.assign(output, evaluate(entry.value, scope) as object);
-  }
+  for (const field of expr.fields) output[field.name] = evaluate(field.value, scope);
   return output;
 }
 
@@ -129,6 +119,7 @@ function operate(expr: OpExpr, scope: Scope): unknown {
     case "toArray":  return ops.toArray(at(0));
     case "finite":   return ops.finite(at(0));
     case "order":    return ops.order(at(0), at(1));
+    case "merge":    return ops.merge(args.map((_, index) => at(index)));
     default:         return assertNever(expr.op, "operator");
   }
 }

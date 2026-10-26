@@ -44,10 +44,13 @@ function subscribeHandlers(world: PlanWorld, owner: Owner): void {
   }
 }
 
+// A handler's block reads its payload by this name (grammar.md 1.1).
+const PAYLOAD = "e";
+
 /** Runs one handler. A failing handler is logged and stops no other handler (grammar.md 3.4). */
 export function runHandler(handler: Handler, payload: unknown, world: PlanWorld): void {
   const env = Environment.root();
-  env.bind(handler.param, payload);
+  env.bind(PAYLOAD, payload);
   const source = `${handler.on}:${handler.event}`;
   try {
     const completion = executeBlock(handler.do, { env, world });

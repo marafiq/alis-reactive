@@ -26,7 +26,7 @@ function requiredField(id: string, name: string, message: string, when = e.lit(t
   return {
     id,
     name,
-    value: e.get(e.obj(id), ["value"], s.string),
+    value: e.as(e.get(e.obj(id), ["value"]), s.string),
     tests: [{ rule: "required", check: e.fn(["v"], e.op("not", e.op("empty", e.ref("v")))) as never, when, message }],
   };
 }
@@ -65,7 +65,7 @@ describe("validate", () => {
 
   it("skips a test whose condition is false", () => {
     render(`<form id="admission">${field("VaId")}<input id="IsVeteran" type="checkbox"></form>`);
-    const veteran = e.get(e.obj("IsVeteran"), ["checked"], s.boolean);
+    const veteran = e.as(e.get(e.obj("IsVeteran"), ["checked"]), s.boolean);
     const form = startForm([requiredField("VaId", "VaId", "'VA ID' is required.", veteran)], "admission",
       "Test_Plan_validation_summary", ["IsVeteran"]);
     (document.getElementById("IsVeteran") as HTMLInputElement).checked = false;
@@ -165,7 +165,7 @@ describe("live", () => {
     const scored: FormField = {
       id: "Rating",
       name: "Rating",
-      value: e.get(e.obj("Rating"), ["value"], s.number),
+      value: e.as(e.get(e.obj("Rating"), ["value"]), s.number),
       tests: [{ rule: "min", check: e.fn(["v"], e.op("gte", e.ref("v"), e.lit(1))) as never, when: e.lit(true), message: "Rate the visit." }],
     };
     const model: ModelPluginData = {
@@ -197,7 +197,7 @@ describe("live", () => {
     const required: FormField = {
       id: "Phone",
       name: "Phone",
-      value: e.get(e.obj("Phone"), ["value"], s.string),
+      value: e.as(e.get(e.obj("Phone"), ["value"]), s.string),
       tests: [{ rule: "required", check: e.fn(["v"], e.op("not", e.op("empty", e.ref("v")))) as never, when: e.lit(true), message: "Enter the family phone." }],
     };
     const model: ModelPluginData = {

@@ -25,8 +25,8 @@ namespace Alis.Reactive.Grammar
             Handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
         }
 
-        [ContractType("4")]
-        public int Version => 4;
+        [ContractType("5")]
+        public int Version => 5;
 
         public string PlanId { get; }
         public IReadOnlyDictionary<string, Vendor> Vendors { get; }
@@ -261,25 +261,28 @@ namespace Alis.Reactive.Grammar
         public string Message { get; }
     }
 
-    /// <summary><c>on(object, path, event, param) { do }</c>: a handler of an event of the object, or of the object it holds at <c>path</c>.</summary>
+    /// <summary>
+    /// <c>on(object, path, event) { do }</c>: a handler of an event of the object, or of the object it holds at
+    /// <c>path</c>. The payload is bound as <c>e</c> (<see cref="Payload"/>) for the handler's block.
+    /// </summary>
     internal sealed class Handler
     {
-        internal Handler(string on, IReadOnlyList<string> path, string eventName, string param, IReadOnlyList<Statement> body)
+        /// <summary>The name a handler's block reads its payload by.</summary>
+        internal const string Payload = "e";
+
+        internal Handler(string on, IReadOnlyList<string> path, string eventName, IReadOnlyList<Statement> body)
         {
             if (string.IsNullOrEmpty(on)) throw new ArgumentException("Object id required.", nameof(on));
             if (string.IsNullOrEmpty(eventName)) throw new ArgumentException("Event required.", nameof(eventName));
-            if (string.IsNullOrEmpty(param)) throw new ArgumentException("Parameter name required.", nameof(param));
             On = on;
             Path = path ?? throw new ArgumentNullException(nameof(path));
             Event = eventName;
-            Param = param;
             Do = body ?? throw new ArgumentNullException(nameof(body));
         }
 
         public string On { get; }
         public IReadOnlyList<string> Path { get; }
         public string Event { get; }
-        public string Param { get; }
         public IReadOnlyList<Statement> Do { get; }
     }
 }
