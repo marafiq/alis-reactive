@@ -114,7 +114,23 @@ namespace Alis.Reactive.Builders.Arrays
             var shape = Shape.FromClrType(memberOperand.Type);
 
             return ConditionGraph.Ordered(
-                CompareOperatorFor(binary.NodeType), CompileValue(left, element), CompileValue(right, element), shape);
+                CompareOperatorFor(binary.NodeType),
+                CompileOperand(left, element, memberOperand.Type),
+                CompileOperand(right, element, memberOperand.Type),
+                shape);
+        }
+
+        // An operand compared with the member. C# compares an enum as its underlying number, so beside an
+        // enum member a constant or captured value arrives folded to that number; the data holds the member's
+        // JavaScript text, so the operand is the enum member again, written as every literal is.
+        private static ValueExpression CompileOperand(Expression operand, ParameterExpression element, Type memberType)
+        {
+            var enumType = Nullable.GetUnderlyingType(memberType) ?? memberType;
+            if (!enumType.IsEnum || ReferencesParameter(operand, element)) return CompileValue(operand, element);
+
+            var value = Expression.Lambda(operand).Compile().DynamicInvoke();
+            var member = value == null || value is Enum ? value : Enum.ToObject(enumType, value);
+            return ValueExpression.LiteralFor(member, Shape.FromClrType(memberType));
         }
 
         private static ValueExpression CompileValue(Expression expression, ParameterExpression element)
