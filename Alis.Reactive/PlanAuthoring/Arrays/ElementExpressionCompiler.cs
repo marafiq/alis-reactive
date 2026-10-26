@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
@@ -16,15 +17,24 @@ namespace Alis.Reactive.Builders.Arrays
     /// </summary>
     internal static class ElementExpressionCompiler
     {
-        // Pure, deterministic, side-effect-free element methods only. A per-element method call is a
-        // value projection, so it must not mutate; side-effecting methods (e.g. grid Row.setCellValue)
-        // belong in a per-element reaction (foreach), not a projection. Grow this set deliberately.
-        private static readonly HashSet<string> PureElementMethods = new HashSet<string>(StringComparer.Ordinal)
+        // The methods a lambda may call on an item, each a C# method with a JavaScript equivalent that is
+        // pure: a per-element call is a value projection, so it must not mutate. The text methods, and the
+        // child element's own. The table is read by the method the lambda calls, so a C# name never misses
+        // its JavaScript one in silence.
+        private static readonly IReadOnlyDictionary<MethodInfo, string> PureMethods = new Dictionary<MethodInfo, string>
         {
-            "getDay", "getMonth", "getFullYear", "getDate", "getHours", "getMinutes", "getSeconds", "getTime",
-            "toUpperCase", "toLowerCase", "trim",
-            "getAttribute", "hasAttribute",
+            [MethodOf<ChildElement>(child => child.GetAttribute(""))] = "getAttribute",
+            [MethodOf<string>(text => text.Trim())] = "trim",
+            [MethodOf<string>(text => text.TrimStart())] = "trimStart",
+            [MethodOf<string>(text => text.TrimEnd())] = "trimEnd",
+            [MethodOf<string>(text => text.ToUpper())] = "toUpperCase",
+            [MethodOf<string>(text => text.ToUpperInvariant())] = "toUpperCase",
+            [MethodOf<string>(text => text.ToLower())] = "toLowerCase",
+            [MethodOf<string>(text => text.ToLowerInvariant())] = "toLowerCase",
         };
+
+        private static MethodInfo MethodOf<T>(Expression<Func<T, object?>> call) =>
+            ((MethodCallExpression)Unwrap(call.Body)).Method;
 
         internal static ConditionGraph CompilePredicate(LambdaExpression predicate)
         {
@@ -145,16 +155,15 @@ namespace Alis.Reactive.Builders.Arrays
                     : ValueExpression.Get(Target.Item, path.Text, shape);
             }
 
-            // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the target must
-            // be rooted at the element and the method must be deterministic. Reuses the RuntimePath.call engine.
+            // A method called on an item's value (x => x.Name.Trim()): the value is rooted at the element and
+            // the method is one of the pure table, written as its JavaScript equivalent.
             if (node is MethodCallExpression call && call.Object != null && ExpressionPathHelper.TryJsonPath(call.Object, element, out var targetPath))
             {
-                var methodName = JsonMemberName.Of(call.Method.Name);
-                if (!PureElementMethods.Contains(methodName))
+                if (!PureMethods.TryGetValue(call.Method, out var methodName))
                     throw new InvalidOperationException(
-                        "Element method '" + methodName + "' is not an allowed pure array DSL method. Add it to " +
-                        "ElementExpressionCompiler.PureElementMethods only if deterministic and side-effect-free, or use a server-side " +
-                        "projection. Side-effecting per-element calls need a reaction, not a projection. Got: " + node);
+                        $"'{call.Method.DeclaringType?.Name}.{call.Method.Name}' has no pure JavaScript form the plan can call on an item; " +
+                        "the lambda may call " + string.Join(", ", PureMethods.Keys.Select(method => method.DeclaringType?.Name + "." + method.Name).Distinct()) +
+                        ". Project the value on the server, or write a reaction for a call that changes the item. Got: " + node);
 
                 var methodArgs = new List<ValueExpression>();
                 foreach (var methodArgument in call.Arguments)
