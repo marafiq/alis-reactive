@@ -79,10 +79,7 @@ namespace Alis.Reactive
 #else
             var bindingName = html.NameFor(expression);
 #endif
-            var identity = InputIdentity.For<TModel, TProp>(
-                expression,
-                bindingName,
-                html.ViewData.TemplateInfo.HtmlFieldPrefix);
+            var identity = InputIdentity.For<TModel, TProp>(expression, bindingName, plan.Context.FieldPrefix);
             var boundField = BoundInputField<TModel, TProp>.Create(
                 plan,
                 expression,

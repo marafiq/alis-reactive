@@ -33,18 +33,18 @@ namespace Alis.Reactive
         }
 
         internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services)
-            : this(scope, services, Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel)))
+            : this(scope, services, Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel)), HtmlFieldPrefix.None)
         {
         }
 
-        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services, PlanId planId)
+        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services, PlanId planId, string fieldPrefix)
         {
             if (scope == null) throw new ArgumentNullException(nameof(scope));
 
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _scope = scope;
             _services = services;
-            _context = new PlanBuildContext(_planId.Value, _renderedInputs);
+            _context = new PlanBuildContext(_planId.Value, _renderedInputs, fieldPrefix);
         }
 
         /// <summary>The plan's identifier: the model type's full name, or the element's id for an element plan.</summary>
@@ -147,7 +147,7 @@ namespace Alis.Reactive
             foreach (var (_, form) in validated)
             {
                 var fields = form.Rules(ruleSource);
-                _context.Check(form.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel)).ToList());
+                _context.Check(form.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
             }
         }
 

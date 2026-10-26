@@ -3,10 +3,9 @@
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInContacts
 @{
     // A contact card of its own model, rendered under a field prefix (NextOfKin, Alternate): its inputs
-    // bind under the prefix, and the card's own save posts them under it, so the server binds the
-    // contact where the packet keeps it. The card's plan is its save button's own, composing with no
-    // other card's: a resolved plan would share the model's plan with the other card, and Form() would
-    // post both cards.
+    // bind under the prefix, the card's own save gathers them by name under it, and its rules check them
+    // there, so the server binds the contact where the packet keeps it. The card's plan is its save
+    // button's own, composing with no other card's.
     const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
     const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
 
@@ -16,17 +15,20 @@
 }
 
 <native-vstack gap="Base">
-    <native-grid cols="C2" gap="Base">
-        @{ Html.InputField(plan, m => m.Name, o => o.Label($"{heading} name"))
-            .NativeTextBox(b => b.CssClass(Field)); }
-        @{ Html.InputField(plan, m => m.Phone, o => o.Label($"{heading} phone"))
-            .NativeTextBox(b => b.CssClass(Field)); }
-    </native-grid>
+    <form id="contact-@slug">
+        <native-grid cols="C2" gap="Base">
+            @{ Html.InputField(plan, m => m.Name, o => o.Label($"{heading} name"))
+                .NativeTextBox(b => b.CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Phone, o => o.Label($"{heading} phone"))
+                .NativeTextBox(b => b.CssClass(Field)); }
+        </native-grid>
+    </form>
     <native-hstack gap="Sm" align="Center" class="flex-wrap">
         @(Html.NativeButton($"save-{slug}", $"Save the {heading.ToLowerInvariant()}")
             .CssClass(ButtonSecondary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
-                p.Post(Url.SandboxRoute("SaveContact", "MoveInContacts")).Gather(g => g.Form())
+                p.Post(Url.SandboxRoute("SaveContact", "MoveInContacts")).Gather(g => g.Form(m => m.Name, m => m.Phone))
+                    .Validate<MoveInContactValidator>($"contact-{slug}")
                     .Response(r => r.OnSuccess<ContactsSaved>((saved, s) =>
                         s.Element($"{slug}-status").Text.Set(saved.Get(x => x.Confirmation))))))
         <native-text><span id="@(slug)-status">Not saved yet.</span></native-text>

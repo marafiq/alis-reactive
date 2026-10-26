@@ -164,4 +164,25 @@ public class WhenTheCoordinatorRecordsMoveInContacts : PlaywrightTestBase
         await Expect(NextOfKinStatus).ToHaveTextAsync("Next of kin: Ruth Hale (555-0101); alternate: none.");
         AssertNoConsoleErrors();
     }
+
+    // The card's own rules resolve its inputs under its prefix: a blank name on the alternate card is refused on
+    // that card, before anything is sent, while the next of kin card beside it stays silent.
+    [Test]
+    public async Task a_blank_alternate_name_is_refused_on_its_own_card_before_it_is_sent()
+    {
+        var saves = new System.Collections.Concurrent.ConcurrentQueue<string>();
+        Page.Request += (_, request) => { if (request.Url.EndsWith("/Sandbox/Patterns/MoveInContacts/SaveContact")) saves.Enqueue(request.Url); };
+        await NavigateToAndWaitForBoot($"{Path}/Alternate");
+        await Page.GetByLabel("Alternate contact phone").FillAsync("555-0102");
+
+        await SaveAlternate.ClickAsync();
+
+        var alternateName = await Page.GetByLabel("Alternate contact name").GetAttributeAsync("id");
+        var nextOfKinName = await Page.GetByLabel("Next of kin name").GetAttributeAsync("id");
+        await Expect(Page.Locator($"#{alternateName}_error")).ToHaveTextAsync("Name the contact.");
+        await Expect(Page.Locator($"#{nextOfKinName}_error")).ToHaveTextAsync("");
+        await Expect(AlternateStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(saves, Is.Empty, "The card refused the name, so nothing was sent.");
+        AssertNoConsoleErrors();
+    }
 }

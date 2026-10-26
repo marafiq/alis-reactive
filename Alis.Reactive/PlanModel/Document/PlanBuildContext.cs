@@ -28,11 +28,15 @@ namespace Alis.Reactive.PlanModel
         // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
 
-        internal PlanBuildContext(string planId, RenderedInputs inputs)
+        internal PlanBuildContext(string planId, RenderedInputs inputs, string fieldPrefix)
         {
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _inputs = inputs ?? throw new ArgumentNullException(nameof(inputs));
+            FieldPrefix = fieldPrefix ?? throw new ArgumentNullException(nameof(fieldPrefix));
         }
+
+        /// <summary>The MVC field prefix the plan's view renders under; empty for a page's own view.</summary>
+        internal string FieldPrefix { get; }
 
         // ── callbacks ────────────────────────────────────────────────────────────
 

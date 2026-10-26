@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (gather == null) throw new ArgumentNullException(nameof(gather));
             var draft = new GatherInputDraft();
-            gather(new GatherBuilder<TRequest, TModel>(draft));
+            gather(new GatherBuilder<TRequest, TModel>(draft, _context.FieldPrefix));
             Step.Gather = draft;
             return this;
         }

@@ -35,9 +35,12 @@ namespace Alis.Reactive.Builders.Requests
     {
         private readonly GatherInputDraft _draft;
 
-        internal GatherBuilder(GatherInputDraft draft)
+        private readonly string _fieldPrefix;
+
+        internal GatherBuilder(GatherInputDraft draft, string fieldPrefix)
         {
             _draft = draft;
+            _fieldPrefix = fieldPrefix ?? throw new ArgumentNullException(nameof(fieldPrefix));
         }
 
         /// <summary>Sets a member of the request to a value read when the request is sent.</summary>
@@ -110,7 +113,10 @@ namespace Alis.Reactive.Builders.Requests
             return this;
         }
 
-        /// <summary>Sends the named inputs of the form, each by its binding name, as MVC binds it.</summary>
+        /// <summary>
+        /// Sends the named inputs of the form, each by its binding name, as MVC binds it: under the view's field
+        /// prefix when the view is a partial rendered for a member of the page's model.
+        /// </summary>
         /// <param name="fields">The view model members whose inputs are sent, for example <c>m =&gt; m.Name, m =&gt; m.Address.City</c>.</param>
         public GatherBuilder<TRequest, TModel> Form(params Expression<Func<TModel, object?>>[] fields)
         {
@@ -119,11 +125,11 @@ namespace Alis.Reactive.Builders.Requests
 
             foreach (var field in fields)
             {
-                var binding = ExpressionPathHelper.ToMemberBindingPath(field);
+                var member = ExpressionPathHelper.ToMemberBindingPath(field);
                 var fieldType = ExpressionPathHelper.ToPropertyType(field);
-                RequestMembers.Require(typeof(TRequest), binding, fieldType);
-                var shape = Shape.FromClrType(fieldType);
-                _draft.Add(binding, ValueExpression.ReadBound(IdGenerator.For(field), shape));
+                RequestMembers.Require(typeof(TRequest), member, fieldType);
+                var binding = HtmlFieldPrefix.Join(_fieldPrefix, member);
+                _draft.Add(binding, ValueExpression.ReadBound(IdGenerator.For(typeof(TModel), binding.Value), Shape.FromClrType(fieldType)));
             }
 
             return this;

@@ -32,7 +32,7 @@ namespace Alis.Reactive
 #if NET48
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
             where TModel : class =>
-            CreatePlan<TModel>(ReactivePlanScope.RootView);
+            CreatePlan(html, ReactivePlanScope.RootView);
 #else
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class =>
@@ -57,7 +57,7 @@ namespace Alis.Reactive
 #if NET48
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)
             where TModel : class =>
-            CreatePlan<TModel>(ReactivePlanScope.PartialView);
+            CreatePlan(html, ReactivePlanScope.PartialView);
 #else
         public static ReactivePlan<TModel> ResolvePlan<TModel>(this IHtmlHelper<TModel> html)
             where TModel : class =>
@@ -80,11 +80,11 @@ namespace Alis.Reactive
 #if NET48
         public static ReactivePlan<TModel> ElementPlan<TModel>(this HtmlHelper<TModel> html, string elementId)
             where TModel : class =>
-            new ReactivePlan<TModel>(ReactivePlanScope.Element, services: null, ElementPlanId(elementId));
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, services: null, ElementPlanId(elementId), FieldPrefixOf(html));
 #else
         public static ReactivePlan<TModel> ElementPlan<TModel>(this IHtmlHelper<TModel> html, string elementId)
             where TModel : class =>
-            new ReactivePlan<TModel>(ReactivePlanScope.Element, html?.ViewContext.HttpContext.RequestServices, ElementPlanId(elementId));
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, html.ViewContext.HttpContext.RequestServices, ElementPlanId(elementId), FieldPrefixOf(html));
 #endif
 
         private static PlanModel.PlanId ElementPlanId(string elementId) =>
@@ -97,14 +97,22 @@ namespace Alis.Reactive
         // created with services: null. Validation metadata is resolved at render
         // time via the MVC5 DependencyResolver, which the app bridges over its DI
         // container in Application_Start. See ReactivePlan.RequireClientValidationRuleSource.
-        private static ReactivePlan<TModel> CreatePlan<TModel>(ReactivePlanScope scope)
+        private static ReactivePlan<TModel> CreatePlan<TModel>(HtmlHelper<TModel> html, ReactivePlanScope scope)
             where TModel : class =>
-            new ReactivePlan<TModel>(scope, services: null);
+            new ReactivePlan<TModel>(scope, services: null, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html));
+
+        // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
+        private static string FieldPrefixOf<TModel>(HtmlHelper<TModel> html) =>
+            html.ViewData.TemplateInfo.HtmlFieldPrefix;
 #else
         private static ReactivePlan<TModel> CreatePlan<TModel>(
             IHtmlHelper<TModel> html, ReactivePlanScope scope)
             where TModel : class =>
-            new ReactivePlan<TModel>(scope, html?.ViewContext.HttpContext.RequestServices);
+            new ReactivePlan<TModel>(scope, html.ViewContext.HttpContext.RequestServices, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html));
+
+        // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
+        private static string FieldPrefixOf<TModel>(IHtmlHelper<TModel> html) =>
+            html.ViewData.TemplateInfo.HtmlFieldPrefix;
 #endif
 
         /// <summary>

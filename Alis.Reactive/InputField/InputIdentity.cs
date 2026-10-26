@@ -29,6 +29,9 @@ namespace Alis.Reactive.InputField
 
         internal string BindingName => Binding.Value;
 
+        /// <param name="expression">The member the input binds.</param>
+        /// <param name="bindingName">The MVC binding name, as MVC names it: under the view's field prefix already.</param>
+        /// <param name="htmlFieldPrefix">The view's field prefix, which the body path takes here.</param>
         internal static InputIdentity For<TModel, TValue>(
             Expression<Func<TModel, TValue>> expression,
             string bindingName,
@@ -36,7 +39,7 @@ namespace Alis.Reactive.InputField
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
 
-            var bodyPath = Path.Parse(htmlFieldPrefix).Append(ExpressionPathHelper.ToBodyPath(expression));
+            var bodyPath = HtmlFieldPrefix.Join(htmlFieldPrefix, ExpressionPathHelper.ToBodyPath(expression));
             return new InputIdentity(
                 ComponentId.Of(IdGenerator.For(typeof(TModel), bindingName)),
                 BindingPath.ForMember(bindingName, bodyPath),

@@ -41,15 +41,23 @@ namespace Alis.Reactive.Validation
         internal static IEnumerable<CheckedField> Bind(
             IReadOnlyList<ClientValidationField> fields,
             IReadOnlyDictionary<string, RenderedInput> renderedInputs,
-            Type modelType)
+            Type modelType,
+            string fieldPrefix)
         {
-            var values = new FormFieldValues(renderedInputs, modelType);
+            // The checks are written relative to the validator's model; the view's field prefix is applied
+            // where an input is resolved, so the rendered paths read here are relative to it too.
+            var values = new FormFieldValues(renderedInputs, modelType, fieldPrefix);
+            var renderedPaths = renderedInputs.Keys
+                .Select(path => HtmlFieldPrefix.Strip(fieldPrefix, path))
+                .Where(path => path != null)
+                .Select(path => path!)
+                .ToList();
             foreach (var field in fields)
             {
                 if (field.HasRules)
                     yield return values.Check(field);
 
-                foreach (var itemField in RenderedItemFields(field.FieldName, field.ItemFields, renderedInputs.Keys))
+                foreach (var itemField in RenderedItemFields(field.FieldName, field.ItemFields, renderedPaths))
                     yield return values.Check(itemField);
             }
         }
@@ -106,25 +114,31 @@ namespace Alis.Reactive.Validation
     }
 
     /// <summary>
-    /// The inputs a form's rules read, by the member's path: an input this plan rendered, by its MVC name,
-    /// in the type the model binds it; otherwise the input a partial renders under the id the model's
-    /// member gives it. Every input is read through the model, as MVC binds it.
+    /// The inputs a form's rules read, by the member's path under the view's field prefix: an input this
+    /// plan rendered, by its MVC name, in the type the model binds it; otherwise the input a partial of the
+    /// same model renders under the id the member gives it. Every input is read through the model, as MVC
+    /// binds it.
     /// </summary>
     internal sealed class FormFieldValues
     {
         private readonly IReadOnlyDictionary<string, RenderedInput> _renderedInputs;
         private readonly Type _modelType;
+        private readonly string _fieldPrefix;
 
-        internal FormFieldValues(IReadOnlyDictionary<string, RenderedInput> renderedInputs, Type modelType)
+        internal FormFieldValues(IReadOnlyDictionary<string, RenderedInput> renderedInputs, Type modelType, string fieldPrefix)
         {
             _renderedInputs = renderedInputs;
             _modelType = modelType;
+            _fieldPrefix = fieldPrefix;
         }
 
-        internal (string Id, Shape Shape) Resolve(FieldReference field) =>
-            _renderedInputs.TryGetValue(field.Path, out var rendered)
+        internal (string Id, Shape Shape) Resolve(FieldReference field)
+        {
+            var path = HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
+            return _renderedInputs.TryGetValue(path, out var rendered)
                 ? (rendered.ComponentId, rendered.Shape)
-                : (IdGenerator.For(_modelType, field.Path), field.Shape);
+                : (IdGenerator.For(_modelType, path), field.Shape);
+        }
 
         internal ValueExpression Value(FieldReference field)
         {
