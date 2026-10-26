@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
@@ -23,10 +22,10 @@ namespace Alis.Reactive.Builders.Conditions
         {
             get
             {
-                var payloadPath = ExpressionPathHelper.ToEventPath(_expression);
-                return payloadPath.Length == 0
+                var payloadPath = ExpressionPathHelper.ToJsonPath(_expression);
+                return payloadPath.IsNone
                     ? ValueExpression.ReadWhole(_data, Shape)
-                    : ValueExpression.Read(_data, G.PathOf(Path.Parse(payloadPath)), Shape);
+                    : ValueExpression.Read(_data, payloadPath.Text, Shape);
             }
         }
     }

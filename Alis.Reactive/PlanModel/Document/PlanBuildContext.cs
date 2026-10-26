@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Validation;
@@ -172,24 +171,15 @@ namespace Alis.Reactive.PlanModel
             {
                 if (!_inputs.TryFindForComponent(ComponentId.Of(declared.Id), out var rendered)) continue;
 
-                var value = G.Get(
-                    G.Obj(objects.Element(declared.Id)),
-                    rendered.Input.ValuePath.Segments.Select(segment => segment.ToPathText()).ToList(),
-                    rendered.Shape);
+                var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.Input.ValuePath.Text, rendered.Shape);
                 inputs.Add(
                     declared.Id,
-                    new InputBinding(rendered.BindingPath, BodyPath(rendered.Binding.Path), value, rendered.Shape, rendered.Input.CommittedBy.Value));
+                    new InputBinding(rendered.BindingPath, rendered.Binding.Path.Body, value, rendered.Shape, rendered.Input.CommittedBy.Value));
             }
 
             return inputs;
         }
 
-        private static IReadOnlyList<object> BodyPath(Path path) =>
-            path.Segments
-                .Select(segment => segment.Kind == "index"
-                    ? (object)int.Parse(segment.ToPathText(), CultureInfo.InvariantCulture)
-                    : segment.ToPathText())
-                .ToList();
     }
 
     /// <summary>An element the plan names, with the vendor whose object it holds.</summary>

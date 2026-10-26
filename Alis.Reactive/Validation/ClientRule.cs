@@ -189,7 +189,7 @@ namespace Alis.Reactive.Validation
             var shape = Shape.FromClrType(value.GetType());
             return new ClientRule(
                 ClientRuleKind.Comparison, NameOf(comparison, peer: false), message,
-                ValidationDateLiteral.From(value, shape), null, comparison, ClientCondition.Always, shape, ShapeDependence.None);
+                value, null, comparison, ClientCondition.Always, shape, ShapeDependence.None);
         }
 
         /// <summary>The value compares with another member of the model, read as the page binds it.</summary>
@@ -219,7 +219,7 @@ namespace Alis.Reactive.Validation
                 throw new ArgumentException(
                     "Client validation range bounds must have the same shape. " +
                     $"Lower bound is '{shape.Kind}', upper bound is '{Shape.FromClrType(to.GetType()).Kind}'.");
-            var bounds = new[] { ValidationDateLiteral.From(from, shape), ValidationDateLiteral.From(to, shape) };
+            var bounds = new object[] { from, to };
             return new ClientRule(
                 inclusive ? ClientRuleKind.Range : ClientRuleKind.ExclusiveRange,
                 inclusive ? "range" : "exclusiveRange",

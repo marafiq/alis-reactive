@@ -96,7 +96,7 @@ namespace Alis.Reactive.Builders.Arrays
         /// <summary>True when the array is non-empty.</summary>
         /// <returns>Whether any element exists, read when the step runs.</returns>
         public ReactiveValue<bool> Any() =>
-            new ReactiveValue<bool>(ValueExpression.ArrayAny(_source, predicate: null));
+            new ReactiveValue<bool>(ValueExpression.ArrayAny(_source));
 
         /// <summary>True when any element matches the predicate.</summary>
         /// <param name="predicate">The test an element passes.</param>
@@ -132,8 +132,7 @@ namespace Alis.Reactive.Builders.Arrays
         /// <param name="predicate">The test the element passes.</param>
         /// <returns>The element, read when the step runs.</returns>
         public ReactiveValue<TElement> Find(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<TElement>(
-                ValueExpression.ArrayFind(_source, Predicate(predicate), projection: null, _elementShape));
+            new ReactiveValue<TElement>(ValueExpression.ArrayFind(_source, Predicate(predicate), _elementShape));
 
         /// <summary>Finds a per-element field from the first element matching the predicate.</summary>
         /// <typeparam name="TField">The field's type.</typeparam>

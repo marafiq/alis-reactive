@@ -14,10 +14,9 @@
             p.Element("desk-call").Text.Set(call.Presses);
             p.Element("desk-room").Text.Set(call.Room);
             p.Element("desk-notified").Show();
+            // The desk's handler and the page's own both hear the same callback; the third call tonight is escalated.
+            p.When(call.Presses).Gte(3).Then(third => third.Element("escalated").Show());
         })
-        .Reactive(evt => evt.OnPressed, (call, p) =>
-            // A second handler of the same callback: the third call tonight is escalated.
-            p.When(call.Presses).Gte(3).Then(third => third.Element("escalated").Show()))
         .Reactive(evt => evt.OnCleared, (call, p) =>
         {
             p.Element("desk-answered").Text.Set(call.Presses);

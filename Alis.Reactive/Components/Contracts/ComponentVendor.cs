@@ -121,7 +121,7 @@ namespace Alis.Reactive
         /// <summary>The vendor as the plan carries it; a DOM event hands the listener the element that raised it.</summary>
         internal Vendor ToGrammar() =>
             new Vendor(
-                G.PathOf(_objectPath),
+                _objectPath.TargetText,
                 _listening,
                 Vendor.PayloadOf(_payload));
 

@@ -15,9 +15,16 @@ namespace Alis.Reactive.PlanModel
     /// </summary>
     internal sealed class RequestStep : Step
     {
-        private string? _method;
-        private string _url = "";
+        private readonly string _method;
+        private readonly string _url;
         private string _format = "json";
+
+        internal RequestStep(string method, string url)
+        {
+            if (string.IsNullOrWhiteSpace(method)) throw new ArgumentException("HTTP method required.", nameof(method));
+            _method = method;
+            _url = url ?? throw new ArgumentNullException(nameof(url));
+        }
 
         internal GatherInputDraft Gather { get; set; } = new GatherInputDraft();
 
@@ -31,20 +38,13 @@ namespace Alis.Reactive.PlanModel
 
         internal string Url => _url;
 
-        internal void To(string method, string url)
-        {
-            _method = method;
-            _url = url ?? throw new ArgumentNullException(nameof(url));
-        }
-
         internal void Format(string format) => _format = format;
 
         internal override void WriteTo(List<Statement> block, Scope scope) => block.AddRange(Write(scope));
 
         private IReadOnlyList<Statement> Write(Scope scope)
         {
-            var method = _method ?? throw new InvalidOperationException(
-                "HTTP request endpoint was not selected. Call Get, Post, Put, or Delete before the request is built.");
+            var method = _method;
             var input = Gather.Resolve(_url);
             var response = scope.Fresh("res");
             var routeScope = scope.WithResponse(Routes.Handle, response);
@@ -58,7 +58,8 @@ namespace Alis.Reactive.PlanModel
 
             var sentence = new List<Statement>();
             sentence.AddRange(WhileLoading.Write(scope));
-            var cleanup = Finally.Write(scope);
+            // The response the try bound stays in scope after it (grammar.md 3.1), so Finally reads it too.
+            var cleanup = Finally.Write(routeScope);
             if (cleanup.Count == 0)
                 sentence.AddRange(exchange);
             else
@@ -96,7 +97,7 @@ namespace Alis.Reactive.PlanModel
                 body = G.Record(values.Append(new SpreadEntry(G.Get(G.Obj(scope.Objects.Model()), new[] { "fields" }, Shape.None))));
 
             Expr arrays = G.List(input.Payload
-                .Where(member => DescribesArray(member.Value.OutputShape))
+                .Where(member => member.Value.OutputShape.DescribesArray)
                 .Select(member => (Expr)G.Lit(member.Name.Value)));
             if (input.IncludesForm)
                 arrays = G.Call(arrays, "concat", G.Get(G.Obj(scope.Objects.Model()), new[] { "arrays" }, Shape.None));
@@ -127,14 +128,13 @@ namespace Alis.Reactive.PlanModel
             return root.Entries();
         }
 
-        private static bool DescribesArray(Shape shape) =>
-            shape.TryGetNullableInnerShape(out var inner) ? DescribesArray(inner) : shape.Kind == "array";
-
+        // The body a request sends: each gathered value at its path, a name making an object and a
+        // position making an array.
         private sealed class BodyNode
         {
             private readonly List<string> _order = new List<string>();
             private readonly Dictionary<string, BodyNode> _children = new Dictionary<string, BodyNode>(StringComparer.Ordinal);
-            private bool _indexed = true;
+            private readonly Dictionary<int, BodyNode> _items = new Dictionary<int, BodyNode>();
             private Expr? _leaf;
 
             internal void Assign(IReadOnlyList<PathSegment> segments, int at, Expr value)
@@ -144,36 +144,51 @@ namespace Alis.Reactive.PlanModel
                     _leaf = value;
                     _children.Clear();
                     _order.Clear();
+                    _items.Clear();
                     return;
                 }
 
                 _leaf = null;
                 var segment = segments[at];
-                if (segment.Kind != "index") _indexed = false;
-                var key = segment.ToPathText();
-                if (!_children.TryGetValue(key, out var child))
-                {
-                    child = new BodyNode();
-                    _children.Add(key, child);
-                    _order.Add(key);
-                }
-
+                var child = segment.IsIndex ? ItemAt(segment.Index) : ChildNamed(segment.ToPathText());
                 child.Assign(segments, at + 1, value);
             }
 
             internal List<RecordEntry> Entries() =>
                 _order.Select(key => (RecordEntry)new FieldEntry(key, _children[key].ToExpr())).ToList();
 
+            private BodyNode ChildNamed(string name)
+            {
+                if (_children.TryGetValue(name, out var child)) return child;
+                child = new BodyNode();
+                _children.Add(name, child);
+                _order.Add(name);
+                return child;
+            }
+
+            private BodyNode ItemAt(int index)
+            {
+                if (_items.TryGetValue(index, out var item)) return item;
+                item = new BodyNode();
+                _items.Add(index, item);
+                return item;
+            }
+
             private Expr ToExpr()
             {
                 if (_leaf != null) return _leaf;
-                if (!_indexed || _children.Count == 0) return G.Record(Entries());
-                var count = _children.Keys.Max(key => int.Parse(key, CultureInfo.InvariantCulture)) + 1;
-                var items = new List<Expr>();
+                if (_items.Count == 0 || _children.Count > 0) return G.Record(Entries().Concat(ItemEntries()));
+                var count = _items.Keys.Max() + 1;
+                var items = new List<Expr>(count);
                 for (var index = 0; index < count; index++)
-                    items.Add(_children.TryGetValue(index.ToString(CultureInfo.InvariantCulture), out var item) ? item.ToExpr() : G.Null);
+                    items.Add(_items.TryGetValue(index, out var item) ? item.ToExpr() : G.Null);
                 return G.List(items);
             }
+
+            // A node with both names and positions is an object; its positions are entries named by their digits.
+            private IEnumerable<RecordEntry> ItemEntries() =>
+                _items.OrderBy(item => item.Key)
+                    .Select(item => (RecordEntry)new FieldEntry(item.Key.ToString(CultureInfo.InvariantCulture), item.Value.ToExpr()));
         }
     }
 

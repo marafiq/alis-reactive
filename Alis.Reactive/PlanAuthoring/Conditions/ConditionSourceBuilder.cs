@@ -76,7 +76,7 @@ namespace Alis.Reactive.Builders.Conditions
         internal Shape Shape => _left.Shape;
 
         internal TNext CompareWith(CompareOperator op, object? literal) =>
-            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralRaw(literal, Shape), Shape));
+            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
 
         internal TNext CompareWith<TRight>(CompareOperator op, TypedSource<TRight> right)
         {
@@ -85,25 +85,25 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         internal TNext CompareWithText(CompareOperator op, string operand) =>
-            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralRaw(operand, PlanModel.Shape.String), Shape));
+            _next(ConditionGraph.Binary(op, Left, ValueExpression.LiteralFor(operand, PlanModel.Shape.String), Shape));
 
         internal TNext CompareWithLength(int length)
         {
             var minimum = MinimumTextLength.From(length, nameof(length));
             return _next(ConditionGraph.Binary(
-                CompareOperator.MinLength, Left, ValueExpression.LiteralRaw(minimum.Value, PlanModel.Shape.Number), Shape));
+                CompareOperator.MinLength, Left, ValueExpression.LiteralFor(minimum.Value, PlanModel.Shape.Number), Shape));
         }
 
         internal TNext CompareWithRange(object low, object high)
         {
-            var endpoints = new List<ValueExpression> { ValueExpression.LiteralRaw(low, Shape), ValueExpression.LiteralRaw(high, Shape) };
+            var endpoints = new List<ValueExpression> { ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape) };
             return _next(ConditionGraph.Binary(
-                CompareOperator.Between, Left, ValueExpression.Array(endpoints, PlanModel.Shape.ArrayOf(ItemShape(Shape))), Shape));
+                CompareOperator.Between, Left, ValueExpression.Array(endpoints, PlanModel.Shape.ArrayOf(Shape)), Shape));
         }
 
         internal TNext ContainsItem(object? item) =>
             _next(ConditionGraph.CollectionItem(
-                CompareOperator.ArrayContains, Left, ValueExpression.LiteralRaw(item, _left.ElementShape), Shape, _left.ElementShape));
+                CompareOperator.ArrayContains, Left, ValueExpression.LiteralFor(item, _left.ElementShape), Shape, _left.ElementShape));
 
         private ValueExpression Left => _left.Expression;
 
@@ -115,11 +115,9 @@ namespace Alis.Reactive.Builders.Conditions
             var left = Left;
             var items = new List<ValueExpression>();
             foreach (var value in values)
-                items.Add(ValueExpression.LiteralRaw(value, Shape));
+                items.Add(ValueExpression.LiteralFor(value, Shape));
 
-            return _next(ConditionGraph.Binary(op, left, ValueExpression.Array(items, PlanModel.Shape.ArrayOf(ItemShape(Shape))), Shape));
+            return _next(ConditionGraph.Binary(op, left, ValueExpression.Array(items, PlanModel.Shape.ArrayOf(Shape)), Shape));
         }
-
-        private static Shape ItemShape(Shape shape) => shape.IsNone ? PlanModel.Shape.Any : shape;
     }
 }

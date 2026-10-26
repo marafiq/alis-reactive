@@ -5,43 +5,30 @@ namespace Alis.Reactive.Builders
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
-        /// <summary>Appends an async HTTP GET reaction to this Reactive Plan pipeline.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
-        public HttpRequestBuilder<TModel> Get(string url)
-        {
-            return Request().Get(url);
-        }
+        /// <summary>Sends a GET request from this step; gathered values go to the query string.</summary>
+        /// <param name="url">The URL, built with <c>Url.Action</c> or a route template.</param>
+        public HttpRequestBuilder<TModel> Get(string url) => Request().Get(url);
 
-        /// <summary>Appends an async HTTP POST reaction to this Reactive Plan pipeline.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
-        public HttpRequestBuilder<TModel> Post(string url)
-        {
-            return Request().Post(url);
-        }
+        /// <summary>Sends a POST request from this step; gathered values go to the body.</summary>
+        /// <param name="url">The URL.</param>
+        public HttpRequestBuilder<TModel> Post(string url) => Request().Post(url);
 
-        /// <summary>Appends an async HTTP PUT reaction to this Reactive Plan pipeline.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <returns>Request builder for gathered input, validation, loading/finally reactions, and response routing.</returns>
-        public HttpRequestBuilder<TModel> Put(string url)
-        {
-            return Request().Put(url);
-        }
+        /// <summary>Sends a PUT request from this step; gathered values go to the body.</summary>
+        /// <param name="url">The URL.</param>
+        public HttpRequestBuilder<TModel> Put(string url) => Request().Put(url);
 
-        /// <summary>Appends an async HTTP DELETE reaction to this Reactive Plan pipeline.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        /// <returns>Request builder for route values, validation, loading/finally reactions, and response routing.</returns>
-        public HttpRequestBuilder<TModel> Delete(string url)
-        {
-            return Request().Delete(url);
-        }
+        /// <summary>Sends a DELETE request from this step; gathered values go to the body.</summary>
+        /// <param name="url">The URL.</param>
+        public HttpRequestBuilder<TModel> Delete(string url) => Request().Delete(url);
 
-        /// <summary>Appends an async reaction whose HTTP request branches execute concurrently.</summary>
-        /// <param name="branches">Request branches to build before they run in parallel.</param>
-        /// <returns>Parallel request builder for configuring the optional all-settled reaction.</returns>
-        public ParallelBuilder<TModel> Parallel(params Action<HttpRequestBuilder<TModel>>[] branches)
+        /// <summary>
+        /// Sends several requests at once, each branch starting with its method:
+        /// <c>p.Parallel(a =&gt; a.Get(url1).Response(..), b =&gt; b.Post(url2).Response(..)).OnAllSettled(s =&gt; ..)</c>.
+        /// </summary>
+        /// <param name="branches">The requests, each started from its branch.</param>
+        public ParallelBuilder<TModel> Parallel(params Func<RequestStart<TModel>, HttpRequestBuilder<TModel>>[] branches)
         {
+            if (branches == null) throw new ArgumentNullException(nameof(branches));
             var builder = new ParallelBuilder<TModel>(Context);
             Context.AddStep(builder.Step);
             foreach (var branch in branches)
@@ -50,11 +37,6 @@ namespace Alis.Reactive.Builders
         }
 
         // A request is placed where it is written and configured until the plan is written.
-        private HttpRequestBuilder<TModel> Request()
-        {
-            var builder = new HttpRequestBuilder<TModel>(Context);
-            Context.AddStep(builder.Step);
-            return builder;
-        }
+        private RequestStart<TModel> Request() => new RequestStart<TModel>(Context, Context.AddStep);
     }
 }

@@ -68,12 +68,14 @@ namespace Alis.Reactive.PlanModel
         }
 
         /// <summary>The binding of the response the handle names; the innermost one for <see cref="ResponseHandle.Innermost"/>.</summary>
-        internal string? ResponseOf(ResponseHandle handle)
+        internal string Response(ResponseHandle handle)
         {
-            if (handle == ResponseHandle.Innermost) return _responses?.Binding;
+            if (handle == ResponseHandle.Innermost && _responses != null) return _responses.Binding;
             for (var frame = _responses; frame != null; frame = frame.Outer)
                 if (frame.Handle == handle) return frame.Binding;
-            return null;
+            throw new InvalidOperationException(
+                $"Plan '{PlanId}' reads a response outside the routes of the request that receives it. Read a " +
+                "response inside OnSuccess, OnError, Chained or Finally of its request.");
         }
 
         /// <summary>

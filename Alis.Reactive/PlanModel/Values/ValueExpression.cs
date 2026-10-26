@@ -37,7 +37,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueExpression Null() => new LiteralExpression(null, Shape.None);
 
-        internal static ValueExpression LiteralRaw(object? value, Shape shape) => new LiteralExpression(value, shape);
+        private static ValueExpression LiteralRaw(object? value, Shape shape) => new LiteralExpression(value, shape);
 
         internal static ValueExpression LiteralFor(object? value, Shape shape)
         {
@@ -118,30 +118,34 @@ namespace Alis.Reactive.PlanModel
 
         // ── array operations ─────────────────────────────────────────────────────
 
-        internal static ValueExpression ArrayCount(ValueExpression source) =>
-            new ArrayOperation("count", source, Shape.Number);
+        internal static ValueExpression ArrayCount(ValueExpression source) => new CountOperation(source);
 
         internal static ValueExpression ArrayFilter(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
-            new ArrayOperation("filter", source, Shape.ArrayOf(itemShape), predicate);
+            new FilterOperation(source, predicate, Shape.ArrayOf(itemShape));
 
         internal static ValueExpression ArrayMap(ValueExpression source, ValueExpression projection, Shape resultItemShape) =>
-            new ArrayOperation("map", source, Shape.ArrayOf(resultItemShape), projection: projection);
+            new MapOperation(source, projection, Shape.ArrayOf(resultItemShape));
 
         internal static ValueExpression ArraySum(ValueExpression source, ValueExpression projection) =>
-            new ArrayOperation("sum", source, Shape.Number, projection: projection);
+            new SumOperation(source, projection);
 
-        internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph? predicate) =>
-            new ArrayOperation("any", source, Shape.Boolean, predicate);
+        internal static ValueExpression ArrayAny(ValueExpression source) => new HasItemsOperation(source);
+
+        internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph predicate) =>
+            new SomeOperation(source, predicate);
 
         internal static ValueExpression ArrayAll(ValueExpression source, ConditionGraph predicate) =>
-            new ArrayOperation("all", source, Shape.Boolean, predicate);
+            new EveryOperation(source, predicate);
+
+        internal static ValueExpression ArrayFind(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
+            new FindOperation(source, predicate, itemShape);
 
         internal static ValueExpression ArrayFind(
-            ValueExpression source, ConditionGraph predicate, ValueExpression? projection, Shape resultShape) =>
-            new ArrayOperation("find", source, resultShape, predicate, projection);
+            ValueExpression source, ConditionGraph predicate, ValueExpression projection, Shape resultShape) =>
+            new FindSelectOperation(source, predicate, projection, resultShape);
 
         internal static ValueExpression ArrayOrderBy(ValueExpression source, ValueExpression key, Shape itemShape, bool descending) =>
-            new ArrayOperation(descending ? "orderByDescending" : "orderBy", source, Shape.ArrayOf(itemShape), projection: key);
+            new OrderByOperation(source, key, Shape.ArrayOf(itemShape), descending);
     }
 
     internal sealed class LiteralExpression : ValueExpression
@@ -267,12 +271,10 @@ namespace Alis.Reactive.PlanModel
         // MVC binds a scalar from a key's first value and an array from all of them.
         internal override Expr Write(Scope scope)
         {
-            var values = DescribesArray(_shape) ? "queryAll" : "query";
+            var values = _shape.DescribesArray ? "queryAll" : "query";
             return G.Get(G.Get(G.Obj(scope.Objects.Document()), new[] { values }, Shape.None), new[] { _key }, _shape);
         }
 
-        private static bool DescribesArray(Shape shape) =>
-            shape.TryGetNullableInnerShape(out var inner) ? DescribesArray(inner) : shape.Kind == "array";
     }
 
     internal sealed class BoundRead : ValueExpression
@@ -334,26 +336,19 @@ namespace Alis.Reactive.PlanModel
     /// An array operation, written as JavaScript's own method with a lambda. The source may wait for a
     /// promise; the lambda body runs once per item, where nothing waits.
     /// </summary>
-    internal sealed class ArrayOperation : ValueExpression
+    /// <summary>
+    /// An operation over a list: the source is read as an array, and the operation's lambdas run per
+    /// item with hoisting off, so a method result read inside one is refused where it is written.
+    /// </summary>
+    internal abstract class ArrayOperation : ValueExpression
     {
-        private readonly string _op;
         private readonly ValueExpression _source;
-        private readonly ConditionGraph? _predicate;
-        private readonly ValueExpression? _projection;
         private readonly Shape _shape;
 
-        internal ArrayOperation(
-            string op,
-            ValueExpression source,
-            Shape shape,
-            ConditionGraph? predicate = null,
-            ValueExpression? projection = null)
+        private protected ArrayOperation(ValueExpression source, Shape shape)
         {
-            _op = op;
             _source = source ?? throw new ArgumentNullException(nameof(source));
-            _shape = shape;
-            _predicate = predicate;
-            _projection = projection;
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
         internal override Shape OutputShape => _shape;
@@ -366,76 +361,167 @@ namespace Alis.Reactive.PlanModel
             return scope.WithoutHoisting(() => Operate(items, scope));
         }
 
-        private Expr Operate(Expr items, Scope scope)
-        {
-            switch (_op)
-            {
-                case "count":
-                    return G.Get(items, new[] { "length" }, Shape.Number);
-                case "filter":
-                    return G.Call(items, new[] { "filter" }, new Expr[] { Predicate(scope) }, G.NoShapes, _shape);
-                case "map":
-                    return G.Call(items, new[] { "map" }, new Expr[] { Projection(scope) }, G.NoShapes, _shape);
-                case "sum":
-                    return Sum(items, scope);
-                case "any":
-                    return _predicate == null
-                        ? G.Op(Operator.Gt, G.Get(items, new[] { "length" }, Shape.Number), G.Lit(0))
-                        : G.Call(items, new[] { "some" }, new Expr[] { Predicate(scope) }, G.NoShapes, Shape.Boolean);
-                case "all":
-                    return G.Call(items, new[] { "every" }, new Expr[] { Predicate(scope) }, G.NoShapes, Shape.Boolean);
-                case "find":
-                    return Find(items, scope);
-                case "orderBy":
-                    return OrderBy(items, scope, descending: false);
-                default:
-                    return OrderBy(items, scope, descending: true);
-            }
-        }
+        private protected abstract Expr Operate(Expr items, Scope scope);
 
-        private FnExpr Predicate(Scope scope)
+        private protected static FnExpr PerItem(ConditionGraph predicate, Scope scope)
         {
-            var predicate = _predicate ?? throw new InvalidOperationException("Array operation '" + _op + "' needs a predicate.");
             var item = scope.Fresh("x");
             return G.Fn(predicate.Write(scope.WithItem(item)), item);
         }
 
-        private FnExpr Projection(Scope scope)
+        private protected static FnExpr PerItem(ValueExpression projection, Scope scope)
         {
-            var projection = _projection ?? throw new InvalidOperationException("Array operation '" + _op + "' needs a selector.");
             var item = scope.Fresh("x");
             return G.Fn(projection.Write(scope.WithItem(item)), item);
         }
 
-        // Sum adds each selected value as a finite number, so text never concatenates.
-        private Expr Sum(Expr items, Scope scope)
+        private protected static Expr Length(Expr items) => G.Get(items, new[] { "length" }, Shape.Number);
+    }
+
+    internal sealed class CountOperation : ArrayOperation
+    {
+        internal CountOperation(ValueExpression source) : base(source, Shape.Number) { }
+
+        private protected override Expr Operate(Expr items, Scope scope) => Length(items);
+    }
+
+    internal sealed class FilterOperation : ArrayOperation
+    {
+        private readonly ConditionGraph _predicate;
+
+        internal FilterOperation(ValueExpression source, ConditionGraph predicate, Shape shape) : base(source, shape)
+        {
+            _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+        }
+
+        private protected override Expr Operate(Expr items, Scope scope) =>
+            G.Call(items, new[] { "filter" }, new Expr[] { PerItem(_predicate, scope) }, G.NoShapes, OutputShape);
+    }
+
+    internal sealed class MapOperation : ArrayOperation
+    {
+        private readonly ValueExpression _projection;
+
+        internal MapOperation(ValueExpression source, ValueExpression projection, Shape shape) : base(source, shape)
+        {
+            _projection = projection ?? throw new ArgumentNullException(nameof(projection));
+        }
+
+        private protected override Expr Operate(Expr items, Scope scope) =>
+            G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, G.NoShapes, OutputShape);
+    }
+
+    /// <summary>Sum adds each selected value as a finite number, so text never concatenates.</summary>
+    internal sealed class SumOperation : ArrayOperation
+    {
+        private readonly ValueExpression _projection;
+
+        internal SumOperation(ValueExpression source, ValueExpression projection) : base(source, Shape.Number)
+        {
+            _projection = projection ?? throw new ArgumentNullException(nameof(projection));
+        }
+
+        private protected override Expr Operate(Expr items, Scope scope)
         {
             var total = scope.Fresh("s");
             var item = scope.Fresh("x");
-            var term = _projection == null ? (Expr)G.Ref(item) : _projection.Write(scope.WithItem(item));
+            var term = _projection.Write(scope.WithItem(item));
             var add = G.Fn(G.Op(Operator.Add, G.Ref(total), G.Op(Operator.Finite, term)), total, item);
             return G.Call(items, new[] { "reduce" }, new Expr[] { add, G.Lit(0) }, G.NoShapes, Shape.Number);
         }
+    }
 
-        // Find gives null when nothing matches, then applies the selector to what it found.
-        private Expr Find(Expr items, Scope scope)
+    internal sealed class HasItemsOperation : ArrayOperation
+    {
+        internal HasItemsOperation(ValueExpression source) : base(source, Shape.Boolean) { }
+
+        private protected override Expr Operate(Expr items, Scope scope) => G.Op(Operator.Gt, Length(items), G.Lit(0));
+    }
+
+    internal sealed class SomeOperation : ArrayOperation
+    {
+        private readonly ConditionGraph _predicate;
+
+        internal SomeOperation(ValueExpression source, ConditionGraph predicate) : base(source, Shape.Boolean)
         {
-            var found = G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { Predicate(scope) }, G.NoShapes, Shape.None), G.Null);
-            if (_projection == null) return G.As(found, _shape);
+            _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+        }
+
+        private protected override Expr Operate(Expr items, Scope scope) =>
+            G.Call(items, new[] { "some" }, new Expr[] { PerItem(_predicate, scope) }, G.NoShapes, Shape.Boolean);
+    }
+
+    internal sealed class EveryOperation : ArrayOperation
+    {
+        private readonly ConditionGraph _predicate;
+
+        internal EveryOperation(ValueExpression source, ConditionGraph predicate) : base(source, Shape.Boolean)
+        {
+            _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+        }
+
+        private protected override Expr Operate(Expr items, Scope scope) =>
+            G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, G.NoShapes, Shape.Boolean);
+    }
+
+    /// <summary>Find gives null when nothing matches.</summary>
+    internal sealed class FindOperation : ArrayOperation
+    {
+        private readonly ConditionGraph _predicate;
+
+        internal FindOperation(ValueExpression source, ConditionGraph predicate, Shape itemShape) : base(source, itemShape)
+        {
+            _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+        }
+
+        private protected override Expr Operate(Expr items, Scope scope) =>
+            G.As(Found(items, _predicate, scope), OutputShape);
+
+        internal static Expr Found(Expr items, ConditionGraph predicate, Scope scope) =>
+            G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, G.NoShapes, Shape.None), G.Null);
+    }
+
+    /// <summary>Find gives null when nothing matches, then applies the selector to what it found.</summary>
+    internal sealed class FindSelectOperation : ArrayOperation
+    {
+        private readonly ConditionGraph _predicate;
+        private readonly ValueExpression _projection;
+
+        internal FindSelectOperation(ValueExpression source, ConditionGraph predicate, ValueExpression projection, Shape resultShape)
+            : base(source, resultShape)
+        {
+            _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+            _projection = projection ?? throw new ArgumentNullException(nameof(projection));
+        }
+
+        private protected override Expr Operate(Expr items, Scope scope)
+        {
+            var found = FindOperation.Found(items, _predicate, scope);
             var match = scope.Fresh("x");
             var selected = _projection.Write(scope.WithItem(match));
             var select = G.Fn(G.Op(Operator.Cond, G.Eq(G.Ref(match), G.Null), G.Null, selected), match);
-            return G.As(G.Apply(select, found), _shape);
+            return G.As(G.Apply(select, found), OutputShape);
+        }
+    }
+
+    internal sealed class OrderByOperation : ArrayOperation
+    {
+        private readonly ValueExpression _key;
+        private readonly bool _descending;
+
+        internal OrderByOperation(ValueExpression source, ValueExpression key, Shape shape, bool descending) : base(source, shape)
+        {
+            _key = key ?? throw new ArgumentNullException(nameof(key));
+            _descending = descending;
         }
 
-        private Expr OrderBy(Expr items, Scope scope, bool descending)
+        private protected override Expr Operate(Expr items, Scope scope)
         {
-            var key = _projection ?? throw new InvalidOperationException("Array operation '" + _op + "' needs a key selector.");
             var left = scope.Fresh("a");
             var right = scope.Fresh("b");
-            Expr compare = G.Op(Operator.Order, key.Write(scope.WithItem(left)), key.Write(scope.WithItem(right)));
-            if (descending) compare = G.Op(Operator.Neg, compare);
-            return G.Call(items, new[] { "toSorted" }, new Expr[] { G.Fn(compare, left, right) }, G.NoShapes, _shape);
+            Expr compare = G.Op(Operator.Order, _key.Write(scope.WithItem(left)), _key.Write(scope.WithItem(right)));
+            if (_descending) compare = G.Op(Operator.Neg, compare);
+            return G.Call(items, new[] { "toSorted" }, new Expr[] { G.Fn(compare, left, right) }, G.NoShapes, OutputShape);
         }
     }
 }

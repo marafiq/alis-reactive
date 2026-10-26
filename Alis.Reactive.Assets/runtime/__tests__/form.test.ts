@@ -109,11 +109,11 @@ describe("server errors", () => {
     expect(document.getElementById("Test_Plan_validation_summary")!.textContent).toBe("Taken");
   });
 
-  it("validates in the browser when the response carried no problem record", () => {
+  it("shows nothing when the response carried no problem record: the body is not errors", () => {
     render(`<form id="admission">${field("Name")}</form>`);
     const form = startForm([requiredField("Name", "Name", "Enter the resident's name.")]);
     form.showErrors(undefined);
-    expect(errorText("Name")).toBe("Enter the resident's name.");
+    expect(errorText("Name")).toBe("");
   });
 });
 

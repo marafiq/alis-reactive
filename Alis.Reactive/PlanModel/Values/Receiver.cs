@@ -76,10 +76,7 @@ namespace Alis.Reactive.PlanModel
 
             internal override (Expr, IReadOnlyList<string>) Locate(Scope scope)
             {
-                var response = scope.ResponseOf(_handle)
-                    ?? throw new InvalidOperationException(
-                        $"Plan '{scope.PlanId}' reads a response body outside the routes of the request that receives it.");
-                return (G.Ref(response), Body);
+                return (G.Ref(scope.Response(_handle)), Body);
             }
         }
 

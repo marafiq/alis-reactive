@@ -178,16 +178,14 @@ namespace Alis.Reactive.Validation
         }
 
         // A value the condition fixes, as the member's own type: an enum is its member's name, which is
-        // how MVC binds it; a date is its ISO text.
+        // how MVC binds it; anything else is written as it is.
         private static object? LiteralOf(Type memberType, object? value)
         {
             if (value == null) return null;
 
             var enumType = System.Nullable.GetUnderlyingType(memberType) ?? memberType;
             var asMemberType = enumType.IsEnum && !value.GetType().IsEnum ? Enum.ToObject(enumType, value) : value;
-            return asMemberType.GetType().IsEnum
-                ? asMemberType.ToString()
-                : ValidationDateLiteral.From(asMemberType, Shape.FromClrType(asMemberType.GetType()));
+            return asMemberType.GetType().IsEnum ? asMemberType.ToString() : asMemberType;
         }
 
         private static CompareOperator UnaryOperator(ClientValueTest test) => test switch
@@ -343,7 +341,7 @@ namespace Alis.Reactive.Validation
                 }
 
                 internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
-                    ConditionGraph.Binary(op, left, ValueExpression.LiteralRaw(_value, fieldShape), fieldShape);
+                    ConditionGraph.Binary(op, left, ValueExpression.LiteralFor(_value, fieldShape), fieldShape);
             }
 
             private sealed class TextValue : TestValue
@@ -356,7 +354,7 @@ namespace Alis.Reactive.Validation
                 }
 
                 internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
-                    ConditionGraph.Binary(op, left, ValueExpression.LiteralRaw(_text, Shape.String), fieldShape);
+                    ConditionGraph.Binary(op, left, ValueExpression.LiteralFor(_text, Shape.String), fieldShape);
             }
 
             private sealed class ListValue : TestValue
@@ -370,8 +368,8 @@ namespace Alis.Reactive.Validation
 
                 internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape)
                 {
-                    var items = _items.Select(item => ValueExpression.LiteralRaw(item, fieldShape)).ToList();
-                    return ConditionGraph.Binary(op, left, ValueExpression.Array(items, Shape.ArrayOf(fieldShape.IsNone ? Shape.Any : fieldShape)), fieldShape);
+                    var items = _items.Select(item => ValueExpression.LiteralFor(item, fieldShape)).ToList();
+                    return ConditionGraph.Binary(op, left, ValueExpression.Array(items, Shape.ArrayOf(fieldShape)), fieldShape);
                 }
             }
 
@@ -387,7 +385,7 @@ namespace Alis.Reactive.Validation
                 }
 
                 internal override ConditionGraph Compare(CompareOperator op, ValueExpression left, Shape fieldShape) =>
-                    ConditionGraph.CollectionItem(op, left, ValueExpression.LiteralRaw(_item, _itemShape), fieldShape, _itemShape);
+                    ConditionGraph.CollectionItem(op, left, ValueExpression.LiteralFor(_item, _itemShape), fieldShape, _itemShape);
             }
         }
     }
@@ -418,19 +416,12 @@ namespace Alis.Reactive.Validation
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
             var body = ConditionValue.StripConvert(member.Body);
-            var names = new List<string>();
-            var current = body;
-            while (current is MemberExpression chain && chain.Expression != null)
-            {
-                names.Insert(0, chain.Member.Name);
-                current = ConditionValue.StripConvert(chain.Expression);
-            }
-
-            var isMemberOfTheModel = member.Parameters.Count == 1 && current == member.Parameters[0] && names.Count > 0;
-            if (!isMemberOfTheModel)
+            if (member.Parameters.Count != 1
+                || !ExpressionPathHelper.TryMemberName(body, member.Parameters[0], out var name)
+                || name.Length == 0)
                 throw new ArgumentException(
                     $"A browser rule names a member of the model, like x => x.Address.City; {member} does not.", nameof(member));
-            return new FieldReference(string.Join(".", names), body.Type, Shape.FromClrType(body.Type));
+            return new FieldReference(name, body.Type, Shape.FromClrType(body.Type));
         }
 
         internal FieldReference PrefixedBy(string prefix) =>

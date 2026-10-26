@@ -68,7 +68,7 @@ namespace Alis.Reactive.Builders
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
             Context.AddStep(new DispatchStep(
                 appEvent.Name,
-                ValueExpression.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload)))));
+                ValueExpression.LiteralFor(payload, Shape.FromClrType(typeof(TPayload)))));
             return this;
         }
 
@@ -152,8 +152,11 @@ namespace Alis.Reactive.Builders
         /// <returns>The query, whose members are value sources.</returns>
         public UrlQuery<TQuery> Url<TQuery>() where TQuery : class => new UrlQuery<TQuery>();
 
-        /// <summary>Appends a reaction that renders accumulated validation errors into a container.</summary>
-        /// <param name="formId">Validation error container element ID.</param>
+        /// <summary>
+        /// Shows the response's validation errors on the form's fields and summary. It belongs inside an
+        /// error route of the request that received them: <c>.OnError(400, e =&gt; e.ValidationErrors(FormId))</c>.
+        /// </summary>
+        /// <param name="formId">The element that holds the form's inputs.</param>
         /// <returns>This pipeline builder.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {

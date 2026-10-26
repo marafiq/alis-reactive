@@ -82,7 +82,7 @@ public class WhenAnsweringACallBell : PlaywrightTestBase
     }
 
     [Test]
-    public async Task the_third_call_is_escalated_by_a_second_handler_of_the_same_callback()
+    public async Task the_third_call_tonight_is_escalated_at_the_desk()
     {
         await OpenRoomWithTheDeskOnDuty();
         await Bell.Press.ClickAsync();

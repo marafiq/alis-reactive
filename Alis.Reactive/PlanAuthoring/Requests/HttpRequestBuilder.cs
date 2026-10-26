@@ -9,33 +9,25 @@ namespace Alis.Reactive.Builders.Requests
     /// </summary>
     /// <remarks>
     /// Created by HTTP entry points such as <c>p.Get("/url")</c> and
-    /// <c>p.Post("/url")</c>. Branches inside <c>p.Parallel(...)</c> use the same builder.
+    /// <c>p.Post("/url")</c>. A branch of <c>p.Parallel(...)</c> and a <c>Chained</c> request start the same way.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
 
-        internal HttpRequestBuilder(PlanBuildContext context)
+        internal HttpRequestBuilder(PlanBuildContext context, RequestStep step)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
+            Step = step ?? throw new ArgumentNullException(nameof(step));
         }
 
         /// <summary>The request this builder configures, written where the request was started.</summary>
-        internal RequestStep Step { get; } = new RequestStep();
+        internal RequestStep Step { get; }
 
-        /// <summary>Selects GET for this request endpoint.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Get(string url) { Step.To("GET", url); return this; }
         /// <summary>Selects POST for this request endpoint.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Post(string url) { Step.To("POST", url); return this; }
         /// <summary>Selects PUT for this request endpoint.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Put(string url) { Step.To("PUT", url); return this; }
         /// <summary>Selects DELETE for this request endpoint.</summary>
-        /// <param name="url">Request URL, which may contain <c>{placeholder}</c> template parameters.</param>
-        public HttpRequestBuilder<TModel> Delete(string url) { Step.To("DELETE", url); return this; }
 
         /// <summary>Builds the request from the view model's own members, for an endpoint that binds the view model.</summary>
         /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>

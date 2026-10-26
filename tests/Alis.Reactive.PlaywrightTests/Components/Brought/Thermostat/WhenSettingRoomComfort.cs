@@ -36,6 +36,7 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     private ILocator NightActive => Page.Locator("#night-active");
     private ILocator NightApplied => Page.Locator("#night-applied");
     private ILocator Mode => Page.Locator("#mode");
+    private ILocator FanRunning => Page.Locator("#fan-running");
     private ILocator Reading => Page.Locator("#reading");
     private ILocator LockStatus => Page.Locator("#lock-status");
     private ILocator PlanSummary => Page.Locator("#plan-summary");
@@ -52,6 +53,8 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     private ILocator NightMode => Page.Locator("#night-mode");
     private ILocator Cool => Page.Locator("#cool");
     private ILocator Off => Page.Locator("#off");
+    private ILocator FanOn => Page.Locator("#fan-on");
+    private ILocator FanAuto => Page.Locator("#fan-auto");
     private ILocator BoostBath => Page.Locator("#boost-bath");
     private ILocator QuietHours => Page.Locator("#quiet-hours");
     private ILocator WingPlan => Page.Locator("#wing-plan");
@@ -251,6 +254,23 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     }
 
     [Test]
+    public async Task the_fan_set_to_on_is_the_fan_the_page_compares()
+    {
+        await OpenRoom();
+        await Expect(Thermostat.Fan).ToHaveTextAsync("fan auto");
+
+        await FanOn.ClickAsync();
+
+        await Expect(Thermostat.Fan).ToHaveTextAsync("fan on");
+        await Expect(FanRunning).ToBeVisibleAsync();
+
+        await FanAuto.ClickAsync();
+        await Expect(Thermostat.Fan).ToHaveTextAsync("fan auto");
+        await Expect(FanRunning).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task switching_off_makes_a_room_near_its_target_not_comfortable()
     {
         await OpenRoom();
@@ -316,6 +336,7 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
 
         internal ILocator TargetText => _root.Locator(".th-target");
         internal ILocator ModeText => _root.Locator(".th-mode");
+        internal ILocator Fan => _root.Locator(".th-fan");
         internal ILocator Range => _root.Locator(".th-range");
         internal ILocator Night => _root.Locator(".th-night");
         internal ILocator Quiet => _root.Locator(".th-quiet");

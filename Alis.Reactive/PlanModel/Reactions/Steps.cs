@@ -157,13 +157,12 @@ namespace Alis.Reactive.PlanModel
             _form = form ?? throw new ArgumentNullException(nameof(form));
         }
 
+        // The errors are the response's body: the step belongs inside an error route of a request.
         internal override void WriteTo(List<Statement> block, Scope scope)
         {
             var form = G.Obj(scope.Objects.Form(_form));
-            var response = scope.ResponseOf(ResponseHandle.Innermost);
-            block.Add(G.Do(response == null
-                ? G.Call(form, "validate")
-                : G.Call(form, "showErrors", G.Get(G.Ref(response), new[] { "body" }, Shape.None))));
+            var response = scope.Response(ResponseHandle.Innermost);
+            block.Add(G.Do(G.Call(form, "showErrors", G.Get(G.Ref(response), new[] { "body" }, Shape.None))));
         }
     }
 

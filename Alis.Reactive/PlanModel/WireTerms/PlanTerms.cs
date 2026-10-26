@@ -65,9 +65,6 @@ namespace Alis.Reactive.PlanModel
 
         public Path Path => _path;
 
-        // A developer-authored field name: its body path is read from the text.
-        internal static BindingPath Of(string value) => new BindingPath(value, Path.Parse(value));
-
         // A model member's field: the MVC name text, and the body path read from the member's types.
         // Equality stays the name alone: one MVC name is one field.
         internal static BindingPath ForMember(string mvcName, Path bodyPath) => new BindingPath(mvcName, bodyPath);

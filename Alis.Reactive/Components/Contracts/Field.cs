@@ -34,7 +34,7 @@ namespace Alis.Reactive
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
 
-            var name = ExpressionPathHelper.ToEventPath(member);
+            var name = ExpressionPathHelper.ToJsonPath(member).ToString();
             if (name.Length == 0)
                 throw new ArgumentException("Select a member of the row, for example (Resident r) => r.Name.", nameof(member));
 

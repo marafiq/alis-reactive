@@ -49,6 +49,9 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>Heat, cool or off.</summary>
         public Property<ThermostatMode> Mode => Property<ThermostatMode>();
 
+        /// <summary>Whether the fan runs only with the heat or cool, or all the time.</summary>
+        public Property<ThermostatFan> Fan => Property<ThermostatFan>();
+
         /// <summary>The room's measured temperature.</summary>
         public ReadOnly<int> Current => ReadOnly<int>();
 
@@ -234,6 +237,18 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
         /// <summary>Neither; the room is never comfortable by the thermostat's measure.</summary>
         [JsonStringEnumMemberName("off")]
         Off,
+    }
+
+    /// <summary>The thermostat's fan modes, by the text its JavaScript uses; an option is its JavaScript text wherever a page writes or compares it.</summary>
+    public enum ThermostatFan
+    {
+        /// <summary>The fan runs with the heat or the cool.</summary>
+        [JsonStringEnumMemberName("auto")]
+        Auto,
+
+        /// <summary>The fan runs all the time.</summary>
+        [JsonStringEnumMemberName("on")]
+        On,
     }
 
     /// <summary>A plan the thermostat applies: the argument of <see cref="Thermostat.ApplyPlan"/> and <see cref="Thermostat.Describe"/>.</summary>

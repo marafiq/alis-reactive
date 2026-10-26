@@ -192,8 +192,7 @@ function revalidate(field: HTMLElement): void {
 function showErrors(containerId: string, problem: unknown): void {
   const isRecord = typeof problem === "object" && problem !== null && !Array.isArray(problem);
   if (!isRecord) {
-    log.debug("show-validation.client", { id: containerId });
-    validate(containerId);
+    log.error("server-errors.not-a-record", { id: containerId });
     return;
   }
 

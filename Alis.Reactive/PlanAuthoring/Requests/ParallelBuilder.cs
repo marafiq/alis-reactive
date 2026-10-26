@@ -21,13 +21,10 @@ namespace Alis.Reactive.Builders.Requests
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        internal void AddBranch(Action<HttpRequestBuilder<TModel>> request)
+        internal void AddBranch(Func<RequestStart<TModel>, HttpRequestBuilder<TModel>> request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-
-            var builder = new HttpRequestBuilder<TModel>(_context);
-            request(builder);
-            Step.Add(builder.Step);
+            request(new RequestStart<TModel>(_context, Step.Add));
         }
 
         /// <summary>The requests this builder configures, written where <c>Parallel</c> is.</summary>

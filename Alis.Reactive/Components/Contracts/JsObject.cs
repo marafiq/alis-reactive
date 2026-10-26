@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -50,7 +49,7 @@ namespace Alis.Reactive
         // that holds it: it shares that object's binding, and its members' JavaScript names start with the
         // path that holds it.
         private JsObject? _holder;
-        private string _pathPrefix = "";
+        private Path _holderPath = Path.None;
 
         // An object a method returned: reached through the method's result, so it holds no events.
         private bool _returned;
@@ -62,8 +61,8 @@ namespace Alis.Reactive
         internal void BindTo(ObjectBinding binding) =>
             _binding = binding ?? throw new ArgumentNullException(nameof(binding));
 
-        internal static TObject Nested<TObject>(JsObject holder, string pathPrefix) where TObject : JsObject, new() =>
-            new TObject { _holder = holder, _pathPrefix = pathPrefix };
+        internal static TObject Nested<TObject>(JsObject holder, Path path) where TObject : JsObject, new() =>
+            new TObject { _holder = holder, _holderPath = path };
 
         private bool IsReturned => _returned || (_holder?.IsReturned ?? false);
 
@@ -106,7 +105,7 @@ namespace Alis.Reactive
             where TObject : JsObject, new() =>
             DeclaresMethod(declaredBy)
                 ? ReturnedObject<TObject>(name, declaredBy)
-                : Nested<TObject>(this, JavaScriptPath(name, declaredBy) + ".");
+                : Nested<TObject>(this, JavaScriptPath(name, declaredBy));
 
         /// <summary>
         /// Declares a method that returns an object with members of its own, for one argument:
@@ -143,7 +142,7 @@ namespace Alis.Reactive
         protected Objects<TItem> Objects<TItem>(string? name = null, [CallerMemberName] string declaredBy = "")
             where TItem : JsObject, new() =>
             DeclaresMethod(declaredBy)
-                ? new Objects<TItem>(ReturnedObject<ReturnedList>(name, declaredBy), "")
+                ? new Objects<TItem>(ReturnedObject<ReturnedList>(name, declaredBy), Path.None)
                 : new Objects<TItem>(this, JavaScriptPath(name, declaredBy));
 
         // ── methods that return nothing ──────────────────────────────────────────
@@ -346,13 +345,16 @@ namespace Alis.Reactive
         }
 
         // The path from the component's object to this object: empty for the component itself.
-        private IReadOnlyList<string> ObjectPath() =>
-            _pathPrefix.Length == 0 ? G.NoPath : G.PathOf(Path.Parse(_pathPrefix.TrimEnd('.')));
+        private IReadOnlyList<string> ObjectPath() => _holderPath.TargetText;
 
-        // The member's JavaScript path from the object a page holds: the holder's path first for a nested
-        // object, then the declared name, or the C# name camel-cased.
-        private string JavaScriptPath(string? name, string declaredBy) =>
-            _pathPrefix + (name == null ? JavaScriptNameOf(declaredBy) : OwnName(name, declaredBy));
+        // The member's path from the object a page holds: the holder's path first for a nested object, then
+        // the declared name, or the C# name camel-cased.
+        private Path JavaScriptPath(string? name, string declaredBy)
+        {
+            if (name == null) return _holderPath.Then(JavaScriptNameOf(declaredBy));
+            // name: "" declares the object itself: a plugin that is a function.
+            return name.Length == 0 ? _holderPath : _holderPath.Then(OwnName(name, declaredBy));
+        }
 
         // A declared name is one JavaScript name. A member of an object the component holds is declared on
         // that object (Object<T>()), and a field of each item of a list is read with Each(..): one way to

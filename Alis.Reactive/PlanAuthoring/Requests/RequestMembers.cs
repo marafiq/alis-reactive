@@ -2,45 +2,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
     // A form input is sent by the view model's binding name. When the endpoint binds a class other than the
     // view model, that name must be a member of the class too, of a type the input's value binds to, or the
-    // server drops or refuses the value. MVC matches member names ignoring case; an index steps into the
+    // server drops or refuses the value. MVC matches member names ignoring case; a position steps into the
     // collection's item type.
     internal static class RequestMembers
     {
-        internal static void Require(Type request, string bindingName, Type inputType)
+        internal static void Require(Type request, BindingPath binding, Type inputType)
         {
-            var member = MemberType(request, bindingName);
+            var member = MemberType(request, binding);
             if (member == null || Binds(inputType, member)) return;
 
             throw new InvalidOperationException(
-                $"Form sends the input '{bindingName}' as {inputType.Name}, but {request.Name}.{bindingName}, which " +
+                $"Form sends the input '{binding.Value}' as {inputType.Name}, but {request.Name}.{binding.Value}, which " +
                 $"the endpoint binds, is {member.Name}. Give the request member the input's type.");
         }
 
         // The member's type, or null when the path reaches an open member (object, a dictionary) that takes any name.
-        private static Type? MemberType(Type request, string bindingName)
+        private static Type? MemberType(Type request, BindingPath binding)
         {
             var current = request;
-            foreach (var segment in bindingName.Split('.'))
+            foreach (var segment in binding.Path.Segments)
             {
-                var bracket = segment.IndexOf('[');
-                var name = bracket < 0 ? segment : segment.Substring(0, bracket);
-                var property = current.GetProperty(
-                    name,
-                    BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                if (property == null)
-                    throw new InvalidOperationException(
-                        $"Form sends the input '{bindingName}', but {request.Name}, the request the endpoint binds, " +
-                        $"has no member '{name}'{(current == request ? "" : " on " + current.Name)}.");
-
-                current = property.PropertyType;
-                var indexes = bracket < 0 ? 0 : segment.Count(character => character == '[');
-                for (var index = 0; index < indexes; index++)
+                if (segment.IsIndex || segment.IsEachItem)
+                {
                     current = ItemType(current);
+                }
+                else
+                {
+                    var name = segment.ToPathText();
+                    var property = current.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+                        ?? throw new InvalidOperationException(
+                            $"Form sends the input '{binding.Value}', but {request.Name}, the request the endpoint binds, " +
+                            $"has no member '{name}'{(current == request ? "" : " on " + current.Name)}.");
+                    current = property.PropertyType;
+                }
 
                 if (IsOpen(current)) return null;
             }

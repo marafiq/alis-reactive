@@ -31,8 +31,8 @@ namespace Alis.Reactive
         public TypedSource<TResult> Get<TResult>(Expression<Func<TValue, TResult>> path)
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
-            var dataPath = ExpressionPathHelper.ToEventPath(path);
-            if (dataPath.Length == 0)
+            var dataPath = ExpressionPathHelper.ToJsonPath(path);
+            if (dataPath.IsNone)
                 throw new ArgumentException("Select a member of the value, for example s => s.Label.", nameof(path));
             return new MemberPathRead<TResult>(this, dataPath);
         }
@@ -40,9 +40,9 @@ namespace Alis.Reactive
         private sealed class MemberPathRead<TResult> : TypedSource<TResult>
         {
             private readonly ReadOnly<TValue> _property;
-            private readonly string _path;
+            private readonly Path _path;
 
-            internal MemberPathRead(ReadOnly<TValue> property, string path)
+            internal MemberPathRead(ReadOnly<TValue> property, Path path)
             {
                 _property = property;
                 _path = path;
@@ -124,12 +124,12 @@ namespace Alis.Reactive
         where TItem : JsObject, new()
     {
         private readonly JsObject _owner;
-        private readonly string _prefix;
+        private readonly Path _path;
 
-        internal Objects(JsObject owner, string path)
+        internal Objects(JsObject owner, Path path)
         {
             _owner = owner ?? throw new ArgumentNullException(nameof(owner));
-            _prefix = path.Length == 0 ? "" : path + ".";
+            _path = path ?? throw new ArgumentNullException(nameof(path));
         }
 
         /// <summary>The item at a position, used as the object: <c>thermostat.Zones.At(0).Target.Set(70)</c>.</summary>
@@ -137,11 +137,11 @@ namespace Alis.Reactive
         public TItem At(int index)
         {
             if (index < 0) throw new ArgumentOutOfRangeException(nameof(index), index, "An item's position is zero or more.");
-            return JsObject.Nested<TItem>(_owner, _prefix + index + ".");
+            return JsObject.Nested<TItem>(_owner, _path.AtIndex(index));
         }
 
         /// <summary>How many items the list has: its <c>length</c>.</summary>
-        public ReadOnly<int> Count => new ReadOnly<int>(_owner, ComponentProperty<int>.At(_prefix + "length"));
+        public ReadOnly<int> Count => new ReadOnly<int>(_owner, ComponentProperty<int>.At(_path.Then("length")));
 
         /// <summary>A property of each item, as a list: <c>thermostat.Zones.Each(zone =&gt; zone.Name)</c>.</summary>
         /// <typeparam name="TField">The C# type of the property.</typeparam>
@@ -149,10 +149,10 @@ namespace Alis.Reactive
         public ReadOnly<IReadOnlyList<TField>> Each<TField>(Func<TItem, ReadOnly<TField>> property)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
-            var eachItem = JsObject.Nested<TItem>(_owner, _prefix + "[].");
+            var eachItem = JsObject.Nested<TItem>(_owner, _path.Each());
             var member = property(eachItem)
                 ?? throw new ArgumentException("Select a property of the item, for example zone => zone.Name.", nameof(property));
-            return new ReadOnly<IReadOnlyList<TField>>(_owner, ComponentProperty<IReadOnlyList<TField>>.At(member.Member.JavaScriptPath));
+            return new ReadOnly<IReadOnlyList<TField>>(_owner, ComponentProperty<IReadOnlyList<TField>>.At(member.Member.Path));
         }
     }
 
@@ -170,12 +170,12 @@ namespace Alis.Reactive
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             if (field == null) throw new ArgumentNullException(nameof(field));
-            var fieldPath = ExpressionPathHelper.ToEventPath(field);
-            if (fieldPath.Length == 0)
+            var fieldPath = ExpressionPathHelper.ToJsonPath(field);
+            if (fieldPath.IsNone)
                 throw new ArgumentException("Select a field of the item, for example slot => slot.Day.", nameof(field));
             return new ReadOnly<IReadOnlyList<TField>>(
                 list.Owner,
-                ComponentProperty<IReadOnlyList<TField>>.At(list.Member.JavaScriptPath + "[]." + fieldPath));
+                ComponentProperty<IReadOnlyList<TField>>.At(list.Member.Path.Each().Append(fieldPath)));
         }
     }
 

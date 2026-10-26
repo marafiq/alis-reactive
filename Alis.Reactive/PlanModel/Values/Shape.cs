@@ -59,6 +59,9 @@ namespace Alis.Reactive.PlanModel
 
         internal bool IsNone => Kind == "none";
 
+        /// <summary>Whether a value of this shape is a list, through a nullable wrapper too.</summary>
+        internal bool DescribesArray => TryGetNullableInnerShape(out var inner) ? inner.DescribesArray : Kind == "array";
+
         /// <summary>
         /// True when a value of this shape serializes to one string, as an HTTP header, a route parameter or a
         /// query value needs: string, number, boolean, date, instant, or a nullable of one of them.

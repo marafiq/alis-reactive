@@ -57,10 +57,10 @@ namespace Alis.Reactive
         internal ValueExpression Read(string member) => ValueExpression.Read(Receiver.Element(_id), new[] { member }, Shape.None);
 
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value) =>
-            _context.AddStep(new SetStep(Receiver.Element(_id), G.PathOf(property.Path), property.Shape, value));
+            _context.AddStep(new SetStep(Receiver.Element(_id), property.Path.TargetText, property.Shape, value));
 
         internal void Call(ComponentMethod method, ValueExpression argument) =>
-            _context.AddStep(new CallStep(Receiver.Element(_id), G.PathOf(method.Path), new[] { argument }, method.ArgumentShapes, method.Awaits));
+            _context.AddStep(new CallStep(Receiver.Element(_id), method.Path.TargetText, new[] { argument }, method.ArgumentShapes, method.Awaits));
     }
 
     /// <summary>An element's text or HTML: set to a literal, or to a value read when the step runs, shown as it arrives.</summary>

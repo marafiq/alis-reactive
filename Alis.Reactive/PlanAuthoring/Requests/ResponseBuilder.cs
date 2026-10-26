@@ -112,11 +112,10 @@ namespace Alis.Reactive.Builders.Requests
         /// <exception cref="InvalidOperationException">
         /// Thrown when this response already has a follow-up request.
         /// </exception>
-        public ResponseBuilder<TModel> Chained(Action<HttpRequestBuilder<TModel>> request)
+        public ResponseBuilder<TModel> Chained(Func<RequestStart<TModel>, HttpRequestBuilder<TModel>> request)
         {
-            var chained = new HttpRequestBuilder<TModel>(_context);
-            request(chained);
-            Routes.ContinueWith(chained.Step);
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            request(new RequestStart<TModel>(_context, Routes.ContinueWith));
             return this;
         }
 
@@ -132,11 +131,12 @@ namespace Alis.Reactive.Builders.Requests
         /// <exception cref="InvalidOperationException">
         /// Thrown when this response already has a follow-up request.
         /// </exception>
-        public ResponseBuilder<TModel> Chained<TResponse>(Action<Data<TResponse>, HttpRequestBuilder<TModel>> request)
+        public ResponseBuilder<TModel> Chained<TResponse>(Func<Data<TResponse>, RequestStart<TModel>, HttpRequestBuilder<TModel>> request)
             where TResponse : class
         {
+            if (request == null) throw new ArgumentNullException(nameof(request));
             var body = new Data<TResponse>(Receiver.Response(Routes.Handle));
-            return Chained(chained => request(body, chained));
+            return Chained(start => request(body, start));
         }
     }
 }

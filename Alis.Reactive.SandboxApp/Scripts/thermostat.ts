@@ -2,7 +2,7 @@
 // lives on its host element as `thermostat`; BroughtComponents/Thermostat/Thermostat.cs declares it to
 // the framework. It has every kind of member a JavaScript object can have:
 //
-//   properties  value (the target; read and written), mode (read and written), current (read only),
+//   properties  value (the target; read and written), mode and fan (read and written), current (read only),
 //               locked (read only), pin (written only), schedule (an object: night read and written,
 //               active read only), zones (a list of objects: name read only, target read and written)
 //   methods     increase(), decrease(), hold(minutes), setRange(min, max), setQuietHours(hours),
@@ -19,6 +19,8 @@
 import "./thermostat.css";
 
 export type ThermostatMode = "heat" | "cool" | "off";
+
+export type FanMode = "auto" | "on";
 
 export interface NightSetting {
   readonly day: string;
@@ -162,6 +164,7 @@ export class Thermostat {
   private readonly room: number;
   private target: number;
   private modeValue: ThermostatMode = "heat";
+  private fanMode: FanMode = "auto";
   private lockedValue: boolean;
   private min = 50;
   private max = 90;
@@ -206,6 +209,15 @@ export class Thermostat {
 
   set mode(mode: ThermostatMode) {
     this.modeValue = mode;
+    this.render();
+  }
+
+  get fan(): FanMode {
+    return this.fanMode;
+  }
+
+  set fan(fan: FanMode) {
+    this.fanMode = fan;
     this.render();
   }
 
@@ -350,7 +362,11 @@ export class Thermostat {
 
   private render(): void {
     const head = element("div", "th-head");
-    head.append(element("strong", "th-target", `${this.target}°${this.unit}`), element("span", "th-mode", this.modeValue));
+    head.append(
+      element("strong", "th-target", `${this.target}°${this.unit}`),
+      element("span", "th-mode", this.modeValue),
+      element("span", "th-fan", `fan ${this.fanMode}`),
+    );
 
     const body = element("div", "th-body");
     body.append(

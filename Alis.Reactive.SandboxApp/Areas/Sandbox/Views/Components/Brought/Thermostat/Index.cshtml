@@ -24,6 +24,16 @@
         p.Element("reading").Text.Set(thermostat.Reading().Label());
         DescribeComfort(p);
     }
+
+    // The fan as a condition compares the enum the page wrote: its JavaScript text, both ways.
+    private static void SetFan(PipelineBuilder<RoomComfortModel> p, ThermostatFan fan)
+    {
+        var thermostat = p.Component<Thermostat>(m => m.Target);
+        thermostat.Fan.Set(fan);
+        p.When(thermostat.Fan).Eq(ThermostatFan.On)
+            .Then(running => running.Element("fan-running").Show())
+            .Else(resting => resting.Element("fan-running").Hide());
+    }
 }
 @{
     ViewData["Title"] = "Room Comfort";
@@ -109,6 +119,7 @@
                 <native-text color="Secondary">Wing range <span id="range-min"></span>–<span id="range-max"></span>°F · Night setting <span id="next-change"></span></native-text>
                 <p id="night-active" class="text-sm text-success" hidden>Night setting active: <span id="night-applied"></span>°F applied.</p>
                 <native-text color="Secondary">Mode <span id="mode">heat</span> · Reading <span id="reading"></span></native-text>
+                <p id="fan-running" class="text-sm text-text-secondary" hidden>The fan runs all night.</p>
                 <native-text color="Secondary"><span id="zone-count">0</span> zones in the room.</native-text>
                 <p id="bath-zone" class="text-sm text-text-secondary" hidden>The bath has its own zone at <span id="bath-target">@Model.Target</span>°F. <span id="bath-boosted" hidden>Boosted for the bath hour.</span></p>
             </native-vstack>
@@ -137,6 +148,12 @@
                 @(Html.NativeButton("off", "Off")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) => SetMode(p, ThermostatMode.Off)))
+                @(Html.NativeButton("fan-on", "Fan on")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) => SetFan(p, ThermostatFan.On)))
+                @(Html.NativeButton("fan-auto", "Fan auto")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) => SetFan(p, ThermostatFan.Auto)))
                 @(Html.NativeButton("boost-bath", "Boost the bath")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>

@@ -121,7 +121,7 @@ namespace Alis.Reactive.Builders.Requests
             {
                 var binding = ExpressionPathHelper.ToMemberBindingPath(field);
                 var fieldType = ExpressionPathHelper.ToPropertyType(field);
-                RequestMembers.Require(typeof(TRequest), binding.Value, fieldType);
+                RequestMembers.Require(typeof(TRequest), binding, fieldType);
                 var shape = Shape.FromClrType(fieldType);
                 _draft.Add(binding, ValueExpression.ReadBound(IdGenerator.For(field), shape));
             }

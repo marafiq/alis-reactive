@@ -124,19 +124,19 @@ namespace Alis.Reactive.Builders.Arrays
         {
             var node = Unwrap(expression);
 
-            if (TryElementPath(node, element, out var path))
+            if (ExpressionPathHelper.TryJsonPath(node, element, out var path))
             {
                 var shape = Shape.FromClrType(node.Type);
-                return path.Length == 0
+                return path.IsNone
                     ? ValueExpression.ReadWhole(Receiver.Item, shape)
-                    : ValueExpression.Read(Receiver.Item, G.PathOf(Path.Parse(path)), shape);
+                    : ValueExpression.Read(Receiver.Item, path.Text, shape);
             }
 
             // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the receiver must
             // be rooted at the element and the method must be deterministic. Reuses the RuntimePath.call engine.
-            if (node is MethodCallExpression call && call.Object != null && TryElementPath(call.Object, element, out var receiverPath))
+            if (node is MethodCallExpression call && call.Object != null && ExpressionPathHelper.TryJsonPath(call.Object, element, out var receiverPath))
             {
-                var methodName = LowerFirstLetter(call.Method.Name);
+                var methodName = JsonMemberName.Of(call.Method.Name);
                 if (!PureElementMethods.Contains(methodName))
                     throw new InvalidOperationException(
                         "Element method '" + methodName + "' is not an allowed pure array DSL method. Add it to " +
@@ -147,9 +147,8 @@ namespace Alis.Reactive.Builders.Arrays
                 foreach (var methodArgument in call.Arguments)
                     methodArgs.Add(CompileValue(Unwrap(methodArgument), element));
 
-                var methodPath = string.IsNullOrEmpty(receiverPath) ? methodName : receiverPath + "." + methodName;
                 return ValueExpression.Invoke(
-                    Receiver.Item, G.PathOf(Path.Parse(methodPath)), methodArgs, G.NoShapes, Shape.FromClrType(node.Type), methodName);
+                    Receiver.Item, receiverPath.Then(methodName).TargetText, methodArgs, G.NoShapes, Shape.FromClrType(node.Type), methodName);
             }
 
             if (ReferencesParameter(node, element))
@@ -182,26 +181,6 @@ namespace Alis.Reactive.Builders.Arrays
                 if (node == _parameter) Found = true;
                 return base.VisitParameter(node);
             }
-        }
-
-        private static bool TryElementPath(Expression expression, ParameterExpression element, out string path)
-        {
-            var segments = new List<string>();
-            var current = Unwrap(expression);
-            while (current is MemberExpression member && member.Expression != null)
-            {
-                segments.Insert(0, JsonMemberName.Of(member.Member.Name));
-                current = Unwrap(member.Expression);
-            }
-
-            if (current == element)
-            {
-                path = string.Join(".", segments);
-                return true;
-            }
-
-            path = string.Empty;
-            return false;
         }
 
         private static CompareOperator CompareOperatorFor(ExpressionType nodeType) =>
@@ -243,8 +222,5 @@ namespace Alis.Reactive.Builders.Arrays
             return expression;
         }
 
-        // Element methods are JavaScript methods, named by their first letter lowered.
-        private static string LowerFirstLetter(string name) =>
-            string.IsNullOrEmpty(name) ? name : char.ToLowerInvariant(name[0]) + name.Substring(1);
     }
 }

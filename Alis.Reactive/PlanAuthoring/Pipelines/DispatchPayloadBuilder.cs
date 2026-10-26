@@ -33,7 +33,7 @@ namespace Alis.Reactive.Builders
             where TSource : TProp
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            _draft.Set(ExpressionPathHelper.ToEventPath(field), source.Expression);
+            _draft.Set(ExpressionPathHelper.ToJsonPath(field), source.Expression);
             return this;
         }
 
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, TProp>> field,
             TProp value)
         {
-            _draft.Set(ExpressionPathHelper.ToEventPath(field), ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(TProp))));
+            _draft.Set(ExpressionPathHelper.ToJsonPath(field), ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(TProp))));
             return this;
         }
 
@@ -68,26 +68,32 @@ namespace Alis.Reactive.Builders
 
         internal bool HasFields => _leaves.Count > 0 || _objects.Count > 0;
 
-        internal void Set(string path, ValueExpression value)
+        // A dispatched payload is an object of named members; a list it carries is set as one member.
+        internal void Set(Path path, ValueExpression value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
+            if (path.IsNone)
+                throw new ArgumentException("Select a member of the payload, for example x => x.ResidentId.", nameof(path));
 
-            var payloadPath = DispatchPayloadPath.Of(path);
-            var parent = GetOrCreateParent(payloadPath);
-            parent.SetLeaf(payloadPath.Leaf, value, payloadPath.Value);
+            var names = new List<string>(path.Segments.Count);
+            foreach (var segment in path.Segments)
+            {
+                if (segment.IsIndex || segment.IsEachItem)
+                    throw new ArgumentException(
+                        $"A dispatched payload is an object of named members; '{path}' names an item of a list. " +
+                        "Set the member that holds the list.", nameof(path));
+                names.Add(segment.ToPathText());
+            }
+
+            var parent = this;
+            var fullPath = path.ToString();
+            for (var index = 0; index < names.Count - 1; index++)
+                parent = parent.GetOrCreateObject(names[index], fullPath);
+            parent.SetLeaf(names[names.Count - 1], value, fullPath);
         }
 
         internal ValueExpression ToValueExpression() =>
             ValueExpression.Object(ToFields());
-
-        private DispatchPayloadDraft GetOrCreateParent(DispatchPayloadPath path)
-        {
-            var current = this;
-            foreach (var segment in path.ParentSegments)
-                current = current.GetOrCreateObject(segment, path.Value);
-
-            return current;
-        }
 
         private DispatchPayloadDraft GetOrCreateObject(string segment, string fullPath)
         {
@@ -135,46 +141,6 @@ namespace Alis.Reactive.Builders
                 fields[child.Key] = child.Value.ToValueExpression();
 
             return fields;
-        }
-    }
-
-    internal sealed class DispatchPayloadPath
-    {
-        private readonly IReadOnlyList<string> _segments;
-
-        private DispatchPayloadPath(string value, IReadOnlyList<string> segments)
-        {
-            Value = value;
-            _segments = segments;
-        }
-
-        internal string Value { get; }
-        internal string Leaf => _segments[_segments.Count - 1];
-
-        internal IEnumerable<string> ParentSegments
-        {
-            get
-            {
-                for (var index = 0; index < _segments.Count - 1; index++)
-                    yield return _segments[index];
-            }
-        }
-
-        internal static DispatchPayloadPath Of(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Dispatch payload path must not be empty.", nameof(value));
-
-            var segments = value.Split('.');
-            foreach (var segment in segments)
-            {
-                if (string.IsNullOrWhiteSpace(segment))
-                    throw new ArgumentException(
-                        "Dispatch payload path '" + value + "' contains an empty segment.",
-                        nameof(value));
-            }
-
-            return new DispatchPayloadPath(value, segments);
         }
     }
 
