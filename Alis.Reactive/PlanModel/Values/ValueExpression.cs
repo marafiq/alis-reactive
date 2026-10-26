@@ -93,20 +93,21 @@ namespace Alis.Reactive.PlanModel
 
         // ── records and lists ────────────────────────────────────────────────────
 
-        internal static ValueExpression Record(IReadOnlyDictionary<string, ValueExpression> fields)
+        /// <summary>A record of named fields, written in the order given; a name appears once.</summary>
+        internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
-            var snapshot = new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
             var shapes = new Dictionary<string, Shape>(StringComparer.Ordinal);
-            foreach (var field in fields)
+            foreach (var (name, value) in fields)
             {
-                if (string.IsNullOrWhiteSpace(field.Key))
+                if (string.IsNullOrWhiteSpace(name))
                     throw new ArgumentException("Object field name must not be null or whitespace.", nameof(fields));
-                snapshot[field.Key] = field.Value ?? throw new ArgumentException($"Object field '{field.Key}' must have a value.", nameof(fields));
-                shapes[field.Key] = field.Value.OutputShape;
+                if (value == null) throw new ArgumentException($"Object field '{name}' must have a value.", nameof(fields));
+                if (shapes.ContainsKey(name)) throw new ArgumentException($"Object field '{name}' is named twice.", nameof(fields));
+                shapes.Add(name, value.OutputShape);
             }
 
-            return new RecordExpression(snapshot, Shape.ObjectOf(shapes));
+            return new RecordExpression(fields.ToList(), Shape.ObjectOf(shapes));
         }
 
         internal static ValueExpression List(IReadOnlyList<ValueExpression> items, Shape shape)
@@ -304,10 +305,10 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class RecordExpression : ValueExpression
     {
-        private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
+        private readonly IReadOnlyList<(string Name, ValueExpression Value)> _fields;
         private readonly Shape _shape;
 
-        internal RecordExpression(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
+        internal RecordExpression(IReadOnlyList<(string Name, ValueExpression Value)> fields, Shape shape)
         {
             _fields = fields;
             _shape = shape;
@@ -315,10 +316,10 @@ namespace Alis.Reactive.PlanModel
 
         internal override Shape OutputShape => _shape;
 
-        internal override bool ReadsAwaited => _fields.Values.Any(value => value.ReadsAwaited);
+        internal override bool ReadsAwaited => _fields.Any(member => member.Value.ReadsAwaited);
 
         internal override Expr Write(Scope scope) =>
-            G.Record(_fields.Select(field => new RecordField(field.Key, field.Value.Write(scope))));
+            G.Record(_fields.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
     }
 
     internal sealed class ListExpression : ValueExpression

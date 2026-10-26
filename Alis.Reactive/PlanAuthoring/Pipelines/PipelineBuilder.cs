@@ -58,7 +58,7 @@ namespace Alis.Reactive.Builders
         }
 
         // An event raised with nothing: a listener reads every member of the detail as missing.
-        private static readonly ValueExpression NoPayload = ValueExpression.Record(new Dictionary<string, ValueExpression>());
+        private static readonly ValueExpression NoPayload = ValueExpression.Record(Array.Empty<(string Name, ValueExpression Value)>());
 
         /// <summary>Raises a declared document event with a payload fixed when the view renders.</summary>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Grammar;
@@ -88,8 +87,7 @@ namespace Alis.Reactive.PlanModel
                     $"The {method} request to '{_url}' gathers nothing, so it has no form data to send: remove AsFormData() or gather a value.");
             var format = _format;
             var nested = method != "GET" && format == "json";
-            var values = nested ? NestedValues(input.Payload, scope) : FlatValues(input.Payload, scope);
-            Expr body = G.Record(values);
+            var body = nested ? Nested(input.Payload).Write(scope) : G.Record(FlatValues(input.Payload, scope));
 
             // Form() writes each input at its own key: nested, leaf by leaf into the authored record
             // (model.fill), so an authored value beside an input survives; flat, merged in by binding name.
@@ -122,75 +120,12 @@ namespace Alis.Reactive.PlanModel
             payload.Select(member => new RecordField(member.Name.Value, member.Value.Write(scope))).ToList();
 
         // A JSON body nests each value at its body path; an index segment (Lines[0]) makes an array.
-        private static List<RecordField> NestedValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope)
+        private static ValueExpression Nested(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload)
         {
-            var root = new BodyNode();
+            var draft = new RecordDraft();
             foreach (var member in payload)
-                root.Assign(member.Name.Path.Segments, 0, member.Value.Write(scope));
-            return root.Entries();
-        }
-
-        // The body a request sends: each gathered value at its path, a name making an object and a
-        // position making an array.
-        private sealed class BodyNode
-        {
-            private readonly List<string> _order = new List<string>();
-            private readonly Dictionary<string, BodyNode> _children = new Dictionary<string, BodyNode>(StringComparer.Ordinal);
-            private readonly Dictionary<int, BodyNode> _items = new Dictionary<int, BodyNode>();
-            private Expr? _leaf;
-
-            internal void Assign(IReadOnlyList<PathSegment> segments, int at, Expr value)
-            {
-                if (at == segments.Count)
-                {
-                    _leaf = value;
-                    _children.Clear();
-                    _order.Clear();
-                    _items.Clear();
-                    return;
-                }
-
-                _leaf = null;
-                var segment = segments[at];
-                var child = segment.IsIndex ? ItemAt(segment.Index) : ChildNamed(segment.ToPathText());
-                child.Assign(segments, at + 1, value);
-            }
-
-            internal List<RecordField> Entries() =>
-                _order.Select(key => new RecordField(key, _children[key].ToExpr())).ToList();
-
-            private BodyNode ChildNamed(string name)
-            {
-                if (_children.TryGetValue(name, out var child)) return child;
-                child = new BodyNode();
-                _children.Add(name, child);
-                _order.Add(name);
-                return child;
-            }
-
-            private BodyNode ItemAt(int index)
-            {
-                if (_items.TryGetValue(index, out var item)) return item;
-                item = new BodyNode();
-                _items.Add(index, item);
-                return item;
-            }
-
-            private Expr ToExpr()
-            {
-                if (_leaf != null) return _leaf;
-                if (_items.Count == 0 || _children.Count > 0) return G.Record(Entries().Concat(ItemEntries()));
-                var count = _items.Keys.Max() + 1;
-                var items = new List<Expr>(count);
-                for (var index = 0; index < count; index++)
-                    items.Add(_items.TryGetValue(index, out var item) ? item.ToExpr() : G.Null);
-                return G.List(items);
-            }
-
-            // A node with both names and positions is an object; its positions are entries named by their digits.
-            private IEnumerable<RecordField> ItemEntries() =>
-                _items.OrderBy(item => item.Key)
-                    .Select(item => new RecordField(item.Key.ToString(CultureInfo.InvariantCulture), item.Value.ToExpr()));
+                draft.Assign(member.Name.Path, member.Value);
+            return draft.ToValueExpression();
         }
     }
 
