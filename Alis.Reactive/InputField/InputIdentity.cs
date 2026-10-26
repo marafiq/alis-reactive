@@ -6,8 +6,9 @@ namespace Alis.Reactive.InputField
 {
     /// <summary>
     /// What the framework dictates for an input before any component renders it: the element id
-    /// derived from the model member, the MVC binding path the value posts under, and the shape of
-    /// the member's value.
+    /// derived from the model type and the MVC binding name, the MVC binding path the value posts
+    /// under, and the shape of the member's value. The binding name carries the HTML field prefix, so a
+    /// partial rendered under two prefixes renders two inputs with two ids.
     /// </summary>
     internal sealed class InputIdentity
     {
@@ -37,7 +38,7 @@ namespace Alis.Reactive.InputField
 
             var bodyPath = Path.Parse(htmlFieldPrefix).Append(ExpressionPathHelper.ToBodyPath(expression));
             return new InputIdentity(
-                ComponentId.Of(IdGenerator.For(expression)),
+                ComponentId.Of(IdGenerator.For(typeof(TModel), bindingName)),
                 BindingPath.ForMember(bindingName, bodyPath),
                 Shape.FromClrType(typeof(TValue)));
         }
