@@ -149,6 +149,45 @@
         </p>
     </a>
 
+    <a asp-area="Sandbox" asp-controller="HospitalTransfer" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Hospital Transfer
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            The whole transfer form goes to the desk as one JSON body behind the page's own check; the desk answers by status, the loader lifts whatever it answered, and only then is the family told from the hospital's answer
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="VisitEscort" asp-action="Index" asp-route-resident="helen" asp-route-wing="Maple" asp-route-desk="east"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Visit Escorts
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Each visit time booked in the planner asks the wing's desk for an escort by the time, the link's wing and desk and the visit count; a release sends a DELETE with its reason, sharing waits for the planner's summary, and the party travels nested as JSON and as query keys
+        </p>
+    </a>
+
+    <a asp-area="Sandbox" asp-controller="ShiftStart" asp-action="Index"
+       class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+        <native-hstack justify="Between" align="Start">
+            <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                Shift Start
+            </h3>
+            <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+        </native-hstack>
+        <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+            Three partners checked side by side with one failing, the handover sheet loaded into the page, the snack order posted as a form of two named fields, and the board signed with nothing to read
+        </p>
+    </a>
+
     <a asp-area="Sandbox" asp-controller="RealTime" asp-action="Index"
        class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
         <native-hstack justify="Between" align="Start">
