@@ -65,8 +65,6 @@ namespace Alis.Reactive
         internal IReadOnlyList<KeyValuePair<string, RenderedInput>> Entries =>
             new List<KeyValuePair<string, RenderedInput>>(_inputs);
 
-        internal bool Contains(BindingPath binding) => _inputs.ContainsKey(binding.Value);
-
         // A partial rendered twice adds the same input twice; a different component on the same field is
         // a defect of the view.
         internal void Add(RenderedInput input)

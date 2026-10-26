@@ -83,8 +83,10 @@ namespace Alis.Reactive.PlanModel
 
         private Expr SendArgument(string method, GatheredInput input, Scope scope)
         {
-            // A request that gathers nothing is sent as JSON, whatever format it named.
-            var format = input.IsEmpty ? "json" : _format;
+            if (input.IsEmpty && _format != "json")
+                throw new InvalidOperationException(
+                    $"The {method} request to '{_url}' gathers nothing, so it has no form data to send: remove AsFormData() or gather a value.");
+            var format = _format;
             var nested = method != "GET" && format == "json";
             var values = nested ? NestedValues(input.Payload, scope) : FlatValues(input.Payload, scope);
             Expr body = G.Record(values);

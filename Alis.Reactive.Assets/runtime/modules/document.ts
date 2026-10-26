@@ -1,8 +1,8 @@
 // alis.document (grammar.md 6.1).
 // D1 `ready` is an event of the owner being started: a ready handler runs when its own owner starts,
 //    after every handler of that owner has subscribed, and never again.
-// D2 `raise(name, detail)` is synchronous: a non-bubbling CustomEvent with detail {} when none is
-//    given. A listener's payload is the detail, or the event itself when the detail is missing.
+// D2 `raise(name, detail)` is synchronous: a non-bubbling CustomEvent carrying the detail the plan
+//    gives it. A listener's payload is the detail, or the event itself when the detail is missing.
 // D3 `query` is the query string read the way MVC binds [FromQuery]: keys match case-insensitively
 //    and a scalar member reads the first value; `queryAll` gives an array member every value. An
 //    absent key reads as missing.
@@ -18,14 +18,14 @@ const RAISE_ATTRIBUTE = "data-alis-raise";
 const RAISE_DETAIL_ATTRIBUTE = "data-alis-detail";
 
 export interface DocumentObject {
-  raise(name: string, detail?: unknown): void;
+  raise(name: string, detail: unknown): void;
   readonly query: Record<string, string | undefined>;
   readonly queryAll: Record<string, string[]>;
 }
 
-export function raise(name: string, detail?: unknown): void {
+export function raise(name: string, detail: unknown): void {
   executeLog.debug("dispatch", { event: name, detail });
-  document.dispatchEvent(new CustomEvent(name, { detail: detail ?? {} }));
+  document.dispatchEvent(new CustomEvent(name, { detail }));
 }
 
 function queryRecord<T>(pick: (values: string[]) => T | undefined): Record<string, T> {

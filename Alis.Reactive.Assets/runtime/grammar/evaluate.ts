@@ -87,8 +87,7 @@ function record(expr: RecordExpr, scope: Scope): Record<string, unknown> {
       output[entry.name] = evaluate(entry.value, scope);
       continue;
     }
-    const spread = evaluate(entry.value, scope);
-    if (spread !== null && typeof spread === "object") Object.assign(output, spread);
+    Object.assign(output, evaluate(entry.value, scope) as object);
   }
   return output;
 }

@@ -1,5 +1,3 @@
-using Alis.Reactive.PlanModel;
-
 namespace Alis.Reactive
 {
     /// <summary>
@@ -10,7 +8,5 @@ namespace Alis.Reactive
     /// <typeparam name="TProp">The value's type.</typeparam>
     public abstract class TypedSource<TProp> : Arg<TProp>
     {
-        internal Shape ElementShape =>
-            Shape.CollectionItemShapeOrNone(typeof(TProp));
     }
 }

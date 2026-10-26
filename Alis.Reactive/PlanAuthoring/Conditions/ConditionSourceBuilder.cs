@@ -96,8 +96,11 @@ namespace Alis.Reactive.Builders.Conditions
         internal TNext CompareWithRange(object low, object high) =>
             _next(ConditionGraph.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
 
-        internal TNext ContainsItem(object? item) =>
-            _next(ConditionGraph.ArrayContains(Left, ValueExpression.LiteralFor(item, _left.ElementShape), Shape, _left.ElementShape));
+        internal TNext ContainsItem<TItem>(TItem item)
+        {
+            var itemShape = PlanModel.Shape.FromClrType(typeof(TItem));
+            return _next(ConditionGraph.ArrayContains(Left, ValueExpression.LiteralFor(item, itemShape), Shape, itemShape));
+        }
 
         private ValueExpression Left => _left.Expression;
 

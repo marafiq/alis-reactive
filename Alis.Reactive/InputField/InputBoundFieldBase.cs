@@ -60,23 +60,17 @@ namespace Alis.Reactive.InputField
 
         /// <summary>
         /// Renders the field wrapper (label + validation error elements) around content
-        /// written by the callback, or the content alone for a hidden field. Throws when no component
-        /// rendered the input: an input the plan does not know is invisible to validation and gather.
+        /// written by the callback, or the content alone for a hidden field.
         /// </summary>
         internal void Render(Action writeContent)
         {
-            if (!Plan.HasRenderedInput(_identity.Binding))
-                throw new InvalidOperationException(
-                    $"Input field '{BindingPath}' was rendered without its component. " +
-                    "Render an input through field.Render<TComponent>(markup), so the plan knows which component holds its value.");
-
             if (Options.IsHidden)
             {
                 writeContent();
                 return;
             }
 
-            var fieldMarkup = new InputFieldBuilder(Writer, BindingPath).ForInputId(ElementId);
+            var fieldMarkup = new InputFieldBuilder(Writer, BindingPath, ElementId);
             if (Options.LabelText != null) fieldMarkup.Label(Options.LabelText);
             if (Options.IsRequired) fieldMarkup.Required();
             using (fieldMarkup.Begin()) { writeContent(); }

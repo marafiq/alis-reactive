@@ -108,21 +108,18 @@ namespace Alis.Reactive.PlanModel
     internal sealed class DispatchStep : Step
     {
         private readonly string _event;
-        private readonly ValueExpression? _payload;
+        private readonly ValueExpression _payload;
 
-        internal DispatchStep(string eventName, ValueExpression? payload)
+        internal DispatchStep(string eventName, ValueExpression payload)
         {
             if (string.IsNullOrWhiteSpace(eventName)) throw new ArgumentException("Event name required.", nameof(eventName));
             _event = eventName;
-            _payload = payload;
+            _payload = payload ?? throw new ArgumentNullException(nameof(payload));
         }
 
         internal override void WriteTo(List<Statement> block, Scope scope) =>
             block.AddRange(scope.WithHoisted(() =>
-            {
-                var detail = _payload == null ? G.Record() : _payload.Write(scope);
-                return new[] { G.Do(G.Call(G.Obj(scope.Objects.Document()), "raise", G.Lit(_event), detail)) };
-            }));
+                new[] { G.Do(G.Call(G.Obj(scope.Objects.Document()), "raise", G.Lit(_event), _payload.Write(scope))) }));
     }
 
     /// <summary>Loads the response into a slot: <c>Into(elementId)</c>.</summary>

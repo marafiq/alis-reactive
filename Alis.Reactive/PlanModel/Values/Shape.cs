@@ -219,9 +219,6 @@ namespace Alis.Reactive.PlanModel
                    && !ns.StartsWith("Microsoft", StringComparison.Ordinal);
         }
 
-        internal static Shape CollectionItemShapeOrNone(Type type) =>
-            TryGetCollectionItemShape(type, enclosingRecords: null, out var itemShape) ? itemShape : None;
-
         internal static Shape FromValue(object? value) =>
             value == null ? None : FromClrType(value.GetType());
 

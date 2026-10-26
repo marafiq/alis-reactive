@@ -41,7 +41,7 @@ namespace Alis.Reactive.Builders
         public PipelineBuilder<TModel> Dispatch(AppEvent appEvent)
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            Context.AddStep(new DispatchStep(appEvent.Name, payload: null));
+            Context.AddStep(new DispatchStep(appEvent.Name, NoPayload));
             return this;
         }
 
@@ -53,9 +53,12 @@ namespace Alis.Reactive.Builders
             where TPayload : class, new()
         {
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
-            Context.AddStep(new DispatchStep(appEvent.Name, payload: null));
+            Context.AddStep(new DispatchStep(appEvent.Name, NoPayload));
             return this;
         }
+
+        // An event raised with nothing: a listener reads every member of the detail as missing.
+        private static readonly ValueExpression NoPayload = ValueExpression.Object(new Dictionary<string, ValueExpression>());
 
         /// <summary>Raises a declared document event with a payload fixed when the view renders.</summary>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>

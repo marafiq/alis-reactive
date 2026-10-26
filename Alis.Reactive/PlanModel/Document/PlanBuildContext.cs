@@ -22,7 +22,8 @@ namespace Alis.Reactive.PlanModel
         private readonly List<(Func<ObjectTable, string> On, IReadOnlyList<string> Path, string Event, Block Body)> _handlers =
             new List<(Func<ObjectTable, string>, IReadOnlyList<string>, string, Block)>();
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
-        private readonly List<RequestStep> _validatedRequests = new List<RequestStep>();
+        private readonly List<(RequestStep Request, FormValidation Validation)> _validatedRequests =
+            new List<(RequestStep, FormValidation)>();
         private readonly Dictionary<string, FormChecks> _forms = new Dictionary<string, FormChecks>(StringComparer.Ordinal);
 
         // The callbacks being built, innermost last: a step lands in the innermost one.
@@ -111,10 +112,18 @@ namespace Alis.Reactive.PlanModel
 
         // ── validation ───────────────────────────────────────────────────────────
 
-        /// <summary>A request that checks its form first; the form's rules are bound when the plan is written.</summary>
-        internal void ValidateBefore(RequestStep request) => _validatedRequests.Add(request);
+        /// <summary>
+        /// A request that checks its form first; the form's rules are bound when the plan is written. A request
+        /// validated again keeps its place with the new validation.
+        /// </summary>
+        internal void ValidateBefore(RequestStep request, FormValidation validation)
+        {
+            var index = _validatedRequests.FindIndex(validated => validated.Request == request);
+            if (index < 0) _validatedRequests.Add((request, validation));
+            else _validatedRequests[index] = (request, validation);
+        }
 
-        internal IReadOnlyList<RequestStep> ValidatedRequests => _validatedRequests;
+        internal IReadOnlyList<(RequestStep Request, FormValidation Validation)> ValidatedRequests => _validatedRequests;
 
         /// <summary>The inputs a request's validator checks on the form, merged into the form's checks.</summary>
         internal void Check(string formId, IEnumerable<CheckedField> fields)

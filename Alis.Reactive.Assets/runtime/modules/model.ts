@@ -117,7 +117,6 @@ function modelObject(planId: string): ModelObject {
 // node already there keeps its other members, copied first so an object the request read from a
 // component is never written into; anything else is replaced.
 function assignAt(root: Record<string, unknown>, path: readonly (string | number)[], value: unknown): void {
-  if (path.length === 0) return;
   let parent: Record<string | number, unknown> = root;
   for (let index = 0; index < path.length - 1; index++) {
     const segment = path[index]!;

@@ -223,7 +223,8 @@ namespace Alis.Reactive.PlanModel
         internal string Element(string id)
         {
             if (_objects.ContainsKey(id)) return id;
-            var vendor = _elementVendors.TryGetValue(id, out var declared) ? declared : ComponentVendor.Native;
+            if (!_elementVendors.TryGetValue(id, out var vendor))
+                throw new InvalidOperationException($"Element '{id}' is used by a step before the plan declared it.");
             AddVendor(vendor.Name, vendor.ToGrammar());
             Add(id, new ElementLocator(id, vendor.Name));
             return id;
@@ -261,24 +262,19 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyDictionary<string, Vendor> Vendors() =>
             _vendors.OrderBy(v => v.Key, StringComparer.Ordinal).ToDictionary(v => v.Key, v => v.Value, StringComparer.Ordinal);
 
-        // A module object is declared once; data given later replaces "no data", so a form whose
-        // rules this plan carries keeps them however the plan first referred to it.
+        // A module object is declared once, with its data where it has any: the plan writes the model's
+        // inputs and each form's rules before any step names them.
         private string Module(string id, string name, string key, PluginData data)
         {
-            if (_objects.TryGetValue(id, out var existing))
-            {
-                var keepsExistingData = data is NoPluginData || !(((PluginLocator)existing).Data is NoPluginData);
-                if (!keepsExistingData) _objects[id] = new PluginLocator(name, key, data);
-                return id;
-            }
-
-            Add(id, new PluginLocator(name, key, data));
+            if (!_objects.ContainsKey(id))
+                Add(id, new PluginLocator(name, key, data));
+            else if (!(data is NoPluginData))
+                throw new InvalidOperationException($"'{id}' is declared twice with data.");
             return id;
         }
 
         private void Add(string id, ObjectLocator locator)
         {
-            if (_objects.ContainsKey(id)) return;
             _objects.Add(id, locator);
             _order.Add(id);
         }

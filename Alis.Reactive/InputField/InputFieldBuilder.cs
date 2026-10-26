@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net;
 
@@ -13,22 +14,21 @@ namespace Alis.Reactive.InputField
     internal class InputFieldBuilder
     {
         private readonly TextWriter _writer;
-        private readonly string? _bindingPath;
+        private readonly string _bindingPath;
+        private readonly string _inputElementId;
         private string? _labelText;
         private bool _isRequired;
-        private string? _inputElementId;
 
-        internal InputFieldBuilder(TextWriter writer, string? bindingPath)
+        internal InputFieldBuilder(TextWriter writer, string bindingPath, string inputElementId)
         {
-            _writer = writer;
-            _bindingPath = bindingPath;
+            _writer = writer ?? throw new ArgumentNullException(nameof(writer));
+            _bindingPath = bindingPath ?? throw new ArgumentNullException(nameof(bindingPath));
+            _inputElementId = inputElementId ?? throw new ArgumentNullException(nameof(inputElementId));
         }
 
         internal InputFieldBuilder Label(string label) { _labelText = label; return this; }
 
         internal InputFieldBuilder Required() { _isRequired = true; return this; }
-
-        internal InputFieldBuilder ForInputId(string? inputElementId) { _inputElementId = inputElementId; return this; }
 
         /// <summary>
         /// Writes the opening field wrapper HTML and returns a scope that writes closing
@@ -41,8 +41,7 @@ namespace Alis.Reactive.InputField
 
             if (_labelText != null)
             {
-                var labelForAttribute = _inputElementId != null ? $" for=\"{WebUtility.HtmlEncode(_inputElementId)}\"" : "";
-                _writer.Write($"<label class=\"text-xs font-medium text-content-secondary\"{labelForAttribute}>");
+                _writer.Write($"<label class=\"text-xs font-medium text-content-secondary\" for=\"{WebUtility.HtmlEncode(_inputElementId)}\">");
                 _writer.Write(WebUtility.HtmlEncode(_labelText));
                 if (_isRequired)
                     _writer.Write(" <span class=\"text-danger ml-0.5\">*</span>");
@@ -51,15 +50,8 @@ namespace Alis.Reactive.InputField
 
             // The message slot renders hidden, as clearing a message leaves it: leaving a field must not
             // move the page under a click that is already on its way to the next control.
-            var closingHtml = "";
-            if (_bindingPath != null)
-            {
-                var validationMessageIdAttribute =
-                    _inputElementId != null ? $" id=\"{WebUtility.HtmlEncode(_inputElementId)}_error\"" : "";
-                closingHtml +=
-                    $"<span{validationMessageIdAttribute} data-valmsg-for=\"{WebUtility.HtmlEncode(_bindingPath)}\" class=\"text-[11px] text-danger\" hidden></span>";
-            }
-            closingHtml += "</div>";
+            var closingHtml =
+                $"<span id=\"{WebUtility.HtmlEncode(_inputElementId)}_error\" data-valmsg-for=\"{WebUtility.HtmlEncode(_bindingPath)}\" class=\"text-[11px] text-danger\" hidden></span></div>";
 
             return new InputFieldRenderScope(_writer, closingHtml);
         }

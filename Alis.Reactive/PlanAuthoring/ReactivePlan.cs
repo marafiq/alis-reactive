@@ -105,8 +105,6 @@ namespace Alis.Reactive
             _renderedInputs.Add(input);
         }
 
-        internal bool HasRenderedInput(BindingPath binding) => _renderedInputs.Contains(binding);
-
         /// <summary>
         /// The browser rules <typeparamref name="TValidator"/> declares, resolved from the services the plan
         /// renders with, for a component whose own JavaScript validates: a grid's cell editor.
@@ -140,15 +138,14 @@ namespace Alis.Reactive
         {
             _context.DeclareRenderedInputs();
 
-            var validated = _context.ValidatedRequests.FirstOrDefault();
-            if (validated?.Validation is not { } validation)
-                return;
+            var validated = _context.ValidatedRequests;
+            if (validated.Count == 0) return;
 
-            var ruleSource = RequireClientValidationRuleSource(services, validation.ValidatorName, $"Request at '{validated.Url}'");
+            var ruleSource = RequireClientValidationRuleSource(
+                services, validated[0].Validation.ValidatorName, $"Request at '{validated[0].Request.Url}'");
             var renderedInputs = _renderedInputs.Snapshot();
-            foreach (var request in _context.ValidatedRequests)
+            foreach (var (_, form) in validated)
             {
-                if (!(request.Validation is { } form)) continue;
                 var fields = form.Rules(ruleSource);
                 _context.Check(form.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel)).ToList());
             }
