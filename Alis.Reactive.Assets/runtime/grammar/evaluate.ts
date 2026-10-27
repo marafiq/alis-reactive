@@ -60,10 +60,10 @@ export function evaluateStatement(expr: Expr, scope: Scope): unknown {
 }
 
 function evaluateCall(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknown {
-  const receiver = evaluate(expr.target, scope);
+  const target = evaluate(expr.target, scope);
   const args = expr.args.map(arg => evaluate(arg, scope));
   const label = labelOf(expr.target);
-  const result = call(receiver, expr.path, args, modeOf(expr.target), label);
+  const result = call(target, expr.path, args, modeOf(expr.target), label);
   if (isPromise(result) && !mayReturnPromise) throw unawaitedPromise(label, expr.path);
   return result;
 }

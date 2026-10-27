@@ -299,7 +299,7 @@ namespace Alis.Reactive.PlanModel
         internal IReadOnlyDictionary<string, Vendor> Vendors() =>
             _vendors.OrderBy(v => v.Key, StringComparer.Ordinal).ToDictionary(v => v.Key, v => v.Value, StringComparer.Ordinal);
 
-        // A module object is declared once, with its data where it has any: the plan writes the model's
+        // A plugin object is declared once, with its data where it has any: the plan writes the model's
         // inputs and each form's rules before any step names them.
         private string PluginObject(string id, string name, string key, PluginData data)
         {

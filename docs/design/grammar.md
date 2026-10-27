@@ -98,7 +98,7 @@ A member read followed by a data read is two nested `get` nodes.
   way, so an upload whose files lost `rawFile` fails at the item instead of posting nothing.
 - **Every other path is optional.** This covers paths off a handler's payload, a response, a record,
   a plugin's data (`document.query`, `model.values`) or a returned object. A missing link reads as
-  missing, and a call on a missing receiver returns missing. This is JavaScript's `?.`.
+  missing, and a call on a missing target returns missing. This is JavaScript's `?.`.
 - **Writes.**
   - A `set` rooted at `obj(id)` needs every segment, the final member included, so a write to a
     member the vendor does not have fails loudly instead of creating a property.
@@ -211,7 +211,7 @@ expression over the converted values.
 | `empty` | True for `""`, missing, and an empty array. Nothing is trimmed. It is used by `IsEmpty()` and `NotEmpty()` in conditions. |
 | `matches(a, pattern, flags)` | False when `a` is missing; otherwise `new RegExp(pattern, flags).test(text(a))`. |
 | `toNumber`, `toDate`, `toBoolean`, `toText` | Explicit C# casts. They use the 2.1 table. |
-| `toArray` | The receiver of a LINQ method. Missing gives `[]`; text or a number gives `[v]`; an iterable gives `Array.from`; anything else is a boundary error. |
+| `toArray` | The target of a LINQ method. Missing gives `[]`; text or a number gives `[v]`; an iterable gives `Array.from`; anything else is a boundary error. |
 | `finite` | `Number(v)` if finite, else 0. `Sum` uses it, so that text never concatenates. |
 | `order(a, b)` | The `OrderBy` comparator. Finite numbers order by difference, with non-finite values last; everything else orders by `String(v)` in code-unit order. It is stable. |
 
@@ -240,7 +240,7 @@ runtime change.
 | `Sum(f)` | `.reduce((s, x) => s + finite(f(x)), 0)` |
 | `Find(p)`, `Find(p, f)` | `.find(fn) ?? null`, then `f` when found |
 | `Enumerable.Contains(constant array, x)` | `[..].includes(x)` |
-| `string.Contains`, `StartsWith`, `EndsWith` | `includes`, `startsWith`, `endsWith`; a missing receiver gives false |
+| `string.Contains`, `StartsWith`, `EndsWith` | `includes`, `startsWith`, `endsWith`; a missing target gives false |
 | `string.Length`, `Trim()`, `ToUpper()`, `ToLower()` | `length`, `trim()`, `toUpperCase()`, `toLowerCase()` |
 | `string.IsNullOrEmpty(s)` | `s == null \|\| s === ""` |
 | `Regex.IsMatch(s, constant)` | `matches(s, pattern, flags)` |
@@ -342,9 +342,9 @@ A failing handler is logged and stops no other handler.
 
    So a ready handler can raise custom events other handlers already hear. Loading a slot starts
    only the slot's handlers, so a ready handler that loads a slot does not run again.
-3. **Booted marks.** After the page starts, the root element gets `data-alis-booted="true"`,
-   `window.__alisReactiveBoot` is set to `{ booted, planId }`, and the document raises `alis:booted`
-   with `detail.planId` (`Alis.Reactive.Assets/runtime/root.ts:58-60`). The Playwright tests wait on these.
+3. **Booted mark.** After the page starts, the root element gets `data-alis-booted="true"`, the one
+   mark of a booted page, readable by whoever arrives later (`Alis.Reactive.Assets/runtime/root.ts`).
+   The Playwright tests wait on it.
 4. **Unloading a slot** runs its owner's disposers, and the boot-owned ones stay. A block that is
    already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:54-60`
    disposes the owner and nothing else).

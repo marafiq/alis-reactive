@@ -156,7 +156,7 @@ describe("paths", () => {
     expect(() => executeBlock([st.set(e.obj("widget"), ["value"], e.lit(1))], scope)).toThrow(/has no member "value"/);
   });
 
-  it("calls a text method on a string receiver", () => {
+  it("calls a text method on text", () => {
     const scope = scopeWith({}, { name: "Margaret Hill" });
     expect(value(e.call(e.ref("name"), ["startsWith"], [e.lit("Marg")]), scope)).toBe(true);
   });

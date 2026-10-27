@@ -67,7 +67,7 @@ export function call(
   const last = path.length - 1;
   const holderValue = read(root, path.slice(0, last), mode, label);
   if (mode === "optional" && isMissing(holderValue)) return undefined;
-  // An optional receiver may be a primitive: "text".includes(..) is a call on a string.
+  // An optional target may be a primitive: "text".includes(..) is a call on a string.
   const holder = mode === "optional" ? (holderValue as Holder) : requireHolder(holderValue, label, path, last);
   const method = holder[path[last]!];
   if (mode === "optional" && isMissing(method)) return undefined;

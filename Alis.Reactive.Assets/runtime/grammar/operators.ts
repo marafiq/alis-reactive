@@ -119,7 +119,7 @@ export function toText(value: unknown): unknown {
 }
 
 /**
- * The receiver of a LINQ method: missing is [], text or a number is [value], an iterable (a
+ * The target of a LINQ method: missing is [], text or a number is [value], an iterable (a
  * DOMTokenList, an HTMLCollection) is its items. Anything else is a boundary error.
  */
 export function toArray(value: unknown): unknown[] {
