@@ -15,22 +15,22 @@ namespace Alis.Reactive
         /// <summary>Matches when the source is greater than <paramref name="operand"/>.</summary>
         public static TNext Gt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gt, operand);
+            source.CompareWith(Comparison.GreaterThan, operand);
 
         /// <summary>Matches when the source is greater than or equal to <paramref name="operand"/>.</summary>
         public static TNext Gte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gte, operand);
+            source.CompareWith(Comparison.GreaterThanOrEqual, operand);
 
         /// <summary>Matches when the source is less than <paramref name="operand"/>.</summary>
         public static TNext Lt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lt, operand);
+            source.CompareWith(Comparison.LessThan, operand);
 
         /// <summary>Matches when the source is less than or equal to <paramref name="operand"/>.</summary>
         public static TNext Lte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lte, operand);
+            source.CompareWith(Comparison.LessThanOrEqual, operand);
 
         /// <summary>Matches when the source lies between <paramref name="low"/> and <paramref name="high"/>, both included.</summary>
         public static TNext Between<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TValue low, TValue high)
@@ -40,42 +40,42 @@ namespace Alis.Reactive
         /// <summary>Matches when the source is greater than another value read when the condition runs.</summary>
         public static TNext Gt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TypedSource<TValue> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gt, right);
+            source.CompareWith(Comparison.GreaterThan, right);
 
         /// <summary>Matches when the source is greater than or equal to another value read when the condition runs.</summary>
         public static TNext Gte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TypedSource<TValue> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gte, right);
+            source.CompareWith(Comparison.GreaterThanOrEqual, right);
 
         /// <summary>Matches when the source is less than another value read when the condition runs.</summary>
         public static TNext Lt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TypedSource<TValue> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lt, right);
+            source.CompareWith(Comparison.LessThan, right);
 
         /// <summary>Matches when the source is less than or equal to another value read when the condition runs.</summary>
         public static TNext Lte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue, TNext> source, TypedSource<TValue> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lte, right);
+            source.CompareWith(Comparison.LessThanOrEqual, right);
 
         /// <summary>Matches when the source has a value greater than <paramref name="operand"/>.</summary>
         public static TNext Gt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gt, operand);
+            source.CompareWith(Comparison.GreaterThan, operand);
 
         /// <summary>Matches when the source has a value greater than or equal to <paramref name="operand"/>.</summary>
         public static TNext Gte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gte, operand);
+            source.CompareWith(Comparison.GreaterThanOrEqual, operand);
 
         /// <summary>Matches when the source has a value less than <paramref name="operand"/>.</summary>
         public static TNext Lt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lt, operand);
+            source.CompareWith(Comparison.LessThan, operand);
 
         /// <summary>Matches when the source has a value less than or equal to <paramref name="operand"/>.</summary>
         public static TNext Lte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TValue operand)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lte, operand);
+            source.CompareWith(Comparison.LessThanOrEqual, operand);
 
         /// <summary>Matches when the source has a value between <paramref name="low"/> and <paramref name="high"/>, both included.</summary>
         public static TNext Between<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TValue low, TValue high)
@@ -85,22 +85,22 @@ namespace Alis.Reactive
         /// <summary>Matches when the source has a value greater than another value read when the condition runs.</summary>
         public static TNext Gt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TypedSource<TValue?> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gt, right);
+            source.CompareWith(Comparison.GreaterThan, right);
 
         /// <summary>Matches when the source has a value greater than or equal to another value read when the condition runs.</summary>
         public static TNext Gte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TypedSource<TValue?> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Gte, right);
+            source.CompareWith(Comparison.GreaterThanOrEqual, right);
 
         /// <summary>Matches when the source has a value less than another value read when the condition runs.</summary>
         public static TNext Lt<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TypedSource<TValue?> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lt, right);
+            source.CompareWith(Comparison.LessThan, right);
 
         /// <summary>Matches when the source has a value less than or equal to another value read when the condition runs.</summary>
         public static TNext Lte<TModel, TValue, TNext>(this ConditionSourceBuilder<TModel, TValue?, TNext> source, TypedSource<TValue?> right)
             where TModel : class where TNext : Condition<TModel> where TValue : struct, IComparable<TValue> =>
-            source.CompareWith(CompareOperator.Lte, right);
+            source.CompareWith(Comparison.LessThanOrEqual, right);
 
         /// <summary>Matches text that contains <paramref name="substring"/>.</summary>
         public static TNext Contains<TModel, TText, TNext>(this ConditionSourceBuilder<TModel, TText, TNext> source, string substring)

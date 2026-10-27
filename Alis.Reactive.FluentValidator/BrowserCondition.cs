@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
@@ -17,15 +18,15 @@ namespace Alis.Reactive.FluentValidator
     internal static class BrowserCondition
     {
         /// <summary>The condition's browser form, or null when part of it has none; the condition then says so where it is described.</summary>
-        internal static ClientCondition? From(LambdaExpression predicate)
+        internal static Condition? From(LambdaExpression predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             return new Translator(predicate.Parameters[0]).Translate(predicate.Body);
         }
 
         /// <summary>Every condition of a nested <c>When</c>, outermost first.</summary>
-        internal static ClientCondition AllOf(IReadOnlyList<ClientCondition> conditions) =>
-            conditions.Count == 1 ? conditions[0] : ClientCondition.All(conditions.ToArray());
+        internal static Condition AllOf(IReadOnlyList<Condition> conditions) =>
+            conditions.Count == 1 ? conditions[0] : Condition.All(conditions.ToArray());
 
         private sealed class Translator
         {
@@ -36,14 +37,14 @@ namespace Alis.Reactive.FluentValidator
                 _model = model;
             }
 
-            internal ClientCondition? Translate(Expression expression)
+            internal Condition? Translate(Expression expression)
             {
                 switch (expression.NodeType)
                 {
                     case ExpressionType.AndAlso:
-                        return Join((BinaryExpression)expression, (l, r) => ClientCondition.All(l, r));
+                        return Join((BinaryExpression)expression, (l, r) => Condition.All(l, r));
                     case ExpressionType.OrElse:
-                        return Join((BinaryExpression)expression, (l, r) => ClientCondition.Any(l, r));
+                        return Join((BinaryExpression)expression, (l, r) => Condition.Any(l, r));
                     case ExpressionType.Not:
                         return Negate(((UnaryExpression)expression).Operand);
                     case ExpressionType.Equal:
@@ -52,17 +53,17 @@ namespace Alis.Reactive.FluentValidator
                     case ExpressionType.GreaterThanOrEqual:
                     case ExpressionType.LessThan:
                     case ExpressionType.LessThanOrEqual:
-                        return Comparison((BinaryExpression)expression);
+                        return Compared((BinaryExpression)expression);
                     case ExpressionType.Call:
                         return Call((MethodCallExpression)expression);
                     default:
                         if (IsHasValue(expression, out var nullable))
-                            return Is(nullable, ClientValueTest.NotNull);
-                        return IsField(expression) ? Is(expression, ClientValueTest.Truthy) : null;
+                            return Is(nullable, ValueTest.NotNull);
+                        return IsField(expression) ? Is(expression, ValueTest.Truthy) : null;
                 }
             }
 
-            private ClientCondition? Join(BinaryExpression expression, Func<ClientCondition, ClientCondition, ClientCondition> join)
+            private Condition? Join(BinaryExpression expression, Func<Condition, Condition, Condition> join)
             {
                 var left = Translate(expression.Left);
                 var right = Translate(expression.Right);
@@ -71,25 +72,25 @@ namespace Alis.Reactive.FluentValidator
 
             // !x.Flag reads as falsy, !string.IsNullOrEmpty(x.Name) as not empty, and !set.Contains(x.Code)
             // as not in; any other negation keeps its operand's form.
-            private ClientCondition? Negate(Expression operand)
+            private Condition? Negate(Expression operand)
             {
                 if (IsField(operand))
-                    return Is(operand, ClientValueTest.Falsy);
+                    return Is(operand, ValueTest.Falsy);
 
                 if (operand is MethodCallExpression call)
                 {
                     if (IsStringMethod(call, nameof(string.IsNullOrEmpty)) && IsField(call.Arguments[0]))
-                        return Is(call.Arguments[0], ClientValueTest.NotEmpty);
+                        return Is(call.Arguments[0], ValueTest.NotEmpty);
 
                     if (TryMembership(call, out var member, out var values))
-                        return ClientCondition.Not(In(member, values));
+                        return Condition.Not(In(member, values));
                 }
 
                 var translated = Translate(operand);
-                return translated == null ? null : ClientCondition.Not(translated);
+                return translated == null ? null : Condition.Not(translated);
             }
 
-            private ClientCondition? Comparison(BinaryExpression expression)
+            private Condition? Compared(BinaryExpression expression)
             {
                 var fieldOnLeft = IsField(expression.Left) && IsFixed(expression.Right);
                 var fieldOnRight = IsField(expression.Right) && IsFixed(expression.Left);
@@ -102,45 +103,45 @@ namespace Alis.Reactive.FluentValidator
 
                 if (value == null)
                 {
-                    if (op == ExpressionType.Equal) return Is(member, ClientValueTest.Null);
-                    if (op == ExpressionType.NotEqual) return Is(member, ClientValueTest.NotNull);
+                    if (op == ExpressionType.Equal) return Is(member, ValueTest.IsNull);
+                    if (op == ExpressionType.NotEqual) return Is(member, ValueTest.NotNull);
                     return null;
                 }
 
-                return ClientCondition.Compare(Lambda(member), ComparisonOf(op), operand);
+                return Condition.Compare(Lambda(member), ComparisonOf(op), operand);
             }
 
-            private ClientCondition? Call(MethodCallExpression call)
+            private Condition? Call(MethodCallExpression call)
             {
                 if (IsStringMethod(call, nameof(string.IsNullOrEmpty)) && IsField(call.Arguments[0]))
-                    return Is(call.Arguments[0], ClientValueTest.Empty);
+                    return Is(call.Arguments[0], ValueTest.IsEmpty);
 
                 if (TryText(call, out var textField, out var test, out var text))
-                    return ClientCondition.Text(Lambda(textField), test, text);
+                    return Condition.Text(Lambda(textField), test, text);
 
                 if (TryMembership(call, out var member, out var values))
                     return In(member, values);
 
                 if (TryCollectionContains(call, out var collection, out var item))
-                    return ClientCondition.Holds(Lambda(collection), item);
+                    return Condition.Holds(Lambda(collection), item);
 
                 return null;
             }
 
-            private ClientCondition Is(Expression member, ClientValueTest test) =>
-                ClientCondition.Is(Lambda(member), test);
+            private Condition Is(Expression member, ValueTest test) =>
+                Condition.Is(Lambda(member), test);
 
-            private ClientCondition In(Expression member, Expression values) =>
-                ClientCondition.In(Lambda(member), values);
+            private Condition In(Expression member, Expression values) =>
+                Condition.In(Lambda(member), values);
 
             // The member as a path from the model: x.Score.Value reads x.Score, whose browser value is the number or nothing.
             private LambdaExpression Lambda(Expression member) => Expression.Lambda(ModelMember(member), _model);
 
             // x.Name.Contains("a"), x.Name.StartsWith("a"), x.Name.EndsWith("a"), Regex.IsMatch(x.Name, "a").
-            private bool TryText(MethodCallExpression call, out Expression field, out ClientTextTest test, out string operand)
+            private bool TryText(MethodCallExpression call, out Expression field, out TextTest test, out string operand)
             {
                 field = null!;
-                test = ClientTextTest.Contains;
+                test = TextTest.Contains;
                 operand = "";
 
                 var isRegex = call.Method.DeclaringType == typeof(Regex) && call.Method.Name == nameof(Regex.IsMatch)
@@ -148,7 +149,7 @@ namespace Alis.Reactive.FluentValidator
                 if (isRegex && IsField(call.Arguments[0]) && IsFixed(call.Arguments[1]))
                 {
                     field = call.Arguments[0];
-                    test = ClientTextTest.Matches;
+                    test = TextTest.Matches;
                     operand = (string)Expressions.Evaluate(call.Arguments[1])!;
                     return true;
                 }
@@ -159,9 +160,9 @@ namespace Alis.Reactive.FluentValidator
 
                 switch (call.Method.Name)
                 {
-                    case nameof(string.Contains): test = ClientTextTest.Contains; break;
-                    case nameof(string.StartsWith): test = ClientTextTest.StartsWith; break;
-                    case nameof(string.EndsWith): test = ClientTextTest.EndsWith; break;
+                    case nameof(string.Contains): test = TextTest.Contains; break;
+                    case nameof(string.StartsWith): test = TextTest.StartsWith; break;
+                    case nameof(string.EndsWith): test = TextTest.EndsWith; break;
                     default: return false;
                 }
 
@@ -296,14 +297,14 @@ namespace Alis.Reactive.FluentValidator
                 _ => op,
             };
 
-            private static ClientComparison ComparisonOf(ExpressionType op) => op switch
+            private static Comparison ComparisonOf(ExpressionType op) => op switch
             {
-                ExpressionType.Equal => ClientComparison.Equal,
-                ExpressionType.NotEqual => ClientComparison.NotEqual,
-                ExpressionType.GreaterThan => ClientComparison.GreaterThan,
-                ExpressionType.GreaterThanOrEqual => ClientComparison.GreaterThanOrEqual,
-                ExpressionType.LessThan => ClientComparison.LessThan,
-                _ => ClientComparison.LessThanOrEqual,
+                ExpressionType.Equal => Comparison.Equal,
+                ExpressionType.NotEqual => Comparison.NotEqual,
+                ExpressionType.GreaterThan => Comparison.GreaterThan,
+                ExpressionType.GreaterThanOrEqual => Comparison.GreaterThanOrEqual,
+                ExpressionType.LessThan => Comparison.LessThan,
+                _ => Comparison.LessThanOrEqual,
             };
         }
     }

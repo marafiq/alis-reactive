@@ -4,22 +4,23 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {
     /// <summary>
-    /// A <c>When</c> or <c>Unless</c>: the server's test, and the browser's form of it when it has one. A
+    /// A rule's <c>When</c> or <c>Unless</c>: the server's test, and the browser's form of it when it has one. A
     /// condition the browser cannot read is either declared the server's (<c>WhenOnServer</c>) or refused
     /// where a page describes the rules, so no rule changes sides in silence.
     /// </summary>
-    internal sealed class Condition<T>
+    internal sealed class RuleCondition<T>
     {
         private readonly Func<T, bool> _holds;
-        private readonly ClientCondition? _browser;
+        private readonly Condition? _browser;
         private readonly string? _unreadable;
 
-        private Condition(Func<T, bool> holds, ClientCondition? browser, string? unreadable)
+        private RuleCondition(Func<T, bool> holds, Condition? browser, string? unreadable)
         {
             _holds = holds;
             _browser = browser;
@@ -28,33 +29,33 @@ namespace Alis.Reactive.FluentValidator
 
         internal bool Holds(T instance) => _holds(instance);
 
-        internal static Condition<T> When(Expression<Func<T, bool>> predicate)
+        internal static RuleCondition<T> When(Expression<Func<T, bool>> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             var browser = BrowserCondition.From(predicate);
-            return new Condition<T>(predicate.Compile(), browser, browser == null ? predicate.Body.ToString() : null);
+            return new RuleCondition<T>(predicate.Compile(), browser, browser == null ? predicate.Body.ToString() : null);
         }
 
-        internal static Condition<T> Unless(Expression<Func<T, bool>> predicate) => When(predicate).Negated();
+        internal static RuleCondition<T> Unless(Expression<Func<T, bool>> predicate) => When(predicate).Negated();
 
         /// <summary>A condition the server alone decides, by the developer's word: <c>WhenOnServer</c>, <c>UnlessOnServer</c>.</summary>
-        internal static Condition<T> OnServer(Expression<Func<T, bool>> predicate)
+        internal static RuleCondition<T> OnServer(Expression<Func<T, bool>> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-            return new Condition<T>(predicate.Compile(), null, null);
+            return new RuleCondition<T>(predicate.Compile(), null, null);
         }
 
         /// <summary>Holds always, with no browser form: what <c>.ServerOnly()</c> writes after a rule's checks.</summary>
-        internal static Condition<T> ServerOnly { get; } = new Condition<T>(_ => true, null, null);
+        internal static RuleCondition<T> ServerOnly { get; } = new RuleCondition<T>(_ => true, null, null);
 
-        internal Condition<T> Negated() =>
-            new Condition<T>(instance => !_holds(instance), _browser == null ? null : ClientCondition.Not(_browser), _unreadable);
+        internal RuleCondition<T> Negated() =>
+            new RuleCondition<T>(instance => !_holds(instance), _browser == null ? null : Condition.Not(_browser), _unreadable);
 
         /// <summary>
         /// The browser's form, or false when the server alone decides. A condition the browser cannot read that
         /// was not declared the server's is refused here, where a page describes the rules.
         /// </summary>
-        internal bool TryForBrowser(out ClientCondition browser)
+        internal bool TryForBrowser(out Condition browser)
         {
             if (_unreadable != null)
                 throw new InvalidOperationException(
@@ -69,24 +70,24 @@ namespace Alis.Reactive.FluentValidator
     /// <summary>Every condition a rule is written under, outermost first.</summary>
     internal sealed class Conditions<T>
     {
-        private readonly IReadOnlyList<Condition<T>> _all;
+        private readonly IReadOnlyList<RuleCondition<T>> _all;
 
-        private Conditions(IReadOnlyList<Condition<T>> all)
+        private Conditions(IReadOnlyList<RuleCondition<T>> all)
         {
             _all = all;
         }
 
-        internal static Conditions<T> None { get; } = new Conditions<T>(Array.Empty<Condition<T>>());
+        internal static Conditions<T> None { get; } = new Conditions<T>(Array.Empty<RuleCondition<T>>());
 
-        internal Conditions<T> And(Condition<T> condition) => new Conditions<T>(_all.Concat(new[] { condition }).ToArray());
+        internal Conditions<T> And(RuleCondition<T> condition) => new Conditions<T>(_all.Concat(new[] { condition }).ToArray());
 
         internal bool Hold(T instance) => _all.All(condition => condition.Holds(instance));
 
         /// <summary>The browser's form of all of them, or false when one is the server's alone.</summary>
-        internal bool TryForBrowser(out ClientCondition condition)
+        internal bool TryForBrowser(out Condition condition)
         {
-            condition = ClientCondition.Always;
-            var forms = new List<ClientCondition>();
+            condition = Condition.Always;
+            var forms = new List<Condition>();
             var onServer = false;
             foreach (var each in _all)
             {
@@ -164,13 +165,13 @@ namespace Alis.Reactive.FluentValidator
 
         // The browser's condition for one check: the rule's enclosing blocks and the check's own conditions,
         // or false when one of them is the server's alone.
-        protected bool TryBrowserCondition(Component<T, TValue> component, out ClientCondition condition)
+        protected bool TryBrowserCondition(Component<T, TValue> component, out Condition condition)
         {
-            condition = ClientCondition.Always;
+            condition = Condition.Always;
             if (!Scope.TryForBrowser(out var scope) || !component.Conditions.TryForBrowser(out var own)) return false;
-            condition = ReferenceEquals(scope, ClientCondition.Always) ? own
-                : ReferenceEquals(own, ClientCondition.Always) ? scope
-                : ClientCondition.All(scope, own);
+            condition = ReferenceEquals(scope, Condition.Always) ? own
+                : ReferenceEquals(own, Condition.Always) ? scope
+                : Condition.All(scope, own);
             return true;
         }
 
@@ -202,18 +203,18 @@ namespace Alis.Reactive.FluentValidator
             return this;
         }
 
-        public IRuleBuilderOptions<T, TValue> When(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.When(predicate));
+        public IRuleBuilderOptions<T, TValue> When(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.When(predicate));
 
-        public IRuleBuilderOptions<T, TValue> Unless(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.Unless(predicate));
+        public IRuleBuilderOptions<T, TValue> Unless(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.Unless(predicate));
 
-        public IRuleBuilderOptions<T, TValue> WhenOnServer(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.OnServer(predicate));
+        public IRuleBuilderOptions<T, TValue> WhenOnServer(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.OnServer(predicate));
 
-        public IRuleBuilderOptions<T, TValue> UnlessOnServer(Expression<Func<T, bool>> predicate) => Conditioned(Condition<T>.OnServer(predicate).Negated());
+        public IRuleBuilderOptions<T, TValue> UnlessOnServer(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.OnServer(predicate).Negated());
 
-        public IRuleBuilderOptions<T, TValue> ServerOnly() => Conditioned(Condition<T>.ServerOnly);
+        public IRuleBuilderOptions<T, TValue> ServerOnly() => Conditioned(RuleCondition<T>.ServerOnly);
 
         // A condition written after checks applies to every check written before it, as in FluentValidation.
-        private IRuleBuilderOptions<T, TValue> Conditioned(Condition<T> condition)
+        private IRuleBuilderOptions<T, TValue> Conditioned(RuleCondition<T> condition)
         {
             foreach (var component in Components)
                 component.Conditions = component.Conditions.And(condition);
@@ -322,7 +323,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal abstract Task Validate(T instance, TValue value, string path, string displayName, ValidationRun run);
 
-        internal abstract void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, ClientCondition when);
+        internal abstract void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when);
     }
 
     internal sealed class CheckComponent<T, TValue> : Component<T, TValue>
@@ -352,14 +353,14 @@ namespace Alis.Reactive.FluentValidator
 
         // A check reaches the browser when the vocabulary has its term and its message is known before any
         // model exists.
-        internal override void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, ClientCondition when)
+        internal override void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when)
         {
             foreach (var rule in BrowserRules(displayName))
                 browser.Add(member.Expression, rule.When(when));
         }
 
         // The same check on each item of a collection member.
-        internal void DescribeForItems(ClientRuleSet browser, ModelMember<T> member, string displayName, ClientCondition when)
+        internal void DescribeForItems(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when)
         {
             var rules = BrowserRules(displayName).ToList();
             if (rules.Count > 0) browser.AddItemRules(member.Expression, rules, when);
@@ -392,7 +393,7 @@ namespace Alis.Reactive.FluentValidator
             await Validators.Run(_child, value, path + ".", run).ConfigureAwait(false);
         }
 
-        internal override void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, ClientCondition when)
+        internal override void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when)
         {
             if (TryItemFields(out var fields)) browser.Add(member.Expression, fields, when);
         }

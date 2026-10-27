@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
@@ -242,45 +243,33 @@ namespace Alis.Reactive.FluentValidator
     /// </summary>
     internal sealed class CompareCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
-        private readonly ClientComparison _comparison;
+        private readonly Comparison _comparison;
         private readonly Operand<T, TValue> _operand;
 
-        internal CompareCheck(ClientComparison comparison, Operand<T, TValue> operand)
+        internal CompareCheck(Comparison comparison, Operand<T, TValue> operand)
         {
             _comparison = comparison;
             _operand = operand;
         }
 
-        internal override string Template => _comparison switch
-        {
-            ClientComparison.Equal => Templates.Equal,
-            ClientComparison.NotEqual => Templates.NotEqual,
-            ClientComparison.GreaterThan => Templates.GreaterThan,
-            ClientComparison.GreaterThanOrEqual => Templates.GreaterThanOrEqual,
-            ClientComparison.LessThan => Templates.LessThan,
-            _ => Templates.LessThanOrEqual,
-        };
-
-        private bool IsEquality => _comparison == ClientComparison.Equal || _comparison == ClientComparison.NotEqual;
+        internal override string Template =>
+            _comparison == Comparison.Equal ? Templates.Equal
+            : _comparison == Comparison.NotEqual ? Templates.NotEqual
+            : _comparison == Comparison.GreaterThan ? Templates.GreaterThan
+            : _comparison == Comparison.GreaterThanOrEqual ? Templates.GreaterThanOrEqual
+            : _comparison == Comparison.LessThan ? Templates.LessThan
+            : Templates.LessThanOrEqual;
 
         internal override bool Passes(T instance, TValue value, MessageArguments arguments)
         {
             var other = _operand.ValueIn(instance);
             arguments.With("ComparisonValue", other).With("ComparisonProperty", _operand.DisplayName);
 
-            if (IsEquality)
-                return Equals(other, value) == (_comparison == ClientComparison.Equal);
+            if (_comparison.IsEquality)
+                return Equals(other, value) == (_comparison == Comparison.Equal);
             if (value == null) return true;
             if (other == null) return false;
-
-            var order = Comparer.Default.Compare(value, other);
-            return _comparison switch
-            {
-                ClientComparison.GreaterThan => order > 0,
-                ClientComparison.GreaterThanOrEqual => order >= 0,
-                ClientComparison.LessThan => order < 0,
-                _ => order <= 0,
-            };
+            return _comparison.Orders(Comparer.Default.Compare(value, other));
         }
 
         // The browser names the other member, whose value it has not read yet, or the literal.
@@ -306,7 +295,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal abstract object? RenderName { get; }
 
-        internal abstract IEnumerable<ClientRule> ForBrowser(ClientComparison comparison, string message);
+        internal abstract IEnumerable<ClientRule> ForBrowser(Comparison comparison, string message);
 
         private sealed class LiteralOperand : Operand<T, TValue>
         {
@@ -324,7 +313,7 @@ namespace Alis.Reactive.FluentValidator
             internal override object? RenderName => _value;
 
             // A null literal has no browser form: compare with null by NotNull or Empty.
-            internal override IEnumerable<ClientRule> ForBrowser(ClientComparison comparison, string message) =>
+            internal override IEnumerable<ClientRule> ForBrowser(Comparison comparison, string message) =>
                 _value == null ? Array.Empty<ClientRule>() : new[] { ClientRule.Compare(comparison, _value, message) };
         }
 
@@ -344,7 +333,7 @@ namespace Alis.Reactive.FluentValidator
             internal override object? RenderName => DisplayName;
 
             // A member the page can bind is a path from the model; a computed value is the server's.
-            internal override IEnumerable<ClientRule> ForBrowser(ClientComparison comparison, string message) =>
+            internal override IEnumerable<ClientRule> ForBrowser(Comparison comparison, string message) =>
                 _member.Path == null
                     ? Array.Empty<ClientRule>()
                     : new[] { ClientRule.CompareWith(comparison, _member.Expression, message) };

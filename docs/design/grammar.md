@@ -668,7 +668,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 
 - `When(predicate, rules)`, `Unless(...)` and `Otherwise(...)` around a block, and `.When(predicate)`
   and `.Unless(predicate)` after a rule's checks, take an expression. The server compiles it;
-  `BrowserCondition` translates it into a `ClientCondition` when every part has a browser form:
+  `BrowserCondition` translates it into a `Condition` over the model's members when every part has a browser form:
   comparisons of members with fixed values, `string.IsNullOrEmpty`, `Contains`, `StartsWith`,
   `EndsWith`, `Regex.IsMatch`, membership in a fixed set, joined by `&&`, `||` and `!`.
   `WhenOnServer(predicate, rules)`, `UnlessOnServer(...)`, `.WhenOnServer(predicate)` and
@@ -745,7 +745,7 @@ It reads the rules by their classes, not the plan.
   and the lambda compiler (`Arrays/ElementExpressionCompiler.cs`) through the one member table (2.3).
 - `PlanModel`: the one model that writes the grammar: steps (`Reactions/Steps.cs`), requests
   (`Requests/RequestStep.cs`), values (`Values/ValueExpression.cs`), conditions
-  (`Conditions/ConditionGraph.cs`), the form writer and the scope that binds responses and method
+  (`Conditions/Condition.cs`, one model for a validator's conditions over members and a reaction's over values), the form writer and the scope that binds responses and method
   results (`Writing/`). `PlanBuildContext.Write` writes the plan once at render.
 - `Alis.Reactive.FluentValidator`: the projection of section 7 and its typed model.
 - `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: vendors, declarations, render helpers, Confirm,

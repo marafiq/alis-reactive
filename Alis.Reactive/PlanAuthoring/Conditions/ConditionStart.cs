@@ -20,11 +20,11 @@ namespace Alis.Reactive.Builders.Conditions
         /// <summary>Asks the user, and holds when they confirm.</summary>
         /// <param name="message">The question.</param>
         public GroupCondition<TModel> Confirm(string message) =>
-            new GroupCondition<TModel>(ConditionGraph.Confirm(message));
+            new GroupCondition<TModel>(Condition.Confirm(message));
 
         /// <summary>Holds when the nested group does not: <c>g.Not(n =&gt; n.When(a).Eq(1).And(b).Truthy())</c>.</summary>
         /// <param name="group">The group to negate.</param>
         public GroupCondition<TModel> Not(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
-            new GroupCondition<TModel>(ConditionGraph.Not(ConditionComposition.Group(group)));
+            new GroupCondition<TModel>(Condition.Not(ConditionComposition.Group(group)));
     }
 }

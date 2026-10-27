@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Components;
+using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.Fusion.Components
@@ -137,9 +138,9 @@ namespace Alis.Reactive.Fusion.Components
                     rules["regex"] = new object[] { pattern.Pattern, rule.Message };
                     break;
                 case FixedComparisonRule comparison when comparison.Number is decimal number:
-                    if (comparison.Comparison == ClientComparison.GreaterThanOrEqual)
+                    if (comparison.Comparison == Comparison.GreaterThanOrEqual)
                         rules["min"] = new object[] { number, rule.Message };
-                    else if (comparison.Comparison == ClientComparison.LessThanOrEqual)
+                    else if (comparison.Comparison == Comparison.LessThanOrEqual)
                         rules["max"] = new object[] { number, rule.Message };
                     break;
                 case RangeRule range when range.Inclusive && range.NumericBounds is { } bounds:

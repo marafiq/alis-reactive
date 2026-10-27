@@ -44,7 +44,7 @@ namespace Alis.Reactive.Builders.Conditions
             _branch.SetElse(PipelineBuilder<TModel>.Build(_context, pipeline));
         }
 
-        internal void AddArm(ConditionGraph condition, Action<PipelineBuilder<TModel>> pipeline) =>
+        internal void AddArm(Condition condition, Action<PipelineBuilder<TModel>> pipeline) =>
             _branch.AddArm(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
     }
 }

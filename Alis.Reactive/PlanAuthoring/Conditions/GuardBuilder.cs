@@ -8,12 +8,12 @@ namespace Alis.Reactive.Builders.Conditions
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
     public abstract class Condition<TModel> where TModel : class
     {
-        private protected Condition(ConditionGraph graph)
+        private protected Condition(Condition graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
         }
 
-        internal ConditionGraph Graph { get; }
+        internal Condition Graph { get; }
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ namespace Alis.Reactive.Builders.Conditions
     {
         private readonly ConditionContinuation<TModel> _continuation;
 
-        internal GuardBuilder(ConditionGraph graph, ConditionContinuation<TModel> continuation) : base(graph)
+        internal GuardBuilder(Condition graph, ConditionContinuation<TModel> continuation) : base(graph)
         {
             _continuation = continuation ?? throw new ArgumentNullException(nameof(continuation));
         }
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Builders.Conditions
             new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Negates this one comparison.</summary>
-        public GuardBuilder<TModel> Not() => new GuardBuilder<TModel>(ConditionGraph.Not(Graph), _continuation);
+        public GuardBuilder<TModel> Not() => new GuardBuilder<TModel>(Condition.Not(Graph), _continuation);
 
         /// <summary>Runs <paramref name="pipeline"/> when the condition holds.</summary>
         /// <param name="pipeline">The reactions of the branch.</param>
@@ -71,7 +71,7 @@ namespace Alis.Reactive.Builders.Conditions
     {
         private readonly ConditionContinuation<TModel> _continuation;
 
-        internal AllGuard(ConditionGraph graph, ConditionContinuation<TModel> continuation) : base(graph)
+        internal AllGuard(Condition graph, ConditionContinuation<TModel> continuation) : base(graph)
         {
             _continuation = continuation;
         }
@@ -100,7 +100,7 @@ namespace Alis.Reactive.Builders.Conditions
     {
         private readonly ConditionContinuation<TModel> _continuation;
 
-        internal AnyGuard(ConditionGraph graph, ConditionContinuation<TModel> continuation) : base(graph)
+        internal AnyGuard(Condition graph, ConditionContinuation<TModel> continuation) : base(graph)
         {
             _continuation = continuation;
         }
@@ -127,7 +127,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
     public sealed class GroupCondition<TModel> : Condition<TModel> where TModel : class
     {
-        internal GroupCondition(ConditionGraph graph) : base(graph) { }
+        internal GroupCondition(Condition graph) : base(graph) { }
 
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
@@ -148,14 +148,14 @@ namespace Alis.Reactive.Builders.Conditions
             new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
 
         /// <summary>Negates this one comparison.</summary>
-        public GroupCondition<TModel> Not() => new GroupCondition<TModel>(ConditionGraph.Not(Graph));
+        public GroupCondition<TModel> Not() => new GroupCondition<TModel>(Condition.Not(Graph));
     }
 
     /// <summary>Comparisons inside a group that must all hold: continue with <c>And</c>.</summary>
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
     public sealed class GroupAll<TModel> : Condition<TModel> where TModel : class
     {
-        internal GroupAll(ConditionGraph graph) : base(graph) { }
+        internal GroupAll(Condition graph) : base(graph) { }
 
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
@@ -171,7 +171,7 @@ namespace Alis.Reactive.Builders.Conditions
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
     public sealed class GroupAny<TModel> : Condition<TModel> where TModel : class
     {
-        internal GroupAny(ConditionGraph graph) : base(graph) { }
+        internal GroupAny(Condition graph) : base(graph) { }
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source) =>

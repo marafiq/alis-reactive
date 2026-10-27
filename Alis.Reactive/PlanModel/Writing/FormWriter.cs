@@ -38,7 +38,7 @@ namespace Alis.Reactive.PlanModel
             return new FormField(field.ComponentId, field.ServerName, field.Value.Write(_scope), tests);
         }
 
-        private Expr When(ClientRule rule, FormFieldValues values) => rule.Condition.ToGraph(values).Write(_scope);
+        private Expr When(ClientRule rule, FormFieldValues values) => rule.Condition.Bound(values).Write(_scope);
 
         // The rule's verdict on the field's value, as the server's rule decides it.
         private FnExpr Check(ClientRule rule, CheckedField field) =>

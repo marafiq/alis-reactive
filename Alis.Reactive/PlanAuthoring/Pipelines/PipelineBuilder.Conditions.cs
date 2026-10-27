@@ -18,6 +18,6 @@ namespace Alis.Reactive.Builders
         /// <summary>Adds a user-decision guard before the pipeline continues.</summary>
         /// <param name="message">User-decision confirmation message.</param>
         public GuardBuilder<TModel> Confirm(string message) =>
-            new GuardBuilder<TModel>(ConditionGraph.Confirm(message), ConditionContinuation<TModel>.InCallback(Context));
+            new GuardBuilder<TModel>(Condition.Confirm(message), ConditionContinuation<TModel>.InCallback(Context));
     }
 }

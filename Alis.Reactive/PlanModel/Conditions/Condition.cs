@@ -1,50 +1,144 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
     /// A condition as the plan evaluates it: one node per comparison family, each carrying exactly its
-    /// operands, composed with All, Any and Not. A condition that waits (a method result that is a promise,
-    /// a user decision) guards its branches with the statements that settle it first.
+    /// operands, composed with All, Any and Not. A validator writes one over the members of its model
+    /// (<c>Condition.Is(x =&gt; x.IsVeteran, ValueTest.Truthy)</c>), and the form binds each member to the
+    /// input that holds it when the page describes its rules; a reaction writes one over the values the
+    /// plan reads. A condition that waits (a method result that is a promise, a user decision) guards its
+    /// branches with the statements that settle it first.
     /// </summary>
-    internal abstract class ConditionGraph
+    public abstract class Condition
     {
-        private protected ConditionGraph() { }
+        private protected Condition() { }
 
-        internal static ConditionGraph Unary(ValueTest test, ValueExpression left, Shape shape) =>
+        /// <summary>No condition: it always holds, and a rule under it always applies.</summary>
+        public static Condition Always { get; } = new TrueCondition();
+
+        // ── over the members of a validator's model ──────────────────────────────
+
+        /// <summary>Tests the member's value alone.</summary>
+        /// <param name="member">The member, as a path from the model: <c>x =&gt; x.IsVeteran</c>.</param>
+        /// <param name="test">The test.</param>
+        public static Condition Is(LambdaExpression member, ValueTest test)
+        {
+            if (test == null) throw new ArgumentNullException(nameof(test));
+            return new MemberTest(FieldReference.Of(member), (left, shape) => Unary(test, left, shape));
+        }
+
+        /// <summary>Compares the member with a value.</summary>
+        /// <param name="member">The member, as a path from the model.</param>
+        /// <param name="comparison">The comparison.</param>
+        /// <param name="value">The value, a constant or a captured variable, read as the member's type: an enum compared through its number is its member.</param>
+        public static Condition Compare(LambdaExpression member, Comparison comparison, Expression value)
+        {
+            if (comparison == null) throw new ArgumentNullException(nameof(comparison));
+            var field = FieldReference.Of(member);
+            var fixedValue = LiteralOf(field.Type, Expressions.Evaluate(value)
+                ?? throw new ArgumentNullException(nameof(value), "Test a missing value with ValueTest.IsNull."));
+            return new MemberTest(field, (left, shape) => Ordered(comparison, left, ValueExpression.LiteralFor(fixedValue, shape), shape));
+        }
+
+        /// <summary>The member is one of the values.</summary>
+        /// <param name="member">The member, as a path from the model.</param>
+        /// <param name="values">The values, a constant or captured collection, each read as the member's type.</param>
+        public static Condition In(LambdaExpression member, Expression values)
+        {
+            var field = FieldReference.Of(member);
+            var fixedValues = Expressions.Evaluate(values) as IEnumerable
+                ?? throw new ArgumentException("The values must be a collection.", nameof(values));
+            var members = fixedValues.Cast<object?>().Select(value => LiteralOf(field.Type, value)).ToArray();
+            return new MemberTest(field, (left, shape) =>
+                Membership(left, members.Select(value => ValueExpression.LiteralFor(value, shape)).ToList(), negated: false, shape));
+        }
+
+        /// <summary>Tests a text member against fixed text.</summary>
+        /// <param name="member">The text member, as a path from the model.</param>
+        /// <param name="test">The test.</param>
+        /// <param name="text">The text, or the pattern for <see cref="TextTest.Matches"/>.</param>
+        public static Condition Text(LambdaExpression member, TextTest test, string text)
+        {
+            if (test == null) throw new ArgumentNullException(nameof(test));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            return new MemberTest(FieldReference.Of(member), (left, shape) => Text(test, left, text, shape));
+        }
+
+        /// <summary>The collection member holds the item.</summary>
+        /// <param name="collection">The collection member, as a path from the model.</param>
+        /// <param name="item">The item, a constant or a captured variable, read as its own type.</param>
+        public static Condition Holds(LambdaExpression collection, Expression item)
+        {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+            var itemType = Expressions.TypeOf(item);
+            var itemShape = Shape.FromClrType(itemType);
+            var fixedItem = LiteralOf(itemType, Expressions.Evaluate(item));
+            return new MemberTest(FieldReference.Of(collection), (left, shape) =>
+                ArrayContains(left, ValueExpression.LiteralFor(fixedItem, itemShape), shape, itemShape));
+        }
+
+        /// <summary>Every term holds.</summary>
+        /// <param name="terms">The terms, at least one.</param>
+        public static Condition All(params Condition[] terms) => new AllCondition(Required(terms));
+
+        /// <summary>At least one term holds.</summary>
+        /// <param name="terms">The terms, at least one.</param>
+        public static Condition Any(params Condition[] terms) => new AnyCondition(Required(terms));
+
+        /// <summary>The term does not hold.</summary>
+        /// <param name="term">The term.</param>
+        public static Condition Not(Condition term) => new NotCondition(term ?? throw new ArgumentNullException(nameof(term)));
+
+        // ── over the values a plan reads ─────────────────────────────────────────
+
+        internal static Condition Unary(ValueTest test, ValueExpression left, Shape shape) =>
             new UnaryCondition(test, left, shape);
 
-        internal static ConditionGraph Ordered(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape) =>
-            new OrderedCondition(op, left, right, shape);
+        internal static Condition Ordered(Comparison comparison, ValueExpression left, ValueExpression right, Shape shape) =>
+            new OrderedCondition(comparison, left, right, shape);
 
-        internal static ConditionGraph Membership(ValueExpression left, IReadOnlyList<ValueExpression> items, bool negated, Shape shape) =>
+        internal static Condition Membership(ValueExpression left, IReadOnlyList<ValueExpression> items, bool negated, Shape shape) =>
             new MembershipCondition(left, items, negated, shape);
 
-        internal static ConditionGraph Range(ValueExpression left, ValueExpression low, ValueExpression high, Shape shape) =>
+        internal static Condition Range(ValueExpression left, ValueExpression low, ValueExpression high, Shape shape) =>
             new RangeCondition(left, low, high, shape);
 
-        internal static ConditionGraph ArrayContains(ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape) =>
+        internal static Condition ArrayContains(ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape) =>
             new ArrayContainsCondition(left, item, collectionShape, itemShape);
 
-        internal static ConditionGraph Text(TextTest test, ValueExpression left, string text, Shape shape) =>
+        internal static Condition Text(TextTest test, ValueExpression left, string text, Shape shape) =>
             new TextCondition(test, left, text, shape);
 
-        internal static ConditionGraph MinLength(ValueExpression left, int length, Shape shape) =>
+        internal static Condition MinLength(ValueExpression left, int length, Shape shape) =>
             new MinLengthCondition(left, length, shape);
 
-        internal static ConditionGraph All(params ConditionGraph[] terms) => new AllCondition(terms.ToList());
+        internal static Condition Confirm(string message) => new ConfirmCondition(message);
 
-        internal static ConditionGraph Any(params ConditionGraph[] terms) => new AnyCondition(terms.ToList());
+        /// <summary>Both conditions: the outer one, then this one.</summary>
+        internal static Condition Combine(Condition outer, Condition inner)
+        {
+            if (outer.IsAlways) return inner;
+            if (inner.IsAlways) return outer;
+            return new AllCondition(new[] { outer, inner });
+        }
 
-        internal static ConditionGraph Not(ConditionGraph term) => new NotCondition(term);
+        internal virtual bool IsAlways => false;
 
-        internal static ConditionGraph Confirm(string message) => new ConfirmCondition(message);
+        /// <summary>The members of the validator's model the condition reads, left to right.</summary>
+        internal virtual IEnumerable<FieldReference> Fields => Array.Empty<FieldReference>();
 
-        /// <summary>A condition that always holds.</summary>
-        internal static ConditionGraph True { get; } = new TrueCondition();
+        /// <summary>The condition with every member it reads relocated under <paramref name="prefix"/>.</summary>
+        internal virtual Condition PrefixedBy(string prefix) => this;
+
+        /// <summary>The condition over the inputs that hold the members it reads.</summary>
+        internal virtual Condition Bound(FormFieldValues fields) => this;
 
         internal virtual bool IsSynchronous => true;
 
@@ -52,10 +146,58 @@ namespace Alis.Reactive.PlanModel
 
         internal virtual IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
             new[] { G.If(Write(scope), then, otherwise) };
+
+        private static IReadOnlyList<Condition> Required(Condition[] terms)
+        {
+            if (terms == null) throw new ArgumentNullException(nameof(terms));
+            if (terms.Length == 0) throw new ArgumentException("A condition over terms needs at least one.", nameof(terms));
+            if (terms.Any(term => term == null)) throw new ArgumentException("A condition term must not be null.", nameof(terms));
+            return terms.ToArray();
+        }
+
+        // A value the condition fixes, as the member's own type: an enum is its member's name, which is
+        // how MVC binds it; anything else is written as it is.
+        private static object? LiteralOf(Type memberType, object? value)
+        {
+            if (value == null) return null;
+
+            var enumType = System.Nullable.GetUnderlyingType(memberType) ?? memberType;
+            var asMemberType = enumType.IsEnum && !value.GetType().IsEnum ? Enum.ToObject(enumType, value) : value;
+            return asMemberType.GetType().IsEnum ? asMemberType.ToString() : asMemberType;
+        }
+    }
+
+    /// <summary>
+    /// A test of one member of a validator's model. When the form binds it, the member is read as MVC
+    /// binds it and tested in the shape its input holds, by the condition the test builds for that read.
+    /// </summary>
+    internal sealed class MemberTest : Condition
+    {
+        private readonly FieldReference _field;
+        private readonly Func<ValueExpression, Shape, Condition> _test;
+
+        internal MemberTest(FieldReference field, Func<ValueExpression, Shape, Condition> test)
+        {
+            _field = field ?? throw new ArgumentNullException(nameof(field));
+            _test = test ?? throw new ArgumentNullException(nameof(test));
+        }
+
+        internal override IEnumerable<FieldReference> Fields => new[] { _field };
+
+        internal override Condition PrefixedBy(string prefix) => new MemberTest(_field.PrefixedBy(prefix), _test);
+
+        internal override Condition Bound(FormFieldValues fields)
+        {
+            var input = fields.Resolve(_field);
+            return _test(ValueExpression.ReadBound(input.Id, Shape.None), input.Shape);
+        }
+
+        internal override Expr Write(Scope scope) =>
+            throw new InvalidOperationException($"The test of '{_field.Path}' is bound to the form's inputs before it is written.");
     }
 
     /// <summary>A comparison of one value: it reads the value, converts it to the condition's shape, and tests it.</summary>
-    internal abstract class ValueCondition : ConditionGraph
+    internal abstract class ValueCondition : Condition
     {
         private readonly ValueExpression _left;
 
@@ -105,18 +247,18 @@ namespace Alis.Reactive.PlanModel
     /// <summary>The value ordered against another of its shape, a literal or a value read when the condition runs.</summary>
     internal sealed class OrderedCondition : ValueCondition
     {
-        private readonly CompareOperator _op;
+        private readonly Comparison _comparison;
         private readonly ValueExpression _right;
 
-        internal OrderedCondition(CompareOperator op, ValueExpression left, ValueExpression right, Shape shape) : base(left, shape)
+        internal OrderedCondition(Comparison comparison, ValueExpression left, ValueExpression right, Shape shape) : base(left, shape)
         {
-            _op = op ?? throw new ArgumentNullException(nameof(op));
+            _comparison = comparison ?? throw new ArgumentNullException(nameof(comparison));
             _right = right ?? throw new ArgumentNullException(nameof(right));
         }
 
         private protected override bool ReadsAwaited => base.ReadsAwaited || _right.ReadsAwaited;
 
-        internal override Expr Write(Scope scope) => G.Op(_op.Operation, Left(scope), _right.WriteAs(Shape, scope));
+        internal override Expr Write(Scope scope) => G.Op(_comparison.Operation, Left(scope), _right.WriteAs(Shape, scope));
     }
 
     /// <summary>The value among a list of values, read once and compared with each, as C#'s Contains does.</summary>
@@ -229,19 +371,27 @@ namespace Alis.Reactive.PlanModel
             G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.None), G.Lit(_length));
     }
 
-    internal sealed class TrueCondition : ConditionGraph
+    internal sealed class TrueCondition : Condition
     {
+        internal override bool IsAlways => true;
+
         internal override Expr Write(Scope scope) => G.True;
     }
 
-    internal sealed class AllCondition : ConditionGraph
+    internal sealed class AllCondition : Condition
     {
-        internal AllCondition(IReadOnlyList<ConditionGraph> terms)
+        internal AllCondition(IReadOnlyList<Condition> terms)
         {
             Terms = terms;
         }
 
-        internal IReadOnlyList<ConditionGraph> Terms { get; }
+        internal IReadOnlyList<Condition> Terms { get; }
+
+        internal override IEnumerable<FieldReference> Fields => Terms.SelectMany(term => term.Fields);
+
+        internal override Condition PrefixedBy(string prefix) => new AllCondition(Terms.Select(term => term.PrefixedBy(prefix)).ToList());
+
+        internal override Condition Bound(FormFieldValues fields) => new AllCondition(Terms.Select(term => term.Bound(fields)).ToList());
 
         internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
 
@@ -265,14 +415,20 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class AnyCondition : ConditionGraph
+    internal sealed class AnyCondition : Condition
     {
-        internal AnyCondition(IReadOnlyList<ConditionGraph> terms)
+        internal AnyCondition(IReadOnlyList<Condition> terms)
         {
             Terms = terms;
         }
 
-        internal IReadOnlyList<ConditionGraph> Terms { get; }
+        internal IReadOnlyList<Condition> Terms { get; }
+
+        internal override IEnumerable<FieldReference> Fields => Terms.SelectMany(term => term.Fields);
+
+        internal override Condition PrefixedBy(string prefix) => new AnyCondition(Terms.Select(term => term.PrefixedBy(prefix)).ToList());
+
+        internal override Condition Bound(FormFieldValues fields) => new AnyCondition(Terms.Select(term => term.Bound(fields)).ToList());
 
         internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
 
@@ -295,14 +451,20 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    internal sealed class NotCondition : ConditionGraph
+    internal sealed class NotCondition : Condition
     {
-        private readonly ConditionGraph _term;
+        private readonly Condition _term;
 
-        internal NotCondition(ConditionGraph term)
+        internal NotCondition(Condition term)
         {
             _term = term ?? throw new ArgumentNullException(nameof(term));
         }
+
+        internal override IEnumerable<FieldReference> Fields => _term.Fields;
+
+        internal override Condition PrefixedBy(string prefix) => new NotCondition(_term.PrefixedBy(prefix));
+
+        internal override Condition Bound(FormFieldValues fields) => new NotCondition(_term.Bound(fields));
 
         internal override bool IsSynchronous => _term.IsSynchronous;
 
@@ -313,7 +475,7 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>A user decision: the confirm asks, and the branches wait for the answer.</summary>
-    internal sealed class ConfirmCondition : ConditionGraph
+    internal sealed class ConfirmCondition : Condition
     {
         private readonly string _message;
 

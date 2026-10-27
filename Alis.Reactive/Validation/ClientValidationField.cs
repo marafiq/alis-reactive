@@ -14,13 +14,13 @@ namespace Alis.Reactive.Validation
     {
         // For a collection item field: the condition declared around its RuleForEach, relative to the
         // collection's owner. Relocating the owner prefixes it; the rendered item prefix never does.
-        private readonly ClientCondition _ownerCondition;
+        private readonly Condition _ownerCondition;
 
         internal ClientValidationField(
             FieldReference field,
             IEnumerable<ClientRule> rules,
             IEnumerable<ClientValidationField> itemFields)
-            : this(field, rules, itemFields, ClientCondition.Always)
+            : this(field, rules, itemFields, Condition.Always)
         {
         }
 
@@ -28,7 +28,7 @@ namespace Alis.Reactive.Validation
             FieldReference field,
             IEnumerable<ClientRule> rules,
             IEnumerable<ClientValidationField> itemFields,
-            ClientCondition ownerCondition)
+            Condition ownerCondition)
         {
             Reference = field;
             Rules = rules.ToArray();
@@ -48,7 +48,7 @@ namespace Alis.Reactive.Validation
 
         internal bool HasRules => Rules.Count > 0;
 
-        internal ClientValidationField PrefixedBy(string prefix, ClientCondition outer) =>
+        internal ClientValidationField PrefixedBy(string prefix, Condition outer) =>
             new ClientValidationField(
                 Reference.PrefixedBy(prefix),
                 Rules.Select(rule => rule.PrefixedBy(prefix, outer)),
@@ -60,12 +60,12 @@ namespace Alis.Reactive.Validation
             PrefixedBy(itemPrefix, _ownerCondition);
 
         // An item field whose owner declared it under a condition (When around RuleForEach).
-        internal ClientValidationField ScopedBy(ClientCondition condition) =>
-            new ClientValidationField(Reference, Rules, ItemFields, ClientCondition.Combine(condition, _ownerCondition));
+        internal ClientValidationField ScopedBy(Condition condition) =>
+            new ClientValidationField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition));
 
         // An item field whose collection's owner moves under prefix: its owner condition moves with it.
-        private ClientValidationField OwnedUnder(string prefix, ClientCondition condition) =>
-            new ClientValidationField(Reference, Rules, ItemFields, ClientCondition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
+        private ClientValidationField OwnedUnder(string prefix, Condition condition) =>
+            new ClientValidationField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Validation
     /// var rules = new ClientRuleSet();
     /// rules.Add((Admission x) =&gt; x.ResidentName, ClientRule.NotEmpty("'Resident Name' must not be empty."));
     /// rules.Add((Admission x) =&gt; x.ServiceNumber, ClientRule.NotEmpty("'Service Number' must not be empty.")
-    ///     .When(ClientCondition.Is((Admission x) =&gt; x.IsVeteran, ClientValueTest.Truthy)));
+    ///     .When(Condition.Is((Admission x) =&gt; x.IsVeteran, ValueTest.Truthy)));
     /// return rules.Fields;
     /// </code>
     /// </example>
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Validation
         /// <param name="collection">The collection member, as a path from the validator's model.</param>
         /// <param name="rules">The rules each item is checked by.</param>
         /// <param name="when">The condition the collection's rule is declared under.</param>
-        public void AddItemRules(LambdaExpression collection, IEnumerable<ClientRule> rules, ClientCondition when)
+        public void AddItemRules(LambdaExpression collection, IEnumerable<ClientRule> rules, Condition when)
         {
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             if (when == null) throw new ArgumentNullException(nameof(when));
@@ -122,7 +122,7 @@ namespace Alis.Reactive.Validation
         /// <param name="collection">The collection member, as a path from the validator's model.</param>
         /// <param name="itemFields">The item's members and rules, by their paths in the item.</param>
         /// <param name="when">The condition the collection's rule is declared under.</param>
-        public void AddItems(LambdaExpression collection, IEnumerable<ClientValidationField> itemFields, ClientCondition when)
+        public void AddItems(LambdaExpression collection, IEnumerable<ClientValidationField> itemFields, Condition when)
         {
             if (itemFields == null) throw new ArgumentNullException(nameof(itemFields));
             if (when == null) throw new ArgumentNullException(nameof(when));
@@ -135,16 +135,16 @@ namespace Alis.Reactive.Validation
         /// <summary>Adds a validator's members in place: a validator included whole.</summary>
         /// <param name="fields">The included validator's members and rules.</param>
         /// <param name="when">The condition the inclusion is declared under.</param>
-        public void Add(IEnumerable<ClientValidationField> fields, ClientCondition when) => AddUnder("", fields, when);
+        public void Add(IEnumerable<ClientValidationField> fields, Condition when) => AddUnder("", fields, when);
 
         /// <summary>Adds a child validator's members under the member that holds them.</summary>
         /// <param name="owner">The member that holds them, as a path from the validator's model.</param>
         /// <param name="fields">The child validator's members and rules.</param>
         /// <param name="when">The condition the child's rule is declared under.</param>
-        public void Add(LambdaExpression owner, IEnumerable<ClientValidationField> fields, ClientCondition when) =>
+        public void Add(LambdaExpression owner, IEnumerable<ClientValidationField> fields, Condition when) =>
             AddUnder(FieldReference.Of(owner).Path, fields, when);
 
-        private void AddUnder(string prefix, IEnumerable<ClientValidationField> fields, ClientCondition when)
+        private void AddUnder(string prefix, IEnumerable<ClientValidationField> fields, Condition when)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
             if (when == null) throw new ArgumentNullException(nameof(when));

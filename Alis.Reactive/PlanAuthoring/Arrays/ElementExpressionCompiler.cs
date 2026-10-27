@@ -10,7 +10,7 @@ namespace Alis.Reactive.Builders.Arrays
 {
     /// <summary>
     /// Compiles a captured per-element lambda into the closed plan-node algebra. A predicate
-    /// becomes a SYNC <see cref="ConditionGraph"/> (compare/all/any/not) whose leaves read the
+    /// becomes a SYNC <see cref="Condition"/> (compare/all/any/not) whose leaves read the
     /// element scope; reads rooted at the lambda parameter become element reads, everything else
     /// is evaluated to a literal. Anything outside the supported set throws at plan render time
     /// (when the Razor view is first requested) — keeping the captured DSL deterministic.
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Builders.Arrays
         private static MethodInfo MethodOf<T>(Expression<Func<T, object?>> call) =>
             ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
 
-        internal static ConditionGraph CompilePredicate(LambdaExpression predicate)
+        internal static Condition CompilePredicate(LambdaExpression predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
@@ -55,18 +55,18 @@ namespace Alis.Reactive.Builders.Arrays
             return CompileValue(Expressions.StripConvert(projection.Body), projection.Parameters[0]);
         }
 
-        private static ConditionGraph CompileCondition(Expression body, ParameterExpression element)
+        private static Condition CompileCondition(Expression body, ParameterExpression element)
         {
             if (body is BinaryExpression binary)
             {
                 switch (binary.NodeType)
                 {
                     case ExpressionType.AndAlso:
-                        return ConditionGraph.All(
+                        return Condition.All(
                             CompileCondition(Expressions.StripConvert(binary.Left), element),
                             CompileCondition(Expressions.StripConvert(binary.Right), element));
                     case ExpressionType.OrElse:
-                        return ConditionGraph.Any(
+                        return Condition.Any(
                             CompileCondition(Expressions.StripConvert(binary.Left), element),
                             CompileCondition(Expressions.StripConvert(binary.Right), element));
                     case ExpressionType.Equal:
@@ -80,7 +80,7 @@ namespace Alis.Reactive.Builders.Arrays
             }
 
             if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Not)
-                return ConditionGraph.Not(CompileCondition(Expressions.StripConvert(unary.Operand), element));
+                return Condition.Not(CompileCondition(Expressions.StripConvert(unary.Operand), element));
 
             if (body is MethodCallExpression call && call.Object != null && TryTextTest(call, out var textTest))
             {
@@ -90,11 +90,11 @@ namespace Alis.Reactive.Builders.Arrays
                         "String operation arguments (Contains/StartsWith/EndsWith) must be constants or captured " +
                         "values, not element-scope reads — the runtime text operand requires a literal. Got: " + argument);
 
-                return ConditionGraph.Text(textTest, CompileValue(Expressions.StripConvert(call.Object), element), FixedText(argument), Shape.String);
+                return Condition.Text(textTest, CompileValue(Expressions.StripConvert(call.Object), element), FixedText(argument), Shape.String);
             }
 
             if (body.Type == typeof(bool))
-                return ConditionGraph.Unary(ValueTest.Truthy, CompileValue(body, element), Shape.Boolean);
+                return Condition.Unary(ValueTest.Truthy, CompileValue(body, element), Shape.Boolean);
 
             throw new InvalidOperationException(
                 "Array predicate supports comparisons (== != > >= < <=), logical (&& || !), " +
@@ -102,7 +102,7 @@ namespace Alis.Reactive.Builders.Arrays
                 body.NodeType + " (" + body + ").");
         }
 
-        private static ConditionGraph CompileComparison(BinaryExpression binary, ParameterExpression element)
+        private static Condition CompileComparison(BinaryExpression binary, ParameterExpression element)
         {
             var left = Expressions.StripConvert(binary.Left);
             var right = Expressions.StripConvert(binary.Right);
@@ -123,8 +123,8 @@ namespace Alis.Reactive.Builders.Arrays
 
             var shape = Shape.FromClrType(memberOperand.Type);
 
-            return ConditionGraph.Ordered(
-                CompareOperatorFor(binary.NodeType),
+            return Condition.Ordered(
+                ComparisonFor(binary.NodeType),
                 CompileOperand(left, element, memberOperand.Type),
                 CompileOperand(right, element, memberOperand.Type),
                 shape);
@@ -185,15 +185,15 @@ namespace Alis.Reactive.Builders.Arrays
             return ValueExpression.LiteralFor(value, Shape.FromValue(value));
         }
 
-        private static CompareOperator CompareOperatorFor(ExpressionType nodeType) =>
+        private static Comparison ComparisonFor(ExpressionType nodeType) =>
             nodeType switch
             {
-                ExpressionType.Equal => CompareOperator.Eq,
-                ExpressionType.NotEqual => CompareOperator.Neq,
-                ExpressionType.GreaterThan => CompareOperator.Gt,
-                ExpressionType.GreaterThanOrEqual => CompareOperator.Gte,
-                ExpressionType.LessThan => CompareOperator.Lt,
-                ExpressionType.LessThanOrEqual => CompareOperator.Lte,
+                ExpressionType.Equal => Comparison.Equal,
+                ExpressionType.NotEqual => Comparison.NotEqual,
+                ExpressionType.GreaterThan => Comparison.GreaterThan,
+                ExpressionType.GreaterThanOrEqual => Comparison.GreaterThanOrEqual,
+                ExpressionType.LessThan => Comparison.LessThan,
+                ExpressionType.LessThanOrEqual => Comparison.LessThanOrEqual,
                 _ => throw new InvalidOperationException("Unsupported comparison node: " + nodeType),
             };
 

@@ -20,7 +20,7 @@ namespace Alis.Reactive.Validation
     /// </remarks>
     public abstract class ClientRule
     {
-        private protected ClientRule(string message, ClientCondition condition)
+        private protected ClientRule(string message, Condition condition)
         {
             Message = message ?? throw new ArgumentNullException(nameof(message));
             Condition = condition ?? throw new ArgumentNullException(nameof(condition));
@@ -36,40 +36,40 @@ namespace Alis.Reactive.Validation
 
         /// <summary>A value is entered: not blank, and not the type's default. A list has at least one item.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule NotEmpty(string message) => new NotEmptyRule(message, ClientCondition.Always);
+        public static ClientRule NotEmpty(string message) => new NotEmptyRule(message, Condition.Always);
 
         /// <summary>A value is bound. A list is never null in the browser, so the rule stays on the server for a list.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule NotNull(string message) => new NotNullRule(message, ClientCondition.Always);
+        public static ClientRule NotNull(string message) => new NotNullRule(message, Condition.Always);
 
         /// <summary>Nothing is entered.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule Empty(string message) => new EmptyRule(message, ClientCondition.Always);
+        public static ClientRule Empty(string message) => new EmptyRule(message, Condition.Always);
 
         /// <summary>Text at least <paramref name="length"/> characters long.</summary>
         /// <param name="length">The fewest characters.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule MinLength(int length, string message) => new MinLengthRule(length, message, ClientCondition.Always);
+        public static ClientRule MinLength(int length, string message) => new MinLengthRule(length, message, Condition.Always);
 
         /// <summary>Text at most <paramref name="length"/> characters long.</summary>
         /// <param name="length">The most characters.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule MaxLength(int length, string message) => new MaxLengthRule(length, message, ClientCondition.Always);
+        public static ClientRule MaxLength(int length, string message) => new MaxLengthRule(length, message, Condition.Always);
 
         /// <summary>An email address, as <c>EmailAddress()</c> reads one: one @, neither first nor last.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule Email(string message) => new PatternRule("email", EmailPattern, "", message, ClientCondition.Always);
+        public static ClientRule Email(string message) => new PatternRule("email", EmailPattern, "", message, Condition.Always);
 
         /// <summary>
         /// An <c>http</c> or <c>https</c> URL, its scheme in any case, as the server's absolute URL reads it.
         /// The browser checks the scheme; the server also checks the rest.
         /// </summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule Url(string message) => new PatternRule("url", UrlPattern, "", message, ClientCondition.Always);
+        public static ClientRule Url(string message) => new PatternRule("url", UrlPattern, "", message, Condition.Always);
 
         /// <summary>A card number that passes the Luhn check.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule CreditCard(string message) => new CreditCardRule(message, ClientCondition.Always);
+        public static ClientRule CreditCard(string message) => new CreditCardRule(message, Condition.Always);
 
         /// <summary>Text the JavaScript regular expression <paramref name="pattern"/> matches.</summary>
         /// <param name="pattern">A pattern that reads the same in JavaScript and .NET.</param>
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Validation
         public static ClientRule Matches(string pattern, string flags, string message)
         {
             if (string.IsNullOrEmpty(pattern)) throw new ArgumentException("A browser pattern needs its text.", nameof(pattern));
-            return new PatternRule("regex", pattern, flags ?? "", message, ClientCondition.Always);
+            return new PatternRule("regex", pattern, flags ?? "", message, Condition.Always);
         }
 
         /// <summary>The value compares with a fixed value: <c>GreaterThanOrEqual</c> is a minimum, <c>LessThanOrEqual</c> a maximum.</summary>
@@ -86,18 +86,18 @@ namespace Alis.Reactive.Validation
         /// <param name="comparison">The comparison.</param>
         /// <param name="value">The fixed value.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule Compare<TValue>(ClientComparison comparison, TValue value, string message)
+        public static ClientRule Compare<TValue>(Comparison comparison, TValue value, string message)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
-            return new FixedComparisonRule(comparison, value, Shape.FromClrType(value.GetType()), message, ClientCondition.Always);
+            return new FixedComparisonRule(comparison, value, Shape.FromClrType(value.GetType()), message, Condition.Always);
         }
 
         /// <summary>The value compares with another member of the model, read as the page binds it.</summary>
         /// <param name="comparison">The comparison.</param>
         /// <param name="peer">The other member, as a path from the model: <c>x =&gt; x.AdmitDate</c>.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static ClientRule CompareWith(ClientComparison comparison, LambdaExpression peer, string message) =>
-            new MemberComparisonRule(comparison, FieldReference.Of(peer), message, ClientCondition.Always);
+        public static ClientRule CompareWith(Comparison comparison, LambdaExpression peer, string message) =>
+            new MemberComparisonRule(comparison, FieldReference.Of(peer), message, Condition.Always);
 
         /// <summary>The value lies between two bounds of its own type.</summary>
         /// <typeparam name="TValue">The bounds' type, which is the member's.</typeparam>
@@ -114,16 +114,16 @@ namespace Alis.Reactive.Validation
                 throw new ArgumentException(
                     "Client validation range bounds must have the same shape. " +
                     $"Lower bound is '{shape.Kind}', upper bound is '{Shape.FromClrType(to.GetType()).Kind}'.");
-            return new RangeRule(from, to, inclusive, shape, message, ClientCondition.Always);
+            return new RangeRule(from, to, inclusive, shape, message, Condition.Always);
         }
 
         /// <summary>The same rule, applied only while <paramref name="condition"/> holds.</summary>
         /// <param name="condition">The condition.</param>
-        public ClientRule When(ClientCondition condition) => Under(condition ?? throw new ArgumentNullException(nameof(condition)));
+        public ClientRule When(Condition condition) => Under(condition ?? throw new ArgumentNullException(nameof(condition)));
 
         // ── what the form writes ─────────────────────────────────────────────────
 
-        internal ClientCondition Condition { get; }
+        internal Condition Condition { get; }
 
         /// <summary>The test's name in the plan.</summary>
         internal abstract string Name { get; }
@@ -139,8 +139,8 @@ namespace Alis.Reactive.Validation
         }
 
         /// <summary>The rule relocated under <paramref name="prefix"/>, declared under <paramref name="outer"/> as well.</summary>
-        internal virtual ClientRule PrefixedBy(string prefix, ClientCondition outer) =>
-            Under(ClientCondition.Combine(outer, Condition.PrefixedBy(prefix)));
+        internal virtual ClientRule PrefixedBy(string prefix, Condition outer) =>
+            Under(Condition.Combine(outer, Condition.PrefixedBy(prefix)));
 
         /// <summary>
         /// True when <paramref name="value"/>, the field's value as MVC binds it, passes: the server rule's own
@@ -148,7 +148,7 @@ namespace Alis.Reactive.Validation
         /// </summary>
         internal abstract Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope);
 
-        private protected abstract ClientRule Under(ClientCondition condition);
+        private protected abstract ClientRule Under(Condition condition);
 
         // ── how a check reads a value ────────────────────────────────────────────
 

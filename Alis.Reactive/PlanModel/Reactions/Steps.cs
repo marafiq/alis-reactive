@@ -193,16 +193,16 @@ namespace Alis.Reactive.PlanModel
     /// </summary>
     internal sealed class BranchStep : Step
     {
-        private readonly List<(ConditionGraph Condition, Block Then)> _arms = new List<(ConditionGraph, Block)>();
+        private readonly List<(Condition Condition, Block Then)> _arms = new List<(Condition, Block)>();
         private Block _else = new Block();
         private bool _hasElse;
 
-        internal BranchStep(ConditionGraph condition, Block then)
+        internal BranchStep(Condition condition, Block then)
         {
             AddArm(condition, then);
         }
 
-        internal void AddArm(ConditionGraph condition, Block then)
+        internal void AddArm(Condition condition, Block then)
         {
             if (_hasElse) throw new InvalidOperationException("Cannot add branches after Else.");
             _arms.Add((condition ?? throw new ArgumentNullException(nameof(condition)), then ?? throw new ArgumentNullException(nameof(then))));

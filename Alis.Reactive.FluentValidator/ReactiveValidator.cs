@@ -119,14 +119,14 @@ namespace Alis.Reactive.FluentValidator
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition does not hold.</returns>
         public IConditionBuilder When(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(Condition<T>.When(predicate), rules);
+            Branch(RuleCondition<T>.When(predicate), rules);
 
         /// <summary>Applies the rules <paramref name="rules"/> declares only when <paramref name="predicate"/> does not hold.</summary>
         /// <param name="predicate">The condition over the model.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
         public IConditionBuilder Unless(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(Condition<T>.Unless(predicate), rules);
+            Branch(RuleCondition<T>.Unless(predicate), rules);
 
         /// <summary>
         /// Applies the rules only when <paramref name="predicate"/> holds, decided by the server alone: for a
@@ -137,14 +137,14 @@ namespace Alis.Reactive.FluentValidator
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition does not hold.</returns>
         public IConditionBuilder WhenOnServer(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(Condition<T>.OnServer(predicate), rules);
+            Branch(RuleCondition<T>.OnServer(predicate), rules);
 
         /// <summary>Applies the rules only when <paramref name="predicate"/> does not hold, decided by the server alone.</summary>
         /// <param name="predicate">The condition over the model.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
         public IConditionBuilder UnlessOnServer(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(Condition<T>.OnServer(predicate).Negated(), rules);
+            Branch(RuleCondition<T>.OnServer(predicate).Negated(), rules);
 
         /// <inheritdoc />
         public ValidationResult Validate(T instance)
@@ -191,7 +191,7 @@ namespace Alis.Reactive.FluentValidator
             return rule;
         }
 
-        private IConditionBuilder Branch(Condition<T> condition, Action rules)
+        private IConditionBuilder Branch(RuleCondition<T> condition, Action rules)
         {
             var outer = _scope;
             DeclareUnder(outer.And(condition), rules);

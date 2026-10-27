@@ -7,36 +7,36 @@ namespace Alis.Reactive.Builders.Conditions
     internal static class ConditionComposition
     {
         // a && b && c is one all-of node; a nested any-of stays a node of its own.
-        internal static ConditionGraph All(ConditionGraph existing, ConditionGraph incoming)
+        internal static Condition All(Condition existing, Condition incoming)
         {
-            var terms = new List<ConditionGraph>();
+            var terms = new List<Condition>();
             FlattenAll(existing, terms);
             FlattenAll(incoming, terms);
-            return ConditionGraph.All(terms.ToArray());
+            return Condition.All(terms.ToArray());
         }
 
-        internal static ConditionGraph Any(ConditionGraph existing, ConditionGraph incoming)
+        internal static Condition Any(Condition existing, Condition incoming)
         {
-            var terms = new List<ConditionGraph>();
+            var terms = new List<Condition>();
             FlattenAny(existing, terms);
             FlattenAny(incoming, terms);
-            return ConditionGraph.Any(terms.ToArray());
+            return Condition.Any(terms.ToArray());
         }
 
-        internal static ConditionGraph Group<TModel>(Func<ConditionStart<TModel>, Condition<TModel>> group)
+        internal static Condition Group<TModel>(Func<ConditionStart<TModel>, Condition<TModel>> group)
             where TModel : class
         {
             if (group == null) throw new ArgumentNullException(nameof(group));
             return group(new ConditionStart<TModel>()).Graph;
         }
 
-        private static void FlattenAll(ConditionGraph condition, List<ConditionGraph> terms)
+        private static void FlattenAll(Condition condition, List<Condition> terms)
         {
             if (condition is AllCondition all) terms.AddRange(all.Terms);
             else terms.Add(condition);
         }
 
-        private static void FlattenAny(ConditionGraph condition, List<ConditionGraph> terms)
+        private static void FlattenAny(Condition condition, List<Condition> terms)
         {
             if (condition is AnyCondition any) terms.AddRange(any.Terms);
             else terms.Add(condition);
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Builders.Conditions
             new BranchConditionContinuation<TModel>(branch);
 
         internal abstract BranchBuilder<TModel> Then(
-            ConditionGraph condition,
+            Condition condition,
             Action<PipelineBuilder<TModel>> pipeline);
     }
 
@@ -71,7 +71,7 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         internal override BranchBuilder<TModel> Then(
-            ConditionGraph condition,
+            Condition condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
             var branch = new BranchStep(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
@@ -91,7 +91,7 @@ namespace Alis.Reactive.Builders.Conditions
         }
 
         internal override BranchBuilder<TModel> Then(
-            ConditionGraph condition,
+            Condition condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
             _branch.AddArm(condition, pipeline);

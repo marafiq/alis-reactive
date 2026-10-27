@@ -121,7 +121,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueExpression ArrayCount(ValueExpression source) => new CountOperation(source);
 
-        internal static ValueExpression ArrayFilter(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
+        internal static ValueExpression ArrayFilter(ValueExpression source, Condition predicate, Shape itemShape) =>
             new FilterOperation(source, predicate, Shape.ArrayOf(itemShape));
 
         internal static ValueExpression ArrayMap(ValueExpression source, ValueExpression projection, Shape resultItemShape) =>
@@ -132,17 +132,17 @@ namespace Alis.Reactive.PlanModel
 
         internal static ValueExpression ArrayAny(ValueExpression source) => new HasItemsOperation(source);
 
-        internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph predicate) =>
+        internal static ValueExpression ArrayAny(ValueExpression source, Condition predicate) =>
             new SomeOperation(source, predicate);
 
-        internal static ValueExpression ArrayEvery(ValueExpression source, ConditionGraph predicate) =>
+        internal static ValueExpression ArrayEvery(ValueExpression source, Condition predicate) =>
             new EveryOperation(source, predicate);
 
-        internal static ValueExpression ArrayFind(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
+        internal static ValueExpression ArrayFind(ValueExpression source, Condition predicate, Shape itemShape) =>
             new FindOperation(source, predicate, itemShape);
 
         internal static ValueExpression ArrayFind(
-            ValueExpression source, ConditionGraph predicate, ValueExpression projection, Shape resultShape) =>
+            ValueExpression source, Condition predicate, ValueExpression projection, Shape resultShape) =>
             new FindSelectOperation(source, predicate, projection, resultShape);
 
         internal static ValueExpression ArrayOrderBy(ValueExpression source, ValueExpression key, Shape itemShape, bool descending) =>
@@ -371,7 +371,7 @@ namespace Alis.Reactive.PlanModel
 
         private protected abstract Expr Operate(Expr items, Scope scope);
 
-        private protected static FnExpr PerItem(ConditionGraph predicate, Scope scope)
+        private protected static FnExpr PerItem(Condition predicate, Scope scope)
         {
             var item = scope.Fresh("x");
             return G.Fn(predicate.Write(scope.WithItem(item)), item);
@@ -395,9 +395,9 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class FilterOperation : ArrayOperation
     {
-        private readonly ConditionGraph _predicate;
+        private readonly Condition _predicate;
 
-        internal FilterOperation(ValueExpression source, ConditionGraph predicate, Shape shape) : base(source, shape)
+        internal FilterOperation(ValueExpression source, Condition predicate, Shape shape) : base(source, shape)
         {
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
@@ -448,9 +448,9 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class SomeOperation : ArrayOperation
     {
-        private readonly ConditionGraph _predicate;
+        private readonly Condition _predicate;
 
-        internal SomeOperation(ValueExpression source, ConditionGraph predicate) : base(source, Shape.Boolean)
+        internal SomeOperation(ValueExpression source, Condition predicate) : base(source, Shape.Boolean)
         {
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
@@ -461,9 +461,9 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class EveryOperation : ArrayOperation
     {
-        private readonly ConditionGraph _predicate;
+        private readonly Condition _predicate;
 
-        internal EveryOperation(ValueExpression source, ConditionGraph predicate) : base(source, Shape.Boolean)
+        internal EveryOperation(ValueExpression source, Condition predicate) : base(source, Shape.Boolean)
         {
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
@@ -475,9 +475,9 @@ namespace Alis.Reactive.PlanModel
     /// <summary>Find gives null when nothing matches.</summary>
     internal sealed class FindOperation : ArrayOperation
     {
-        private readonly ConditionGraph _predicate;
+        private readonly Condition _predicate;
 
-        internal FindOperation(ValueExpression source, ConditionGraph predicate, Shape itemShape) : base(source, itemShape)
+        internal FindOperation(ValueExpression source, Condition predicate, Shape itemShape) : base(source, itemShape)
         {
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
@@ -485,17 +485,17 @@ namespace Alis.Reactive.PlanModel
         private protected override Expr Operate(Expr items, Scope scope) =>
             G.As(Found(items, _predicate, scope), OutputShape);
 
-        internal static Expr Found(Expr items, ConditionGraph predicate, Scope scope) =>
+        internal static Expr Found(Expr items, Condition predicate, Scope scope) =>
             G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.None), G.Null);
     }
 
     /// <summary>Find gives null when nothing matches, then applies the selector to what it found.</summary>
     internal sealed class FindSelectOperation : ArrayOperation
     {
-        private readonly ConditionGraph _predicate;
+        private readonly Condition _predicate;
         private readonly ValueExpression _projection;
 
-        internal FindSelectOperation(ValueExpression source, ConditionGraph predicate, ValueExpression projection, Shape resultShape)
+        internal FindSelectOperation(ValueExpression source, Condition predicate, ValueExpression projection, Shape resultShape)
             : base(source, resultShape)
         {
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));

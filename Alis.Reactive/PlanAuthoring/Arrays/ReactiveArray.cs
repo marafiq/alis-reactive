@@ -149,7 +149,7 @@ namespace Alis.Reactive.Builders.Arrays
 
         internal override ValueExpression Expression => _source;
 
-        private static ConditionGraph Predicate(Expression<Func<TElement, bool>> predicate)
+        private static Condition Predicate(Expression<Func<TElement, bool>> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             return ElementExpressionCompiler.CompilePredicate(predicate);

@@ -23,9 +23,9 @@ namespace Alis.Reactive.Builders.Conditions
         where TNext : Condition<TModel>
     {
         private readonly TypedSource<TProp> _left;
-        private readonly Func<ConditionGraph, TNext> _next;
+        private readonly Func<Condition, TNext> _next;
 
-        internal ConditionSourceBuilder(TypedSource<TProp> source, Func<ConditionGraph, TNext> next)
+        internal ConditionSourceBuilder(TypedSource<TProp> source, Func<Condition, TNext> next)
         {
             _left = source ?? throw new ArgumentNullException(nameof(source));
             _next = next ?? throw new ArgumentNullException(nameof(next));
@@ -33,19 +33,19 @@ namespace Alis.Reactive.Builders.Conditions
 
         /// <summary>Matches when the source equals <paramref name="operand"/>.</summary>
         /// <param name="operand">The value compared with the source.</param>
-        public TNext Eq(TProp operand) => CompareWith(CompareOperator.Eq, operand);
+        public TNext Eq(TProp operand) => CompareWith(Comparison.Equal, operand);
 
         /// <summary>Matches when the source differs from <paramref name="operand"/>.</summary>
         /// <param name="operand">The value compared with the source.</param>
-        public TNext NotEq(TProp operand) => CompareWith(CompareOperator.Neq, operand);
+        public TNext NotEq(TProp operand) => CompareWith(Comparison.NotEqual, operand);
 
         /// <summary>Matches when the source equals another value read when the condition runs.</summary>
         /// <param name="right">The value compared with the source.</param>
-        public TNext Eq(TypedSource<TProp> right) => CompareWith(CompareOperator.Eq, right);
+        public TNext Eq(TypedSource<TProp> right) => CompareWith(Comparison.Equal, right);
 
         /// <summary>Matches when the source differs from another value read when the condition runs.</summary>
         /// <param name="right">The value compared with the source.</param>
-        public TNext NotEq(TypedSource<TProp> right) => CompareWith(CompareOperator.Neq, right);
+        public TNext NotEq(TypedSource<TProp> right) => CompareWith(Comparison.NotEqual, right);
 
         /// <summary>Matches a truthy value: not null, not zero, not empty.</summary>
         public TNext Truthy() => Unary(ValueTest.Truthy);
@@ -75,42 +75,42 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal Shape Shape => _left.Shape;
 
-        internal TNext CompareWith(CompareOperator op, object? literal) =>
-            _next(ConditionGraph.Ordered(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
+        internal TNext CompareWith(Comparison op, object? literal) =>
+            _next(Condition.Ordered(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
 
-        internal TNext CompareWith<TRight>(CompareOperator op, TypedSource<TRight> right)
+        internal TNext CompareWith<TRight>(Comparison op, TypedSource<TRight> right)
         {
             if (right == null) throw new ArgumentNullException(nameof(right));
-            return _next(ConditionGraph.Ordered(op, Left, right.Expression, Shape));
+            return _next(Condition.Ordered(op, Left, right.Expression, Shape));
         }
 
         internal TNext CompareWithText(TextTest test, string text) =>
-            _next(ConditionGraph.Text(test, Left, text ?? throw new ArgumentNullException(nameof(text)), Shape));
+            _next(Condition.Text(test, Left, text ?? throw new ArgumentNullException(nameof(text)), Shape));
 
         internal TNext CompareWithLength(int length)
         {
             var minimum = MinimumTextLength.From(length, nameof(length));
-            return _next(ConditionGraph.MinLength(Left, minimum.Value, Shape));
+            return _next(Condition.MinLength(Left, minimum.Value, Shape));
         }
 
         internal TNext CompareWithRange(object low, object high) =>
-            _next(ConditionGraph.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
+            _next(Condition.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
 
         internal TNext ContainsItem<TItem>(TItem item)
         {
             var itemShape = PlanModel.Shape.FromClrType(typeof(TItem));
-            return _next(ConditionGraph.ArrayContains(Left, ValueExpression.LiteralFor(item, itemShape), Shape, itemShape));
+            return _next(Condition.ArrayContains(Left, ValueExpression.LiteralFor(item, itemShape), Shape, itemShape));
         }
 
         private ValueExpression Left => _left.Expression;
 
-        private TNext Unary(ValueTest test) => _next(ConditionGraph.Unary(test, Left, Shape));
+        private TNext Unary(ValueTest test) => _next(Condition.Unary(test, Left, Shape));
 
         private TNext Among(TProp[] values, bool negated)
         {
             if (values == null) throw new ArgumentNullException(nameof(values));
             var items = values.Select(value => ValueExpression.LiteralFor(value, Shape)).ToList();
-            return _next(ConditionGraph.Membership(Left, items, negated, Shape));
+            return _next(Condition.Membership(Left, items, negated, Shape));
         }
     }
 }
