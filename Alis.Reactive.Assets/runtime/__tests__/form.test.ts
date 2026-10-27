@@ -1,23 +1,29 @@
 // alis.form (grammar.md 6.4): validation messages, scope, unmounted fields, server errors, live wiring.
 
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FormField, FormPluginData, ModelPluginData } from "../types/index";
-import { registerPlugin, resetPluginsForTests } from "../objects/plugins";
-import { Owner } from "../objects/owner";
-import { startOwner } from "../plans/start";
-import { formPlugin, resetFormsForTests, type FormObject } from "../plugins/form/form";
-import { modelPlugin, resetModelForTests } from "../plugins/model";
+import type { FormObject } from "../plugins/form/form";
 import { e, element, fakeWidget, plan, plugin, s } from "./support/plan";
 
-beforeAll(() => {
-  resetPluginsForTests();
+// Each test runs a fresh runtime: the plugin registry, the forms and the model start empty, with no
+// reset hook shipped in the runtime for it.
+let Owner: (typeof import("../objects/owner"))["Owner"];
+let startOwner: (typeof import("../plans/start"))["startOwner"];
+let formPlugin: (typeof import("../plugins/form/form"))["formPlugin"];
+let modelPlugin: (typeof import("../plugins/model"))["modelPlugin"];
+
+beforeEach(async () => {
+  vi.resetModules();
+  ({ Owner } = await import("../objects/owner"));
+  ({ startOwner } = await import("../plans/start"));
+  ({ formPlugin } = await import("../plugins/form/form"));
+  ({ modelPlugin } = await import("../plugins/model"));
+  const { registerPlugin } = await import("../objects/plugins");
   registerPlugin("alis.form", formPlugin);
   registerPlugin("alis.model", modelPlugin);
 });
 
 afterEach(() => {
-  resetFormsForTests();
-  resetModelForTests();
   document.body.innerHTML = "";
 });
 
@@ -87,11 +93,14 @@ describe("validate", () => {
     expect(summary.textContent).toBe("Enter the resident's name.");
   });
 
-  it("fails for an unmounted field with an active test, and skips it when every test is inactive", () => {
+  it("fails an unmounted field whose test is active, as the server fails a missing required member", () => {
     render(`<form id="admission"></form><div id="Test_Plan_validation_summary" hidden></div>`);
     expect(startForm([requiredField("Ghost", "Ghost", "Ghost is required.")]).validate()).toBe(false);
-    resetFormsForTests();
-    expect(startForm([requiredField("Ghost2", "Ghost2", "msg", e.lit(false))]).validate()).toBe(true);
+  });
+
+  it("passes an unmounted field whose every test is inactive", () => {
+    render(`<form id="admission"></form><div id="Test_Plan_validation_summary" hidden></div>`);
+    expect(startForm([requiredField("Ghost", "Ghost", "Ghost is required.", e.lit(false))]).validate()).toBe(true);
   });
 
   it("fails when the container is missing and the form has tests", () => {

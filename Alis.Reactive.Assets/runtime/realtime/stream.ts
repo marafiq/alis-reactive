@@ -106,11 +106,3 @@ export const streamPlugin: Plugin = {
     log.debug("event.listening", { url, event });
   },
 };
-
-export function resetStreamsForTests(): void {
-  for (const managed of streams.values()) {
-    managed.stopping = true;
-    managed.source.close();
-  }
-  streams.clear();
-}

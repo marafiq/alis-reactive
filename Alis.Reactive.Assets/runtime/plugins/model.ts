@@ -166,7 +166,3 @@ function announceCommits(input: ModelInput, owner: Owner): void {
   announcing.add(element);
   owner.onDispose(() => announcing.delete(element));
 }
-
-export function resetModelForTests(): void {
-  inputsByPlan.clear();
-}

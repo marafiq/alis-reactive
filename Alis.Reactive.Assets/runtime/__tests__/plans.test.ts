@@ -1,21 +1,25 @@
 // Owners, handlers, the document's ready and raise, and slots (grammar.md 3.5, 6.1, 6.5).
 
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { registerPlugin, resetPluginsForTests } from "../objects/plugins";
-import { Owner } from "../objects/owner";
-import { startOwner } from "../plans/start";
-import { documentPlugin } from "../plugins/document";
-import { slotPlugin, resetSlotsForTests } from "../plugins/slot";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { e, element, fakeWidget, on, plan, plugin, s, st } from "./support/plan";
 
-beforeAll(() => {
-  resetPluginsForTests();
-  registerPlugin("alis.document", documentPlugin);
+// Each test runs a fresh runtime: the plugin registry and the slots start empty, with no reset hook
+// shipped in the runtime for it.
+let Owner: (typeof import("../objects/owner"))["Owner"];
+let startOwner: (typeof import("../plans/start"))["startOwner"];
+let slotPlugin: (typeof import("../plugins/slot"))["slotPlugin"];
+
+beforeEach(async () => {
+  vi.resetModules();
+  ({ Owner } = await import("../objects/owner"));
+  ({ startOwner } = await import("../plans/start"));
+  ({ slotPlugin } = await import("../plugins/slot"));
+  const { registerPlugin } = await import("../objects/plugins");
+  registerPlugin("alis.document", (await import("../plugins/document")).documentPlugin);
   registerPlugin("alis.slot", slotPlugin);
 });
 
 afterEach(() => {
-  resetSlotsForTests();
   document.body.innerHTML = "";
 });
 

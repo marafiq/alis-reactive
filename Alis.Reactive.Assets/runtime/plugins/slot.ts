@@ -104,8 +104,3 @@ export const slotPlugin: Plugin = {
     unload: () => unload(id),
   }),
 };
-
-export function resetSlotsForTests(): void {
-  for (const owner of owners.values()) owner.dispose();
-  owners.clear();
-}

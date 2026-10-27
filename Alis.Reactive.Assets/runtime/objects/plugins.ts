@@ -45,7 +45,3 @@ export function pluginOf(name: string, instance: unknown): Plugin {
   if (!canHaveMembers(instance)) throw new Error(`[alis] plugin "${name}" must be an object or function`);
   return { object: () => instance };
 }
-
-export function resetPluginsForTests(): void {
-  plugins.clear();
-}

@@ -1,17 +1,22 @@
 // The vendor driver's second way to listen (grammar.md 6.9 E4): a listener assigned to the property the
 // event names. The method style is covered by the handler tests in plans.test.ts.
 
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { registerPlugin, resetPluginsForTests } from "../objects/plugins";
-import { Owner } from "../objects/owner";
-import { startOwner } from "../plans/start";
-import { documentPlugin } from "../plugins/document";
-import { subscribeVendor } from "../objects/vendor-driver";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { e, element, fakeWidget, on, plan, s, st, vendors } from "./support/plan";
 
-beforeAll(() => {
-  resetPluginsForTests();
-  registerPlugin("alis.document", documentPlugin);
+// Each test runs a fresh runtime: the plugin registry and every plugin's state start empty, with no
+// reset hook shipped in the runtime for it.
+let Owner: (typeof import("../objects/owner"))["Owner"];
+let startOwner: (typeof import("../plans/start"))["startOwner"];
+let subscribeVendor: (typeof import("../objects/vendor-driver"))["subscribeVendor"];
+
+beforeEach(async () => {
+  vi.resetModules();
+  ({ Owner } = await import("../objects/owner"));
+  ({ startOwner } = await import("../plans/start"));
+  ({ subscribeVendor } = await import("../objects/vendor-driver"));
+  const { registerPlugin } = await import("../objects/plugins");
+  registerPlugin("alis.document", (await import("../plugins/document")).documentPlugin);
 });
 
 afterEach(() => {

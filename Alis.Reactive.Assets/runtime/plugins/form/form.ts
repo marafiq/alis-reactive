@@ -284,9 +284,3 @@ export const formPlugin: Plugin = {
     });
   },
 };
-
-export function resetFormsForTests(): void {
-  formsByContainer.clear();
-  summaries.clear();
-  liveWiredElements = new WeakSet<HTMLElement>();
-}
