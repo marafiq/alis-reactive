@@ -1,11 +1,17 @@
 using System.Diagnostics;
+using Microsoft.Playwright;
 using Microsoft.Playwright.NUnit;
+using NUnit.Framework;
 
-namespace Alis.Reactive.PlaywrightTests;
+namespace Alis.Reactive.Playwright.Extensions;
 
+/// <summary>
+/// One browser page per test against the sandbox the test assembly started: real gestures, the page's console
+/// captured, and a trace kept when the test fails.
+/// </summary>
 public abstract class PlaywrightTestBase : PageTest
 {
-    protected string BaseUrl => WebServerFixture.BaseUrl;
+    protected string BaseUrl => SandboxServer.BaseUrl;
     private const int BootPollIntervalMs = 50;
     private const int ReactiveBootTimeoutMs = 60000;
     private const int NavigationTimeoutBootRecoveryMs = 1000;

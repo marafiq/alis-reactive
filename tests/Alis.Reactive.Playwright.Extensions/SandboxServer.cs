@@ -1,14 +1,16 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using NUnit.Framework;
 
-namespace Alis.Reactive.PlaywrightTests;
+namespace Alis.Reactive.Playwright.Extensions;
 
 /// <summary>
-/// Runs one SandboxApp Kestrel instance on an isolated port for the Playwright test assembly.
+/// Runs one SandboxApp Kestrel instance on a free port for a Playwright test assembly. NUnit runs a setup
+/// fixture only from the test assembly itself, so each test project declares one deriving from this class:
+/// <c>[SetUpFixture] public sealed class Sandbox : SandboxServer;</c> in its root namespace.
 /// </summary>
-[SetUpFixture]
-public class WebServerFixture
+public abstract class SandboxServer
 {
     private const int CapturedServerOutputLines = 200;
     private const int SandboxReadinessAttempts = 60;
@@ -170,7 +172,7 @@ public class WebServerFixture
 
         throw new FileNotFoundException(
             "The Playwright test output is missing Alis.Reactive.SandboxApp.dll. " +
-            "Build tests/Alis.Reactive.PlaywrightTests before running Playwright tests.",
+            "Build the test project, which references the sandbox, before running its tests.",
             candidate);
     }
 }
