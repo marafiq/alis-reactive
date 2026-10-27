@@ -96,7 +96,7 @@ namespace Alis.Reactive
         // net48 / System.Web has no per-request IServiceProvider, so the plan is
         // created with services: null. Validation metadata is resolved at render
         // time via the MVC5 DependencyResolver, which the app bridges over its DI
-        // container in Application_Start. See ReactivePlan.RequireClientValidationRuleSource.
+        // container in Application_Start. See ReactivePlan.RequireBrowserRuleSource.
         private static ReactivePlan<TModel> CreatePlan<TModel>(HtmlHelper<TModel> html, ReactivePlanScope scope)
             where TModel : class =>
             new ReactivePlan<TModel>(scope, services: null, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html));

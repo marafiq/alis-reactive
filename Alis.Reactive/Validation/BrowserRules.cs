@@ -9,7 +9,7 @@ namespace Alis.Reactive.Validation
     /// A value is entered: not blank, and not the type's default. On a list, at least one item; on an
     /// enum, a member other than the default one.
     /// </summary>
-    public sealed class NotEmptyRule : ClientRule
+    public sealed class NotEmptyRule : BrowserRule
     {
         internal NotEmptyRule(string message, Condition condition)
             : base(message, condition)
@@ -18,7 +18,7 @@ namespace Alis.Reactive.Validation
 
         internal override string Name => "required";
 
-        internal override bool TryFor(FieldReference field, out ClientRule rule)
+        internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = field.Shape.Kind == "array" ? new AtLeastOneRule(Message, Condition)
                 : DefaultMemberOf(field.Type) is string member ? new NotDefaultMemberRule(member, Message, Condition)
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Validation
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Not(BlankOrDefault(value, fieldShape));
 
-        private protected override ClientRule Under(Condition condition) => new NotEmptyRule(Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new NotEmptyRule(Message, condition);
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ namespace Alis.Reactive.Validation
     /// browser, and a number, a boolean, a date or an enum that cannot be null always binds, so on those
     /// the rule stays with the server, which always passes it.
     /// </summary>
-    public sealed class NotNullRule : ClientRule
+    public sealed class NotNullRule : BrowserRule
     {
         internal NotNullRule(string message, Condition condition)
             : base(message, condition)
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Validation
 
         internal override string Name => "required";
 
-        internal override bool TryFor(FieldReference field, out ClientRule rule)
+        internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = this;
             return field.Shape.Kind != "array" && (!field.Type.IsValueType || Nullable.GetUnderlyingType(field.Type) != null);
@@ -61,11 +61,11 @@ namespace Alis.Reactive.Validation
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) => G.Not(Blank(value));
 
-        private protected override ClientRule Under(Condition condition) => new NotNullRule(Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new NotNullRule(Message, condition);
     }
 
-    /// <summary>An enum member other than the type's default one: what <see cref="ClientRule.NotEmpty"/> asks of an enum.</summary>
-    public sealed class NotDefaultMemberRule : ClientRule
+    /// <summary>An enum member other than the type's default one: what <see cref="BrowserRule.NotEmpty"/> asks of an enum.</summary>
+    public sealed class NotDefaultMemberRule : BrowserRule
     {
         internal NotDefaultMemberRule(string defaultMember, string message, Condition condition)
             : base(message, condition)
@@ -81,11 +81,11 @@ namespace Alis.Reactive.Validation
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Not(G.Or(Blank(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember))));
 
-        private protected override ClientRule Under(Condition condition) => new NotDefaultMemberRule(DefaultMember, Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new NotDefaultMemberRule(DefaultMember, Message, condition);
     }
 
-    /// <summary>A list has at least one item: what <see cref="ClientRule.NotEmpty"/> asks of a list.</summary>
-    public sealed class AtLeastOneRule : ClientRule
+    /// <summary>A list has at least one item: what <see cref="BrowserRule.NotEmpty"/> asks of a list.</summary>
+    public sealed class AtLeastOneRule : BrowserRule
     {
         internal AtLeastOneRule(string message, Condition condition)
             : base(message, condition)
@@ -101,11 +101,11 @@ namespace Alis.Reactive.Validation
             return G.Op(Operator.Cond, isArray, hasItems, G.Not(BlankOrDefault(value, fieldShape)));
         }
 
-        private protected override ClientRule Under(Condition condition) => new AtLeastOneRule(Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new AtLeastOneRule(Message, condition);
     }
 
     /// <summary>Nothing is entered.</summary>
-    public sealed class EmptyRule : ClientRule
+    public sealed class EmptyRule : BrowserRule
     {
         internal EmptyRule(string message, Condition condition)
             : base(message, condition)
@@ -117,11 +117,11 @@ namespace Alis.Reactive.Validation
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             BlankOrDefault(value, fieldShape);
 
-        private protected override ClientRule Under(Condition condition) => new EmptyRule(Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new EmptyRule(Message, condition);
     }
 
     /// <summary>Text at least <see cref="Length"/> characters long.</summary>
-    public sealed class MinLengthRule : ClientRule
+    public sealed class MinLengthRule : BrowserRule
     {
         internal MinLengthRule(int length, string message, Condition condition)
             : base(message, condition)
@@ -137,11 +137,11 @@ namespace Alis.Reactive.Validation
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), G.Op(Operator.Gte, TextLength(value), G.Lit(Length)));
 
-        private protected override ClientRule Under(Condition condition) => new MinLengthRule(Length, Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new MinLengthRule(Length, Message, condition);
     }
 
     /// <summary>Text at most <see cref="Length"/> characters long.</summary>
-    public sealed class MaxLengthRule : ClientRule
+    public sealed class MaxLengthRule : BrowserRule
     {
         internal MaxLengthRule(int length, string message, Condition condition)
             : base(message, condition)
@@ -157,14 +157,14 @@ namespace Alis.Reactive.Validation
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), G.Op(Operator.Lte, TextLength(value), G.Lit(Length)));
 
-        private protected override ClientRule Under(Condition condition) => new MaxLengthRule(Length, Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new MaxLengthRule(Length, Message, condition);
     }
 
     /// <summary>
     /// Text a JavaScript regular expression matches: the validator's own pattern, or the one an email
     /// address or a URL is decided by.
     /// </summary>
-    public sealed class PatternRule : ClientRule
+    public sealed class PatternRule : BrowserRule
     {
         private readonly string _name;
 
@@ -187,11 +187,11 @@ namespace Alis.Reactive.Validation
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), G.Op(Operator.Matches, value, G.Lit(Pattern), G.Lit(Flags)));
 
-        private protected override ClientRule Under(Condition condition) => new PatternRule(_name, Pattern, Flags, Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new PatternRule(_name, Pattern, Flags, Message, condition);
     }
 
     /// <summary>A card number that passes the Luhn check.</summary>
-    public sealed class CreditCardRule : ClientRule
+    public sealed class CreditCardRule : BrowserRule
     {
         internal CreditCardRule(string message, Condition condition)
             : base(message, condition)
@@ -203,7 +203,7 @@ namespace Alis.Reactive.Validation
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), CardNumber(value, scope));
 
-        private protected override ClientRule Under(Condition condition) => new CreditCardRule(Message, condition);
+        private protected override BrowserRule Under(Condition condition) => new CreditCardRule(Message, condition);
 
         // The server's card check: dashes and spaces dropped, every other character a digit, and
         // the Luhn sum a multiple of ten.
@@ -242,7 +242,7 @@ namespace Alis.Reactive.Validation
     /// The value compares with a target under the target's shape: a fixed value of the member's type,
     /// or another member of the model.
     /// </summary>
-    public abstract class ComparisonRule : ClientRule
+    public abstract class ComparisonRule : BrowserRule
     {
         private protected ComparisonRule(Comparison comparison, Shape shape, string message, Condition condition)
             : base(message, condition)
@@ -312,7 +312,7 @@ namespace Alis.Reactive.Validation
 
         private protected override Expr Target(FormFieldValues values, Scope scope) => G.Lit(_value);
 
-        private protected override ClientRule Under(Condition condition) =>
+        private protected override BrowserRule Under(Condition condition) =>
             new FixedComparisonRule(Comparison, _value, Shape, Message, condition);
     }
 
@@ -329,19 +329,19 @@ namespace Alis.Reactive.Validation
 
         internal override IEnumerable<FieldReference> Fields => new[] { _peer };
 
-        internal override ClientRule PrefixedBy(string prefix, Condition outer) =>
+        internal override BrowserRule PrefixedBy(string prefix, Condition outer) =>
             new MemberComparisonRule(Comparison, _peer.PrefixedBy(prefix), Message, Condition.Combine(outer, Condition.PrefixedBy(prefix)));
 
         private protected override bool ComparesWithMember => true;
 
         private protected override Expr Target(FormFieldValues values, Scope scope) => values.Value(_peer).Write(scope);
 
-        private protected override ClientRule Under(Condition condition) =>
+        private protected override BrowserRule Under(Condition condition) =>
             new MemberComparisonRule(Comparison, _peer, Message, condition);
     }
 
     /// <summary>The value lies between two bounds of its own type, both included or both excluded.</summary>
-    public sealed class RangeRule : ClientRule
+    public sealed class RangeRule : BrowserRule
     {
         private readonly object _from;
         private readonly object _to;
@@ -384,7 +384,7 @@ namespace Alis.Reactive.Validation
             return G.Or(Absent(value), compared);
         }
 
-        private protected override ClientRule Under(Condition condition) =>
+        private protected override BrowserRule Under(Condition condition) =>
             new RangeRule(_from, _to, Inclusive, _shape, Message, condition);
     }
 }

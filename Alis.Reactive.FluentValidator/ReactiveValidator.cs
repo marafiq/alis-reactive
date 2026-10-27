@@ -38,7 +38,7 @@ namespace Alis.Reactive.FluentValidator
         internal abstract bool IsAsync { get; }
 
         /// <summary>The rules the browser runs, with those of the child validators the rules hold.</summary>
-        internal abstract IReadOnlyList<ClientValidationField> ClientRules();
+        internal abstract IReadOnlyList<BrowserField> BrowserRules();
     }
 
     /// <summary>
@@ -170,9 +170,9 @@ namespace Alis.Reactive.FluentValidator
 
         internal override bool IsAsync => _rules.Any(rule => rule.IsAsync);
 
-        internal override IReadOnlyList<ClientValidationField> ClientRules()
+        internal override IReadOnlyList<BrowserField> BrowserRules()
         {
-            var browser = new ClientRuleSet();
+            var browser = new BrowserRuleSet();
             foreach (var rule in _rules)
                 rule.DescribeFor(browser);
             return browser.Fields;

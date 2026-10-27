@@ -11,7 +11,7 @@ namespace Alis.Reactive.Validation
     /// </summary>
     internal sealed class CheckedField
     {
-        internal CheckedField(string componentId, string serverName, Shape shape, IReadOnlyList<ClientRule> rules, FormFieldValues values)
+        internal CheckedField(string componentId, string serverName, Shape shape, IReadOnlyList<BrowserRule> rules, FormFieldValues values)
         {
             ComponentId = componentId;
             ServerName = serverName;
@@ -26,7 +26,7 @@ namespace Alis.Reactive.Validation
 
         internal Shape Shape { get; }
 
-        internal IReadOnlyList<ClientRule> Rules { get; }
+        internal IReadOnlyList<BrowserRule> Rules { get; }
 
         /// <summary>Where the rules' conditions and comparisons read the other members.</summary>
         internal FormFieldValues Values { get; }
@@ -39,7 +39,7 @@ namespace Alis.Reactive.Validation
         /// item of a collection the page rendered.
         /// </summary>
         internal static IEnumerable<CheckedField> Bind(
-            IReadOnlyList<ClientValidationField> fields,
+            IReadOnlyList<BrowserField> fields,
             IReadOnlyDictionary<string, RenderedInput> renderedInputs,
             Type modelType,
             string fieldPrefix)
@@ -64,9 +64,9 @@ namespace Alis.Reactive.Validation
 
         // Each item field of a collection, at every item the page rendered an input of: Lines[0].Qty for
         // the item field Qty when the page rendered Lines[0].Qty, or an input nested inside it.
-        private static IEnumerable<ClientValidationField> RenderedItemFields(
+        private static IEnumerable<BrowserField> RenderedItemFields(
             string collectionPath,
-            IReadOnlyList<ClientValidationField> itemFields,
+            IReadOnlyList<BrowserField> itemFields,
             IEnumerable<string> renderedPaths)
         {
             foreach (var renderedPath in renderedPaths)
@@ -146,7 +146,7 @@ namespace Alis.Reactive.Validation
             return ValueExpression.ReadBound(input.Id, input.Shape);
         }
 
-        internal CheckedField Check(ClientValidationField field)
+        internal CheckedField Check(BrowserField field)
         {
             var input = Resolve(field.Reference);
             return new CheckedField(input.Id, field.FieldName, input.Shape, field.Rules, this);

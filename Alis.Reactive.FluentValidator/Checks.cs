@@ -39,7 +39,7 @@ namespace Alis.Reactive.FluentValidator
     /// <summary>A term the browser runs as well: the plan's form of the decision the server makes.</summary>
     internal interface IBrowserCheck
     {
-        IEnumerable<ClientRule> ForBrowser(string message);
+        IEnumerable<BrowserRule> ForBrowser(string message);
     }
 
     internal sealed class NotNullCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
@@ -48,7 +48,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal override bool Passes(T instance, TValue value, MessageArguments arguments) => value != null;
 
-        public IEnumerable<ClientRule> ForBrowser(string message) => new[] { ClientRule.NotNull(message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.NotNull(message) };
     }
 
     /// <summary>Not null, not blank text, not an empty list, and not the type's default.</summary>
@@ -58,7 +58,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal override bool Passes(T instance, TValue value, MessageArguments arguments) => !Emptiness.IsEmpty(value);
 
-        public IEnumerable<ClientRule> ForBrowser(string message) => new[] { ClientRule.NotEmpty(message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.NotEmpty(message) };
     }
 
     internal sealed class EmptyCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
@@ -67,7 +67,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal override bool Passes(T instance, TValue value, MessageArguments arguments) => Emptiness.IsEmpty(value);
 
-        public IEnumerable<ClientRule> ForBrowser(string message) => new[] { ClientRule.Empty(message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.Empty(message) };
     }
 
     internal static class Emptiness
@@ -117,10 +117,10 @@ namespace Alis.Reactive.FluentValidator
         internal override void NameRenderArguments(MessageArguments arguments) =>
             arguments.With("MinLength", _min).With("MaxLength", _max);
 
-        public IEnumerable<ClientRule> ForBrowser(string message)
+        public IEnumerable<BrowserRule> ForBrowser(string message)
         {
-            if (_min > 0) yield return ClientRule.MinLength(_min, message);
-            if (_max >= 0) yield return ClientRule.MaxLength(_max, message);
+            if (_min > 0) yield return BrowserRule.MinLength(_min, message);
+            if (_max >= 0) yield return BrowserRule.MaxLength(_max, message);
         }
     }
 
@@ -155,8 +155,8 @@ namespace Alis.Reactive.FluentValidator
                 _regex = pattern;
             }
 
-            public IEnumerable<ClientRule> ForBrowser(string message) =>
-                new[] { ClientRule.Matches(_regex.ToString(), JavaScriptPattern.Flags(_regex), message) };
+            public IEnumerable<BrowserRule> ForBrowser(string message) =>
+                new[] { BrowserRule.Matches(_regex.ToString(), JavaScriptPattern.Flags(_regex), message) };
         }
     }
 
@@ -195,7 +195,7 @@ namespace Alis.Reactive.FluentValidator
             return at > 0 && at != value.Length - 1 && at == value.LastIndexOf('@');
         }
 
-        public IEnumerable<ClientRule> ForBrowser(string message) => new[] { ClientRule.Email(message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.Email(message) };
     }
 
     /// <summary>Digits, with dashes and spaces between them, whose Luhn checksum holds. Null text passes.</summary>
@@ -219,7 +219,7 @@ namespace Alis.Reactive.FluentValidator
             return checksum % 10 == 0;
         }
 
-        public IEnumerable<ClientRule> ForBrowser(string message) => new[] { ClientRule.CreditCard(message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.CreditCard(message) };
     }
 
     /// <summary>An absolute http or https address. Null or empty text passes.</summary>
@@ -234,7 +234,7 @@ namespace Alis.Reactive.FluentValidator
                 && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
         }
 
-        public IEnumerable<ClientRule> ForBrowser(string message) => new[] { ClientRule.Url(message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.Url(message) };
     }
 
     /// <summary>
@@ -276,7 +276,7 @@ namespace Alis.Reactive.FluentValidator
         internal override void NameRenderArguments(MessageArguments arguments) =>
             arguments.With("ComparisonValue", _operand.RenderName).With("ComparisonProperty", _operand.DisplayName);
 
-        public IEnumerable<ClientRule> ForBrowser(string message) => _operand.ForBrowser(_comparison, message);
+        public IEnumerable<BrowserRule> ForBrowser(string message) => _operand.ForBrowser(_comparison, message);
     }
 
     /// <summary>
@@ -295,7 +295,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal abstract object? RenderName { get; }
 
-        internal abstract IEnumerable<ClientRule> ForBrowser(Comparison comparison, string message);
+        internal abstract IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message);
 
         private sealed class LiteralOperand : Operand<T, TValue>
         {
@@ -313,8 +313,8 @@ namespace Alis.Reactive.FluentValidator
             internal override object? RenderName => _value;
 
             // A null literal has no browser form: compare with null by NotNull or Empty.
-            internal override IEnumerable<ClientRule> ForBrowser(Comparison comparison, string message) =>
-                _value == null ? Array.Empty<ClientRule>() : new[] { ClientRule.Compare(comparison, _value, message) };
+            internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message) =>
+                _value == null ? Array.Empty<BrowserRule>() : new[] { BrowserRule.Compare(comparison, _value, message) };
         }
 
         private sealed class MemberOperand : Operand<T, TValue>
@@ -333,10 +333,10 @@ namespace Alis.Reactive.FluentValidator
             internal override object? RenderName => DisplayName;
 
             // A member the page can bind is a path from the model; a computed value is the server's.
-            internal override IEnumerable<ClientRule> ForBrowser(Comparison comparison, string message) =>
+            internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message) =>
                 _member.Path == null
-                    ? Array.Empty<ClientRule>()
-                    : new[] { ClientRule.CompareWith(comparison, _member.Expression, message) };
+                    ? Array.Empty<BrowserRule>()
+                    : new[] { BrowserRule.CompareWith(comparison, _member.Expression, message) };
         }
     }
 
@@ -372,8 +372,8 @@ namespace Alis.Reactive.FluentValidator
         internal override void NameRenderArguments(MessageArguments arguments) =>
             arguments.With("From", _from).With("To", _to);
 
-        public IEnumerable<ClientRule> ForBrowser(string message) =>
-            new[] { ClientRule.Between(_from, _to, _inclusive, message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message) =>
+            new[] { BrowserRule.Between(_from, _to, _inclusive, message) };
     }
 
     /// <summary>A C# predicate: the server's alone.</summary>

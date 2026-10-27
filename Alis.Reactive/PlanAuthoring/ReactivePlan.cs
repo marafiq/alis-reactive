@@ -94,12 +94,12 @@ namespace Alis.Reactive
         /// The browser rules <typeparamref name="TValidator"/> declares, resolved from the services the plan
         /// renders with, for a component whose own JavaScript validates: a grid's cell editor.
         /// </summary>
-        /// <example><c>FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.ClientRules&lt;ResidentCareItemValidator&gt;())</c></example>
+        /// <example><c>FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.BrowserRules&lt;ResidentCareItemValidator&gt;())</c></example>
         /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
         /// <returns>Each field the validator names, with the rules the browser can evaluate.</returns>
-        public IReadOnlyList<ClientValidationField> ClientRules<TValidator>() where TValidator : class =>
-            RequireClientValidationRuleSource(_services, typeof(TValidator).Name, "This view")
-                .GetClientRules<TValidator>();
+        public IReadOnlyList<BrowserField> BrowserRules<TValidator>() where TValidator : class =>
+            RequireBrowserRuleSource(_services, typeof(TValidator).Name, "This view")
+                .GetBrowserRules<TValidator>();
 
         /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>
         /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
@@ -126,7 +126,7 @@ namespace Alis.Reactive
             var validated = _context.ValidatedRequests;
             if (validated.Count == 0) return;
 
-            var ruleSource = RequireClientValidationRuleSource(
+            var ruleSource = RequireBrowserRuleSource(
                 services, validated[0].Validation.ValidatorName, $"Request at '{validated[0].Request.Url}'");
             var renderedInputs = _renderedInputs.Snapshot();
             foreach (var (_, form) in validated)
@@ -136,19 +136,19 @@ namespace Alis.Reactive
             }
         }
 
-        private static IClientValidationRuleSource RequireClientValidationRuleSource(
+        private static IBrowserRuleSource RequireBrowserRuleSource(
             IServiceProvider? services,
             string validatorName,
             string requiredBy)
         {
             // ASP.NET Core flows the source through the per-request IServiceProvider.
-            var source = services?.GetService(typeof(IClientValidationRuleSource)) as IClientValidationRuleSource;
+            var source = services?.GetService(typeof(IBrowserRuleSource)) as IBrowserRuleSource;
 
 #if NET48
             // net48 / System.Web has no per-request IServiceProvider. MVC5's idiomatic
             // service locator is DependencyResolver, bridged at startup via SetResolver.
-            source ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(IClientValidationRuleSource))
-                as IClientValidationRuleSource;
+            source ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(IBrowserRuleSource))
+                as IBrowserRuleSource;
 #endif
 
             if (source != null) return source;
@@ -156,15 +156,15 @@ namespace Alis.Reactive
 #if NET48
             throw new InvalidOperationException(
                 $"{requiredBy} specifies validation source '{validatorName}', " +
-                "but no IClientValidationRuleSource could be resolved. " +
+                "but no IBrowserRuleSource could be resolved. " +
                 "Register the validators with AddReactiveFluentValidation(...) and bridge it to " +
                 "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
 #else
             throw new InvalidOperationException(
                 $"{requiredBy} specifies validation source '{validatorName}', " +
-                "but no IClientValidationRuleSource is registered in DI. " +
+                "but no IBrowserRuleSource is registered in DI. " +
                 "Register the validators with services.AddReactiveFluentValidation(...), " +
-                "or register your own IClientValidationRuleSource.");
+                "or register your own IBrowserRuleSource.");
 #endif
         }
     }

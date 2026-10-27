@@ -128,7 +128,7 @@ namespace Alis.Reactive.FluentValidator
 
         Task Validate(T instance, string prefix, ValidationRun run);
 
-        void DescribeFor(ClientRuleSet browser);
+        void DescribeFor(BrowserRuleSet browser);
     }
 
     /// <summary>The checks and child validators written after one <c>RuleFor</c> or <c>RuleForEach</c>.</summary>
@@ -161,7 +161,7 @@ namespace Alis.Reactive.FluentValidator
 
         public abstract Task Validate(T instance, string prefix, ValidationRun run);
 
-        public abstract void DescribeFor(ClientRuleSet browser);
+        public abstract void DescribeFor(BrowserRuleSet browser);
 
         // The browser's condition for one check: the rule's enclosing blocks and the check's own conditions,
         // or false when one of them is the server's alone.
@@ -242,7 +242,7 @@ namespace Alis.Reactive.FluentValidator
                 await component.Validate(instance, value, prefix + FieldPath, FieldDisplayName, run).ConfigureAwait(false);
         }
 
-        public override void DescribeFor(ClientRuleSet browser)
+        public override void DescribeFor(BrowserRuleSet browser)
         {
             foreach (var component in Components)
                 if (TryBrowserCondition(component, out var when))
@@ -274,7 +274,7 @@ namespace Alis.Reactive.FluentValidator
 
         // The browser validates an item through the item's own validator, or by the checks written on the
         // item itself, at each item the page renders.
-        public override void DescribeFor(ClientRuleSet browser)
+        public override void DescribeFor(BrowserRuleSet browser)
         {
             foreach (var component in Components)
             {
@@ -307,10 +307,10 @@ namespace Alis.Reactive.FluentValidator
             await Validators.Run(_included, instance, prefix, run).ConfigureAwait(false);
         }
 
-        public void DescribeFor(ClientRuleSet browser)
+        public void DescribeFor(BrowserRuleSet browser)
         {
             if (!_scope.TryForBrowser(out var scope) || !(_included is ReactiveValidator rules)) return;
-            browser.Add(rules.ClientRules(), scope);
+            browser.Add(rules.BrowserRules(), scope);
         }
     }
 
@@ -323,7 +323,7 @@ namespace Alis.Reactive.FluentValidator
 
         internal abstract Task Validate(T instance, TValue value, string path, string displayName, ValidationRun run);
 
-        internal abstract void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when);
+        internal abstract void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when);
     }
 
     internal sealed class CheckComponent<T, TValue> : Component<T, TValue>
@@ -353,25 +353,25 @@ namespace Alis.Reactive.FluentValidator
 
         // A check reaches the browser when the vocabulary has its term and its message is known before any
         // model exists.
-        internal override void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when)
+        internal override void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when)
         {
             foreach (var rule in BrowserRules(displayName))
                 browser.Add(member.Expression, rule.When(when));
         }
 
         // The same check on each item of a collection member.
-        internal void DescribeForItems(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when)
+        internal void DescribeForItems(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when)
         {
             var rules = BrowserRules(displayName).ToList();
             if (rules.Count > 0) browser.AddItemRules(member.Expression, rules, when);
         }
 
-        private IEnumerable<ClientRule> BrowserRules(string displayName)
+        private IEnumerable<BrowserRule> BrowserRules(string displayName)
         {
-            if (!(_check is IBrowserCheck term)) return Array.Empty<ClientRule>();
+            if (!(_check is IBrowserCheck term)) return Array.Empty<BrowserRule>();
             var arguments = new MessageArguments(displayName);
             _check.NameRenderArguments(arguments);
-            return Message.TryForBrowser(arguments, out var text) ? term.ForBrowser(text) : Array.Empty<ClientRule>();
+            return Message.TryForBrowser(arguments, out var text) ? term.ForBrowser(text) : Array.Empty<BrowserRule>();
         }
     }
 
@@ -393,15 +393,15 @@ namespace Alis.Reactive.FluentValidator
             await Validators.Run(_child, value, path + ".", run).ConfigureAwait(false);
         }
 
-        internal override void DescribeFor(ClientRuleSet browser, ModelMember<T> member, string displayName, Condition when)
+        internal override void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when)
         {
             if (TryItemFields(out var fields)) browser.Add(member.Expression, fields, when);
         }
 
         // A validator the app wrote another way than ReactiveValidator gives the browser nothing.
-        internal bool TryItemFields(out IReadOnlyList<ClientValidationField> fields)
+        internal bool TryItemFields(out IReadOnlyList<BrowserField> fields)
         {
-            fields = _child is ReactiveValidator rules ? rules.ClientRules() : Array.Empty<ClientValidationField>();
+            fields = _child is ReactiveValidator rules ? rules.BrowserRules() : Array.Empty<BrowserField>();
             return _child is ReactiveValidator;
         }
     }

@@ -4,14 +4,14 @@ namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// The browser rules of a validator, by its type: what a plan's forms check and what
-    /// <c>plan.ClientRules&lt;TValidator&gt;()</c> returns. <c>AddReactiveFluentValidation</c> registers
-    /// <c>ReactiveValidator</c>'s; another validation library registers its own, built with <see cref="ClientRuleSet"/>.
+    /// <c>plan.BrowserRules&lt;TValidator&gt;()</c> returns. <c>AddReactiveFluentValidation</c> registers
+    /// <c>ReactiveValidator</c>'s; another validation library registers its own, built with <see cref="BrowserRuleSet"/>.
     /// </summary>
-    public interface IClientValidationRuleSource
+    public interface IBrowserRuleSource
     {
         /// <summary>The browser rules the validator declares.</summary>
         /// <typeparam name="TValidator">The validator's type.</typeparam>
         /// <returns>Each member the validator names, with its rules.</returns>
-        IReadOnlyList<ClientValidationField> GetClientRules<TValidator>() where TValidator : class;
+        IReadOnlyList<BrowserField> GetBrowserRules<TValidator>() where TValidator : class;
     }
 }

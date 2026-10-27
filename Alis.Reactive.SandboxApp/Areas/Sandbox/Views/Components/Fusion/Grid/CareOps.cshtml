@@ -22,7 +22,7 @@
     var columns = FusionGridColumns.Of<ResidentCareItem>();
 
     // The grid's open-tasks cell checks the range ResidentCareItemValidator gives the browser.
-    var careValidation = FusionGridValidation.From<ResidentCareItem>(plan.ClientRules<ResidentCareItemValidator>());
+    var careValidation = FusionGridValidation.From<ResidentCareItem>(plan.BrowserRules<ResidentCareItemValidator>());
 
     var riskChips = new[] { "All" }.Concat(CareOpsOptions.RiskLevels).Select(text => new ChipCollection { Text = text }).ToList();
     var careChips = new[] { "All" }.Concat(CareOpsOptions.CareLevels).Select(text => new ChipCollection { Text = text }).ToList();

@@ -25,7 +25,7 @@ namespace Alis.Reactive.Fusion.Components
     /// EJ2 equivalent and are checked by the server on save.
     /// <code>
     /// var columns = FusionGridColumns.Of&lt;ResidentCareItem&gt;();
-    /// var care = FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.ClientRules&lt;ResidentCareItemValidator&gt;());
+    /// var care = FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.BrowserRules&lt;ResidentCareItemValidator&gt;());
     /// new GridColumn { Field = columns.Field(r =&gt; r.OpenTasks), EditType = "numericedit",
     ///     ValidationRules = care.Field(r =&gt; r.OpenTasks) }
     /// </code>
@@ -34,8 +34,8 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>The column rules for grid columns over <typeparamref name="TRow"/>, from a validator's browser rules.</summary>
         /// <typeparam name="TRow">Your row class.</typeparam>
-        /// <param name="rules">The row validator's browser rules: <c>plan.ClientRules&lt;ResidentCareItemValidator&gt;()</c>.</param>
-        public static FusionGridFieldValidation<TRow> From<TRow>(IReadOnlyList<ClientValidationField> rules)
+        /// <param name="rules">The row validator's browser rules: <c>plan.BrowserRules&lt;ResidentCareItemValidator&gt;()</c>.</param>
+        public static FusionGridFieldValidation<TRow> From<TRow>(IReadOnlyList<BrowserField> rules)
             where TRow : class
         {
             if (rules == null) throw new ArgumentNullException(nameof(rules));
@@ -51,9 +51,9 @@ namespace Alis.Reactive.Fusion.Components
     public sealed class FusionGridFieldValidation<TRow>
         where TRow : class
     {
-        private readonly IReadOnlyList<ClientValidationField> _fields;
+        private readonly IReadOnlyList<BrowserField> _fields;
 
-        internal FusionGridFieldValidation(IReadOnlyList<ClientValidationField> fields)
+        internal FusionGridFieldValidation(IReadOnlyList<BrowserField> fields)
         {
             _fields = fields;
         }
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Fusion.Components
         /// </remarks>
         /// <typeparam name="TField">The type of the column's member.</typeparam>
         /// <param name="field">The column's member, for example <c>r =&gt; r.OpenTasks</c>.</param>
-        [TypedDslExemption("Syncfusion's column ValidationRules take a dictionary of its own rule values; the rules themselves are read as typed ClientRule members.")]
+        [TypedDslExemption("Syncfusion's column ValidationRules take a dictionary of its own rule values; the rules themselves are read as typed BrowserRule members.")]
         public IReadOnlyDictionary<string, object>? Field<TField>(Expression<Func<TRow, TField>> field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
@@ -108,7 +108,7 @@ namespace Alis.Reactive.Fusion.Components
     /// </summary>
     internal static class Ej2ColumnRules
     {
-        internal static Dictionary<string, object> From(ClientValidationField field)
+        internal static Dictionary<string, object> From(BrowserField field)
         {
             var rules = new Dictionary<string, object>(StringComparer.Ordinal);
             foreach (var rule in field.Rules)
@@ -119,7 +119,7 @@ namespace Alis.Reactive.Fusion.Components
             return rules;
         }
 
-        private static void Add(Dictionary<string, object> rules, ClientRule rule)
+        private static void Add(Dictionary<string, object> rules, BrowserRule rule)
         {
             switch (rule)
             {

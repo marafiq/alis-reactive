@@ -645,7 +645,7 @@ no key (H2) and no entry (H4).
 `RuleFor`, `RuleForEach`, `When`, `Unless`, `Otherwise`, `Include`, `SetValidator`, `ChildRules`,
 the checks and `WithMessage`, written as FluentValidation users write them. The FluentValidation
 package is not used. Each check is one term of the vocabulary and defines both halves where both
-exist: what the server decides, and, for a term the browser decides the same way, the `ClientRule`
+exist: what the server decides, and, for a term the browser decides the same way, the `BrowserRule`
 the plan carries. The rules are data, like the `rules` schema of Syncfusion's React form, but they
 are typed C#, bound to inputs by component ID, and conditional. The browser gets the rules of the
 validator instance the server resolves for that request.
@@ -725,11 +725,11 @@ of complex items has none. The decision is made at render and is deterministic.
 
 ### 7.6 Grid column rules
 
-The Fusion grid maps a validator's browser rules (`plan.ClientRules<TValidator>()`) to Syncfusion's
+The Fusion grid maps a validator's browser rules (`plan.BrowserRules<TValidator>()`) to Syncfusion's
 column rules, keeping only those EJ2 decides as the server does: `required`, `minLength`,
 `maxLength`, numeric `min`, `max` and `range`, and one pattern per column. `EmailAddress()` and
 `Url()` reach the cell as EJ2's `regex` with the patterns the form tests them with (`PatternRule.Pattern`,
-`Alis.Reactive/Validation/ClientRules.cs`), because EJ2's own `email` and `url` rules decide differently.
+`Alis.Reactive/Validation/BrowserRules.cs`), because EJ2's own `email` and `url` rules decide differently.
 It reads the rules by their classes, not the plan.
 
 ## 8. Where the code is

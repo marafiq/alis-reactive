@@ -203,7 +203,7 @@ namespace Alis.Reactive.PlanModel
     internal sealed class FormValidation
     {
         internal FormValidation(
-            Func<IClientValidationRuleSource, IReadOnlyList<ClientValidationField>> rules,
+            Func<IBrowserRuleSource, IReadOnlyList<BrowserField>> rules,
             string validatorName,
             string form)
         {
@@ -212,7 +212,7 @@ namespace Alis.Reactive.PlanModel
             Form = form ?? throw new ArgumentNullException(nameof(form));
         }
 
-        internal Func<IClientValidationRuleSource, IReadOnlyList<ClientValidationField>> Rules { get; }
+        internal Func<IBrowserRuleSource, IReadOnlyList<BrowserField>> Rules { get; }
 
         internal string ValidatorName { get; }
 

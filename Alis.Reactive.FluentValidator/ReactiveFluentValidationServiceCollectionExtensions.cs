@@ -26,7 +26,7 @@ namespace Alis.Reactive.FluentValidator
 
             // Transient: the browser's rules are read from the validator the request resolves, so a
             // scoped dependency, DateTime.Today or a captured setting is the one this request's server sees.
-            services.TryAddTransient<IClientValidationRuleSource, ReactiveValidatorRuleSource>();
+            services.TryAddTransient<IBrowserRuleSource, ReactiveValidatorRuleSource>();
 
             var builder = new ReactiveFluentValidationBuilder(services);
             configure(builder);
@@ -100,7 +100,7 @@ namespace Alis.Reactive.FluentValidator
     }
 
     // The browser rules of the validator this request resolves, read when the page renders.
-    internal sealed class ReactiveValidatorRuleSource : IClientValidationRuleSource
+    internal sealed class ReactiveValidatorRuleSource : IBrowserRuleSource
     {
         private readonly IServiceProvider _services;
         private readonly HashSet<Type> _validators;
@@ -111,13 +111,13 @@ namespace Alis.Reactive.FluentValidator
             _validators = new HashSet<Type>(registered.SelectMany(types => types.Types));
         }
 
-        public IReadOnlyList<ClientValidationField> GetClientRules<TValidator>() where TValidator : class
+        public IReadOnlyList<BrowserField> GetBrowserRules<TValidator>() where TValidator : class
         {
             if (!_validators.Contains(typeof(TValidator)))
                 throw new InvalidOperationException(
                     $"No validator '{typeof(TValidator).FullName}' is registered for the page's browser rules. " +
                     "Register it with services.AddReactiveFluentValidation(validation => validation.Add<TValidator>()).");
-            return ((ReactiveValidator)(object)_services.GetRequiredService<TValidator>()).ClientRules();
+            return ((ReactiveValidator)(object)_services.GetRequiredService<TValidator>()).BrowserRules();
         }
     }
 }

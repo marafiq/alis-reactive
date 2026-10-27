@@ -12,7 +12,7 @@
     var columns = FusionGridColumns.Of<FamilyContact>();
 
     // Each cell checks the rules FamilyContactValidator gives the browser; the server checks them all on save.
-    var contactRules = FusionGridValidation.From<FamilyContact>(plan.ClientRules<FamilyContactValidator>());
+    var contactRules = FusionGridValidation.From<FamilyContact>(plan.BrowserRules<FamilyContactValidator>());
 }
 
 <native-vstack gap="Lg">
