@@ -135,11 +135,11 @@ namespace Alis.Reactive.Builders.Arrays
         // JavaScript text, so the operand is the enum member again, written as every literal is.
         private static ValueExpression CompileOperand(Expression operand, ParameterExpression element, Type memberType)
         {
-            var enumType = Nullable.GetUnderlyingType(memberType) ?? memberType;
-            if (!enumType.IsEnum || Expressions.Reads(operand, element)) return CompileValue(operand, element);
+            var enumType = EnumMember.TypeOf(memberType);
+            if (enumType == null || Expressions.Reads(operand, element)) return CompileValue(operand, element);
 
             var value = Expressions.Evaluate(operand);
-            var member = value == null || value is Enum ? value : Enum.ToObject(enumType, value);
+            var member = value == null ? null : EnumMember.Of(enumType, value);
             return ValueExpression.LiteralFor(member, Shape.FromClrType(memberType));
         }
 

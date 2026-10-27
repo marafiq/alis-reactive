@@ -29,8 +29,8 @@ namespace Alis.Reactive.Validation
         // The member an enum's default binds as (its member with value 0), which the server's NotEmpty refuses.
         private static string? DefaultMemberOf(Type memberType)
         {
-            var enumType = Nullable.GetUnderlyingType(memberType) ?? memberType;
-            return enumType.IsEnum && Enum.IsDefined(enumType, Enum.ToObject(enumType, 0)) ? Enum.ToObject(enumType, 0).ToString() : null;
+            var enumType = EnumMember.TypeOf(memberType);
+            return enumType == null ? null : EnumMember.Default(enumType)?.ToString();
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>

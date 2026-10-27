@@ -160,10 +160,8 @@ namespace Alis.Reactive.PlanModel
         private static object? LiteralOf(Type memberType, object? value)
         {
             if (value == null) return null;
-
-            var enumType = System.Nullable.GetUnderlyingType(memberType) ?? memberType;
-            var asMemberType = enumType.IsEnum && !value.GetType().IsEnum ? Enum.ToObject(enumType, value) : value;
-            return asMemberType.GetType().IsEnum ? asMemberType.ToString() : asMemberType;
+            var enumType = EnumMember.TypeOf(memberType);
+            return enumType == null ? value : EnumMember.Of(enumType, value).ToString();
         }
     }
 
