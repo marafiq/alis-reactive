@@ -123,7 +123,7 @@ namespace Alis.Reactive.Validation
 
         // ── what the form writes ─────────────────────────────────────────────────
 
-        internal Condition Condition { get; }
+        internal Condition Condition { get; private set; }
 
         /// <summary>The test's name in the plan.</summary>
         internal abstract string Name { get; }
@@ -148,7 +148,14 @@ namespace Alis.Reactive.Validation
         /// </summary>
         internal abstract Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope);
 
-        private protected abstract BrowserRule Under(Condition condition);
+        // The same rule under another condition. A rule holds only its message, its condition and immutable
+        // operands, so a shallow copy with the condition swapped is that rule.
+        private protected BrowserRule Under(Condition condition)
+        {
+            var rule = (BrowserRule)MemberwiseClone();
+            rule.Condition = condition;
+            return rule;
+        }
 
         // ── how a check reads a value ────────────────────────────────────────────
 
