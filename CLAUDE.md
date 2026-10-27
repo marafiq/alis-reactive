@@ -23,6 +23,14 @@ checklists or proof artifacts. A done report names the Playwright run and the li
 proves it, and says plainly what was not exercised. net48 is proven only by the `verify-net48` CI
 run.
 
+The framework core has two proofs of its own, with no component library and no browser between the
+C# and the behavior; both run in seconds and belong to the gate. `tests/Alis.Reactive.PlanTests`
+authors plans through the public builders and keeps each plan it writes as a golden, one promise of
+the grammar per test, and every refusal a developer meets asserted by its message.
+`Alis.Reactive.Assets/runtime/__tests__/authored-plans.test.ts` runs those goldens in the runtime
+against the plain DOM they name, with a real gesture and a visible outcome. A shipped or brought
+component is still proven by Playwright. `tests/Alis.Reactive.PlanTests/CLAUDE.md` has the rules.
+
 ```bash
 scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"  # focused proof
 scripts/test.sh             # full gate: typecheck, assets, vitest, checks, dotnet build, Playwright
