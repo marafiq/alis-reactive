@@ -57,6 +57,16 @@ public static class AdmissionEvents
     public static readonly AppEvent Opened = AppEvent.Declare();
 
     public static readonly AppEvent<RoomCheck> RoomChecked = AppEvent.Declare<RoomCheck>();
+
+    public static readonly AppEvent<Admission> Admitted = AppEvent.Declare<Admission>();
+}
+
+/// <summary>What an endpoint binds when it reads the age as text: the form's number does not fit it.</summary>
+public sealed class AdmissionAsText
+{
+    public string? Name { get; set; }
+
+    public string? Age { get; set; }
 }
 
 /// <summary>The rules every admission is checked by, written once and run on both sides.</summary>
@@ -79,6 +89,33 @@ public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
     {
         When(x => x.Tags.Any(tag => tag.Length > 3), () =>
             RuleFor(x => x.Age).GreaterThan(0).WithMessage("Give the resident's age."));
+    }
+}
+
+/// <summary>The rules of a next of kin, written once for every validator that holds one.</summary>
+public sealed class ContactRules : ReactiveValidator<Contact>
+{
+    public ContactRules()
+    {
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Name the contact.");
+    }
+}
+
+/// <summary>A message after a child validator has no check of its own to name.</summary>
+public sealed class MessageAfterChildRules : ReactiveValidator<Admission>
+{
+    public MessageAfterChildRules()
+    {
+        RuleFor(x => x.NextOfKin).SetValidator(new ContactRules()).WithMessage("Give a next of kin.");
+    }
+}
+
+/// <summary>A rule on a value computed from a member has no member to report under.</summary>
+public sealed class ComputedMemberRules : ReactiveValidator<Admission>
+{
+    public ComputedMemberRules()
+    {
+        RuleFor(x => x.Name!.Trim()).NotEmpty().WithMessage("Name the resident.");
     }
 }
 

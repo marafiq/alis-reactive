@@ -1,0 +1,441 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "Alis_Reactive_PlanTests_Support_Admission__Name": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Admission__Name",
+      "vendor": "native"
+    },
+    "admission": {
+      "kind": "element",
+      "id": "admission",
+      "vendor": "native"
+    },
+    "$model": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "Alis.Reactive.PlanTests.Support.Admission",
+      "data": {
+        "kind": "model",
+        "inputs": {
+          "Alis_Reactive_PlanTests_Support_Admission__Name": {
+            "name": "Name",
+            "body": [
+              "Name"
+            ],
+            "value": {
+              "kind": "as",
+              "expr": {
+                "kind": "get",
+                "target": {
+                  "kind": "obj",
+                  "id": "Alis_Reactive_PlanTests_Support_Admission__Name"
+                },
+                "path": [
+                  "value"
+                ]
+              },
+              "shape": {
+                "kind": "string"
+              }
+            },
+            "shape": {
+              "kind": "string"
+            },
+            "committed": "change",
+            "list": false
+          }
+        }
+      }
+    },
+    "$form:admission": {
+      "kind": "plugin",
+      "name": "alis.form",
+      "key": "admission",
+      "data": {
+        "kind": "form",
+        "summary": "Alis_Reactive_PlanTests_Support_Admission_validation_summary",
+        "fields": [
+          {
+            "id": "Alis_Reactive_PlanTests_Support_Admission__Name",
+            "name": "Name",
+            "value": {
+              "kind": "call",
+              "target": {
+                "kind": "obj",
+                "id": "$model"
+              },
+              "path": [
+                "boundValueOf"
+              ],
+              "args": [
+                {
+                  "kind": "lit",
+                  "value": "Alis_Reactive_PlanTests_Support_Admission__Name"
+                }
+              ]
+            },
+            "tests": [
+              {
+                "rule": "required",
+                "check": {
+                  "kind": "fn",
+                  "params": [
+                    "v"
+                  ],
+                  "body": {
+                    "kind": "op",
+                    "op": "not",
+                    "args": [
+                      {
+                        "kind": "op",
+                        "op": "or",
+                        "args": [
+                          {
+                            "kind": "op",
+                            "op": "not",
+                            "args": [
+                              {
+                                "kind": "op",
+                                "op": "matches",
+                                "args": [
+                                  {
+                                    "kind": "ref",
+                                    "name": "v"
+                                  },
+                                  {
+                                    "kind": "lit",
+                                    "value": "[\\s\\S]"
+                                  },
+                                  {
+                                    "kind": "lit",
+                                    "value": ""
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "kind": "op",
+                            "op": "matches",
+                            "args": [
+                              {
+                                "kind": "ref",
+                                "name": "v"
+                              },
+                              {
+                                "kind": "lit",
+                                "value": "^[\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]*$"
+                              },
+                              {
+                                "kind": "lit",
+                                "value": ""
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "when": {
+                  "kind": "lit",
+                  "value": true
+                },
+                "message": "Name the resident."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "$http": {
+      "kind": "plugin",
+      "name": "alis.http",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "if",
+          "arms": [
+            {
+              "when": {
+                "kind": "call",
+                "target": {
+                  "kind": "obj",
+                  "id": "$form:admission"
+                },
+                "path": [
+                  "validate"
+                ],
+                "args": []
+              },
+              "then": [
+                {
+                  "kind": "let",
+                  "name": "res1",
+                  "expr": {
+                    "kind": "call",
+                    "target": {
+                      "kind": "obj",
+                      "id": "$http"
+                    },
+                    "path": [
+                      "send"
+                    ],
+                    "args": [
+                      {
+                        "kind": "record",
+                        "fields": [
+                          {
+                            "name": "method",
+                            "value": {
+                              "kind": "lit",
+                              "value": "POST"
+                            }
+                          },
+                          {
+                            "name": "url",
+                            "value": {
+                              "kind": "lit",
+                              "value": "/save"
+                            }
+                          },
+                          {
+                            "name": "route",
+                            "value": {
+                              "kind": "record",
+                              "fields": []
+                            }
+                          },
+                          {
+                            "name": "values",
+                            "value": {
+                              "kind": "call",
+                              "target": {
+                                "kind": "obj",
+                                "id": "$model"
+                              },
+                              "path": [
+                                "fill"
+                              ],
+                              "args": [
+                                {
+                                  "kind": "record",
+                                  "fields": []
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "name": "arrays",
+                            "value": {
+                              "kind": "call",
+                              "target": {
+                                "kind": "list",
+                                "items": []
+                              },
+                              "path": [
+                                "concat"
+                              ],
+                              "args": [
+                                {
+                                  "kind": "get",
+                                  "target": {
+                                    "kind": "obj",
+                                    "id": "$model"
+                                  },
+                                  "path": [
+                                    "arrays"
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "name": "headers",
+                            "value": {
+                              "kind": "record",
+                              "fields": []
+                            }
+                          },
+                          {
+                            "name": "format",
+                            "value": {
+                              "kind": "lit",
+                              "value": "json"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "await": true
+                }
+              ]
+            }
+          ],
+          "else": []
+        }
+      ]
+    },
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "if",
+          "arms": [
+            {
+              "when": {
+                "kind": "call",
+                "target": {
+                  "kind": "obj",
+                  "id": "$form:admission"
+                },
+                "path": [
+                  "validate"
+                ],
+                "args": []
+              },
+              "then": [
+                {
+                  "kind": "let",
+                  "name": "res2",
+                  "expr": {
+                    "kind": "call",
+                    "target": {
+                      "kind": "obj",
+                      "id": "$http"
+                    },
+                    "path": [
+                      "send"
+                    ],
+                    "args": [
+                      {
+                        "kind": "record",
+                        "fields": [
+                          {
+                            "name": "method",
+                            "value": {
+                              "kind": "lit",
+                              "value": "POST"
+                            }
+                          },
+                          {
+                            "name": "url",
+                            "value": {
+                              "kind": "lit",
+                              "value": "/close"
+                            }
+                          },
+                          {
+                            "name": "route",
+                            "value": {
+                              "kind": "record",
+                              "fields": []
+                            }
+                          },
+                          {
+                            "name": "values",
+                            "value": {
+                              "kind": "call",
+                              "target": {
+                                "kind": "obj",
+                                "id": "$model"
+                              },
+                              "path": [
+                                "fill"
+                              ],
+                              "args": [
+                                {
+                                  "kind": "record",
+                                  "fields": []
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "name": "arrays",
+                            "value": {
+                              "kind": "call",
+                              "target": {
+                                "kind": "list",
+                                "items": []
+                              },
+                              "path": [
+                                "concat"
+                              ],
+                              "args": [
+                                {
+                                  "kind": "get",
+                                  "target": {
+                                    "kind": "obj",
+                                    "id": "$model"
+                                  },
+                                  "path": [
+                                    "arrays"
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "name": "headers",
+                            "value": {
+                              "kind": "record",
+                              "fields": []
+                            }
+                          },
+                          {
+                            "name": "format",
+                            "value": {
+                              "kind": "lit",
+                              "value": "json"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "await": true
+                }
+              ]
+            }
+          ],
+          "else": []
+        }
+      ]
+    }
+  ]
+}
