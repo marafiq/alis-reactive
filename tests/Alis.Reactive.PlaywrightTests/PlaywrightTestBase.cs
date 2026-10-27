@@ -11,8 +11,7 @@ public abstract class PlaywrightTestBase : PageTest
     private const int NavigationTimeoutBootRecoveryMs = 1000;
     private const string ReactiveBootedTrace = "[alis:boot] booted";
     private const string ReactiveBootedMarkerSelector = "html[data-alis-booted='true']";
-    private const string ReactiveBootedPagePredicate =
-        "() => document.documentElement.dataset.alisBooted === 'true' || window.__alisReactiveBoot?.booted === true";
+    private const string ReactiveBootedPagePredicate = "() => document.documentElement.dataset.alisBooted === 'true'";
     private static readonly string[] IgnoredNavigationErrors =
     [
         "ERR_NETWORK_CHANGED",

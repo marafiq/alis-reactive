@@ -26,7 +26,6 @@ interface PendingPlugin {
 
 interface RuntimeWindow extends Window {
   __alisPlugins?: PendingPlugin[];
-  __alisReactiveBoot?: { readonly booted: true };
 }
 
 registerPlugin("alis.document", documentPlugin);
@@ -56,8 +55,7 @@ function start(): void {
   log.info("booting", { plans: planIds });
   startOwner(Owner.page(), plans);
 
+  // The one mark of a booted page: state on the root element, readable by whoever arrives later.
   document.documentElement.dataset["alisBooted"] = "true";
-  runtimeWindow.__alisReactiveBoot = { booted: true };
-  document.dispatchEvent(new CustomEvent("alis:booted"));
   log.info("booted", { plans: planIds });
 }
