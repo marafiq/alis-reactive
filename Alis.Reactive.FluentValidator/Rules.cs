@@ -149,7 +149,7 @@ namespace Alis.Reactive.FluentValidator
 
         protected Conditions<T> Scope { get; }
 
-        protected List<Component<T, TValue>> Components { get; } = new List<Component<T, TValue>>();
+        protected List<RulePart<T, TValue>> Parts { get; } = new List<RulePart<T, TValue>>();
 
         /// <summary>The member's path, as model binding names it and as errors are reported.</summary>
         protected string FieldPath { get; }
@@ -157,7 +157,7 @@ namespace Alis.Reactive.FluentValidator
         /// <summary>The member as a message names it: <c>AdmissionDate</c> reads "Admission Date".</summary>
         protected string FieldDisplayName { get; }
 
-        public bool IsAsync => Components.Any(component => component.IsAsync);
+        public bool IsAsync => Parts.Any(part => part.IsAsync);
 
         public abstract Task Validate(T instance, string prefix, ValidationRun run);
 
@@ -165,10 +165,10 @@ namespace Alis.Reactive.FluentValidator
 
         // The browser's condition for one check: the rule's enclosing blocks and the check's own conditions,
         // or false when one of them is the server's alone.
-        protected bool TryBrowserCondition(Component<T, TValue> component, out Condition condition)
+        protected bool TryBrowserCondition(RulePart<T, TValue> part, out Condition condition)
         {
             condition = Condition.Always;
-            if (!Scope.TryForBrowser(out var scope) || !component.Conditions.TryForBrowser(out var own)) return false;
+            if (!Scope.TryForBrowser(out var scope) || !part.Conditions.TryForBrowser(out var own)) return false;
             condition = ReferenceEquals(scope, Condition.Always) ? own
                 : ReferenceEquals(own, Condition.Always) ? scope
                 : Condition.All(scope, own);
@@ -178,14 +178,14 @@ namespace Alis.Reactive.FluentValidator
         public IRuleBuilderOptions<T, TValue> Add(Check<T, TValue> check)
         {
             if (check == null) throw new ArgumentNullException(nameof(check));
-            Components.Add(new CheckComponent<T, TValue>(check));
+            Parts.Add(new CheckPart<T, TValue>(check));
             return this;
         }
 
         public IRuleBuilderOptions<T, TValue> SetValidator(IValidator<TValue> validator)
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
-            Components.Add(new ChildComponent<T, TValue>(validator));
+            Parts.Add(new ChildPart<T, TValue>(validator));
             return this;
         }
 
@@ -216,13 +216,13 @@ namespace Alis.Reactive.FluentValidator
         // A condition written after checks applies to every check written before it, as in FluentValidation.
         private IRuleBuilderOptions<T, TValue> Conditioned(RuleCondition<T> condition)
         {
-            foreach (var component in Components)
-                component.Conditions = component.Conditions.And(condition);
+            foreach (var part in Parts)
+                part.Conditions = part.Conditions.And(condition);
             return this;
         }
 
-        private CheckComponent<T, TValue> LastCheck(string option) =>
-            Components.LastOrDefault() as CheckComponent<T, TValue>
+        private CheckPart<T, TValue> LastCheck(string option) =>
+            Parts.LastOrDefault() as CheckPart<T, TValue>
             ?? throw new InvalidOperationException($"{option} names the check written just before it; write a check first, like .NotEmpty().{option}(..).");
     }
 
@@ -238,15 +238,15 @@ namespace Alis.Reactive.FluentValidator
         {
             if (!Scope.Hold(instance)) return;
             var value = (TValue)Member.ValueIn(instance)!;
-            foreach (var component in Components)
-                await component.Validate(instance, value, prefix + FieldPath, FieldDisplayName, run).ConfigureAwait(false);
+            foreach (var part in Parts)
+                await part.Validate(instance, value, prefix + FieldPath, FieldDisplayName, run).ConfigureAwait(false);
         }
 
         public override void DescribeFor(BrowserRuleSet browser)
         {
-            foreach (var component in Components)
-                if (TryBrowserCondition(component, out var when))
-                    component.DescribeFor(browser, Member, FieldDisplayName, when);
+            foreach (var part in Parts)
+                if (TryBrowserCondition(part, out var when))
+                    part.DescribeFor(browser, Member, FieldDisplayName, when);
         }
     }
 
@@ -267,8 +267,8 @@ namespace Alis.Reactive.FluentValidator
             foreach (var item in items)
             {
                 var path = prefix + FieldPath + "[" + index++ + "]";
-                foreach (var component in Components)
-                    await component.Validate(instance, item, path, FieldDisplayName, run).ConfigureAwait(false);
+                foreach (var part in Parts)
+                    await part.Validate(instance, item, path, FieldDisplayName, run).ConfigureAwait(false);
             }
         }
 
@@ -276,12 +276,12 @@ namespace Alis.Reactive.FluentValidator
         // item itself, at each item the page renders.
         public override void DescribeFor(BrowserRuleSet browser)
         {
-            foreach (var component in Components)
+            foreach (var part in Parts)
             {
-                if (!TryBrowserCondition(component, out var when)) continue;
-                if (component is ChildComponent<T, TElement> child && child.TryItemFields(out var itemFields))
+                if (!TryBrowserCondition(part, out var when)) continue;
+                if (part is ChildPart<T, TElement> child && child.TryItemFields(out var itemFields))
                     browser.AddItems(Member.Expression, itemFields, when);
-                if (component is CheckComponent<T, TElement> check)
+                if (part is CheckPart<T, TElement> check)
                     check.DescribeForItems(browser, Member, FieldDisplayName, when);
             }
         }
@@ -315,7 +315,7 @@ namespace Alis.Reactive.FluentValidator
     }
 
     /// <summary>One check or child validator of a rule, with the conditions written after it.</summary>
-    internal abstract class Component<T, TValue>
+    internal abstract class RulePart<T, TValue>
     {
         internal Conditions<T> Conditions { get; set; } = Conditions<T>.None;
 
@@ -326,11 +326,11 @@ namespace Alis.Reactive.FluentValidator
         internal abstract void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when);
     }
 
-    internal sealed class CheckComponent<T, TValue> : Component<T, TValue>
+    internal sealed class CheckPart<T, TValue> : RulePart<T, TValue>
     {
         private readonly Check<T, TValue> _check;
 
-        internal CheckComponent(Check<T, TValue> check)
+        internal CheckPart(Check<T, TValue> check)
         {
             _check = check;
             Message = Message<T>.Template(check.Template);
@@ -375,11 +375,11 @@ namespace Alis.Reactive.FluentValidator
         }
     }
 
-    internal sealed class ChildComponent<T, TValue> : Component<T, TValue>
+    internal sealed class ChildPart<T, TValue> : RulePart<T, TValue>
     {
         private readonly IValidator<TValue> _child;
 
-        internal ChildComponent(IValidator<TValue> child)
+        internal ChildPart(IValidator<TValue> child)
         {
             _child = child;
         }
