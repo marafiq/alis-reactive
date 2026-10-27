@@ -25,13 +25,18 @@ namespace Alis.Reactive.Builders
         /// Sends several requests at once, each branch starting with its method:
         /// <c>p.Parallel(a =&gt; a.Get(url1).Response(..), b =&gt; b.Post(url2).Response(..)).OnAllSettled(s =&gt; ..)</c>.
         /// </summary>
-        /// <param name="branches">The requests, each started from its branch.</param>
-        public ParallelBuilder<TModel> Parallel(params Func<RequestStart<TModel>, HttpRequestBuilder<TModel>>[] branches)
+        /// <param name="first">The first request, started from its branch.</param>
+        /// <param name="more">The other requests, each started from its branch.</param>
+        public ParallelBuilder<TModel> Parallel(
+            Func<RequestStart<TModel>, HttpRequestBuilder<TModel>> first,
+            params Func<RequestStart<TModel>, HttpRequestBuilder<TModel>>[] more)
         {
-            if (branches == null) throw new ArgumentNullException(nameof(branches));
+            if (first == null) throw new ArgumentNullException(nameof(first));
+            if (more == null) throw new ArgumentNullException(nameof(more));
             var builder = new ParallelBuilder<TModel>(Context);
             Context.AddStep(builder.Step);
-            foreach (var branch in branches)
+            builder.AddBranch(first);
+            foreach (var branch in more)
                 builder.AddBranch(branch);
             return builder;
         }

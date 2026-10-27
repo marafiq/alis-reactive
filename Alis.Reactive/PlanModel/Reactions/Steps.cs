@@ -257,9 +257,6 @@ namespace Alis.Reactive.PlanModel
 
         internal override void WriteTo(List<Statement> block, Scope scope)
         {
-            if (_requests.Count == 0)
-                throw new InvalidOperationException("Parallel requires at least one HTTP request branch.");
-
             block.Add(G.All(_requests.Select(request =>
             {
                 var branch = new List<Statement>();
