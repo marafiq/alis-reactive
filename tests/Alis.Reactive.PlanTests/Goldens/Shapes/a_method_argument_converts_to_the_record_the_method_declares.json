@@ -1,0 +1,122 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "desk": {
+      "kind": "element",
+      "id": "desk",
+      "vendor": "native"
+    },
+    "status": {
+      "kind": "element",
+      "id": "status",
+      "vendor": "native"
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "roomChecked",
+      "do": [
+        {
+          "kind": "let",
+          "name": "reserve1",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "desk"
+            },
+            "path": [
+              "reserve"
+            ],
+            "args": [
+              {
+                "kind": "as",
+                "expr": {
+                  "kind": "ref",
+                  "name": "e"
+                },
+                "shape": {
+                  "kind": "object",
+                  "fields": {
+                    "room": {
+                      "kind": "string"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "await": true
+        },
+        {
+          "kind": "if",
+          "arms": [
+            {
+              "when": {
+                "kind": "op",
+                "op": "truthy",
+                "args": [
+                  {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "ref",
+                      "name": "reserve1"
+                    },
+                    "shape": {
+                      "kind": "boolean"
+                    }
+                  }
+                ]
+              },
+              "then": [
+                {
+                  "kind": "set",
+                  "target": {
+                    "kind": "obj",
+                    "id": "status"
+                  },
+                  "path": [
+                    "textContent"
+                  ],
+                  "value": {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "lit",
+                      "value": "Reserved"
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "else": []
+        }
+      ]
+    }
+  ]
+}

@@ -88,6 +88,8 @@ public sealed class Desk : Component
     public override ComponentVendor Vendor => ComponentVendor.Native;
 
     public TypedSource<bool> IsFree(Arg<string> room) => MethodAsync<bool>(room);
+
+    public TypedSource<bool> Reserve(Arg<RoomCheck> check) => MethodAsync<bool>(check);
 }
 
 /// <summary>A second kind of input, for the one page that may not render a member twice with two kinds.</summary>

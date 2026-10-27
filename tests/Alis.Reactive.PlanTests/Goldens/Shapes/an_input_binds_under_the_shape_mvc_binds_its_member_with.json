@@ -1,0 +1,293 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Vitals",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "Alis_Reactive_PlanTests_Support_Vitals__Weight": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Vitals__Weight",
+      "vendor": "native"
+    },
+    "Alis_Reactive_PlanTests_Support_Vitals__MeasuredOn": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Vitals__MeasuredOn",
+      "vendor": "native"
+    },
+    "Alis_Reactive_PlanTests_Support_Vitals__RecordedAt": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Vitals__RecordedAt",
+      "vendor": "native"
+    },
+    "Alis_Reactive_PlanTests_Support_Vitals__Notes": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Vitals__Notes",
+      "vendor": "native"
+    },
+    "$model": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "Alis.Reactive.PlanTests.Support.Vitals",
+      "data": {
+        "kind": "model",
+        "inputs": {
+          "Alis_Reactive_PlanTests_Support_Vitals__Weight": {
+            "name": "Weight",
+            "body": [
+              "Weight"
+            ],
+            "value": {
+              "kind": "as",
+              "expr": {
+                "kind": "get",
+                "target": {
+                  "kind": "obj",
+                  "id": "Alis_Reactive_PlanTests_Support_Vitals__Weight"
+                },
+                "path": [
+                  "value"
+                ]
+              },
+              "shape": {
+                "kind": "nullable",
+                "inner": {
+                  "kind": "number"
+                }
+              }
+            },
+            "shape": {
+              "kind": "nullable",
+              "inner": {
+                "kind": "number"
+              }
+            },
+            "committed": "change",
+            "list": false
+          },
+          "Alis_Reactive_PlanTests_Support_Vitals__MeasuredOn": {
+            "name": "MeasuredOn",
+            "body": [
+              "MeasuredOn"
+            ],
+            "value": {
+              "kind": "as",
+              "expr": {
+                "kind": "get",
+                "target": {
+                  "kind": "obj",
+                  "id": "Alis_Reactive_PlanTests_Support_Vitals__MeasuredOn"
+                },
+                "path": [
+                  "value"
+                ]
+              },
+              "shape": {
+                "kind": "date"
+              }
+            },
+            "shape": {
+              "kind": "date"
+            },
+            "committed": "change",
+            "list": false
+          },
+          "Alis_Reactive_PlanTests_Support_Vitals__RecordedAt": {
+            "name": "RecordedAt",
+            "body": [
+              "RecordedAt"
+            ],
+            "value": {
+              "kind": "as",
+              "expr": {
+                "kind": "get",
+                "target": {
+                  "kind": "obj",
+                  "id": "Alis_Reactive_PlanTests_Support_Vitals__RecordedAt"
+                },
+                "path": [
+                  "value"
+                ]
+              },
+              "shape": {
+                "kind": "instant"
+              }
+            },
+            "shape": {
+              "kind": "instant"
+            },
+            "committed": "change",
+            "list": false
+          },
+          "Alis_Reactive_PlanTests_Support_Vitals__Notes": {
+            "name": "Notes",
+            "body": [
+              "Notes"
+            ],
+            "value": {
+              "kind": "as",
+              "expr": {
+                "kind": "get",
+                "target": {
+                  "kind": "obj",
+                  "id": "Alis_Reactive_PlanTests_Support_Vitals__Notes"
+                },
+                "path": [
+                  "value"
+                ]
+              },
+              "shape": {
+                "kind": "array",
+                "item": {
+                  "kind": "string"
+                }
+              }
+            },
+            "shape": {
+              "kind": "array",
+              "item": {
+                "kind": "string"
+              }
+            },
+            "committed": "change",
+            "list": true
+          }
+        }
+      }
+    },
+    "$http": {
+      "kind": "plugin",
+      "name": "alis.http",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "let",
+          "name": "res1",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "$http"
+            },
+            "path": [
+              "send"
+            ],
+            "args": [
+              {
+                "kind": "record",
+                "fields": [
+                  {
+                    "name": "method",
+                    "value": {
+                      "kind": "lit",
+                      "value": "POST"
+                    }
+                  },
+                  {
+                    "name": "url",
+                    "value": {
+                      "kind": "lit",
+                      "value": "/vitals"
+                    }
+                  },
+                  {
+                    "name": "route",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "value": {
+                      "kind": "call",
+                      "target": {
+                        "kind": "obj",
+                        "id": "$model"
+                      },
+                      "path": [
+                        "fill"
+                      ],
+                      "args": [
+                        {
+                          "kind": "record",
+                          "fields": []
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "arrays",
+                    "value": {
+                      "kind": "call",
+                      "target": {
+                        "kind": "list",
+                        "items": []
+                      },
+                      "path": [
+                        "concat"
+                      ],
+                      "args": [
+                        {
+                          "kind": "get",
+                          "target": {
+                            "kind": "obj",
+                            "id": "$model"
+                          },
+                          "path": [
+                            "arrays"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "headers",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "format",
+                    "value": {
+                      "kind": "lit",
+                      "value": "json"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "await": true
+        }
+      ]
+    }
+  ]
+}

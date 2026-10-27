@@ -49,6 +49,34 @@ internal static class Page
     internal static JsonObject Objects(this JsonNode plan) => plan["objects"]!.AsObject();
 
     internal static string Pretty(this JsonNode plan) => plan.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+
+    /// <summary>The node and everything under it, in document order.</summary>
+    internal static IEnumerable<JsonNode> Nodes(this JsonNode node)
+    {
+        yield return node;
+        var children = node switch
+        {
+            JsonObject members => members.Select(member => member.Value),
+            JsonArray items => items,
+            _ => Enumerable.Empty<JsonNode?>(),
+        };
+        foreach (var child in children.OfType<JsonNode>())
+            foreach (var descendant in child.Nodes())
+                yield return descendant;
+    }
+
+    /// <summary>A shape as the grammar writes it: <c>nullable&lt;number&gt;</c>, <c>array&lt;string&gt;</c>, <c>object{room:string}</c>.</summary>
+    internal static string Describe(this JsonNode shape)
+    {
+        var kind = shape["kind"]!.GetValue<string>();
+        return kind switch
+        {
+            "array" => $"array<{shape["item"]!.Describe()}>",
+            "nullable" => $"nullable<{shape["inner"]!.Describe()}>",
+            "object" => "object{" + string.Join(", ", shape["fields"]!.AsObject().Select(field => field.Key + ":" + field.Value!.Describe())) + "}",
+            _ => kind,
+        };
+    }
 }
 
 /// <summary>The plain DOM a page is made of, declared the way any brought component is: on the native vendor.</summary>
