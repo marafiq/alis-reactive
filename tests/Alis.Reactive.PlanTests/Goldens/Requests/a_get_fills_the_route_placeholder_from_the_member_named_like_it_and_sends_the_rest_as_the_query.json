@@ -1,0 +1,119 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {},
+  "objects": {
+    "$http": {
+      "kind": "plugin",
+      "name": "alis.http",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "let",
+          "name": "res1",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "$http"
+            },
+            "path": [
+              "send"
+            ],
+            "args": [
+              {
+                "kind": "record",
+                "fields": [
+                  {
+                    "name": "method",
+                    "value": {
+                      "kind": "lit",
+                      "value": "GET"
+                    }
+                  },
+                  {
+                    "name": "url",
+                    "value": {
+                      "kind": "lit",
+                      "value": "/residents/{Id}"
+                    }
+                  },
+                  {
+                    "name": "route",
+                    "value": {
+                      "kind": "record",
+                      "fields": [
+                        {
+                          "name": "Id",
+                          "value": {
+                            "kind": "lit",
+                            "value": 1042
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "value": {
+                      "kind": "record",
+                      "fields": [
+                        {
+                          "name": "Wing",
+                          "value": {
+                            "kind": "lit",
+                            "value": "Garden"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "arrays",
+                    "value": {
+                      "kind": "list",
+                      "items": []
+                    }
+                  },
+                  {
+                    "name": "headers",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "format",
+                    "value": {
+                      "kind": "lit",
+                      "value": "json"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "await": true
+        }
+      ]
+    }
+  ]
+}

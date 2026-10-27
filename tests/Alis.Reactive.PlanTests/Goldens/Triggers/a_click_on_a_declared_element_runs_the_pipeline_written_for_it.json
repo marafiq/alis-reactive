@@ -1,0 +1,56 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "status": {
+      "kind": "element",
+      "id": "status",
+      "vendor": "native"
+    },
+    "save": {
+      "kind": "element",
+      "id": "save",
+      "vendor": "native"
+    }
+  },
+  "handlers": [
+    {
+      "on": "save",
+      "path": [],
+      "event": "click",
+      "do": [
+        {
+          "kind": "set",
+          "target": {
+            "kind": "obj",
+            "id": "status"
+          },
+          "path": [
+            "textContent"
+          ],
+          "value": {
+            "kind": "as",
+            "expr": {
+              "kind": "lit",
+              "value": "Saved"
+            },
+            "shape": {
+              "kind": "string"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -73,6 +73,7 @@
     <ItemGroup>
         <InternalsVisibleTo Include="Alis.Reactive.PlanContractGenerator" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator" />
+        <InternalsVisibleTo Include="Alis.Reactive.PlanTests" />
     </ItemGroup>
 
 </Project>

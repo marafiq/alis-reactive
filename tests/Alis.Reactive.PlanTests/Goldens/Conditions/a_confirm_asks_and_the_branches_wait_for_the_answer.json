@@ -1,0 +1,102 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "status": {
+      "kind": "element",
+      "id": "status",
+      "vendor": "native"
+    },
+    "$confirm": {
+      "kind": "plugin",
+      "name": "alis.confirm",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "let",
+          "name": "ok1",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "$confirm"
+            },
+            "path": [
+              "ask"
+            ],
+            "args": [
+              {
+                "kind": "lit",
+                "value": "Admit Helen?"
+              }
+            ]
+          },
+          "await": true
+        },
+        {
+          "kind": "if",
+          "arms": [
+            {
+              "when": {
+                "kind": "ref",
+                "name": "ok1"
+              },
+              "then": [
+                {
+                  "kind": "set",
+                  "target": {
+                    "kind": "obj",
+                    "id": "status"
+                  },
+                  "path": [
+                    "textContent"
+                  ],
+                  "value": {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "lit",
+                      "value": "Admitted"
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "else": []
+        }
+      ]
+    }
+  ]
+}
