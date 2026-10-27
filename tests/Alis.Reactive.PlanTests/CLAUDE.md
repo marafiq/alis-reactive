@@ -7,9 +7,9 @@ arranged through internals (`Support/Page.cs` constructs the plan and registers 
 the goldens assert the plan JSON, which a behavior-keeping refactor changes. They are feedback while
 coding until they are rebuilt on the public surface; the refusal tests are the closest to the rules,
 since a refusal's message is what a developer sees.
- This project authors the plan a page carries with
-the plan builders, with Razor left out (`Support/Page.cs` stands in for `Html.InputField` and `plan.Render`). No component library, no
-browser, no sandbox: a change to what a page carries is a diff to read here, in under a second.
+This project authors the plan a page carries with the plan builders, with Razor left out
+(`Support/Page.cs` stands in for `Html.InputField` and `plan.Render`). No component library, no browser,
+no sandbox: a change to what a page carries is a diff to read here, in under a second.
 
 ## What a test is
 
