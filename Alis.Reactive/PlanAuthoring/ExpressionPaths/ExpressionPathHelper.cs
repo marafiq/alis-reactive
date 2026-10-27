@@ -118,8 +118,7 @@ namespace Alis.Reactive
         {
             if (TrySteps(expr, out var steps, out _)) return steps;
             throw new InvalidOperationException(
-                "ExpressionPathHelper only supports property-access chains and MVC indexer paths " +
-                $"(e.g. m => m.Address.City or m => m.Items[0].Sku). Got unsupported expression node: {Expressions.StripConvert(expr).NodeType}.");
+                $"Select a member by its path, like m => m.Address.City or m => m.Items[0].Sku; '{Expressions.StripConvert(expr)}' is not one.");
         }
 
         // The steps from the parameter the chain starts at; false when the expression is not such a chain.
