@@ -6,7 +6,7 @@
 import type { PlanDocument, PluginData } from "../types/index";
 import type { Listener } from "./vendor-driver";
 import type { Owner } from "./owner";
-import type { PlanWorld } from "./world";
+import type { PlanObjects } from "./plan-objects";
 import { canHaveMembers } from "../grammar/paths";
 
 /** What a plugin receives with a plan's data contribution. */
@@ -15,7 +15,7 @@ export interface Contribution {
   readonly data: PluginData;
   readonly owner: Owner;
   readonly plan: PlanDocument;
-  readonly world: PlanWorld;
+  readonly objects: PlanObjects;
 }
 
 export interface Plugin {

@@ -16,7 +16,7 @@
 
 import type { InputBinding } from "../types/index";
 import type { Contribution, Plugin } from "../objects/plugins";
-import type { PlanWorld } from "../objects/world";
+import type { PlanObjects } from "../objects/plan-objects";
 import { Environment } from "../grammar/environment";
 import { evaluate } from "../grammar/evaluate";
 import { bound } from "../grammar/shape";
@@ -31,7 +31,7 @@ const log = logger("model");
 export interface ModelInput {
   readonly id: string;
   readonly binding: InputBinding;
-  readonly world: PlanWorld;
+  readonly objects: PlanObjects;
 }
 
 export interface ModelObject {
@@ -62,7 +62,7 @@ function inputsOf(planId: string): Map<string, ModelInput> {
 }
 
 function currentValue(input: ModelInput): unknown {
-  return evaluate(input.binding.value, { env: Environment.root(), world: input.world });
+  return evaluate(input.binding.value, { env: Environment.root(), objects: input.objects });
 }
 
 function bindInput(input: ModelInput): unknown {
@@ -70,7 +70,7 @@ function bindInput(input: ModelInput): unknown {
 }
 
 function isMounted(input: ModelInput): boolean {
-  return input.world.element(input.id) !== null;
+  return input.objects.element(input.id) !== null;
 }
 
 function mountedInput(planId: string, id: string): ModelInput | undefined {
@@ -127,12 +127,12 @@ function assignAt(root: Record<string, unknown>, path: readonly (string | number
 
 export const modelPlugin: Plugin = {
   object: planId => modelObject(planId),
-  contribute({ key, data, owner, world }: Contribution) {
+  contribute({ key, data, owner, objects }: Contribution) {
     if (data.kind !== "model") return;
     const inputs = inputsOf(key);
     const added: ModelInput[] = [];
     for (const [id, binding] of Object.entries(data.inputs)) {
-      const input: ModelInput = { id, binding, world };
+      const input: ModelInput = { id, binding, objects };
       inputs.set(id, input);
       added.push(input);
       announceCommits(input, owner);
@@ -149,7 +149,7 @@ export const modelPlugin: Plugin = {
 const announcing = new WeakSet<HTMLElement>();
 
 function announceCommits(input: ModelInput, owner: Owner): void {
-  const element = input.world.element(input.id);
+  const element = input.objects.element(input.id);
   if (element === null || announcing.has(element)) return;
 
   const announce = (): void => {
@@ -158,7 +158,7 @@ function announceCommits(input: ModelInput, owner: Owner): void {
   // An input whose component is not constructed yet cannot announce its commits; the form then hears
   // none for it, and the trace says so.
   try {
-    input.world.subscribe(input.id, [], input.binding.committed, announce, owner);
+    input.objects.subscribe(input.id, [], input.binding.committed, announce, owner);
   } catch (error) {
     log.error("input.commit-unwired", { input: input.id, event: input.binding.committed, error: toJavaScriptString(error) });
     return;

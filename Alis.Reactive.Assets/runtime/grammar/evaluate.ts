@@ -11,28 +11,28 @@ import { isMissing, shaped } from "./shape";
 import * as ops from "./operators";
 
 /** Resolves the located objects of the plan being run. */
-export interface World {
+export interface Objects {
   object(id: string): unknown;
 }
 
 export interface Scope {
   readonly env: Environment;
-  readonly world: World;
+  readonly objects: Objects;
 }
 
 export function childScope(scope: Scope): Scope {
-  return { env: scope.env.child(), world: scope.world };
+  return { env: scope.env.child(), objects: scope.objects };
 }
 
 /** The scope a plugin evaluates a plan's own expressions in: nothing bound, the plan's objects. */
-export function rootScope(world: World): Scope {
-  return { env: Environment.root(), world };
+export function rootScope(objects: Objects): Scope {
+  return { env: Environment.root(), objects };
 }
 
 export function evaluate(expr: Expr, scope: Scope): unknown {
   switch (expr.kind) {
     case "lit":    return expr.value;
-    case "obj":    return scope.world.object(expr.id);
+    case "obj":    return scope.objects.object(expr.id);
     case "ref":    return scope.env.lookup(expr.name);
     case "get":    return read(evaluate(expr.target, scope), expr.path, modeOf(expr.target), labelOf(expr.target));
     case "as":     return shaped(evaluate(expr.expr, scope), expr.shape);
@@ -77,7 +77,7 @@ function closure(params: readonly string[], body: Expr, scope: Scope): (...args:
   return (...args: unknown[]) => {
     const env = scope.env.child();
     params.forEach((name, index) => env.bind(name, args[index]));
-    return evaluate(body, { env, world: scope.world });
+    return evaluate(body, { env, objects: scope.objects });
   };
 }
 

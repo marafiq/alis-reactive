@@ -3,13 +3,13 @@
 // cached, so a slot's content can change underneath a plan (grammar.md E1).
 
 import type { ElementLocator, ObjectLocator, PlanDocument, Vendor } from "../types/index";
-import type { World } from "../grammar/evaluate";
+import type { Objects } from "../grammar/evaluate";
 import { read } from "../grammar/paths";
 import { pluginNamed } from "./plugins";
 import type { Owner } from "./owner";
 import { subscribeVendor, vendorObject, type Listener } from "./vendor-driver";
 
-export class PlanWorld implements World {
+export class PlanObjects implements Objects {
   constructor(readonly plan: PlanDocument) {}
 
   object(id: string): unknown {

@@ -31,7 +31,7 @@ namespace Alis.Reactive.PlanModel
         /// <summary>The scope of a block: it binds the method results its statements use, and sees its parent's.</summary>
         internal Scope ForBlock() => new Scope(_plan, EventParam, _responses, _item, new ResultFrame(_results));
 
-        internal ObjectTable Objects => _plan.Objects;
+        internal PlanObjects Objects => _plan.Objects;
 
         internal string PlanId => _plan.PlanId;
 
@@ -172,7 +172,7 @@ namespace Alis.Reactive.PlanModel
         // result; null where no statement can run before a value is read, as in an array operation.
         private List<Statement>? _hoisted;
 
-        internal PlanWriter(string planId, ObjectTable objects)
+        internal PlanWriter(string planId, PlanObjects objects)
         {
             PlanId = planId;
             Objects = objects;
@@ -180,7 +180,7 @@ namespace Alis.Reactive.PlanModel
 
         internal string PlanId { get; }
 
-        internal ObjectTable Objects { get; }
+        internal PlanObjects Objects { get; }
 
         internal string Fresh(string stem) => stem + (++_names).ToString(CultureInfo.InvariantCulture);
 
@@ -234,7 +234,7 @@ namespace Alis.Reactive.PlanModel
     /// The objects a plan names, in the order it first names them: elements by id and vendor, and the
     /// modules a bundle registered (the document, HTTP, forms, slots, streams, hubs, plugins).
     /// </summary>
-    internal sealed class ObjectTable
+    internal sealed class PlanObjects
     {
         internal const string DocumentId = "$document";
         internal const string HttpId = "$http";
@@ -247,7 +247,7 @@ namespace Alis.Reactive.PlanModel
         private readonly Dictionary<string, ComponentVendor> _elementVendors = new Dictionary<string, ComponentVendor>(StringComparer.Ordinal);
         private readonly Dictionary<string, Vendor> _vendors = new Dictionary<string, Vendor>(StringComparer.Ordinal);
 
-        internal ObjectTable(string planId, IEnumerable<DeclaredObject> declared)
+        internal PlanObjects(string planId, IEnumerable<DeclaredObject> declared)
         {
             _planId = planId;
             foreach (var element in declared)

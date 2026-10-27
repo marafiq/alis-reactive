@@ -2,20 +2,20 @@
 
 import { afterEach, describe, expect, it } from "vitest";
 import { Environment } from "../grammar/environment";
-import { evaluate, type Scope, type World } from "../grammar/evaluate";
+import { evaluate, type Scope, type Objects } from "../grammar/evaluate";
 import { executeBlock } from "../grammar/execute";
 import { e, s, st } from "./support/plan";
 
-function scopeWith(objects: Record<string, unknown> = {}, bindings: Record<string, unknown> = {}): Scope {
+function scopeWith(located: Record<string, unknown> = {}, bindings: Record<string, unknown> = {}): Scope {
   const env = Environment.root();
   for (const [name, value] of Object.entries(bindings)) env.bind(name, value);
-  const world: World = {
+  const objects: Objects = {
     object: id => {
-      if (!(id in objects)) throw new Error(`no object ${id}`);
-      return objects[id];
+      if (!(id in located)) throw new Error(`no object ${id}`);
+      return located[id];
     },
   };
-  return { env, world };
+  return { env, objects };
 }
 
 const value = (expr: Parameters<typeof evaluate>[0], scope = scopeWith()) => evaluate(expr, scope);

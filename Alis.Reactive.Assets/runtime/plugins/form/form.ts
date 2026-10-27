@@ -18,7 +18,7 @@
 import type { FormField, FormTest } from "../../types/index";
 import type { Contribution, Plugin } from "../../objects/plugins";
 import type { Owner } from "../../objects/owner";
-import type { PlanWorld } from "../../objects/world";
+import type { PlanObjects } from "../../objects/plan-objects";
 import { evaluate, rootScope } from "../../grammar/evaluate";
 import { asText } from "../../grammar/shape";
 import { isRecord } from "../../shared/record";
@@ -33,7 +33,7 @@ const log = logger("validation");
 
 interface Entry {
   readonly field: FormField;
-  readonly world: PlanWorld;
+  readonly objects: PlanObjects;
   readonly owner: Owner;
 }
 
@@ -89,11 +89,11 @@ function clearAndHide(summary: HTMLElement | null): void {
 // ── evaluation ─────────────────────────────────────────────────────────────
 
 function evaluateWhen(entry: Entry, test: FormTest): boolean {
-  return !!evaluate(test.when, rootScope(entry.world));
+  return !!evaluate(test.when, rootScope(entry.objects));
 }
 
 function checkPasses(entry: Entry, test: FormTest, value: unknown): boolean {
-  const check = evaluate(test.check, rootScope(entry.world)) as (value: unknown) => unknown;
+  const check = evaluate(test.check, rootScope(entry.objects)) as (value: unknown) => unknown;
   return !!check(value);
 }
 
@@ -108,7 +108,7 @@ function evaluateField(entry: Entry, container: HTMLElement, summary: HTMLElemen
   }
 
   const inlineHidden = !canRenderInline(field.id);
-  const value = evaluate(field.value, rootScope(entry.world));
+  const value = evaluate(field.value, rootScope(entry.objects));
   for (const test of field.tests) {
     if (!evaluateWhen(entry, test)) continue;
     if (checkPasses(entry, test, value)) continue;
@@ -266,11 +266,11 @@ export const formPlugin: Plugin = {
     validate: () => validate(containerId),
     showErrors: problem => showErrors(containerId, problem),
   }),
-  contribute({ key, data, owner, world }: Contribution) {
+  contribute({ key, data, owner, objects }: Contribution) {
     if (data.kind !== "form") return;
     const entries = entriesOf(key);
     if (!summaries.has(key)) summaries.set(key, data.summary);
-    const added = data.fields.map(field => ({ field, world, owner }));
+    const added = data.fields.map(field => ({ field, objects, owner }));
     entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
     for (const entry of added) wireLive(entry);

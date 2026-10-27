@@ -127,13 +127,13 @@ namespace Alis.Reactive.Builders
             return SignalR<THub, NoPayload>(hub, eventSelector, (_, p) => pipeline(p));
         }
 
-        private TriggerBuilder<TModel> On(Func<ObjectTable, string> on, string eventName, Action<PipelineBuilder<TModel>> pipeline)
+        private TriggerBuilder<TModel> On(Func<PlanObjects, string> on, string eventName, Action<PipelineBuilder<TModel>> pipeline)
         {
             _context.On(on, G.NoPath, eventName, PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
-        private TriggerBuilder<TModel> On<TPayload>(Func<ObjectTable, string> on, string eventName, Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
+        private TriggerBuilder<TModel> On<TPayload>(Func<PlanObjects, string> on, string eventName, Action<Data<TPayload>, PipelineBuilder<TModel>> pipeline)
         {
             var payload = new Data<TPayload>(Target.Event);
             _context.On(on, G.NoPath, eventName, PipelineBuilder<TModel>.Build(_context, p => pipeline(payload, p)));
@@ -141,7 +141,7 @@ namespace Alis.Reactive.Builders
         }
 
         // A declared event of a stream or a hub: its payload is live inside the callback, as a component's is.
-        private TriggerBuilder<TModel> On<TArgs>(Func<ObjectTable, string> on, Event<TArgs> declaredEvent, Action<TArgs, PipelineBuilder<TModel>> pipeline)
+        private TriggerBuilder<TModel> On<TArgs>(Func<PlanObjects, string> on, Event<TArgs> declaredEvent, Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TArgs : JsObject
         {
             if (declaredEvent == null) throw new ArgumentException("Select one of the declared events, for example s => s.Alert.", nameof(declaredEvent));

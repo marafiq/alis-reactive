@@ -9,35 +9,35 @@ import { isPromise } from "../grammar/evaluate";
 import { executeBlock } from "../grammar/execute";
 import { pluginNamed } from "../objects/plugins";
 import type { Owner } from "../objects/owner";
-import { PlanWorld } from "../objects/world";
+import { PlanObjects } from "../objects/plan-objects";
 import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 
 const log = logger("plans");
 
 export function startOwner(owner: Owner, plans: readonly PlanDocument[]): void {
-  const worlds = plans.map(plan => new PlanWorld(plan));
-  for (const world of worlds) contribute(world, owner);
-  for (const world of worlds) subscribeHandlers(world, owner);
+  const objectsByPlan = plans.map(plan => new PlanObjects(plan));
+  for (const objects of objectsByPlan) contribute(objects, owner);
+  for (const objects of objectsByPlan) subscribeHandlers(objects, owner);
   owner.start();
   log.info("owner.started", { owner: owner.name, plans: plans.map(plan => plan.planId) });
 }
 
-function contribute(world: PlanWorld, owner: Owner): void {
-  for (const [id, locator] of Object.entries(world.plan.objects)) {
+function contribute(objects: PlanObjects, owner: Owner): void {
+  for (const [id, locator] of Object.entries(objects.plan.objects)) {
     if (locator.kind !== "plugin" || locator.data.kind === "none") continue;
     const plugin = pluginNamed(locator.name);
     if (!plugin.contribute) throw new Error(`[alis] plugin "${locator.name}" takes no data (object "${id}")`);
-    plugin.contribute({ key: locator.key, data: locator.data, owner, plan: world.plan, world });
+    plugin.contribute({ key: locator.key, data: locator.data, owner, plan: objects.plan, objects });
   }
 }
 
 // A handler whose object is not constructed yet fails at the boundary when it subscribes; it stops
 // no other handler (grammar.md 3.4).
-function subscribeHandlers(world: PlanWorld, owner: Owner): void {
-  for (const handler of world.plan.handlers) {
+function subscribeHandlers(objects: PlanObjects, owner: Owner): void {
+  for (const handler of objects.plan.handlers) {
     try {
-      world.subscribe(handler.on, handler.path, handler.event, payload => runHandler(handler, payload, world), owner);
+      objects.subscribe(handler.on, handler.path, handler.event, payload => runHandler(handler, payload, objects), owner);
     } catch (error) {
       log.error("handler.subscribe-failed", { error: toJavaScriptString(error), on: handler.on, event: handler.event });
     }
@@ -48,12 +48,12 @@ function subscribeHandlers(world: PlanWorld, owner: Owner): void {
 const PAYLOAD = "e";
 
 /** Runs one handler. A failing handler is logged and stops no other handler (grammar.md 3.4). */
-export function runHandler(handler: Handler, payload: unknown, world: PlanWorld): void {
+export function runHandler(handler: Handler, payload: unknown, objects: PlanObjects): void {
   const env = Environment.root();
   env.bind(PAYLOAD, payload);
   const source = `${handler.on}:${handler.event}`;
   try {
-    const completion = executeBlock(handler.do, { env, world });
+    const completion = executeBlock(handler.do, { env, objects });
     if (isPromise(completion)) {
       completion.catch(error => log.error("handler.failed", { error: toJavaScriptString(error), source }));
     }

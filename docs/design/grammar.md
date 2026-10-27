@@ -754,7 +754,7 @@ It reads the rules by their classes, not the plan.
 **TypeScript** (`Alis.Reactive.Assets`)
 - `runtime/grammar`: `evaluate` (the nine expressions), `execute` (the six statements, await),
   `operators`, `paths`, `shape` and `environment`. It imports nothing below.
-- `runtime/objects`: the two locators (`world`), the vendor driver, the plugins registered by name,
+- `runtime/objects`: the two locators (`plan-objects`), the vendor driver, the plugins registered by name,
   and owners.
 - `runtime/plans`: discovery, start and the mount events.
 - `runtime/plugins`: `alis.document`, `alis.http`, `alis.model`, `alis.form`, `alis.slot`;

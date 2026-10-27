@@ -18,8 +18,8 @@ namespace Alis.Reactive.PlanModel
         private readonly RenderedInputs _inputs;
         private readonly List<DeclaredObject> _declared = new List<DeclaredObject>();
         private readonly Dictionary<string, DeclaredObject> _declaredById = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
-        private readonly List<(Func<ObjectTable, string> On, IReadOnlyList<string> Path, string Event, Block Body)> _handlers =
-            new List<(Func<ObjectTable, string>, IReadOnlyList<string>, string, Block)>();
+        private readonly List<(Func<PlanObjects, string> On, IReadOnlyList<string> Path, string Event, Block Body)> _handlers =
+            new List<(Func<PlanObjects, string>, IReadOnlyList<string>, string, Block)>();
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<(RequestStep Request, FormValidation Validation)> _validatedRequests =
             new List<(RequestStep, FormValidation)>();
@@ -73,7 +73,7 @@ namespace Alis.Reactive.PlanModel
         internal void AddStep(Step step) => ActiveBlock.Add(step);
 
         /// <summary>Runs <paramref name="body"/> each time an object the plan names raises <paramref name="eventName"/>.</summary>
-        internal void On(Func<ObjectTable, string> on, IReadOnlyList<string> path, string eventName, Block body) =>
+        internal void On(Func<PlanObjects, string> on, IReadOnlyList<string> path, string eventName, Block body) =>
             _handlers.Add((on, path, eventName, body));
 
         // ── objects ──────────────────────────────────────────────────────────────
@@ -145,7 +145,7 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal GrammarPlan Write()
         {
-            var objects = new ObjectTable(_planId, _declared);
+            var objects = new PlanObjects(_planId, _declared);
             var plan = new PlanWriter(_planId, objects);
 
             var inputs = ModelInputs(objects);
@@ -176,7 +176,7 @@ namespace Alis.Reactive.PlanModel
 
         // Each input this plan rendered: its MVC name, its JSON body path, its value read in the model's
         // type and the event its component commits a value with.
-        private IReadOnlyDictionary<string, InputBinding> ModelInputs(ObjectTable objects)
+        private IReadOnlyDictionary<string, InputBinding> ModelInputs(PlanObjects objects)
         {
             var inputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
             foreach (var declared in _declared)

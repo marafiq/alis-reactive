@@ -64,9 +64,9 @@ namespace Alis.Reactive.PlanModel
         // An object a registered plugin makes: a plugin by its name, a stream or a hub by its URL.
         private sealed class PluginTarget : Target
         {
-            private readonly Func<ObjectTable, string> _object;
+            private readonly Func<PlanObjects, string> _object;
 
-            internal PluginTarget(Func<ObjectTable, string> @object)
+            internal PluginTarget(Func<PlanObjects, string> @object)
             {
                 _object = @object;
             }
