@@ -18,6 +18,11 @@
       "id": "drawer",
       "vendor": "native"
     },
+    "close": {
+      "kind": "element",
+      "id": "close",
+      "vendor": "native"
+    },
     "$http": {
       "kind": "plugin",
       "name": "alis.http",
@@ -165,7 +170,14 @@
             }
           ],
           "else": []
-        },
+        }
+      ]
+    },
+    {
+      "on": "close",
+      "path": [],
+      "event": "click",
+      "do": [
         {
           "kind": "do",
           "expr": {

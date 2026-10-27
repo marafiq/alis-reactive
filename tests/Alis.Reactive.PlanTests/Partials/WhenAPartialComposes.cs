@@ -1,4 +1,5 @@
 using Alis.Reactive.PlanTests.Support;
+using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.PlanTests.Partials;
 
@@ -21,20 +22,18 @@ public class WhenAPartialComposes
     }
 
     [Test]
-    public void a_response_loads_into_a_slot_and_an_unload_empties_it()
+    public void a_response_loads_into_a_slot_and_a_click_unloads_it()
     {
         var plan = Page.Plan<Admission>();
-        plan.Triggers().DomReady(p =>
-        {
-            p.Get("/card").Response(r => r.OnSuccess(s => s.Into("drawer")));
-            p.Unload("drawer");
-        });
+        plan.Triggers().DomReady(p => p.Get("/card").Response(r => r.OnSuccess(s => s.Into("drawer"))));
+        plan.Render<Button>("close", HtmlString.Empty).Reactive(button => button.Click, p => p.Unload("drawer"));
 
         var rendered = plan.Rendered();
 
         var slot = rendered.Objects()["$slot:drawer"]!;
         Assert.That(slot["name"]!.GetValue<string>(), Is.EqualTo("alis.slot"));
         Assert.That(slot["key"]!.GetValue<string>(), Is.EqualTo("drawer"));
-        Golden.Matches(rendered, "Partials", nameof(a_response_loads_into_a_slot_and_an_unload_empties_it));
+        Assert.That(rendered.Handlers().Count, Is.EqualTo(2));
+        Golden.Matches(rendered, "Partials", nameof(a_response_loads_into_a_slot_and_a_click_unloads_it));
     }
 }
