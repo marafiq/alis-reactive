@@ -187,9 +187,9 @@ namespace Alis.Reactive.Validation
         private protected static Expr BlankOrDefault(Expr v, Shape fieldShape)
         {
             var terms = new List<Expr> { NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$") };
-            if (fieldShape.Kind == "boolean") terms.Add(G.Eq(v, G.False));
-            if (fieldShape.Kind == "number") terms.Add(G.Eq(v, G.Lit(0)));
-            if (fieldShape.Kind == "date" || fieldShape.Kind == "instant") terms.Add(G.Op(Operator.Lt, G.Op(Operator.ToNumber, v), G.Lit(DayAfterEarliestDate)));
+            if (fieldShape is BooleanShape) terms.Add(G.Eq(v, G.False));
+            if (fieldShape is NumberShape) terms.Add(G.Eq(v, G.Lit(0)));
+            if (fieldShape is DateShape or InstantShape) terms.Add(G.Op(Operator.Lt, G.Op(Operator.ToNumber, v), G.Lit(DayAfterEarliestDate)));
             return G.Or(terms);
         }
 
@@ -247,7 +247,7 @@ namespace Alis.Reactive.Validation
         private static Expr Nullable(Expr value, Shape inner, Func<Expr, Shape, Expr> convert)
         {
             var absent = G.Eq(value, G.Null);
-            if (inner.Kind == "number" || inner.Kind == "boolean" || inner.Kind == "date" || inner.Kind == "instant")
+            if (inner is NumberShape or BooleanShape or DateShape or InstantShape)
                 absent = G.Or(absent, Matches(value, "^[" + NetWhitespace + "]*$"));
             return G.Op(Operator.Cond, absent, G.Null, convert(value, inner));
         }

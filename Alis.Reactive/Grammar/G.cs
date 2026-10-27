@@ -39,7 +39,7 @@ namespace Alis.Reactive.Grammar
             if (value is AsExpr inner)
             {
                 if (inner.Shape == shape) return value;
-                if (shape.Kind == "array" && inner.Shape.TryGetArrayItemShape(out var item) && IsUnconverted(item))
+                if (shape is ArrayShape && inner.Shape.TryGetArrayItemShape(out var item) && IsUnconverted(item))
                     return new AsExpr(inner.Expr, shape);
             }
             return new AsExpr(value, shape);
@@ -102,7 +102,7 @@ namespace Alis.Reactive.Grammar
 
         internal static Statement All(IReadOnlyList<IReadOnlyList<Statement>> blocks) => new AllStatement(blocks);
 
-        internal static bool IsUnconverted(Shape shape) => shape.Kind == "none" || shape.Kind == "any";
+        internal static bool IsUnconverted(Shape shape) => shape is NoneShape or AnyShape;
 
         // A value the conversion would hand back as it is: a missing value, or text, a boolean or a number
         // under its own scalar shape, nullable or not (grammar.md 2.1).

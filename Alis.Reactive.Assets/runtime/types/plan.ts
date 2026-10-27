@@ -91,6 +91,61 @@ export interface AsExpr {
   shape: Shape;
 }
 
+export type Shape =
+  | AnyShape
+  | ArrayShape
+  | BooleanShape
+  | DateShape
+  | InstantShape
+  | NoneShape
+  | NullableShape
+  | NumberShape
+  | ObjectShape
+  | StringShape;
+
+export interface AnyShape {
+  kind: "any";
+}
+
+export interface ArrayShape {
+  kind: "array";
+  item: Shape;
+}
+
+export interface BooleanShape {
+  kind: "boolean";
+}
+
+export interface DateShape {
+  kind: "date";
+}
+
+export interface InstantShape {
+  kind: "instant";
+}
+
+export interface NoneShape {
+  kind: "none";
+}
+
+export interface NullableShape {
+  kind: "nullable";
+  inner: Shape;
+}
+
+export interface NumberShape {
+  kind: "number";
+}
+
+export interface ObjectShape {
+  kind: "object";
+  fields: Record<string, Shape>;
+}
+
+export interface StringShape {
+  kind: "string";
+}
+
 export interface CallExpr {
   kind: "call";
   target: Expr;
@@ -261,58 +316,3 @@ export type Operator =
   | "finite"
   | "order"
   | "merge";
-
-export type Shape =
-  | AnyShape
-  | ArrayShape
-  | BooleanShape
-  | DateShape
-  | InstantShape
-  | NoneShape
-  | NullableShape
-  | NumberShape
-  | ObjectShape
-  | StringShape;
-
-export interface AnyShape {
-  kind: "any";
-}
-
-export interface ArrayShape {
-  kind: "array";
-  item: Shape;
-}
-
-export interface BooleanShape {
-  kind: "boolean";
-}
-
-export interface DateShape {
-  kind: "date";
-}
-
-export interface InstantShape {
-  kind: "instant";
-}
-
-export interface NoneShape {
-  kind: "none";
-}
-
-export interface NullableShape {
-  kind: "nullable";
-  inner: Shape;
-}
-
-export interface NumberShape {
-  kind: "number";
-}
-
-export interface ObjectShape {
-  kind: "object";
-  fields: Record<string, Shape>;
-}
-
-export interface StringShape {
-  kind: "string";
-}

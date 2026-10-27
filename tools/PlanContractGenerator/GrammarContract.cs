@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.ContractGeneration
@@ -36,7 +35,6 @@ namespace Alis.Reactive.ContractGeneration
             writer.Declare("VendorPayload", LiteralUnion("VendorPayload",
                 Enum.GetValues(typeof(VendorEventPayload)).Cast<VendorEventPayload>().Select(Vendor.PayloadOf)));
             writer.Declare("Operator", LiteralUnion("Operator", Operator.Table.Select(op => op.Token)));
-            writer.DeclareShapes();
             return Header + "\n" + writer.Text();
         }
 
@@ -82,24 +80,6 @@ namespace Alis.Reactive.ContractGeneration
                     foreach (var referenced in ReferencedNodeTypes(property.PropertyType))
                         Visit(referenced);
             }
-
-            internal void DeclareShapes()
-            {
-                var kinds = Shape.Kinds;
-                Declare("Shape", "export type Shape =\n" +
-                    string.Join("\n", kinds.Select(k => "  | " + ShapeName(k))) + ";");
-                foreach (var kind in kinds)
-                {
-                    var members = new StringBuilder();
-                    members.Append("  kind: \"").Append(kind).Append("\";\n");
-                    if (kind == "array") members.Append("  item: Shape;\n");
-                    if (kind == "nullable") members.Append("  inner: Shape;\n");
-                    if (kind == "object") members.Append("  fields: Record<string, Shape>;\n");
-                    Declare(ShapeName(kind), "export interface " + ShapeName(kind) + " {\n" + members + "}");
-                }
-            }
-
-            private static string ShapeName(string kind) => char.ToUpperInvariant(kind[0]) + kind.Substring(1) + "Shape";
         }
 
         private static bool IsUnion(Type type)
@@ -137,23 +117,21 @@ namespace Alis.Reactive.ContractGeneration
         {
             var declared = property.GetCustomAttribute<ContractTypeAttribute>();
             if (declared != null) return declared.TypeScript;
-            if (property.Name == "Kind" && property.PropertyType == typeof(string))
-                return JsonSerializer.Serialize(KindOf(owner));
+            if (property.Name is "Kind" or "Version")
+                return JsonSerializer.Serialize(ConstantOf(owner, property));
             return TypeScriptOf(property.PropertyType);
         }
 
-        private static string KindOf(Type node)
-        {
-            var instance = RuntimeHelpers.GetUninitializedObject(node);
-            return (string)node.GetProperty("Kind")!.GetValue(instance)!;
-        }
+        // A node declares its discriminator and the document its version as constants: the contract carries
+        // each as a literal type, read without running a constructor.
+        private static object ConstantOf(Type node, PropertyInfo property) =>
+            property.GetValue(RuntimeHelpers.GetUninitializedObject(node))!;
 
         private static string TypeScriptOf(Type type)
         {
             if (type == typeof(string)) return "string";
             if (type == typeof(bool)) return "boolean";
             if (type == typeof(int) || type == typeof(long) || type == typeof(double)) return "number";
-            if (type == typeof(Shape)) return "Shape";
             if (TryElementOf(type, out var item)) return ArrayOf(TypeScriptOf(item));
             if (TryValueOf(type, out var value)) return "Record<string, " + TypeScriptOf(value) + ">";
             if (type.Namespace == typeof(GrammarPlan).Namespace) return TypeName(type);

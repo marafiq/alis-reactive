@@ -25,7 +25,6 @@ namespace Alis.Reactive.Grammar
             Handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
         }
 
-        [ContractType("5")]
         public int Version => 5;
 
         public string PlanId { get; }

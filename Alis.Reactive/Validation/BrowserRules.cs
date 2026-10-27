@@ -20,7 +20,7 @@ namespace Alis.Reactive.Validation
 
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
-            rule = field.Shape.Kind == "array" ? new AtLeastOneRule(Message, Condition)
+            rule = field.Shape is ArrayShape ? new AtLeastOneRule(Message, Condition)
                 : DefaultMemberOf(field.Type) is string member ? new NotDefaultMemberRule(member, Message, Condition)
                 : this;
             return true;
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Validation
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = this;
-            return field.Shape.Kind != "array" && (!field.Type.IsValueType || Nullable.GetUnderlyingType(field.Type) != null);
+            return field.Shape is not ArrayShape && (!field.Type.IsValueType || Nullable.GetUnderlyingType(field.Type) != null);
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) => G.Not(Blank(value));

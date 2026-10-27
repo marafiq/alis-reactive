@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive

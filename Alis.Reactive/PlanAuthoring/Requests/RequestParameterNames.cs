@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
@@ -33,7 +34,7 @@ namespace Alis.Reactive.Builders.Requests
         // result or a payload read typed as object) is the developer's to keep scalar.
         internal static void RouteParameter(string placeholder, Shape shape)
         {
-            var undeclared = shape.IsNone || shape.Kind == "any";
+            var undeclared = shape is NoneShape or AnyShape;
             if (undeclared || shape.IsScalar) return;
 
             throw new InvalidOperationException(

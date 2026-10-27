@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders

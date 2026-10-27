@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
@@ -98,7 +99,7 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal TNext ContainsItem<TItem>(TItem item)
         {
-            var itemShape = PlanModel.Shape.FromClrType(typeof(TItem));
+            var itemShape = Grammar.Shape.FromClrType(typeof(TItem));
             return _next(Condition.ArrayContains(Left, ValueExpression.LiteralFor(item, itemShape), Shape, itemShape));
         }
 

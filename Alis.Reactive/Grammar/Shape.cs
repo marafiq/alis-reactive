@@ -3,103 +3,57 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using Alis.Reactive.Serialization;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.Grammar
 {
-    internal sealed class ShapeJsonConverter : JsonConverter<Shape>
-    {
-        public override void Write(Utf8JsonWriter writer, Shape value, JsonSerializerOptions options) =>
-            value.WriteTo(writer);
-
-        public override Shape Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-            throw new NotSupportedException("Plan types are write-only.");
-    }
-
     /// <summary>
-    /// The type of a value in the plan, as MVC binds it: a scalar (string, number, boolean, date, instant),
-    /// an array of a shape, a nullable shape, an object of named shapes, any value, or none.
+    /// The type of a value in the plan, as MVC binds it (grammar.md 2.1): a scalar (string, number,
+    /// boolean, date, instant), an array of a shape, a nullable shape, an object of named shapes, any
+    /// value, or none. Ten productions, one node each, written and declared like every other node.
     /// </summary>
-    [JsonConverter(typeof(ShapeJsonConverter))]
-    internal sealed class Shape : IEquatable<Shape>
+    [JsonConverter(typeof(PlanNodeDiscriminator<Shape>))]
+    internal abstract class Shape : IEquatable<Shape>
     {
-        // Declared before the shapes below, which are built with it.
-        private static readonly IReadOnlyDictionary<string, Shape> NoFields =
-            new ReadOnlyDictionary<string, Shape>(new Dictionary<string, Shape>());
-
-        internal static readonly Shape String = new Shape("string");
-        internal static readonly Shape Number = new Shape("number");
-        internal static readonly Shape Boolean = new Shape("boolean");
-        internal static readonly Shape Date = new Shape("date");
+        internal static readonly Shape String = new StringShape();
+        internal static readonly Shape Number = new NumberShape();
+        internal static readonly Shape Boolean = new BooleanShape();
+        internal static readonly Shape Date = new DateShape();
         /// <summary>A moment in time with its offset (<see cref="DateTimeOffset"/>), sent as the exact instant.</summary>
-        internal static readonly Shape Instant = new Shape("instant");
-        internal static readonly Shape Any = new Shape("any");
-        internal static readonly Shape None = new Shape("none");
+        internal static readonly Shape Instant = new InstantShape();
+        internal static readonly Shape Any = new AnyShape();
+        internal static readonly Shape None = new NoneShape();
 
-        /// <summary>Every kind a shape can be, as the contract declares them; array wraps an item, nullable an inner shape, object its fields.</summary>
-        internal static readonly IReadOnlyList<string> Kinds =
-            new[] { "any", "array", "boolean", "date", "instant", "none", "nullable", "number", "object", "string" };
-
-        // The item of an array or the inner shape of a nullable: one shape for those two kinds, none for
-        // the others. A list, not a None sentinel, because None is itself built by these constructors.
-        private readonly IReadOnlyList<Shape> _wrapped;
-        private readonly IReadOnlyDictionary<string, Shape> _fields;
-
-        private Shape(string kind)
-            : this(kind, Array.Empty<Shape>(), NoFields)
-        {
-        }
-
-        private Shape(string kind, IReadOnlyList<Shape> wrapped, IReadOnlyDictionary<string, Shape> fields)
-        {
-            Kind = kind;
-            _wrapped = wrapped;
-            _fields = fields;
-        }
+        private protected Shape() { }
 
         /// <summary>JSON shape kind, such as <c>string</c>, <c>array</c>, <c>object</c>, or <c>nullable</c>.</summary>
-        public string Kind { get; }
+        public abstract string Kind { get; }
 
-        internal bool IsNone => Kind == "none";
+        internal bool IsNone => this is NoneShape;
 
         /// <summary>Whether a value of this shape is a list, through a nullable wrapper too.</summary>
-        internal bool DescribesArray => TryGetNullableInnerShape(out var inner) ? inner.DescribesArray : Kind == "array";
+        internal bool DescribesArray => this is NullableShape nullable ? nullable.Inner.DescribesArray : this is ArrayShape;
 
         /// <summary>
         /// True when a value of this shape serializes to one string, as an HTTP header, a route parameter or a
         /// query value needs: string, number, boolean, date, instant, or a nullable of one of them.
         /// </summary>
-        internal bool IsScalar
+        internal bool IsScalar => this switch
         {
-            get
-            {
-                switch (Kind)
-                {
-                    case "string":
-                    case "number":
-                    case "boolean":
-                    case "date":
-                    case "instant":
-                        return true;
-                    case "nullable":
-                        return _wrapped[0].IsScalar;
-                    default:
-                        return false;
-                }
-            }
-        }
+            NullableShape nullable => nullable.Inner.IsScalar,
+            StringShape or NumberShape or BooleanShape or DateShape or InstantShape => true,
+            _ => false,
+        };
 
-        internal static Shape ArrayOf(Shape item) =>
-            new Shape("array", new[] { Wrappable(item, nameof(item)) }, NoFields);
+        internal static Shape ArrayOf(Shape item) => new ArrayShape(Wrappable(item, nameof(item)));
 
-        internal static Shape Nullable(Shape inner) =>
-            new Shape("nullable", new[] { Wrappable(inner, nameof(inner)) }, NoFields);
+        internal static Shape Nullable(Shape inner) => new NullableShape(Wrappable(inner, nameof(inner)));
 
         internal static Shape ObjectOf(Dictionary<string, Shape> fields)
         {
             if (fields is null) throw new ArgumentNullException(nameof(fields));
-            return new Shape("object", Array.Empty<Shape>(), new ReadOnlyDictionary<string, Shape>(fields));
+            return new ObjectShape(new ReadOnlyDictionary<string, Shape>(fields));
         }
 
         private static Shape Wrappable(Shape shape, string parameter)
@@ -109,53 +63,25 @@ namespace Alis.Reactive.PlanModel
             return shape;
         }
 
-        internal bool TryGetArrayItemShape(out Shape item) => TryGetWrapped("array", out item);
-
-        internal bool TryGetNullableInnerShape(out Shape inner) => TryGetWrapped("nullable", out inner);
-
-        private bool TryGetWrapped(string kind, out Shape wrapped)
+        internal bool TryGetArrayItemShape(out Shape item)
         {
-            var wraps = Kind == kind;
-            wrapped = wraps ? _wrapped[0] : None;
-            return wraps;
+            item = this is ArrayShape array ? array.Item : None;
+            return this is ArrayShape;
         }
 
-        internal string DescribeContract()
+        internal bool TryGetNullableInnerShape(out Shape inner)
         {
-            switch (Kind)
-            {
-                case "array":
-                    return "array<" + _wrapped[0].DescribeContract() + ">";
-                case "nullable":
-                    return "nullable<" + _wrapped[0].DescribeContract() + ">";
-                case "object":
-                    return "object{" + string.Join(", ", _fields.Select(field => field.Key + ":" + field.Value.DescribeContract())) + "}";
-                default:
-                    return Kind;
-            }
+            inner = this is NullableShape nullable ? nullable.Inner : None;
+            return this is NullableShape;
         }
 
-        internal void WriteTo(Utf8JsonWriter writer)
+        internal string DescribeContract() => this switch
         {
-            writer.WriteStartObject();
-            writer.WriteString("kind", Kind);
-            if (Kind == "array") WriteMember(writer, "item", _wrapped[0]);
-            if (Kind == "nullable") WriteMember(writer, "inner", _wrapped[0]);
-            if (Kind == "object")
-            {
-                writer.WriteStartObject("fields");
-                foreach (var field in _fields)
-                    WriteMember(writer, field.Key, field.Value);
-                writer.WriteEndObject();
-            }
-            writer.WriteEndObject();
-        }
-
-        private static void WriteMember(Utf8JsonWriter writer, string name, Shape shape)
-        {
-            writer.WritePropertyName(name);
-            shape.WriteTo(writer);
-        }
+            ArrayShape array => "array<" + array.Item.DescribeContract() + ">",
+            NullableShape nullable => "nullable<" + nullable.Inner.DescribeContract() + ">",
+            ObjectShape record => "object{" + string.Join(", ", record.Fields.Select(field => field.Key + ":" + field.Value.DescribeContract())) + "}",
+            _ => Kind,
+        };
 
         // ── from CLR types ───────────────────────────────────────────────────────
 
@@ -304,23 +230,106 @@ namespace Alis.Reactive.PlanModel
         /// <summary>Determines whether two <see cref="Shape"/> instances represent the same type contract.</summary>
         /// <param name="other">Shape to compare.</param>
         /// <returns><see langword="true"/> if the shapes are structurally equal.</returns>
-        public bool Equals(Shape? other) =>
-            other is not null
-            && Kind == other.Kind
-            && _wrapped.SequenceEqual(other._wrapped)
-            && _fields.Count == other._fields.Count
-            && _fields.All(field => other._fields.TryGetValue(field.Key, out var shape) && field.Value.Equals(shape));
+        public bool Equals(Shape? other) => other switch
+        {
+            null => false,
+            ArrayShape array => this is ArrayShape mine && mine.Item.Equals(array.Item),
+            NullableShape nullable => this is NullableShape mine && mine.Inner.Equals(nullable.Inner),
+            ObjectShape record => this is ObjectShape mine && SameFields(mine.Fields, record.Fields),
+            _ => Kind == other.Kind,
+        };
+
+        private static bool SameFields(IReadOnlyDictionary<string, Shape> mine, IReadOnlyDictionary<string, Shape> theirs) =>
+            mine.Count == theirs.Count
+            && mine.All(field => theirs.TryGetValue(field.Key, out var shape) && field.Value.Equals(shape));
 
         /// <inheritdoc/>
         public override bool Equals(object? obj) => Equals(obj as Shape);
 
         /// <inheritdoc/>
-        public override int GetHashCode() =>
-            _wrapped.Aggregate(StringComparer.Ordinal.GetHashCode(Kind), (hash, wrapped) => unchecked(hash * 31 + wrapped.GetHashCode()));
+        public override int GetHashCode() => this switch
+        {
+            ArrayShape array => unchecked(StringComparer.Ordinal.GetHashCode(Kind) * 31 + array.Item.GetHashCode()),
+            NullableShape nullable => unchecked(StringComparer.Ordinal.GetHashCode(Kind) * 31 + nullable.Inner.GetHashCode()),
+            _ => StringComparer.Ordinal.GetHashCode(Kind),
+        };
 
         /// <summary>Compares two shapes for structural equality.</summary>
         public static bool operator ==(Shape? left, Shape? right) => Equals(left, right);
         /// <summary>Compares two shapes for structural inequality.</summary>
         public static bool operator !=(Shape? left, Shape? right) => !Equals(left, right);
+    }
+
+    internal sealed class StringShape : Shape
+    {
+        public override string Kind => "string";
+    }
+
+    internal sealed class NumberShape : Shape
+    {
+        public override string Kind => "number";
+    }
+
+    internal sealed class BooleanShape : Shape
+    {
+        public override string Kind => "boolean";
+    }
+
+    internal sealed class DateShape : Shape
+    {
+        public override string Kind => "date";
+    }
+
+    internal sealed class InstantShape : Shape
+    {
+        public override string Kind => "instant";
+    }
+
+    /// <summary>A value of no declared shape, converted by nothing.</summary>
+    internal sealed class AnyShape : Shape
+    {
+        public override string Kind => "any";
+    }
+
+    /// <summary>No value: what a method without a result or a payload without a body reads.</summary>
+    internal sealed class NoneShape : Shape
+    {
+        public override string Kind => "none";
+    }
+
+    /// <summary>A list whose items are one shape.</summary>
+    internal sealed class ArrayShape : Shape
+    {
+        internal ArrayShape(Shape item)
+        {
+            Item = item;
+        }
+
+        public override string Kind => "array";
+        public Shape Item { get; }
+    }
+
+    /// <summary>A shape or nothing, as MVC binds a nullable.</summary>
+    internal sealed class NullableShape : Shape
+    {
+        internal NullableShape(Shape inner)
+        {
+            Inner = inner;
+        }
+
+        public override string Kind => "nullable";
+        public Shape Inner { get; }
+    }
+
+    /// <summary>An object of named shapes, by their JSON names.</summary>
+    internal sealed class ObjectShape : Shape
+    {
+        internal ObjectShape(IReadOnlyDictionary<string, Shape> fields)
+        {
+            Fields = fields;
+        }
+
+        public override string Kind => "object";
+        public IReadOnlyDictionary<string, Shape> Fields { get; }
     }
 }
