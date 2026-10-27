@@ -36,6 +36,8 @@ JSON the framework did not produce. Each names the object, the path and the plan
 - Sync stays sync: a handler with no awaited statement never returns a promise, so a vendor reads
   a payload's `cancel` in the same turn. Only `do`/`let` with `await` wait.
 - One evaluator. A second way to read a value is a defect.
+- One switch per generated union, ending in `assertNever`, so a node added in C# fails typecheck here
+  before it fails in a browser. An `if` over a kind narrows to one case; it never stands in for the switch.
 
 ## Component tripwire
 

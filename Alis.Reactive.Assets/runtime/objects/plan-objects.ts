@@ -2,9 +2,10 @@
 // plugin registered under its name (grammar.md 1.1). Elements are looked up at every use and never
 // cached, so a slot's content can change underneath a plan (grammar.md E1).
 
-import type { ElementLocator, ObjectLocator, PlanDocument, Vendor } from "../types/index";
+import type { ElementLocator, ObjectLocator, PlanDocument, PluginLocator, Vendor } from "../types/index";
 import type { Objects } from "../grammar/evaluate";
 import { read } from "../grammar/paths";
+import { assertNever } from "../shared/assert-never";
 import { pluginNamed } from "./plugins";
 import type { Owner } from "./owner";
 import { subscribeVendor, vendorObject, type Listener } from "./vendor-driver";
@@ -14,8 +15,11 @@ export class PlanObjects implements Objects {
 
   object(id: string): unknown {
     const locator = this.locator(id);
-    if (locator.kind === "plugin") return pluginNamed(locator.name).object(locator.key);
-    return vendorObject(this.requireElement(locator), locator.vendor, this.vendor(locator));
+    switch (locator.kind) {
+      case "plugin":  return pluginNamed(locator.name).object(locator.key);
+      case "element": return vendorObject(this.requireElement(locator), locator.vendor, this.vendor(locator));
+      default:        return assertNever(locator, "object locator");
+    }
   }
 
   /** The element of an input, or null when it is not on the page. An input is always an element. */
@@ -26,14 +30,14 @@ export class PlanObjects implements Objects {
   /** Subscribes on the object, or on the object at `path` under it: a nested object's own event. */
   subscribe(id: string, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const locator = this.locator(id);
-    if (locator.kind === "plugin") {
-      if (path.length > 0) throw new Error(`[alis] plugin "${locator.name}" has no object at ${path.join(".")}`);
-      const plugin = pluginNamed(locator.name);
-      if (!plugin.subscribe) throw new Error(`[alis] plugin "${locator.name}" has no events`);
-      plugin.subscribe(locator.key, event, listener, owner);
-      return;
+    switch (locator.kind) {
+      case "plugin":  return subscribePlugin(locator, path, event, listener, owner);
+      case "element": return this.subscribeElement(locator, path, event, listener, owner);
+      default:        return assertNever(locator, "object locator");
     }
+  }
 
+  private subscribeElement(locator: ElementLocator, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const vendor = this.vendor(locator);
     const root = vendorObject(this.requireElement(locator), locator.vendor, vendor);
     const target = path.length === 0 ? root : read(root, path, "checked", `#${locator.id}`);
@@ -54,4 +58,12 @@ export class PlanObjects implements Objects {
     if (!element) throw new Error(`[alis] #${locator.id} is not on the page`);
     return element;
   }
+}
+
+// A plugin's object has no nested objects: a handler subscribes to the plugin itself.
+function subscribePlugin(locator: PluginLocator, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
+  if (path.length > 0) throw new Error(`[alis] plugin "${locator.name}" has no object at ${path.join(".")}`);
+  const plugin = pluginNamed(locator.name);
+  if (!plugin.subscribe) throw new Error(`[alis] plugin "${locator.name}" has no events`);
+  plugin.subscribe(locator.key, event, listener, owner);
 }
