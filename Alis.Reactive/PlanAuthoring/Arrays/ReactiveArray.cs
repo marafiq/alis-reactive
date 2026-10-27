@@ -70,8 +70,8 @@ namespace Alis.Reactive.Builders.Arrays
             // serializes as Shape.Any, and the runtime would fall back to lexicographic
             // String(value) order, where every object becomes "[object Object]".
             // Reject it where it is authored rather than emit a silently wrong runtime sort.
-            var keyKind = Shape.FromClrType(typeof(TKey)).Kind;
-            var keyIsSortableScalar = keyKind is "string" or "number" or "boolean" or "date" or "instant" or "nullable";
+            var keyShape = Shape.FromClrType(typeof(TKey));
+            var keyIsSortableScalar = keyShape is StringShape or NumberShape or BooleanShape or DateShape or InstantShape or NullableShape;
             if (!keyIsSortableScalar)
                 throw new InvalidOperationException(
                     "OrderBy key must project to a scalar (string, number, date, bool, enum), not '" +
