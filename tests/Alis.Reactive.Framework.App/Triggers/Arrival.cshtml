@@ -1,0 +1,38 @@
+@using Alis.Reactive.Framework.App.Triggers
+@model ArrivalPage
+@{
+    ViewData["Title"] = "Arrival";
+    var plan = Html.ReactivePlan<ArrivalPage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>Arrival</h1>
+
+@plan.Slate("slate", title: "Arrivals")
+
+<p>Resident: <span id="resident"></span> · wing: <span id="wing"></span> · floor: <span id="floor"></span> · visitor: <span id="visitor"></span></p>
+<p>Ready handlers run, counted: <span id="ready-count"></span></p>
+<div id="visit-slot"></div>
+
+@{ Html.On(plan, t => t.DomReady(p =>
+{
+    var url = p.Url<ArrivalQuery>();
+    tally.Add(1);
+    p.Element("resident").Text.Set(url.Get(q => q.Resident));
+    p.Element("wing").Text.Set(url.Get(q => q.Wing));
+    p.When(url.Get(q => q.Wings)).IsEmpty()
+        .Then(none => none.Component<Slate>("slate").Note.Set("no wings"))
+        .Else(some => some.Component<Slate>("slate").Summarize(url.Get(q => q.Wings)));
+    p.When(url.Get(q => q.Floor)).Gt(2)
+        .Then(up => up.Element("floor").Text.Set("upstairs"))
+        .Else(down => down.Element("floor").Text.Set("downstairs"));
+    p.When(url.Get(q => q.Visitor)).IsNull()
+        .Then(none => none.Element("visitor").Text.Set("no visitor"))
+        .Else(some => some.Element("visitor").Text.Set(url.Get(q => q.Visitor)));
+})); }
+
+@(plan.Button("load-visit", "Load a visit card")
+    .Reactive(button => button.Click, p => p.Get("/Triggers/Visit").Response(r => r.OnSuccess(s => s.Into("visit-slot")))))
+@(plan.Button("count-ready", "Count the ready handlers")
+    .Reactive(button => button.Click, p => p.Element("ready-count").Text.Set(tally.Total)))
+
+@Html.RenderPlan(plan)

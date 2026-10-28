@@ -458,9 +458,14 @@ run_project() {
 
   check_browser_assets_are_fresh
 
+  # run_project is called as an if condition, where bash suspends set -e: a failed build must stop the
+  # project explicitly, or the tests would run on the previous binaries.
   if [ "$no_build" -eq 0 ]; then
     echo "[playwright:runner] building test project"
-    dotnet build "$project" -c "$configuration"
+    if ! dotnet build "$project" -c "$configuration"; then
+      echo "[playwright:runner] ERROR: the build of $project failed; no test ran." >&2
+      return 4
+    fi
   else
     echo "[playwright:runner] skipping build (--no-build)"
     check_no_build_is_fresh
