@@ -73,6 +73,10 @@ public sealed class CheckedForm
 
     public string? Badge { get; set; } = "A-17";
 
+    public DateTime Visiting { get; set; } = new(2026, 10, 5);
+
+    public DateTimeOffset Called { get; set; } = new(2026, 10, 5, 9, 0, 0, TimeSpan.Zero);
+
     public Contact Contact { get; set; } = new();
 }
 
@@ -124,6 +128,8 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
         RuleFor(x => x.Guests).NotEmpty().WithMessage("At least one guest.");
         RuleFor(x => x.Leaving).GreaterThanOrEqualTo(x => x.Arriving).WithMessage("Leave on or after arriving.");
         RuleFor(x => x.Badge).Matches("^A-").ServerOnly().WithMessage("Badges start with A-.");
+        RuleFor(x => x.Visiting).NotEmpty().WithMessage("Give the visiting day.");
+        RuleFor(x => x.Called).NotEmpty().WithMessage("Give the time of the call.");
         RuleFor(x => x.Contact).SetValidator(new ContactRules());
     }
 }

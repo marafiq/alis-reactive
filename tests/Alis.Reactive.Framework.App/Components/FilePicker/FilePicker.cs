@@ -22,6 +22,9 @@ public sealed class FilePicker : Component, IInputComponent
     /// <summary>The files the person chose, in the order chosen; none until they choose.</summary>
     public ReadOnly<IReadOnlyList<BrowserFile>> Files => ReadOnly<IReadOnlyList<BrowserFile>>();
 
+    /// <summary>The same files as the browser lists them: the file input's own <c>FileList</c>, not an array.</summary>
+    public ReadOnly<IReadOnlyList<BrowserFile>> Listed => ReadOnly<IReadOnlyList<BrowserFile>>();
+
     /// <summary>Raised when the person chooses files.</summary>
     public Event<FilesChosen> Chosen => Event<FilesChosen>();
 

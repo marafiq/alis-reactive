@@ -1,0 +1,27 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model ShiftsPage
+@{
+    ViewData["Title"] = "A shift";
+    var plan = Html.ReactivePlan<ShiftsPage>();
+}
+<h1>A shift</h1>
+
+@plan.Slate("rota", title: "Rota", "Ada", "Ben")
+
+<p>The shift: <span id="shift"></span></p>
+<p>The rota: <span id="on-rota"></span></p>
+
+@{ Html.On(plan, t => t.DomReady(p => p.When(p.Url<ShiftQuery>().Get(q => q.Starts)).Lt(new TimeOnly(12, 0))
+    .Then(morning => morning.Element("shift").Text.Set("a morning shift"))
+    .Else(later => later.Element("shift").Text.Set("not a morning shift")))); }
+
+@(plan.Button("ask-ada", "Is Ada on the rota?")
+    .Reactive(button => button.Click, p => p.When(p.Component<Slate>("rota").Has("Ada")).Gt(false)
+        .Then(t => t.Element("on-rota").Text.Set("Ada is on the rota"))
+        .Else(e => e.Element("on-rota").Text.Set("Ada is not on the rota"))))
+@(plan.Button("ask-zed", "Is Zed on the rota?")
+    .Reactive(button => button.Click, p => p.When(p.Component<Slate>("rota").Has("Zed")).Gt(false)
+        .Then(t => t.Element("on-rota").Text.Set("Zed is on the rota"))
+        .Else(e => e.Element("on-rota").Text.Set("Zed is not on the rota"))))
+
+@Html.RenderPlan(plan)

@@ -2,7 +2,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Members;
 
 /// <summary>
 /// A component's methods, called by a page's pipelines: with no argument (M1), with up to four (M2), with a
-/// record (M3), for a result read where any value is read (M4), asynchronously (M5), and refusing (M6).
+/// record (M3), for a result read where any value is read (M4), asynchronously (M5), and refusing (M6). A
+/// method declared plain whose JavaScript returns a promise runs without the pipeline waiting for it.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageCallsAComponentsMethods : AppPageTest
@@ -75,6 +76,16 @@ public sealed class WhenAPageCallsAComponentsMethods : AppPageTest
         await Button("Save").ClickAsync();
 
         await Expect(Page.Locator("#save-status")).ToHaveTextAsync("saved");
+    }
+
+    [Test]
+    public async Task a_promise_from_a_method_declared_plain_is_not_waited_for_by_the_next_step()
+    {
+        await Open("/Members/Methods");
+
+        await Button("Start saving and go on").ClickAsync();
+
+        await Expect(Page.Locator("#went-on-status")).ToHaveTextAsync("saving");
     }
 
     [Test]

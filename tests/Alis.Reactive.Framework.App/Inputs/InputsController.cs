@@ -20,6 +20,26 @@ public sealed class InputsController : Controller
             $"arrives {admitted.Arrives.ToUniversalTime().ToString("HH:mm", CultureInfo.InvariantCulture)} UTC"),
     });
 
+    public IActionResult Booking() => View(new BookingPage());
+
+    /// <summary>
+    /// Binds the posted booking from its form fields as any endpoint does, and says what it bound: each member's
+    /// value, or the text it was sent when that text does not bind to the member's type.
+    /// </summary>
+    [HttpPost]
+    public IActionResult Booking([FromForm] BookingPage booking) => Json(new BookingEcho
+    {
+        Summary = string.Join(", ",
+            Bound("day", nameof(BookingPage.Day), booking.Day.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)),
+            Bound("called", nameof(BookingPage.Called), booking.Called.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture)),
+            Bound("guests", nameof(BookingPage.Guests), booking.Guests.ToString(CultureInfo.InvariantCulture))),
+    });
+
+    private string Bound(string label, string member, string value) =>
+        ModelState.TryGetValue(member, out var entry) && entry.Errors.Count > 0
+            ? $"{label} '{entry.AttemptedValue}' not bound"
+            : $"{label} {value}";
+
     /// <summary>A visitor's arrival, the desk's pass carried hidden, unless the desk gave none; a note the address gives starts the page.</summary>
     public IActionResult Arrival(string? note = null, bool noPass = false) => View(new ArrivalPage { Note = note, Pass = noPass ? null : "P-7" });
 

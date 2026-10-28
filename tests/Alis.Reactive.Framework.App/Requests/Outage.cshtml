@@ -1,0 +1,148 @@
+@using Alis.Reactive.Framework.App.Requests
+@model OutagePage
+@{
+    ViewData["Title"] = "When a request fails";
+    var plan = Html.ReactivePlan<OutagePage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>When a request fails</h1>
+
+@plan.Slate("keeper", title: "Keeper")
+<div id="ledger-shelf">@plan.Slate("ledger", title: "Night ledger")</div>
+
+@* Each pipeline counts its attempt on the tally first, and writes the attempt where each of its steps ran. *@
+<dl>
+    <dt>The ledger's title sent</dt>
+    <dd>tried <span id="title-tried"></span> · answered <span id="title-answer"></span> · finished <span id="title-finished"></span> · went on <span id="title-after"></span></dd>
+    <dt>An answer written into the ledger</dt>
+    <dd>tried <span id="answer-tried"></span> · written <span id="answer-written"></span> · finished <span id="answer-finished"></span> · went on <span id="answer-after"></span></dd>
+    <dt>Looked up by the keeper's limit</dt>
+    <dd>tried <span id="limit-tried"></span> · answered <span id="limit-answer"></span> · finished <span id="limit-finished"></span> · went on <span id="limit-after"></span></dd>
+    <dt>The keeper saved when the title is sent</dt>
+    <dd>tried <span id="save-tried"></span> · keeper <span id="save-status"></span> at <span id="save-finished"></span> · went on <span id="save-after"></span></dd>
+    <dt>The ledger and the desk asked at once</dt>
+    <dd>tried <span id="both-tried"></span> · the ledger <span id="both-ledger"></span> · the desk <span id="both-desk"></span> · settled <span id="both-settled"></span></dd>
+    <dt>Two answers written at once, one into the ledger</dt>
+    <dd>tried <span id="pair-tried"></span> · the ledger <span id="pair-ledger"></span> · the desk <span id="pair-desk"></span> · settled <span id="pair-settled"></span></dd>
+    <dt>A connection that drops</dt><dd id="dropped"></dd>
+    <dt>An answer cut short</dt><dd id="garbled"></dd>
+    <dt>A page in XHTML</dt><dd id="xhtml"></dd>
+    <dt>A file of bytes</dt><dd id="bytes"></dd>
+    <dt>Attempts counted</dt><dd id="attempts"></dd>
+</dl>
+
+@(plan.Button("put-away", "Put the ledger away")
+    .Reactive(button => button.Click, p => p.Unload("ledger-shelf")))
+@(plan.Button("count", "Count the attempts")
+    .Reactive(button => button.Click, p => p.Element("attempts").Text.Set(tally.Total)))
+@(plan.Button("set-limit", "Give the keeper a limit of 3")
+    .Reactive(button => button.Click, p => p.Component<Slate>("keeper").Limit.Set(3)))
+
+@(plan.Button("send-title", "Send the ledger's title")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("title-tried").Text.Set(tally.Total);
+        p.Post("/Requests/Ledger")
+            .Gather<LedgerNote>(g => g.Set(x => x.Title, p.Component<Slate>("ledger").Title))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("title-answer").Text.Set(echo.Get(x => x.Summary))))
+            .Finally(f => f.Element("title-finished").Text.Set(tally.Total));
+        p.Element("title-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("write-answer", "Write the answer into the ledger")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("answer-tried").Text.Set(tally.Total);
+        p.Get("/Requests/Residents/{id}")
+            .Gather<ResidentQuery>(g => g.Set(x => x.Id, 7))
+            .Response(r => r.OnSuccess<Echo>((echo, s) =>
+            {
+                s.Component<Slate>("ledger").Title.Set(echo.Get(x => x.Summary));
+                s.Element("answer-written").Text.Set(tally.Total);
+            }))
+            .Finally(f => f.Element("answer-finished").Text.Set(tally.Total));
+        p.Element("answer-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("look-up-limit", "Look up by the keeper's limit")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("limit-tried").Text.Set(tally.Total);
+        p.Get("/Requests/Limits/{limit}")
+            .Gather<LimitRoute>(g => g.Set(x => x.Limit, p.Component<Slate>("keeper").Limit))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("limit-answer").Text.Set(echo.Get(x => x.Summary))))
+            .Finally(f => f.Element("limit-finished").Text.Set(tally.Total));
+        p.Element("limit-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("send-and-save", "Send the title and save the keeper")
+    .Reactive(button => button.Click, p =>
+    {
+        var keeper = p.Component<Slate>("keeper");
+        tally.Add(1);
+        p.Element("save-tried").Text.Set(tally.Total);
+        p.Post("/Requests/Ledger")
+            .Gather<LedgerNote>(g => g.Set(x => x.Title, p.Component<Slate>("ledger").Title))
+            .Finally(f =>
+            {
+                keeper.Save();
+                f.Element("save-status").Text.Set(keeper.Status);
+                f.Element("save-finished").Text.Set(tally.Total);
+            });
+        p.Element("save-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("ask-both", "Ask the ledger and the desk at once")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("both-tried").Text.Set(tally.Total);
+        p.Parallel(
+                ledger => ledger.Post("/Requests/Ledger")
+                    .Gather<LedgerNote>(g => g.Set(x => x.Title, p.Component<Slate>("ledger").Title))
+                    .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("both-ledger").Text.Set(tally.Total))),
+                desk => desk.Get("/Requests/Slow")
+                    .Gather<SlowQuery>(g => g.Set(x => x.Delay, 50).Set(x => x.Name, "the desk"))
+                    .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("both-desk").Text.Set(tally.Total))))
+            .OnAllSettled(s => s.Element("both-settled").Text.Set(tally.Total));
+    }))
+@(plan.Button("write-both", "Write two answers at once")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("pair-tried").Text.Set(tally.Total);
+        p.Parallel(
+                ledger => ledger.Get("/Requests/Slow")
+                    .Gather<SlowQuery>(g => g.Set(x => x.Delay, 50).Set(x => x.Name, "the ledger's line"))
+                    .Response(r => r.OnSuccess<Echo>((echo, s) =>
+                    {
+                        s.Component<Slate>("ledger").Title.Set(echo.Get(x => x.Summary));
+                        s.Element("pair-ledger").Text.Set(tally.Total);
+                    })),
+                desk => desk.Get("/Requests/Slow")
+                    .Gather<SlowQuery>(g => g.Set(x => x.Delay, 50).Set(x => x.Name, "the desk"))
+                    .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("pair-desk").Text.Set(tally.Total))))
+            .OnAllSettled(s => s.Element("pair-settled").Text.Set(tally.Total));
+    }))
+
+@(plan.Button("ask-dropped", "Ask an endpoint that drops the connection")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Dropped")
+        .Response(r => r
+            .OnSuccess(s => s.Element("dropped").Text.Set("answered"))
+            .OnError(e => e.Element("dropped").Text.Set("the connection dropped")))))
+@(plan.Button("ask-garbled", "Ask an endpoint whose answer is cut short")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Garbled")
+        .Response(r => r
+            .OnSuccess(s => s.Element("garbled").Text.Set("answered"))
+            .OnError(e => e.Element("garbled").Text.Set("the answer could not be read")))))
+@(plan.Button("ask-xhtml", "Ask for a page in XHTML")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Xhtml")
+        .Response(r => r.OnSuccess<string>((page, s) => s.When(page).IsEmpty()
+            .Then(t => t.Element("xhtml").Text.Set("no text in the answer"))
+            .Else(e => e.Element("xhtml").Text.Set(page))))))
+@(plan.Button("ask-bytes", "Ask for a file of bytes")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Bytes")
+        .Response(r => r.OnSuccess<string>((file, s) => s.When(file).IsEmpty()
+            .Then(t => t.Element("bytes").Text.Set("no text in the answer"))
+            .Else(e => e.Element("bytes").Text.Set(file))))))
+
+@Html.RenderPlan(plan)

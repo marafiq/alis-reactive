@@ -60,6 +60,11 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     [TestCase("Purpose", "   ", "Tour", "Give a purpose.", TestName = "not_empty_refuses_only_spaces_and_takes_text")]
     [TestCase("Guests", "0", "1", "At least one guest.", TestName = "not_empty_refuses_a_numbers_default_and_takes_another")]
     [TestCase("Leaving", "2026-09-30", "2026-10-01", "Leave on or after arriving.", TestName = "a_nullable_member_bound_refuses_a_date_before_its_peer_and_takes_the_peers_own")]
+    [TestCase("Visiting", "", "2026-10-06", "Give the visiting day.", TestName = "not_empty_refuses_a_day_left_empty_as_its_types_default_and_takes_a_day")]
+    [TestCase("Called", "", "2026-10-06T09:00:00Z", "Give the time of the call.", TestName = "not_empty_refuses_a_moment_left_empty_as_its_types_default_and_takes_a_moment")]
+    [TestCase("Card", "5555555555554445", "5555555555554444", "Give a card number.", TestName = "a_card_check_takes_a_number_whose_doubled_digits_pass_nine")]
+    [TestCase("Floor", "ten", "9", "A floor below ten.", TestName = "an_ordered_number_check_refuses_text_that_is_no_number")]
+    [TestCase("Later", "soon", "2026-10-03", "Later comes after earlier.", TestName = "an_ordered_date_check_refuses_text_that_is_no_date")]
     public async Task a_check_refuses_what_its_rule_refuses_and_takes_what_it_takes(string field, string refused, string taken, string message)
     {
         await Open("/Validation/Checks");

@@ -9,6 +9,20 @@ public sealed class SlotsController : Controller
 
     public IActionResult Lounge() => View(new LoungePage());
 
+    public IActionResult Hall() => View(new HallPage());
+
+    /// <summary>The notice board, loaded into the hall's slot; it holds a slot of its own.</summary>
+    public IActionResult Board() => PartialView("Board", new HallBoard());
+
+    /// <summary>A note pinned into the board's slot.</summary>
+    public IActionResult Note() => PartialView("Note", new HallNote());
+
+    /// <summary>A notice with no plan.</summary>
+    public IActionResult Plain() => PartialView("Plain");
+
+    /// <summary>An answer with nothing in it.</summary>
+    public IActionResult Nothing() => NoContent();
+
     /// <summary>The visitor card, loaded into the lounge's slot.</summary>
     public IActionResult VisitorCard() => PartialView("VisitorCard", new VisitorCard());
 

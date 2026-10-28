@@ -40,3 +40,12 @@ public sealed class DecisionsPage;
 
 /// <summary>A page whose branches are written wrongly, which the framework refuses to render.</summary>
 public sealed class RefusedPage;
+
+/// <summary>A shift: the time it starts, given by the address, and who is on its rota.</summary>
+public sealed class ShiftsPage;
+
+/// <summary>The query a shift is opened with, as its action would bind it with [FromQuery].</summary>
+public sealed class ShiftQuery
+{
+    public TimeOnly? Starts { get; set; }
+}

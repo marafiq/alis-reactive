@@ -11,6 +11,7 @@
 <p>Branch taken: <span id="branch"></span></p>
 <p>Total read: <span id="total"></span></p>
 <p>Save read after it finished: <span id="save-status"></span></p>
+<p>Save read by the step after a save the page does not wait for: <span id="went-on-status"></span></p>
 <p>Looked up: <span id="lookup"></span></p>
 <p>Before the throw: <span id="before-throw"></span> · After it: <span id="after-throw"></span></p>
 <p>Before the rejection: <span id="before-reject"></span> · After it: <span id="after-reject"></span></p>
@@ -37,6 +38,13 @@
         var slate = p.Component<Slate>("slate");
         slate.Save();
         p.Element("save-status").Text.Set(slate.Status);
+    }))
+@(plan.Button("start-saving", "Start saving and go on")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.StartSaving();
+        p.Element("went-on-status").Text.Set(slate.Status);
     }))
 @(plan.Button("look-up", "Look up Ben")
     .Reactive(button => button.Click, p => p.Element("lookup").Text.Set(p.Component<Slate>("slate").Lookup("Ben"))))

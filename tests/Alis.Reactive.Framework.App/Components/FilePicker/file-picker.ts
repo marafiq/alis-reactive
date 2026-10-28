@@ -20,6 +20,11 @@ export class FilePicker {
     return Array.from(this.input.files ?? []);
   }
 
+  /** The files as the browser lists them: the input's own FileList. */
+  get listed(): FileList | null {
+    return this.input.files;
+  }
+
   on(name: string, listener: Listener): void {
     const named = this.listeners.get(name) ?? new Set<Listener>();
     named.add(listener);

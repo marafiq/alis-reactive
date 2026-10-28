@@ -61,6 +61,9 @@ public sealed class Slate : Component
     /// <summary>Saves the slate; finishes a moment later.</summary>
     public void Save() => MethodAsync();
 
+    /// <summary>Starts the slate's save and goes on without waiting for it: the same save, declared as a plain method.</summary>
+    public void StartSaving() => Method(name: "save");
+
     /// <summary>Finds a row by its label, a moment later.</summary>
     public TypedSource<string> Lookup(Arg<string> label) => MethodAsync<string>(label);
 

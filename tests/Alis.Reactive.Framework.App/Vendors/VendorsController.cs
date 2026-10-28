@@ -19,6 +19,8 @@ public sealed class VendorsController : Controller
 
     public IActionResult Unbuilt() => View(new UnbuiltPage());
 
+    public IActionResult UnbuiltInput() => View(new UnbuiltInputPage());
+
     public IActionResult NewerDeclaration() => View(new NewerDeclarationPage());
 }
 
@@ -39,6 +41,12 @@ public sealed class WingListener
 
 /// <summary>A slate whose element its script has not built a slate on.</summary>
 public sealed class UnbuiltPage;
+
+/// <summary>A note whose entry's element its script has not built an entry on.</summary>
+public sealed class UnbuiltInputPage
+{
+    public string? Note { get; set; }
+}
 
 /// <summary>A slate written against a declaration newer than the slate the page runs.</summary>
 public sealed class NewerDeclarationPage;
