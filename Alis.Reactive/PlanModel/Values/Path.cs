@@ -111,41 +111,30 @@ namespace Alis.Reactive.PlanModel
             .ToList();
 
         /// <summary>
-        /// Reads a path from text, at the boundaries that hand the framework text: an MVC field prefix and a
-        /// vendor's object path. Everywhere else a path is built from typed steps.
+        /// Reads a path from text, at the boundaries that hand the framework text: an MVC field prefix
+        /// (<c>NextOfKin</c>, <c>Members[1].Address</c>) and a vendor's object path (<c>slate</c>,
+        /// <c>ej2_instances.0</c>). A step of digits, or digits in brackets as MVC names a list item, is a
+        /// position; any other step is a member. Everywhere else a path is built from typed steps.
         /// </summary>
-        internal static Path Parse(string dotPath)
+        internal static Path Parse(string text)
         {
-            if (string.IsNullOrEmpty(dotPath)) return None;
+            if (string.IsNullOrEmpty(text)) return None;
 
-            var parts = dotPath.Split(new[] { '.' }, StringSplitOptions.None);
-            var segments = new List<PathSegment>(parts.Length);
-            for (var index = 0; index < parts.Length; index++)
+            var steps = text.Replace("]", "").Replace('[', '.').Split('.');
+            var segments = new List<PathSegment>(steps.Length);
+            for (var index = 0; index < steps.Length; index++)
             {
-                var part = parts[index];
-                if (string.IsNullOrWhiteSpace(part))
+                var step = steps[index];
+                if (string.IsNullOrWhiteSpace(step))
                     throw new ArgumentException(
-                        $"Path '{dotPath}' contains an empty segment at index {index}. " +
+                        $"Path '{text}' contains an empty segment at index {index}. " +
                         "Use dot-separated property names without consecutive, leading, or trailing dots.",
-                        nameof(dotPath));
+                        nameof(text));
 
-                var eachItem = part.EndsWith("[]", StringComparison.Ordinal);
-                var name = eachItem ? part.Substring(0, part.Length - 2) : part;
-                if (name.Length == 0)
-                    segments.Add(PathSegment.EachItem);
-                else if (int.TryParse(name, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedIndex))
-                    segments.Add(PathSegment.AtIndex(parsedIndex));
-                else
-                    segments.Add(PathSegment.Property(name));
-                if (eachItem && name.Length != 0) segments.Add(PathSegment.EachItem);
+                segments.Add(int.TryParse(step, NumberStyles.None, CultureInfo.InvariantCulture, out var position)
+                    ? PathSegment.AtIndex(position)
+                    : PathSegment.Property(step));
             }
-
-            // One [] reads a list member of each item; a second would read a list of lists, which no
-            // shape the member declares can describe and form data cannot post.
-            if (segments.Count(segment => segment.IsEachItem) > 1)
-                throw new ArgumentException(
-                    $"Path '{dotPath}' reads a list inside a list. Declare the inner list as its own member.",
-                    nameof(dotPath));
 
             return new Path(segments);
         }
