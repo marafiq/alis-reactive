@@ -12,6 +12,9 @@ const options = {
   format: 'iife',
   globalName: '__alisReactive',
   minify: !watch,
+  // The map is written beside the bundle with no reference inside it, so no page ever asks for it and
+  // the package ships the bundle alone; the framework's coverage report reads it.
+  sourcemap: 'external',
 };
 
 if (watch) {

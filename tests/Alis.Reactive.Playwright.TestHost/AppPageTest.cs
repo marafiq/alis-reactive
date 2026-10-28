@@ -15,9 +15,12 @@ public abstract class AppPageTest : PageTest
 {
     private const int DefaultTimeoutMs = 60000;
     private const string BootedMarker = "html[data-alis-booted='true']";
+    private const string RuntimeBundle = "/scripts/alis-reactive.dev.js";
+    private static readonly string? CoverageDir = Environment.GetEnvironmentVariable("ALIS_JS_COVERAGE_DIR");
     private readonly List<string> _console = new();
     private readonly object _consoleLock = new();
     private Stopwatch? _stopwatch;
+    private ICDPSession? _coverage;
 
     /// <summary>The address of the app the test assembly runs.</summary>
     protected string BaseUrl => AppServer.BaseUrl;
@@ -49,11 +52,22 @@ public abstract class AppPageTest : PageTest
             Snapshots = true,
             Sources = false,
         });
+
+        // With ALIS_JS_COVERAGE_DIR set, the page records which code of the runtime bundle it runs
+        // (scripts/framework-coverage.mjs reads it); without it, nothing is recorded.
+        if (CoverageDir is not null)
+        {
+            _coverage = await Context.NewCDPSessionAsync(Page);
+            await _coverage.SendAsync("Profiler.enable");
+            await _coverage.SendAsync("Profiler.startPreciseCoverage", new Dictionary<string, object> { ["callCount"] = true, ["detailed"] = true });
+        }
     }
 
     [TearDown]
     public async Task KeepFailureEvidence()
     {
+        await KeepCoverage();
+
         var failed = TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed;
         var traceDir = Path.Combine(AppContext.BaseDirectory, "..", "..", "TestResults", "playwright-traces");
         var testName = TestContext.CurrentContext.Test.Name;
@@ -82,6 +96,23 @@ public abstract class AppPageTest : PageTest
         }
 
         WriteProgress("end", tracePath, screenshotPath);
+    }
+
+    private async Task KeepCoverage()
+    {
+        if (_coverage is null) return;
+        var taken = await _coverage.SendAsync("Profiler.takePreciseCoverage");
+        _coverage = null;
+        if (taken is not { } result) return;
+
+        var runtime = result.GetProperty("result").EnumerateArray()
+            .Where(script => script.GetProperty("url").GetString()?.EndsWith(RuntimeBundle, StringComparison.Ordinal) == true)
+            .Select(script => script.GetProperty("functions"))
+            .ToList();
+        Directory.CreateDirectory(CoverageDir!);
+        var test = TestContext.CurrentContext.Test;
+        var file = Path.Combine(CoverageDir!, $"{test.ClassName}.{test.Name}.json");
+        await File.WriteAllTextAsync(file, System.Text.Json.JsonSerializer.Serialize(runtime));
     }
 
     private void Keep(string line)
