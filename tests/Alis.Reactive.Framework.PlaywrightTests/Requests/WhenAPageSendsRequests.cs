@@ -3,7 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// <summary>
 /// A page's requests, each reaching an endpoint that says what it received: where gathered members go (the
 /// route, the query, the JSON body, form data, headers), values read when the request is sent (a component's
-/// property, a plugin, a method's result: M4), the answer's routes (success, an error by status, any error),
+/// property, a plugin, a method's result: M4, and a value that is never missing in a member that may be empty),
+/// the answer's routes (success, an error by status, any error),
 /// and the order around a request (chained, parallel, while loading, finally).
 /// </summary>
 [TestFixture]
@@ -85,6 +86,17 @@ public sealed class WhenAPageSendsRequests : AppPageTest
 
         await Button("Post the total").ClickAsync();
         await Expect(Line("note")).ToHaveTextAsync("note 'Totals' titled nothing, tally 0, amount 40.5");
+    }
+
+    [Test]
+    public async Task a_value_that_is_never_missing_fills_a_member_that_may_be_empty()
+    {
+        await Open("/Requests/Desk");
+        await Button("Place a line").ClickAsync();
+
+        await Button("Post the total as an estimate").ClickAsync();
+
+        await Expect(Line("estimate")).ToHaveTextAsync("estimate 40.5");
     }
 
     [Test]

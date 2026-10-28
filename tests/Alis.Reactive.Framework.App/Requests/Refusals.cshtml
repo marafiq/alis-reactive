@@ -1,0 +1,38 @@
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Framework.App.Requests
+@model GatherRefusalsPage
+@{
+    ViewData["Title"] = "A refused gather";
+    var plan = Html.ReactivePlan<GatherRefusalsPage>();
+
+    // A button that sends the sign-in, gathered as the mistaken request would gather it.
+    IHtmlContent Send(Func<HttpRequestBuilder<GatherRefusalsPage>, HttpRequestBuilder<GatherRefusalsPage>> gather) =>
+        plan.Button("send", "Send").Reactive(button => button.Click, p => gather(p.Post("/Requests/SignIns")));
+}
+<h1>A refused gather</h1>
+
+@switch (Model.Mistake)
+{
+    case GatherMistake.NameAMemberTheRequestLacks:
+        @Send(request => request.Gather<PassRequest>(g => g.Form(m => m.Visitor)))
+        break;
+    case GatherMistake.NameAMemberTheRequestsNestedClassLacks:
+        @Send(request => request.Gather<GuideRequest>(g => g.Form(m => m.Guide.Phone)))
+        break;
+    case GatherMistake.SendANumberToText:
+        @Send(request => request.Gather<PartyAsText>(g => g.Form(m => m.Party)))
+        break;
+    case GatherMistake.SendAMaybeNumberToANumber:
+        @Send(request => request.Gather<RoomRequired>(g => g.Form(m => m.Room)))
+        break;
+    case GatherMistake.NameNoInput:
+        @Send(request => request.Gather(g => g.Form(Array.Empty<Expression<Func<GatherRefusalsPage, object?>>>())))
+        break;
+    case GatherMistake.GiveAHeaderNoValue:
+        @Send(request => request.Gather(g => g.Header("X-Shift", Model.Shift!)))
+        break;
+}
+
+@Html.RenderPlan(plan)
