@@ -1,6 +1,7 @@
 // An owner is the page or a slot (grammar.md 3.5). It holds disposers for what was done on its behalf
 // (handler subscriptions, plugin data contributions, connection subscriptions) and knows nothing about
-// what they are. Starting an owner runs the work waiting for its start: the document's `ready`.
+// what they are. Starting an owner runs the work waiting for its start: the document's `ready`. An
+// owner starts once, after its plans have subscribed and contributed (plans/start.ts).
 
 import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
@@ -10,7 +11,6 @@ const log = logger("owner");
 export class Owner {
   private readonly disposers: (() => void)[] = [];
   private readonly startHooks: (() => void)[] = [];
-  private started = false;
   private disposed = false;
 
   private constructor(readonly name: string, readonly isSlot: boolean) {}
@@ -32,13 +32,10 @@ export class Owner {
   }
 
   whenStarted(hook: () => void): void {
-    if (this.started) throw new Error(`[alis] ${this.name} has started; a ready handler subscribes before its owner starts`);
     this.startHooks.push(hook);
   }
 
   start(): void {
-    if (this.started) return;
-    this.started = true;
     // A hook runs a ready handler, which logs its own failure and stops no other (plans/start.ts runHandler).
     for (const hook of this.startHooks.splice(0)) hook();
   }
