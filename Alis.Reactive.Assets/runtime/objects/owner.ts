@@ -39,14 +39,8 @@ export class Owner {
   start(): void {
     if (this.started) return;
     this.started = true;
-    // A ready handler that throws stops no other (grammar.md 3.4).
-    for (const hook of this.startHooks.splice(0)) {
-      try {
-        hook();
-      } catch (error) {
-        log.error("start.hook-failed", { error: toJavaScriptString(error), owner: this.name });
-      }
-    }
+    // A hook runs a ready handler, which logs its own failure and stops no other (plans/start.ts runHandler).
+    for (const hook of this.startHooks.splice(0)) hook();
   }
 
   dispose(): void {
