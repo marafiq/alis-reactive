@@ -110,6 +110,25 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     }
 
     [Test]
+    public async Task the_servers_answer_stays_when_the_field_is_left_unchanged_and_goes_when_it_is_typed_over()
+    {
+        await Open("/Validation/Checks");
+        var answer = Field("Badge").GetByText("Badges start with A-.");
+
+        await Page.GetByLabel("Badge", new() { Exact = true }).FillAsync("B-17");
+        await Save();
+        await Expect(answer).ToBeVisibleAsync();
+
+        await Page.GetByLabel("Badge", new() { Exact = true }).FocusAsync();
+        await Page.Keyboard.PressAsync("Tab");
+        await Expect(Page.GetByLabel("Phone", new() { Exact = true })).ToBeFocusedAsync();
+        await Expect(answer).ToBeVisibleAsync();
+
+        await Page.GetByLabel("Badge", new() { Exact = true }).PressSequentiallyAsync("8");
+        await Expect(answer).ToBeHiddenAsync();
+    }
+
+    [Test]
     public async Task a_child_validators_rule_the_server_alone_makes_comes_back_beside_its_field()
     {
         await Open("/Validation/Checks");

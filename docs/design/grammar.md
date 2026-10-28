@@ -539,7 +539,8 @@ no key (H2) and no entry (H4).
   - the DOM `input` event on a field clears its inline message;
   - DOM `blur` and `alis:commit` (M4) revalidate that one field, against every container that
     holds it (a section saved on its own sits inside the whole form), and the first failing test
-    shows. The form never names a component's event, so the order in which the form and the
+    shows. A message the server placed (F8) stays on `blur`: no input and no commit came since, so
+    the value it judged has not changed; typing clears it and a commit re-checks the field. The form never names a component's event, so the order in which the form and the
     input's plan start does not matter, and neither does the order the containers were declared.
 - **F8 Server errors.** `showErrors(problem)` clears first.
   - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a

@@ -26,7 +26,7 @@ import { logger } from "../../diagnostics/trace";
 import { COMMIT_EVENT, MOUNT_EVENT } from "../../plans/mount-events";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
-  showInline, showSummaryDiv, summaryHasEntries,
+  showInline, showServerInline, showsServerMessage, showSummaryDiv, summaryHasEntries,
 } from "./display";
 
 const log = logger("validation");
@@ -216,7 +216,7 @@ function showErrors(containerId: string, problem: unknown): void {
     const entry = entries.find(candidate => candidate.field.name === name);
     const element = entry ? document.getElementById(entry.field.id) : null;
     if (entry && element !== null && canRenderInline(entry.field.id)) {
-      showInline(entry.field.id, message);
+      showServerInline(entry.field.id, message);
     } else {
       addSummaryError(summary, name, message);
     }
@@ -233,16 +233,21 @@ function wireLive(entry: Entry): void {
 
   const clear = (): void => clearInline(field.id);
   const recheck = (): void => revalidate(element);
+  // Leaving a field the server judged keeps the server's message: no input and no commit came since,
+  // so the value it judged has not changed.
+  const recheckOnLeave = (): void => {
+    if (!showsServerMessage(field.id)) revalidate(element);
+  };
   // Typing clears the message before the component hears the keystroke (capture runs first), so a
   // commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks
   // the field after the clear and its message stays.
   element.addEventListener("input", clear, true);
-  element.addEventListener("blur", recheck);
+  element.addEventListener("blur", recheckOnLeave);
   element.addEventListener(COMMIT_EVENT, recheck);
   liveWiredElements.add(element);
   owner.onDispose(() => {
     element.removeEventListener("input", clear, true);
-    element.removeEventListener("blur", recheck);
+    element.removeEventListener("blur", recheckOnLeave);
     element.removeEventListener(COMMIT_EVENT, recheck);
     liveWiredElements.delete(element);
   });

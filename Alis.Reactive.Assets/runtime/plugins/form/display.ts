@@ -12,12 +12,26 @@ export function showInline(componentDomId: string, message: string): void {
     errorSpan.textContent = message;
     errorSpan.removeAttribute("hidden");
     errorSpan.style.display = "";
+    delete errorSpan.dataset.alisFromServer;
   }
+}
+
+// The slot remembers that the server wrote its message, so leaving the field keeps it: the value the
+// server judged has not changed. A slot rendered again starts unmarked.
+export function showServerInline(componentDomId: string, message: string): void {
+  showInline(componentDomId, message);
+  const errorSpan = findErrorSpan(componentDomId);
+  if (errorSpan) errorSpan.dataset.alisFromServer = "";
+}
+
+export function showsServerMessage(componentDomId: string): boolean {
+  return findErrorSpan(componentDomId)?.dataset.alisFromServer !== undefined;
 }
 
 export function clearInline(componentDomId: string): void {
   const errorSpan = findErrorSpan(componentDomId);
   if (errorSpan) {
+    delete errorSpan.dataset.alisFromServer;
     errorSpan.textContent = "";
     errorSpan.setAttribute("hidden", "");
     errorSpan.style.display = "none";
