@@ -29,7 +29,9 @@ const files = readdirSync(jsDir).filter(name => name.endsWith(".json"));
 for (const name of files) {
   const scripts = JSON.parse(readFileSync(path.join(jsDir, name), "utf8"));
   for (const functions of scripts) {
-    const ranges = functions.flatMap(fn => fn.ranges)
+    // A function reported without block detail (V8 gives none for a page opened a second time in one test)
+    // says only that it was entered, not which of its blocks ran: it counts as not run, never as all run.
+    const ranges = functions.flatMap(fn => fn.isBlockCoverage ? fn.ranges : fn.ranges.map(range => ({ ...range, count: 0 })))
       .sort((a, b) => a.startOffset - b.startOffset || b.endOffset - a.endOffset);
     const counts = new Int32Array(bundle.length).fill(-1);
     for (const range of ranges) counts.fill(range.count, range.startOffset, range.endOffset);
