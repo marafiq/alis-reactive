@@ -129,7 +129,7 @@ namespace Alis.Reactive
         public bool Equals(ComponentVendor? other) =>
             other != null
             && Name == other.Name
-            && _objectPath.Equals(other._objectPath)
+            && _objectPath.SameAs(other._objectPath)
             && _listening.SameAs(other._listening)
             && _payload == other._payload;
 

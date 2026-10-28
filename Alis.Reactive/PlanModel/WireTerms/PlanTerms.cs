@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Alis.Reactive.PlanModel
 {
-    internal abstract class PlanString : IEquatable<PlanString>
+    internal abstract class PlanString
     {
         // The term names what the developer gave ("Plugin name"), so a refusal says which name is missing.
         protected PlanString(string value, string term)
@@ -16,8 +16,7 @@ namespace Alis.Reactive.PlanModel
 
         internal string Value { get; }
 
-        public bool Equals(PlanString? other) =>
-            other != null && GetType() == other.GetType() && Value == other.Value;
+        internal bool SameAs(PlanString other) => GetType() == other.GetType() && Value == other.Value;
     }
 
     internal sealed class PlanId : PlanString

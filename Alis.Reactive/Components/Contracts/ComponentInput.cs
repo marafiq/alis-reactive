@@ -48,7 +48,7 @@ namespace Alis.Reactive
 
         internal bool Matches(ComponentInput other) =>
             ValuePath.ToString() == other.ValuePath.ToString()
-            && CommittedBy.Equals(other.CommittedBy);
+            && CommittedBy.SameAs(other.CommittedBy);
 
         internal string Describe() => $"{ValuePath}, committed by {CommittedBy.Value}";
     }

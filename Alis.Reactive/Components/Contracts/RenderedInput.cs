@@ -44,11 +44,11 @@ namespace Alis.Reactive
         }
 
         internal bool SameAs(RenderedInput other) =>
-            _identity.Id.Equals(other._identity.Id)
+            _identity.Id.SameAs(other._identity.Id)
             && ComponentVendor.Equals(other.ComponentVendor)
-            && _identity.Binding.Equals(other._identity.Binding)
+            && _identity.Binding.SameAs(other._identity.Binding)
             && Input.Matches(other.Input)
-            && _kind.Equals(other._kind)
+            && _kind.SameAs(other._kind)
             && Shape == other.Shape;
 
         internal string Describe() =>

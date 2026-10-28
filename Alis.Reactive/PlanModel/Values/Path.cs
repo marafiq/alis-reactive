@@ -6,7 +6,7 @@ using System.Linq;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>One step of a path: a member by name, an item by position, or each item of a list.</summary>
-    internal sealed class PathSegment : IEquatable<PathSegment>
+    internal sealed class PathSegment
     {
         private readonly string _text;
         private readonly int _index;
@@ -43,14 +43,14 @@ namespace Alis.Reactive.PlanModel
         /// <summary>The step as the plan carries it: the member's name, the position's digits, or <c>[]</c> for each item.</summary>
         internal string ToPathText() => _text;
 
-        public bool Equals(PathSegment? other) => other != null && Kind == other.Kind && _text == other._text;
+        internal bool SameAs(PathSegment other) => Kind == other.Kind && _text == other._text;
     }
 
     /// <summary>
     /// The one path model: from an object or a value, step by step, to a member. Every module builds a path
     /// from typed steps; the plan reads it as <see cref="Text"/>, a request body as <see cref="Body"/>.
     /// </summary>
-    internal sealed class Path : IEquatable<Path>
+    internal sealed class Path
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 
@@ -135,7 +135,8 @@ namespace Alis.Reactive.PlanModel
             return new Path(segments);
         }
 
-        public bool Equals(Path? other) => other != null && Segments.SequenceEqual(other.Segments);
+        internal bool SameAs(Path other) =>
+            Segments.Count == other.Segments.Count && Segments.Zip(other.Segments, (mine, theirs) => mine.SameAs(theirs)).All(same => same);
 
         public override string ToString()
         {
