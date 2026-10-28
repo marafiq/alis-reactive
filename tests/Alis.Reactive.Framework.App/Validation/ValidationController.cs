@@ -16,6 +16,18 @@ public sealed class ValidationController : Controller
 
     public IActionResult EscortRefused() => View(new EscortRequest());
 
+    public IActionResult Notice() => View(new Notice());
+
+    /// <summary>Checks the notice with the same rules the page carries, one of which waits; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Notice")]
+    public async Task<IActionResult> SaveNotice([FromBody] Notice notice, [FromServices] NoticeRules rules)
+    {
+        var result = await rules.ValidateAsync(notice);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     /// <summary>Checks the escort request with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Escort")]
     public IActionResult SaveEscort([FromBody] EscortRequest request, [FromServices] EscortRules rules)

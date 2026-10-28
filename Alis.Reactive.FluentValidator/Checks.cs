@@ -363,7 +363,6 @@ namespace Alis.Reactive.FluentValidator
         internal override bool Passes(T instance, TValue value, MessageArguments arguments)
         {
             if (value == null) return true;
-            arguments.With("PropertyValue", value);
             var fromOrder = Comparer.Default.Compare(value, _from);
             var toOrder = Comparer.Default.Compare(value, _to);
             return _inclusive ? fromOrder >= 0 && toOrder <= 0 : fromOrder > 0 && toOrder < 0;
