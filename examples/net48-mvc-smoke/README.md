@@ -27,8 +27,9 @@ A real .NET Framework 4.8 consumer hits the same issues. Each is captured here w
 
 ```powershell
 npm ci; npm run build:all
-bash scripts/pack.sh 1.0.0-rc.1            # builds the local rc.1 feed in ./nupkgs
-msbuild examples/net48-mvc-smoke/Net48MvcSmoke.csproj /p:Configuration=Release /restore /t:Build
+$v = "0.0.0-local.$(Get-Date -Format yyyyMMddHHmmss)"   # a new version each time: NuGet keeps the first package of a version
+bash scripts/pack.sh $v                   # builds the local feed in ./nupkgs
+msbuild examples/net48-mvc-smoke/Net48MvcSmoke.csproj /p:Configuration=Release /p:AlisReactiveVersion=$v /restore /t:Build
 & "$env:ProgramFiles\IIS Express\iisexpress.exe" /path:(Resolve-Path examples/net48-mvc-smoke) /port:5000
 # browse http://localhost:5000/ , tick the checkbox, the green proof box appears
 ```

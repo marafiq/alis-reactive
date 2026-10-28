@@ -306,8 +306,9 @@ the check names.
 ## Open decisions (owner)
 
 - `npm run lint` as a blocking step in `gate / test` (lint was clean on 2026-06-09).
-- `verify-net48.yml` packs and asserts the fixture version `1.0.0-rc.1` (`verify-net48.yml`,
-  `examples/net48-mvc-smoke/Net48MvcSmoke.csproj:84`, `_Layout.cshtml:10,18`); rename to a fixture
-  version such as `0.0.0-net48smoke` in a separate PR so CI logs stop reading like a release.
+- `verify-net48.yml`'s pack job still packs `1.0.0-rc.1` for its artifact; rename it to a fixture
+  version in a separate PR so CI logs stop reading like a release. The IIS job packs
+  `0.0.0-ci.{run}.{attempt}`: the NuGet cache brought back an earlier run's rc.1 package, and NuGet
+  never re-extracts a version it already holds.
 - Committed `packages.lock.json` files for locked NuGet restores (see "Caching").
 - A `.nvmrc` (`22`) so local Node matches CI (the dev box runs 24).
