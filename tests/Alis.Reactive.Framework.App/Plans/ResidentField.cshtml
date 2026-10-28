@@ -1,0 +1,10 @@
+@using Alis.Reactive.Framework.App.Plans
+@model VisitPage
+@{
+    // A partial of the page's own model, rendered with the page: its plan joins the page's.
+    var plan = Html.ResolvePlan<VisitPage>();
+}
+<div id="resident-field">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    @Html.RenderPlan(plan)
+</div>
