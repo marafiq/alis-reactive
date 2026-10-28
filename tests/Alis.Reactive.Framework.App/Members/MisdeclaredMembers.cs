@@ -69,5 +69,8 @@ public sealed class HeadedSlate : Component, IHeadedBoard
     SlateHeader IHeadedBoard.Header => Object<SlateHeader>();
 }
 
+/// <summary>A page that writes what a declaration names: a field, and a vendor.</summary>
+public sealed class NamesPage;
+
 /// <summary>A slate whose header the page reaches through an interface.</summary>
 public sealed class HeadedPage;

@@ -1,0 +1,14 @@
+@using Alis.Reactive.Framework.App.Members
+@model NamesPage
+@{
+    ViewData["Title"] = "What a declaration names";
+    var plan = Html.ReactivePlan<NamesPage>();
+}
+<h1>What a declaration names</h1>
+
+@plan.Slate("slate", title: "Day round")
+
+<p>The cards sort by: <span id="sort-field">@Field.Of((SlateCard card) => card.Due)</span></p>
+<p>The slate's vendor: <span id="slate-vendor">@Slate.SlateVendor</span></p>
+
+@Html.RenderPlan(plan)
