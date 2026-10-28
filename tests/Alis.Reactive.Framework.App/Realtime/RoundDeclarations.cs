@@ -22,11 +22,28 @@ public sealed class RoundFeed : SignalRHub
 
     public Event BoardCleared => Event();
 
+    public Event Found => Event();
+
     public void ClearBoard() => Send();
+
+    /// <summary>The server's ClearBoard, under another member's name.</summary>
+    public void Sweep() => Send(name: "ClearBoard");
 
     public void Ping(Arg<string> resident) => Send(resident);
 
     public TypedSource<string> Acknowledge(Arg<string> nurse) => Invoke<string>(nurse);
+
+    public void Tidy() => Invoke();
+
+    public void TidyFor(Arg<string> resident) => Invoke(resident);
+
+    public TypedSource<string> Roster() => Invoke<string>();
+
+    /// <summary>The server calls back the page it knows by this connection id, which a page reads only while connected.</summary>
+    public void Find(Arg<string?> connectionId) => Send(connectionId);
+
+    /// <summary>The server calls StatusChanged with a bare word instead of one object, then BoardCleared.</summary>
+    public void AskForABareStatus() => Send();
 }
 
 public sealed class RoundStatus : JsObject

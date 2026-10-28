@@ -1,0 +1,7 @@
+@{
+    ViewData["Title"] = "An event with a blank name";
+    var silenced = AppEvent.Declare(name: " ");
+}
+<h1>An event with a blank name</h1>
+
+<p>The page would raise <code>@silenced</code>.</p>

@@ -1,0 +1,12 @@
+@using Alis.Reactive.Framework.App.Realtime
+@{
+    ViewData["Title"] = "The line's events";
+}
+<h1>The line's events</h1>
+
+<p>The page raises these document events as the line changes, for any part of it to listen to:</p>
+<ul>
+    <li>when the server hangs up: <code id="hung-up">@LineEvents.HungUp</code></li>
+    <li>when the server welcomes a call, with the call's number: <code id="welcomed">@LineEvents.Welcomed</code></li>
+    <li>when the server answers again: <code id="answered">@LineEvents.Answered</code></li>
+</ul>

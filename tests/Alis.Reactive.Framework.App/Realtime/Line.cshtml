@@ -1,0 +1,53 @@
+@using Alis.Reactive.Framework.App.Realtime
+@model LinePage
+@{
+    ViewData["Title"] = "The line to the ward";
+    var plan = Html.ReactivePlan<LinePage>();
+    var line = SignalRHub.At<WardLine>($"/hubs/line?world={Model.World}");
+    var board = ServerPushStream.At<WardBoard>($"/Realtime/Board?world={Model.World}");
+}
+<h1>The line to the ward</h1>
+
+@if (Model.OffersRetry)
+{
+    <div id="alis-realtime-connection-retry-container" hidden>
+        <p>The connection dropped.</p>
+        <button type="button">Retry</button>
+    </div>
+}
+
+<p>Line: call <span id="line-call"></span> · <span id="line-dropped"></span> · <span id="line-back"></span> · <span id="line-found"></span> · <span id="line-closed"></span> · <span id="line-answered"></span></p>
+<p>Board: call <span id="board-call"></span> · <span id="bulletin"></span> · <span id="all-clear"></span> · <span id="board-taken-back"></span></p>
+
+@{ Html.On(plan, t => t
+    .SignalR(line, h => h.Welcomed, (welcome, p) => p.Element("line-call").Text.Set(welcome.Call))
+    .SignalR(line, h => h.Reconnecting, p => p.Element("line-dropped").Text.Set("dropped"))
+    .SignalR(line, h => h.Reconnected, (back, p) =>
+    {
+        p.Element("line-back").Text.Set("back");
+        p.Hub(line).Find(back.ConnectionId);
+    })
+    .SignalR(line, h => h.Found, p => p.Element("line-found").Text.Set("found"))
+    .SignalR(line, h => h.Close, p => p.Element("line-closed").Text.Set("closed"))
+    .ServerPush(board, s => s.Welcome, (welcome, p) => p.Element("board-call").Text.Set(welcome.Call))
+    .ServerPush(board, s => s.Bulletin, p => p.Element("bulletin").Text.Set("a bulletin came"))
+    .ServerPush(board, s => s.AllClear, p => p.Element("all-clear").Text.Set("all clear"))); }
+
+@(plan.Button("drop-line", "Drop the line")
+    .Reactive(button => button.Click, p => p.Hub(line).Drop()))
+@(plan.Button("hang-up-line", "Hang up the line")
+    .Reactive(button => button.Click, p => p.Hub(line).HangUp()))
+@(plan.Button("answer-line", "Answer the line again")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Line/Answer?world={Model.World}")
+        .Response(r => r.OnSuccess(s => s.Element("line-answered").Text.Set("answered")))))
+@(plan.Button("close-board", "Close the board for good")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/Close?world={Model.World}")))
+@(plan.Button("open-board", "Take the board back")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/Open?world={Model.World}")
+        .Response(r => r.OnSuccess(s => s.Element("board-taken-back").Text.Set("taken back")))))
+@(plan.Button("push-bulletin", "Push a bulletin")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/Bulletin?world={Model.World}&garbled=false")))
+@(plan.Button("push-garbled-bulletin", "Push a garbled bulletin")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/Bulletin?world={Model.World}&garbled=true")))
+
+@Html.RenderPlan(plan)
