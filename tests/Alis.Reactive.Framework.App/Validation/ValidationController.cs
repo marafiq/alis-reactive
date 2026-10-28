@@ -129,4 +129,9 @@ public sealed class ValidationController : Controller
             return BadRequest(new { errors = result.ErrorsByField });
         return Json(new Booked { Summary = $"booked {booking.Visitor} for {booking.Guests} guest(s)" });
     }
+
+    /// <summary>Checks the visit and answers with every failure as a line of text, as a log would write it.</summary>
+    [HttpPost("/Validation/Book/Failures")]
+    public IActionResult BookFailures([FromBody] VisitBooking booking, [FromServices] VisitRules rules) =>
+        Json(new Booked { Summary = string.Join("; ", rules.Validate(booking).Errors) });
 }

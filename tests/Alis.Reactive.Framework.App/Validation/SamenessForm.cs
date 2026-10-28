@@ -24,6 +24,10 @@ public sealed class SamenessForm
     public string Surname { get; set; } = "Mill";
 
     public string Initial { get; set; } = "B";
+
+    public List<string>? Wings { get; set; }
+
+    public List<string>? FormerWings { get; set; }
 }
 
 /// <summary>One rule per shape a comparison reads its value under.</summary>
@@ -40,5 +44,6 @@ public sealed class SamenessRules : ReactiveValidator<SamenessForm>
         RuleFor(x => x.Wards).Equal(x => x.Rooms).WithMessage("Not as required: Wards.");
         RuleFor(x => x.Surname).GreaterThan("M").WithMessage("Not as required: Surname.");
         RuleFor(x => x.Initial).InclusiveBetween("A", "M").WithMessage("Not as required: Initial.");
+        RuleFor(x => x.Wings).NotEqual(x => x.FormerWings).WithMessage("Not as required: Wings.");
     }
 }

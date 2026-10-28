@@ -18,6 +18,7 @@
 </div>
 
 <p>Booked: <span id="booked"></span></p>
+<p>The desk says: <span id="failures"></span></p>
 
 @(plan.Button("book", "Book the visit")
     .Reactive(button => button.Click, p => p.Post("/Validation/Book")
@@ -33,5 +34,10 @@
         .Response(r => r
             .OnSuccess<Booked>((booked, s) => s.Element("booked").Text.Set(booked.Get(x => x.Summary)))
             .OnError(400, e => e.ValidationErrors("visit-form")))))
+
+@(plan.Button("ask-desk", "Ask the desk what is wrong")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Book/Failures")
+        .Gather(g => g.Form())
+        .Response(r => r.OnSuccess<Booked>((said, s) => s.Element("failures").Text.Set(said.Get(x => x.Summary))))))
 
 @Html.RenderPlan(plan)

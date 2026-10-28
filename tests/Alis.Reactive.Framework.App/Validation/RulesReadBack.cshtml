@@ -11,6 +11,9 @@
     {
         NotEmptyRule => "not empty",
         MaxLengthRule longest => $"at most {longest.Length} characters",
+        RangeRule { NumericBounds: { } bounds } => $"from {bounds.From} to {bounds.To}",
+        FixedComparisonRule { Number: decimal number } => $"compared with {number}",
+        FixedComparisonRule => "compared with a value that is no number",
         _ => "another check",
     };
 }
@@ -22,6 +25,16 @@
         foreach (var rule in field.Rules)
         {
             <li>@field.FieldName: @Kind(rule), @(rule.IsUnconditional ? "always" : "only while its condition holds")</li>
+        }
+    }
+</ul>
+
+<ul id="sameness-rules">
+    @foreach (var field in plan.BrowserRules<SamenessRules>())
+    {
+        foreach (var rule in field.Rules)
+        {
+            <li>@field.FieldName: @Kind(rule)</li>
         }
     }
 </ul>
