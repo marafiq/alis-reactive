@@ -23,6 +23,7 @@
     <dt>Parallel</dt><dd><span id="slow-one"></span> · <span id="slow-two"></span> · settled after: <span id="settled"></span></dd>
     <dt>While loading</dt><dd id="loading"></dd>
     <dt>Finally</dt><dd id="finished"></dd>
+    <dt>Finally inside a route</dt><dd id="finished-inside"></dd>
 </dl>
 
 @(plan.Button("get-resident", "Get the resident")
@@ -114,6 +115,11 @@
     .Reactive(button => button.Click, p => p.Get("/Requests/Residents/{id}")
         .Gather<ResidentQuery>(g => g.Set(x => x.Id, 3))
         .Finally(f => f.Element("finished").Text.Set("finished after the answer"))))
+@(plan.Button("finish-inside", "Finish inside the first answer")
+    .Reactive(button => button.Click, p => p.Get("/Requests/First")
+        .Response(r => r.OnSuccess<FirstAnswer>((first, s) => s.Get("/Requests/Second")
+            .Gather<SecondQuery>(g => g.Set(x => x.From, "the inner request"))
+            .Finally(f => f.Element("finished-inside").Text.Set(first.Get(x => x.Next)))))))
 @(plan.Button("add-four", "Add 4 to the tally")
     .Reactive(button => button.Click, p => tally.Add(4)))
 

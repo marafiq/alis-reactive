@@ -175,4 +175,14 @@ public sealed class WhenAPageSendsRequests : AppPageTest
         await Button("Ask a broken endpoint").ClickAsync();
         await Expect(Line("finished")).ToHaveTextAsync("finished after the refusal");
     }
+
+    [Test]
+    public async Task a_finally_inside_a_route_reads_the_answer_of_the_request_around_it()
+    {
+        await Open("/Requests/Desk");
+
+        await Button("Finish inside the first answer").ClickAsync();
+
+        await Expect(Line("finished-inside")).ToHaveTextAsync("the second step");
+    }
 }
