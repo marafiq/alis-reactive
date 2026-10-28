@@ -5,7 +5,9 @@
 //
 // A runtime segment counts as run when any test ran it: V8's block coverage gives each range a count,
 // an inner range overriding the one around it. A C# line counts as run when its hits are above zero.
-// The framework's own component code (components/**) is a consumer and is not counted.
+// The framework's own component code (components/**) is a consumer and is not counted. Neither is
+// runtime/shared/assert-never.ts: it runs only for a node a switch's union has no case for, which the
+// generated contract makes a type error, so no page can run it.
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { SourceMapConsumer } from "source-map-js";
@@ -43,10 +45,11 @@ const mappings = [];
 map.eachMapping(m => { if (m.source) mappings.push(m); });
 mappings.sort((a, b) => offsetOf(a.generatedLine, a.generatedColumn) - offsetOf(b.generatedLine, b.generatedColumn));
 const runtime = new Map();
+const unreachable = new Set(["runtime/shared/assert-never.ts"]);
 for (let i = 0; i < mappings.length; i++) {
   const m = mappings[i];
   const source = m.source.replace(/^(\.\.\/)+/, "").replace(/^Alis\.Reactive\.Assets\//, "");
-  if (!source.startsWith("runtime/")) continue;
+  if (!source.startsWith("runtime/") || unreachable.has(source)) continue;
   const start = offsetOf(m.generatedLine, m.generatedColumn);
   const end = i + 1 < mappings.length ? offsetOf(mappings[i + 1].generatedLine, mappings[i + 1].generatedColumn) : bundle.length;
   if (end <= start) continue;
