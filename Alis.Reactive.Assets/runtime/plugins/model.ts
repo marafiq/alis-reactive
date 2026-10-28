@@ -14,7 +14,7 @@
 //    field any plan of the composition rendered: what validation checks, so the browser judges what
 //    the server will; missing when no plan rendered it.
 
-import type { InputBinding } from "../types/index";
+import type { InputBinding, ModelPluginData } from "../types/index";
 import type { Contribution, Plugin } from "../objects/plugins";
 import type { PlanObjects } from "../objects/plan-objects";
 import { Environment } from "../grammar/environment";
@@ -113,11 +113,11 @@ function assignAt(root: Record<string, unknown>, path: readonly (string | number
 
 export const modelPlugin: Plugin = {
   object: planId => modelObject(planId),
+  // The plan gives alis.model no data but its own: the inputs it rendered.
   contribute({ key, data, owner, objects }: Contribution) {
-    if (data.kind !== "model") return;
     const inputs = inputsOf(key);
     const added: ModelInput[] = [];
-    for (const [id, binding] of Object.entries(data.inputs)) {
+    for (const [id, binding] of Object.entries((data as ModelPluginData).inputs)) {
       const input: ModelInput = { id, binding, objects };
       inputs.set(id, input);
       added.push(input);
