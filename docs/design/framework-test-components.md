@@ -40,7 +40,8 @@ when that slice lands, so no member exists without the test that proves it. The 
 | `Button` | the element itself, through the core's native vendor (`ComponentVendor.Native`), a click as its event | A plain `<button>`: the gesture that starts most framework pipelines. It needs no TypeScript. |
 | `DayPicker` | as `Slate`, the object under `dayPicker` | A few days to pick one from, holding no day (a `DateTime?` that is null) until the user picks one, and a check, a moment later, whether the picked day is free, shown on its own line. |
 | `ConfirmDialog` | the app's own `alis.confirm`, registered by name on `window.__alisPlugins`, no element and no declaration | The question a page's `p.Confirm(..)` asks, with a Yes and a No. |
-| `FilePicker` | as `Slate`, the object under `filePicker`, declared an input (`IInputComponent`) | A file input holding the files the person chose as the browser's own `File` objects (`BrowserFile`), committed when they choose: what a page reads of a file, and the file a form-data request sends (the Requests slice). |
+| `FilePicker` | as `Slate`, the object under `filePicker`, declared an input (`IInputComponent`) | A file input holding the files the person chose as the browser's own `File` objects (`BrowserFile`), committed when they choose, and listing them as the browser does (`Listed`, the input's own `FileList`): what a page reads of a file, and the file a form-data request sends (the Requests slice). |
+| `Stamp` | none: no plan reaches it; the script its render helper writes after its element builds it, as a vendor's render helper writes the script that builds its widget | A line of text its own script writes: the script a slot runs when it loads HTML (the Slots slice). |
 | `Choice<TEnum>` | as `Slate`, the object under `choice`, declared an input committed by its own `changed` event; its render helper writes its markup to the field's writer | A select of an enum's members by name, with a blank option for a member that may hold none: an enum member gathered, checked, compared and set (the Inputs slice). |
 
 ## The capabilities
@@ -58,6 +59,7 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | P6 | One field of each item of a list of data | `Slate.Cards` (`ReadOnly<IReadOnlyList<SlateCard>>`): `.Each(c => c.Name)` into `Slate.Summarize` | every card's name, in order, on the slate |
 | P7 | A nullable property written from a value that is never missing | `Slate.Limit` (`Property<int?>`) from `Slate.Count` | the slate's limit is its row count |
 | P8 | A write-only property written from a value read when the step runs | `Slate.Note` from `Slate.Title` | the note repeats the title |
+| P9 | A member read as its declared type when the component keeps another kind of value | `Slate.Limited` (the limit, a number), `Slate.HoldsCards` (the cards, a list), `Slate.HasPlaced` (the day placed last, a date) read as flags; `Slate.PlacedFlags` (a flag) read as a number; `Slate.StartedAt` (a timestamp) read as a day | the branch each flag takes; the count shown; the day the slate shows for a line placed on it |
 | O1 | A nested object's members | `Slate.Header` (`Object<T>()`): `Header.Caption`, `Header.Rename(..)` | the header's caption changes by a call and by a write, and reads back |
 | O2 | An object a method returns, and its members | `Slate.RowAt(index)` (`Object<T>(arg)`): `Row.Label`, `Row.Mark()` | the row at that position is marked, and only it |
 | O3 | A list of objects: an item by position, a field of each item | `Slate.Rows` (`Objects<T>`): `Rows.At(2)`, `Rows.Each(r => r.Label)` into `Slate.Summarize(labels)` | the third row's label; every label, joined on the slate |
@@ -72,6 +74,7 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | M8 | A field passed alone | `Slate.SortCards(Field.Of((SlateCard c) => c.Name))`, and by `Due` | the cards in name order, then in due order |
 | M9 | An argument the declaration always passes | `Slate.AddRowBy(label)` with `Fixed("page")` | the row says it was added by the page |
 | M10 | A value passed as the wider type the method declares | `Slate.SummarizeAny(rows.Each(r => r.Label))` with `Pass<IEnumerable<object>, TItems>` | the rows' labels as the summary |
+| M11 | A method declared plain whose JavaScript returns a promise runs without the pipeline waiting for it | `Slate.StartSaving()`, the slate's `save` declared with `Method` | the step after it reads the slate still saving |
 | E1 | An event without a payload runs its pipeline | `Slate.Cleared`, raised when a method cleared it | the page reacts to the slate being cleared |
 | E2 | A payload's members read | `Slate.RowAdded` (`Event<TArgs>`), raised by the slate's own Add row: `Label`, `Count` | the new row's label and the new count in the page |
 | E3 | A payload's member written before the component reads it back: a cancel | `Slate.Changing`, raised by the slate's own retitle: `Cancel`, `Reason` | the slate keeps its title and shows the reason |
@@ -91,9 +94,11 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | I7 | An input's id is its model's full name, two underscores and its member path, and `IdGenerator.For` gives it | labels the page writes for `Entry` inputs of a nested model type | the endpoint binds what was typed into the input each label names |
 | I8 | A member rendered twice on one plan: one input with the same component, refused with another | `Entry` twice; `Entry` then `FilePicker` | the endpoint binds the value; the message the page is refused with |
 | I9 | A partial rendered for two members of the page sends, checks and reaches its own inputs, each named by its binding path | a contact card for `Primary` and for `Alternate`, inside a plain form | each card's save binds its own member; the message beside its own field; the name read back from its own input; what a plain form post binds |
+| I10 | Files the browser lists in its own `FileList` are posted as files | `FilePicker.Listed` in a form-data request | the endpoint names the file it received |
 | G1 | A plugin's property read and written, a method called, a result read | `Tally.Total`, `Tally.Mark`, `Tally.Add(n)`, `Tally.HasPassedTheMark()` | the total in the page; the branch the mark decides. An app's plugin has no events: only the framework's own plugins are subscribed to (`runtime/objects/plugins.ts`, `pluginOf`) |
 | L1 | Constructed on `alis:mount` before handlers subscribe, at boot and in injected HTML | `Slate` on the page (every slice) and in a loaded card | the loaded slate's own event is heard by the card's pipeline |
 | L2 | An unloaded slot lets go of what it held, and loads fresh again | a card with a `Slate`, unloaded and loaded again | the slot is empty; the reloaded slate starts with its own rows |
+| L3 | A script in loaded HTML runs, as a vendor's script that builds its widget does | a `Stamp` in a note loaded into a slot | the stamp shows the text its own script wrote |
 | B1 | A step naming an element that is not on the page fails only its own pipeline | a page pipeline writing into the unloaded card | the step before it ran, the step after it did not, and the next gesture works |
 
 The framework's other promises (triggers, conditions, requests, validation, slots, realtime,

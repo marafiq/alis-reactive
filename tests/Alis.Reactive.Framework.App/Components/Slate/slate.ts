@@ -132,11 +132,15 @@ export class Slate {
   private placedText = "";
   private runningTotal = 0;
   private saveStatus = "idle";
+  private placedDay: Date | null = null;
+  private placedWithFlag = false;
+  private readonly startedAtMs: number;
 
   constructor(private readonly host: SlateHost) {
     const changed = (): void => this.show();
     this.header = new Header(changed);
     this.titleText = host.dataset["title"] ?? "";
+    this.startedAtMs = Number(host.dataset["started"] ?? "0");
     this.rows = (host.dataset["rows"] ?? "")
       .split("|")
       .filter(label => label.length > 0)
@@ -216,6 +220,8 @@ export class Slate {
   /** A placed line of four values; the number joins the total. Each must arrive as its own type. */
   place(text: string, number: number, flag: boolean, day: Date): void {
     this.runningTotal += number;
+    this.placedDay = day;
+    this.placedWithFlag = flag;
     this.placedText = `${text} · ${number.toFixed(1)} · ${flag === true ? "yes" : "no"} · ${dayText(day)}`;
     this.show();
   }
@@ -226,6 +232,21 @@ export class Slate {
     this.latestCard = { name: card.name, due: card.due };
     this.cardList.push({ name: card.name, due: card.due });
     this.show();
+  }
+
+  /** When the slate was started, as a timestamp. */
+  get startedAt(): number {
+    return this.startedAtMs;
+  }
+
+  /** The day of the line placed last, or null before any. */
+  get placedOn(): Date | null {
+    return this.placedDay;
+  }
+
+  /** The flag of the line placed last. */
+  get placedFlag(): boolean {
+    return this.placedWithFlag;
   }
 
   /** The card filled last, as data. */

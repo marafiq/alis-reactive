@@ -27,13 +27,20 @@ public sealed class InputsController : Controller
     /// value, or the text it was sent when that text does not bind to the member's type.
     /// </summary>
     [HttpPost]
-    public IActionResult Booking([FromForm] BookingPage booking) => Json(new BookingEcho
+    public IActionResult Booking([FromForm] BookingPage booking) => Json(Booked(booking));
+
+    /// <summary>Binds the booking from a JSON body as any endpoint does, and says what it bound.</summary>
+    [HttpPost("/Inputs/Booking/Json")]
+    public IActionResult BookingJson([FromBody] BookingPage booking) => Json(Booked(booking));
+
+    private BookingEcho Booked(BookingPage booking) => new()
     {
         Summary = string.Join(", ",
             Bound("day", nameof(BookingPage.Day), booking.Day.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)),
             Bound("called", nameof(BookingPage.Called), booking.Called.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture)),
-            Bound("guests", nameof(BookingPage.Guests), booking.Guests.ToString(CultureInfo.InvariantCulture))),
-    });
+            Bound("guests", nameof(BookingPage.Guests), booking.Guests.ToString(CultureInfo.InvariantCulture)),
+            booking.Tags is { Count: > 0 } tags ? "tags " + string.Join(" and ", tags.Select(tag => $"'{tag}'")) : "no tags"),
+    };
 
     private string Bound(string label, string member, string value) =>
         ModelState.TryGetValue(member, out var entry) && entry.Errors.Count > 0

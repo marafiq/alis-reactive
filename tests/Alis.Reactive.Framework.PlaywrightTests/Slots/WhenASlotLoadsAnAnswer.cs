@@ -5,7 +5,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Slots;
 /// inside it too (S1, S2); a slot looked up when it is no longer on the page fails only the pipeline that
 /// loads it (S3); an answer that is not HTML leaves the slot as it was; HTML with no plan takes the place of
 /// what the slot held (S1); and a script in the loaded HTML runs, as a vendor's script that builds its widget
-/// does (S1, step 4).
+/// does (S1, step 4; L3).
 /// </summary>
 [TestFixture]
 public sealed class WhenASlotLoadsAnAnswer : AppPageTest

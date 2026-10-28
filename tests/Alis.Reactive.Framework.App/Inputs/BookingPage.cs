@@ -8,6 +8,8 @@ public sealed class BookingPage
     public DateTimeOffset Called { get; set; }
 
     public int Guests { get; set; }
+
+    public List<string>? Tags { get; set; }
 }
 
 /// <summary>What the endpoint bound, in its own words.</summary>

@@ -3,7 +3,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// <summary>
 /// A file the person chose, as the browser hands it to a page (<c>BrowserFile</c>): what the page reads of it,
 /// posted for an endpoint to check, and the file itself, which a form-data request sends, from an array or from
-/// the browser's own file list (H4); a query or a JSON body has no form for a file, so a request that would
+/// the browser's own file list (H4, I10); a query or a JSON body has no form for a file, so a request that would
 /// carry one stops before it is sent (H2, H3).
 /// </summary>
 [TestFixture]
