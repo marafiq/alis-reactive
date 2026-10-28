@@ -1,0 +1,43 @@
+@using Alis.Reactive.Framework.App.Validation
+@model BoundsForm
+@{
+    ViewData["Title"] = "Bounds written every way";
+    var plan = Html.ReactivePlan<BoundsForm>();
+}
+<h1>Bounds written every way</h1>
+
+<div id="bounds-form">
+    @{ Html.InputField(plan, m => m.Base, o => o.Label("Base")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeBase, o => o.Label("MaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeAtLeastTwo, o => o.Label("MaybeAtLeastTwo")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeBelowFive, o => o.Label("MaybeBelowFive")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeAtMostFive, o => o.Label("MaybeAtMostFive")).Entry(); }
+    @{ Html.InputField(plan, m => m.AtLeastBase, o => o.Label("AtLeastBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.BelowBase, o => o.Label("BelowBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.AtMostBase, o => o.Label("AtMostBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeAboveBase, o => o.Label("MaybeAboveBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeAtLeastBase, o => o.Label("MaybeAtLeastBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeBelowBase, o => o.Label("MaybeBelowBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeAtMostBase, o => o.Label("MaybeAtMostBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeAboveMaybeBase, o => o.Label("MaybeAboveMaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeBelowMaybeBase, o => o.Label("MaybeBelowMaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeAtMostMaybeBase, o => o.Label("MaybeAtMostMaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.AboveMaybeBase, o => o.Label("AboveMaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.AtLeastMaybeBase, o => o.Label("AtLeastMaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.BelowMaybeBase, o => o.Label("BelowMaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.AtMostMaybeBase, o => o.Label("AtMostMaybeBase")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeOneToFive, o => o.Label("MaybeOneToFive")).Entry(); }
+    @{ Html.InputField(plan, m => m.MaybeInsideTen, o => o.Label("MaybeInsideTen")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Bounds")
+        .Gather(g => g.Form())
+        .Validate<BoundsRules>("bounds-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("bounds-form")))))
+
+@Html.RenderPlan(plan)

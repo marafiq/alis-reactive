@@ -18,6 +18,18 @@ public sealed class ValidationController : Controller
 
     public IActionResult Notice() => View(new Notice());
 
+    public IActionResult Bounds() => View(new BoundsForm());
+
+    /// <summary>Checks the bounds with the same rules the page carries; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Bounds")]
+    public IActionResult SaveBounds([FromBody] BoundsForm form, [FromServices] BoundsRules rules)
+    {
+        var result = rules.Validate(form);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     /// <summary>Checks the notice with the same rules the page carries, one of which waits; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Notice")]
     public async Task<IActionResult> SaveNotice([FromBody] Notice notice, [FromServices] NoticeRules rules)
