@@ -207,7 +207,7 @@ expression over the converted values.
 | `==`, `!=` | Both missing are equal; one missing is unequal; two `Date`s compare by time; otherwise `===`. This is C#'s lifted equality. |
 | `<`, `<=`, `>`, `>=` | Defined for two finite numbers, two `Date`s by time, two texts by code unit, or two booleans. Every other pair is false, including missing, NaN and mixed kinds. This is C#'s lifted comparison. |
 | `&&`, `\|\|`, `!` | Short-circuit, left to right. |
-| `+ - * / %` | C# arithmetic over numbers; `+` adds and never joins text. An operand that is missing or not a number gives missing, so a date's month (2.3) where an item has no date is missing. |
+| `+ - * %` | C# arithmetic over numbers; `+` adds and never joins text. An operand that is missing or not a number gives missing, so a date's month (2.3) where an item has no date is missing. |
 | `??`, `?:` | As in C#. |
 | `merge` | The fields of every record operand, left to right, in one record (a gathered request's values with the model's). |
 | `-x` | C#'s unary minus over a number (`neg`). |
@@ -222,6 +222,8 @@ expression over the converted values.
 - **An `if` arm** is taken when its condition is truthy. A missing value is false.
 - **The validation rule `NotEmpty`** is not `empty`. It is a check chosen by the property's
   type (section 7.4).
+- **No division.** The set has no `/`: no builder divides, and a lambda's arithmetic is refused
+  (2.3). A builder that needs it adds the operator with the page that proves it.
 
 ### 2.3 Lambdas, arrays and text
 

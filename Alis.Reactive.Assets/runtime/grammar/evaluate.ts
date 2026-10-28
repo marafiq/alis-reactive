@@ -106,7 +106,6 @@ function operate(expr: OpExpr, scope: Scope): unknown {
     case "add":
     case "sub":
     case "mul":
-    case "div":
     case "mod":      return ops.arithmetic(expr.op, at(0), at(1));
     case "neg":      return ops.negate(at(0));
     case "truthy":   return ops.truthy(at(0));

@@ -23,7 +23,6 @@ namespace Alis.Reactive.Grammar
         internal static readonly Operator Add = Define("add", 2, 2);
         internal static readonly Operator Sub = Define("sub", 2, 2);
         internal static readonly Operator Mul = Define("mul", 2, 2);
-        internal static readonly Operator Div = Define("div", 2, 2);
         internal static readonly Operator Mod = Define("mod", 2, 2);
         internal static readonly Operator Neg = Define("neg", 1, 1);
         internal static readonly Operator Coalesce = Define("coalesce", 2, int.MaxValue);

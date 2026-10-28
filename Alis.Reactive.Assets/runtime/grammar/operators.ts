@@ -58,7 +58,7 @@ export function greaterThanOrEqual(left: unknown, right: unknown): boolean {
 }
 
 /** C# arithmetic over numbers. An operand that is missing or not a number gives missing. */
-export function arithmetic(op: "add" | "sub" | "mul" | "div" | "mod", left: unknown, right: unknown): unknown {
+export function arithmetic(op: "add" | "sub" | "mul" | "mod", left: unknown, right: unknown): unknown {
   const a = asNumber(left);
   const b = asNumber(right);
   if (a === undefined || b === undefined) return null;
@@ -66,7 +66,6 @@ export function arithmetic(op: "add" | "sub" | "mul" | "div" | "mod", left: unkn
     case "add": return a + b;
     case "sub": return a - b;
     case "mul": return a * b;
-    case "div": return a / b;
     case "mod": return a % b;
   }
 }
