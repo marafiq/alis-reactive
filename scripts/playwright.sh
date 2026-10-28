@@ -149,6 +149,10 @@ check_browser_assets_are_fresh() {
   playwright_check_assets
 }
 
+# Each source project is fresh when its sources are older than its own assembly in the test output: a
+# build refreshes that copy whenever it rebuilds the project, while the test assembly itself is rebuilt
+# only when its own sources or a referenced public surface change (a view edit rebuilds the app alone).
+# A project with no assembly there (the analyzers) is compared against the test assembly.
 check_no_build_is_fresh() {
   if [ ! -f "$assembly" ]; then
     echo "[playwright:runner] ERROR: --no-build requested, but '$assembly' does not exist." >&2
@@ -168,21 +172,27 @@ check_no_build_is_fresh() {
     [ -n "$source" ] && sources+=("$source")
   done < <(playwright_sources)
 
-  local changed_dotnet
-  changed_dotnet="$(
-    find "${sources[@]}" \
-      \( -path '*/bin' -o -path '*/bin/*' -o -path '*/obj' -o -path '*/obj/*' \) -prune -o \
-      -type f \
-      \( -name '*.cs' -o -name '*.cshtml' -o -name '*.csproj' -o -name '*.props' -o -name '*.targets' \) \
-      -newer "$assembly" \
-      -print \
-      | head -20
-  )"
+  local output_dir built changed_dotnet="" changed
+  output_dir="$(dirname "$assembly")"
+  for source in "${sources[@]}"; do
+    built="$output_dir/$(basename "$source").dll"
+    [ -f "$built" ] || built="$assembly"
+    changed="$(
+      find "$source" \
+        \( -path '*/bin' -o -path '*/bin/*' -o -path '*/obj' -o -path '*/obj/*' \) -prune -o \
+        -type f \
+        \( -name '*.cs' -o -name '*.cshtml' -o -name '*.csproj' -o -name '*.props' -o -name '*.targets' \) \
+        -newer "$built" \
+        -print \
+        | head -20
+    )"
+    [ -n "$changed" ] && changed_dotnet+="$changed"$'\n'
+  done
 
   if [ -n "$changed_dotnet" ]; then
     echo "[playwright:runner] ERROR: --no-build would run stale Playwright binaries." >&2
-    echo "[playwright:runner] Source files are newer than '$assembly':" >&2
-    printf '%s\n' "$changed_dotnet" >&2
+    echo "[playwright:runner] Source files are newer than their built assemblies in '$output_dir':" >&2
+    printf '%s' "$changed_dotnet" | head -20 >&2
     echo "[playwright:runner] Run scripts/playwright.sh without --no-build, or rebuild first." >&2
     exit 3
   fi

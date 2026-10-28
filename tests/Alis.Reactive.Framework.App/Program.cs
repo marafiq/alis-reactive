@@ -25,6 +25,7 @@ RequireBuilt(Path.Combine(root, "wwwroot", "js", "framework-components.js"));
 app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(runtimeDir), RequestPath = "/scripts" });
 app.UseStaticFiles();
 app.UseRouting();
+app.MapControllers();
 app.MapControllerRoute("slices", "{controller=Home}/{action=Index}");
 app.Run();
 

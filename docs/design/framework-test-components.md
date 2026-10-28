@@ -56,7 +56,7 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | M1 | A method with no argument | `Slate.Clear()` | the slate is empty |
 | M2 | A method with up to four arguments, each arriving as its declared type | `Slate.Place(text, number, flag, day)` | the four values on the slate, the number formatted and the day read from a real date |
 | M3 | A record argument converts to the record the method declares (a date inside it arrives as a date) | `Slate.Fill(card)` | the card's fields on the slate, its date as the day picked |
-| M4 | A method's result read where any value is read: a condition, a set, a gather, a route value | `Slate.Has(text)`, `Slate.Total()` | the branch taken; the total as it stands; the total in the request (with the Requests slice) |
+| M4 | A method's result read where any value is read: a condition, a set, a gather, a route value | `Slate.Has(text)`, `Slate.Total()` | the branch taken; the total as it stands; the total in a request's path and in its body |
 | M5 | An async method awaited, and an async result | `Slate.Save()`, `Slate.Lookup(key)` | "saved" after the slate finishes; the looked-up value |
 | M6 | A method that throws or rejects stops the rest of its pipeline, and the page goes on | `Slate.Fail()`, `Slate.FailLater()` | the step before it ran, the steps after it did not, and the next gesture works |
 | E1 | An event without a payload runs its pipeline | `Slate.Cleared`, raised when a method cleared it | the page reacts to the slate being cleared |
