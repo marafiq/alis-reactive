@@ -1,0 +1,36 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Framework.App.Plans
+@model PlanRefusalsPage
+@{
+    ViewData["Title"] = "A refused plan";
+    var plan = Html.ReactivePlan<PlanRefusalsPage>();
+}
+<h1>A refused plan</h1>
+
+@switch (Model.Mistake)
+{
+    case PlanMistake.RenderAComponentWithNoId:
+        @(plan.Render<Button>("", new HtmlString("<button type=\"button\">Send</button>")))
+        break;
+    case PlanMistake.GiveAnElementPlanNoId:
+        @(Html.RenderPlan(Html.ElementPlan<PlanRefusalsPage>("")))
+        break;
+    case PlanMistake.NameAPluginWithASpace:
+        plan.RegisterPlugin<SpacedNightLog>();
+        break;
+    case PlanMistake.GiveAPluginNoName:
+        plan.RegisterPlugin<UnnamedNightLog>();
+        break;
+    case PlanMistake.GiveAHeaderNoName:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits").Gather(g => g.Header("", "night"))))
+        break;
+    case PlanMistake.NameARoutePlaceholderWithADash:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Get("/Plans/Rooms/{room-number}")))
+        break;
+    case PlanMistake.RouteAStatusHttpDoesNotHave:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r.OnError(600, e => e.Element("refused").Text.Set("refused")))))
+        break;
+}
+
+@Html.RenderPlan(plan)
