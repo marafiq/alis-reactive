@@ -29,10 +29,10 @@ namespace Alis.Reactive.FluentValidator
             Written = written;
         }
 
-        /// <summary>The member's path from the model, as model binding names it; null for a computed value.</summary>
         /// <summary>The member as the validator wrote it: the path a browser rule names it by.</summary>
         internal LambdaExpression Expression { get; }
 
+        /// <summary>The member's path from the model, as model binding names it; null for a computed value.</summary>
         internal string? Path { get; }
 
         /// <summary>The member's own name: the last step of its path.</summary>

@@ -1,8 +1,9 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
 /// <summary>
-/// A list a component holds, tested: whether it holds an item, and whether it is empty. The slate's rows
-/// are the residents on the round; its own Add row button adds "Row 3".
+/// A list a component holds, tested: whether it holds an item, whether the list is declared as an array, a
+/// list or a sequence, and whether it is empty. The slate's rows are the residents on the round; its own Add
+/// row button adds "Row 3".
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageTestsAList : AppPageTest
@@ -22,6 +23,21 @@ public sealed class WhenAPageTestsAList : AppPageTest
         await Page.Locator("#round").GetByRole(AriaRole.Button, new() { Name = "Add row", Exact = true }).ClickAsync();
         await CheckTheRound();
         await Expect(Line("has-row-3")).ToHaveTextAsync("Row 3 is on the round");
+    }
+
+    [TestCase("array-row-3", TestName = "a_list_declared_as_an_array_holds_an_item_once_it_is_added")]
+    [TestCase("list-row-3", TestName = "a_list_declared_as_a_list_holds_an_item_once_it_is_added")]
+    [TestCase("sequence-row-3", TestName = "a_list_declared_as_a_sequence_holds_an_item_once_it_is_added")]
+    public async Task a_list_holds_an_item_whatever_collection_it_is_declared_as(string line)
+    {
+        await Open("/Conditions/Round");
+
+        await CheckTheRound();
+        await Expect(Line(line)).ToHaveTextAsync("not held");
+
+        await Page.Locator("#round").GetByRole(AriaRole.Button, new() { Name = "Add row", Exact = true }).ClickAsync();
+        await CheckTheRound();
+        await Expect(Line(line)).ToHaveTextAsync("held");
     }
 
     [Test]

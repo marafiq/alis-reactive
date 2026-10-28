@@ -1,5 +1,6 @@
 using Alis.Reactive.FluentValidator;
 using Alis.Reactive.Framework.App.Realtime;
+using Alis.Reactive.Framework.App.Validation;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,10 @@ builder.Services.AddControllersWithViews().AddRazorOptions(razor =>
     razor.ViewLocationFormats.Add("/{1}/{0}.cshtml");
     razor.ViewLocationFormats.Add("/Shared/{0}.cshtml");
 });
-builder.Services.AddReactiveFluentValidation(validation => validation.AddFromAssemblyContaining<Program>());
+// Scanning finds every validator but a generic one, which the app registers for each model it checks.
+builder.Services.AddReactiveFluentValidation(validation => validation
+    .AddFromAssemblyContaining<Program>()
+    .Add<GuestNameRules<RegisteredGuest>>());
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<LineExchange>();
 

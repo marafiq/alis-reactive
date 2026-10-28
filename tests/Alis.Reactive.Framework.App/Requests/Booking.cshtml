@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Requests
+@model BookingPage
+@{
+    ViewData["Title"] = "A booking";
+    var plan = Html.ReactivePlan<BookingPage>();
+}
+<h1>A booking</h1>
+
+<p>Refused because: <span id="refused"></span></p>
+
+@(plan.Button("book-taken", "Book the taken room")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Bookings/Taken")
+        .Response(r => r.OnError<BookingProblem>((problem, e) => e.Element("refused").Text.Set(problem.Get(x => x.Reason))))))
+@(plan.Button("book-closed", "Book in the closed wing")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Bookings/Closed")
+        .Response(r => r.OnError<BookingProblem>((problem, e) => e.Element("refused").Text.Set(problem.Get(x => x.Reason))))))
+
+@Html.RenderPlan(plan)

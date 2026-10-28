@@ -92,6 +92,15 @@ public sealed class Slate : Component
     public void SummarizeAny<TItems>(TypedSource<TItems> labels) where TItems : IEnumerable<object> =>
         Method(Pass<IEnumerable<object>, TItems>(labels), name: "summarize");
 
+    /// <summary>The rows' labels, as the array the slate keeps them in.</summary>
+    public ReadOnly<string[]> LabelArray => ReadOnly<string[]>(name: "labels");
+
+    /// <summary>The rows' labels, declared as a list.</summary>
+    public ReadOnly<List<string>> LabelList => ReadOnly<List<string>>(name: "labels");
+
+    /// <summary>The rows' labels, declared as a sequence.</summary>
+    public ReadOnly<IEnumerable<string>> LabelSequence => ReadOnly<IEnumerable<string>>(name: "labels");
+
     /// <summary>Raised when the slate has been cleared.</summary>
     public Event Cleared => Event();
 

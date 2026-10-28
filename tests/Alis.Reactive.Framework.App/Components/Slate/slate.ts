@@ -173,6 +173,11 @@ export class Slate {
     return this.rows.length;
   }
 
+  /** The rows' labels, in order. */
+  get labels(): string[] {
+    return this.rows.map(row => row.label);
+  }
+
   /** A note shown under the title. Written only: the slate keeps no getter for it. */
   set note(text: string) {
     this.noteText = text;

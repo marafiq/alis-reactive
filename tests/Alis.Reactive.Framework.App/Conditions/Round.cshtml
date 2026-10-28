@@ -10,6 +10,7 @@
 
 <p>Row 3: <span id="has-row-3"></span></p>
 <p>The round: <span id="round-empty"></span></p>
+<p>Row 3, read as an array: <span id="array-row-3"></span> · as a list: <span id="list-row-3"></span> · as a sequence: <span id="sequence-row-3"></span></p>
 
 @(plan.Button("clear", "Clear the round")
     .Reactive(button => button.Click, p => p.Component<Slate>("round").Clear()))
@@ -20,6 +21,16 @@
         p.When(labels).ArrayContains("Row 3")
             .Then(t => t.Element("has-row-3").Text.Set("Row 3 is on the round"))
             .Else(e => e.Element("has-row-3").Text.Set("Row 3 is not on the round"));
+        var slate = p.Component<Slate>("round");
+        p.When(slate.LabelArray).ArrayContains("Row 3")
+            .Then(t => t.Element("array-row-3").Text.Set("held"))
+            .Else(e => e.Element("array-row-3").Text.Set("not held"));
+        p.When(slate.LabelList).ArrayContains("Row 3")
+            .Then(t => t.Element("list-row-3").Text.Set("held"))
+            .Else(e => e.Element("list-row-3").Text.Set("not held"));
+        p.When(slate.LabelSequence).ArrayContains("Row 3")
+            .Then(t => t.Element("sequence-row-3").Text.Set("held"))
+            .Else(e => e.Element("sequence-row-3").Text.Set("not held"));
         p.When(labels).IsEmpty()
             .Then(t => t.Element("round-empty").Text.Set("nobody is on the round"))
             .Else(e => e.Element("round-empty").Text.Set("the round has residents"));

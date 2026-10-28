@@ -22,6 +22,35 @@ public sealed class ValidationController : Controller
 
     public IActionResult Sameness() => View(new SamenessForm());
 
+    public IActionResult Guest() => View(new RegisteredGuest());
+
+    public IActionResult UnregisteredGuest() => View(new UnregisteredGuest());
+
+    /// <summary>Checks the guest by the generic rules registered for it; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Guest")]
+    public IActionResult SaveGuest([FromBody] RegisteredGuest guest, [FromServices] GuestNameRules<RegisteredGuest> rules)
+    {
+        var result = rules.Validate(guest);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"saved {guest.Name}" });
+    }
+
+    /// <summary>Checks the guest by a rule that reads through a null, and says what the validator said of it.</summary>
+    [HttpPost("/Validation/GuestUnguarded")]
+    public IActionResult SaveGuestUnguarded([FromBody] RegisteredGuest guest, [FromServices] UnguardedGuestRules rules)
+    {
+        try
+        {
+            rules.Validate(guest);
+            return Json(new Booked { Summary = "saved" });
+        }
+        catch (NullReferenceException unguarded)
+        {
+            return Json(new Booked { Summary = unguarded.Message });
+        }
+    }
+
     /// <summary>Checks the comparisons with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Sameness")]
     public IActionResult SaveSameness([FromBody] SamenessForm form, [FromServices] SamenessRules rules)

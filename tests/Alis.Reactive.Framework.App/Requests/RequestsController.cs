@@ -12,6 +12,16 @@ public sealed class RequestsController : Controller
 {
     public IActionResult Desk() => View(new RequestsPage());
 
+    public IActionResult Booking() => View(new BookingPage());
+
+    /// <summary>Refuses the booking as a conflict, with its reason in the body.</summary>
+    [HttpPost("/Requests/Bookings/Taken")]
+    public IActionResult BookTaken() => Conflict(new BookingProblem { Reason = "room 2 is taken" });
+
+    /// <summary>Refuses the booking as forbidden, with its reason in the body.</summary>
+    [HttpPost("/Requests/Bookings/Closed")]
+    public IActionResult BookClosed() => StatusCode(403, new BookingProblem { Reason = "the east wing is closed" });
+
     public IActionResult RouteRefusals(RouteMistake mistake) => View(new RouteRefusalsPage { Mistake = mistake });
 
     [HttpGet("/Requests/Residents/{id}")]
