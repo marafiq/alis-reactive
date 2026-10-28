@@ -1,0 +1,45 @@
+@using Alis.Reactive.Framework.App.Elements
+@model PanelPage
+@{
+    ViewData["Title"] = "Panel";
+    var plan = Html.ReactivePlan<PanelPage>();
+}
+<style>.gone { display: none; }</style>
+<h1>Panel</h1>
+
+<p id="notice" hidden>Visiting hours have changed.</p>
+<p id="quiet" class="gone">Quiet hours from nine.</p>
+@Html.Banner()
+
+@await Html.PartialAsync("_Visitor", new PanelVisitor())
+<p>Visitor read by the panel: <span id="visitor-read"></span></p>
+<p>Nurse call heard: <span id="call-heard"></span> · room: <span id="call-room"></span></p>
+
+@(plan.Button("show-notice", "Show the notice")
+    .Reactive(button => button.Click, p => p.Element("notice").Show()))
+@(plan.Button("hide-notice", "Hide the notice")
+    .Reactive(button => button.Click, p => p.Element("notice").Hide()))
+@(plan.Button("bring-quiet", "Take gone off the quiet hours")
+    .Reactive(button => button.Click, p => p.Element("quiet").ClassList.Remove("gone")))
+@(plan.Button("toggle-quiet", "Toggle gone on the quiet hours")
+    .Reactive(button => button.Click, p => p.Element("quiet").ClassList.Toggle("gone")))
+@(plan.Button("post-banner", "Post lunch on the banner")
+    .Reactive(button => button.Click, p =>
+    {
+        var banner = p.Component<Banner>();
+        banner.Message.Set("Lunch is served");
+        banner.Flash();
+    }))
+@(plan.Button("read-visitor", "Read the visitor")
+    .Reactive(button => button.Click, p =>
+        p.Element("visitor-read").Text.Set(p.Component<Entry, PanelVisitor>(m => m.Name).Value)))
+@(plan.Button("call-nurse", "Call the nurse with no room")
+    .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled)))
+
+@{ Html.On(plan, t => t.CustomEvent(PanelEvents.NurseCalled, (called, p) =>
+    {
+        p.Element("call-heard").Text.Set("heard");
+        p.Element("call-room").Text.Set(called.Get(x => x.Room));
+    })); }
+
+@Html.RenderPlan(plan)

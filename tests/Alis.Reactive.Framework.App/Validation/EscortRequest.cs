@@ -92,7 +92,7 @@ public sealed class EscortVisit
 public sealed class EscortRules : ReactiveValidator<EscortRequest>
 {
     private static readonly string[] KnownWings = { "East", "West" };
-    private static readonly List<string> ListedWings = new() { "West", "Garden" };
+    private static readonly List<string?> ListedWings = new() { "West", "Garden" };
     private readonly int GuestLimit = 4;
 
     public EscortRules()

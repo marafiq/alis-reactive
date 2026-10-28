@@ -1,0 +1,20 @@
+@using Alis.Reactive.Framework.App.Elements
+@model RefusedDispatchPage
+@{
+    ViewData["Title"] = "A dispatch the page cannot render";
+    var plan = Html.ReactivePlan<RefusedDispatchPage>();
+}
+<h1>A dispatch the page cannot render</h1>
+
+@if (Model.Mistake == DispatchMistake.PayloadWithNoField)
+{
+    @(plan.Button("call", "Call")
+        .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => { })))
+}
+else
+{
+    @(plan.Button("call", "Call")
+        .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => payload.Set(x => x, new Called()))))
+}
+
+@Html.RenderPlan(plan)

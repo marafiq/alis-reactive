@@ -23,6 +23,8 @@ public sealed class ConditionsController : Controller
 
     public IActionResult Triage() => View(new TriagePage());
 
+    public IActionResult Groups() => View(new TriagePage());
+
     public IActionResult CarePlan() => View(new CarePlanPage());
 
     public IActionResult Availability() => View(new AvailabilityPage());
