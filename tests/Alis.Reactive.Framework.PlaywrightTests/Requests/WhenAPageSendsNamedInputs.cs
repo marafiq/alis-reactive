@@ -16,13 +16,13 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
 
     private async Task Type(string label, string text) => await Page.GetByLabel(label, new() { Exact = true }).FillAsync(text);
 
-    // A care plan as the person's computer keeps it: a text file of its own.
-    private async Task ChooseACarePlan()
+    // A text file as the person's computer keeps it, chosen with the file picker labelled for it.
+    private async Task Choose(string label, string name, string text)
     {
-        var folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "alis-care-plan-" + Guid.NewGuid().ToString("N")));
-        var file = Path.Combine(folder.FullName, "plan.txt");
-        await File.WriteAllTextAsync(file, "Walk daily.");
-        await Page.GetByLabel("Care plan").SetInputFilesAsync(file);
+        var folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "alis-requests-" + Guid.NewGuid().ToString("N")));
+        var file = Path.Combine(folder.FullName, name);
+        await File.WriteAllTextAsync(file, text);
+        await Page.GetByLabel(label).SetInputFilesAsync(file);
     }
 
     [Test]
@@ -97,7 +97,7 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
     public async Task a_named_input_reaches_a_request_member_of_a_type_its_own_type_derives_from()
     {
         await Open("/Requests/CarePlan");
-        await ChooseACarePlan();
+        await Choose("Care plan", "plan.txt", "Walk daily.");
 
         await Button("Send the care plan as a sequence").ClickAsync();
 
@@ -108,11 +108,22 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
     public async Task a_named_input_reaches_a_request_member_that_is_another_collection_of_the_same_items()
     {
         await Open("/Requests/CarePlan");
-        await ChooseACarePlan();
+        await Choose("Care plan", "plan.txt", "Walk daily.");
 
         await Button("Send the care plan as an array").ClickAsync();
 
         await Expect(Line("received")).ToHaveTextAsync("received plan.txt, 11 bytes of text/plain: Walk daily.");
+    }
+
+    [Test]
+    public async Task a_named_input_bound_to_a_sequence_reaches_a_request_member_that_is_another_collection_of_its_items()
+    {
+        await Open("/Requests/Consents");
+        await Choose("Consents", "consent.txt", "Signed.");
+
+        await Button("Send the consents").ClickAsync();
+
+        await Expect(Line("received")).ToHaveTextAsync("received consent.txt, 7 bytes of text/plain: Signed.");
     }
 
     [Test]

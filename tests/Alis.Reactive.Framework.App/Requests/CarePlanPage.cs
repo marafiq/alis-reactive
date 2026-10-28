@@ -23,3 +23,15 @@ public sealed class CarePlanFiles
 {
     public IFormFile[]? CarePlan { get; set; }
 }
+
+/// <summary>The resident's signed consents, chosen as files the page's model holds as a sequence.</summary>
+public sealed class ConsentsPage
+{
+    public IEnumerable<IFormFile>? Consents { get; set; }
+}
+
+/// <summary>The consents bound as an array of files: another collection of the same items as the page's sequence.</summary>
+public sealed class ConsentFiles
+{
+    public IFormFile[]? Consents { get; set; }
+}

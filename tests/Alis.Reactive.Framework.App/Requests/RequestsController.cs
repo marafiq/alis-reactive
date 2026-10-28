@@ -112,6 +112,11 @@ public sealed class RequestsController : Controller
     [HttpPost("/Requests/CarePlans/Array")]
     public async Task<IActionResult> SendCarePlanArray([FromForm] CarePlanFiles files) => Said(await Received(files.CarePlan));
 
+    public IActionResult Consents() => View(new ConsentsPage());
+
+    [HttpPost("/Requests/Consents")]
+    public async Task<IActionResult> SendConsents([FromForm] ConsentFiles files) => Said(await Received(files.Consents));
+
     // Each file as the server reads it: its name, its length, its media type and its text.
     private static async Task<string> Received(IEnumerable<IFormFile>? files)
     {
