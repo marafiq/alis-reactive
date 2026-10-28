@@ -8,8 +8,6 @@ namespace Alis.Reactive.PlanModel
         // The term names what the developer gave ("Plugin name"), so a refusal says which name is missing.
         protected PlanString(string value, string term)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value), term + " must not be empty.");
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException(term + " must not be empty.", nameof(value));
 
@@ -20,18 +18,6 @@ namespace Alis.Reactive.PlanModel
 
         public bool Equals(PlanString? other) =>
             other != null && GetType() == other.GetType() && Value == other.Value;
-
-        public override bool Equals(object? obj) => Equals(obj as PlanString);
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return ((GetType().GetHashCode() * 397) ^ Value.GetHashCode());
-            }
-        }
-
-        public override string ToString() => Value;
     }
 
     internal sealed class PlanId : PlanString

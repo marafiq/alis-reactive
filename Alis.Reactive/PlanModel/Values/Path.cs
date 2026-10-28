@@ -44,10 +44,6 @@ namespace Alis.Reactive.PlanModel
         internal string ToPathText() => _text;
 
         public bool Equals(PathSegment? other) => other != null && Kind == other.Kind && _text == other._text;
-
-        public override bool Equals(object? obj) => Equals(obj as PathSegment);
-
-        public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(_text);
     }
 
     /// <summary>
@@ -140,11 +136,6 @@ namespace Alis.Reactive.PlanModel
         }
 
         public bool Equals(Path? other) => other != null && Segments.SequenceEqual(other.Segments);
-
-        public override bool Equals(object? obj) => Equals(obj as Path);
-
-        public override int GetHashCode() =>
-            Segments.Aggregate(17, (hash, segment) => unchecked(hash * 31 + segment.GetHashCode()));
 
         public override string ToString()
         {
