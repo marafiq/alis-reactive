@@ -1,0 +1,64 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model NamesPage
+@{
+    ViewData["Title"] = "Find a resident";
+    var plan = Html.ReactivePlan<NamesPage>();
+}
+<h1>Find a resident</h1>
+
+@{ Html.InputField(plan, m => m.Name, o => o.Label("Name")).Entry(); }
+@{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+
+<p>Ada: <span id="is-ada"></span></p>
+<p>Not Ada: <span id="not-ada"></span></p>
+<p>Names an Ann: <span id="names-ann"></span></p>
+<p>A doctor: <span id="doctor"></span></p>
+<p>A Jackson: <span id="jackson"></span></p>
+<p>Room code: <span id="room-code"></span></p>
+<p>Long enough to search: <span id="long-enough"></span></p>
+<p>Named: <span id="named"></span></p>
+<p>Unnamed: <span id="unnamed"></span></p>
+<p>On today's round: <span id="on-round"></span></p>
+<p>Off today's round: <span id="off-round"></span></p>
+
+@(plan.Button("check", "Check")
+    .Reactive(button => button.Click, p =>
+    {
+        var name = p.Component<Entry>(m => m.Name).Value;
+        var room = p.Component<Entry>(m => m.Room).Value;
+        p.When(name).Eq("Ada")
+            .Then(t => t.Element("is-ada").Text.Set("Ada"))
+            .Else(e => e.Element("is-ada").Text.Set("not Ada"));
+        p.When(name).NotEq("Ada")
+            .Then(t => t.Element("not-ada").Text.Set("someone other than Ada"))
+            .Else(e => e.Element("not-ada").Text.Set("Ada herself"));
+        p.When(name).Contains("Ann")
+            .Then(t => t.Element("names-ann").Text.Set("names an Ann"))
+            .Else(e => e.Element("names-ann").Text.Set("names no Ann"));
+        p.When(name).StartsWith("Dr")
+            .Then(t => t.Element("doctor").Text.Set("a doctor"))
+            .Else(e => e.Element("doctor").Text.Set("not a doctor"));
+        p.When(name).EndsWith("Jackson")
+            .Then(t => t.Element("jackson").Text.Set("a Jackson"))
+            .Else(e => e.Element("jackson").Text.Set("not a Jackson"));
+        p.When(room).Matches("^[A-Z][0-9]{2}$")
+            .Then(t => t.Element("room-code").Text.Set("a room code"))
+            .Else(e => e.Element("room-code").Text.Set("not a room code"));
+        p.When(name).MinLength(3)
+            .Then(t => t.Element("long-enough").Text.Set("long enough"))
+            .Else(e => e.Element("long-enough").Text.Set("too short"));
+        p.When(name).NotEmpty()
+            .Then(t => t.Element("named").Text.Set("named"))
+            .Else(e => e.Element("named").Text.Set("no name given"));
+        p.When(name).IsEmpty()
+            .Then(t => t.Element("unnamed").Text.Set("no name yet"))
+            .Else(e => e.Element("unnamed").Text.Set("has a name"));
+        p.When(name).In("Ada", "Ben")
+            .Then(t => t.Element("on-round").Text.Set("on the round"))
+            .Else(e => e.Element("on-round").Text.Set("not on the round"));
+        p.When(name).NotIn("Ada", "Ben")
+            .Then(t => t.Element("off-round").Text.Set("off the round"))
+            .Else(e => e.Element("off-round").Text.Set("not off the round"));
+    }))
+
+@Html.RenderPlan(plan)
