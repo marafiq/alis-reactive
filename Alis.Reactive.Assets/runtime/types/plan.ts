@@ -300,7 +300,6 @@ export type Operator =
   | "add"
   | "sub"
   | "mul"
-  | "div"
   | "mod"
   | "neg"
   | "coalesce"

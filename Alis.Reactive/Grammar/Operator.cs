@@ -22,7 +22,6 @@ namespace Alis.Reactive.Grammar
         internal static readonly Operator Add = Define("add");
         internal static readonly Operator Sub = Define("sub");
         internal static readonly Operator Mul = Define("mul");
-        internal static readonly Operator Div = Define("div");
         internal static readonly Operator Mod = Define("mod");
         internal static readonly Operator Neg = Define("neg");
         internal static readonly Operator Coalesce = Define("coalesce");

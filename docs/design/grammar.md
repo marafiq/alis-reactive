@@ -101,7 +101,7 @@ A member read followed by a data read is two nested `get` nodes.
   member fails loudly instead of reading `undefined`. The items a `[]` reads are checked the same
   way, so an upload whose files lost `rawFile` fails at the item instead of posting nothing.
 - **Every other path is optional.** This covers paths off a handler's payload, a response, a record,
-  a plugin's data (`document.query`, `model.values`) or a returned object. A missing link reads as
+  a plugin's data (`document.query`) or a returned object. A missing link reads as
   missing, and a call on a missing target returns missing. This is JavaScript's `?.`.
 - **Writes.**
   - A `set` rooted at `obj(id)` needs every segment, the final member included, so a write to a
@@ -187,7 +187,7 @@ the exception: a `DateTimeOffset` names a moment, so it is sent as that moment i
 exactly whatever the zone of the browser or the server.
 
 **Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
-- **Where:** the `alis.model` values a request body carries (`values`, `fill`, `fields`, so
+- **Where:** the `alis.model` values a request body carries (`fill`, `fields`, so
   `Form()` sends them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`), and every
   input a validation rule reads: its field, a peer, and each
   member its condition reads, through `model.boundValueOf(id)`.
@@ -207,7 +207,7 @@ expression over the converted values.
 | `==`, `!=` | Both missing are equal; one missing is unequal; two `Date`s compare by time; otherwise `===`. This is C#'s lifted equality. |
 | `<`, `<=`, `>`, `>=` | Defined for two finite numbers, two `Date`s by time, two texts by code unit, or two booleans. Every other pair is false, including missing, NaN and mixed kinds. This is C#'s lifted comparison. |
 | `&&`, `\|\|`, `!` | Short-circuit, left to right. |
-| `+ - * / %` | C# arithmetic over numbers; `+` over texts concatenates. |
+| `+ - * %` | C# arithmetic over numbers; `+` adds and never joins text. An operand that is missing or not a number gives missing, so a date's month (2.3) where an item has no date is missing. |
 | `??`, `?:` | As in C#. |
 | `merge` | The fields of every record operand, left to right, in one record (a gathered request's values with the model's). |
 | `-x` | C#'s unary minus over a number (`neg`). |
@@ -222,6 +222,8 @@ expression over the converted values.
 - **An `if` arm** is taken when its condition is truthy. A missing value is false.
 - **The validation rule `NotEmpty`** is not `empty`. It is a check chosen by the property's
   type (section 7.4).
+- **No division.** The set has no `/`: no builder divides, and a lambda's arithmetic is refused
+  (2.3). A builder that needs it adds the operator with the page that proves it.
 
 ### 2.3 Lambdas, arrays and text
 
@@ -300,7 +302,7 @@ at render: a handle used outside the block that binds it throws, and names the h
 | `let` | Binds the value. |
 | `if` | Takes the first arm whose condition is truthy, else the `else` block. |
 | `all` | Starts every block, waits until all have settled, and logs each failure without rethrowing. |
-| `try` | Runs the body, then the `finally` block on every exit; an error from the body propagates after the `finally` block. |
+| `try` | Runs the body, then the `finally` block on every exit; an error from the body propagates after the `finally` block. The body awaits: a `try` is written only around a request's send, when it has a `Finally` (5.1). |
 
 ### 3.3 Await
 
@@ -516,10 +518,11 @@ no key (H2) and no entry (H4).
 
 ### 6.3 `model` (`plugin("alis.model", planId)`)
 
-- **M1 `values`.** Every mounted input of the composed plan, read through each input's `value`
-  expression as a binding read (2.1), and nested by binding name. An unmounted input is skipped.
-- **M2 `fields`.** The same inputs, flat, keyed by MVC binding name.
-- **M3 `fill(record)`.** Writes the inputs of M1 into `record` at their body paths and returns it.
+- **M1 Values.** Every mounted input of the composed plan, read through each input's `value`
+  expression as a binding read (2.1). An unmounted input is skipped. A request carries them through
+  M2 or M3.
+- **M2 `fields`.** The values of M1, flat, keyed by MVC binding name.
+- **M3 `fill(record)`.** Writes the values of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
 - **M5 `boundValueOf(id)`.** One input's value as a binding read (2.1), for a validation rule or a
   gathered `Form(m => ..)` field, wherever in the composition it was rendered; missing when no plan

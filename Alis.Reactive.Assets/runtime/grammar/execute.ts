@@ -89,17 +89,17 @@ function all(blocks: readonly (readonly Statement[])[], scope: Scope): Completio
   });
 }
 
-// The body runs in the enclosing block's scope, so its top-level bindings stay visible after the
-// try: code after a try runs only when the body completed (grammar.md 3.1).
+// The body awaits: a try holds a request's send (grammar.md 5.1). It runs in the enclosing block's
+// scope, so its top-level bindings stay visible after the try: code after a try runs only when the
+// body completed (grammar.md 3.1).
 function attempt(body: readonly Statement[], cleanup: readonly Statement[], scope: Scope): Completion {
-  let completion: Completion;
+  let completion: Promise<void>;
   try {
-    completion = executeBlock(body, scope);
+    completion = executeBlock(body, scope) as Promise<void>;
   } catch (error) {
     return rethrowAfter(executeBlock(cleanup, childScope(scope)), error);
   }
 
-  if (!isPromise(completion)) return executeBlock(cleanup, childScope(scope));
   return completion.then(
     () => executeBlock(cleanup, childScope(scope)),
     error => rethrowAfter(executeBlock(cleanup, childScope(scope)), error),

@@ -21,6 +21,9 @@ public sealed class Resident
 
     public DateTime Admitted { get; set; }
 
+    /// <summary>The day the resident left the home, when they have.</summary>
+    public DateTime? LeftOn { get; set; }
+
     /// <summary>When the next visitor arrives, in the visitor's own zone.</summary>
     public DateTimeOffset NextVisit { get; set; }
 
@@ -89,7 +92,7 @@ public static class Register
         new()
         {
             Name = "Ada Hartley", Nickname = null, Age = 102, Present = false, Balance = 0.25m, Weight = 70.25, Score = null,
-            Admitted = new DateTime(2026, 3, 14), NextVisit = new DateTimeOffset(2026, 10, 27, 8, 0, 0, TimeSpan.FromHours(9)),
+            Admitted = new DateTime(2026, 3, 14), LeftOn = new DateTime(2026, 4, 30), NextVisit = new DateTimeOffset(2026, 10, 27, 8, 0, 0, TimeSpan.FromHours(9)),
             Wing = Wing.East, Room = "E4  ", Keyworker = new() { Name = "Gus" },
         },
         new()

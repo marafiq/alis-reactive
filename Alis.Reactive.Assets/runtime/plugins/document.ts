@@ -31,14 +31,11 @@ export function raise(name: string, detail: unknown): void {
 
 function queryRecord<T>(pick: (values: string[]) => T | undefined): Record<string, T> {
   const params = new URLSearchParams(window.location.search);
+  // A plan reads the record only by a member's binding name (UrlRead), never by a symbol.
   return new Proxy({} as Record<string, T>, {
-    get(_target, key) {
-      if (typeof key !== "string") return undefined;
+    get(_target, key: string) {
       const values = valuesFor(params, key);
       return values.length === 0 ? undefined : pick(values);
-    },
-    has(_target, key) {
-      return typeof key === "string" && valuesFor(params, key).length > 0;
     },
   });
 }
