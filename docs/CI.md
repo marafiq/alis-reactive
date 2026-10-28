@@ -7,7 +7,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 
 - **The local full gate is the release-grade browser proof.** `scripts/test.sh` runs typecheck,
   assets, vitest, the consistency checks, `dotnet build`, the non-Playwright dotnet tests, and the
-  whole Playwright suite. `scripts/test.sh --parallel` runs the Playwright leg as the five CI
+  whole Playwright suite. `scripts/test.sh --parallel` runs the Playwright leg as the CI
   shards side by side (each with its own sandbox): about 20 minutes instead of about 60 on a
   12-core machine. CI runs the same scripts; it never defines a second gate.
 - **CI Playwright is single-worker.** `tests/Alis.Reactive.PlaywrightTests/GlobalUsings.cs:4-5`
@@ -99,11 +99,11 @@ selects without running them: `dotnet test --list-tests` (with the NUnit adapter
 `DisplayName=FullName`) gives the discovered set, and because `--list-tests` ignores `--filter`
 (observed: every shard listed all 1232 tests), `scripts/vstest-filter.mjs` applies the shard's
 expression with the VSTest grammar (`~ !~ = != | &`, parentheses, case-insensitive values). The
-partition proof is: the five lists concatenated equal the full list
+partition proof is: every shard's list concatenated equals the full list of every project
 (`scripts/playwright.sh --list --no-build`), every test exactly once:
 
 ```bash
-for s in fusion-a-f-and-core fusion-g-l-and-http fusion-m-z components-and-validation conditions-patterns-and-rest; do
+for s in $(scripts/playwright.sh --list-shards); do
   scripts/playwright.sh --shard "$s" --list --no-build > "/tmp/shard-$s.txt"; wc -l < "/tmp/shard-$s.txt"
 done
 scripts/playwright.sh --list --no-build > /tmp/all.txt
@@ -114,8 +114,8 @@ diff <(sort /tmp/all.txt) /tmp/union.txt && echo "no gaps"; sort /tmp/union.txt 
 Job time adds about 2 min of setup (checkout, toolchain, `scripts/build.sh` 76 s, browser install
 28 s). Wall clock for the browser leg: about 20 minutes instead of about 80, at roughly the same
 total runner minutes. Times are from one run and will drift. Re-balance by moving a letter or a
-namespace between shards in `shard_filter()`; keep every letter present exactly once and one
-complement shard, then re-run the partition proof above.
+namespace between shards in the project's `playwright.project.sh` (`playwright_shard_filter`); keep
+every letter present exactly once and one complement shard, then re-run the partition proof above.
 
 ### Retries: only what failed, with artifacts only on failure
 
@@ -177,7 +177,7 @@ until proven otherwise. The convention:
    test. Widening a timeout is not a fix (CLAUDE.md, Rules: root cause, not patch).
 2. If it cannot be fixed within the PR, quarantine it: add `[Category("Quarantine")]`
    ([NUnit Category](https://docs.nunit.org/articles/nunit/writing-tests/attributes/category.html)),
-   add the shard exclusion `&TestCategory!=Quarantine` to every `shard_filter()` case and a sixth,
+   add the shard exclusion `&TestCategory!=Quarantine` to every `playwright_shard_filter` case and a sixth,
    non-blocking `quarantine` shard with `TestCategory=Quarantine`, and add the row below. The PR that
    quarantines must show the shard's test count dropping by exactly the quarantined tests.
 3. Quarantine expires after **14 days**: fix and remove the category, or delete the test with the
@@ -201,7 +201,7 @@ until proven otherwise. The convention:
   Scheduled workflows run on the default branch only and are disabled after 60 days without
   repository activity ([schedule](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule)).
 - **Tag releases: the browser shards block publishing.** Recommendation and the workflow agree
-  (`nuget-publish.yml`: `pack-and-publish` needs `gate`, which includes all five shards). Evidence:
+  (`nuget-publish.yml`: `pack-and-publish` needs `gate`, which includes every shard). Evidence:
   (1) ten consecutive green legs since the license fix (2026-06-10 to 2026-07-11) plus the
   `v1.0.0-rc.2` publish leg, which meets the repo's re-arm criterion (three consecutive green
   runs); (2) sharding plus one in-shard re-run changes the cost of
@@ -290,8 +290,9 @@ the check names.
 1. Read the workflow you are changing and this page. If the change is a new step in the gate, it
    goes in `gate.yml` (once), not in a caller.
 2. A tool version changes in `.github/actions/setup-toolchain/action.yml` or `global.json`, nowhere else.
-3. A new shard or a re-balance changes `shard_filter()` in `scripts/playwright.sh` **and** the matrix
-   in `gate.yml` **and** the table above. Every letter A-Z must appear in exactly one Fusion shard,
+3. A new shard or a re-balance changes its project's `playwright.project.sh` **and** the matrix in
+   `gate.yml` **and** the table above. A new Playwright project adds its own `playwright.project.sh`
+   (name, shards, bundles, sources); the runner finds it by that file. Every letter A-Z must appear in exactly one Fusion shard,
    and one shard must remain the complement. Prove the partition with
    `scripts/playwright.sh --shard <name> --print-filter` for each shard.
 4. A third-party action is pinned to a commit SHA with a version comment; resolve it with

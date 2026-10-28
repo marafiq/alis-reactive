@@ -18,7 +18,7 @@ First Playwright browser install:
 
 ```bash
 dotnet build tests/Alis.Reactive.PlaywrightTests
-pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+pwsh tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
 ```
 
 ## Command Table
@@ -29,7 +29,7 @@ pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 instal
 | Build everything | `scripts/build.sh` | Installs npm deps if needed, builds all JS/CSS bundles, then runs `dotnet build`. |
 | Run sandbox | `scripts/run.sh` | Builds assets first, then starts `http://localhost:5220`. Stop with `Ctrl+C`. |
 | Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> consistency checks -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright. |
-| Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the five CI shards side by side, each with its own sandbox. About 20 minutes instead of about 60. |
+| Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the CI shards side by side, each with its own sandbox. About 20 minutes instead of about 60. |
 | Upgrade Syncfusion | `node scripts/pin-syncfusion.mjs <version>` then `npm ci` | Moves the npm and NuGet pins together and locks every control package at the version the umbrella shipped with; `--check` verifies (runs in every gate). |
 | Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright. |
 | Full Playwright | `scripts/playwright.sh` | Use this instead of raw `dotnet test` for browser tests. |
@@ -95,9 +95,9 @@ Use `scripts/test.sh` before push. It runs the gates in this order:
 npm run typecheck -> npm run build:all -> npm test -> consistency checks -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
 ```
 
-`scripts/test.sh --parallel` runs the same gate with the Playwright leg split into the five CI
+`scripts/test.sh --parallel` runs the same gate with the Playwright leg split into every project's CI
 shards (`scripts/playwright.sh --list-shards`) running side by side; each shard's console output is
-written to `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-<stamp>/<shard>.log`.
+written to `tests/TestResults/playwright/parallel-<stamp>/<shard>.log`.
 All shards of one run share its stamp in their TRX names (`playwright-<stamp>.<shard>.trx`). Ctrl-C
 stops every shard with its sandbox and browser.
 
@@ -118,7 +118,7 @@ filter, logs the exact `dotnet test` command, writes live output, TRX, and VSTes
 diagnostics under:
 
 ```text
-tests/Alis.Reactive.PlaywrightTests/TestResults/observable/
+tests/<Project>/TestResults/observable/
 ```
 
 Progress markers identify the active test:

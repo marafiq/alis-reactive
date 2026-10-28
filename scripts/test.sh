@@ -16,18 +16,18 @@ Runs the ordered verification gate:
   4. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
   5. dotnet build
   6. non-Playwright dotnet test projects, if any
-  7. scripts/playwright.sh --no-build (or its five CI shards at once with --parallel)
+  7. scripts/playwright.sh --no-build, every Playwright project (or every CI shard at once with --parallel)
 
 Options:
-  --parallel  Run the Playwright leg as the five CI shards (scripts/playwright.sh
-              --list-shards), side by side, each with its own sandbox. About 20
+  --parallel  Run the Playwright leg as every project's CI shards (scripts/playwright.sh
+              --list-shards), side by side, each with its own app. About 20
               minutes instead of about 60.
   --no-e2e    Skip the Playwright browser leg after typecheck, assets, vitest,
               consistency checks, dotnet build, and non-Playwright dotnet tests have passed.
   -h, --help  Show this help.
 
-Playwright starts its own sandbox on a random free port. Do not pre-start the
-sandbox for this command.
+Each Playwright project starts its own app on a random free port. Do not pre-start an
+app for this command.
 
 Set CONFIGURATION=Release to run the .NET build/test legs in Release.
 USAGE
@@ -108,9 +108,9 @@ run_dotnet_tests() {
   done
 }
 
-# CI runs exactly the shards listed in gate.yml's matrix; scripts/playwright.sh defines them. A shard
-# added to the script but not to the matrix would never run in CI and nothing would fail, so the two
-# lists must match.
+# CI runs exactly the shards listed in gate.yml's matrix; each project's playwright.project.sh declares
+# its own. A shard declared there but not in the matrix would never run in CI and nothing would fail,
+# so the two lists must match.
 check_ci_shard_matrix() {
   local script_shards ci_shards
   script_shards="$(scripts/playwright.sh --list-shards | sort)"
@@ -140,14 +140,14 @@ stop_shards() {
   exit 130
 }
 
-# The five CI shards side by side. Each scripts/playwright.sh run starts its own sandbox on a free
+# Every project's CI shards side by side. Each scripts/playwright.sh run starts its own app on a free
 # port. All shards share one run stamp (each adds its shard name to its file names), and every
 # shard's console output lands in one directory.
 run_parallel_playwright() {
   local run_stamp run_dir shard status=0 code
   local shards=()
   run_stamp="$(date +%Y%m%d-%H%M%S)"
-  run_dir="tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-$run_stamp"
+  run_dir="tests/TestResults/playwright/parallel-$run_stamp"
   mkdir -p "$run_dir"
 
   while IFS= read -r shard; do
@@ -161,7 +161,7 @@ run_parallel_playwright() {
       scripts/playwright.sh --no-build --shard "$shard" > "$run_dir/$shard.log" 2>&1 &
     shard_pids+=("$!")
     echo "[test] shard $shard started: tail -f $run_dir/$shard.log"
-    sleep 1   # spreads the five sandbox and browser start-ups
+    sleep 1   # spreads the app and browser start-ups
   done
 
   for i in "${!shards[@]}"; do

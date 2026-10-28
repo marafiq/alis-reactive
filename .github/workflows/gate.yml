@@ -3,10 +3,10 @@ name: gate
 # The one verification gate. Every workflow that asks "is this commit good?" calls this file —
 # ci.yml on pull requests and pushes, nightly.yml on a schedule, nuget-publish.yml on a release
 # tag — so there is exactly one definition of the steps, the tool versions
-# (.github/actions/setup-toolchain), the shard partition (scripts/playwright.sh --shard) and the
-# timeouts. Locally the same gate is `scripts/test.sh` (`--parallel` runs the same five shards). In
-# CI it is split into one deterministic job and five browser shards (about 20 minutes instead of
-# about 80).
+# (.github/actions/setup-toolchain), the shard partition (each Playwright project's
+# playwright.project.sh, run through scripts/playwright.sh --shard) and the timeouts. Locally the same
+# gate is `scripts/test.sh` (`--parallel` runs the same shards). In CI it is split into one
+# deterministic job and one job per browser shard (about 20 minutes instead of about 80).
 # Design rationale, the evidence behind the numbers, and the change checklist: docs/CI.md.
 on:
   workflow_call:
@@ -82,7 +82,7 @@ jobs:
       - name: Install Playwright browsers
         # Deliberately not cached: Playwright's CI guide says restoring a browser cache takes about
         # as long as the download, and the OS dependencies are not cacheable (docs/CI.md).
-        run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+        run: pwsh tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
 
       - name: Run shard ${{ matrix.shard }}
         run: scripts/playwright.sh --no-build --shard "${{ matrix.shard }}" --retry-failed "${{ inputs.retry-failed }}"
@@ -92,7 +92,7 @@ jobs:
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
         with:
           name: Playwright results (${{ matrix.shard }})
-          path: tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
+          path: tests/*/TestResults/observable/*.trx
           reporter: dotnet-trx
           use-actions-summary: true
           list-suites: failed
@@ -107,10 +107,10 @@ jobs:
           name: playwright-${{ matrix.shard }}
           overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
           path: |
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.log
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.diag.log
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/flaky-*.txt
-            tests/Alis.Reactive.PlaywrightTests/bin/TestResults/playwright-traces/*
+            tests/*/TestResults/observable/*.log
+            tests/*/TestResults/observable/*.trx
+            tests/*/TestResults/observable/*.diag.log
+            tests/*/TestResults/observable/flaky-*.txt
+            tests/*/bin/TestResults/playwright-traces/*
           retention-days: 14
           if-no-files-found: warn

@@ -226,7 +226,7 @@ Reference: [`dotnet nuget delete`](https://learn.microsoft.com/en-us/dotnet/core
 - **On `main` (or `release/X.Y`) only.** `verify-tag` requires the tagged commit to be reachable
   from `origin/main` or an `origin/release/*` branch. Merge first, then tag the merged commit.
 - **Merging to `main` never publishes.** CI only gates; publishing requires a `v*` tag.
-- **The browser suite blocks a release.** All five shards must be green; the evidence for making
+- **The browser suite blocks a release.** Every shard must be green; the evidence for making
   it blocking is in `docs/CI.md` ("Gating"). A red shard is re-run with `gh run rerun <run-id> --failed`.
 - **Re-running a tag is safe.** `--skip-duplicate` skips already-published versions and the GitHub
   Release is updated, not duplicated.
