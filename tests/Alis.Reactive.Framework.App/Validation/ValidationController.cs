@@ -12,6 +12,20 @@ public sealed class ValidationController : Controller
 
     public IActionResult Household() => View(new Household());
 
+    public IActionResult Escort() => View(new EscortRequest());
+
+    public IActionResult EscortRefused() => View(new EscortRequest());
+
+    /// <summary>Checks the escort request with the same rules the page carries; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Escort")]
+    public IActionResult SaveEscort([FromBody] EscortRequest request, [FromServices] EscortRules rules)
+    {
+        var result = rules.Validate(request);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     /// <summary>Checks the household with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Household")]
     public IActionResult SaveHousehold([FromBody] Household household, [FromServices] HouseholdRules rules)

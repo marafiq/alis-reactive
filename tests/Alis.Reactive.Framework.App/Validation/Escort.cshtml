@@ -1,0 +1,57 @@
+@using Alis.Reactive.Framework.App.Validation
+@model EscortRequest
+@{
+    ViewData["Title"] = "An escort request";
+    var plan = Html.ReactivePlan<EscortRequest>();
+}
+<h1>An escort request</h1>
+
+<div id="escort-form">
+    @{ Html.InputField(plan, m => m.Guests, o => o.Label("Guests")).Entry(); }
+    @{ Html.InputField(plan, m => m.Overnight, o => o.Label("Overnight")).Entry(); }
+    @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
+    @{ Html.InputField(plan, m => m.Floor, o => o.Label("Floor")).Entry(); }
+    @{ Html.InputField(plan, m => m.Visit.Purpose, o => o.Label("Purpose")).Entry(); }
+    @{ Html.InputField(plan, m => m.ForTwo, o => o.Label("ForTwo")).Entry(); }
+    @{ Html.InputField(plan, m => m.NotForTwo, o => o.Label("NotForTwo")).Entry(); }
+    @{ Html.InputField(plan, m => m.ForMore, o => o.Label("ForMore")).Entry(); }
+    @{ Html.InputField(plan, m => m.ForTwoOrMore, o => o.Label("ForTwoOrMore")).Entry(); }
+    @{ Html.InputField(plan, m => m.ForFewer, o => o.Label("ForFewer")).Entry(); }
+    @{ Html.InputField(plan, m => m.ForTwoOrFewer, o => o.Label("ForTwoOrFewer")).Entry(); }
+    @{ Html.InputField(plan, m => m.TwoBelow, o => o.Label("TwoBelow")).Entry(); }
+    @{ Html.InputField(plan, m => m.TwoAtMost, o => o.Label("TwoAtMost")).Entry(); }
+    @{ Html.InputField(plan, m => m.TwoAbove, o => o.Label("TwoAbove")).Entry(); }
+    @{ Html.InputField(plan, m => m.TwoAtLeast, o => o.Label("TwoAtLeast")).Entry(); }
+    @{ Html.InputField(plan, m => m.OverLimit, o => o.Label("OverLimit")).Entry(); }
+    @{ Html.InputField(plan, m => m.NoWing, o => o.Label("NoWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.AnyWing, o => o.Label("AnyWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.BlankWing, o => o.Label("BlankWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.GivenWing, o => o.Label("GivenWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.AnnexWing, o => o.Label("AnnexWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.EastFirst, o => o.Label("EastFirst")).Entry(); }
+    @{ Html.InputField(plan, m => m.AnnexLast, o => o.Label("AnnexLast")).Entry(); }
+    @{ Html.InputField(plan, m => m.PoleWing, o => o.Label("PoleWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.KnownWing, o => o.Label("KnownWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.OtherWing, o => o.Label("OtherWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.ListedWing, o => o.Label("ListedWing")).Entry(); }
+    @{ Html.InputField(plan, m => m.KnownFloor, o => o.Label("KnownFloor")).Entry(); }
+    @{ Html.InputField(plan, m => m.HighFloor, o => o.Label("HighFloor")).Entry(); }
+    @{ Html.InputField(plan, m => m.ByNight, o => o.Label("ByNight")).Entry(); }
+    @{ Html.InputField(plan, m => m.ByDay, o => o.Label("ByDay")).Entry(); }
+    @{ Html.InputField(plan, m => m.NotMany, o => o.Label("NotMany")).Entry(); }
+    @{ Html.InputField(plan, m => m.TourPurpose, o => o.Label("TourPurpose")).Entry(); }
+    @{ Html.InputField(plan, m => m.ManyByNight, o => o.Label("ManyByNight")).Entry(); }
+    @{ Html.InputField(plan, m => m.ManyOrByNight, o => o.Label("ManyOrByNight")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Escort")
+        .Gather(g => g.Form())
+        .Validate<EscortRules>("escort-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("escort-form")))))
+
+@Html.RenderPlan(plan)

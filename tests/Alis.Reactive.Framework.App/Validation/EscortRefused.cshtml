@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Validation
+@model EscortRequest
+@{
+    ViewData["Title"] = "An escort request the page cannot check";
+    var plan = Html.ReactivePlan<EscortRequest>();
+}
+<h1>An escort request the page cannot check</h1>
+
+<div id="escort-form">
+    @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
+</div>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Escort")
+        .Gather(g => g.Form())
+        .Validate<UnreadableEscortRules>("escort-form")))
+
+@Html.RenderPlan(plan)
