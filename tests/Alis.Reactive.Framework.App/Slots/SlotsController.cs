@@ -14,8 +14,16 @@ public sealed class SlotsController : Controller
         return PartialView("Card", new KinCard());
     }
 
-    /// <summary>Binds the desk as any endpoint does, and says whom it bound as next of kin.</summary>
+    /// <summary>
+    /// Binds the desk as any endpoint does and checks it by the desk's rules, so a message names the member
+    /// as the desk binds it (NextOfKin.Name); then says whom it bound as next of kin.
+    /// </summary>
     [HttpPost]
-    public IActionResult Kin([FromBody] DeskPage desk) =>
-        Json(new KinEcho { Summary = $"next of kin {desk.NextOfKin.Name ?? "none"}" });
+    public IActionResult Kin([FromBody] DeskPage desk, [FromServices] DeskRules rules)
+    {
+        var result = rules.Validate(desk);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new KinEcho { Summary = $"next of kin {desk.NextOfKin.Name ?? "none"}" });
+    }
 }

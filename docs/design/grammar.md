@@ -49,8 +49,9 @@ That is the whole document. The grammar names no feature.
     input binds a list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value,
     tests: [{ rule, check: fn(v), when, message }] }] }`: one per member a rule is written on, whether
-    or not the browser can check it, so `tests` is empty when every check is the server's. `rule`
-    names the declaration a test came from, for traces only. An input
+    or not the browser can check it, so `tests` is empty when every check is the server's. `name` is
+    the input's binding name, under the view's field prefix, as the server reports it. `rule` names the
+    declaration a test came from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
     know which form will contain it.
 - **No owner field.** The owner of a plan is whoever discovered it: the page at boot, or a slot when

@@ -150,10 +150,11 @@ namespace Alis.Reactive.Validation
             return ValueExpression.ReadBound(input.Id, input.Shape);
         }
 
+        // The field is named as its input binds, under the view's prefix: the name the server reports it by.
         internal CheckedField Check(BrowserField field)
         {
             var input = Resolve(field.Reference);
-            return new CheckedField(input.Id, field.FieldName, input.Shape, field.Rules, this);
+            return new CheckedField(input.Id, HtmlFieldPrefix.Join(_fieldPrefix, field.FieldName), input.Shape, field.Rules, this);
         }
     }
 
