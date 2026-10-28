@@ -3,7 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 /// <summary>
 /// One retry offer for every connection the server closed for good, a hub and a stream on one page: one click
 /// retries each of them, and the offer stays while any of them is still closed. The server numbers the calls
-/// it takes on each.
+/// it takes on each. The board is closed first, so the offer it shows proves the board closed before the line
+/// is hung up.
 /// </summary>
 [TestFixture]
 public sealed class WhenSeveralConnectionsDrop : AppPageTest
@@ -20,10 +21,10 @@ public sealed class WhenSeveralConnectionsDrop : AppPageTest
         await Open("/Realtime/Line");
         await Expect(Line("line-call")).ToHaveTextAsync("1");
         await Expect(Line("board-call")).ToHaveTextAsync("1");
-        await Button("Hang up the line").ClickAsync();
-        await Expect(Line("line-closed")).ToHaveTextAsync("closed");
         await Button("Close the board for good").ClickAsync();
         await Expect(RetryOffer).ToBeVisibleAsync();
+        await Button("Hang up the line").ClickAsync();
+        await Expect(Line("line-closed")).ToHaveTextAsync("closed");
         await Button("Answer the line again").ClickAsync();
         await Expect(Line("line-answered")).ToHaveTextAsync("answered");
         await Button("Take the board back").ClickAsync();
@@ -41,10 +42,10 @@ public sealed class WhenSeveralConnectionsDrop : AppPageTest
         await Open("/Realtime/Line");
         await Expect(Line("line-call")).ToHaveTextAsync("1");
         await Expect(Line("board-call")).ToHaveTextAsync("1");
-        await Button("Hang up the line").ClickAsync();
-        await Expect(Line("line-closed")).ToHaveTextAsync("closed");
         await Button("Close the board for good").ClickAsync();
         await Expect(RetryOffer).ToBeVisibleAsync();
+        await Button("Hang up the line").ClickAsync();
+        await Expect(Line("line-closed")).ToHaveTextAsync("closed");
         await Button("Take the board back").ClickAsync();
         await Expect(Line("board-taken-back")).ToHaveTextAsync("taken back");
 
