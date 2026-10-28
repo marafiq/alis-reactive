@@ -160,10 +160,12 @@ check_no_build_is_fresh() {
     exit 3
   fi
 
+  # build/ holds the targets that decide what each package serves, so a change there is a change to the core.
   local sources=(
     Alis.Reactive
     Alis.Reactive.Analyzers
     Alis.Reactive.FluentValidator
+    build
     tests/Alis.Reactive.Playwright.TestHost
     "$project_dir"
   )

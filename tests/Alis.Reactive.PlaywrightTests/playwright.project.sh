@@ -51,6 +51,13 @@ playwright_check_assets() {
     Alis.Reactive.Assets/package.json
 
   check_asset_output_is_fresh \
+    "design-system Fusion CSS" \
+    "Alis.Reactive.Assets/dist/css/design-system-fusion.dev.css" \
+    Alis.Reactive.Assets/design-system \
+    Alis.Reactive.Assets/vite.design-system.config.ts \
+    Alis.Reactive.Assets/package.json
+
+  check_asset_output_is_fresh \
     "Syncfusion CSS" \
     "Alis.Reactive.Assets/dist/css/syncfusion.dev.css" \
     Alis.Reactive.Assets/fusion \
