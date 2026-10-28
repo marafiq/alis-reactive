@@ -236,11 +236,11 @@ namespace Alis.Reactive.PlanModel
 
         internal string Confirm() => PluginObject(ConfirmId, "alis.confirm", "", PluginData.None);
 
-        internal string Model(PluginData data) => PluginObject(ModelId, "alis.model", _planId, data);
+        internal string Model(ModelPluginData data) => PluginObject(ModelId, "alis.model", _planId, data);
 
         internal string Model() => PluginObject(ModelId, "alis.model", _planId, PluginData.None);
 
-        internal string Form(string containerId, PluginData data) => PluginObject("$form:" + containerId, "alis.form", containerId, data);
+        internal string Form(string containerId, FormPluginData data) => PluginObject("$form:" + containerId, "alis.form", containerId, data);
 
         internal string Form(string containerId) => PluginObject("$form:" + containerId, "alis.form", containerId, PluginData.None);
 

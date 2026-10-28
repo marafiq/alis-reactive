@@ -15,7 +15,7 @@
 //    logged and shows nothing.
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the summary.
 
-import type { FormField, FormTest } from "../../types/index";
+import type { FormField, FormPluginData, FormTest } from "../../types/index";
 import type { Contribution, Plugin } from "../../objects/plugins";
 import type { Owner } from "../../objects/owner";
 import type { PlanObjects } from "../../objects/plan-objects";
@@ -271,8 +271,9 @@ export const formPlugin: Plugin = {
     validate: () => validate(containerId),
     showErrors: problem => showErrors(containerId, problem),
   }),
-  contribute({ key, data, owner, objects }: Contribution) {
-    if (data.kind !== "form") return;
+  // The plan gives alis.form no data but a form's: its fields and its summary.
+  contribute({ key, data: contributed, owner, objects }: Contribution) {
+    const data = contributed as FormPluginData;
     const entries = entriesOf(key);
     if (!summaries.has(key)) summaries.set(key, data.summary);
     const added = data.fields.map(field => ({ field, objects, owner }));
