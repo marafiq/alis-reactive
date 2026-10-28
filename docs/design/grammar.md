@@ -101,7 +101,7 @@ A member read followed by a data read is two nested `get` nodes.
   member fails loudly instead of reading `undefined`. The items a `[]` reads are checked the same
   way, so an upload whose files lost `rawFile` fails at the item instead of posting nothing.
 - **Every other path is optional.** This covers paths off a handler's payload, a response, a record,
-  a plugin's data (`document.query`, `model.values`) or a returned object. A missing link reads as
+  a plugin's data (`document.query`) or a returned object. A missing link reads as
   missing, and a call on a missing target returns missing. This is JavaScript's `?.`.
 - **Writes.**
   - A `set` rooted at `obj(id)` needs every segment, the final member included, so a write to a
@@ -187,7 +187,7 @@ the exception: a `DateTimeOffset` names a moment, so it is sent as that moment i
 exactly whatever the zone of the browser or the server.
 
 **Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
-- **Where:** the `alis.model` values a request body carries (`values`, `fill`, `fields`, so
+- **Where:** the `alis.model` values a request body carries (`fill`, `fields`, so
   `Form()` sends them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`), and every
   input a validation rule reads: its field, a peer, and each
   member its condition reads, through `model.boundValueOf(id)`.
@@ -516,10 +516,11 @@ no key (H2) and no entry (H4).
 
 ### 6.3 `model` (`plugin("alis.model", planId)`)
 
-- **M1 `values`.** Every mounted input of the composed plan, read through each input's `value`
-  expression as a binding read (2.1), and nested by binding name. An unmounted input is skipped.
-- **M2 `fields`.** The same inputs, flat, keyed by MVC binding name.
-- **M3 `fill(record)`.** Writes the inputs of M1 into `record` at their body paths and returns it.
+- **M1 Values.** Every mounted input of the composed plan, read through each input's `value`
+  expression as a binding read (2.1). An unmounted input is skipped. A request carries them through
+  M2 or M3.
+- **M2 `fields`.** The values of M1, flat, keyed by MVC binding name.
+- **M3 `fill(record)`.** Writes the values of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
 - **M5 `boundValueOf(id)`.** One input's value as a binding read (2.1), for a validation rule or a
   gathered `Form(m => ..)` field, wherever in the composition it was rendered; missing when no plan
