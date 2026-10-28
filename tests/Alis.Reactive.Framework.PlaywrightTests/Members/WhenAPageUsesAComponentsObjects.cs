@@ -43,6 +43,26 @@ public sealed class WhenAPageUsesAComponentsObjects : AppPageTest
     }
 
     [Test]
+    public async Task an_object_a_method_of_two_arguments_returns_is_the_one_its_members_act_on()
+    {
+        await Open("/Members/Objects");
+
+        await Button("Mark the last row").ClickAsync();
+
+        await Expect(Rows).ToHaveTextAsync(["Ada", "Ben", "Cyd (marked)"]);
+    }
+
+    [Test]
+    public async Task an_object_declared_for_an_interface_the_declaration_implements_is_the_object_it_names()
+    {
+        await Open("/Members/Headed");
+
+        await Button("Set the caption through the board").ClickAsync();
+
+        await Expect(Slate.GetByText("Board round")).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task a_list_of_objects_gives_an_item_by_position_and_a_field_of_every_item()
     {
         await Open("/Members/Objects");

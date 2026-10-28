@@ -204,9 +204,24 @@ export class Slate {
     return row;
   }
 
+  /** The row at a position counted from the first row, or from the last. */
+  rowFrom(index: number, fromLast: boolean): Row {
+    return this.rowAt(fromLast === true ? this.rows.length - 1 - index : index);
+  }
+
   /** The rows marked so far. */
   markedRows(): Row[] {
     return this.rows.filter(row => row.marked);
+  }
+
+  /** The labels of a run of rows, from a position, joined by commas. */
+  labelsFrom(start: number, count: number): string {
+    return this.labels.slice(start, start + count).join(", ");
+  }
+
+  /** The labels of a run of rows, from a position, joined by the separator given. */
+  labelsJoined(start: number, count: number, separator: string): string {
+    return this.labels.slice(start, start + count).join(separator);
   }
 
   /** Shows the labels as the summary line. */
@@ -311,6 +326,11 @@ export class Slate {
     await aMoment();
     this.saveStatus = "saved";
     this.show();
+  }
+
+  async saveRows(): Promise<number> {
+    await this.save();
+    return this.rows.length;
   }
 
   async lookup(label: string): Promise<string> {

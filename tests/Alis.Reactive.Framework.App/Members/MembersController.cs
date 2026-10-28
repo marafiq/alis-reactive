@@ -14,4 +14,8 @@ public sealed class MembersController : Controller
     public IActionResult Data() => View(new DataPage());
 
     public IActionResult Kinds() => View(new KindsPage());
+
+    public IActionResult Headed() => View(new HeadedPage());
+
+    public IActionResult Refused(MemberMistake mistake) => View("Refused", new MemberRefusalsPage { Mistake = mistake });
 }
