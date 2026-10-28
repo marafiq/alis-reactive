@@ -7,8 +7,10 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// The comparisons that apply only to some types: ordering to comparable values (numbers, dates and
-    /// times, and their nullable forms), text operators to text, and <c>ArrayContains</c> to collections.
-    /// The compiler offers each only where it means something.
+    /// times of day, and their nullable forms), text operators to text, and <c>ArrayContains</c> to collections.
+    /// The compiler offers each only where it means something. A <see cref="TimeSpan"/> orders in C# but reaches
+    /// the browser as its text, which does not order as its length does, so ordering one is refused where the page
+    /// renders.
     /// </summary>
     public static class ConditionOperators
     {

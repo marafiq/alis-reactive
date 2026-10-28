@@ -49,3 +49,9 @@ public sealed class ShiftQuery
 {
     public TimeOnly? Starts { get; set; }
 }
+
+/// <summary>The query a stay is opened with: how long it lasts.</summary>
+public sealed class StayQuery
+{
+    public TimeSpan? Length { get; set; }
+}
