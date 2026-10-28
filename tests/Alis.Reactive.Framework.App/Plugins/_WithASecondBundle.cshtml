@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] · Alis.Reactive framework</title>
+</head>
+<body>
+    @RenderBody()
+    @* The app's components, then a second bundle of the app (Plugins/Bundles), then the runtime. *@
+    <script src="/js/framework-components.js"></script>
+    <script src="/js/@(ViewData["SecondBundle"]).js"></script>
+    <script src="/scripts/alis-reactive.dev.js"></script>
+</body>
+</html>

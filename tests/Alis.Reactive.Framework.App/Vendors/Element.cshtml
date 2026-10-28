@@ -11,9 +11,11 @@
     {
         p.Element("changed-to").Text.Set(change.Level);
         p.Element("changed-from").Text.Set(change.Previous);
-    }))
+    })
+    .Reactive(meter => meter.Change, (meter, p) => p.Element("change-read").Text.Set(meter.Level)))
 
 <p>Changed to <span id="changed-to"></span> from <span id="changed-from"></span></p>
+<p>The meter read off its change: level <span id="change-read"></span></p>
 <p>Level read: <span id="level"></span> of <span id="max"></span></p>
 
 @(plan.Button("set-level", "Set the level to 7")

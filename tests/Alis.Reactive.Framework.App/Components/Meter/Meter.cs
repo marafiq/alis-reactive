@@ -24,6 +24,12 @@ public sealed class Meter : Component
 
     /// <summary>Raised when the meter's own buttons change its level.</summary>
     public Event<MeterLevelChanged> LevelChanged => Event<MeterLevelChanged>();
+
+    /// <summary>
+    /// Raised after <see cref="LevelChanged"/> as a plain DOM event with no detail, as an input raises
+    /// <c>change</c>: a listener receives the meter itself.
+    /// </summary>
+    public Event<MeterAsChanged> Change => Event<MeterAsChanged>();
 }
 
 public sealed class MeterLevelChanged : JsObject
@@ -31,6 +37,12 @@ public sealed class MeterLevelChanged : JsObject
     public ReadOnly<int> Level => ReadOnly<int>();
 
     public ReadOnly<int> Previous => ReadOnly<int>();
+}
+
+/// <summary>The meter as it stands after a change: the payload of an event with no detail is the element that raised it.</summary>
+public sealed class MeterAsChanged : JsObject
+{
+    public ReadOnly<int> Level => ReadOnly<int>();
 }
 
 public static class MeterHtml

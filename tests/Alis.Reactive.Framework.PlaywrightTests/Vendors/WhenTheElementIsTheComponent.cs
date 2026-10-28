@@ -2,7 +2,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Vendors;
 
 /// <summary>
 /// A component whose element is its object and whose events are DOM events (V3): its properties are the
-/// element's, and a listener's payload is the event's detail.
+/// element's, and a listener's payload is the event's detail, or the element that raised an event with none.
 /// </summary>
 [TestFixture]
 public sealed class WhenTheElementIsTheComponent : AppPageTest
@@ -35,5 +35,15 @@ public sealed class WhenTheElementIsTheComponent : AppPageTest
 
         await Expect(Page.Locator("#changed-to")).ToHaveTextAsync("4");
         await Expect(Page.Locator("#changed-from")).ToHaveTextAsync("3");
+    }
+
+    [Test]
+    public async Task a_dom_event_with_no_detail_hands_the_pipeline_the_element_that_raised_it()
+    {
+        await Open("/Vendors/Element");
+
+        await Meter.GetByRole(AriaRole.Button, new() { Name = "Lower" }).ClickAsync();
+
+        await Expect(Page.Locator("#change-read")).ToHaveTextAsync("2");
     }
 }
