@@ -59,10 +59,10 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | M4 | A method's result read where any value is read: a condition, a set, a gather, a route value | `Slate.Has(text)`, `Slate.Total()` | the branch taken; the total as it stands; the total in the request (with the Requests slice) |
 | M5 | An async method awaited, and an async result | `Slate.Save()`, `Slate.Lookup(key)` | "saved" after the slate finishes; the looked-up value |
 | M6 | A method that throws or rejects stops the rest of its pipeline, and the page goes on | `Slate.Fail()`, `Slate.FailLater()` | the step before it ran, the steps after it did not, and the next gesture works |
-| E1 | An event without a payload runs its pipeline | `Slate.Cleared` | the page reacts to the slate being cleared |
-| E2 | A payload's members read | `Slate.Changed` (`Event<TArgs>`): `Previous`, `Current` | the old and new values in the page |
-| E3 | A payload's member written before the component reads it back: a cancel | `Slate.Changing`: `Cancel`, `Reason` | the slate keeps its value and shows the reason |
-| E4 | A payload's method called | `Slate.Changing`: `Clamp()` | the clamped value on the slate |
+| E1 | An event without a payload runs its pipeline | `Slate.Cleared`, raised when a method cleared it | the page reacts to the slate being cleared |
+| E2 | A payload's members read | `Slate.RowAdded` (`Event<TArgs>`), raised by the slate's own Add row: `Label`, `Count` | the new row's label and the new count in the page |
+| E3 | A payload's member written before the component reads it back: a cancel | `Slate.Changing`, raised by the slate's own retitle: `Cancel`, `Reason` | the slate keeps its title and shows the reason |
+| E4 | A payload's method called before the component reads the payload | `Slate.Changing`: `Clamp()` | the slate takes the clamped title |
 | E5 | An event of a nested object | `Slate.Header.Renamed` | the page reacts to the header being renamed |
 | E6 | A handler stops listening when its owner is released | a `Slate` in a slot, unloaded | a gesture after the unload changes nothing |
 | V1 | Listening through a method pair | `Slate` | (every Slate event row) |

@@ -3,12 +3,36 @@
 
 type Listener = (payload: unknown) => void;
 
+/** Listeners by event name, as the slate and its header both keep them. */
+class Listeners {
+  private readonly named = new Map<string, Set<Listener>>();
+
+  add(name: string, listener: Listener): void {
+    const listeners = this.named.get(name) ?? new Set<Listener>();
+    listeners.add(listener);
+    this.named.set(name, listeners);
+  }
+
+  remove(name: string, listener: Listener): void {
+    this.named.get(name)?.delete(listener);
+  }
+
+  emit(name: string, payload?: unknown): void {
+    for (const listener of [...(this.named.get(name) ?? [])]) listener(payload);
+  }
+
+  clear(): void {
+    this.named.clear();
+  }
+}
+
 interface SlateHost extends HTMLElement {
   slate?: Slate;
 }
 
 /** The header above the title: an object the slate holds. */
 export class Header {
+  readonly listeners = new Listeners();
   private captionText = "";
 
   constructor(private readonly changed: () => void) {}
@@ -24,7 +48,25 @@ export class Header {
 
   rename(caption: string): void {
     this.caption = caption;
+    this.listeners.emit("renamed", { caption });
   }
+
+  on(name: string, listener: Listener): void {
+    this.listeners.add(name, listener);
+  }
+
+  off(name: string, listener: Listener): void {
+    this.listeners.remove(name, listener);
+  }
+}
+
+/** What a changing listener receives; the slate reads cancel, reason and requested back once the listeners ran. */
+export interface Changing {
+  requested: string;
+  readonly current: string;
+  cancel: boolean;
+  reason: string;
+  clamp(): void;
 }
 
 /** One row of the slate. */
@@ -62,13 +104,15 @@ function aMoment(): Promise<void> {
 export class Slate {
   readonly header: Header;
   readonly rows: Row[];
-  private readonly listeners = new Map<string, Set<Listener>>();
+  private readonly listeners = new Listeners();
   private readonly captionLine: HTMLParagraphElement;
   private readonly heading: HTMLHeadingElement;
   private readonly noteLine: HTMLParagraphElement;
   private readonly summaryLine: HTMLParagraphElement;
   private readonly list: HTMLUListElement;
   private readonly addButton: HTMLButtonElement;
+  private readonly retitleButtons: HTMLButtonElement[];
+  private readonly reasonLine: HTMLParagraphElement;
   private readonly placedLine: HTMLParagraphElement;
   private titleText: string;
   private noteText = "";
@@ -95,7 +139,17 @@ export class Slate {
     this.addButton.type = "button";
     this.addButton.textContent = "Add row";
     this.addButton.addEventListener("click", this.addRow);
-    host.replaceChildren(this.captionLine, this.heading, this.noteLine, this.summaryLine, this.placedLine, this.list, this.addButton);
+    this.reasonLine = document.createElement("p");
+    this.retitleButtons = ["Night round", "Afternoon extended round"].map(title => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = `Retitle as ${title}`;
+      button.addEventListener("click", () => this.retitle(title));
+      return button;
+    });
+    host.replaceChildren(
+      this.captionLine, this.heading, this.reasonLine, this.noteLine, this.summaryLine, this.placedLine,
+      this.list, this.addButton, ...this.retitleButtons);
     host.slate = this;
     this.show();
   }
@@ -142,6 +196,7 @@ export class Slate {
   clear(): void {
     this.rows.splice(0, this.rows.length);
     this.show();
+    this.listeners.emit("cleared");
   }
 
   /** A placed line of four values; the number joins the total. Each must arrive as its own type. */
@@ -193,25 +248,47 @@ export class Slate {
   }
 
   on(name: string, listener: Listener): void {
-    const named = this.listeners.get(name) ?? new Set<Listener>();
-    named.add(listener);
-    this.listeners.set(name, named);
+    this.listeners.add(name, listener);
   }
 
   off(name: string, listener: Listener): void {
-    this.listeners.get(name)?.delete(listener);
+    this.listeners.remove(name, listener);
   }
 
   destroy(): void {
     this.addButton.removeEventListener("click", this.addRow);
     this.listeners.clear();
+    this.header.listeners.clear();
     delete this.host.slate;
   }
 
   private readonly addRow = (): void => {
-    this.rows.push(new Row(`Row ${this.rows.length + 1}`, () => this.show()));
+    const label = `Row ${this.rows.length + 1}`;
+    this.rows.push(new Row(label, () => this.show()));
     this.show();
+    this.listeners.emit("rowAdded", { label, count: this.rows.length });
   };
+
+  // Asks its listeners before it takes a new title: a listener may cancel with a reason, or clamp
+  // the requested title; the slate reads the payload once they have all run.
+  private retitle(requested: string): void {
+    const change: Changing = {
+      requested,
+      current: this.titleText,
+      cancel: false,
+      reason: "",
+      clamp() {
+        this.requested = this.requested.split(" ")[0] ?? this.requested;
+      },
+    };
+    this.listeners.emit("changing", change);
+    if (change.cancel) {
+      this.reasonLine.textContent = change.reason;
+      return;
+    }
+    this.reasonLine.textContent = "";
+    this.title = change.requested;
+  }
 
   private show(): void {
     this.captionLine.textContent = this.header.caption;

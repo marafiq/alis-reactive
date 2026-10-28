@@ -69,6 +69,39 @@ public sealed class Slate : Component
 
     /// <summary>Refuses a moment later, by rejecting.</summary>
     public void FailLater() => MethodAsync();
+
+    /// <summary>Raised when the slate has been cleared.</summary>
+    public Event Cleared => Event();
+
+    /// <summary>Raised when the slate's own Add row button has added a row.</summary>
+    public Event<SlateRowAdded> RowAdded => Event<SlateRowAdded>();
+
+    /// <summary>Raised before the title changes, when the slate's own retitle buttons ask for it; the slate reads the payload back.</summary>
+    public Event<SlateChanging> Changing => Event<SlateChanging>();
+}
+
+public sealed class SlateRowAdded : JsObject
+{
+    public ReadOnly<string> Label => ReadOnly<string>();
+
+    public ReadOnly<int> Count => ReadOnly<int>();
+}
+
+/// <summary>A title change the slate has been asked for, before it takes it.</summary>
+public sealed class SlateChanging : JsObject
+{
+    public ReadOnly<string> Requested => ReadOnly<string>();
+
+    public ReadOnly<string> Current => ReadOnly<string>();
+
+    /// <summary>Written by a listener: the slate keeps its title.</summary>
+    public Property<bool> Cancel => Property<bool>();
+
+    /// <summary>Written by a listener: why, shown by the slate when it keeps its title.</summary>
+    public Property<string> Reason => Property<string>();
+
+    /// <summary>Shortens the requested title to its first word.</summary>
+    public void Clamp() => Method();
 }
 
 /// <summary>A card the slate shows: whose it is and the day it is due.</summary>
@@ -84,6 +117,14 @@ public sealed class SlateHeader : JsObject
     public Property<string> Caption => Property<string>();
 
     public void Rename(Arg<string> caption) => Method(caption);
+
+    /// <summary>Raised by the header when it is renamed, with its new caption.</summary>
+    public Event<SlateHeaderRenamed> Renamed => Event<SlateHeaderRenamed>();
+}
+
+public sealed class SlateHeaderRenamed : JsObject
+{
+    public ReadOnly<string> Caption => ReadOnly<string>();
 }
 
 public sealed class SlateRow : JsObject
