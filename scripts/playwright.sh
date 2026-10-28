@@ -222,9 +222,9 @@ Usage:
   scripts/playwright.sh --project sandbox --filter "FullyQualifiedName~Components.Fusion.Grid"
   scripts/playwright.sh --filter "Name=test_one|Name=test_two"
   scripts/playwright.sh Components.Fusion.Grid
-  scripts/playwright.sh --shard fusion-n-z --no-build
-  scripts/playwright.sh --shard fusion-n-z --print-filter
-  scripts/playwright.sh --shard fusion-n-z --list --no-build
+  scripts/playwright.sh --shard fusion-s-z --no-build
+  scripts/playwright.sh --shard fusion-s-z --print-filter
+  scripts/playwright.sh --shard fusion-s-z --list --no-build
 
 Projects (tests/*/playwright.project.sh): $(list_projects | tr '\n' ' ')
 Shards: $(list_shards | tr '\n' ' ')
