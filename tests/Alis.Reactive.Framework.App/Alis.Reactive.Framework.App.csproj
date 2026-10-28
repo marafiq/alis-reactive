@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <!-- The app the framework is proven on: the core and the validator package only, so no component
+         library can compile into a framework page. Its components are brought the way any app brings
+         one (docs/design/framework-test-components.md). Its TypeScript is built by npm (build:all);
+         the app refuses to start without the bundle, and scripts/playwright.sh refuses a stale one. -->
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj" />
+        <ProjectReference Include="..\..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj" />
+    </ItemGroup>
+
+</Project>

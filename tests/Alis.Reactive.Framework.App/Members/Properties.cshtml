@@ -1,0 +1,23 @@
+@using Alis.Reactive.Framework.App.Members
+@model PropertiesPage
+@{
+    ViewData["Title"] = "Properties";
+    var plan = Html.ReactivePlan<PropertiesPage>();
+}
+<h1>Properties</h1>
+
+@plan.Slate("slate", title: "Day round", "Ada", "Ben")
+
+<p>Rows counted: <span id="row-count"></span></p>
+<p>Title read: <span id="title-read"></span></p>
+
+@(plan.Button("count-rows", "Count rows")
+    .Reactive(button => button.Click, p => p.Element("row-count").Text.Set(p.Component<Slate>("slate").Count)))
+@(plan.Button("leave-note", "Leave a note")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Note.Set("Back at three")))
+@(plan.Button("rename", "Rename")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Title.Set("Night round")))
+@(plan.Button("read-title", "Read title")
+    .Reactive(button => button.Click, p => p.Element("title-read").Text.Set(p.Component<Slate>("slate").Title)))
+
+@Html.RenderPlan(plan)

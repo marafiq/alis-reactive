@@ -1,7 +1,8 @@
 # Framework test components
 
 The framework is proven through the components it was built to drive, and only through its public
-extension point. Five small components, written in TypeScript with no library, are brought into a
+extension point. Five small components, written in TypeScript with no library, and a plain button are
+brought into a
 test app the way any app brings one (`docs/design/bring-your-own-component.md`): a declaration class
 of members by their JavaScript names, a render helper, and code that constructs on `alis:mount`.
 Their only purpose is to carry every capability a JavaScript object can offer the framework, so a
@@ -10,7 +11,8 @@ are consumers with test projects of their own; none of them appears on a framewo
 
 Where they live: `tests/Alis.Reactive.Framework.App/Components/<Name>/` (declaration, render helper
 and TypeScript together). Their tests: `tests/Alis.Reactive.Framework.PlaywrightTests`, one vertical
-slice per framework area, mirroring the app's slice folders. The rules every test follows:
+slice per framework area, mirroring the app's slice folders. A component grows the members a slice needs
+when that slice lands, so no member exists without the test that proves it. The rules every test follows:
 `.claude/memory/framework-test-principles.md`.
 
 ## What the components must be
@@ -34,6 +36,7 @@ slice per framework area, mirroring the app's slice folders. The rules every tes
 | `Meter` | the element itself, `addEventListener`, the DOM event as the payload (`CustomEvent.detail`) | A custom element `<fw-meter>` with a level and a maximum. |
 | `Entry` | as `Slate`, declared an input (`IInputComponent`) | A text entry whose value a form gathers and validates, committed when the user leaves it. |
 | `Tally` | a plugin registered by name on `window.__alisPlugins`, no element | A page-wide counter with a total, an add method and an event when it passes a mark. |
+| `Button` | the element itself, through the core's native vendor (`ComponentVendor.Native`), a click as its event | A plain `<button>`: the gesture that starts most framework pipelines. It needs no TypeScript. |
 
 ## The capabilities
 

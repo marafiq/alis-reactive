@@ -1,0 +1,15 @@
+{
+  "name": "alis-reactive-framework-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The framework test app's components, bundled the way an app bundles its own. Not shipped.",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "watch": "node esbuild.config.mjs --watch",
+    "typecheck": "tsc --project tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

@@ -4,23 +4,26 @@
   "type": "module",
   "workspaces": [
     "Alis.Reactive.Assets",
-    "Alis.Reactive.SandboxApp"
+    "Alis.Reactive.SandboxApp",
+    "tests/Alis.Reactive.Framework.App"
   ],
   "scripts": {
-    "build:all": "npm run build -w Alis.Reactive.Assets && npm run build -w Alis.Reactive.SandboxApp",
+    "build:all": "npm run build -w Alis.Reactive.Assets && npm run build -w Alis.Reactive.SandboxApp && npm run build -w tests/Alis.Reactive.Framework.App",
     "generate:plan-types": "npm run generate:plan-types -w Alis.Reactive.Assets",
     "build:runtime": "npm run build:runtime -w Alis.Reactive.Assets",
     "build:design-system": "npm run build:design-system -w Alis.Reactive.Assets",
     "build:fusion": "npm run build:fusion -w Alis.Reactive.Assets",
     "build:sandbox": "npm run build -w Alis.Reactive.SandboxApp",
+    "build:framework-app": "npm run build -w tests/Alis.Reactive.Framework.App",
+    "watch:framework-app": "npm run watch -w tests/Alis.Reactive.Framework.App",
     "watch:runtime": "npm run watch:runtime -w Alis.Reactive.Assets",
     "watch:design-system": "npm run watch:design-system -w Alis.Reactive.Assets",
     "watch:fusion": "npm run watch:fusion -w Alis.Reactive.Assets",
     "watch:sandbox-plugins": "npm run watch:plugins -w Alis.Reactive.SandboxApp",
     "watch:sandbox-css": "npm run watch:css -w Alis.Reactive.SandboxApp",
-    "typecheck": "npm run typecheck -w Alis.Reactive.Assets && npm run typecheck -w Alis.Reactive.SandboxApp",
-    "lint": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/",
-    "lint:fix": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ --fix",
+    "typecheck": "npm run typecheck -w Alis.Reactive.Assets && npm run typecheck -w Alis.Reactive.SandboxApp && npm run typecheck -w tests/Alis.Reactive.Framework.App",
+    "lint": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ tests/Alis.Reactive.Framework.App/Components/",
+    "lint:fix": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ tests/Alis.Reactive.Framework.App/Components/ --fix",
     "test": "npm run test -w Alis.Reactive.Assets && npm run test -w Alis.Reactive.SandboxApp",
     "test:watch": "npm run test:watch -w Alis.Reactive.Assets"
   },

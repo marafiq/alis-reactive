@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../Alis.Reactive.Playwright.TestHost/Alis.Reactive.Playwright.TestHost.csproj" />
+        <ProjectReference Include="../Alis.Reactive.Framework.App/Alis.Reactive.Framework.App.csproj" />
+    </ItemGroup>
+
+</Project>
