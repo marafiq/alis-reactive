@@ -28,7 +28,7 @@ public class WhenAnArrayOperationCannotRunInTheBrowser
             plan.Triggers().DomReady(p => p.Get("/residents").Response(r =>
                 r.OnSuccess<List<Admission>>((rows, s) => s.From(rows).Where(x => x.Name!.Contains(x.NextOfKin.Name!))))));
 
-        Assert.That(refused!.Message, Does.Contain("must be constants or captured values"));
+        Assert.That(refused!.Message, Does.Contain("must be a constant or a captured value"));
     }
 
     [Test]
@@ -53,6 +53,6 @@ public class WhenAnArrayOperationCannotRunInTheBrowser
             plan.Triggers().DomReady(p => p.Get("/residents").Response(r =>
                 r.OnSuccess<List<Admission>>((rows, s) => s.From(rows).Select(x => new { x.Name })))));
 
-        Assert.That(refused!.Message, Does.Contain("Element selector must be a member access"));
+        Assert.That(refused!.Message, Does.Contain("a computed object and arithmetic have no form the plan writes"));
     }
 }

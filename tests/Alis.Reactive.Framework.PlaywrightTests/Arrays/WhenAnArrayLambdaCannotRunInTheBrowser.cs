@@ -4,7 +4,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 /// A lambda the array operations cannot run in the browser is refused where the page renders, with a message
 /// that names the mistake, instead of a plan that would compute something else: a record as an order's key, a
 /// method with no pure JavaScript form, a computed projection, a text test against the item or against a
-/// character, a comparison that never reads the item, and a cast to a flag.
+/// character, a comparison that never reads the item, a cast to a flag, a member of a value the member table of
+/// grammar.md 2.3 does not name, a day of the week read as a value, a cast that drops a fraction, and a cast to a
+/// narrower number.
 /// </summary>
 [TestFixture]
 public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
@@ -28,7 +30,7 @@ public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
     {
         await Render("CallAMethodWithNoJavaScriptForm");
 
-        await Expect(Message("'String.Substring' has no pure JavaScript form the plan can call on an item; the lambda may call ChildElement.GetAttribute, String.Trim, String.TrimStart, String.TrimEnd, String.ToUpper, String.ToUpperInvariant, String.ToLower, String.ToLowerInvariant.")).ToBeVisibleAsync();
+        await Expect(Message("'String.Substring' has no pure JavaScript form the plan can call on an item; the lambda may call ChildElement.GetAttribute, ChildElement.HasAttribute, String.Trim, String.TrimStart, String.TrimEnd, String.ToUpper, String.ToUpperInvariant, String.ToLower, String.ToLowerInvariant, and test with String.Contains, String.StartsWith, String.EndsWith, String.IsNullOrEmpty, Enumerable.Contains and Regex.IsMatch.")).ToBeVisibleAsync();
     }
 
     [Test]
@@ -36,7 +38,7 @@ public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
     {
         await Render("ComputeAProjection");
 
-        await Expect(Message("Element selector must be a member access (x => x.Field, x => x.A.B) or the element itself (x => x).")).ToBeVisibleAsync();
+        await Expect(Message("An array lambda reads the item (x => x), its members (x => x.Field, x => x.A.B), and the members, methods and operators of the member table (grammar.md 2.3); a computed object and arithmetic have no form the plan writes.")).ToBeVisibleAsync();
     }
 
     [Test]
@@ -44,7 +46,7 @@ public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
     {
         await Render("TestTextAgainstTheItem");
 
-        await Expect(Message("String operation arguments (Contains/StartsWith/EndsWith) must be constants or captured values, not element-scope reads")).ToBeVisibleAsync();
+        await Expect(Message("A text test's text (Contains, StartsWith, EndsWith, Regex.IsMatch's pattern) must be a constant or a captured value, not a read of the item: the plan writes it as a literal.")).ToBeVisibleAsync();
     }
 
     [Test]
@@ -68,6 +70,38 @@ public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
     {
         await Render("CastToAFlag");
 
-        await Expect(Message("Array predicate supports comparisons (== != > >= < <=), logical (&& || !), string Contains/StartsWith/EndsWith, and boolean members.")).ToBeVisibleAsync();
+        await Expect(Message("An array predicate is a test of the item: a comparison (== != > >= < <=), && || !, a text test (Contains, StartsWith, EndsWith, string.IsNullOrEmpty, Regex.IsMatch), Contains over fixed values, or a boolean value. Got a Boolean?: x.Discharged")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_member_of_a_value_the_table_does_not_name_is_refused_with_the_members_it_names()
+    {
+        await Render("ReadAMemberWithNoJavaScriptForm");
+
+        await Expect(Message("'DateTime.DayOfYear' is a member of a value .NET defines that has no JavaScript form; a lambda may read DateTime.Year, DateTime.Month, DateTime.Day, DateTime.Hour, DateTime.Minute, DateTime.Second, String.Length, DateTime.DayOfWeek (compared with a DayOfWeek), Nullable.Value and Nullable.HasValue. Project the value on the server.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_day_of_the_week_read_as_a_value_is_refused_because_the_browser_reads_its_number()
+    {
+        await Render("ReadADayOfTheWeekAsAValue");
+
+        await Expect(Message("'DateTime.DayOfWeek' is read in the browser as getDay(), the day's number, so a lambda reads it only to compare it with a DayOfWeek (x => x.Admitted.DayOfWeek == DayOfWeek.Saturday). Project it on the server.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_cast_that_drops_a_fraction_is_refused_because_a_browsers_number_keeps_it()
+    {
+        await Render("CastToAWholeNumber");
+
+        await Expect(Message("A cast from Double to Int32 changes the value as C# computes it (a whole number drops the fraction, a narrower number wraps), and a browser's number does not. Project the value on the server.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_cast_to_a_narrower_number_is_refused_because_a_browsers_number_does_not_wrap()
+    {
+        await Render("CastToANarrowerNumber");
+
+        await Expect(Message("A cast from Int32 to Byte changes the value as C# computes it (a whole number drops the fraction, a narrower number wraps), and a browser's number does not. Project the value on the server.")).ToBeVisibleAsync();
     }
 }

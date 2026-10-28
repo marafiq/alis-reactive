@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.Validation;
@@ -176,7 +174,7 @@ namespace Alis.Reactive.FluentValidator
             {
                 field = null!;
                 values = null!;
-                if (!TryContains(call, out var source, out var candidate)) return false;
+                if (!Expressions.TryContains(call, out var source, out var candidate)) return false;
                 if (!IsFixed(source) || !IsField(candidate)) return false;
 
                 field = candidate;
@@ -192,53 +190,12 @@ namespace Alis.Reactive.FluentValidator
             {
                 collection = null!;
                 item = null!;
-                if (!TryContains(call, out var source, out var candidate)) return false;
+                if (!Expressions.TryContains(call, out var source, out var candidate)) return false;
                 if (!IsField(source) || !IsFixed(candidate)) return false;
 
                 collection = source;
                 item = candidate;
                 return true;
-            }
-
-            // Enumerable.Contains(source, item), MemoryExtensions.Contains(span, item) or (span, item, null)
-            // (C# 14 binds an array's Contains to a span, through the comparer overload for an item type that
-            // is not IEquatable), or an instance Contains on a collection (List<T>, a set).
-            private static bool TryContains(MethodCallExpression call, out Expression source, out Expression item)
-            {
-                source = null!;
-                item = null!;
-                if (call.Method.Name != "Contains") return false;
-
-                var isStaticContains = call.Object == null
-                    && (call.Arguments.Count == 2 || (call.Arguments.Count == 3 && IsNullComparer(call.Arguments[2])))
-                    && (call.Method.DeclaringType == typeof(Enumerable) || call.Method.DeclaringType?.FullName == "System.MemoryExtensions");
-                if (isStaticContains)
-                {
-                    source = WithoutSpanConversion(call.Arguments[0]);
-                    item = call.Arguments[1];
-                    return true;
-                }
-
-                var isCollectionContains = call.Object != null && call.Arguments.Count == 1
-                    && call.Object.Type != typeof(string)
-                    && typeof(IEnumerable).IsAssignableFrom(call.Object.Type);
-                if (!isCollectionContains) return false;
-
-                source = call.Object!;
-                item = call.Arguments[0];
-                return true;
-            }
-
-            // The default comparer, which C# passes as null when the overload takes one.
-            private static bool IsNullComparer(Expression comparer) =>
-                Expressions.StripConvert(comparer) is ConstantExpression constant && constant.Value == null;
-
-            // The array or collection under an implicit conversion to a span.
-            private static Expression WithoutSpanConversion(Expression expression)
-            {
-                if (expression is MethodCallExpression conversion && conversion.Method.Name == "op_Implicit" && conversion.Arguments.Count == 1)
-                    return conversion.Arguments[0];
-                return Expressions.StripConvert(expression);
             }
 
             private static bool IsStringMethod(MethodCallExpression call, string name) =>
@@ -253,14 +210,11 @@ namespace Alis.Reactive.FluentValidator
                 if (!(current is MemberExpression)) return false;
                 while (current is MemberExpression member && member.Expression != null)
                 {
-                    if (IsValueMember(member.Member)) return false;
+                    if (Expressions.IsValueMember(member.Member)) return false;
                     current = Expressions.StripConvert(member.Expression);
                 }
                 return current == _model;
             }
-
-            private static bool IsValueMember(MemberInfo member) =>
-                member.DeclaringType?.Namespace?.StartsWith("System", StringComparison.Ordinal) == true;
 
             // x.Score.HasValue: the nullable member has a value.
             private bool IsHasValue(Expression expression, out Expression nullable)

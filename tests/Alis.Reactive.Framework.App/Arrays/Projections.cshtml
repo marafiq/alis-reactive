@@ -7,14 +7,14 @@
     var plan = Html.ReactivePlan<ProjectionsPage>();
 
     // A button that reads the residents and shows what the selector gives for each, in their order.
-    IHtmlContent Project(string id, string text, Expression<Func<Resident, string>> selector) =>
+    IHtmlContent Project<TValue>(string id, string text, Expression<Func<Resident, TValue>> selector) =>
         plan.Button(id, text).Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
             .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
                 s.Element("projected").Text.Set(s.From(residents).Select(selector)))));
 }
 <h1>Array projections</h1>
 
-<p>The residents, as the home keeps them: Cyd Marsh, Ada Hartley, Ben Hart, Dot Ashton.</p>
+<p>The residents, as the home keeps them: Cyd Marsh (81, present, nickname left blank), Ada Hartley (102, away, no nickname), Ben Hart (79, present, Benny), Dot Ashton (80, away, Dottie).</p>
 <p>Projected: <span id="projected"></span></p>
 
 @Project("names", "Names", x => x.Name)
@@ -26,5 +26,10 @@
 @Project("names-in-invariant-capitals", "Names in invariant capitals", x => x.Name.ToUpperInvariant())
 @Project("names-in-small-letters", "Names in small letters", x => x.Name.ToLower())
 @Project("names-in-invariant-small-letters", "Names in invariant small letters", x => x.Name.ToLowerInvariant())
+@Project("rooms-trimmed-in-capitals", "Rooms trimmed, in capitals", x => x.Room.Trim().ToUpper())
+@Project("nicknames-or-names", "Nicknames, or names where there is none", x => x.Nickname ?? x.Name)
+@Project("here-or-away", "Here or away", x => x.Present ? "here" : "away")
+@Project("each-older-than-80", "Whether each is older than 80", x => x.Age > 80)
+@Project("each-without-a-nickname", "Whether each goes by no nickname", x => string.IsNullOrEmpty(x.Nickname))
 
 @Html.RenderPlan(plan)

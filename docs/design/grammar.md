@@ -231,9 +231,9 @@ The C# expression compiler turns a lambda into `fn`. Inside it:
   declaration names;
 - the members below map to JavaScript.
 
-The table below is the complete member table. A member that is not in it is an analyzer error at
-compile time, and the compiler fails at render as a backstop. A new member is one row, with no
-runtime change.
+The table below is the complete member table. A member, method or operator that is not in it is
+refused when the view renders, by a message that names it and lists what the table allows. A new member
+is one row, with no runtime change.
 
 | C# | JavaScript |
 |---|---|
@@ -243,20 +243,31 @@ runtime change.
 | `Any()`, `Any(p)`, `All(p)` | `.length > 0`, `.some(fn)`, `.every(fn)` |
 | `Sum(f)` | `.reduce((s, x) => s + finite(f(x)), 0)` |
 | `Find(p)`, `Find(p, f)` | `.find(fn) ?? null`, then `f` when found |
-| `Enumerable.Contains(constant array, x)` | `[..].includes(x)` |
-| `string.Contains`, `StartsWith`, `EndsWith` | `includes`, `startsWith`, `endsWith`; a missing target gives false |
-| `string.Length`, `Trim()`, `ToUpper()`, `ToLower()` | `length`, `trim()`, `toUpperCase()`, `toLowerCase()` |
-| `string.IsNullOrEmpty(s)` | `s == null \|\| s === ""` |
-| `Regex.IsMatch(s, constant)` | `matches(s, pattern, flags)` |
-| `DateTime.DayOfWeek`, `.Month`, `.Year`, `.Day`, `.Hour`, `.Minute`, `.Second` | `getDay()`, `getMonth() + 1`, `getFullYear()`, `getDate()`, `getHours()`, `getMinutes()`, `getSeconds()` |
+| `Enumerable.Contains(fixed values, x)`, a fixed array's own `Contains` (C# 14 binds it to a span), a fixed list's | `[..].some(i => i == x)` |
+| `string.Contains`, `StartsWith`, `EndsWith` with fixed text | `includes`, `startsWith`, `endsWith`; a missing target gives false |
+| `string.Length`, `Trim()`, `TrimStart()`, `TrimEnd()`, `ToUpper()`, `ToUpperInvariant()`, `ToLower()`, `ToLowerInvariant()` | `length`, `trim()`, `trimStart()`, `trimEnd()`, `toUpperCase()`, `toLowerCase()`; a chain calls each on the value before it |
+| `string.IsNullOrEmpty(s)` | `empty(s)`: missing or `""` |
+| `Regex.IsMatch(s, fixed pattern)` | `matches(s, pattern, "")` |
+| `DateTime.Year`, `.Month`, `.Day`, `.Hour`, `.Minute`, `.Second` | `getFullYear()`, `getMonth() + 1`, `getDate()`, `getHours()`, `getMinutes()`, `getSeconds()`: the local parts |
+| `DateTime.DayOfWeek`, compared with a `DayOfWeek` | `getDay()`, compared with the `DayOfWeek`'s number, as C# compares it |
+| a nullable's `Value`, `HasValue` | the value itself; `x != null` |
 | a declared element's `GetAttribute(n)`, `HasAttribute(n)` | `getAttribute(n)`, `hasAttribute(n)` |
-| operators, `??`, `?:`, casts | the operators of 2.2 |
+| `==`, `!=`, `<`, `<=`, `>`, `>=`, `&&`, `\|\|`, `!`, `??`, `?:` | the operators of 2.2; a test is a value too, so `Select(x => x.Age > 80)` gives true or false per item |
+| a conversion that keeps the value: a widening, a nullable lift, an enum as its number | the value itself |
 
-These are the members built (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs`, and the
-allow-list and string operators of `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs`)
-plus those the validation `When` conditions need. That allow-list names JavaScript's
-date methods directly (`getDay`, `getTime`) on any C# method of that name, and no view calls one;
-here they are reached from `DateTime`'s own members. Members that
+Refused when the view renders, because the browser cannot give C#'s answer with the grammar's nodes:
+- a member of a value .NET defines that is not a row (`DateTime.DayOfYear`, a list's `Count`, a
+  `DateTimeOffset`'s parts, which are in an offset the browser does not keep);
+- a date's `DayOfWeek` read anywhere but a comparison, since the browser holds its number where C#
+  shows its name;
+- arithmetic, since JavaScript's numbers give neither C#'s integer division nor its overflow, and `+`
+  over a missing text gives missing where C# gives the other text;
+- a cast that changes the value (`(int)x.Weight`), since C# drops the fraction or wraps a number too
+  wide for its type and a browser's number does neither.
+
+The array methods are `Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs`; the members, methods and
+operators a lambda may use are the tables of `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs`.
+The validation `When` conditions read the same tests over a model's members (7.3). Members that
 nothing uses yet (`First`, `Distinct`, `Skip`, `Take`, `SelectMany`, `Min`, `Max`, `Average`,
 `ThenBy`, `Concat`) are added the same way, each with a journey that proves it.
 

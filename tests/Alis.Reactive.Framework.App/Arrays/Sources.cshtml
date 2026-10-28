@@ -10,7 +10,7 @@
 
 <ul id="seats">
     <li data-resident="Ada Hartley" data-supervision="close">Seat 1</li>
-    <li data-resident="Ben Hart" data-supervision="light">Seat 2</li>
+    <li data-resident="Ben Hart" data-supervision="light" data-wheelchair>Seat 2</li>
     <li data-resident="Cyd Marsh" data-supervision="close">Seat 3</li>
 </ul>
 <p id="badge" class="badge ward-north">Badge</p>
@@ -23,6 +23,7 @@
 <p>Rows marked: <span id="marked-rows"></span></p>
 <p>Seats: <span id="seat-count"></span></p>
 <p>Seats under close supervision: <span id="close-seats"></span></p>
+<p>Seats with a wheelchair space: <span id="wheelchair-seats"></span></p>
 <p>Wards on the badge: <span id="badge-wards"></span></p>
 
 @(plan.Button("read-list", "Read the residents list")
@@ -54,6 +55,10 @@
 @(plan.Button("read-close-seats", "Read the seats under close supervision")
     .Reactive(button => button.Click, p => p.Element("close-seats").Text.Set(p.Element("seats").Children
         .Where(seat => seat.GetAttribute("data-supervision") == "close")
+        .Select(seat => seat.GetAttribute("data-resident")))))
+@(plan.Button("read-wheelchair-seats", "Read the seats with a wheelchair space")
+    .Reactive(button => button.Click, p => p.Element("wheelchair-seats").Text.Set(p.Element("seats").Children
+        .Where(seat => seat.HasAttribute("data-wheelchair"))
         .Select(seat => seat.GetAttribute("data-resident")))))
 @(plan.Button("add-east", "Add the east ward to the badge")
     .Reactive(button => button.Click, p => p.Element("badge").ClassList.Add("ward-east")))

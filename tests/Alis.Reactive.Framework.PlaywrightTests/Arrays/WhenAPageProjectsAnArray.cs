@@ -3,9 +3,12 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 /// <summary>
 /// <c>Select</c> of a member, of a nested member, and of each text method the lambda compiler maps to its
 /// JavaScript form (<c>Trim</c>, <c>TrimStart</c>, <c>TrimEnd</c>, <c>ToUpper</c>, <c>ToUpperInvariant</c>,
-/// <c>ToLower</c>, <c>ToLowerInvariant</c>): one value per item, in the items' order. The residents endpoint
-/// answers Cyd Marsh (room "  n12 ", keyworker Fay), Ada Hartley ("E4  ", Gus), Ben Hart (" n7", Fay) and
-/// Dot Ashton ("S2", Hal), in that order. A page's text collapses runs of spaces, as a browser shows them.
+/// <c>ToLower</c>, <c>ToLowerInvariant</c>), of those methods chained, of <c>??</c> and <c>?:</c>, and of a test
+/// an operator or a method makes: one value per item, in the items' order. The residents endpoint answers Cyd
+/// Marsh (81, present, room "  n12 ",
+/// keyworker Fay, nickname blank), Ada Hartley (102, away, "E4  ", Gus, no nickname), Ben Hart (79, present,
+/// " n7", Fay, Benny) and Dot Ashton (80, away, "S2", Hal, Dottie), in that order. A page's text collapses runs
+/// of spaces, as a browser shows them.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageProjectsAnArray : AppPageTest
@@ -102,5 +105,55 @@ public sealed class WhenAPageProjectsAnArray : AppPageTest
         await Button("Names in invariant small letters").ClickAsync();
 
         await Expect(Projected).ToHaveTextAsync("cyd marsh,ada hartley,ben hart,dot ashton");
+    }
+
+    [Test]
+    public async Task a_chain_of_text_methods_applies_each_in_the_order_written()
+    {
+        await Open("/Arrays/Projections");
+
+        await Button("Rooms trimmed, in capitals").ClickAsync();
+
+        await Expect(Projected).ToHaveTextAsync("N12,E4,N7,S2");
+    }
+
+    [Test]
+    public async Task coalesce_gives_the_first_value_that_is_not_missing_and_keeps_a_blank_one()
+    {
+        await Open("/Arrays/Projections");
+
+        await Button("Nicknames, or names where there is none").ClickAsync();
+
+        await Expect(Projected).ToHaveTextAsync(",Ada Hartley,Benny,Dottie");
+    }
+
+    [Test]
+    public async Task a_conditional_gives_the_branch_its_test_chooses()
+    {
+        await Open("/Arrays/Projections");
+
+        await Button("Here or away").ClickAsync();
+
+        await Expect(Projected).ToHaveTextAsync("here,away,here,away");
+    }
+
+    [Test]
+    public async Task a_test_projected_is_each_items_answer()
+    {
+        await Open("/Arrays/Projections");
+
+        await Button("Whether each is older than 80").ClickAsync();
+
+        await Expect(Projected).ToHaveTextAsync("true,true,false,false");
+    }
+
+    [Test]
+    public async Task a_test_a_method_makes_projected_is_each_items_answer()
+    {
+        await Open("/Arrays/Projections");
+
+        await Button("Whether each goes by no nickname").ClickAsync();
+
+        await Expect(Projected).ToHaveTextAsync("true,true,false,false");
     }
 }
