@@ -23,6 +23,12 @@ public sealed class NoteRequest
     public decimal Amount { get; set; }
 }
 
+/// <summary>An estimate the desk may not have yet.</summary>
+public sealed class EstimateRequest
+{
+    public decimal? Estimate { get; set; }
+}
+
 public sealed class TotalRoute
 {
     public decimal Total { get; set; }

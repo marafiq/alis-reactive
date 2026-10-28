@@ -9,3 +9,4 @@ import "./Components/Entry/entry";
 import "./Components/Roster/roster";
 import "./Components/DayPicker/day-picker";
 import "./Components/ConfirmDialog/confirm-dialog";
+import "./Components/FilePicker/file-picker";

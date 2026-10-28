@@ -17,6 +17,7 @@
     <dt>Form data</dt><dd id="uploaded"></dd>
     <dt>Headers</dt><dd id="headers"></dd>
     <dt>A method's result</dt><dd id="total"></dd>
+    <dt>An estimate</dt><dd id="estimate"></dd>
     <dt>Refused</dt><dd id="refused"></dd>
     <dt>Chained</dt><dd id="chained"></dd>
     <dt>Parallel</dt><dd><span id="slow-one"></span> · <span id="slow-two"></span> · settled after: <span id="settled"></span></dd>
@@ -62,6 +63,10 @@
     .Reactive(button => button.Click, p => p.Post("/Requests/Notes")
         .Gather<NoteRequest>(g => g.Set(x => x.Text, "Totals").Set(x => x.Amount, p.Component<Slate>("slate").Total()))
         .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("note").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("post-estimate", "Post the total as an estimate")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Estimates")
+        .Gather<EstimateRequest>(g => g.Set(x => x.Estimate, p.Component<Slate>("slate").Total()))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("estimate").Text.Set(echo.Get(x => x.Summary))))))
 @(plan.Button("refuse-409", "Ask for a taken room")
     .Reactive(button => button.Click, p => p.Get("/Requests/Refuse")
         .Gather<RefuseQuery>(g => g.Set(x => x.Status, 409))

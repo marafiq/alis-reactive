@@ -40,6 +40,7 @@ when that slice lands, so no member exists without the test that proves it. The 
 | `Button` | the element itself, through the core's native vendor (`ComponentVendor.Native`), a click as its event | A plain `<button>`: the gesture that starts most framework pipelines. It needs no TypeScript. |
 | `DayPicker` | as `Slate`, the object under `dayPicker` | A few days to pick one from, holding no day (a `DateTime?` that is null) until the user picks one, and a check, a moment later, whether the picked day is free, shown on its own line. |
 | `ConfirmDialog` | the app's own `alis.confirm`, registered by name on `window.__alisPlugins`, no element and no declaration | The question a page's `p.Confirm(..)` asks, with a Yes and a No. |
+| `FilePicker` | as `Slate`, the object under `filePicker`, declared an input (`IInputComponent`) | A file input holding the files the person chose as the browser's own `File` objects (`BrowserFile`), committed when they choose: what a page reads of a file, and the file a form-data request sends (the Requests slice). |
 
 ## The capabilities
 

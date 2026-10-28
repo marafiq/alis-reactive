@@ -1,0 +1,34 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Framework.App.Requests
+@model EscortCard
+@{
+    var plan = Html.ReactivePlan<EscortCard>();
+
+    // The card's save, gathering the escort's name into the request the page asked for.
+    IHtmlContent Send(Func<HttpRequestBuilder<EscortCard>, HttpRequestBuilder<EscortCard>> gather) =>
+        plan.Button("send-escort", "Send the escort").Reactive(button => button.Click, p =>
+            gather(p.Post("/Requests/Escorts"))
+                .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("escort-bound").Text.Set(echo.Get(x => x.Summary)))));
+}
+<section id="escort-card">
+    <h2>Escort</h2>
+
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Escort")).Entry(); }
+    <p>The endpoint bound: <span id="escort-bound"></span></p>
+
+    @switch ((EscortGather)ViewData["Gather"]!)
+    {
+        case EscortGather.AsTheCard:
+            @Send(request => request.Gather(g => g.Form(m => m.Name)))
+            break;
+        case EscortGather.AsTheVisit:
+            @Send(request => request.Gather<EscortPage>(g => g.Form(m => m.Name)))
+            break;
+        case EscortGather.AsARequestWithoutThePrefix:
+            @Send(request => request.Gather<EscortRequest>(g => g.Form(m => m.Name)))
+            break;
+    }
+</section>
+
+@Html.RenderPlan(plan)

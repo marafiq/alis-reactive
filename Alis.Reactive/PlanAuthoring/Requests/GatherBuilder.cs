@@ -118,6 +118,10 @@ namespace Alis.Reactive.Builders.Requests
         /// Sends the named inputs of the form, each by its binding name, as MVC binds it: under the view's field
         /// prefix when the view is a partial rendered for a member of the page's model.
         /// </summary>
+        /// <remarks>
+        /// A request other than the view model must have a member for each binding name, prefix included, of a
+        /// type the input's value binds to; the view is refused when it renders otherwise.
+        /// </remarks>
         /// <param name="fields">The view model members whose inputs are sent, for example <c>m =&gt; m.Name, m =&gt; m.Address.City</c>.</param>
         public GatherBuilder<TRequest, TModel> Form(params Expression<Func<TModel, object?>>[] fields)
         {
@@ -126,10 +130,10 @@ namespace Alis.Reactive.Builders.Requests
 
             foreach (var field in fields)
             {
-                var member = ExpressionPathHelper.ToMemberBindingPath(field);
+                var binding = HtmlFieldPrefix.Join(_fieldPrefix, ExpressionPathHelper.ToMemberBindingPath(field));
                 var fieldType = ExpressionPathHelper.ToPropertyType(field);
-                RequestMembers.Require(typeof(TRequest), member, fieldType);
-                var binding = HtmlFieldPrefix.Join(_fieldPrefix, member);
+                if (typeof(TRequest) != typeof(TModel))
+                    RequestMembers.Require(typeof(TRequest), binding, fieldType);
                 _draft.Add(binding, ValueExpression.ReadBound(IdGenerator.For(typeof(TModel), binding.Value), Shape.FromClrType(fieldType)));
             }
 
