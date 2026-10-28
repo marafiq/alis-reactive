@@ -1,0 +1,37 @@
+@using Alis.Reactive.Framework.App.Validation
+@model VisitBooking
+@{
+    ViewData["Title"] = "Book a visit";
+    var plan = Html.ReactivePlan<VisitBooking>();
+}
+<h1>Book a visit</h1>
+
+<div id="visit-form">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Required().Label("Visitor")).Entry(); }
+    @{ Html.InputField(plan, m => m.Relation, o => o.Label("Relation")).Entry(); }
+    @{ Html.InputField(plan, m => m.Company, o => o.Label("Company")).Entry(); }
+    @{ Html.InputField(plan, m => m.Phone, o => o.Label("Phone")).Entry(); }
+    @{ Html.InputField(plan, m => m.Email, o => o.Label("Email")).Entry(); }
+    @{ Html.InputField(plan, m => m.ConfirmEmail, o => o.Label("Email again")).Entry(); }
+    @{ Html.InputField(plan, m => m.Guests, o => o.Label("Guests")).Entry(); }
+    @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes")).Entry(); }
+</div>
+
+<p>Booked: <span id="booked"></span></p>
+
+@(plan.Button("book", "Book the visit")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Book")
+        .Gather(g => g.Form())
+        .Validate<VisitRules>("visit-form")
+        .Response(r => r
+            .OnSuccess<Booked>((booked, s) => s.Element("booked").Text.Set(booked.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("visit-form")))))
+@(plan.Button("book-midnight", "Book the midnight slot")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Book")
+        .Gather(g => g.Form().Set(x => x.Slot, "Midnight"))
+        .Validate<VisitRules>("visit-form")
+        .Response(r => r
+            .OnSuccess<Booked>((booked, s) => s.Element("booked").Text.Set(booked.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("visit-form")))))
+
+@Html.RenderPlan(plan)
