@@ -207,7 +207,7 @@ expression over the converted values.
 | `==`, `!=` | Both missing are equal; one missing is unequal; two `Date`s compare by time; otherwise `===`. This is C#'s lifted equality. |
 | `<`, `<=`, `>`, `>=` | Defined for two finite numbers, two `Date`s by time, two texts by code unit, or two booleans. Every other pair is false, including missing, NaN and mixed kinds. This is C#'s lifted comparison. |
 | `&&`, `\|\|`, `!` | Short-circuit, left to right. |
-| `+ - * / %` | C# arithmetic over numbers; `+` over texts concatenates. |
+| `+ - * / %` | C# arithmetic over numbers; `+` adds and never joins text. An operand that is missing or not a number gives missing, so a date's month (2.3) where an item has no date is missing. |
 | `??`, `?:` | As in C#. |
 | `merge` | The fields of every record operand, left to right, in one record (a gathered request's values with the model's). |
 | `-x` | C#'s unary minus over a number (`neg`). |

@@ -57,12 +57,8 @@ export function greaterThanOrEqual(left: unknown, right: unknown): boolean {
   return sign !== undefined && sign >= 0;
 }
 
-/** C# arithmetic over numbers; + over two texts concatenates. A missing operand gives missing. */
+/** C# arithmetic over numbers. An operand that is missing or not a number gives missing. */
 export function arithmetic(op: "add" | "sub" | "mul" | "div" | "mod", left: unknown, right: unknown): unknown {
-  if (isMissing(left) || isMissing(right)) return null;
-  const concatenates = op === "add" && (typeof left === "string" || typeof right === "string");
-  if (concatenates) return `${asText(left) ?? ""}${asText(right) ?? ""}`;
-
   const a = asNumber(left);
   const b = asNumber(right);
   if (a === undefined || b === undefined) return null;
