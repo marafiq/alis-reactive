@@ -37,9 +37,6 @@ function queryRecord<T>(pick: (values: string[]) => T | undefined): Record<strin
       const values = valuesFor(params, key);
       return values.length === 0 ? undefined : pick(values);
     },
-    has(_target, key) {
-      return typeof key === "string" && valuesFor(params, key).length > 0;
-    },
   });
 }
 
