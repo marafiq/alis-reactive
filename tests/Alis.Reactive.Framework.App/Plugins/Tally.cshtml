@@ -1,0 +1,24 @@
+@using Alis.Reactive.Framework.App.Plugins
+@model TallyPage
+@{
+    ViewData["Title"] = "A plugin";
+    var plan = Html.ReactivePlan<TallyPage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>A plugin</h1>
+
+<p>Total read: <span id="total"></span></p>
+<p>Against the mark: <span id="against-mark"></span></p>
+
+@(plan.Button("add-four", "Add 4")
+    .Reactive(button => button.Click, p => tally.Add(4)))
+@(plan.Button("read-total", "Read the total")
+    .Reactive(button => button.Click, p => p.Element("total").Text.Set(tally.Total)))
+@(plan.Button("lower-mark", "Lower the mark to 3")
+    .Reactive(button => button.Click, p => tally.Mark.Set(3)))
+@(plan.Button("check-mark", "Has the tally passed the mark?")
+    .Reactive(button => button.Click, p => p.When(tally.HasPassedTheMark()).Truthy()
+        .Then(t => t.Element("against-mark").Text.Set("passed"))
+        .Else(e => e.Element("against-mark").Text.Set("not yet"))))
+
+@Html.RenderPlan(plan)

@@ -32,10 +32,10 @@ when that slice lands, so no member exists without the test that proves it. The 
 | Component | How the framework reaches it | What it is |
 |---|---|---|
 | `Slate` | a method pair (`on`/`off`), the object under `slate` on its element, the listener's argument as the payload | A board that holds one value of every shape the plan converts, a header object, rows, and the events of changing them. Every property, method, object and event kind is on it. |
-| `Bell` | callback properties (`bell.onRung = listener`) | A bell that rings and counts its rings. |
+| `Bell` | callback properties (`bell.onRung = listener`), the property already holding the bell's own callback | A bell that rings and counts its rings. |
 | `Meter` | the element itself, `addEventListener`, the DOM event as the payload (`CustomEvent.detail`) | A custom element `<fw-meter>` with a level and a maximum. |
 | `Entry` | as `Slate`, declared an input (`IInputComponent`) | A text entry whose value a form gathers and validates, committed when the user leaves it. |
-| `Tally` | a plugin registered by name on `window.__alisPlugins`, no element | A page-wide counter with a total, an add method and an event when it passes a mark. |
+| `Tally` | a plugin registered by name on `window.__alisPlugins`, no element | A page-wide counter with a total, a mark to count towards, an add method and a question whether it passed the mark. |
 | `Button` | the element itself, through the core's native vendor (`ComponentVendor.Native`), a click as its event | A plain `<button>`: the gesture that starts most framework pipelines. It needs no TypeScript. |
 
 ## The capabilities
@@ -66,14 +66,14 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | E5 | An event of a nested object | `Slate.Header.Renamed` | the page reacts to the header being renamed |
 | E6 | A handler stops listening when its owner is released | a `Slate` in a slot, unloaded | a gesture after the unload changes nothing |
 | V1 | Listening through a method pair | `Slate` | (every Slate event row) |
-| V2 | Listening through callback properties | `Bell.Rung`, `Bell.Ring()`, `Bell.Rings` | the page counts the rings |
-| V3 | The element as the object, the DOM event as the payload | `Meter.Level`, `Meter.LevelChanged` | the level the meter shows; the page reacts to its change |
+| V2 | Listening through callback properties, beside the component's own callback | `Bell.OnRung`, `Bell.Ring()`, `Bell.Rings` | the page counts the rings, and the bell still shows its own count |
+| V3 | The element as the object, the DOM event's detail as the payload | `Meter.Level`, `Meter.Max`, `Meter.LevelChanged` | the level the meter shows and reads back; the page shows the change's detail |
 | V4 | The object under a path on its element | `Slate` (`slate`) | (every Slate row) |
 | I1 | An input's value gathered into a request under its member name | `Entry` in `Gather(g => g.Form())` | the server's answer, which echoes what it bound |
 | I2 | A validation message on the input's own error slot | `Entry` under a validator | the message beside the entry |
 | I3 | The commit event clears a corrected message | `Entry`, corrected | the message goes, with no submit |
 | I4 | An input in a partial binds under the partial's prefix | `Entry` in a partial for a member | the server's answer shows the prefixed member bound |
-| G1 | A plugin's property read, method called, event heard | `Tally.Total`, `Tally.Add(n)`, `Tally.Passed` | the total in the page; the page reacts to the mark |
+| G1 | A plugin's property read and written, a method called, a result read | `Tally.Total`, `Tally.Mark`, `Tally.Add(n)`, `Tally.HasPassedTheMark()` | the total in the page; the branch the mark decides. An app's plugin has no events: only the framework's own plugins are subscribed to (`runtime/objects/plugins.ts`, `pluginOf`) |
 | L1 | Constructed on `alis:mount` before handlers subscribe, at boot and in injected HTML | `Slate` on the page and in a loaded partial | its first event is heard in both |
 | L2 | Destroyed on `alis:unmount` | a `Slate` in a slot, unloaded | the slate's markup is gone, and its listeners with it (E6) |
 | B1 | A missing element fails only the handler that names it | a pipeline naming an absent `Slate` | the other handler's outcome shows |

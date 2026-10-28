@@ -1,0 +1,20 @@
+@using Alis.Reactive.Framework.App.Vendors
+@model CallbackPropertiesPage
+@{
+    ViewData["Title"] = "Callback properties";
+    var plan = Html.ReactivePlan<CallbackPropertiesPage>();
+}
+<h1>Callback properties</h1>
+
+@(plan.Bell("bell")
+    .Reactive(bell => bell.OnRung, (ring, p) => p.Element("rang").Text.Set(ring.Times)))
+
+<p>The page heard ring number: <span id="rang"></span></p>
+<p>Rings read: <span id="rings"></span></p>
+
+@(plan.Button("ring-from-page", "Ring from the page")
+    .Reactive(button => button.Click, p => p.Component<Bell>("bell").Ring()))
+@(plan.Button("read-rings", "Read the rings")
+    .Reactive(button => button.Click, p => p.Element("rings").Text.Set(p.Component<Bell>("bell").Rings)))
+
+@Html.RenderPlan(plan)
