@@ -1,0 +1,30 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model DecisionsPage
+@{
+    ViewData["Title"] = "Decisions";
+    var plan = Html.ReactivePlan<DecisionsPage>();
+}
+<h1>Decisions</h1>
+
+@plan.Meter("pain", level: 3, max: 5)
+
+<p>Discharge: <span id="discharge"></span></p>
+<p>Doctor, called when pain is 4 or more and the nurse agrees: <span id="doctor"></span></p>
+<p>Pain relief, skipped when pain is under 2 or the nurse says so: <span id="relief"></span></p>
+
+@(plan.Button("ask-discharge", "Discharge")
+    .Reactive(button => button.Click, p => p.Confirm("Discharge the resident?")
+        .Then(t => t.Element("discharge").Text.Set("discharged"))
+        .Else(e => e.Element("discharge").Text.Set("kept in"))))
+@(plan.Button("escalate", "Escalate")
+    .Reactive(button => button.Click, p => p.When(p.Component<Meter>("pain").Level).Gte(4)
+        .And(g => g.Confirm("Call the doctor?"))
+        .Then(t => t.Element("doctor").Text.Set("doctor called"))
+        .Else(e => e.Element("doctor").Text.Set("no call"))))
+@(plan.Button("plan-relief", "Plan pain relief")
+    .Reactive(button => button.Click, p => p.When(p.Component<Meter>("pain").Level).Lt(2)
+        .Or(g => g.Confirm("Skip the pain relief?"))
+        .Then(t => t.Element("relief").Text.Set("relief skipped"))
+        .Else(e => e.Element("relief").Text.Set("relief given"))))
+
+@Html.RenderPlan(plan)

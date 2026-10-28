@@ -1,7 +1,7 @@
 # Framework test components
 
 The framework is proven through the components it was built to drive, and only through its public
-extension point. Six small components, written in TypeScript with no library, and a plain button are
+extension point. Small components, written in TypeScript with no library, and a plain button are
 brought into a
 test app the way any app brings one (`docs/design/bring-your-own-component.md`): a declaration class
 of members by their JavaScript names, a render helper, and code that constructs on `alis:mount`.
@@ -38,6 +38,8 @@ when that slice lands, so no member exists without the test that proves it. The 
 | `Tally` | a plugin registered by name on `window.__alisPlugins`, no element | A page-wide counter with a total, a mark to count towards, an add method and a question whether it passed the mark. |
 | `Roster` | callback properties with no events, the object under `roster` on its element | A list that shows the names it is given, in the order given: the method a transformed array is passed to (`Roster.Show(names)`, the Arrays slice). |
 | `Button` | the element itself, through the core's native vendor (`ComponentVendor.Native`), a click as its event | A plain `<button>`: the gesture that starts most framework pipelines. It needs no TypeScript. |
+| `DayPicker` | as `Slate`, the object under `dayPicker` | A few days to pick one from, holding no day (a `DateTime?` that is null) until the user picks one, and a check, a moment later, whether the picked day is free, shown on its own line. |
+| `ConfirmDialog` | the app's own `alis.confirm`, registered by name on `window.__alisPlugins`, no element and no declaration | The question a page's `p.Confirm(..)` asks, with a Yes and a No. |
 
 ## The capabilities
 

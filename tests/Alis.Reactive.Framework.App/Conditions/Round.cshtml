@@ -1,0 +1,28 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model RoundPage
+@{
+    ViewData["Title"] = "The day round";
+    var plan = Html.ReactivePlan<RoundPage>();
+}
+<h1>The day round</h1>
+
+@plan.Slate("round", title: "Day round", "Ada", "Ben")
+
+<p>Row 3: <span id="has-row-3"></span></p>
+<p>The round: <span id="round-empty"></span></p>
+
+@(plan.Button("clear", "Clear the round")
+    .Reactive(button => button.Click, p => p.Component<Slate>("round").Clear()))
+@(plan.Button("check", "Check the round")
+    .Reactive(button => button.Click, p =>
+    {
+        var labels = p.Component<Slate>("round").Rows.Each(row => row.Label);
+        p.When(labels).ArrayContains("Row 3")
+            .Then(t => t.Element("has-row-3").Text.Set("Row 3 is on the round"))
+            .Else(e => e.Element("has-row-3").Text.Set("Row 3 is not on the round"));
+        p.When(labels).IsEmpty()
+            .Then(t => t.Element("round-empty").Text.Set("nobody is on the round"))
+            .Else(e => e.Element("round-empty").Text.Set("the round has residents"));
+    }))
+
+@Html.RenderPlan(plan)

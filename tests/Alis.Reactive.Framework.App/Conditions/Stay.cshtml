@@ -1,0 +1,39 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model StayPage
+@{
+    ViewData["Title"] = "Plan a stay";
+    var plan = Html.ReactivePlan<StayPage>();
+    var days = new[] { new DateTime(2026, 10, 27), new DateTime(2026, 10, 28), new DateTime(2026, 10, 29) };
+}
+<h1>Plan a stay</h1>
+
+<h2>Arrives</h2>
+@plan.DayPicker("arrive", days, booked: Array.Empty<DateTime>())
+<h2>Leaves</h2>
+@plan.DayPicker("leave", days, booked: Array.Empty<DateTime>())
+
+<p>Leaves after arriving: <span id="later"></span></p>
+<p>Leaves on or after arriving: <span id="same-or-later"></span></p>
+<p>Leaves before arriving: <span id="earlier"></span></p>
+<p>Leaves on or before arriving: <span id="same-or-earlier"></span></p>
+
+@(plan.Button("check", "Check the stay")
+    .Reactive(button => button.Click, p =>
+    {
+        var arrives = p.Component<DayPicker>("arrive").Day;
+        var leaves = p.Component<DayPicker>("leave").Day;
+        p.When(leaves).Gt(arrives)
+            .Then(t => t.Element("later").Text.Set("leaves after arriving"))
+            .Else(e => e.Element("later").Text.Set("does not leave after arriving"));
+        p.When(leaves).Gte(arrives)
+            .Then(t => t.Element("same-or-later").Text.Set("leaves on or after arriving"))
+            .Else(e => e.Element("same-or-later").Text.Set("leaves before arriving"));
+        p.When(leaves).Lt(arrives)
+            .Then(t => t.Element("earlier").Text.Set("leaves before arriving"))
+            .Else(e => e.Element("earlier").Text.Set("does not leave before arriving"));
+        p.When(leaves).Lte(arrives)
+            .Then(t => t.Element("same-or-earlier").Text.Set("leaves on or before arriving"))
+            .Else(e => e.Element("same-or-earlier").Text.Set("leaves after arriving"));
+    }))
+
+@Html.RenderPlan(plan)
