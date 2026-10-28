@@ -6,5 +6,6 @@
 }
 <div id="resident-field">
     @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    <p>The resident field's plan merges into another: <span id="resident-plan-merges">@(plan.IsPartial ? "yes" : "no")</span></p>
     @Html.RenderPlan(plan)
 </div>

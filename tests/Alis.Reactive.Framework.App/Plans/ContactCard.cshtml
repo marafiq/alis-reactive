@@ -16,6 +16,7 @@
             .Gather(g => g.Form())
             .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element($"{slug}-saved").Text.Set(saved.Get(x => x.Summary))))))
     <p>The endpoint bound: <span id="@(slug)-saved"></span></p>
+    <p>The card's plan merges into another: <span id="@(slug)-plan-merges">@(plan.IsPartial ? "yes" : "no")</span></p>
 </section>
 
 @Html.RenderPlan(plan)

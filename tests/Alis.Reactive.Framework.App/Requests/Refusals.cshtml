@@ -33,6 +33,12 @@
     case GatherMistake.NameNoInput:
         @Send(request => request.Gather(g => g.Form(Array.Empty<Expression<Func<GatherRefusalsPage, object?>>>())))
         break;
+    case GatherMistake.SetAMemberThenTheValueHoldingIt:
+        @Send(request => request.Gather(g => g.Set(m => m.Guide.Phone, "555 0100").Set(m => m.Guide, new SignInGuide { Name = "Ada" })))
+        break;
+    case GatherMistake.SetAValueThenAMemberUnderIt:
+        @Send(request => request.Gather(g => g.Set(m => m.Guide, new SignInGuide { Name = "Ada" }).Set(m => m.Guide.Phone, "555 0100")))
+        break;
     case GatherMistake.GiveAHeaderNoValue:
         @Send(request => request.Gather(g => g.Header("X-Shift", Model.Shift!)))
         break;

@@ -29,6 +29,8 @@ public enum GatherMistake
     SendFilesToText,
     NameNoInput,
     GiveAHeaderNoValue,
+    SetAMemberThenTheValueHoldingIt,
+    SetAValueThenAMemberUnderIt,
 }
 
 /// <summary>The guide, as a request that knows only the guide's name.</summary>
