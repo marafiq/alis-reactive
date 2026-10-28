@@ -13,12 +13,18 @@ public sealed class WhenAPageOrdersATimeOrAFlag : AppPageTest
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();
 
     [Test]
-    public async Task a_time_of_day_orders_before_a_later_one_and_after_an_earlier_one()
+    public async Task a_time_of_day_orders_before_a_later_one()
     {
         await Open("/Conditions/Shifts?starts=07:00:00");
-        await Expect(Line("shift")).ToHaveTextAsync("a morning shift");
 
+        await Expect(Line("shift")).ToHaveTextAsync("a morning shift");
+    }
+
+    [Test]
+    public async Task a_time_of_day_does_not_order_before_an_earlier_one()
+    {
         await Open("/Conditions/Shifts?starts=14:30:00");
+
         await Expect(Line("shift")).ToHaveTextAsync("not a morning shift");
     }
 
