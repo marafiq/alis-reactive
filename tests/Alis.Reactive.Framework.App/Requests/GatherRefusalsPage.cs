@@ -13,6 +13,8 @@ public sealed class GatherRefusalsPage
 
     public SignInGuide Guide { get; set; } = new();
 
+    public List<IFormFile>? CarePlan { get; set; }
+
     /// <summary>The shift a header would carry; the view was given none.</summary>
     public string? Shift { get; set; }
 }
@@ -24,6 +26,7 @@ public enum GatherMistake
     NameAMemberTheRequestsNestedClassLacks,
     SendANumberToText,
     SendAMaybeNumberToANumber,
+    SendFilesToText,
     NameNoInput,
     GiveAHeaderNoValue,
 }
@@ -43,6 +46,12 @@ public sealed class GuideName
 public sealed class PartyAsText
 {
     public string? Party { get; set; }
+}
+
+/// <summary>The care plan, as text.</summary>
+public sealed class CarePlanAsText
+{
+    public string? CarePlan { get; set; }
 }
 
 /// <summary>A room the request requires.</summary>

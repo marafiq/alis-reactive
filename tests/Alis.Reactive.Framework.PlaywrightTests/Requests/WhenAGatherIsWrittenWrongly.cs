@@ -3,8 +3,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// <summary>
 /// The gathers a page is refused for when it renders, with the message the developer reads: a named input the
 /// request has no member for, at its root or in a class it holds; a named input whose value the request member
-/// cannot bind, a number into text or a value that may be empty into one that may not; a named input of a partial
-/// sent to a request without the partial's prefix; a named form that names no input; and a header with no value.
+/// cannot bind, a number into text, a value that may be empty into one that may not, or a list into text, each
+/// type named as C# writes it; a named input of a partial sent to a request without the partial's prefix; a named
+/// form that names no input; and a header with no value.
 /// </summary>
 [TestFixture]
 public sealed class WhenAGatherIsWrittenWrongly : AppPageTest
@@ -44,6 +45,14 @@ public sealed class WhenAGatherIsWrittenWrongly : AppPageTest
         await Render("/Requests/Refused?mistake=SendAMaybeNumberToANumber");
 
         await Expect(Message("Form sends the input 'Room' as Int32?, but RoomRequired.Room, which the endpoint binds, is Int32. Give the request member the input's type.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_named_input_of_a_list_is_refused_for_a_request_member_of_text_naming_the_list_as_csharp_writes_it()
+    {
+        await Render("/Requests/Refused?mistake=SendFilesToText");
+
+        await Expect(Message("Form sends the input 'CarePlan' as List<IFormFile>, but CarePlanAsText.CarePlan, which the endpoint binds, is String. Give the request member the input's type.")).ToBeVisibleAsync();
     }
 
     [Test]

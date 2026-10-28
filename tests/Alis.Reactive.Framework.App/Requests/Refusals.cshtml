@@ -27,6 +27,9 @@
     case GatherMistake.SendAMaybeNumberToANumber:
         @Send(request => request.Gather<RoomRequired>(g => g.Form(m => m.Room)))
         break;
+    case GatherMistake.SendFilesToText:
+        @Send(request => request.Gather<CarePlanAsText>(g => g.Form(m => m.CarePlan)))
+        break;
     case GatherMistake.NameNoInput:
         @Send(request => request.Gather(g => g.Form(Array.Empty<Expression<Func<GatherRefusalsPage, object?>>>())))
         break;
