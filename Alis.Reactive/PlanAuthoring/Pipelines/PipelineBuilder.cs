@@ -105,11 +105,14 @@ namespace Alis.Reactive.Builders
 
         /// <summary>The component the view rendered for a member of this plan's model.</summary>
         /// <typeparam name="TComponent">The component's declaration, whose members the page uses directly.</typeparam>
-        /// <param name="expr">The model member the component is bound to; its id is derived as the render helper derives it.</param>
+        /// <param name="expr">
+        /// The model member the component is bound to; its id is derived as the input field derives it, under
+        /// the view's field prefix, so a partial rendered for a member of the page's model reaches its own input.
+        /// </param>
         /// <returns>The component: <c>rate.Min.Set(0m)</c>, <c>rate.Increment()</c>, <c>p.When(rate.Value).Gt(1m)</c>.</returns>
         public TComponent Component<TComponent>(Expression<Func<TModel, object?>> expr)
             where TComponent : JsObject, IComponent, new() =>
-            Live<TComponent>(IdGenerator.For<TModel, object?>(expr));
+            Live<TComponent>(IdGenerator.For(typeof(TModel), HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
 
         /// <summary>The component the view rendered for a member of another model, such as a partial's.</summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>

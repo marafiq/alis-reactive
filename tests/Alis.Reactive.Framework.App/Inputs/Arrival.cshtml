@@ -1,0 +1,26 @@
+@using Alis.Reactive.Framework.App.Inputs
+@model ArrivalPage
+@{
+    ViewData["Title"] = "A visitor arrives";
+    var plan = Html.ReactivePlan<ArrivalPage>();
+}
+<h1>A visitor arrives</h1>
+
+<div id="arrival-form">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Required().Label("Visitor")).Entry(); }
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry()
+        .Reactive(entry => entry.Committed, (committed, p) => p.Element("room-noted").Text.Set(committed.Value)); }
+    @{ Html.InputField(plan, m => m.Note).Entry(); }
+    @{ Html.InputField(plan, m => m.Pass, o => o.Hidden().Label("Pass")).HiddenEntry(); }
+</div>
+
+<p>The endpoint bound: <span id="bound"></span></p>
+<p>Room noted: <span id="room-noted"></span></p>
+
+@(plan.Button("arrive", "Sign in")
+    .Reactive(button => button.Click, p => p.Post("/Inputs/Arrival")
+        .Gather(g => g.Form())
+        .Validate<ArrivalRules>("arrival-form")
+        .Response(r => r.OnSuccess<ArrivalEcho>((echo, s) => s.Element("bound").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

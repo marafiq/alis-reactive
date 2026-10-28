@@ -11,3 +11,4 @@ import "./Components/DayPicker/day-picker";
 import "./Components/ConfirmDialog/confirm-dialog";
 import "./Components/FilePicker/file-picker";
 import "./Components/Banner/banner";
+import "./Components/Choice/choice";

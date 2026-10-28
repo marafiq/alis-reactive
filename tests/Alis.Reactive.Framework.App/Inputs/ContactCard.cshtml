@@ -1,0 +1,27 @@
+@using Alis.Reactive.Framework.App.Inputs
+@model ContactCard
+@{
+    // The card is rendered for a member of the contacts page (Primary, Alternate): its inputs bind under that
+    // member, and its plan is its own save button's, composing with no other card's.
+    var heading = (string)ViewData["Heading"]!;
+    var slug = ViewData.TemplateInfo.HtmlFieldPrefix.ToLowerInvariant();
+    var plan = Html.ElementPlan<ContactCard>($"save-{slug}");
+}
+<section id="card-@slug">
+    <h2>@heading</h2>
+
+    @{ Html.InputField(plan, m => m.Name, o => o.Label($"{heading} name")).Entry(); }
+    @{ Html.InputField(plan, m => m.Phones[0], o => o.Label($"{heading} phone")).Entry(); }
+
+    <p>The name read back: <span id="@(slug)-read"></span></p>
+
+    @(plan.Button($"save-{slug}", $"Save the {heading.ToLowerInvariant()}")
+        .Reactive(button => button.Click, p => p.Post("/Inputs/Contacts")
+            .Gather(g => g.Form())
+            .Validate<ContactCardRules>($"card-{slug}")
+            .Response(r => r.OnSuccess<ContactsEcho>((echo, s) => s.Element("contacts-bound").Text.Set(echo.Get(x => x.Summary))))))
+    @(plan.Button($"read-{slug}", $"Read back the {heading.ToLowerInvariant()}")
+        .Reactive(button => button.Click, p => p.Element($"{slug}-read").Text.Set(p.Component<Entry>(m => m.Name).Value)))
+</section>
+
+@Html.RenderPlan(plan)
