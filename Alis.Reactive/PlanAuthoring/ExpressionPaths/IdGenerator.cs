@@ -14,10 +14,11 @@ namespace Alis.Reactive
     /// </para>
     /// <para>
     /// All component vendors (Syncfusion, native) produce the same ID for the same
-    /// model/property pair, so cross-component references resolve correctly. Repeated
-    /// forms for the same model/property pair share the generated ID unless the
-    /// component is rendered with an explicit scoped ID. The <c>name</c> attribute for
-    /// MVC model binding is not affected: only the <c>id</c> attribute.
+    /// model/property pair, so cross-component references resolve correctly. An input a
+    /// partial renders under a field prefix carries the prefix in its member path
+    /// (<c>..._ContactCard__Primary_Name</c>); these methods take no prefix, so they give
+    /// the ID of an input rendered without one. The <c>name</c> attribute for MVC model
+    /// binding is not affected: only the <c>id</c> attribute.
     /// </para>
     /// </remarks>
     public static class IdGenerator

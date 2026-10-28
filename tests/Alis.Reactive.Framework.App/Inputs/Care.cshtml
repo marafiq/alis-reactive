@@ -7,7 +7,8 @@
 <h1>A resident's care</h1>
 
 <div id="care-form">
-    @{ Html.InputField(plan, m => m.Level, o => o.Label("Level of care")).Choice(); }
+    @{ Html.InputField(plan, m => m.Level, o => o.Label("Level of care")).Choice()
+        .Reactive(choice => choice.Changed, (_, p) => p.Element("level-picked").Text.Set(p.Component<Choice<CareLevel>>(m => m.Level).Value)); }
     @{ Html.InputField(plan, m => m.PreviousLevel, o => o.Label("Previous level")).Choice(); }
     @{ Html.InputField(plan, m => m.Shift, o => o.Label("Shift")).Choice(); }
     @{ Html.InputField(plan, m => m.Equipment, o => o.Label("Lifting equipment")).Entry(); }
@@ -16,6 +17,7 @@
 
 <p>The endpoint bound: <span id="bound"></span></p>
 <p>Assessed: <span id="assessed"></span></p>
+<p>Level picked: <span id="level-picked"></span></p>
 
 @(plan.Button("save", "Save the care")
     .Reactive(button => button.Click, p => p.Post("/Inputs/Care")

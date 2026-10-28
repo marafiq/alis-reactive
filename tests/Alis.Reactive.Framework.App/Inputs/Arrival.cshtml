@@ -8,12 +8,14 @@
 
 <div id="arrival-form">
     @{ Html.InputField(plan, m => m.Visitor, o => o.Required().Label("Visitor")).Entry(); }
-    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry()
+        .Reactive(entry => entry.Committed, (committed, p) => p.Element("room-noted").Text.Set(committed.Value)); }
     @{ Html.InputField(plan, m => m.Note).Entry(); }
     @{ Html.InputField(plan, m => m.Pass, o => o.Hidden().Label("Pass")).HiddenEntry(); }
 </div>
 
 <p>The endpoint bound: <span id="bound"></span></p>
+<p>Room noted: <span id="room-noted"></span></p>
 
 @(plan.Button("arrive", "Sign in")
     .Reactive(button => button.Click, p => p.Post("/Inputs/Arrival")

@@ -65,6 +65,11 @@ public sealed class InputsController : Controller
         Summary = $"primary {Said(contacts.Primary)}, alternate {Said(contacts.Alternate)}",
     });
 
+    /// <summary>Binds the contacts a plain form posted, by the names of its inputs, and says what it bound.</summary>
+    [HttpPost("/Inputs/Contacts/Posted")]
+    public IActionResult ContactsPosted([FromForm] ContactsPage contacts) =>
+        Content($"Posted: primary {Said(contacts.Primary)}, alternate {Said(contacts.Alternate)}");
+
     private static string Said(ContactCard card) => $"{card.Name ?? "none"} ({card.Phones.FirstOrDefault() ?? "none"})";
 
     /// <summary>A resident's care, each choice starting on an answer the rules accept.</summary>

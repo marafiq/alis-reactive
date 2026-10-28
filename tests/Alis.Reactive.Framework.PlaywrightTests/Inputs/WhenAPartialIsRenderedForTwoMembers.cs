@@ -3,8 +3,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 /// <summary>
 /// One partial of its own model rendered for two members of the page's model, under two field prefixes (I9):
 /// each rendering sends its inputs under its own member and checks its own inputs, a rule for each item of a
-/// list checks the item a rendering renders under its member, and a step that names one of the partial's
-/// inputs by its member reaches the input its own rendering rendered.
+/// list checks the item a rendering renders under its member, a step that names one of the partial's inputs by
+/// its member reaches the input its own rendering rendered, and a plain form post sends each input under the
+/// binding path its field gave it.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPartialIsRenderedForTwoMembers : AppPageTest
@@ -84,5 +85,17 @@ public sealed class WhenAPartialIsRenderedForTwoMembers : AppPageTest
         await Button("Read back the alternate contact").ClickAsync();
 
         await Expect(Page.Locator("#alternate-read")).ToHaveTextAsync("Bob");
+    }
+
+    [Test]
+    public async Task a_plain_form_post_sends_each_input_under_the_binding_path_its_field_gave_it()
+    {
+        await Open("/Inputs/Contacts");
+        await Input("Primary contact name").FillAsync("Ann");
+        await Input("Alternate contact name").FillAsync("Bob");
+
+        await Button("Post both contacts").ClickAsync();
+
+        await Expect(Page.GetByText("Posted: primary Ann (555 0100), alternate Bob (555 0199)")).ToBeVisibleAsync();
     }
 }

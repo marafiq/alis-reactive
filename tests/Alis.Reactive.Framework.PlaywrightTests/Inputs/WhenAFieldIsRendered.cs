@@ -3,8 +3,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 /// <summary>
 /// The wrapper an input field renders around its component, by the options it is given (I6): a label names
 /// the input it is given for; a required field marks its label and an optional one does not; a field given no
-/// options has no label and keeps its message beside it; and a hidden field renders its component alone, so it
-/// carries its value with no label, and its message goes to the form's summary.
+/// options has no label and keeps its message beside it; a hidden field renders its component alone, so it
+/// carries its value with no label, and its message goes to the form's summary; and the component a field
+/// renders runs the pipelines its events are given.
 /// </summary>
 [TestFixture]
 public sealed class WhenAFieldIsRendered : AppPageTest
@@ -83,5 +84,16 @@ public sealed class WhenAFieldIsRendered : AppPageTest
         await Expect(Summary).ToContainTextAsync("The desk gives every visitor a pass.");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
         lock (_signIns) Assert.That(_signIns, Is.Empty, "the browser held the request");
+    }
+
+    [Test]
+    public async Task the_component_a_field_renders_runs_the_pipelines_its_events_are_given()
+    {
+        await Open("/Inputs/Arrival");
+
+        await Page.GetByLabel("Room", new() { Exact = true }).FillAsync("12");
+        await Page.GetByLabel("Room", new() { Exact = true }).PressAsync("Tab");
+
+        await Expect(Page.Locator("#room-noted")).ToHaveTextAsync("12");
     }
 }

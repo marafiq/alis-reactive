@@ -12,7 +12,11 @@
 }
 <h1>A resident's contacts</h1>
 
-@await Html.PartialAsync("ContactCard", Model.Primary, primary)
-@await Html.PartialAsync("ContactCard", Model.Alternate, alternate)
+@* A plain form around both cards: the browser posts every input under the name its field gave it. *@
+<form method="post" action="/Inputs/Contacts/Posted">
+    @await Html.PartialAsync("ContactCard", Model.Primary, primary)
+    @await Html.PartialAsync("ContactCard", Model.Alternate, alternate)
+    <button type="submit">Post both contacts</button>
+</form>
 
 <p>The endpoint bound: <span id="contacts-bound"></span></p>
