@@ -83,7 +83,9 @@ jobs:
       - name: Install Playwright browsers
         # Deliberately not cached: Playwright's CI guide says restoring a browser cache takes about
         # as long as the download, and the OS dependencies are not cacheable (docs/CI.md).
-        run: pwsh tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+        # The script's own errors do not stop pwsh, so a failed install would pass and every test would then
+        # meet no browser: stop on the first error.
+        run: pwsh -NoProfile -Command '$ErrorActionPreference = "Stop"; & tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium; exit $LASTEXITCODE'
 
       - name: Run shard ${{ matrix.shard }}
         run: scripts/playwright.sh --no-build --shard "${{ matrix.shard }}" --retry-failed "${{ inputs.retry-failed }}"

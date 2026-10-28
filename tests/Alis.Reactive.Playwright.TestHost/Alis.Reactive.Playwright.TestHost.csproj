@@ -4,6 +4,9 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <!-- The host owns the Playwright reference and its playwright.ps1, which loads Microsoft.Playwright.dll
+             from beside itself; a library's output carries its packages only when told to. -->
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 
     <ItemGroup>
