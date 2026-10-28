@@ -53,6 +53,10 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | P2 | Write a write-only property | `Slate.Note` | the note appears on the slate |
 | P3 | Write, then read, a read-write property | `Slate.Title` | the slate shows the new title; the page shows the title read back |
 | P4 | A value converts to its member's shape where it is read and where it is written | an `Entry`'s text read as a number, a maybe-number, a date and an instant (with I1); `Slate.Place` and `Slate.Fill` arguments (M2, M3) | dates typed as a person writes them reach the endpoint as dates; a blank maybe-number is posted as nothing |
+| P5 | A member of a data value the component holds | `Slate.LastCard` (`ReadOnly<SlateCard>`): `.Get(c => c.Name)` | the name of the card filled last |
+| P6 | One field of each item of a list of data | `Slate.Cards` (`ReadOnly<IReadOnlyList<SlateCard>>`): `.Each(c => c.Name)` into `Slate.Summarize` | every card's name, in order, on the slate |
+| P7 | A nullable property written from a value that is never missing | `Slate.Limit` (`Property<int?>`) from `Slate.Count` | the slate's limit is its row count |
+| P8 | A write-only property written from a value read when the step runs | `Slate.Note` from `Slate.Title` | the note repeats the title |
 | O1 | A nested object's members | `Slate.Header` (`Object<T>()`): `Header.Caption`, `Header.Rename(..)` | the header's caption changes by a call and by a write, and reads back |
 | O2 | An object a method returns, and its members | `Slate.RowAt(index)` (`Object<T>(arg)`): `Row.Label`, `Row.Mark()` | the row at that position is marked, and only it |
 | O3 | A list of objects: an item by position, a field of each item | `Slate.Rows` (`Objects<T>`): `Rows.At(2)`, `Rows.Each(r => r.Label)` into `Slate.Summarize(labels)` | the third row's label; every label, joined on the slate |
@@ -63,6 +67,10 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | M4 | A method's result read where any value is read: a condition, a set, a gather, a route value | `Slate.Has(text)`, `Slate.Total()` | the branch taken; the total as it stands; the total in a request's path and in its body |
 | M5 | An async method awaited, and an async result | `Slate.Save()`, `Slate.Lookup(key)` | "saved" after the slate finishes; the looked-up value |
 | M6 | A method that throws or rejects stops the rest of its pipeline, and the page goes on | `Slate.Fail()`, `Slate.FailLater()` | the step before it ran, the steps after it did not, and the next gesture works |
+| M7 | A field of the page's own class passed by its JavaScript name, with a value of its type | `Slate.SetCard(index, Field.Of((SlateCard c) => c.Name), "Bea")` | the first card is renamed |
+| M8 | A field passed alone | `Slate.SortCards(Field.Of((SlateCard c) => c.Name))`, and by `Due` | the cards in name order, then in due order |
+| M9 | An argument the declaration always passes | `Slate.AddRowBy(label)` with `Fixed("page")` | the row says it was added by the page |
+| M10 | A value passed as the wider type the method declares | `Slate.SummarizeAny(rows.Each(r => r.Label))` with `Pass<IEnumerable<object>, TItems>` | the rows' labels as the summary |
 | E1 | An event without a payload runs its pipeline | `Slate.Cleared`, raised when a method cleared it | the page reacts to the slate being cleared |
 | E2 | A payload's members read | `Slate.RowAdded` (`Event<TArgs>`), raised by the slate's own Add row: `Label`, `Count` | the new row's label and the new count in the page |
 | E3 | A payload's member written before the component reads it back: a cancel | `Slate.Changing`, raised by the slate's own retitle: `Cancel`, `Reason` | the slate keeps its title and shows the reason |

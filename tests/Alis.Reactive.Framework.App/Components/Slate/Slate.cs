@@ -70,6 +70,28 @@ public sealed class Slate : Component
     /// <summary>Refuses a moment later, by rejecting.</summary>
     public void FailLater() => MethodAsync();
 
+    /// <summary>The card filled last, as data the slate keeps: its members are read, never called.</summary>
+    public ReadOnly<SlateCard> LastCard => ReadOnly<SlateCard>();
+
+    /// <summary>Every card filled, in the order the slate keeps them.</summary>
+    public ReadOnly<IReadOnlyList<SlateCard>> Cards => ReadOnly<IReadOnlyList<SlateCard>>();
+
+    /// <summary>How many rows the slate allows; nothing until a page sets it.</summary>
+    public Property<int?> Limit => Property<int?>();
+
+    /// <summary>Writes one field of a card, named as the slate names it, with a value of the field's type.</summary>
+    public void SetCard<TValue>(Arg<int> index, Field<TValue> field, Arg<TValue> value) => Method(index, field, value);
+
+    /// <summary>Orders the cards by a field.</summary>
+    public void SortCards(Field field) => Method(field);
+
+    /// <summary>Adds a row the page asks for; the slate is always told it was the page.</summary>
+    public void AddRowBy(Arg<string> label) => Method(label, Fixed("page"));
+
+    /// <summary>Shows any list of labels as the summary line: the slate's method takes any list.</summary>
+    public void SummarizeAny<TItems>(TypedSource<TItems> labels) where TItems : IEnumerable<object> =>
+        Method(Pass<IEnumerable<object>, TItems>(labels), name: "summarize");
+
     /// <summary>Raised when the slate has been cleared.</summary>
     public Event Cleared => Event();
 

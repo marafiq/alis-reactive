@@ -585,7 +585,8 @@ no key (H2) and no entry (H4).
 - **R2 Events.** A named event subscribes by its name, and unnamed messages arrive as `message`. The
   payload is `JSON.parse(data)`.
 - **R3 Retry.** A permanent close adds a marker to `#alis-realtime-connection-retry-container`. One
-  click retries every dropped connection, and the retried subscriptions keep their owners.
+  click retries every dropped connection, and the retried subscriptions keep their owners. Releasing
+  a connection (its last subscription's owner unloads) withdraws its marker, for a stream and a hub alike.
 - **R4 Members.** `readyState` is the `EventSource`'s (0 connecting, 1 open, 2 closed); `close()`
   closes it, and a close is not a drop: nothing is retried.
 

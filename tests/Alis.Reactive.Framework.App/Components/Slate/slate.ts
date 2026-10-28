@@ -86,8 +86,15 @@ export class Row {
 }
 
 export interface Card {
-  readonly name: string;
-  readonly due: Date;
+  name: string;
+  due: Date;
+}
+
+// The slate orders cards by a field's value: a date by its time, anything else as it compares.
+function order(a: unknown, b: unknown): number {
+  const left = a instanceof Date ? a.getTime() : a;
+  const right = b instanceof Date ? b.getTime() : b;
+  return left === right ? 0 : (left as string | number) < (right as string | number) ? -1 : 1;
 }
 
 const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -114,6 +121,11 @@ export class Slate {
   private readonly retitleButtons: HTMLButtonElement[];
   private readonly reasonLine: HTMLParagraphElement;
   private readonly placedLine: HTMLParagraphElement;
+  private readonly cardsLine: HTMLParagraphElement;
+  private readonly limitLine: HTMLParagraphElement;
+  private readonly cardList: Card[] = [];
+  private latestCard: Card | null = null;
+  private limitValue: number | null = null;
   private titleText: string;
   private noteText = "";
   private summaryText = "";
@@ -135,6 +147,8 @@ export class Slate {
     this.summaryLine = document.createElement("p");
     this.list = document.createElement("ul");
     this.placedLine = document.createElement("p");
+    this.cardsLine = document.createElement("p");
+    this.limitLine = document.createElement("p");
     this.addButton = document.createElement("button");
     this.addButton.type = "button";
     this.addButton.textContent = "Add row";
@@ -149,7 +163,7 @@ export class Slate {
     });
     host.replaceChildren(
       this.captionLine, this.heading, this.reasonLine, this.noteLine, this.summaryLine, this.placedLine,
-      this.list, this.addButton, ...this.retitleButtons);
+      this.cardsLine, this.limitLine, this.list, this.addButton, ...this.retitleButtons);
     host.slate = this;
     this.show();
   }
@@ -209,6 +223,47 @@ export class Slate {
   /** A card: whose it is and the day it is due, by name and weekday. */
   fill(card: Card): void {
     this.placedText = `${card.name} due ${weekdays[card.due.getDay()]} ${dayText(card.due)}`;
+    this.latestCard = { name: card.name, due: card.due };
+    this.cardList.push({ name: card.name, due: card.due });
+    this.show();
+  }
+
+  /** The card filled last, as data. */
+  get lastCard(): Card | null {
+    return this.latestCard;
+  }
+
+  /** Every card filled, as data. */
+  get cards(): readonly Card[] {
+    return this.cardList;
+  }
+
+  get limit(): number | null {
+    return this.limitValue;
+  }
+
+  set limit(value: number | null) {
+    this.limitValue = value;
+    this.show();
+  }
+
+  /** Writes one field of a card. */
+  setCard(index: number, field: string, value: unknown): void {
+    const card = this.cardList[index];
+    if (card === undefined) throw new RangeError(`The slate has no card ${index}.`);
+    (card as unknown as Record<string, unknown>)[field] = value;
+    this.show();
+  }
+
+  /** Orders the cards by a field. */
+  sortCards(field: string): void {
+    this.cardList.sort((a, b) => order((a as unknown as Record<string, unknown>)[field], (b as unknown as Record<string, unknown>)[field]));
+    this.show();
+  }
+
+  /** Adds a row, saying who asked for it. */
+  addRowBy(label: string, by: string): void {
+    this.rows.push(new Row(`${label} (by ${by})`, () => this.show()));
     this.show();
   }
 
@@ -296,6 +351,8 @@ export class Slate {
     this.noteLine.textContent = this.noteText;
     this.summaryLine.textContent = this.summaryText;
     this.placedLine.textContent = this.placedText;
+    this.cardsLine.textContent = this.cardList.length === 0 ? "" : `Cards: ${this.cardList.map(card => card.name).join(" · ")}`;
+    this.limitLine.textContent = this.limitValue === null ? "No limit" : `Limit: ${this.limitValue}`;
     this.list.replaceChildren(...this.rows.map(row => {
       const item = document.createElement("li");
       item.textContent = row.marked ? `${row.label} (marked)` : row.label;

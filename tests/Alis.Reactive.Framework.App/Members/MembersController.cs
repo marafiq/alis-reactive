@@ -10,4 +10,6 @@ public sealed class MembersController : Controller
     public IActionResult Objects() => View(new ObjectsPage());
 
     public IActionResult Methods() => View(new MethodsPage());
+
+    public IActionResult Data() => View(new DataPage());
 }
