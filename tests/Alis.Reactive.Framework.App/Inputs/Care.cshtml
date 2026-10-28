@@ -1,0 +1,37 @@
+@using Alis.Reactive.Framework.App.Inputs
+@model CarePage
+@{
+    ViewData["Title"] = "A resident's care";
+    var plan = Html.ReactivePlan<CarePage>();
+}
+<h1>A resident's care</h1>
+
+<div id="care-form">
+    @{ Html.InputField(plan, m => m.Level, o => o.Label("Level of care")).Choice(); }
+    @{ Html.InputField(plan, m => m.PreviousLevel, o => o.Label("Previous level")).Choice(); }
+    @{ Html.InputField(plan, m => m.Shift, o => o.Label("Shift")).Choice(); }
+    @{ Html.InputField(plan, m => m.Equipment, o => o.Label("Lifting equipment")).Entry(); }
+    @{ Html.InputField(plan, m => m.Keyworker, o => o.Label("Keyworker")).Entry(); }
+</div>
+
+<p>The endpoint bound: <span id="bound"></span></p>
+<p>Assessed: <span id="assessed"></span></p>
+
+@(plan.Button("save", "Save the care")
+    .Reactive(button => button.Click, p => p.Post("/Inputs/Care")
+        .Gather(g => g.Form())
+        .Validate<CareRules>("care-form")
+        .Response(r => r
+            .OnSuccess<CareEcho>((echo, s) => s.Element("bound").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("care-form")))))
+
+@(plan.Button("assess", "Assess")
+    .Reactive(button => button.Click, p =>
+        p.When(p.Component<Choice<CareLevel>>(m => m.Level).Value).Eq(CareLevel.Memory)
+            .Then(t => t.Element("assessed").Text.Set("memory care"))
+            .Else(e => e.Element("assessed").Text.Set("not memory care"))))
+
+@(plan.Button("to-nursing", "Move to nursing care")
+    .Reactive(button => button.Click, p => p.Component<Choice<CareLevel>>(m => m.Level).Value.Set(CareLevel.Nursing)))
+
+@Html.RenderPlan(plan)

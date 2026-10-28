@@ -7,7 +7,7 @@ namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// A value is entered: not blank, and not the type's default. On a list, at least one item; on an
-    /// enum, a member other than the default one.
+    /// enum, a member other than the default one, and on a nullable enum, whose default is null, any member.
     /// </summary>
     public sealed class NotEmptyRule : BrowserRule
     {
@@ -27,11 +27,9 @@ namespace Alis.Reactive.Validation
         }
 
         // The member an enum's default binds as (its member with value 0), which the server's NotEmpty refuses.
-        private static string? DefaultMemberOf(Type memberType)
-        {
-            var enumType = EnumMember.TypeOf(memberType);
-            return enumType == null ? null : EnumMember.Default(enumType)?.ToString();
-        }
+        // A nullable enum's default is null, which binds as blank, so its member with value 0 is an answer.
+        private static string? DefaultMemberOf(Type memberType) =>
+            memberType.IsEnum ? EnumMember.Default(memberType)?.ToString() : null;
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Not(BlankOrDefault(value, fieldShape));

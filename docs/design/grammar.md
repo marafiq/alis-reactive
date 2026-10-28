@@ -692,7 +692,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 | Term | Server | Browser check `(v)` |
 |---|---|---|
 | `NotNull` | `v != null` | text or a nullable: not blank (blank text binds as null); a number, a boolean, a date or an enum that cannot be null always binds, so no browser check |
-| `NotEmpty` | not null, blank text, an empty list or the type's default | by the property's type: text not blank; number not blank and not 0; boolean not blank and not false; date not blank and not 0001-01-01; enum not blank and not the member its default binds as; collection at least one item |
+| `NotEmpty` | not null, blank text, an empty list or the type's default | by the property's type: text not blank; number not blank and not 0; boolean not blank and not false; date not blank and not 0001-01-01; enum not blank and not the member its default binds as (a nullable enum, whose default is null: not blank); collection at least one item |
 | `Empty` | the negation of `NotEmpty` | the negation of the row above |
 | `MinimumLength`, `MaximumLength`, `Length` | null passes; the length is within bounds | `v == null` or the length is within bounds |
 | `EmailAddress` | null passes; exactly one `@`, neither first nor last | the same |
