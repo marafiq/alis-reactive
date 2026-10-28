@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 public sealed class SwitchLocator
 {

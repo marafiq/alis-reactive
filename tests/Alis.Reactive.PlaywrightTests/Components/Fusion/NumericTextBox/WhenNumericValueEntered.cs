@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.NumericTextBox;
 
 // Journey: a care coordinator sets a resident's Monthly Service Plan — how many catered

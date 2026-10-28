@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// A Syncfusion DropDownTree: the input <c>#{componentId}</c> that shows the chosen node's text, the box

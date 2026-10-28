@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// Reads the emitted Reactive Plan and provides typed component locators.

@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Breadcrumb;
 
 // Journey: a care coordinator is deep in a resident's care record. The breadcrumb

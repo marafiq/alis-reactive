@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion BulletChart by its component ID: its bars, their target lines and its tooltip.</summary>
 public sealed class FusionBulletChartLocator

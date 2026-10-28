@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion SplitButton: the primary button, the arrow beside it, and the popup menu the arrow opens.</summary>
 public sealed class FusionSplitButtonLocator

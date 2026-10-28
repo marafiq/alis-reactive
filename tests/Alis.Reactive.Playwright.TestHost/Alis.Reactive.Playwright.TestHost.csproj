@@ -12,8 +12,4 @@
         <PackageReference Include="NUnit" Version="4.6.1" />
     </ItemGroup>
 
-    <ItemGroup>
-        <InternalsVisibleTo Include="Alis.Reactive.PlaywrightTests" />
-    </ItemGroup>
-
 </Project>

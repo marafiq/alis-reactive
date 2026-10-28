@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// Syncfusion DropDownList uses <c>#{componentId}_popup</c> with <c>.e-list-item</c> options.

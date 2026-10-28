@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Switch;
 
 // Journey: a resident manages their Care Alert Preferences. A master "receive care alerts"

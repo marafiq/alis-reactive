@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// A Syncfusion ChipList: its chips in order, a chip by its text, the chips it shows selected, and the icon

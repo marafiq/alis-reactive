@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AIAssistView;
 
 /// <summary>

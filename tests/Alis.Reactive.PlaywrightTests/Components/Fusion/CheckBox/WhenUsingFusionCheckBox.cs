@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.CheckBox;
 
 // Journey: a new resident completes their Move-In Services Agreement with a move-in

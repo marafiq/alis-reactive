@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion ListView by its component ID: its items, which are selected and which are checked.</summary>
 public sealed class FusionListViewLocator

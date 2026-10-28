@@ -1,7 +1,7 @@
 using System.Globalization;
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// Uses popup gestures because typed text does not always update Syncfusion <c>ej2.value</c>.

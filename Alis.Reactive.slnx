@@ -17,7 +17,7 @@
     <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlanTests/Alis.Reactive.PlanTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
+    <Project Path="tests/Alis.Reactive.Playwright.TestHost/Alis.Reactive.Playwright.TestHost.csproj" />
   </Folder>
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />

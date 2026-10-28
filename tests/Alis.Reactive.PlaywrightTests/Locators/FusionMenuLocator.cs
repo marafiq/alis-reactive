@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion Menu: its top list, the hamburger icon that opens and closes it, and an item by its text.</summary>
 public sealed class FusionMenuLocator

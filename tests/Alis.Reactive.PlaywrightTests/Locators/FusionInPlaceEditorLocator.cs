@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion InPlaceEditor rendered inline: a shown value that opens an editor with save and cancel buttons.</summary>
 public sealed class FusionInPlaceEditorLocator

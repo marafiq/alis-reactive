@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion ContextMenu: its top list, the lists it has open, and an item by its text.</summary>
 public sealed class FusionContextMenuLocator

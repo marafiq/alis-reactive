@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.RadioButton;
 
 // Journey: a care coordinator completes a new resident's Move-in Room & Care Plan.

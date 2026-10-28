@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextBox;
 
 // Journey: a care coordinator updates a resident's profile card — the preferred name the

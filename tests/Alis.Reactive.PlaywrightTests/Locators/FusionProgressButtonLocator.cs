@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion ProgressButton: the button, the words on it, and the bar that fills while its progress runs.</summary>
 public sealed class FusionProgressButtonLocator

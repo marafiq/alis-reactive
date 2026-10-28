@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Button;
 
 // Journey: a care-team member runs a resident's Daily Wellness Check-In.

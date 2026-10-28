@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.PharmacyReview;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.PharmacyReview;

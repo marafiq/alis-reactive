@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar;
 
 // Journey: a care coordinator works the Resident Care Dashboard. Care-services

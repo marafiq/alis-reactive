@@ -1,88 +1,84 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using NUnit.Framework;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.Playwright.TestHost;
 
 /// <summary>
-/// Runs one SandboxApp Kestrel instance on a free port for a Playwright test assembly. NUnit runs a setup
-/// fixture only from the test assembly itself, so each test project declares one deriving from this class:
-/// <c>[SetUpFixture] public sealed class Sandbox : SandboxServer;</c> in its root namespace.
+/// Runs, on a free port, the web app a Playwright test assembly is written against: the app whose entry
+/// assembly the test project names. NUnit runs a setup fixture only from the test assembly itself, so each
+/// test project declares one in its root namespace:
+/// <code>[SetUpFixture] public sealed class Sandbox() : AppServer(typeof(Program).Assembly);</code>
+/// One app per test assembly: the address every page test opens is the assembly's.
 /// </summary>
-public abstract class SandboxServer
+/// <param name="app">The app's entry assembly, as the test project references it.</param>
+/// <param name="environment">Environment variables the app runs with, beside the Development environment.</param>
+public abstract class AppServer(Assembly app, params (string Name, string Value)[] environment)
 {
-    private const int CapturedServerOutputLines = 200;
-    private const int SandboxReadinessAttempts = 60;
-    private const int SandboxReadinessDelayMs = 500;
+    private const int CapturedOutputLines = 200;
+    private const int ReadinessAttempts = 60;
+    private const int ReadinessDelayMs = 500;
     private static Process? _server;
-    private static readonly string[] RequiredBootAssets =
-    [
-        "/",
-        "/vendor/syncfusion/dist/ej2.min.js",
-        "/scripts/alis-reactive.dev.js",
-        "/css/design-system.dev.css",
-        "/css/syncfusion.dev.css",
-        "/css/sandbox.css",
-        "/js/sandbox-plugins.js"
-    ];
+    private static string? _baseUrl;
 
-    public static string BaseUrl { get; private set; } = "";
+    internal static string BaseUrl => _baseUrl ?? throw new InvalidOperationException(
+        "No app is running for this test assembly. Declare the app in the test project's root namespace: " +
+        "[SetUpFixture] public sealed class App() : AppServer(typeof(Program).Assembly);");
 
     [OneTimeSetUp]
-    public async Task StartServer()
+    public async Task StartApp()
     {
-        var port = GetAvailablePort();
-        BaseUrl = $"http://localhost:{port}";
+        if (_server is not null)
+            throw new InvalidOperationException("An app is already running for this test assembly: declare one AppServer per test project.");
 
-        var projectDir = FindProjectDir();
-        var sandboxAssembly = FindSandboxAssembly();
-        var output = new ServerOutputBuffer(CapturedServerOutputLines);
-
-        _server = new Process
+        var name = app.GetName().Name!;
+        var url = $"http://localhost:{FreePort()}";
+        var output = new OutputTail(CapturedOutputLines);
+        var server = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"\"{sandboxAssembly}\" --urls {BaseUrl}",
-                WorkingDirectory = projectDir,
+                Arguments = $"\"{app.Location}\" --urls {url}",
+                WorkingDirectory = ContentRoot(name),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                Environment =
-                {
-                    ["ASPNETCORE_ENVIRONMENT"] = "Development",
-                    ["DOTNET_URLS"] = BaseUrl,
-                    ["ALIS_NO_BROADCAST"] = "1"
-                }
-            }
+                Environment = { ["ASPNETCORE_ENVIRONMENT"] = "Development" },
+            },
         };
+        foreach (var (key, value) in environment)
+            server.StartInfo.Environment[key] = value;
 
-        TestContext.Progress.WriteLine($"[playwright:sandbox] starting {BaseUrl}");
-        _server.OutputDataReceived += (_, e) => output.Capture("out", e.Data);
-        _server.ErrorDataReceived += (_, e) => output.Capture("err", e.Data);
-        _server.Start();
-        _server.BeginOutputReadLine();
-        _server.BeginErrorReadLine();
+        TestContext.Progress.WriteLine($"[playwright:app] starting {name} {url}");
+        server.OutputDataReceived += (_, e) => output.Capture("out", e.Data);
+        server.ErrorDataReceived += (_, e) => output.Capture("err", e.Data);
+        _server = server;
+        server.Start();
+        server.BeginOutputReadLine();
+        server.BeginErrorReadLine();
 
         using var http = new HttpClient();
-        if (await WaitForSandboxReadiness(http, output))
+        if (await AnswersHome(http, server, url, output))
         {
-            TestContext.Progress.WriteLine($"[playwright:sandbox] ready {BaseUrl}");
+            _baseUrl = url;
+            TestContext.Progress.WriteLine($"[playwright:app] ready {name} {url}");
             return;
         }
 
-        StopServer();
-        throw new Exception(
-            $"Server did not start within 30 seconds at {BaseUrl}.{Environment.NewLine}{output.Render()}");
+        StopApp();
+        throw new TimeoutException(
+            $"{name} did not answer {url}/ within {ReadinessAttempts * ReadinessDelayMs / 1000} seconds.{Environment.NewLine}{output.Render()}");
     }
 
     [OneTimeTearDown]
-    public void StopServer()
+    public void StopApp()
     {
         var server = _server;
         _server = null;
-
+        _baseUrl = null;
         if (server is null)
             return;
 
@@ -97,7 +93,7 @@ public abstract class SandboxServer
         }
     }
 
-    private static int GetAvailablePort()
+    private static int FreePort()
     {
         using var listener = new TcpListener(IPAddress.Loopback, 0);
         listener.Start();
@@ -106,109 +102,71 @@ public abstract class SandboxServer
         return port;
     }
 
-    private static async Task<bool> WaitForSandboxReadiness(HttpClient http, ServerOutputBuffer output)
+    // The app is ready when its home page answers: the pipeline that serves the page serves its bundles,
+    // and the runner refuses to start when a bundle is missing or stale.
+    private static async Task<bool> AnswersHome(HttpClient http, Process server, string url, OutputTail output)
     {
-        for (var readinessAttempt = 0; readinessAttempt < SandboxReadinessAttempts; readinessAttempt++)
+        for (var attempt = 0; attempt < ReadinessAttempts; attempt++)
         {
-            if (_server is { HasExited: true })
-                throw new Exception(
-                    $"Server exited before it started at {BaseUrl}.{Environment.NewLine}{output.Render()}");
+            if (server.HasExited)
+                throw new InvalidOperationException($"The app exited before it answered {url}/.{Environment.NewLine}{output.Render()}");
 
-            if (await AllBootAssetsRespond(http))
-                return true;
+            try
+            {
+                using var response = await http.GetAsync(url + "/", HttpCompletionOption.ResponseHeadersRead);
+                if (response.IsSuccessStatusCode)
+                    return true;
+            }
+            catch (HttpRequestException)
+            {
+                // Not listening yet.
+            }
 
-            await Task.Delay(SandboxReadinessDelayMs);
+            await Task.Delay(ReadinessDelayMs);
         }
 
         return false;
     }
 
-    private static async Task<bool> AllBootAssetsRespond(HttpClient http)
+    // The app's own folder, where its views and wwwroot are: <name>/<name>.csproj above the test output.
+    private static string ContentRoot(string name)
     {
-        foreach (var asset in RequiredBootAssets)
+        for (var dir = TestContext.CurrentContext.TestDirectory; dir is not null; dir = Path.GetDirectoryName(dir))
         {
-            if (!await BootAssetResponds(http, asset))
-                return false;
+            var project = Path.Combine(dir, name, name + ".csproj");
+            if (File.Exists(project))
+                return Path.GetDirectoryName(project)!;
         }
 
-        return true;
+        throw new DirectoryNotFoundException(
+            $"No {name}/{name}.csproj above {TestContext.CurrentContext.TestDirectory}: an app's folder is named for its assembly.");
     }
 
-    private static async Task<bool> BootAssetResponds(HttpClient http, string assetPath)
+    private sealed class OutputTail(int capacity)
     {
-        try
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Get, BaseUrl + assetPath);
-            using var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            return response.IsSuccessStatusCode;
-        }
-        catch
-        {
-            return false;
-        }
-    }
+        private readonly Queue<string> _lines = new();
+        private readonly object _gate = new();
 
-    private static string FindProjectDir()
-    {
-        var dir = TestContext.CurrentContext.TestDirectory;
-        while (dir != null)
+        internal void Capture(string stream, string? line)
         {
-            var candidate = Path.Combine(dir, "Alis.Reactive.SandboxApp", "Alis.Reactive.SandboxApp.csproj");
-            if (File.Exists(candidate))
-                return Path.GetDirectoryName(candidate)!;
-            dir = Path.GetDirectoryName(dir);
+            if (line is null) return;
+
+            lock (_gate)
+            {
+                if (_lines.Count == capacity)
+                    _lines.Dequeue();
+                _lines.Enqueue($"[{stream}] {line}");
+            }
         }
 
-        // Fallback supports local runs launched from the repo root instead of test output.
-        var repoRoot = Path.GetFullPath(Path.Combine(TestContext.CurrentContext.TestDirectory, "..", "..", "..", "..", ".."));
-        return Path.Combine(repoRoot, "Alis.Reactive.SandboxApp");
-    }
-
-    private static string FindSandboxAssembly()
-    {
-        var candidate = Path.Combine(TestContext.CurrentContext.TestDirectory, "Alis.Reactive.SandboxApp.dll");
-        if (File.Exists(candidate))
-            return candidate;
-
-        throw new FileNotFoundException(
-            "The Playwright test output is missing Alis.Reactive.SandboxApp.dll. " +
-            "Build the test project, which references the sandbox, before running its tests.",
-            candidate);
-    }
-}
-
-internal sealed class ServerOutputBuffer
-{
-    private readonly int _capacity;
-    private readonly Queue<string> _lines = new();
-    private readonly object _gate = new();
-
-    internal ServerOutputBuffer(int capacity)
-    {
-        _capacity = capacity;
-    }
-
-    internal void Capture(string stream, string? line)
-    {
-        if (line == null) return;
-
-        lock (_gate)
+        internal string Render()
         {
-            if (_lines.Count == _capacity)
-                _lines.Dequeue();
-
-            _lines.Enqueue($"[{stream}] {line}");
-        }
-    }
-
-    internal string Render()
-    {
-        lock (_gate)
-        {
-            if (_lines.Count == 0)
-                return "No server output captured.";
-
-            return "Recent server output:" + Environment.NewLine + string.Join(Environment.NewLine, _lines);
+            lock (_gate)
+            {
+                return _lines.Count == 0
+                    ? "No app output captured."
+                    : "Recent app output:" + Environment.NewLine + string.Join(Environment.NewLine, _lines);
+            }
         }
     }
 }

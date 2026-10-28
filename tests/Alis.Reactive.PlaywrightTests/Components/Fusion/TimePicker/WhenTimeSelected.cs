@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TimePicker;
 
 // Journey: a care coordinator sets a resident's morning medication time.

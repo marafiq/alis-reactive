@@ -107,3 +107,6 @@ app.MapControllerRoute(
         pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+// The test projects start the sandbox by its entry point (AppServer).
+public partial class Program;

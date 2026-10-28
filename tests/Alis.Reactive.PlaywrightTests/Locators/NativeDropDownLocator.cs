@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// Locates a native <c>&lt;select&gt;</c> rendered by <c>NativeDropDown</c>; the component id is

@@ -13,7 +13,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 - **CI Playwright is single-worker.** `tests/Alis.Reactive.PlaywrightTests/GlobalUsings.cs:4-5`
   declares `[assembly: Parallelizable(ParallelScope.Fixtures)]` and
   `[assembly: LevelOfParallelism(1)]`; one Kestrel sandbox per test assembly run
-  (`tests/Alis.Reactive.Playwright.Extensions/SandboxServer.cs` on a free port, started by the
+  (`tests/Alis.Reactive.Playwright.TestHost/AppServer.cs` on a free port, started by the
   `[SetUpFixture]` each test project declares over it). Playwright's own CI guide
   recommends one worker on CI "to prioritize stability and reproducibility"
   ([playwright.dev/docs/ci](https://playwright.dev/docs/ci)).

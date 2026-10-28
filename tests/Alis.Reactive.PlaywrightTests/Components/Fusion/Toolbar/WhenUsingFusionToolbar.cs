@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Toolbar;
 
 // Journey: a resident manages their account from a command bar. They can request

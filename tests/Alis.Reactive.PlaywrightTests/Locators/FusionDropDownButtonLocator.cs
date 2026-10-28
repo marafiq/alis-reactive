@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion DropDownButton: the button and the popup menu it opens.</summary>
 public sealed class FusionDropDownButtonLocator

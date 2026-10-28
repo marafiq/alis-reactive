@@ -12,8 +12,8 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var hasBootStart = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booting"));
-        var hasBootEnd = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booted"));
+        var hasBootStart = ConsoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booting"));
+        var hasBootEnd = ConsoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booted"));
 
         Assert.That(hasBootStart, Is.True, "Boot start trace must appear in console");
         Assert.That(hasBootEnd, Is.True, "Boot complete trace must appear in console");
@@ -27,7 +27,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var messages = _consoleMessages;
+        var messages = ConsoleMessages.ToList();
 
         var lastListenerTraceIndex = -1;
         for (var messageIndex = 0; messageIndex < messages.Count; messageIndex++)
@@ -67,7 +67,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var dispatchMessages = _consoleMessages
+        var dispatchMessages = ConsoleMessages
             .Where(m => m.Contains("[alis:execute] dispatch {"))
             .ToList();
 
@@ -90,7 +90,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var elementReactionMessages = _consoleMessages
+        var elementReactionMessages = ConsoleMessages
             .Where(m => m.Contains("[alis:execute]") && (m.Contains("set {") || m.Contains("call {")))
             .ToList();
 

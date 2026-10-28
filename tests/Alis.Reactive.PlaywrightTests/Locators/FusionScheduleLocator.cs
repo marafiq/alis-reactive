@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// A Syncfusion Schedule: its appointments, its cells, its header bar, the details popup an appointment opens,

@@ -1,17 +1,12 @@
-using System.Diagnostics;
-using Microsoft.Playwright;
-using Microsoft.Playwright.NUnit;
-using NUnit.Framework;
-
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests;
 
 /// <summary>
-/// One browser page per test against the sandbox the test assembly started: real gestures, the page's console
-/// captured, and a trace kept when the test fails.
+/// A page test against the sandbox: the shared page lifecycle (<see cref="AppPageTest"/>) plus what the
+/// sandbox's pages need, the Syncfusion runtime served from node_modules with its animations off and the
+/// layout's web fonts left out, and the sandbox suites' own helpers over the page's console.
 /// </summary>
-public abstract class PlaywrightTestBase : PageTest
+public abstract class PlaywrightTestBase : AppPageTest
 {
-    protected string BaseUrl => SandboxServer.BaseUrl;
     private const int BootPollIntervalMs = 50;
     private const int ReactiveBootTimeoutMs = 60000;
     private const int NavigationTimeoutBootRecoveryMs = 1000;
@@ -25,24 +20,17 @@ public abstract class PlaywrightTestBase : PageTest
         "ERR_NETWORK_IO_SUSPENDED"
     ];
 
-    protected readonly List<string> _consoleMessages = new();
+    private readonly List<string> _consoleMessages = new();
     private readonly List<string> _consoleErrors = new();
     private readonly object _consoleLock = new();
-    private Stopwatch? _testStopwatch;
+
+    /// <summary>The page's console so far, copied under the lock the console handler writes under.</summary>
+    protected IReadOnlyList<string> ConsoleMessages => SnapshotConsoleMessages();
 
     [SetUp]
-    public async Task SetUpConsoleCapture()
+    public async Task PrepareSandboxPage()
     {
-        _testStopwatch = Stopwatch.StartNew();
-        WriteProgress("start");
-
         ClearConsoleState();
-        Page.SetDefaultTimeout(60000);
-        Page.SetDefaultNavigationTimeout(60000);
-        await RouteExternalFontsToLocalFallback();
-        await RouteLocalSyncfusionRuntime();
-        await DisableSyncfusionScriptAnimations();
-
         Page.Console += (_, msg) =>
         {
             lock (_consoleLock)
@@ -52,7 +40,6 @@ public abstract class PlaywrightTestBase : PageTest
                     _consoleErrors.Add(msg.Text);
             }
         };
-
         Page.PageError += (_, error) =>
         {
             lock (_consoleLock)
@@ -62,14 +49,9 @@ public abstract class PlaywrightTestBase : PageTest
             }
         };
 
-        // Failure traces capture screenshots, DOM snapshots, and network in a Playwright .zip.
-        await Context.Tracing.StartAsync(new()
-        {
-            Title = $"{TestContext.CurrentContext.Test.ClassName}.{TestContext.CurrentContext.Test.Name}",
-            Screenshots = true,
-            Snapshots = true,
-            Sources = false
-        });
+        await RouteExternalFontsToLocalFallback();
+        await RouteLocalSyncfusionRuntime();
+        await DisableSyncfusionScriptAnimations();
     }
 
     private async Task RouteExternalFontsToLocalFallback()
@@ -111,44 +93,6 @@ public abstract class PlaywrightTestBase : PageTest
             }));
     }
 
-    [TearDown]
-    public async Task TearDown()
-    {
-        var failed = TestContext.CurrentContext.Result.Outcome.Status
-            == NUnit.Framework.Interfaces.TestStatus.Failed;
-        var tracePath = default(string);
-        var screenshotPath = default(string);
-
-        // Keep failure artifacts beside the test project so wrapper diagnostics use stable paths.
-        var projectDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", ".."));
-        var traceDir = Path.Combine(projectDir, "TestResults", "playwright-traces");
-        Directory.CreateDirectory(traceDir);
-
-        var testName = TestContext.CurrentContext.Test.Name;
-        tracePath = failed ? Path.Combine(traceDir, $"{testName}.zip") : null;
-        screenshotPath = failed ? Path.Combine(traceDir, $"{testName}.png") : null;
-
-        await Context.Tracing.StopAsync(new() { Path = tracePath });
-
-        if (failed)
-        {
-            await Page.ScreenshotAsync(new() { Path = screenshotPath!, FullPage = true });
-            TestContext.AddTestAttachment(tracePath!, "Playwright trace");
-            TestContext.AddTestAttachment(screenshotPath!, "Screenshot on failure");
-
-            var messages = SnapshotConsoleMessages();
-            if (messages.Count > 0)
-            {
-                TestContext.Out.WriteLine("=== Page Console Output ===");
-                foreach (var msg in messages)
-                    TestContext.Out.WriteLine(msg);
-                TestContext.Out.WriteLine("=== End Console Output ===");
-            }
-        }
-
-        WriteProgress("end", tracePath, screenshotPath);
-    }
-
     protected async Task NavigateTo(string path)
     {
         try
@@ -167,18 +111,6 @@ public abstract class PlaywrightTestBase : PageTest
             TestContext.Out.WriteLine(
                 "Navigation timed out after reactive boot was observed; continuing with reactive boot as readiness.");
         }
-    }
-
-    protected async Task NavigateToAndWaitForTextSignal(
-        string path,
-        string selector,
-        string placeholder = "\u2014",
-        int timeoutMs = 10000)
-    {
-        await NavigateTo(path);
-        await WaitForReactiveBoot(timeoutMs);
-        await Expect(Page.Locator(selector))
-            .Not.ToHaveTextAsync(placeholder, new() { Timeout = timeoutMs });
     }
 
     protected async Task NavigateToAndWaitForBoot(
@@ -376,29 +308,6 @@ public abstract class PlaywrightTestBase : PageTest
         foreach (var message in messages)
             TestContext.Out.WriteLine(message);
         TestContext.Out.WriteLine("=== End Console Output ===");
-    }
-
-    private void WriteProgress(string phase, string? tracePath = null, string? screenshotPath = null)
-    {
-        var test = TestContext.CurrentContext.Test;
-        var result = TestContext.CurrentContext.Result;
-        var outcome = phase == "start"
-            ? "Running"
-            : result.Outcome.Label is { Length: > 0 }
-            ? $"{result.Outcome.Status}:{result.Outcome.Label}"
-            : result.Outcome.Status.ToString();
-        var elapsed = _testStopwatch?.Elapsed;
-        var elapsedText = elapsed.HasValue ? $"{elapsed.Value.TotalSeconds:0.000}s" : "-";
-
-        TestContext.Progress.WriteLine(
-            $"[playwright:{phase}] {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss.fff zzz} " +
-            $"{outcome} elapsed={elapsedText} {test.FullName}");
-
-        if (tracePath is { Length: > 0 })
-            TestContext.Progress.WriteLine($"[playwright:artifact] trace={tracePath}");
-
-        if (screenshotPath is { Length: > 0 })
-            TestContext.Progress.WriteLine($"[playwright:artifact] screenshot={screenshotPath}");
     }
 
     private static string FindRequiredFile(string relativePath)

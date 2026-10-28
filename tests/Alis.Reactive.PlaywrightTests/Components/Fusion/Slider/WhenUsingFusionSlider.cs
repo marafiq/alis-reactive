@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 
 // Journey: a resident sets their Comfort & Care Preferences. The page carries over

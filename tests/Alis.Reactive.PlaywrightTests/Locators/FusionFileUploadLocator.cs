@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion Uploader rendered for a form (files are sent with the form, not uploaded on their own).</summary>
 public sealed class FusionFileUploadLocator

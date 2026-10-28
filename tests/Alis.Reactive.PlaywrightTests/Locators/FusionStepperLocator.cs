@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>A Syncfusion Stepper: its steps, the one it has open, and the tooltip it shows on hover.</summary>
 public sealed class FusionStepperLocator

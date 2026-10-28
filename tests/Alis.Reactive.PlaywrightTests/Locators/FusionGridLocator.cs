@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// A Syncfusion Grid: its rows, a row by the text it carries, a cell of a row, the rows it shows selected, the

@@ -1,4 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.NumericCondition;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.NumericCondition;

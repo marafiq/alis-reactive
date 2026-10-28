@@ -1,4 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.AutoComplete;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete;

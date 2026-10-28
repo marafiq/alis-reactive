@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Alis.Reactive.Playwright.Extensions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Menu;
 

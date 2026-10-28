@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Carousel;
 
 // Journey: a nurse walks a resident through their Guided Care-Plan Review.

@@ -29,7 +29,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var finalDispatch = _consoleMessages
+        var finalDispatch = ConsoleMessages
             .FirstOrDefault(m => m.Contains("[alis:execute]")
                                  && m.Contains("dispatch")
                                  && m.Contains("\"event\":\"final\""));
@@ -83,7 +83,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var dispatches = _consoleMessages
+        var dispatches = ConsoleMessages
             .Where(m => m.Contains("[alis:execute]") && m.Contains("dispatch"))
             .ToList();
 

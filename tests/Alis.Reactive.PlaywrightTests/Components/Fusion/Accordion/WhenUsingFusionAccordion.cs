@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Accordion;
 
 // Journey: a resident reads their personal "My Care Plan" page. The plan is organized into

@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace Alis.Reactive.Playwright.Extensions;
+namespace Alis.Reactive.PlaywrightTests.Locators;
 
 /// <summary>
 /// Syncfusion AutoComplete uses <c>#{componentId}</c> input and <c>#{componentId}_popup</c> popup IDs.

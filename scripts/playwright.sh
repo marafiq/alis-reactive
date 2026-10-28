@@ -123,7 +123,7 @@ check_no_build_is_fresh() {
       Alis.Reactive.Native \
       Alis.Reactive.NativeTagHelpers \
       Alis.Reactive.SandboxApp \
-      tests/Alis.Reactive.Playwright.Extensions \
+      tests/Alis.Reactive.Playwright.TestHost \
       tests/Alis.Reactive.PlaywrightTests \
       \( -path '*/bin' -o -path '*/bin/*' -o -path '*/obj' -o -path '*/obj/*' \) -prune -o \
       -type f \
