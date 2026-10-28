@@ -4,3 +4,4 @@ import "./Components/Slate/slate";
 import "./Components/Bell/bell";
 import "./Components/Meter/meter";
 import "./Components/Tally/tally";
+import "./Components/Entry/entry";

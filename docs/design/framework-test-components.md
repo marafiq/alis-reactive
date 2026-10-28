@@ -48,7 +48,7 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | P1 | Read a read-only property | `Slate.Count` | the count the slate shows, copied into the page |
 | P2 | Write a write-only property | `Slate.Note` | the note appears on the slate |
 | P3 | Write, then read, a read-write property | `Slate.Title` | the slate shows the new title; the page shows the title read back |
-| P4 | A value converts to its member's shape when read and written: text, number, yes/no, date, instant, maybe-number, list, record | `Slate.Text`, `Number`, `Flag`, `Day`, `Moment`, `Maybe`, `Tags`, `Card` | each value shown in the form its shape gives it (a number added, a day as the date picked, a list as its items) |
+| P4 | A value converts to its member's shape where it is read and where it is written | an `Entry`'s text read as a number, a maybe-number, a date and an instant (with I1); `Slate.Place` and `Slate.Fill` arguments (M2, M3) | dates typed as a person writes them reach the endpoint as dates; a blank maybe-number is posted as nothing |
 | O1 | A nested object's members | `Slate.Header` (`Object<T>()`): `Header.Caption`, `Header.Rename(..)` | the header's caption changes by a call and by a write, and reads back |
 | O2 | An object a method returns, and its members | `Slate.RowAt(index)` (`Object<T>(arg)`): `Row.Label`, `Row.Mark()` | the row at that position is marked, and only it |
 | O3 | A list of objects: an item by position, a field of each item | `Slate.Rows` (`Objects<T>`): `Rows.At(2)`, `Rows.Each(r => r.Label)` into `Slate.Summarize(labels)` | the third row's label; every label, joined on the slate |
@@ -69,9 +69,9 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | V2 | Listening through callback properties, beside the component's own callback | `Bell.OnRung`, `Bell.Ring()`, `Bell.Rings` | the page counts the rings, and the bell still shows its own count |
 | V3 | The element as the object, the DOM event's detail as the payload | `Meter.Level`, `Meter.Max`, `Meter.LevelChanged` | the level the meter shows and reads back; the page shows the change's detail |
 | V4 | The object under a path on its element | `Slate` (`slate`) | (every Slate row) |
-| I1 | An input's value gathered into a request under its member name | `Entry` in `Gather(g => g.Form())` | the server's answer, which echoes what it bound |
-| I2 | A validation message on the input's own error slot | `Entry` under a validator | the message beside the entry |
-| I3 | The commit event clears a corrected message | `Entry`, corrected | the message goes, with no submit |
+| I1 | An input's value gathered into a request under its member name, as its member's type | `Entry` for text, number, maybe-number, date and instant members, in `Gather(g => g.Form())` | the endpoint's answer, which says what it bound |
+| I2 | A rule the browser can check holds the request and shows its message on the input's own slot | `Entry` under a validator | the message beside the entry, and no request; a number rule compares numbers, not text |
+| I3 | Typing clears a message; leaving an input (its commit) re-checks it | `Entry` after a refused submit | the message goes as the user types; leaving with a value that breaks a rule shows that rule's message, with no submit |
 | I4 | An input in a partial binds under the partial's prefix | `Entry` in a partial for a member | the server's answer shows the prefixed member bound |
 | G1 | A plugin's property read and written, a method called, a result read | `Tally.Total`, `Tally.Mark`, `Tally.Add(n)`, `Tally.HasPassedTheMark()` | the total in the page; the branch the mark decides. An app's plugin has no events: only the framework's own plugins are subscribed to (`runtime/objects/plugins.ts`, `pluginOf`) |
 | L1 | Constructed on `alis:mount` before handlers subscribe, at boot and in injected HTML | `Slate` on the page and in a loaded partial | its first event is heard in both |
