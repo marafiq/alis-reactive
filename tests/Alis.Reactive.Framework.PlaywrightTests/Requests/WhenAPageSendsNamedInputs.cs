@@ -2,7 +2,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
 /// <summary>
 /// A request that names the inputs it sends (<c>g.Form(m =&gt; m.A, m =&gt; m.B)</c>), each reaching an endpoint that
-/// says what it bound: only the inputs named, each by its binding name and read as MVC binds it, into a request
+/// says what it bound: only the inputs named, each by its binding name and read as MVC binds it (blank text as
+/// nothing, a number left empty as zero), into a request
 /// member of a type the input's value binds to (the same type, one that may be empty, a base type, another
 /// collection of the same items), matched ignoring case, through a list item or into a member that takes any
 /// name; and in a partial rendered for a member of the page's model, under that member's prefix.
@@ -36,6 +37,18 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
         await Button("Sign in").ClickAsync();
 
         await Expect(Line("signed-in")).ToHaveTextAsync("Ada, party of 3, note none");
+    }
+
+    [Test]
+    public async Task a_named_input_left_blank_is_sent_as_mvc_binds_an_empty_input()
+    {
+        await Open("/Requests/SignIn");
+        await Type("Visitor", "   ");
+        await Type("Party", "");
+
+        await Button("Sign in").ClickAsync();
+
+        await Expect(Line("signed-in")).ToHaveTextAsync("no one, party of 0, note none");
     }
 
     [Test]
