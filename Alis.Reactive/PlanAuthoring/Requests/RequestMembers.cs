@@ -76,8 +76,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         private static bool IsCollection(Type type) =>
-            type != typeof(string) && (type.IsArray || type.GetInterfaces().Any(candidate =>
-                candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>)));
+            type != typeof(string) && (type.IsArray || SequenceOf(type) != null);
 
         // A member typed as object or a dictionary takes any name below it.
         private static bool IsOpen(Type type) =>
@@ -89,11 +88,13 @@ namespace Alis.Reactive.Builders.Requests
             var dictionaryValue = DictionaryValueType(collection);
             if (dictionaryValue != null) return dictionaryValue;
 
-            var enumerable = collection.IsGenericType && collection.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                ? collection
-                : collection.GetInterfaces().FirstOrDefault(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-            return enumerable?.GetGenericArguments()[0] ?? typeof(object);
+            return SequenceOf(collection)?.GetGenericArguments()[0] ?? typeof(object);
         }
+
+        // The IEnumerable<T> a type is or implements: an interface does not list itself among its interfaces.
+        private static Type? SequenceOf(Type type) =>
+            new[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(candidate =>
+                candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>));
 
         private static Type? DictionaryValueType(Type type)
         {
