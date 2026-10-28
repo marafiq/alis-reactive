@@ -6,7 +6,6 @@
    this file compiles classes emitted from framework C# code only. */
 @source "../../Alis.Reactive.DesignSystem/**/*.cs";
 @source "../../Alis.Reactive.NativeTagHelpers/**/*.cs";
-@source "../../Alis.Reactive.Native/**/*.cs";
 @source "../../Alis.Reactive.Fusion/**/*.cs";
 
 /* Safelisted dynamic classes from C# TokenMap */
@@ -27,8 +26,9 @@
 /* Brand: single source of truth, see brand.css. */
 @import "./brand.css";
 
-/* Theme tokens registered as Tailwind utilities. */
-@theme {
+/* Theme tokens registered as Tailwind utilities. Static: every token is emitted on :root whether a
+   utility uses it or not, because the components' own stylesheets read them by name. */
+@theme static {
   /* Brand: sourced from brand.css */
   --color-primary: var(--alis-brand-primary);
   --color-primary-light: var(--alis-brand-primary-light);
@@ -73,7 +73,5 @@
 /* Layers */
 @import "./base.css";
 @import "./validation.css";
-@import "./components/drawer.css";
-@import "./components/loader.css";
 @import "./components/hovercard.css";
 @import "./components/inplace-editor-saved.css";
