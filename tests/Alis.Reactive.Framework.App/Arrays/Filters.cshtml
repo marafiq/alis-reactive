@@ -1,4 +1,5 @@
 @using System.Linq.Expressions
+@using System.Text.RegularExpressions
 @using Microsoft.AspNetCore.Html
 @using Alis.Reactive.Framework.App.Arrays
 @model FiltersPage
@@ -6,6 +7,9 @@
     ViewData["Title"] = "Array filters";
     var plan = Html.ReactivePlan<FiltersPage>();
     var initial = "A";
+    var northOrSouth = new[] { Wing.North, Wing.South };
+    var keyworkersOnLeave = new[] { "Gus", "Hal" };
+    var keyworkersOnShift = new List<string> { "Fay" };
 
     // A button that reads the residents, keeps those the predicate holds for, and shows their names.
     IHtmlContent Keep(string id, string text, Expression<Func<Resident, bool>> predicate) =>
@@ -16,6 +20,9 @@
 <h1>Array filters</h1>
 
 <p>The residents, as the home keeps them: Cyd Marsh (81, present), Ada Hartley (102, away), Ben Hart (79, present), Dot Ashton (80, away).</p>
+<p>Admitted: Cyd on Monday 5 January 2026 at 09:45:30, Ada on Saturday 14 March 2026 at midnight, Ben on Friday 19 June 2026 at 14:09:45, Dot on Sunday 2 November 2025 at 21:30:09.</p>
+<p>Scores today: Cyd 7, Ada none, Ben 0, Dot 9.</p>
+<p>Nicknames: Cyd's left blank, Ada none, Ben Benny, Dot Dottie. Keyworkers: Fay for Cyd and Ben, Gus for Ada, Hal for Dot; Gus and Hal are on leave, Fay is on shift.</p>
 <p>Kept: <span id="kept"></span></p>
 
 @Keep("older-than-80", "Older than 80", x => x.Age > 80)
@@ -36,5 +43,22 @@
 @Keep("north-wing", "North wing", x => x.Wing == Wing.North)
 @Keep("admitted-14-march", "Admitted on 14 March 2026", x => x.Admitted == new DateTime(2026, 3, 14))
 @Keep("admitted-before-march", "Admitted before March 2026", x => x.Admitted < new DateTime(2026, 3, 1))
+@Keep("admitted-in-2025", "Admitted in 2025", x => x.Admitted.Year == 2025)
+@Keep("admitted-in-january-or-february", "Admitted in January or February", x => x.Admitted.Month < 3)
+@Keep("admitted-on-the-5th", "Admitted on the 5th of a month", x => x.Admitted.Day == 5)
+@Keep("admitted-at-9-hours", "Admitted in the 9 o'clock hour", x => x.Admitted.Hour == 9)
+@Keep("admitted-at-9-minutes", "Admitted at 9 minutes past the hour", x => x.Admitted.Minute == 9)
+@Keep("admitted-at-9-seconds", "Admitted at 9 seconds past the minute", x => x.Admitted.Second == 9)
+@Keep("admitted-on-a-friday", "Admitted on a Friday", x => x.Admitted.DayOfWeek == DayOfWeek.Friday)
+@Keep("scored-above-6", "Scored above 6", x => x.Score != null && x.Score.Value > 6)
+@Keep("scored", "Scored today", x => x.Score.HasValue)
+@Keep("named-in-more-than-9-characters", "Named in more than 9 characters", x => x.Name.Length > 9)
+@Keep("older-than-100-as-a-long", "Older than 100, read as a long", x => (long)x.Age > 100L)
+@Keep("no-nickname", "Called by no nickname", x => string.IsNullOrEmpty(x.Nickname))
+@Keep("east-or-south-wing", "In the east or south wing", x => Enumerable.Contains(new[] { Wing.East, Wing.South }, x.Wing))
+@Keep("north-or-south-wing", "In the north or south wing", x => northOrSouth.Contains(x.Wing))
+@Keep("keyworker-on-leave", "With a keyworker on leave", x => keyworkersOnLeave.Contains(x.Keyworker.Name))
+@Keep("keyworker-on-shift", "With a keyworker on shift", x => keyworkersOnShift.Contains(x.Keyworker.Name))
+@Keep("two-digit-room", "In a room numbered in two digits", x => Regex.IsMatch(x.Room, "\\d{2}"))
 
 @Html.RenderPlan(plan)

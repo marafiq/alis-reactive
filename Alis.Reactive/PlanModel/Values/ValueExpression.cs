@@ -117,6 +117,19 @@ namespace Alis.Reactive.PlanModel
             return new ListExpression(items.ToList(), shape);
         }
 
+        // ── operators and tests, per item of an array lambda, which never waits ──
+
+        /// <summary>An operator of grammar.md 2.2 over values (<c>??</c>, <c>?:</c>, a date's month counted from 1), its result read in a shape.</summary>
+        internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands)
+        {
+            if (op == null) throw new ArgumentNullException(nameof(op));
+            op.RequireArity(operands.Length);
+            return new OperationExpression(op, operands, shape);
+        }
+
+        /// <summary>Whether a condition holds, as a boolean value: <c>x =&gt; x.Age &gt; 80</c> projected.</summary>
+        internal static ValueExpression Holds(Condition condition) => new HoldsExpression(condition);
+
         // ── array operations ─────────────────────────────────────────────────────
 
         internal static ValueExpression ArrayCount(ValueExpression source) => new CountOperation(source);
@@ -341,6 +354,39 @@ namespace Alis.Reactive.PlanModel
         internal override bool ReadsAwaited => Items.Any(item => item.ReadsAwaited);
 
         internal override Expr Write(Scope scope) => G.List(Items.Select(item => item.Write(scope)));
+    }
+
+    internal sealed class OperationExpression : ValueExpression
+    {
+        private readonly Operator _op;
+        private readonly IReadOnlyList<ValueExpression> _operands;
+        private readonly Shape _shape;
+
+        internal OperationExpression(Operator op, IReadOnlyList<ValueExpression> operands, Shape shape)
+        {
+            _op = op;
+            _operands = operands;
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+        }
+
+        internal override Shape OutputShape => _shape;
+
+        internal override Expr Write(Scope scope) =>
+            G.As(G.Op(_op, _operands.Select(operand => operand.Write(scope)).ToArray()), _shape);
+    }
+
+    internal sealed class HoldsExpression : ValueExpression
+    {
+        private readonly Condition _condition;
+
+        internal HoldsExpression(Condition condition)
+        {
+            _condition = condition ?? throw new ArgumentNullException(nameof(condition));
+        }
+
+        internal override Shape OutputShape => Shape.Boolean;
+
+        internal override Expr Write(Scope scope) => _condition.Write(scope);
     }
 
     /// <summary>

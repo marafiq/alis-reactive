@@ -16,4 +16,8 @@ public enum Mistake
     TestTextAgainstACharacter,
     CompareWithoutTheItem,
     CastToAFlag,
+    ReadAMemberWithNoJavaScriptForm,
+    ReadADayOfTheWeekAsAValue,
+    CastToAWholeNumber,
+    CastToANarrowerNumber,
 }

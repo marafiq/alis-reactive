@@ -3,7 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 /// <summary>
 /// An array read from each source a page can give <c>p.From(..)</c>, and the arrays an element offers: a list
 /// a response carries, a response that is an array, a sequence a response member holds, a list a response
-/// does not hold, a component's list, a list a method returns, an element's children and its classes. The
+/// does not hold, a component's list, a list a method returns, an element's children (read by an attribute's
+/// value and by whether they have one) and its classes. The
 /// residents endpoint answers Cyd Marsh, Ada Hartley, Ben Hart and Dot Ashton, in that order.
 /// </summary>
 [TestFixture]
@@ -93,6 +94,16 @@ public sealed class WhenAPageReadsAnArrayFromASource : AppPageTest
         await Button("Read the seats under close supervision").ClickAsync();
 
         await Expect(Page.Locator("#close-seats")).ToHaveTextAsync("Ada Hartley,Cyd Marsh");
+    }
+
+    [Test]
+    public async Task a_child_is_kept_by_an_attribute_it_has_even_one_with_no_value()
+    {
+        await Open("/Arrays/Sources");
+
+        await Button("Read the seats with a wheelchair space").ClickAsync();
+
+        await Expect(Page.Locator("#wheelchair-seats")).ToHaveTextAsync("Ben Hart");
     }
 
     [Test]

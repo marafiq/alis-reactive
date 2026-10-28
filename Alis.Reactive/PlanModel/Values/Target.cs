@@ -40,7 +40,7 @@ namespace Alis.Reactive.PlanModel
 
         internal static Target Item { get; } = new ItemTarget();
 
-        /// <summary>The object a method call returns.</summary>
+        /// <summary>The value an expression gives: what a method call returns, or an item's value an array lambda reads further (its date, its text).</summary>
         internal static Target Returned(ValueExpression call) => new ReturnedTarget(call);
 
         /// <summary>Data a callback received rather than an object the page holds; shown as it arrived.</summary>

@@ -8,7 +8,7 @@
     var eldest = 102;
 
     // A button that reads the residents and lists them as the mistaken operation would.
-    IHtmlContent List(Func<ReactiveArray<Resident>, ReactiveArray<string>> listed) =>
+    IHtmlContent List<TListed>(Func<ReactiveArray<Resident>, TypedSource<TListed>> listed) =>
         plan.Button("list", "List the residents").Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
             .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
                 s.Element("listed").Text.Set(listed(s.From(residents))))));
@@ -39,6 +39,18 @@
         break;
     case Mistake.CastToAFlag:
         @List(residents => residents.Where(x => (bool)x.Discharged!).Select(x => x.Name))
+        break;
+    case Mistake.ReadAMemberWithNoJavaScriptForm:
+        @List(residents => residents.Where(x => x.Admitted.DayOfYear > 40).Select(x => x.Name))
+        break;
+    case Mistake.ReadADayOfTheWeekAsAValue:
+        @List(residents => residents.Select(x => x.Admitted.DayOfWeek))
+        break;
+    case Mistake.CastToANarrowerNumber:
+        @List(residents => residents.Where(x => (byte)x.Age == 102).Select(x => x.Name))
+        break;
+    case Mistake.CastToAWholeNumber:
+        @List(residents => residents.Where(x => (int)x.Weight == 61).Select(x => x.Name))
         break;
 }
 
