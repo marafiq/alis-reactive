@@ -48,8 +48,9 @@ That is the whole document. The grammar names no feature.
     the located object, the shape it reads as, the event that commits a value (M4), and whether the
     input binds a list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value,
-    tests: [{ rule, check: fn(v), when, message }] }] }`. `rule` names the declaration a test came
-    from, for traces only. An input
+    tests: [{ rule, check: fn(v), when, message }] }] }`: one per member a rule is written on, whether
+    or not the browser can check it, so `tests` is empty when every check is the server's. `rule`
+    names the declaration a test came from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
     know which form will contain it.
 - **No owner field.** The owner of a plan is whoever discovered it: the page at boot, or a slot when
@@ -539,7 +540,8 @@ no key (H2) and no entry (H4).
     input's plan start does not matter, and neither does the order the containers were declared.
 - **F8 Server errors.** `showErrors(problem)` clears first.
   - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a
-    sentence) and matches a test field by its exact binding name. Anything else goes to the summary.
+    sentence) and matches a form field by its exact binding name, whatever its tests, then places
+    the message as F6 does. Anything else goes to the summary.
   - When `problem` is not a record (an empty or non-JSON body), it logs `server-errors.not-a-record`
     and shows nothing: the server said nothing the form can place.
 - **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or

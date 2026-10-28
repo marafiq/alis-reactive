@@ -8,6 +8,18 @@ public sealed class ValidationController : Controller
 {
     public IActionResult Visit() => View(new VisitBooking());
 
+    public IActionResult Checks() => View(new CheckedForm());
+
+    /// <summary>Checks the form with the same rules the page carries; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Checks")]
+    public IActionResult SaveChecks([FromBody] CheckedForm form, [FromServices] CheckRules rules)
+    {
+        var result = rules.Validate(form);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     /// <summary>Checks the booking with the same rules the page carries, and answers 400 with every message by field.</summary>
     [HttpPost("/Validation/Book")]
     public IActionResult Book([FromBody] VisitBooking booking, [FromServices] VisitRules rules)

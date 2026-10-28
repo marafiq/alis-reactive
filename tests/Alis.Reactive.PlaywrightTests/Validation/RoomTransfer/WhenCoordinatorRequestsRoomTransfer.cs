@@ -12,8 +12,8 @@ namespace Alis.Reactive.PlaywrightTests.Validation.RoomTransfer;
 /// <remarks>
 /// The rules that stay on the server stay by what they are: C# that asks the room book, a lookup that
 /// waits, a message written from the model, a rule kept there on purpose, a condition only C# can
-/// evaluate. Each is proven by the request being sent once and the server's answer appearing: beside
-/// the field when the field has a rule the page runs, in the summary when it has none.
+/// evaluate. Each is proven by the request being sent once and the server's answer appearing beside
+/// the field it is about, whether or not the field has a rule the page runs.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
@@ -153,8 +153,8 @@ public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
 
         await ClickWhenStable(RequestTransfer);
 
-        await Expect(ValidationSummary).ToHaveTextAsync("Keep the reason under 100 characters.");
-        await Expect(_plan.ErrorFor(m => m.Reason)).ToHaveTextAsync("");
+        await Expect(_plan.ErrorFor(m => m.Reason)).ToHaveTextAsync("Keep the reason under 100 characters.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(TransferStatus).ToHaveTextAsync("No transfer requested yet.");
         Assert.That(_requestsSent, Has.Count.EqualTo(1), "The page does not count the reason's characters: the server does.");
 
@@ -172,7 +172,8 @@ public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
 
         await ClickWhenStable(RequestTransfer);
 
-        await Expect(ValidationSummary).ToHaveTextAsync("Helen Park's notes run over 20 characters.");
+        await Expect(_plan.ErrorFor(m => m.Notes)).ToHaveTextAsync("Helen Park's notes run over 20 characters.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(TransferStatus).ToHaveTextAsync("No transfer requested yet.");
         Assert.That(_requestsSent, Has.Count.EqualTo(1), "A message written from the model is the server's to say.");
 
@@ -189,8 +190,8 @@ public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
 
         await ClickWhenStable(RequestTransfer);
 
-        await Expect(ValidationSummary).ToHaveTextAsync("A weekend transfer needs the administrator on call to approve it.");
-        await Expect(_plan.ErrorFor(m => m.WeekendApprover)).ToHaveTextAsync("");
+        await Expect(_plan.ErrorFor(m => m.WeekendApprover)).ToHaveTextAsync("A weekend transfer needs the administrator on call to approve it.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(TransferStatus).ToHaveTextAsync("No transfer requested yet.");
         Assert.That(_requestsSent, Has.Count.EqualTo(1), "Which days are weekends is decided in C#, so the server is asked.");
 

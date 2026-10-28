@@ -20,8 +20,9 @@ namespace Alis.Reactive.Validation
         internal BrowserField(
             FieldReference field,
             IEnumerable<BrowserRule> rules,
-            IEnumerable<BrowserField> itemFields)
-            : this(field, rules, itemFields, Condition.Always)
+            IEnumerable<BrowserField> itemFields,
+            bool isChecked)
+            : this(field, rules, itemFields, isChecked, Condition.Always)
         {
         }
 
@@ -29,11 +30,13 @@ namespace Alis.Reactive.Validation
             FieldReference field,
             IEnumerable<BrowserRule> rules,
             IEnumerable<BrowserField> itemFields,
+            bool isChecked,
             Condition ownerCondition)
         {
             Reference = field;
             Rules = rules.ToArray();
             ItemFields = itemFields.ToArray();
+            IsChecked = isChecked;
             _ownerCondition = ownerCondition;
         }
 
@@ -47,13 +50,18 @@ namespace Alis.Reactive.Validation
 
         internal FieldReference Reference { get; }
 
-        internal bool HasRules => Rules.Count > 0;
+        /// <summary>
+        /// A rule is written on the member, so the server reports under the member's name, whether or not the
+        /// browser can check it. A member only a condition reads, or only a rule compares with, is not checked.
+        /// </summary>
+        internal bool IsChecked { get; }
 
         internal BrowserField PrefixedBy(string prefix, Condition outer) =>
             new BrowserField(
                 Reference.PrefixedBy(prefix),
                 Rules.Select(rule => rule.PrefixedBy(prefix, outer)),
-                ItemFields.Select(field => field.OwnedUnder(prefix, outer)));
+                ItemFields.Select(field => field.OwnedUnder(prefix, outer)),
+                IsChecked);
 
         // A collection item field rendered at itemPrefix: its own conditions take the item prefix,
         // its owner's condition does not.
@@ -62,11 +70,11 @@ namespace Alis.Reactive.Validation
 
         // An item field whose owner declared it under a condition (When around RuleForEach).
         internal BrowserField ScopedBy(Condition condition) =>
-            new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition));
+            new BrowserField(Reference, Rules, ItemFields, IsChecked, Condition.Combine(condition, _ownerCondition));
 
         // An item field whose collection's owner moves under prefix: its owner condition moves with it.
         private BrowserField OwnedUnder(string prefix, Condition condition) =>
-            new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
+            new BrowserField(Reference, Rules, ItemFields, IsChecked, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
     }
 
     /// <summary>
@@ -87,6 +95,13 @@ namespace Alis.Reactive.Validation
     {
         private readonly Dictionary<string, Entry> _fields = new Dictionary<string, Entry>(StringComparer.Ordinal);
         private readonly List<Entry> _order = new List<Entry>();
+
+        /// <summary>
+        /// Names a member a rule is written on, whether or not the browser can check the rule: the form then
+        /// carries the member's field, so a message the server sends for it lands beside its input.
+        /// </summary>
+        /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
+        public void Declare(LambdaExpression member) => Ensure(FieldReference.Of(member)).Checked = true;
 
         /// <summary>Adds a rule on a member.</summary>
         /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
@@ -116,7 +131,7 @@ namespace Alis.Reactive.Validation
             foreach (var rule in rules)
                 if (rule.TryFor(item, out var resolved)) itemRules.Add(resolved);
             if (itemRules.Count == 0) return;
-            Ensure(member).ItemFields.Add(new BrowserField(item, itemRules, Array.Empty<BrowserField>()).ScopedBy(when));
+            Ensure(member).ItemFields.Add(new BrowserField(item, itemRules, Array.Empty<BrowserField>(), isChecked: true).ScopedBy(when));
         }
 
         /// <summary>Adds the rules of each item of a collection member: a validator applied to every item.</summary>
@@ -154,6 +169,7 @@ namespace Alis.Reactive.Validation
             {
                 var target = field.PrefixedBy(prefix, when);
                 var entry = Ensure(target.Reference);
+                if (target.IsChecked) entry.Checked = true;
                 foreach (var rule in target.Rules)
                     AddRule(target.Reference, rule);
                 entry.ItemFields.AddRange(target.ItemFields);
@@ -162,12 +178,14 @@ namespace Alis.Reactive.Validation
 
         /// <summary>Every member the validator names, with its rules, where it first named it.</summary>
         public IReadOnlyList<BrowserField> Fields =>
-            _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields)).ToArray();
+            _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields, entry.Checked)).ToArray();
 
         private void AddRule(FieldReference field, BrowserRule rule)
         {
             Ensure(rule.Fields);
-            Ensure(field).Rules.Add(rule);
+            var entry = Ensure(field);
+            entry.Rules.Add(rule);
+            entry.Checked = true;
         }
 
         private void Ensure(IEnumerable<FieldReference> fields)
@@ -201,6 +219,8 @@ namespace Alis.Reactive.Validation
             }
 
             internal FieldReference Field { get; }
+
+            internal bool Checked { get; set; }
 
             internal List<BrowserRule> Rules { get; } = new List<BrowserRule>();
 

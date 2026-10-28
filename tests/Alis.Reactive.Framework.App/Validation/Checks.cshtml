@@ -1,0 +1,55 @@
+@using Alis.Reactive.Framework.App.Validation
+@model CheckedForm
+@{
+    ViewData["Title"] = "Every check";
+    var plan = Html.ReactivePlan<CheckedForm>();
+}
+<h1>Every check</h1>
+
+<div id="checks-form">
+    @{ Html.InputField(plan, m => m.Count, o => o.Label("Count")).Entry(); }
+    @{ Html.InputField(plan, m => m.Spare, o => o.Label("Spare")).Entry(); }
+    @{ Html.InputField(plan, m => m.Code, o => o.Label("Code")).Entry(); }
+    @{ Html.InputField(plan, m => m.Pin, o => o.Label("Pin")).Entry(); }
+    @{ Html.InputField(plan, m => m.Nickname, o => o.Label("Nickname")).Entry(); }
+    @{ Html.InputField(plan, m => m.Website, o => o.Label("Website")).Entry(); }
+    @{ Html.InputField(plan, m => m.Card, o => o.Label("Card")).Entry(); }
+    @{ Html.InputField(plan, m => m.Letters, o => o.Label("Letters")).Entry(); }
+    @{ Html.InputField(plan, m => m.Answer, o => o.Label("Answer")).Entry(); }
+    @{ Html.InputField(plan, m => m.Other, o => o.Label("Other")).Entry(); }
+    @{ Html.InputField(plan, m => m.Reason, o => o.Label("Reason")).Entry(); }
+    @{ Html.InputField(plan, m => m.Rooms, o => o.Label("Rooms")).Entry(); }
+    @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
+    @{ Html.InputField(plan, m => m.Floor, o => o.Label("Floor")).Entry(); }
+    @{ Html.InputField(plan, m => m.Level, o => o.Label("Level")).Entry(); }
+    @{ Html.InputField(plan, m => m.Score, o => o.Label("Score")).Entry(); }
+    @{ Html.InputField(plan, m => m.Budget, o => o.Label("Budget")).Entry(); }
+    @{ Html.InputField(plan, m => m.Earlier, o => o.Label("Earlier")).Entry(); }
+    @{ Html.InputField(plan, m => m.Later, o => o.Label("Later")).Entry(); }
+    @{ Html.InputField(plan, m => m.Email, o => o.Label("Email")).Entry(); }
+    @{ Html.InputField(plan, m => m.Short, o => o.Label("Short")).Entry(); }
+    @{ Html.InputField(plan, m => m.Lower, o => o.Label("Lower")).Entry(); }
+    @{ Html.InputField(plan, m => m.Stars, o => o.Label("Stars")).Entry(); }
+    @{ Html.InputField(plan, m => m.Original, o => o.Label("Original")).Entry(); }
+    @{ Html.InputField(plan, m => m.Repeat, o => o.Label("Repeat")).Entry(); }
+    @{ Html.InputField(plan, m => m.Former, o => o.Label("Former")).Entry(); }
+    @{ Html.InputField(plan, m => m.Fresh, o => o.Label("Fresh")).Entry(); }
+    @{ Html.InputField(plan, m => m.Purpose, o => o.Label("Purpose")).Entry(); }
+    @{ Html.InputField(plan, m => m.Guests, o => o.Label("Guests")).Entry(); }
+    @{ Html.InputField(plan, m => m.Arriving, o => o.Label("Arriving")).Entry(); }
+    @{ Html.InputField(plan, m => m.Leaving, o => o.Label("Leaving")).Entry(); }
+    @{ Html.InputField(plan, m => m.Badge, o => o.Label("Badge")).Entry(); }
+    @{ Html.InputField(plan, m => m.Contact.Phone, o => o.Label("Phone")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Checks")
+        .Gather(g => g.Form())
+        .Validate<CheckRules>("checks-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("checks-form")))))
+
+@Html.RenderPlan(plan)

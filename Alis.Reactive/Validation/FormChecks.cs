@@ -53,9 +53,12 @@ namespace Alis.Reactive.Validation
                 .Where(path => path != null)
                 .Select(path => path!)
                 .ToList();
+            // A checked member is carried whether or not this plan renders it (a partial of the same model may)
+            // and whether or not the browser can check it: a message the server sends for it then lands
+            // beside its input wherever the input is.
             foreach (var field in fields)
             {
-                if (field.HasRules)
+                if (field.IsChecked)
                     yield return values.Check(field);
 
                 foreach (var itemField in RenderedItemFields(field.FieldName, field.ItemFields, renderedPaths))
@@ -77,7 +80,7 @@ namespace Alis.Reactive.Validation
                         continue;
 
                     var renderedField = itemField.RenderedAt(itemPrefix);
-                    if (isDirectField && renderedField.HasRules)
+                    if (isDirectField && renderedField.IsChecked)
                         yield return renderedField;
 
                     foreach (var nestedItemField in RenderedItemFields(renderedField.FieldName, renderedField.ItemFields, new[] { renderedPath }))

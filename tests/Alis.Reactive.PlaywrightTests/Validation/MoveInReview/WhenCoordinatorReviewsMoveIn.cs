@@ -11,7 +11,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.MoveInReview;
 /// <remarks>
 /// The rules are written once, in FluentValidation's grammar. The page checks every rule it can; a
 /// rule whose condition only the server can decide (a returning resident's previous room) is answered
-/// by the server, in the page's validation summary. The page sends every field it renders and, beside
+/// by the server, beside the field it is about. The page sends every field it renders and, beside
 /// the pharmacy phone, the pharmacy network the community contracts.
 /// </remarks>
 [TestFixture]
@@ -228,9 +228,9 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // A condition on the plan's length has no browser form, so only the server asks, in the summary.
-        await Expect(ValidationSummary).ToHaveTextAsync("A mobility plan this long needs a therapist to review it.");
-        await Expect(_plan.ErrorFor(m => m.TherapistReviewer)).ToHaveTextAsync("");
+        // A condition on the plan's length has no browser form, so only the server asks, beside the reviewer.
+        await Expect(_plan.ErrorFor(m => m.TherapistReviewer)).ToHaveTextAsync("A mobility plan this long needs a therapist to review it.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(ReviewStatus).ToHaveTextAsync("Not saved yet.");
         Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The page cannot decide this rule, so the server is asked.");
 
@@ -499,8 +499,9 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // The field has no rule the page runs, so the server's answer shows in the page's summary.
-        await Expect(ValidationSummary).ToContainTextAsync("Enter the forwarding ZIP as five digits.");
+        // The field has no rule the page runs, so only the server answers, beside the field.
+        await Expect(_plan.ErrorFor(m => m.ForwardingZip)).ToHaveTextAsync("Enter the forwarding ZIP as five digits.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The pattern ends in .NET's \\z, so the server checks it.");
         await Write(m => m.ForwardingZip, "02139");
         await ClickWhenStable(SaveReview);
@@ -535,8 +536,8 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        await Expect(ValidationSummary).ToBeVisibleAsync();
-        await Expect(ValidationSummary).ToContainTextAsync("A returning resident's previous room is required.");
+        await Expect(_plan.ErrorFor(m => m.PreviousRoom)).ToHaveTextAsync("A returning resident's previous room is required.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(ReviewStatus).ToHaveTextAsync("Not saved yet.");
         Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The page cannot decide this rule, so the server is asked.");
 

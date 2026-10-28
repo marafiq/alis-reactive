@@ -24,6 +24,9 @@ public class WhenThePetPolicyIsDecidedByTheServer : PlaywrightTestBase
     private ILocator Field(Expression<Func<PetPolicyModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}");
 
+    private ILocator ErrorFor(Expression<Func<PetPolicyModel, object?>> member) =>
+        Page.Locator($"#{IdGenerator.For(member)}_error");
+
     private async Task NavigateAndBoot()
     {
         _savesSent = new ConcurrentQueue<string>();
@@ -49,7 +52,8 @@ public class WhenThePetPolicyIsDecidedByTheServer : PlaywrightTestBase
 
         await ClickWhenStable(SavePolicy);
 
-        await Expect(ValidationSummary.Locator("[data-valmsg-summary-for='PetName']")).ToHaveTextAsync("Name the pet.");
+        await Expect(ErrorFor(m => m.PetName)).ToHaveTextAsync("Name the pet.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(PolicyStatus).ToHaveTextAsync("The policy was not saved.");
         Assert.That(_savesSent, Has.Count.EqualTo(1), "The page has no form of the tags query, so it sent the policy and the server decided.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
