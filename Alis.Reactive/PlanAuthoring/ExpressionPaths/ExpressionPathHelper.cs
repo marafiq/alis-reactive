@@ -174,13 +174,6 @@ namespace Alis.Reactive
                 return true;
             }
 
-            if (expr is IndexExpression indexer && indexer.Object != null && indexer.Arguments.Count == 1)
-            {
-                collection = indexer.Object;
-                index = EvaluateIndex(indexer.Arguments[0]);
-                return true;
-            }
-
             if (expr is MethodCallExpression call &&
                 call.Method.Name == "get_Item" &&
                 call.Object != null &&

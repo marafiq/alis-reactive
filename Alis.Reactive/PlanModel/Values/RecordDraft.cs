@@ -24,8 +24,6 @@ namespace Alis.Reactive.PlanModel
         {
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (value == null) throw new ArgumentNullException(nameof(value));
-            if (path.ReadsEachItem)
-                throw new ArgumentException($"'{path}' names every item of a list; a record assigns one path.", nameof(path));
             Assign(path.Segments, 0, value, path.ToString());
         }
 
