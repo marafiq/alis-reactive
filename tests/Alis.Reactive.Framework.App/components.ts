@@ -5,3 +5,4 @@ import "./Components/Bell/bell";
 import "./Components/Meter/meter";
 import "./Components/Tally/tally";
 import "./Components/Entry/entry";
+import "./Components/Roster/roster";
