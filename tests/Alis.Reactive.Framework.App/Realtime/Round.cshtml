@@ -1,0 +1,49 @@
+@using Alis.Reactive.Framework.App.Realtime
+@model RoundPage
+@{
+    ViewData["Title"] = "The round, live";
+    var plan = Html.ReactivePlan<RoundPage>();
+    var news = ServerPushStream.At<RoundStream>($"/Realtime/News?world={Model.World}");
+    var feed = SignalRHub.At<RoundFeed>("/hubs/round");
+}
+<h1>The round, live</h1>
+
+<p>News: <span id="news"></span> (number <span id="news-count"></span>) · <span id="all-clear"></span></p>
+<p>Stream state: <span id="stream-state"></span></p>
+<p>Board: <span id="board"></span> · status: <span id="status-resident"></span> is <span id="status"></span></p>
+<p>Acknowledged: <span id="ack"></span> · hub: <span id="hub-state"></span></p>
+
+@{ Html.On(plan, t => t
+    .ServerPush(news, s => s.News, (item, p) =>
+    {
+        p.Element("news").Text.Set(item.Message);
+        p.Element("news-count").Text.Set(item.Count);
+    })
+    .ServerPush(news, s => s.AllClear, p => p.Element("all-clear").Text.Set("all clear"))
+    .SignalR(feed, h => h.StatusChanged, (status, p) =>
+    {
+        p.Element("status-resident").Text.Set(status.Resident);
+        p.Element("status").Text.Set(status.Status);
+    })
+    .SignalR(feed, h => h.BoardCleared, p => p.Element("board").Text.Set("cleared"))); }
+
+@(plan.Button("push-news", "Push the next news")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Push?world={Model.World}&kind=news")))
+@(plan.Button("push-all-clear", "Push the all clear")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Push?world={Model.World}&kind=allClear")))
+@(plan.Button("close-stream", "Close the stream")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Stream(news).Close();
+        p.Element("stream-state").Text.Set(p.Stream(news).ReadyState);
+    }))
+@(plan.Button("clear-board", "Clear the board")
+    .Reactive(button => button.Click, p => p.Hub(feed).ClearBoard()))
+@(plan.Button("ping", "Ping Ben")
+    .Reactive(button => button.Click, p => p.Hub(feed).Ping("Ben")))
+@(plan.Button("acknowledge", "Acknowledge as Ada")
+    .Reactive(button => button.Click, p => p.Element("ack").Text.Set(p.Hub(feed).Acknowledge("Ada"))))
+@(plan.Button("read-hub-state", "Read the hub's state")
+    .Reactive(button => button.Click, p => p.Element("hub-state").Text.Set(p.Hub(feed).State)))
+
+@Html.RenderPlan(plan)

@@ -12,6 +12,7 @@ builder.Services.AddControllersWithViews().AddRazorOptions(razor =>
     razor.ViewLocationFormats.Add("/Shared/{0}.cshtml");
 });
 builder.Services.AddReactiveFluentValidation(validation => validation.AddFromAssemblyContaining<Program>());
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -26,6 +27,7 @@ app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvid
 app.UseStaticFiles();
 app.UseRouting();
 app.MapControllers();
+app.MapHub<Alis.Reactive.Framework.App.Realtime.RoundHub>("/hubs/round");
 app.MapControllerRoute("slices", "{controller=Home}/{action=Index}");
 app.Run();
 
