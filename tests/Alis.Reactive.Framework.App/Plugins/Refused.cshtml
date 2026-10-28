@@ -1,0 +1,14 @@
+@using Alis.Reactive.Framework.App.Plugins
+@model RefusedPluginPage
+@{
+    ViewData["Title"] = "A plugin the runtime refuses";
+    Layout = "_WithASecondBundle";
+    var plan = Html.ReactivePlan<RefusedPluginPage>();
+}
+<h1>A plugin the runtime refuses</h1>
+
+<p>Started: <span id="started"></span></p>
+
+@{ Html.On(plan, t => t.DomReady(p => p.Element("started").Text.Set("the page started"))); }
+
+@Html.RenderPlan(plan)

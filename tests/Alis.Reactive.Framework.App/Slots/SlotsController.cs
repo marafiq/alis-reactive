@@ -7,6 +7,11 @@ public sealed class SlotsController : Controller
 {
     public IActionResult Desk() => View(new DeskPage());
 
+    public IActionResult Lounge() => View(new LoungePage());
+
+    /// <summary>The visitor card, loaded into the lounge's slot.</summary>
+    public IActionResult VisitorCard() => PartialView("VisitorCard", new VisitorCard());
+
     /// <summary>The next-of-kin card, rendered for the desk's NextOfKin member, so its inputs bind under that prefix.</summary>
     public IActionResult Card()
     {

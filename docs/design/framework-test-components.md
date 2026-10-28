@@ -32,8 +32,8 @@ when that slice lands, so no member exists without the test that proves it. The 
 | Component | How the framework reaches it | What it is |
 |---|---|---|
 | `Slate` | a method pair (`on`/`off`), the object under `slate` on its element, the listener's argument as the payload | A board that holds one value of every shape the plan converts, a header object, rows, and the events of changing them. Every property, method, object and event kind is on it. |
-| `Bell` | callback properties (`bell.onRung = listener`), the property already holding the bell's own callback | A bell that rings and counts its rings. |
-| `Meter` | the element itself, `addEventListener`, the DOM event as the payload (`CustomEvent.detail`) | A custom element `<fw-meter>` with a level and a maximum. |
+| `Bell` | callback properties (`bell.onRung = listener`), the property already holding the bell's own callback | A bell that rings and counts its rings. Destroyed, it takes its callback property away, so a handler assigned to it can no longer be released (the Slots slice). |
+| `Meter` | the element itself, `addEventListener`, the DOM event as the payload (`CustomEvent.detail`), or the element when the event has no detail | A custom element `<fw-meter>` with a level and a maximum, which raises `levelChanged` with a detail and then `change` with none. |
 | `Entry` | as `Slate`, declared an input (`IInputComponent`) | A text entry whose value a form gathers and validates, committed when the user leaves it. |
 | `Tally` | a plugin registered by name on `window.__alisPlugins`, no element | A page-wide counter with a total, a mark to count towards, an add method and a question whether it passed the mark. |
 | `Roster` | callback properties with no events, the object under `roster` on its element | A list that shows the names it is given, in the order given: the method a transformed array is passed to (`Roster.Show(names)`, the Arrays slice). |
@@ -79,7 +79,7 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | E6 | A handler stops listening when its owner is released | a loaded card's handler of a page event, the card's slot unloaded | the page still hears the bell; the unloaded card does not |
 | V1 | Listening through a method pair | `Slate` | (every Slate event row) |
 | V2 | Listening through callback properties, beside the component's own callback | `Bell.OnRung`, `Bell.Ring()`, `Bell.Rings` | the page counts the rings, and the bell still shows its own count |
-| V3 | The element as the object, the DOM event's detail as the payload | `Meter.Level`, `Meter.Max`, `Meter.LevelChanged` | the level the meter shows and reads back; the page shows the change's detail |
+| V3 | The element as the object, the DOM event's detail as the payload, or the element for an event with no detail | `Meter.Level`, `Meter.Max`, `Meter.LevelChanged`, `Meter.Change` | the level the meter shows and reads back; the page shows the change's detail, and the level read off the meter its `change` hands over |
 | V4 | The object under a path on its element | `Slate` (`slate`) | (every Slate row) |
 | I1 | An input's value gathered into a request under its member name, as its member's type | `Entry` for text, number, maybe-number, date and instant members, in `Gather(g => g.Form())` | the endpoint's answer, which says what it bound |
 | I2 | A rule the browser can check holds the request and shows its message on the input's own slot | `Entry` under a validator | the message beside the entry, and no request; a number rule compares numbers, not text |

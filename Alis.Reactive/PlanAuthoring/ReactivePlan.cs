@@ -37,7 +37,6 @@ namespace Alis.Reactive
         /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
         public bool IsPartial => _scope.IsPartial;
         internal bool RendersValidationSummary => _scope.RendersValidationSummary;
-        internal IReadOnlyDictionary<string, RenderedInput> RenderedInputs => _renderedInputs.Snapshot();
         internal PlanBuildContext Context => _context;
 
         /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>

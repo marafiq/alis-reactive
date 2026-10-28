@@ -1,5 +1,6 @@
 // The bell: rings and counts its rings. It knows nothing of Alis.Reactive. A listener is a callback
 // property, and onRung already holds the bell's own callback, which shows how many times it rang.
+// Destroyed, the bell takes its callback property away, so nothing can call into a bell that is gone.
 
 type Callback = (ring: { readonly times: number }) => void;
 
@@ -8,7 +9,7 @@ interface BellHost extends HTMLElement {
 }
 
 export class Bell {
-  onRung: Callback | null;
+  onRung?: Callback | null;
   private rungTimes = 0;
   private readonly ringsLine: HTMLParagraphElement;
   private readonly button: HTMLButtonElement;
@@ -38,6 +39,7 @@ export class Bell {
 
   destroy(): void {
     this.button.removeEventListener("click", this.ringFromButton);
+    delete this.onRung;
     delete this.host.bell;
   }
 

@@ -5,12 +5,13 @@ namespace Alis.Reactive.PlanModel
 {
     internal abstract class PlanString : IEquatable<PlanString>
     {
-        protected PlanString(string value, string parameterName)
+        // The term names what the developer gave ("Plugin name"), so a refusal says which name is missing.
+        protected PlanString(string value, string term)
         {
             if (value == null)
-                throw new ArgumentNullException(parameterName);
+                throw new ArgumentNullException(nameof(value), term + " must not be empty.");
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException(parameterName + " must not be empty.", parameterName);
+                throw new ArgumentException(term + " must not be empty.", nameof(value));
 
             Value = value;
         }
@@ -35,7 +36,7 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class PlanId : PlanString
     {
-        private PlanId(string value) : base(value, nameof(value)) { }
+        private PlanId(string value) : base(value, "Plan id") { }
 
         internal static PlanId ForModel(Type modelType)
         {
@@ -49,7 +50,7 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class ComponentId : PlanString
     {
-        private ComponentId(string value) : base(value, nameof(value)) { }
+        private ComponentId(string value) : base(value, "Component id") { }
 
         internal static ComponentId Of(string value) => new ComponentId(value);
     }
@@ -58,7 +59,7 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly Path _path;
 
-        private BindingPath(string value, Path path) : base(value, nameof(value))
+        private BindingPath(string value, Path path) : base(value, "Binding path")
         {
             _path = path ?? throw new ArgumentNullException(nameof(path));
         }
@@ -72,28 +73,28 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class MemberName : PlanString
     {
-        private MemberName(string value) : base(value, nameof(value)) { }
+        private MemberName(string value) : base(value, "Member name") { }
 
         internal static MemberName Of(string value) => new MemberName(value);
     }
 
     internal sealed class ComponentKind : PlanString
     {
-        private ComponentKind(string value) : base(value, nameof(value)) { }
+        private ComponentKind(string value) : base(value, "Component kind") { }
 
         internal static ComponentKind Of(string value) => new ComponentKind(value);
     }
 
     internal sealed class EventName : PlanString
     {
-        private EventName(string value) : base(value, nameof(value)) { }
+        private EventName(string value) : base(value, "Event name") { }
 
         internal static EventName Of(string value) => new EventName(value);
     }
 
     internal sealed class PluginName : PlanString
     {
-        private PluginName(string value) : base(value, nameof(value))
+        private PluginName(string value) : base(value, "Plugin name")
         {
             if (HasWhitespace(value))
                 throw new ArgumentException("Plugin name must not contain whitespace.", nameof(value));
@@ -114,7 +115,7 @@ namespace Alis.Reactive.PlanModel
 
     internal sealed class HeaderName : PlanString
     {
-        private HeaderName(string value) : base(value, nameof(value)) { }
+        private HeaderName(string value) : base(value, "Header name") { }
 
         internal static HeaderName Of(string value) => new HeaderName(value);
     }
@@ -126,7 +127,7 @@ namespace Alis.Reactive.PlanModel
                 @"^[a-zA-Z0-9_]+$",
                 System.Text.RegularExpressions.RegexOptions.Compiled);
 
-        private RouteParameterName(string value) : base(value, nameof(value))
+        private RouteParameterName(string value) : base(value, "Route parameter name")
         {
             var hasInvalidCharacters = !Pattern.IsMatch(value);
             if (hasInvalidCharacters)

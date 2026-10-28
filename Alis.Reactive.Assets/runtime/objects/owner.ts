@@ -23,10 +23,6 @@ export class Owner {
     return new Owner(`slot:${id}`, true);
   }
 
-  get isDisposed(): boolean {
-    return this.disposed;
-  }
-
   onDispose(disposer: () => void): void {
     if (this.disposed) {
       disposer();

@@ -1,0 +1,27 @@
+@using Alis.Reactive.Framework.App.Plans
+@model NoticeboardPage
+@{
+    ViewData["Title"] = "The noticeboard";
+    var plan = Html.ReactivePlan<NoticeboardPage>();
+}
+<h1>The noticeboard</h1>
+
+<div id="notice-slot"></div>
+<p>Pinning: <span id="pinning"></span> · pinned: <span id="pinned"></span></p>
+
+@(plan.Button("pin-notice", "Pin the notice")
+    .Reactive(button => button.Click, p => p.Get("/Plans/Notice").Response(r => r.OnSuccess(s =>
+    {
+        s.Element("pinning").Text.Set("the notice");
+        s.Into("notice-slot");
+        s.Element("pinned").Text.Set("the notice");
+    }))))
+@(plan.Button("pin-torn-notice", "Pin the torn notice")
+    .Reactive(button => button.Click, p => p.Get("/Plans/TornNotice").Response(r => r.OnSuccess(s =>
+    {
+        s.Element("pinning").Text.Set("the torn notice");
+        s.Into("notice-slot");
+        s.Element("pinned").Text.Set("the torn notice");
+    }))))
+
+@Html.RenderPlan(plan)

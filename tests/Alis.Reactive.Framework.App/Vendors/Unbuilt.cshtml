@@ -1,0 +1,27 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Framework.App.Vendors
+@model UnbuiltPage
+@{
+    ViewData["Title"] = "A component not built yet";
+    var plan = Html.ReactivePlan<UnbuiltPage>();
+}
+<h1>A component not built yet</h1>
+
+@* The slate's element without the class its script builds a slate on, so no slate object is made for it. *@
+@(plan.Render<Slate>("unbuilt-slate", new HtmlString("<div id=\"unbuilt-slate\"></div>"))
+    .Reactive(slate => slate.RowAdded, (added, p) => p.Element("row-heard").Text.Set(added.Label)))
+
+<p>Row heard: <span id="row-heard"></span> · greeting: <span id="greeting"></span></p>
+<p>Retitle tried: <span id="retitle-tried"></span> · retitled: <span id="retitled"></span></p>
+
+@(plan.Button("greet", "Say hello")
+    .Reactive(button => button.Click, p => p.Element("greeting").Text.Set("hello")))
+@(plan.Button("retitle", "Retitle the slate")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("retitle-tried").Text.Set("tried");
+        p.Component<Slate>("unbuilt-slate").Title.Set("Night round");
+        p.Element("retitled").Text.Set("retitled");
+    }))
+
+@Html.RenderPlan(plan)
