@@ -1,0 +1,58 @@
+@using Alis.Reactive.Framework.App.Members
+@model MethodsPage
+@{
+    ViewData["Title"] = "Methods";
+    var plan = Html.ReactivePlan<MethodsPage>();
+}
+<h1>Methods</h1>
+
+@plan.Slate("slate", title: "Day round", "Ada", "Ben")
+
+<p>Branch taken: <span id="branch"></span></p>
+<p>Total read: <span id="total"></span></p>
+<p>Save read after it finished: <span id="save-status"></span></p>
+<p>Looked up: <span id="lookup"></span></p>
+<p>Before the throw: <span id="before-throw"></span> · After it: <span id="after-throw"></span></p>
+<p>Before the rejection: <span id="before-reject"></span> · After it: <span id="after-reject"></span></p>
+
+@(plan.Button("clear", "Clear")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Clear()))
+@(plan.Button("place", "Place a line")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Place("Ada", 40.5m, true, new DateTime(2026, 10, 27))))
+@(plan.Button("fill", "Fill a card")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Fill(new SlateCard { Name = "Ben", Due = new DateTime(2026, 10, 27) })))
+@(plan.Button("ask-ada", "Is Ada on the slate?")
+    .Reactive(button => button.Click, p => p.When(p.Component<Slate>("slate").Has("Ada")).Truthy()
+        .Then(t => t.Element("branch").Text.Set("Ada is on the slate"))
+        .Else(e => e.Element("branch").Text.Set("Ada is not on the slate"))))
+@(plan.Button("ask-zed", "Is Zed on the slate?")
+    .Reactive(button => button.Click, p => p.When(p.Component<Slate>("slate").Has("Zed")).Truthy()
+        .Then(t => t.Element("branch").Text.Set("Zed is on the slate"))
+        .Else(e => e.Element("branch").Text.Set("Zed is not on the slate"))))
+@(plan.Button("read-total", "Read the total")
+    .Reactive(button => button.Click, p => p.Element("total").Text.Set(p.Component<Slate>("slate").Total())))
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.Save();
+        p.Element("save-status").Text.Set(slate.Status);
+    }))
+@(plan.Button("look-up", "Look up Ben")
+    .Reactive(button => button.Click, p => p.Element("lookup").Text.Set(p.Component<Slate>("slate").Lookup("Ben"))))
+@(plan.Button("throw", "Call the refusing method")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("before-throw").Text.Set("ran");
+        p.Component<Slate>("slate").Fail();
+        p.Element("after-throw").Text.Set("ran");
+    }))
+@(plan.Button("reject", "Call the rejecting method")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("before-reject").Text.Set("ran");
+        p.Component<Slate>("slate").FailLater();
+        p.Element("after-reject").Text.Set("ran");
+    }))
+
+@Html.RenderPlan(plan)

@@ -43,6 +43,22 @@ export class Row {
   }
 }
 
+export interface Card {
+  readonly name: string;
+  readonly due: Date;
+}
+
+const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+function dayText(day: Date): string {
+  const two = (value: number): string => String(value).padStart(2, "0");
+  return `${day.getFullYear()}-${two(day.getMonth() + 1)}-${two(day.getDate())}`;
+}
+
+function aMoment(): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, 150));
+}
+
 export class Slate {
   readonly header: Header;
   readonly rows: Row[];
@@ -53,9 +69,13 @@ export class Slate {
   private readonly summaryLine: HTMLParagraphElement;
   private readonly list: HTMLUListElement;
   private readonly addButton: HTMLButtonElement;
+  private readonly placedLine: HTMLParagraphElement;
   private titleText: string;
   private noteText = "";
   private summaryText = "";
+  private placedText = "";
+  private runningTotal = 0;
+  private saveStatus = "idle";
 
   constructor(private readonly host: SlateHost) {
     const changed = (): void => this.show();
@@ -70,11 +90,12 @@ export class Slate {
     this.noteLine = document.createElement("p");
     this.summaryLine = document.createElement("p");
     this.list = document.createElement("ul");
+    this.placedLine = document.createElement("p");
     this.addButton = document.createElement("button");
     this.addButton.type = "button";
     this.addButton.textContent = "Add row";
     this.addButton.addEventListener("click", this.addRow);
-    host.replaceChildren(this.captionLine, this.heading, this.noteLine, this.summaryLine, this.list, this.addButton);
+    host.replaceChildren(this.captionLine, this.heading, this.noteLine, this.summaryLine, this.placedLine, this.list, this.addButton);
     host.slate = this;
     this.show();
   }
@@ -117,6 +138,60 @@ export class Slate {
     this.show();
   }
 
+  /** Takes every row off the slate. */
+  clear(): void {
+    this.rows.splice(0, this.rows.length);
+    this.show();
+  }
+
+  /** A placed line of four values; the number joins the total. Each must arrive as its own type. */
+  place(text: string, number: number, flag: boolean, day: Date): void {
+    this.runningTotal += number;
+    this.placedText = `${text} · ${number.toFixed(1)} · ${flag === true ? "yes" : "no"} · ${dayText(day)}`;
+    this.show();
+  }
+
+  /** A card: whose it is and the day it is due, by name and weekday. */
+  fill(card: Card): void {
+    this.placedText = `${card.name} due ${weekdays[card.due.getDay()]} ${dayText(card.due)}`;
+    this.show();
+  }
+
+  has(label: string): boolean {
+    return this.rows.some(row => row.label === label);
+  }
+
+  total(): number {
+    return this.runningTotal;
+  }
+
+  get status(): string {
+    return this.saveStatus;
+  }
+
+  async save(): Promise<void> {
+    this.saveStatus = "saving";
+    this.show();
+    await aMoment();
+    this.saveStatus = "saved";
+    this.show();
+  }
+
+  async lookup(label: string): Promise<string> {
+    await aMoment();
+    const position = this.rows.findIndex(row => row.label === label);
+    return position === -1 ? `${label} is not on the slate` : `${label} is row ${position + 1}`;
+  }
+
+  fail(): void {
+    throw new Error("The slate refused.");
+  }
+
+  async failLater(): Promise<void> {
+    await aMoment();
+    throw new Error("The slate refused, a moment later.");
+  }
+
   on(name: string, listener: Listener): void {
     const named = this.listeners.get(name) ?? new Set<Listener>();
     named.add(listener);
@@ -143,6 +218,7 @@ export class Slate {
     this.heading.textContent = this.titleText;
     this.noteLine.textContent = this.noteText;
     this.summaryLine.textContent = this.summaryText;
+    this.placedLine.textContent = this.placedText;
     this.list.replaceChildren(...this.rows.map(row => {
       const item = document.createElement("li");
       item.textContent = row.marked ? `${row.label} (marked)` : row.label;

@@ -39,6 +39,44 @@ public sealed class Slate : Component
 
     /// <summary>Shows the labels it is given as the slate's summary line.</summary>
     public void Summarize(Arg<IReadOnlyList<string>> labels) => Method(labels);
+
+    /// <summary>Takes every row off the slate.</summary>
+    public void Clear() => Method();
+
+    /// <summary>Shows a placed line of four values, and adds the number to the slate's total.</summary>
+    public void Place(Arg<string> text, Arg<decimal> number, Arg<bool> flag, Arg<DateTime> day) => Method(text, number, flag, day);
+
+    /// <summary>Shows a card: whose it is, and the day it is due.</summary>
+    public void Fill(Arg<SlateCard> card) => Method(card);
+
+    /// <summary>Whether a row carries the label.</summary>
+    public TypedSource<bool> Has(Arg<string> label) => Method<bool>(label);
+
+    /// <summary>The sum of every number placed so far.</summary>
+    public TypedSource<decimal> Total() => Method<decimal>();
+
+    /// <summary>Where a save stands: idle, saving, or saved.</summary>
+    public ReadOnly<string> Status => ReadOnly<string>();
+
+    /// <summary>Saves the slate; finishes a moment later.</summary>
+    public void Save() => MethodAsync();
+
+    /// <summary>Finds a row by its label, a moment later.</summary>
+    public TypedSource<string> Lookup(Arg<string> label) => MethodAsync<string>(label);
+
+    /// <summary>Refuses, by throwing.</summary>
+    public void Fail() => Method();
+
+    /// <summary>Refuses a moment later, by rejecting.</summary>
+    public void FailLater() => MethodAsync();
+}
+
+/// <summary>A card the slate shows: whose it is and the day it is due.</summary>
+public sealed class SlateCard
+{
+    public string Name { get; set; } = "";
+
+    public DateTime Due { get; set; }
 }
 
 public sealed class SlateHeader : JsObject
