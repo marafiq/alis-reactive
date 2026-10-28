@@ -1,6 +1,4 @@
 using System.Text.Encodings.Web;
-using Alis.Reactive.DesignSystem.Layout;
-using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.Heading;
@@ -37,15 +35,26 @@ public class NativeHeadingTagHelper : TagHelper
     /// <inheritdoc/>
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
-        output.TagName = $"h{(int)Level}";
+        var level = LevelNumber(Level);
+        output.TagName = $"h{level}";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", HeadingCss.Classes(Level, Spacing, CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join(
+            "alis-heading",
+            $"alis-heading--h{level}",
+            LayoutClasses.SpaceBelow(Spacing),
+            CssClass));
 
         var overline = Overline;
         if (!string.IsNullOrEmpty(overline))
         {
             output.PreElement.SetHtmlContent(
-                $"<p class=\"{HeadingCss.OverlineClasses()}\">{HtmlEncoder.Default.Encode(overline)}</p>");
+                $"<p class=\"alis-heading__overline\">{HtmlEncoder.Default.Encode(overline)}</p>");
         }
     }
+
+    private static int LevelNumber(HeadingLevel level) => level switch
+    {
+        HeadingLevel.H1 or HeadingLevel.H2 or HeadingLevel.H3 or HeadingLevel.H4 or HeadingLevel.H5 or HeadingLevel.H6 => (int)level,
+        _ => throw new ArgumentOutOfRangeException(nameof(level), level, "Not a heading level.")
+    };
 }

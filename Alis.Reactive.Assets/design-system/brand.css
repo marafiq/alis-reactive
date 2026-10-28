@@ -1,10 +1,9 @@
 /* Alis.Reactive brand: the single source of truth for brand color and type.
 
-   Consumed by the design-system stylesheet (app.css), the Syncfusion theme
-   overrides (../fusion/syncfusion.entry.css), and the
-   sandbox stylesheet. Each of those imports this file, so every bundle carries
-   the brand independently; change a value here to rebrand every surface,
-   native and Syncfusion alike.
+   Consumed by the design-system stylesheet (app.css), its Syncfusion theme
+   overrides (fusion.css), and the sandbox stylesheet. Each of those imports
+   this file, so every bundle carries the brand independently; change a value
+   here to rebrand every surface, native and Syncfusion alike.
 
    Primary shades are declared as RGB triplets: one declaration feeds both
    Tailwind's rgb() utilities and Syncfusion's rgba(var(), alpha) slots, which

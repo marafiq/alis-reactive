@@ -1,5 +1,3 @@
-using Alis.Reactive.DesignSystem.Layout;
-using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.VStack;
@@ -32,6 +30,10 @@ public class NativeVStackTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", VStackCss.Classes(Gap, DivideY, CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join(
+            "alis-vstack",
+            LayoutClasses.Gap(Gap),
+            DivideY ? "alis-vstack--divided" : "",
+            CssClass));
     }
 }

@@ -40,6 +40,8 @@
     <File Path="package.json" />
     <File Path="eslint.config.js" />
     <File Path="Directory.Build.props" />
-    <File Path="build/AlisReactiveAssets.targets" />
+    <File Path="build/AlisReactiveStaticWebAssets.targets" />
+    <File Path="build/AlisReactiveNetFrameworkContent.targets" />
+    <File Path="build/AlisReactiveBrowserAssets.targets" />
   </Folder>
 </Solution>

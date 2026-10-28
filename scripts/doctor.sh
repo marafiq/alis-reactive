@@ -117,7 +117,8 @@ fi
 
 check_output "runtime bundle" "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js" "scripts/build.sh"
 check_output "design-system CSS" "Alis.Reactive.Assets/dist/css/design-system.dev.css" "scripts/build.sh"
-check_output "Syncfusion CSS" "Alis.Reactive.Assets/dist/css/syncfusion.dev.css" "scripts/build.sh"
+check_output "design-system Fusion CSS" "Alis.Reactive.Assets/dist/css/design-system-fusion.dev.css" "scripts/build.sh"
+check_output "Fusion (Syncfusion) CSS" "Alis.Reactive.Assets/dist/css/syncfusion.dev.css" "scripts/build.sh"
 check_output "sandbox plugin bundle" "Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js" "scripts/build.sh"
 check_output "sandbox CSS" "Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css" "scripts/build.sh"
 for descriptor in tests/*/playwright.project.sh; do

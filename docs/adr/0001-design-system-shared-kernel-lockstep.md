@@ -1,6 +1,6 @@
 # ADR-0001: DesignSystem is a lockstep-versioned shared kernel
 
-**Status:** accepted
+**Status:** accepted; its dependency direction is superseded by ADR-0002 (lockstep versioning stands)
 **Date:** 2026-06-08
 **Domain:** components | process
 

@@ -1,0 +1,33 @@
+<Project>
+
+  <!--
+    Packed into every Alis.Reactive package that ships browser assets and targets net48, as
+    build\net48\{PackageId}.targets (packages.config) and buildTransitive\net48\{PackageId}.targets
+    (PackageReference). NuGet imports it into .NET Framework projects only.
+
+    ASP.NET MVC 5 has no static web assets, so after every build this copies the package's
+    staticwebassets\ folder, the same files an ASP.NET Core app serves at ~/_content/{PackageId}/,
+    into the web project at Content\{PackageId}\. Link them from a view with
+    Url.Content("~/Content/{PackageId}/{path}"), for example ~/Content/AlisReactive/js/alis-reactive.js.
+
+    The copied files are build output: keep Content\AlisReactive*\ out of source control, and include
+    the folder as Content in the web project so publish deploys it.
+
+    Every Alis.Reactive package imports this same file under its own name. The item gathers each
+    package's files with that package's destination; the target is defined once per import, the last
+    definition wins, and it copies them all.
+  -->
+
+  <ItemGroup>
+    <AlisReactivePackageContent Include="$(MSBuildThisFileDirectory)..\..\staticwebassets\**\*">
+      <DestinationFolder>$(MSBuildProjectDirectory)\Content\$(MSBuildThisFileName)\</DestinationFolder>
+    </AlisReactivePackageContent>
+  </ItemGroup>
+
+  <Target Name="CopyAlisReactivePackageContent" AfterTargets="Build" Condition="'@(AlisReactivePackageContent)' != ''">
+    <Copy SourceFiles="@(AlisReactivePackageContent)"
+          DestinationFiles="@(AlisReactivePackageContent->'%(DestinationFolder)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

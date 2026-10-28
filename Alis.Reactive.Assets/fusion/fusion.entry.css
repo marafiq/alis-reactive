@@ -1,0 +1,11 @@
+/* AlisReactive.Fusion stylesheet entry: the styling Fusion's markup needs.
+   Built by vite.fusion.config.ts into dist/css/syncfusion.dev.css, which the Fusion package ships at
+   ~/_content/AlisReactive.Fusion/css/fusion.css.
+
+   The Syncfusion EJ2 components need a Syncfusion theme to work at all (popups, icons, layout), so
+   Fusion ships the Tailwind3 theme in the version its Syncfusion packages are pinned to, with the
+   theme's own defaults. A design system restyles it on top: the Alis one does in
+   ../design-system/fusion.css. */
+
+@import "@syncfusion/ej2/tailwind3.css";
+@import "./grid-dialog-form.css";

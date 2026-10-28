@@ -24,6 +24,7 @@
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\Styles\**\*.*" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\dist\css\design-system.dev.css" />
+    <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\dist\css\design-system-fusion.dev.css" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\dist\css\syncfusion.dev.css" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\wwwroot\css\sandbox.css" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\wwwroot\js\sandbox-plugins.js" />

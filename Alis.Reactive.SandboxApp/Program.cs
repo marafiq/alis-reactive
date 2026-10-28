@@ -47,20 +47,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Sandbox consumes the built framework bundles directly from Assets/dist.
-// Using the same path in dev and CI catches stale or missing bundles early.
-var assetDistDir = Path.GetFullPath(
-    Path.Combine(app.Environment.ContentRootPath, "..", "Alis.Reactive.Assets", "dist"));
-if (!Directory.Exists(assetDistDir))
-{
-    throw new InvalidOperationException(
-        $"Asset bundles not found at '{assetDistDir}'. " +
-        "Run 'npm run build:all' from the repo root before starting the sandbox.");
-}
-app.Environment.WebRootFileProvider = new CompositeFileProvider(
-    new PhysicalFileProvider(assetDistDir),
-    app.Environment.WebRootFileProvider);
-
 // Playwright boot must not depend on CDN availability. Syncfusion's ASP.NET
 // helpers require global `ej/ejs` before the Reactive runtime boots.
 var syncfusionPackageDir = Path.GetFullPath(

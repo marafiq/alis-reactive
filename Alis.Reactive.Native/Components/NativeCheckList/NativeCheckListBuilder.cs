@@ -43,8 +43,8 @@ namespace Alis.Reactive.Native.Components
         private readonly string _elementId;
         private readonly string _bindingPath;
         private readonly List<RadioButtonItem> _options = new List<RadioButtonItem>();
-        private string _cssClass = "flex flex-col gap-2";
-        private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
+        private string _cssClass = "alis-check-list";
+        private string _optionCssClass = "alis-check-list__option";
 
         // Internal because the factory also registers this input component in the Reactive Plan.
 #if NET48
@@ -177,11 +177,11 @@ namespace Alis.Reactive.Native.Components
                 if (isChecked) writer.Write(" checked");
                 writer.Write(" />");
 
-                writer.Write("<div class=\"flex flex-col\">");
-                writer.Write($"<span class=\"text-sm font-medium leading-none\">{encoder.Encode(option.Text)}</span>");
+                writer.Write("<div class=\"alis-check-list__text\">");
+                writer.Write($"<span class=\"alis-check-list__label\">{encoder.Encode(option.Text)}</span>");
                 if (option.Description != null)
                 {
-                    writer.Write($"<span class=\"text-xs text-content-secondary mt-1\">{encoder.Encode(option.Description)}</span>");
+                    writer.Write($"<span class=\"alis-check-list__description\">{encoder.Encode(option.Description)}</span>");
                 }
                 writer.Write("</div>");
 
