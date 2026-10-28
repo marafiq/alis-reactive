@@ -23,6 +23,8 @@ namespace Alis.Reactive.Builders
         public TypedSource<TValue> Get<TValue>(Expression<Func<TQuery, TValue>> member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
+            if (ExpressionPathHelper.ToJsonPath(member).IsNone)
+                throw new ArgumentException("Select a member of the query, for example q => q.FacilityId.", nameof(member));
             return new TypedUrlSource<TValue>(ExpressionPathHelper.ToMemberBindingPath(member).Value);
         }
     }

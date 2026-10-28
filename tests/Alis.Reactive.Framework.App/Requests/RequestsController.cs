@@ -12,6 +12,8 @@ public sealed class RequestsController : Controller
 {
     public IActionResult Desk() => View(new RequestsPage());
 
+    public IActionResult RouteRefusals(RouteMistake mistake) => View(new RouteRefusalsPage { Mistake = mistake });
+
     [HttpGet("/Requests/Residents/{id}")]
     public IActionResult Resident(int id, [FromQuery] string? wing) => Said($"resident {id} in {wing ?? "no wing"}");
 

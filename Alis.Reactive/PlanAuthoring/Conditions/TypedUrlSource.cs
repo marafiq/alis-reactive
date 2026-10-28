@@ -11,9 +11,8 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal TypedUrlSource(string paramName)
         {
-            var urlParam = UrlParameterName.Of(paramName);
-            RequestScalarTarget.UrlQueryParameter<TProp>(urlParam);
-            _paramName = urlParam.Value;
+            RequestScalarTarget.UrlQueryParameter<TProp>(paramName);
+            _paramName = paramName;
         }
 
         internal override ValueExpression Expression =>

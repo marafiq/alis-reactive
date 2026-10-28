@@ -1,0 +1,48 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Framework.App.Requests
+@model RouteRefusalsPage
+@{
+    ViewData["Title"] = "A refused route";
+    var plan = Html.ReactivePlan<RouteRefusalsPage>();
+
+    // A button that looks the room up at the URL, gathered as the mistaken request would gather it.
+    IHtmlContent Look(string url, Func<HttpRequestBuilder<RouteRefusalsPage>, HttpRequestBuilder<RouteRefusalsPage>> gather) =>
+        plan.Button("look", "Look the room up").Reactive(button => button.Click, p => gather(p.Get(url)));
+}
+<h1>A refused route</h1>
+
+@switch (Model.Mistake)
+{
+    case RouteMistake.LeaveAPlaceholderUnfilled:
+        @Look("/Requests/Rooms/{roomId}", request => request.Gather<RoomLookup>(g => g.Set(x => x.Rooms, Model.Rooms)))
+        break;
+    case RouteMistake.CloseABraceNeverOpened:
+        @Look("/Requests/Rooms/roomId}", request => request.Gather<RoomLookup>(g => g.Set(x => x.RoomId, Model.RoomId)))
+        break;
+    case RouteMistake.OpenABraceNeverClosed:
+        @Look("/Requests/Rooms/{roomId", request => request.Gather<RoomLookup>(g => g.Set(x => x.RoomId, Model.RoomId)))
+        break;
+    case RouteMistake.NameAPlaceholderBadly:
+        @Look("/Requests/Rooms/{room-id}", request => request.Gather<RoomLookup>(g => g.Set(x => x.RoomId, Model.RoomId)))
+        break;
+    case RouteMistake.FillAPlaceholderWithAList:
+        @Look("/Requests/Rooms/{rooms}", request => request.Gather<RoomLookup>(g => g.Set(x => x.Rooms, Model.Rooms)))
+        break;
+    case RouteMistake.SendARecordAsAHeader:
+        @plan.Slate("slate", title: "Rooms")
+        @(plan.Button("look", "Look the room up").Reactive(button => button.Click, p =>
+            p.Get("/Requests/Rooms").Gather(g => g.Header("X-Guide", p.Component<Slate>("slate").LastCard))))
+        break;
+    case RouteMistake.ReadARecordFromTheQuery:
+        @(plan.Button("look", "Look the room up").Reactive(button => button.Click, p =>
+            p.When(p.Url<RoomQuery>().Get(q => q.Guide)).NotNull().Then(t => t.Element("guide").Text.Set("given"))))
+        break;
+    case RouteMistake.ReadTheWholeQuery:
+        @(plan.Button("look", "Look the room up").Reactive(button => button.Click, p =>
+            p.When(p.Url<RoomQuery>().Get(q => q)).NotNull().Then(t => t.Element("guide").Text.Set("given"))))
+        break;
+}
+<p>Guide: <span id="guide"></span></p>
+
+@Html.RenderPlan(plan)

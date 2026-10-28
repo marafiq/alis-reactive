@@ -4,24 +4,6 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
-    internal sealed class UrlParameterName
-    {
-        private UrlParameterName(string value)
-        {
-            Value = value;
-        }
-
-        internal string Value { get; }
-
-        internal static UrlParameterName Of(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("URL param name must not be null or whitespace.", nameof(value));
-
-            return new UrlParameterName(value);
-        }
-    }
-
     internal static class RequestScalarTarget
     {
         internal static Shape Header<TProp>(HeaderName name)
@@ -43,12 +25,11 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         // A query key may repeat, and MVC binds an array from every value; a scalar takes the first.
-        internal static Shape UrlQueryParameter<TProp>(UrlParameterName name)
+        internal static Shape UrlQueryParameter<TProp>(string name)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
             var shape = Shape.FromClrType(typeof(TProp));
             var isArrayOfScalars = shape.TryGetArrayItemShape(out var item) && item.IsScalar;
-            return isArrayOfScalars ? shape : RequireShape<TProp>("URL param", name.Value);
+            return isArrayOfScalars ? shape : RequireShape<TProp>("URL param", name);
         }
 
         private static Shape RequireShape<TProp>(string label, string name)
