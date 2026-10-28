@@ -80,6 +80,48 @@ public sealed class EscortRequest
     public string? ManyByNight { get; set; } = "yes";
 
     public string? ManyOrByNight { get; set; } = "yes";
+
+    public List<string>? Tags { get; set; }
+
+    public string? NoAnnex { get; set; } = "yes";
+
+    public string? EastNamedFirst { get; set; } = "yes";
+
+    public string? GuestOfNote { get; set; } = "yes";
+
+    /// <summary>Who comes with the visitor: checked by its own validator, while the visit is overnight.</summary>
+    public EscortCompanion Companion { get; set; } = new();
+}
+
+/// <summary>A companion of the visitor: what kind, how long they stay, and a field per rule its validator writes under a condition.</summary>
+public sealed class EscortCompanion
+{
+    public string? Kind { get; set; }
+
+    public string? Stay { get; set; }
+
+    public string? Name { get; set; } = "yes";
+
+    public string? Room { get; set; } = "yes";
+
+    public string? Phone { get; set; } = "yes";
+
+    public string? Badge { get; set; } = "yes";
+
+    public string? Pass { get; set; } = "yes";
+}
+
+/// <summary>A companion's rules: one always, the others each under a condition of its own over the companion's members.</summary>
+public sealed class EscortCompanionRules : ReactiveValidator<EscortCompanion>
+{
+    public EscortCompanionRules()
+    {
+        RuleFor(c => c.Name).NotEmpty().WithMessage("Name the companion.");
+        RuleFor(c => c.Room).NotEmpty().When(c => c.Stay == "overnight").WithMessage("Give the companion's room for the night.");
+        RuleFor(c => c.Phone).NotEmpty().When(c => c.Kind == "carer" && c.Stay == "overnight").WithMessage("Give the night carer's phone.");
+        RuleFor(c => c.Badge).NotEmpty().When(c => c.Kind == "carer" || c.Kind == "nurse").WithMessage("Give the companion's badge.");
+        RuleFor(c => c.Pass).NotEmpty().When(c => !(c.Kind == "family")).WithMessage("Give a pass to a companion who is not family.");
+    }
 }
 
 /// <summary>The visit the escort is for.</summary>
@@ -127,6 +169,30 @@ public sealed class EscortRules : ReactiveValidator<EscortRequest>
         RuleFor(x => x.TourPurpose).NotEmpty().When(x => x.Visit.Purpose == "Tour").WithMessage("Needed for a tour.");
         RuleFor(x => x.ManyByNight).NotEmpty().When(x => x.Guests > 2 && x.Overnight).WithMessage("Needed for many guests overnight.");
         RuleFor(x => x.ManyOrByNight).NotEmpty().When(x => x.Guests > 2 || x.Overnight).WithMessage("Needed for many guests or overnight.");
+        RuleFor(x => x.NoAnnex).NotEmpty().When(x => x.Wing != null && !x.Wing.Contains("Annex")).WithMessage("Needed when the wing is no annex.");
+        RuleFor(x => x.EastNamedFirst).NotEmpty().When(x => "East" == x.Wing).WithMessage("Needed when East is the wing.");
+        RuleFor(x => x.GuestOfNote).NotEmpty().When(x => x.Tags != null && x.Tags.Contains("vip")).WithMessage("Needed for a guest of note.");
+        RuleFor(x => x.Companion).SetValidator(new EscortCompanionRules()).When(x => x.Overnight);
+    }
+}
+
+/// <summary>A rule under an ordering against nothing, which no value passes and the browser has no form of.</summary>
+public sealed class NothingOrderedEscortRules : ReactiveValidator<EscortRequest>
+{
+    private static readonly int? NoGuestLimit = null;
+
+    public NothingOrderedEscortRules()
+    {
+        RuleFor(x => x.ForMore).NotEmpty().When(x => x.Guests > NoGuestLimit).WithMessage("Needed above no limit.");
+    }
+}
+
+/// <summary>A rule under a text method the browser has no form of (Equals), and not declared the server's.</summary>
+public sealed class TextEqualsEscortRules : ReactiveValidator<EscortRequest>
+{
+    public TextEqualsEscortRules()
+    {
+        RuleFor(x => x.ForMore).NotEmpty().When(x => x.Wing != null && x.Wing.Equals("East")).WithMessage("Needed for the east wing.");
     }
 }
 

@@ -42,6 +42,17 @@
     @{ Html.InputField(plan, m => m.TourPurpose, o => o.Label("TourPurpose")).Entry(); }
     @{ Html.InputField(plan, m => m.ManyByNight, o => o.Label("ManyByNight")).Entry(); }
     @{ Html.InputField(plan, m => m.ManyOrByNight, o => o.Label("ManyOrByNight")).Entry(); }
+    @{ Html.InputField(plan, m => m.Tags, o => o.Label("Tags")).Entry(); }
+    @{ Html.InputField(plan, m => m.NoAnnex, o => o.Label("NoAnnex")).Entry(); }
+    @{ Html.InputField(plan, m => m.EastNamedFirst, o => o.Label("EastNamedFirst")).Entry(); }
+    @{ Html.InputField(plan, m => m.GuestOfNote, o => o.Label("GuestOfNote")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion.Kind, o => o.Label("Companion kind")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion.Stay, o => o.Label("Companion stay")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion.Name, o => o.Label("Companion name")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion.Room, o => o.Label("Companion room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion.Phone, o => o.Label("Companion phone")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion.Badge, o => o.Label("Companion badge")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion.Pass, o => o.Label("Companion pass")).Entry(); }
 </div>
 
 <p>Saved: <span id="saved"></span></p>

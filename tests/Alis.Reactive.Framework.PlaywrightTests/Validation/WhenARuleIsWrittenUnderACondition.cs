@@ -1,10 +1,14 @@
+using System.Text.RegularExpressions;
+
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
 /// <summary>
 /// A rule written under a condition applies only while the condition holds, in the browser as on the server,
 /// for every form a condition the browser can read takes: the six comparisons with the member on either
 /// side, a value the validator fixes, null, empty text, the three text tests and a pattern, a fixed array and
-/// list, a nullable's value, a flag, a negation, a nested member, and the conditions joined by and and or.
+/// list, a nullable's value, a flag, a negation, a nested member, a list member holding an item, and the
+/// conditions joined by and and or. A child validator's rules apply only while the condition written on the
+/// child holds, and each condition of its own reads the child's inputs.
 /// Each field starts filled; a test empties it, sets what the condition reads so that it holds, and the
 /// browser refuses with nothing sent; then it sets it so that it does not, and the request is saved.
 /// </summary>
@@ -74,6 +78,9 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
     [TestCase("ByDay", "Overnight", "false", "true", "Needed for a day visit.", TestName = "a_negated_flag_holds_while_it_is_false")]
     [TestCase("NotMany", "Guests", "2", "3", "Needed unless there are more than two guests.", TestName = "a_negated_comparison_holds_where_the_comparison_does_not")]
     [TestCase("TourPurpose", "Purpose", "Tour", "Lunch", "Needed for a tour.", TestName = "a_nested_members_comparison_holds_at_the_value")]
+    [TestCase("NoAnnex", "Wing", "East", "East Annex", "Needed when the wing is no annex.", TestName = "a_negated_text_test_holds_for_text_without_the_value")]
+    [TestCase("EastNamedFirst", "Wing", "East", "West", "Needed when East is the wing.", TestName = "a_value_on_the_left_equal_to_the_member_holds_at_the_value")]
+    [TestCase("GuestOfNote", "Tags", "vip", "garden", "Needed for a guest of note.", TestName = "a_list_member_holding_a_fixed_item_holds_while_the_list_holds_it")]
     public async Task a_rule_applies_only_while_its_condition_holds(string field, string driver, string holds, string other, string message)
     {
         await Open("/Validation/Escort");
@@ -95,6 +102,107 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 
         await Expect(Page.GetByText("has no browser form").First).ToBeVisibleAsync();
         await Expect(Page.GetByText("declare that the server alone decides it: WhenOnServer or UnlessOnServer").First).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task an_ordering_against_nothing_is_refused_where_the_page_renders()
+    {
+        await Page.GotoAsync($"{BaseUrl}/Validation/EscortRefused?unreadable=OrderAgainstNothing");
+
+        await Expect(Page.GetByText(new Regex("The condition '.*NoGuestLimit.*' has no browser form")).First).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_text_method_the_browser_has_no_form_of_is_refused_where_the_page_renders()
+    {
+        await Page.GotoAsync($"{BaseUrl}/Validation/EscortRefused?unreadable=TextEquals");
+
+        await Expect(Page.GetByText(new Regex("The condition '.*x\\.Wing\\.Equals\\(\"East\"\\).*' has no browser form")).First).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_childs_rule_applies_only_while_the_condition_written_on_the_child_holds()
+    {
+        await Open("/Validation/Escort");
+        await Write("Companion name", "");
+
+        await Write("Overnight", "true");
+        await Save();
+        await ExpectHeld("Companion name", "Name the companion.");
+
+        await Write("Overnight", "false");
+        await Save();
+        await ExpectSaved("Companion name", "Name the companion.");
+    }
+
+    [Test]
+    public async Task a_childs_rule_under_its_own_condition_applies_only_while_that_condition_and_the_one_on_the_child_both_hold()
+    {
+        await Open("/Validation/Escort");
+        await Write("Companion room", "");
+
+        await Write("Overnight", "true");
+        await Write("Companion stay", "overnight");
+        await Save();
+        await ExpectHeld("Companion room", "Give the companion's room for the night.");
+
+        await Write("Companion stay", "day");
+        await Save();
+        await ExpectSaved("Companion room", "Give the companion's room for the night.");
+
+        await Write("Companion stay", "overnight");
+        await Write("Overnight", "false");
+        await Save();
+        await ExpectSaved("Companion room", "Give the companion's room for the night.");
+    }
+
+    [Test]
+    public async Task a_childs_conditions_joined_by_and_read_the_childs_own_inputs()
+    {
+        await Open("/Validation/Escort");
+        await Write("Companion phone", "");
+        await Write("Overnight", "true");
+        await Write("Companion stay", "overnight");
+
+        await Write("Companion kind", "carer");
+        await Save();
+        await ExpectHeld("Companion phone", "Give the night carer's phone.");
+
+        await Write("Companion kind", "family");
+        await Save();
+        await ExpectSaved("Companion phone", "Give the night carer's phone.");
+    }
+
+    [Test]
+    public async Task a_childs_conditions_joined_by_or_read_the_childs_own_inputs()
+    {
+        await Open("/Validation/Escort");
+        await Write("Companion badge", "");
+        await Write("Overnight", "true");
+
+        await Write("Companion kind", "nurse");
+        await Save();
+        await ExpectHeld("Companion badge", "Give the companion's badge.");
+
+        await Write("Companion kind", "family");
+        await Save();
+        await ExpectSaved("Companion badge", "Give the companion's badge.");
+    }
+
+    [Test]
+    public async Task a_childs_negated_condition_reads_the_childs_own_input()
+    {
+        await Open("/Validation/Escort");
+        await Write("Companion pass", "");
+        await Write("Overnight", "true");
+
+        await Write("Companion kind", "carer");
+        await Save();
+        await ExpectHeld("Companion pass", "Give a pass to a companion who is not family.");
+
+        await Write("Companion kind", "family");
+        await Save();
+        await ExpectSaved("Companion pass", "Give a pass to a companion who is not family.");
     }
 
     [Test]

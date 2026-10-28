@@ -14,7 +14,16 @@ public sealed class ValidationController : Controller
 
     public IActionResult Escort() => View(new EscortRequest());
 
-    public IActionResult EscortRefused() => View(new EscortRequest());
+    /// <summary>An escort request whose rules sit under a condition the browser cannot read, the one the address names.</summary>
+    public IActionResult EscortRefused(EscortUnreadable unreadable = EscortUnreadable.LengthOfText)
+    {
+        ViewData["Unreadable"] = unreadable;
+        return View(new EscortRequest());
+    }
+
+    public IActionResult RulesReadBack() => View(new VisitBooking());
+
+    public IActionResult RuleSetRefused(RuleSetMistake mistake) => View(new RuleSetRefusalsPage { Mistake = mistake });
 
     public IActionResult Notice() => View(new Notice());
 
