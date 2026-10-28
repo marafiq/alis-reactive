@@ -40,15 +40,11 @@ async function startWithRetry(managed: Managed, url: string): Promise<void> {
     }
   }
   log.error("start.failed", { hubUrl: url, attempts: startDelays.length });
-  if (hubs.get(url) === managed) showRetryIndicator(url, () => retry(url));
+  if (hubs.get(url) === managed) showRetryIndicator(url, () => retry(managed, url));
 }
 
-function retry(url: string): void {
-  const managed = hubs.get(url);
-  if (!managed) {
-    removeRetryIndicator(url);
-    return;
-  }
+// The offer belongs to a connection the page still holds: releasing the last subscription withdraws it.
+function retry(managed: Managed, url: string): void {
   if (managed.connection.state !== signalR.HubConnectionState.Disconnected) return;
   log.info("retry.manual", { hubUrl: url });
   managed.started = startWithRetry(managed, url);
@@ -95,7 +91,7 @@ function managedFor(url: string): Managed {
       return;
     }
     log.warn("connection.disconnected", { hubUrl: url, error: error ? toJavaScriptString(error) : undefined });
-    showRetryIndicator(url, () => retry(url));
+    showRetryIndicator(url, () => retry(managed, url));
     emitLifecycle(managed, "close", {});
   });
 
@@ -110,6 +106,7 @@ function release(url: string, managed: Managed): void {
   managed.stopping = true;
   void managed.connection.stop();
   if (hubs.get(url) === managed) hubs.delete(url);
+  removeRetryIndicator(url);
 }
 
 const LIFECYCLE_EVENTS = new Set(["reconnecting", "reconnected", "close"]);
