@@ -10,7 +10,7 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce React
 | `Alis.Reactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
 | `Alis.Reactive.Fusion` | Syncfusion EJ2 component integration |
 | `Alis.Reactive.FluentValidator` | Validation rules in FluentValidation's grammar, run by the server and the browser |
-| `Alis.Reactive.DesignSystem` | Design-system tokens, layout helpers, and stylesheet |
+| `Alis.Reactive.DesignSystem` | The look an app chooses: tokens, stylesheets, and C# layout class helpers. No component package depends on it |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
 `Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, `Alis.Reactive.FluentValidator`,
@@ -89,50 +89,75 @@ The full command reference lives in **[docs/developer-cli.md](docs/developer-cli
 
 ## How the bundles ship
 
-`npm run build:all` produces JS/CSS bundles that three places consume. Every
-bundle output path is gitignored — `git status` stays clean after a build.
+`npm run build:all` builds the browser bundles into `Alis.Reactive.Assets/dist/` (gitignored).
+Each package ships its own files the way a Razor class library does: as static web assets.
 
-| Consumer | How it gets the bundles |
-|----------|-------------------------|
-| **Sandbox** | `SandboxApp/Program.cs` serves `Alis.Reactive.Assets/dist/` directly via a `CompositeFileProvider` — no copy into `wwwroot/` |
-| **NuGet** | Each asset-bearing csproj packs its bundle from `Alis.Reactive.Assets/dist/` — `AlisReactive` the runtime JS, `AlisReactive.DesignSystem` the design-system CSS, `AlisReactive.Fusion` the Syncfusion CSS. `dotnet pack` never runs npm |
-| **Example app** (`examples/resident-intake/`) | Uses local project references so solution builds exercise the current source contract |
+| Consumer | How it gets the files |
+|----------|-----------------------|
+| **Sandbox** and `examples/resident-intake` | Project references. In Development the app serves each file at `~/_content/{PackageId}/...` from where npm wrote it, so a watcher's rebuild shows on the next request |
+| **ASP.NET Core app (net10.0)** | Package references. The same `~/_content/{PackageId}/...` paths; publish copies the files under `wwwroot/_content/` |
+| **ASP.NET MVC 5 app (net48)** | Package references. Each package's `build\net48\{PackageId}.targets` copies its files into the web project at `Content\{PackageId}\` after every build |
+
+`dotnet pack` never runs npm, and refuses to pack a package whose bundle is missing.
+
+## Browser assets: what each package ships and where it lands
+
+Components ship the styling their own markup needs. The look (color, type, the brand) is the
+design system's: an app references `AlisReactive.DesignSystem`, or another design system that sets
+the same tokens (`--color-border`, `--color-accent`, `--font-display`, ...), and the components
+follow it. Without one, their stylesheets fall back to neutral colors and the page's font.
+
+| Package | File | net10.0 URL | net48 file in the web project |
+|---------|------|-------------|-------------------------------|
+| `AlisReactive` | runtime script | `~/_content/AlisReactive/js/alis-reactive.js` | `Content\AlisReactive\js\alis-reactive.js` |
+| `AlisReactive.Native` | drawer, loader, check list, radio group | `~/_content/AlisReactive.Native/css/native.css` | `Content\AlisReactive.Native\css\native.css` |
+| `AlisReactive.NativeTagHelpers` | `<native-*>` layout tag helpers | `~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css` | (net10.0 only) |
+| `AlisReactive.Fusion` | Syncfusion Tailwind3 theme, grid dialog form | `~/_content/AlisReactive.Fusion/css/fusion.css` | `Content\AlisReactive.Fusion\css\fusion.css` |
+| `AlisReactive.DesignSystem` | tokens, page base, field and validation look | `~/_content/AlisReactive.DesignSystem/css/design-system.css` | `Content\AlisReactive.DesignSystem\css\design-system.css` |
+| `AlisReactive.DesignSystem` | the brand on Syncfusion components | `~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css` | `Content\AlisReactive.DesignSystem\css\design-system-fusion.css` |
+
+Link them in this order: the design system, the component stylesheets, Fusion's, then the design
+system's Fusion layer (its values must follow the Syncfusion theme's), then your own CSS.
+
+```html
+<link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/_content/AlisReactive.Native/css/native.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/_content/AlisReactive.Fusion/css/fusion.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css" asp-append-version="true"/>
+...
+<script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
+```
+
+The app serves them with `app.UseStaticFiles()`, as the sandbox does. Running from build
+output outside Development needs `builder.WebHost.UseStaticWebAssets()`; a published app does not.
+
+On net48, link the copied files with `Url.Content("~/Content/AlisReactive/js/alis-reactive.js")`.
+They are build output: keep `Content\AlisReactive*\` out of source control, and include the folder
+as `Content` in the web project so publish deploys it. MVC 5 has no `asp-append-version`; bundle
+them with System.Web.Optimization or add the package version to the URL to bust caches on upgrade.
 
 ## For UI developers — the design system
 
-Bringing the design system into a consuming app is four steps; you do **not** need to
+Bringing the design system into a consuming app is three steps; you do **not** need to
 touch the framework internals.
 
-1. **Reference the NuGet package.** Add a **package** reference to `AlisReactive.DesignSystem`.
-   Each asset package ships a per-package MSBuild targets file (`{PackageId}.targets`, generated
-   from `build/AlisReactiveAssets.targets`) that, on build, copies its versioned CSS into your
-   app's `wwwroot/css/` — `design-system.<version>.css` here, and `syncfusion.<version>.css` if
-   you also add the `AlisReactive.Fusion` package. The version is baked into the filename.
-   *(This copy fires for **package** references only. The in-repo `examples/resident-intake`
-   uses local **project** references for source-contract testing, so it does not auto-copy the
-   CSS that way.)*
+1. **Reference the package.** Add a reference to `AlisReactive.DesignSystem` next to the
+   component packages you use. The component packages do not bring it: it is the app's choice.
 
-2. **Link the stylesheet and mark the root** in `_Layout.cshtml` — exactly as the
-   example app and sandbox do. The filename carries the version of the package you
-   installed (a `1.2.3` package yields `design-system.1.2.3.css`), so after your first
-   build check `wwwroot/css/` for the exact names and link those:
+2. **Link the stylesheets and mark the root** in `_Layout.cshtml`, in the order shown above, and
+   put the **`alis-root`** class on the element wrapping your content; the design system's page
+   styles are scoped to it so they never leak into the rest of the host app. (The Inter web font is
+   the design default; see the sandbox `_Layout` for the `preconnect`/`font` links.)
 
    ```html
-   <link rel="stylesheet" href="~/css/design-system.<version>.css" asp-append-version="true"/>
-   <link rel="stylesheet" href="~/css/syncfusion.<version>.css" asp-append-version="true"/>  <!-- if using Fusion -->
-   ...
-   <body class="alis-root h-full">   <!-- the design system is scoped under .alis-root -->
+   <body class="alis-root h-full">
    ```
 
-   The design system expects the **`alis-root`** class on the element wrapping your
-   content; styles are scoped to it so they never leak into the rest of the host app.
-   (The Inter web font is the design default — see the example `_Layout` for the
-   `preconnect`/`font` links.)
-
 3. **Build class strings from C#, not by hand.** `Alis.Reactive.DesignSystem` exposes
-   small static layout helpers that return the right scoped classes for the current
-   tokens — so spacing, elevation, and color stay consistent without memorizing utility
-   names. Each takes typed token enums:
+   small static layout helpers that return the design system's utility classes for the current
+   tokens, so spacing, elevation, and color stay consistent without memorizing utility names.
+   Each takes typed token enums:
 
    | Helper (in `DesignSystem/Layout`) | Returns classes for | Example tokens |
    |---|---|---|
@@ -146,8 +171,8 @@ touch the framework internals.
    </div>
    ```
 
-4. **Go deeper** in the `Alis.Reactive.DesignSystem/Layout` + `Tokens` source — the enums there
-   are the full, typed vocabulary; there is no untyped string surface to discover.
+   The `<native-*>` tag helpers do not use these: they write their own class names, styled by
+   `native-tag-helpers.css`, and take their own enums (`Alis.Reactive.NativeTagHelpers.*`).
 
 ## Repo Layout
 
@@ -158,18 +183,19 @@ Alis.Reactive.Fusion/             C# Syncfusion-component library
 Alis.Reactive.FluentValidator/    C# validation rules in FluentValidation's grammar, server and browser
 Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
 Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
-Alis.Reactive.DesignSystem/       C# design-system tokens + layout helpers
-Alis.Reactive.Assets/             Framework browser assets — npm workspace (runtime, design-system, Fusion)
+Alis.Reactive.DesignSystem/       C# design-system tokens + layout class helpers; ships the design-system CSS
+Alis.Reactive.Assets/             Framework browser assets — npm workspace (runtime, components, CSS)
 Alis.Reactive.SandboxApp/         Dev harness + live component demos
 examples/resident-intake/         Source-referenced consumer example
 tests/                            Test projects (NUnit + vitest + Playwright)
 ```
 
 `Alis.Reactive.Assets/` is the single home for all framework browser assets — an
-npm workspace holding the runtime TypeScript, the design-system CSS, and the
-Syncfusion CSS. esbuild and vite build each into `dist/`; the C# packages ship
-those bundles but never build them. A `NoTargets` `.csproj` makes the workspace
-visible in the solution and compiles nothing.
+npm workspace holding the runtime TypeScript, the design-system CSS, the Syncfusion
+CSS, and the stylesheets the component packages ship as written. esbuild and vite
+build the bundles into `dist/`; the C# packages ship those files as static web assets
+(`build/AlisReactiveStaticWebAssets.targets`) but never build them. A `NoTargets`
+`.csproj` makes the workspace visible in the solution and compiles nothing.
 
 ## License
 

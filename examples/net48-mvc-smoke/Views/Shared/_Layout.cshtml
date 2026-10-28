@@ -4,17 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title — net48 MVC Smoke</title>
-    @* Asset filenames are version-stamped by the package targets. The 1.0.0-rc.1 here and on the
-       script below must match AlisReactiveVersion in Net48MvcSmoke.csproj; verify-net48.yml asserts
-       the landed filenames, so a mismatched version bump fails CI loudly instead of 404ing silently. *@
-    <link rel="stylesheet" href="@Url.Content("~/Content/alisreactive/design-system.1.0.0-rc.1.css")" />
+    @* Each package's build\net48 targets copies its files into Content\{PackageId}\ on build;
+       verify-net48.yml asserts they landed. The design system is this app's choice of look. *@
+    <link rel="stylesheet" href="@Url.Content("~/Content/AlisReactive.DesignSystem/css/design-system.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/AlisReactive.Native/css/native.css")" />
 </head>
 <body class="alis-root">
     <div style="max-width: 720px; margin: 2rem auto; padding: 0 1rem;">
         @RenderBody()
     </div>
-    @* Runtime JS landed by the package targets. root.ts auto-discovers the [data-reactive-plan]
+    @* Runtime JS copied by the AlisReactive package. root.ts auto-discovers the [data-reactive-plan]
        script element that RenderPlan emits and boots the plan - no inline script needed. *@
-    <script src="@Url.Content("~/Content/alisreactive/alis-reactive.1.0.0-rc.1.js")"></script>
+    <script src="@Url.Content("~/Content/AlisReactive/js/alis-reactive.js")"></script>
 </body>
 </html>

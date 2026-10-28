@@ -57,9 +57,10 @@ For live UI work, run the relevant watcher plus the sandbox:
 |-----------|---------------|----------|
 | Framework runtime TypeScript | `npm run watch:runtime` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Framework design-system CSS | `npm run watch:design-system` | `dotnet watch --project Alis.Reactive.SandboxApp` |
-| Framework Syncfusion CSS | `npm run watch:fusion` | `dotnet watch --project Alis.Reactive.SandboxApp` |
+| Framework Fusion (Syncfusion) CSS | `npm run watch:fusion` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only plugin JS | `npm run watch:sandbox-plugins` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only CSS | `npm run watch:sandbox-css` | `dotnet watch --project Alis.Reactive.SandboxApp` |
+| Native or tag helper CSS | none (shipped as written) | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Razor or C# view/demo changes | none | `dotnet watch --project Alis.Reactive.SandboxApp` |
 
 Browser refresh is enough after TS/CSS watcher output changes. Restart the
@@ -69,9 +70,11 @@ Asset ownership:
 
 | Asset | Source | Output | Ships to consumers |
 |-------|--------|--------|--------------------|
-| Runtime JS | `Alis.Reactive.Assets/runtime/` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | yes, `AlisReactive` |
-| Design-system CSS | `Alis.Reactive.Assets/design-system/` | `Alis.Reactive.Assets/dist/css/design-system.dev.css` | yes, `AlisReactive.DesignSystem` |
-| Syncfusion CSS | `Alis.Reactive.Assets/fusion/` | `Alis.Reactive.Assets/dist/css/syncfusion.dev.css` | yes, `AlisReactive.Fusion` |
+| Runtime JS | `Alis.Reactive.Assets/runtime/` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | yes, `AlisReactive`: `_content/AlisReactive/js/alis-reactive.js` |
+| Design-system CSS | `Alis.Reactive.Assets/design-system/` | `Alis.Reactive.Assets/dist/css/design-system.dev.css`, `design-system-fusion.dev.css` | yes, `AlisReactive.DesignSystem`: `css/design-system.css`, `css/design-system-fusion.css` |
+| Fusion CSS (Syncfusion theme) | `Alis.Reactive.Assets/fusion/` | `Alis.Reactive.Assets/dist/css/syncfusion.dev.css` | yes, `AlisReactive.Fusion`: `css/fusion.css` |
+| Native CSS | `Alis.Reactive.Assets/native/native.css` | none, shipped as written | yes, `AlisReactive.Native`: `css/native.css` |
+| Native tag helper CSS | `Alis.Reactive.Assets/native-tag-helpers/native-tag-helpers.css` | none, shipped as written | yes, `AlisReactive.NativeTagHelpers`: `css/native-tag-helpers.css` |
 | Sandbox plugin JS | `Alis.Reactive.SandboxApp/Scripts/` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` | no |
 | Sandbox CSS | `Alis.Reactive.SandboxApp/Styles/` | `Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css` | no |
 

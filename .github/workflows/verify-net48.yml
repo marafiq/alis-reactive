@@ -94,13 +94,14 @@ jobs:
         shell: pwsh
         run: msbuild examples/net48-mvc-smoke/Net48MvcSmoke.csproj /p:Configuration=Release /restore /t:Build
 
-      - name: Confirm runtime assets landed in Content\alisreactive
+      - name: Confirm the packages' browser assets landed in Content\{PackageId}
         shell: pwsh
         run: |
-          $dir = "examples/net48-mvc-smoke/Content/alisreactive"
-          Get-ChildItem $dir
-          if (-not (Test-Path "$dir/alis-reactive.1.0.0-rc.1.js")) { throw "runtime JS did not land in Content\alisreactive" }
-          if (-not (Test-Path "$dir/design-system.1.0.0-rc.1.css")) { throw "design-system CSS did not land in Content\alisreactive" }
+          $dir = "examples/net48-mvc-smoke/Content"
+          Get-ChildItem $dir -Recurse -File | ForEach-Object { $_.FullName }
+          if (-not (Test-Path "$dir/AlisReactive/js/alis-reactive.js")) { throw "runtime JS did not land in Content\AlisReactive\js" }
+          if (-not (Test-Path "$dir/AlisReactive.Native/css/native.css")) { throw "Native CSS did not land in Content\AlisReactive.Native\css" }
+          if (-not (Test-Path "$dir/AlisReactive.DesignSystem/css/design-system.css")) { throw "design-system CSS did not land in Content\AlisReactive.DesignSystem\css" }
 
       - name: Generate web.config binding redirects from the built bin assemblies
         shell: pwsh

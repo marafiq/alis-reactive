@@ -193,8 +193,9 @@ done
 ```
 
 The package page is `https://www.nuget.org/packages/AlisReactive/1.0.0-rc.4`. The consumer-side
-proof is a scratch project: `dotnet add package AlisReactive --version 1.0.0-rc.4` followed by a
-build that lands `wwwroot/scripts/alis-reactive.1.0.0-rc.4.js`
+proof is a scratch web project: `dotnet add package AlisReactive --version 1.0.0-rc.4`, then
+`dotnet run` in Development serves `~/_content/AlisReactive/js/alis-reactive.js` (the package's
+`staticwebassets/js/alis-reactive.js`)
 ([flat container API](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource)).
 
 ## Roll back

@@ -35,14 +35,17 @@ Visual Studio (or MSBuild + IIS Express) and .NET Framework 4.8 installed.
 ## The five checks
 
 ### 1. Asset landing (Task 3a — cross-platform-ish, confirm on Windows)
-After build, confirm the shipped targets copied the version-stamped assets to a servable path:
-- [ ] `Content\alisreactive\alis-reactive.1.0.0-rc.1.js`
-- [ ] `Content\alisreactive\design-system.1.0.0-rc.1.css`
-- [ ] `Content\alisreactive\syncfusion.1.0.0-rc.1.css`
+After build, confirm each package's `build\net48\{PackageId}.targets` copied its browser assets into
+`Content\{PackageId}\`:
+- [ ] `Content\AlisReactive\js\alis-reactive.js`
+- [ ] `Content\AlisReactive.Native\css\native.css`
+- [ ] `Content\AlisReactive.Fusion\css\fusion.css`
+- [ ] `Content\AlisReactive.DesignSystem\css\design-system.css` and `design-system-fusion.css`
 
-(SDK-style net10 consumers instead get `wwwroot\scripts\*.js` + `wwwroot\css\*.css` — verify that
-path separately on the net10 consumer.) If the classic Web Application Project does not auto-include
-`Content\` files on publish, record the exact consumer-side include step needed (feeds the install docs).
+(net10 consumers get no copies: the same files are static web assets served at
+`~/_content/{PackageId}/...`.) The copies are build output and are not added to the project; include
+`Content\AlisReactive*\` as `Content` in the classic Web Application Project so publish deploys it,
+and record any further step needed (feeds the install docs).
 
 ### 2. Syncfusion `.Render()` executes on net48
 The net48 package depends on `Syncfusion.EJ2.MVC5` (a *different* assembly than net10's
