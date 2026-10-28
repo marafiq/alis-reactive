@@ -1,0 +1,290 @@
+/* AlisReactive.NativeTagHelpers: the styling the layout tag helpers' markup needs, shipped with the
+   package as written (~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css).
+   Colors and type read the design system's tokens (--color-*, --font-display) when an app links
+   one; without one, text inherits the page's and surfaces fall back to neutral values.
+
+   The rules set only what a tag helper attribute controls, so classes the page writes on the tag
+   (class="mt-4 flex-wrap") keep working for everything else. */
+
+/* native-container */
+.alis-container {
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* native-vstack, native-hstack, native-grid */
+.alis-vstack {
+  display: flex;
+  flex-direction: column;
+}
+
+.alis-vstack--divided > :not(:last-child) {
+  border-top-width: 0;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.alis-hstack {
+  display: flex;
+}
+
+.alis-hstack--wrap { flex-wrap: wrap; }
+
+.alis-align-start { align-items: flex-start; }
+.alis-align-center { align-items: center; }
+.alis-align-end { align-items: flex-end; }
+.alis-align-stretch { align-items: stretch; }
+.alis-align-baseline { align-items: baseline; }
+
+.alis-justify-start { justify-content: flex-start; }
+.alis-justify-center { justify-content: center; }
+.alis-justify-end { justify-content: flex-end; }
+.alis-justify-between { justify-content: space-between; }
+.alis-justify-around { justify-content: space-around; }
+.alis-justify-evenly { justify-content: space-evenly; }
+
+.alis-grid {
+  display: grid;
+}
+
+.alis-grid--cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.alis-grid--cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.alis-grid--cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.alis-grid--cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.alis-grid--cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.alis-grid--cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+
+/* Responsive: one column on a phone; up to two from 40rem; three or more from 64rem. */
+.alis-grid--responsive-1,
+.alis-grid--responsive-2,
+.alis-grid--responsive-3,
+.alis-grid--responsive-4,
+.alis-grid--responsive-5,
+.alis-grid--responsive-6 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 40rem) {
+  .alis-grid--responsive-2,
+  .alis-grid--responsive-3,
+  .alis-grid--responsive-4,
+  .alis-grid--responsive-5,
+  .alis-grid--responsive-6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .alis-grid--responsive-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .alis-grid--responsive-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .alis-grid--responsive-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .alis-grid--responsive-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+
+.alis-gap-none { gap: 0; }
+.alis-gap-xs { gap: 0.25rem; }
+.alis-gap-sm { gap: 0.5rem; }
+.alis-gap-base { gap: 1rem; }
+.alis-gap-md { gap: 1.5rem; }
+.alis-gap-lg { gap: 2rem; }
+.alis-gap-xl { gap: 2.5rem; }
+.alis-gap-xxl { gap: 3rem; }
+.alis-gap-max { gap: 4rem; }
+
+/* native-heading, native-text: space below */
+.alis-space-xs { margin-bottom: 0.25rem; }
+.alis-space-sm { margin-bottom: 0.5rem; }
+.alis-space-base { margin-bottom: 0.75rem; }
+.alis-space-md { margin-bottom: 1rem; }
+.alis-space-lg { margin-bottom: 1.5rem; }
+
+/* native-heading */
+.alis-heading {
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
+}
+
+.alis-heading--h1 {
+  font-size: 1.875rem;
+  line-height: calc(2.25 / 1.875);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.alis-heading--h2 {
+  font-size: 1.25rem;
+  line-height: calc(1.75 / 1.25);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.alis-heading--h3 {
+  font-size: 1.125rem;
+  line-height: calc(1.75 / 1.125);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.alis-heading--h4 {
+  font-size: 1.125rem;
+  line-height: calc(1.75 / 1.125);
+  font-weight: 500;
+}
+
+.alis-heading--h5 {
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.alis-heading--h6 {
+  font-size: 0.875rem;
+  line-height: calc(1.25 / 0.875);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.alis-heading__overline {
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  line-height: calc(1 / 0.75);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+/* native-text */
+.alis-text--xs { font-size: 0.75rem; line-height: calc(1 / 0.75); }
+.alis-text--sm { font-size: 0.875rem; line-height: calc(1.25 / 0.875); }
+.alis-text--base { font-size: 1rem; line-height: 1.5; }
+.alis-text--lg { font-size: 1.125rem; line-height: calc(1.75 / 1.125); }
+.alis-text--xl { font-size: 1.25rem; line-height: calc(1.75 / 1.25); }
+
+.alis-text--primary { color: var(--color-text-primary); }
+.alis-text--secondary { color: var(--color-text-secondary, #475569); }
+.alis-text--muted { color: var(--color-text-muted, #94a3b8); }
+.alis-text--inverse { color: #fff; }
+.alis-text--accent { color: var(--color-accent); }
+.alis-text--success { color: var(--color-success, #059669); }
+.alis-text--warning { color: var(--color-warning, #d97706); }
+.alis-text--error { color: var(--color-error, #dc2626); }
+.alis-text--inherit { color: inherit; }
+
+.alis-text--bold { font-weight: 600; }
+
+/* native-kv */
+.alis-kv__label,
+.alis-kv__value {
+  margin: 0;
+}
+
+.alis-kv__label {
+  font-weight: 500;
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.alis-kv__value {
+  font-size: 0.875rem;
+  line-height: calc(1.25 / 0.875);
+  color: var(--color-text-primary);
+}
+
+.alis-kv--stacked > .alis-kv__label {
+  font-size: 0.75rem;
+  line-height: calc(1 / 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.alis-kv--stacked > .alis-kv__value {
+  margin-top: 0.25rem;
+}
+
+.alis-kv--inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alis-kv--inline > .alis-kv__label {
+  font-size: 0.875rem;
+  line-height: calc(1.25 / 0.875);
+}
+
+/* native-divider */
+.alis-divider {
+  height: 0;
+  margin: 1rem 0;
+  border: 0 solid var(--color-border, #e2e8f0);
+  border-top-width: 1px;
+  color: inherit;
+}
+
+.alis-divider--dashed {
+  border-top-style: dashed;
+}
+
+.alis-divider-labeled {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.alis-divider-labeled__line {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+}
+
+.alis-divider-labeled__rule {
+  width: 100%;
+  border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+.alis-divider-labeled__text-row {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.alis-divider-labeled__text {
+  padding-inline: 0.75rem;
+  font-size: 0.875rem;
+  line-height: calc(1.25 / 0.875);
+  color: var(--color-text-muted, #94a3b8);
+  background-color: var(--color-surface, #fff);
+}
+
+/* native-card */
+.alis-card {
+  background-color: var(--color-surface-elevated, #fff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 1rem;
+}
+
+.alis-card--flat { box-shadow: none; }
+.alis-card--low { box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); }
+.alis-card--medium { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+.alis-card--high { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+
+.alis-card--accent { border-left-width: 4px; }
+.alis-card--accent-primary { border-left-color: var(--color-accent, currentColor); }
+.alis-card--accent-secondary { border-left-color: var(--color-text-secondary, #475569); }
+.alis-card--accent-success { border-left-color: var(--color-success, #059669); }
+.alis-card--accent-warning { border-left-color: var(--color-warning, #d97706); }
+.alis-card--accent-error { border-left-color: var(--color-error, #dc2626); }
+.alis-card--accent-info { border-left-color: var(--color-info, #2563eb); }
+.alis-card--accent-muted { border-left-color: var(--color-text-muted, #94a3b8); }
+
+.alis-card__header,
+.alis-card__footer {
+  padding: 1rem 1.5rem;
+}
+
+.alis-card__header--divided { border-bottom: 1px solid var(--color-border, #e2e8f0); }
+.alis-card__footer--divided { border-top: 1px solid var(--color-border, #e2e8f0); }
+
+.alis-card__body--compact { padding: 1rem 1.25rem; }
+.alis-card__body--standard { padding: 1.5rem; }

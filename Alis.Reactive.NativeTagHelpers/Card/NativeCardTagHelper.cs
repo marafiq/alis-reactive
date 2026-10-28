@@ -1,5 +1,3 @@
-using Alis.Reactive.DesignSystem.Layout;
-using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.Card;
@@ -32,12 +30,31 @@ public class NativeCardTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-
-        var cardClasses = CardCss.CardClasses(Elevation);
-        if (Accent.HasValue)
-            cardClasses = CssUtils.MergeClasses(cardClasses, CardCss.AccentInnerClasses(Accent.Value));
-        cardClasses = CssUtils.MergeClasses(cardClasses, CssClass);
-
-        output.Attributes.SetAttribute("class", cardClasses);
+        output.Attributes.SetAttribute("class", LayoutClasses.Join(
+            "alis-card",
+            ElevationClass(Elevation),
+            Accent.HasValue ? "alis-card--accent " + AccentClass(Accent.Value) : "",
+            CssClass));
     }
+
+    private static string ElevationClass(CardElevation elevation) => elevation switch
+    {
+        CardElevation.Flat => "alis-card--flat",
+        CardElevation.Low => "alis-card--low",
+        CardElevation.Medium => "alis-card--medium",
+        CardElevation.High => "alis-card--high",
+        _ => throw new ArgumentOutOfRangeException(nameof(elevation), elevation, "Not a card elevation.")
+    };
+
+    private static string AccentClass(AccentColor accent) => accent switch
+    {
+        AccentColor.Primary => "alis-card--accent-primary",
+        AccentColor.Secondary => "alis-card--accent-secondary",
+        AccentColor.Success => "alis-card--accent-success",
+        AccentColor.Warning => "alis-card--accent-warning",
+        AccentColor.Error => "alis-card--accent-error",
+        AccentColor.Info => "alis-card--accent-info",
+        AccentColor.Muted => "alis-card--accent-muted",
+        _ => throw new ArgumentOutOfRangeException(nameof(accent), accent, "Not an accent color.")
+    };
 }

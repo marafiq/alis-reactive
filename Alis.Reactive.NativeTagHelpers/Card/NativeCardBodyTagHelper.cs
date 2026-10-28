@@ -1,5 +1,3 @@
-using Alis.Reactive.DesignSystem.Layout;
-using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.Card;
@@ -26,6 +24,14 @@ public class NativeCardBodyTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", CssUtils.MergeClasses(CardCss.BodyClasses(Padding), CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join("alis-card__body", PaddingClass(Padding), CssClass));
     }
+
+    private static string PaddingClass(CardPadding padding) => padding switch
+    {
+        CardPadding.None => "",
+        CardPadding.Compact => "alis-card__body--compact",
+        CardPadding.Standard => "alis-card__body--standard",
+        _ => throw new ArgumentOutOfRangeException(nameof(padding), padding, "Not a card padding.")
+    };
 }

@@ -1,4 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- The Razor SDK makes this a Razor class library, so its stylesheet ships as a static web asset.
+       There are no Razor files to compile. -->
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -15,7 +19,17 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj" />
     <ProjectReference Include="../Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
+
+  <!-- The stylesheet the layout tag helpers' markup needs (card, stacks, grid, heading, text,
+       key/value, divider, container), shipped as written from Alis.Reactive.Assets/native-tag-helpers:
+       served at ~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css. Where and how:
+       build\AlisReactiveStaticWebAssets.targets. The look comes from whatever design system the app
+       links. -->
+  <ItemGroup>
+    <AlisReactiveStaticWebAsset Include="../Alis.Reactive.Assets/native-tag-helpers/native-tag-helpers.css" RelativePath="css/native-tag-helpers.css" />
+  </ItemGroup>
+
+  <Import Project="../build/AlisReactiveStaticWebAssets.targets" />
 </Project>

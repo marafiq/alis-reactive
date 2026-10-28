@@ -1,5 +1,3 @@
-using Alis.Reactive.DesignSystem.Layout;
-using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.Card;
@@ -24,8 +22,12 @@ public class NativeCardHeaderTagHelper : TagHelper
     /// <inheritdoc/>
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
+        var isDivided = Divider == CardDivider.Header || Divider == CardDivider.Both;
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", CssUtils.MergeClasses(CardCss.HeaderClasses(Divider), CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join(
+            "alis-card__header",
+            isDivided ? "alis-card__header--divided" : "",
+            CssClass));
     }
 }
