@@ -164,7 +164,6 @@ namespace Alis.Reactive.Grammar
         {
             Operator = op ?? throw new ArgumentNullException(nameof(op));
             Args = args ?? throw new ArgumentNullException(nameof(args));
-            op.RequireArity(args.Count);
         }
 
         public string Kind => "op";
