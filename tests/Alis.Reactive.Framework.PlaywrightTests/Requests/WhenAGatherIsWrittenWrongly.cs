@@ -72,6 +72,22 @@ public sealed class WhenAGatherIsWrittenWrongly : AppPageTest
     }
 
     [Test]
+    public async Task a_value_set_over_a_member_already_set_under_it_is_refused()
+    {
+        await Render("/Requests/Refused?mistake=SetAMemberThenTheValueHoldingIt");
+
+        await Expect(Page.GetByText("'Guide' is assigned twice, or over members of its own; assign each path once.").First).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_member_set_under_a_value_already_set_is_refused()
+    {
+        await Render("/Requests/Refused?mistake=SetAValueThenAMemberUnderIt");
+
+        await Expect(Page.GetByText("'Guide.Phone' is assigned under a value; assign the value or its members, not both.").First).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task a_header_given_no_value_is_refused()
     {
         await Render("/Requests/Refused?mistake=GiveAHeaderNoValue");

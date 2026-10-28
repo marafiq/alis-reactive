@@ -27,6 +27,24 @@
     case PlanMistake.NameARoutePlaceholderWithADash:
         @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Get("/Plans/Rooms/{room-number}")))
         break;
+    case PlanMistake.ReadAnotherPlansComponent:
+        var board = Html.ElementPlan<PlanRefusalsPage>("copy-title");
+        TypedSource<string>? title = null;
+        @plan.Slate("slate", title: "Round")
+        @(plan.Button("read-title", "Read the title").Reactive(button => button.Click, p => title = p.Component<Slate>("slate").Title))
+        @(board.Button("copy-title", "Copy the title").Reactive(button => button.Click, p => p.Element("copied").Text.Set(title!)))
+        <span id="copied"></span>
+        @Html.RenderPlan(board)
+        break;
+    case PlanMistake.ReadAResponseOutsideItsRoutes:
+        TypedSource<string>? summary = null;
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p =>
+        {
+            p.Post("/Plans/Visits").Response(r => r.OnSuccess<Booked>((booked, s) => summary = booked.Get(x => x.Summary)));
+            p.Element("booked").Text.Set(summary!);
+        }))
+        <span id="booked"></span>
+        break;
     case PlanMistake.RouteAStatusHttpDoesNotHave:
         @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
             .Response(r => r.OnError(600, e => e.Element("refused").Text.Set("refused")))))

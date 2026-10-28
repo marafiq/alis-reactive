@@ -14,6 +14,15 @@ public sealed class WhenPlansShareAPlanId : AppPageTest
     private ILocator Field(string label) => Page.GetByLabel(label, new() { Exact = true });
 
     [Test]
+    public async Task a_partials_plan_says_it_merges_into_the_pages_plan_and_the_pages_says_it_does_not()
+    {
+        await Open("/Plans/Visit");
+
+        await Expect(Page.Locator("#resident-plan-merges")).ToHaveTextAsync("yes");
+        await Expect(Page.Locator("#page-plan-merges")).ToHaveTextAsync("no");
+    }
+
+    [Test]
     public async Task a_partial_of_the_pages_model_rendered_with_the_page_joins_the_pages_plan()
     {
         await Open("/Plans/Visit");

@@ -34,8 +34,17 @@ public sealed class Slate : Component
     /// <summary>The row at a position, as the object the slate returns for it.</summary>
     public SlateRow RowAt(Arg<int> index) => Object<SlateRow>(index);
 
+    /// <summary>The row at a position counted from the first row, or from the last, as the object the slate returns for it.</summary>
+    public SlateRow RowFrom(Arg<int> index, Arg<bool> fromLast) => Object<SlateRow>(index, fromLast);
+
     /// <summary>The rows marked so far, as a list the slate returns.</summary>
     public Objects<SlateRow> MarkedRows() => Objects<SlateRow>();
+
+    /// <summary>The labels of a run of rows, from a position, joined by commas.</summary>
+    public TypedSource<string> LabelsFrom(Arg<int> start, Arg<int> count) => Method<string>(start, count);
+
+    /// <summary>The labels of a run of rows, from a position, joined by the separator given.</summary>
+    public TypedSource<string> LabelsJoined(Arg<int> start, Arg<int> count, Arg<string> separator) => Method<string>(start, count, separator);
 
     /// <summary>Shows the labels it is given as the slate's summary line.</summary>
     public void Summarize(Arg<IReadOnlyList<string>> labels) => Method(labels);
@@ -60,6 +69,9 @@ public sealed class Slate : Component
 
     /// <summary>Saves the slate; finishes a moment later.</summary>
     public void Save() => MethodAsync();
+
+    /// <summary>Saves the slate and says how many rows it saved; finishes a moment later.</summary>
+    public TypedSource<int> SaveRows() => MethodAsync<int>();
 
     /// <summary>Starts the slate's save and goes on without waiting for it: the same save, declared as a plain method.</summary>
     public void StartSaving() => Method(name: "save");

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "An escort request the page cannot check";
     var plan = Html.ReactivePlan<EscortRequest>();
+    var unreadable = (EscortUnreadable)ViewData["Unreadable"]!;
 }
 <h1>An escort request the page cannot check</h1>
 
@@ -10,9 +11,23 @@
     @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
 </div>
 
-@(plan.Button("save", "Save")
-    .Reactive(button => button.Click, p => p.Post("/Validation/Escort")
-        .Gather(g => g.Form())
-        .Validate<UnreadableEscortRules>("escort-form")))
+@switch (unreadable)
+{
+    case EscortUnreadable.LengthOfText:
+        @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/Escort")
+            .Gather(g => g.Form())
+            .Validate<UnreadableEscortRules>("escort-form")))
+        break;
+    case EscortUnreadable.OrderAgainstNothing:
+        @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/Escort")
+            .Gather(g => g.Form())
+            .Validate<NothingOrderedEscortRules>("escort-form")))
+        break;
+    case EscortUnreadable.TextEquals:
+        @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/Escort")
+            .Gather(g => g.Form())
+            .Validate<TextEqualsEscortRules>("escort-form")))
+        break;
+}
 
 @Html.RenderPlan(plan)

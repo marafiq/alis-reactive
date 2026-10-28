@@ -123,7 +123,6 @@ namespace Alis.Reactive.PlanModel
         internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands)
         {
             if (op == null) throw new ArgumentNullException(nameof(op));
-            op.RequireArity(operands.Length);
             return new OperationExpression(op, operands, shape);
         }
 
@@ -274,7 +273,7 @@ namespace Alis.Reactive.PlanModel
         internal override bool ReadsAwaited => _awaits || _call.ReadsAwaited;
 
         internal override Expr Write(Scope scope) =>
-            G.As(scope.Result(this, JsonMemberName.Of(_member), _awaits, _member, () => _call.WriteUnconverted(scope)), OutputShape);
+            G.As(scope.Result(this, JsonMemberName.Of(_member), _awaits, () => _call.WriteUnconverted(scope)), OutputShape);
     }
 
     internal sealed class UrlRead : ValueExpression
@@ -412,7 +411,7 @@ namespace Alis.Reactive.PlanModel
         internal override Expr Write(Scope scope)
         {
             var items = G.Op(Operator.ToArray, _source.Write(scope));
-            return scope.WithoutHoisting(() => Operate(items, scope));
+            return Operate(items, scope);
         }
 
         private protected abstract Expr Operate(Expr items, Scope scope);

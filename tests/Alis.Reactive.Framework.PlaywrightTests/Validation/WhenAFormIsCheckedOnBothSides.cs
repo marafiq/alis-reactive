@@ -33,6 +33,16 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
             Has = Page.GetByLabel(new System.Text.RegularExpressions.Regex($"^{System.Text.RegularExpressions.Regex.Escape(label)}( \\*)?$")),
         });
 
+    [Test]
+    public async Task a_failure_the_server_finds_reads_as_its_field_and_its_message()
+    {
+        await Open("/Validation/Visit");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Ask the desk what is wrong", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#failures")).ToHaveTextAsync("Visitor: Name the visitor.");
+    }
+
     private async Task Fill(string visitor, string relation, string company, string phone, string email, string again, string guests, string notes)
     {
         await Page.GetByLabel("Visitor").FillAsync(visitor);

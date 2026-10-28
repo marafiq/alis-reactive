@@ -99,6 +99,18 @@ public sealed class InputsController : Controller
 
     private static string Said(ContactCard card) => $"{card.Name ?? "none"} ({card.Phones.FirstOrDefault() ?? "none"})";
 
+    /// <summary>A resident's circle, a card for each of two list items.</summary>
+    public IActionResult Circle() => View(new CirclePage());
+
+    /// <summary>Binds the circle as any endpoint does, and says whom it bound at each position of the list.</summary>
+    [HttpPost]
+    public IActionResult Circle([FromBody] CirclePage circle) => Json(new CircleEcho
+    {
+        Summary = circle.Members.Count == 0
+            ? "no members"
+            : string.Join(", ", circle.Members.Select((member, position) => $"member {position} {member?.Name ?? "none"}")),
+    });
+
     /// <summary>A resident's care, each choice starting on an answer the rules accept.</summary>
     public IActionResult Care() => View(new CarePage { Level = CareLevel.Residential, PreviousLevel = CareLevel.Residential });
 

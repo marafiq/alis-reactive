@@ -9,6 +9,14 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 public sealed class WhenAnElementHasAPlanOfItsOwn : AppPageTest
 {
     [Test]
+    public async Task an_element_plan_rendered_by_a_partial_says_it_merges_into_no_other_plan()
+    {
+        await Open("/Plans/Contacts");
+
+        await Expect(Page.Locator("#nextofkin-plan-merges")).ToHaveTextAsync("no");
+    }
+
+    [Test]
     public async Task each_element_plan_sends_only_the_inputs_it_rendered()
     {
         await Open("/Plans/Contacts");

@@ -13,6 +13,8 @@
 <p>Save read after it finished: <span id="save-status"></span></p>
 <p>Save read by the step after a save the page does not wait for: <span id="went-on-status"></span></p>
 <p>Looked up: <span id="lookup"></span></p>
+<p>Labels read: <span id="labels"></span></p>
+<p>Save read by the step after a save whose count no step reads: <span id="rows-save-status"></span></p>
 <p>Before the throw: <span id="before-throw"></span> · After it: <span id="after-throw"></span></p>
 <p>Before the rejection: <span id="before-reject"></span> · After it: <span id="after-reject"></span></p>
 
@@ -46,6 +48,17 @@
         slate.StartSaving();
         p.Element("went-on-status").Text.Set(slate.Status);
     }))
+@(plan.Button("save-rows", "Save the rows")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.SaveRows();
+        p.Element("rows-save-status").Text.Set(slate.Status);
+    }))
+@(plan.Button("labels-from", "Read the labels from the first")
+    .Reactive(button => button.Click, p => p.Element("labels").Text.Set(p.Component<Slate>("slate").LabelsFrom(0, 2))))
+@(plan.Button("labels-joined", "Read the labels joined by and")
+    .Reactive(button => button.Click, p => p.Element("labels").Text.Set(p.Component<Slate>("slate").LabelsJoined(0, 2, " and "))))
 @(plan.Button("look-up", "Look up Ben")
     .Reactive(button => button.Click, p => p.Element("lookup").Text.Set(p.Component<Slate>("slate").Lookup("Ben"))))
 @(plan.Button("throw", "Call the refusing method")

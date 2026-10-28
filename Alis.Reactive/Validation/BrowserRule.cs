@@ -227,7 +227,7 @@ namespace Alis.Reactive.Validation
         }
 
         // A value as equality under the shape reads it, with no skip for nothing bound, as the server's
-        // Equal and NotEqual: converted the way the shape converts a missing value too; with no shape, as text.
+        // Equal and NotEqual: converted the way the shape converts a missing value too.
         private protected static Expr Canonical(Expr value, Shape shape)
         {
             if (shape.TryGetNullableInnerShape(out var inner)) return Nullable(value, inner, Canonical);
@@ -243,8 +243,6 @@ namespace Alis.Reactive.Validation
                 case "date":
                 case "instant":
                     return G.Call(G.Op(Operator.ToDate, value), "getTime");
-                case "none":
-                    return G.Op(Operator.Coalesce, G.Op(Operator.ToText, value), G.Lit(""));
                 default:
                     return value;
             }

@@ -97,6 +97,16 @@ public sealed class WhenAPageStartsItsPipelines : AppPageTest
     }
 
     [Test]
+    public async Task an_announced_payloads_array_member_is_set_and_read_by_position()
+    {
+        await Open("/Triggers/Announcements");
+
+        await Button("Announce a move").ClickAsync();
+
+        await Expect(Line("moved-escort")).ToHaveTextAsync("Bea");
+    }
+
+    [Test]
     public async Task markup_carrying_an_events_name_raises_it_with_the_payload_it_carries_when_clicked()
     {
         await Open("/Triggers/Announcements");

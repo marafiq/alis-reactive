@@ -35,6 +35,9 @@ public sealed class Moved
     public RoomRef From { get; set; } = new();
 
     public List<Mover> Lines { get; set; } = new();
+
+    /// <summary>Who escorts the move, an array by position.</summary>
+    public string[] Escorts { get; set; } = [];
 }
 
 public sealed class RoomRef

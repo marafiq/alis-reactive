@@ -22,6 +22,8 @@ public sealed class VendorsController : Controller
     public IActionResult UnbuiltInput() => View(new UnbuiltInputPage());
 
     public IActionResult NewerDeclaration() => View(new NewerDeclarationPage());
+
+    public IActionResult Refused(VendorMistake mistake) => View("Refused", new VendorRefusalsPage { Mistake = mistake });
 }
 
 /// <summary>A bell whose listeners are callback properties.</summary>

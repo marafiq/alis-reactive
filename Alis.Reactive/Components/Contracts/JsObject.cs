@@ -380,12 +380,14 @@ namespace Alis.Reactive
                 : name;
         }
 
-        // The kind of C# member decides: a property holds an object, a method returns one.
+        // The kind of C# member decides: a property holds an object, a method returns one. A member that
+        // implements an interface explicitly carries the interface in its name (IHeadedBoard.Header).
         private bool DeclaresMethod(string declaredBy)
         {
-            var members = GetType().GetMember(
-                declaredBy,
-                BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            var members = GetType()
+                .GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
+                .Where(member => member.Name == declaredBy || member.Name.EndsWith("." + declaredBy, StringComparison.Ordinal))
+                .ToArray();
             if (members.Length == 0)
                 throw new ArgumentException(
                     $"'{GetType().Name}' has no member '{declaredBy}'. Declare an object as a C# property or method, " +

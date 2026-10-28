@@ -54,6 +54,20 @@ public sealed class WhenValuesAreComparedUnderTheirShape : AppPageTest
     }
 
     [Test]
+    public async Task a_list_is_never_equal_to_another_list_in_the_browser_as_the_servers_equals_finds()
+    {
+        await Open("/Validation/Sameness");
+        var message = Field("Wings").GetByText("Not as required: Wings.", new() { Exact = true });
+
+        await Page.GetByLabel("Wings", new() { Exact = true }).FillAsync("East");
+        await Page.GetByLabel("Former wings", new() { Exact = true }).FillAsync("East");
+        await Save();
+
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(message).ToBeHiddenAsync();
+    }
+
+    [Test]
     public async Task a_range_of_text_is_the_servers_and_its_answer_lands_beside_the_field()
     {
         await Open("/Validation/Sameness");

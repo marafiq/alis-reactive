@@ -1,0 +1,22 @@
+@using Alis.Reactive.Framework.App.Validation
+@using Alis.Reactive.Validation
+@model RuleSetRefusalsPage
+@{
+    ViewData["Title"] = "Browser rules built wrongly";
+    var rules = new BrowserRuleSet();
+    switch (Model.Mistake)
+    {
+        case RuleSetMistake.NameARuleForACallOnAMember:
+            rules.Add((VisitBooking x) => x.Visitor!.Trim(), BrowserRule.NotEmpty("Name the visitor."));
+            break;
+        case RuleSetMistake.DeclareItemsOfAMemberThatHoldsNone:
+            rules.DeclareItems((VisitBooking x) => x.Guests);
+            break;
+        case RuleSetMistake.BoundARangeByTwoKindsOfValue:
+            rules.Add((VisitBooking x) => x.Guests, BrowserRule.Between<IComparable>(1, new DateTime(2026, 1, 1), inclusive: true, "Out of range."));
+            break;
+    }
+}
+<h1>Browser rules built wrongly</h1>
+
+<p>Rules built: @rules.Fields.Count</p>

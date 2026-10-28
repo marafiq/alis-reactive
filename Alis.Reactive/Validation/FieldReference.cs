@@ -29,9 +29,7 @@ namespace Alis.Reactive.Validation
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
             var body = Expressions.StripConvert(member.Body);
-            if (member.Parameters.Count != 1
-                || !ExpressionPathHelper.TryMemberName(body, member.Parameters[0], out var name)
-                || name.Length == 0)
+            if (member.Parameters.Count != 1 || !ExpressionPathHelper.TryMemberName(body, member.Parameters[0], out var name))
                 throw new ArgumentException(
                     $"A browser rule names a member of the model, like x => x.Address.City; {member} does not.", nameof(member));
             return new FieldReference(name, body.Type, Shape.FromClrType(body.Type));

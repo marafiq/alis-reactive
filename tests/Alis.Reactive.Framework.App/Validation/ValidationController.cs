@@ -14,7 +14,16 @@ public sealed class ValidationController : Controller
 
     public IActionResult Escort() => View(new EscortRequest());
 
-    public IActionResult EscortRefused() => View(new EscortRequest());
+    /// <summary>An escort request whose rules sit under a condition the browser cannot read, the one the address names.</summary>
+    public IActionResult EscortRefused(EscortUnreadable unreadable = EscortUnreadable.LengthOfText)
+    {
+        ViewData["Unreadable"] = unreadable;
+        return View(new EscortRequest());
+    }
+
+    public IActionResult RulesReadBack() => View(new VisitBooking());
+
+    public IActionResult RuleSetRefused(RuleSetMistake mistake) => View(new RuleSetRefusalsPage { Mistake = mistake });
 
     public IActionResult Notice() => View(new Notice());
 
@@ -120,4 +129,9 @@ public sealed class ValidationController : Controller
             return BadRequest(new { errors = result.ErrorsByField });
         return Json(new Booked { Summary = $"booked {booking.Visitor} for {booking.Guests} guest(s)" });
     }
+
+    /// <summary>Checks the visit and answers with every failure as a line of text, as a log would write it.</summary>
+    [HttpPost("/Validation/Book/Failures")]
+    public IActionResult BookFailures([FromBody] VisitBooking booking, [FromServices] VisitRules rules) =>
+        Json(new Booked { Summary = string.Join("; ", rules.Validate(booking).Errors) });
 }

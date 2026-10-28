@@ -15,9 +15,9 @@ namespace Alis.Reactive.PlanModel
         private readonly PlanWriter _plan;
         private readonly string? _item;
         private readonly ResponseFrame? _responses;
-        private readonly ResultFrame? _results;
+        private readonly ResultFrame _results;
 
-        private Scope(PlanWriter plan, string eventParam, ResponseFrame? responses, string? item, ResultFrame? results)
+        private Scope(PlanWriter plan, string eventParam, ResponseFrame? responses, string? item, ResultFrame results)
         {
             _plan = plan;
             EventParam = eventParam;
@@ -26,7 +26,7 @@ namespace Alis.Reactive.PlanModel
             _results = results;
         }
 
-        internal static Scope ForHandler(PlanWriter plan, string eventParam) => new Scope(plan, eventParam, null, null, null);
+        internal static Scope ForHandler(PlanWriter plan, string eventParam) => new Scope(plan, eventParam, null, null, new ResultFrame(null));
 
         /// <summary>The scope of a block: it binds the method results its statements use, and sees its parent's.</summary>
         internal Scope ForBlock() => new Scope(_plan, EventParam, _responses, _item, new ResultFrame(_results));
@@ -51,18 +51,13 @@ namespace Alis.Reactive.PlanModel
         /// What a method returned, bound once per block by a <c>let</c> hoisted before the statement that
         /// first reads it; a later read in the block, or in a block inside it, is the name (grammar.md 3.1).
         /// </summary>
-        internal Expr Result(object result, string stem, bool awaits, string member, Func<Expr> call)
+        internal Expr Result(object result, string stem, bool awaits, Func<Expr> call)
         {
-            for (var frame = _results; frame != null; frame = frame.Outer)
+            for (ResultFrame? frame = _results; frame != null; frame = frame.Outer)
                 if (frame.TryGet(result, out var bound)) return G.Ref(bound);
 
-            if (_results == null)
-                throw new InvalidOperationException(
-                    $"Plan '{PlanId}' calls '{member}' outside a reaction. Call a method inside a trigger, a component's " +
-                    ".Reactive, Then, Else, OnSuccess, OnError, WhileLoading, Finally or OnAllSettled callback.");
-
             var name = Fresh(stem);
-            _plan.Hoist(G.Let(name, call(), awaits), member);
+            _plan.Hoist(G.Let(name, call(), awaits));
             _results.Add(result, name);
             _plan.Written(result);
             return G.Ref(name);
@@ -72,16 +67,11 @@ namespace Alis.Reactive.PlanModel
         /// A promise's own line: written at the end of the block, at <paramref name="index"/>, unless a
         /// statement of the block or of a block inside it bound the result first (grammar.md 3.1).
         /// </summary>
-        internal void DeferOwnLine(object result, int index, Func<IReadOnlyList<Statement>> write)
-        {
-            if (_results == null)
-                throw new InvalidOperationException($"Plan '{PlanId}' calls a method outside a reaction.");
+        internal void DeferOwnLine(object result, int index, Func<IReadOnlyList<Statement>> write) =>
             _results.Defer(result, index, write);
-        }
 
         internal void WriteDeferred(List<Statement> block)
         {
-            if (_results == null) return;
             foreach (var (result, index, write) in _results.Deferred)
             {
                 if (_plan.WasWritten(result)) continue;
@@ -105,10 +95,6 @@ namespace Alis.Reactive.PlanModel
         /// awaited when the method returns a promise, lands just before them.
         /// </summary>
         internal IReadOnlyList<Statement> WithHoisted(Func<IReadOnlyList<Statement>> write) => _plan.WithHoisted(write);
-
-        /// <summary>Writes a value where no statement runs before it is read: inside an array operation's lambda.</summary>
-        internal T WithoutHoisting<T>(Func<T> write) => _plan.WithoutHoisting(write);
-
 
         private sealed class ResultFrame
         {
@@ -169,7 +155,7 @@ namespace Alis.Reactive.PlanModel
         private readonly HashSet<object> _written = new HashSet<object>();
 
         // The statements hoisted before the statement being written, such as the let that binds a method's
-        // result; null where no statement can run before a value is read, as in an array operation.
+        // result; null outside a statement, where no value reads a method's result.
         private List<Statement>? _hoisted;
 
         internal PlanWriter(string planId, PlanObjects objects)
@@ -204,30 +190,7 @@ namespace Alis.Reactive.PlanModel
             }
         }
 
-        internal T WithoutHoisting<T>(Func<T> write)
-        {
-            var outer = _hoisted;
-            _hoisted = null;
-            try
-            {
-                return write();
-            }
-            finally
-            {
-                _hoisted = outer;
-            }
-        }
-
-        internal void Hoist(Statement statement, string member)
-        {
-            if (_hoisted == null)
-                throw new InvalidOperationException(
-                    $"Plan '{PlanId}' calls '{member}' inside an array operation or a validation rule, where no " +
-                    "statement runs before the value is read. Call it in a reaction step instead.");
-
-            _hoisted.Add(statement);
-        }
-
+        internal void Hoist(Statement statement) => _hoisted!.Add(statement);
     }
 
     /// <summary>
@@ -305,8 +268,6 @@ namespace Alis.Reactive.PlanModel
         {
             if (!_objects.ContainsKey(id))
                 Add(id, new PluginLocator(name, key, data));
-            else if (!(data is NoPluginData))
-                throw new InvalidOperationException($"'{id}' is declared twice with data.");
             return id;
         }
 

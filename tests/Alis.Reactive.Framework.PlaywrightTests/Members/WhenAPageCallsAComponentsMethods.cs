@@ -69,6 +69,36 @@ public sealed class WhenAPageCallsAComponentsMethods : AppPageTest
     }
 
     [Test]
+    public async Task a_result_of_a_method_of_two_arguments_is_read_where_any_value_is_read()
+    {
+        await Open("/Members/Methods");
+
+        await Button("Read the labels from the first").ClickAsync();
+
+        await Expect(Page.Locator("#labels")).ToHaveTextAsync("Ada, Ben");
+    }
+
+    [Test]
+    public async Task a_result_of_a_method_of_three_arguments_is_read_where_any_value_is_read()
+    {
+        await Open("/Members/Methods");
+
+        await Button("Read the labels joined by and").ClickAsync();
+
+        await Expect(Page.Locator("#labels")).ToHaveTextAsync("Ada and Ben");
+    }
+
+    [Test]
+    public async Task an_async_method_whose_result_no_step_reads_runs_in_its_place_and_the_next_step_waits_for_it()
+    {
+        await Open("/Members/Methods");
+
+        await Button("Save the rows").ClickAsync();
+
+        await Expect(Page.Locator("#rows-save-status")).ToHaveTextAsync("saved");
+    }
+
+    [Test]
     public async Task an_async_method_is_finished_before_the_next_step_reads_what_it_did()
     {
         await Open("/Members/Methods");

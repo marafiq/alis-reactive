@@ -20,6 +20,7 @@
 @await Html.PartialAsync("CompanionCard", Model.Companion, companion)
 
 <p>The visit's endpoint bound: <span id="booked"></span></p>
+<p>The page's plan merges into another: <span id="page-plan-merges">@(plan.IsPartial ? "yes" : "no")</span></p>
 
 @(plan.Button("book", "Book the visit")
     .Reactive(button => button.Click, p => p.Post("/Plans/Visits")

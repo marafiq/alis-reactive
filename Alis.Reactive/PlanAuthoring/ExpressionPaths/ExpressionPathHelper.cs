@@ -48,17 +48,11 @@ namespace Alis.Reactive
             return MvcName(Steps(memberChain));
         }
 
-        /// <summary>The MVC binding name of a member chain rooted at <paramref name="root"/>; false for any other expression.</summary>
+        /// <summary>The MVC binding name of a chain of members from <paramref name="root"/>; false for any other expression, the root itself included.</summary>
         internal static bool TryMemberName(Expression memberChain, ParameterExpression root, out string name)
         {
-            if (TrySteps(memberChain, out var steps, out var parameter) && parameter == root)
-            {
-                name = MvcName(steps);
-                return true;
-            }
-
-            name = string.Empty;
-            return false;
+            name = TrySteps(memberChain, out var steps, out var parameter) && parameter == root ? MvcName(steps) : "";
+            return name.Length > 0;
         }
 
         // Component IDs match MVC's Html.IdFor(), including nested-property underscores.
@@ -177,13 +171,6 @@ namespace Alis.Reactive
             {
                 collection = binary.Left;
                 index = EvaluateIndex(binary.Right);
-                return true;
-            }
-
-            if (expr is IndexExpression indexer && indexer.Object != null && indexer.Arguments.Count == 1)
-            {
-                collection = indexer.Object;
-                index = EvaluateIndex(indexer.Arguments[0]);
                 return true;
             }
 

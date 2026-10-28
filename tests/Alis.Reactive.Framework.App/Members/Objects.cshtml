@@ -21,6 +21,8 @@
     .Reactive(button => button.Click, p => p.Element("caption-read").Text.Set(p.Component<Slate>("slate").Header.Caption)))
 @(plan.Button("mark-second", "Mark the second row")
     .Reactive(button => button.Click, p => p.Component<Slate>("slate").RowAt(1).Mark()))
+@(plan.Button("mark-last", "Mark the last row")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").RowFrom(0, true).Mark()))
 @(plan.Button("read-second", "Read the second row")
     .Reactive(button => button.Click, p => p.Element("second-row").Text.Set(p.Component<Slate>("slate").RowAt(1).Label)))
 @(plan.Button("read-third", "Read the third row")

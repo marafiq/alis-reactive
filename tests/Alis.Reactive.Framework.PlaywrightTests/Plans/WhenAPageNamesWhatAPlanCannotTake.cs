@@ -3,8 +3,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 /// <summary>
 /// The names a page gives its plan that the plan cannot take, each refused when the page renders with the
 /// message the developer reads: a component or an element plan with no id, a plugin named with a space or not
-/// named, a header with no name, a route placeholder no route value can be named, and an error route for a
-/// status HTTP does not have.
+/// named, a header with no name, a route placeholder no route value can be named, an error route for a
+/// status HTTP does not have, a value read through another plan's component, and a response read outside the
+/// routes of its request.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
@@ -61,6 +62,23 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
 
         await Expect(Message(
             "URL template '/Plans/Rooms/{room-number}' is invalid: invalid placeholder '{room-number}'. Names must match [a-zA-Z0-9_] (ASCII only).")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_value_read_through_a_component_of_another_plan_is_refused()
+    {
+        await Render("ReadAnotherPlansComponent");
+
+        await Expect(Message("Element 'slate' is used by a step before the plan declared it.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_response_read_outside_the_routes_of_its_request_is_refused()
+    {
+        await Render("ReadAResponseOutsideItsRoutes");
+
+        await Expect(Message(
+            "reads a response outside the routes of the request that receives it. Read a response inside OnSuccess, OnError, Chained or Finally of its request.")).ToBeVisibleAsync();
     }
 
     [Test]
