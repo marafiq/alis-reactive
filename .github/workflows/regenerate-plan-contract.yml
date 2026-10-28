@@ -30,7 +30,8 @@ jobs:
       - uses: ./.github/actions/setup-toolchain
 
       - name: Run PlanContractGenerator
-        run: dotnet run --project tools/PlanContractGenerator/PlanContractGenerator.csproj -- Alis.Reactive.Assets/runtime/types/plan.ts
+        # The generator needs the core's C# only; the runtime bundle the core ships is not built here.
+        run: dotnet run --project tools/PlanContractGenerator/PlanContractGenerator.csproj --property:BuildReactiveBrowserAssets=false -- Alis.Reactive.Assets/runtime/types/plan.ts
 
       - name: Commit plan.ts when the contract moved
         run: |
