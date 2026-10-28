@@ -64,7 +64,7 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | E3 | A payload's member written before the component reads it back: a cancel | `Slate.Changing`, raised by the slate's own retitle: `Cancel`, `Reason` | the slate keeps its title and shows the reason |
 | E4 | A payload's method called before the component reads the payload | `Slate.Changing`: `Clamp()` | the slate takes the clamped title |
 | E5 | An event of a nested object | `Slate.Header.Renamed` | the page reacts to the header being renamed |
-| E6 | A handler stops listening when its owner is released | a `Slate` in a slot, unloaded | a gesture after the unload changes nothing |
+| E6 | A handler stops listening when its owner is released | a loaded card's handler of a page event, the card's slot unloaded | the page still hears the bell; the unloaded card does not |
 | V1 | Listening through a method pair | `Slate` | (every Slate event row) |
 | V2 | Listening through callback properties, beside the component's own callback | `Bell.OnRung`, `Bell.Ring()`, `Bell.Rings` | the page counts the rings, and the bell still shows its own count |
 | V3 | The element as the object, the DOM event's detail as the payload | `Meter.Level`, `Meter.Max`, `Meter.LevelChanged` | the level the meter shows and reads back; the page shows the change's detail |
@@ -72,11 +72,11 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | I1 | An input's value gathered into a request under its member name, as its member's type | `Entry` for text, number, maybe-number, date and instant members, in `Gather(g => g.Form())` | the endpoint's answer, which says what it bound |
 | I2 | A rule the browser can check holds the request and shows its message on the input's own slot | `Entry` under a validator | the message beside the entry, and no request; a number rule compares numbers, not text |
 | I3 | Typing clears a message; leaving an input (its commit) re-checks it | `Entry` after a refused submit | the message goes as the user types; leaving with a value that breaks a rule shows that rule's message, with no submit |
-| I4 | An input in a partial binds under the partial's prefix | `Entry` in a partial for a member | the server's answer shows the prefixed member bound |
+| I4 | An input in a partial binds under the partial's prefix | `Entry` in a card loaded for the desk's `NextOfKin` member | the endpoint binds the name under `NextOfKin` |
 | G1 | A plugin's property read and written, a method called, a result read | `Tally.Total`, `Tally.Mark`, `Tally.Add(n)`, `Tally.HasPassedTheMark()` | the total in the page; the branch the mark decides. An app's plugin has no events: only the framework's own plugins are subscribed to (`runtime/objects/plugins.ts`, `pluginOf`) |
-| L1 | Constructed on `alis:mount` before handlers subscribe, at boot and in injected HTML | `Slate` on the page and in a loaded partial | its first event is heard in both |
-| L2 | Destroyed on `alis:unmount` | a `Slate` in a slot, unloaded | the slate's markup is gone, and its listeners with it (E6) |
-| B1 | A missing element fails only the handler that names it | a pipeline naming an absent `Slate` | the other handler's outcome shows |
+| L1 | Constructed on `alis:mount` before handlers subscribe, at boot and in injected HTML | `Slate` on the page (every slice) and in a loaded card | the loaded slate's own event is heard by the card's pipeline |
+| L2 | An unloaded slot lets go of what it held, and loads fresh again | a card with a `Slate`, unloaded and loaded again | the slot is empty; the reloaded slate starts with its own rows |
+| B1 | A step naming an element that is not on the page fails only its own pipeline | a page pipeline writing into the unloaded card | the step before it ran, the step after it did not, and the next gesture works |
 
 The framework's other promises (triggers, conditions, requests, validation, slots, realtime,
 dispatch, the URL) are tested in their own slices with these components as the page's arrange; their
