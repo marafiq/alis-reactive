@@ -1,0 +1,63 @@
+@using Alis.Reactive.Framework.App.Arrays
+@model SourcesPage
+@{
+    ViewData["Title"] = "Array sources";
+    var plan = Html.ReactivePlan<SourcesPage>();
+}
+<h1>Array sources</h1>
+
+@plan.Slate("slate", title: "Day round", "Ada", "Ben", "Cyd")
+
+<ul id="seats">
+    <li data-resident="Ada Hartley" data-supervision="close">Seat 1</li>
+    <li data-resident="Ben Hart" data-supervision="light">Seat 2</li>
+    <li data-resident="Cyd Marsh" data-supervision="close">Seat 3</li>
+</ul>
+<p id="badge" class="badge ward-north">Badge</p>
+
+<p>The list the response carries: <span id="from-list"></span></p>
+<p>The response that is an array: <span id="from-array"></span></p>
+<p>The sequence a response member holds: <span id="from-sequence"></span></p>
+<p>Visitors the census does not list: <span id="visitor-count"></span></p>
+<p>Rows other than Ben: <span id="other-rows"></span></p>
+<p>Rows marked: <span id="marked-rows"></span></p>
+<p>Seats: <span id="seat-count"></span></p>
+<p>Seats under close supervision: <span id="close-seats"></span></p>
+<p>Wards on the badge: <span id="badge-wards"></span></p>
+
+@(plan.Button("read-list", "Read the residents list")
+    .Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+        .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+            s.Element("from-list").Text.Set(s.From(residents).Select(x => x.Name))))))
+@(plan.Button("read-array", "Read the residents array")
+    .Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+        .Response(r => r.OnSuccess<Resident[]>((residents, s) =>
+            s.Element("from-array").Text.Set(s.From(residents).Select(x => x.Name))))))
+@(plan.Button("read-sequence", "Read the census residents")
+    .Reactive(button => button.Click, p => p.Get("/Arrays/Census")
+        .Response(r => r.OnSuccess<Census>((census, s) =>
+            s.Element("from-sequence").Text.Set(s.From(census.Get(x => x.Residents)).Select(x => x.Name))))))
+@(plan.Button("count-visitors", "Count the census visitors")
+    .Reactive(button => button.Click, p => p.Get("/Arrays/Census")
+        .Response(r => r.OnSuccess<Census>((census, s) =>
+            s.Element("visitor-count").Text.Set(s.From(census.Get(x => x.Visitors!)).Count())))))
+@(plan.Button("read-rows", "Read the rows other than Ben")
+    .Reactive(button => button.Click, p =>
+        p.Element("other-rows").Text.Set(p.From(p.Component<Slate>("slate").Rows.Each(row => row.Label)).Where(label => label != "Ben"))))
+@(plan.Button("mark-second", "Mark the second row")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").RowAt(1).Mark()))
+@(plan.Button("read-marked", "Read the marked rows")
+    .Reactive(button => button.Click, p =>
+        p.Element("marked-rows").Text.Set(p.From(p.Component<Slate>("slate").MarkedRows().Each(row => row.Label)).Select(label => label.ToUpper()))))
+@(plan.Button("count-seats", "Count the seats")
+    .Reactive(button => button.Click, p => p.Element("seat-count").Text.Set(p.Element("seats").Children.Count())))
+@(plan.Button("read-close-seats", "Read the seats under close supervision")
+    .Reactive(button => button.Click, p => p.Element("close-seats").Text.Set(p.Element("seats").Children
+        .Where(seat => seat.GetAttribute("data-supervision") == "close")
+        .Select(seat => seat.GetAttribute("data-resident")))))
+@(plan.Button("add-east", "Add the east ward to the badge")
+    .Reactive(button => button.Click, p => p.Element("badge").ClassList.Add("ward-east")))
+@(plan.Button("read-wards", "Read the wards on the badge")
+    .Reactive(button => button.Click, p => p.Element("badge-wards").Text.Set(p.Element("badge").ClassList.Items.Where(name => name.StartsWith("ward-")))))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,40 @@
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Framework.App.Arrays
+@model FiltersPage
+@{
+    ViewData["Title"] = "Array filters";
+    var plan = Html.ReactivePlan<FiltersPage>();
+    var initial = "A";
+
+    // A button that reads the residents, keeps those the predicate holds for, and shows their names.
+    IHtmlContent Keep(string id, string text, Expression<Func<Resident, bool>> predicate) =>
+        plan.Button(id, text).Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+            .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+                s.Element("kept").Text.Set(s.From(residents).Where(predicate).Select(x => x.Name)))));
+}
+<h1>Array filters</h1>
+
+<p>The residents, as the home keeps them: Cyd Marsh (81, present), Ada Hartley (102, away), Ben Hart (79, present), Dot Ashton (80, away).</p>
+<p>Kept: <span id="kept"></span></p>
+
+@Keep("older-than-80", "Older than 80", x => x.Age > 80)
+@Keep("80-or-older", "80 or older", x => x.Age >= 80)
+@Keep("younger-than-80", "Younger than 80", x => x.Age < 80)
+@Keep("80-or-younger", "80 or younger", x => x.Age <= 80)
+@Keep("exactly-80", "Exactly 80", x => x.Age == 80)
+@Keep("not-80", "Not 80", x => x.Age != 80)
+@Keep("80-is-younger", "80 is younger than them", x => 80 < x.Age)
+@Keep("present", "Present", x => x.Present)
+@Keep("away", "Away", x => !x.Present)
+@Keep("present-and-older-than-80", "Present and older than 80", x => x.Present && x.Age > 80)
+@Keep("over-100-or-under-80", "Over 100 or under 80", x => x.Age > 100 || x.Age < 80)
+@Keep("named-hart", "Named Hart", x => x.Name.Contains("Hart"))
+@Keep("starting-with-a", "Starting with A", x => x.Name.StartsWith(initial))
+@Keep("ending-in-hart", "Ending in Hart", x => x.Name.EndsWith("Hart"))
+@Keep("nickname-starting-with-d", "Nickname starting with D", x => x.Nickname!.StartsWith("D"))
+@Keep("north-wing", "North wing", x => x.Wing == Wing.North)
+@Keep("admitted-14-march", "Admitted on 14 March 2026", x => x.Admitted == new DateTime(2026, 3, 14))
+@Keep("admitted-before-march", "Admitted before March 2026", x => x.Admitted < new DateTime(2026, 3, 1))
+
+@Html.RenderPlan(plan)

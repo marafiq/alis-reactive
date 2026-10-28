@@ -1,0 +1,40 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders.Arrays
+@using Alis.Reactive.Framework.App.Arrays
+@model OrdersPage
+@{
+    ViewData["Title"] = "Array orders";
+    var plan = Html.ReactivePlan<OrdersPage>();
+
+    // A button that reads the residents, puts them in the order asked for, and shows their names.
+    IHtmlContent Order(string id, string text, Func<ReactiveArray<Resident>, ReactiveArray<Resident>> order) =>
+        plan.Button(id, text).Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+            .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+                s.Element("ordered").Text.Set(order(s.From(residents)).Select(x => x.Name)))));
+}
+<h1>Array orders</h1>
+
+<p>The residents, as the home keeps them: Cyd Marsh, Ada Hartley, Ben Hart, Dot Ashton.</p>
+<p>Ordered: <span id="ordered"></span></p>
+
+@Order("by-name", "By name", residents => residents.OrderBy(x => x.Name))
+@Order("by-name-last-first", "By name, last first", residents => residents.OrderByDescending(x => x.Name))
+@Order("by-age", "By age, youngest first", residents => residents.OrderBy(x => x.Age))
+@Order("by-age-eldest-first", "By age, eldest first", residents => residents.OrderByDescending(x => x.Age))
+@Order("by-admission", "By admission, earliest first", residents => residents.OrderBy(x => x.Admitted))
+@Order("by-admission-latest-first", "By admission, latest first", residents => residents.OrderByDescending(x => x.Admitted))
+@Order("by-next-visit", "By next visit, soonest first", residents => residents.OrderBy(x => x.NextVisit))
+@Order("away-first", "Away first", residents => residents.OrderBy(x => x.Present))
+@Order("away-first-then-by-name", "By name, then away first", residents => residents.OrderBy(x => x.Name).OrderBy(x => x.Present))
+@Order("present-by-age", "Present, youngest first", residents => residents.Where(x => x.Present).OrderBy(x => x.Age))
+
+<p>Names of residents 80 or older, last first: <span id="names-last-first"></span></p>
+@(plan.Button("names-80-or-older-last-first", "Names of residents 80 or older, last first")
+    .Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+        .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+            s.Element("names-last-first").Text.Set(s.From(residents)
+                .Where(x => x.Age >= 80)
+                .Select(x => x.Name)
+                .OrderByDescending(name => name))))))
+
+@Html.RenderPlan(plan)
