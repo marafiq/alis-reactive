@@ -7,8 +7,8 @@
   --tw-ring-color: var(--color-error);
 }
 
-/* Inline error message */
-.alis-root span[data-valmsg-for] {
+/* Inline error message: the message slot of a field (field.css) */
+.alis-root .alis-field__message {
   display: block;
   font-size: 0.75rem;
   color: var(--color-error);
