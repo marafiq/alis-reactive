@@ -1,11 +1,10 @@
 @import "tailwindcss" source(none);
 @plugin "@tailwindcss/forms";
 
-/* Source scanning: framework C# only.
-   Consumers scan their own views via their own tailwind config;
-   this file compiles classes emitted from framework C# code only. */
+/* Source scanning: the design system's own C# class helpers only (Layout/*Css.cs, TokenMap).
+   The component packages write their own class names and ship their own stylesheets, which read
+   the tokens below; consumers scan their own views via their own tailwind config. */
 @source "../../Alis.Reactive.DesignSystem/**/*.cs";
-@source "../../Alis.Reactive.Fusion/**/*.cs";
 
 /* Safelisted dynamic classes from C# TokenMap */
 @source inline("grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-5 grid-cols-6");

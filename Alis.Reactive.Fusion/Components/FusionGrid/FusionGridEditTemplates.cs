@@ -178,7 +178,7 @@ namespace Alis.Reactive.Fusion.Components
         {
             var name = HtmlEncoder.Default.Encode(Field.Of(field).Name);
             _fields.Add(
-                "<label class=\"grid gap-1\"><span class=\"font-medium text-text\">"
+                "<label class=\"alis-grid-dialog-form__field\"><span class=\"alis-grid-dialog-form__label\">"
                 + HtmlEncoder.Default.Encode(label) + "</span>" + editor(name) + "</label>");
             return this;
         }
@@ -203,7 +203,7 @@ namespace Alis.Reactive.Fusion.Components
         internal string Render()
         {
             var html = new StringBuilder();
-            html.Append("<div class=\"grid grid-cols-1 gap-3 p-2 text-sm\">");
+            html.Append("<div class=\"alis-grid-dialog-form\">");
             foreach (var field in _fields) html.Append(field);
             html.Append("</div>");
             return html.ToString();

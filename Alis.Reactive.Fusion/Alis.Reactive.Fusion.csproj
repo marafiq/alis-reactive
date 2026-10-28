@@ -34,16 +34,15 @@
       <!-- Run the typed-DSL analyzer (ALIS009) on this slice's own source so untyped
            public component API fails the build here, not ships to consumers. -->
       <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-      <!-- Fusion components emit design-system classes and the Syncfusion theme
-           consumes design-system brand tokens: the design system is a real
-           dependency, and this flows its CSS package to Fusion consumers. -->
-      <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
 
-    <!-- The Syncfusion stylesheet npm builds into Alis.Reactive.Assets/dist (vite.fusion.config.ts),
+    <!-- The styling Fusion's markup needs: the Syncfusion Tailwind3 theme at the version the
+         Syncfusion packages above are pinned to, and the grid dialog form's own CSS. npm builds it
+         into Alis.Reactive.Assets/dist (vite.fusion.config.ts, Alis.Reactive.Assets/fusion); it is
          served at ~/_content/AlisReactive.Fusion/css/fusion.css (net10) and copied to
          Content\AlisReactive.Fusion\css\fusion.css (net48). Where and how:
-         build\AlisReactiveStaticWebAssets.targets. -->
+         build\AlisReactiveStaticWebAssets.targets. The brand comes from whatever design system the
+         app links after it. -->
     <ItemGroup>
         <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\syncfusion.dev.css" RelativePath="css/fusion.css" />
     </ItemGroup>

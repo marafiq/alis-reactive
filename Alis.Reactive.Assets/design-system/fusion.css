@@ -1,6 +1,8 @@
-/* Syncfusion Tailwind3 theme overrides.
-   Companion to @import "@syncfusion/ej2/tailwind3.css" in syncfusion.entry.css.
-   See TOKENS.md for the full reference and value-format conventions (hex vs
+/* The design system's look for Syncfusion components: overrides of the Syncfusion Tailwind3 theme
+   that AlisReactive.Fusion ships (~/_content/AlisReactive.Fusion/css/fusion.css). Built by
+   vite.design-system.config.ts into ~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css;
+   an app links it after the Fusion stylesheet, because these :root values must come after the
+   theme's own. See fusion-tokens.md for the full reference and value-format conventions (hex vs
    raw RGB triplet).
 
    Tokens set to their Tailwind3 defaults are scaffolded here so every
@@ -8,9 +10,11 @@
    below to rebrand; remove lines you want to keep at Syncfusion defaults (it changes
    nothing, but shrinks the cascade footprint). */
 
+@import "./brand.css";
+
 :root {
   /* Brand primary.
-     Sourced from brand.css (imported by syncfusion.entry.css). The Syncfusion
+     Sourced from brand.css (imported below). The Syncfusion
      tailwind3 theme uses --color-sf-primary directly as a color value (e.g.
      `color: var(--color-sf-primary)`), matching its own hex default, so this
      takes the rgb()-resolved brand color, not the raw triplet. */

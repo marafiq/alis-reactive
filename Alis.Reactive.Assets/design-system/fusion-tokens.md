@@ -1,7 +1,8 @@
 # Syncfusion Tailwind3 Theme Tokens
 
 Reference for customizing Syncfusion EJ2 components via CSS variables.
-Complements `syncfusion.overrides.css` and `syncfusion.entry.css` in this folder.
+Complements `fusion.css` in this folder: the design system's overrides of the Syncfusion Tailwind3
+theme that `AlisReactive.Fusion` ships (`../fusion/fusion.entry.css`).
 
 ## Source of truth
 
@@ -68,7 +69,7 @@ browser drops the rule.
 ## High-leverage tokens (the ~10% you'll reach for most)
 
 These cover the majority of brand customization. Full defaults are populated in
-`syncfusion.overrides.css` — edit there, not here. This list is for discoverability.
+`fusion.css` — edit there, not here. This list is for discoverability.
 
 ### Brand
 | Token | Default (Tailwind3 indigo) |
@@ -154,9 +155,9 @@ These cover the majority of brand customization. Full defaults are populated in
 1. Open `_tailwind3.scss` in your editor. Search for the visual element (e.g. "chip", "grid",
    "scheduler").
 2. Note the token name + default value.
-3. Redeclare it at `:root` in `syncfusion.overrides.css`. Match the value format of the default
+3. Redeclare it at `:root` in `fusion.css`. Match the value format of the default
    (hex → hex, triplet → triplet).
-4. Only drop to selector-level `.e-*` overrides (which `syncfusion.overrides.css` already has many
+4. Only drop to selector-level `.e-*` overrides (which `fusion.css` already has many
    of) when no token covers the property you need to change (geometry, specific states).
 
 ## Finding what uses a token

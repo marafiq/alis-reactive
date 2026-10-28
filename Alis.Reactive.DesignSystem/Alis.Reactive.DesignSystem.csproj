@@ -12,7 +12,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>AlisReactive.DesignSystem</PackageId>
     <IsPackable>true</IsPackable>
-    <PackageDescription>Design system for Alis.Reactive — brand tokens, layout primitives, and the design-system stylesheet. Consumed by the component packages independently of the reactive core.</PackageDescription>
+    <PackageDescription>Design system for Alis.Reactive — brand tokens, layout class helpers, and the stylesheets that give the framework's markup and components their look. An app references it to choose this look; the component packages do not depend on it.</PackageDescription>
     <PackageTags>reactive;design-system;css;tokens</PackageTags>
   </PropertyGroup>
 
@@ -25,12 +25,18 @@
     <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <!-- The design-system stylesheet npm builds into Alis.Reactive.Assets/dist
-       (vite.design-system.config.ts), served at ~/_content/AlisReactive.DesignSystem/css/design-system.css
-       (net10) and copied to Content\AlisReactive.DesignSystem\css\design-system.css (net48). Where and
-       how: build\AlisReactiveStaticWebAssets.targets. -->
+  <!-- The stylesheets npm builds into Alis.Reactive.Assets/dist (vite.design-system.config.ts):
+         css/design-system.css         the color and font tokens the component stylesheets read,
+                                       the page base, and the look of the core's field and
+                                       validation markup
+         css/design-system-fusion.css  its look for Syncfusion components; link it after
+                                       AlisReactive.Fusion's css/fusion.css
+       Served at ~/_content/AlisReactive.DesignSystem/{path} (net10) and copied to
+       Content\AlisReactive.DesignSystem\{path} (net48). Where and how:
+       build\AlisReactiveStaticWebAssets.targets. -->
   <ItemGroup>
     <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\design-system.dev.css" RelativePath="css/design-system.css" />
+    <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\design-system-fusion.dev.css" RelativePath="css/design-system-fusion.css" />
   </ItemGroup>
 
   <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />
