@@ -63,6 +63,13 @@ namespace Alis.Reactive.Validation
                 ItemFields.Select(field => field.OwnedUnder(prefix, outer)),
                 IsChecked);
 
+        /// <summary>
+        /// The same member and its item fields with no rule the browser checks: what a rule under a condition
+        /// only the server decides still names, so the server's message for it lands beside its input.
+        /// </summary>
+        internal BrowserField WithoutRules() =>
+            new BrowserField(Reference, Array.Empty<BrowserRule>(), ItemFields.Select(field => field.WithoutRules()), IsChecked, _ownerCondition);
+
         // A collection item field rendered at itemPrefix: its own conditions take the item prefix,
         // its owner's condition does not.
         internal BrowserField RenderedAt(string itemPrefix) =>
@@ -102,6 +109,18 @@ namespace Alis.Reactive.Validation
         /// </summary>
         /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
         public void Declare(LambdaExpression member) => Ensure(FieldReference.Of(member)).Checked = true;
+
+        /// <summary>
+        /// Names the items of a collection member a rule checks, whether or not the browser can check the rule:
+        /// <c>RuleForEach(x =&gt; x.Rooms).Must(..)</c>. The form then carries each rendered item's field.
+        /// </summary>
+        /// <param name="collection">The collection member, as a path from the validator's model.</param>
+        public void DeclareItems(LambdaExpression collection)
+        {
+            var member = FieldReference.Of(collection);
+            Ensure(member).ItemFields.Add(
+                new BrowserField(FieldReference.ItemOf(member), Array.Empty<BrowserRule>(), Array.Empty<BrowserField>(), isChecked: true));
+        }
 
         /// <summary>Adds a rule on a member.</summary>
         /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>

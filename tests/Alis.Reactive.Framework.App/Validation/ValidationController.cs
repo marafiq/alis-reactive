@@ -10,6 +10,18 @@ public sealed class ValidationController : Controller
 
     public IActionResult Checks() => View(new CheckedForm());
 
+    public IActionResult Household() => View(new Household());
+
+    /// <summary>Checks the household with the same rules the page carries; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Household")]
+    public IActionResult SaveHousehold([FromBody] Household household, [FromServices] HouseholdRules rules)
+    {
+        var result = rules.Validate(household);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     /// <summary>Checks the form with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Checks")]
     public IActionResult SaveChecks([FromBody] CheckedForm form, [FromServices] CheckRules rules)

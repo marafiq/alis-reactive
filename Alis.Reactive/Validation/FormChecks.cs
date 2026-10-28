@@ -25,6 +25,9 @@ namespace Alis.Reactive.Validation
 
         internal string ServerName { get; }
 
+        internal CheckedField With(IReadOnlyList<BrowserRule> rules) =>
+            new CheckedField(ComponentId, ServerName, Shape, Rules.Concat(rules).ToArray(), Values);
+
         internal Shape Shape { get; }
 
         internal IReadOnlyList<BrowserRule> Rules { get; }
@@ -56,14 +59,24 @@ namespace Alis.Reactive.Validation
             // A checked member is carried whether or not this plan renders it (a partial of the same model may)
             // and whether or not the browser can check it: a message the server sends for it then lands
             // beside its input wherever the input is.
+            var bound = new List<CheckedField>();
             foreach (var field in fields)
             {
                 if (field.IsChecked)
-                    yield return values.Check(field);
+                    Join(bound, values.Check(field));
 
                 foreach (var itemField in RenderedItemFields(field.FieldName, field.ItemFields, renderedPaths))
-                    yield return values.Check(itemField);
+                    Join(bound, values.Check(itemField));
             }
+            return bound;
+        }
+
+        // Several rules on one collection each name its items: an item's field carries the checks of all of them.
+        private static void Join(List<CheckedField> bound, CheckedField field)
+        {
+            var index = bound.FindIndex(existing => existing.ComponentId == field.ComponentId);
+            if (index < 0) bound.Add(field);
+            else bound[index] = bound[index].With(field.Rules);
         }
 
         // Each item field of a collection, at every item the page rendered an input of: Lines[0].Qty for

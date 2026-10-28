@@ -48,8 +48,10 @@ That is the whole document. The grammar names no feature.
     the located object, the shape it reads as, the event that commits a value (M4), and whether the
     input binds a list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value,
-    tests: [{ rule, check: fn(v), when, message }] }] }`: one per member a rule is written on, whether
-    or not the browser can check it, so `tests` is empty when every check is the server's. `name` is
+    tests: [{ rule, check: fn(v), when, message }] }] }`: one per member a rule is written on, and per
+    rendered item of a collection a rule checks, whether or not the browser can check it (a rule under
+    a condition only the server decides still names its members), so `tests` is empty when every
+    check is the server's. An item's field carries the checks of every rule on its collection. `name` is
     the input's binding name, under the view's field prefix, as the server reports it. `rule` names the
     declaration a test came from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
