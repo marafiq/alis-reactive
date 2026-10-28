@@ -75,24 +75,32 @@ wiring required checks.
 wildcards, so Fusion component namespaces are split by their **first letter**
 (`FullyQualifiedName~.Components.Fusion.A` matches `AutoComplete`, `AIAssistView`, `Accordion`);
 every letter A-Z is listed across the three Fusion shards, so a new component lands in exactly one.
+A shard's filters never overlap another's: `components` leaves out `.Validation.`, which the
+`validation` shard selects.
 The last shard is the complement of the others, so a new top-level namespace can never fall outside
 every shard. `scripts/playwright.sh --shard <name> --print-filter` prints the exact filter.
 Sharding is the Playwright-recommended way to parallelize across machines
 ([playwright.dev/docs/test-sharding](https://playwright.dev/docs/test-sharding)).
 
-Expected time per shard, from the per-test `elapsed=` markers of run 29164122260 (single worker,
-`ubuntu-latest`, 2026-07-11):
+Expected time per shard, from the per-test `elapsed=` markers of run 40694273254 (single worker,
+`ubuntu-latest`, 2026-10-28). A sandbox test there took about 5.5 s; a framework test about 0.4 s.
+The five sandbox shards before these ran 52-58 minutes for `components-and-validation` against the
+60-minute limit, and it ran out on run 40711754374; the partition below splits it and moves
+`HttpPipeline` and `CoreBehaviors` into a shard of their own.
 
-| Shard | Filter (summary) | Tests (`--list`) | Test time (2026-07-11 log) | Expected job time |
+| Shard | Filter (summary) | Tests (`--list`) | Test time (2026-10-28 log) | Expected job time |
 |-------|------------------|------------------|----------------------------|-------------------|
-| `fusion-a-f-and-core` | Fusion A-F, `CoreBehaviors` | 217 | 719 s + 129 s = 848 s | ~16 min |
-| `fusion-g-l-and-http` | Fusion G-L, `HttpPipeline` | 256 | 543 s + 385 s = 928 s | ~18 min |
-| `fusion-m-z` | Fusion M-Z | 213 | 809 s | ~16 min |
-| `components-and-validation` | `Components.*` except Fusion (Native, AppLevel), `Validation` | 274 | 504 s + 553 s = 1057 s | ~20 min |
-| `conditions-patterns-and-rest` | everything not in the others (`Conditions`, `Patterns`, future namespaces) | 272 | 574 s + 478 s = 1052 s | ~20 min |
+| `framework` | the framework project, whole | 576 | 195 s (498 tests) | ~6 min |
+| `fusion-a-f` | Fusion A-F | 215 | 1635 s | ~30 min |
+| `fusion-g-m` | Fusion G-M | 372 | 1729 s + 364 s = 2093 s | ~38 min |
+| `fusion-n-z` | Fusion N-Z | 251 | 1898 s | ~35 min |
+| `http-and-core` | `HttpPipeline`, `CoreBehaviors` | 185 | 730 s + 406 s = 1136 s | ~22 min |
+| `components` | `Components.*` except Fusion (Native, AppLevel) | 286 | 1633 s | ~30 min |
+| `validation` | `Validation` | 303 | 1681 s | ~31 min |
+| `conditions-patterns-and-rest` | everything not in the others (`Conditions`, `Patterns`, `Plugins`, future namespaces) | 356 | 1661 s | ~31 min |
 
-The test counts are the `--list` output at the commit that introduced the shards: sum 1232 = the
-discovered set, union identical to the full list, zero duplicates.
+The test counts are the `--list` output at the commit that introduced this partition: sum 2544 = the
+discovered set of both projects, union identical to the full list, zero duplicates.
 
 `scripts/playwright.sh --shard <name> --list --no-build` prints the fully qualified names a shard
 selects without running them: `dotnet test --list-tests` (with the NUnit adapter's
@@ -111,9 +119,9 @@ cat /tmp/shard-*.txt | sort > /tmp/union.txt
 diff <(sort /tmp/all.txt) /tmp/union.txt && echo "no gaps"; sort /tmp/union.txt | uniq -d | wc -l   # 0 = no duplicates
 ```
 
-Job time adds about 2 min of setup (checkout, toolchain, `scripts/build.sh` 76 s, browser install
-28 s). Wall clock for the browser leg: about 20 minutes instead of about 80, at roughly the same
-total runner minutes. Times are from one run and will drift. Re-balance by moving a letter or a
+Job time adds about 3 min of setup (checkout, toolchain, `scripts/build.sh`, browser install).
+Wall clock for the browser leg is the slowest shard, about 40 minutes, at roughly the same total
+runner minutes. Times are from one run and will drift. Re-balance by moving a letter or a
 namespace between shards in the project's `playwright.project.sh` (`playwright_shard_filter`); keep
 every letter present exactly once and one complement shard, then re-run the partition proof above.
 

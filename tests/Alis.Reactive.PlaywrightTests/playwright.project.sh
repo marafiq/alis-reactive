@@ -9,7 +9,7 @@ playwright_project=sandbox
 # match on the namespace segment, and every letter is listed so a new component always lands in
 # exactly one shard. The last shard is the complement of the others, so a new top-level namespace
 # can never fall outside every shard.
-playwright_shards="fusion-a-f-and-core fusion-g-l-and-http fusion-m-z components-and-validation conditions-patterns-and-rest"
+playwright_shards="fusion-a-f fusion-g-m fusion-n-z http-and-core components validation conditions-patterns-and-rest"
 
 fusion_letters() {
   local expr="" letter
@@ -21,17 +21,23 @@ fusion_letters() {
 
 playwright_shard_filter() {
   case "$1" in
-    fusion-a-f-and-core)
-      printf '(%s)|FullyQualifiedName~.CoreBehaviors.' "$(fusion_letters A B C D E F)"
+    fusion-a-f)
+      printf '(%s)' "$(fusion_letters A B C D E F)"
       ;;
-    fusion-g-l-and-http)
-      printf '(%s)|FullyQualifiedName~.HttpPipeline.' "$(fusion_letters G H I J K L)"
+    fusion-g-m)
+      printf '(%s)' "$(fusion_letters G H I J K L M)"
       ;;
-    fusion-m-z)
-      printf '(%s)' "$(fusion_letters M N O P Q R S T U V W X Y Z)"
+    fusion-n-z)
+      printf '(%s)' "$(fusion_letters N O P Q R S T U V W X Y Z)"
       ;;
-    components-and-validation)
-      printf '(FullyQualifiedName~.Components.&FullyQualifiedName!~.Components.Fusion.)|FullyQualifiedName~.Validation.'
+    http-and-core)
+      printf 'FullyQualifiedName~.HttpPipeline.|FullyQualifiedName~.CoreBehaviors.'
+      ;;
+    components)
+      printf 'FullyQualifiedName~.Components.&FullyQualifiedName!~.Components.Fusion.&FullyQualifiedName!~.Validation.'
+      ;;
+    validation)
+      printf 'FullyQualifiedName~.Validation.'
       ;;
     conditions-patterns-and-rest)
       printf 'FullyQualifiedName!~.Components.&FullyQualifiedName!~.Validation.&FullyQualifiedName!~.CoreBehaviors.&FullyQualifiedName!~.HttpPipeline.'

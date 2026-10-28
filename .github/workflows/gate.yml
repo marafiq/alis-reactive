@@ -52,8 +52,8 @@ jobs:
     name: playwright (${{ matrix.shard }})
     if: ${{ inputs.playwright }}
     runs-on: ubuntu-latest
-    # Observed: 14-18 minutes of tests per shard plus about 2 minutes of setup, single worker
-    # (docs/CI.md, "Sharding"). 60 leaves 3x headroom for a slow runner and one re-run pass.
+    # Expected: at most about 35 minutes of tests per shard plus about 3 minutes of setup, single
+    # worker (docs/CI.md, "Sharding"). 60 leaves room for a slow runner and one re-run pass.
     timeout-minutes: 60
     permissions:
       contents: read
@@ -63,10 +63,12 @@ jobs:
       matrix:
         shard:
           - framework
-          - fusion-a-f-and-core
-          - fusion-g-l-and-http
-          - fusion-m-z
-          - components-and-validation
+          - fusion-a-f
+          - fusion-g-m
+          - fusion-n-z
+          - http-and-core
+          - components
+          - validation
           - conditions-patterns-and-rest
     env:
       # Without a registered license, EJ2 overlays a trial modal that intercepts every interaction:

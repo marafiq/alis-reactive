@@ -83,7 +83,7 @@ gh run list --branch main --limit 6          # CI (gate) and verify-net48 green 
 git tag -a v1.0.0-rc.4 -m "AlisReactive 1.0.0-rc.4" "$(git rev-parse origin/main)"
 git push origin v1.0.0-rc.4
 
-# 2. Watch the publish run: verify-tag -> gate (test + five browser shards) -> pack-and-publish.
+# 2. Watch the publish run: verify-tag -> gate (test + every browser shard) -> pack-and-publish.
 gh run watch "$(gh run list --workflow=nuget-publish.yml --limit 1 --json databaseId -q '.[0].databaseId')"
 ```
 

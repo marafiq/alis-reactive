@@ -1,7 +1,7 @@
 # Monthly, grouped dependency updates: at most one PR per ecosystem per month. npm and NuGet get minor
 # and patch only; GitHub Actions get every version, majors included, because an action's major tracks
 # the runner's Node runtime and the PR's own CI run is the proof.
-# Every Dependabot PR runs the full gate (five browser shards), so fewer, bigger PRs save runner time;
+# Every Dependabot PR runs the full gate (every browser shard), so fewer, bigger PRs save runner time;
 # the maintainer may also cherry-pick several of them onto one branch, prove it locally with
 # scripts/test.sh, and land them in a single PR (docs/CI.md, "Dependency updates").
 # npm and NuGet majors are never proposed automatically: they are upgraded deliberately, one at a time.

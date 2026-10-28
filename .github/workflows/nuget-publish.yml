@@ -9,7 +9,7 @@ name: Publish NuGet packages
 #
 # Gates, in order:
 #   verify-tag  annotated tag, SemVer version, commit reachable from main or release/*  (seconds)
-#   gate        the shared gate (gate.yml): deterministic suite + five browser shards — BLOCKING
+#   gate        the shared gate (gate.yml): deterministic suite + every browser shard — BLOCKING
 #               (a red shard stops the release; re-run the failed jobs, publishing is idempotent)
 #   pack-and-publish  six packages at the tagged version -> nuget.org -> GitHub Release
 #                     (runs in the `nuget-release` environment; add a required reviewer there for
