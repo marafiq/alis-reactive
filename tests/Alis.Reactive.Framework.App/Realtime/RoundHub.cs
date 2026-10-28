@@ -13,4 +13,21 @@ public sealed class RoundHub : Hub
         Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident, status = "up" });
 
     public string Acknowledge(string nurse) => $"acknowledged by {nurse}";
+
+    /// <summary>Tells the page it is tidying before it completes, so the page hears it before the steps after the call.</summary>
+    public Task Tidy() =>
+        Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident = "everyone", status = "tidying" });
+
+    public Task TidyFor(string resident) =>
+        Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident, status = "tidying" });
+
+    public string Roster() => "Ada and Ben";
+
+    public Task Find(string connectionId) => Clients.Client(connectionId).SendAsync(Feed.Found.Name);
+
+    public async Task AskForABareStatus()
+    {
+        await Clients.Caller.SendAsync(Feed.StatusChanged.Name, "up");
+        await Clients.Caller.SendAsync(Feed.BoardCleared.Name);
+    }
 }

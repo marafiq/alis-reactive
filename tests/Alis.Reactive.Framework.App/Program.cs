@@ -1,4 +1,5 @@
 using Alis.Reactive.FluentValidator;
+using Alis.Reactive.Framework.App.Realtime;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.Services.AddControllersWithViews().AddRazorOptions(razor =>
 });
 builder.Services.AddReactiveFluentValidation(validation => validation.AddFromAssemblyContaining<Program>());
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<LineExchange>();
 
 var app = builder.Build();
 
@@ -28,6 +30,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.MapControllers();
 app.MapHub<Alis.Reactive.Framework.App.Realtime.RoundHub>("/hubs/round");
+app.MapLineHub("/hubs/line");
 app.MapControllerRoute("slices", "{controller=Home}/{action=Index}");
 app.Run();
 

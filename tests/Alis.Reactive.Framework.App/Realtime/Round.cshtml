@@ -10,8 +10,8 @@
 
 <p>News: <span id="news"></span> (number <span id="news-count"></span>) · <span id="all-clear"></span></p>
 <p>Stream state: <span id="stream-state"></span></p>
-<p>Board: <span id="board"></span> · status: <span id="status-resident"></span> is <span id="status"></span></p>
-<p>Acknowledged: <span id="ack"></span> · hub: <span id="hub-state"></span></p>
+<p>Board: <span id="board"></span> · status: <span id="status-resident"></span> is <span id="status"></span> · <span id="status-heard"></span></p>
+<p>Acknowledged: <span id="ack"></span> · hub: <span id="hub-state"></span> · roster: <span id="roster"></span> · <span id="found"></span></p>
 
 @{ Html.On(plan, t => t
     .ServerPush(news, s => s.News, (item, p) =>
@@ -22,10 +22,12 @@
     .ServerPush(news, s => s.AllClear, p => p.Element("all-clear").Text.Set("all clear"))
     .SignalR(feed, h => h.StatusChanged, (status, p) =>
     {
+        p.Element("status-heard").Text.Set("heard");
         p.Element("status-resident").Text.Set(status.Resident);
         p.Element("status").Text.Set(status.Status);
     })
-    .SignalR(feed, h => h.BoardCleared, p => p.Element("board").Text.Set("cleared"))); }
+    .SignalR(feed, h => h.BoardCleared, p => p.Element("board").Text.Set("cleared"))
+    .SignalR(feed, h => h.Found, p => p.Element("found").Text.Set("found"))); }
 
 @(plan.Button("push-news", "Push the next news")
     .Reactive(button => button.Click, p => p.Post($"/Realtime/Push?world={Model.World}&kind=news")))
@@ -45,5 +47,25 @@
     .Reactive(button => button.Click, p => p.Element("ack").Text.Set(p.Hub(feed).Acknowledge("Ada"))))
 @(plan.Button("read-hub-state", "Read the hub's state")
     .Reactive(button => button.Click, p => p.Element("hub-state").Text.Set(p.Hub(feed).State)))
+@(plan.Button("sweep-board", "Sweep the board")
+    .Reactive(button => button.Click, p => p.Hub(feed).Sweep()))
+@(plan.Button("tidy", "Tidy up")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Hub(feed).Tidy();
+        p.Element("status").Text.Set("tidied");
+    }))
+@(plan.Button("tidy-for-ben", "Tidy up for Ben")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Hub(feed).TidyFor("Ben");
+        p.Element("status").Text.Set("tidied");
+    }))
+@(plan.Button("read-roster", "Read the roster")
+    .Reactive(button => button.Click, p => p.Element("roster").Text.Set(p.Hub(feed).Roster())))
+@(plan.Button("find-me", "Find me by my connection id")
+    .Reactive(button => button.Click, p => p.Hub(feed).Find(p.Hub(feed).ConnectionId)))
+@(plan.Button("bare-status", "Ask for a bare status")
+    .Reactive(button => button.Click, p => p.Hub(feed).AskForABareStatus()))
 
 @Html.RenderPlan(plan)
