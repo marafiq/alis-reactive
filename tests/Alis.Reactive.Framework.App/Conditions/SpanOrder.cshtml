@@ -1,0 +1,16 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model RefusedPage
+@{
+    ViewData["Title"] = "A length of time ordered";
+    var plan = Html.ReactivePlan<RefusedPage>();
+}
+<h1>A length of time ordered</h1>
+
+<p>The stay: <span id="stay"></span></p>
+
+@* A TimeSpan reaches the browser as its text, and "1.02:00:00" sorts before "23:00:00". *@
+@{ Html.On(plan, t => t.DomReady(p => p.When(p.Url<StayQuery>().Get(q => q.Length)).Gt(TimeSpan.FromHours(23))
+    .Then(longer => longer.Element("stay").Text.Set("longer than 23 hours"))
+    .Else(shorter => shorter.Element("stay").Text.Set("not longer than 23 hours")))); }
+
+@Html.RenderPlan(plan)

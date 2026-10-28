@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "A care plan";
     var plan = Html.ReactivePlan<CarePlanPage>();
+    var tally = plan.RegisterPlugin<Tally>();
 }
 <h1>A care plan</h1>
 
@@ -11,6 +12,10 @@
 <dl>
     <dt>Checked</dt><dd id="checked"></dd>
     <dt>Received</dt><dd id="received"></dd>
+    <dt>Looked up by the address</dt>
+    <dd>tried <span id="lookup-tried"></span> · <span id="looked-up"></span> · went on <span id="lookup-after"></span></dd>
+    <dt>Posted as JSON</dt>
+    <dd>tried <span id="json-tried"></span> · <span id="posted-json"></span> · went on <span id="json-after"></span></dd>
 </dl>
 
 @(plan.Button("check", "Check the care plan")
@@ -40,5 +45,31 @@
         .Gather<CarePlanFiles>(g => g.Form(m => m.CarePlan))
         .AsFormData()
         .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+
+@(plan.Button("send-listed", "Send the care plan as the browser lists it")
+    .Reactive(button => button.Click, p => p.Post("/Requests/CarePlans")
+        .Gather<ListedCarePlan>(g => g.Set(x => x.CarePlan, p.Component<FilePicker>(m => m.CarePlan).Listed))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("look-up", "Look up the care plan by the address")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("lookup-tried").Text.Set(tally.Total);
+        p.Get("/Requests/CarePlans/Lookup")
+            .Gather(g => g.Form())
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("looked-up").Text.Set(echo.Get(x => x.Summary))));
+        p.Element("lookup-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("post-json", "Post the care plan as JSON")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("json-tried").Text.Set(tally.Total);
+        p.Post("/Requests/CarePlans/Json")
+            .Gather(g => g.Form())
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("posted-json").Text.Set(echo.Get(x => x.Summary))));
+        p.Element("json-after").Text.Set(tally.Total);
+    }))
 
 @Html.RenderPlan(plan)

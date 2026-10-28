@@ -24,6 +24,12 @@ public sealed class CarePlanFiles
     public IFormFile[]? CarePlan { get; set; }
 }
 
+/// <summary>The care plan as the browser lists the chosen files, sent under the page's member name.</summary>
+public sealed class ListedCarePlan
+{
+    public IReadOnlyList<BrowserFile>? CarePlan { get; set; }
+}
+
 /// <summary>The resident's signed consents, chosen as files the page's model holds as a sequence.</summary>
 public sealed class ConsentsPage
 {

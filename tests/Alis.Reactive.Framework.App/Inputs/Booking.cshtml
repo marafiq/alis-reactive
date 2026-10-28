@@ -1,0 +1,29 @@
+@using Alis.Reactive.Framework.App.Inputs
+@model BookingPage
+@{
+    ViewData["Title"] = "Book a visit";
+    var plan = Html.ReactivePlan<BookingPage>();
+}
+<h1>Book a visit</h1>
+
+<div id="booking-form">
+    @{ Html.InputField(plan, m => m.Day, o => o.Label("Day")).Entry(); }
+    @{ Html.InputField(plan, m => m.Called, o => o.Label("Called at")).Entry(); }
+    @{ Html.InputField(plan, m => m.Guests, o => o.Label("Guests")).Entry(); }
+    @{ Html.InputField(plan, m => m.Tags, o => o.Label("Tags")).Entry(); }
+</div>
+
+<p>The endpoint bound: <span id="booked"></span></p>
+
+@(plan.Button("book", "Book")
+    .Reactive(button => button.Click, p => p.Post("/Inputs/Booking")
+        .Gather(g => g.Form())
+        .AsFormData()
+        .Response(r => r.OnSuccess<BookingEcho>((echo, s) => s.Element("booked").Text.Set(echo.Get(x => x.Summary))))))
+
+@(plan.Button("book-json", "Book as JSON")
+    .Reactive(button => button.Click, p => p.Post("/Inputs/Booking/Json")
+        .Gather(g => g.Form())
+        .Response(r => r.OnSuccess<BookingEcho>((echo, s) => s.Element("booked").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

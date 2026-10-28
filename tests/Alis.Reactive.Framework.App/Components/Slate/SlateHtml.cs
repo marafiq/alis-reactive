@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
@@ -17,6 +18,24 @@ public static class SlateHtml
         var markup = new StringBuilder()
             .Append("<div class=\"slate\" id=\"").Append(Encode(id))
             .Append("\" data-title=\"").Append(Encode(title))
+            .Append("\" data-rows=\"").Append(Encode(string.Join("|", rows)))
+            .Append("\"></div>");
+        return plan.Render<Slate>(id, new HtmlString(markup.ToString()));
+    }
+
+    /// <summary>A slate started at a moment, which the slate keeps as a timestamp; otherwise as <see cref="Slate{TModel}(ReactivePlan{TModel}, string, string, string[])"/>.</summary>
+    public static RenderedComponent<Slate, TModel> Slate<TModel>(
+        this ReactivePlan<TModel> plan,
+        string id,
+        string title,
+        DateTimeOffset startedAt,
+        params string[] rows)
+        where TModel : class
+    {
+        var markup = new StringBuilder()
+            .Append("<div class=\"slate\" id=\"").Append(Encode(id))
+            .Append("\" data-title=\"").Append(Encode(title))
+            .Append("\" data-started=\"").Append(startedAt.ToUnixTimeMilliseconds().ToString(CultureInfo.InvariantCulture))
             .Append("\" data-rows=\"").Append(Encode(string.Join("|", rows)))
             .Append("\"></div>");
         return plan.Render<Slate>(id, new HtmlString(markup.ToString()));

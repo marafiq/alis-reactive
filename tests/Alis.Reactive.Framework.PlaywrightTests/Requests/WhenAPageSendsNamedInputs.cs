@@ -6,7 +6,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// nothing, a number left empty as zero), into a request
 /// member of a type the input's value binds to (the same type, one that may be empty, a base type, another
 /// collection of the same items), matched ignoring case, through a list item or into a member that takes any
-/// name; and in a partial rendered for a member of the page's model, under that member's prefix.
+/// name; and in a partial rendered for a member of the page's model, under that member's prefix. An input no
+/// longer on the page is sent as nothing (M5).
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageSendsNamedInputs : AppPageTest
@@ -71,6 +72,21 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
         await Button("Count the party").ClickAsync();
 
         await Expect(Line("party")).ToHaveTextAsync("party of 3");
+    }
+
+    [Test]
+    public async Task a_named_input_no_longer_on_the_page_is_sent_as_nothing()
+    {
+        await Open("/Requests/SignIn");
+        await Type("Party", "3");
+        await Button("Count the party").ClickAsync();
+        await Expect(Line("party")).ToHaveTextAsync("party of 3");
+
+        await Button("Put the party's field away").ClickAsync();
+        await Expect(Page.GetByLabel("Party", new() { Exact = true })).ToHaveCountAsync(0);
+        await Button("Count the party").ClickAsync();
+
+        await Expect(Line("party")).ToHaveTextAsync("no party");
     }
 
     [Test]

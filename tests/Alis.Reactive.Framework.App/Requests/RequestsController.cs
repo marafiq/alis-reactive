@@ -70,6 +70,56 @@ public sealed class RequestsController : Controller
     public IActionResult Estimate([FromBody] EstimateRequest estimate) =>
         Said(estimate.Estimate is decimal value ? $"estimate {Number(value)}" : "no estimate");
 
+    public IActionResult Outage() => View(new OutagePage());
+
+    [HttpPost("/Requests/Ledger")]
+    public IActionResult Ledger([FromBody] LedgerNote note) => Said($"ledger titled {note.Title ?? "nothing"}");
+
+    [HttpGet("/Requests/Limits/{limit}")]
+    public IActionResult Limit(int limit) => Said($"limit {limit}");
+
+    /// <summary>Drops the connection before it answers, as a server that fails mid-request does.</summary>
+    [HttpGet("/Requests/Dropped")]
+    public IActionResult Dropped()
+    {
+        HttpContext.Abort();
+        return new EmptyResult();
+    }
+
+    /// <summary>Says it answers JSON, then sends JSON that stops part way.</summary>
+    [HttpGet("/Requests/Garbled")]
+    public IActionResult Garbled() => Content("{\"summary\": \"the night", "application/json");
+
+    [HttpGet("/Requests/Xhtml")]
+    public IActionResult Xhtml() => Content("The night desk is open.", "application/xhtml+xml");
+
+    [HttpGet("/Requests/Bytes")]
+    public IActionResult Bytes() => File(System.Text.Encoding.UTF8.GetBytes("ledger.bin"), "application/octet-stream");
+
+    public IActionResult Census() => View(new CensusPage());
+
+    /// <summary>Says the query it was sent, as the address reads, and the wing and wings it bound from it.</summary>
+    [HttpGet("/Requests/Census/Asked")]
+    public IActionResult CensusAsked([FromQuery] CensusQuery query) =>
+        Said($"query {QueryText()}, bound wing {query.Wing ?? "none"} and wings {Listed(query.Wings)}");
+
+    /// <summary>Says each field the form post carried, by name and value.</summary>
+    [HttpPost("/Requests/Census/Posted")]
+    public IActionResult CensusPosted() =>
+        Said("fields " + string.Join(", ", Request.Form.Select(field => $"{field.Key}='{field.Value}'")));
+
+    [HttpPost("/Requests/Census/Labels")]
+    public IActionResult LabelsKept([FromBody] CensusLabels labels) =>
+        Said("labels " + string.Join(" and ", (labels.Labels ?? []).Select(label => label is null ? "null" : $"'{label}'")));
+
+    [HttpGet("/Requests/Census/Cards")]
+    public IActionResult CardsAsked() => Said($"asked with query {QueryText()}");
+
+    private string QueryText() => Request.QueryString.HasValue ? Request.QueryString.Value! : "nothing";
+
+    private static string Listed(List<string>? items) =>
+        items is null || items.Count == 0 ? "none" : string.Join(" and ", items.Select(item => item ?? "an empty one"));
+
     public IActionResult SignIn() => View(new SignInPage());
 
     [HttpPost("/Requests/SignIns")]
@@ -117,6 +167,12 @@ public sealed class RequestsController : Controller
 
     [HttpPost("/Requests/CarePlans")]
     public async Task<IActionResult> SendCarePlan([FromForm] CarePlanPage page) => Said(await Received(page.CarePlan));
+
+    [HttpGet("/Requests/CarePlans/Lookup")]
+    public IActionResult LookUpCarePlan() => Said($"looked up with query {QueryText()}");
+
+    [HttpPost("/Requests/CarePlans/Json")]
+    public IActionResult PostCarePlanJson() => Said($"posted as {Request.ContentType ?? "no content"}");
 
     [HttpPost("/Requests/CarePlans/Sequence")]
     public async Task<IActionResult> SendCarePlanSequence([FromForm] CarePlanUpload upload) => Said(await Received(upload.CarePlan));

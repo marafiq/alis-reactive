@@ -2,7 +2,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Triggers;
 
 /// <summary>
 /// What starts a page's pipelines: the page being ready, once (D1), read with the URL it was opened with (D3),
-/// and the app's own events, raised synchronously (D2) with the payload a page composes.
+/// and the app's own events, raised synchronously (D2) with the payload a page composes, or by a click on
+/// markup that carries the event's name and its payload (D4).
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageStartsItsPipelines : AppPageTest
@@ -93,5 +94,16 @@ public sealed class WhenAPageStartsItsPipelines : AppPageTest
 
         await Expect(Line("moved-from")).ToHaveTextAsync("12");
         await Expect(Line("moved-who")).ToHaveTextAsync("Ada");
+    }
+
+    [Test]
+    public async Task markup_carrying_an_events_name_raises_it_with_the_payload_it_carries_when_clicked()
+    {
+        await Open("/Triggers/Announcements");
+
+        await Button("Admit Bea from the board").ClickAsync();
+
+        await Expect(Line("admitted-name")).ToHaveTextAsync("Bea");
+        await Expect(Line("admitted-room")).ToHaveTextAsync("4");
     }
 }

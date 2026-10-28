@@ -27,6 +27,14 @@ public sealed class WhenABranchIsWrittenWrongly : AppPageTest
     }
 
     [Test]
+    public async Task an_order_of_a_length_of_time_is_refused()
+    {
+        await Render("/Conditions/SpanOrder");
+
+        await Expect(Page.GetByText("A TimeSpan has no order the browser can compute as C# does").First).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task a_negative_minimum_length_is_refused()
     {
         await Render("/Conditions/NegativeMinLength");

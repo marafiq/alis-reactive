@@ -40,6 +40,8 @@
     @{ Html.InputField(plan, m => m.Leaving, o => o.Label("Leaving")).Entry(); }
     @{ Html.InputField(plan, m => m.Badge, o => o.Label("Badge")).Entry(); }
     @{ Html.InputField(plan, m => m.Contact.Phone, o => o.Label("Phone")).Entry(); }
+    @{ Html.InputField(plan, m => m.Visiting, o => o.Label("Visiting")).Entry(); }
+    @{ Html.InputField(plan, m => m.Called, o => o.Label("Called")).Entry(); }
 </div>
 
 <p>Saved: <span id="saved"></span></p>

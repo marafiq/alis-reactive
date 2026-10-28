@@ -1,0 +1,46 @@
+@using Alis.Reactive.Framework.App.Members
+@model KindsPage
+@{
+    ViewData["Title"] = "Kinds";
+    var plan = Html.ReactivePlan<KindsPage>();
+}
+<h1>Kinds</h1>
+
+@* Started at noon UTC on 2026-10-27, which is the 27th in every zone from UTC-11 to UTC+11. *@
+@plan.Slate("slate", "Night round", new DateTimeOffset(2026, 10, 27, 12, 0, 0, TimeSpan.Zero), "Ada", "Ben")
+
+<p>Limited: <span id="limited"></span></p>
+<p>Cards: <span id="holds-cards"></span></p>
+<p>Placed: <span id="placed"></span></p>
+<p>Flags counted: <span id="flags"></span></p>
+
+@(plan.Button("limit-three", "Limit the slate to 3")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Limit.Set(3)))
+@(plan.Button("limit-zero", "Limit the slate to 0")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Limit.Set(0)))
+@(plan.Button("ask-limited", "Is the slate limited?")
+    .Reactive(button => button.Click, p => p.When(p.Component<Slate>("slate").Limited).Eq(true)
+        .Then(t => t.Element("limited").Text.Set("limited"))
+        .Else(e => e.Element("limited").Text.Set("not limited"))))
+@(plan.Button("fill", "Fill a card")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Fill(new SlateCard { Name = "Cy", Due = new DateTime(2026, 10, 29) })))
+@(plan.Button("ask-cards", "Does the slate hold a card?")
+    .Reactive(button => button.Click, p => p.When(p.Component<Slate>("slate").HoldsCards).Eq(true)
+        .Then(t => t.Element("holds-cards").Text.Set("holds a card"))
+        .Else(e => e.Element("holds-cards").Text.Set("holds no card"))))
+@(plan.Button("place-flagged", "Place a flagged line on the day the slate started")
+    .Reactive(button => button.Click, p =>
+    {
+        var board = p.Component<Slate>("slate");
+        board.Place("Ada", 1m, true, board.StartedAt);
+    }))
+@(plan.Button("place-plain", "Place a line with no flag")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Place("Ben", 2m, false, new DateTime(2026, 10, 28))))
+@(plan.Button("ask-placed", "Has a line been placed?")
+    .Reactive(button => button.Click, p => p.When(p.Component<Slate>("slate").HasPlaced).Eq(true)
+        .Then(t => t.Element("placed").Text.Set("a line is placed"))
+        .Else(e => e.Element("placed").Text.Set("nothing is placed"))))
+@(plan.Button("count-flags", "Count the placed flag")
+    .Reactive(button => button.Click, p => p.Element("flags").Text.Set(p.Component<Slate>("slate").PlacedFlags)))
+
+@Html.RenderPlan(plan)

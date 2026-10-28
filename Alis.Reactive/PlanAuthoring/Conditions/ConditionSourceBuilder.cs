@@ -12,7 +12,8 @@ namespace Alis.Reactive.Builders.Conditions
     /// Obtained from <c>p.When(..)</c>, <c>ElseIf(..)</c>, <c>And(..)</c>, <c>Or(..)</c> or a group's
     /// <c>g.When(..)</c>. Equality, membership and emptiness apply to every type. Ordering
     /// (<c>Gt</c>, <c>Gte</c>, <c>Lt</c>, <c>Lte</c>, <c>Between</c>) applies only to comparable values
-    /// (numbers, dates, times and their nullable forms), text operators (<c>Contains</c>,
+    /// (numbers, dates, times of day and their nullable forms; a <see cref="System.TimeSpan"/> is refused where
+    /// the page renders, because its text does not order as its length does), text operators (<c>Contains</c>,
     /// <c>StartsWith</c>, <c>EndsWith</c>, <c>Matches</c>, <c>MinLength</c>) only to text, and
     /// <c>ArrayContains</c> only to collections; they are extension methods in <see cref="Alis.Reactive"/>.
     /// </remarks>
@@ -76,12 +77,16 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal Shape Shape => _left.Shape;
 
-        internal TNext CompareWith(Comparison op, object? literal) =>
-            _next(Condition.Ordered(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
+        internal TNext CompareWith(Comparison op, object? literal)
+        {
+            if (!op.IsEquality) RequireBrowserOrder();
+            return _next(Condition.Ordered(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
+        }
 
         internal TNext CompareWith<TRight>(Comparison op, TypedSource<TRight> right)
         {
             if (right == null) throw new ArgumentNullException(nameof(right));
+            if (!op.IsEquality) RequireBrowserOrder();
             return _next(Condition.Ordered(op, Left, right.Expression, Shape));
         }
 
@@ -94,8 +99,22 @@ namespace Alis.Reactive.Builders.Conditions
             return _next(Condition.MinLength(Left, minimum.Value, Shape));
         }
 
-        internal TNext CompareWithRange(object low, object high) =>
-            _next(Condition.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
+        internal TNext CompareWithRange(object low, object high)
+        {
+            RequireBrowserOrder();
+            return _next(Condition.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
+        }
+
+        // A TimeSpan reaches the browser as its text, and text orders by its characters: "1.02:00:00" (26 hours)
+        // sorts before "23:00:00". The browser cannot order it as C# does, so the page is refused where it renders.
+        private static void RequireBrowserOrder()
+        {
+            var type = System.Nullable.GetUnderlyingType(typeof(TProp)) ?? typeof(TProp);
+            if (type == typeof(TimeSpan))
+                throw new InvalidOperationException(
+                    "A TimeSpan has no order the browser can compute as C# does: it reaches the browser as its text, and " +
+                    "\"1.02:00:00\" sorts before \"23:00:00\". Order it on the server, or read the length as a number.");
+        }
 
         internal TNext ContainsItem<TItem>(TItem item)
         {

@@ -2,7 +2,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
 /// <summary>
 /// A file the person chose, as the browser hands it to a page (<c>BrowserFile</c>): what the page reads of it,
-/// posted for an endpoint to check, and the file itself, which a form-data request sends.
+/// posted for an endpoint to check, and the file itself, which a form-data request sends, from an array or from
+/// the browser's own file list (H4, I10); a query or a JSON body has no form for a file, so a request that would
+/// carry one stops before it is sent (H2, H3).
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageSendsAFile : AppPageTest
@@ -46,6 +48,53 @@ public sealed class WhenAPageSendsAFile : AppPageTest
 
         await Button("Send the care plan").ClickAsync();
 
+        await Expect(Line("received")).ToHaveTextAsync("received plan.txt, 11 bytes of text/plain: Walk daily.");
+    }
+
+    [Test]
+    public async Task a_form_data_request_sends_the_files_of_the_browsers_own_file_list()
+    {
+        await Open("/Requests/CarePlan");
+        await Choose(CarePlanFile());
+
+        await Button("Send the care plan as the browser lists it").ClickAsync();
+
+        await Expect(Line("received")).ToHaveTextAsync("received plan.txt, 11 bytes of text/plain: Walk daily.");
+    }
+
+    [Test]
+    public async Task a_file_in_a_query_stops_its_request_and_the_steps_after_it()
+    {
+        await Open("/Requests/CarePlan");
+        await Button("Look up the care plan by the address").ClickAsync();
+        await Expect(Line("looked-up")).ToHaveTextAsync("looked up with query nothing");
+        await Expect(Line("lookup-after")).ToHaveTextAsync("1");
+        await Choose(CarePlanFile());
+
+        await Button("Look up the care plan by the address").ClickAsync();
+
+        await Expect(Line("lookup-tried")).ToHaveTextAsync("2");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Line("lookup-after")).ToHaveTextAsync("1");
+        await Button("Send the care plan").ClickAsync();
+        await Expect(Line("received")).ToHaveTextAsync("received plan.txt, 11 bytes of text/plain: Walk daily.");
+    }
+
+    [Test]
+    public async Task a_file_in_a_json_body_stops_its_request_and_the_steps_after_it()
+    {
+        await Open("/Requests/CarePlan");
+        await Button("Post the care plan as JSON").ClickAsync();
+        await Expect(Line("posted-json")).ToHaveTextAsync("posted as application/json");
+        await Expect(Line("json-after")).ToHaveTextAsync("1");
+        await Choose(CarePlanFile());
+
+        await Button("Post the care plan as JSON").ClickAsync();
+
+        await Expect(Line("json-tried")).ToHaveTextAsync("2");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Line("json-after")).ToHaveTextAsync("1");
+        await Button("Send the care plan").ClickAsync();
         await Expect(Line("received")).ToHaveTextAsync("received plan.txt, 11 bytes of text/plain: Walk daily.");
     }
 }

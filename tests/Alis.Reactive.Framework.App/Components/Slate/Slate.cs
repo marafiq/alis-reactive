@@ -61,6 +61,9 @@ public sealed class Slate : Component
     /// <summary>Saves the slate; finishes a moment later.</summary>
     public void Save() => MethodAsync();
 
+    /// <summary>Starts the slate's save and goes on without waiting for it: the same save, declared as a plain method.</summary>
+    public void StartSaving() => Method(name: "save");
+
     /// <summary>Finds a row by its label, a moment later.</summary>
     public TypedSource<string> Lookup(Arg<string> label) => MethodAsync<string>(label);
 
@@ -78,6 +81,21 @@ public sealed class Slate : Component
 
     /// <summary>How many rows the slate allows; nothing until a page sets it.</summary>
     public Property<int?> Limit => Property<int?>();
+
+    /// <summary>When the slate was started; the slate keeps it as a timestamp, a number of milliseconds.</summary>
+    public ReadOnly<DateTime> StartedAt => ReadOnly<DateTime>();
+
+    /// <summary>Whether the slate has a limit: the limit the slate keeps, a number or nothing, read as a flag.</summary>
+    public ReadOnly<bool> Limited => ReadOnly<bool>(name: "limit");
+
+    /// <summary>Whether the slate holds a card: the list of cards the slate keeps, read as a flag.</summary>
+    public ReadOnly<bool> HoldsCards => ReadOnly<bool>(name: "cards");
+
+    /// <summary>Whether a line has been placed: the day the slate keeps of the line placed last, or nothing, read as a flag.</summary>
+    public ReadOnly<bool> HasPlaced => ReadOnly<bool>(name: "placedOn");
+
+    /// <summary>The flag of the line placed last, counted as one or none; the slate keeps it as true or false.</summary>
+    public ReadOnly<int> PlacedFlags => ReadOnly<int>(name: "placedFlag");
 
     /// <summary>Writes one field of a card, named as the slate names it, with a value of the field's type.</summary>
     public void SetCard<TValue>(Arg<int> index, Field<TValue> field, Arg<TValue> value) => Method(index, field, value);

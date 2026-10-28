@@ -7,7 +7,7 @@
 <h1>Sign in</h1>
 
 @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
-@{ Html.InputField(plan, m => m.Party, o => o.Label("Party")).Entry(); }
+<div id="party-shelf">@{ Html.InputField(plan, m => m.Party, o => o.Label("Party")).Entry(); }</div>
 @{ Html.InputField(plan, m => m.Note, o => o.Label("Note")).Entry(); }
 @{ Html.InputField(plan, m => m.PassId, o => o.Label("Pass")).Entry(); }
 @{ Html.InputField(plan, m => m.Lines[0].Note, o => o.Label("First line")).Entry(); }
@@ -35,6 +35,8 @@
     .Reactive(button => button.Click, p => p.Post("/Requests/Parties")
         .Gather<PartyRequest>(g => g.Form(m => m.Party))
         .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("party").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("put-party-away", "Put the party's field away")
+    .Reactive(button => button.Click, p => p.Unload("party-shelf")))
 @(plan.Button("note-line", "Note the first line")
     .Reactive(button => button.Click, p => p.Post("/Requests/Lines")
         .Gather<LineNotes>(g => g.Form(m => m.Lines[0].Note))

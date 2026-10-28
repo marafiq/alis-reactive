@@ -11,6 +11,10 @@ public sealed class ConditionsController : Controller
 {
     public IActionResult Levels() => View(new LevelsPage());
 
+    public IActionResult Shifts() => View(new ShiftsPage());
+
+    public IActionResult SpanOrder() => View(new RefusedPage());
+
     public IActionResult Goal() => View(new GoalPage());
 
     public IActionResult Names() => View(new NamesPage());
