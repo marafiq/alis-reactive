@@ -96,6 +96,14 @@ const csRows = [...csharp].sort(([a], [b]) => a.localeCompare(b)).map(([file, f]
 const csTotal = csRows.reduce((sum, r) => sum + r.total, 0);
 const csRunTotal = csRows.reduce((sum, r) => sum + r.run, 0);
 
+// A run that recorded nothing measured nothing: no share is written for it.
+if (files.length === 0 || csTotal === 0) {
+  console.error(
+    `[coverage] nothing was measured: ${files.length} page tests recorded runtime coverage and the ` +
+    `Cobertura file names ${csTotal} lines of the core. The tests did not run; no report is written.`);
+  process.exit(1);
+}
+
 const lines = [
   "# What the framework's tests run of the framework",
   "",
