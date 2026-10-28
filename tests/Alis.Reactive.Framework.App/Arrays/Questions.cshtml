@@ -1,0 +1,57 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders.Arrays
+@using Alis.Reactive.Framework.App.Arrays
+@model QuestionsPage
+@{
+    ViewData["Title"] = "Array questions";
+    var plan = Html.ReactivePlan<QuestionsPage>();
+
+    // A button that reads the residents and shows the one value asked of them.
+    IHtmlContent Tell<TValue>(string id, string text, Func<ReactiveArray<Resident>, TypedSource<TValue>> value) =>
+        plan.Button(id, text).Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+            .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+                s.Element("told").Text.Set(value(s.From(residents))))));
+
+    // A button that reads the residents and answers yes when the question holds of them, no when it does not.
+    IHtmlContent Ask(string id, string text, Func<ReactiveArray<Resident>, TypedSource<bool>> question) =>
+        plan.Button(id, text).Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+            .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+                s.When(question(s.From(residents))).Truthy()
+                    .Then(t => t.Element("answer").Text.Set("yes"))
+                    .Else(e => e.Element("answer").Text.Set("no")))));
+
+    // A button that reads the residents and shows what was found, or says no one was.
+    IHtmlContent Find(string id, string text, Func<ReactiveArray<Resident>, TypedSource<string>> found) =>
+        plan.Button(id, text).Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+            .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+                s.When(found(s.From(residents))).IsNull()
+                    .Then(t => t.Element("found").Text.Set("no one"))
+                    .Else(e => e.Element("found").Text.Set(found(s.From(residents)))))));
+}
+<h1>Array questions</h1>
+
+<p>The residents, as the home keeps them: Cyd Marsh (81, present), Ada Hartley (102, away), Ben Hart (79, present), Dot Ashton (80, away).</p>
+<p>Told: <span id="told"></span></p>
+<p>Answer: <span id="answer"></span></p>
+<p>Found: <span id="found"></span></p>
+
+@Tell("count-all", "How many residents?", residents => residents.Count())
+@Tell("count-present", "How many are present?", residents => residents.Count(x => x.Present))
+@Tell("sum-ages", "Their ages added up", residents => residents.Sum(x => x.Age))
+@Tell("sum-balances", "Their balances added up", residents => residents.Sum(x => x.Balance))
+@Tell("sum-weights", "Their weights added up", residents => residents.Sum(x => x.Weight))
+@Tell("sum-ages-over-110", "The ages of those over 110 added up", residents => residents.Where(x => x.Age > 110).Sum(x => x.Age))
+
+@Ask("anyone-over-100", "Is there anyone over 100?", residents => residents.Where(x => x.Age > 100).Any())
+@Ask("anyone-over-110", "Is there anyone over 110?", residents => residents.Where(x => x.Age > 110).Any())
+@Ask("any-over-100", "Is any of them over 100?", residents => residents.Any(x => x.Age > 100))
+@Ask("any-over-110", "Is any of them over 110?", residents => residents.Any(x => x.Age > 110))
+@Ask("all-79-or-older", "Are they all 79 or older?", residents => residents.All(x => x.Age >= 79))
+@Ask("all-present", "Are they all present?", residents => residents.All(x => x.Present))
+
+@Find("first-hart", "The first named Hart", residents => residents.Select(x => x.Name).Find(name => name.Contains("Hart")))
+@Find("first-zed", "The first named Zed", residents => residents.Select(x => x.Name).Find(name => name.Contains("Zed")))
+@Find("first-over-80", "The name of the first over 80", residents => residents.Find(x => x.Age > 80, x => x.Name))
+@Find("first-over-110", "The name of the first over 110", residents => residents.Find(x => x.Age > 110, x => x.Name))
+
+@Html.RenderPlan(plan)

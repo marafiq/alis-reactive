@@ -1,0 +1,30 @@
+@using System.Linq.Expressions
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Framework.App.Arrays
+@model ProjectionsPage
+@{
+    ViewData["Title"] = "Array projections";
+    var plan = Html.ReactivePlan<ProjectionsPage>();
+
+    // A button that reads the residents and shows what the selector gives for each, in their order.
+    IHtmlContent Project(string id, string text, Expression<Func<Resident, string>> selector) =>
+        plan.Button(id, text).Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+            .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+                s.Element("projected").Text.Set(s.From(residents).Select(selector)))));
+}
+<h1>Array projections</h1>
+
+<p>The residents, as the home keeps them: Cyd Marsh, Ada Hartley, Ben Hart, Dot Ashton.</p>
+<p>Projected: <span id="projected"></span></p>
+
+@Project("names", "Names", x => x.Name)
+@Project("keyworkers", "Keyworkers", x => x.Keyworker.Name)
+@Project("rooms-trimmed", "Rooms trimmed", x => x.Room.Trim())
+@Project("rooms-trimmed-at-the-start", "Rooms trimmed at the start", x => x.Room.TrimStart())
+@Project("rooms-trimmed-at-the-end", "Rooms trimmed at the end", x => x.Room.TrimEnd())
+@Project("names-in-capitals", "Names in capitals", x => x.Name.ToUpper())
+@Project("names-in-invariant-capitals", "Names in invariant capitals", x => x.Name.ToUpperInvariant())
+@Project("names-in-small-letters", "Names in small letters", x => x.Name.ToLower())
+@Project("names-in-invariant-small-letters", "Names in invariant small letters", x => x.Name.ToLowerInvariant())
+
+@Html.RenderPlan(plan)
