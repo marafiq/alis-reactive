@@ -302,7 +302,7 @@ at render: a handle used outside the block that binds it throws, and names the h
 | `let` | Binds the value. |
 | `if` | Takes the first arm whose condition is truthy, else the `else` block. |
 | `all` | Starts every block, waits until all have settled, and logs each failure without rethrowing. |
-| `try` | Runs the body, then the `finally` block on every exit; an error from the body propagates after the `finally` block. |
+| `try` | Runs the body, then the `finally` block on every exit; an error from the body propagates after the `finally` block. The body awaits: a `try` is written only around a request's send, when it has a `Finally` (5.1). |
 
 ### 3.3 Await
 
