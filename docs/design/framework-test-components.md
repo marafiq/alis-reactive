@@ -49,9 +49,10 @@ capability breaks (rule 5); a row with no passing test is an open gap.
 | P2 | Write a write-only property | `Slate.Note` | the note appears on the slate |
 | P3 | Write, then read, a read-write property | `Slate.Title` | the slate shows the new title; the page shows the title read back |
 | P4 | A value converts to its member's shape when read and written: text, number, yes/no, date, instant, maybe-number, list, record | `Slate.Text`, `Number`, `Flag`, `Day`, `Moment`, `Maybe`, `Tags`, `Card` | each value shown in the form its shape gives it (a number added, a day as the date picked, a list as its items) |
-| O1 | A nested object's members | `Slate.Header` (`Object<T>()`): `Header.Caption`, `Header.Rename(..)` | the header's caption changes |
-| O2 | An object a method returns, and its members | `Slate.RowAt(index)` (`Object<T>(arg)`): `Row.Label`, `Row.Mark()` | the row at that position is marked |
-| O3 | A list of objects: an item by position, a field of each item | `Slate.Rows` (`Objects<T>`): `Rows.At(1)`, `Rows.Each(r => r.Label)` | the second row's label; every label, joined |
+| O1 | A nested object's members | `Slate.Header` (`Object<T>()`): `Header.Caption`, `Header.Rename(..)` | the header's caption changes by a call and by a write, and reads back |
+| O2 | An object a method returns, and its members | `Slate.RowAt(index)` (`Object<T>(arg)`): `Row.Label`, `Row.Mark()` | the row at that position is marked, and only it |
+| O3 | A list of objects: an item by position, a field of each item | `Slate.Rows` (`Objects<T>`): `Rows.At(2)`, `Rows.Each(r => r.Label)` into `Slate.Summarize(labels)` | the third row's label; every label, joined on the slate |
+| O4 | A list of objects a method returns | `Slate.MarkedRows()` (`Objects<T>()` on a method): `.Count` | how many rows are marked when the pipeline runs |
 | M1 | A method with no argument | `Slate.Clear()` | the slate is empty |
 | M2 | A method with up to four arguments | `Slate.Place(text, number, flag, day)` | the four values on the slate |
 | M3 | A record argument converts to the record the method declares (a date inside it arrives as a date) | `Slate.Fill(card)` | the card's fields on the slate, its date as the day picked |

@@ -1,0 +1,37 @@
+@using Alis.Reactive.Framework.App.Members
+@model ObjectsPage
+@{
+    ViewData["Title"] = "Objects";
+    var plan = Html.ReactivePlan<ObjectsPage>();
+}
+<h1>Objects</h1>
+
+@plan.Slate("slate", title: "Day round", "Ada", "Ben", "Cyd")
+
+<p>Caption read: <span id="caption-read"></span></p>
+<p>Second row read: <span id="second-row"></span></p>
+<p>Third row read from the list: <span id="third-row"></span></p>
+<p>Rows marked: <span id="marked-count"></span></p>
+
+@(plan.Button("rename-header", "Rename the header")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Header.Rename("Evening round")))
+@(plan.Button("set-caption", "Set the caption")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Header.Caption.Set("Late round")))
+@(plan.Button("read-caption", "Read the caption")
+    .Reactive(button => button.Click, p => p.Element("caption-read").Text.Set(p.Component<Slate>("slate").Header.Caption)))
+@(plan.Button("mark-second", "Mark the second row")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").RowAt(1).Mark()))
+@(plan.Button("read-second", "Read the second row")
+    .Reactive(button => button.Click, p => p.Element("second-row").Text.Set(p.Component<Slate>("slate").RowAt(1).Label)))
+@(plan.Button("read-third", "Read the third row")
+    .Reactive(button => button.Click, p => p.Element("third-row").Text.Set(p.Component<Slate>("slate").Rows.At(2).Label)))
+@(plan.Button("summarize", "Summarize the rows")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.Summarize(slate.Rows.Each(row => row.Label));
+    }))
+@(plan.Button("count-marked", "Count the marked rows")
+    .Reactive(button => button.Click, p => p.Element("marked-count").Text.Set(p.Component<Slate>("slate").MarkedRows().Count)))
+
+@Html.RenderPlan(plan)

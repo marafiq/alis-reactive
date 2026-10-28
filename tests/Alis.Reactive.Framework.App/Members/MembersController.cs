@@ -6,4 +6,6 @@ namespace Alis.Reactive.Framework.App.Members;
 public sealed class MembersController : Controller
 {
     public IActionResult Properties() => View(new PropertiesPage());
+
+    public IActionResult Objects() => View(new ObjectsPage());
 }
