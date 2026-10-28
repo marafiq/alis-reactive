@@ -27,10 +27,10 @@ public sealed class WhenAPageTestsText : AppPageTest
         await Open("/Conditions/Names");
 
         await Check("Ada");
-        await Expect(Line("is-ada")).ToHaveTextAsync("Ada");
+        await Expect(Line("is-ada")).ToHaveTextAsync("the name is Ada");
 
         await Check("Adam");
-        await Expect(Line("is-ada")).ToHaveTextAsync("not Ada");
+        await Expect(Line("is-ada")).ToHaveTextAsync("the name is not Ada");
     }
 
     [Test]

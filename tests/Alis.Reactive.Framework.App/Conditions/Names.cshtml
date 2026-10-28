@@ -27,8 +27,8 @@
         var name = p.Component<Entry>(m => m.Name).Value;
         var room = p.Component<Entry>(m => m.Room).Value;
         p.When(name).Eq("Ada")
-            .Then(t => t.Element("is-ada").Text.Set("Ada"))
-            .Else(e => e.Element("is-ada").Text.Set("not Ada"));
+            .Then(t => t.Element("is-ada").Text.Set("the name is Ada"))
+            .Else(e => e.Element("is-ada").Text.Set("the name is not Ada"));
         p.When(name).NotEq("Ada")
             .Then(t => t.Element("not-ada").Text.Set("someone other than Ada"))
             .Else(e => e.Element("not-ada").Text.Set("Ada herself"));
