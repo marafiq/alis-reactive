@@ -1,0 +1,20 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model RefusedPage
+@{
+    ViewData["Title"] = "A second Else";
+    var plan = Html.ReactivePlan<RefusedPage>();
+}
+<h1>A second Else</h1>
+
+@plan.Meter("pain", level: 3, max: 5)
+<p>Plan: <span id="plan"></span></p>
+
+@(plan.Button("plan-care", "Plan care")
+    .Reactive(button => button.Click, p =>
+    {
+        var carePlan = p.When(p.Component<Meter>("pain").Level).Gte(4).Then(t => t.Element("plan").Text.Set("Call the doctor"));
+        carePlan.Else(e => e.Element("plan").Text.Set("No action"));
+        carePlan.Else(e => e.Element("plan").Text.Set("Give pain relief"));
+    }))
+
+@Html.RenderPlan(plan)
