@@ -6,10 +6,10 @@ using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Requests
 {
-    // A form input is sent by the view model's binding name. When the endpoint binds a class other than the
-    // view model, that name must be a member of the class too, of a type the input's value binds to, or the
-    // server drops or refuses the value. MVC matches member names ignoring case; a position steps into the
-    // collection's item type.
+    // A form input is sent by its binding name, under the view's field prefix. When the endpoint binds a class
+    // other than the view model, that name must be a member of the class too, of a type the input's value binds
+    // to, or the server drops or refuses the value. MVC matches member names ignoring case; a position steps
+    // into the collection's item type.
     internal static class RequestMembers
     {
         internal static void Require(Type request, BindingPath binding, Type inputType)
@@ -18,8 +18,20 @@ namespace Alis.Reactive.Builders.Requests
             if (member == null || Binds(inputType, member)) return;
 
             throw new InvalidOperationException(
-                $"Form sends the input '{binding.Value}' as {inputType.Name}, but {request.Name}.{binding.Value}, which " +
-                $"the endpoint binds, is {member.Name}. Give the request member the input's type.");
+                $"Form sends the input '{binding.Value}' as {Spelled(inputType)}, but {Spelled(request)}.{binding.Value}, which " +
+                $"the endpoint binds, is {Spelled(member)}. Give the request member the input's type.");
+        }
+
+        // A type as C# writes it, so a message names Int32? and List<IFormFile> rather than Nullable`1 and List`1.
+        private static string Spelled(Type type)
+        {
+            var underlying = Nullable.GetUnderlyingType(type);
+            if (underlying != null) return Spelled(underlying) + "?";
+            if (!type.IsGenericType) return type.Name;
+            // A class nested in a generic one is generic without a backtick of its own.
+            var arity = type.Name.IndexOf('`');
+            var name = arity < 0 ? type.Name : type.Name.Substring(0, arity);
+            return $"{name}<{string.Join(", ", type.GetGenericArguments().Select(Spelled))}>";
         }
 
         // The member's type, or null when the path reaches an open member (object, a dictionary) that takes any name.
@@ -37,8 +49,8 @@ namespace Alis.Reactive.Builders.Requests
                     var name = segment.ToPathText();
                     var property = current.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
                         ?? throw new InvalidOperationException(
-                            $"Form sends the input '{binding.Value}', but {request.Name}, the request the endpoint binds, " +
-                            $"has no member '{name}'{(current == request ? "" : " on " + current.Name)}.");
+                            $"Form sends the input '{binding.Value}', but {Spelled(request)}, the request the endpoint binds, " +
+                            $"has no member '{name}'{(current == request ? "" : " on " + Spelled(current))}.");
                     current = property.PropertyType;
                 }
 
