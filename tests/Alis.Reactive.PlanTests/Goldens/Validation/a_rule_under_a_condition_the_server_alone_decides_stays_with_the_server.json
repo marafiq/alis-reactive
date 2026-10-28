@@ -189,6 +189,27 @@
                 "message": "Name the resident."
               }
             ]
+          },
+          {
+            "id": "Alis_Reactive_PlanTests_Support_Admission__Age",
+            "name": "Age",
+            "value": {
+              "kind": "call",
+              "target": {
+                "kind": "obj",
+                "id": "$model"
+              },
+              "path": [
+                "boundValueOf"
+              ],
+              "args": [
+                {
+                  "kind": "lit",
+                  "value": "Alis_Reactive_PlanTests_Support_Admission__Age"
+                }
+              ]
+            },
+            "tests": []
           }
         ]
       }

@@ -15,8 +15,7 @@ public class WhenAValidatorDescribesItsRules
         var rendered = plan.Rendered(Registered.Validator<AdmissionRules>());
 
         var form = rendered.Objects()["$form:admission"]!["data"]!;
-        var field = form["fields"]!.AsArray().Single()!;
-        Assert.That(field["name"]!.GetValue<string>(), Is.EqualTo("Name"));
+        var field = form["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Name")!;
         Assert.That(field["tests"]!.AsArray().Single()!["rule"]!.GetValue<string>(), Is.EqualTo("required"));
         Assert.That(field["tests"]!.AsArray().Single()!["message"]!.GetValue<string>(), Is.EqualTo("Name the resident."));
         Golden.Matches(rendered, "Validation", nameof(a_check_the_browser_can_make_lands_on_the_input_that_renders_the_member));
@@ -30,8 +29,10 @@ public class WhenAValidatorDescribesItsRules
 
         var rendered = plan.Rendered(Registered.Validator<AdmissionRules>());
 
-        var names = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Select(field => field!["name"]!.GetValue<string>());
-        Assert.That(names, Is.EqualTo(new[] { "Name" }), "the age's rule is the server's, so the page carries no check for it");
+        var fields = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray()
+            .ToDictionary(field => field!["name"]!.GetValue<string>(), field => field!["tests"]!.AsArray().Count);
+        Assert.That(fields["Name"], Is.EqualTo(1));
+        Assert.That(fields["Age"], Is.Zero, "the age's rule is the server's, so the page carries its field and no check for it");
         Golden.Matches(rendered, "Validation", nameof(a_rule_under_a_condition_the_server_alone_decides_stays_with_the_server));
     }
 
@@ -46,7 +47,8 @@ public class WhenAValidatorDescribesItsRules
         var rendered = plan.Rendered(Registered.Validator<AdmissionRules>());
 
         Assert.That(rendered.Handlers().Count, Is.EqualTo(2));
-        Assert.That(rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Count, Is.EqualTo(1));
+        var names = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Select(field => field!["name"]!.GetValue<string>());
+        Assert.That(names, Is.EqualTo(new[] { "Name", "Age" }), "each member a rule is written on, once");
         Golden.Matches(rendered, "Validation", nameof(two_requests_that_validate_one_form_describe_it_once));
     }
 }

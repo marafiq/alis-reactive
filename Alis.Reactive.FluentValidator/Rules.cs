@@ -242,11 +242,15 @@ namespace Alis.Reactive.FluentValidator
                 await part.Validate(instance, value, prefix + FieldPath, FieldDisplayName, run).ConfigureAwait(false);
         }
 
+        // A check on the member reports under the member's name, so the member is declared whether or not
+        // the browser can make the check; a child validator alone reports under its own members.
         public override void DescribeFor(BrowserRuleSet browser)
         {
             foreach (var part in Parts)
                 if (TryBrowserCondition(part, out var when))
                     part.DescribeFor(browser, Member, FieldDisplayName, when);
+            if (Parts.Any(part => part is CheckPart<T, TValue>))
+                browser.Declare(Member.Expression);
         }
     }
 
