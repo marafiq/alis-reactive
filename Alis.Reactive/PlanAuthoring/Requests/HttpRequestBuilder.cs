@@ -67,7 +67,8 @@ namespace Alis.Reactive.Builders.Requests
         /// <remarks>
         /// <para>Supports element reactions, component reactions, and condition guards.
         /// Does not provide response body access because the response may not
-        /// exist on network failure.</para>
+        /// exist on network failure: a read of this request's response inside Finally, such as
+        /// <c>Into</c> or a body captured from <c>OnSuccess</c>, is refused where the page renders.</para>
         /// <para>Typical use: hide a loading spinner that <see cref="WhileLoading"/> showed.</para>
         /// <para>Finally also runs when the request cannot be built, for example when a route parameter's
         /// source has no value; the error that stopped the request is still reported, and no response route

@@ -436,7 +436,7 @@ if (form.validate()) {                            // .Validate<V>(container); ou
     if (res.ok) { …OnSuccess by status, exact first… }
     else if (res.status === 409) { …OnError(409)… }
     else { …untyped OnError… }                    // also reached by status 0
-  } finally { …Finally… }                         // emitted only when Finally exists
+  } finally { …Finally… }                         // emitted only when Finally exists; reads no res
   if (res.ok) { …Chained<TResponse>((res, next) => …)… }   // PlanAuthoring/Requests/ResponseBuilder.cs:135
 }
 ```

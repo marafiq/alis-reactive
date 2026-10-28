@@ -87,7 +87,7 @@ namespace Alis.Reactive.PlanModel
                 if (frame.Handle == handle) return frame.Binding;
             throw new InvalidOperationException(
                 $"Plan '{PlanId}' reads a response outside the routes of the request that receives it. Read a " +
-                "response inside OnSuccess, OnError, Chained or Finally of its request.");
+                "response inside OnSuccess, OnError or Chained of its request; Finally runs whether or not one came.");
         }
 
         /// <summary>

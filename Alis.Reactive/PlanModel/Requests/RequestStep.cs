@@ -57,8 +57,9 @@ namespace Alis.Reactive.PlanModel
 
             var sentence = new List<Statement>();
             sentence.AddRange(WhileLoading.Write(scope));
-            // The response the try bound stays in scope after it (grammar.md 3.1), so Finally reads it too.
-            var cleanup = Finally.Write(routeScope);
+            // Finally runs whether or not the request was sent or answered, so it reads no response of its own
+            // request, as C# refuses a finally that reads what its try assigned.
+            var cleanup = Finally.Write(scope);
             if (cleanup.Count == 0)
                 sentence.AddRange(exchange);
             else

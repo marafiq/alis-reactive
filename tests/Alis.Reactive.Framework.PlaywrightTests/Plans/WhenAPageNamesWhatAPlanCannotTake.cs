@@ -5,7 +5,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 /// message the developer reads: a component or an element plan with no id, a plugin named with a space or not
 /// named, a header with no name, a route placeholder no route value can be named, an error route for a
 /// status HTTP does not have, a value read through another plan's component, and a response read outside the
-/// routes of its request.
+/// routes of its request, Finally included.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
@@ -78,7 +78,25 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
         await Render("ReadAResponseOutsideItsRoutes");
 
         await Expect(Message(
-            "reads a response outside the routes of the request that receives it. Read a response inside OnSuccess, OnError, Chained or Finally of its request.")).ToBeVisibleAsync();
+            "reads a response outside the routes of the request that receives it. Read a response inside OnSuccess, OnError or Chained of its request; Finally runs whether or not one came.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_finally_that_reads_its_requests_response_is_refused()
+    {
+        await Render("ReadTheResponseInFinally");
+
+        await Expect(Message(
+            "reads a response outside the routes of the request that receives it. Read a response inside OnSuccess, OnError or Chained of its request; Finally runs whether or not one came.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_finally_that_loads_its_requests_response_into_an_element_is_refused()
+    {
+        await Render("LoadTheResponseInFinally");
+
+        await Expect(Message(
+            "reads a response outside the routes of the request that receives it. Read a response inside OnSuccess, OnError or Chained of its request; Finally runs whether or not one came.")).ToBeVisibleAsync();
     }
 
     [Test]
