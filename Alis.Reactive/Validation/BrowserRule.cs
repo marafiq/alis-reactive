@@ -199,7 +199,15 @@ namespace Alis.Reactive.Validation
 
         private protected static Expr IsNumber(Expr value) => G.Eq(G.Op(Operator.Finite, value), value);
 
-        // A value as the number a comparison under the shape orders it by; anything else cannot be compared.
+        // The shapes the browser orders as the server does: numbers, flags and dates. The server orders text by
+        // its culture, which the browser cannot match, so an order of text stays with the server.
+        private protected static bool IsOrdered(Shape shape)
+        {
+            var orderedShape = shape.TryGetNullableInnerShape(out var inner) ? inner : shape;
+            return orderedShape is NumberShape or BooleanShape or DateShape or InstantShape;
+        }
+
+        // A value as the number a comparison under an ordered shape (IsOrdered) orders it by.
         private protected static Expr Comparable(Expr value, Shape shape)
         {
             if (shape.TryGetNullableInnerShape(out var inner)) return Nullable(value, inner, Comparable);
@@ -214,7 +222,7 @@ namespace Alis.Reactive.Validation
                 case "boolean":
                     return G.Op(Operator.Cond, G.Op(Operator.ToBoolean, value), G.Lit(1), G.Lit(0));
                 default:
-                    return G.Null;
+                    throw new InvalidOperationException($"A value of shape '{shape.Kind}' has no order in the browser.");
             }
         }
 

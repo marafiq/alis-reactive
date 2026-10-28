@@ -20,6 +20,18 @@ public sealed class ValidationController : Controller
 
     public IActionResult Bounds() => View(new BoundsForm());
 
+    public IActionResult Sameness() => View(new SamenessForm());
+
+    /// <summary>Checks the comparisons with the same rules the page carries; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Sameness")]
+    public IActionResult SaveSameness([FromBody] SamenessForm form, [FromServices] SamenessRules rules)
+    {
+        var result = rules.Validate(form);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     /// <summary>Checks the bounds with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Bounds")]
     public IActionResult SaveBounds([FromBody] BoundsForm form, [FromServices] BoundsRules rules)

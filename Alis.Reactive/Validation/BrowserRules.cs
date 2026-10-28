@@ -259,6 +259,13 @@ namespace Alis.Reactive.Validation
 
         private protected abstract bool ComparesWithMember { get; }
 
+        // Equality has a browser form under every shape; order only under a shape the browser orders as the server does.
+        internal override bool TryFor(FieldReference field, out BrowserRule rule)
+        {
+            rule = this;
+            return Comparison.IsEquality || IsOrdered(Shape);
+        }
+
         /// <summary>The target as the check reads it when it runs.</summary>
         private protected abstract Expr Target(FormFieldValues values, Scope scope);
 
@@ -340,6 +347,13 @@ namespace Alis.Reactive.Validation
             AsNumber(_from) is decimal from && AsNumber(_to) is decimal to ? (from, to) : null;
 
         internal override string Name => Inclusive ? "range" : "exclusiveRange";
+
+        // A range of text stays with the server, which orders text by its culture.
+        internal override bool TryFor(FieldReference field, out BrowserRule rule)
+        {
+            rule = this;
+            return IsOrdered(_shape);
+        }
 
         // The value and both bounds as numbers under the bounds' shape; nothing bound passes, as the
         // server's range check does.
