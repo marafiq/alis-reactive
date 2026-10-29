@@ -3,8 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 /// <summary>
 /// A plan of its own for one element (<c>ElementPlan</c>), identified by the element's id: it composes with no
 /// other plan, so two cards of one model, on a page with no plan of its own, each send only the input they
-/// rendered. A plan that validates a form shows the messages no field of it shows; one that validates nothing
-/// adds no markup for them.
+/// rendered. A plan that validates a form shows the messages no field of it shows; one that neither validates a
+/// form nor shows a form's errors adds no markup for them.
 /// </summary>
 [TestFixture]
 public sealed class WhenAnElementHasAPlanOfItsOwn : AppPageTest
@@ -43,7 +43,7 @@ public sealed class WhenAnElementHasAPlanOfItsOwn : AppPageTest
     }
 
     [Test]
-    public async Task an_element_plan_that_validates_nothing_renders_no_validation_summary()
+    public async Task an_element_plan_that_neither_validates_nor_shows_a_forms_errors_renders_no_validation_summary()
     {
         await Open("/Plans/Contacts");
 

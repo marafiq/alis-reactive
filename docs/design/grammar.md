@@ -51,7 +51,9 @@ That is the whole document. The grammar names no feature.
     tests: [{ rule, check: fn(v), when, message }] }] }`: one per member a rule is written on, and per
     rendered item of a collection a rule checks, whether or not the browser can check it (a rule under
     a condition only the server decides still names its members), so `tests` is empty when every
-    check is the server's. An item's field carries the checks of every rule on its collection. `name` is
+    check is the server's. An item's field carries the checks of every rule on its collection. A form
+    the plan shows server errors for (F8) that no validator of the plan names has one field per input
+    the plan rendered, each with no tests. `name` is
     the input's binding name, under the view's field prefix, as the server reports it. `rule` names the
     declaration a test came from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
@@ -568,8 +570,8 @@ no key (H2) and no entry (H4).
   Otherwise the message goes to the summary, `{planId with . and + as _}_validation_summary`, one
   entry per key, replaced and never duplicated. `Html.RenderPlan` renders the summary for a root
   view's plan always, since the partials that join it (same `planId`) show their messages there, and
-  for an element plan when its request validates a form; an element plan that validates nothing
-  renders none.
+  for an element plan when its request validates a form or it shows a form's server errors (F8); an
+  element plan that does neither renders none.
 - **F7 Live.** At creation (boot or slot load):
   - the DOM `input` event on a field clears its inline message;
   - DOM `blur` and `alis:commit` (M4) revalidate that one field, against every container that
@@ -577,7 +579,9 @@ no key (H2) and no entry (H4).
     shows. A message the server placed (F8) stays on `blur`: no input and no commit came since, so
     the value it judged has not changed; typing clears it and a commit re-checks the field. The form never names a component's event, so the order in which the form and the
     input's plan start does not matter, and neither does the order the containers were declared.
-- **F8 Server errors.** `showErrors(problem)` clears first.
+- **F8 Server errors.** `showErrors(problem)` clears first. A form a plan shows server errors for is a
+  form of that plan, written as a validated form is (1.1); when no validator of the plan names it, its
+  fields are the plan's rendered inputs with no tests, so its messages are placed the same way.
   - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a
     sentence) and matches a form field by its exact binding name, whatever its tests, then places
     the message as F6 does. Anything else goes to the summary.

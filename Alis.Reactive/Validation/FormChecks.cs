@@ -71,6 +71,20 @@ namespace Alis.Reactive.Validation
             return bound;
         }
 
+        /// <summary>
+        /// The inputs a form no validator of the plan names places the server's messages on: every input the plan
+        /// rendered, named as it binds, with no check of the browser's.
+        /// </summary>
+        internal static IEnumerable<CheckedField> Rendered(
+            IReadOnlyDictionary<string, RenderedInput> renderedInputs,
+            Type modelType,
+            string fieldPrefix)
+        {
+            var values = new FormFieldValues(renderedInputs, modelType, fieldPrefix);
+            return renderedInputs.Values.Select(input =>
+                new CheckedField(input.ComponentId, input.BindingPath, input.Shape, Array.Empty<BrowserRule>(), values));
+        }
+
         // Several rules on one collection each name its items: an item's field carries the checks of all of them.
         private static void Join(List<CheckedField> bound, CheckedField field)
         {

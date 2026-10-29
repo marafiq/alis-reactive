@@ -36,7 +36,7 @@ namespace Alis.Reactive
         public string PlanId => _planId.Value;
         /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
         public bool IsPartial => _scope.IsPartial;
-        internal bool RendersValidationSummary => _scope.RendersValidationSummary(_context.ValidatedRequests.Count > 0);
+        internal bool RendersValidationSummary => _scope.RendersValidationSummary(_context.Forms.Count > 0);
         internal PlanBuildContext Context => _context;
 
         /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
@@ -117,27 +117,34 @@ namespace Alis.Reactive
             return GrammarSerializer.Serialize(_context.Write());
         }
 
-        // Every rendered input joins the plan, then each validated form takes its one validator's rules: every
-        // request that validates a form names the same validator, so the form is bound once.
+        // Every rendered input joins the plan, then each form of the plan is bound. A validated form takes its one
+        // validator's rules: every request that validates a form names the same validator, so the form is bound
+        // once. A form no request validates places the server's messages on the inputs the plan rendered.
         private void ResolveAll(IServiceProvider? services)
         {
             _context.DeclareRenderedInputs();
+            var renderedInputs = _renderedInputs.Snapshot();
 
             var validated = _context.ValidatedRequests;
-            if (validated.Count == 0) return;
-
-            var ruleSource = RequireBrowserRuleSource(
-                services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
-            var renderedInputs = _renderedInputs.Snapshot();
             var oneByForm = validated
                 .Select(request => request.Validation)
                 .GroupBy(validation => validation.Form, StringComparer.Ordinal)
-                .Select(sameForm => sameForm.First());
-            foreach (var validation in oneByForm)
+                .Select(sameForm => sameForm.First())
+                .ToList();
+            if (oneByForm.Count > 0)
             {
-                var fields = validation.Rules(ruleSource);
-                _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
+                var ruleSource = RequireBrowserRuleSource(
+                    services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
+                foreach (var validation in oneByForm)
+                {
+                    var fields = validation.Rules(ruleSource);
+                    _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
+                }
             }
+
+            var unvalidated = _context.Forms.Except(oneByForm.Select(validation => validation.Form), StringComparer.Ordinal);
+            foreach (var form in unvalidated)
+                _context.Check(form, CheckedField.Rendered(renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
         }
 
         private static IBrowserRuleSource RequireBrowserRuleSource(
@@ -187,7 +194,8 @@ namespace Alis.Reactive
         internal abstract bool IsPartial { get; }
 
         /// <summary>Whether the plan renders the summary its forms show the messages no field shows in.</summary>
-        internal abstract bool RendersValidationSummary(bool validatesAForm);
+        /// <param name="hasAForm">Whether a request of the plan validates a form or an error route shows a form's errors.</param>
+        internal abstract bool RendersValidationSummary(bool hasAForm);
     }
 
     // The plan the page's partials join: their forms show their messages in its summary too, so it renders
@@ -196,7 +204,7 @@ namespace Alis.Reactive
     {
         internal override bool IsPartial => false;
 
-        internal override bool RendersValidationSummary(bool validatesAForm) => true;
+        internal override bool RendersValidationSummary(bool hasAForm) => true;
     }
 
     // A partial joins the plan of its model, whose root view renders the summary.
@@ -204,15 +212,16 @@ namespace Alis.Reactive
     {
         internal override bool IsPartial => true;
 
-        internal override bool RendersValidationSummary(bool validatesAForm) => false;
+        internal override bool RendersValidationSummary(bool hasAForm) => false;
     }
 
     // A plan of its own for one element composes with no other plan: it renders a summary when its request
-    // validates a form, and none otherwise, so a row template's many link plans add no markup.
+    // validates a form or shows a form's errors, and none otherwise, so a row template's many link plans add no
+    // markup.
     internal sealed class ElementPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => false;
 
-        internal override bool RendersValidationSummary(bool validatesAForm) => validatesAForm;
+        internal override bool RendersValidationSummary(bool hasAForm) => hasAForm;
     }
 }

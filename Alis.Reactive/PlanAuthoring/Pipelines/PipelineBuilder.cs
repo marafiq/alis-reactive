@@ -204,11 +204,17 @@ namespace Alis.Reactive.Builders
         /// Shows the response's validation errors on the form's fields and summary. It belongs inside an
         /// error route of the request that received them: <c>.OnError(400, e =&gt; e.ValidationErrors(FormId))</c>.
         /// </summary>
+        /// <remarks>
+        /// A message goes beside the input the plan rendered for the member the server names, and to the plan's
+        /// summary when the plan renders none. The form need not be validated: a form no request validates
+        /// places the server's messages on the inputs the plan rendered.
+        /// </remarks>
         /// <param name="formId">The element that holds the form's inputs.</param>
         /// <returns>This pipeline builder.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
             Context.AddStep(new ShowErrorsStep(formId));
+            Context.ShowErrorsOn(formId);
             return this;
         }
 
