@@ -26,4 +26,14 @@ public sealed class RenderingController : Controller
     {
         Summary = $"resident {handover.Resident ?? "none"}, notes {handover.Notes ?? "none"}",
     });
+
+    /// <summary>The relief nurse, rendered as the shift's Relief member.</summary>
+    public IActionResult Relief(ReliefPrefix prefix) => View(new ReliefNurse { Prefix = prefix });
+
+    /// <summary>Binds the shift the relief nurse takes over, and says whom it bound.</summary>
+    [HttpPost("/Rendering/Reliefs")]
+    public IActionResult Reliefs([FromBody] ReliefShift shift) => Json(new HandoverEcho
+    {
+        Summary = $"relief {shift.Relief.Name ?? "none"}",
+    });
 }

@@ -30,6 +30,28 @@ public sealed class VitalsCard
     public string? Pulse { get; set; }
 }
 
+/// <summary>The nurse who relieves the shift, rendered as the shift's Relief member.</summary>
+public sealed class ReliefNurse
+{
+    public ReliefPrefix Prefix { get; set; }
+
+    public string? Name { get; set; }
+}
+
+/// <summary>The shift the relief nurse takes over, as the endpoint binds it.</summary>
+public sealed class ReliefShift
+{
+    public ReliefNurse Relief { get; set; } = new();
+}
+
+/// <summary>When the relief nurse's view takes the Relief prefix: before its plan starts, or after.</summary>
+public enum ReliefPrefix
+{
+    BeforeThePlanStarts,
+
+    AfterThePlanStarts,
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class HandoverEcho
 {
