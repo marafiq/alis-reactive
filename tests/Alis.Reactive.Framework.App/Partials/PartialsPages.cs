@@ -73,6 +73,26 @@ public sealed class FluidsReading
     public int? Millilitres { get; set; }
 }
 
+/// <summary>A visitor known by name, whatever else the visit records.</summary>
+public interface INamedVisitor
+{
+    string? Visitor { get; }
+}
+
+/// <summary>A page that renders an input whose id cannot follow its member.</summary>
+public sealed class PartialRefusalsPage : INamedVisitor
+{
+    public PartialMistake Mistake { get; set; }
+
+    public string? Visitor { get; set; }
+}
+
+/// <summary>The ways an input can bind something with no class to scope its id.</summary>
+public enum PartialMistake
+{
+    TypeAPartialToAnInterface,
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class PartialsEcho
 {

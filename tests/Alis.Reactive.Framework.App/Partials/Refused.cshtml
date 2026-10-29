@@ -1,0 +1,16 @@
+@using Alis.Reactive.Framework.App.Partials
+@model PartialRefusalsPage
+@{
+    ViewData["Title"] = "A refused input";
+    var plan = Html.ReactivePlan<PartialRefusalsPage>();
+}
+<h1>A refused input</h1>
+
+@switch (Model.Mistake)
+{
+    case PartialMistake.TypeAPartialToAnInterface:
+        @await Html.PartialAsync("NamedVisitorLine", Model)
+        break;
+}
+
+@Html.RenderPlan(plan)

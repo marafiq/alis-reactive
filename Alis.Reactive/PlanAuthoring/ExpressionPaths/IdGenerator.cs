@@ -53,8 +53,15 @@ namespace Alis.Reactive
         /// </summary>
         /// <param name="declarer">The class that declares the bound member (<see cref="ExpressionPathHelper.ToDeclarer"/>).</param>
         /// <param name="mvcName">The member's full MVC name, the view's field prefix included: <c>NextOfKin.Name</c>.</param>
-        internal static string ForMember(Type declarer, string mvcName) =>
-            Scope(declarer) + "__" + ExpressionPathHelper.ToMvcElementId(mvcName);
+        internal static string ForMember(Type declarer, string mvcName)
+        {
+            if (declarer.IsInterface)
+                throw new InvalidOperationException(
+                    $"Input '{mvcName}' binds a member that {CSharpTypeName.Of(declarer)} declares. An input's id is scoped by the " +
+                    "class that declares its member, so the page's rules, sends and reads of it would not find it: type the view " +
+                    "to the class, or a base class, that declares it.");
+            return Scope(declarer) + "__" + ExpressionPathHelper.ToMvcElementId(mvcName);
+        }
 
         // The class's namespace and its name as C# writes it, after the classes it is nested in:
         // Alis.Reactive.Models.Ward+Room is Alis_Reactive_Models_Ward_Room.

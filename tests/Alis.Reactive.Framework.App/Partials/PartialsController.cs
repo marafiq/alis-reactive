@@ -36,5 +36,7 @@ public sealed class PartialsController : Controller
     public IActionResult ChartFluids([FromBody] ChartEntry<FluidsReading> entry) => Said(
         $"{entry.Reading.Millilitres?.ToString() ?? "no"} ml, initials {entry.Initials ?? "none"}");
 
+    public IActionResult Refused(PartialMistake mistake) => View("Refused", new PartialRefusalsPage { Mistake = mistake });
+
     private JsonResult Said(string summary) => Json(new PartialsEcho { Summary = summary });
 }
