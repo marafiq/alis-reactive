@@ -46,7 +46,10 @@ namespace Alis.Reactive
         /// <para>
         /// Call <c>ResolvePlan</c> at the top of a partial and <see cref="RenderPlan{TModel}"/> at the
         /// bottom. The rendered partial contributes plan JSON without emitting its own validation
-        /// summary container.
+        /// summary container: the messages no field of its forms shows go to the summary of the root
+        /// view's plan of the same model, the plan it joins. A partial of a model no root view on the page
+        /// plans (a card of its own model) joins nothing; it starts a plan of its own with
+        /// <c>ReactivePlan</c>, which renders that summary.
         /// </para>
         /// <para>
         /// Returned plan's behaviors merge into the owning view's Active Plan state.
@@ -72,7 +75,9 @@ namespace Alis.Reactive
         /// <remarks>
         /// Render the element with <paramref name="elementId"/>, wire it with <c>.Reactive(...)</c> or
         /// <see cref="HtmlExtensions.On{TModel}"/>, and write <see cref="RenderPlan{TModel}"/> next to
-        /// it. The plan has no form, so it renders no validation summary.
+        /// it. When the element's request validates a form, the plan renders the summary for the messages
+        /// no field of the form shows (a member the server names that the element's view does not
+        /// render); a plan that validates nothing renders none.
         /// </remarks>
         /// <typeparam name="TModel">View model type, providing compile-time expression paths.</typeparam>
         /// <param name="elementId">The element's id; it also identifies the plan.</param>
@@ -135,8 +140,9 @@ namespace Alis.Reactive
             new HtmlString(PlanMarkup(plan));
 #endif
 
-        // The plan's script, and for a root view the summary that takes the errors no field's own slot can
-        // show: a hidden field's, an unloaded partial's, a member the page never rendered.
+        // The plan's script, and the summary that takes the errors no field's own slot can show (a hidden
+        // field's, an unloaded partial's, a member the page never rendered): a root view's always, an
+        // element plan's when it validates a form.
         private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan) where TModel : class
         {
             var script = $"<script type=\"application/json\" id=\"alis-plan-{PlanElementId.For(plan.PlanId)}\" data-reactive-plan>{plan.Render()}</script>";

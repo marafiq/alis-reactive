@@ -557,7 +557,10 @@ no key (H2) and no entry (H4).
 - **F6 Display.** A message goes inline into `{id}_error` when that slot is renderable: it has a
   parent, and no ancestor has `hidden` or `display: none`. Then the field gets `alis-has-error`.
   Otherwise the message goes to the summary, `{planId with . and + as _}_validation_summary`, one
-  entry per key, replaced and never duplicated.
+  entry per key, replaced and never duplicated. `Html.RenderPlan` renders the summary for a root
+  view's plan always, since the partials that join it (same `planId`) show their messages there, and
+  for an element plan when its request validates a form; an element plan that validates nothing
+  renders none.
 - **F7 Live.** At creation (boot or slot load):
   - the DOM `input` event on a field clears its inline message;
   - DOM `blur` and `alis:commit` (M4) revalidate that one field, against every container that
