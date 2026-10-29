@@ -59,14 +59,18 @@ Around them:
   the developer places it (the tag helper), else after the script of the first plan of the request that
   validates or shows the form's errors. The runtime never creates it.
 - **A per-request record** (`ViewContext.HttpContext.Items`, the same member on both targets) records the
-  inputs rendered (id, view path), the summaries rendered, and each plan's view path with whether it
-  rendered. It refuses an id rendered twice (a field rendered twice with the same component is refused
-  too: two elements with one id), behavior added after a plan rendered, a plan rendered twice, and a plan
-  started but never rendered (a partial's `RenderPlan` in a section Razor does not render). It lets the
-  page's collection-item rules bind to rows rendered by partials in the same request.
-- **Rows that arrive later** bring their own checks: `plan.Checks<TValidator>(formId)` contributes the
-  checks of the inputs this plan rendered to that form. An unmounted item field is not checked (the server
-  sees no missing item); an unmounted member field is, as F5 says.
+  inputs rendered (element id, view path) and the summaries rendered. It refuses an id rendered twice (a
+  field rendered twice with the same component is refused too: two elements with one id). A plan seals when
+  it renders: behavior added after it, and a second rendering, are refused. A plan that never renders (a
+  partial's `RenderPlan` inside its own `@section`, which Razor never renders) is not detected: detecting it
+  needs a guess from render order, which misfired on a helper that renders its plan when its markup is
+  written, so the rule is documented instead.
+- **The page's model governs every row.** The page's collection-item rules (`RuleForEach`, `ChildRules`,
+  `SetValidator` on a list) are written once in the page's plan by item name and apply, when the form
+  checks, to every row mounted at that moment, whoever rendered it: the page, a partial in the same
+  request, or a row loaded later into a slot. A row partial carries no rules of its own, as MVC's
+  unobtrusive validation picks up rows added later. An unmounted item field is not checked (the server sees
+  no missing item); an unmounted member field is, as F5 says.
 - **A plan whose script sits inside an element some plan loads into** starts under that slot's owner at
   boot, so its first replacement or Unload releases it. Writing a slot's HTML with `Html.Set` in a plan that
   loads into it is refused naming `Unload`. Live-validation wiring follows the element and is released on
@@ -98,5 +102,5 @@ Around them:
 - Wave 1, in parallel: ids follow the member and `p.Bound` (rule 1); server-rendered content in a slot
   belongs to the slot; the per-request record and its refusals.
 - Wave 2: forms send and show what they hold (rule 2, rule 3's model table, the summary).
-- Wave 3: one plan call, the deletions and migrations, item rules and `Checks`, the slot-write refusal,
-  dynamic rows, the spec and the guide, net48.
+- Wave 3: one plan call, the deletions and migrations, item rules over every mounted row, the slot-write
+  refusal, dynamic rows, the spec and the guide, net48.

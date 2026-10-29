@@ -86,11 +86,11 @@ namespace Alis.Reactive
 #if NET48
         public static ReactivePlan<TModel> ElementPlan<TModel>(this HtmlHelper<TModel> html, string elementId)
             where TModel : class =>
-            Started(html.ViewContext, new ReactivePlan<TModel>(ReactivePlanScope.Element, services: null, ElementPlanId(elementId), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext)));
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, services: null, ElementPlanId(elementId), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 #else
         public static ReactivePlan<TModel> ElementPlan<TModel>(this IHtmlHelper<TModel> html, string elementId)
             where TModel : class =>
-            Started(html.ViewContext, new ReactivePlan<TModel>(ReactivePlanScope.Element, html.ViewContext.HttpContext.RequestServices, ElementPlanId(elementId), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext)));
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, html.ViewContext.HttpContext.RequestServices, ElementPlanId(elementId), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 #endif
 
         private static PlanModel.PlanId ElementPlanId(string elementId) =>
@@ -105,7 +105,7 @@ namespace Alis.Reactive
         // container in Application_Start. See ReactivePlan.RequireBrowserRuleSource.
         private static ReactivePlan<TModel> CreatePlan<TModel>(HtmlHelper<TModel> html, ReactivePlanScope scope)
             where TModel : class =>
-            Started(html.ViewContext, new ReactivePlan<TModel>(scope, services: null, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext)));
+            new ReactivePlan<TModel>(scope, services: null, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
         // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
         private static string FieldPrefixOf<TModel>(HtmlHelper<TModel> html) =>
@@ -114,20 +114,12 @@ namespace Alis.Reactive
         private static ReactivePlan<TModel> CreatePlan<TModel>(
             IHtmlHelper<TModel> html, ReactivePlanScope scope)
             where TModel : class =>
-            Started(html.ViewContext, new ReactivePlan<TModel>(scope, html.ViewContext.HttpContext.RequestServices, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext)));
+            new ReactivePlan<TModel>(scope, html.ViewContext.HttpContext.RequestServices, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
         // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
         private static string FieldPrefixOf<TModel>(IHtmlHelper<TModel> html) =>
             html.ViewData.TemplateInfo.HtmlFieldPrefix;
 #endif
-
-        // The request's record keeps each plan with the view that started it, so a plan that can no longer render is found.
-        private static ReactivePlan<TModel> Started<TModel>(ViewContext view, ReactivePlan<TModel> plan)
-            where TModel : class
-        {
-            RenderedPage.Of(view).Started(plan.Context, view);
-            return plan;
-        }
 
         /// <summary>
         /// Renders the generated plan JSON for all behaviors defined in <paramref name="plan"/>.
@@ -138,26 +130,20 @@ namespace Alis.Reactive
         /// messages no field shows go: for a root view's plan always, for an element plan when it validates
         /// a form or shows a form's errors, and for a partial's plan never. A plan renders once, after
         /// everything written to it: an input or behavior written to it later (a <c>@section</c> the layout
-        /// renders after the call), a second call, and a partial's plan still unrendered when a plan started
-        /// before it renders (a call inside the partial's <c>@section</c>, which Razor never renders) are refused.
+        /// renders after the call) and a second call are refused. Write it in the view's body or in a section
+        /// the layout renders: Razor never renders a partial's own <c>@section</c>.
         /// </remarks>
         /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
         /// <param name="plan">Reactive Plan whose generated JSON should be embedded.</param>
         /// <returns>HTML content containing the plan JSON consumed by the runtime.</returns>
 #if NET48
         public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan)
-            where TModel : class
-        {
-            RenderedPage.Of(html.ViewContext).Rendering(plan.Context);
-            return new MvcHtmlString(PlanMarkup(plan));
-        }
+            where TModel : class =>
+            new MvcHtmlString(PlanMarkup(plan));
 #else
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan)
-            where TModel : class
-        {
-            RenderedPage.Of(html.ViewContext).Rendering(plan.Context);
-            return new HtmlString(PlanMarkup(plan));
-        }
+            where TModel : class =>
+            new HtmlString(PlanMarkup(plan));
 #endif
 
         // The plan's script, and the summary that takes the errors no field's own slot can show (a hidden

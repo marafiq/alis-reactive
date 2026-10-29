@@ -17,14 +17,12 @@ public sealed class RoundsPage
 }
 
 /// <summary>
-/// Where the vitals card renders its plan: in its body, in a section of its own, or through its button's helper when
-/// the button's markup is written.
+/// Where the vitals card renders its plan: in its body, or through its button's helper when the button's markup is
+/// written.
 /// </summary>
 public enum VitalsCardPlan
 {
     InTheCardsBody,
-
-    InTheCardsSection,
 
     WhenItsButtonIsWritten,
 }

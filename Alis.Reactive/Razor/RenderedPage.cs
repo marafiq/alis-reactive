@@ -4,7 +4,6 @@ using Alis.Reactive.PlanModel;
 #if NET48
 using System.Web.Mvc;
 #else
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
@@ -13,9 +12,7 @@ namespace Alis.Reactive
     /// <summary>
     /// What the views of one request rendered, kept in the request's items so that a page, its layout and its
     /// partials write to one record whichever plan they render for: the element id of each input, with the view that
-    /// rendered it, and each plan, with the view that started it, in the order they started. An element id names one
-    /// element, so an input that renders an id a second time is refused there; a plan that cannot render any more is
-    /// refused when a plan started before it renders.
+    /// rendered it. An element id names one element, so an input that renders an id a second time is refused there.
     /// </summary>
     internal sealed class RenderedPage
     {
@@ -23,7 +20,6 @@ namespace Alis.Reactive
         private static readonly object Key = new object();
 
         private readonly Dictionary<string, string> _viewByElementId = new Dictionary<string, string>(StringComparer.Ordinal);
-        private readonly List<StartedPlan> _plans = new List<StartedPlan>();
 
         private RenderedPage()
         {
@@ -64,54 +60,6 @@ namespace Alis.Reactive
                     "ViewDataDictionary whose TemplateInfo has its own HtmlFieldPrefix).");
 
             _viewByElementId.Add(elementId, viewPath);
-        }
-
-        /// <summary>A view starts a plan.</summary>
-        internal void Started(PlanBuildContext plan, ViewContext view) => _plans.Add(new StartedPlan(plan, view));
-
-        /// <summary>
-        /// A plan renders in the view that started it. A plan another view started after it ran in a partial nested in
-        /// this view, which has finished by now. A partial has no layout, so a @section it defines never renders: a plan
-        /// of such a partial that has not rendered by now wrote its RenderPlan there, and never renders. A plan still
-        /// unrendered in a partial that defines no section may yet render, as a helper's plan does when ASP.NET Core
-        /// writes the helper's markup, after every view has run.
-        /// </summary>
-        internal void Rendering(PlanBuildContext plan)
-        {
-            var rendering = _plans.FindIndex(started => started.Plan == plan);
-            var view = _plans[rendering].View;
-            for (var later = rendering + 1; later < _plans.Count; later++)
-            {
-                var started = _plans[later];
-                if (started.Plan.Rendered || ReferenceEquals(started.View, view) || !HasSectionsNoLayoutRenders(started.View)) continue;
-                throw new InvalidOperationException(
-                    $"The plan started in {started.Plan.View} never rendered: its view finished before the plan of " +
-                    $"{plan.View} rendered. Razor never renders a partial's @section, so a @Html.RenderPlan(plan) written " +
-                    $"in one never runs: write it in the body of {started.Plan.View}, after the last behavior written to its plan.");
-            }
-        }
-
-        // The sections a view defined, kept on its page, render only in a layout; a partial has none unless it names one.
-        private static bool HasSectionsNoLayoutRenders(ViewContext view) =>
-#if NET48
-            // MVC 5 keeps a page's sections private to the page, so a partial's are out of reach: not detected.
-            false;
-#else
-            view.View is RazorView { RazorPage: var page } && page.SectionWriters.Count > 0 && string.IsNullOrEmpty(page.Layout);
-#endif
-
-        // A plan and the view it started in: a page shares its view with its layout and its sections, a partial has its own.
-        private sealed class StartedPlan
-        {
-            internal StartedPlan(PlanBuildContext plan, ViewContext view)
-            {
-                Plan = plan;
-                View = view;
-            }
-
-            internal PlanBuildContext Plan { get; }
-
-            internal ViewContext View { get; }
         }
     }
 }
