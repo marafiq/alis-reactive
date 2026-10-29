@@ -120,6 +120,12 @@ public sealed class RequestsController : Controller
     private static string Listed(List<string>? items) =>
         items is null || items.Count == 0 ? "none" : string.Join(" and ", items.Select(item => item ?? "an empty one"));
 
+    public IActionResult Round() => View(new RoundPage { Doses = { [1042] = new() } });
+
+    [HttpPost("/Requests/Rounds")]
+    public IActionResult RecordRound([FromForm] RoundPage round) =>
+        Said(round.Doses.TryGetValue(1042, out var dose) ? $"dose for 1042: {dose.Amount ?? "none"}" : "no dose for 1042");
+
     public IActionResult SignIn() => View(new SignInPage());
 
     [HttpPost("/Requests/SignIns")]

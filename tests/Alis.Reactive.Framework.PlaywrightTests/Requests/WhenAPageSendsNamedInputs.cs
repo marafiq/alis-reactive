@@ -6,8 +6,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// nothing, a number left empty as zero), into a request
 /// member of a type the input's value binds to (the same type, one that may be empty, a base type, another
 /// collection of the same items), matched ignoring case, through a list item or into a member that takes any
-/// name; and in a partial rendered for a member of the page's model, under that member's prefix. An input no
-/// longer on the page is sent as nothing (M5).
+/// name; and in a partial rendered for a member of the page's model, under that member's prefix, or for an entry
+/// of a dictionary keyed by a number, posted as form data. An input no longer on the page is sent as nothing (M5).
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageSendsNamedInputs : AppPageTest
@@ -109,6 +109,17 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
         await Button("Record the dose").ClickAsync();
 
         await Expect(Line("dose")).ToHaveTextAsync("dose for 1042: two tablets");
+    }
+
+    [Test]
+    public async Task a_partial_rendered_for_an_entry_of_a_dictionary_keyed_by_number_reaches_that_entry_as_form_data()
+    {
+        await Open("/Requests/Round");
+        await Type("Dose", "two tablets");
+
+        await Button("Record the dose").ClickAsync();
+
+        await Expect(Line("dose-bound")).ToHaveTextAsync("dose for 1042: two tablets");
     }
 
     [Test]

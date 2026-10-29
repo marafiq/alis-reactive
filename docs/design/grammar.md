@@ -454,6 +454,12 @@ if (form.validate()) {                            // .Validate<V>(container); ou
 - **Keys.** A member's key is its MVC binding name. `values` is a nested record for JSON
   (`{"Address":{"City":..}}`). For a query string or form data it is flat (`Address.City`,
   `Lines[0].Sku`), because only C# knows a dictionary from an object.
+- **A partial's prefix.** A member the view names is read from its types, so `m => m.Doses[1042]` of
+  a `Dictionary<int, T>` is the entry keyed `1042` in a JSON body. A partial's field prefix is text,
+  and in a JSON body a number in it is a list position: a card rendered under `Lines[2]` fills the
+  third item. A partial rendered for an entry of a dictionary keyed by a number (`Doses[1042]`) posts
+  as form data (`AsFormData()`), whose flat name `Doses[1042].Amount` MVC binds into the entry; as
+  JSON its body holds a list at `Doses`, which a dictionary does not bind.
 - **`Form()`** writes every input into the authored JSON record leaf by leaf with
   `model.fill(record)`, so an authored value beside an input (`Address.Verified` next to
   `Address.City`) is kept and an input wins only its own leaf. A query string or form data spreads

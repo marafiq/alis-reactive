@@ -17,6 +17,13 @@ namespace Alis.Reactive.Builders.Requests
     /// <c>{placeholder}</c> in the URL fills the path; the others go to the query string for GET, and to the
     /// JSON or form-data body otherwise.
     /// </para>
+    /// <para>
+    /// A form input of a partial is sent under the view's field prefix, and in a JSON body a number in that
+    /// prefix is a list position: a card rendered under <c>Lines[2]</c> fills the third line. An entry of a
+    /// dictionary keyed by a number (<c>Doses[1042]</c> of a <c>Dictionary&lt;int, Dose&gt;</c>) is not a position,
+    /// so a partial rendered for it posts with <c>AsFormData()</c>, where MVC binds <c>Doses[1042].Amount</c> into
+    /// the entry. A member the view itself names, <c>m =&gt; m.Doses[1042]</c>, is the entry in either body.
+    /// </para>
     /// <code>
     /// p.Get("/suites/{suiteType}/rate")
     ///  .Gather&lt;SuiteRateQuery&gt;(g =&gt; g.Set(x =&gt; x.SuiteType, suite.Value));
