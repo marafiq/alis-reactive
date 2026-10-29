@@ -100,6 +100,19 @@ public sealed class WhenAPageSendsRequests : AppPageTest
     }
 
     [Test]
+    public async Task a_post_whose_only_member_is_set_to_nothing_sends_that_member_as_null_in_its_json_body()
+    {
+        await Open("/Requests/Desk");
+
+        var request = await Page.RunAndWaitForRequestAsync(
+            () => Button("Post the estimate left empty").ClickAsync(),
+            sent => sent.Url.EndsWith("/Requests/Estimates"));
+
+        Assert.That(request.PostData, Is.EqualTo("{\"Estimate\":null}"));
+        await Expect(Line("estimate")).ToHaveTextAsync("no estimate");
+    }
+
+    [Test]
     public async Task an_error_status_the_page_names_runs_its_own_route_with_its_body()
     {
         await Open("/Requests/Desk");

@@ -52,6 +52,29 @@ public sealed class ContactCard
     public string? Name { get; set; }
 }
 
+/// <summary>The keyholders of a room: a card for the primary keyholder, saved by its own plan and checked by the server.</summary>
+public sealed class KeyholdersPage
+{
+    public KeyholderCard Primary { get; set; } = new();
+}
+
+/// <summary>A keyholder: the card renders the name; how they are related is the server's to ask for.</summary>
+public sealed class KeyholderCard
+{
+    public string? Name { get; set; }
+
+    public string? Relationship { get; set; }
+}
+
+/// <summary>The keyholder card's rule: a name the browser can check is given.</summary>
+public sealed class KeyholderRules : ReactiveValidator<KeyholderCard>
+{
+    public KeyholderRules()
+    {
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Name the keyholder.");
+    }
+}
+
 /// <summary>A noticeboard with a slot a notice is pinned into.</summary>
 public sealed class NoticeboardPage;
 

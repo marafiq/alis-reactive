@@ -36,7 +36,7 @@ namespace Alis.Reactive
         public string PlanId => _planId.Value;
         /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
         public bool IsPartial => _scope.IsPartial;
-        internal bool RendersValidationSummary => _scope.RendersValidationSummary;
+        internal bool RendersValidationSummary => _scope.RendersValidationSummary(_context.ValidatedRequests.Count > 0);
         internal PlanBuildContext Context => _context;
 
         /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
@@ -181,29 +181,33 @@ namespace Alis.Reactive
 
         internal abstract bool IsPartial { get; }
 
-        internal abstract bool RendersValidationSummary { get; }
+        /// <summary>Whether the plan renders the summary its forms show the messages no field shows in.</summary>
+        internal abstract bool RendersValidationSummary(bool validatesAForm);
     }
 
+    // The plan the page's partials join: their forms show their messages in its summary too, so it renders
+    // one whether or not it validates a form itself.
     internal sealed class RootViewPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => false;
 
-        internal override bool RendersValidationSummary => true;
+        internal override bool RendersValidationSummary(bool validatesAForm) => true;
     }
 
+    // A partial joins the plan of its model, whose root view renders the summary.
     internal sealed class PartialViewPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => true;
 
-        internal override bool RendersValidationSummary => false;
+        internal override bool RendersValidationSummary(bool validatesAForm) => false;
     }
 
-    // A plan of its own for one element (a link in a row template): it composes with no other plan
-    // and has no form, so it renders no validation summary.
+    // A plan of its own for one element composes with no other plan: it renders a summary when its request
+    // validates a form, and none otherwise, so a row template's many link plans add no markup.
     internal sealed class ElementPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => false;
 
-        internal override bool RendersValidationSummary => false;
+        internal override bool RendersValidationSummary(bool validatesAForm) => validatesAForm;
     }
 }

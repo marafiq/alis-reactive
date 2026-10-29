@@ -1,0 +1,13 @@
+@using Alis.Reactive.Framework.App.Requests
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model RoundPage
+@{
+    ViewData["Title"] = "The evening round";
+
+    // The dose card is rendered for the round's entry under resident 1042, so its input binds as Doses[1042].Amount.
+    var card = new ViewDataDictionary(ViewData);
+    card.TemplateInfo.HtmlFieldPrefix = "Doses[1042]";
+}
+<h1>The evening round</h1>
+
+@await Html.PartialAsync("RoundDoseCard", Model.Doses[1042], card)

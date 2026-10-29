@@ -28,6 +28,14 @@ public sealed class PlansController : Controller
     public IActionResult SaveContacts([FromBody] ContactsPage contacts) => Said(
         $"next of kin {contacts.NextOfKin.Name ?? "none"}, alternate {contacts.Alternate.Name ?? "none"}");
 
+    public IActionResult Keyholders() => View(new KeyholdersPage());
+
+    /// <summary>Refuses a keyholder whose relationship is not given, by the member's binding name.</summary>
+    [HttpPost("/Plans/Keyholders")]
+    public IActionResult SaveKeyholders([FromBody] KeyholdersPage keyholders) => keyholders.Primary.Relationship is null
+        ? BadRequest(new { errors = new Dictionary<string, string[]> { ["Primary.Relationship"] = ["Say how the keyholder is related."] } })
+        : Said($"keyholder {keyholders.Primary.Name}");
+
     public IActionResult Noticeboard() => View(new NoticeboardPage());
 
     public IActionResult Notice() => PartialView("Notice", new Notice());

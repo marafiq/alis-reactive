@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Plans
+@model KeyholderCard
+@{
+    // The card's plan is its save button's own; the card renders the keyholder's name, not how they are related.
+    var plan = Html.ElementPlan<KeyholderCard>("save-keyholder");
+}
+<section id="keyholder" aria-label="The keyholder">
+    <h2>The keyholder</h2>
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("The keyholder's name")).Entry(); }
+
+    @(plan.Button("save-keyholder", "Save the keyholder")
+        .Reactive(button => button.Click, p => p.Post("/Plans/Keyholders")
+            .Gather(g => g.Form())
+            .Validate<KeyholderRules>("keyholder")
+            .Response(r => r.OnError(400, e => e.ValidationErrors("keyholder")))))
+</section>
+
+@Html.RenderPlan(plan)
