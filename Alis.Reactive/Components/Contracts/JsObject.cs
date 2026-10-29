@@ -40,6 +40,9 @@ namespace Alis.Reactive
     /// hands its callback, or a registered plugin. A write or a call lands in the callback the line is
     /// written in, whichever variable holds the object. A method that returns a value runs in that
     /// callback too, once: before the first line that uses its result, or at its own line when no line does.
+    /// An async result first used inside a branch's arm, a request's WhileLoading or Finally, a request its
+    /// form checks, or a chained or parallel request is asked again by a line outside that part, which
+    /// cannot know the part ran.
     /// </para>
     /// </remarks>
     public abstract class JsObject

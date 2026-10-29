@@ -188,7 +188,8 @@ commits it. Validation, gather and `alis:commit` follow from it with no further 
 is an ordinary C# data class; an argument of that type reaches the method as the object of its
 members by their JSON names, whether the page wrote it or a response carried it. A method that
 returns a value runs once per callback, before the first line that reads its result, or at its own
-line when no line does; a `MethodAsync<T>` result makes that first line wait for the promise.
+line when no line does; a `MethodAsync<T>` result makes that first line wait for the promise, and is
+asked again by a line outside the branch arm or request part where it was first read (grammar.md 3.1).
 
 **Step 3: render it, then use it as the object.** The render helper writes the component's own
 markup with the id and name the framework derives from the model, and hands the markup back:
