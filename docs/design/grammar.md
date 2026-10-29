@@ -56,6 +56,8 @@ That is the whole document. The grammar names no feature.
     declaration a test came from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
     know which form will contain it.
+- **A hub is plugin data.** `alis.hub` data is `{}`: it carries nothing, and every plan that names a
+  hub writes it, so the plan holds the hub's connection under its owner (B1).
 - **No owner field.** The owner of a plan is whoever discovered it: the page at boot, or a slot when
   it loads.
 
@@ -349,8 +351,8 @@ A failing handler is logged and stops no other handler.
 ### 3.5 Boot and lifetime
 
 1. **Owners.** An owner is the page, or a slot. It holds disposers: its handler subscriptions, its
-   plugin data contributions, and the connection subscriptions those plugins made for it. It knows
-   nothing about what they are.
+   plugin data contributions (a hub's connection is held by one), and the stream subscriptions those
+   plugins made for it. It knows nothing about what they are.
 2. **Starting an owner.** For the page at boot, or a slot at load:
    1. discover the plan scripts and compose the ones that share a `planId`;
    2. locate the objects;
@@ -598,20 +600,27 @@ no key (H2) and no entry (H4).
 ### 6.6 `stream` (`plugin("alis.stream", url)`)
 
 - **R1 One connection.** One `EventSource` per URL, counted by subscriptions, and closed when the
-  last one is released.
+  last one is released. A plan that only names the stream, to read `readyState` or call `close()`,
+  holds nothing: a URL no handler listens to has no source and reads as closed.
 - **R2 Events.** A named event subscribes by its name, and unnamed messages arrive as `message`. The
   payload is `JSON.parse(data)`.
 - **R3 Retry.** A permanent close adds a marker to `#alis-realtime-connection-retry-container`. One
-  click retries every dropped connection, and the retried subscriptions keep their owners. Releasing
-  a connection (its last subscription's owner unloads) withdraws its marker, for a stream and a hub alike.
+  click takes every marker and retries its connection, and the retried subscriptions keep their
+  owners: the offer is withdrawn when the retry starts, and a connection is offered again only if
+  that retry fails, so no retry runs beside another. Releasing a connection withdraws its marker, for
+  a stream (its last subscription's owner unloads) and a hub (its last holder's owner unloads) alike.
 - **R4 Members.** `readyState` is the `EventSource`'s (0 connecting, 1 open, 2 closed); `close()`
   closes it, and a close is not a drop: nothing is retried.
 
 ### 6.7 `hub` (`plugin("alis.hub", url)`)
 
-- **B1 One connection.** One `HubConnection` per URL, counted by subscriptions, with credentials and
-  automatic reconnect.
-- **B2 Start.** Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator (R3).
+- **B1 One connection.** One `HubConnection` per URL, with credentials and automatic reconnect,
+  counted by holders. A plan that names the hub, in a handler or a step, holds its connection for as
+  long as its owner lives: the hold is its data contribution (1.1), taken when the owner starts, so
+  a step reaches a connection some owner holds and never opens one of its own. The connection stops,
+  and its marker is withdrawn (R3), when the last owner holding it is disposed.
+- **B2 Start.** Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator (R3). A
+  retry from the indicator starts the same way, and offers again only if all four attempts fail.
 - **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
   method's single argument.
 - **B4 Members.** `invoke(method, …args)` is async and returns a value; `send(method, …args)` is
