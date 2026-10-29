@@ -26,11 +26,6 @@ namespace Alis.Reactive.Validation
             return true;
         }
 
-        // The member an enum's default binds as (its member with value 0), which the server's NotEmpty refuses.
-        // A nullable enum's default is null, which binds as blank, so its member with value 0 is an answer.
-        private static string? DefaultMemberOf(Type memberType) =>
-            memberType.IsEnum ? EnumMember.Default(memberType)?.ToString() : null;
-
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Not(BlankOrDefault(value, fieldShape));
     }
@@ -92,7 +87,10 @@ namespace Alis.Reactive.Validation
             G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0));
     }
 
-    /// <summary>Nothing is entered. On a list, no items.</summary>
+    /// <summary>
+    /// Nothing is entered. On a list, no items; on an enum, nothing chosen or the default member, and on a
+    /// nullable enum, whose default is null, nothing chosen.
+    /// </summary>
     public sealed class EmptyRule : BrowserRule
     {
         internal EmptyRule(string message, Condition condition)
@@ -104,7 +102,9 @@ namespace Alis.Reactive.Validation
 
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
-            rule = field.Shape is ArrayShape ? new NoItemsRule(Message, Condition) : this;
+            rule = field.Shape is ArrayShape ? new NoItemsRule(Message, Condition)
+                : DefaultMemberOf(field.Type) is string member ? new DefaultMemberRule(member, Message, Condition)
+                : this;
             return true;
         }
 
@@ -126,6 +126,24 @@ namespace Alis.Reactive.Validation
         // counted; a missing one has none, as the server's Empty passes null.
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0)));
+    }
+
+    /// <summary>Nothing chosen, or the enum member the type's default binds as: what <see cref="BrowserRule.Empty"/> asks of an enum.</summary>
+    public sealed class DefaultMemberRule : BrowserRule
+    {
+        internal DefaultMemberRule(string defaultMember, string message, Condition condition)
+            : base(message, condition)
+        {
+            DefaultMember = defaultMember;
+        }
+
+        /// <summary>The member the type's default binds as, which the rule takes.</summary>
+        public string DefaultMember { get; }
+
+        internal override string Name => "empty";
+
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
+            G.Or(Blank(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember)));
     }
 
     /// <summary>Text at least <see cref="Length"/> characters long.</summary>

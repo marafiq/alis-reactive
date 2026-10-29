@@ -71,6 +71,18 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"booked from wing {ride.Wing} at {ride.PickUp:hh\\:mm}" });
     }
 
+    public IActionResult GuestMeal() => View(new GuestMealOrder());
+
+    /// <summary>Checks the meal by its rules; 400 with every message by field, or ordered from the menu it bound.</summary>
+    [HttpPost("/Validation/GuestMeal")]
+    public IActionResult OrderGuestMeal([FromBody] GuestMealOrder meal, [FromServices] GuestMealRules rules)
+    {
+        var result = rules.Validate(meal);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"ordered from the {meal.Menu} menu" });
+    }
+
     public IActionResult Handover() => View(new HandoverNote());
 
     /// <summary>A handover whose one form a second request validates by another validator, the one the address names.</summary>

@@ -197,6 +197,12 @@ namespace Alis.Reactive.Validation
         // with no text form. A pattern with one character of anything fails on exactly those.
         private static Expr NothingEntered(Expr v) => G.Not(Matches(v, "[\\s\\S]"));
 
+        // The member an enum's default binds as (its member with value 0): what the server's NotEmpty refuses and
+        // its Empty takes. A nullable enum's default is null, which binds as blank, so its member with value 0 is
+        // an answer like any other.
+        private protected static string? DefaultMemberOf(Type memberType) =>
+            memberType.IsEnum ? EnumMember.Default(memberType)?.ToString() : null;
+
         private protected static Expr IsNumber(Expr value) => G.Eq(G.Op(Operator.Finite, value), value);
 
         // The shapes the browser orders as the server does: numbers, flags and dates. The server orders text by
