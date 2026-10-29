@@ -50,7 +50,7 @@ namespace Alis.Reactive.Validation
             return field.Shape is not ArrayShape && (!field.Type.IsValueType || Nullable.GetUnderlyingType(field.Type) != null);
         }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) => G.Not(Blank(value));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) => G.Not(NothingEntered(value));
     }
 
     /// <summary>An enum member other than the type's default one: what <see cref="BrowserRule.NotEmpty"/> asks of an enum.</summary>
@@ -68,7 +68,7 @@ namespace Alis.Reactive.Validation
         internal override string Name => "required";
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Not(G.Or(Blank(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember))));
+            G.Not(G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember))));
     }
 
     /// <summary>A list has at least one item: what <see cref="BrowserRule.NotEmpty"/> asks of a list.</summary>
@@ -143,7 +143,7 @@ namespace Alis.Reactive.Validation
         internal override string Name => "empty";
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Or(Blank(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember)));
+            G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember)));
     }
 
     /// <summary>Text at least <see cref="Length"/> characters long.</summary>

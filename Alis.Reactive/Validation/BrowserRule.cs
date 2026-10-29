@@ -159,8 +159,6 @@ namespace Alis.Reactive.Validation
 
         // ── how a check reads a value ────────────────────────────────────────────
 
-        private protected const string NetWhitespace = "\\t\\n\\v\\f\\r \\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000";
-
         // One @, with something on each side: what EmailAddress() accepts.
         private const string EmailPattern = "^[^@]+@[^@]+$";
 
@@ -179,9 +177,6 @@ namespace Alis.Reactive.Validation
 
         private protected static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.None);
 
-        // Nothing bound: nothing entered, or text of only whitespace, which MVC binds as null.
-        private protected static Expr Blank(Expr v) => G.Or(NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$"));
-
         // What NotEmpty rejects, as far as the field's shape tells: nothing entered (the binding read already
         // reads text of only whitespace as nothing), and the type's default: false, 0, or 0001-01-01 for a date.
         private protected static Expr BlankOrDefault(Expr v, Shape fieldShape)
@@ -194,8 +189,9 @@ namespace Alis.Reactive.Validation
         }
 
         // Nothing was entered: a missing value, one whose text is "" (an empty list included), or one
-        // with no text form. A pattern with one character of anything fails on exactly those.
-        private static Expr NothingEntered(Expr v) => G.Not(Matches(v, "[\\s\\S]"));
+        // with no text form. A pattern with one character of anything fails on exactly those. The binding
+        // read has already made text of only whitespace missing (grammar.md 2.1).
+        private protected static Expr NothingEntered(Expr v) => G.Not(Matches(v, "[\\s\\S]"));
 
         // The member an enum's default binds as (its member with value 0): what the server's NotEmpty refuses and
         // its Empty takes. A nullable enum's default is null, which binds as blank, so its member with value 0 is
@@ -254,15 +250,10 @@ namespace Alis.Reactive.Validation
             }
         }
 
-        // A nullable as MVC binds it: a missing value stays missing, and for a number, boolean or date so
-        // does blank text; anything else converts under the inner shape.
-        private static Expr Nullable(Expr value, Shape inner, Func<Expr, Shape, Expr> convert)
-        {
-            var absent = G.Eq(value, G.Null);
-            if (inner is NumberShape or BooleanShape or DateShape or InstantShape)
-                absent = G.Or(absent, Matches(value, "^[" + NetWhitespace + "]*$"));
-            return G.Op(Operator.Cond, absent, G.Null, convert(value, inner));
-        }
+        // A nullable as MVC binds it: a missing value stays missing (the binding read makes blank text one);
+        // anything else converts under the inner shape.
+        private static Expr Nullable(Expr value, Shape inner, Func<Expr, Shape, Expr> convert) =>
+            G.Op(Operator.Cond, G.Eq(value, G.Null), G.Null, convert(value, inner));
 
         private protected static decimal? AsNumber(object? value) => value switch
         {
