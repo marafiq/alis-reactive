@@ -26,7 +26,13 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         return View(page);
     }
 
-    public IActionResult Ward([FromQuery] bool pageListens = false) => View(new WardPage(pageListens));
+    /// <summary>The ward page; the server refuses its first calls to the line when asked to.</summary>
+    public IActionResult Ward([FromQuery] bool pageListens = false, [FromQuery] int refusals = 0)
+    {
+        var page = new WardPage(pageListens);
+        exchange.World(page.World).RefuseNegotiations(refusals);
+        return View(page);
+    }
 
     public IActionResult Bed([FromQuery] string world) => PartialView(new BedCard(world));
 

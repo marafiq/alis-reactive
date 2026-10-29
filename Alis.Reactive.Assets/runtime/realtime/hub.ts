@@ -2,8 +2,8 @@
 // so a page with a hub trigger needs no script of its own.
 // B1 One HubConnection per URL, with credentials and automatic reconnect, counted by holders: a plan
 //    that names the hub holds its connection for as long as the plan's owner lives (its data
-//    contribution). The connection stops, and its retry offer is withdrawn, when the last owner
-//    holding it is disposed.
+//    contribution). The connection stops, a start still trying it makes no further attempt, and its
+//    retry offer is withdrawn, when the last owner holding it is disposed.
 // B2 Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator. A click on the
 //    offer takes it and starts again; the offer comes back only if every attempt of that start fails.
 // B3 Client methods are events, matched without regard to case; the payload is the single argument.
@@ -43,9 +43,11 @@ async function startWithRetry(managed: Managed, url: string): Promise<void> {
       log.warn("start.retry", { hubUrl: url, attempt: attempt + 1, delay, error: toJavaScriptString(error) });
       await new Promise(resolve => setTimeout(resolve, delay));
     }
+    // Released meanwhile: a start never outlives its holders, so it tries no more and offers nothing.
+    if (managed.stopping) return;
   }
   log.error("start.failed", { hubUrl: url, attempts: startDelays.length });
-  if (hubs.get(url) === managed) showRetryIndicator(url, () => retry(managed, url));
+  showRetryIndicator(url, () => retry(managed, url));
 }
 
 // The offer is shown only on a disconnected connection no start is running for, and a click takes it,
