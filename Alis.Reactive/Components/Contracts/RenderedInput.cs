@@ -45,7 +45,7 @@ namespace Alis.Reactive
 
         internal bool SameAs(RenderedInput other) =>
             _identity.Id.SameAs(other._identity.Id)
-            && ComponentVendor.Equals(other.ComponentVendor)
+            && ComponentVendor.SameAs(other.ComponentVendor)
             && _identity.Binding.SameAs(other._identity.Binding)
             && Input.Matches(other.Input)
             && _kind.SameAs(other._kind)

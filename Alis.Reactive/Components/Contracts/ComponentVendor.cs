@@ -26,7 +26,7 @@ namespace Alis.Reactive
     ///     "callbell", objectPath: "callBell", payload: VendorEventPayload.Argument);
     /// </code>
     /// </remarks>
-    public sealed class ComponentVendor : IEquatable<ComponentVendor>
+    public sealed class ComponentVendor
     {
         private static readonly Regex NamePattern =
             new Regex(@"^[a-zA-Z][a-zA-Z0-9_-]*$", RegexOptions.Compiled);
@@ -125,19 +125,11 @@ namespace Alis.Reactive
                 _listening,
                 Vendor.PayloadOf(_payload));
 
-        /// <inheritdoc />
-        public bool Equals(ComponentVendor? other) =>
-            other != null
-            && Name == other.Name
+        internal bool SameAs(ComponentVendor other) =>
+            Name == other.Name
             && _objectPath.SameAs(other._objectPath)
             && _listening.SameAs(other._listening)
             && _payload == other._payload;
-
-        /// <inheritdoc />
-        public override bool Equals(object? obj) => Equals(obj as ComponentVendor);
-
-        /// <inheritdoc />
-        public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(Name);
 
         /// <inheritdoc />
         public override string ToString() => Name;
