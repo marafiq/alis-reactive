@@ -59,9 +59,10 @@ namespace Alis.Reactive
 
         /// <summary>
         /// The class whose scope the id of the member's input takes: the class that declares the chain's last
-        /// member, by its base definition (<c>KinCard</c> for <c>m =&gt; m.NextOfKin.Name</c>, the page's model for
-        /// <c>m =&gt; m.Phones[0]</c>). A member an interface declares, read on a class, is declared by the class that
-        /// implements it; read on the interface itself it is the interface, which scopes no id.
+        /// member, by its base definition (<c>KinCard</c> for <c>m =&gt; m.NextOfKin.Name</c>, the class that
+        /// declares <c>Phones</c> for <c>m =&gt; m.Phones[0]</c>). A member an interface declares, read on a class,
+        /// is declared by the class that implements it; read on the interface itself it is the interface, which
+        /// scopes no id.
         /// </summary>
         /// <remarks>
         /// A lambda with no member (<c>m =&gt; m</c> in a template of a text member) is refused: the view's own
