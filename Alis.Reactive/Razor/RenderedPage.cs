@@ -4,6 +4,7 @@ using Alis.Reactive.PlanModel;
 #if NET48
 using System.Web.Mvc;
 #else
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
@@ -69,9 +70,11 @@ namespace Alis.Reactive
         internal void Started(PlanBuildContext plan, ViewContext view) => _plans.Add(new StartedPlan(plan, view));
 
         /// <summary>
-        /// A plan renders in the view that started it. A plan another view started after it ran in a view nested in
-        /// this one, a partial, which has finished by now; one of those that has not rendered never will, as a plan
-        /// rendered in a partial's @section never does. Plans of one view render in the order the view writes.
+        /// A plan renders in the view that started it. A plan another view started after it ran in a partial nested in
+        /// this view, which has finished by now. A partial has no layout, so a @section it defines never renders: a plan
+        /// of such a partial that has not rendered by now wrote its RenderPlan there, and never renders. A plan still
+        /// unrendered in a partial that defines no section may yet render, as a helper's plan does when ASP.NET Core
+        /// writes the helper's markup, after every view has run.
         /// </summary>
         internal void Rendering(PlanBuildContext plan)
         {
@@ -80,13 +83,22 @@ namespace Alis.Reactive
             for (var later = rendering + 1; later < _plans.Count; later++)
             {
                 var started = _plans[later];
-                if (started.Plan.Rendered || ReferenceEquals(started.View, view)) continue;
+                if (started.Plan.Rendered || ReferenceEquals(started.View, view) || !HasSectionsNoLayoutRenders(started.View)) continue;
                 throw new InvalidOperationException(
                     $"The plan started in {started.Plan.View} never rendered: its view finished before the plan of " +
                     $"{plan.View} rendered. Razor never renders a partial's @section, so a @Html.RenderPlan(plan) written " +
                     $"in one never runs: write it in the body of {started.Plan.View}, after the last behavior written to its plan.");
             }
         }
+
+        // The sections a view defined, kept on its page, render only in a layout; a partial has none unless it names one.
+        private static bool HasSectionsNoLayoutRenders(ViewContext view) =>
+#if NET48
+            // MVC 5 keeps a page's sections private to the page, so a partial's are out of reach: not detected.
+            false;
+#else
+            view.View is RazorView { RazorPage: var page } && page.SectionWriters.Count > 0 && string.IsNullOrEmpty(page.Layout);
+#endif
 
         // A plan and the view it started in: a page shares its view with its layout and its sections, a partial has its own.
         private sealed class StartedPlan

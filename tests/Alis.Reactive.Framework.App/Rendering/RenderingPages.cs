@@ -16,12 +16,17 @@ public sealed class RoundsPage
     public string? Resident { get; set; }
 }
 
-/// <summary>Where the vitals card renders its plan: in its body, or in a section of its own.</summary>
+/// <summary>
+/// Where the vitals card renders its plan: in its body, in a section of its own, or through its button's helper when
+/// the button's markup is written.
+/// </summary>
 public enum VitalsCardPlan
 {
     InTheCardsBody,
 
     InTheCardsSection,
+
+    WhenItsButtonIsWritten,
 }
 
 /// <summary>The resident's vitals, recorded on a card of their own during the round.</summary>

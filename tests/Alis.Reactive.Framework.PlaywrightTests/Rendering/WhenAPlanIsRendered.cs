@@ -70,6 +70,16 @@ public sealed class WhenAPlanIsRendered : AppPageTest
     }
 
     [Test]
+    public async Task a_partials_plan_a_helper_renders_when_its_markup_is_written_runs_beside_the_page_plan()
+    {
+        await Open("/Rendering/Rounds?card=WhenItsButtonIsWritten");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Record the vitals", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#vitals-state")).ToHaveTextAsync("recorded");
+    }
+
+    [Test]
     public async Task a_partials_plan_rendered_in_the_partials_own_section_is_refused_as_never_rendered()
     {
         await Render("/Rendering/Rounds?card=InTheCardsSection");
