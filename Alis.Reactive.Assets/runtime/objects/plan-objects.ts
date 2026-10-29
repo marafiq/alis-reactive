@@ -31,7 +31,7 @@ export class PlanObjects implements Objects {
   subscribe(id: string, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const locator = this.locator(id);
     switch (locator.kind) {
-      case "plugin":  return subscribePlugin(locator, path, event, listener, owner);
+      case "plugin":  return subscribePlugin(locator, event, listener, owner);
       case "element": return this.subscribeElement(locator, path, event, listener, owner);
       default:        return assertNever(locator, "object locator");
     }
@@ -60,10 +60,8 @@ export class PlanObjects implements Objects {
   }
 }
 
-// A plugin's object has no nested objects: a handler subscribes to the plugin itself.
-function subscribePlugin(locator: PluginLocator, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
-  if (path.length > 0) throw new Error(`[alis] plugin "${locator.name}" has no object at ${path.join(".")}`);
-  const plugin = pluginNamed(locator.name);
-  if (!plugin.subscribe) throw new Error(`[alis] plugin "${locator.name}" has no events`);
-  plugin.subscribe(locator.key, event, listener, owner);
+// A handler subscribes to the plugin itself, never to an object it holds (the C# refuses one), and only
+// the framework's own plugins raise events: alis.document, alis.stream and alis.hub, each with subscribe.
+function subscribePlugin(locator: PluginLocator, event: string, listener: Listener, owner: Owner): void {
+  pluginNamed(locator.name).subscribe!(locator.key, event, listener, owner);
 }
