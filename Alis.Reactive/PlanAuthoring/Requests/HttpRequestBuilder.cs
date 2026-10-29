@@ -80,13 +80,19 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Runs client validation for the target container before sending the request.</summary>
+        /// <remarks>
+        /// A form is validated by one validator: every request of the plan that validates the form names the
+        /// same one, and the form's browser checks are that validator's rules. A request that names another
+        /// validator for the same form is refused where the page renders; give each validator a form of its
+        /// own, or write one validator whose rules differ by <c>When</c> conditions.
+        /// </remarks>
         /// <typeparam name="TValidationSource">Source type whose metadata declares the client validation rules.</typeparam>
         /// <param name="formId">DOM element ID of the form container for error display.</param>
         public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId)
             where TValidationSource : class
         {
             if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
-            var validation = new FormValidation(source => source.GetBrowserRules<TValidationSource>(), CSharpTypeName.Of(typeof(TValidationSource)), formId);
+            var validation = new FormValidation(source => source.GetBrowserRules<TValidationSource>(), typeof(TValidationSource), formId);
             Step.Validation = validation;
             _context.ValidateBefore(Step, validation);
             return this;

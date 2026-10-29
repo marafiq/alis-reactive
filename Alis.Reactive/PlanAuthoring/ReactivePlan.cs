@@ -117,7 +117,8 @@ namespace Alis.Reactive
             return GrammarSerializer.Serialize(_context.Write());
         }
 
-        // Every rendered input joins the plan, then each validated form takes its validator's rules.
+        // Every rendered input joins the plan, then each validated form takes its one validator's rules: every
+        // request that validates a form names the same validator, so the form is bound once.
         private void ResolveAll(IServiceProvider? services)
         {
             _context.DeclareRenderedInputs();
@@ -126,12 +127,16 @@ namespace Alis.Reactive
             if (validated.Count == 0) return;
 
             var ruleSource = RequireBrowserRuleSource(
-                services, validated[0].Validation.ValidatorName, $"Request at '{validated[0].Request.Url}'");
+                services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
             var renderedInputs = _renderedInputs.Snapshot();
-            foreach (var (_, form) in validated)
+            var oneByForm = validated
+                .Select(request => request.Validation)
+                .GroupBy(validation => validation.Form, StringComparer.Ordinal)
+                .Select(sameForm => sameForm.First());
+            foreach (var validation in oneByForm)
             {
-                var fields = form.Rules(ruleSource);
-                _context.Check(form.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
+                var fields = validation.Rules(ruleSource);
+                _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
             }
         }
 

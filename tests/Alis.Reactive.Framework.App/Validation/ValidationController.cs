@@ -35,6 +35,47 @@ public sealed class ValidationController : Controller
 
     public IActionResult UnregisteredGuest() => View(new UnregisteredGuest());
 
+    public IActionResult Incident() => View(new IncidentReport());
+
+    /// <summary>Checks the report by its rules; 400 with every message by field, or filed with the photos it bound.</summary>
+    [HttpPost("/Validation/Incident")]
+    public IActionResult FileIncident([FromForm] IncidentReport report, [FromServices] IncidentReportRules rules)
+    {
+        var result = rules.Validate(report);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "filed with " + string.Join(", ", report.Photos!.Select(photo => photo.FileName)) });
+    }
+
+    public IActionResult Handover() => View(new HandoverNote());
+
+    /// <summary>A handover whose one form a second request validates by another validator, the one the address names.</summary>
+    public IActionResult HandoverRefused(HandoverMistake mistake)
+    {
+        ViewData["Mistake"] = mistake;
+        return View(new HandoverNote());
+    }
+
+    /// <summary>Checks the draft by the handover's rules; 400 with every message by field, or saved.</summary>
+    [HttpPost("/Validation/Handover/Draft")]
+    public IActionResult SaveHandoverDraft([FromBody] HandoverNote note, [FromServices] HandoverRules rules)
+    {
+        var result = rules.Validate(note);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"draft saved for {note.Resident}" });
+    }
+
+    /// <summary>Checks the handover by the same rules; 400 with every message by field, or handed over.</summary>
+    [HttpPost("/Validation/Handover")]
+    public IActionResult HandOver([FromBody] HandoverNote note, [FromServices] HandoverRules rules)
+    {
+        var result = rules.Validate(note);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"handed over for {note.Resident}" });
+    }
+
     /// <summary>Checks the guest by the generic rules registered for it; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Guest")]
     public IActionResult SaveGuest([FromBody] RegisteredGuest guest, [FromServices] GuestNameRules<RegisteredGuest> rules)

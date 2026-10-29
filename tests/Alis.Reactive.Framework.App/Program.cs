@@ -16,7 +16,9 @@ builder.Services.AddControllersWithViews().AddRazorOptions(razor =>
 // Scanning finds every validator but a generic one, which the app registers for each model it checks.
 builder.Services.AddReactiveFluentValidation(validation => validation
     .AddFromAssemblyContaining<Program>()
-    .Add<GuestNameRules<RegisteredGuest>>());
+    .Add<GuestNameRules<RegisteredGuest>>()
+    .Add<NoteRules<HandoverNote>>()
+    .Add<NoteRules<IncidentNote>>());
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<LineExchange>();
 

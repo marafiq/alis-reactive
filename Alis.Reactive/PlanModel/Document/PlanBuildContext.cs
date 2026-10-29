@@ -23,7 +23,8 @@ namespace Alis.Reactive.PlanModel
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<(RequestStep Request, FormValidation Validation)> _validatedRequests =
             new List<(RequestStep, FormValidation)>();
-        private readonly Dictionary<string, FormChecks> _forms = new Dictionary<string, FormChecks>(StringComparer.Ordinal);
+        private readonly Dictionary<string, IReadOnlyList<CheckedField>> _forms =
+            new Dictionary<string, IReadOnlyList<CheckedField>>(StringComparer.Ordinal);
 
         // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
@@ -117,10 +118,21 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>
         /// A request that checks its form first; the form's rules are bound when the plan is written. A request
-        /// validated again keeps its place with the new validation.
+        /// validated again keeps its place with the new validation. A form is validated by one validator, so a
+        /// request that names another for a form another request validates is refused.
         /// </summary>
         internal void ValidateBefore(RequestStep request, FormValidation validation)
         {
+            foreach (var (other, otherValidation) in _validatedRequests)
+            {
+                if (other == request || otherValidation.Form != validation.Form || otherValidation.Validator == validation.Validator)
+                    continue;
+                throw new InvalidOperationException(
+                    $"Form '{validation.Form}' is validated by {CSharpTypeName.Of(otherValidation.Validator)} and by " +
+                    $"{CSharpTypeName.Of(validation.Validator)}, but a form takes one validator. Give each validator a " +
+                    "form of its own, or write one validator whose rules differ by When conditions.");
+            }
+
             var index = _validatedRequests.FindIndex(validated => validated.Request == request);
             if (index < 0) _validatedRequests.Add((request, validation));
             else _validatedRequests[index] = (request, validation);
@@ -128,13 +140,11 @@ namespace Alis.Reactive.PlanModel
 
         internal IReadOnlyList<(RequestStep Request, FormValidation Validation)> ValidatedRequests => _validatedRequests;
 
-        /// <summary>The inputs a request's validator checks on the form, merged into the form's checks.</summary>
-        internal void Check(string formId, IEnumerable<CheckedField> fields)
+        /// <summary>The inputs a form's one validator checks on it, bound again each time the plan renders.</summary>
+        internal void Check(string formId, IReadOnlyList<CheckedField> fields)
         {
             DeclareElement(formId);
-            if (!_forms.TryGetValue(formId, out var form))
-                _forms.Add(formId, form = new FormChecks());
-            form.Merge(fields);
+            _forms[formId] = fields;
         }
 
         // ── writing ──────────────────────────────────────────────────────────────
@@ -153,8 +163,8 @@ namespace Alis.Reactive.PlanModel
 
             var forms = new FormWriter(Scope.ForHandler(plan, "$form"));
             foreach (var declared in _declared)
-                if (_forms.TryGetValue(declared.Id, out var form))
-                    objects.Form(declared.Id, forms.Form(form.Fields));
+                if (_forms.TryGetValue(declared.Id, out var fields))
+                    objects.Form(declared.Id, forms.Form(fields));
 
             var handlers = _handlers
                 .Select(handler =>
