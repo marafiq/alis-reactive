@@ -229,17 +229,18 @@ namespace Alis.Reactive.PlanModel
                 index++;
             }
 
-            var rest = Rest(index, scope);
+            var rest = Rest(index, arms.Count == 0 ? scope : scope.ForBlock());
             return arms.Count == 0 ? rest : new[] { G.If(arms, rest) };
         }
 
         // What runs when no synchronous arm before `index` matched: the arm that waits, guarding the arms
-        // after it, or the Else.
+        // after it, or the Else. Arms nested in an `if` are a block of their own: what a waiting arm binds
+        // there is read only there.
         private IReadOnlyList<Statement> Rest(int index, Scope scope)
         {
             if (index >= _arms.Count) return _else.Write(scope);
             var (condition, then) = _arms[index];
-            return condition.Guard(then.Write(scope), Arms(index + 1, scope), scope);
+            return condition.Guard(then.Write(scope), Arms(index + 1, scope.ForBlock()), scope);
         }
     }
 
@@ -258,7 +259,7 @@ namespace Alis.Reactive.PlanModel
             block.Add(G.All(_requests.Select(request =>
             {
                 var branch = new List<Statement>();
-                request.WriteTo(branch, scope);
+                request.WriteTo(branch, scope.ForBlock());
                 return (IReadOnlyList<Statement>)branch;
             }).ToList()));
             block.AddRange(_settled.Write(scope));

@@ -15,11 +15,10 @@ export function discoverPlans(root: ParentNode, remove: boolean): PlanDocument[]
   return plans;
 }
 
+// An element's text is never null; an empty script fails to parse, as any text the framework did not write.
 function parsePlan(script: HTMLElement): PlanDocument {
-  const json = script.textContent?.trim();
-  if (!json) throw new Error("[alis] a plan script is empty");
   try {
-    return JSON.parse(json) as PlanDocument;
+    return JSON.parse(script.textContent!) as PlanDocument;
   } catch (error) {
     throw new Error(`[alis] a plan script is not valid JSON: ${(error as Error).message}`);
   }

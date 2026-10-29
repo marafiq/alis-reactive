@@ -160,8 +160,8 @@ function sortKey(value: unknown): unknown {
   return value instanceof Date ? value.getTime() : value;
 }
 
+// toArray turns a missing value into [] first, so the value described is never null.
 function describe(value: unknown): string {
-  if (value === null) return "null";
   if (typeof value === "object") return (value as object).constructor?.name ?? "object";
   return typeof value;
 }

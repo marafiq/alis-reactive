@@ -6,7 +6,9 @@
 // D3 `query` is the query string read the way MVC binds [FromQuery]: keys match case-insensitively
 //    and a scalar member reads the first value; `queryAll` gives an array member every value. An
 //    absent key reads as missing.
-// D4 A click on an element carrying data-alis-raise raises that event with the element's detail.
+// D4 A click on an element carrying data-alis-raise raises that event with the element's detail, or with
+//    an empty record when it carries none. An element whose data-alis-raise is empty names no event, so
+//    the click goes on to the element around it.
 
 import type { Plugin } from "../objects/plugins";
 import { logger } from "../diagnostics/trace";
@@ -17,6 +19,7 @@ const triggerLog = logger("trigger");
 
 const RAISE_ATTRIBUTE = "data-alis-raise";
 const RAISE_DETAIL_ATTRIBUTE = "data-alis-detail";
+const NAMED_RAISE = `[${RAISE_ATTRIBUTE}]:not([${RAISE_ATTRIBUTE}=""])`;
 
 export interface DocumentObject {
   raise(name: string, detail: unknown): void;
@@ -68,10 +71,10 @@ function wireMarkupRaise(): void {
   document.addEventListener("click", event => {
     const target = event.target;
     if (!(target instanceof Element)) return;
-    const source = target.closest(`[${RAISE_ATTRIBUTE}]`);
+    const source = target.closest(NAMED_RAISE);
     if (!source) return;
-    const name = source.getAttribute(RAISE_ATTRIBUTE);
-    if (!name) return;
+    // The selector matched the attribute with a value.
+    const name = source.getAttribute(RAISE_ATTRIBUTE)!;
     const detailText = source.getAttribute(RAISE_DETAIL_ATTRIBUTE);
     raise(name, detailText ? JSON.parse(detailText) : {});
   }, true);

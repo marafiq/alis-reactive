@@ -289,10 +289,16 @@ A block runs in an environment of names:
 A method that returns a value or an object is bound once per block: the `let` that holds its result
 is hoisted before the statement that first reads it (with `await` when the method is async, 3.3),
 and every later read in the block, or in a block inside it, is `ref` of that name. A result no
-statement reads is bound at the method's own line. A read never runs the method again.
+statement reads is bound at the method's own line. A read in the block that bound it, or in a block
+inside it, never runs the method again. A read outside that block binds the result again, because it
+cannot know the block ran: an `if` arm (a request its form checks runs inside the check's), an `all`
+block, a request's WhileLoading and its `finally` each bind for themselves, and so does a chained
+request. Only an async result meets this: it is awaited where it is first read, which can be inside
+one of them, while a sync result is bound at its own line unless a statement before it read it.
 
 A `try` body's top-level bindings stay in scope after the `try`. Code after a `try` runs only when
-the body completed, so each of them was bound.
+the body completed, so each of them was bound. The `finally` block reads none of them, since it also
+runs when the body stopped part way.
 
 A name is visible only where C# could see the variable that produced it. The builder enforces this
 at render: a handle used outside the block that binds it throws, and names the handle.
@@ -325,7 +331,7 @@ method's result is not re-read: it is bound once (3.1).
 **Plan order is C# evaluation order.** A returning method emits its `let` (`let … await` when the
 method is async) before the statement that first reads the result, in the active scope, and returns
 a value that names the result:
-- the value is read, never invoked again, however often it is used;
+- the value is read, never invoked again, however often the block that binds it uses it (3.1);
 - a call written as an argument runs before the statement it feeds, as C# evaluates arguments
   first.
 
@@ -496,8 +502,9 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - a scalar member reads the first value;
   - an absent key reads as missing.
 - **D4 Markup-raised events.** A click on an element carrying `data-alis-raise` raises that event
-  with the element's detail. The listener is delegated, and it reads only attributes the framework
-  stamped.
+  with the element's detail, or with an empty record when it carries none. An element whose
+  `data-alis-raise` is empty names no event, so the click goes on to the element around it. The
+  listener is delegated, and it reads only attributes the framework stamped.
 
 ### 6.2 `http` (`plugin("alis.http")`)
 

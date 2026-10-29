@@ -398,7 +398,8 @@ namespace Alis.Reactive.PlanModel
         internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
             IsSynchronous ? base.Guard(then, otherwise, scope) : AllOf(0, then, otherwise, scope);
 
-        // Consecutive synchronous terms share one `if`; a term that waits guards the rest.
+        // Consecutive synchronous terms share one `if`; a term that waits guards the rest, which are a block
+        // of their own inside that `if`.
         private IReadOnlyList<Statement> AllOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
         {
             if (start >= Terms.Count) return then;
@@ -406,10 +407,10 @@ namespace Alis.Reactive.PlanModel
             if (synchronous.Count > 0)
             {
                 var guard = G.And(synchronous.Select(term => term.Write(scope)).ToList());
-                return new[] { G.If(guard, AllOf(start + synchronous.Count, then, otherwise, scope), otherwise) };
+                return new[] { G.If(guard, AllOf(start + synchronous.Count, then, otherwise, scope.ForBlock()), otherwise) };
             }
 
-            return Terms[start].Guard(AllOf(start + 1, then, otherwise, scope), otherwise, scope);
+            return Terms[start].Guard(AllOf(start + 1, then, otherwise, scope.ForBlock()), otherwise, scope);
         }
     }
 
@@ -442,10 +443,10 @@ namespace Alis.Reactive.PlanModel
             if (synchronous.Count > 0)
             {
                 var guard = G.Or(synchronous.Select(term => term.Write(scope)).ToList());
-                return new[] { G.If(guard, then, AnyOf(start + synchronous.Count, then, otherwise, scope)) };
+                return new[] { G.If(guard, then, AnyOf(start + synchronous.Count, then, otherwise, scope.ForBlock())) };
             }
 
-            return Terms[start].Guard(then, AnyOf(start + 1, then, otherwise, scope), scope);
+            return Terms[start].Guard(then, AnyOf(start + 1, then, otherwise, scope.ForBlock()), scope);
         }
     }
 

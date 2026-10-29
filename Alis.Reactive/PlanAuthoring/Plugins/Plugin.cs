@@ -4,7 +4,9 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// A JavaScript object the page registers by name, for work the DSL does not model (URL, DOM and array
-    /// APIs). Declared like any JavaScript object; its name is its only string.
+    /// APIs). Declared like any JavaScript object; its name is its only string. A plugin's members are
+    /// called and read: it raises no events a page subscribes to. A JavaScript object that raises events
+    /// is brought as a component.
     /// </summary>
     /// <example>
     /// <code>

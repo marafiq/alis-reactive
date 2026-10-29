@@ -1,0 +1,14 @@
+@using Alis.Reactive.Framework.App.Subscriptions
+@model GatePage
+@{
+    ViewData["Title"] = "The gate's line";
+    var plan = Html.ReactivePlan<GatePage>();
+    var feed = ServerPushStream.At<GateFeed>("/Subscriptions/Feed");
+}
+<h1>The gate's line</h1>
+
+<p>Line: <span id="line"></span></p>
+
+@{ Html.On(plan, t => t.ServerPush(feed, f => f.Line.Cut, p => p.Element("line").Text.Set("the line was cut"))); }
+
+@Html.RenderPlan(plan)
