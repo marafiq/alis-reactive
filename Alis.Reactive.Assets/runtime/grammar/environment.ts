@@ -1,7 +1,8 @@
 // Bindings are lexical (grammar.md 3.1): a handler binds its parameter, `let` binds a name for the
 // rest of its block, and `fn` binds its parameters for its body. A name is visible where C# could
-// see the variable that produced it, which the C# builder checks at render; an unbound name here is
-// a plan the framework did not produce.
+// see the variable that produced it, which the C# builder checks at render, and the builder reads a
+// name only in the block that binds it or a block inside it: a name this block does not hold, a
+// parent does.
 
 export class Environment {
   private readonly names = new Map<string, unknown>();
@@ -21,8 +22,6 @@ export class Environment {
   }
 
   lookup(name: string): unknown {
-    if (this.names.has(name)) return this.names.get(name);
-    if (this.parent) return this.parent.lookup(name);
-    throw new Error(`[alis] "${name}" is not bound here`);
+    return this.names.has(name) ? this.names.get(name) : this.parent!.lookup(name);
   }
 }
