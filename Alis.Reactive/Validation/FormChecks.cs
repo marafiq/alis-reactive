@@ -170,25 +170,4 @@ namespace Alis.Reactive.Validation
             return new CheckedField(input.Id, HtmlFieldPrefix.Join(_fieldPrefix, field.FieldName), input.Shape, field.Rules, this);
         }
     }
-
-    /// <summary>
-    /// The inputs one form checks. A second request that validates the same form replaces an input's
-    /// rules and adds the inputs it newly names.
-    /// </summary>
-    internal sealed class FormChecks
-    {
-        private readonly List<CheckedField> _fields = new List<CheckedField>();
-
-        internal IReadOnlyList<CheckedField> Fields => _fields;
-
-        internal void Merge(IEnumerable<CheckedField> incoming)
-        {
-            foreach (var field in incoming)
-            {
-                var index = _fields.FindIndex(existing => existing.ComponentId == field.ComponentId);
-                if (index < 0) _fields.Add(field);
-                else _fields[index] = field;
-            }
-        }
-    }
 }

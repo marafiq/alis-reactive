@@ -23,7 +23,7 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         // A type as C# writes it, so a message names Int32? and List<IFormFile> rather than Nullable`1 and List`1.
-        private static string Spelled(Type type)
+        internal static string Spelled(Type type)
         {
             var underlying = Nullable.GetUnderlyingType(type);
             if (underlying != null) return Spelled(underlying) + "?";

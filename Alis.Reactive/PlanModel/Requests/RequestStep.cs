@@ -199,23 +199,23 @@ namespace Alis.Reactive.PlanModel
         }
     }
 
-    // The form a request validates before it is sent, and the browser rules it reads from the validator the
-    // request names.
+    // The form a request validates before it is sent, the validator the request names, and the browser rules
+    // read from it.
     internal sealed class FormValidation
     {
         internal FormValidation(
             Func<IBrowserRuleSource, IReadOnlyList<BrowserField>> rules,
-            string validatorName,
+            Type validator,
             string form)
         {
             Rules = rules ?? throw new ArgumentNullException(nameof(rules));
-            ValidatorName = validatorName ?? throw new ArgumentNullException(nameof(validatorName));
+            Validator = validator ?? throw new ArgumentNullException(nameof(validator));
             Form = form ?? throw new ArgumentNullException(nameof(form));
         }
 
         internal Func<IBrowserRuleSource, IReadOnlyList<BrowserField>> Rules { get; }
 
-        internal string ValidatorName { get; }
+        internal Type Validator { get; }
 
         internal string Form { get; }
     }
