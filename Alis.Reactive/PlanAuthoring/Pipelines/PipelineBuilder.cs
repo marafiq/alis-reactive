@@ -114,7 +114,11 @@ namespace Alis.Reactive.Builders
             where TComponent : JsObject, IComponent, new() =>
             Live<TComponent>(IdGenerator.For(typeof(TModel), HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
 
-        /// <summary>The component the view rendered for a member of another model, such as a partial's.</summary>
+        /// <summary>
+        /// The component a view of another model rendered for one of its members with no field prefix, such as
+        /// a partial rendered at the top level. The id is derived from the other model alone, so an input a
+        /// partial rendered under a prefix is reached from that partial's own plan, or by an event it raises.
+        /// </summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <typeparam name="TOtherModel">The model the component was rendered for.</typeparam>
         /// <param name="expr">The other model's member the component is bound to.</param>

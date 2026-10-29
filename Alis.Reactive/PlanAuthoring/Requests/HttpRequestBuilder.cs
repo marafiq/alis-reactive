@@ -25,10 +25,6 @@ namespace Alis.Reactive.Builders.Requests
         /// <summary>The request this builder configures, written where the request was started.</summary>
         internal RequestStep Step { get; }
 
-        /// <summary>Selects POST for this request endpoint.</summary>
-        /// <summary>Selects PUT for this request endpoint.</summary>
-        /// <summary>Selects DELETE for this request endpoint.</summary>
-
         /// <summary>Builds the request from the view model's own members, for an endpoint that binds the view model.</summary>
         /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
         public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel, TModel>> gather) =>

@@ -126,7 +126,9 @@ kinds:
   public members, by their JSON names, are its fields. A class that contains itself is `any` where it
   recurs; a declaration (`JsObject`), a dictionary and a framework type are `any`.
 - An enum is `string`: its member name, which is how MVC binds it. A `Guid`, a `TimeSpan` and a
-  `TimeOnly` are `string` too.
+  `TimeOnly` are `string` too. An enum a declaration uses for a JavaScript value (a vendor's option)
+  may name that text with `[JsonStringEnumMemberName]`, which a literal honours; a model's enum is
+  read, compared and checked by member name, because that is what its input holds and MVC binds.
 - `date` values are JavaScript `Date` objects. `DateTime` and `DateOnly` are `date`.
 - `instant` values are `Date` objects too, for a `DateTimeOffset`: a moment, not a calendar day.
 
