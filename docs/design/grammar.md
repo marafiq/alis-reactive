@@ -627,7 +627,8 @@ no key (H2) and no entry (H4).
   counted by holders. A plan that names the hub, in a handler or a step, holds its connection for as
   long as its owner lives: the hold is its data contribution (1.1), taken when the owner starts, so
   a step reaches a connection some owner holds and never opens one of its own. The connection stops,
-  and its marker is withdrawn (R3), when the last owner holding it is disposed.
+  a start still trying it makes no further attempt, and its marker is withdrawn (R3), when the last
+  owner holding it is disposed.
 - **B2 Start.** Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator (R3). A
   retry from the indicator starts the same way, and offers again only if all four attempts fail.
 - **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
