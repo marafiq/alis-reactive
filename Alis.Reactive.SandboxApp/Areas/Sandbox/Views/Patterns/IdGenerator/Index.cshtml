@@ -74,19 +74,8 @@
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-2">2. FormData POST — Form (gathers by name)</h2>
-        <form id="form-form" class="grid grid-cols-2 gap-4 mb-4">
-            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
-                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
-            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
-                .FusionNumericTextBox(b => b
-                    .Min(0).Max(99999).Step(1)); }
-            @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
-                .NativeDropDown(b => b
-                    .Items(statusItems)
-                    .Placeholder("-- Select --")
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
-        </form>
+        <h2 class="text-sm font-semibold mb-2">2. FormData POST — the same fields (gathers by name)</h2>
+        @* An element id names one element, so the fields render once, above, and this request sends them as form data. *@
         @(Html.NativeButton("form-submit-btn", "Submit FormData")
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>
