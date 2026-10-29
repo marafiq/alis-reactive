@@ -37,6 +37,25 @@ public sealed class ValidationController : Controller
 
     public IActionResult Incident() => View(new IncidentReport());
 
+    public IActionResult Outing() => View(new ResidentOuting());
+
+    /// <summary>The outing signed out from a card whose sign-out button carries a plan of its own.</summary>
+    public IActionResult OutingCard() => View(new ResidentOuting());
+
+    /// <summary>Signs the resident out, or refuses with every message by the member's binding name.</summary>
+    [HttpPost("/Validation/Outing")]
+    public IActionResult SignOutForAnOuting([FromBody] ResidentOuting outing)
+    {
+        var errors = new Dictionary<string, string[]>();
+        if (outing.Resident is not ("Ada Lovelace" or "Tom Kilburn"))
+            errors[nameof(ResidentOuting.Resident)] = ["No resident of that name lives here."];
+        if (string.IsNullOrWhiteSpace(outing.BackBy))
+            errors[nameof(ResidentOuting.BackBy)] = ["Say when the resident will be back."];
+        return errors.Count > 0
+            ? BadRequest(new { errors })
+            : Json(new Booked { Summary = $"{outing.Resident} signed out with {outing.Companion}" });
+    }
+
     /// <summary>Checks the report by its rules; 400 with every message by field, or filed with the photos it bound.</summary>
     [HttpPost("/Validation/Incident")]
     public IActionResult FileIncident([FromForm] IncidentReport report, [FromServices] IncidentReportRules rules)
