@@ -18,20 +18,8 @@ namespace Alis.Reactive.Builders.Requests
             if (member == null || Binds(inputType, member)) return;
 
             throw new InvalidOperationException(
-                $"Form sends the input '{binding.Value}' as {Spelled(inputType)}, but {Spelled(request)}.{binding.Value}, which " +
-                $"the endpoint binds, is {Spelled(member)}. Give the request member the input's type.");
-        }
-
-        // A type as C# writes it, so a message names Int32? and List<IFormFile> rather than Nullable`1 and List`1.
-        private static string Spelled(Type type)
-        {
-            var underlying = Nullable.GetUnderlyingType(type);
-            if (underlying != null) return Spelled(underlying) + "?";
-            if (!type.IsGenericType) return type.Name;
-            // A class nested in a generic one is generic without a backtick of its own.
-            var arity = type.Name.IndexOf('`');
-            var name = arity < 0 ? type.Name : type.Name.Substring(0, arity);
-            return $"{name}<{string.Join(", ", type.GetGenericArguments().Select(Spelled))}>";
+                $"Form sends the input '{binding.Value}' as {CSharpTypeName.Of(inputType)}, but {CSharpTypeName.Of(request)}.{binding.Value}, which " +
+                $"the endpoint binds, is {CSharpTypeName.Of(member)}. Give the request member the input's type.");
         }
 
         // The member's type, or null when the path reaches an open member (object, a dictionary) that takes any name.
@@ -49,8 +37,8 @@ namespace Alis.Reactive.Builders.Requests
                     var name = segment.ToPathText();
                     var property = current.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
                         ?? throw new InvalidOperationException(
-                            $"Form sends the input '{binding.Value}', but {Spelled(request)}, the request the endpoint binds, " +
-                            $"has no member '{name}'{(current == request ? "" : " on " + Spelled(current))}.");
+                            $"Form sends the input '{binding.Value}', but {CSharpTypeName.Of(request)}, the request the endpoint binds, " +
+                            $"has no member '{name}'{(current == request ? "" : " on " + CSharpTypeName.Of(current))}.");
                     current = property.PropertyType;
                 }
 

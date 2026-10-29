@@ -79,14 +79,14 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal TNext CompareWith(Comparison op, object? literal)
         {
-            if (!op.IsEquality) RequireBrowserOrder();
+            if (!op.IsEquality) BrowserOrder.Require(typeof(TProp));
             return _next(Condition.Ordered(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
         }
 
         internal TNext CompareWith<TRight>(Comparison op, TypedSource<TRight> right)
         {
             if (right == null) throw new ArgumentNullException(nameof(right));
-            if (!op.IsEquality) RequireBrowserOrder();
+            if (!op.IsEquality) BrowserOrder.Require(typeof(TProp));
             return _next(Condition.Ordered(op, Left, right.Expression, Shape));
         }
 
@@ -101,19 +101,8 @@ namespace Alis.Reactive.Builders.Conditions
 
         internal TNext CompareWithRange(object low, object high)
         {
-            RequireBrowserOrder();
+            BrowserOrder.Require(typeof(TProp));
             return _next(Condition.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
-        }
-
-        // A TimeSpan reaches the browser as its text, and text orders by its characters: "1.02:00:00" (26 hours)
-        // sorts before "23:00:00". The browser cannot order it as C# does, so the page is refused where it renders.
-        private static void RequireBrowserOrder()
-        {
-            var type = System.Nullable.GetUnderlyingType(typeof(TProp)) ?? typeof(TProp);
-            if (type == typeof(TimeSpan))
-                throw new InvalidOperationException(
-                    "A TimeSpan has no order the browser can compute as C# does: it reaches the browser as its text, and " +
-                    "\"1.02:00:00\" sorts before \"23:00:00\". Order it on the server, or read the length as a number.");
         }
 
         internal TNext ContainsItem<TItem>(TItem item)

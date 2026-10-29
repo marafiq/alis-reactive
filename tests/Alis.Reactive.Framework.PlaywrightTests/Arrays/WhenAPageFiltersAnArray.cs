@@ -7,13 +7,14 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 /// grammar.md 2.3 an item's values have: a date's year, month, day, hour, minute, second and day of the week, a
 /// nullable's value and whether it has one, a text's length, and a widening cast; and the table's tests:
 /// <c>string.IsNullOrEmpty</c>, <c>Enumerable.Contains</c> of fixed values (and a fixed array's own
-/// <c>Contains</c>, which C# 14 binds to a span, and a fixed list's) and <c>Regex.IsMatch</c>. Each keeps the
+/// <c>Contains</c>, which C# 14 binds to a span, and a fixed list's) and <c>Regex.IsMatch</c>; and a length of
+/// time compared for equality, which its text decides as C# does. Each keeps the
 /// residents it holds for, in their order, and drops the others. The residents endpoint answers Cyd Marsh (81,
 /// present, North, nickname blank, keyworker Fay, admitted Monday 5 January 2026 at 09:45:30, score 7), Ada
 /// Hartley (102, away, East, no nickname, Gus, admitted Saturday 14 March 2026 at midnight, no score), Ben Hart
 /// (79, present, North, Benny, Fay, admitted Friday 19 June 2026 at 14:09:45, score 0) and Dot Ashton (80, away,
-/// South, Dottie, Hal, admitted Sunday 2 November 2025 at 21:30:09, score 9), in that order. Each date part keeps
-/// residents no other part keeps.
+/// South, Dottie, Hal, admitted Sunday 2 November 2025 at 21:30:09, score 9), in that order, given 23, 26, 4 and 53
+/// hours of care this week. Each date part keeps residents no other part keeps.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageFiltersAnArray : AppPageTest
@@ -370,5 +371,15 @@ public sealed class WhenAPageFiltersAnArray : AppPageTest
         await Button("In a room numbered in two digits").ClickAsync();
 
         await Expect(Kept).ToHaveTextAsync("Cyd Marsh");
+    }
+
+    [Test]
+    public async Task a_length_of_time_compared_for_equality_keeps_the_item_that_holds_it()
+    {
+        await Open("/Arrays/Filters");
+
+        await Button("Given 26 hours of care this week").ClickAsync();
+
+        await Expect(Kept).ToHaveTextAsync("Ada Hartley");
     }
 }

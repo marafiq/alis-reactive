@@ -20,4 +20,6 @@ public enum Mistake
     ReadADayOfTheWeekAsAValue,
     CastToAWholeNumber,
     CastToANarrowerNumber,
+    CompareALengthOfTime,
+    OrderByALengthOfTime,
 }

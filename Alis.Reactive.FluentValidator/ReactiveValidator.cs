@@ -151,7 +151,7 @@ namespace Alis.Reactive.FluentValidator
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
             if (IsAsync)
-                throw new InvalidOperationException($"{GetType().Name} has a rule that waits (MustAsync); validate with ValidateAsync.");
+                throw new InvalidOperationException($"{CSharpTypeName.Of(GetType())} has a rule that waits (MustAsync); validate with ValidateAsync.");
 
             var run = new ValidationRun(synchronous: true, CancellationToken.None);
             RunRules(instance, "", run).GetAwaiter().GetResult();

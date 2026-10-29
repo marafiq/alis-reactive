@@ -56,8 +56,8 @@ namespace Alis.Reactive
         private bool _returned;
 
         internal ObjectBinding Binding => _binding ?? _holder?.Binding ?? throw new InvalidOperationException(
-            $"'{GetType().Name}' is a declaration, not a live object. Reach one inside a callback: " +
-            $"p.Component<{GetType().Name}>(..), the payload an event hands its callback, or a registered plugin.");
+            $"'{CSharpTypeName.Of(GetType())}' is a declaration, not a live object. Reach one inside a callback: " +
+            $"p.Component<{CSharpTypeName.Of(GetType())}>(..), the payload an event hands its callback, or a registered plugin.");
 
         internal void BindTo(ObjectBinding binding) =>
             _binding = binding ?? throw new ArgumentNullException(nameof(binding));
@@ -349,7 +349,7 @@ namespace Alis.Reactive
         {
             if (IsReturned)
                 throw new InvalidOperationException(
-                    $"'{GetType().Name}.{declaredBy}' declares an event on an object a method returns. Events belong " +
+                    $"'{CSharpTypeName.Of(GetType())}.{declaredBy}' declares an event on an object a method returns. Events belong " +
                     "to the component and to the objects it holds (Object<T>() on a property).");
             return name == null ? JavaScriptNameOf(declaredBy) : OwnName(name, declaredBy);
         }
@@ -374,7 +374,7 @@ namespace Alis.Reactive
             var reachesIntoAnObject = name.IndexOf('.') >= 0 || name.IndexOf('[') >= 0;
             return reachesIntoAnObject
                 ? throw new ArgumentException(
-                    $"'{GetType().Name}.{declaredBy}' is named '{name}', a path into an object or a list it holds. " +
+                    $"'{CSharpTypeName.Of(GetType())}.{declaredBy}' is named '{name}', a path into an object or a list it holds. " +
                     "Declare the object with Object<T>() and the member on it, or read a field of each item " +
                     "with the list's Each(item => item.Field).", nameof(name))
                 : name;
@@ -390,7 +390,7 @@ namespace Alis.Reactive
                 .ToArray();
             if (members.Length == 0)
                 throw new ArgumentException(
-                    $"'{GetType().Name}' has no member '{declaredBy}'. Declare an object as a C# property or method, " +
+                    $"'{CSharpTypeName.Of(GetType())}' has no member '{declaredBy}'. Declare an object as a C# property or method, " +
                     "for example public Settings Settings => Object<Settings>(); or public Reading Reading() => Object<Reading>();",
                     nameof(declaredBy));
             return members.All(member => member is MethodInfo);

@@ -3,7 +3,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 /// <summary>
 /// One member's field rendered twice on one plan (I8): with the same component it is one input, and the page
 /// renders and sends it; with another component it is a defect of the view, refused when the page renders with
-/// a message naming the member and both components.
+/// a message naming the member and both components, a generic one as C# writes it.
 /// </summary>
 [TestFixture]
 public sealed class WhenAFieldIsRenderedTwice : AppPageTest
@@ -31,6 +31,18 @@ public sealed class WhenAFieldIsRenderedTwice : AppPageTest
             "Input 'Visitor' is rendered twice with different components: " +
             "first [Alis_Reactive_Framework_App_Inputs_DepartPage__Visitor, entry, value, committed by committed, Entry, string], " +
             "then [Alis_Reactive_Framework_App_Inputs_DepartPage__Visitor, file-picker, files, committed by chosen, FilePicker, string].").First)
+            .ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_generic_component_in_the_refusal_is_named_as_csharp_writes_it()
+    {
+        await Render("/Inputs/Depart?rendering=TheKindWithAnotherComponent");
+
+        await Expect(Page.GetByText(
+            "Input 'Kind' is rendered twice with different components: " +
+            "first [Alis_Reactive_Framework_App_Inputs_DepartPage__Kind, choice, value, committed by changed, Choice<VisitKind>, string], " +
+            "then [Alis_Reactive_Framework_App_Inputs_DepartPage__Kind, entry, value, committed by committed, Entry, string].").First)
             .ToBeVisibleAsync();
     }
 }

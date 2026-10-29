@@ -15,7 +15,7 @@ public sealed class WhenABranchIsWrittenWrongly : AppPageTest
     {
         await Render("/Conditions/ElseIfAfterElse");
 
-        await Expect(Page.GetByText("Cannot add ElseIf after Else.").First).ToBeVisibleAsync();
+        await Expect(Page.GetByText("An ElseIf cannot follow the Else of its When.").First).ToBeVisibleAsync();
     }
 
     [Test]
@@ -23,7 +23,7 @@ public sealed class WhenABranchIsWrittenWrongly : AppPageTest
     {
         await Render("/Conditions/ElseTwice");
 
-        await Expect(Page.GetByText("Else already called.").First).ToBeVisibleAsync();
+        await Expect(Page.GetByText("A When has one Else.").First).ToBeVisibleAsync();
     }
 
     [Test]
