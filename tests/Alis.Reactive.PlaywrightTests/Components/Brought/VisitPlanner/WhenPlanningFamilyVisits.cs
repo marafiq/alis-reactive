@@ -21,8 +21,7 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
 
     // The companion panel renders CompanionVisitPlanModel.VisitSlots; its ID is the framework's
     // deterministic ID for that member.
-    private const string CompanionPlannerId =
-        "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Components_Brought_CompanionVisitPlanModel__VisitSlots";
+    private static readonly string CompanionPlannerId = IdGenerator.For<CompanionVisitPlanModel>(m => m.VisitSlots);
 
     private PagePlan<FamilyVisitPlanModel> _plan = null!;
     private ConcurrentQueue<string> _saves = null!;

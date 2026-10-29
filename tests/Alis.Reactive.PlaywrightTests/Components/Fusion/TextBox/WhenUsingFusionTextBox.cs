@@ -1,3 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextBox;
 
 // Journey: a care coordinator updates a resident's profile card — the preferred name the
@@ -10,9 +12,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextBox;
 public class WhenUsingFusionTextBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/TextBox";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TextBoxModel";
-    private const string PreferredNameId = GeneratedTypeScope + "__PreferredName";
-    private const string DietaryNoteId = GeneratedTypeScope + "__DietaryNote";
+    private static readonly string PreferredNameId = IdGenerator.For<TextBoxModel>(m => m.PreferredName);
+    private static readonly string DietaryNoteId = IdGenerator.For<TextBoxModel>(m => m.DietaryNote);
 
     private FusionTextBoxLocator PreferredName => new(Page, PreferredNameId);
     private FusionTextBoxLocator DietaryNote => new(Page, DietaryNoteId);

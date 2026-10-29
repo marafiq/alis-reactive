@@ -6,7 +6,6 @@ namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 public class WhenManagingTodoItems : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Patterns/Todo";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TodoModel__";
 
     private PagePlan<TodoModel> _plan = null!;
 
@@ -20,7 +19,7 @@ public class WhenManagingTodoItems : PlaywrightTestBase
     private ILocator SaveBtn => Page.Locator("#save-btn");
     private ILocator Result => _plan.Element("todo-result");
     private ILocator DueDateSection => Page.Locator("#due-date-section");
-    private ILocator UrgentCheckbox => Page.Locator($"#{ModelIdPrefix}IsUrgent");
+    private ILocator UrgentCheckbox => Page.Locator($"#{IdGenerator.For<TodoModel>(m => m.IsUrgent)}");
     private ILocator SaveToast => Page.Locator(".e-toast").First;
     private ILocator SaveToastTitle => SaveToast.Locator(".e-toast-title");
 

@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using System.Text.Json;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 
@@ -6,7 +8,6 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/Contract/AjaxPartial";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
@@ -15,34 +16,34 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
-    private ILocator Input(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}");
+    private ILocator Input(Expression<Func<ResidentModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
 
     private async Task SelectCustomAddress()
     {
-        await Input("AddressType").SelectOptionAsync("Custom Address");
-        await Expect(Input("Address_Street")).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Expect(Input("Address_City")).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Expect(Input("Address_ZipCode")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Input(m => m.AddressType).SelectOptionAsync("Custom Address");
+        await Expect(Input(m => m.Address.Street)).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Input(m => m.Address.City)).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Input(m => m.Address.ZipCode)).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
     private async Task FillParentFields()
     {
-        await Input("Name").FillAsync("Jane Smith");
-        await Input("Email").FillAsync("jane@care.com");
-        await Input("ConfirmEmail").FillAsync("jane@care.com");
+        await Input(m => m.Name).FillAsync("Jane Smith");
+        await Input(m => m.Email).FillAsync("jane@care.com");
+        await Input(m => m.ConfirmEmail).FillAsync("jane@care.com");
     }
 
     private async Task AddEmergencyContact()
     {
         await ClickWhenStable(Page.Locator("#add-emergency-contact-btn"));
-        await Expect(Input("EmergencyName")).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Input(m => m.EmergencyName)).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
     private async Task FillCustomAddress()
     {
-        await Input("Address_Street").FillAsync("123 Sunrise Blvd");
-        await Input("Address_City").FillAsync("Palm Springs");
-        await Input("Address_ZipCode").FillAsync("92262");
+        await Input(m => m.Address.Street).FillAsync("123 Sunrise Blvd");
+        await Input(m => m.Address.City).FillAsync("Palm Springs");
+        await Input(m => m.Address.ZipCode).FillAsync("92262");
     }
 
     private Task<IRequest> SubmitAndCaptureRequest() =>
@@ -63,7 +64,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await Expect(SummaryDiv).ToBeHiddenAsync();
         await Expect(Result).ToHaveTextAsync("");
 
-        await Input("AddressType").SelectOptionAsync("Facility Address");
+        await Input(m => m.AddressType).SelectOptionAsync("Facility Address");
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
@@ -80,9 +81,9 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await Expect(Result).ToHaveTextAsync("");
 
         await FillParentFields();
-        await Input("Address_Street").FillAsync("123 Sunrise Blvd");
-        await Input("Address_City").FillAsync("Palm Springs");
-        await Input("Address_ZipCode").FillAsync("92262");
+        await Input(m => m.Address.Street).FillAsync("123 Sunrise Blvd");
+        await Input(m => m.Address.City).FillAsync("Palm Springs");
+        await Input(m => m.Address.ZipCode).FillAsync("92262");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
@@ -102,13 +103,13 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await FillParentFields();
         await SelectCustomAddress();
 
-        await Input("Address_Street").FillAsync("Old St");
+        await Input(m => m.Address.Street).FillAsync("Old St");
 
-        await Input("AddressType").SelectOptionAsync("Facility Address");
-        await Expect(Input("Address_Street")).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Input(m => m.AddressType).SelectOptionAsync("Facility Address");
+        await Expect(Input(m => m.Address.Street)).ToBeHiddenAsync(new() { Timeout = 5000 });
         await SelectCustomAddress();
 
-        var streetVal = await Input("Address_Street").InputValueAsync();
+        var streetVal = await Input(m => m.Address.Street).InputValueAsync();
         Assert.That(streetVal, Is.EqualTo(""));
 
         await ClickWhenStable(SubmitBtn);
@@ -126,9 +127,9 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await Input("Name").FillAsync("Jane Smith");
-        await Input("Email").FillAsync("a@b.com");
-        await Input("ConfirmEmail").FillAsync("x@y.com");
+        await Input(m => m.Name).FillAsync("Jane Smith");
+        await Input(m => m.Email).FillAsync("a@b.com");
+        await Input(m => m.ConfirmEmail).FillAsync("x@y.com");
 
         await ClickWhenStable(SubmitBtn);
 
@@ -137,7 +138,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await Expect(SummaryDiv).ToBeHiddenAsync();
         await Expect(Result).ToHaveTextAsync("");
 
-        await Input("ConfirmEmail").FillAsync("a@b.com");
+        await Input(m => m.ConfirmEmail).FillAsync("a@b.com");
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync();
         await Expect(Result).ToHaveTextAsync("Admission saved", new() { Timeout = 5000 });
@@ -157,17 +158,17 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
 
-        await Input("Address_Street").FillAsync("123 Sunrise Blvd");
+        await Input(m => m.Address.Street).FillAsync("123 Sunrise Blvd");
         await Expect(ErrorFor("Address.Street")).ToBeHiddenAsync();
 
-        await Input("AddressType").SelectOptionAsync("Facility Address");
-        await Expect(Input("Address_Street")).ToBeHiddenAsync(new() { Timeout = 5000 });
+        await Input(m => m.AddressType).SelectOptionAsync("Facility Address");
+        await Expect(Input(m => m.Address.Street)).ToBeHiddenAsync(new() { Timeout = 5000 });
         await SelectCustomAddress();
 
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
 
-        await Input("Address_Street").FillAsync("456 Palm Ave");
+        await Input(m => m.Address.Street).FillAsync("456 Palm Ave");
         await Expect(ErrorFor("Address.Street")).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
@@ -181,8 +182,8 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
 
         await SelectCustomAddress();
 
-        await Input("Address_ZipCode").ClickAsync();
-        await Input("Address_ZipCode").PressSequentiallyAsync("92262");
+        await Input(m => m.Address.ZipCode).ClickAsync();
+        await Input(m => m.Address.ZipCode).PressSequentiallyAsync("92262");
         await Page.Keyboard.PressAsync("Tab");
 
         var status = Page.Locator("#zipcode-status");
@@ -199,10 +200,10 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
         await FillParentFields();
         await SelectCustomAddress();
-        await Input("Address_Street").FillAsync("Old St");
+        await Input(m => m.Address.Street).FillAsync("Old St");
 
-        await Input("AddressType").SelectOptionAsync("Facility Address");
-        await Expect(Input("Address_Street")).ToHaveCountAsync(0, new() { Timeout = 5000 });
+        await Input(m => m.AddressType).SelectOptionAsync("Facility Address");
+        await Expect(Input(m => m.Address.Street)).ToHaveCountAsync(0, new() { Timeout = 5000 });
         var submit = await SubmitAndCaptureRequest();
 
         using (var body = JsonDocument.Parse(submit.PostData ?? "{}"))
@@ -225,7 +226,7 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await SelectCustomAddress();
         await AddEmergencyContact();
         await FillCustomAddress();
-        await Input("EmergencyName").FillAsync("Ruth Hale");
+        await Input(m => m.EmergencyName).FillAsync("Ruth Hale");
 
         var submit = await SubmitAndCaptureRequest();
 
@@ -247,10 +248,10 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await FillParentFields();
         await SelectCustomAddress();
         await AddEmergencyContact();
-        await Input("EmergencyName").FillAsync("Ruth Hale");
+        await Input(m => m.EmergencyName).FillAsync("Ruth Hale");
 
-        await Input("AddressType").SelectOptionAsync("Facility Address");
-        await Expect(Input("Address_Street")).ToHaveCountAsync(0, new() { Timeout = 5000 });
+        await Input(m => m.AddressType).SelectOptionAsync("Facility Address");
+        await Expect(Input(m => m.Address.Street)).ToHaveCountAsync(0, new() { Timeout = 5000 });
         await SelectCustomAddress();
         await FillCustomAddress();
         var submit = await SubmitAndCaptureRequest();

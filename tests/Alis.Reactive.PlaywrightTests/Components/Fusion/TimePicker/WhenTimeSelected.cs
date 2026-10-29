@@ -1,3 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TimePicker;
 
 // Journey: a care coordinator sets a resident's morning medication time.
@@ -13,8 +15,7 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TimePicker;
 public class WhenTimeSelected : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/TimePicker";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TimePickerModel";
-    private const string MedicationTimeId = GeneratedTypeScope + "__MedicationTime";
+    private static readonly string MedicationTimeId = IdGenerator.For<TimePickerModel>(m => m.MedicationTime);
 
     private TimePickerLocator MedicationTime => new(Page, MedicationTimeId);
     private ILocator MedicationOrigin => Page.Locator("#medication-origin");

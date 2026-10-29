@@ -1,3 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.NumericTextBox;
 
 // Journey: a care coordinator sets a resident's Monthly Service Plan — how many catered
@@ -8,9 +10,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.NumericTextBox;
 public class WhenNumericValueEntered : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NumericTextBox";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NumericTextBoxModel";
-    private const string MealsId = GeneratedTypeScope + "__MealsPerWeek";
-    private const string WellnessId = GeneratedTypeScope + "__WellnessChecksPerWeek";
+    private static readonly string MealsId = IdGenerator.For<NumericTextBoxModel>(m => m.MealsPerWeek);
+    private static readonly string WellnessId = IdGenerator.For<NumericTextBoxModel>(m => m.WellnessChecksPerWeek);
 
     private NumericTextBoxLocator Meals => new(Page, MealsId);
     private NumericTextBoxLocator Wellness => new(Page, WellnessId);

@@ -1,3 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 
 // Journey: a resident sets their Comfort & Care Preferences. The page carries over
@@ -8,9 +10,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 public class WhenUsingFusionSlider : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Slider";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SliderModel";
-    private const string RoomTemperatureId = GeneratedTypeScope + "__RoomTemperature";
-    private const string QuietHoursId = GeneratedTypeScope + "__QuietHours";
+    private static readonly string RoomTemperatureId = IdGenerator.For<SliderModel>(m => m.RoomTemperature);
+    private static readonly string QuietHoursId = IdGenerator.For<SliderModel>(m => m.QuietHours);
 
     private FusionSliderLocator RoomTemperature => new(Page, RoomTemperatureId);
     private FusionSliderLocator QuietHours => new(Page, QuietHoursId);
