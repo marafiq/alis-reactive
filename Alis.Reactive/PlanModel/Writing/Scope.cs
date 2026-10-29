@@ -248,7 +248,7 @@ namespace Alis.Reactive.PlanModel
 
         internal string Stream(string url) => PluginObject("$stream:" + url, "alis.stream", url, PluginData.None);
 
-        internal string Hub(string url) => PluginObject("$hub:" + url, "alis.hub", url, PluginData.None);
+        internal string Hub(string url) => PluginObject("$hub:" + url, "alis.hub", url, new HubPluginData());
 
         internal string Plugin(string name) => PluginObject("$plugin:" + name, name, "", PluginData.None);
 

@@ -20,6 +20,7 @@
 <p>Board state: <span id="board-state"></span></p>
 
 <div id="bed-slot"></div>
+<div id="call-point-slot"></div>
 
 @{ Html.On(plan, t => t.ServerPush(switchboard, s => s.Lines, (lines, p) =>
     {
@@ -39,14 +40,19 @@
     .Reactive(button => button.Click, p => p.Get($"/Realtime/Bed?world={Model.World}").Response(r => r.OnSuccess(s => s.Into("bed-slot")))))
 @(plan.Button("close-bed", "Close the bed")
     .Reactive(button => button.Click, p => p.Unload("bed-slot")))
-@(plan.Button("drop-line", "Drop the line")
-    .Reactive(button => button.Click, p => p.Hub(line).Drop()))
-@(plan.Button("hang-up-line", "Hang up the line")
-    .Reactive(button => button.Click, p => p.Hub(line).HangUp()))
-@(plan.Button("note-first", "Note first")
-    .Reactive(button => button.Click, p => p.Hub(line).Note("first")))
-@(plan.Button("note-second", "Note second")
-    .Reactive(button => button.Click, p => p.Hub(line).Note("second")))
+@(plan.Button("open-call-point", "Open the call point")
+    .Reactive(button => button.Click, p => p.Get($"/Realtime/CallPoint?world={Model.World}").Response(r => r.OnSuccess(s => s.Into("call-point-slot")))))
+@(plan.Button("close-call-point", "Close the call point")
+    .Reactive(button => button.Click, p => p.Unload("call-point-slot")))
+@if (Model.PageListens)
+{
+    @(plan.Button("drop-line", "Drop the line")
+        .Reactive(button => button.Click, p => p.Hub(line).Drop()))
+    @(plan.Button("note-first", "Note first")
+        .Reactive(button => button.Click, p => p.Hub(line).Note("first")))
+    @(plan.Button("note-second", "Note second")
+        .Reactive(button => button.Click, p => p.Hub(line).Note("second")))
+}
 @(plan.Button("push-first-news", "Push the first news")
     .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/News?world={Model.World}&text=first")))
 @(plan.Button("push-second-news", "Push the second news")

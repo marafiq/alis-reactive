@@ -163,6 +163,17 @@ namespace Alis.Reactive.Grammar
         public string Kind => "none";
     }
 
+    /// <summary>
+    /// <c>alis.hub</c> data: it carries nothing but itself. A plan that names a hub contributes it, so the plan
+    /// holds the hub's connection for as long as its owner lives (grammar.md 6.7, B1).
+    /// </summary>
+    internal sealed class HubPluginData : PluginData
+    {
+        internal HubPluginData() { }
+
+        public string Kind => "hub";
+    }
+
     /// <summary><c>alis.model</c> data: the inputs this plan rendered, by element id (grammar.md 6.3).</summary>
     internal sealed class ModelPluginData : PluginData
     {

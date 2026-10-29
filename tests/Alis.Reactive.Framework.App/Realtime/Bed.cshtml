@@ -17,4 +17,7 @@
     .ServerPush(board, s => s.Welcome, (welcome, p) => p.Element("bed-board-call").Text.Set(welcome.Call))
     .ServerPush(board, s => s.News, (news, p) => p.Element("bed-news").Text.Set(news.Text))); }
 
+@(plan.Button("hang-up-line", "Hang up the line")
+    .Reactive(button => button.Click, p => p.Hub(line).HangUp()))
+
 @Html.RenderPlan(plan)

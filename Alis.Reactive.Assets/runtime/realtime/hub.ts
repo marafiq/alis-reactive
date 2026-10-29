@@ -1,13 +1,18 @@
 // alis.hub (grammar.md 6.7), keyed by hub URL. It ships the SignalR client in the framework's bundle,
 // so a page with a hub trigger needs no script of its own.
-// B1 One HubConnection per URL, counted by subscriptions, with credentials and automatic reconnect.
-// B2 Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator.
+// B1 One HubConnection per URL, with credentials and automatic reconnect, counted by holders: a plan
+//    that names the hub holds its connection for as long as the plan's owner lives (its data
+//    contribution). The connection stops, and its retry offer is withdrawn, when the last owner
+//    holding it is disposed.
+// B2 Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator. A click on the
+//    offer takes it and starts again; the offer comes back only if every attempt of that start fails.
 // B3 Client methods are events, matched without regard to case; the payload is the single argument.
 // B4 invoke(method, ...args) and send(method, ...args) are async; state and connectionId are
 //    properties; reconnecting, reconnected and close are events.
 
 import * as signalR from "@microsoft/signalr";
 import type { Plugin } from "../objects/plugins";
+import type { Owner } from "../objects/owner";
 import type { Listener } from "../objects/vendor-driver";
 import { showRetryIndicator, removeRetryIndicator } from "./retry-indicator";
 import { logger } from "../diagnostics/trace";
@@ -19,7 +24,7 @@ const log = logger("signalr");
 interface Managed {
   readonly connection: signalR.HubConnection;
   started: Promise<void>;
-  subscriptions: number;
+  holders: number;
   stopping: boolean;
   readonly lifecycle: Map<string, Set<Listener>>;
 }
@@ -54,10 +59,7 @@ function emitLifecycle(managed: Managed, event: string, payload: unknown): void 
   for (const listener of managed.lifecycle.get(event) ?? []) listener(payload);
 }
 
-function managedFor(url: string): Managed {
-  const existing = hubs.get(url);
-  if (existing) return existing;
-
+function connect(url: string): Managed {
   const connection = new signalR.HubConnectionBuilder()
     .withUrl(url, { withCredentials: true })
     .withAutomaticReconnect()
@@ -71,7 +73,7 @@ function managedFor(url: string): Managed {
   const managed: Managed = {
     connection,
     started: Promise.resolve(),
-    subscriptions: 0,
+    holders: 0,
     stopping: false,
     lifecycle: new Map(),
   };
@@ -100,20 +102,34 @@ function managedFor(url: string): Managed {
   return managed;
 }
 
+function hold(url: string, owner: Owner): void {
+  const managed = hubs.get(url) ?? connect(url);
+  managed.holders += 1;
+  owner.onDispose(() => release(url, managed));
+}
+
 function release(url: string, managed: Managed): void {
-  managed.subscriptions -= 1;
-  if (managed.subscriptions > 0) return;
+  managed.holders -= 1;
+  if (managed.holders > 0) return;
   managed.stopping = true;
   void managed.connection.stop();
-  if (hubs.get(url) === managed) hubs.delete(url);
+  hubs.delete(url);
   removeRetryIndicator(url);
+}
+
+// The connection the owner of a step's plan holds. A block that runs on after that owner is disposed
+// finds none, and fails rather than open a connection nothing would release.
+function held(url: string): Managed {
+  const managed = hubs.get(url);
+  if (!managed) throw new Error(`[alis] hub "${url}" is held by no owner: the plan that named it was released`);
+  return managed;
 }
 
 const LIFECYCLE_EVENTS = new Set(["reconnecting", "reconnected", "close"]);
 
 export const hubPlugin: Plugin = {
   object: url => {
-    const managed = managedFor(url);
+    const managed = held(url);
     return {
       get state() {
         return managed.connection.state;
@@ -131,18 +147,17 @@ export const hubPlugin: Plugin = {
       },
     };
   },
+  contribute({ key, owner }) {
+    hold(key, owner);
+  },
   subscribe(url: string, event: string, listener: Listener, owner) {
-    const managed = managedFor(url);
-    managed.subscriptions += 1;
+    const managed = held(url);
 
     if (LIFECYCLE_EVENTS.has(event)) {
       const listeners = managed.lifecycle.get(event) ?? new Set<Listener>();
       managed.lifecycle.set(event, listeners);
       listeners.add(listener);
-      owner.onDispose(() => {
-        listeners.delete(listener);
-        release(url, managed);
-      });
+      owner.onDispose(() => listeners.delete(listener));
       return;
     }
 
@@ -160,10 +175,7 @@ export const hubPlugin: Plugin = {
       listener(payload);
     };
     managed.connection.on(event, onMethod);
-    owner.onDispose(() => {
-      managed.connection.off(event, onMethod);
-      release(url, managed);
-    });
+    owner.onDispose(() => managed.connection.off(event, onMethod));
     log.debug("method.listening", { hubUrl: url, method: event });
   },
 };

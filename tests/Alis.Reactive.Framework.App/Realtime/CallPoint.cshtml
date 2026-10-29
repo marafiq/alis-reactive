@@ -1,0 +1,16 @@
+@using Alis.Reactive.Framework.App.Realtime
+@model CallPointCard
+@{
+    var plan = Html.ReactivePlan<CallPointCard>();
+    var line = SignalRHub.At<WardLine>($"/hubs/line?world={Model.World}");
+}
+<section id="call-point">
+    <h2>Call point, bed 4</h2>
+    <p>The call point calls the ward's line while it is open, and listens to none of it.</p>
+    <p>The ward answered: <span id="call-answer"></span></p>
+</section>
+
+@(plan.Button("call-the-nurse", "Call the nurse")
+    .Reactive(button => button.Click, p => p.Element("call-answer").Text.Set(p.Hub(line).CallTheNurse())))
+
+@Html.RenderPlan(plan)

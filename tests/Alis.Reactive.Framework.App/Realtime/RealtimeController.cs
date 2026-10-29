@@ -30,6 +30,8 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
 
     public IActionResult Bed([FromQuery] string world) => PartialView(new BedCard(world));
 
+    public IActionResult CallPoint([FromQuery] string world) => PartialView(new CallPointCard(world));
+
     public IActionResult Names() => View();
 
     public IActionResult BlankEventName() => View();
