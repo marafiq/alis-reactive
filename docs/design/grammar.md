@@ -197,7 +197,8 @@ exactly whatever the zone of the browser or the server.
 - **Where:** the `alis.model` values a request body carries (`fill`, `fields`, so
   `Form()` and `Form(formId)` send them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`),
   every input a validation rule reads: its field, a peer, and each
-  member its condition reads, through `model.boundValueOf(id)`.
+  member its condition reads, through `model.boundValueOf(id)`, and `p.Bound(m => m.X)`, which reads the
+  same way.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
   makes it, under every shape: text, a nullable of any shape (a `Guid?`, a `TimeSpan?`, a `char?`),
   and `any` (a `char`, a `Uri`). A non-nullable number, boolean or date left empty is its type's
@@ -575,7 +576,7 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   A node already on the path keeps its other members; it is copied before it is written.
 - **M5 `boundValueOf(id)`.** On the page's table (`plugin("alis.model", "")`): the value of the
   mounted input with that id, whichever plan rendered it, as a binding read (2.1), for a validation
-  rule and a gathered `Form(m => ..)` field; missing when no input with that id
+  rule, a gathered `Form(m => ..)` field and `p.Bound(m => ..)`; missing when no input with that id
   is on the page, as the server sees a member no input posts.
 - **M6 One element per id.** The server refuses an element id rendered twice in one request
   (`Alis.Reactive/Razor/RenderedPage.cs`). Two requests can still bring one twice, as two slots that

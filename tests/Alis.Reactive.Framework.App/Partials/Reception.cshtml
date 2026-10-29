@@ -13,7 +13,14 @@
     <div id="kin-slot"></div>
 </form>
 
+<p>The next of kin as the reception would bind it: <span id="kin-bound"></span></p>
 <p>The reception's endpoint bound: <span id="reception-saved"></span></p>
+
+@* The bound value reads the member whether or not the template is loaded: missing while it is not. *@
+@(plan.Button("read-kin", "Read the next of kin")
+    .Reactive(button => button.Click, p => p.When(p.Bound(m => m.NextOfKin.Name)).IsNull()
+        .Then(none => none.Element("kin-bound").Text.Set("no next of kin"))
+        .Else(some => some.Element("kin-bound").Text.Set(p.Bound(m => m.NextOfKin.Name)))))
 
 @(plan.Button("add-kin", "Add the next of kin")
     .Reactive(button => button.Click, p => p.Get("/Partials/NextOfKin").Response(r => r.OnSuccess(s => s.Into("kin-slot")))))
