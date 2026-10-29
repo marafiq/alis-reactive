@@ -5,11 +5,17 @@ import type { PlanDocument } from "../types/index";
 
 const PLAN_SELECTOR = "[data-reactive-plan]";
 
-/** Parses every plan script under a root. With `remove`, the scripts leave the markup. */
-export function discoverPlans(root: ParentNode, remove: boolean): PlanDocument[] {
-  const plans: PlanDocument[] = [];
+/** A plan and the script it was read from, which says where the server rendered the plan. */
+export interface DiscoveredPlan {
+  readonly plan: PlanDocument;
+  readonly script: HTMLElement;
+}
+
+/** Parses every plan script under a root, in document order. With `remove`, the scripts leave the markup. */
+export function discoverPlans(root: ParentNode, remove: boolean): DiscoveredPlan[] {
+  const plans: DiscoveredPlan[] = [];
   for (const script of Array.from(root.querySelectorAll<HTMLElement>(PLAN_SELECTOR))) {
-    plans.push(parsePlan(script));
+    plans.push({ plan: parsePlan(script), script });
     if (remove) script.remove();
   }
   return plans;

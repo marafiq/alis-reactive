@@ -1,0 +1,45 @@
+@using Alis.Reactive.Framework.App.Slots
+@model MoveInPage
+@{
+    ViewData["Title"] = "Moving in";
+    var plan = Html.ReactivePlan<MoveInPage>();
+}
+<h1>Moving in</h1>
+<p>Progress: <span id="move-in-progress"></span></p>
+
+@* The page starts before the step rendered inside it, as before a step loaded later: each step then
+   names itself in the progress line, and hears who takes the move-in. *@
+@{ Html.On(plan, t => t.DomReady(p =>
+{
+    p.Element("move-in-progress").Text.Set("started");
+    p.Dispatch(MoveInEvents.Opened, opened => opened.Set(x => x.Coordinator, p.Component<Entry>(m => m.Coordinator).Value));
+})); }
+
+@(plan.Bell("move-in-bell")
+    .Reactive(bell => bell.OnRung, (ring, p) => p.Dispatch(MoveInEvents.BellRang, rang => rang.Set(x => x.Times, ring.Times))))
+@{ Html.On(plan, t => t.CustomEvent(MoveInEvents.BellRang, (rang, p) => p.Element("page-heard").Text.Set(rang.Get(x => x.Times)))); }
+
+<p>
+    The page heard ring: <span id="page-heard"></span> · the resident step heard ring: <span id="resident-step-heard"></span>
+    · the needs heard ring: <span id="needs-heard"></span>
+</p>
+
+<form id="move-in">
+    @{ Html.InputField(plan, m => m.Coordinator, o => o.Label("Taken by")).Entry(); }
+    @* The first step is rendered with the page, inside the container every step loads into. *@
+    <div id="move-in-step">
+        @await Html.PartialAsync("/Slots/MoveInResident.cshtml", new MoveInResident())
+    </div>
+</form>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save-move-in", "Save for later")
+    .Reactive(button => button.Click, p => p.Post("/Slots/MoveIn/Save")
+        .Gather(g => g.Form())
+        .Validate<MoveInRules>("move-in")
+        .Response(r => r.OnSuccess<MoveInSaved>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+@(plan.Button("clear-steps", "Clear the steps")
+    .Reactive(button => button.Click, p => p.Unload("move-in-step")))
+
+@Html.RenderPlan(plan)

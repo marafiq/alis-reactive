@@ -1,7 +1,8 @@
-// Starting an owner (grammar.md 3.5): locate each plan's objects, hand every plugin its data
-// contribution under the owner, subscribe every handler, then start the owner, which runs the
-// handlers waiting for this owner's start (the document's `ready`). A slot's load starts only the
-// slot's owner, so a ready handler that loads a slot does not run again.
+// Starting owners (grammar.md 3.5): locate each plan's objects, hand every plugin its data
+// contribution under the plan's owner, subscribe every handler, then start each owner in the order
+// given, which runs the handlers waiting for that owner's start (the document's `ready`). Every owner
+// subscribes before any starts, so a ready handler of one is heard by the handlers of all. A slot's
+// load starts only the slot's owner, so a ready handler that loads a slot does not run again.
 
 import type { Handler, PlanDocument } from "../types/index";
 import { Environment } from "../grammar/environment";
@@ -15,12 +16,28 @@ import { toJavaScriptString } from "../shared/javascript-string";
 
 const log = logger("plans");
 
+/** An owner and the plans that start under it. */
+export interface OwnedPlans {
+  readonly owner: Owner;
+  readonly plans: readonly PlanDocument[];
+}
+
+export function startOwners(owned: readonly OwnedPlans[]): void {
+  const located = owned.map(({ owner, plans }) => ({ owner, plans, objectsByPlan: plans.map(plan => new PlanObjects(plan)) }));
+  for (const { owner, objectsByPlan } of located) {
+    for (const objects of objectsByPlan) contribute(objects, owner);
+  }
+  for (const { owner, objectsByPlan } of located) {
+    for (const objects of objectsByPlan) subscribeHandlers(objects, owner);
+  }
+  for (const { owner, plans } of located) {
+    owner.start();
+    log.info("owner.started", { owner: owner.name, plans: plans.map(plan => plan.planId) });
+  }
+}
+
 export function startOwner(owner: Owner, plans: readonly PlanDocument[]): void {
-  const objectsByPlan = plans.map(plan => new PlanObjects(plan));
-  for (const objects of objectsByPlan) contribute(objects, owner);
-  for (const objects of objectsByPlan) subscribeHandlers(objects, owner);
-  owner.start();
-  log.info("owner.started", { owner: owner.name, plans: plans.map(plan => plan.planId) });
+  startOwners([{ owner, plans }]);
 }
 
 // The plan gives data only to alis.model, alis.form and alis.hub, which the runtime registers, each with
