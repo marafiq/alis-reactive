@@ -21,7 +21,8 @@
                     .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
             </div>
             @* The contacts can be saved on their own: Save Contacts, under the section, checks only the
-               fields in it, with the same validator Save Intake uses for the whole form. *@
+               fields in it, with the same validator Save Intake uses for the whole form, and sends the
+               section's inputs with the flag the endpoint reads beside them. *@
             <div id="contacts-section" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @for (var i = 0; i < Model.Contacts.Count; i++)
                 {
@@ -38,7 +39,7 @@
                     .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("SaveContacts", "EmergencyContacts")).Gather(g => g.Form())
+                        p.Post(Url.SandboxRoute("SaveContacts", "EmergencyContacts")).Gather(g => g.Form().Form(m => m.HasContacts))
                          .Validate<EmergencyContactsValidator>("contacts-section")
                          .Response(r => r
                             .OnSuccess<EmergencyContactsConfirmation>((json, s) =>
