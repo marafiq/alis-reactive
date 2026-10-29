@@ -35,6 +35,18 @@ public sealed class ValidationController : Controller
 
     public IActionResult UnregisteredGuest() => View(new UnregisteredGuest());
 
+    public IActionResult Incident() => View(new IncidentReport());
+
+    /// <summary>Checks the report by its rules; 400 with every message by field, or filed with the photos it bound.</summary>
+    [HttpPost("/Validation/Incident")]
+    public IActionResult FileIncident([FromForm] IncidentReport report, [FromServices] IncidentReportRules rules)
+    {
+        var result = rules.Validate(report);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "filed with " + string.Join(", ", report.Photos!.Select(photo => photo.FileName)) });
+    }
+
     public IActionResult Handover() => View(new HandoverNote());
 
     /// <summary>A handover whose one form a second request validates by another validator, the one the address names.</summary>

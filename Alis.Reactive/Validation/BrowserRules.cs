@@ -86,12 +86,10 @@ namespace Alis.Reactive.Validation
 
         internal override string Name => "atLeastOne";
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
-        {
-            var isArray = G.Eq(G.Get(value, new[] { "constructor", "name" }, Shape.None), G.Lit("Array"));
-            var hasItems = G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0));
-            return G.Op(Operator.Cond, isArray, hasItems, G.Not(BlankOrDefault(value, fieldShape)));
-        }
+        // The value is the list as the field's shape reads it: an array, or the list the input keeps when it is
+        // no array (a file input's FileList), each counting its items; a missing one has none.
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
+            G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0));
     }
 
     /// <summary>Nothing is entered.</summary>

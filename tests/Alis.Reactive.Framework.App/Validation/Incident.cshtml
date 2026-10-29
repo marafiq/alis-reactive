@@ -1,0 +1,31 @@
+@using Alis.Reactive.Framework.App.Validation
+@model IncidentReport
+@{
+    ViewData["Title"] = "File an incident report";
+    var plan = Html.ReactivePlan<IncidentReport>();
+}
+<h1>File an incident report</h1>
+
+<div id="incident-form">
+    @{ Html.InputField(plan, m => m.Photos, o => o.Required().Label("Photos")).FileInput(); }
+</div>
+
+<p>Filed: <span id="filed"></span></p>
+
+@(plan.Button("file", "File the report")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Incident")
+        .AsFormData()
+        .Gather(g => g.Form())
+        .Validate<IncidentReportRules>("incident-form")
+        .Response(r => r
+            .OnSuccess<Booked>((filed, s) => s.Element("filed").Text.Set(filed.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("incident-form")))))
+@(plan.Button("ask-desk", "Ask the desk to file it")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Incident")
+        .AsFormData()
+        .Gather(g => g.Form())
+        .Response(r => r
+            .OnSuccess<Booked>((filed, s) => s.Element("filed").Text.Set(filed.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("incident-form")))))
+
+@Html.RenderPlan(plan)
