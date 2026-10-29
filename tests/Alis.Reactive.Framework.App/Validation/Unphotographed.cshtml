@@ -1,0 +1,39 @@
+@using Alis.Reactive.Framework.App.Validation
+@model UnphotographedReport
+@{
+    ViewData["Title"] = "File a report without photos";
+    var plan = Html.ReactivePlan<UnphotographedReport>();
+}
+<h1>File a report for a resident who declined photographs</h1>
+
+<div id="unphotographed-form">
+    @{ Html.InputField(plan, m => m.Photos, o => o.Label("Photos")).FileInput(); }
+</div>
+
+<p>Report: <span id="report-status"></span></p>
+
+@(plan.Button("file", "File the report")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Unphotographed")
+        .AsFormData()
+        .Gather(g => g.Form())
+        .Validate<UnphotographedReportRules>("unphotographed-form")
+        .Response(r => r
+            .OnSuccess<Booked>((filed, s) => s.Element("report-status").Text.Set(filed.Get(x => x.Summary)))
+            .OnError(400, e =>
+            {
+                e.ValidationErrors("unphotographed-form");
+                e.Element("report-status").Text.Set("returned by the desk");
+            }))))
+@(plan.Button("ask-desk", "Ask the desk to file it")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Unphotographed")
+        .AsFormData()
+        .Gather(g => g.Form())
+        .Response(r => r
+            .OnSuccess<Booked>((filed, s) => s.Element("report-status").Text.Set(filed.Get(x => x.Summary)))
+            .OnError(400, e =>
+            {
+                e.ValidationErrors("unphotographed-form");
+                e.Element("report-status").Text.Set("returned by the desk");
+            }))))
+
+@Html.RenderPlan(plan)

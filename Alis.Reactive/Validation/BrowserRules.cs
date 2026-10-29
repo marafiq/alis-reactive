@@ -92,7 +92,7 @@ namespace Alis.Reactive.Validation
             G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0));
     }
 
-    /// <summary>Nothing is entered.</summary>
+    /// <summary>Nothing is entered. On a list, no items.</summary>
     public sealed class EmptyRule : BrowserRule
     {
         internal EmptyRule(string message, Condition condition)
@@ -102,8 +102,30 @@ namespace Alis.Reactive.Validation
 
         internal override string Name => "empty";
 
+        internal override bool TryFor(FieldReference field, out BrowserRule rule)
+        {
+            rule = field.Shape is ArrayShape ? new NoItemsRule(Message, Condition) : this;
+            return true;
+        }
+
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             BlankOrDefault(value, fieldShape);
+    }
+
+    /// <summary>A list has no items: what <see cref="BrowserRule.Empty"/> asks of a list.</summary>
+    public sealed class NoItemsRule : BrowserRule
+    {
+        internal NoItemsRule(string message, Condition condition)
+            : base(message, condition)
+        {
+        }
+
+        internal override string Name => "noItems";
+
+        // The list as AtLeastOneRule reads it, an array or the input's own list (a FileList), with no items
+        // counted; a missing one has none, as the server's Empty passes null.
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
+            G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0)));
     }
 
     /// <summary>Text at least <see cref="Length"/> characters long.</summary>

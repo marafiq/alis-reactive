@@ -42,7 +42,7 @@ namespace Alis.Reactive.Validation
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule NotNull(string message) => new NotNullRule(message, Condition.Always);
 
-        /// <summary>Nothing is entered.</summary>
+        /// <summary>Nothing is entered. A list has no items.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule Empty(string message) => new EmptyRule(message, Condition.Always);
 

@@ -47,6 +47,18 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "filed with " + string.Join(", ", report.Photos!.Select(photo => photo.FileName)) });
     }
 
+    public IActionResult Unphotographed() => View(new UnphotographedReport());
+
+    /// <summary>Checks the report by its rules; 400 with every message by field, or filed with no photos.</summary>
+    [HttpPost("/Validation/Unphotographed")]
+    public IActionResult FileUnphotographed([FromForm] UnphotographedReport report, [FromServices] UnphotographedReportRules rules)
+    {
+        var result = rules.Validate(report);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "filed without photos" });
+    }
+
     public IActionResult Handover() => View(new HandoverNote());
 
     /// <summary>A handover whose one form a second request validates by another validator, the one the address names.</summary>
