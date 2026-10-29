@@ -123,7 +123,7 @@ namespace Alis.Reactive.Builders.Arrays
             throw new InvalidOperationException(
                 "An array predicate is a test of the item: a comparison (== != > >= < <=), && || !, a text test " +
                 "(Contains, StartsWith, EndsWith, string.IsNullOrEmpty, Regex.IsMatch), Contains over fixed values, " +
-                "or a boolean value. Got a " + Describe(body.Type) + ": " + body);
+                "or a boolean value. Got a " + CSharpTypeName.Of(body.Type) + ": " + body);
         }
 
         // A test made by a method: text's Contains, StartsWith and EndsWith with fixed text, string.IsNullOrEmpty,
@@ -362,7 +362,7 @@ namespace Alis.Reactive.Builders.Arrays
             {
                 if (Narrows(conversion.Operand.Type, conversion.Type))
                     throw new InvalidOperationException(
-                        $"A cast from {Describe(conversion.Operand.Type)} to {Describe(conversion.Type)} changes the value as C# computes it " +
+                        $"A cast from {CSharpTypeName.Of(conversion.Operand.Type)} to {CSharpTypeName.Of(conversion.Type)} changes the value as C# computes it " +
                         "(a whole number drops the fraction, a narrower number wraps), and a browser's number does not. " +
                         "Project the value on the server. Got: " + expression);
 
@@ -411,16 +411,7 @@ namespace Alis.Reactive.Builders.Arrays
         private static ValueExpression DateCall(ValueExpression date, string method) =>
             ValueExpression.Call(Target.Returned(date), new[] { method }, Array.Empty<ValueExpression>(), Array.Empty<Shape>(), Shape.Number, method);
 
-        private static string NameOf(MemberInfo member) => Describe(member.DeclaringType!) + "." + member.Name;
-
-        // A type as a developer reads it: DateTime, Nullable, Boolean?.
-        private static string Describe(Type type)
-        {
-            var inner = Nullable.GetUnderlyingType(type);
-            if (inner != null) return inner.Name + "?";
-            var arity = type.Name.IndexOf('`');
-            return arity < 0 ? type.Name : type.Name.Substring(0, arity);
-        }
+        private static string NameOf(MemberInfo member) => CSharpTypeName.Of(member.DeclaringType!) + "." + member.Name;
 
         private static Comparison ComparisonFor(ExpressionType nodeType) =>
             nodeType switch

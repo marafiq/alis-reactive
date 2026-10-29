@@ -40,7 +40,7 @@ namespace Alis.Reactive
         internal static RenderedInput Of(InputIdentity identity, IInputComponent component)
         {
             if (component == null) throw new ArgumentNullException(nameof(component));
-            return new RenderedInput(identity, component.Vendor, component.Input, ComponentKind.Of(component.GetType().Name));
+            return new RenderedInput(identity, component.Vendor, component.Input, ComponentKind.Of(CSharpTypeName.Of(component.GetType())));
         }
 
         internal bool SameAs(RenderedInput other) =>

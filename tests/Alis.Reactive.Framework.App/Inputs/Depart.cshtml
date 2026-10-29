@@ -7,6 +7,7 @@
 <h1>A visitor leaves</h1>
 
 @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+@{ Html.InputField(plan, m => m.Kind, o => o.Label("Kind of visit")).Choice(); }
 @switch (Model.Rendering)
 {
     case DepartRendering.WithTheSameComponent:
@@ -14,6 +15,9 @@
         break;
     case DepartRendering.WithAnotherComponent:
         Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor's pass")).FilePicker();
+        break;
+    case DepartRendering.TheKindWithAnotherComponent:
+        Html.InputField(plan, m => m.Kind, o => o.Label("Kind of visit, typed")).Entry();
         break;
 }
 

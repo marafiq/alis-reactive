@@ -97,7 +97,7 @@ namespace Alis.Reactive
         /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
         /// <returns>Each field the validator names, with the rules the browser can evaluate.</returns>
         public IReadOnlyList<BrowserField> BrowserRules<TValidator>() where TValidator : class =>
-            RequireBrowserRuleSource(_services, typeof(TValidator).Name, "This view")
+            RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>();
 
         /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>

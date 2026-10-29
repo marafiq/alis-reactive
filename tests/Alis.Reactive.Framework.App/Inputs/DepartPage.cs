@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Alis.Reactive.Framework.App.Inputs;
 
 /// <summary>A visitor signing out, whose one member a view renders twice.</summary>
@@ -6,6 +8,15 @@ public sealed class DepartPage
     public DepartRendering Rendering { get; set; }
 
     public string? Visitor { get; set; }
+
+    public VisitKind Kind { get; set; }
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum VisitKind
+{
+    Family,
+    Professional,
 }
 
 /// <summary>How the view renders the visitor's field the second time.</summary>
@@ -16,6 +27,9 @@ public enum DepartRendering
 
     /// <summary>With another component: a defect of the view.</summary>
     WithAnotherComponent,
+
+    /// <summary>The kind of visit, chosen from its members, rendered again with another component: a defect of the view.</summary>
+    TheKindWithAnotherComponent,
 }
 
 /// <summary>What the endpoint bound, in its own words.</summary>

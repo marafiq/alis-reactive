@@ -75,7 +75,7 @@ namespace Alis.Reactive.Builders.Arrays
             if (!keyIsSortableScalar)
                 throw new InvalidOperationException(
                     "OrderBy key must project to a scalar (string, number, date, bool, enum), not '" +
-                    typeof(TKey).Name + "'. Project a scalar field, e.g. .OrderBy(x => x.StartDate), " +
+                    CSharpTypeName.Of(typeof(TKey)) + "'. Project a scalar field, e.g. .OrderBy(x => x.StartDate), " +
                     "not .OrderBy(x => x.Address).");
 
             return new ReactiveArray<TElement>(
