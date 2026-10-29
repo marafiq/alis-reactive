@@ -22,14 +22,14 @@ namespace Alis.Reactive
 
         private readonly ReactivePlanScope _scope;
 
-        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services, PlanId planId, string fieldPrefix)
+        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services, PlanId planId, string fieldPrefix, string view)
         {
             if (scope == null) throw new ArgumentNullException(nameof(scope));
 
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _scope = scope;
             _services = services;
-            _context = new PlanBuildContext(_planId.Value, _renderedInputs, fieldPrefix);
+            _context = new PlanBuildContext(_planId.Value, _renderedInputs, fieldPrefix, view);
         }
 
         /// <summary>The plan's identifier: the model type's full name, or the element's id for an element plan.</summary>
@@ -86,7 +86,7 @@ namespace Alis.Reactive
         internal void AddRenderedInput(RenderedInput input)
         {
             if (input == null) throw new ArgumentNullException(nameof(input));
-            _renderedInputs.Add(input);
+            _context.AddInput(input);
         }
 
         /// <summary>
@@ -100,19 +100,28 @@ namespace Alis.Reactive
             RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>();
 
-        /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>
+        /// <summary>
+        /// Registers components, resolves validation, and serializes the Reactive Plan as compact JSON. A plan renders
+        /// once, after everything written to it: an input or behavior written to it later, and a second rendering, are
+        /// refused.
+        /// </summary>
         /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
         public string Render()
         {
+            _context.Seal();
             ResolveAll(_services);
             return GrammarSerializer.Serialize(_context.Write());
         }
 
-        /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as compact JSON.</summary>
+        /// <summary>
+        /// Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as
+        /// compact JSON. A plan renders once, after everything written to it, as <see cref="Render()"/> does.
+        /// </summary>
         /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
         /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
         public string Render(IServiceProvider services)
         {
+            _context.Seal();
             ResolveAll(services);
             return GrammarSerializer.Serialize(_context.Write());
         }

@@ -86,11 +86,11 @@ namespace Alis.Reactive
 #if NET48
         public static ReactivePlan<TModel> ElementPlan<TModel>(this HtmlHelper<TModel> html, string elementId)
             where TModel : class =>
-            new ReactivePlan<TModel>(ReactivePlanScope.Element, services: null, ElementPlanId(elementId), FieldPrefixOf(html));
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, services: null, ElementPlanId(elementId), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 #else
         public static ReactivePlan<TModel> ElementPlan<TModel>(this IHtmlHelper<TModel> html, string elementId)
             where TModel : class =>
-            new ReactivePlan<TModel>(ReactivePlanScope.Element, html.ViewContext.HttpContext.RequestServices, ElementPlanId(elementId), FieldPrefixOf(html));
+            new ReactivePlan<TModel>(ReactivePlanScope.Element, html.ViewContext.HttpContext.RequestServices, ElementPlanId(elementId), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 #endif
 
         private static PlanModel.PlanId ElementPlanId(string elementId) =>
@@ -105,7 +105,7 @@ namespace Alis.Reactive
         // container in Application_Start. See ReactivePlan.RequireBrowserRuleSource.
         private static ReactivePlan<TModel> CreatePlan<TModel>(HtmlHelper<TModel> html, ReactivePlanScope scope)
             where TModel : class =>
-            new ReactivePlan<TModel>(scope, services: null, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html));
+            new ReactivePlan<TModel>(scope, services: null, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
         // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
         private static string FieldPrefixOf<TModel>(HtmlHelper<TModel> html) =>
@@ -114,7 +114,7 @@ namespace Alis.Reactive
         private static ReactivePlan<TModel> CreatePlan<TModel>(
             IHtmlHelper<TModel> html, ReactivePlanScope scope)
             where TModel : class =>
-            new ReactivePlan<TModel>(scope, html.ViewContext.HttpContext.RequestServices, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html));
+            new ReactivePlan<TModel>(scope, html.ViewContext.HttpContext.RequestServices, PlanModel.PlanId.ForModel(typeof(TModel)), FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
         // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
         private static string FieldPrefixOf<TModel>(IHtmlHelper<TModel> html) =>

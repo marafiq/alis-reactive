@@ -1,0 +1,23 @@
+@using Alis.Reactive.Framework.App.Rendering
+@model ShiftHandover
+@{
+    ViewData["Title"] = "A shift handed over";
+    Layout = "_Shift";
+    var plan = Html.ReactivePlan<ShiftHandover>();
+}
+<h1>A shift handed over</h1>
+
+@{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+<p>The handover's endpoint bound: <span id="handed"></span></p>
+
+@section Aside {
+    @{ Html.InputField(plan, m => m.Notes, o => o.Label("Notes for the next shift")).Entry(); }
+    @(plan.Button("hand-over", "Hand over")
+        .Reactive(button => button.Click, p => p.Post("/Rendering/Handovers")
+            .Gather(g => g.Form(m => m.Resident, m => m.Notes))
+            .Response(r => r.OnSuccess<HandoverEcho>((echo, s) => s.Element("handed").Text.Set(echo.Get(x => x.Summary))))))
+}
+
+@section Scripts {
+    @Html.RenderPlan(plan)
+}
