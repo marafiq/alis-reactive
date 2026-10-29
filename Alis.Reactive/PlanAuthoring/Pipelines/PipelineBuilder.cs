@@ -172,9 +172,14 @@ namespace Alis.Reactive.Builders
         }
 
         /// <summary>
-        /// The hub a trigger listens to, by the declaration and URL the page handed <c>t.SignalR(..)</c>:
+        /// A declared hub, for its members and the methods the page calls on the server:
         /// <c>p.Hub(residents).ClearBoard()</c>, <c>p.Element("link").Text.Set(p.Hub(residents).State)</c>.
         /// </summary>
+        /// <remarks>
+        /// The plan holds the hub's connection, whether or not a trigger listens to it, for as long as its
+        /// owner lives: the page, or the slot the plan was loaded into. The connection closes when the last
+        /// plan holding it is unloaded.
+        /// </remarks>
         /// <typeparam name="THub">The hub's declaration.</typeparam>
         /// <param name="hub">The hub at its URL: <c>SignalRHub.At&lt;THub&gt;(url)</c>.</param>
         /// <returns>The hub, whose members the page uses directly.</returns>

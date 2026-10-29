@@ -1,9 +1,11 @@
 // alis.stream (grammar.md 6.6), keyed by URL, in the framework's bundle.
-// R1 One EventSource per URL, counted by subscriptions, closed when the last one is released.
+// R1 One EventSource per URL, counted by subscriptions, closed when the last one is released. A plan
+//    that only names the stream holds nothing.
 // R2 A named event subscribes by its name; unnamed messages arrive as "message". The payload is
 //    JSON.parse(data).
-// R3 A permanent close adds a marker to the retry indicator; one click retries every dropped
-//    connection, and the retried subscriptions keep their owners.
+// R3 A permanent close adds a marker to the retry indicator; one click takes every marker and retries
+//    its connection, and the retried subscriptions keep their owners. A retry that closes for good
+//    offers again; releasing the connection withdraws its offer.
 
 import type { Plugin } from "../objects/plugins";
 import type { Listener } from "../objects/vendor-driver";
@@ -37,7 +39,7 @@ function open(url: string, managed?: Managed): EventSource {
     if (!current || current.stopping || current.source !== source) return;
     if (source.readyState === EventSource.CLOSED) {
       log.error("connection.closed-permanent", { url });
-      showRetryIndicator(url, () => retry(url));
+      showRetryIndicator(url, () => retry(url, current));
     } else {
       log.warn("connection.reconnecting", { url });
     }
@@ -58,9 +60,8 @@ function managedFor(url: string): Managed {
   return managed;
 }
 
-function retry(url: string): void {
-  const managed = streams.get(url);
-  if (!managed) return;
+// Releasing the connection withdraws its offer, so a retry always finds the connection still held.
+function retry(url: string, managed: Managed): void {
   log.info("retry.manual", { url });
   managed.source.close();
   managed.source = open(url, managed);

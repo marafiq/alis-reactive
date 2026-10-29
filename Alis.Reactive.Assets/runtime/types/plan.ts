@@ -57,6 +57,7 @@ export interface PluginLocator {
 
 export type PluginData =
   | FormPluginData
+  | HubPluginData
   | ModelPluginData
   | NoPluginData;
 
@@ -206,6 +207,10 @@ export interface FormTest {
   check: FnExpr;
   when: Expr;
   message: string;
+}
+
+export interface HubPluginData {
+  kind: "hub";
 }
 
 export interface ModelPluginData {

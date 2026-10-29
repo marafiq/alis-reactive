@@ -4,9 +4,10 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 /// A hub the server drops, hangs up on or refuses. The server welcomes every call it takes and numbers it, so
 /// the call number says which connection the page holds. A dropped connection runs its Reconnecting pipeline,
 /// comes back under a new id the server knows the page by and runs its Reconnected pipeline; a connection the
-/// server closes for good runs its Close pipeline and the page offers to retry it, a click on the offer calls
-/// the hub again and the offer goes once it answers; a start the server refuses is tried again, a start
-/// refused on every try ends in the offer; and a page with no offer still hears the close.
+/// server closes for good runs its Close pipeline and the page offers to retry it; a click takes the offer and
+/// calls the hub again, a retry the hub answers leaves no offer and a retry refused on every try is offered
+/// again; a start the server refuses is tried again, a start refused on every try ends in the offer; and a page
+/// with no offer still hears the close.
 /// </summary>
 [TestFixture]
 public sealed class WhenTheServerDropsAHub : AppPageTest
@@ -93,7 +94,20 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
     }
 
     [Test]
-    public async Task the_retry_offer_goes_once_the_hub_answers_again()
+    public async Task a_click_on_retry_takes_the_offer_away_while_the_hub_is_called_again()
+    {
+        await Open("/Realtime/Line");
+        await Expect(Line("line-call")).ToHaveTextAsync("1");
+        await Button("Hang up the line").ClickAsync();
+        await Expect(RetryOffer).ToBeVisibleAsync();
+
+        await Button("Retry").ClickAsync();
+
+        await Expect(RetryOffer).ToBeHiddenAsync();
+    }
+
+    [Test]
+    public async Task a_retry_the_hub_answers_brings_its_welcome_and_leaves_no_offer()
     {
         await Open("/Realtime/Line");
         await Expect(Line("line-call")).ToHaveTextAsync("1");
@@ -106,6 +120,20 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
 
         await Expect(Line("line-call")).ToHaveTextAsync("2");
         await Expect(RetryOffer).ToBeHiddenAsync();
+    }
+
+    [Test]
+    public async Task a_retry_the_server_refuses_on_every_try_is_offered_again()
+    {
+        await Open("/Realtime/Line");
+        await Expect(Line("line-call")).ToHaveTextAsync("1");
+        await Button("Hang up the line").ClickAsync();
+        await Expect(RetryOffer).ToBeVisibleAsync();
+        await Button("Retry").ClickAsync();
+        await Expect(RetryOffer).ToBeHiddenAsync();
+
+        // The retry tries four times, 0, 2, 10 and 30 seconds apart, before it offers to retry again.
+        await Expect(RetryOffer).ToBeVisibleAsync(new() { Timeout = 60_000 });
     }
 
     [Test]

@@ -19,6 +19,9 @@ public sealed class WardLine : SignalRHub
     public void Find(Arg<string> connectionId) => Send(connectionId);
 
     public void Note(Arg<string> text) => Send(text);
+
+    /// <summary>The server answers a call from the bed.</summary>
+    public TypedSource<string> CallTheNurse() => Invoke<string>();
 }
 
 public sealed class LineCall : JsObject
@@ -64,7 +67,10 @@ public sealed class LinePage(bool offersRetry)
     public bool OffersRetry { get; } = offersRetry;
 }
 
-/// <summary>The ward page: a bed loaded into a slot listens to the line and the board, and the page may listen too.</summary>
+/// <summary>
+/// The ward page: a bed loaded into a slot listens to the line and the board, a call point loaded into another
+/// calls the line and listens to none of it, and the page may listen to the line and call it too.
+/// </summary>
 public sealed class WardPage(bool pageListens)
 {
     public string World { get; } = Guid.NewGuid().ToString("N");
@@ -74,6 +80,12 @@ public sealed class WardPage(bool pageListens)
 
 /// <summary>A bed's monitor, loaded into the ward's slot: it listens to the ward's line and board.</summary>
 public sealed class BedCard(string world)
+{
+    public string World { get; } = world;
+}
+
+/// <summary>A bed's call point, loaded into the ward's slot: it calls the ward's line and listens to none of it.</summary>
+public sealed class CallPointCard(string world)
 {
     public string World { get; } = world;
 }

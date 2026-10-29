@@ -36,6 +36,8 @@ public sealed class LineHub(LineExchange exchange) : Hub
 
     public Task Note(string text) => Clients.Caller.SendAsync(Line.Noted.Name, new { text });
 
+    public string CallTheNurse() => "a nurse is on the way";
+
     private LineWorld World() => exchange.World(Context.GetHttpContext()!.Request.Query["world"].ToString());
 }
 

@@ -1,9 +1,10 @@
 // One developer-owned layout element is the retry indicator for every live
 // connection: <div id="alis-realtime-connection-retry-container" hidden>...</div>.
 // Marker children are the only registry — one per dropped connection, each
-// carrying its retry action. The indicator is visible while any marker exists;
-// one click retries every dropped connection. Without the element the behavior
-// is not invoked at all — that is a loud boundary error, never a fallback.
+// carrying its retry action. The indicator is visible while any marker exists.
+// One click takes every marker and retries its connection; a connection whose
+// retry fails adds its marker again. Without the element the behavior is not
+// invoked at all — that is a loud boundary error, never a fallback.
 
 import { logger } from "../diagnostics/trace";
 
@@ -52,7 +53,10 @@ function wireRetryClickOnce(element: HTMLElement): void {
   element.dataset.alisRetryWired = "true";
 
   element.addEventListener("click", () => {
-    element.querySelectorAll(`[${RETRY_ATTR}]`).forEach(marker =>
-      marker.dispatchEvent(new Event(RETRY_EVENT)));
+    const markers = Array.from(element.querySelectorAll(`[${RETRY_ATTR}]`));
+    for (const marker of markers) marker.remove();
+    element.hidden = true;
+    log.debug("taken", { count: markers.length });
+    for (const marker of markers) marker.dispatchEvent(new Event(RETRY_EVENT));
   });
 }
