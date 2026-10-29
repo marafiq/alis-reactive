@@ -63,13 +63,6 @@ namespace Alis.Reactive.PlanModel
         internal static MemberName Of(string value) => new MemberName(value);
     }
 
-    internal sealed class ComponentKind : PlanString
-    {
-        private ComponentKind(string value) : base(value, "Component kind") { }
-
-        internal static ComponentKind Of(string value) => new ComponentKind(value);
-    }
-
     internal sealed class EventName : PlanString
     {
         private EventName(string value) : base(value, "Event name") { }

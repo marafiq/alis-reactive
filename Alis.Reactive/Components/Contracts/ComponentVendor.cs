@@ -125,12 +125,6 @@ namespace Alis.Reactive
                 _listening,
                 Vendor.PayloadOf(_payload));
 
-        internal bool SameAs(ComponentVendor other) =>
-            Name == other.Name
-            && _objectPath.SameAs(other._objectPath)
-            && _listening.SameAs(other._listening)
-            && _payload == other._payload;
-
         /// <inheritdoc />
         public override string ToString() => Name;
 

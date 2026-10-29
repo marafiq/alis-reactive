@@ -75,8 +75,8 @@ public class WhenLiveConnectionDrops : PlaywrightTestBase
 
         await ClickWhenStable(RetryIndicator);
 
-        // A retry against a still-broken server must never read as success: the
-        // indicator stays visible through the attempt instead of blinking away.
+        // A retry against a still-broken server must never read as success: the click
+        // takes the offer, and the retry that closes again offers it again (grammar.md R3).
         await Expect(RetryIndicator).ToBeVisibleAsync(new() { Timeout = 1000 });
         await WaitForTraceMessage("[alis:server-push] retry.manual", 10000);
         await Expect(RetryIndicator).ToBeVisibleAsync();

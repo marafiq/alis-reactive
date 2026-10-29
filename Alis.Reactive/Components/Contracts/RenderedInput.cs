@@ -15,14 +15,15 @@ namespace Alis.Reactive
     internal sealed class RenderedInput
     {
         private readonly InputIdentity _identity;
-        private readonly ComponentKind _kind;
+        // The declaration's class: its vendor and its input are the class's own, so one class is one component.
+        private readonly Type _component;
 
-        private RenderedInput(InputIdentity identity, ComponentVendor vendor, ComponentInput input, ComponentKind kind)
+        private RenderedInput(InputIdentity identity, ComponentVendor vendor, ComponentInput input, Type component)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             ComponentVendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
             Input = input ?? throw new ArgumentNullException(nameof(input));
-            _kind = kind ?? throw new ArgumentNullException(nameof(kind));
+            _component = component ?? throw new ArgumentNullException(nameof(component));
         }
 
         internal string ComponentId => _identity.ElementId;
@@ -40,19 +41,17 @@ namespace Alis.Reactive
         internal static RenderedInput Of(InputIdentity identity, IInputComponent component)
         {
             if (component == null) throw new ArgumentNullException(nameof(component));
-            return new RenderedInput(identity, component.Vendor, component.Input, ComponentKind.Of(CSharpTypeName.Of(component.GetType())));
+            return new RenderedInput(identity, component.Vendor, component.Input, component.GetType());
         }
 
         internal bool SameAs(RenderedInput other) =>
             _identity.Id.SameAs(other._identity.Id)
-            && ComponentVendor.SameAs(other.ComponentVendor)
             && _identity.Binding.SameAs(other._identity.Binding)
-            && Input.Matches(other.Input)
-            && _kind.SameAs(other._kind)
+            && _component == other._component
             && Shape == other.Shape;
 
         internal string Describe() =>
-            $"[{ComponentId}, {ComponentVendor.Name}, {Input.Describe()}, {_kind.Value}, {Shape.DescribeContract()}]";
+            $"[{ComponentId}, {ComponentVendor.Name}, {Input.Describe()}, {CSharpTypeName.Of(_component)}, {Shape.DescribeContract()}]";
     }
 
     /// <summary>The inputs one plan rendered, by binding path. One field is rendered once.</summary>

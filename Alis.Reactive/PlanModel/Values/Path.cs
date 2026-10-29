@@ -42,8 +42,6 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>The step as the plan carries it: the member's name, the position's digits, or <c>[]</c> for each item.</summary>
         internal string ToPathText() => _text;
-
-        internal bool SameAs(PathSegment other) => Kind == other.Kind && _text == other._text;
     }
 
     /// <summary>
@@ -134,9 +132,6 @@ namespace Alis.Reactive.PlanModel
 
             return new Path(segments);
         }
-
-        internal bool SameAs(Path other) =>
-            Segments.Count == other.Segments.Count && Segments.Zip(other.Segments, (mine, theirs) => mine.SameAs(theirs)).All(same => same);
 
         public override string ToString()
         {

@@ -46,10 +46,6 @@ namespace Alis.Reactive
             return new ComponentInput(value.Member.Path, EventName.Of(committedBy.Name));
         }
 
-        internal bool Matches(ComponentInput other) =>
-            ValuePath.ToString() == other.ValuePath.ToString()
-            && CommittedBy.SameAs(other.CommittedBy);
-
         internal string Describe() => $"{ValuePath}, committed by {CommittedBy.Value}";
     }
 }
