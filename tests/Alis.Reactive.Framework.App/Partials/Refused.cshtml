@@ -11,6 +11,9 @@
     case PartialMistake.TypeAPartialToAnInterface:
         @await Html.PartialAsync("NamedVisitorLine", Model)
         break;
+    case PartialMistake.BindAnInputToTheModelItself:
+        @Html.EditorFor(m => m.Visitor, "VisitorText")
+        break;
 }
 
 @Html.RenderPlan(plan)

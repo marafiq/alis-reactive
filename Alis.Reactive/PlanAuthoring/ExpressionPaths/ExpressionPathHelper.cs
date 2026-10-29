@@ -61,14 +61,22 @@ namespace Alis.Reactive
         /// The class whose scope the id of the member's input takes: the class that declares the chain's last
         /// member, by its base definition (<c>KinCard</c> for <c>m =&gt; m.NextOfKin.Name</c>, the page's model for
         /// <c>m =&gt; m.Phones[0]</c>). A member an interface declares, read on a class, is declared by the class that
-        /// implements it; read on the interface itself it is the interface. A lambda with no member keeps the
-        /// view's model.
+        /// implements it; read on the interface itself it is the interface, which scopes no id.
         /// </summary>
+        /// <remarks>
+        /// A lambda with no member (<c>m =&gt; m</c> in a template of a text member) is refused: the view's own
+        /// model is the member's type, not the class that declares the member, so its id would be one the page's
+        /// rules, sends and reads never derive.
+        /// </remarks>
         internal static Type ToDeclarer(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             var bound = Steps(expression.Body).LastOrDefault(step => step.IsMember);
-            return bound.IsMember ? DeclarerOf(bound.Access!) : expression.Parameters[0].Type;
+            if (!bound.IsMember)
+                throw new InvalidOperationException(
+                    $"{expression} binds no member. An input's id is scoped by the class that declares the member it binds: " +
+                    "render the input in a view of that class, like m => m.Name.");
+            return DeclarerOf(bound.Access!);
         }
 
         // Component IDs match MVC's Html.IdFor(), including nested-property underscores.

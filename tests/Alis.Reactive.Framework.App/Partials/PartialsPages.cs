@@ -91,6 +91,7 @@ public sealed class PartialRefusalsPage : INamedVisitor
 public enum PartialMistake
 {
     TypeAPartialToAnInterface,
+    BindAnInputToTheModelItself,
 }
 
 /// <summary>What an endpoint bound, in its own words.</summary>
