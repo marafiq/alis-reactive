@@ -7,6 +7,8 @@
 // S2 unload() raises alis:unmount on the content, releasing the same owners, and empties the slot.
 // S3 Wired HTML that anything else removes (a drawer closing on content a plan loaded into it) is
 //    announced the same way, alis:unmount on its root, and the owners inside it are released alike.
+// Content the server rendered inside a slot's container starts under the slot's owner at boot
+// (slotOwner, grammar.md 3.5), so the slot's first load or unload releases it like loaded content.
 
 import type { Plugin } from "../objects/plugins";
 import { Owner } from "../objects/owner";
@@ -33,12 +35,11 @@ function container(id: string): HTMLElement {
 
 function load(id: string, html: unknown): void {
   if (typeof html !== "string") throw new Error(`[alis] slot #${id} expects HTML text, got ${typeof html}`);
-  listenForUnmounts();
   const target = container(id);
 
   const host = document.createElement("div");
   host.innerHTML = html;
-  const plans = discoverPlans(host, true);
+  const plans = discoverPlans(host, true).map(found => found.plan);
 
   announceUnmount(target);
   target.innerHTML = "";
@@ -47,14 +48,23 @@ function load(id: string, html: unknown): void {
   announceMount(target);
   if (plans.length === 0) return;
 
-  const owner = Owner.slot(id);
-  owners.set(id, owner);
-  startOwner(owner, plans);
+  startOwner(slotOwner(id), plans);
   log.info("partial-slot.load", { slotId: id, plans: plans.length });
 }
 
-function unload(id: string): void {
+/**
+ * A new owner for what the slot holds, released by the slot's next load or unload, or when anything
+ * removes the content around it. Only an owner has anything to release, so the first one starts the
+ * listening.
+ */
+export function slotOwner(id: string): Owner {
   listenForUnmounts();
+  const owner = Owner.slot(id);
+  owners.set(id, owner);
+  return owner;
+}
+
+function unload(id: string): void {
   const target = container(id);
   announceUnmount(target);
   target.innerHTML = "";

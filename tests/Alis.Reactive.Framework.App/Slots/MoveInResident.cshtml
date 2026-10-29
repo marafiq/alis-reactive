@@ -1,0 +1,37 @@
+@using Alis.Reactive.Framework.App.Slots
+@model MoveInResident
+@{
+    var plan = Html.ReactivePlan<MoveInResident>();
+}
+<section id="resident-step">
+    <h2>The resident</h2>
+    <p>Details taken by <span id="resident-taken-by"></span></p>
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Resident")).Entry(); }
+
+    @* The needs are rendered with the step, inside a container of the step's own; they start after the step. *@
+    <p>Needs: <span id="needs-status"></span></p>
+    <div id="resident-needs">
+        @await Html.PartialAsync("/Slots/MoveInNeeds.cshtml", new MoveInNeeds())
+    </div>
+    @(plan.Button("no-needs", "No special needs")
+        .Reactive(button => button.Click, p => p.Unload("resident-needs")))
+
+    @* The step checks the page's form by its own rules, then loads the next step where it sits. *@
+    @(plan.Button("resident-next", "Next")
+        .Reactive(button => button.Click, p => p.Post("/Slots/MoveIn/Resident")
+            .Gather(g => g.Form())
+            .Validate<MoveInResidentRules>("move-in")
+            .Response(r => r
+                .OnSuccess(s => s.Into("move-in-step"))
+                .OnError(400, e => e.ValidationErrors("move-in")))))
+</section>
+
+@{ Html.On(plan, t => t.DomReady(p =>
+{
+    p.Element("move-in-progress").Text.Set("on the resident step");
+    p.Element("needs-status").Text.Set("not asked yet");
+})); }
+@{ Html.On(plan, t => t.CustomEvent(MoveInEvents.Opened, (opened, p) => p.Element("resident-taken-by").Text.Set(opened.Get(x => x.Coordinator)))); }
+@{ Html.On(plan, t => t.CustomEvent(MoveInEvents.BellRang, (rang, p) => p.Element("resident-step-heard").Text.Set(rang.Get(x => x.Times)))); }
+
+@Html.RenderPlan(plan)

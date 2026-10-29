@@ -366,23 +366,31 @@ A failing handler is logged and stops no other handler.
 1. **Owners.** An owner is the page, or a slot. It holds disposers: its handler subscriptions, its
    plugin data contributions (a hub's connection is held by one), and the stream subscriptions those
    plugins made for it. It knows nothing about what they are.
-2. **Starting an owner.** For the page at boot, or a slot at load:
+2. **Starting an owner.** For the owners at boot, or a slot at load:
    1. discover the plan scripts and compose the ones that share a `planId`;
    2. locate the objects;
-   3. pass each plugin its data contribution under the owner;
+   3. pass each plugin its data contribution under the plan's owner;
    4. subscribe every handler;
-   5. start the owner, which runs the handlers waiting for this owner's start (`document`'s `ready`,
-      D1).
+   5. start each owner, which runs the handlers waiting for that owner's start (`document`'s
+      `ready`, D1).
 
-   So a ready handler can raise custom events other handlers already hear. Loading a slot starts
-   only the slot's handlers, so a ready handler that loads a slot does not run again.
-3. **Booted mark.** After the page starts, the root element gets `data-alis-booted="true"`, the one
+   Every owner contributes and subscribes before any starts, so a ready handler can raise custom
+   events other handlers already hear, the other owners' too. Loading a slot starts only the slot's
+   handlers, so a ready handler that loads a slot does not run again.
+3. **Content rendered inside a slot.** At boot, a plan whose script sits inside an element some plan
+   loads into (the key of an `alis.slot` any plan on the page names) starts under that slot's owner,
+   the innermost such element's, and every other plan under the page's. The slot's first load or
+   unload then releases it as it releases loaded content (6.5 S1, S2): its handlers, its model inputs
+   and its form tests (F9). The owners start as loads would have started them: the page's first, then
+   each slot's, an outer slot's before the slot inside it. Only plan data decides it, and only boot:
+   every plan in HTML a slot loads starts under that slot's owner, wherever it sits in that HTML.
+4. **Booted mark.** After the owners start, the root element gets `data-alis-booted="true"`, the one
    mark of a booted page, readable by whoever arrives later (`Alis.Reactive.Assets/runtime/root.ts`).
    The Playwright tests wait on it.
-4. **Unloading a slot** runs its owner's disposers, and the boot-owned ones stay. A block that is
-   already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:54-60`
+5. **Unloading a slot** runs its owner's disposers, and the page's owner's stay. A block that is
+   already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:84-90`
    disposes the owner and nothing else).
-5. **Mount events.** The app hears `alis:unmount` and `alis:mount` on the document, with
+6. **Mount events.** The app hears `alis:unmount` and `alis:mount` on the document, with
    `detail.root`, around every change of content. This is the public contract with app bundles
    that construct and destroy their own widgets.
 
@@ -594,10 +602,10 @@ no key (H2) and no entry (H4).
     and shows nothing: the server said nothing the form can place.
 - **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
   unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
-  plans it touched (the form plugin's contribution in `Alis.Reactive.Assets/runtime/plugins/form/form.ts`). Content rendered with the page belongs to the page even inside
-  a slot's container: when a load replaces it, its tests stay, and its fields, no longer rendered,
-  are checked as missing values (F5). A form whose steps replace each other in one slot therefore
-  loads its first step into the slot too (the intake journey, `Validation/IntakeSteps`).
+  plans it touched (the form plugin's contribution in `Alis.Reactive.Assets/runtime/plugins/form/form.ts`). Content the server rendered inside a slot's container
+  belongs to the slot (3.5), so a form whose steps replace each other in one slot may render its
+  first step with the page: the first load or unload there removes that step's tests as it removes a
+  loaded step's (`Slots/WhenASlotStartsWithServerRenderedContent`).
 
 ### 6.5 `slot` (`plugin("alis.slot", containerId)`)
 
