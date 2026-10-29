@@ -25,8 +25,8 @@
     <li><a href="/Inputs/Room">Inputs: inputs labelled by the ids the framework gives them</a></li>
     <li><a href="/Inputs/Care">Inputs: enum members chosen, checked, compared and set</a></li>
     <li><a href="/Inputs/Contacts">Inputs: one card rendered for two members of the page</a></li>
-    <li><a href="/Inputs/Depart?rendering=WithTheSameComponent">Inputs: a member's field rendered twice</a></li>
-    <li><a href="/Inputs/Depart?rendering=WithAnotherComponent">Inputs: a member's field rendered twice with two components, refused</a></li>
+    <li><a href="/Inputs/Depart?rendering=TwiceOnOnePlan">Inputs: a member's field rendered twice on one plan, refused</a></li>
+    <li><a href="/Inputs/Depart?rendering=AgainInAPartial">Inputs: a member's field rendered again by a partial's plan, refused</a></li>
     <li><a href="/Slots/Desk">Slots: a partial loaded into a slot and unloaded from it</a></li>
     <li><a href="/Slots/Lounge">Slots: a slot released even when releasing one of its handlers fails</a></li>
     <li><a href="/Slots/Hall">Slots: a slot inside a slot, answers that are not HTML or have no plan, and a vendor script</a></li>
@@ -34,6 +34,15 @@
     <li><a href="/Plans/Contacts">Plans: element plans on a page with no plan of its own</a></li>
     <li><a href="/Plans/Noticeboard">Plans: the plans in loaded HTML, and HTML whose plan is not JSON</a></li>
     <li><a href="/Plans/Serviced">Plans: a plan the view renders with the services it hands over</a></li>
+    <li><a href="/Rendering/Handover">Rendering: a plan rendered in the layout's last section takes what an earlier section wrote</a></li>
+    <li><a href="/Rendering/NotesInASection">Rendering: an input written after its plan rendered, refused</a></li>
+    <li><a href="/Rendering/SaveInASection">Rendering: behavior written after its plan rendered, refused</a></li>
+    <li><a href="/Rendering/RenderedTwice">Rendering: a plan rendered twice, refused</a></li>
+    <li><a href="/Rendering/Rounds?card=InTheCardsBody">Rendering: a partial's plan rendered in its body, beside the page's</a></li>
+    <li><a href="/Rendering/Rounds?card=WhenItsButtonIsWritten">Rendering: a partial's plan a helper renders when its markup is written</a></li>
+    <li><a href="/Rendering/Rounds?card=InTheCardsSection">Rendering: a partial's plan rendered in its own section, never rendered, refused</a></li>
+    <li><a href="/Rendering/Relief?prefix=BeforeThePlanStarts">Rendering: a view's field prefix taken before its plan starts</a></li>
+    <li><a href="/Rendering/Relief?prefix=AfterThePlanStarts">Rendering: a view's field prefix changed after its plan started, refused</a></li>
     <li><a href="/Requests/Booking">Requests: any error read by its typed body</a></li>
     <li><a href="/Requests/Desk">Requests: every verb, gather, format, answer and order</a></li>
     <li><a href="/Requests/Outage">Requests: a request that cannot be built, an answer that cannot be handled, a dropped connection</a></li>

@@ -1,0 +1,10 @@
+@using Alis.Reactive.Framework.App.Inputs
+@model DepartPage
+@{
+    // The visitor's pass: a partial of the page's own model, with a plan of its own, that renders the visitor again.
+    var plan = Html.ReactivePlan<DepartPage>();
+}
+<section id="visitor-pass" aria-label="The visitor's pass">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor on the pass")).Entry(); }
+    @Html.RenderPlan(plan)
+</section>

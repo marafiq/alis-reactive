@@ -128,20 +128,3 @@ public sealed class Desk : Component
 
     public TypedSource<bool> Reserve(Arg<RoomCheck> check) => MethodAsync<bool>(check);
 }
-
-/// <summary>A second kind of input, for the one page that may not render a member twice with two kinds.</summary>
-public sealed class NumberInput : Component, IInputComponent
-{
-    public override ComponentVendor Vendor => ComponentVendor.Native;
-
-    public Property<int> Value => Property<int>();
-
-    public Event<NumberChange> Change => Event<NumberChange>();
-
-    ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
-}
-
-public sealed class NumberChange : JsObject
-{
-    public ReadOnly<int> Value => ReadOnly<int>();
-}

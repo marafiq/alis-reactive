@@ -32,21 +32,59 @@ namespace Alis.Reactive.PlanModel
         // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
 
-        internal PlanBuildContext(string planId, RenderedInputs inputs, string fieldPrefix)
+        internal PlanBuildContext(string planId, RenderedInputs inputs, string fieldPrefix, string view)
         {
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _inputs = inputs ?? throw new ArgumentNullException(nameof(inputs));
             FieldPrefix = fieldPrefix ?? throw new ArgumentNullException(nameof(fieldPrefix));
+            View = view ?? throw new ArgumentNullException(nameof(view));
         }
 
         /// <summary>The MVC field prefix the plan's view renders under; empty for a page's own view.</summary>
         internal string FieldPrefix { get; }
+
+        /// <summary>The path of the view that started the plan, which what the plan refuses names.</summary>
+        internal string View { get; }
+
+        /// <summary>Whether the plan has rendered: from then on it takes no input and no behavior, and renders no more.</summary>
+        internal bool Rendered { get; private set; }
+
+        // ── rendering ────────────────────────────────────────────────────────────
+
+        /// <summary>The plan renders, once.</summary>
+        internal void Seal()
+        {
+            if (Rendered)
+                throw new InvalidOperationException(
+                    $"The plan of {View} is rendered twice, so every handler it holds would run twice: render it once, " +
+                    "after the last behavior written to it.");
+            Rendered = true;
+        }
+
+        /// <summary>An input the view rendered joins the plan, while the plan has not rendered.</summary>
+        internal void AddInput(RenderedInput input)
+        {
+            RefuseOnceRendered($"Input '{input.BindingPath}'", "the input");
+            _inputs.Add(input);
+        }
+
+        // Razor runs a view's sections after its body, when the layout renders them: what a section writes to a plan
+        // the body rendered never reaches the page.
+        private void RefuseOnceRendered(string written, string what)
+        {
+            if (!Rendered) return;
+            throw new InvalidOperationException(
+                $"{written} is written after the plan of {View} rendered, so the plan the page runs does not hold it. " +
+                "Razor runs a @section after the view's body: render the plan in a section the layout renders after the " +
+                $"others, such as @section Scripts {{ @Html.RenderPlan(plan) }}, or write {what} in the body.");
+        }
 
         // ── callbacks ────────────────────────────────────────────────────────────
 
         /// <summary>Builds a callback: every step written while it runs lands in the returned block.</summary>
         internal Block Build(Action callback)
         {
+            RefuseOnceRendered("Behavior", "the behavior");
             var block = new Block();
             _blocks.Push(block);
             try

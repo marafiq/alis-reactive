@@ -1,0 +1,25 @@
+@using Alis.Reactive.Framework.App.Rendering
+@model RoundsPage
+@{
+    ViewData["Title"] = "The round";
+    Layout = "_Shift";
+    var plan = Html.ReactivePlan<RoundsPage>();
+    var card = Model.Card switch
+    {
+        VitalsCardPlan.InTheCardsBody => "VitalsCard",
+        VitalsCardPlan.InTheCardsSection => "VitalsCardScripts",
+        _ => "VitalsCardButton",
+    };
+}
+<h1>The round</h1>
+
+@{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+@await Html.PartialAsync(card, new VitalsCard())
+<p>The handover's endpoint bound: <span id="handed"></span></p>
+
+@(plan.Button("hand-over", "Hand over")
+    .Reactive(button => button.Click, p => p.Post("/Rendering/Handovers")
+        .Gather(g => g.Form(m => m.Resident))
+        .Response(r => r.OnSuccess<HandoverEcho>((echo, s) => s.Element("handed").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

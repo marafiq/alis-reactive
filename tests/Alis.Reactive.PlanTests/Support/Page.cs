@@ -17,11 +17,14 @@ namespace Alis.Reactive.PlanTests.Support;
 internal static class Page
 {
     internal static ReactivePlan<TModel> Plan<TModel>() where TModel : class =>
-        new(ReactivePlanScope.RootView, services: null, PlanId.ForModel(typeof(TModel)), HtmlFieldPrefix.None);
+        new(ReactivePlanScope.RootView, services: null, PlanId.ForModel(typeof(TModel)), HtmlFieldPrefix.None, ViewOf<TModel>());
 
     /// <summary>A partial's plan, rendered for the member of the page's model the prefix names.</summary>
     internal static ReactivePlan<TModel> Partial<TModel>(string fieldPrefix) where TModel : class =>
-        new(ReactivePlanScope.PartialView, services: null, PlanId.ForModel(typeof(TModel)), fieldPrefix);
+        new(ReactivePlanScope.PartialView, services: null, PlanId.ForModel(typeof(TModel)), fieldPrefix, ViewOf<TModel>());
+
+    // The view a page's plan starts in, named for its model.
+    private static string ViewOf<TModel>() => $"/{typeof(TModel).Name}.cshtml";
 
     internal static TriggerBuilder<TModel> Triggers<TModel>(this ReactivePlan<TModel> plan) where TModel : class =>
         new(plan, plan.Context);

@@ -1,6 +1,5 @@
 using Alis.Reactive.Builders;
 using Alis.Reactive.Components;
-using Alis.Reactive.InputField;
 using Alis.Reactive.PlanModel;
 using Alis.Reactive.PlanTests.Support;
 
@@ -53,18 +52,6 @@ public class WhenAPageCannotRender
 
         Assert.That(refused!.Message, Does.Contain("has no browser form"));
         Assert.That(refused.Message, Does.Contain("WhenOnServer"));
-    }
-
-    [Test]
-    public void a_member_rendered_twice_with_two_kinds_of_input_is_refused()
-    {
-        var plan = Page.Plan<Admission>().TextInput(m => m.Age);
-
-        var refused = Assert.Throws<InvalidOperationException>(() =>
-            plan.AddRenderedInput(RenderedInput.Of(
-                InputIdentity.For<Admission, int>(m => m.Age, "Age", HtmlFieldPrefix.None), new NumberInput())));
-
-        Assert.That(refused!.Message, Does.Contain("rendered twice with different components"));
     }
 
     [Test]
