@@ -378,7 +378,7 @@ A failing handler is logged and stops no other handler.
 | `set` targets a writable member | C# type: `ReadOnly<T>` has no `Set` |
 | Members, arguments and payload types exist and match | C# type |
 | Ordering applies only to comparable types; text operators apply only to text | C# type: generic constraints |
-| A condition never orders a `TimeSpan`: it reaches the browser as its text, and `"1.02:00:00"` sorts before `"23:00:00"` | render |
+| A condition or an array lambda (a comparison, an `OrderBy` key) never orders a `TimeSpan`: it reaches the browser as its text, and `"1.02:00:00"` sorts before `"23:00:00"` | render |
 | An event's payload type matches the callback | C# type |
 | A member call that returns a value is not discarded | analyzer: a discarded `Value<T>` is an error |
 | Every handle is used inside an active block, within its binding's scope | builder at render, naming the handle |
