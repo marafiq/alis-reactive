@@ -106,18 +106,22 @@ namespace Alis.Reactive.Builders
         /// <summary>The component the view rendered for a member of this plan's model.</summary>
         /// <typeparam name="TComponent">The component's declaration, whose members the page uses directly.</typeparam>
         /// <param name="expr">
-        /// The model member the component is bound to; its id is derived as the input field derives it, under
-        /// the view's field prefix, so a partial rendered for a member of the page's model reaches its own input.
+        /// The model member the component is bound to; its id is derived as the input field derives it, from the
+        /// class that declares the member and the member's path under the view's field prefix, so the page reaches
+        /// the input an editor template or a partial renders for the member: <c>m =&gt; m.NextOfKin.Name</c>.
         /// </param>
         /// <returns>The component: <c>rate.Min.Set(0m)</c>, <c>rate.Increment()</c>, <c>p.When(rate.Value).Gt(1m)</c>.</returns>
         public TComponent Component<TComponent>(Expression<Func<TModel, object?>> expr)
             where TComponent : JsObject, IComponent, new() =>
-            Live<TComponent>(IdGenerator.For(typeof(TModel), HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
+            Live<TComponent>(IdGenerator.ForMember(
+                ExpressionPathHelper.ToDeclarer(expr),
+                HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
 
         /// <summary>
         /// The component a view of another model rendered for one of its members with no field prefix, such as
-        /// a partial rendered at the top level. The id is derived from the other model alone, so an input a
-        /// partial rendered under a prefix is reached from that partial's own plan, or by an event it raises.
+        /// a partial rendered at the top level. The id is derived as the input field derives it, from the class
+        /// that declares the member and the member's path; an input a partial rendered under a prefix is reached
+        /// by the member of this plan's model that holds it, <c>p.Component&lt;Entry&gt;(m =&gt; m.NextOfKin.Name)</c>.
         /// </summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <typeparam name="TOtherModel">The model the component was rendered for.</typeparam>
@@ -126,7 +130,7 @@ namespace Alis.Reactive.Builders
         public TComponent Component<TComponent, TOtherModel>(Expression<Func<TOtherModel, object?>> expr)
             where TComponent : JsObject, IComponent, new()
             where TOtherModel : class =>
-            Live<TComponent>(IdGenerator.For<TOtherModel, object?>(expr));
+            Live<TComponent>(IdGenerator.For(expr));
 
         /// <summary>The component the view rendered with an id it chose.</summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>

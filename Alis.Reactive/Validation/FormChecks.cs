@@ -50,13 +50,13 @@ namespace Alis.Reactive.Validation
         {
             // The checks are written relative to the validator's model; the view's field prefix is applied
             // where an input is resolved, so the rendered paths read here are relative to it too.
-            var values = new FormFieldValues(renderedInputs, modelType, fieldPrefix);
+            var values = new FormFieldValues(renderedInputs, fieldPrefix);
             var renderedPaths = renderedInputs.Keys
                 .Select(path => HtmlFieldPrefix.Strip(fieldPrefix, path))
                 .Where(path => path != null)
                 .Select(path => path!)
                 .ToList();
-            // A checked member is carried whether or not this plan renders it (a partial of the same model may)
+            // A checked member is carried whether or not this plan renders it (a partial or the member's editor template may)
             // and whether or not the browser can check it: a message the server sends for it then lands
             // beside its input wherever the input is.
             var bound = new List<CheckedField>();
@@ -80,7 +80,7 @@ namespace Alis.Reactive.Validation
             Type modelType,
             string fieldPrefix)
         {
-            var values = new FormFieldValues(renderedInputs, modelType, fieldPrefix);
+            var values = new FormFieldValues(renderedInputs, fieldPrefix);
             return renderedInputs.Values.Select(input =>
                 new CheckedField(input.ComponentId, input.BindingPath, input.Shape, Array.Empty<BrowserRule>(), values));
         }
@@ -146,20 +146,18 @@ namespace Alis.Reactive.Validation
 
     /// <summary>
     /// The inputs a form's rules read, by the member's path under the view's field prefix: an input this
-    /// plan rendered, by its MVC name, in the type the model binds it; otherwise the input a partial of the
-    /// same model renders under the id the member gives it. Every input is read through the model, as MVC
-    /// binds it.
+    /// plan rendered, by its MVC name, in the type the model binds it; otherwise the input another view
+    /// renders for the member (a partial, the editor template of the member's class) under the id the member
+    /// gives it. Every input is read through the model, as MVC binds it.
     /// </summary>
     internal sealed class FormFieldValues
     {
         private readonly IReadOnlyDictionary<string, RenderedInput> _renderedInputs;
-        private readonly Type _modelType;
         private readonly string _fieldPrefix;
 
-        internal FormFieldValues(IReadOnlyDictionary<string, RenderedInput> renderedInputs, Type modelType, string fieldPrefix)
+        internal FormFieldValues(IReadOnlyDictionary<string, RenderedInput> renderedInputs, string fieldPrefix)
         {
             _renderedInputs = renderedInputs;
-            _modelType = modelType;
             _fieldPrefix = fieldPrefix;
         }
 
@@ -168,7 +166,7 @@ namespace Alis.Reactive.Validation
             var path = HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
             return _renderedInputs.TryGetValue(path, out var rendered)
                 ? (rendered.ComponentId, rendered.Shape)
-                : (IdGenerator.For(_modelType, path), field.Shape);
+                : (IdGenerator.ForMember(field.Declarer, path), field.Shape);
         }
 
         internal ValueExpression Value(FieldReference field)

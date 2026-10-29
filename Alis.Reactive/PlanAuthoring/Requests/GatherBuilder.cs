@@ -141,7 +141,8 @@ namespace Alis.Reactive.Builders.Requests
                 var fieldType = ExpressionPathHelper.ToPropertyType(field);
                 if (typeof(TRequest) != typeof(TModel))
                     RequestMembers.Require(typeof(TRequest), binding, fieldType);
-                _draft.Add(binding, ValueExpression.ReadBound(IdGenerator.For(typeof(TModel), binding.Value), Shape.FromClrType(fieldType)));
+                var inputId = IdGenerator.ForMember(ExpressionPathHelper.ToDeclarer(field), binding.Value);
+                _draft.Add(binding, ValueExpression.ReadBound(inputId, Shape.FromClrType(fieldType)));
             }
 
             return this;

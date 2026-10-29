@@ -1,0 +1,30 @@
+@using Alis.Reactive.Framework.App.Partials
+@model LobbyPage
+@{
+    ViewData["Title"] = "The lobby";
+    var plan = Html.ReactivePlan<LobbyPage>();
+}
+<h1>The lobby</h1>
+
+<form id="lobby-form">
+    @* The visitor's line is a partial of the base class every visit record shares, rendered with the page's model. *@
+    @await Html.PartialAsync("VisitorLine", Model)
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+</form>
+
+<p>The visitor read back: <span id="visitor-read"></span></p>
+<p>The lobby's endpoint bound: <span id="signed-in"></span></p>
+
+@(plan.Button("read-visitor", "Read the visitor")
+    .Reactive(button => button.Click, p => p.Element("visitor-read").Text.Set(p.Component<Entry>(m => m.Visitor).Value)))
+@(plan.Button("sign-in", "Sign in")
+    .Reactive(button => button.Click, p => p.Post("/Partials/SignIn")
+        .Gather(g => g.Form())
+        .Validate<LobbyRules>("lobby-form")
+        .Response(r => r
+            .OnSuccess<PartialsEcho>((echo, s) => s.Element("signed-in").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("lobby-form")))))
+
+<section id="lobby-messages" aria-label="The lobby's messages">
+    @Html.RenderPlan(plan)
+</section>

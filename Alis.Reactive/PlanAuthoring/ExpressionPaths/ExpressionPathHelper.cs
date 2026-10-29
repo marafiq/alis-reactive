@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using Alis.Reactive.PlanModel;
 
@@ -12,6 +13,7 @@ namespace Alis.Reactive
     // member by name, a list item by position or a dictionary entry by key, and written in the three
     // forms the framework uses: a JSON path (camel-cased names, read in the browser), a body path (the
     // members' own names, sent to the server) and an MVC binding name (text, the boundary MVC reads).
+    // Its last member names the class that declares it, which scopes the id of the member's input.
     internal static class ExpressionPathHelper
     {
         /// <summary>The JSON path a member chain reads in the browser: a response, a payload, an item.</summary>
@@ -55,9 +57,30 @@ namespace Alis.Reactive
             return name.Length > 0;
         }
 
-        // Component IDs match MVC's Html.IdFor(), including nested-property underscores.
-        internal static string ToElementId(LambdaExpression expression) => ToMvcElementId(ToMemberName(expression.Body));
+        /// <summary>
+        /// The class whose scope the id of the member's input takes: the class that declares the chain's last
+        /// member, by its base definition (<c>KinCard</c> for <c>m =&gt; m.NextOfKin.Name</c>, the class that
+        /// declares <c>Phones</c> for <c>m =&gt; m.Phones[0]</c>). A member an interface declares, read on a class,
+        /// is declared by the class that implements it; read on the interface itself it is the interface, which
+        /// scopes no id.
+        /// </summary>
+        /// <remarks>
+        /// A lambda with no member (<c>m =&gt; m</c> in a template of a text member) is refused: the view's own
+        /// model is the member's type, not the class that declares the member, so its id would be one the page's
+        /// rules, sends and reads never derive.
+        /// </remarks>
+        internal static Type ToDeclarer(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            var bound = Steps(expression.Body).LastOrDefault(step => step.IsMember);
+            if (!bound.IsMember)
+                throw new InvalidOperationException(
+                    $"{expression} binds no member. An input's id is scoped by the class that declares the member it binds: " +
+                    "render the input in a view of that class, like m => m.Name.");
+            return DeclarerOf(bound.Access!);
+        }
 
+        // Component IDs match MVC's Html.IdFor(), including nested-property underscores.
         internal static string ToMvcElementId(string propertyPath) =>
             propertyPath
                 .Replace(".", "_")
@@ -75,6 +98,21 @@ namespace Alis.Reactive
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             return BindingPath.ForMember(ToMemberName(expression.Body), ToBodyPath(expression));
+        }
+
+        private static Type DeclarerOf(MemberExpression access)
+        {
+            if (!(access.Member is PropertyInfo property)) return access.Member.DeclaringType!;
+
+            var getter = property.GetMethod!;
+            var owner = Expressions.TypeOf(access.Expression!);
+            var interfaceMemberReadOnAClass = getter.DeclaringType!.IsInterface && !owner.IsInterface && !owner.IsArray;
+            if (interfaceMemberReadOnAClass)
+            {
+                var map = owner.GetInterfaceMap(getter.DeclaringType);
+                getter = map.TargetMethods[Array.IndexOf(map.InterfaceMethods, getter)];
+            }
+            return getter.GetBaseDefinition().DeclaringType!;
         }
 
         private static Path JsonPath(IReadOnlyList<AccessStep> steps) =>
@@ -130,7 +168,7 @@ namespace Alis.Reactive
             if (expr is MemberExpression { Expression: { } owner } member)
             {
                 if (!TrySteps(owner, out steps, out parameter)) return false;
-                steps.Add(AccessStep.Member(member.Member.Name));
+                steps.Add(AccessStep.Member(member));
                 return true;
             }
 
@@ -195,18 +233,19 @@ namespace Alis.Reactive
         {
             private readonly string _kind;
 
-            private AccessStep(string kind, string name, int position)
+            private AccessStep(string kind, string name, int position, MemberExpression? access)
             {
                 _kind = kind;
                 Name = name;
                 Position = position;
+                Access = access;
             }
 
-            internal static AccessStep Member(string name) => new AccessStep("member", name, -1);
+            internal static AccessStep Member(MemberExpression access) => new AccessStep("member", access.Member.Name, -1, access);
 
-            internal static AccessStep AtPosition(int position) => new AccessStep("position", "", position);
+            internal static AccessStep AtPosition(int position) => new AccessStep("position", "", position, null);
 
-            internal static AccessStep ForKey(int key) => new AccessStep("key", key.ToString(CultureInfo.InvariantCulture), -1);
+            internal static AccessStep ForKey(int key) => new AccessStep("key", key.ToString(CultureInfo.InvariantCulture), -1, null);
 
             internal bool IsMember => _kind == "member";
 
@@ -219,6 +258,9 @@ namespace Alis.Reactive
             internal string Key => Name;
 
             internal int Position { get; }
+
+            // The member read, on the owner it is read on: what names the class that declares it.
+            internal MemberExpression? Access { get; }
         }
     }
 }
