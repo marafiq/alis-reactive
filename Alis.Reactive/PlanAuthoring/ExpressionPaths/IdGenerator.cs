@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Alis.Reactive
 {
@@ -12,7 +13,9 @@ namespace Alis.Reactive
     /// Format: <c>{Namespace_DeclaringClass}__{MemberPath}</c>. Double underscore separates the scope from the
     /// path. The scope is the class that declares the member, by its base definition, not the model the
     /// expression starts at: <c>m =&gt; m.Address.City</c> of an <c>OrderModel</c> is
-    /// <c>Alis_Reactive_SandboxApp_Models_Address__Address_City</c>.
+    /// <c>Alis_Reactive_SandboxApp_Models_Address__Address_City</c>. A generic class's scope is its namespace
+    /// and its name as C# writes it, every character outside letters, digits and underscores made an
+    /// underscore: <c>ChartEntry&lt;FluidsReading&gt;</c> is <c>..._ChartEntry_FluidsReading_</c>.
     /// </para>
     /// <para>
     /// A page, its validator, and the editor template or partial that renders the member reach the same ID
@@ -53,8 +56,22 @@ namespace Alis.Reactive
         internal static string ForMember(Type declarer, string mvcName) =>
             Scope(declarer) + "__" + ExpressionPathHelper.ToMvcElementId(mvcName);
 
-        // The class's full name, its dots and the plus of a class nested in another as underscores:
+        // The class's namespace and its name as C# writes it, after the classes it is nested in:
         // Alis.Reactive.Models.Ward+Room is Alis_Reactive_Models_Ward_Room.
-        private static string Scope(Type declarer) => declarer.FullName!.Replace('.', '_').Replace('+', '_');
+        private static string Scope(Type declarer)
+        {
+            var name = new StringBuilder(CSharpTypeName.Of(declarer));
+            for (var holder = declarer.DeclaringType; holder != null; holder = holder.DeclaringType)
+                name.Insert(0, CSharpTypeName.Of(holder) + ".");
+            if (!string.IsNullOrEmpty(declarer.Namespace))
+                name.Insert(0, declarer.Namespace + ".");
+
+            for (var index = 0; index < name.Length; index++)
+                if (!IsIdCharacter(name[index])) name[index] = '_';
+            return name.ToString();
+        }
+
+        private static bool IsIdCharacter(char character) =>
+            character is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9' or '_';
     }
 }

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Partials;
 
-/// <summary>A page and its partials composing by the member an input binds: an editor template, a partial of a base class.</summary>
+/// <summary>A page and its partials composing by the member an input binds: an editor template, a partial of a base class, a generic model.</summary>
 public sealed class PartialsController : Controller
 {
     public IActionResult Desk() => View(new DeskPage());
@@ -28,6 +28,13 @@ public sealed class PartialsController : Controller
     }
 
     public IActionResult Lobby() => View(new LobbyPage());
+
+    public IActionResult Fluids() => View(new ChartEntry<FluidsReading>());
+
+    /// <summary>Binds the chart entry as any endpoint does and says what was charted, and by whom.</summary>
+    [HttpPost]
+    public IActionResult ChartFluids([FromBody] ChartEntry<FluidsReading> entry) => Said(
+        $"{entry.Reading.Millilitres?.ToString() ?? "no"} ml, initials {entry.Initials ?? "none"}");
 
     private JsonResult Said(string summary) => Json(new PartialsEcho { Summary = summary });
 }

@@ -59,6 +59,20 @@ public sealed class LobbyPage : VisitRecord
     public string? Resident { get; set; }
 }
 
+/// <summary>An entry on a resident's chart, whatever is charted: the reading, and the initials of who charted it.</summary>
+public sealed class ChartEntry<TReading> where TReading : class, new()
+{
+    public string? Initials { get; set; }
+
+    public TReading Reading { get; set; } = new();
+}
+
+/// <summary>A fluids reading charted at the bedside.</summary>
+public sealed class FluidsReading
+{
+    public int? Millilitres { get; set; }
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class PartialsEcho
 {
