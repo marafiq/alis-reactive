@@ -1,11 +1,11 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
 /// <summary>
-/// The id an input is rendered with, derived from its model and its member (I7): the model's full name with
-/// its dots, and the plus of a type nested in another, as underscores, then two underscores, then the member's
-/// path with its dots as underscores; and the id <c>IdGenerator.For</c> gives for a member, of a value type or
-/// typed, is the id of the input the field rendered for that member, so a label the page writes with it names
-/// that input.
+/// The id an input is rendered with, derived from its member (I7, ADR-0003 rule 1): the full name of the class
+/// that declares the member, with its dots, and the plus of a type nested in another, as underscores, then two
+/// underscores, then the member's whole path with its dots as underscores; and the id <c>IdGenerator.For</c>
+/// gives for a member, of a value type or typed, is the id of the input the field rendered for that member, so
+/// a label the page writes with it names that input.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageNamesAnInputByItsId : AppPageTest
@@ -15,7 +15,7 @@ public sealed class WhenAPageNamesAnInputByItsId : AppPageTest
     private ILocator Save => Page.GetByRole(AriaRole.Button, new() { Name = "Save the room", Exact = true });
 
     [Test]
-    public async Task an_inputs_id_is_its_models_full_name_then_its_member_path_joined_by_underscores()
+    public async Task an_inputs_id_is_the_full_name_of_the_class_declaring_its_member_then_its_path_joined_by_underscores()
     {
         await Open("/Inputs/Room");
 
