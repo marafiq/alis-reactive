@@ -84,7 +84,9 @@ namespace Alis.Reactive.Builders.Requests
         /// A form is validated by one validator: every request of the plan that validates the form names the
         /// same one, and the form's browser checks are that validator's rules. A request that names another
         /// validator for the same form is refused where the page renders; give each validator a form of its
-        /// own, or write one validator whose rules differ by <c>When</c> conditions.
+        /// own, or write one validator whose rules differ by <c>When</c> conditions. A partial loaded into the
+        /// form whose own request validates it adds its validator's checks, and the form checks them too
+        /// while the partial is loaded.
         /// </remarks>
         /// <typeparam name="TValidationSource">Source type whose metadata declares the client validation rules.</typeparam>
         /// <param name="formId">DOM element ID of the form container for error display.</param>
