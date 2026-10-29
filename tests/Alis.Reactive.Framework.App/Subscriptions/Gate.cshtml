@@ -1,0 +1,26 @@
+@using Alis.Reactive.Framework.App.Subscriptions
+@model GatePage
+@{
+    ViewData["Title"] = "The front gate";
+    var plan = Html.ReactivePlan<GatePage>();
+}
+<h1>The front gate</h1>
+
+<p>Last announcement: <span id="announcement"></span></p>
+
+@{ Html.On(plan, t => t
+    .CustomEvent(GateEvents.Announced, (announced, p) => p.When(announced.Get(x => x.Type)).IsNull()
+        .Then(none => none.Element("announcement").Text.Set("an announcement of no type"))
+        .Else(typed => typed.Element("announcement").Text.Set(announced.Get(x => x.Type))))); }
+
+@* Markup that raises the app's event when clicked (grammar.md 6.1, D4): the bell carries no detail; the
+   visitor's row carries one, and its Details button names no event, so a click on it is the row's. *@
+<button type="button" data-alis-raise="@GateEvents.Announced.Name">Ring the gate bell</button>
+<ul>
+    <li data-alis-raise="@GateEvents.Announced.Name"
+        data-alis-detail="@System.Text.Json.JsonSerializer.Serialize(new Announcement { Type = "a visitor" }, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web))">
+        A visitor at the gate <button type="button" data-alis-raise="">Details</button>
+    </li>
+</ul>
+
+@Html.RenderPlan(plan)

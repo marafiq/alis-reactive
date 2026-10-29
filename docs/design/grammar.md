@@ -494,8 +494,9 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - a scalar member reads the first value;
   - an absent key reads as missing.
 - **D4 Markup-raised events.** A click on an element carrying `data-alis-raise` raises that event
-  with the element's detail. The listener is delegated, and it reads only attributes the framework
-  stamped.
+  with the element's detail, or with an empty record when it carries none. An element whose
+  `data-alis-raise` is empty names no event, so the click goes on to the element around it. The
+  listener is delegated, and it reads only attributes the framework stamped.
 
 ### 6.2 `http` (`plugin("alis.http")`)
 
