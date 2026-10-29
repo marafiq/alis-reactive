@@ -5,8 +5,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 /// that names the mistake, instead of a plan that would compute something else: a record as an order's key, a
 /// method with no pure JavaScript form, a computed projection, a text test against the item or against a
 /// character, a comparison that never reads the item, a cast to a flag, a member of a value the member table of
-/// grammar.md 2.3 does not name, a day of the week read as a value, a cast that drops a fraction, and a cast to a
-/// narrower number.
+/// grammar.md 2.3 does not name, a day of the week read as a value, a cast that drops a fraction, a cast to a
+/// narrower number, and a length of time ordered by a comparison or as an order's key: it reaches the browser as
+/// its text, which does not order as the length does.
 /// </summary>
 [TestFixture]
 public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
@@ -103,5 +104,21 @@ public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
         await Render("CastToANarrowerNumber");
 
         await Expect(Message("A cast from Int32 to Byte changes the value as C# computes it (a whole number drops the fraction, a narrower number wraps), and a browser's number does not. Project the value on the server.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task an_order_comparison_of_a_length_of_time_is_refused_because_its_text_does_not_order_as_its_length()
+    {
+        await Render("CompareALengthOfTime");
+
+        await Expect(Message("A TimeSpan has no order the browser can compute as C# does: it reaches the browser as its text, and \"1.02:00:00\" sorts before \"23:00:00\". Order it on the server, or read the length as a number.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task an_order_by_a_length_of_time_that_may_be_missing_is_refused_because_its_text_does_not_order_as_its_length()
+    {
+        await Render("OrderByALengthOfTime");
+
+        await Expect(Message("A TimeSpan has no order the browser can compute as C# does: it reaches the browser as its text, and \"1.02:00:00\" sorts before \"23:00:00\". Order it on the server, or read the length as a number.")).ToBeVisibleAsync();
     }
 }

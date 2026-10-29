@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
@@ -184,6 +185,8 @@ namespace Alis.Reactive.Builders.Arrays
             else throw new InvalidOperationException(
                 "Array predicate comparison must reference the element on at least one side; " +
                 "comparing two constants is a developer mistake. Got: " + binary);
+
+            if (!ComparisonFor(binary.NodeType).IsEquality) BrowserOrder.Require(memberOperand.Type);
 
             // C# compares a DayOfWeek by its number, and a date's day of the week is getDay(), a number too.
             if (IsDayOfWeek(left) || IsDayOfWeek(right))

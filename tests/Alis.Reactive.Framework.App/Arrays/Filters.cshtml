@@ -22,6 +22,7 @@
 <p>The residents, as the home keeps them: Cyd Marsh (81, present), Ada Hartley (102, away), Ben Hart (79, present), Dot Ashton (80, away).</p>
 <p>Admitted: Cyd on Monday 5 January 2026 at 09:45:30, Ada on Saturday 14 March 2026 at midnight, Ben on Friday 19 June 2026 at 14:09:45, Dot on Sunday 2 November 2025 at 21:30:09.</p>
 <p>Scores today: Cyd 7, Ada none, Ben 0, Dot 9.</p>
+<p>Care this week: Cyd 23 hours, Ada 26 hours, Ben 4 hours, Dot 53 hours.</p>
 <p>Nicknames: Cyd's left blank, Ada none, Ben Benny, Dot Dottie. Keyworkers: Fay for Cyd and Ben, Gus for Ada, Hal for Dot; Gus and Hal are on leave, Fay is on shift.</p>
 <p>Kept: <span id="kept"></span></p>
 
@@ -60,5 +61,6 @@
 @Keep("keyworker-on-leave", "With a keyworker on leave", x => keyworkersOnLeave.Contains(x.Keyworker.Name))
 @Keep("keyworker-on-shift", "With a keyworker on shift", x => keyworkersOnShift.Contains(x.Keyworker.Name))
 @Keep("two-digit-room", "In a room numbered in two digits", x => Regex.IsMatch(x.Room, "\\d{2}"))
+@Keep("given-26-hours-of-care", "Given 26 hours of care this week", x => x.CareThisWeek == TimeSpan.FromHours(26))
 
 @Html.RenderPlan(plan)

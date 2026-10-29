@@ -52,6 +52,12 @@
     case Mistake.CastToAWholeNumber:
         @List(residents => residents.Where(x => (int)x.Weight == 61).Select(x => x.Name))
         break;
+    case Mistake.CompareALengthOfTime:
+        @List(residents => residents.Where(x => x.CareThisWeek > TimeSpan.FromHours(12)).Select(x => x.Name))
+        break;
+    case Mistake.OrderByALengthOfTime:
+        @List(residents => residents.OrderBy(x => x.LastOuting).Select(x => x.Name))
+        break;
 }
 
 @Html.RenderPlan(plan)

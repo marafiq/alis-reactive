@@ -52,7 +52,9 @@ namespace Alis.Reactive.Builders.Arrays
         /// <typeparam name="TKey">The key's type: a string, number, date, bool or enum.</typeparam>
         /// <param name="key">The key, for example <c>r =&gt; r.Name</c>.</param>
         /// <returns>The elements in ascending key order.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the key is not a scalar.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the key is not a scalar, or is a <see cref="TimeSpan"/>, whose text does not order as its length does.
+        /// </exception>
         public ReactiveArray<TElement> OrderBy<TKey>(Expression<Func<TElement, TKey>> key) =>
             Order(key, descending: false);
 
@@ -60,12 +62,16 @@ namespace Alis.Reactive.Builders.Arrays
         /// <typeparam name="TKey">The key's type: a string, number, date, bool or enum.</typeparam>
         /// <param name="key">The key, for example <c>r =&gt; r.StartDate</c>.</param>
         /// <returns>The elements in descending key order.</returns>
-        /// <exception cref="InvalidOperationException">Thrown when the key is not a scalar.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the key is not a scalar, or is a <see cref="TimeSpan"/>, whose text does not order as its length does.
+        /// </exception>
         public ReactiveArray<TElement> OrderByDescending<TKey>(Expression<Func<TElement, TKey>> key) =>
             Order(key, descending: true);
 
         private ReactiveArray<TElement> Order<TKey>(Expression<Func<TElement, TKey>> key, bool descending)
         {
+            BrowserOrder.Require(typeof(TKey));
+
             // Sort keys must coerce to comparable scalars. Non-scalar keys (object/collection)
             // serializes as Shape.Any, and the runtime would fall back to lexicographic
             // String(value) order, where every object becomes "[object Object]".
