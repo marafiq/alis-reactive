@@ -204,15 +204,13 @@ namespace Alis.Reactive.PlanModel
 
         internal void AddArm(Condition condition, Block then)
         {
-            if (_hasElse) throw new InvalidOperationException("Cannot add branches after Else.");
+            if (_hasElse) throw new InvalidOperationException("An ElseIf cannot follow the Else of its When.");
             _arms.Add((condition ?? throw new ArgumentNullException(nameof(condition)), then ?? throw new ArgumentNullException(nameof(then))));
         }
 
-        internal bool HasElse => _hasElse;
-
         internal void SetElse(Block otherwise)
         {
-            if (_hasElse) throw new InvalidOperationException("Else already called.");
+            if (_hasElse) throw new InvalidOperationException("A When has one Else.");
             _else = otherwise ?? throw new ArgumentNullException(nameof(otherwise));
             _hasElse = true;
         }
