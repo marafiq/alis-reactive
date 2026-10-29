@@ -17,6 +17,9 @@ public sealed class RenderingController : Controller
     /// <summary>The handover, its plan rendered in the body and again in the layout's last section.</summary>
     public IActionResult RenderedTwice() => View(new ShiftHandover());
 
+    /// <summary>The round: the handover with the resident's vitals card, whose plan renders where the address says.</summary>
+    public IActionResult Rounds(VitalsCardPlan card) => View(new RoundsPage { Card = card });
+
     /// <summary>Binds the handover as any endpoint does, and says what it bound.</summary>
     [HttpPost("/Rendering/Handovers")]
     public IActionResult Handovers([FromBody] ShiftHandover handover) => Json(new HandoverEcho

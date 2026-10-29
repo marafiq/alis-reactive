@@ -3,8 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Rendering;
 /// <summary>
 /// A plan renders once, after everything its view writes to it. A layout renders a view's sections after its body,
 /// so a plan rendered in the layout's last section takes what an earlier section wrote; an input or behavior written
-/// after the plan rendered, and a plan rendered twice, are refused when the page renders, each naming the view and
-/// the fix.
+/// after the plan rendered, a plan rendered twice, and a partial's plan that never renders are refused when the page
+/// renders, each naming the view and the fix.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPlanIsRendered : AppPageTest
@@ -56,6 +56,29 @@ public sealed class WhenAPlanIsRendered : AppPageTest
         await Expect(Page.GetByText(
             "The plan of /Rendering/RenderedTwice.cshtml is rendered twice, so every handler it holds would run twice: " +
             "render it once, after the last behavior written to it.").First)
+            .ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_partials_plan_rendered_in_the_partials_body_runs_beside_the_page_plan_rendered_after_it()
+    {
+        await Open("/Rendering/Rounds?card=InTheCardsBody");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Record the vitals", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#vitals-state")).ToHaveTextAsync("recorded");
+    }
+
+    [Test]
+    public async Task a_partials_plan_rendered_in_the_partials_own_section_is_refused_as_never_rendered()
+    {
+        await Render("/Rendering/Rounds?card=InTheCardsSection");
+
+        await Expect(Page.GetByText(
+            "The plan started in /Rendering/VitalsCardScripts.cshtml never rendered: its view finished before the plan of " +
+            "/Rendering/Rounds.cshtml rendered. Razor never renders a partial's @section, so a @Html.RenderPlan(plan) " +
+            "written in one never runs: write it in the body of /Rendering/VitalsCardScripts.cshtml, after the last " +
+            "behavior written to its plan.").First)
             .ToBeVisibleAsync();
     }
 }

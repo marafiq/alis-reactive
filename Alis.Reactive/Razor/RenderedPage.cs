@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Alis.Reactive.PlanModel;
 #if NET48
 using System.Web.Mvc;
 #else
@@ -11,7 +12,9 @@ namespace Alis.Reactive
     /// <summary>
     /// What the views of one request rendered, kept in the request's items so that a page, its layout and its
     /// partials write to one record whichever plan they render for: the element id of each input, with the view that
-    /// rendered it. An element id names one element, so an input that renders an id a second time is refused there.
+    /// rendered it, and each plan, with the view that started it, in the order they started. An element id names one
+    /// element, so an input that renders an id a second time is refused there; a plan that cannot render any more is
+    /// refused when a plan started before it renders.
     /// </summary>
     internal sealed class RenderedPage
     {
@@ -19,6 +22,7 @@ namespace Alis.Reactive
         private static readonly object Key = new object();
 
         private readonly Dictionary<string, string> _viewByElementId = new Dictionary<string, string>(StringComparer.Ordinal);
+        private readonly List<StartedPlan> _plans = new List<StartedPlan>();
 
         private RenderedPage()
         {
@@ -59,6 +63,43 @@ namespace Alis.Reactive
                     "ViewDataDictionary whose TemplateInfo has its own HtmlFieldPrefix).");
 
             _viewByElementId.Add(elementId, viewPath);
+        }
+
+        /// <summary>A view starts a plan.</summary>
+        internal void Started(PlanBuildContext plan, ViewContext view) => _plans.Add(new StartedPlan(plan, view));
+
+        /// <summary>
+        /// A plan renders in the view that started it. A plan another view started after it ran in a view nested in
+        /// this one, a partial, which has finished by now; one of those that has not rendered never will, as a plan
+        /// rendered in a partial's @section never does. Plans of one view render in the order the view writes.
+        /// </summary>
+        internal void Rendering(PlanBuildContext plan)
+        {
+            var rendering = _plans.FindIndex(started => started.Plan == plan);
+            var view = _plans[rendering].View;
+            for (var later = rendering + 1; later < _plans.Count; later++)
+            {
+                var started = _plans[later];
+                if (started.Plan.Rendered || ReferenceEquals(started.View, view)) continue;
+                throw new InvalidOperationException(
+                    $"The plan started in {started.Plan.View} never rendered: its view finished before the plan of " +
+                    $"{plan.View} rendered. Razor never renders a partial's @section, so a @Html.RenderPlan(plan) written " +
+                    $"in one never runs: write it in the body of {started.Plan.View}, after the last behavior written to its plan.");
+            }
+        }
+
+        // A plan and the view it started in: a page shares its view with its layout and its sections, a partial has its own.
+        private sealed class StartedPlan
+        {
+            internal StartedPlan(PlanBuildContext plan, ViewContext view)
+            {
+                Plan = plan;
+                View = view;
+            }
+
+            internal PlanBuildContext Plan { get; }
+
+            internal ViewContext View { get; }
         }
     }
 }
