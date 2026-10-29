@@ -29,6 +29,16 @@ public sealed class PartialsController : Controller
 
     public IActionResult Lobby() => View(new LobbyPage());
 
+    /// <summary>Binds the lobby's record as any endpoint does, checks it by the sign-in rules, and says whom it signed in.</summary>
+    [HttpPost]
+    public IActionResult SignIn([FromBody] LobbyPage lobby, [FromServices] LobbyRules rules)
+    {
+        var result = rules.Validate(lobby);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Said($"visitor {lobby.Visitor} signed in to see {lobby.Resident ?? "no one"}");
+    }
+
     public IActionResult Fluids() => View(new ChartEntry<FluidsReading>());
 
     /// <summary>Binds the chart entry as any endpoint does and says what was charted, and by whom.</summary>

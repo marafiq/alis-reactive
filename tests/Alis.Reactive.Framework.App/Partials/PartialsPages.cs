@@ -47,8 +47,14 @@ public sealed class KinOnFileRules : ReactiveValidator<DeskPage>
     }
 }
 
+/// <summary>A record a visitor signs in on, whichever class keeps it.</summary>
+public interface ISignedIn
+{
+    string? Visitor { get; }
+}
+
 /// <summary>What every visit records, whichever desk takes it: the visitor, rendered by a partial of this class.</summary>
-public abstract class VisitRecord
+public abstract class VisitRecord : ISignedIn
 {
     public string? Visitor { get; set; }
 }
@@ -58,6 +64,18 @@ public sealed class LobbyPage : VisitRecord
 {
     public string? Resident { get; set; }
 }
+
+/// <summary>Rules written once for any record a visitor signs in on: they read the visitor through the interface.</summary>
+public abstract class SignInRules<TRecord> : ReactiveValidator<TRecord> where TRecord : class, ISignedIn
+{
+    protected SignInRules()
+    {
+        RuleFor(x => x.Visitor).NotEmpty().WithMessage("Name the visitor who signs in.");
+    }
+}
+
+/// <summary>The lobby's rules: the sign-in rules, on the lobby's record.</summary>
+public sealed class LobbyRules : SignInRules<LobbyPage>;
 
 /// <summary>An entry on a resident's chart, whatever is charted: the reading, and the initials of who charted it.</summary>
 public sealed class ChartEntry<TReading> where TReading : class, new()
