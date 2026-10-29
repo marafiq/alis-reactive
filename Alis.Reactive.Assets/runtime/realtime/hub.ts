@@ -43,9 +43,9 @@ async function startWithRetry(managed: Managed, url: string): Promise<void> {
   if (hubs.get(url) === managed) showRetryIndicator(url, () => retry(managed, url));
 }
 
-// The offer belongs to a connection the page still holds: releasing the last subscription withdraws it.
+// The offer is shown only on a disconnected connection no start is running for, and a click takes it,
+// so a retry never runs beside another start.
 function retry(managed: Managed, url: string): void {
-  if (managed.connection.state !== signalR.HubConnectionState.Disconnected) return;
   log.info("retry.manual", { hubUrl: url });
   managed.started = startWithRetry(managed, url);
 }

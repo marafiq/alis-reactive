@@ -37,7 +37,7 @@ function open(url: string, managed?: Managed): EventSource {
     if (!current || current.stopping || current.source !== source) return;
     if (source.readyState === EventSource.CLOSED) {
       log.error("connection.closed-permanent", { url });
-      showRetryIndicator(url, () => retry(url));
+      showRetryIndicator(url, () => retry(url, current));
     } else {
       log.warn("connection.reconnecting", { url });
     }
@@ -58,9 +58,8 @@ function managedFor(url: string): Managed {
   return managed;
 }
 
-function retry(url: string): void {
-  const managed = streams.get(url);
-  if (!managed) return;
+// Releasing the connection withdraws its offer, so a retry always finds the connection still held.
+function retry(url: string, managed: Managed): void {
   log.info("retry.manual", { url });
   managed.source.close();
   managed.source = open(url, managed);
