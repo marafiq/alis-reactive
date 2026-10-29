@@ -21,7 +21,9 @@ namespace Alis.Reactive
         /// </summary>
         /// <remarks>
         /// Chain a component extension on the result to choose the rendered control.
-        /// Field wrapper owns label display and validation error placement.
+        /// Field wrapper owns label display and validation error placement. A field renders its element id
+        /// once on a page: rendered again, by this plan or another, it is refused; so is a field the view's
+        /// field prefix changed under after the plan started.
         /// </remarks>
         /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>

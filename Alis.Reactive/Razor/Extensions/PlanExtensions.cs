@@ -136,7 +136,10 @@ namespace Alis.Reactive
         /// Must be the last call in every view. A plan that is not rendered
         /// produces no runtime behavior. After the plan it renders the validation summary, where the
         /// messages no field shows go: for a root view's plan always, for an element plan when it validates
-        /// a form or shows a form's errors, and for a partial's plan never.
+        /// a form or shows a form's errors, and for a partial's plan never. A plan renders once, after
+        /// everything written to it: an input or behavior written to it later (a <c>@section</c> the layout
+        /// renders after the call), a second call, and a partial's plan still unrendered when a plan started
+        /// before it renders (a call inside the partial's <c>@section</c>, which Razor never renders) are refused.
         /// </remarks>
         /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
         /// <param name="plan">Reactive Plan whose generated JSON should be embedded.</param>
