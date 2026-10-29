@@ -198,8 +198,13 @@ exactly whatever the zone of the browser or the server.
   input a validation rule reads: its field, a peer, and each
   member its condition reads, through `model.boundValueOf(id)`.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
-  makes it; a non-nullable number, boolean or date left empty is its type's default (0, `false`,
-  0001-01-01), the value the property keeps when there is nothing to bind; a nullable one is `null`.
+  makes it, under every shape: text, a nullable of any shape (a `Guid?`, a `TimeSpan?`, a `char?`),
+  and `any` (a `char`, a `Uri`). A non-nullable number, boolean or date left empty is its type's
+  default (0, `false`, 0001-01-01), the value the property keeps when there is nothing to bind; a
+  nullable one is `null`.
+- **Limit:** a non-nullable member whose default the browser has no value for (a `char`, say) left
+  blank is sent as `null` in a JSON body, which the server cannot bind; give it a nullable type, or
+  check it with `NotEmpty` so the browser holds it.
 - **Elsewhere** a read keeps its shape conversion alone, so `p.When(name.Value).IsEmpty()` still sees
   `""`.
 

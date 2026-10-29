@@ -1,0 +1,37 @@
+@using Alis.Reactive.Framework.App.Validation
+@model GuestMealOrder
+@{
+    ViewData["Title"] = "Order a guest's meal";
+    var plan = Html.ReactivePlan<GuestMealOrder>();
+}
+<h1>Order a meal for a visiting guest</h1>
+
+<div id="meal-form">
+    @{ Html.InputField(plan, m => m.Menu, o => o.Label("Menu")).Choice(); }
+</div>
+
+<p>Meal: <span id="meal-status"></span></p>
+
+@(plan.Button("order", "Order the meal")
+    .Reactive(button => button.Click, p => p.Post("/Validation/GuestMeal")
+        .Gather(g => g.Form())
+        .Validate<GuestMealRules>("meal-form")
+        .Response(r => r
+            .OnSuccess<Booked>((ordered, s) => s.Element("meal-status").Text.Set(ordered.Get(x => x.Summary)))
+            .OnError(400, e =>
+            {
+                e.ValidationErrors("meal-form");
+                e.Element("meal-status").Text.Set("returned by the kitchen");
+            }))))
+@(plan.Button("ask-kitchen", "Ask the kitchen to make it")
+    .Reactive(button => button.Click, p => p.Post("/Validation/GuestMeal")
+        .Gather(g => g.Form())
+        .Response(r => r
+            .OnSuccess<Booked>((ordered, s) => s.Element("meal-status").Text.Set(ordered.Get(x => x.Summary)))
+            .OnError(400, e =>
+            {
+                e.ValidationErrors("meal-form");
+                e.Element("meal-status").Text.Set("returned by the kitchen");
+            }))))
+
+@Html.RenderPlan(plan)

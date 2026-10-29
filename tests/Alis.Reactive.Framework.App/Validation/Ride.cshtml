@@ -1,0 +1,40 @@
+@using Alis.Reactive.Framework.App.Validation
+@model RideRequest
+@{
+    ViewData["Title"] = "Book a ride";
+    var plan = Html.ReactivePlan<RideRequest>();
+}
+<h1>Book a ride to an appointment</h1>
+
+<div id="ride-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident record")).Entry(); }
+    @{ Html.InputField(plan, m => m.PickUp, o => o.Label("Pick-up time")).Entry(); }
+    @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
+    @{ Html.InputField(plan, m => m.Directions, o => o.Label("Directions link")).Entry(); }
+</div>
+
+<p>Ride: <span id="ride-status"></span></p>
+
+@(plan.Button("book", "Book the ride")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Ride")
+        .Gather(g => g.Form())
+        .Validate<RideRequestRules>("ride-form")
+        .Response(r => r
+            .OnSuccess<Booked>((booked, s) => s.Element("ride-status").Text.Set(booked.Get(x => x.Summary)))
+            .OnError(400, e =>
+            {
+                e.ValidationErrors("ride-form");
+                e.Element("ride-status").Text.Set("returned by the desk");
+            }))))
+@(plan.Button("ask-desk", "Ask the desk to book it")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Ride")
+        .Gather(g => g.Form())
+        .Response(r => r
+            .OnSuccess<Booked>((booked, s) => s.Element("ride-status").Text.Set(booked.Get(x => x.Summary)))
+            .OnError(400, e =>
+            {
+                e.ValidationErrors("ride-form");
+                e.Element("ride-status").Text.Set("returned by the desk");
+            }))))
+
+@Html.RenderPlan(plan)

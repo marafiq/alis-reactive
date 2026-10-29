@@ -42,7 +42,7 @@ namespace Alis.Reactive.Validation
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule NotNull(string message) => new NotNullRule(message, Condition.Always);
 
-        /// <summary>Nothing is entered.</summary>
+        /// <summary>Nothing is entered. A list has no items.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule Empty(string message) => new EmptyRule(message, Condition.Always);
 
@@ -182,11 +182,11 @@ namespace Alis.Reactive.Validation
         // Nothing bound: nothing entered, or text of only whitespace, which MVC binds as null.
         private protected static Expr Blank(Expr v) => G.Or(NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$"));
 
-        // What NotEmpty rejects, as far as the field's shape tells: nothing entered, text of only
-        // whitespace, and the type's default: false, 0, or 0001-01-01 for a date.
+        // What NotEmpty rejects, as far as the field's shape tells: nothing entered (the binding read already
+        // reads text of only whitespace as nothing), and the type's default: false, 0, or 0001-01-01 for a date.
         private protected static Expr BlankOrDefault(Expr v, Shape fieldShape)
         {
-            var terms = new List<Expr> { NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$") };
+            var terms = new List<Expr> { NothingEntered(v) };
             if (fieldShape is BooleanShape) terms.Add(G.Eq(v, G.False));
             if (fieldShape is NumberShape) terms.Add(G.Eq(v, G.Lit(0)));
             if (fieldShape is DateShape or InstantShape) terms.Add(G.Op(Operator.Lt, G.Op(Operator.ToNumber, v), G.Lit(DayAfterEarliestDate)));
@@ -196,6 +196,12 @@ namespace Alis.Reactive.Validation
         // Nothing was entered: a missing value, one whose text is "" (an empty list included), or one
         // with no text form. A pattern with one character of anything fails on exactly those.
         private static Expr NothingEntered(Expr v) => G.Not(Matches(v, "[\\s\\S]"));
+
+        // The member an enum's default binds as (its member with value 0): what the server's NotEmpty refuses and
+        // its Empty takes. A nullable enum's default is null, which binds as blank, so its member with value 0 is
+        // an answer like any other.
+        private protected static string? DefaultMemberOf(Type memberType) =>
+            memberType.IsEnum ? EnumMember.Default(memberType)?.ToString() : null;
 
         private protected static Expr IsNumber(Expr value) => G.Eq(G.Op(Operator.Finite, value), value);
 
