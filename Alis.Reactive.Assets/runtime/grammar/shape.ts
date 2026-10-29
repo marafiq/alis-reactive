@@ -36,15 +36,17 @@ function convert(value: unknown, shape: Shape): unknown {
 
 /**
  * A value as MVC binds it into the model the server validates (grammar.md 2.1, binding reads): text
- * that is empty or only whitespace is null, as ConvertEmptyStringToNull makes it; a non-nullable
- * number, boolean or date left empty is its type's default (0, false, 0001-01-01), the value the
- * property keeps when binding has nothing to bind. A nullable shape already reads blank as null.
+ * that is empty or only whitespace is null, as ConvertEmptyStringToNull makes it, under any shape
+ * that holds text (a char or a link is any); a non-nullable number, boolean or date left empty is its
+ * type's default (0, false, 0001-01-01), the value the property keeps when binding has nothing to
+ * bind. A nullable shape already reads blank as null.
  */
 export function bound(value: unknown, shape: Shape): unknown {
   const converted = shaped(value, shape);
   const nothingBound = isMissing(converted) || isBlankText(converted);
   switch (shape.kind) {
-    case "string":  return nothingBound ? null : converted;
+    case "string":
+    case "any":     return nothingBound ? null : converted;
     case "number":  return nothingBound ? 0 : converted;
     case "boolean": return nothingBound ? false : converted;
     case "date":    return nothingBound ? earliestDate() : converted;
@@ -181,15 +183,11 @@ function asObjectOf(value: unknown, shape: Extract<Shape, { kind: "object" }>): 
   return converted ?? record;
 }
 
-// A nullable shape is a CLR Nullable<T>. Blank text is no number, boolean or date: MVC binds it as
-// null, so the browser does too. Text-represented values keep their blank text.
+// A nullable shape is a CLR Nullable<T>, and T is never text: MVC binds blank text into none of them
+// (a number, a Guid, a time, a char), only as null, so the browser reads it as null too.
 function asNullable(value: unknown, inner: Shape): unknown {
-  if (isBlankText(value) && innerParsesText(inner)) return null;
+  if (isBlankText(value)) return null;
   return convert(value, inner);
-}
-
-function innerParsesText(inner: Shape): boolean {
-  return inner.kind === "number" || inner.kind === "boolean" || inner.kind === "date" || inner.kind === "instant";
 }
 
 // Whitespace as .NET's char.IsWhiteSpace defines it (string.IsNullOrWhiteSpace, which MVC binding

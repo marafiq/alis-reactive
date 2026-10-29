@@ -59,6 +59,18 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "filed without photos" });
     }
 
+    public IActionResult Ride() => View(new RideRequest());
+
+    /// <summary>Checks the ride by its rules; 400 with every message by field, or booked.</summary>
+    [HttpPost("/Validation/Ride")]
+    public IActionResult BookRide([FromBody] RideRequest ride, [FromServices] RideRequestRules rules)
+    {
+        var result = rules.Validate(ride);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"booked from wing {ride.Wing} at {ride.PickUp:hh\\:mm}" });
+    }
+
     public IActionResult Handover() => View(new HandoverNote());
 
     /// <summary>A handover whose one form a second request validates by another validator, the one the address names.</summary>

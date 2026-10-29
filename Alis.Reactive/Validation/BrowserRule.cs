@@ -182,11 +182,11 @@ namespace Alis.Reactive.Validation
         // Nothing bound: nothing entered, or text of only whitespace, which MVC binds as null.
         private protected static Expr Blank(Expr v) => G.Or(NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$"));
 
-        // What NotEmpty rejects, as far as the field's shape tells: nothing entered, text of only
-        // whitespace, and the type's default: false, 0, or 0001-01-01 for a date.
+        // What NotEmpty rejects, as far as the field's shape tells: nothing entered (the binding read already
+        // reads text of only whitespace as nothing), and the type's default: false, 0, or 0001-01-01 for a date.
         private protected static Expr BlankOrDefault(Expr v, Shape fieldShape)
         {
-            var terms = new List<Expr> { NothingEntered(v), Matches(v, "^[" + NetWhitespace + "]*$") };
+            var terms = new List<Expr> { NothingEntered(v) };
             if (fieldShape is BooleanShape) terms.Add(G.Eq(v, G.False));
             if (fieldShape is NumberShape) terms.Add(G.Eq(v, G.Lit(0)));
             if (fieldShape is DateShape or InstantShape) terms.Add(G.Op(Operator.Lt, G.Op(Operator.ToNumber, v), G.Lit(DayAfterEarliestDate)));
