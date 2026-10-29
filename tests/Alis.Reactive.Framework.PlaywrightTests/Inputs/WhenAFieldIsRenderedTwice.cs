@@ -1,9 +1,9 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
 /// <summary>
-/// One member's field rendered twice on one plan (I8): with the same component it is one input, and the page
-/// renders and sends it; with another component it is a defect of the view, refused when the page renders with
-/// a message naming the member and both components, a generic one as C# writes it.
+/// One member's field rendered twice on a page (I8): two elements cannot share one id, so a field rendered a
+/// second time is refused when the page renders, by the same plan or by another, with a message naming the
+/// element id and both views; a field rendered once renders and is sent.
 /// </summary>
 [TestFixture]
 public sealed class WhenAFieldIsRenderedTwice : AppPageTest
@@ -12,9 +12,9 @@ public sealed class WhenAFieldIsRenderedTwice : AppPageTest
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     [Test]
-    public async Task a_field_rendered_twice_with_the_same_component_is_one_input_and_the_page_sends_it()
+    public async Task a_field_rendered_once_renders_and_the_page_sends_it()
     {
-        await Open("/Inputs/Depart?rendering=WithTheSameComponent");
+        await Open("/Inputs/Depart");
 
         await Page.GetByLabel("Visitor", new() { Exact = true }).FillAsync("Ada");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Sign out", Exact = true }).ClickAsync();
@@ -23,26 +23,26 @@ public sealed class WhenAFieldIsRenderedTwice : AppPageTest
     }
 
     [Test]
-    public async Task a_field_rendered_twice_with_another_component_is_refused_naming_both()
+    public async Task a_field_rendered_twice_on_one_plan_is_refused_naming_its_element_id()
     {
-        await Render("/Inputs/Depart?rendering=WithAnotherComponent");
+        await Render("/Inputs/Depart?rendering=TwiceOnOnePlan");
 
         await Expect(Page.GetByText(
-            "Input 'Visitor' is rendered twice with different components: " +
-            "first [Alis_Reactive_Framework_App_Inputs_DepartPage__Visitor, entry, value, committed by committed, Entry, string], " +
-            "then [Alis_Reactive_Framework_App_Inputs_DepartPage__Visitor, file-picker, files, committed by chosen, FilePicker, string].").First)
+            "Input 'Visitor' renders element id 'Alis_Reactive_Framework_App_Inputs_DepartPage__Visitor' a second time on this page: " +
+            "first in /Inputs/Depart.cshtml, then in /Inputs/Depart.cshtml. An element id names one element, so the page would " +
+            "reach only the first: render the field once, or each copy under a field prefix of its own (Html.EditorFor, or a " +
+            "partial given a ViewDataDictionary whose TemplateInfo has its own HtmlFieldPrefix).").First)
             .ToBeVisibleAsync();
     }
 
     [Test]
-    public async Task a_generic_component_in_the_refusal_is_named_as_csharp_writes_it()
+    public async Task a_field_a_partials_plan_renders_again_is_refused_naming_both_views()
     {
-        await Render("/Inputs/Depart?rendering=TheKindWithAnotherComponent");
+        await Render("/Inputs/Depart?rendering=AgainInAPartial");
 
         await Expect(Page.GetByText(
-            "Input 'Kind' is rendered twice with different components: " +
-            "first [Alis_Reactive_Framework_App_Inputs_DepartPage__Kind, choice, value, committed by changed, Choice<VisitKind>, string], " +
-            "then [Alis_Reactive_Framework_App_Inputs_DepartPage__Kind, entry, value, committed by committed, Entry, string].").First)
+            "Input 'Visitor' renders element id 'Alis_Reactive_Framework_App_Inputs_DepartPage__Visitor' a second time on this page: " +
+            "first in /Inputs/Depart.cshtml, then in /Inputs/DepartPass.cshtml.").First)
             .ToBeVisibleAsync();
     }
 }

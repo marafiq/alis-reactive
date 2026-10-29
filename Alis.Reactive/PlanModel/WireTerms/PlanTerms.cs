@@ -15,8 +15,6 @@ namespace Alis.Reactive.PlanModel
         }
 
         internal string Value { get; }
-
-        internal bool SameAs(PlanString other) => GetType() == other.GetType() && Value == other.Value;
     }
 
     internal sealed class PlanId : PlanString

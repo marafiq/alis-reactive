@@ -15,15 +15,12 @@ namespace Alis.Reactive
     internal sealed class RenderedInput
     {
         private readonly InputIdentity _identity;
-        // The declaration's class: its vendor and its input are the class's own, so one class is one component.
-        private readonly Type _component;
 
-        private RenderedInput(InputIdentity identity, ComponentVendor vendor, ComponentInput input, Type component)
+        private RenderedInput(InputIdentity identity, ComponentVendor vendor, ComponentInput input)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             ComponentVendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
             Input = input ?? throw new ArgumentNullException(nameof(input));
-            _component = component ?? throw new ArgumentNullException(nameof(component));
         }
 
         internal string ComponentId => _identity.ElementId;
@@ -41,20 +38,11 @@ namespace Alis.Reactive
         internal static RenderedInput Of(InputIdentity identity, IInputComponent component)
         {
             if (component == null) throw new ArgumentNullException(nameof(component));
-            return new RenderedInput(identity, component.Vendor, component.Input, component.GetType());
+            return new RenderedInput(identity, component.Vendor, component.Input);
         }
-
-        internal bool SameAs(RenderedInput other) =>
-            _identity.Id.SameAs(other._identity.Id)
-            && _identity.Binding.SameAs(other._identity.Binding)
-            && _component == other._component
-            && Shape == other.Shape;
-
-        internal string Describe() =>
-            $"[{ComponentId}, {ComponentVendor.Name}, {Input.Describe()}, {CSharpTypeName.Of(_component)}, {Shape.DescribeContract()}]";
     }
 
-    /// <summary>The inputs one plan rendered, by binding path. One field is rendered once.</summary>
+    /// <summary>The inputs one plan rendered, by binding path.</summary>
     internal sealed class RenderedInputs
     {
         private readonly Dictionary<string, RenderedInput> _inputs = new Dictionary<string, RenderedInput>(StringComparer.Ordinal);
@@ -65,20 +53,9 @@ namespace Alis.Reactive
         internal IReadOnlyList<KeyValuePair<string, RenderedInput>> Entries =>
             new List<KeyValuePair<string, RenderedInput>>(_inputs);
 
-        // A partial rendered twice adds the same input twice; a different component on the same field is
-        // a defect of the view.
-        internal void Add(RenderedInput input)
-        {
-            if (_inputs.TryGetValue(input.BindingPath, out var existing))
-            {
-                if (existing.SameAs(input)) return;
-                throw new InvalidOperationException(
-                    $"Input '{input.BindingPath}' is rendered twice with different components: " +
-                    $"first {existing.Describe()}, then {input.Describe()}.");
-            }
-
-            _inputs[input.BindingPath] = input;
-        }
+        // A field joins its plan once: the page refuses an element id rendered a second time before the input joins
+        // (RenderedPage), and one plan's binding path names one element id.
+        internal void Add(RenderedInput input) => _inputs.Add(input.BindingPath, input);
 
         internal bool TryFindForComponent(ComponentId componentId, [NotNullWhen(true)] out RenderedInput? input)
         {
