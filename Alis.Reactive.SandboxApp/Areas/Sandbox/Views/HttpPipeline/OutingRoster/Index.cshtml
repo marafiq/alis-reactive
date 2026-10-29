@@ -16,7 +16,7 @@
     <native-heading level="H1">Garden Outing</native-heading>
     <native-text color="Secondary">Thursday's trip to the botanical garden. Find the residents who use the chosen aids, then book the bus.</native-text>
 
-    <native-card><native-card-body>
+    <native-card><native-card-body id="outing-roster-form">
         <native-vstack gap="Sm">
             @{ Html.InputField(plan, m => m.MobilityAids, o => o.Label("Mobility aids"))
                 .FusionMultiSelect(b => b
@@ -58,7 +58,7 @@
                     .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("Book", "OutingRoster")).Gather(g => g.Form())
+                        p.Post(Url.SandboxRoute("Book", "OutingRoster")).Gather(g => g.Form("outing-roster-form"))
                          .AsFormData()
                          .Response(r => r
                             .OnSuccess<OutingBookingAnswer>((json, s) =>

@@ -233,7 +233,7 @@
                 @(Html.NativeButton("save-comfort", "Save")
                     .CssClass(ButtonSubmit)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
-                        p.Post(Url.SandboxRoute("Save", "Thermostat")).Gather(g => g.Form())
+                        p.Post(Url.SandboxRoute("Save", "Thermostat")).Gather(g => g.Form(FormId))
                             .Response(r => r.OnSuccess<RoomComfortSaved>((saved, s) =>
                                 s.Element("confirmation").Text.Set(saved.Get(x => x.Confirmation))))))
                 <native-text><span id="confirmation"></span></native-text>

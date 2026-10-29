@@ -43,7 +43,8 @@ That is the whole document. The grammar names no feature.
   contributes its data under its owner, and the plugin joins the contributions per key. The C#
   declaration of each plugin states its data type, so the generated contract types it too.
 - **Inputs and forms are plugin data.**
-  - The inputs of a view are `alis.model` data: `{ inputs: { id: { name, body, value, shape,
+  - The inputs of a view are `alis.model` data, contributed to the page's one table of inputs
+    (`plugin("alis.model", "")`, 6.3): `{ inputs: { id: { name, body, value, shape,
     committed, list } } }`: the MVC binding name, the JSON body path, the value as an expression of
     the located object, the shape it reads as, the event that commits a value (M4), and whether the
     input binds a list (H2, H4).
@@ -194,8 +195,8 @@ exactly whatever the zone of the browser or the server.
 
 **Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
 - **Where:** the `alis.model` values a request body carries (`fill`, `fields`, so
-  `Form()` sends them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`), and every
-  input a validation rule reads: its field, a peer, and each
+  `Form()` and `Form(formId)` send them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`),
+  every input a validation rule reads: its field, a peer, and each
   member its condition reads, through `model.boundValueOf(id)`.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
   makes it, under every shape: text, a nullable of any shape (a `Guid?`, a `TimeSpan?`, a `char?`),
@@ -407,6 +408,7 @@ A failing handler is logged and stops no other handler.
 | Every handle is used inside an active block, within its binding's scope | builder at render, naming the handle |
 | A lambda uses only members the compiler maps | analyzer at compile time; render as a backstop |
 | Every route placeholder is filled from the request | render |
+| A request that sends `Form()`, the inputs of the form it validates, validates a form; otherwise it names its element with `Form(formId)` | render |
 | A regular expression is in JavaScript's dialect | render |
 | Input IDs come from `IdGenerator`; other IDs are explicit; no ID repeats in a plan | render |
 | A validation rule reaches the browser only when the page can evaluate it (7.5) | render |
@@ -467,13 +469,20 @@ if (form.validate()) {                            // .Validate<V>(container); ou
 ```
 
 - **Gather.** `Gather<TRequest>(g => ..)` builds the request the endpoint binds: `Set(x => x.M, v)`
-  sets a member, `Form()` sends every input of the composed form, `Form(m => m.A, ..)` named inputs,
-  and `Header(name, v)` a header. `.Gather(g => ..)` takes the view model as the request. Where a
+  sets a member, `Form()` sends the inputs inside the form the request validates, `Form(formId)` the
+  inputs inside the element named, `Form(m => m.A, ..)` named inputs, and `Header(name, v)` a header.
+  `.Gather(g => ..)` takes the view model as the request. Where a
   member goes is decided in C# when the request is built, by MVC's rule for route values: a top-level
   member named like a `{placeholder}` (ignoring case) fills the path (`route`, keyed by the
   placeholder's own spelling); every other member goes to `values`, which is the query string for GET
-  and the body otherwise. Every placeholder must be filled, a member is set once, and a `Form` field
-  must be a member of `TRequest` of a type its value binds to; each is checked at render.
+  and the body otherwise. Every placeholder must be filled, a member is set once, a request sends one
+  form's inputs, a request that sends `Form()` validates a form (`Validate<TValidator>(formId)`), and a
+  `Form` field must be a member of `TRequest` of a type its value binds to; each is checked at render.
+- **A form is an element.** What `Form()` and `Form(formId)` send is decided by containment, as an
+  HTML form posts the inputs it holds: every mounted input inside the element (6.3 M1), whichever
+  plan rendered it: the page, a partial, a member's editor template, or a partial a slot loaded in a
+  request of its own. An input outside the element is not sent, whatever plan rendered it, and a
+  section saved on its own names its section.
 - **Keys.** A member's key is its MVC binding name. `values` is a nested record for JSON
   (`{"Address":{"City":..}}`). For a query string or form data it is flat (`Address.City`,
   `Lines[0].Sku`), because only C# knows a dictionary from an object.
@@ -483,10 +492,10 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   third item. A partial rendered for an entry of a dictionary keyed by a number (`Doses[1042]`) posts
   as form data (`AsFormData()`), whose flat name `Doses[1042].Amount` MVC binds into the entry; as
   JSON its body holds a list at `Doses`, which a dictionary does not bind.
-- **`Form()`** writes every input into the authored JSON record leaf by leaf with
-  `model.fill(record)`, so an authored value beside an input (`Address.Verified` next to
-  `Address.City`) is kept and an input wins only its own leaf. A query string or form data spreads
-  `model.fields`.
+- **`Form()`** writes every input inside its form into the authored JSON record leaf by leaf with
+  `inputs.fill(record)`, where `inputs` is `plugin("alis.model", formId)`, so an authored value beside
+  an input (`Address.Verified` next to `Address.City`) is kept and an input wins only its own leaf. A
+  query string or form data spreads `inputs.fields`.
 
 ### 5.2 Templates
 
@@ -548,17 +557,32 @@ no key (H2) and no entry (H4).
 - **H7 Status 0.** Status 0 means no usable response: the network failed, or a JSON body could not
   be parsed. `ok` is false, and no exact-status route matches it.
 
-### 6.3 `model` (`plugin("alis.model", planId)`)
+### 6.3 `model` (`plugin("alis.model", "")`, `plugin("alis.model", containerId)`)
 
-- **M1 Values.** Every mounted input of the composed plan, read through each input's `value`
-  expression as a binding read (2.1). An unmounted input is skipped. A request carries them through
-  M2 or M3.
-- **M2 `fields`.** The values of M1, flat, keyed by MVC binding name.
+The page holds one table of inputs, keyed by element id. Every plan contributes the inputs it
+rendered (1.1) under its owner, whichever view or request rendered them: the page, a partial, a
+member's editor template, a partial a slot loaded. The plan id keys nothing. An owner's release (a
+slot's load or unload, 3.5) removes exactly the entries it contributed and keeps every other.
+
+- **M1 Values.** `plugin("alis.model", containerId)` is the mounted inputs inside the element with
+  that id, whichever plan rendered them, each read through its `value` expression as a binding read
+  (2.1). An input that is not on the page, or not inside the element, is not sent. An element that is
+  not on the page is a boundary error (3.4): the request is not sent. A request carries the values
+  through M2 or M3.
+- **M2 `fields`.** The values of M1, flat, keyed by MVC binding name; `arrays` names those that bind
+  a list.
 - **M3 `fill(record)`.** Writes the values of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
-- **M5 `boundValueOf(id)`.** One input's value as a binding read (2.1), for a validation rule or a
-  gathered `Form(m => ..)` field, wherever in the composition it was rendered; missing when no plan
-  renders it.
+- **M5 `boundValueOf(id)`.** On the page's table (`plugin("alis.model", "")`): the value of the
+  mounted input with that id, whichever plan rendered it, as a binding read (2.1), for a validation
+  rule and a gathered `Form(m => ..)` field; missing when no input with that id
+  is on the page, as the server sees a member no input posts.
+- **M6 One element per id.** The server refuses an element id rendered twice in one request
+  (`Alis.Reactive/Razor/RenderedPage.cs`). Two requests can still bring one twice, as two slots that
+  each load one partial do. The table keeps both entries; every read goes through the element the
+  DOM finds by the id, the first in document order, so both read the same input; and each owner's
+  release removes only its own entry, so the other slot's input is read once the first leaves. A
+  second entry for an id logs `input.duplicate-id`.
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
   commits a value (`ComponentInput.Of(Value, committedBy: ...)`,
   `Alis.Reactive/Components/Contracts/ComponentInput.cs:41`). When the plan that renders the
@@ -570,7 +594,10 @@ no key (H2) and no entry (H4).
 `validate()` returns a bool; `showErrors(problem)`; the tests are the form's `alis.form` data (1.1).
 
 - **F1 Scope.** A test applies only when its field's element is inside the container element. A
-  missing container fails validation when the form has tests.
+  missing container fails validation when the form has tests. A field's value, and every value its
+  tests read, is read through M5, so a rule of the page's validator checks the input a partial, an
+  editor template or a slot's content renders for its member, whichever plan rendered it: the same
+  containment decides what the form checks and what its `Form()` sends (5.1).
 - **F3 First failure wins.** For each field, tests whose `when` is false are skipped, and the first
   failing `check` decides.
 - **F4 Validate.** First clear every inline message and the summary, then evaluate every field,

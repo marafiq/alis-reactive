@@ -14,6 +14,7 @@
     </native-text>
 
     <native-card><native-card-body>
+        <div id="move-in-booking">
         <native-grid cols="C2" gap="Base">
             @{ Html.InputField(plan, m => m.MoveInDay, o => o.Label("Move-in day"))
                 .FusionDatePicker(b => b.Placeholder("Choose the move-in day"))
@@ -39,13 +40,14 @@
             @{ Html.InputField(plan, m => m.TruckArrives, o => o.Label("Moving truck arrives"))
                 .FusionDateTimePicker(b => b.Placeholder("Choose when the truck arrives")); }
         </native-grid>
+        </div>
         <p id="move-in-note" class="mt-3 text-sm text-text-secondary">Choose the move-in day to see its terms.</p>
         @(Html.NativeButton("book-move-in-btn", "Book Move-in")
             .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post(Url.SandboxRoute("BookMoveIn", "FusionDatePicker"))
-                 .Gather(g => g.Form())
+                 .Gather(g => g.Form("move-in-booking"))
                  .Response(r => r
                     .OnSuccess<MoveInBooked>((json, s) => s.Element("booking-status").Text.Set(json.Get(x => x.Confirmation)))
                     .OnError(400, e => e.Element("booking-status").Text.Set("The move-in day could not be booked.")));

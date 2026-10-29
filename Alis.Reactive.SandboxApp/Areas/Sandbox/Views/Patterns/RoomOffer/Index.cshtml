@@ -35,6 +35,7 @@
         <native-text color="Secondary">Maple Grove admissions. Prepare the room offer for a prospective resident, then send it.</native-text>
     </div>
 
+    <div id="room-offer-form" class="flex flex-col gap-6">
     <native-card><native-card-body>
         <native-vstack gap="Base">
             <native-heading level="H2">Care level and deposit</native-heading>
@@ -140,13 +141,14 @@
             <native-text>Monthly rate on the offer letter: $<span id="offer-rate">0</span></native-text>
         </native-vstack></div>
     </native-card-body></native-card>
+    </div>
 
     <native-hstack gap="Sm" class="flex-wrap">
         @(Html.NativeButton("send-offer-btn", "Send the offer")
             .CssClass(ButtonPrimary)
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Send", "RoomOffer")).Gather(g => g.Form())
+                p.Post(Url.SandboxRoute("Send", "RoomOffer")).Gather(g => g.Form("room-offer-form"))
                  .Response(r => r.OnSuccess<RoomOfferSent>((sent, s) =>
                      s.Element("offer-status").Text.Set(sent.Get(x => x.Confirmation))));
             }))

@@ -7,9 +7,11 @@
 <h1>A room on the ward</h1>
 
 @* Each input is rendered with no label of its own; the page labels it by the id the framework gives it. *@
-@{ Html.InputField(plan, m => m.Bed).Entry(); }
-@{ Html.InputField(plan, m => m.Note).Entry(); }
-@{ Html.InputField(plan, m => m.Contact.Phone).Entry(); }
+<form id="room-form">
+    @{ Html.InputField(plan, m => m.Bed).Entry(); }
+    @{ Html.InputField(plan, m => m.Note).Entry(); }
+    @{ Html.InputField(plan, m => m.Contact.Phone).Entry(); }
+</form>
 
 <label for="Alis_Reactive_Framework_App_Inputs_Ward_RoomContact__Contact_Phone">Phone, by the id written out</label>
 <label for="@(IdGenerator.For<Ward.Room>(m => m.Bed))">Bed, by the id of its member</label>
@@ -19,7 +21,7 @@
 
 @(plan.Button("save-room", "Save the room")
     .Reactive(button => button.Click, p => p.Post("/Inputs/Room")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("room-form"))
         .Response(r => r.OnSuccess<RoomEcho>((echo, s) => s.Element("bound").Text.Set(echo.Get(x => x.Summary))))))
 
 @Html.RenderPlan(plan)

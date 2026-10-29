@@ -112,6 +112,31 @@ public enum PartialMistake
     BindAnInputToTheModelItself,
 }
 
+/// <summary>
+/// An admission: the page renders the resident, and the room is a member of the admission's own model that a
+/// partial of the admission renders (RoomLine): with the page when the desk shows the room at once, or loaded
+/// into the page later.
+/// </summary>
+public sealed class AdmissionPage
+{
+    public string? Resident { get; set; }
+
+    public string? Room { get; set; }
+
+    /// <summary>Whether the page renders the room's line with itself; otherwise the desk loads it when a room is chosen.</summary>
+    public bool ShowsRoom { get; set; }
+}
+
+/// <summary>The admission's rules: a room the browser checks is chosen, and one only the server knows is closed.</summary>
+public sealed class AdmissionRules : ReactiveValidator<AdmissionPage>
+{
+    public AdmissionRules()
+    {
+        RuleFor(x => x.Room).NotEmpty().WithMessage("Choose the resident's room.");
+        RuleFor(x => x.Room).Must(room => room != "13").WithMessage("Room 13 is closed for repairs.");
+    }
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class PartialsEcho
 {

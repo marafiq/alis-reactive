@@ -17,13 +17,13 @@
 
 @(plan.Button("book", "Book")
     .Reactive(button => button.Click, p => p.Post("/Inputs/Booking")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("booking-form"))
         .AsFormData()
         .Response(r => r.OnSuccess<BookingEcho>((echo, s) => s.Element("booked").Text.Set(echo.Get(x => x.Summary))))))
 
 @(plan.Button("book-json", "Book as JSON")
     .Reactive(button => button.Click, p => p.Post("/Inputs/Booking/Json")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("booking-form"))
         .Response(r => r.OnSuccess<BookingEcho>((echo, s) => s.Element("booked").Text.Set(echo.Get(x => x.Summary))))))
 
 @Html.RenderPlan(plan)

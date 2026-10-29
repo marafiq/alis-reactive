@@ -1,10 +1,10 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 
 /// <summary>
-/// A plan of its own for one element (<c>ElementPlan</c>), identified by the element's id: it composes with no
-/// other plan, so two cards of one model, on a page with no plan of its own, each send only the input they
-/// rendered. A plan that validates a form shows the messages no field of it shows; one that neither validates a
-/// form nor shows a form's errors adds no markup for them.
+/// A plan of its own for one element (<c>ElementPlan</c>), identified by the element's id. Two cards of one
+/// model, on a page with no plan of its own, each send only the input inside their own card, the element each
+/// save names (ADR-0003 rule 2). A plan that validates a form shows the messages no field of it shows; one that
+/// neither validates a form nor shows a form's errors adds no markup for them.
 /// </summary>
 [TestFixture]
 public sealed class WhenAnElementHasAPlanOfItsOwn : AppPageTest
@@ -18,7 +18,7 @@ public sealed class WhenAnElementHasAPlanOfItsOwn : AppPageTest
     }
 
     [Test]
-    public async Task each_element_plan_sends_only_the_inputs_it_rendered()
+    public async Task each_cards_save_sends_only_the_inputs_inside_its_card()
     {
         await Open("/Plans/Contacts");
         await Page.GetByLabel("The next of kin's name", new() { Exact = true }).FillAsync("Tom");

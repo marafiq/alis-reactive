@@ -15,7 +15,7 @@
 
     @(plan.Button("sign-out", "Sign the resident out")
         .Reactive(button => button.Click, p => p.Post("/Validation/Outing")
-            .Gather(g => g.Form())
+            .Gather(g => g.Form("outing-card"))
             .Response(r => r.OnError(400, e => e.ValidationErrors("outing-card")))))
 </section>
 

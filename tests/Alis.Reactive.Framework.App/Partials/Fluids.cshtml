@@ -6,16 +6,18 @@
 }
 <h1>Fluids at the bedside</h1>
 
-@{ Html.InputField(plan, m => m.Reading.Millilitres, o => o.Label("Millilitres")).Entry(); }
-@* The initials are rendered with no label of their own; the page labels them by the id the framework gives them. *@
-@{ Html.InputField(plan, m => m.Initials).Entry(); }
-<label for="Alis_Reactive_Framework_App_Partials_ChartEntry_FluidsReading___Initials">Initials, by the id written out</label>
+<form id="fluids-chart">
+    @{ Html.InputField(plan, m => m.Reading.Millilitres, o => o.Label("Millilitres")).Entry(); }
+    @* The initials are rendered with no label of their own; the page labels them by the id the framework gives them. *@
+    @{ Html.InputField(plan, m => m.Initials).Entry(); }
+    <label for="Alis_Reactive_Framework_App_Partials_ChartEntry_FluidsReading___Initials">Initials, by the id written out</label>
+</form>
 
 <p>The chart's endpoint bound: <span id="charted"></span></p>
 
 @(plan.Button("chart-fluids", "Chart the fluids")
     .Reactive(button => button.Click, p => p.Post("/Partials/ChartFluids")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("fluids-chart"))
         .Response(r => r.OnSuccess<PartialsEcho>((echo, s) => s.Element("charted").Text.Set(echo.Get(x => x.Summary))))))
 
 @Html.RenderPlan(plan)

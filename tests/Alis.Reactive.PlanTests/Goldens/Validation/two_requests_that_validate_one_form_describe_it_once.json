@@ -26,7 +26,7 @@
     "$model": {
       "kind": "plugin",
       "name": "alis.model",
-      "key": "Alis.Reactive.PlanTests.Support.Admission",
+      "key": "",
       "data": {
         "kind": "model",
         "inputs": {
@@ -166,6 +166,14 @@
         "kind": "none"
       }
     },
+    "$inputs:admission": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "admission",
+      "data": {
+        "kind": "none"
+      }
+    },
     "$document": {
       "kind": "plugin",
       "name": "alis.document",
@@ -240,7 +248,7 @@
                               "kind": "call",
                               "target": {
                                 "kind": "obj",
-                                "id": "$model"
+                                "id": "$inputs:admission"
                               },
                               "path": [
                                 "fill"
@@ -269,7 +277,7 @@
                                   "kind": "get",
                                   "target": {
                                     "kind": "obj",
-                                    "id": "$model"
+                                    "id": "$inputs:admission"
                                   },
                                   "path": [
                                     "arrays"
@@ -369,7 +377,7 @@
                               "kind": "call",
                               "target": {
                                 "kind": "obj",
-                                "id": "$model"
+                                "id": "$inputs:admission"
                               },
                               "path": [
                                 "fill"
@@ -398,7 +406,7 @@
                                   "kind": "get",
                                   "target": {
                                     "kind": "obj",
-                                    "id": "$model"
+                                    "id": "$inputs:admission"
                                   },
                                   "path": [
                                     "arrays"

@@ -1,10 +1,11 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 
 /// <summary>
-/// The plans of a page compose by the plan id they share, the model they are written for. A partial of the
-/// page's own model joins the page's plan (<c>ResolvePlan</c>), rendered with the page or loaded into a slot,
-/// so the page's form sends its inputs, and it renders no validation summary of its own. A partial of its own
-/// model stands alone: the page's form sends none of its inputs.
+/// A partial of the page's own model joins the page's plan (<c>ResolvePlan</c>) and renders no validation
+/// summary of its own, so a message no field shows goes to the page's. What a save sends no longer follows the
+/// plan id (ADR-0003 rule 2): a form sends the inputs inside it, so the page's save sends a partial rendered
+/// inside the page's form, with the page or loaded into a slot there, and not a card rendered outside it, which
+/// its own save sends.
 /// </summary>
 [TestFixture]
 public sealed class WhenPlansShareAPlanId : AppPageTest
@@ -23,7 +24,7 @@ public sealed class WhenPlansShareAPlanId : AppPageTest
     }
 
     [Test]
-    public async Task a_partial_of_the_pages_model_rendered_with_the_page_joins_the_pages_plan()
+    public async Task a_partial_rendered_inside_the_pages_form_is_sent_by_the_pages_save()
     {
         await Open("/Plans/Visit");
         await Field("Visitor").FillAsync("Ada");
@@ -35,7 +36,7 @@ public sealed class WhenPlansShareAPlanId : AppPageTest
     }
 
     [Test]
-    public async Task a_partial_of_the_pages_model_loaded_into_a_slot_joins_the_pages_plan_while_it_is_loaded()
+    public async Task a_partial_loaded_into_a_slot_inside_the_pages_form_is_sent_while_it_is_loaded()
     {
         await Open("/Plans/Visit");
         await Button("Choose a room").ClickAsync();
@@ -51,7 +52,7 @@ public sealed class WhenPlansShareAPlanId : AppPageTest
     }
 
     [Test]
-    public async Task a_partial_of_its_own_model_stands_alone_so_only_its_own_form_sends_its_inputs()
+    public async Task a_card_outside_the_pages_form_is_sent_by_its_own_save_alone()
     {
         await Open("/Plans/Visit");
         await Field("Visitor").FillAsync("Ada");

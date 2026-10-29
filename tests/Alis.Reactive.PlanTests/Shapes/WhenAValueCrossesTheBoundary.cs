@@ -19,7 +19,7 @@ public class WhenAValueCrossesTheBoundary
             .TextInput(m => m.MeasuredOn)
             .TextInput(m => m.RecordedAt)
             .TextInput(m => m.Notes);
-        plan.Triggers().DomReady(p => p.Post("/vitals").Gather(g => g.Form()));
+        plan.Triggers().DomReady(p => p.Post("/vitals").Gather(g => g.Form("vitals")));
 
         var rendered = plan.Rendered();
 

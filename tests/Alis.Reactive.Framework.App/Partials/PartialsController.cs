@@ -27,6 +27,37 @@ public sealed class PartialsController : Controller
         return Said($"next of kin {desk.NextOfKin.Name} is on file");
     }
 
+    /// <summary>The reception: the desk's record, whose next of kin is loaded into the page when the visitor names one.</summary>
+    public IActionResult Reception() => View(new DeskPage());
+
+    /// <summary>The reception with two slots that each load the next of kin's template, so the page holds its input twice.</summary>
+    public IActionResult DoubleBooked() => View(new DeskPage());
+
+    /// <summary>
+    /// The next of kin's editor template, loaded into the reception's slot: rendered for the desk's NextOfKin member,
+    /// as EditorFor renders it, so its input binds as NextOfKin.Name.
+    /// </summary>
+    public IActionResult NextOfKin()
+    {
+        ViewData.TemplateInfo.HtmlFieldPrefix = nameof(DeskPage.NextOfKin);
+        return PartialView("EditorTemplates/KinCard", new KinCard());
+    }
+
+    public IActionResult Admission(bool showsRoom = false) => View(new AdmissionPage { ShowsRoom = showsRoom });
+
+    /// <summary>The room's line, loaded into the admission's slot: a partial of the admission's own model.</summary>
+    public IActionResult RoomLine() => PartialView("RoomLine", new AdmissionPage());
+
+    /// <summary>Binds the admission as any endpoint does, checks it by the admission's rules, and says where the resident goes.</summary>
+    [HttpPost]
+    public IActionResult Admit([FromBody] AdmissionPage admission, [FromServices] AdmissionRules rules)
+    {
+        var result = rules.Validate(admission);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Said($"{admission.Resident ?? "no one"} admitted to room {admission.Room}");
+    }
+
     public IActionResult Lobby() => View(new LobbyPage());
 
     /// <summary>Binds the lobby's record as any endpoint does, checks it by the sign-in rules, and says whom it signed in.</summary>

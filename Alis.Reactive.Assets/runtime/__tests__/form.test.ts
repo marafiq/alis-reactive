@@ -184,7 +184,7 @@ describe("live", () => {
     const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [scored] };
     startOwner(Owner.page(), [plan({
       Rating: element("Rating", "fake"),
-      model: plugin("alis.model", "Test.Plan", model),
+      model: plugin("alis.model", "", model),
       form: plugin("alis.form", "admission", form),
     }, [])]);
 
@@ -216,7 +216,7 @@ describe("live", () => {
     const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [required] };
     startOwner(Owner.page(), [plan({
       Phone: element("Phone", "fake"),
-      model: plugin("alis.model", "Test.Plan", model),
+      model: plugin("alis.model", "", model),
       form: plugin("alis.form", "admission", form),
     }, [])]);
 

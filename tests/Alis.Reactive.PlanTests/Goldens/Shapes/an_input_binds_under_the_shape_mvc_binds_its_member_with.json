@@ -36,7 +36,7 @@
     "$model": {
       "kind": "plugin",
       "name": "alis.model",
-      "key": "Alis.Reactive.PlanTests.Support.Vitals",
+      "key": "",
       "data": {
         "kind": "model",
         "inputs": {
@@ -171,6 +171,14 @@
         "kind": "none"
       }
     },
+    "$inputs:vitals": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "vitals",
+      "data": {
+        "kind": "none"
+      }
+    },
     "$document": {
       "kind": "plugin",
       "name": "alis.document",
@@ -229,7 +237,7 @@
                       "kind": "call",
                       "target": {
                         "kind": "obj",
-                        "id": "$model"
+                        "id": "$inputs:vitals"
                       },
                       "path": [
                         "fill"
@@ -258,7 +266,7 @@
                           "kind": "get",
                           "target": {
                             "kind": "obj",
-                            "id": "$model"
+                            "id": "$inputs:vitals"
                           },
                           "path": [
                             "arrays"

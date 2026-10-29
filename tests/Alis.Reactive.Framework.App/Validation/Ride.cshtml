@@ -28,7 +28,7 @@
             }))))
 @(plan.Button("ask-desk", "Ask the desk to book it")
     .Reactive(button => button.Click, p => p.Post("/Validation/Ride")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("ride-form"))
         .Response(r => r
             .OnSuccess<Booked>((booked, s) => s.Element("ride-status").Text.Set(booked.Get(x => x.Summary)))
             .OnError(400, e =>

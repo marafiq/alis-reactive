@@ -78,7 +78,7 @@
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("Print", "MedicationReconciliation")).Gather(g => g.Form())
+                    p.Post(Url.SandboxRoute("Print", "MedicationReconciliation")).Gather(g => g.Form("reconciliation-form"))
                      .Response(r => r
                         .OnSuccess<MedicationReconciliationConfirmation>((json, s) =>
                         {

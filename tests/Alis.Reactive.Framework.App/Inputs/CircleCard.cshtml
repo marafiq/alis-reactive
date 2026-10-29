@@ -14,7 +14,7 @@
 
     @(plan.Button($"save-{slug}", $"Save the {heading.ToLowerInvariant()}")
         .Reactive(button => button.Click, p => p.Post("/Inputs/Circle")
-            .Gather(g => g.Form())
+            .Gather(g => g.Form($"card-{slug}"))
             .Response(r => r.OnSuccess<CircleEcho>((echo, s) => s.Element("circle-bound").Text.Set(echo.Get(x => x.Summary))))))
 </section>
 

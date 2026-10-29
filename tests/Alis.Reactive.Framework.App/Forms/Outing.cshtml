@@ -1,0 +1,34 @@
+@using Alis.Reactive.Framework.App.Forms
+@model OutingPage
+@{
+    ViewData["Title"] = "An outing";
+    var plan = Html.ReactivePlan<OutingPage>();
+}
+<h1>An outing</h1>
+
+<form id="outing-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    <fieldset id="companion-section">
+        <legend>The companion</legend>
+        @{ Html.InputField(plan, m => m.Companion, o => o.Label("Companion")).Entry(); }
+    </fieldset>
+</form>
+
+@* The desk's note sits beside the booking's form, not in it. *@
+<section id="desk-note">
+    @{ Html.InputField(plan, m => m.Note, o => o.Label("Note for the desk")).Entry(); }
+</section>
+
+<p>The endpoint bound: <span id="outing-bound"></span></p>
+
+@(plan.Button("book-outing", "Book the outing")
+    .Reactive(button => button.Click, p => p.Post("/Forms/Bound")
+        .Gather(g => g.Form())
+        .Validate<OutingRules>("outing-form")
+        .Response(r => r.OnSuccess<FormsEcho>((echo, s) => s.Element("outing-bound").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("save-companion", "Save the companion")
+    .Reactive(button => button.Click, p => p.Post("/Forms/Bound")
+        .Gather(g => g.Form("companion-section"))
+        .Response(r => r.OnSuccess<FormsEcho>((echo, s) => s.Element("outing-bound").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

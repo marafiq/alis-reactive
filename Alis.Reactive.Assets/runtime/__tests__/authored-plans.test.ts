@@ -120,10 +120,19 @@ describe("requests", () => {
     expect(sent[0]).toMatchObject({ method: "GET", url: "/residents/1042?Wing=Garden" });
   });
 
+  // The view lays the form out: the inputs inside the element the request's Form(formId) names.
+  function formHolding(formId: string, inputs: HTMLElement[]): void {
+    const form = document.createElement("form");
+    form.id = formId;
+    document.body.appendChild(form);
+    for (const held of inputs) form.appendChild(held);
+  }
+
   it("a POST of the form sends the input's value and reads the success body", async () => {
     const plan = authored("Requests", "a_post_of_the_form_reads_the_success_body_where_the_route_names_it");
     const sent = server({ "/admit": { json: { confirmation: "ADM-7" } } });
     const elements = mount(plan);
+    formHolding("admission", [input(elements, "Name")]);
     type(input(elements, "Name"), "Helen");
     startOwner(Owner.page(), [plan]);
     await vi.waitFor(() => expect(elements["status"]!.textContent).toBe("ADM-7"));
@@ -134,6 +143,7 @@ describe("requests", () => {
     const plan = authored("Shapes", "an_input_binds_under_the_shape_mvc_binds_its_member_with");
     const sent = server();
     const elements = mount(plan);
+    formHolding("vitals", ["Weight", "MeasuredOn", "RecordedAt", "Notes"].map(member => input(elements, member)));
     type(input(elements, "Weight"), "70");
     type(input(elements, "MeasuredOn"), "2026-10-27");
     type(input(elements, "RecordedAt"), "2026-10-27T05:30:00Z");

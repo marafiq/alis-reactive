@@ -204,15 +204,13 @@ namespace Alis.Reactive.PlanModel
         internal const string ModelId = "$model";
         internal const string ConfirmId = "$confirm";
 
-        private readonly string _planId;
         private readonly Dictionary<string, ObjectLocator> _objects = new Dictionary<string, ObjectLocator>(StringComparer.Ordinal);
         private readonly List<string> _order = new List<string>();
         private readonly Dictionary<string, ComponentVendor> _elementVendors = new Dictionary<string, ComponentVendor>(StringComparer.Ordinal);
         private readonly Dictionary<string, Vendor> _vendors = new Dictionary<string, Vendor>(StringComparer.Ordinal);
 
-        internal PlanObjects(string planId, IEnumerable<DeclaredObject> declared)
+        internal PlanObjects(IEnumerable<DeclaredObject> declared)
         {
-            _planId = planId;
             foreach (var element in declared)
             {
                 _elementVendors[element.Id] = element.Vendor;
@@ -236,9 +234,13 @@ namespace Alis.Reactive.PlanModel
 
         internal string Confirm() => PluginObject(ConfirmId, "alis.confirm", "", PluginData.None);
 
-        internal string Model(ModelPluginData data) => PluginObject(ModelId, "alis.model", _planId, data);
+        // The page's one table of mounted inputs, which every plan joins with the inputs it rendered (grammar.md 6.3).
+        internal string Model(ModelPluginData data) => PluginObject(ModelId, "alis.model", "", data);
 
-        internal string Model() => PluginObject(ModelId, "alis.model", _planId, PluginData.None);
+        internal string Model() => PluginObject(ModelId, "alis.model", "", PluginData.None);
+
+        /// <summary>The mounted inputs inside the element with this id, whichever plan rendered them (grammar.md M1).</summary>
+        internal string Inputs(string containerId) => PluginObject("$inputs:" + containerId, "alis.model", containerId, PluginData.None);
 
         internal string Form(string containerId, FormPluginData data) => PluginObject("$form:" + containerId, "alis.form", containerId, data);
 

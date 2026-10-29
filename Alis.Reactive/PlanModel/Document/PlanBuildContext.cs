@@ -217,7 +217,7 @@ namespace Alis.Reactive.PlanModel
         /// </summary>
         internal GrammarPlan Write()
         {
-            var objects = new PlanObjects(_planId, _declared);
+            var objects = new PlanObjects(_declared);
             var plan = new PlanWriter(_planId, objects);
 
             var inputs = ModelInputs(objects);

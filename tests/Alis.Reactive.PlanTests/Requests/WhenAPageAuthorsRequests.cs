@@ -27,7 +27,7 @@ public class WhenAPageAuthorsRequests
     {
         var plan = Page.Plan<Admission>().TextInput(m => m.Name);
         plan.Triggers().DomReady(p =>
-            p.Post("/admit").Gather(g => g.Form())
+            p.Post("/admit").Gather(g => g.Form("admission"))
              .Response(r => r.OnSuccess<AdmissionSaved>((saved, s) => s.Element("status").Text.Set(saved.Get(x => x.Confirmation)))));
 
         var rendered = plan.Rendered();

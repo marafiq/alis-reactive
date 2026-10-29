@@ -40,7 +40,7 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("SaveCarePlan", "Loader")).Gather(g => g.Form())
+                    p.Post(Url.SandboxRoute("SaveCarePlan", "Loader")).Gather(g => g.Form("care-plan-form"))
                      .WhileLoading(l => l.Component<NativeLoader>().Show())
                      .Response(r => r.OnSuccess<CarePlanSaved>((json, s) =>
                      {

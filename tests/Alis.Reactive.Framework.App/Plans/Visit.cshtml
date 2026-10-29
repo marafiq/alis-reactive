@@ -24,7 +24,7 @@
 
 @(plan.Button("book", "Book the visit")
     .Reactive(button => button.Click, p => p.Post("/Plans/Visits")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("visit"))
         .Response(r => r.OnSuccess<Booked>((booked, s) => s.Element("booked").Text.Set(booked.Get(x => x.Summary))))))
 @(plan.Button("book-unreasoned", "Book without a reason")
     .Reactive(button => button.Click, p => p.Post("/Plans/Visits/Unreasoned")
