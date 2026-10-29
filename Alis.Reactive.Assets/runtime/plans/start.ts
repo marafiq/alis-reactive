@@ -23,12 +23,11 @@ export function startOwner(owner: Owner, plans: readonly PlanDocument[]): void {
   log.info("owner.started", { owner: owner.name, plans: plans.map(plan => plan.planId) });
 }
 
+// The plan gives data only to alis.model and alis.form, which the runtime registers, each with contribute.
 function contribute(objects: PlanObjects, owner: Owner): void {
-  for (const [id, locator] of Object.entries(objects.plan.objects)) {
+  for (const locator of Object.values(objects.plan.objects)) {
     if (locator.kind !== "plugin" || locator.data.kind === "none") continue;
-    const plugin = pluginNamed(locator.name);
-    if (!plugin.contribute) throw new Error(`[alis] plugin "${locator.name}" takes no data (object "${id}")`);
-    plugin.contribute({ key: locator.key, data: locator.data, owner, plan: objects.plan, objects });
+    pluginNamed(locator.name).contribute!({ key: locator.key, data: locator.data, owner, plan: objects.plan, objects });
   }
 }
 
