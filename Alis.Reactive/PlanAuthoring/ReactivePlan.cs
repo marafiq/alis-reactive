@@ -36,7 +36,8 @@ namespace Alis.Reactive
         public string PlanId => _planId.Value;
         /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
         public bool IsPartial => _scope.IsPartial;
-        internal bool RendersValidationSummary => _scope.RendersValidationSummary(_context.Forms.Count > 0);
+        /// <summary>The forms this plan validates or shows the server's errors on, by container id.</summary>
+        internal IReadOnlyList<string> Forms => _context.Forms;
         internal PlanBuildContext Context => _context;
 
         /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
@@ -201,36 +202,23 @@ namespace Alis.Reactive
             new ElementPlanScope();
 
         internal abstract bool IsPartial { get; }
-
-        /// <summary>Whether the plan renders the summary its forms show the messages no field shows in.</summary>
-        /// <param name="hasAForm">Whether a request of the plan validates a form or an error route shows a form's errors.</param>
-        internal abstract bool RendersValidationSummary(bool hasAForm);
     }
 
-    // The plan the page's partials join: their forms show their messages in its summary too, so it renders
-    // one whether or not it validates a form itself.
+    // The plan the page's partials of the same model join.
     internal sealed class RootViewPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => false;
-
-        internal override bool RendersValidationSummary(bool hasAForm) => true;
     }
 
-    // A partial joins the plan of its model, whose root view renders the summary.
+    // A partial joins the plan of its model.
     internal sealed class PartialViewPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => true;
-
-        internal override bool RendersValidationSummary(bool hasAForm) => false;
     }
 
-    // A plan of its own for one element composes with no other plan: it renders a summary when its request
-    // validates a form or shows a form's errors, and none otherwise, so a row template's many link plans add no
-    // markup.
+    // A plan of its own for one element composes with no other plan.
     internal sealed class ElementPlanScope : ReactivePlanScope
     {
         internal override bool IsPartial => false;
-
-        internal override bool RendersValidationSummary(bool hasAForm) => hasAForm;
     }
 }

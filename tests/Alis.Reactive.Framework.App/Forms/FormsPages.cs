@@ -24,6 +24,25 @@ public sealed class OutingRules : ReactiveValidator<OutingPage>
     }
 }
 
+/// <summary>The front desk's log: a visit and a parcel, each logged by a form of its own.</summary>
+public sealed class FrontDeskPage
+{
+    public string? Visitor { get; set; }
+
+    public string? Parcel { get; set; }
+}
+
+/// <summary>
+/// A stay booked for a guest: the stay's form holds only the guest's line, which the desk loads when it picks a
+/// guest; when the stay starts is the server's to ask for.
+/// </summary>
+public sealed class StayPage
+{
+    public string? Guest { get; set; }
+
+    public string? StartsOn { get; set; }
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class FormsEcho
 {

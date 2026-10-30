@@ -16,7 +16,7 @@ export class PlanObjects implements Objects {
   object(id: string): unknown {
     const locator = this.locator(id);
     switch (locator.kind) {
-      case "plugin":  return pluginNamed(locator.name).object(locator.key);
+      case "plugin":  return pluginNamed(locator.name).object(locator.key, locator.data);
       case "element": return vendorObject(this.requireElement(locator), locator.vendor, this.vendor(locator));
       default:        return assertNever(locator, "object locator");
     }

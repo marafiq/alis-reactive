@@ -24,11 +24,9 @@ namespace Alis.Reactive.PlanModel
             _scope = scope;
         }
 
-        internal FormPluginData Form(IReadOnlyList<CheckedField> fields) =>
-            new FormPluginData(SummaryId, fields.Select(Field).ToList());
-
-        /// <summary>The element id of the plan's validation summary, as <c>Html.RenderPlan</c> renders it.</summary>
-        private string SummaryId => PlanElementId.ValidationSummaryFor(_scope.PlanId);
+        /// <summary>The form's data: its summary, the form's own whichever plan renders it, and its fields.</summary>
+        internal FormPluginData Form(string formId, IReadOnlyList<CheckedField> fields) =>
+            new FormPluginData(FormSummary.IdOf(formId), fields.Select(Field).ToList());
 
         private FormField Field(CheckedField field)
         {

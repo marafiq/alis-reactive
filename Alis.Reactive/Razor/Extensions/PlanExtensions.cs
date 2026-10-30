@@ -45,11 +45,8 @@ namespace Alis.Reactive
         /// <remarks>
         /// <para>
         /// Call <c>ResolvePlan</c> at the top of a partial and <see cref="RenderPlan{TModel}"/> at the
-        /// bottom. The rendered partial contributes plan JSON without emitting its own validation
-        /// summary container: the messages no field of its forms shows go to the summary of the root
-        /// view's plan of the same model, the plan it joins. A partial of a model no root view on the page
-        /// plans (a card of its own model) joins nothing; it starts a plan of its own with
-        /// <c>ReactivePlan</c>, which renders that summary.
+        /// bottom. The rendered partial contributes plan JSON; the messages no field of a form shows go to
+        /// that form's summary, whichever plan renders it.
         /// </para>
         /// <para>
         /// Returned plan's behaviors merge into the owning view's Active Plan state.
@@ -75,10 +72,9 @@ namespace Alis.Reactive
         /// <remarks>
         /// Render the element with <paramref name="elementId"/>, wire it with <c>.Reactive(...)</c> or
         /// <see cref="HtmlExtensions.On{TModel}"/>, and write <see cref="RenderPlan{TModel}"/> next to
-        /// it. When the element's request validates a form, or an error route of it shows a form's errors
-        /// (<c>e.ValidationErrors(formId)</c>), the plan renders the summary for the messages no field of the
-        /// form shows (a member the server names that the element's view does not render); a plan that does
-        /// neither renders none.
+        /// it. A plan whose request validates a form or shows a form's errors renders that form's summary when
+        /// the page holds none yet, as every plan does (<see cref="RenderPlan{TModel}"/>), so a row template's
+        /// many link plans add no markup.
         /// </remarks>
         /// <typeparam name="TModel">View model type, providing compile-time expression paths.</typeparam>
         /// <param name="elementId">The element's id; it also identifies the plan.</param>
@@ -126,12 +122,13 @@ namespace Alis.Reactive
         /// </summary>
         /// <remarks>
         /// Must be the last call in every view. A plan that is not rendered
-        /// produces no runtime behavior. After the plan it renders the validation summary, where the
-        /// messages no field shows go: for a root view's plan always, for an element plan when it validates
-        /// a form or shows a form's errors, and for a partial's plan never. A plan renders once, after
-        /// everything written to it: an input or behavior written to it later (a <c>@section</c> the layout
-        /// renders after the call) and a second call are refused. Write it in the view's body or in a section
-        /// the layout renders: Razor never renders a partial's own <c>@section</c>.
+        /// produces no runtime behavior. After the plan it renders the summary of each form the plan validates
+        /// or shows the server's errors on (<c>e.ValidationErrors(formId)</c>) that the page holds none of yet:
+        /// <c>{formId}_validation_summary</c>, where the messages no field of the form shows go. A form's
+        /// summary renders once per request, so it sits after the first plan that names the form. A plan
+        /// renders once, after everything written to it: an input or behavior written to it later (a
+        /// <c>@section</c> the layout renders after the call) and a second call are refused. Write it in the
+        /// view's body or in a section the layout renders: Razor never renders a partial's own <c>@section</c>.
         /// </remarks>
         /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
         /// <param name="plan">Reactive Plan whose generated JSON should be embedded.</param>
@@ -139,28 +136,22 @@ namespace Alis.Reactive
 #if NET48
         public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan)
             where TModel : class =>
-            new MvcHtmlString(PlanMarkup(plan));
+            new MvcHtmlString(PlanMarkup(plan, RenderedPage.Of(html.ViewContext)));
 #else
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan)
             where TModel : class =>
-            new HtmlString(PlanMarkup(plan));
+            new HtmlString(PlanMarkup(plan, RenderedPage.Of(html.ViewContext)));
 #endif
 
-        // The plan's script, and the summary that takes the errors no field's own slot can show (a hidden
-        // field's, an unloaded partial's, a member the page never rendered): a root view's always, an
-        // element plan's when it validates a form or shows a form's errors.
-        private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan) where TModel : class
+        // The plan's script, then the summary of each of its forms the page holds none of yet, where the messages
+        // no field of the form can show go (a hidden field's, an unloaded partial's, a member no input renders).
+        private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan, RenderedPage page) where TModel : class
         {
-            var script = $"<script type=\"application/json\" id=\"alis-plan-{PlanElementId.For(plan.PlanId)}\" data-reactive-plan>{plan.Render()}</script>";
-            return plan.RendersValidationSummary ? script + ValidationSummaryFor(plan.PlanId) : script;
-        }
-
-        // The runtime finds the summary by this id, the same one native-validation-summary writes.
-        private static string ValidationSummaryFor(string planId)
-        {
-            var encodedPlanId = System.Net.WebUtility.HtmlEncode(planId);
-            var encodedSummaryId = System.Net.WebUtility.HtmlEncode(PlanElementId.ValidationSummaryFor(planId));
-            return $"<div id=\"{encodedSummaryId}\" data-reactive-validation-summary=\"{encodedPlanId}\" hidden></div>";
+            var markup = new System.Text.StringBuilder(
+                $"<script type=\"application/json\" id=\"alis-plan-{PlanElementId.For(plan.PlanId)}\" data-reactive-plan>{plan.Render()}</script>");
+            foreach (var form in plan.Forms)
+                if (page.SummaryRenders(form)) markup.Append(FormSummary.Markup(form));
+            return markup.ToString();
         }
     }
 
@@ -168,8 +159,5 @@ namespace Alis.Reactive
     {
         public static string For(string planId) =>
             planId.Replace('.', '-').Replace('+', '-');
-
-        public static string ValidationSummaryFor(string planId) =>
-            planId.Replace('.', '_').Replace('+', '_') + "_validation_summary";
     }
 }

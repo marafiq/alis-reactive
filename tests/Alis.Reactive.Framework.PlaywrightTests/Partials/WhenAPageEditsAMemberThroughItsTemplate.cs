@@ -29,7 +29,7 @@ public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
 
     private ILocator KinField => Page.Locator("#kin-card > div").Filter(new() { Has = Input("Next of kin") });
 
-    private ILocator DeskSummary => Page.Locator("#desk-messages [data-reactive-validation-summary]");
+    private ILocator SummaryOf(string formId) => Page.Locator($"#{formId}_validation_summary");
 
     [Test]
     public async Task the_page_reads_the_templates_input_by_the_member()
@@ -50,7 +50,7 @@ public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
         await Button("Save the desk").ClickAsync();
 
         await Expect(KinField.GetByText("Name the next of kin.")).ToBeVisibleAsync();
-        await Expect(DeskSummary).ToBeHiddenAsync();
+        await Expect(SummaryOf("desk-form")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -62,7 +62,7 @@ public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
         await Button("Check the next of kin on file").ClickAsync();
 
         await Expect(KinField.GetByText("That name is not on the resident's file.")).ToBeVisibleAsync();
-        await Expect(DeskSummary).ToBeHiddenAsync();
+        await Expect(SummaryOf("kin-section")).ToBeHiddenAsync();
     }
 
     [Test]

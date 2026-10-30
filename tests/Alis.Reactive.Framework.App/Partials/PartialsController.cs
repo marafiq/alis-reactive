@@ -79,5 +79,23 @@ public sealed class PartialsController : Controller
 
     public IActionResult Refused(PartialMistake mistake) => View("Refused", new PartialRefusalsPage { Mistake = mistake });
 
+    public IActionResult Handover() => View(new HandoverPage());
+
+    /// <summary>Refuses every handover whose keyholder's relationship is not given, by the member's binding name.</summary>
+    [HttpPost]
+    public IActionResult HandOver([FromBody] HandoverPage handover) => handover.Keyholder.Relationship is null
+        ? BadRequest(new { errors = new Dictionary<string, string[]> { ["Keyholder.Relationship"] = ["Say how the keyholder is related."] } })
+        : Said($"room {handover.Room} handed to {handover.Keyholder.Name}");
+
+    public IActionResult Escort() => View(new EscortPage());
+
+    /// <summary>Refuses the escort a line sends: which shift they cover is the server's to ask for, by the member's binding name.</summary>
+    [HttpPost]
+    public IActionResult CheckEscort([FromBody] EscortPage escort)
+    {
+        var line = escort.Driver.Name is null ? nameof(EscortPage.Aide) : nameof(EscortPage.Driver);
+        return BadRequest(new { errors = new Dictionary<string, string[]> { [$"{line}.Shift"] = [$"Say which shift the {line.ToLowerInvariant()} covers."] } });
+    }
+
     private JsonResult Said(string summary) => Json(new PartialsEcho { Summary = summary });
 }

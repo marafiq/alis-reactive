@@ -1,11 +1,11 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 
 /// <summary>
-/// A partial of the page's own model joins the page's plan (<c>ResolvePlan</c>) and renders no validation
-/// summary of its own, so a message no field shows goes to the page's. What a save sends no longer follows the
-/// plan id (ADR-0003 rule 2): a form sends the inputs inside it, so the page's save sends a partial rendered
-/// inside the page's form, with the page or loaded into a slot there, and not a card rendered outside it, which
-/// its own save sends.
+/// A partial of the page's own model joins the page's plan (<c>ResolvePlan</c>). What a save sends and where a
+/// message goes no longer follow the plan id (ADR-0003 rule 2): a form sends the inputs inside it, so the page's
+/// save sends a partial rendered inside the page's form, with the page or loaded into a slot there, and not a card
+/// rendered outside it, which its own save sends; and the message no field shows goes to the summary of the form
+/// a request checks, whichever plan's request it is.
 /// </summary>
 [TestFixture]
 public sealed class WhenPlansShareAPlanId : AppPageTest
@@ -66,13 +66,13 @@ public sealed class WhenPlansShareAPlanId : AppPageTest
     }
 
     [Test]
-    public async Task a_partial_that_joins_the_pages_plan_leaves_the_message_no_field_shows_to_the_pages_summary()
+    public async Task a_partials_own_request_shows_the_message_no_field_shows_in_the_summary_of_the_form_it_checks()
     {
         await Open("/Plans/Visit");
         await Field("Visitor").FillAsync("Ada");
 
-        await Button("Book without a reason").ClickAsync();
+        await Button("Book for the resident").ClickAsync();
 
-        await Expect(Page.Locator("#page-messages").GetByText("Say why the visit is booked.")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#visit_validation_summary")).ToHaveTextAsync("Say why the visit is booked.");
     }
 }

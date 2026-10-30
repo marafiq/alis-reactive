@@ -7,15 +7,16 @@
 // F4 validate() clears every inline message and the summary, evaluates every field, returns the AND.
 // F5 A field with no element posts no value: each active test checks a missing value, and the first
 //    that fails puts its message in the summary.
-// F6 A message goes inline into {id}_error when that slot can render, else into the summary.
+// F6 A message goes inline into {id}_error when that slot can render, else into the form's summary, the
+//    element the form's data names ({formId}_validation_summary), which the server renders.
 // F7 At creation, and whenever HTML mounts (a field a partial loads): DOM `input` clears a field's
 //    message; DOM `blur` and alis:commit (the model re-raises each input's own commit event as it)
 //    revalidate it against every container that holds it. Each element is wired once.
 // F8 showErrors(problem) places server errors by exact binding name; a body that is not a record is
 //    logged and shows nothing.
-// F9 A slot's load or unload removes exactly its own fields, then clears and hides the summary.
+// F9 A slot's load or unload removes exactly its own fields, then clears and hides the form's summary.
 
-import type { FormField, FormPluginData, FormTest } from "../../types/index";
+import type { FormField, FormPluginData, FormTest, PluginData } from "../../types/index";
 import type { Contribution, Plugin } from "../../objects/plugins";
 import type { Owner } from "../../objects/owner";
 import type { PlanObjects } from "../../objects/plan-objects";
@@ -35,6 +36,8 @@ interface Entry {
   readonly field: FormField;
   readonly objects: PlanObjects;
   readonly owner: Owner;
+  /** The id of the form's summary, from the data the field came with. */
+  readonly summary: string;
 }
 
 export interface FormObject {
@@ -43,9 +46,6 @@ export interface FormObject {
 }
 
 const formsByContainer = new Map<string, Entry[]>();
-// The summary element of each validated container, from the form's data: a form with no browser
-// check of its own still shows the server's answers there.
-const summaries = new Map<string, string>();
 // The elements wired for live validation. A partial that reloads brings new elements under the same
 // ids, so wiring is remembered per element, not per id.
 let liveWiredElements = new WeakSet<HTMLElement>();
@@ -61,11 +61,6 @@ function entriesOf(containerId: string): Entry[] {
 }
 
 // ── summary ────────────────────────────────────────────────────────────────
-
-function summaryElement(containerId: string): HTMLElement | null {
-  const id = summaries.get(containerId);
-  return id === undefined ? null : document.getElementById(id);
-}
 
 function addSummaryError(summary: HTMLElement | null, key: string, message: string): void {
   if (summary === null) return;
@@ -140,7 +135,7 @@ function unmountedField(entry: Entry, summary: HTMLElement | null): boolean {
   return true;
 }
 
-function validate(containerId: string): boolean {
+function validate(containerId: string, summaryId: string): boolean {
   const entries = entriesOf(containerId);
   const container = document.getElementById(containerId);
   if (container === null) {
@@ -149,7 +144,7 @@ function validate(containerId: string): boolean {
     return false;
   }
 
-  const summary = summaryElement(containerId);
+  const summary = document.getElementById(summaryId);
   for (const entry of entries) clearInline(entry.field.id);
   clearAndHide(summary);
 
@@ -175,7 +170,7 @@ function holdersOf(field: HTMLElement): Holder[] {
     const own = entries.filter(entry => entry.field.id === field.id);
     const container = own.length > 0 ? document.getElementById(containerId) : null;
     if (container === null || !container.contains(field)) continue;
-    holders.push({ container, summary: summaryElement(containerId), entries: own });
+    holders.push({ container, summary: document.getElementById(own[0]!.summary), entries: own });
   }
   return holders;
 }
@@ -192,14 +187,14 @@ function revalidate(field: HTMLElement): void {
   }
 }
 
-function showErrors(containerId: string, problem: unknown): void {
+function showErrors(containerId: string, summaryId: string, problem: unknown): void {
   if (!isRecord(problem)) {
     log.error("server-errors.not-a-record", { id: containerId });
     return;
   }
 
   const entries = entriesOf(containerId);
-  const summary = summaryElement(containerId);
+  const summary = document.getElementById(summaryId);
   for (const entry of entries) clearInline(entry.field.id);
   clearAndHide(summary);
 
@@ -266,26 +261,29 @@ function listenForMounts(): void {
   document.addEventListener(MOUNT_EVENT, wireMountedFields);
 }
 
+// A plan writes a form's data on every form it validates or shows the server's errors on, so the plan that
+// asks for the form names its summary.
+function summaryOf(data: PluginData): string {
+  return (data as FormPluginData).summary;
+}
+
 export const formPlugin: Plugin = {
-  object: (containerId): FormObject => ({
-    validate: () => validate(containerId),
-    showErrors: problem => showErrors(containerId, problem),
+  object: (containerId, data): FormObject => ({
+    validate: () => validate(containerId, summaryOf(data)),
+    showErrors: problem => showErrors(containerId, summaryOf(data), problem),
   }),
   // The plan gives alis.form no data but a form's: its fields and its summary.
   contribute({ key, data: contributed, owner, objects }: Contribution) {
     const data = contributed as FormPluginData;
     const entries = entriesOf(key);
-    if (!summaries.has(key)) summaries.set(key, data.summary);
-    const added = data.fields.map(field => ({ field, objects, owner }));
+    const added = data.fields.map(field => ({ field, objects, owner, summary: data.summary }));
     entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
     for (const entry of added) wireLive(entry);
     listenForMounts();
 
     owner.onDispose(() => {
-      const remaining = entriesOf(key).filter(entry => !added.includes(entry));
-      formsByContainer.set(key, remaining);
-      if (remaining.length === 0 && summaries.get(key) === data.summary) summaries.delete(key);
+      formsByContainer.set(key, entriesOf(key).filter(entry => !added.includes(entry)));
       clearAndHide(document.getElementById(data.summary));
     });
   },

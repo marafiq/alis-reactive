@@ -1,0 +1,28 @@
+@using Alis.Reactive.Framework.App.Forms
+@model FrontDeskPage
+@{
+    ViewData["Title"] = "The front desk's log";
+    var plan = Html.ReactivePlan<FrontDeskPage>();
+}
+<h1>The front desk's log</h1>
+
+@* Each entry is logged by a form of its own; the server alone checks each. *@
+<form id="visit-form" aria-label="A visit">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+</form>
+<form id="parcel-form" aria-label="A parcel">
+    @{ Html.InputField(plan, m => m.Parcel, o => o.Label("Parcel")).Entry(); }
+</form>
+
+@(plan.Button("log-visit", "Log the visit")
+    .Reactive(button => button.Click, p => p.Post("/Forms/LogVisit")
+        .Gather(g => g.Form("visit-form"))
+        .Response(r => r.OnError(400, e => e.ValidationErrors("visit-form")))))
+@(plan.Button("log-parcel", "Log the parcel")
+    .Reactive(button => button.Click, p => p.Post("/Forms/LogParcel")
+        .Gather(g => g.Form("parcel-form"))
+        .Response(r => r.OnError(400, e => e.ValidationErrors("parcel-form")))))
+
+<section id="desk-messages" aria-label="The desk's messages">
+    @Html.RenderPlan(plan)
+</section>

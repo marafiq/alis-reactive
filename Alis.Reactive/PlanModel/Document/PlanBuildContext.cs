@@ -226,7 +226,7 @@ namespace Alis.Reactive.PlanModel
             var forms = new FormWriter(Scope.ForHandler(plan, "$form"));
             foreach (var declared in _declared)
                 if (_forms.TryGetValue(declared.Id, out var fields))
-                    objects.Form(declared.Id, forms.Form(fields));
+                    objects.Form(declared.Id, forms.Form(declared.Id, fields));
 
             var handlers = _handlers
                 .Select(handler =>

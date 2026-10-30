@@ -55,7 +55,7 @@ function startForm(
   const objects: Record<string, ReturnType<typeof element>> = { form: plugin("alis.form", containerId, data) };
   for (const id of [...fields.map(f => f.id), ...others]) objects[id] = element(id, "native");
   startOwner(Owner.page(), [plan(objects, [])]);
-  return formPlugin.object(containerId) as FormObject;
+  return formPlugin.object(containerId, data) as FormObject;
 }
 
 const errorText = (id: string) => document.getElementById(`${id}_error`)?.textContent;

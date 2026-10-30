@@ -137,6 +137,53 @@ public sealed class AdmissionRules : ReactiveValidator<AdmissionPage>
     }
 }
 
+/// <summary>
+/// A room handed over to a keyholder: the page renders the room, and the keyholder's line is the editor template
+/// of its own model, which carries the handover's save.
+/// </summary>
+public sealed class HandoverPage
+{
+    public string? Room { get; set; }
+
+    public KeyholderLine Keyholder { get; set; } = new();
+}
+
+/// <summary>A keyholder: the line renders the name; how they are related is the server's to ask for.</summary>
+public sealed class KeyholderLine
+{
+    public string? Name { get; set; }
+
+    public string? Relationship { get; set; }
+}
+
+/// <summary>The keyholder line's rules: a name the browser checks is given.</summary>
+public sealed class KeyholderLineRules : ReactiveValidator<KeyholderLine>
+{
+    public KeyholderLineRules()
+    {
+        RuleFor(x => x.Name).NotEmpty().WithMessage("Name the keyholder.");
+    }
+}
+
+/// <summary>
+/// The escort for a resident's appointment: a driver and an aide, each a line of one model rendered through its
+/// editor template, each checked against the roster by a request of its own line.
+/// </summary>
+public sealed class EscortPage
+{
+    public EscortLine Driver { get; set; } = new();
+
+    public EscortLine Aide { get; set; } = new();
+}
+
+/// <summary>One escort: the line renders the name; which shift they cover is the server's to ask for.</summary>
+public sealed class EscortLine
+{
+    public string? Name { get; set; }
+
+    public string? Shift { get; set; }
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class PartialsEcho
 {

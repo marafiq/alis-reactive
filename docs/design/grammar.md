@@ -49,7 +49,8 @@ That is the whole document. The grammar names no feature.
     the located object, the shape it reads as, the event that commits a value (M4), and whether the
     input binds a list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value,
-    tests: [{ rule, check: fn(v), when, message }] }] }`: one per member a rule is written on, and per
+    tests: [{ rule, check: fn(v), when, message }] }] }`. `summary` is the id of the form's summary,
+    `{formId}_validation_summary` (F6), the same whichever plan writes the form. A field is one per member a rule is written on, and per
     rendered item of a collection a rule checks, whether or not the browser can check it (a rule under
     a condition only the server decides still names its members), so `tests` is empty when every
     check is the server's. An item's field carries the checks of every rule on its collection. A form
@@ -608,11 +609,15 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   passes. The first failing test's message goes to the summary.
 - **F6 Display.** A message goes inline into `{id}_error` when that slot is renderable: it has a
   parent, and no ancestor has `hidden` or `display: none`. Then the field gets `alis-has-error`.
-  Otherwise the message goes to the summary, `{planId with . and + as _}_validation_summary`, one
-  entry per key, replaced and never duplicated. `Html.RenderPlan` renders the summary for a root
-  view's plan always, since the partials that join it (same `planId`) show their messages there, and
-  for an element plan when its request validates a form or it shows a form's server errors (F8); an
-  element plan that does neither renders none.
+  Otherwise the message goes to the form's summary, `{formId}_validation_summary`, the element the
+  data of the plan that asks names (1.1), one entry per key, replaced and never duplicated; each form
+  has its own, so one form's messages never clear another's. The server renders the summary, and the
+  runtime never creates it: `Html.RenderPlan` writes it after the plan's script for each form the plan
+  validates or shows server errors on (F8), once per form per request
+  (`Alis.Reactive/Razor/RenderedPage.cs`), so it sits after the first plan of the request that names
+  the form; a plan that does neither renders none. A request of its own whose plan names a form the
+  page already holds (a slot's answer) renders the form's summary again; the DOM's first in document
+  order shows the messages, as M6 reads an input, and the copy leaves with the slot (F9).
 - **F7 Live.** At creation (boot or slot load):
   - the DOM `input` event on a field clears its inline message;
   - DOM `blur` and `alis:commit` (M4) revalidate that one field, against every container that
@@ -628,9 +633,12 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
     the message as F6 does. Anything else goes to the summary.
   - When `problem` is not a record (an empty or non-JSON body), it logs `server-errors.not-a-record`
     and shows nothing: the server said nothing the form can place.
-- **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
-  unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
-  plans it touched (the form plugin's contribution in `Alis.Reactive.Assets/runtime/plugins/form/form.ts`). Content the server rendered inside a slot's container
+- **F9 Composition.** The tests every plan writes for a container are joined per owner, whatever the
+  plan's `planId`. A slot's load or unload removes exactly its own tests and subscriptions, then
+  clears and hides the summary of each form it touched (the form plugin's contribution in
+  `Alis.Reactive.Assets/runtime/plugins/form/form.ts`). The summary is the form's, not the slot's
+  plan's, so the form's own requests show their messages there after the slot leaves
+  (`Forms/WhenALoadedLineJoinsTheFormAndLeaves`). Content the server rendered inside a slot's container
   belongs to the slot (3.5), so a form whose steps replace each other in one slot may render its
   first step with the page: the first load or unload there removes that step's tests as it removes a
   loaded step's (`Slots/WhenASlotStartsWithServerRenderedContent`).

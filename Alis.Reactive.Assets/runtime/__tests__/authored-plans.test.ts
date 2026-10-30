@@ -156,8 +156,8 @@ describe("requests", () => {
 
 describe("validation", () => {
   // The view lays the form out: the input inside the container the plan validates, an error slot
-  // beside it, and the page's summary.
-  function layOut(elements: Record<string, HTMLElement>, planId: string): { error: HTMLElement } {
+  // beside it, and the form's summary.
+  function layOut(elements: Record<string, HTMLElement>): { error: HTMLElement } {
     const container = elements["admission"]!;
     const name = input(elements, "Name");
     container.appendChild(name);
@@ -165,7 +165,7 @@ describe("validation", () => {
     error.id = `${name.id}_error`;
     container.appendChild(error);
     const summary = document.createElement("div");
-    summary.id = `${planId.replaceAll(".", "_")}_validation_summary`;
+    summary.id = `${container.id}_validation_summary`;
     document.body.append(summary);
     return { error };
   }
@@ -174,7 +174,7 @@ describe("validation", () => {
     const plan = authored("Validation", "a_check_the_browser_can_make_lands_on_the_input_that_renders_the_member");
     const sent = server();
     const elements = mount(plan);
-    const { error } = layOut(elements, plan.planId);
+    const { error } = layOut(elements);
     startOwner(Owner.page(), [plan]);
     await vi.waitFor(() => expect(error.textContent).toBe("Name the resident."));
     expect(input(elements, "Name").classList.contains("alis-has-error")).toBe(true);
@@ -185,7 +185,7 @@ describe("validation", () => {
     const plan = authored("Validation", "a_check_the_browser_can_make_lands_on_the_input_that_renders_the_member");
     const sent = server();
     const elements = mount(plan);
-    const { error } = layOut(elements, plan.planId);
+    const { error } = layOut(elements);
     type(input(elements, "Name"), "Helen");
     startOwner(Owner.page(), [plan]);
     await vi.waitFor(() => expect(sent).toHaveLength(1));
