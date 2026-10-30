@@ -3,12 +3,12 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>ALIS007: a response route keeps one follow-up request; a second .Chained() silently replaces the first.</summary>
+/// <summary>ALIS007: a response has one follow-up request; a second .Chained() in one fluent chain is reported as the view compiles.</summary>
 [TestFixture]
 public class DuplicateChainedRequestTests
 {
     private const string Message =
-        "Duplicate .Chained() call — only the last chained request survives. Use a single .Chained() with the final request.";
+        "Duplicate .Chained() call — a response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..)).";
 
     [Test]
     public Task a_second_chained_on_one_response_is_reported() =>

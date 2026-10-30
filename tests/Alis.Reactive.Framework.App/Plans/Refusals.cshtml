@@ -82,6 +82,15 @@
                 .OnError(409, e => e.Element("refused").Text.Set("taken again")))))
         <span id="refused"></span>
         break;
+    case PlanMistake.ChainTwoRequests:
+        @* ALIS007 refuses .Chained(..).Chained(..) at compile time; written as two statements, the builder refuses it. *@
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r =>
+            {
+                r.Chained(next => next.Get("/Plans/Notice"));
+                r.Chained(next => next.Get("/Plans/Notice"));
+            })))
+        break;
 }
 
 @Html.RenderPlan(plan)

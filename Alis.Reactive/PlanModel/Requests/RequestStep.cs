@@ -178,8 +178,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (Chained != null)
                 throw new InvalidOperationException(
-                    "A response can declare only one chained request. " +
-                    "To continue the sequence, attach the next Chained request to the existing follow-up request.");
+                    "A response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..)).");
             Chained = request;
         }
 

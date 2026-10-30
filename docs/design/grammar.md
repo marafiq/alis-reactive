@@ -412,7 +412,8 @@ A failing handler is logged and stops no other handler.
 | A validation rule reaches the browser only when the page can evaluate it (7.5) | render |
 | Enum literals are emitted as names, the same text the input reads | construction |
 | A member path and a data path are never one node (1.3) | construction |
-| Exact-status routes match before catch-alls; only the first `OnSuccess` route runs; error routes sit behind `!res.ok` | construction: the request builder orders them |
+| A response routes each outcome once: one `OnSuccess`, one `OnError` without a status, one `OnError(status)` for each status, and one `Chained` request | builder, where the second is written; ALIS007 reports a second `Chained` in one fluent chain as the view compiles |
+| Exact-status routes match before catch-alls; error routes sit behind `!res.ok` | construction: the request builder orders them |
 
 ## 5. Lowering: each fluent method, as productions
 
@@ -458,7 +459,7 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   try {
     const req = record(…Gather…);                 // the gathered request
     const res = await http.send({ method, url, route, values: req, arrays, headers, format });
-    if (res.ok) { …OnSuccess by status, exact first… }
+    if (res.ok) { …OnSuccess… }
     else if (res.status === 409) { …OnError(409)… }
     else { …untyped OnError… }                    // also reached by status 0
   } finally { …Finally… }                         // emitted only when Finally exists; reads no res

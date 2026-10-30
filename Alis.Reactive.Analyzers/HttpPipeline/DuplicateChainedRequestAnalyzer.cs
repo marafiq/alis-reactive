@@ -7,8 +7,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers.HttpPipeline
 {
     /// <summary>
-    /// Reports duplicate <c>.Chained()</c> calls on one response route because
-    /// each route keeps only one follow-up request.
+    /// Reports a second <c>.Chained()</c> call in one fluent chain on a response, which has one follow-up
+    /// request: the request builder refuses the second when the view renders, and this reports it as the view compiles.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateChainedRequestAnalyzer : DiagnosticAnalyzer
@@ -18,11 +18,11 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "Duplicate .Chained() call on ResponseBuilder",
-            messageFormat: "Duplicate .Chained() call — only the last chained request survives. Use a single .Chained() with the final request.",
+            messageFormat: "Duplicate .Chained() call — a response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..)).",
             category: "Alis.Reactive.HttpPipeline",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Each ResponseBuilder chain should have at most one .Chained() call. Multiple calls silently overwrite — only the last one takes effect.",
+            description: "A response has one follow-up request. The request builder refuses a second .Chained() when the view renders; this reports one written in the same fluent chain as the view compiles.",
             helpLinkUri: null);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
