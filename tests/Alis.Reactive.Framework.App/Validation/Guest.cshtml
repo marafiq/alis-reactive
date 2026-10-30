@@ -23,7 +23,7 @@
         .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
 @(plan.Button("save-unwaited", "Save without waiting for the rule that waits")
     .Reactive(button => button.Click, p => p.Post("/Validation/GuestUnwaited")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("guest-form"))
         .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
 
 @Html.RenderPlan(plan)
