@@ -75,6 +75,13 @@
                 .OnError(e => e.Element("refused").Text.Set("refused again")))))
         <span id="refused"></span>
         break;
+    case PlanMistake.RouteAStatusTwice:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r
+                .OnError(409, e => e.Element("refused").Text.Set("taken"))
+                .OnError(409, e => e.Element("refused").Text.Set("taken again")))))
+        <span id="refused"></span>
+        break;
 }
 
 @Html.RenderPlan(plan)

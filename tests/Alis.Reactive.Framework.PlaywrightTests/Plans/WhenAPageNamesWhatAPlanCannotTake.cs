@@ -117,6 +117,14 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
     }
 
     [Test]
+    public async Task a_second_error_route_for_one_status_on_one_response_is_refused()
+    {
+        await Render("RouteAStatusTwice");
+
+        await Expect(Message("A response has one OnError(409); write every step of it in that one callback.")).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task an_error_route_for_a_status_http_does_not_have_is_refused()
     {
         await Render("RouteAStatusHttpDoesNotHave");
