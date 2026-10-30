@@ -122,7 +122,7 @@ namespace Alis.Reactive
                 foreach (var validation in oneByForm)
                 {
                     var fields = validation.Rules(ruleSource);
-                    _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
+                    _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, _context.FieldPrefix).ToList());
                 }
             }
         }
