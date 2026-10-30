@@ -16,6 +16,7 @@ public class WhenAViewRegistersThePagerTwice : PlaywrightTestBase
 
         Assert.That(response, Is.Not.Null);
         Assert.That(response!.Status, Is.EqualTo(500), "A view that registers a plugin twice does not render.");
-        await Expect(Page.Locator("body")).ToContainTextAsync("Plugin 'pager' is already registered.");
+        await Expect(Page.Locator("body")).ToContainTextAsync(
+            "Plugin 'pager' is registered twice on the plan of /Areas/Sandbox/Views/Plugins/Pager/Duplicate.cshtml: register it once, and use the plugin RegisterPlugin returned wherever the view needs it.");
     }
 }

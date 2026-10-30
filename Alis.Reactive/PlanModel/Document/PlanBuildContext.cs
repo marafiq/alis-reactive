@@ -146,7 +146,9 @@ namespace Alis.Reactive.PlanModel
         internal void RegisterPlugin(string name)
         {
             if (!_plugins.Add(name))
-                throw new InvalidOperationException($"Plugin '{name}' is already registered.");
+                throw new InvalidOperationException(
+                    $"Plugin '{name}' is registered twice on the plan of {View}: register it once, and use the plugin " +
+                    "RegisterPlugin returned wherever the view needs it.");
         }
 
         private void Add(DeclaredObject declared)

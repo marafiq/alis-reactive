@@ -1,6 +1,3 @@
-using Alis.Reactive.Builders;
-using Alis.Reactive.Components;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Refusals;
@@ -46,16 +43,5 @@ public class WhenAPageCannotRender
         var refused = Assert.Throws<InvalidOperationException>(() => plan.Render());
 
         Assert.That(refused!.Message, Does.Contain("reads a response outside the routes of the request"));
-    }
-
-    [Test]
-    public void a_plugin_registered_twice_is_refused_by_name()
-    {
-        var plan = Page.Plan<Admission>();
-        plan.RegisterPlugin<Clock>();
-
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.RegisterPlugin<Clock>());
-
-        Assert.That(refused!.Message, Does.Contain("'clock' is already registered"));
     }
 }

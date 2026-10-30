@@ -1,11 +1,12 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 
 /// <summary>
-/// The names a page gives its plan that the plan cannot take, each refused when the page renders with the
-/// message the developer reads: a component or an element plan with no id, a plugin named with a space or not
-/// named, a header with no name, a route placeholder no route value can be named, an error route for a
-/// status HTTP does not have, a value read through another plan's component, and a response read outside the
-/// routes of its request, Finally included.
+/// The names a page gives its plan, and the behavior it writes, that the plan cannot take, each refused when the
+/// page renders with the message the developer reads: a component or an element plan with no id, a plugin named
+/// with a space or not named, a plugin registered twice, a header with no name, a route placeholder no route value
+/// can be named, an error route for a status HTTP does not have, a second route for one outcome of a response or a
+/// second chained request, a value read through another plan's component, a response read outside the routes of
+/// its request, Finally included, and a step written after its callback returned.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
@@ -97,6 +98,15 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
 
         await Expect(Message(
             "reads a response outside the routes of the request that receives it. Read a response inside OnSuccess, OnError or Chained of its request; Finally runs whether or not one came.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_plugin_registered_twice_on_one_plan_is_refused()
+    {
+        await Render("RegisterAPluginTwice");
+
+        await Expect(Message(
+            "Plugin 'night-log' is registered twice on the plan of /Plans/Refusals.cshtml: register it once, and use the plugin RegisterPlugin returned wherever the view needs it.")).ToBeVisibleAsync();
     }
 
     [Test]

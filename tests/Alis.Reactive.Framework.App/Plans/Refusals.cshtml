@@ -98,6 +98,10 @@
         kept!.Element("status").Text.Set("late");
         <span id="status"></span>
         break;
+    case PlanMistake.RegisterAPluginTwice:
+        plan.RegisterPlugin<NightLog>();
+        plan.RegisterPlugin<NightLog>();
+        break;
 }
 
 @Html.RenderPlan(plan)
