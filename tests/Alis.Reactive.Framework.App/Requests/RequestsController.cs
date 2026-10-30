@@ -120,6 +120,13 @@ public sealed class RequestsController : Controller
     [HttpGet("/Requests/Census/Cards")]
     public IActionResult CardsAsked() => Said($"asked with query {QueryText()}");
 
+    public IActionResult Handover(HandoverToken token) => View(new HandoverPage { Token = token });
+
+    /// <summary>Accepts the handover only with the antiforgery token the page was given, as ASP.NET Core checks it by default.</summary>
+    [HttpPost("/Requests/Handovers")]
+    [ValidateAntiForgeryToken]
+    public IActionResult HandOver([FromBody] HandoverNote handover) => Said($"'{handover.Note}', accepted");
+
     private string QueryText() => Request.QueryString.HasValue ? Request.QueryString.Value! : "nothing";
 
     private static string Listed(List<string>? items) =>

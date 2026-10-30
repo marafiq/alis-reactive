@@ -1,0 +1,27 @@
+@using Alis.Reactive.Framework.App.Requests
+@using Microsoft.AspNetCore.Antiforgery
+@inject IAntiforgery Antiforgery
+@model HandoverPage
+@{
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<HandoverPage>();
+
+    // The request token, and the cookie it is checked against, stored with this response.
+    var token = Antiforgery.GetAndStoreTokens(Context).RequestToken!;
+}
+<h1>Shift handover</h1>
+
+<p>Handed over: <span id="handed-over"></span></p>
+
+@(plan.Button("hand-over", "Hand over the shift")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Handovers")
+        .Gather<HandoverNote>(g =>
+        {
+            g.Set(x => x.Note, "Room 4 needs a check at two");
+            if (Model.Token == HandoverToken.Sent) g.Header("RequestVerificationToken", token);
+        })
+        .Response(r => r
+            .OnSuccess<Echo>((echo, s) => s.Element("handed-over").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(400, e => e.Element("handed-over").Text.Set("refused as a bad request")))))
+
+@Html.RenderPlan(plan)

@@ -174,6 +174,21 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Sends an HTTP header with a fixed value.</summary>
+        /// <remarks>
+        /// <para>
+        /// An endpoint that checks the antiforgery token (<c>[ValidateAntiForgeryToken]</c>) reads it, as ASP.NET Core
+        /// does by default, from the <c>RequestVerificationToken</c> header, and checks it against the cookie stored
+        /// with the page. The view asks <c>IAntiforgery</c> for both, and the request sends the token:
+        /// </para>
+        /// <code>
+        /// @inject IAntiforgery Antiforgery
+        /// var token = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+        ///
+        /// p.Post("/handovers")
+        ///  .Gather&lt;HandoverNote&gt;(g =&gt; g.Set(x =&gt; x.Note, note.Value).Header("RequestVerificationToken", token));
+        /// </code>
+        /// <para>ASP.NET MVC 5's <c>[ValidateAntiForgeryToken]</c> reads the form field <c>__RequestVerificationToken</c>, not a header.</para>
+        /// </remarks>
         /// <param name="name">The header name.</param>
         /// <param name="value">The header value.</param>
         public GatherBuilder<TRequest, TModel> Header(string name, string value)
