@@ -29,6 +29,9 @@ public sealed class ValidationController : Controller
 
     public IActionResult Bounds() => View(new BoundsForm());
 
+    /// <summary>The bounds page, checked by a range written with its bounds the wrong way round.</summary>
+    public IActionResult BoundsRefused() => View(new BoundsForm());
+
     public IActionResult Sameness() => View(new SamenessForm());
 
     public IActionResult Guest() => View(new RegisteredGuest());
@@ -153,6 +156,21 @@ public sealed class ValidationController : Controller
         catch (NullReferenceException unguarded)
         {
             return Json(new Booked { Summary = unguarded.Message });
+        }
+    }
+
+    /// <summary>Checks the guest by a rule that waits, without waiting for it, and says what the validator said of it.</summary>
+    [HttpPost("/Validation/GuestUnwaited")]
+    public IActionResult SaveGuestUnwaited([FromBody] RegisteredGuest guest, [FromServices] WaitingGuestRules rules)
+    {
+        try
+        {
+            rules.Validate(guest);
+            return Json(new Booked { Summary = "saved" });
+        }
+        catch (InvalidOperationException refused)
+        {
+            return Json(new Booked { Summary = refused.Message });
         }
     }
 

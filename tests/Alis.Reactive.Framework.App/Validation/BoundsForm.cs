@@ -77,3 +77,12 @@ public sealed class BoundsRules : ReactiveValidator<BoundsForm>
         RuleFor(x => x.MaybeInsideTen).ExclusiveBetween(0, 10).WithMessage("Out of bounds: MaybeInsideTen.");
     }
 }
+
+/// <summary>A range written with its bounds the wrong way round.</summary>
+public sealed class BackwardsRangeRules : ReactiveValidator<BoundsForm>
+{
+    public BackwardsRangeRules()
+    {
+        RuleFor(x => x.MaybeOneToFive).InclusiveBetween(5, 1);
+    }
+}

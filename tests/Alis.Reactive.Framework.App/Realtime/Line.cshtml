@@ -5,6 +5,7 @@
     var plan = Html.ReactivePlan<LinePage>();
     var line = SignalRHub.At<WardLine>($"/hubs/line?world={Model.World}");
     var board = ServerPushStream.At<WardBoard>($"/Realtime/Board?world={Model.World}");
+    var switchboard = ServerPushStream.At<Switchboard>($"/Realtime/Switchboard?world={Model.World}");
 }
 <h1>The line to the ward</h1>
 
@@ -18,6 +19,7 @@
 
 <p>Line: call <span id="line-call"></span> · <span id="line-dropped"></span> · <span id="line-back"></span> · <span id="line-found"></span> · <span id="line-closed"></span> · <span id="line-answered"></span></p>
 <p>Board: call <span id="board-call"></span> · <span id="bulletin"></span> · <span id="all-clear"></span> · <span id="board-taken-back"></span></p>
+<p>The server refused <span id="line-refused"></span> calls to the line.</p>
 
 @{ Html.On(plan, t => t
     .SignalR(line, h => h.Welcomed, (welcome, p) => p.Element("line-call").Text.Set(welcome.Call))
@@ -31,7 +33,8 @@
     .SignalR(line, h => h.Close, p => p.Element("line-closed").Text.Set("closed"))
     .ServerPush(board, s => s.Welcome, (welcome, p) => p.Element("board-call").Text.Set(welcome.Call))
     .ServerPush(board, s => s.Bulletin, p => p.Element("bulletin").Text.Set("a bulletin came"))
-    .ServerPush(board, s => s.AllClear, p => p.Element("all-clear").Text.Set("all clear"))); }
+    .ServerPush(board, s => s.AllClear, p => p.Element("all-clear").Text.Set("all clear"))
+    .ServerPush(switchboard, s => s.Lines, (lines, p) => p.Element("line-refused").Text.Set(lines.Refused))); }
 
 @(plan.Button("drop-line", "Drop the line")
     .Reactive(button => button.Click, p => p.Hub(line).Drop()))

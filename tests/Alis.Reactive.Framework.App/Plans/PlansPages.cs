@@ -102,7 +102,7 @@ public sealed class PlanRefusalsPage
     public PlanMistake Mistake { get; set; }
 }
 
-/// <summary>The mistakes a page can make in what it names.</summary>
+/// <summary>The mistakes a page can make in what it names and in the behavior it writes.</summary>
 public enum PlanMistake
 {
     RenderAComponentWithNoId,
@@ -116,6 +116,21 @@ public enum PlanMistake
     ReadAResponseOutsideItsRoutes,
     ReadTheResponseInFinally,
     LoadTheResponseInFinally,
+    RouteASuccessTwice,
+    RouteEveryErrorTwice,
+    RouteAStatusTwice,
+    ChainTwoRequests,
+    WriteAStepAfterItsCallbackReturned,
+    RegisterAPluginTwice,
+}
+
+/// <summary>A night log the page registers as a plugin.</summary>
+public sealed class NightLog : Plugin
+{
+    public NightLog()
+        : base("night-log")
+    {
+    }
 }
 
 /// <summary>A night log the page registers as a plugin under a name with a space in it.</summary>

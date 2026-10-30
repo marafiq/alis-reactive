@@ -46,7 +46,7 @@ public sealed class WardBoard : ServerPushStream
     public Event AllClear => Event();
 }
 
-/// <summary>How many of a page's line and board connections the server holds open, as it changes.</summary>
+/// <summary>How many of a page's line and board connections the server holds open, and how many calls to the line it refused, as they change.</summary>
 public sealed class Switchboard : ServerPushStream
 {
     public Event<LineCounts> Lines => Event<LineCounts>();
@@ -57,9 +57,14 @@ public sealed class LineCounts : JsObject
     public ReadOnly<int> Hub => ReadOnly<int>();
 
     public ReadOnly<int> Board => ReadOnly<int>();
+
+    public ReadOnly<int> Refused => ReadOnly<int>();
 }
 
-/// <summary>The line page: a line and a board the page listens to, and the offer to retry them when they drop.</summary>
+/// <summary>
+/// The line page: a line and a board the page listens to, the offer to retry them when they drop, and how many
+/// calls to the line the server refused.
+/// </summary>
 public sealed class LinePage(bool offersRetry)
 {
     public string World { get; } = Guid.NewGuid().ToString("N");

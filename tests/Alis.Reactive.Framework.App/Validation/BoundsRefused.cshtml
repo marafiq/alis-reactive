@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Validation
+@model BoundsForm
+@{
+    ViewData["Title"] = "A range written backwards";
+    var plan = Html.ReactivePlan<BoundsForm>();
+}
+<h1>A range written backwards</h1>
+
+<div id="bounds-form">
+    @{ Html.InputField(plan, m => m.MaybeOneToFive, o => o.Label("MaybeOneToFive")).Entry(); }
+</div>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Bounds")
+        .Gather(g => g.Form())
+        .Validate<BackwardsRangeRules>("bounds-form")))
+
+@Html.RenderPlan(plan)

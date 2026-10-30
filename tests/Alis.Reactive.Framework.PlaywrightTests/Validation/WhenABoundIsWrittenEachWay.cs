@@ -3,7 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 /// <summary>
 /// A comparison written every way the validator takes it (against a value or another member, the checked
 /// member and the other one each nullable or not) and a nullable range: each refuses at its bound in the
-/// browser with nothing sent, or takes its bound, as its kind says, and the endpoint saves what it takes.
+/// browser with nothing sent, or takes its bound, as its kind says, and the endpoint saves what it takes. A range
+/// written with its upper bound below its lower is refused where the page that checks by it renders.
 /// </summary>
 [TestFixture]
 public sealed class WhenABoundIsWrittenEachWay : AppPageTest
@@ -62,5 +63,15 @@ public sealed class WhenABoundIsWrittenEachWay : AppPageTest
         await Save();
         await Expect(Saved).ToHaveTextAsync("saved");
         await Expect(message).ToBeHiddenAsync();
+    }
+
+    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
+    [Test]
+    public async Task a_range_whose_upper_bound_is_below_its_lower_is_refused_where_the_page_renders()
+    {
+        await Page.GotoAsync($"{BaseUrl}/Validation/BoundsRefused");
+
+        await Expect(Page.GetByText(
+            "InclusiveBetween(5, 1) has its upper bound below its lower bound: write the lower bound first.").First).ToBeVisibleAsync();
     }
 }

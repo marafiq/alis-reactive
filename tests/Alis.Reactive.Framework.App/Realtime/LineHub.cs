@@ -45,17 +45,23 @@ public static class LineHubRoutes
 {
     /// <summary>
     /// Maps the line's hub behind a gate: while a page's world refuses calls (its first calls, or every call
-    /// while hung up), the server answers the page's call before the hub's handshake with 503.
+    /// while hung up), the server answers the page's call before the hub's handshake with 503, and counts the
+    /// refusal once it is sent.
     /// </summary>
     public static void MapLineHub(this WebApplication app, string pattern)
     {
         app.Use(async (context, next) =>
         {
             var exchange = context.RequestServices.GetRequiredService<LineExchange>();
-            if (context.Request.Path.StartsWithSegments(pattern + "/negotiate")
-                && exchange.World(context.Request.Query["world"].ToString()).RefusesNegotiation())
+            var world = context.Request.Query["world"].ToString();
+            if (context.Request.Path.StartsWithSegments(pattern + "/negotiate") && exchange.World(world).RefusesNegotiation())
             {
                 context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                context.Response.OnCompleted(() =>
+                {
+                    exchange.World(world).LineCallRefused();
+                    return Task.CompletedTask;
+                });
                 return;
             }
             await next();

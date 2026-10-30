@@ -63,17 +63,4 @@ public class WhenAComponentIsDeclaredWrong
 
         Assert.That(refused!.Message, Does.Contain("Two different vendors are named 'gauge'"));
     }
-
-    [Test]
-    public void an_id_rendered_with_one_vendor_cannot_be_read_as_another()
-    {
-        var plan = Page.Plan<Admission>();
-        plan.Render<Button>("save", HtmlString.Empty).Reactive(b => b.Click, p => p.Element("status").Text.Set("Saved"));
-
-        var refused = Assert.Throws<InvalidOperationException>(() =>
-            plan.Triggers().DomReady(p => p.Element("status").Text.Set(p.Component<Gauge>("save").Label)));
-
-        Assert.That(refused!.Message, Does.Contain("registered as vendor 'native'"));
-        Assert.That(refused.Message, Does.Contain("re-referenced as 'gauge'"));
-    }
 }

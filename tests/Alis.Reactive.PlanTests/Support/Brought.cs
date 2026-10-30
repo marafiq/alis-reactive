@@ -51,13 +51,3 @@ public sealed class Thermostat : Component
 
     public Property<int> Target => Property<int>(name: "settings.target");
 }
-
-/// <summary>A plugin an app registers on the page.</summary>
-public sealed class Clock : Plugin
-{
-    public Clock() : base("clock")
-    {
-    }
-
-    public ReadOnly<string> Now => ReadOnly<string>();
-}

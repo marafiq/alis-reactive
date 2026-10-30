@@ -160,7 +160,9 @@ namespace Alis.Reactive.PlanModel
         internal void OnError(Block route)
         {
             if (_error != null)
-                throw new InvalidOperationException("A response has one OnError for every status; write every step of it in that one callback.");
+                throw new InvalidOperationException(
+                    "A response has one OnError without a status; write every step of it in that one callback, and route " +
+                    "a status of its own with OnError(status, ..).");
             _error = route;
         }
 
@@ -176,8 +178,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (Chained != null)
                 throw new InvalidOperationException(
-                    "A response can declare only one chained request. " +
-                    "To continue the sequence, attach the next Chained request to the existing follow-up request.");
+                    "A response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..)).");
             Chained = request;
         }
 

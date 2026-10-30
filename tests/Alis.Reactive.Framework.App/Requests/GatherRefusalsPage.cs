@@ -31,6 +31,8 @@ public enum GatherMistake
     GiveAHeaderNoValue,
     SetAMemberThenTheValueHoldingIt,
     SetAValueThenAMemberUnderIt,
+    SetAMemberTwice,
+    SendFormDataWithNothingGathered,
 }
 
 /// <summary>The guide, as a request that knows only the guide's name.</summary>

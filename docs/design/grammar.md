@@ -405,6 +405,9 @@ A failing handler is logged and stops no other handler.
 | An event's payload type matches the callback | C# type |
 | A member call that returns a value is not discarded | analyzer: a discarded `Value<T>` is an error |
 | Every handle is used inside an active block, within its binding's scope | builder at render, naming the handle |
+| Every step is written inside a callback being built, not after its callback returned | builder, at the step |
+| An element holds one component: an id is named with one vendor in a plan | builder, naming the id and both vendors |
+| A plugin is registered once in a plan | builder, naming the plugin and the view |
 | A lambda uses only members the compiler maps | analyzer at compile time; render as a backstop |
 | Every route placeholder is filled from the request | render |
 | A regular expression is in JavaScript's dialect | render |
@@ -412,7 +415,8 @@ A failing handler is logged and stops no other handler.
 | A validation rule reaches the browser only when the page can evaluate it (7.5) | render |
 | Enum literals are emitted as names, the same text the input reads | construction |
 | A member path and a data path are never one node (1.3) | construction |
-| Exact-status routes match before catch-alls; only the first `OnSuccess` route runs; error routes sit behind `!res.ok` | construction: the request builder orders them |
+| A response routes each outcome once: one `OnSuccess`, one `OnError` without a status, one `OnError(status)` for each status, and one `Chained` request | builder, where the second is written; ALIS007 reports a second `Chained` in one fluent chain as the view compiles |
+| Exact-status routes match before catch-alls; error routes sit behind `!res.ok` | construction: the request builder orders them |
 
 ## 5. Lowering: each fluent method, as productions
 
@@ -458,7 +462,7 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   try {
     const req = record(…Gather…);                 // the gathered request
     const res = await http.send({ method, url, route, values: req, arrays, headers, format });
-    if (res.ok) { …OnSuccess by status, exact first… }
+    if (res.ok) { …OnSuccess… }
     else if (res.status === 409) { …OnError(409)… }
     else { …untyped OnError… }                    // also reached by status 0
   } finally { …Finally… }                         // emitted only when Finally exists; reads no res
@@ -472,8 +476,9 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   member goes is decided in C# when the request is built, by MVC's rule for route values: a top-level
   member named like a `{placeholder}` (ignoring case) fills the path (`route`, keyed by the
   placeholder's own spelling); every other member goes to `values`, which is the query string for GET
-  and the body otherwise. Every placeholder must be filled, a member is set once, and a `Form` field
-  must be a member of `TRequest` of a type its value binds to; each is checked at render.
+  and the body otherwise. Every placeholder must be filled, a member is set once, a `Form` field
+  must be a member of `TRequest` of a type its value binds to, and a request sent as form data
+  (`AsFormData()`) gathers something; each is checked at render.
 - **Keys.** A member's key is its MVC binding name. `values` is a nested record for JSON
   (`{"Address":{"City":..}}`). For a query string or form data it is flat (`Address.City`,
   `Lines[0].Sku`), because only C# knows a dictionary from an object.
@@ -671,8 +676,10 @@ no key (H2) and no entry (H4).
   a step reaches a connection some owner holds and never opens one of its own. The connection stops,
   a start still trying it makes no further attempt, and its marker is withdrawn (R3), when the last
   owner holding it is disposed.
-- **B2 Start.** Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator (R3). A
-  retry from the indicator starts the same way, and offers again only if all four attempts fail.
+- **B2 Start.** A start tries four times: at once, at once again, then 2 and 10 seconds after the try
+  before; 30 seconds after the fourth try fails it shows the retry indicator (R3)
+  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:33-51`). A click on the indicator starts the same way,
+  and offers again only if all four tries fail.
 - **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
   method's single argument.
 - **B4 Members.** `invoke(method, …args)` is async and returns a value; `send(method, …args)` is
@@ -738,7 +745,8 @@ validator instance the server resolves for that request.
 ### 7.2 Server-only by what a rule is
 
 A rule reaches the browser unless something in it only the server can do. No list is kept:
-- `Must` and `MustAsync` are C# (a lookup, a service); they have no browser term.
+- `Must` and `MustAsync` are C# (a lookup, a service); they have no browser term. A validator that holds
+  a `MustAsync` rule validates with `ValidateAsync`; its `Validate` refuses, naming `ValidateAsync`.
 - `WithMessage(model => ...)` builds its text from the model; only the server can say it.
 - A message with nothing left to say once the sentence naming the entered value is dropped.
 - `Matches` with an option JavaScript lacks or syntax it reads differently (`\A`, `\z`, `\G`,
@@ -779,7 +787,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 | `Matches` | null passes; the regex matches | `v == null` or `matches(v, pattern, flags)`, flags from `RegexOptions`, when JavaScript reads the pattern the same way |
 | comparison with a literal | ordered: null passes; equality: no null skip | ordered: `v == null` or `v op literal`; equality: `v op literal` |
 | comparison with another member | the member is read by its path from the model | the peer is read by that path; ordered: `v == null` or (peer present and `v op peer`); equality: `v op peer` |
-| `InclusiveBetween`, `ExclusiveBetween` | null passes; within the bounds | `v == null` or within the bounds |
+| `InclusiveBetween`, `ExclusiveBetween` | null passes; within the bounds; bounds written upper first are refused where the validator is built | `v == null` or within the bounds |
 | `SetValidator`, `ChildRules`, `RuleForEach(..).SetValidator`, `Include` | the child's rules, paths prefixed | the child's browser rules, prefixed, under the enclosing conditions |
 | `Must`, `MustAsync` | the predicate | none: server-only |
 

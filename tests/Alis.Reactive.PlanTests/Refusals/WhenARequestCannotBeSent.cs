@@ -53,30 +53,4 @@ public class WhenARequestCannotBeSent
         Assert.That(refused!.Message, Does.Contain("'Age' as Int32"));
         Assert.That(refused.Message, Does.Contain("AdmissionAsText.Age"));
     }
-
-    [Test]
-    public void a_second_on_success_on_one_response_is_refused()
-    {
-        var plan = Page.Plan<Admission>();
-
-        var refused = Assert.Throws<InvalidOperationException>(() =>
-            plan.Triggers().DomReady(p => p.Post("/admit").Response(r => r
-                .OnSuccess(s => s.Element("status").Text.Set("Saved"))
-                .OnSuccess(s => s.Element("status").Text.Set("Saved again")))));
-
-        Assert.That(refused!.Message, Does.Contain("one OnSuccess"));
-    }
-
-    [Test]
-    public void a_second_chained_request_on_one_response_is_refused()
-    {
-        var plan = Page.Plan<Admission>();
-
-        var refused = Assert.Throws<InvalidOperationException>(() =>
-            plan.Triggers().DomReady(p => p.Get("/first").Response(r => r
-                .Chained(start => start.Get("/second"))
-                .Chained(start => start.Get("/third")))));
-
-        Assert.That(refused!.Message, Does.Contain("one chained request"));
-    }
 }

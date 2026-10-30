@@ -135,8 +135,8 @@ namespace Alis.Reactive.PlanModel
             {
                 if (existing.Vendor.Name != vendor.Name)
                     throw new InvalidOperationException(
-                        $"Component '{componentId}' registered as vendor '{existing.Vendor.Name}' " +
-                        $"but re-referenced as '{vendor.Name}'. A component cannot change vendor.");
+                        $"Element '{componentId}' is named as a component of vendor '{existing.Vendor.Name}' and as one of vendor " +
+                        $"'{vendor.Name}', but an element holds one component: name it by the declaration of the component its view renders.");
                 return;
             }
 
@@ -146,7 +146,9 @@ namespace Alis.Reactive.PlanModel
         internal void RegisterPlugin(string name)
         {
             if (!_plugins.Add(name))
-                throw new InvalidOperationException($"Plugin '{name}' is already registered.");
+                throw new InvalidOperationException(
+                    $"Plugin '{name}' is registered twice on the plan of {View}: register it once, and use the plugin " +
+                    "RegisterPlugin returned wherever the view needs it.");
         }
 
         private void Add(DeclaredObject declared)
