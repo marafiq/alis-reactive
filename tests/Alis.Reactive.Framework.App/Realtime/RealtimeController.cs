@@ -146,7 +146,7 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         return Ok();
     }
 
-    /// <summary>How many of the page's line and board connections the server holds open, now and as it changes.</summary>
+    /// <summary>How many of the page's line and board connections the server holds open, and how many calls to the line it refused, now and as they change.</summary>
     [HttpGet("/Realtime/Switchboard")]
     public async Task Lines([FromQuery] string world, CancellationToken stopped)
     {
@@ -156,7 +156,7 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         try
         {
             await foreach (var count in watcher.Reader.ReadAllAsync(stopped))
-                await Write(Switch.Lines.Name, new { hub = count.Hub, board = count.Board }, stopped);
+                await Write(Switch.Lines.Name, new { hub = count.Hub, board = count.Board, refused = count.Refused }, stopped);
         }
         catch (OperationCanceledException)
         {

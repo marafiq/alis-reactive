@@ -6,8 +6,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 /// comes back under a new id the server knows the page by and runs its Reconnected pipeline; a connection the
 /// server closes for good runs its Close pipeline and the page offers to retry it; a click takes the offer and
 /// calls the hub again, a retry the hub answers leaves no offer and a retry refused on every try is offered
-/// again; a start the server refuses is tried again, a start refused on every try ends in the offer; and a page
-/// with no offer still hears the close.
+/// again; a start the server refuses is tried again, a start refused on every try ends in the offer, and a click
+/// on that offer calls the hub again; and a page with no offer still hears the close.
 /// </summary>
 [TestFixture]
 public sealed class WhenTheServerDropsAHub : AppPageTest
@@ -17,6 +17,23 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
     private ILocator Button(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true });
 
     private ILocator RetryOffer => Page.GetByText("The connection dropped.");
+
+    // The page's clock is the test's, installed before the page opens, so the waits between a start's tries
+    // pass when the test moves it on rather than in real seconds.
+    private Task TakeThePagesClock() => Page.Clock.InstallAsync();
+
+    // A start tries at once and at once again, then waits 2 and 10 seconds before its third and fourth tries,
+    // and 30 more before it offers to retry. The server counts each try it refuses, and page time moves past a
+    // wait only once the try before it was refused.
+    private async Task PassTheWaitsOfAStartTheServerRefuses()
+    {
+        await Page.GetByText("The server refused 2 calls to the line.", new() { Exact = true }).WaitForAsync();
+        await Page.Clock.FastForwardAsync(2_000);
+        await Page.GetByText("The server refused 3 calls to the line.", new() { Exact = true }).WaitForAsync();
+        await Page.Clock.FastForwardAsync(10_000);
+        await Page.GetByText("The server refused 4 calls to the line.", new() { Exact = true }).WaitForAsync();
+        await Page.Clock.FastForwardAsync(30_000);
+    }
 
     [Test]
     public async Task a_hub_the_server_drops_runs_its_reconnecting_pipeline()
@@ -125,6 +142,7 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
     [Test]
     public async Task a_retry_the_server_refuses_on_every_try_is_offered_again()
     {
+        await TakeThePagesClock();
         await Open("/Realtime/Line");
         await Expect(Line("line-call")).ToHaveTextAsync("1");
         await Button("Hang up the line").ClickAsync();
@@ -132,8 +150,9 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
         await Button("Retry").ClickAsync();
         await Expect(RetryOffer).ToBeHiddenAsync();
 
-        // The retry tries four times, 0, 2, 10 and 30 seconds apart, before it offers to retry again.
-        await Expect(RetryOffer).ToBeVisibleAsync(new() { Timeout = 60_000 });
+        await PassTheWaitsOfAStartTheServerRefuses();
+
+        await Expect(RetryOffer).ToBeVisibleAsync();
     }
 
     [Test]
@@ -147,12 +166,28 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
     [Test]
     public async Task a_hub_the_server_refuses_on_every_try_is_offered_for_retry()
     {
+        await TakeThePagesClock();
         await Open("/Realtime/Line?refusals=4");
         await Expect(RetryOffer).ToBeHiddenAsync();
 
-        // The page tries four times, 0, 2, 10 and 30 seconds apart, before it offers to retry.
-        await Expect(RetryOffer).ToBeVisibleAsync(new() { Timeout = 60_000 });
+        await PassTheWaitsOfAStartTheServerRefuses();
+
+        await Expect(RetryOffer).ToBeVisibleAsync();
         await Expect(Line("line-call")).ToHaveTextAsync("");
+    }
+
+    [Test]
+    public async Task a_click_on_the_retry_offered_after_a_start_refused_on_every_try_calls_the_hub_again()
+    {
+        await TakeThePagesClock();
+        await Open("/Realtime/Line?refusals=4");
+        await PassTheWaitsOfAStartTheServerRefuses();
+        await Expect(RetryOffer).ToBeVisibleAsync();
+        await Expect(Line("line-call")).ToHaveTextAsync("");
+
+        await Button("Retry").ClickAsync();
+
+        await Expect(Line("line-call")).ToHaveTextAsync("1");
     }
 
     [Test]

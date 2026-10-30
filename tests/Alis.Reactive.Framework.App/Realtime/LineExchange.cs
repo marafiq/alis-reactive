@@ -6,7 +6,7 @@ namespace Alis.Reactive.Framework.App.Realtime;
 /// <summary>
 /// The server's side of every page's line (a SignalR hub) and board (a server-sent event stream), each
 /// page's kept apart by its world: the calls the server took, the connections it holds open, whether it
-/// refuses to take the page's calls, and the pushes it sends.
+/// refuses to take the page's calls and how many it refused, and the pushes it sends.
 /// </summary>
 public sealed class LineExchange
 {
@@ -23,6 +23,7 @@ public sealed class LineWorld
     private readonly List<BoardCall> _boards = new();
     private readonly List<Channel<LineCount>> _watchers = new();
     private int _lineCalls;
+    private int _refusedLineCalls;
     private int _boardCalls;
     private int _negotiationsToRefuse;
     private bool _hungUp;
@@ -43,6 +44,16 @@ public sealed class LineWorld
             if (_negotiationsToRefuse == 0) return false;
             _negotiationsToRefuse--;
             return true;
+        }
+    }
+
+    /// <summary>Counts a call to the line the server refused.</summary>
+    public void LineCallRefused()
+    {
+        lock (_gate)
+        {
+            _refusedLineCalls++;
+            Announce();
         }
     }
 
@@ -143,7 +154,10 @@ public sealed class LineWorld
         }
     }
 
-    /// <summary>Watches how many line and board connections the server holds open, starting with how many it holds now.</summary>
+    /// <summary>
+    /// Watches how many line and board connections the server holds open and how many calls to the line it
+    /// refused, starting with the counts now.
+    /// </summary>
     public Channel<LineCount> Watch()
     {
         var watcher = Channel.CreateUnbounded<LineCount>();
@@ -166,11 +180,11 @@ public sealed class LineWorld
         foreach (var watcher in _watchers) watcher.Writer.TryWrite(count);
     }
 
-    private LineCount Count() => new(_lines.Count, _boards.Count(call => call.Answered));
+    private LineCount Count() => new(_lines.Count, _boards.Count(call => call.Answered), _refusedLineCalls);
 }
 
-/// <summary>How many line and board connections the server holds open for a page.</summary>
-public sealed record LineCount(int Hub, int Board);
+/// <summary>How many line and board connections the server holds open for a page, and how many calls to the line it refused.</summary>
+public sealed record LineCount(int Hub, int Board, int Refused);
 
 /// <summary>One board response the server holds open.</summary>
 public sealed class BoardCall : IDisposable

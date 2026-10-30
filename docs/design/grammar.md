@@ -658,8 +658,10 @@ no key (H2) and no entry (H4).
   a step reaches a connection some owner holds and never opens one of its own. The connection stops,
   a start still trying it makes no further attempt, and its marker is withdrawn (R3), when the last
   owner holding it is disposed.
-- **B2 Start.** Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator (R3). A
-  retry from the indicator starts the same way, and offers again only if all four attempts fail.
+- **B2 Start.** A start tries four times: at once, at once again, then 2 and 10 seconds after the try
+  before; 30 seconds after the fourth try fails it shows the retry indicator (R3)
+  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:33-51`). A click on the indicator starts the same way,
+  and offers again only if all four tries fail.
 - **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
   method's single argument.
 - **B4 Members.** `invoke(method, …args)` is async and returns a value; `send(method, …args)` is
