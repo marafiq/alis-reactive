@@ -65,7 +65,7 @@ namespace Alis.Reactive
         internal override Target Locate()
         {
             Context.DeclareComponent(_componentId, _vendor);
-            return Target.Element(_componentId);
+            return Target.Component(_componentId);
         }
     }
 

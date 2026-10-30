@@ -5,33 +5,45 @@ using Alis.Reactive.Grammar;
 namespace Alis.Reactive.PlanModel
 {
     /// <summary>
-    /// The object a read, a write or a call goes to: an element, a plugin, or data a callback was handed
+    /// The object a read, a write or a call goes to: an element, the component on it, a plugin, or data a callback was handed
     /// (the event's payload, a response body, an array item).
     /// </summary>
     internal abstract class Target
     {
         private protected Target() { }
 
-        internal static Target Element(string id) => new ElementTarget(id);
+        /// <summary>The element the view rendered with this id, as the browser finds it.</summary>
+        internal static Target Element(string id)
+        {
+            if (id == null) throw new ArgumentNullException(nameof(id));
+            return new LocatedTarget(objects => objects.Element(id));
+        }
+
+        /// <summary>The component on the element with this id, as its vendor locates it.</summary>
+        internal static Target Component(string id)
+        {
+            if (id == null) throw new ArgumentNullException(nameof(id));
+            return new LocatedTarget(objects => objects.Component(id));
+        }
 
         internal static Target Plugin(string name)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new PluginTarget(objects => objects.Plugin(name));
+            return new LocatedTarget(objects => objects.Plugin(name));
         }
 
         /// <summary>The stream object at a URL: <c>alis.stream</c> keyed by it.</summary>
         internal static Target Stream(string url)
         {
             if (url == null) throw new ArgumentNullException(nameof(url));
-            return new PluginTarget(objects => objects.Stream(url));
+            return new LocatedTarget(objects => objects.Stream(url));
         }
 
         /// <summary>The hub object at a URL: <c>alis.hub</c> keyed by it.</summary>
         internal static Target Hub(string url)
         {
             if (url == null) throw new ArgumentNullException(nameof(url));
-            return new PluginTarget(objects => objects.Hub(url));
+            return new LocatedTarget(objects => objects.Hub(url));
         }
 
         internal static Target Event { get; } = new EventTarget();
@@ -49,24 +61,13 @@ namespace Alis.Reactive.PlanModel
         /// <summary>The expression for the object, and the path from it to where its members start.</summary>
         internal abstract (Expr Root, IReadOnlyList<string> Path) Write(Scope scope);
 
-        private sealed class ElementTarget : Target
-        {
-            private readonly string _id;
-
-            internal ElementTarget(string id)
-            {
-                _id = id ?? throw new ArgumentNullException(nameof(id));
-            }
-
-            internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(scope.Objects.Element(_id)), G.NoPath);
-        }
-
-        // An object a registered plugin makes: a plugin by its name, a stream or a hub by its URL.
-        private sealed class PluginTarget : Target
+        // An object the plan locates: an element, the component on it, or what a registered plugin makes (a
+        // plugin by its name, a stream or a hub by its URL).
+        private sealed class LocatedTarget : Target
         {
             private readonly Func<PlanObjects, string> _object;
 
-            internal PluginTarget(Func<PlanObjects, string> @object)
+            internal LocatedTarget(Func<PlanObjects, string> @object)
             {
                 _object = @object;
             }

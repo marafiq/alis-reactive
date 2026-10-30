@@ -93,7 +93,7 @@ namespace Alis.Reactive
 
             // The component joins the plan after the elements its own callback names.
             context.DeclareComponent(_componentId, Declaration.Vendor);
-            context.On(objects => objects.Element(_componentId), declaredEvent.ObjectPath, declaredEvent.Name, body);
+            context.On(objects => objects.Component(_componentId), declaredEvent.ObjectPath, declaredEvent.Name, body);
             return this;
         }
 

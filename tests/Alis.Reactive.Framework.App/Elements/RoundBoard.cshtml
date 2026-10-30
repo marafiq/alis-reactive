@@ -1,0 +1,24 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Framework.App.Elements
+@model RoundBoardPage
+@{
+    ViewData["Title"] = "Round board";
+    var plan = Html.ReactivePlan<RoundBoardPage>();
+
+    // The element and the slate on it are named in the order the page was asked for: the plan takes either.
+    IHtmlContent Hide() => plan.Button("hide-board", "Hide the board")
+        .Reactive(button => button.Click, p => p.Element("round-board").Hide());
+    IHtmlContent Retitle() => plan.Button("retitle-board", "Retitle the board")
+        .Reactive(button => button.Click, p => p.Component<Slate>("round-board").Title.Set("Evening round"));
+    var steps = Model.First == BoardStep.Element ? new[] { Hide(), Retitle() } : new[] { Retitle(), Hide() };
+}
+<h1>Round board</h1>
+
+@plan.Slate("round-board", title: "Day round", "Ada", "Bea")
+
+@foreach (var step in steps)
+{
+    @step
+}
+
+@Html.RenderPlan(plan)

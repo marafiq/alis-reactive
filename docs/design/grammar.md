@@ -809,6 +809,12 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
     arguments, and keeps running, so a widget's own callback and an earlier handler both stay and two
     handlers of one event run in plan order. When the handler's owner unloads, the property gets back
     what it held, skipping handlers whose owners unloaded before it, whatever order owners unload in.
+- **E5 An element and its component.** `p.Element(id)` is the element the view rendered, located by
+  the browser's own vendor (`native`), and `p.Component<T>(id)` the component on it, located by its
+  vendor. They are two objects whichever the view names first: the component keyed `id` (the key the
+  page's inputs use), the element under it `$element:id`. On an element whose component is the native
+  vendor's they are one object, keyed `id`. An element holds one component: naming it as the
+  components of two vendors is refused when the page renders.
 
 ## 7. Validation projection
 

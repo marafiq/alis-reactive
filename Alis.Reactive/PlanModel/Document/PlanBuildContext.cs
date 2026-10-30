@@ -16,8 +16,12 @@ namespace Alis.Reactive.PlanModel
 
         private readonly string _planId;
         private readonly RenderedInputs _inputs;
+        // The elements the plan's steps name and the components on elements, in the order the plan first names
+        // them. An element and the component on it are two objects, whichever is named first: an element step
+        // reaches the element, a component's members its object.
         private readonly List<DeclaredObject> _declared = new List<DeclaredObject>();
-        private readonly Dictionary<string, DeclaredObject> _declaredById = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
+        private readonly HashSet<string> _elements = new HashSet<string>(StringComparer.Ordinal);
+        private readonly Dictionary<string, ComponentVendor> _components = new Dictionary<string, ComponentVendor>(StringComparer.Ordinal);
         private readonly List<(Func<PlanObjects, string> On, IReadOnlyList<string> Path, string Event, Block Body)> _handlers =
             new List<(Func<PlanObjects, string>, IReadOnlyList<string>, string, Block)>();
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
@@ -124,27 +128,28 @@ namespace Alis.Reactive.PlanModel
 
         // ── objects ──────────────────────────────────────────────────────────────
 
-        /// <summary>An element the view rendered with this id, found by the browser itself unless a component claims it.</summary>
+        /// <summary>An element the view rendered with this id, found by the browser itself, whatever component it holds.</summary>
         internal void DeclareElement(string elementId)
         {
             if (string.IsNullOrWhiteSpace(elementId)) throw new ArgumentException("Element ID required.", nameof(elementId));
-            if (!_declaredById.ContainsKey(elementId)) Add(new DeclaredObject(elementId, ComponentVendor.Native));
+            if (_elements.Add(elementId)) _declared.Add(DeclaredObject.Element(elementId));
         }
 
         /// <summary>A component on the element with this id, from one vendor for the whole plan.</summary>
         internal void DeclareComponent(string componentId, ComponentVendor vendor)
         {
             if (string.IsNullOrWhiteSpace(componentId)) throw new ArgumentException("Component ID required.", nameof(componentId));
-            if (_declaredById.TryGetValue(componentId, out var existing))
+            if (_components.TryGetValue(componentId, out var existing))
             {
-                if (existing.Vendor.Name != vendor.Name)
+                if (existing.Name != vendor.Name)
                     throw new InvalidOperationException(
-                        $"Element '{componentId}' is named as a component of vendor '{existing.Vendor.Name}' and as one of vendor " +
+                        $"Element '{componentId}' is named as a component of vendor '{existing.Name}' and as one of vendor " +
                         $"'{vendor.Name}', but an element holds one component: name it by the declaration of the component its view renders.");
                 return;
             }
 
-            Add(new DeclaredObject(componentId, vendor));
+            _components.Add(componentId, vendor);
+            _declared.Add(DeclaredObject.Component(componentId, vendor));
         }
 
         /// <summary>A slot this plan loads into or unloads (<c>Into</c>, <c>Unload</c>).</summary>
@@ -172,12 +177,6 @@ namespace Alis.Reactive.PlanModel
                 throw new InvalidOperationException(
                     $"Plugin '{name}' is registered twice on the plan of {View}: register it once, and use the plugin " +
                     "RegisterPlugin returned wherever the view needs it.");
-        }
-
-        private void Add(DeclaredObject declared)
-        {
-            _declared.Add(declared);
-            _declaredById.Add(declared.Id, declared);
         }
 
         // ── validation ───────────────────────────────────────────────────────────
@@ -246,7 +245,7 @@ namespace Alis.Reactive.PlanModel
 
             var forms = new FormWriter(Scope.ForHandler(plan, "$form"));
             foreach (var declared in _declared)
-                if (_forms.TryGetValue(declared.Id, out var fields))
+                if (declared.IsElement && _forms.TryGetValue(declared.Id, out var fields))
                     objects.Form(declared.Id, forms.Form(declared.Id, fields));
 
             var handlers = _handlers
@@ -274,9 +273,9 @@ namespace Alis.Reactive.PlanModel
             var inputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
             foreach (var declared in _declared)
             {
-                if (!_inputs.TryFindForComponent(ComponentId.Of(declared.Id), out var rendered)) continue;
+                if (declared.IsElement || !_inputs.TryFindForComponent(ComponentId.Of(declared.Id), out var rendered)) continue;
 
-                var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.Input.ValuePath.Text, rendered.Shape);
+                var value = G.Get(G.Obj(objects.Component(declared.Id)), rendered.Input.ValuePath.Text, rendered.Shape);
                 inputs.Add(
                     declared.Id,
                     new InputBinding(rendered.BindingPath, rendered.Binding.Path.Body, value, rendered.Shape, rendered.Input.CommittedBy.Value));
@@ -287,17 +286,27 @@ namespace Alis.Reactive.PlanModel
 
     }
 
-    /// <summary>An element the plan names, with the vendor whose object it holds.</summary>
+    /// <summary>
+    /// An object the plan names on an element: the element itself, which the browser's own (native) vendor
+    /// locates, or the component on it, located by its vendor.
+    /// </summary>
     internal sealed class DeclaredObject
     {
-        internal DeclaredObject(string id, ComponentVendor vendor)
+        private DeclaredObject(string id, ComponentVendor vendor, bool isElement)
         {
             Id = id;
             Vendor = vendor;
+            IsElement = isElement;
         }
+
+        internal static DeclaredObject Element(string id) => new DeclaredObject(id, ComponentVendor.Native, isElement: true);
+
+        internal static DeclaredObject Component(string id, ComponentVendor vendor) => new DeclaredObject(id, vendor, isElement: false);
 
         internal string Id { get; }
 
         internal ComponentVendor Vendor { get; }
+
+        internal bool IsElement { get; }
     }
 }

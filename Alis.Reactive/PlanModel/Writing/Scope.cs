@@ -194,8 +194,9 @@ namespace Alis.Reactive.PlanModel
     }
 
     /// <summary>
-    /// The objects a plan names, in the order it first names them: elements by id and vendor, and the
-    /// modules a bundle registered (the document, HTTP, forms, slots, streams, hubs, plugins).
+    /// The objects a plan names, in the order it first names them: elements and the components on them, by
+    /// id and vendor, and the modules a bundle registered (the document, HTTP, forms, slots, streams, hubs,
+    /// plugins).
     /// </summary>
     internal sealed class PlanObjects
     {
@@ -204,29 +205,45 @@ namespace Alis.Reactive.PlanModel
         internal const string ModelId = "$model";
         internal const string ConfirmId = "$confirm";
 
+        // The element under a component another vendor locates: a second object on the same element.
+        private const string ElementUnderComponent = "$element:";
+
         private readonly Dictionary<string, ObjectLocator> _objects = new Dictionary<string, ObjectLocator>(StringComparer.Ordinal);
         private readonly List<string> _order = new List<string>();
-        private readonly Dictionary<string, ComponentVendor> _elementVendors = new Dictionary<string, ComponentVendor>(StringComparer.Ordinal);
+        private readonly Dictionary<string, string> _elements = new Dictionary<string, string>(StringComparer.Ordinal);
+        private readonly Dictionary<string, string> _components = new Dictionary<string, string>(StringComparer.Ordinal);
         private readonly Dictionary<string, Vendor> _vendors = new Dictionary<string, Vendor>(StringComparer.Ordinal);
 
-        internal PlanObjects(IEnumerable<DeclaredObject> declared)
+        // A component is keyed by its element's id, which the page's table of inputs keys it by too. The element
+        // is the native vendor's object, so it shares that key when no other vendor's component is on it.
+        internal PlanObjects(IReadOnlyList<DeclaredObject> declared)
         {
-            foreach (var element in declared)
+            var vendorsOnElements = declared
+                .Where(each => !each.IsElement)
+                .ToDictionary(each => each.Id, each => each.Vendor.Name, StringComparer.Ordinal);
+            foreach (var each in declared)
             {
-                _elementVendors[element.Id] = element.Vendor;
-                Element(element.Id);
+                var underAnotherVendor = each.IsElement
+                    && vendorsOnElements.TryGetValue(each.Id, out var vendor)
+                    && vendor != ComponentVendor.Native.Name;
+                var key = underAnotherVendor ? ElementUnderComponent + each.Id : each.Id;
+                (each.IsElement ? _elements : _components).Add(each.Id, key);
+                if (_objects.ContainsKey(key)) continue;
+                AddVendor(each.Vendor.Name, each.Vendor.ToGrammar());
+                Add(key, new ElementLocator(each.Id, each.Vendor.Name));
             }
         }
 
-        internal string Element(string id)
-        {
-            if (_objects.ContainsKey(id)) return id;
-            if (!_elementVendors.TryGetValue(id, out var vendor))
-                throw new InvalidOperationException($"Element '{id}' is used by a step before the plan declared it.");
-            AddVendor(vendor.Name, vendor.ToGrammar());
-            Add(id, new ElementLocator(id, vendor.Name));
-            return id;
-        }
+        /// <summary>The element the view rendered with this id, as the browser finds it.</summary>
+        internal string Element(string id) => Declared(_elements, id);
+
+        /// <summary>The component on the element with this id, as its vendor locates it.</summary>
+        internal string Component(string id) => Declared(_components, id);
+
+        private static string Declared(IReadOnlyDictionary<string, string> keys, string id) =>
+            keys.TryGetValue(id, out var key)
+                ? key
+                : throw new InvalidOperationException($"Element '{id}' is used by a step before the plan declared it.");
 
         internal string Document() => PluginObject(DocumentId, "alis.document", "", PluginData.None);
 

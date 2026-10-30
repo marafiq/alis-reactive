@@ -8,7 +8,8 @@ namespace Alis.Reactive
 {
     /// <summary>
     /// An element of the page, found by the id the view gave it: <c>p.Element("status")</c>. Its text,
-    /// its HTML, its class list and whether it shows.
+    /// its HTML, its class list and whether it shows. It is the element itself even when a component is on
+    /// it, whichever the view names first; the component's members are reached with <c>p.Component&lt;T&gt;(id)</c>.
     /// </summary>
     /// <example>
     /// <code>
