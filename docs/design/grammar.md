@@ -586,9 +586,9 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   release removes only its own entry, so the other slot's input is read once the first leaves. A
   second entry for an id logs `input.duplicate-id`.
 - **M7 `ids`.** On `plugin("alis.model", containerId)`: the element id of each mounted input inside the
-  element, keyed by binding name, whichever plan rendered it. The form places a server message and
-  clears the messages inside the container by it (F8), and wires those inputs for live validation
-  (F7).
+  element, keyed by binding name, whichever plan rendered it. The form places a server message by it
+  (F8), clears the messages inside the container by it (F4, F8), and wires those inputs for live
+  validation (F7).
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
   commits a value (`ComponentInput.Of(Value, committedBy: ...)`,
   `Alis.Reactive/Components/Contracts/ComponentInput.cs:41`). When the plan that renders the
@@ -606,8 +606,11 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   containment decides what the form checks and what its `Form()` sends (5.1).
 - **F3 First failure wins.** For each field, tests whose `when` is false are skipped, and the first
   failing `check` decides.
-- **F4 Validate.** First clear every inline message and the summary, then evaluate every field,
-  then return the AND.
+- **F4 Validate.** `validate()` checks the tests written for its container, so a section saved on its
+  own is checked by its own validator and the whole form by the form's (one container, one validator,
+  one server decision). First clear the inline message of every field of the form and of every mounted
+  input inside the container (M7), whichever form showed it, so a section's message does not outlive
+  the whole form's save, and the summary; then evaluate every field, then return the AND.
 - **F5 Unmounted field.** A field with no element posts no value, so each active test checks
   nothing, as the server checks a missing member: a required test fails, a length or a pattern
   passes. The first failing test's message goes to the summary.

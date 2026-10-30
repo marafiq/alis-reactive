@@ -4,7 +4,9 @@
 // F1 A test applies only when its field's element is inside the container; a missing container fails
 //    validation when the form has tests.
 // F3 Per field, tests whose `when` is false are skipped and the first failing check decides.
-// F4 validate() clears every inline message and the summary, evaluates every field, returns the AND.
+// F4 validate() checks the tests written for its container: it clears every inline message inside the
+//    container, whichever form showed it (a section saved on its own), and the summary, then evaluates
+//    every field and returns the AND.
 // F5 A field with no element posts no value: each active test checks a missing value, and the first
 //    that fails puts its message in the summary.
 // F6 A message goes inline into {id}_error when that slot can render, else into the form's summary, the
@@ -147,8 +149,9 @@ function validate(containerId: string, summaryId: string): boolean {
     return false;
   }
 
+  // A section of the form saved on its own may have shown a message the form's own tests do not make.
   const summary = document.getElementById(summaryId);
-  for (const entry of entries) clearInline(entry.field.id);
+  clearInlineMessages(entries, containedInputs(containerId).ids);
   clearAndHide(summary);
 
   let valid = true;

@@ -20,6 +20,15 @@ public sealed class FormsController : Controller
         Summary = $"resident {outing.Resident ?? "none"}, companion {outing.Companion ?? "none"}, note {outing.Note ?? "none"}",
     });
 
+    public IActionResult Lunch() => View(new LunchPage());
+
+    /// <summary>Binds the lunch as any endpoint does and says whom it seats.</summary>
+    [HttpPost]
+    public IActionResult BookLunch([FromBody] LunchPage lunch) => Json(new FormsEcho
+    {
+        Summary = $"lunch for {lunch.Resident ?? "no one"}, companion {lunch.Companion ?? "none"}",
+    });
+
     public IActionResult FrontDesk() => View(new FrontDeskPage());
 
     /// <summary>Refuses every visit: whom the visitor came to see is the server's to ask for, and no field shows it.</summary>

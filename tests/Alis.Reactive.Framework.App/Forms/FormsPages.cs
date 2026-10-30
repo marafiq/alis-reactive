@@ -24,6 +24,35 @@ public sealed class OutingRules : ReactiveValidator<OutingPage>
     }
 }
 
+/// <summary>
+/// A lunch booked for a resident: the resident inside the booking's form, and the companion in a section of the
+/// form that is saved on its own, by rules of its own.
+/// </summary>
+public sealed class LunchPage
+{
+    public string? Resident { get; set; }
+
+    public string? Companion { get; set; }
+}
+
+/// <summary>The booking's rules: a resident the browser checks is named; a companion is not the booking's to require.</summary>
+public sealed class LunchRules : ReactiveValidator<LunchPage>
+{
+    public LunchRules()
+    {
+        RuleFor(x => x.Resident).NotEmpty().WithMessage("Name the resident at lunch.");
+    }
+}
+
+/// <summary>The companion section's own rules, for when it is saved on its own.</summary>
+public sealed class LunchCompanionRules : ReactiveValidator<LunchPage>
+{
+    public LunchCompanionRules()
+    {
+        RuleFor(x => x.Companion).NotEmpty().WithMessage("Name the companion.");
+    }
+}
+
 /// <summary>The front desk's log: a visit and a parcel, each logged by a form of its own.</summary>
 public sealed class FrontDeskPage
 {
