@@ -133,7 +133,6 @@ namespace Alis.Reactive
         private void ResolveAll(IServiceProvider? services)
         {
             _context.DeclareRenderedInputs();
-            var renderedInputs = _renderedInputs.Snapshot();
 
             var validated = _context.ValidatedRequests;
             var oneByForm = validated
@@ -148,7 +147,7 @@ namespace Alis.Reactive
                 foreach (var validation in oneByForm)
                 {
                     var fields = validation.Rules(ruleSource);
-                    _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
+                    _context.Check(validation.Form, CheckedField.Bind(validation.Form, fields, _context.FieldPrefix).ToList());
                 }
             }
         }

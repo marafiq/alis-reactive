@@ -68,10 +68,21 @@ export interface FormPluginData {
 }
 
 export interface FormField {
-  id: string;
   name: string;
-  value: Expr;
   tests: FormTest[];
+}
+
+export interface FormTest {
+  rule: string;
+  check: FnExpr;
+  when: FnExpr;
+  message: string;
+}
+
+export interface FnExpr {
+  kind: "fn";
+  params: string[];
+  body: Expr;
 }
 
 export type Expr =
@@ -154,12 +165,6 @@ export interface CallExpr {
   args: Expr[];
 }
 
-export interface FnExpr {
-  kind: "fn";
-  params: string[];
-  body: Expr;
-}
-
 export interface GetExpr {
   kind: "get";
   target: Expr;
@@ -200,13 +205,6 @@ export interface RecordField {
 export interface RefExpr {
   kind: "ref";
   name: string;
-}
-
-export interface FormTest {
-  rule: string;
-  check: FnExpr;
-  when: Expr;
-  message: string;
 }
 
 export interface HubPluginData {

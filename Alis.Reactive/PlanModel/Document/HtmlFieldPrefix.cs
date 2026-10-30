@@ -33,15 +33,5 @@ namespace Alis.Reactive.PlanModel
             if (body == null) throw new ArgumentNullException(nameof(body));
             return prefix.Length == 0 ? body : Path.Parse(prefix).Append(body);
         }
-
-        /// <summary>The path under the prefix, relative to it; null for a path of another prefix.</summary>
-        internal static string? Strip(string prefix, string path)
-        {
-            if (prefix == null) throw new ArgumentNullException(nameof(prefix));
-            if (path == null) throw new ArgumentNullException(nameof(path));
-            if (prefix.Length == 0) return path;
-            if (string.Equals(path, prefix, StringComparison.Ordinal)) return "";
-            return path.StartsWith(prefix + ".", StringComparison.Ordinal) ? path.Substring(prefix.Length + 1) : null;
-        }
     }
 }

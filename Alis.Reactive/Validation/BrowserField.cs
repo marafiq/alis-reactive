@@ -14,7 +14,7 @@ namespace Alis.Reactive.Validation
     public sealed class BrowserField
     {
         // For a collection item field: the condition declared around its RuleForEach, relative to the
-        // collection's owner. Relocating the owner prefixes it; the rendered item prefix never does.
+        // collection's owner. Relocating the owner prefixes it; the item's name (Lines[*]) never does.
         private readonly Condition _ownerCondition;
 
         internal BrowserField(
@@ -70,10 +70,10 @@ namespace Alis.Reactive.Validation
         internal BrowserField WithoutRules() =>
             new BrowserField(Reference, Array.Empty<BrowserRule>(), ItemFields.Select(field => field.WithoutRules()), IsChecked, _ownerCondition);
 
-        // A collection item field rendered at itemPrefix: its own conditions take the item prefix,
-        // its owner's condition does not.
-        internal BrowserField RenderedAt(string itemPrefix) =>
-            PrefixedBy(itemPrefix, _ownerCondition);
+        // A collection item field under the name that stands for every item (Lines[*]): its own conditions
+        // take the item's name, its owner's condition does not.
+        internal BrowserField UnderItem(string itemName) =>
+            PrefixedBy(itemName, _ownerCondition);
 
         // An item field whose owner declared it under a condition (When around RuleForEach).
         internal BrowserField ScopedBy(Condition condition) =>
@@ -112,7 +112,7 @@ namespace Alis.Reactive.Validation
 
         /// <summary>
         /// Names the items of a collection member a rule checks, whether or not the browser can check the rule:
-        /// <c>RuleForEach(x =&gt; x.Rooms).Must(..)</c>. The form then carries each rendered item's field.
+        /// <c>RuleForEach(x =&gt; x.Rooms).Must(..)</c>. The form then carries the items' field, <c>Rooms[*]</c>.
         /// </summary>
         /// <param name="collection">The collection member, as a path from the validator's model.</param>
         public void DeclareItems(LambdaExpression collection)

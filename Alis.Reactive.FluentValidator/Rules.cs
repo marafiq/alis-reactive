@@ -279,7 +279,7 @@ namespace Alis.Reactive.FluentValidator
         }
 
         // The browser validates an item through the item's own validator, or by the checks written on the
-        // item itself, at each item the page renders.
+        // item itself, at every item on the page when the form checks.
         // Under a condition only the server decides, the items and the child's members are still named.
         public override void DescribeFor(BrowserRuleSet browser)
         {

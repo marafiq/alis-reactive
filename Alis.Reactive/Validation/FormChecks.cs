@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
@@ -7,26 +6,21 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Validation
 {
     /// <summary>
-    /// One input a form checks: the element that holds it, the name the server reports its errors under,
-    /// the type the model binds it in, and the validator's rules on it.
+    /// One member, or the items of a collection, that a form checks: the binding name the server reports it under,
+    /// the type the model binds it in, and the validator's rules on it. An item's name stands for every item,
+    /// <c>Lines[*].Qty</c>, so the form checks each item mounted when it checks, whoever rendered it.
     /// </summary>
     internal sealed class CheckedField
     {
-        internal CheckedField(string componentId, string serverName, Shape shape, IReadOnlyList<BrowserRule> rules, FormFieldValues values)
+        internal CheckedField(string name, Shape shape, IReadOnlyList<BrowserRule> rules, FormFieldValues values)
         {
-            ComponentId = componentId;
-            ServerName = serverName;
+            Name = name;
             Shape = shape;
             Rules = rules;
             Values = values;
         }
 
-        internal string ComponentId { get; }
-
-        internal string ServerName { get; }
-
-        internal CheckedField With(IReadOnlyList<BrowserRule> rules) =>
-            new CheckedField(ComponentId, ServerName, Shape, Rules.Concat(rules).ToArray(), Values);
+        internal string Name { get; }
 
         internal Shape Shape { get; }
 
@@ -35,136 +29,95 @@ namespace Alis.Reactive.Validation
         /// <summary>Where the rules' conditions and comparisons read the other members.</summary>
         internal FormFieldValues Values { get; }
 
-        /// <summary>The value the rules check: the input as MVC binds it.</summary>
-        internal ValueExpression Value => ValueExpression.ReadBound(ComponentId, Shape);
+        internal CheckedField With(IReadOnlyList<BrowserRule> rules) =>
+            new CheckedField(Name, Shape, Rules.Concat(rules).ToArray(), Values);
 
         /// <summary>
-        /// The inputs a validator's rules check on this plan's form: every member with rules, and each
-        /// item of a collection the page rendered.
+        /// The fields a validator's rules check on a form: every member with rules, whether or not this plan renders
+        /// it (a partial or the member's editor template may), and each item field of a collection, named for every item.
         /// </summary>
-        internal static IEnumerable<CheckedField> Bind(
-            IReadOnlyList<BrowserField> fields,
-            IReadOnlyDictionary<string, RenderedInput> renderedInputs,
-            Type modelType,
-            string fieldPrefix)
+        internal static IEnumerable<CheckedField> Bind(string formId, IReadOnlyList<BrowserField> fields, string fieldPrefix)
         {
-            // The checks are written relative to the validator's model; the view's field prefix is applied
-            // where an input is resolved, so the rendered paths read here are relative to it too.
-            var values = new FormFieldValues(renderedInputs, fieldPrefix);
-            var renderedPaths = renderedInputs.Keys
-                .Select(path => HtmlFieldPrefix.Strip(fieldPrefix, path))
-                .Where(path => path != null)
-                .Select(path => path!)
-                .ToList();
-            // A checked member is carried whether or not this plan renders it (a partial or the member's editor
-            // template may) and whether or not the browser can check it.
+            var values = new FormFieldValues(formId, fieldPrefix);
             var bound = new List<CheckedField>();
+            foreach (var field in Checked(fields))
+                Join(bound, values.Check(field));
+            return bound;
+        }
+
+        // Each checked member, then each item field of a collection at the item name standing for every item: Lines[*].Qty
+        // for the item field Qty of Lines, and Lines[*].Deliveries[*].Code for an item's own collection.
+        private static IEnumerable<BrowserField> Checked(IEnumerable<BrowserField> fields)
+        {
             foreach (var field in fields)
             {
-                if (field.IsChecked)
-                    Join(bound, values.Check(field));
+                if (field.IsChecked) yield return field;
 
-                foreach (var itemField in RenderedItemFields(field.FieldName, field.ItemFields, renderedPaths))
-                    Join(bound, values.Check(itemField));
+                var items = field.ItemFields.Select(itemField => itemField.UnderItem(field.FieldName + "[*]"));
+                foreach (var itemField in Checked(items))
+                    yield return itemField;
             }
-            return bound;
         }
 
         // Several rules on one collection each name its items: an item's field carries the checks of all of them.
         private static void Join(List<CheckedField> bound, CheckedField field)
         {
-            var index = bound.FindIndex(existing => existing.ComponentId == field.ComponentId);
+            var index = bound.FindIndex(existing => existing.Name == field.Name);
             if (index < 0) bound.Add(field);
             else bound[index] = bound[index].With(field.Rules);
-        }
-
-        // Each item field of a collection, at every item the page rendered an input of: Lines[0].Qty for
-        // the item field Qty when the page rendered Lines[0].Qty, or an input nested inside it.
-        private static IEnumerable<BrowserField> RenderedItemFields(
-            string collectionPath,
-            IReadOnlyList<BrowserField> itemFields,
-            IEnumerable<string> renderedPaths)
-        {
-            foreach (var renderedPath in renderedPaths)
-                foreach (var itemField in itemFields)
-                {
-                    if (!TryRenderedItem(collectionPath, itemField.FieldName, renderedPath, out var itemPrefix, out var isDirectField))
-                        continue;
-
-                    var renderedField = itemField.RenderedAt(itemPrefix);
-                    if (isDirectField && renderedField.IsChecked)
-                        yield return renderedField;
-
-                    foreach (var nestedItemField in RenderedItemFields(renderedField.FieldName, renderedField.ItemFields, new[] { renderedPath }))
-                        yield return nestedItemField;
-                }
-        }
-
-        private static bool TryRenderedItem(
-            string collectionPath,
-            string itemFieldPath,
-            string renderedPath,
-            out string itemPrefix,
-            out bool isDirectField)
-        {
-            itemPrefix = "";
-            isDirectField = false;
-
-            var openingBracket = collectionPath.Length;
-            if (!renderedPath.StartsWith(collectionPath + "[", StringComparison.Ordinal)) return false;
-
-            var closingBracket = renderedPath.IndexOf(']', openingBracket + 1);
-            if (closingBracket < 0) return false;
-
-            var prefix = renderedPath.Substring(0, closingBracket + 1);
-            var renderedItemFieldPath = itemFieldPath.Length == 0 ? prefix : prefix + "." + itemFieldPath;
-            isDirectField = string.Equals(renderedPath, renderedItemFieldPath, StringComparison.Ordinal);
-            var nestedField =
-                renderedPath.StartsWith(renderedItemFieldPath + ".", StringComparison.Ordinal) ||
-                renderedPath.StartsWith(renderedItemFieldPath + "[", StringComparison.Ordinal);
-            if (!isDirectField && !nestedField) return false;
-
-            itemPrefix = prefix;
-            return true;
         }
     }
 
     /// <summary>
-    /// The inputs a form's rules read, by the member's path under the view's field prefix: an input this
-    /// plan rendered, by its MVC name, in the type the model binds it; otherwise the input another view
-    /// renders for the member (a partial, the editor template of the member's class) under the id the member
-    /// gives it. Every input is read through the model, as MVC binds it.
+    /// The members a form's rules read, by the binding name the server reports each under, the view's field prefix
+    /// applied: each is read from the input that binds it, whichever view rendered it (this plan, a partial, a
+    /// member's editor template, a slot's content), as MVC binds it.
     /// </summary>
     internal sealed class FormFieldValues
     {
-        private readonly IReadOnlyDictionary<string, RenderedInput> _renderedInputs;
+        private readonly string _formId;
         private readonly string _fieldPrefix;
 
-        internal FormFieldValues(IReadOnlyDictionary<string, RenderedInput> renderedInputs, string fieldPrefix)
+        internal FormFieldValues(string formId, string fieldPrefix)
         {
-            _renderedInputs = renderedInputs;
+            _formId = formId;
             _fieldPrefix = fieldPrefix;
         }
 
-        internal (string Id, Shape Shape) Resolve(FieldReference field)
+        internal ValueExpression Value(FieldReference field) => new FormInputRead(_formId, NameOf(field), field.Shape);
+
+        internal CheckedField Check(BrowserField field) =>
+            new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);
+
+        private string NameOf(FieldReference field) => HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
+    }
+
+    /// <summary>
+    /// A member a form's test reads, by its binding name, as MVC binds it: the form's own input, else the page's
+    /// (grammar.md M8). An item's name, <c>Lines[*].Qty</c>, is read at the indexes of the item the test checks,
+    /// which the form hands each test as <see cref="Indexes"/>.
+    /// </summary>
+    internal sealed class FormInputRead : ValueExpression
+    {
+        /// <summary>The parameter a test's check and condition take the indexes of the item it checks by.</summary>
+        internal const string Indexes = "i";
+
+        private readonly string _formId;
+        private readonly string _name;
+        private readonly Shape _shape;
+
+        internal FormInputRead(string formId, string name, Shape shape)
         {
-            var path = HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
-            return _renderedInputs.TryGetValue(path, out var rendered)
-                ? (rendered.ComponentId, rendered.Shape)
-                : (IdGenerator.ForMember(field.Declarer, path), field.Shape);
+            _formId = formId;
+            _name = name;
+            _shape = shape;
         }
 
-        internal ValueExpression Value(FieldReference field)
-        {
-            var input = Resolve(field);
-            return ValueExpression.ReadBound(input.Id, input.Shape);
-        }
+        internal override Shape OutputShape => _shape;
 
-        // The field is named as its input binds, under the view's prefix: the name the server reports it by.
-        internal CheckedField Check(BrowserField field)
-        {
-            var input = Resolve(field.Reference);
-            return new CheckedField(input.Id, HtmlFieldPrefix.Join(_fieldPrefix, field.FieldName), input.Shape, field.Rules, this);
-        }
+        // The model hands the value back as MVC binds it, already in the input's shape: the plan converts it no
+        // second time.
+        internal override Expr Write(Scope scope) =>
+            G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "valueOf" }, new Expr[] { G.Lit(_name), G.Ref(Indexes) }, Shape.None);
     }
 }
