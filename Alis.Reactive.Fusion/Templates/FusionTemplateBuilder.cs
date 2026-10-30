@@ -272,9 +272,9 @@ namespace Alis.Reactive.Fusion.Templates
             where TPayload : class, new()
         {
             if (raises == null) throw new ArgumentNullException(nameof(raises));
-            var detailMember = TemplateElements.DetailMember(member);
+            var detailAttribute = TemplateElements.DetailAttribute(member);
             var binding = FusionTemplateExpression.ToBinding(from);
-            _childRenderers.Add(() => TemplateElements.EventButton(text, raises.Name, detailMember, binding, css));
+            _childRenderers.Add(() => TemplateElements.EventButton(text, raises.Name, detailAttribute, binding, css));
             return this;
         }
 

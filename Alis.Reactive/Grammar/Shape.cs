@@ -123,16 +123,18 @@ namespace Alis.Reactive.Grammar
         private static Shape RecordOf(Type type, HashSet<Type> enclosingRecords)
         {
             var fields = new Dictionary<string, Shape>(StringComparer.Ordinal);
-            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-            {
-                var serialized = property.GetIndexParameters().Length == 0
-                    && property.GetMethod != null
-                    && property.GetCustomAttribute<JsonIgnoreAttribute>() == null;
-                if (serialized) fields[JsonMemberName.Of(property.Name)] = Of(property.PropertyType, enclosingRecords);
-            }
+            foreach (var property in SerializedProperties(type))
+                fields[JsonMemberName.Of(property.Name)] = Of(property.PropertyType, enclosingRecords);
             enclosingRecords.Remove(type);
             return ObjectOf(fields);
         }
+
+        /// <summary>The members of a data class its JSON holds: its public properties with a getter, less those it ignores.</summary>
+        internal static IEnumerable<PropertyInfo> SerializedProperties(Type type) =>
+            type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(property => property.GetIndexParameters().Length == 0
+                                   && property.GetMethod != null
+                                   && property.GetCustomAttribute<JsonIgnoreAttribute>() == null);
 
         // Data the app defines: not a live JavaScript object (a declaration), not a framework or library
         // type, not a dictionary (JSON of any keys).

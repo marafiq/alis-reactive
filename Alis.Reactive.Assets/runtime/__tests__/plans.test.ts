@@ -122,10 +122,10 @@ describe("the document", () => {
 
   it("raises an event from a framework-stamped template button", () => {
     const status = paragraph("status");
-    document.body.insertAdjacentHTML("beforeend", `<button id="row-edit" data-alis-raise="edit-row" data-alis-detail='{"id":4}'>Edit</button>`);
+    document.body.insertAdjacentHTML("beforeend", `<button id="row-edit" data-alis-raise="edit-row" data-alis-detail-row-id="4">Edit</button>`);
     startOwner(Owner.page(), [plan(
       { document: plugin("alis.document"), status: element("status") },
-      [on("document", "edit-row", setText("status", e.get(e.ref("e"), ["id"])))],
+      [on("document", "edit-row", setText("status", e.get(e.ref("e"), ["rowId"])))],
     )]);
     document.getElementById("row-edit")!.click();
     expect(status.textContent).toBe("4");

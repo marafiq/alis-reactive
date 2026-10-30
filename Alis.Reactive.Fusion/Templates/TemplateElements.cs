@@ -1,3 +1,7 @@
+using System;
+using System.Linq.Expressions;
+using System.Text;
+
 namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
@@ -33,22 +37,37 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Renders a button whose click raises a document event with one payload member bound from the
         /// row. The template carries no script and no JSON: the runtime raises the event named by
-        /// <c>data-alis-raise</c> with a record of the member <c>data-alis-detail-member</c> names, holding
-        /// the text the template engine writes for the row's value into <c>data-alis-detail-text</c>. The
-        /// listener's typed read converts that text by the member's type (grammar.md 6.1, D4), so a
-        /// number, a Guid, an enum or any text reaches the plan the same way.
+        /// <c>data-alis-raise</c> with a record of the member the button's <c>data-alis-detail-</c> attribute
+        /// names, holding the text the template engine writes for the row's value. The listener's typed read
+        /// converts that text by the member's type (grammar.md 5.2, 6.1 D4), so a number, a Guid, an enum or
+        /// any text reaches the plan the same way.
         /// </summary>
-        internal static string EventButton(string text, string eventName, string detailMember, string valueBinding, TemplateCss css) =>
+        internal static string EventButton(string text, string eventName, string detailAttribute, string valueBinding, TemplateCss css) =>
             $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
-            $"data-alis-detail-member=\"{detailMember}\" data-alis-detail-text=\"{valueBinding}\">{text}</button>";
+            $"{detailAttribute}=\"{valueBinding}\">{text}</button>";
 
-        /// <summary>The JSON name of the payload member a template button fills; a direct member only.</summary>
-        internal static string DetailMember<TPayload, TProperty>(System.Linq.Expressions.Expression<System.Func<TPayload, TProperty>> member)
+        /// <summary>The attribute that carries the payload member a template button fills; a direct member only.</summary>
+        internal static string DetailAttribute<TPayload, TProperty>(Expression<Func<TPayload, TProperty>> member)
         {
             var path = FusionTemplateExpression.ToPropertyPath(member);
-            return path.IndexOf('.') < 0
-                ? path
-                : throw new System.ArgumentException($"A template button fills a direct payload member; '{path}' is nested.", nameof(member));
+            if (path.IndexOf('.') >= 0)
+                throw new ArgumentException($"A template button fills a direct payload member; '{path}' is nested.", nameof(member));
+            return DatasetAttribute(path);
+        }
+
+        // The attribute the DOM's dataset names alisDetail followed by the member's JSON name with its first letter
+        // capitalized: each capital is a dash and the small letter (residentId is data-alis-detail-resident-id),
+        // as the core writes a view's markup (grammar.md 6.1, D4).
+        private static string DatasetAttribute(string member)
+        {
+            var key = "alisDetail" + char.ToUpperInvariant(member[0]) + member.Substring(1);
+            var attribute = new StringBuilder("data-");
+            foreach (var letter in key)
+            {
+                if (letter >= 'A' && letter <= 'Z') attribute.Append('-').Append(char.ToLowerInvariant(letter));
+                else attribute.Append(letter);
+            }
+            return attribute.ToString();
         }
     }
 
@@ -78,7 +97,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal TemplateCssClass(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string ClassAttribute =>
@@ -110,7 +129,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal PresentTemplateAltText(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string Attribute => $" alt=\"{_value}\"";
@@ -138,7 +157,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal PresentTemplateElementId(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string Attribute => $" id=\"{_value}\"";
