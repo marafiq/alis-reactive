@@ -1,0 +1,55 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders.Requests
+@using Alis.Reactive.Framework.App.Requests
+@model WrittenTwicePage
+@{
+    ViewData["Title"] = "Book a visit";
+    var plan = Html.ReactivePlan<WrittenTwicePage>();
+
+    // The booking's button, its request writing one part twice.
+    IHtmlContent Book(Func<HttpRequestBuilder<WrittenTwicePage>, HttpRequestBuilder<WrittenTwicePage>> request) =>
+        plan.Button("book", "Book the visit").Reactive(button => button.Click, p => request(p.Post("/Requests/Notes")));
+}
+<h1>Book a visit</h1>
+
+<form id="visit">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+</form>
+<p>Booking: <span id="booking"></span></p>
+
+@switch (Model.Part)
+{
+    case RequestPart.Gather:
+        @Book(request => request
+            .Gather(g => g.Set(m => m.Visitor, "Ada"))
+            .Gather(g => g.Set(m => m.Visitor, "Bea")))
+        break;
+    case RequestPart.Validate:
+        @Book(request => request
+            .Validate<WrittenTwiceRules>("visit")
+            .Validate<WrittenTwiceRules>("visit"))
+        break;
+    case RequestPart.WhileLoading:
+        @Book(request => request
+            .WhileLoading(l => l.Element("booking").Text.Set("booking"))
+            .WhileLoading(l => l.Element("booking").Text.Set("still booking")))
+        break;
+    case RequestPart.Response:
+        @Book(request => request
+            .Response(r => r.OnSuccess(s => s.Element("booking").Text.Set("booked")))
+            .Response(r => r.OnError(e => e.Element("booking").Text.Set("refused"))))
+        break;
+    case RequestPart.Finally:
+        @Book(request => request
+            .Finally(f => f.Element("booking").Text.Set("done"))
+            .Finally(f => f.Element("booking").Text.Set("done again")))
+        break;
+    case RequestPart.BodyFormat:
+        @Book(request => request
+            .Gather(g => g.Set(m => m.Visitor, "Ada"))
+            .AsFormData()
+            .AsJson())
+        break;
+}
+
+@Html.RenderPlan(plan)

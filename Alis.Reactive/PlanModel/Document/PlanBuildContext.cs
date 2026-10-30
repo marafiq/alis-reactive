@@ -183,15 +183,15 @@ namespace Alis.Reactive.PlanModel
         // ── validation ───────────────────────────────────────────────────────────
 
         /// <summary>
-        /// A request that checks its form first; the form's rules are bound when the plan is written. A request
-        /// validated again keeps its place with the new validation. A form is validated by one validator, so a
-        /// request that names another for a form another request validates is refused.
+        /// A request that checks its form first, once; the form's rules are bound when the plan is written. A form
+        /// is validated by one validator, so a request that names another for a form another request validates is
+        /// refused.
         /// </summary>
         internal void ValidateBefore(RequestStep request, FormValidation validation)
         {
-            foreach (var (other, otherValidation) in _validatedRequests)
+            foreach (var (_, otherValidation) in _validatedRequests)
             {
-                if (other == request || otherValidation.Form != validation.Form || otherValidation.Validator == validation.Validator)
+                if (otherValidation.Form != validation.Form || otherValidation.Validator == validation.Validator)
                     continue;
                 throw new InvalidOperationException(
                     $"Form '{validation.Form}' is validated by {CSharpTypeName.Of(otherValidation.Validator)} and by " +
@@ -199,9 +199,7 @@ namespace Alis.Reactive.PlanModel
                     "form of its own, or write one validator whose rules differ by When conditions.");
             }
 
-            var index = _validatedRequests.FindIndex(validated => validated.Request == request);
-            if (index < 0) _validatedRequests.Add((request, validation));
-            else _validatedRequests[index] = (request, validation);
+            _validatedRequests.Add((request, validation));
         }
 
         internal IReadOnlyList<(RequestStep Request, FormValidation Validation)> ValidatedRequests => _validatedRequests;

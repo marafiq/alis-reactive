@@ -16,7 +16,14 @@ namespace Alis.Reactive.PlanModel
     {
         private readonly string _method;
         private readonly string _url;
-        private string _format = "json";
+
+        // Each part is null until written: a request has one of each, and an empty part cannot tell a second
+        // call from the first.
+        private GatherInputDraft? _gather;
+        private Block? _whileLoading;
+        private ResponseRoutes? _routes;
+        private Block? _finally;
+        private string? _format;
 
         internal RequestStep(string method, string url)
         {
@@ -25,19 +32,30 @@ namespace Alis.Reactive.PlanModel
             _url = url ?? throw new ArgumentNullException(nameof(url));
         }
 
-        internal GatherInputDraft Gather { get; set; } = new GatherInputDraft();
-
-        internal Block WhileLoading { get; set; } = new Block();
-
-        internal Block Finally { get; set; } = new Block();
-
-        internal ResponseRoutes Routes { get; set; } = new ResponseRoutes();
-
-        internal FormValidation? Validation { get; set; }
+        internal FormValidation? Validation { get; private set; }
 
         internal string Url => _url;
 
-        internal void Format(string format) => _format = format;
+        internal void Gathers(GatherInputDraft gather) =>
+            _gather = Once(_gather, gather, "A request has one Gather; gather every member it sends in that one callback.");
+
+        internal void ValidatedBy(FormValidation validation) =>
+            Validation = Once(Validation, validation, "A request checks one form before it is sent; call Validate once, naming that form.");
+
+        internal void LoadsWith(Block steps) =>
+            _whileLoading = Once(_whileLoading, steps, "A request has one WhileLoading; write every step of it in that one callback.");
+
+        internal void RoutesBy(ResponseRoutes routes) =>
+            _routes = Once(_routes, routes, "A request has one Response; write every route of it in that one callback.");
+
+        internal void FinishesWith(Block steps) =>
+            _finally = Once(_finally, steps, "A request has one Finally; write every step of it in that one callback.");
+
+        internal void Format(string format) =>
+            _format = Once(_format, format, "A request has one body format; call AsJson() or AsFormData() once.");
+
+        private static T Once<T>(T? written, T part, string refusal) where T : class =>
+            written == null ? part : throw new InvalidOperationException(refusal);
 
         internal override void WriteTo(List<Statement> block, Scope scope) => block.AddRange(Write(scope));
 
@@ -46,31 +64,32 @@ namespace Alis.Reactive.PlanModel
             // A request its form checks first runs inside the check, so what it binds is its own.
             var scope = Validation == null ? around : around.ForBlock();
             var method = _method;
-            var input = Gather.Resolve(method, _url, Validation);
+            var input = (_gather ?? new GatherInputDraft()).Resolve(method, _url, Validation);
+            var routes = _routes ?? new ResponseRoutes();
             var response = scope.Fresh("res");
-            var routeScope = scope.WithResponse(Routes.Handle, response);
+            var routeScope = scope.WithResponse(routes.Handle, response);
 
             // WhileLoading runs before the request is built, and Finally whether or not it was built, sent or
             // answered, so neither reads what building and sending it binds: both are written before it. Finally
             // reads no response of its own request, as C# refuses a finally that reads what its try assigned.
             var sentence = new List<Statement>();
-            sentence.AddRange(WhileLoading.Write(scope));
-            var cleanup = Finally.Write(scope);
+            if (_whileLoading != null) sentence.AddRange(_whileLoading.Write(scope));
+            var cleanup = _finally == null ? G.NoStatements : _finally.Write(scope);
 
             // A gathered value that returns a promise settles just before the request is sent.
             var exchange = scope.WithHoisted(() => new[]
             {
                 G.Let(response, G.Call(G.Obj(scope.Objects.Http()), "send", SendArgument(method, input, scope)), awaits: true),
             }).ToList();
-            exchange.AddRange(Routes.Write(response, routeScope));
+            exchange.AddRange(routes.Write(response, routeScope));
 
             if (cleanup.Count == 0)
                 sentence.AddRange(exchange);
             else
                 sentence.Add(G.Try(exchange, cleanup));
 
-            if (Routes.Chained != null)
-                sentence.Add(G.If(Ok(response), Routes.Chained.Write(routeScope.ForBlock()), G.NoStatements));
+            if (routes.Chained != null)
+                sentence.Add(G.If(Ok(response), routes.Chained.Write(routeScope.ForBlock()), G.NoStatements));
 
             if (Validation is { } validation)
             {
@@ -87,10 +106,11 @@ namespace Alis.Reactive.PlanModel
 
         private Expr SendArgument(string method, GatheredInput input, Scope scope)
         {
-            if (input.IsEmpty && _format != "json")
+            // JSON is the body format a request names none for.
+            var format = _format ?? "json";
+            if (input.IsEmpty && format != "json")
                 throw new InvalidOperationException(
                     $"The {method} request to '{_url}' gathers nothing, so it has no form data to send: remove AsFormData() or gather a value.");
-            var format = _format;
             var nested = method != "GET" && format == "json";
             var body = nested ? Nested(input.Payload).Write(scope) : G.Record(FlatValues(input.Payload, scope));
 

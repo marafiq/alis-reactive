@@ -10,6 +10,8 @@ namespace Alis.Reactive.Builders.Requests
     /// <remarks>
     /// Created by HTTP entry points such as <c>p.Get("/url")</c> and
     /// <c>p.Post("/url")</c>. A branch of <c>p.Parallel(...)</c> and a <c>Chained</c> request start the same way.
+    /// A request has one of each part: a second <c>Gather</c>, <c>Validate</c>, <c>WhileLoading</c>,
+    /// <c>Response</c>, <c>Finally</c> or body format would replace the first, so it is refused where the page renders.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
     public class HttpRequestBuilder<TModel> where TModel : class
@@ -42,7 +44,7 @@ namespace Alis.Reactive.Builders.Requests
             if (gather == null) throw new ArgumentNullException(nameof(gather));
             var draft = new GatherInputDraft();
             gather(new GatherBuilder<TRequest, TModel>(draft, _context.FieldPrefix));
-            Step.Gather = draft;
+            Step.Gathers(draft);
             return this;
         }
 
@@ -55,7 +57,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the pre-request reaction graph, such as showing a spinner.</param>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
-            Step.WhileLoading = PipelineBuilder<TModel>.Build(_context, pipeline);
+            Step.LoadsWith(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -75,7 +77,7 @@ namespace Alis.Reactive.Builders.Requests
         /// <param name="pipeline">Builds the cleanup reaction graph to run after the request settles.</param>
         public HttpRequestBuilder<TModel> Finally(Action<PipelineBuilder<TModel>> pipeline)
         {
-            Step.Finally = PipelineBuilder<TModel>.Build(_context, pipeline);
+            Step.FinishesWith(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -95,7 +97,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
             var validation = new FormValidation(source => source.GetBrowserRules<TValidationSource>(), typeof(TValidationSource), formId);
-            Step.Validation = validation;
+            Step.ValidatedBy(validation);
             _context.ValidateBefore(Step, validation);
             return this;
         }
@@ -106,7 +108,7 @@ namespace Alis.Reactive.Builders.Requests
         {
             var builder = new ResponseBuilder<TModel>(_context);
             response(builder);
-            Step.Routes = builder.Routes;
+            Step.RoutesBy(builder.Routes);
             return this;
         }
     }
