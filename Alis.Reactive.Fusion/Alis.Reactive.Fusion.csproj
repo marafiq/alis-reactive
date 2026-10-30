@@ -10,8 +10,9 @@
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
+    <!-- Syncfusion must match the npm browser assets exactly on both target frameworks. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-      <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="33.1.47" />
+      <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="[33.1.47]" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
@@ -19,8 +20,12 @@
          via the MVC5 package, different ASP.NET host types. Mirrors the net48 group in
          Alis.Reactive.csproj; PolySharp + ReferenceAssemblies enable C# 14 on net48. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-      <PackageReference Include="Syncfusion.EJ2.MVC5" Version="33.1.47" />
+      <PackageReference Include="Syncfusion.EJ2.MVC5" Version="[33.1.47]" />
       <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+      <!-- AddReactiveFusion() extends IServiceCollection on both TFMs; net10 gets it from the
+           ASP.NET Core framework reference. Accept the same minimum as AlisReactive.FluentValidator
+           and allow newer DI versions. -->
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[9.0.0,)" />
       <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
       <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
       <Reference Include="System.Web" />
