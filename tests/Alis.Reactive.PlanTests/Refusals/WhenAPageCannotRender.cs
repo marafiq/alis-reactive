@@ -33,18 +33,6 @@ public class WhenAPageCannotRender
     }
 
     [Test]
-    public void a_step_written_after_its_callback_returned_is_refused()
-    {
-        var plan = Page.Plan<Admission>();
-        PipelineBuilder<Admission>? kept = null;
-        plan.Triggers().DomReady(p => kept = p);
-
-        var refused = Assert.Throws<InvalidOperationException>(() => kept!.Element("status").Text.Set("late"));
-
-        Assert.That(refused!.Message, Does.Contain("outside any callback"));
-    }
-
-    [Test]
     public void a_response_read_outside_the_routes_of_its_request_is_refused()
     {
         var plan = Page.Plan<Admission>();

@@ -134,6 +134,15 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
     }
 
     [Test]
+    public async Task a_step_written_after_its_callback_returned_is_refused()
+    {
+        await Render("WriteAStepAfterItsCallbackReturned");
+
+        await Expect(Message(
+            "A reaction step was written outside any callback. Write it inside a trigger, a component's .Reactive, Then, Else, OnSuccess, OnError, WhileLoading, Finally or OnAllSettled callback.")).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task an_error_route_for_a_status_http_does_not_have_is_refused()
     {
         await Render("RouteAStatusHttpDoesNotHave");

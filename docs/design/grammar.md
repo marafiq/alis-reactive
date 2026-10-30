@@ -405,6 +405,7 @@ A failing handler is logged and stops no other handler.
 | An event's payload type matches the callback | C# type |
 | A member call that returns a value is not discarded | analyzer: a discarded `Value<T>` is an error |
 | Every handle is used inside an active block, within its binding's scope | builder at render, naming the handle |
+| Every step is written inside a callback being built, not after its callback returned | builder, at the step |
 | A lambda uses only members the compiler maps | analyzer at compile time; render as a backstop |
 | Every route placeholder is filled from the request | render |
 | A regular expression is in JavaScript's dialect | render |
