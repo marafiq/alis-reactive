@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.PlanModel
@@ -47,20 +46,10 @@ namespace Alis.Reactive.PlanModel
             if (value == null) return Null();
             if (value is DateTime date) return Literal(date);
             if (value is Field field) return Literal(field.Name);
-            if (value is Enum option) return LiteralRaw(JavaScriptTextOf(option), shape);
+            // An option is its member name ("Descending"), or the JavaScript text the enum names for it
+            // ([JsonStringEnumMemberName("notequal")] NotEqual), as the plan writes an enum anywhere.
+            if (value is Enum option) return LiteralRaw(GrammarSerializer.TextOf(option, option.GetType()), shape);
             return LiteralRaw(value, shape);
-        }
-
-        // An option is its member name ("Descending"), unless the enum names the JavaScript text the
-        // way System.Text.Json does: [JsonStringEnumMemberName("notequal")] NotEqual.
-        private static string JavaScriptTextOf(Enum option)
-        {
-            var memberName = option.ToString();
-            var member = option.GetType().GetField(memberName);
-            var declared = member == null
-                ? null
-                : (JsonStringEnumMemberNameAttribute?)Attribute.GetCustomAttribute(member, typeof(JsonStringEnumMemberNameAttribute));
-            return declared == null ? memberName : declared.Name;
         }
 
         // ── reads ────────────────────────────────────────────────────────────────

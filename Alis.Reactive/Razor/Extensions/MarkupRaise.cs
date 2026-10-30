@@ -2,8 +2,6 @@ using System;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.Razor.Extensions
@@ -15,12 +13,6 @@ namespace Alis.Reactive.Razor.Extensions
     /// </summary>
     internal static class MarkupRaise
     {
-        // A member's value as the text JSON gives it, an enum by its member's name, as a condition compares it.
-        private static readonly JsonSerializerOptions ValueText = new JsonSerializerOptions
-        {
-            Converters = { new JsonStringEnumConverter() },
-        };
-
         internal static string Of(string eventName) => $"data-alis-raise=\"{WebUtility.HtmlEncode(eventName)}\"";
 
         // A member left null carries no attribute, so the listener reads it as missing.
@@ -31,7 +23,8 @@ namespace Alis.Reactive.Razor.Extensions
             {
                 var value = Carried<TPayload>(member).GetValue(payload);
                 if (value == null) continue;
-                var text = TextOf(JsonSerializer.SerializeToElement(value, member.PropertyType, ValueText));
+                // The member's value as the plan writes it, an enum by its member's name, as a condition compares it.
+                var text = GrammarSerializer.TextOf(value, member.PropertyType);
                 attributes.Append(' ').Append(DatasetAttribute(JsonMemberName.Of(member.Name)))
                     .Append("=\"").Append(WebUtility.HtmlEncode(text)).Append('"');
             }
@@ -46,9 +39,6 @@ namespace Alis.Reactive.Razor.Extensions
                 "carries each member of the payload it raises as the text of one attribute, so a member it carries is text, a " +
                 "number, a bool, a date, a Guid or an enum. Raise a payload that holds a record or a list from a pipeline, with p.Dispatch.");
         }
-
-        private static string TextOf(JsonElement value) =>
-            value.ValueKind == JsonValueKind.String ? value.GetString()! : value.GetRawText();
 
         // The attribute the DOM's dataset names alisDetail followed by the member's name with its first letter
         // capitalized: each capital is a dash and the small letter, so residentId is data-alis-detail-resident-id.

@@ -1,0 +1,29 @@
+@using Alis.Reactive.Framework.App.Triggers
+@model AlarmsPage
+@{
+    ViewData["Title"] = "Call alarms";
+    var plan = Html.ReactivePlan<AlarmsPage>();
+}
+<h1>Call alarms</h1>
+
+<p>Alarm from room <span id="alarm-room"></span>, <span id="alarm-urgency"></span>: <span id="alarm-response"></span></p>
+
+@{ Html.On(plan, t => t.CustomEvent(AlarmEvents.Raised, (alarm, p) =>
+{
+    p.Element("alarm-room").Text.Set(alarm.Get(x => x.Room));
+    p.Element("alarm-urgency").Text.Set(alarm.Get(x => x.Urgency));
+    p.When(alarm.Get(x => x.Urgency)).Eq(AlarmUrgency.Urgent)
+        .Then(urgent => urgent.Element("alarm-response").Text.Set("send the nurse now"))
+        .Else(routine => routine.Element("alarm-response").Text.Set("note it for the round"));
+})); }
+
+@(plan.Button("raise-fall", "Raise the fall alarm")
+    .Reactive(button => button.Click, p => p.Dispatch(AlarmEvents.Raised, new Alarm { Room = "12", Urgency = AlarmUrgency.Urgent })))
+@(plan.Button("raise-tap", "Raise the dripping tap alarm")
+    .Reactive(button => button.Click, p => p.Dispatch(AlarmEvents.Raised, new Alarm { Room = "4", Urgency = AlarmUrgency.Routine })))
+@(plan.Button("raise-call", "Raise the call alarm")
+    .Reactive(button => button.Click, p => p.Dispatch(AlarmEvents.Raised, alarm => alarm
+        .Set(x => x.Room, "7")
+        .Set(x => x.Urgency, AlarmUrgency.Urgent))))
+
+@Html.RenderPlan(plan)

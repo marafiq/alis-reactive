@@ -11,4 +11,6 @@ public sealed class TriggersController : Controller
     public IActionResult Visit() => PartialView("Visit", new VisitCard());
 
     public IActionResult Announcements() => View(new AnnouncementsPage());
+
+    public IActionResult Alarms() => View(new AlarmsPage());
 }

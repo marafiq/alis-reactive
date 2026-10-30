@@ -135,8 +135,10 @@ kinds:
   recurs; a declaration (`JsObject`), a dictionary and a framework type are `any`.
 - An enum is `string`: its member name, which is how MVC binds it. A `Guid`, a `TimeSpan` and a
   `TimeOnly` are `string` too. An enum a declaration uses for a JavaScript value (a vendor's option)
-  may name that text with `[JsonStringEnumMemberName]`, which a literal honours; a model's enum is
-  read, compared and checked by member name, because that is what its input holds and MVC binds.
+  may name that text with `[JsonStringEnumMemberName]`, which the plan honours; a model's enum is
+  read, compared and checked by member name, because that is what its input holds and MVC binds. The
+  plan writes an enum so wherever a value holds one: a literal alone, a member of a record such as a
+  payload `p.Dispatch(appEvent, payload)` raises, an item of a list.
 - `date` values are JavaScript `Date` objects. `DateTime` and `DateOnly` are `date`.
 - `instant` values are `Date` objects too, for a `DateTimeOffset`: a moment, not a calendar day.
 
