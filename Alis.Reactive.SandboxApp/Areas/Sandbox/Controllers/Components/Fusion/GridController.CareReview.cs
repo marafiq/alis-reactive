@@ -6,7 +6,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     /// <summary>
     /// The East wing's care reviews: the director of nursing goes through the wing's twelve residents six to a
     /// page, puts the residents she picks on Thursday's care conference agenda, and starts a resident's review
-    /// from their row. Every page starts from the same list, and an answer works from what the page sent,
+    /// or asks housekeeping to ready their suite from their row. Every page starts from the same list, and an answer works from what the page sent,
     /// keeping nothing.
     /// </summary>
     public partial class GridController
@@ -36,6 +36,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 ResidentId = resident.ResidentId,
                 Review = WingReviewUnderWay,
                 Summary = $"Review started for {resident.ResidentName}, suite {resident.Suite}."
+            });
+        }
+
+        [HttpPost("WingReviewReadySuite")]
+        public IActionResult WingReviewReadySuite([FromBody] WingReviewSuiteVisit visit)
+        {
+            var resident = WingReviewsOnFile().FirstOrDefault(r => r.Suite == visit.Suite);
+            if (resident == null)
+                return BadRequest(new WingReviewRefusal { Summary = "That suite is not on the East wing." });
+
+            return Ok(new WingReviewSuiteReady
+            {
+                Summary = $"Housekeeping will ready suite {resident.Suite} before {resident.ResidentName}'s review."
             });
         }
 

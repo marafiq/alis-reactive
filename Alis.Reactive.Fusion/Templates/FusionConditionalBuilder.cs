@@ -141,11 +141,18 @@ namespace Alis.Reactive.Fusion.Templates
         /// <summary>
         /// Adds a button whose click raises a declared document event, its payload member filled from
         /// the row: <c>.EventButton("Review", CareEvents.ReviewResident, e =&gt; e.Id, m =&gt; m.ResidentId)</c>.
+        /// The row's value reaches the listener as the text the template writes, and the listener's read
+        /// (<c>e.Get(x =&gt; x.Id)</c>) converts it to the member's type: a number, text, a Guid or an enum alike.
         /// </summary>
+        /// <remarks>
+        /// Fill the member from the row's key. The template engine writes the row's text into the markup as it is,
+        /// inside single quotes, so text holding an apostrophe, or a member the row leaves null (written
+        /// <c>null</c>), does not arrive as the row holds it.
+        /// </remarks>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
         /// <typeparam name="TProperty">The member's type, the same on the payload and the row.</typeparam>
         /// <param name="text">Button text.</param>
-        /// <param name="raises">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="raises">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <param name="member">The payload member the button fills (a direct member).</param>
         /// <param name="from">The template model property the member's value comes from.</param>
         public FusionConditionalBuilder<TModel> EventButton<TPayload, TProperty>(
@@ -163,7 +170,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
         /// <typeparam name="TProperty">The member's type, the same on the payload and the row.</typeparam>
         /// <param name="text">Button text.</param>
-        /// <param name="raises">The event, declared once with <see cref="AppEvent.Named{TPayload}(string)"/>.</param>
+        /// <param name="raises">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <param name="member">The payload member the button fills (a direct member).</param>
         /// <param name="from">The template model property the member's value comes from.</param>
         /// <param name="css">CSS class.</param>

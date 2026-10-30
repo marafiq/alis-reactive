@@ -13,8 +13,10 @@
 
     var columns = FusionGridColumns.Of<WingReviewResident>();
 
-    var startReview = FusionTemplate.Create<WingReviewResident>()
+    var rowActions = FusionTemplate.Create<WingReviewResident>()
+        .Class("flex gap-2")
         .EventButton("Start review", WingReviewEvents.StartReview, e => e.ResidentId, m => m.ResidentId, "e-small")
+        .EventButton("Ready the suite", WingReviewEvents.ReadySuite, e => e.Suite, m => m.Suite, "e-small")
         .Render();
 
     Html.On(plan, t => t
@@ -33,6 +35,14 @@
                         s.Element("review-status").Text.Set(started.Get(x => x.Summary));
                     })
                     .OnError<WingReviewRefusal>(400, (refused, e) =>
+                        e.Element("review-status").Text.Set(refused.Get(x => x.Summary)))))
+        .CustomEvent(WingReviewEvents.ReadySuite, (visit, p) =>
+            p.Post(Url.SandboxRoute("WingReviewReadySuite", "Grid"))
+                .Gather<WingReviewSuiteVisit>(g => g.Set(x => x.Suite, visit.Get(x => x.Suite)))
+                .Response(r => r
+                    .OnSuccess<WingReviewSuiteReady>((ready, s) =>
+                        s.Element("review-status").Text.Set(ready.Get(x => x.Summary)))
+                    .OnError<WingReviewRefusal>(400, (refused, e) =>
                         e.Element("review-status").Text.Set(refused.Get(x => x.Summary))))));
 }
 
@@ -41,7 +51,8 @@
         <native-heading level="H1">Wing Care Reviews</native-heading>
         <native-text color="Secondary">
             @Model.Wing wing, @Model.Director, director of nursing. Go through the wing a page at a time, put the
-            residents you pick on Thursday's care conference agenda, and start a resident's review from their row.
+            residents you pick on Thursday's care conference agenda, and start a resident's review or have their
+            suite readied from their row.
         </native-text>
     </div>
 
@@ -80,7 +91,7 @@
                 new GridColumn { Field = columns.Field(r => r.RiskLevel), HeaderText = "Risk", Width = "110" },
                 new GridColumn { Field = columns.Field(r => r.ReviewDue), HeaderText = "Review due", Width = "120" },
                 new GridColumn { Field = columns.Field(r => r.Review), HeaderText = "Review", Width = "120" },
-                new GridColumn { HeaderText = "", Width = "140", Template = startReview }
+                new GridColumn { HeaderText = "", Width = "260", Template = rowActions }
             }))
             .Reactive(evt => evt.ActionComplete<WingReviewResident>(), (_, p) =>
                 p.Element("high-risk-on-page").Text.Set(

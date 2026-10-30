@@ -6,9 +6,11 @@
 // D3 `query` is the query string read the way MVC binds [FromQuery]: keys match case-insensitively
 //    and a scalar member reads the first value; `queryAll` gives an array member every value. An
 //    absent key reads as missing.
-// D4 A click on an element carrying data-alis-raise raises that event with the element's detail, or with
-//    an empty record when it carries none. An element whose data-alis-raise is empty names no event, so
-//    the click goes on to the element around it.
+// D4 A click on an element carrying data-alis-raise raises that event with the element's detail: the
+//    record data-alis-detail holds as JSON; else a record of the one member data-alis-detail-member
+//    names, holding the text of data-alis-detail-text, which the listener's typed read converts; else an
+//    empty record. An element whose data-alis-raise is empty names no event, so the click goes on to the
+//    element around it.
 
 import type { Plugin } from "../objects/plugins";
 import { logger } from "../diagnostics/trace";
@@ -19,6 +21,8 @@ const triggerLog = logger("trigger");
 
 const RAISE_ATTRIBUTE = "data-alis-raise";
 const RAISE_DETAIL_ATTRIBUTE = "data-alis-detail";
+const RAISE_MEMBER_ATTRIBUTE = "data-alis-detail-member";
+const RAISE_TEXT_ATTRIBUTE = "data-alis-detail-text";
 const NAMED_RAISE = `[${RAISE_ATTRIBUTE}]:not([${RAISE_ATTRIBUTE}=""])`;
 
 export interface DocumentObject {
@@ -74,10 +78,18 @@ function wireMarkupRaise(): void {
     const source = target.closest(NAMED_RAISE);
     if (!source) return;
     // The selector matched the attribute with a value.
-    const name = source.getAttribute(RAISE_ATTRIBUTE)!;
-    const detailText = source.getAttribute(RAISE_DETAIL_ATTRIBUTE);
-    raise(name, detailText ? JSON.parse(detailText) : {});
+    raise(source.getAttribute(RAISE_ATTRIBUTE)!, markupDetail(source));
   }, true);
+}
+
+// Markup the server renders serializes its payload; a vendor template knows a row's value only as the
+// text it writes, so it names one member and carries that text for the plan's read to convert.
+function markupDetail(source: Element): unknown {
+  const json = source.getAttribute(RAISE_DETAIL_ATTRIBUTE);
+  if (json) return JSON.parse(json);
+  const member = source.getAttribute(RAISE_MEMBER_ATTRIBUTE);
+  if (member) return { [member]: source.getAttribute(RAISE_TEXT_ATTRIBUTE) };
+  return {};
 }
 
 export const documentPlugin: Plugin = {

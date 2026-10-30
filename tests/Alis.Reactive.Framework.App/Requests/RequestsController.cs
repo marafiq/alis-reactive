@@ -73,7 +73,12 @@ public sealed class RequestsController : Controller
     public IActionResult Outage() => View(new OutagePage());
 
     [HttpPost("/Requests/Ledger")]
-    public IActionResult Ledger([FromBody] LedgerNote note) => Said($"ledger titled {note.Title ?? "nothing"}");
+    public IActionResult Ledger([FromBody] LedgerNote note) => Said(note.Title switch
+    {
+        null => "ledger titled nothing",
+        "" => "ledger with an empty title",
+        var title => $"ledger titled {title}",
+    });
 
     [HttpGet("/Requests/Limits/{limit}")]
     public IActionResult Limit(int limit) => Said($"limit {limit}");

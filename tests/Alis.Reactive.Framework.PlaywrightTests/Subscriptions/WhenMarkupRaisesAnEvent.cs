@@ -2,9 +2,10 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Subscriptions;
 
 /// <summary>
 /// Markup that raises an app's event when it is clicked (grammar.md 6.1, D4): without a detail the
-/// listener's payload is an empty record, so each member it reads is missing; and an element whose
-/// data-alis-raise names no event is not a source, so a click on it is the element's around it. A detail
-/// the markup carries reaching the listener is proven by Triggers/WhenAPageStartsItsPipelines.
+/// listener's payload is an empty record, so each member it reads is missing; markup that names one member
+/// and carries its text, as a vendor template's button does, hands the listener that member; and an element
+/// whose data-alis-raise names no event is not a source, so a click on it is the element's around it. A
+/// JSON detail the markup carries reaching the listener is proven by Triggers/WhenAPageStartsItsPipelines.
 /// </summary>
 [TestFixture]
 public sealed class WhenMarkupRaisesAnEvent : AppPageTest
@@ -19,6 +20,16 @@ public sealed class WhenMarkupRaisesAnEvent : AppPageTest
         await Page.GetByRole(AriaRole.Button, new() { Name = "Ring the gate bell", Exact = true }).ClickAsync();
 
         await Expect(Announcement).ToHaveTextAsync("an announcement of no type");
+    }
+
+    [Test]
+    public async Task markup_that_names_one_member_and_carries_its_text_hands_the_listener_that_member()
+    {
+        await Open("/Subscriptions/Gate");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "A delivery at the gate", Exact = true }).ClickAsync();
+
+        await Expect(Announcement).ToHaveTextAsync("a delivery");
     }
 
     [Test]

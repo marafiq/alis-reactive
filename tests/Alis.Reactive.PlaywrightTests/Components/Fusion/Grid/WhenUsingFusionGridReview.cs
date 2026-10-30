@@ -3,15 +3,17 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 /// <summary>
 /// As the director of nursing, I want to go through the wing's residents a page at a time, see how many on the
 /// page are high risk, put the residents I pick on Thursday's care conference agenda, and start a resident's
-/// review from their row, so that every resident due a review has one under way before the conference.
+/// review or have their suite readied from their row, so that every resident due a review has one under way
+/// before the conference.
 /// </summary>
 /// <remarks>
 /// East wing, twelve residents six to a page. Page one: Amina Patel, Grace Bennett, Henry Liu, Irene Morgan,
 /// Jonah Reed and Katherine Ortiz, one of them high risk (Katherine Ortiz); page two starts with Leo Simmons and
 /// carries three high-risk residents. Henry Liu's review started last week; every other review has not. The
 /// high-risk count is worked out from the rows of the page the grid shows each time the grid finishes showing
-/// a page; counting the whole wing would say four on either page. The agenda and the started review come from
-/// the server, which names the residents the page sent.
+/// a page; counting the whole wing would say four on either page. The agenda, the started review and the
+/// readied suite come from the server, which names the residents the page sent: a review by the resident's
+/// number, a suite by its name (E-104).
 /// Not exercised: ActionComplete's payload, which the count does not read
 /// (WhenUsingFusionGridInlineEdit.a_review_moved_to_a_weekday_is_booked_by_the_care_team_calendar reads its
 /// RequestType and Data); the values of GetSelectedRowIndexes beyond whether any row is picked
@@ -34,6 +36,8 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
     private ILocator PickedResidents => Reviews.SelectedRows.Locator($"td[aria-colindex='{ResidentColumn}']");
     private ILocator StartReview(string resident) =>
         Reviews.Row(resident).GetByRole(AriaRole.Button, new() { Name = "Start review" });
+    private ILocator ReadySuite(string resident) =>
+        Reviews.Row(resident).GetByRole(AriaRole.Button, new() { Name = "Ready the suite" });
 
     private async Task NavigateAndBoot()
     {
@@ -136,6 +140,18 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
         await Expect(Reviews.Cell("Grace Bennett", ReviewColumn)).ToHaveTextAsync("Under way", new() { Timeout = 10000 });
         await Expect(Reviews.Cell("Amina Patel", ReviewColumn)).ToHaveTextAsync("Not started");
         await Expect(Reviews.Cell("Irene Morgan", ReviewColumn)).ToHaveTextAsync("Not started");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task readying_a_residents_suite_from_their_row_asks_housekeeping_for_that_suite()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(ReadySuite("Grace Bennett"));
+
+        await Expect(Status).ToHaveTextAsync(
+            "Housekeeping will ready suite E-104 before Grace Bennett's review.", new() { Timeout = 10000 });
         AssertNoConsoleErrors();
     }
 

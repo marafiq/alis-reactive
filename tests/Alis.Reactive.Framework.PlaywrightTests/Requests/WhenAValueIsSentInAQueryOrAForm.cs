@@ -3,8 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// <summary>
 /// What a request carries, as the endpoint that receives it says: a list in a query as one key per item, a
 /// value the address leaves out as an empty key and a list it leaves out as no key (H2), the same in form data
-/// (H4), blank text in a JSON body as null while a list keeps its blank items (H3), and a query member whose
-/// items have no text form stopping its own request.
+/// (H4), empty text the request sets in a JSON body as empty text, and a list's blank items as their text (H3),
+/// and a query member whose items have no text form stopping its own request.
 /// </summary>
 [TestFixture]
 public sealed class WhenAValueIsSentInAQueryOrAForm : AppPageTest
@@ -44,13 +44,16 @@ public sealed class WhenAValueIsSentInAQueryOrAForm : AppPageTest
     }
 
     [Test]
-    public async Task blank_text_in_a_json_body_is_sent_as_null()
+    public async Task empty_text_a_request_sets_is_sent_as_empty_text_in_its_json_body()
     {
         await Open("/Requests/Census");
 
-        await Click("Send the untitled slate's title");
+        var request = await Page.RunAndWaitForRequestAsync(
+            () => Click("Send the untitled slate's title"),
+            sent => sent.Url.EndsWith("/Requests/Ledger"));
 
-        await Expect(Line("blank-title")).ToHaveTextAsync("ledger titled nothing");
+        Assert.That(request.PostData, Is.EqualTo("{\"Title\":\"\"}"));
+        await Expect(Line("blank-title")).ToHaveTextAsync("ledger with an empty title");
     }
 
     [Test]
