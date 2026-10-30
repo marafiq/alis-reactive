@@ -45,6 +45,9 @@
     case GatherMistake.SetAMemberTwice:
         @Send(request => request.Gather(g => g.Set(m => m.Visitor, "Ada").Set(m => m.Visitor, "Bea")))
         break;
+    case GatherMistake.SendFormDataWithNothingGathered:
+        @Send(request => request.AsFormData())
+        break;
 }
 
 @Html.RenderPlan(plan)

@@ -5,7 +5,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// request has no member for, at its root or in a class it holds; a named input whose value the request member
 /// cannot bind, a number into text, a value that may be empty into one that may not, or a list into text, each
 /// type named as C# writes it; a named input of a partial sent to a request without the partial's prefix; a named
-/// form that names no input; a member set twice; and a header with no value.
+/// form that names no input; a member set twice; a header with no value; and form data sent with nothing gathered.
 /// </summary>
 [TestFixture]
 public sealed class WhenAGatherIsWrittenWrongly : AppPageTest
@@ -101,5 +101,14 @@ public sealed class WhenAGatherIsWrittenWrongly : AppPageTest
         await Render("/Requests/Refused?mistake=SetAMemberTwice");
 
         await Expect(Message("The request member 'Visitor' is gathered twice; set each member once.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task form_data_sent_with_nothing_gathered_is_refused()
+    {
+        await Render("/Requests/Refused?mistake=SendFormDataWithNothingGathered");
+
+        await Expect(Message(
+            "The POST request to '/Requests/SignIns' gathers nothing, so it has no form data to send: remove AsFormData() or gather a value.")).ToBeVisibleAsync();
     }
 }

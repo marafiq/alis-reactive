@@ -21,17 +21,6 @@ public class WhenAPageCannotRender
     }
 
     [Test]
-    public void form_data_with_nothing_gathered_is_refused_at_render()
-    {
-        var plan = Page.Plan<Admission>();
-        plan.Triggers().DomReady(p => p.Post("/admit").AsFormData());
-
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Render());
-
-        Assert.That(refused!.Message, Does.Contain("gathers nothing"));
-    }
-
-    [Test]
     public void a_condition_the_browser_cannot_read_is_refused_naming_it_and_the_way_out()
     {
         var plan = Page.Plan<Admission>().TextInput(m => m.Age);

@@ -472,8 +472,9 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   member goes is decided in C# when the request is built, by MVC's rule for route values: a top-level
   member named like a `{placeholder}` (ignoring case) fills the path (`route`, keyed by the
   placeholder's own spelling); every other member goes to `values`, which is the query string for GET
-  and the body otherwise. Every placeholder must be filled, a member is set once, and a `Form` field
-  must be a member of `TRequest` of a type its value binds to; each is checked at render.
+  and the body otherwise. Every placeholder must be filled, a member is set once, a `Form` field
+  must be a member of `TRequest` of a type its value binds to, and a request sent as form data
+  (`AsFormData()`) gathers something; each is checked at render.
 - **Keys.** A member's key is its MVC binding name. `values` is a nested record for JSON
   (`{"Address":{"City":..}}`). For a query string or form data it is flat (`Address.City`,
   `Lines[0].Sku`), because only C# knows a dictionary from an object.
