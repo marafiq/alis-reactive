@@ -1,3 +1,5 @@
+using Alis.Reactive.FluentValidator;
+
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.AppLevel.PharmacyDelivery
 {
     // Journey: the night nurse receives the evening pharmacy delivery. The slip opens in the page's
@@ -8,6 +10,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.AppLevel.Phar
     {
         /// <summary>Who received the delivery.</summary>
         public string? ReceivedBy { get; set; } = "Nurse Patel";
+    }
+
+    /// <summary>The delivery receipt's rule: the delivery is marked only once someone is named as having received it.</summary>
+    public class DeliveryReceiptValidator : ReactiveValidator<PharmacyDeliveryModel>
+    {
+        public DeliveryReceiptValidator()
+        {
+            RuleFor(x => x.ReceivedBy).NotEmpty().WithMessage("Say who received the delivery.");
+        }
     }
 
     /// <summary>The delivery slip that opens in the drawer.</summary>
