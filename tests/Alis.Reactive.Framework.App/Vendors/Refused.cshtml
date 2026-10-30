@@ -24,6 +24,13 @@
             p.Component<Board>("board").Clear();
         }))
         break;
+    case VendorMistake.ReadTheSlateAsAMeter:
+        @(plan.Button("clear", "Clear").Reactive(button => button.Click, p =>
+        {
+            p.Component<Slate>("slate").Clear();
+            p.Component<Meter>("slate").Level.Set(1);
+        }))
+        break;
 }
 
 @Html.RenderPlan(plan)

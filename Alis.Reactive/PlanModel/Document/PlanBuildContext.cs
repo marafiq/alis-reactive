@@ -135,8 +135,8 @@ namespace Alis.Reactive.PlanModel
             {
                 if (existing.Vendor.Name != vendor.Name)
                     throw new InvalidOperationException(
-                        $"Component '{componentId}' registered as vendor '{existing.Vendor.Name}' " +
-                        $"but re-referenced as '{vendor.Name}'. A component cannot change vendor.");
+                        $"Element '{componentId}' is named as a component of vendor '{existing.Vendor.Name}' and as one of vendor " +
+                        $"'{vendor.Name}', but an element holds one component: name it by the declaration of the component its view renders.");
                 return;
             }
 

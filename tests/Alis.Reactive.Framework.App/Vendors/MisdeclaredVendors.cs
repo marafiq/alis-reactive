@@ -2,12 +2,13 @@ using Alis.Reactive.Framework.App.Components;
 
 namespace Alis.Reactive.Framework.App.Vendors;
 
-/// <summary>The mistakes a page can make in declaring its components' vendor, each refused where the page renders.</summary>
+/// <summary>The mistakes a page can make in declaring its components' vendor, or in naming them, each refused where the page renders.</summary>
 public enum VendorMistake
 {
     NameAVendorStartingWithADigit,
     PathAnObjectWithAStrayDot,
     NameTwoVendorsAlike,
+    ReadTheSlateAsAMeter,
 }
 
 /// <summary>A page that declares a vendor wrongly, the way its mistake asks.</summary>

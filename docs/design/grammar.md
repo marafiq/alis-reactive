@@ -406,6 +406,7 @@ A failing handler is logged and stops no other handler.
 | A member call that returns a value is not discarded | analyzer: a discarded `Value<T>` is an error |
 | Every handle is used inside an active block, within its binding's scope | builder at render, naming the handle |
 | Every step is written inside a callback being built, not after its callback returned | builder, at the step |
+| An element holds one component: an id is named with one vendor in a plan | builder, naming the id and both vendors |
 | A plugin is registered once in a plan | builder, naming the plugin and the view |
 | A lambda uses only members the compiler maps | analyzer at compile time; render as a backstop |
 | Every route placeholder is filled from the request | render |
