@@ -1,0 +1,20 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.WingReviewViewModel
+@using Alis.Reactive.Fusion.Templates
+@{
+    ViewData["Title"] = "Wing Care Reviews — waiting list";
+
+    // A waiting resident's bed is missing until one is free, and the template engine writes a missing value as the
+    // text "null": a row button that fills the payload's bed from it is refused here, as the view renders, naming
+    // the fix. The page never reaches the browser.
+    var plan = Html.ReactivePlan<WingReviewViewModel>();
+    var rowActions = FusionTemplate.Create<WingReviewWaitingResident>()
+        .EventButton("Keep the bed", WingReviewEvents.KeepBed, e => e.Bed, m => m.Bed, "e-small")
+        .Render();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Waiting List</native-heading>
+    <native-text color="Secondary">This page fills a row button's payload from a bed that may be missing, so it never renders.</native-text>
+</native-vstack>
+
+@Html.RenderPlan(plan)

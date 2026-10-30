@@ -46,12 +46,27 @@ namespace Alis.Reactive.Fusion.Templates
             $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
             $"{detailAttribute}=\"{valueBinding}\">{text}</button>";
 
-        /// <summary>The attribute that carries the payload member a template button fills; a direct member only.</summary>
-        internal static string DetailAttribute<TPayload, TProperty>(Expression<Func<TPayload, TProperty>> member)
+        /// <summary>
+        /// The attribute that carries the payload member a template button fills: a direct member, and one that
+        /// always holds a value, since the template engine writes a missing value as the text <c>null</c>.
+        /// </summary>
+        internal static string DetailAttribute<TPayload, TProperty>(string text, Expression<Func<TPayload, TProperty>> member)
         {
             var path = FusionTemplateExpression.ToPropertyPath(member);
             if (path.IndexOf('.') >= 0)
                 throw new ArgumentException($"A template button fills a direct payload member; '{path}' is nested.", nameof(member));
+
+            var held = Nullable.GetUnderlyingType(typeof(TProperty));
+            if (held != null)
+            {
+                var memberName = ((MemberExpression)(member.Body is UnaryExpression convert ? convert.Operand : member.Body)).Member.Name;
+                throw new ArgumentException(
+                    $"Template button '{text}' fills '{typeof(TPayload).Name}.{memberName}' of type {held.Name}?, and the template " +
+                    "engine writes a missing value as the text \"null\", which the listener would read as that text. Fill it from " +
+                    $"a member of type {held.Name}, which always holds a value.",
+                    nameof(member));
+            }
+
             return DatasetAttribute(path);
         }
 

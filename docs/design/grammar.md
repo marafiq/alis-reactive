@@ -503,8 +503,9 @@ for text) raises a declared `AppEvent<T>` and fills one payload member from the 
 `data-alis-raise="name"` and the member's own attribute (D4), `data-alis-detail-resident-id="${residentId}"`,
 not an inline `onclick` and not JSON: the template engine knows the row's value only as the text it
 writes, so the button carries that text and the listener's read converts it by the member's shape (2.1),
-as it converts any value it reads. The document plugin raises the event when it is clicked (6.1, D4),
-and handlers hear it with `on(document, name)`.
+as it converts any value it reads. The engine writes a missing value as the text `null`, so a member of
+a nullable type (`int?`) is refused when the template is built. The document plugin raises the event
+when it is clicked (6.1, D4), and handlers hear it with `on(document, name)`.
 
 ## 6. The vocabulary: built-in objects and what each must do
 

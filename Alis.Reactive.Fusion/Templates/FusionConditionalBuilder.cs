@@ -146,14 +146,15 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <remarks>
         /// Fill the member from the row's key. The template engine writes the row's text into the markup as it is,
-        /// inside single quotes, so text holding an apostrophe, or a member the row leaves null (written
-        /// <c>null</c>), does not arrive as the row holds it.
+        /// inside single quotes, so text holding an apostrophe does not arrive as the row holds it. It writes a
+        /// missing value as the text <c>null</c>, so a member of a nullable type (<c>int?</c>) is refused when the
+        /// template is built, and text the row leaves null arrives as that text.
         /// </remarks>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
         /// <typeparam name="TProperty">The member's type, the same on the payload and the row.</typeparam>
         /// <param name="text">Button text.</param>
         /// <param name="raises">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
-        /// <param name="member">The payload member the button fills (a direct member).</param>
+        /// <param name="member">The payload member the button fills: a direct member, of a type that is not nullable.</param>
         /// <param name="from">The template model property the member's value comes from.</param>
         public FusionConditionalBuilder<TModel> EventButton<TPayload, TProperty>(
             string text,
@@ -171,7 +172,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// <typeparam name="TProperty">The member's type, the same on the payload and the row.</typeparam>
         /// <param name="text">Button text.</param>
         /// <param name="raises">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
-        /// <param name="member">The payload member the button fills (a direct member).</param>
+        /// <param name="member">The payload member the button fills: a direct member, of a type that is not nullable.</param>
         /// <param name="from">The template model property the member's value comes from.</param>
         /// <param name="css">CSS class.</param>
         public FusionConditionalBuilder<TModel> EventButton<TPayload, TProperty>(
@@ -192,7 +193,7 @@ namespace Alis.Reactive.Fusion.Templates
             where TPayload : class, new()
         {
             if (raises == null) throw new ArgumentNullException(nameof(raises));
-            var detailAttribute = TemplateElements.DetailAttribute(member);
+            var detailAttribute = TemplateElements.DetailAttribute(text, member);
             var binding = FusionTemplateExpression.ToBinding(from);
             _childRenderers.Add(() => TemplateElements.EventButton(text, raises.Name, detailAttribute, binding, css));
             return this;
