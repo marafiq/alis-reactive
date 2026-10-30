@@ -10,17 +10,6 @@ namespace Alis.Reactive.PlanTests.Refusals;
 public class WhenAPageCannotRender
 {
     [Test]
-    public void a_member_gathered_twice_is_refused_with_its_name()
-    {
-        var plan = Page.Plan<Admission>();
-
-        var refused = Assert.Throws<InvalidOperationException>(() =>
-            plan.Triggers().DomReady(p => p.Get("/residents").Gather<ResidentQuery>(g => g.Set(x => x.Wing, "Garden").Set(x => x.Wing, "Maple"))));
-
-        Assert.That(refused!.Message, Does.Contain("'Wing' is gathered twice"));
-    }
-
-    [Test]
     public void a_dispatch_that_sets_no_field_of_its_payload_is_refused()
     {
         var plan = Page.Plan<Admission>();

@@ -42,6 +42,9 @@
     case GatherMistake.GiveAHeaderNoValue:
         @Send(request => request.Gather(g => g.Header("X-Shift", Model.Shift!)))
         break;
+    case GatherMistake.SetAMemberTwice:
+        @Send(request => request.Gather(g => g.Set(m => m.Visitor, "Ada").Set(m => m.Visitor, "Bea")))
+        break;
 }
 
 @Html.RenderPlan(plan)
