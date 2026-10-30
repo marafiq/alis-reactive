@@ -40,6 +40,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Summary { get; set; } = "";
     }
 
+    /// <summary>The suite the director asks housekeeping to ready before a resident's review, named from their row.</summary>
+    public class WingReviewSuiteVisit
+    {
+        public string Suite { get; set; } = "";
+    }
+
+    /// <summary>What housekeeping says about the suite it will ready.</summary>
+    public class WingReviewSuiteReady
+    {
+        public string Summary { get; set; } = "";
+    }
+
     /// <summary>The residents the director picked for the care conference.</summary>
     public class WingReviewConference
     {
@@ -63,5 +75,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         /// <summary>Raised by a resident's Start review button with that resident's key.</summary>
         public static readonly AppEvent<WingReviewStart> StartReview = AppEvent.Declare<WingReviewStart>();
+
+        /// <summary>Raised by a resident's Ready the suite button with that resident's suite.</summary>
+        public static readonly AppEvent<WingReviewSuiteVisit> ReadySuite = AppEvent.Declare<WingReviewSuiteVisit>();
     }
 }

@@ -32,15 +32,15 @@ namespace Alis.Reactive.Fusion.Templates
 
         /// <summary>
         /// Renders a button whose click raises a document event with one payload member bound from the
-        /// row. The template carries no script: the runtime raises the event named by
-        /// <c>data-alis-raise</c> with the JSON in <c>data-alis-detail</c>. The detail's quotes are
-        /// <c>&amp;quot;</c> so they survive the Syncfusion template engine's quote conversion.
+        /// row. The template carries no script and no JSON: the runtime raises the event named by
+        /// <c>data-alis-raise</c> with a record of the member <c>data-alis-detail-member</c> names, holding
+        /// the text the template engine writes for the row's value into <c>data-alis-detail-text</c>. The
+        /// listener's typed read converts that text by the member's type (grammar.md 6.1, D4), so a
+        /// number, a Guid, an enum or any text reaches the plan the same way.
         /// </summary>
-        internal static string EventButton(string text, string eventName, string detailMember, string valueBinding, TemplateCss css)
-        {
-            var detail = $"{{&quot;{detailMember}&quot;:{valueBinding}}}";
-            return $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" data-alis-detail=\"{detail}\">{text}</button>";
-        }
+        internal static string EventButton(string text, string eventName, string detailMember, string valueBinding, TemplateCss css) =>
+            $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
+            $"data-alis-detail-member=\"{detailMember}\" data-alis-detail-text=\"{valueBinding}\">{text}</button>";
 
         /// <summary>The JSON name of the payload member a template button fills; a direct member only.</summary>
         internal static string DetailMember<TPayload, TProperty>(System.Linq.Expressions.Expression<System.Func<TPayload, TProperty>> member)

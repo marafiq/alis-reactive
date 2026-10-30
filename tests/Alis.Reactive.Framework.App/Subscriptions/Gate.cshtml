@@ -14,13 +14,16 @@
         .Else(typed => typed.Element("announcement").Text.Set(announced.Get(x => x.Type))))); }
 
 @* Markup that raises the app's event when clicked (grammar.md 6.1, D4): the bell carries no detail; the
-   visitor's row carries one, and its Details button names no event, so a click on it is the row's. *@
+   visitor's row carries one, and its Details button names no event, so a click on it is the row's; the
+   delivery's row names one member and carries its text, as a vendor template's button does. *@
 <button type="button" data-alis-raise="@GateEvents.Announced.Name">Ring the gate bell</button>
 <ul>
     <li data-alis-raise="@GateEvents.Announced.Name"
         data-alis-detail="@System.Text.Json.JsonSerializer.Serialize(new Announcement { Type = "a visitor" }, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web))">
         A visitor at the gate <button type="button" data-alis-raise="">Details</button>
     </li>
+    <li><button type="button" data-alis-raise="@GateEvents.Announced.Name"
+                data-alis-detail-member="type" data-alis-detail-text="a delivery">A delivery at the gate</button></li>
 </ul>
 
 @Html.RenderPlan(plan)
