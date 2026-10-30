@@ -534,7 +534,8 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - `Html.Raises(appEvent)` (an `AppEvent`, or an `AppEvent<T>` raised without its payload) and
     `Html.Raises(appEvent, payload)` write them into a view's own element. A payload member is text, a
     number, a bool, a date, a Guid or an enum, written as JSON writes it, an enum by its member's name;
-    a member left null carries no attribute, so it reads as missing.
+    a member left null carries no attribute, so it reads as missing; a member that is a record or a
+    list is refused when the view renders, naming `p.Dispatch`.
   - A template's button (5.2) writes one member's attribute holding the text the template engine
     writes for the row's value.
 

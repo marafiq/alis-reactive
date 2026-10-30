@@ -4,8 +4,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Subscriptions;
 /// Markup that raises an app's event when it is clicked (grammar.md 6.1, D4), written with Html.Raises: an event
 /// that carries nothing is raised; without its payload the listener reads each member as missing; each member the
 /// markup carries reaches the listener as its type, a text as its text, a number as a number and an enum as its
-/// member; and a click inside the markup is the markup's. A whole payload the markup carries reaching the listener
-/// is proven by Triggers/WhenAPageStartsItsPipelines.
+/// member; a click inside the markup is the markup's; and a payload that holds a record is refused as the view
+/// renders. A whole payload the markup carries reaching the listener is proven by
+/// Triggers/WhenAPageStartsItsPipelines.
 /// </summary>
 [TestFixture]
 public sealed class WhenMarkupRaisesAnEvent : AppPageTest
@@ -73,5 +74,18 @@ public sealed class WhenMarkupRaisesAnEvent : AppPageTest
         await Button("Details").ClickAsync();
 
         await Expect(Announcement).ToHaveTextAsync("a visitor");
+    }
+
+    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
+    [Test]
+    public async Task markup_raising_a_payload_that_holds_a_record_is_refused_naming_the_fix()
+    {
+        await Page.GotoAsync(BaseUrl + "/Subscriptions/EscortedVisit");
+
+        await Expect(Page.GetByText(
+            "'EscortedVisit.Visitor' is a GateVisitor, and markup carries each member of the payload it raises as the " +
+            "text of one attribute, so a member it carries is text, a number, a bool, a date, a Guid or an enum. Raise " +
+            "a payload that holds a record or a list from a pipeline, with p.Dispatch.").First)
+            .ToBeVisibleAsync();
     }
 }

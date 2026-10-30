@@ -10,5 +10,8 @@ public sealed class SubscriptionsController : Controller
 {
     public IActionResult Gate() => View(new GatePage());
 
+    /// <summary>Markup that raises a payload holding a record, refused as the view renders.</summary>
+    public IActionResult EscortedVisit() => View(new GatePage());
+
     public IActionResult HeldObjectEvent() => View(new GatePage());
 }

@@ -1,4 +1,6 @@
+using System;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -27,13 +29,22 @@ namespace Alis.Reactive.Razor
             var attributes = new StringBuilder(Of(eventName));
             foreach (var member in Shape.SerializedProperties(typeof(TPayload)))
             {
-                var value = member.GetValue(payload);
+                var value = Carried<TPayload>(member).GetValue(payload);
                 if (value == null) continue;
                 var text = TextOf(JsonSerializer.SerializeToElement(value, member.PropertyType, ValueText));
                 attributes.Append(' ').Append(DatasetAttribute(JsonMemberName.Of(member.Name)))
                     .Append("=\"").Append(WebUtility.HtmlEncode(text)).Append('"');
             }
             return attributes.ToString();
+        }
+
+        private static PropertyInfo Carried<TPayload>(PropertyInfo member)
+        {
+            if (Shape.FromClrType(member.PropertyType).IsScalar) return member;
+            throw new InvalidOperationException(
+                $"'{CSharpTypeName.Of(typeof(TPayload))}.{member.Name}' is a {CSharpTypeName.Of(member.PropertyType)}, and markup " +
+                "carries each member of the payload it raises as the text of one attribute, so a member it carries is text, a " +
+                "number, a bool, a date, a Guid or an enum. Raise a payload that holds a record or a list from a pipeline, with p.Dispatch.");
         }
 
         private static string TextOf(JsonElement value) =>
