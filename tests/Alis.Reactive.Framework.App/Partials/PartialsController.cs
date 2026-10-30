@@ -105,5 +105,35 @@ public sealed class PartialsController : Controller
         return BadRequest(new { errors = new Dictionary<string, string[]> { [$"{line}.Shift"] = [$"Say which shift the {line.ToLowerInvariant()} covers."] } });
     }
 
+    public IActionResult Concierge() => View(new ConciergePage());
+
+    /// <summary>Binds the concierge's visit as any endpoint does and checks it by the concierge's rules; then says whom it bound.</summary>
+    [HttpPost]
+    public IActionResult SaveConcierge([FromBody] ConciergePage visit, [FromServices] ConciergeRules rules)
+    {
+        var result = rules.Validate(visit);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Said($"visitor {visit.Visitor ?? "none"}, next of kin {visit.NextOfKin.Name ?? "none"}");
+    }
+
+    /// <summary>Notes the next of kin a desk sends, by the member's binding name, and says whom it bound.</summary>
+    [HttpPost]
+    public IActionResult NoteKin([FromBody] KinNote note) => Said($"next of kin {note.NextOfKin.Name ?? "none"}");
+
+    public IActionResult Changeover() => View(new ChangeoverPage());
+
+    public IActionResult Bookings() => View(new BookingsPage());
+
+    /// <summary>Binds the visit as any endpoint does, checks it by the visit's rules, and says whom it booked.</summary>
+    [HttpPost]
+    public IActionResult BookVisit([FromBody] BookingsPage booking, [FromServices] BookingRules rules)
+    {
+        var result = rules.Validate(booking);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Said($"visitor {booking.Visitor ?? "none"}, next of kin {booking.NextOfKin.Name ?? "none"}");
+    }
+
     private JsonResult Said(string summary) => Json(new PartialsEcho { Summary = summary });
 }

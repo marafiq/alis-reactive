@@ -7,7 +7,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// member of a type the input's value binds to (the same type, one that may be empty, a base type, another
 /// collection of the same items), matched ignoring case, through a list item or into a member that takes any
 /// name; and in a partial rendered for a member of the page's model, under that member's prefix, or for an entry
-/// of a dictionary keyed by a number, posted as form data. An input no longer on the page is sent as nothing (M5).
+/// of a dictionary keyed by a number, posted as form data. An input no longer on the page is sent as nothing (M8).
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageSendsNamedInputs : AppPageTest
