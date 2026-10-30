@@ -4,8 +4,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Rows;
 /// The page's model governs every row (ADR-0003, grammar.md F1): the sheet's rule for each contact is written once,
 /// in the page's plan, by the contact's binding name, and checks every contact on the page when the sheet is saved,
 /// whoever rendered the row: the list partial rendered with the page, or rendered again into its slot when the desk
-/// adds a contact. A row's rule reads the members of its own row; a row that left the page is not checked; and the
-/// server's message for a row lands beside that row.
+/// adds a contact. A row's rule reads the members of its own row, and a condition on a member the page keeps beside
+/// the form reads the page's input for it (grammar.md M8); a row that left the page is not checked; and the server's
+/// message for a row lands beside that row.
 /// </summary>
 [TestFixture]
 public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
@@ -111,6 +112,22 @@ public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
         await Expect(Field("Contact 2's phone").GetByText("Give the guardian a phone the desk can call.")).ToBeVisibleAsync();
         await Expect(Field("Contact 1's phone").GetByText("Give the guardian a phone the desk can call.")).ToBeHiddenAsync();
         await ExpectNothingSent();
+    }
+
+    [Test]
+    public async Task a_condition_on_a_member_beside_the_form_reads_the_input_the_page_renders_for_it()
+    {
+        await Open("/Rows/Contacts");
+        await Input("Contact 1's phone").FillAsync("");
+
+        await Input("Wing").FillAsync("Memory care");
+        await Click("Save the contacts");
+        await Expect(Field("Contact 1's phone").GetByText("The memory care wing calls every contact: give each a phone.")).ToBeVisibleAsync();
+        await ExpectNothingSent();
+
+        await Input("Wing").FillAsync("Garden");
+        await Click("Save the contacts");
+        await Expect(Saved).ToHaveTextAsync("Ada's contacts: Bo, Cy");
     }
 
     [Test]

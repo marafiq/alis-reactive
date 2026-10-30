@@ -6,6 +6,9 @@
 }
 <h1>Emergency contacts</h1>
 
+@* The wing sits beside the sheet, not in it: each save sends it with the sheet's own inputs. *@
+@{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
+
 @* The contacts are one list partial in a slot, rendered with the page and again each time the desk adds or removes
    a contact. The page's rules check every contact on the page when the sheet is saved. *@
 <form id="contacts-form">
@@ -19,14 +22,14 @@
 
 @(plan.Button("save-contacts", "Save the contacts")
     .Reactive(button => button.Click, p => p.Post("/Rows/SaveContacts")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form().Form(m => m.Wing))
         .Validate<ContactSheetRules>("contacts-form")
         .Response(r => r
             .OnSuccess<SavedContacts>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
             .OnError(400, e => e.ValidationErrors("contacts-form")))))
 @(plan.Button("post-contacts", "Post the contacts as a form")
     .Reactive(button => button.Click, p => p.Post("/Rows/PostContacts")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form().Form(m => m.Wing))
         .AsFormData()
         .Validate<ContactSheetRules>("contacts-form")
         .Response(r => r
