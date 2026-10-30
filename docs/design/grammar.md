@@ -536,9 +536,14 @@ imports none of them. The obligations are numbered so that tests and code can ci
   (`Alis.Reactive.Assets/runtime/plugins/document.ts`).
 - **D3 `query`.** The query string as a record, read the way MVC binds `[FromQuery]`:
   - keys match case-insensitively;
-  - an array member reads every value;
+  - keys and values are decoded as a form's are, so `+` reads as a space and `%2B` as a plus;
+  - an array member reads every value, in the address's order;
   - a scalar member reads the first value;
   - an absent key reads as missing.
+
+  A value is the text the address holds, converted to the member's shape (2.1); a query read is not
+  a binding read, so a key given no value (`?Wing=`) reads as `""` where MVC binds `null` to a text
+  member.
 - **D4 Markup-raised events.** A click on an element carrying `data-alis-raise`, or on an element
   inside one, raises the event the nearest such element names, with the record of that element's
   `data-alis-detail-` attributes. Each is one payload member, named as the DOM's `dataset` names it

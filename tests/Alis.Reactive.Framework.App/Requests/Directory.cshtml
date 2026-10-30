@@ -1,0 +1,19 @@
+@using Alis.Reactive.Framework.App.Requests
+@model DirectoryPage
+@{
+    ViewData["Title"] = "The directory";
+    var plan = Html.ReactivePlan<DirectoryPage>();
+}
+<h1>The directory</h1>
+
+<p>Residents of the <span id="wing"></span> wing, and of the wings:</p>
+@plan.Roster("wings")
+
+@{ Html.On(plan, t => t.DomReady(p =>
+{
+    var address = p.Url<DirectoryQuery>();
+    p.Element("wing").Text.Set(address.Get(q => q.Wing));
+    p.Component<Roster>("wings").Show(address.Get(q => q.Wings));
+})); }
+
+@Html.RenderPlan(plan)

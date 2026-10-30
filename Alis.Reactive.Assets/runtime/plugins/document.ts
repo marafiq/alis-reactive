@@ -3,9 +3,9 @@
 //    after every handler of that owner has subscribed, and never again.
 // D2 `raise(name, detail)` is synchronous: a non-bubbling CustomEvent carrying the detail the plan
 //    gives it. A listener's payload is the detail, or the event itself when the detail is missing.
-// D3 `query` is the query string read the way MVC binds [FromQuery]: keys match case-insensitively
-//    and a scalar member reads the first value; `queryAll` gives an array member every value. An
-//    absent key reads as missing.
+// D3 `query` is the query string read the way MVC binds [FromQuery]: keys match case-insensitively,
+//    keys and values are decoded as a form's are ("+" is a space), and a scalar member reads the first
+//    value; `queryAll` gives an array member every value, in order. An absent key reads as missing.
 // D4 A click on an element carrying data-alis-raise, or inside one, raises the event the nearest names,
 //    with a record of that element's data-alis-detail- attributes: each is one payload member, named as
 //    the DOM's dataset names it (data-alis-detail-resident-id is residentId) and holding its text, which

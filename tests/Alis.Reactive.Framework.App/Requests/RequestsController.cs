@@ -152,6 +152,8 @@ public sealed class RequestsController : Controller
         Said($"lines {string.Join(" and ", order.Lines.Select(line => $"{line.Sku ?? "nothing"} x {line.Quantity}"))}; " +
              $"city {order.Address.City ?? "none"}; wings {Listed(order.Wings)} from {Request.Form["Wings"].Count} Wings fields");
 
+    public IActionResult Directory() => View(new DirectoryPage());
+
     private string QueryText() => Request.QueryString.HasValue ? Request.QueryString.Value! : "nothing";
 
     private static string Listed(List<string>? items) =>
