@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.RadioButton;
 
 // Journey: a care coordinator completes a new resident's Move-in Room & Care Plan.
@@ -188,11 +186,11 @@ public class WhenUsingFusionRadioButton : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"room\":\"Shared Companion Suite\""),
+        Assert.That(body, Does.Contain("\"Room\":\"Shared Companion Suite\""),
             "the gather pipeline must carry SelectedValue() under its declared key");
-        Assert.That(body, Does.Contain("\"companionSuiteChosen\":true"),
+        Assert.That(body, Does.Contain("\"CompanionSuiteChosen\":true"),
             "the gather pipeline must carry the companion suite's Checked() source under its declared key");
-        Assert.That(body, Does.Contain("\"companionSuiteUnavailable\":false"),
+        Assert.That(body, Does.Contain("\"CompanionSuiteUnavailable\":false"),
             "the gather pipeline must carry the companion suite's Disabled() source under its declared key");
 
         AssertNoConsoleErrors();

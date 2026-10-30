@@ -1,0 +1,54 @@
+/* The call bell the sandbox wrote itself (call-bell.ts). */
+.call-bell {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 20rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d6dde6;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  font-size: 0.875rem;
+}
+
+.call-bell .cb-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.call-bell .cb-room {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.call-bell .cb-state {
+  color: #475569;
+}
+
+.call-bell .cb-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.call-bell .cb-press,
+.call-bell .cb-clear {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #94a3b8;
+  border-radius: 9999px;
+  background: #fff;
+}
+
+.call-bell .cb-press {
+  border-color: #b45309;
+  color: #b45309;
+}
+
+.call-bell .cb-count {
+  color: #64748b;
+}
+
+.call-bell .cb-status {
+  min-height: 1.25rem;
+  margin: 0;
+  color: #b45309;
+}

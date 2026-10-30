@@ -19,7 +19,9 @@ namespace Alis.Reactive.Native.Components
     /// </summary>
     /// <remarks>
     /// Uses the Reactive Plan-owned render target for element ID and MVC binding name.
-    /// No label or validation slot is rendered.
+    /// No label or validation slot is rendered. The input carries <c>data-alis-hidden-field</c>, so the
+    /// framework's hidden-field code (constructed on <c>alis:mount</c>) raises <c>change</c> when its value
+    /// is written with a new value.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type rendered through the hidden input.</typeparam>
@@ -44,17 +46,14 @@ namespace Alis.Reactive.Native.Components
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
+            _bindingPath = bindingPath;
         }
-
-        internal string ElementId => _elementId;
-        internal string BindingPath => _bindingPath;
 
 #if NET48
         /// <inheritdoc />
@@ -71,7 +70,8 @@ namespace Alis.Reactive.Native.Components
         {
             var hiddenInputAttributes = new Dictionary<string, object>
             {
-                ["id"] = _elementId
+                ["id"] = _elementId,
+                ["data-alis-hidden-field"] = ""
             };
 
             var hiddenInputHtml = _html.HiddenFor(_expression, hiddenInputAttributes);

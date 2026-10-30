@@ -4,9 +4,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class EmergencyContactValidator : ReactiveValidator<EmergencyContact>
     {
+        /// <summary>The community's front desk, which families sometimes give instead of their own number.</summary>
+        public const string FrontDeskPhone = "555-0199";
+
         public EmergencyContactValidator()
         {
-            ClientRule(x => x.Phone).Required("Phone is required.");
+            RuleFor(x => x.Phone).NotEmpty().WithMessage("Phone is required.");
+
+            // The server checks the number against the community's directory; the browser cannot.
+            RuleFor(x => x.Phone)
+                .Must(phone => phone != FrontDeskPhone)
+                .WithMessage($"{FrontDeskPhone} is the front desk. Enter the contact's own number.");
         }
     }
 
@@ -14,10 +22,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public EmergencyContactsValidator()
         {
-            ClientRule(x => x.ResidentName).Required("Resident name is required.");
+            RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Resident name is required.");
 
-            WhenField(x => x.HasContacts, () =>
-                ClientRuleEach(x => x.Contacts).SetValidator(new EmergencyContactValidator()));
+            When(x => x.HasContacts, () =>
+                RuleForEach(x => x.Contacts).SetValidator(new EmergencyContactValidator()));
         }
     }
 }

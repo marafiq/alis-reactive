@@ -1,0 +1,56 @@
+@using Alis.Reactive.Framework.App.Triggers
+@model AnnouncementsPage
+@{
+    ViewData["Title"] = "Announcements";
+    var plan = Html.ReactivePlan<AnnouncementsPage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>Announcements</h1>
+
+@plan.Slate("slate", title: "Night")
+
+<p>Round: <span id="round"></span> · read right after announcing: <span id="after-announcing"></span></p>
+<p>Admitted: <span id="admitted-name"></span> to room <span id="admitted-room"></span></p>
+<p>Moved from room <span id="moved-from"></span> with <span id="moved-who"></span>, escorted second by <span id="moved-escort"></span></p>
+
+@{ Html.On(plan, t => t
+    .CustomEvent(RoundEvents.Started, p =>
+    {
+        p.Element("round").Text.Set("the round started");
+        p.Component<Slate>("slate").Title.Set("Round started");
+    })
+    .CustomEvent(RoundEvents.Admitted, (admitted, p) =>
+    {
+        p.Element("admitted-name").Text.Set(admitted.Get(x => x.Name));
+        p.Element("admitted-room").Text.Set(admitted.Get(x => x.Room));
+    })
+    .CustomEvent(RoundEvents.Moved, (moved, p) =>
+    {
+        p.Element("moved-from").Text.Set(moved.Get(x => x.From.Room));
+        p.Element("moved-who").Text.Set(moved.Get(x => x.Lines[0].Name));
+        p.Element("moved-escort").Text.Set(moved.Get(x => x.Escorts[1]));
+    })); }
+
+@(plan.Button("announce", "Announce the round")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Dispatch(RoundEvents.Started);
+        p.Element("after-announcing").Text.Set(p.Component<Slate>("slate").Title);
+    }))
+@(plan.Button("admit-fixed", "Announce Ada's admission")
+    .Reactive(button => button.Click, p => p.Dispatch(RoundEvents.Admitted, new Admitted { Name = "Ada", Room = 12 })))
+@(plan.Button("admit-read", "Announce the slate's admission")
+    .Reactive(button => button.Click, p => p.Dispatch(RoundEvents.Admitted, admitted => admitted
+        .Set(x => x.Name, p.Component<Slate>("slate").Title)
+        .Set(x => x.Room, tally.Total))))
+@(plan.Button("add-four", "Add 4 to the tally")
+    .Reactive(button => button.Click, p => tally.Add(4)))
+@* Markup that raises the app's event itself when clicked, carrying its payload (grammar.md 6.1, D4). *@
+<button type="button" id="admit-from-board" @Html.Raises(RoundEvents.Admitted, new Admitted { Name = "Bea", Room = 4 })>Admit Bea from the board</button>@(plan.Button("move", "Announce a move")
+    .Reactive(button => button.Click, p => p.Dispatch(RoundEvents.Moved, moved => moved
+        .Set(x => x.From.Room, 12)
+        .Set(x => x.Lines[0].Name, "Ada")
+        .Set(x => x.Escorts[0], "Cy")
+        .Set(x => x.Escorts[1], "Bea"))))
+
+@Html.RenderPlan(plan)

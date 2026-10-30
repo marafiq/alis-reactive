@@ -1,0 +1,44 @@
+@using Alis.Reactive.Framework.App.Partials
+@model DeskPage
+@{
+    ViewData["Title"] = "The front desk";
+    var plan = Html.ReactivePlan<DeskPage>();
+}
+<h1>The front desk</h1>
+
+<form id="desk-form">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+    <fieldset id="kin-section">
+        <legend>The resident's next of kin</legend>
+        @* The next of kin's own editor template, rendered under the member's prefix: its input binds as NextOfKin.Name. *@
+        @Html.EditorFor(m => m.NextOfKin)
+    </fieldset>
+</form>
+
+<p>The next of kin read back: <span id="kin-read"></span></p>
+<p>The desk's endpoint bound: <span id="desk-saved"></span></p>
+
+@(plan.Button("read-kin", "Read the next of kin")
+    .Reactive(button => button.Click, p => p.Element("kin-read").Text.Set(p.Component<Entry>(m => m.NextOfKin.Name).Value)))
+@(plan.Button("save-desk", "Save the desk")
+    .Reactive(button => button.Click, p => p.Post("/Partials/SaveDesk")
+        .Gather(g => g.Form())
+        .Validate<DeskRules>("desk-form")
+        .Response(r => r
+            .OnSuccess<PartialsEcho>((echo, s) => s.Element("desk-saved").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("desk-form")))))
+@(plan.Button("check-kin", "Check the next of kin on file")
+    .Reactive(button => button.Click, p =>
+    {
+        var kin = p.Component<Entry>(m => m.NextOfKin.Name);
+        p.Post("/Partials/CheckKin")
+            .Gather(g => g.Set(x => x.NextOfKin.Name, kin.Value))
+            .Validate<KinOnFileRules>("kin-section")
+            .Response(r => r
+                .OnSuccess<PartialsEcho>((echo, s) => s.Element("desk-saved").Text.Set(echo.Get(x => x.Summary)))
+                .OnError(400, e => e.ValidationErrors("kin-section")));
+    }))
+
+<section id="desk-messages" aria-label="The desk's messages">
+    @Html.RenderPlan(plan)
+</section>

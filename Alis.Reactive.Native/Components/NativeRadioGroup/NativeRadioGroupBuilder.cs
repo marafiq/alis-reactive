@@ -41,8 +41,8 @@ namespace Alis.Reactive.Native.Components
         private readonly string _elementId;
         private readonly string _bindingPath;
         private readonly List<RadioButtonItem> _options = new List<RadioButtonItem>();
-        private string _cssClass = "flex flex-col gap-2";
-        private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
+        private string _cssClass = "alis-radio-group";
+        private string _optionCssClass = "alis-radio-group__option";
 
         // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeRadioGroupBuilder(
@@ -52,20 +52,14 @@ namespace Alis.Reactive.Native.Components
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
+            _bindingPath = bindingPath;
         }
-
-        internal string ElementId => _elementId;
-
-        internal string BindingPath => _bindingPath;
-
-        internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
         /// Adds radio options supplied outside the fluent builder, such as controller
@@ -158,8 +152,10 @@ namespace Alis.Reactive.Native.Components
 
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
-            // Hidden input is the Reactive Plan component target and intentionally omits a name attribute.
-            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" />");
+            // The hidden input is the component and has no name: the radios post the value. The framework's
+            // radio-group code (constructed on alis:mount) keeps the picked value on it and raises change, and
+            // checks the radio a write to its value names.
+            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" data-alis-radio-group />");
 
             for (int i = 0; i < _options.Count; i++)
             {
@@ -178,11 +174,11 @@ namespace Alis.Reactive.Native.Components
                 radioHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
 
-                writer.Write("<div class=\"flex flex-col\">");
-                writer.Write($"<span class=\"text-sm font-medium leading-none\">{encoder.Encode(option.Text)}</span>");
+                writer.Write("<div class=\"alis-radio-group__text\">");
+                writer.Write($"<span class=\"alis-radio-group__label\">{encoder.Encode(option.Text)}</span>");
                 if (option.Description != null)
                 {
-                    writer.Write($"<span class=\"text-xs text-content-secondary mt-1\">{encoder.Encode(option.Description)}</span>");
+                    writer.Write($"<span class=\"alis-radio-group__description\">{encoder.Encode(option.Description)}</span>");
                 }
                 writer.Write("</div>");
 
@@ -191,9 +187,6 @@ namespace Alis.Reactive.Native.Components
             }
 
             writer.Write("</div>");
-
-            // Inline initialization works on page load and partial injection without DOM scanning.
-            writer.Write($@"<script>(function(){{var h=document.getElementById(""{encodedId}"");h.isInteracted=false;h.parentElement.addEventListener(""change"",function(e){{if(e.target.type!==""radio"")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(""change"",{{bubbles:true}}));}});}})();</script>");
         }
     }
 }

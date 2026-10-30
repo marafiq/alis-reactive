@@ -1,0 +1,77 @@
+@using Alis.Reactive.Framework.App.Requests
+@model CarePlanPage
+@{
+    ViewData["Title"] = "A care plan";
+    var plan = Html.ReactivePlan<CarePlanPage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>A care plan</h1>
+
+<form id="care-plan-form">
+    @{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care plan")).FilePicker(); }
+</form>
+
+<dl>
+    <dt>Checked</dt><dd id="checked"></dd>
+    <dt>Received</dt><dd id="received"></dd>
+    <dt>Looked up by the address</dt>
+    <dd>tried <span id="lookup-tried"></span> · <span id="looked-up"></span> · went on <span id="lookup-after"></span></dd>
+    <dt>Posted as JSON</dt>
+    <dd>tried <span id="json-tried"></span> · <span id="posted-json"></span> · went on <span id="json-after"></span></dd>
+</dl>
+
+@(plan.Button("check", "Check the care plan")
+    .Reactive(button => button.Click, p =>
+    {
+        var chosen = p.Component<FilePicker>(m => m.CarePlan).Files;
+        p.Post("/Requests/CarePlans/Check")
+            .Gather<CarePlanCheck>(g => g
+                .Set(x => x.CarePlan!.Name, chosen.Get(files => files[0].Name))
+                .Set(x => x.CarePlan!.Size, chosen.Get(files => files[0].Size))
+                .Set(x => x.CarePlan!.Type, chosen.Get(files => files[0].Type))
+                .Set(x => x.CarePlan!.LastModified, chosen.Get(files => files[0].LastModified)))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("checked").Text.Set(echo.Get(x => x.Summary))));
+    }))
+@(plan.Button("send", "Send the care plan")
+    .Reactive(button => button.Click, p => p.Post("/Requests/CarePlans")
+        .Gather(g => g.Form("care-plan-form"))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("send-sequence", "Send the care plan as a sequence")
+    .Reactive(button => button.Click, p => p.Post("/Requests/CarePlans/Sequence")
+        .Gather<CarePlanUpload>(g => g.Form(m => m.CarePlan))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("send-array", "Send the care plan as an array")
+    .Reactive(button => button.Click, p => p.Post("/Requests/CarePlans/Array")
+        .Gather<CarePlanFiles>(g => g.Form(m => m.CarePlan))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+
+@(plan.Button("send-listed", "Send the care plan as the browser lists it")
+    .Reactive(button => button.Click, p => p.Post("/Requests/CarePlans")
+        .Gather<ListedCarePlan>(g => g.Set(x => x.CarePlan, p.Component<FilePicker>(m => m.CarePlan).Listed))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("look-up", "Look up the care plan by the address")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("lookup-tried").Text.Set(tally.Total);
+        p.Get("/Requests/CarePlans/Lookup")
+            .Gather(g => g.Form("care-plan-form"))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("looked-up").Text.Set(echo.Get(x => x.Summary))));
+        p.Element("lookup-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("post-json", "Post the care plan as JSON")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("json-tried").Text.Set(tally.Total);
+        p.Post("/Requests/CarePlans/Json")
+            .Gather(g => g.Form("care-plan-form"))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("posted-json").Text.Set(echo.Get(x => x.Summary))));
+        p.Element("json-after").Text.Set(tally.Total);
+    }))
+
+@Html.RenderPlan(plan)

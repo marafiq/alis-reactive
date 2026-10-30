@@ -1,0 +1,25 @@
+@using Alis.Reactive.Framework.App.Forms
+@model StayPage
+@{
+    ViewData["Title"] = "A stay";
+    var plan = Html.ReactivePlan<StayPage>();
+}
+<h1>A stay</h1>
+
+@* The stay's form holds only the guest's line, loaded here when the desk picks a guest. *@
+<form id="stay-form">
+    <div id="guest-slot"></div>
+</form>
+
+@(plan.Button("pick-guest", "Pick the guest")
+    .Reactive(button => button.Click, p => p.Get("/Forms/GuestLine").Response(r => r.OnSuccess(s => s.Into("guest-slot")))))
+@(plan.Button("clear-guest", "Clear the guest")
+    .Reactive(button => button.Click, p => p.Unload("guest-slot")))
+@(plan.Button("book-stay", "Book the stay")
+    .Reactive(button => button.Click, p => p.Post("/Forms/BookStay")
+        .Gather(g => g.Form("stay-form"))
+        .Response(r => r.OnError(400, e => e.ValidationErrors("stay-form")))))
+
+<section id="stay-messages" aria-label="The stay's messages">
+    @Html.RenderPlan(plan)
+</section>

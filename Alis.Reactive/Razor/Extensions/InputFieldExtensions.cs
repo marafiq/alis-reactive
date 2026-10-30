@@ -8,7 +8,7 @@ using System.Web.Mvc.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Extensions
+namespace Alis.Reactive
 {
     /// <summary>
     /// Razor view extension for starting a model-bound input field.
@@ -21,7 +21,9 @@ namespace Alis.Reactive.Native.Extensions
         /// </summary>
         /// <remarks>
         /// Chain a component extension on the result to choose the rendered control.
-        /// Field wrapper owns label display and validation error placement.
+        /// Field wrapper owns label display and validation error placement. A field renders its element id
+        /// once on a page: rendered again, by this plan or another, it is refused; so is a field the view's
+        /// field prefix changed under after the plan started.
         /// </remarks>
         /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
@@ -74,26 +76,41 @@ namespace Alis.Reactive.Native.Extensions
         {
             var options = configuration.CreateOptions();
 #if NET48
-            // System.Web.Mvc NameFor honors HtmlFieldPrefix and returns MvcHtmlString; the slot stores a string binding path.
+            // System.Web.Mvc NameFor honors HtmlFieldPrefix and returns MvcHtmlString; the identity keeps the binding path as text.
             var bindingName = html.NameFor(expression).ToHtmlString();
 #else
             var bindingName = html.NameFor(expression);
 #endif
-            var componentSlot = ModelBoundInputComponentSlot.For<TModel, TProp>(
-                expression,
-                bindingName,
-                html.ViewData.TemplateInfo.HtmlFieldPrefix);
+            RefuseAPrefixTheViewTookAfterThePlanStarted(html.ViewData.TemplateInfo.HtmlFieldPrefix, plan.Context, bindingName);
+            var identity = InputIdentity.For<TModel, TProp>(expression, bindingName, plan.Context.FieldPrefix);
+            RenderedPage.Of(html.ViewContext).Input(identity.ElementId, identity.BindingName, RenderedPage.ViewPathOf(html.ViewContext));
             var boundField = BoundInputField<TModel, TProp>.Create(
                 plan,
                 expression,
                 options,
-                componentSlot);
+                identity);
 
             return new InputBoundField<TModel, TProp>(
                 html,
                 boundField,
                 html.ViewContext.Writer);
         }
+
+        // MVC names the input under the prefix the view renders under now, and the plan sends and checks it under the
+        // prefix the view rendered under when the plan started: they are one prefix, or the input posts under a name
+        // its plan does not know.
+        private static void RefuseAPrefixTheViewTookAfterThePlanStarted(string prefix, PlanModel.PlanBuildContext plan, string bindingName)
+        {
+            if (prefix == plan.FieldPrefix) return;
+            throw new InvalidOperationException(
+                $"The field prefix of {plan.View} changed from {Described(plan.FieldPrefix)} to {Described(prefix)} after its " +
+                $"plan started, so input '{bindingName}' would post under a name its plan does not send or check. On .NET " +
+                "Framework a ViewDataDictionary copied from ViewData shares the view's TemplateInfo, so giving the copy a " +
+                "prefix gives it to the view: render the member with Html.EditorFor, or give the copy a new TemplateInfo " +
+                $"{{ HtmlFieldPrefix = \"{prefix}\" }}.");
+        }
+
+        private static string Described(string prefix) => prefix.Length == 0 ? "none" : $"'{prefix}'";
     }
 
     internal abstract class InputFieldConfiguration

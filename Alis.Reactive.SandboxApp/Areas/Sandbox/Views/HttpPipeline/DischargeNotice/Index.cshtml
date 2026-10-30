@@ -1,5 +1,4 @@
 @model DischargeNoticePageModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Discharge";
@@ -8,13 +7,15 @@
     {
         (Key: "margaret", Name: "Margaret Hill", Room: "Maple 214", Channel: "text", Contact: "Family reached by text message"),
         (Key: "arthur", Name: "Arthur Bell", Room: "Maple 216", Channel: "email", Contact: "Family reached by email"),
+        (Key: "rosa", Name: "Rosa Diaz", Room: "Maple 218", Channel: "phone", Contact: "Family reached by phone"),
     };
 }
 
 <native-vstack gap="Lg">
     <native-heading level="H1">Discharge a Resident</native-heading>
     <native-text color="Secondary">
-        Maple Grove, second floor. Discharging a resident also notifies their family.
+        Maple Grove, second floor. Discharging a resident also notifies their family; a discharge the
+        office refuses notifies no one.
     </native-text>
 
     @foreach (var resident in residents)
@@ -31,16 +32,20 @@
                          .Response(r => r
                             .OnSuccess<DischargeResult>((json, s) =>
                             {
-                                s.Element($"{resident.Key}-discharge-status").SetText(json, x => x.Message);
+                                s.Element($"{resident.Key}-discharge-status").Text.Set(json.Get(x => x.Message));
+                            })
+                            .OnError<DischargeResult>(409, (refused, e) =>
+                            {
+                                e.Element($"{resident.Key}-discharge-status").Text.Set(refused.Get(x => x.Message));
                             })
                             .Chained(c => c
                                 .Post(Url.SandboxRoute("NotifyFamily", "DischargeNotice"))
-                                .Gather(g => g.Static("channel", resident.Channel))
+                                .Gather<FamilyNoticeRequest>(g => g.Set(x => x.Channel, resident.Channel))
                                 .Response(notice => notice
                                     .OnError<FamilyNoticeResult>(503, (json, e) =>
                                     {
-                                        e.Element($"{resident.Key}-family-reason").SetText(json, x => x.Message);
-                                        e.Element($"{resident.Key}-family-status").SetText("The family was not notified.");
+                                        e.Element($"{resident.Key}-family-reason").Text.Set(json.Get(x => x.Message));
+                                        e.Element($"{resident.Key}-family-status").Text.Set("The family was not notified.");
                                     }))));
                     }))
                 <p id="@(resident.Key)-discharge-status" class="text-sm text-text-muted">Not discharged yet.</p>

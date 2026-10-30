@@ -1,0 +1,22 @@
+@using Alis.Reactive.Framework.App.Inputs
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model ContactsPage
+@{
+    ViewData["Title"] = "A resident's contacts";
+
+    // The same card twice, under two prefixes: each card's inputs bind as Primary.* or Alternate.*.
+    var primary = new ViewDataDictionary(ViewData) { { "Heading", "Primary contact" } };
+    primary.TemplateInfo.HtmlFieldPrefix = nameof(ContactsPage.Primary);
+    var alternate = new ViewDataDictionary(ViewData) { { "Heading", "Alternate contact" } };
+    alternate.TemplateInfo.HtmlFieldPrefix = nameof(ContactsPage.Alternate);
+}
+<h1>A resident's contacts</h1>
+
+@* A plain form around both cards: the browser posts every input under the name its field gave it. *@
+<form method="post" action="/Inputs/Contacts/Posted">
+    @await Html.PartialAsync("ContactCard", Model.Primary, primary)
+    @await Html.PartialAsync("ContactCard", Model.Alternate, alternate)
+    <button type="submit">Post both contacts</button>
+</form>
+
+<p>The endpoint bound: <span id="contacts-bound"></span></p>

@@ -1,102 +1,75 @@
 @model NativeTextAreaModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "NativeTextArea";
+    ViewData["Title"] = "Shift Handover";
+
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string Template = "Vitals:\nMeals:\nMedications:\nFalls or incidents:\nFamily calls:";
 
     var plan = Html.ReactivePlan<NativeTextAreaModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<NativeTextArea>(m => m.CareNotes).SetValue("Resident stable. Vitals within normal range.");
-    }));
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var comp = p.Component<NativeTextArea>(m => m.CareNotes);
-        p.Element("value-echo").SetText(comp.Value());
-    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">NativeTextArea — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises NativeTextArea vertical slice: property writes (SetValue),
-        property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
-        Senior living domain: care notes and incident descriptions.
-    </native-text>
+    <div>
+        <native-heading level="H1">Shift Handover</native-heading>
+        <native-text color="Secondary">Maple wing, evening to night. Write what the night nurse needs to know before you leave.</native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">1. Property Write (SetValue)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, sets care notes to "Resident stable. Vitals within normal range."
-        </p>
-        @{ Html.InputField(plan, m => m.CareNotes, o => o.Label("Care Notes"))
-            .NativeTextArea(b => b
-                .Rows(4)
-                .Placeholder("Enter care notes")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
-    </native-card-body></native-card>
+        <native-vstack gap="Base">
+            <div id="handover-form" class="flex flex-col gap-4">
+            @{ Html.InputField(plan, m => m.HandoverNote, o => o.Label("Handover for the night nurse"))
+                .NativeTextArea(b => b.Rows(8).Placeholder("How the shift went, resident by resident").CssClass(Field)); }
 
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the care notes component value and echoes it.
-        </p>
-        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Incident description wires a Changed event with typed condition:
-            <code>When(args, x =&gt; x.Value).IsEmpty()</code> shows incident status.
-        </p>
-        @{ Html.InputField(plan, m => m.IncidentDescription, o => o.Label("Incident Description"))
-            .NativeTextArea(b => b
-                .Rows(4)
-                .Placeholder("Describe the incident")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, x => x.Value).IsEmpty()
-                        .Then(t =>
+            @{ Html.InputField(plan, m => m.Incident, o => o.Label("Incident this shift"))
+                .NativeTextArea(b => b.Rows(3).Placeholder("A fall, a refusal, a family complaint").CssClass(Field))
+                .Reactive(evt => evt.Change, (args, p) =>
+                    p.When(args.Value).IsEmpty()
+                        .Then(none =>
                         {
-                            t.Element("incident-status").SetText("no incident");
-                            t.Element("incident-status").AddClass("text-red-600");
-                            t.Element("incident-status").RemoveClass("text-green-600");
+                            none.Element("incident-flag").Hide();
+                            none.Element("incident-none").Show();
                         })
-                        .Else(e =>
+                        .Else(incident =>
                         {
-                            e.Element("incident-status").SetText("incident logged");
-                            e.Element("incident-status").AddClass("text-green-600");
-                            e.Element("incident-status").RemoveClass("text-red-600");
-                        });
-                })); }
-        <p class="font-mono text-sm mt-2">Status: <span id="incident-status" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                            incident.Element("incident-flag-text").Text.Set(args.Value);
+                            incident.Element("incident-flag").Show();
+                            incident.Element("incident-none").Hide();
+                        })); }
+            </div>
+            <p id="incident-none" class="text-sm text-text-muted">No incidents this shift.</p>
+            <p id="incident-flag" hidden class="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                The night nurse reads this first: <span id="incident-flag-text"></span>
+            </p>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads care notes via <code>When(comp.Value()).IsEmpty()</code>
-            and shows a warning or confirmation.
-        </p>
-        @(Html.NativeButton("check-notes-btn", "Check Care Notes")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var comp = p.Component<NativeTextArea>(m => m.CareNotes);
-                p.When(comp.Value()).IsEmpty()
-                    .Then(t => t.Element("notes-warning").SetText("notes required"))
-                    .Else(e => e.Element("notes-warning").SetText("notes recorded"));
-            }))
-        <p class="font-mono text-sm mt-2">Warning: <span id="notes-warning" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+            <native-hstack gap="Sm" align="Center" class="flex-wrap">
+                @(Html.NativeButton("handover-template-btn", "Start from the Template")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var handover = p.Component<NativeTextArea>(m => m.HandoverNote);
+                        handover.Value.Set(Template);
+                        handover.Focus();
+                    }))
+                @(Html.NativeButton("send-handover-btn", "Send Handover")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var handover = p.Component<NativeTextArea>(m => m.HandoverNote);
+                        p.When(handover.Value).IsEmpty()
+                            .Then(empty =>
+                            {
+                                empty.Element("handover-status").Text.Set("Write the handover before sending it.");
+                                empty.Component<NativeTextArea>(m => m.HandoverNote).Focus();
+                            })
+                            .Else(written => written.Post(Url.SandboxRoute("Send", "NativeTextArea")).Gather(g => g.Form("handover-form"))
+                                .Response(r => r.OnSuccess<ShiftHandoverSent>((sent, s) =>
+                                    s.Element("handover-status").Text.Set(sent.Get(x => x.Message)))));
+                    }))
+                <p id="handover-status" class="text-sm text-text-muted"></p>
+            </native-hstack>
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

@@ -1,138 +1,159 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.SmartComponents
 @model SmartComponentsModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
+@using Microsoft.AspNetCore.Mvc.Rendering
 @{
-    ViewData["Title"] = "Smart Components";
+    ViewData["Title"] = "Referral Intake";
+
+    const string SmartPasteId = "referral-smart-paste";
+    const string LetterPanelId = "referral-letter";
+    const string LetterView = "~/Areas/Sandbox/Views/Components/Fusion/SmartComponents/_ReferralLetter.cshtml";
+    const string IntakeTemplate = "Referral reviewed with the family. ";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string PrimaryButton = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string InputCss = "w-full rounded-md border border-border px-3 py-1.5 text-sm";
 
     var plan = Html.ReactivePlan<SmartComponentsModel>();
-
-    plan.Reactive(m => m.CareNote, evt => evt.BeforeSuggestionInsert, (args, p) =>
-    {
-        p.Element("before-suggestion").SetText(args, x => x.Text);
-    });
-
-    plan.Reactive(m => m.CareNote, evt => evt.AfterSuggestionInsert, (args, p) =>
-    {
-        p.Element("after-suggestion").SetText(args, x => x.InsertedText);
-    });
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
-        note.SetValue("Resident is");
-        p.Element("smart-note-value").SetText(note.Value());
-    }));
+    var inbox = Model.Inbox.Select(referral => new SelectListItem(referral.Summary, referral.Id)).ToList();
+    var careLevels = Model.CareLevels.Select(level => new SelectListItem(level, level)).ToList();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Fusion Smart Components</native-heading>
+    <native-heading level="H1">Referral Intake</native-heading>
+    <native-text color="Secondary">
+        Maple Grove admissions. Open a referral from today's inbox, or paste a letter, and the referral fills in from it.
+    </native-text>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <native-vstack gap="Base">
-            @{ Html.InputField(plan, m => m.CareNote, o => o.Label("Smart care note"))
+    <native-grid cols="C2" gap="Lg">
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                @{ Html.InputField(plan, m => m.IncomingReferral, o => o.Label("Today's inbox"))
+                    .NativeDropDown(b => b.Items(inbox).Placeholder("-- Open a referral --").CssClass(InputCss))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        // The referral's letter replaces the one on the page, and the referral fills in from it.
+                        p.When(args.Value).NotEmpty().Then(opened => opened
+                            .Get(Url.SandboxRoute("Letter", "SmartComponents"))
+                            .Gather<ReferralLetterQuery>(g => g.Set(x => x.ReferralId, args.Value))
+                            .Response(r => r.OnSuccess(s =>
+                            {
+                                s.Into(LetterPanelId);
+                                s.Component<FusionSmartPasteButton>(SmartPasteId).Click();
+                            })));
+                    }); }
+
+                <div id="@LetterPanelId">
+                    @await Html.PartialAsync(LetterView, string.Empty)
+                </div>
+            </native-vstack>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-heading level="H2">Referral</native-heading>
+            <form id="referral-form" class="mt-3">
+                <native-vstack gap="Base">
+                    @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident"))
+                        .NativeTextBox(b => b.CssClass(InputCss)); }
+                    @{ Html.InputField(plan, m => m.ReferredBy, o => o.Label("Referring physician"))
+                        .NativeTextBox(b => b.CssClass(InputCss)); }
+                    @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Level of care"))
+                        .NativeDropDown(b => b.Items(careLevels).Placeholder("-- Level of care --").CssClass(InputCss)); }
+                    @{ Html.InputField(plan, m => m.Reason, o => o.Label("Reason for referral"))
+                        .NativeTextBox(b => b.CssClass(InputCss)); }
+
+                    @Html.FusionSmartPasteButton(SmartPasteId, o =>
+                    {
+                        o.Content = "Fill in from the letter";
+                        o.AiAssistEndpoint = Url.SandboxRoute("Paste", "SmartComponents");
+                        o.IsPrimary = true;
+                        o.CssClass = PrimaryButton;
+                    })
+                </native-vstack>
+            </form>
+        </native-card-body></native-card>
+    </native-grid>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            @{ Html.InputField(plan, m => m.IntakeNote, o => o.Label("Intake note"))
                 .FusionSmartTextArea(o =>
                 {
-                    o.Value = Model.CareNote;
-                    o.UserRole = "Care coordinator writing concise senior living notes";
-                    o.UserPhrases = new[] { "hydrating well", "fall precautions reviewed" };
-                    o.SuggestionEndpoint = "/api/smart-components/suggest";
+                    o.Value = Model.IntakeNote;
+                    o.UserRole = "Admissions coordinator writing a referral intake note";
+                    o.UserPhrases = new[] { "family tour scheduled", "discharge summary requested" };
+                    o.SuggestionEndpoint = Url.SandboxRoute("Suggest", "SmartComponents");
                     o.SuggestionMode = FusionSmartSuggestionMode.Inline;
                     o.Rows = 4;
                     o.CssClass = "w-full rounded-md border border-border p-3 text-sm";
+                })
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args.IsInteracted).Falsy().Then(template => template.Element("note-status").Text.Set("Started from the template."))
+                        .ElseIf(args.Value).IsEmpty().Then(cleared => cleared.Element("note-status").Text.Set("Intake note cleared."))
+                        .ElseIf(args.PreviousValue).IsEmpty().Then(written => written.Element("note-status").Text.Set("Intake note written."))
+                        .Else(updated => updated.Element("note-status").Text.Set("Intake note updated."));
+                })
+                .Reactive(evt => evt.BeforeSuggestionInsert, (args, p) =>
+                {
+                    // The note takes a suggested phrase, never a suggested dose.
+                    p.When(args.Text).Matches(@"\d\s*mg\b")
+                        .Then(dose =>
+                        {
+                            args.Cancel.Set(true);
+                            dose.Element("dose-left-out").Show();
+                        })
+                        .Else(phrase => phrase.Element("dose-left-out").Hide());
+                })
+                .Reactive(evt => evt.AfterSuggestionInsert, (args, p) =>
+                {
+                    p.Element("suggestion-added-text").Text.Set(args.InsertedText);
+                    p.Element("suggestion-added").Show();
                 }); }
+            <p class="text-xs text-text-muted">Suggestions appear as you type; Tab adds one.</p>
+            <p id="suggestion-added" hidden class="text-xs text-text-muted">Suggestion added: <span id="suggestion-added-text" class="italic"></span></p>
+            <p id="dose-left-out" hidden class="text-xs text-red-700">A dose was suggested and left out. Copy doses from the discharge summary.</p>
+            <p id="note-status" class="text-sm">No intake note yet.</p>
 
-            <native-hstack gap="Sm">
-                @(Html.NativeButton("set-smart-note-btn", "Set Note")
-                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
+            <native-hstack gap="Sm" class="flex-wrap mt-2">
+                @(Html.NativeButton("start-from-template-btn", "Start from the template")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        var note = p.Component<FusionSmartTextArea>(m => m.CareNote);
-                        note.SetValue("Resident prefers morning therapy");
-                        p.Element("smart-note-value").SetText(note.Value());
+                        var note = p.Component<FusionSmartTextArea>(m => m.IntakeNote);
+                        note.Value.Set(IntakeTemplate);
+                        note.FocusIn();
                     }))
-                @(Html.NativeButton("focus-smart-note-btn", "Focus Note")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                @(Html.NativeButton("save-referral-btn", "Save referral")
+                    .CssClass(PrimaryButton)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionSmartTextArea>(m => m.CareNote).FocusIn();
-                        p.Element("smart-note-focus-status").SetText("focus called");
-                    }))
-            </native-hstack>
-
-            <native-vstack gap="Xs" class="font-mono text-sm">
-                <p>Value: <span id="smart-note-value">none</span></p>
-                <p>Before: <span id="before-suggestion">none</span></p>
-                <p>After: <span id="after-suggestion">none</span></p>
-                <p>Focus: <span id="smart-note-focus-status">idle</span></p>
-            </native-vstack>
-        </native-vstack>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <native-vstack gap="Base">
-            <textarea id="custom-clipboard" class="sr-only">Resident Nora is moving to room 212B. Hydration rounds complete.</textarea>
-
-            <form id="smart-paste-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label for="Resident" class="block text-sm font-medium text-text-primary mb-1">Resident</label>
-                    <input id="Resident" name="Resident" class="w-full rounded-md border border-border p-2 text-sm" />
-                </div>
-                <div>
-                    <label for="Room" class="block text-sm font-medium text-text-primary mb-1">Room</label>
-                    <input id="Room" name="Room" class="w-full rounded-md border border-border p-2 text-sm" />
-                </div>
-                <div>
-                    <label for="Notes" class="block text-sm font-medium text-text-primary mb-1">Notes</label>
-                    <input id="Notes" name="Notes" class="w-full rounded-md border border-border p-2 text-sm" />
-                </div>
-                <div class="md:col-span-3">
-                    @Html.FusionSmartPasteButton("smart-paste", o =>
-                    {
-                        o.Content = "Smart Paste";
-                        o.AiAssistEndpoint = "/api/smart-components/paste";
-                        o.IsPrimary = true;
-                        o.CssClass = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white";
-                    })
-                </div>
-            </form>
-
-            <native-hstack gap="Sm">
-                @(Html.NativeButton("run-smart-paste-btn", "Run Smart Paste")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionSmartPasteButton>("smart-paste").Click();
-                        p.Element("paste-command-status").SetText("click called");
-                    }))
-                @(Html.NativeButton("focus-smart-paste-btn", "Focus Paste")
-                    .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionSmartPasteButton>("smart-paste").FocusIn();
-                        p.Element("paste-focus-status").SetText("focus called");
-                    }))
-                @(Html.NativeButton("disable-smart-paste-btn", "Disable Paste")
-                    .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white")
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        var paste = p.Component<FusionSmartPasteButton>("smart-paste");
-                        paste.SetDisabled(true);
-                        p.Element("paste-disabled-value").SetText(paste.Disabled());
+                        // A saved referral locks Fill in from the letter, so a locked button means it is saved.
+                        var smartPaste = p.Component<FusionSmartPasteButton>(SmartPasteId);
+                        var resident = p.Component<NativeTextBox>(m => m.ResidentName);
+                        p.When(smartPaste.Disabled).Truthy()
+                            .Then(saved => saved.Element("intake-status").Text.Set("This referral is already saved."))
+                            .ElseIf(resident.Value).IsEmpty()
+                            .Then(empty =>
+                            {
+                                empty.Element("intake-status").Text.Set("Fill in the referral from its letter before saving.");
+                                smartPaste.FocusIn();
+                            })
+                            .Else(filled => filled.Post(Url.SandboxRoute("Save", "SmartComponents"))
+                                .Gather<ReferralIntakeSave>(g => g
+                                    .Set(x => x.ResidentName, resident.Value)
+                                    .Set(x => x.CareLevel, p.Component<NativeDropDown>(m => m.CareLevel).Value)
+                                    .Set(x => x.IntakeNote, p.Component<FusionSmartTextArea>(m => m.IntakeNote).Value))
+                                .Response(r => r.OnSuccess<ReferralIntakeSaved>((saved, s) =>
+                                {
+                                    s.Element("intake-status").Text.Set(saved.Get(x => x.Message));
+                                    smartPaste.Disabled.Set(true);
+                                })));
                     }))
             </native-hstack>
-
-            <native-vstack gap="Xs" class="font-mono text-sm">
-                <p>Command: <span id="paste-command-status">idle</span></p>
-                <p>Focus: <span id="paste-focus-status">idle</span></p>
-                <p>Disabled: <span id="paste-disabled-value">false</span></p>
-            </native-vstack>
+            <p id="intake-status" class="text-sm font-medium">Not saved yet.</p>
         </native-vstack>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

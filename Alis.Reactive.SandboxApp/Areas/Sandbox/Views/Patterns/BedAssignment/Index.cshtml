@@ -1,0 +1,96 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.BedAssignment
+@model BedAssignmentModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Bed Assignment";
+
+    const string ButtonPrimary = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+
+    var plan = Html.ReactivePlan<BedAssignmentModel>();
+    var roomsUrl = Url.SandboxRoute("Rooms", "BedAssignment");
+    var bedsUrl = Url.SandboxRoute("Beds", "BedAssignment");
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Bed Assignment</native-heading>
+        <native-text color="Secondary">Maple Grove admissions. Margaret Thompson moves in on Monday, November 16. Choose her wing, then a room with an open bed, then the bed.</native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-grid cols="C3" gap="Base">
+                @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing"))
+                    .FusionDropDownList(b => b
+                        .DataSource(Model.Wings)
+                        .Fields<BedWing>(w => w.Name, w => w.Code)
+                        .Placeholder("Choose a wing"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.Get(roomsUrl)
+                            .Gather<WingRoomsQuery>(g => g.Form(m => m.Wing))
+                            .Response(r => r.OnSuccess<WingRooms>((offered, s) =>
+                            {
+                                // The new wing's rooms replace the old; a room chosen before is cleared, and its beds with it.
+                                s.Component<FusionDropDownList>(m => m.Room).Items<BedRoom>().Set(offered.Get(x => x.Rooms));
+                                s.Element("room-summary").Text.Set(offered.Get(x => x.Summary));
+                            }))); }
+
+                @{ Html.InputField(plan, m => m.Room, o => o.Label("Room"))
+                    .FusionDropDownList(b => b
+                        .Fields<BedRoom>(r => r.Name, r => r.Number)
+                        .Placeholder("Choose a room"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        // A room cleared because another wing was chosen takes its beds with it.
+                        var bed = p.Component<FusionDropDownList>(m => m.Bed);
+                        p.When(args.Value).IsEmpty()
+                            .Then(none =>
+                            {
+                                bed.Items<OpenBed>().Set(Array.Empty<OpenBed>());
+                                none.Element("bed-summary").Text.Set("Choose a room to see its open beds.");
+                            })
+                            .Else(chosen => chosen.Get(bedsUrl)
+                                .Gather<RoomBedsQuery>(g => g.Form(m => m.Wing, m => m.Room))
+                                .Response(r => r.OnSuccess<RoomBeds>((open, s) =>
+                                {
+                                    bed.Items<OpenBed>().Set(open.Get(x => x.Beds));
+                                    s.Element("bed-summary").Text.Set(open.Get(x => x.Summary));
+                                })));
+                    }); }
+
+                @{ Html.InputField(plan, m => m.Bed, o => o.Label("Bed"))
+                    .FusionDropDownList(b => b
+                        .Fields<OpenBed>(d => d.Name, d => d.Code)
+                        .Placeholder("Choose a bed"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.When(args.Value).IsEmpty()
+                            .Then(none => none.Element("bed-hold").Hide())
+                            .Else(chosen =>
+                            {
+                                chosen.Element("held-bed").Text.Set(args.Value);
+                                chosen.Element("bed-hold").Show();
+                            });
+                    }); }
+            </native-grid>
+            <p id="room-summary" class="text-sm text-text-secondary">Choose a wing to see its rooms with an open bed.</p>
+            <p id="bed-summary" class="text-sm text-text-secondary">Choose a room to see its open beds.</p>
+            <p id="bed-hold" class="text-sm" hidden>Bed <span id="held-bed" class="font-medium"></span> is held for Margaret Thompson until you assign it.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-hstack gap="Sm" align="Center" class="flex-wrap">
+        @(Html.NativeButton("assign-bed-btn", "Assign the bed")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Post(Url.SandboxRoute("Assign", "BedAssignment"))
+                    .Gather(g => g.Form(m => m.Wing, m => m.Room, m => m.Bed))
+                    .Response(r => r
+                        .OnSuccess<BedAssignmentAnswer>((assigned, s) => s.Element("assignment-status").Text.Set(assigned.Get(x => x.Message)))
+                        .OnError<BedAssignmentAnswer>(400, (refused, e) => e.Element("assignment-status").Text.Set(refused.Get(x => x.Message))))))
+        <p id="assignment-status" class="text-sm">No bed assigned yet.</p>
+    </native-hstack>
+</native-vstack>
+
+@Html.RenderPlan(plan)

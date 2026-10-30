@@ -1,0 +1,55 @@
+@model IntakeStepsModel
+@using Alis.Reactive.Native.Components
+@{
+    var plan = Html.ReactivePlan<IntakeStepsModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    var careLevels = new[]
+    {
+        new SelectListItem("Independent living", "Independent living"),
+        new SelectListItem("Assisted living", "Assisted living"),
+        new SelectListItem(IntakeCareValidator.FullCareLevel, IntakeCareValidator.FullCareLevel),
+    };
+}
+
+<native-heading level="H2">Step 2 of 2: Care needs for @Model.ResidentName</native-heading>
+
+@* The care needs the nurse reviews: only this step renders them. *@
+<div id="care-needs" class="flex flex-col gap-4">
+<native-grid cols="C2" gap="Base">
+    @* The mobility questions depend on the care level, so the server sends them once a level is chosen. *@
+    @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care level"))
+        .NativeDropDown(b => b.Items(careLevels).Placeholder("-- Choose a care level --").CssClass(Field))
+        .Reactive(evt => evt.Change, (args, p) =>
+        {
+            p.Get(Url.SandboxRoute("MobilityQuestions", "IntakeSteps"))
+             .Gather(g => g.Set(x => x.CareLevel, args.Value))
+             .Response(r => r.OnSuccess(s => s.Into("mobility-questions")));
+        }); }
+    @* The family phone the resident step accepted, which the coordinator may still correct here. *@
+    @{ Html.InputField(plan, m => m.FamilyPhone, o => o.Label("Family phone"))
+        .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
+</native-grid>
+
+<div id="mobility-questions">
+    <p class="text-sm text-text-muted">Choose a care level to see its mobility questions.</p>
+</div>
+</div>
+
+@* Finish checks this step's care answers in the browser, including the mobility questions, even
+   before they arrive. The resident step is no longer on the page: its name travels with the
+   request, and the server checks the whole intake, the resident step's rules included. *@
+@(Html.NativeButton("finish-intake-btn", "Finish intake")
+    .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+    .Reactive(plan, evt => evt.Click, (args, p) =>
+    {
+        p.Post(Url.SandboxRoute("Finish", "IntakeSteps"))
+         .Gather(g => g
+            .Form()
+            .Set(x => x.ResidentName, Model.ResidentName))
+         .Validate<IntakeCareValidator>("intake-form")
+         .Response(r => r
+            .OnSuccess<IntakeConfirmation>((json, s) => s.Element("intake-status").Text.Set(json.Get(x => x.Confirmation)))
+            .OnError(400, e => e.ValidationErrors("intake-form")));
+    }))
+
+@Html.RenderPlan(plan)

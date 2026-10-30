@@ -12,8 +12,8 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var hasBootStart = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booting"));
-        var hasBootEnd = _consoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booted"));
+        var hasBootStart = ConsoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booting"));
+        var hasBootEnd = ConsoleMessages.Any(m => m.Contains("[alis:boot]") && m.Contains("booted"));
 
         Assert.That(hasBootStart, Is.True, "Boot start trace must appear in console");
         Assert.That(hasBootEnd, Is.True, "Boot complete trace must appear in console");
@@ -27,7 +27,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var messages = _consoleMessages;
+        var messages = ConsoleMessages.ToList();
 
         var lastListenerTraceIndex = -1;
         for (var messageIndex = 0; messageIndex < messages.Count; messageIndex++)
@@ -55,7 +55,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         AssertTraceContains("execute", "\"event\":\"test\"");
-        AssertTraceContains("execute", "\"event\":\"test-received\"");
+        AssertTraceContains("execute", "\"event\":\"testReceived\"");
         AssertTraceContains("execute", "\"event\":\"final\"");
 
         AssertNoConsoleErrors();
@@ -67,17 +67,17 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var dispatchMessages = _consoleMessages
+        var dispatchMessages = ConsoleMessages
             .Where(m => m.Contains("[alis:execute] dispatch {"))
             .ToList();
 
         Assert.That(dispatchMessages, Has.Count.EqualTo(3),
-            "Exactly 3 dispatch traces expected (test, test-received, final)");
+            "Exactly 3 dispatch traces expected (test, testReceived, final)");
 
         Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test\"")), Is.True,
             "Dispatch trace must include event name 'test'");
-        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"test-received\"")), Is.True,
-            "Dispatch trace must include event name 'test-received'");
+        Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"testReceived\"")), Is.True,
+            "Dispatch trace must include event name 'testReceived'");
         Assert.That(dispatchMessages.Any(m => m.Contains("\"event\":\"final\"")), Is.True,
             "Dispatch trace must include event name 'final'");
 
@@ -90,7 +90,7 @@ public class WhenTraceReportsExecution : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var elementReactionMessages = _consoleMessages
+        var elementReactionMessages = ConsoleMessages
             .Where(m => m.Contains("[alis:execute]") && (m.Contains("set {") || m.Contains("call {")))
             .ToList();
 

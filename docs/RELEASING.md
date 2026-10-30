@@ -83,7 +83,7 @@ gh run list --branch main --limit 6          # CI (gate) and verify-net48 green 
 git tag -a v1.0.0-rc.4 -m "AlisReactive 1.0.0-rc.4" "$(git rev-parse origin/main)"
 git push origin v1.0.0-rc.4
 
-# 2. Watch the publish run: verify-tag -> gate (test + five browser shards + 0b) -> pack-and-publish.
+# 2. Watch the publish run: verify-tag -> gate (test + every browser shard) -> pack-and-publish.
 gh run watch "$(gh run list --workflow=nuget-publish.yml --limit 1 --json databaseId -q '.[0].databaseId')"
 ```
 
@@ -169,11 +169,10 @@ git switch -c fix/forward-port-1.0.1 origin/main && git cherry-pick <fix-sha> &&
 
 | Workflow | Runs on | Gates | Publishes? |
 |----------|---------|-------|------------|
-| `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, assets, vitest, gate-script self-tests, dotnet build, dotnet tests), five `gate / playwright (<shard>)` jobs, then `gate / behavioral coverage (0b)` over all shards | never |
+| `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, assets, vitest, consistency checks, dotnet build, dotnet tests) and five `gate / playwright (<shard>)` jobs | never |
 | `verify-net48.yml` | pushes and pull requests to `main` and `release/*` | net48 build + pack on real .NET Framework 4.8 (Windows); IIS Express boot proof of the net48 sample app | never (packs a local fixture feed) |
 | `nightly.yml` | 03:30 UTC Monday to Friday on `main`; manual | the full gate; opens or updates a `ci-nightly-failure` issue when red | never |
-| `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards + 0b, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |
-| `deploy-docs.yml` | pushes to `main` touching the docs site or the public C# surface | docs-site build | GitHub Pages |
+| `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |
 
 `nuget-publish.yml`'s `pack-and-publish` job asserts that exactly the six expected packages exist at
 the tagged version before pushing, pushes with `--skip-duplicate` (re-runs are idempotent), then
@@ -194,8 +193,9 @@ done
 ```
 
 The package page is `https://www.nuget.org/packages/AlisReactive/1.0.0-rc.4`. The consumer-side
-proof is a scratch project: `dotnet add package AlisReactive --version 1.0.0-rc.4` followed by a
-build that lands `wwwroot/scripts/alis-reactive.1.0.0-rc.4.js`
+proof is a scratch web project: `dotnet add package AlisReactive --version 1.0.0-rc.4`, then
+`dotnet run` in Development serves `~/_content/AlisReactive/js/alis-reactive.js` (the package's
+`staticwebassets/js/alis-reactive.js`)
 ([flat container API](https://learn.microsoft.com/en-us/nuget/api/package-base-address-resource)).
 
 ## Roll back
@@ -227,7 +227,7 @@ Reference: [`dotnet nuget delete`](https://learn.microsoft.com/en-us/dotnet/core
 - **On `main` (or `release/X.Y`) only.** `verify-tag` requires the tagged commit to be reachable
   from `origin/main` or an `origin/release/*` branch. Merge first, then tag the merged commit.
 - **Merging to `main` never publishes.** CI only gates; publishing requires a `v*` tag.
-- **The browser suite blocks a release.** All five shards must be green; the evidence for making
+- **The browser suite blocks a release.** Every shard must be green; the evidence for making
   it blocking is in `docs/CI.md` ("Gating"). A red shard is re-run with `gh run rerun <run-id> --failed`.
 - **Re-running a tag is safe.** `--skip-duplicate` skips already-published versions and the GitHub
   Release is updated, not duplicated.

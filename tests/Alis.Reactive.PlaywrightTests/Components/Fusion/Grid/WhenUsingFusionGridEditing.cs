@@ -1,292 +1,287 @@
-using Alis.Reactive.Fusion.Components;
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
+/// <summary>
+/// As the resident services coordinator, I want to correct, admit and move out residents on the Maple wing
+/// roster, and have the roster refuse a move into memory care that only the transfer team books, so that the
+/// roster the nurses work from matches who lives on the wing.
+/// </summary>
+/// <remarks>
+/// The roster is Amina Patel, Grace Bennett, Henry Liu, Irene Morgan (already approved for memory care and
+/// moving to Willow wing), Jonah Reed and Katherine Ortiz. Henry and Irene are due for review today; choosing
+/// one opens their row for editing. The handoff correction applies a resident's risk and open tasks from the
+/// night nurse's note to their row.
+/// Not exercised:
+/// Refresh: UpdateRow redraws the roster itself (normal-edit.js:269-280), so a Refresh after it would break
+/// unseen; WhenUsingFusionGridBilling's refresh test fails when Refresh breaks.
+/// ActionBegin's and ActionComplete's Name and Type: EJ2 sets both to the event's own name (observer.js:92;
+/// normal-edit.js:299, 421), the same on every save, so they carry nothing a page could show; the page tells a
+/// save from a cancel by RequestType.
+/// SelectedRow: an inline save reports -1, as the roster clears its selection when a row opens for editing
+/// (normal-edit.js:227-229, 300), and an added row reports 0 (normal-edit.js:651).
+/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridEditing : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Editing";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentGridEditingModel";
-    private const string ResidentNameId = GeneratedTypeScope + "__ResidentName";
-    private const string RiskLevelId = GeneratedTypeScope + "__RiskLevel";
-    private const string OpenTasksId = GeneratedTypeScope + "__OpenTasks";
+    private const string RosterId = "maple-roster";
 
-    private FusionTextBoxLocator ResidentName => new(Page, ResidentNameId);
-    private DropDownListLocator RiskLevel => new(Page, RiskLevelId);
-    private NumericTextBoxLocator OpenTasks => new(Page, OpenTasksId);
+    // The roster numbers its columns from 1.
+    private const int ResidentColumn = 2;
+    private const int CareLevelColumn = 3;
+    private const int SuiteColumn = 4;
+    private const int RiskColumn = 5;
+    private const int OpenTasksColumn = 6;
 
-    private ILocator ErrorFor(string property) => Page.Locator($"#{GeneratedTypeScope}__{property}_error");
+    private PagePlan<ResidentGridEditingModel> _plan = null!;
 
-    private async Task NavigateEditing()
+    private ILocator Roster => Page.Locator($"#{RosterId}");
+    private ILocator Rows => Page.Locator($"#{RosterId} .e-row");
+    private ILocator Cell(string resident, int column) =>
+        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator Editor(string field) => Page.Locator($"#{RosterId}{field}");
+    private ILocator RowBeingEdited => Page.Locator($"#{RosterId} .e-editedrow");
+    private ILocator Status => Page.Locator("#roster-status");
+    private ILocator TransferWarning => Page.Locator("#transfer-warning");
+    private ILocator ReviewHenry => Page.Locator("#review-henry-liu");
+    private ILocator ReviewIrene => Page.Locator("#review-irene-morgan");
+    private ILocator Edit => Page.Locator("#roster-edit");
+    private ILocator Save => Page.Locator("#roster-save");
+    private ILocator Cancel => Page.Locator("#roster-cancel");
+    private ILocator MoveOut => Page.Locator("#roster-move-out");
+    private ILocator AddRespiteStay => Page.Locator("#roster-add-respite");
+    private ILocator AdmitFromWaitingList => Page.Locator("#roster-admit");
+    private ILocator ApplyCorrection => Page.Locator("#apply-correction");
+    private ILocator CorrectionStatus => Page.Locator("#correction-status");
+
+    private FusionTextBoxLocator CorrectedResident => new(Page, _plan.FindComponent(m => m.ResidentName)!.ElementId);
+    private DropDownListLocator CorrectedRisk => _plan.DropDownList(m => m.RiskLevel);
+    private NumericTextBoxLocator CorrectedOpenTasks => _plan.NumericTextBox(m => m.OpenTasks);
+
+    private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(Page.Locator("#editing-load-status"))
-            .ToHaveTextAsync("loaded editing rows", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#resident-inline-edit-grid .e-row").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<ResidentGridEditingModel>.FromPage(Page);
+        await Expect(Rows).ToHaveCountAsync(6, new() { Timeout = 10000 });
+    }
+
+    // Opens Henry Liu's row from today's review list.
+    private async Task ReviewHenrysRow()
+    {
+        await ClickWhenStable(ReviewHenry);
+        await Expect(Editor("residentName")).ToHaveValueAsync("Henry Liu", new() { Timeout = 10000 });
+    }
+
+    private async Task FillCorrection(string resident, string risk, string openTasks)
+    {
+        await CorrectedResident.FillAndBlur(resident);
+        await CorrectedRisk.Select(risk);
+        await CorrectedOpenTasks.FillAndBlur(openTasks);
     }
 
     [Test]
-    public async Task inline_editing_methods_add_update_edit_and_delete_rows()
+    public async Task the_roster_lists_the_wings_residents_when_it_opens()
     {
-        await NavigateEditing();
+        await NavigateAndBoot();
 
-        await ClickWhenStable(Page.Locator("#inline-add-literal"));
-        await Expect(Page.Locator("#resident-inline-edit-grid")).ToContainTextAsync("Zara Inline", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#inline-add-server"));
-        await Expect(Page.Locator("#resident-inline-edit-grid")).ToContainTextAsync("Sofia Server", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-command-status")).ToHaveTextAsync(
-            "Sofia Server loaded from the server",
-            new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#inline-select-first"));
-        await ClickWhenStable(Page.Locator("#inline-start-edit"));
-        await Expect(Page.Locator("#inline-begin-row")).ToHaveTextAsync("0", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#resident-inline-edit-grid .e-editedrow")).ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#inline-close-edit"));
-        await Expect(Page.Locator("#inline-command-status")).ToHaveTextAsync("closeEdit called", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#inline-update-row"));
-        await Expect(Page.Locator("#resident-inline-edit-grid")).ToContainTextAsync("Amina Updated", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#inline-select-first"));
-        await ClickWhenStable(Page.Locator("#inline-delete-selected"));
-        await Expect(Page.Locator("#inline-command-status")).ToHaveTextAsync("deleteRecord called", new() { Timeout = 10000 });
-
+        await Expect(Rows.First).ToContainTextAsync("Amina Patel");
+        await Expect(Cell("Irene Morgan", CareLevelColumn)).ToHaveTextAsync("Memory Care");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task action_begin_save_edit_reads_typed_current_previous_and_action_fields()
+    public async Task choosing_a_resident_due_for_review_opens_their_row_for_editing()
     {
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Row"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Form"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Target"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("ForeignKeyData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("IsScroll"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("PrimaryKeyValue"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("RowData"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditActionArgs<ResidentDirectoryGridItem>).GetProperty("Index"),
-            Is.Null);
+        await NavigateAndBoot();
 
-        await NavigateEditing();
+        await ClickWhenStable(ReviewHenry);
 
-        await ClickWhenStable(Page.Locator("#inline-select-first"));
-        await ClickWhenStable(Page.Locator("#inline-start-edit"));
-        await Expect(Page.Locator("#resident-inline-edit-grid .e-editedrow"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-
-        var editInput = Page.Locator("#resident-inline-edit-grid input[name='residentName']");
-        await Expect(editInput).ToBeVisibleAsync(new() { Timeout = 10000 });
-        await editInput.FillAsync("Amina ActionBegin");
-
-        await ClickWhenStable(Page.Locator("#inline-end-edit"));
-
-        await Expect(Page.Locator("#inline-action-begin"))
-            .ToHaveTextAsync("save", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-action"))
-            .ToHaveTextAsync("edit", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-type"))
-            .ToHaveTextAsync("actionBegin", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-event"))
-            .ToHaveTextAsync("actionBegin", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-cancel"))
-            .ToHaveTextAsync("false", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-row"))
-            .ToHaveTextAsync("0", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-selected-row"))
-            .ToHaveTextAsync("-1", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-resident"))
-            .ToHaveTextAsync("Amina ActionBegin", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-action-begin-previous-resident"))
-            .ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#resident-inline-edit-grid"))
-            .ToContainTextAsync("Amina ActionBegin", new() { Timeout = 10000 });
-
+        await Expect(Editor("residentName")).ToHaveValueAsync("Henry Liu", new() { Timeout = 10000 });
+        await Expect(Editor("suite")).ToHaveValueAsync("108");
+        await Expect(Status).ToHaveTextAsync("Editing Henry Liu.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task batch_editing_exposes_cell_events_indexed_batch_payload_and_batch_changes_source()
+    public async Task a_corrected_name_is_saved_to_the_roster()
     {
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Cell"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Column"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("ColumnObject"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("IsForeignKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSaveArgs<ResidentDirectoryGridItem, int>).GetProperty("Name"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Cancel"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Cell"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Column"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("ColumnObject"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("IsForeignKey"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridCellSavedArgs<ResidentDirectoryGridItem, int>).GetProperty("Name"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridBeforeBatchSaveArgs<ResidentDirectoryGridItem>).GetProperty("Name"),
-            Is.Null);
-        Assert.That(
-            typeof(FusionGridEditEventArgsExtensions).GetMethods()
-                .Where(method => method.Name == nameof(FusionGridEditEventArgsExtensions.Cancel))
-                .Any(method => method.GetParameters()[0].ParameterType.Name.StartsWith("FusionGridCellSavedArgs")),
-            Is.False);
+        await NavigateAndBoot();
+        await Cell("Grace Bennett", ResidentColumn).ClickAsync();
+        await ClickWhenStable(Edit);
+        await Expect(Editor("residentName")).ToHaveValueAsync("Grace Bennett", new() { Timeout = 10000 });
+        await Editor("residentName").FillAsync("Grace Bennett-Holt");
 
-        await NavigateEditing();
+        await ClickWhenStable(Save);
 
-        await ClickWhenStable(Page.Locator("#batch-edit-cell"));
-        await Expect(Page.Locator("#resident-batch-edit-grid input.e-field").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Page.Locator("#resident-batch-edit-grid input.e-field").First.FillAsync("4");
-        await ClickWhenStable(Page.Locator("#batch-save-cell"));
-
-        await Expect(Page.Locator("#batch-cell-save-column")).ToHaveTextAsync("openTasks", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-save-value")).ToHaveTextAsync("4", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-save-previous")).ToHaveTextAsync("0", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-save-resident")).ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-save-cancel")).ToHaveTextAsync("false", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-saved-column")).ToHaveTextAsync("openTasks", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-saved-value")).ToHaveTextAsync("4", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-saved-previous")).ToHaveTextAsync("0", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-saved-resident")).ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#batch-update-cell"));
-        await Expect(Page.Locator("#resident-batch-edit-grid")).ToContainTextAsync("6", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#batch-gather-changes"));
-        await Expect(Page.Locator("#batch-summary")).ToHaveTextAsync(
-            "batch added 0, changed 1, deleted 0",
-            new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#batch-end-edit"));
-        await Expect(Page.Locator("#batch-before-save-tasks")).ToHaveTextAsync("6", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-before-save-resident")).ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-before-save-cancel")).ToHaveTextAsync("false", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-action-complete")).Not.ToHaveTextAsync("waiting", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#batch-edit-cell"));
-        await Expect(Page.Locator("#resident-batch-edit-grid input.e-field").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Page.Locator("#resident-batch-edit-grid input.e-field").First.FillAsync("99");
-        await ClickWhenStable(Page.Locator("#batch-save-cell"));
-        await Expect(Page.Locator("#batch-cell-save-value")).ToHaveTextAsync("99", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-save-previous")).ToHaveTextAsync("6", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-cell-save-cancelled")).ToHaveTextAsync("blocked 99", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#resident-batch-edit-grid")).ToContainTextAsync("6", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#resident-batch-edit-grid")).Not.ToContainTextAsync("99", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#batch-edit-cell"));
-        await Expect(Page.Locator("#resident-batch-edit-grid input.e-field").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Page.Locator("#resident-batch-edit-grid input.e-field").First.FillAsync("8");
-        await ClickWhenStable(Page.Locator("#batch-save-cell"));
-        await Expect(Page.Locator("#batch-cell-save-value")).ToHaveTextAsync("8", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#batch-end-edit"));
-        await Expect(Page.Locator("#batch-before-save-tasks")).ToHaveTextAsync("8", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-before-save-cancelled")).ToHaveTextAsync("blocked batch 8", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-action-complete")).ToHaveTextAsync("waiting after cancelled batch", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#resident-batch-edit-grid")).ToContainTextAsync("8", new() { Timeout = 10000 });
-
-        await ClickWhenStable(Page.Locator("#batch-gather-changes"));
-        await Expect(Page.Locator("#batch-summary")).ToHaveTextAsync(
-            "batch added 0, changed 1, deleted 0",
-            new() { Timeout = 10000 });
-        await Expect(Page.Locator("#batch-action-complete"))
-            .ToHaveTextAsync("waiting after cancelled batch", new() { Timeout = 10000 });
-
+        await Expect(Cell("Grace Bennett-Holt", ResidentColumn)).ToHaveTextAsync("Grace Bennett-Holt", new() { Timeout = 10000 });
+        await Expect(RowBeingEdited).ToHaveCountAsync(0);
+        await Expect(Status).ToHaveTextAsync("Saved Grace Bennett-Holt.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task dialog_editing_renders_builder_template_fields_and_typed_begin_event()
+    public async Task cancelling_an_edit_keeps_the_residents_details()
     {
-        await NavigateEditing();
+        await NavigateAndBoot();
+        await ReviewHenrysRow();
+        await Editor("residentName").FillAsync("Henry Lu");
 
-        await ClickWhenStable(Page.Locator("#dialog-select-first"));
-        await ClickWhenStable(Page.Locator("#dialog-start-edit"));
+        await ClickWhenStable(Cancel);
 
-        await Expect(Page.Locator("input[name='residentName']"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.Locator("select[name='riskLevel']"))
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
-        await Expect(Page.Locator("#dialog-begin-resident"))
-            .Not.ToHaveTextAsync("waiting", new() { Timeout = 10000 });
-
-        await Page.Keyboard.PressAsync("Escape");
-
+        await Expect(RowBeingEdited).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Expect(Cell("Henry Liu", ResidentColumn)).ToHaveTextAsync("Henry Liu");
+        await Expect(Status).ToHaveTextAsync("Discarded the changes to Henry Liu.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task validation_updates_grid_only_after_form_rules_pass()
+    public async Task a_move_into_memory_care_is_refused_as_a_roster_edit()
     {
-        await NavigateEditing();
+        await NavigateAndBoot();
+        await ReviewHenrysRow();
+        await Expect(Editor("careLevel")).ToHaveValueAsync("Assisted Living");
+        await Editor("careLevel").FillAsync("Memory Care");
 
-        await ClickWhenStable(Page.Locator("#validation-save-grid-row"));
-        await Expect(ErrorFor("ResidentName")).ToContainTextAsync("required", new() { Timeout = 10000 });
-        await Expect(ErrorFor("RiskLevel")).ToContainTextAsync("required", new() { Timeout = 10000 });
-        await Expect(ErrorFor("OpenTasks")).ToContainTextAsync("required", new() { Timeout = 10000 });
+        await ClickWhenStable(Save);
 
-        await ResidentName.FillAndBlur("Li");
-        await Expect(ErrorFor("ResidentName")).ToContainTextAsync("at least 3", new() { Timeout = 10000 });
+        await Expect(TransferWarning).ToHaveTextAsync(
+            "Henry Liu moves to memory care through a transfer to Willow wing, not a roster edit.", new() { Timeout = 10000 });
+        await Expect(TransferWarning).ToBeVisibleAsync();
+        await Expect(RowBeingEdited).ToHaveCountAsync(1);
+        await Expect(Status).ToHaveTextAsync("Editing Henry Liu.");
+        AssertNoConsoleErrors();
+    }
 
-        await ResidentName.FillAndBlur("Mara Validated");
-        await RiskLevel.Select("High");
-        await OpenTasks.FillAndBlur("9");
-        await ClickWhenStable(Page.Locator("#validation-save-grid-row"));
-        await Expect(ErrorFor("OpenTasks")).ToContainTextAsync("between 0 and 7", new() { Timeout = 10000 });
+    // Irene's move to memory care is already booked, so correcting her row is no move into memory care.
+    [Test]
+    public async Task a_resident_already_in_memory_care_can_still_be_corrected()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(ReviewIrene);
+        await Expect(Editor("suite")).ToHaveValueAsync("112", new() { Timeout = 10000 });
+        await Editor("suite").FillAsync("130");
 
-        await OpenTasks.FillAndBlur("4");
-        await ClickWhenStable(Page.Locator("#validation-save-grid-row"));
+        await ClickWhenStable(Save);
 
-        await Expect(Page.Locator("#validation-status")).ToContainTextAsync(
-            "Mara Validated passed validation",
-            new() { Timeout = 10000 });
-        await Expect(Page.Locator("#resident-inline-edit-grid")).ToContainTextAsync("Mara Validated", new() { Timeout = 10000 });
+        await Expect(Cell("Irene Morgan", SuiteColumn)).ToHaveTextAsync("130", new() { Timeout = 10000 });
+        await Expect(Status).ToHaveTextAsync("Saved Irene Morgan.");
+        await Expect(TransferWarning).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
 
+    [Test]
+    public async Task this_weeks_respite_guest_is_added_at_the_top_of_the_roster()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(AddRespiteStay);
+
+        await Expect(Rows).ToHaveCountAsync(7, new() { Timeout = 10000 });
+        await Expect(Rows.First).ToContainTextAsync("Walter Kim");
+        await Expect(Cell("Walter Kim", CareLevelColumn)).ToHaveTextAsync("Respite");
+        await Expect(Status).ToHaveTextAsync("Added Walter Kim to the roster.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task admitting_from_the_waiting_list_adds_the_next_resident_at_the_top()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(AdmitFromWaitingList);
+
+        await Expect(Rows).ToHaveCountAsync(7, new() { Timeout = 10000 });
+        await Expect(Rows.First).ToContainTextAsync("Rosa Diaz");
+        await Expect(Cell("Rosa Diaz", SuiteColumn)).ToHaveTextAsync("122");
+        await Expect(Status).ToHaveTextAsync("Added Rosa Diaz to the roster.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task moving_out_the_selected_resident_takes_them_off_the_roster()
+    {
+        await NavigateAndBoot();
+        await Cell("Grace Bennett", ResidentColumn).ClickAsync();
+
+        await ClickWhenStable(MoveOut);
+
+        await Expect(Rows).ToHaveCountAsync(5, new() { Timeout = 10000 });
+        await Expect(Roster).Not.ToContainTextAsync("Grace Bennett");
+        await Expect(Status).ToHaveTextAsync("Moved out Grace Bennett.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_correction_without_resident_risk_or_tasks_says_what_is_missing()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(ApplyCorrection);
+
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Name the resident to correct.", new() { Timeout = 10000 });
+        await Expect(_plan.ErrorFor(m => m.RiskLevel)).ToHaveTextAsync("Choose the resident's risk level.");
+        await Expect(_plan.ErrorFor(m => m.OpenTasks)).ToHaveTextAsync("Enter the open tasks from the handoff note.");
+        await Expect(CorrectionStatus).ToHaveTextAsync("No corrections applied yet.");
+        AssertNoConsoleErrors();
+    }
+
+    // Once a correction has been tried, a field checks itself again as the coordinator leaves it.
+    [Test]
+    public async Task a_name_too_short_to_find_a_resident_is_refused_as_the_coordinator_leaves_the_field()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(ApplyCorrection);
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Name the resident to correct.", new() { Timeout = 10000 });
+
+        await CorrectedResident.FillAndBlur("Li");
+
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Write the resident's full name.", new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task more_open_tasks_than_the_night_shift_carries_are_refused()
+    {
+        await NavigateAndBoot();
+        await FillCorrection("Henry Liu", "High", "9");
+
+        await ClickWhenStable(ApplyCorrection);
+
+        await Expect(_plan.ErrorFor(m => m.OpenTasks)).ToHaveTextAsync(
+            "The night shift carries 0 to 7 open tasks per resident.", new() { Timeout = 10000 });
+        await Expect(Cell("Henry Liu", OpenTasksColumn)).ToHaveTextAsync("6");
+        AssertNoConsoleErrors();
+    }
+
+    // Rosa Diaz is on the waiting list, not on the wing; only the server knows who lives here.
+    [Test]
+    public async Task a_correction_for_someone_not_on_the_wing_is_refused_by_the_server()
+    {
+        await NavigateAndBoot();
+        await FillCorrection("Rosa Diaz", "High", "4");
+
+        await ClickWhenStable(ApplyCorrection);
+
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync(
+            "No resident named Rosa Diaz lives on Maple wing.", new() { Timeout = 10000 });
+        await Expect(CorrectionStatus).ToHaveTextAsync("No corrections applied yet.");
+        await Expect(Rows).ToHaveCountAsync(6);
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+    }
+
+    [Test]
+    public async Task a_handoff_correction_updates_the_residents_row()
+    {
+        await NavigateAndBoot();
+        await FillCorrection("Henry Liu", "High", "4");
+
+        await ClickWhenStable(ApplyCorrection);
+
+        await Expect(CorrectionStatus).ToHaveTextAsync(
+            "Henry Liu's row now shows High risk and 4 open tasks.", new() { Timeout = 10000 });
+        await Expect(Cell("Henry Liu", RiskColumn)).ToHaveTextAsync("High", new() { Timeout = 10000 });
+        await Expect(Cell("Henry Liu", OpenTasksColumn)).ToHaveTextAsync("4");
         AssertNoConsoleErrors();
     }
 }

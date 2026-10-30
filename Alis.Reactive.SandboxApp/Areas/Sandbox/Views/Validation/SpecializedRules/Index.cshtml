@@ -1,5 +1,4 @@
 @model NewRuleTypesModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "New Rule Types";
@@ -10,7 +9,8 @@
     <native-heading level="H1">New Rule Types</native-heading>
     <native-text color="Secondary">
         Exercises all new validation rule types: creditCard, exclusiveRange, gt, lt,
-        notEqual, notEqualTo, url, and empty. Each field validates on submit and live on blur.
+        notEqual, notEqualTo, url, and empty. Each field validates on submit and live on blur, and the
+        server checks the same rules on what the form sends, so the two give one answer.
     </native-text>
 
     <native-card>
@@ -62,22 +62,21 @@
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
                 p.Post(Url.SandboxRoute("ValidateClient", "NewRuleTypes"))
+                 .Gather(g => g.Form())
                  .Validate<NewRuleTypesValidator>("new-rules-form")
-                 .Response(r => r.OnSuccess(s =>
-                 {
-                     s.Element("new-rules-result").SetText("All new rule types passed!");
-                     s.Element("new-rules-result").AddClass("text-green-600");
-                     s.Element("new-rules-result").RemoveClass("text-text-muted");
-                 }));
+                 .Response(r => r
+                     .OnSuccess(s =>
+                     {
+                         s.Element("new-rules-result").Text.Set("All new rule types passed!");
+                         s.Element("new-rules-result").ClassList.Add("text-green-600");
+                         s.Element("new-rules-result").ClassList.Remove("text-text-muted");
+                     })
+                     .OnError(400, e => e.ValidationErrors("new-rules-form")));
             }))
         <p id="new-rules-result" class="mt-3 text-sm text-text-muted">Click to validate</p>
     </native-card-body>
     </native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

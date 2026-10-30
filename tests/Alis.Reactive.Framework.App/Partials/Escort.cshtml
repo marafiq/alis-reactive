@@ -1,0 +1,12 @@
+@using Alis.Reactive.Framework.App.Partials
+@model EscortPage
+@{
+    ViewData["Title"] = "An escort";
+}
+<h1>The escort for an appointment</h1>
+
+@* The page has no plan of its own: each escort's line checks itself and shows the server's answer on this form. *@
+<form id="escort-form">
+    @Html.EditorFor(m => m.Driver)
+    @Html.EditorFor(m => m.Aide)
+</form>

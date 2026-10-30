@@ -1,220 +1,198 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ProgressButton
 @model FusionProgressButtonModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "FusionProgressButton";
+    ViewData["Title"] = "Medication Pass Report";
 
-    const string buttonId = "resident-progress-button";
+    const string SendId = "send-report";
+    const int UploadMilliseconds = 6000;
+    const double DraftPercentSent = 60;
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+
     var plan = Html.ReactivePlan<FusionProgressButtonModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
+    var pharmacies = new[]
     {
-        var button = p.Component<FusionProgressButton>(buttonId);
-        button.SetContent("Ready Save");
-        button.SetProgressEnabled(true);
-        p.Element("content-echo").SetText(button.Content());
-        p.Element("progress-enabled-echo").SetText(button.ProgressEnabled());
-    }));
+        new SelectListItem("Lakeside Pharmacy", "Lakeside"),
+        new SelectListItem("Riverside Pharmacy", "Riverside"),
+        new SelectListItem("County Pharmacy (fax)", "County")
+    };
+
+    FusionProgressButton Report(PipelineBuilder<FusionProgressButtonModel> p) => p.Component<FusionProgressButton>(SendId);
+
+    // How much of the report this send carries: a send that starts less than one step in carries all of it,
+    // one that starts further in carries the rest of a send that stopped part-way.
+    void DescribeStart(PipelineBuilder<FusionProgressButtonModel> p, FusionProgressButtonProgressArgs args)
+    {
+        p.Element("report-sent").Hide();
+        p.When(args.Percent).Lt(args.Step)
+            .Then(whole =>
+            {
+                whole.Element("send-rest").Hide();
+                whole.Element("send-whole").Show();
+            })
+            .Else(rest =>
+            {
+                rest.Element("send-rest-from").Text.Set(args.Percent);
+                rest.Element("send-whole").Hide();
+                rest.Element("send-rest").Show();
+            });
+    }
+
+    // An upload shows how much of the report has gone; a fax only says it is going.
+    void ShowProgress(PipelineBuilder<FusionProgressButtonModel> p, FusionProgressButtonProgressArgs args) =>
+        p.When(Report(p).EnableProgress).Truthy()
+            .Then(upload =>
+            {
+                upload.Element("send-percent").Text.Set(args.Percent);
+                upload.Element("send-faxing").Hide();
+                upload.Element("send-progress").Show();
+            })
+            .Else(fax =>
+            {
+                fax.Element("send-progress").Hide();
+                fax.Element("send-faxing").Show();
+            });
+
+    // A pharmacy that confirms it has the report ends the upload there and then.
+    void SendToPharmacy(PipelineBuilder<FusionProgressButtonModel> p) =>
+        p.Post(Url.SandboxRoute("Send", "ProgressButton"))
+            .Gather<MedicationPassSendRequest>(g => g.Set(x => x.Pharmacy, p.Component<NativeDropDown>(m => m.Pharmacy).Value))
+            .Response(r => r.OnSuccess<MedicationPassSendReply>((json, s) =>
+            {
+                s.Element("pharmacy-reply").Text.Set(json.Get(x => x.Reply));
+                s.Element("pharmacy-reply").Show();
+                s.When(json.Get(x => x.ConfirmedOnReceipt)).Truthy()
+                    .Then(confirmed => Report(confirmed).ProgressComplete());
+            }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionProgressButton</native-heading>
+    <native-heading level="H1">Medication Pass Report</native-heading>
+    <native-text color="Secondary">Evening shift, Maple wing. Rosa Alvarez, LPN, sends the pass to the pharmacy before handoff.</native-text>
 
     <native-card><native-card-body>
-        <native-heading level="H2">Runtime Progress</native-heading>
-        <native-hstack gap="Base" align="Center">
-            @(Html.FusionProgressButton(plan, buttonId, b => b
-                .Content("Initial Save")
-                .CssClass("care-progress")
-                .Duration(500)
-                .EnableProgress(false))
-                .Reactive(evt => evt.Began, (args, p) =>
+        <native-heading level="H2">Evening pass</native-heading>
+        <p class="text-sm mt-2">18 residents. 64 doses given, 2 refused, 1 held.</p>
+        <ul class="text-sm list-disc pl-5 mt-2">
+            <li>Room 112, Harold Finch: metoprolol 25 mg refused</li>
+            <li>Room 118, Edith Moore: donepezil 10 mg refused</li>
+            <li>Room 124, Walter Ruiz: warfarin 5 mg held, INR pending</li>
+        </ul>
+
+        <native-vstack gap="Sm" class="mt-6">
+            @{ Html.InputField(plan, m => m.PassChecked, o => o.Label("I checked every resident's medications on this pass"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border"))
+                .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.Element("begin-percent").SetText(args, x => x.Percent);
-                    p.Element("begin-duration").SetText(args, x => x.CurrentDuration);
-                    p.Element("begin-step").SetText(args, x => x.Step);
-                    p.When(args, x => x.Percent).Eq(0d)
-                        .Then(t => t.Element("begin-condition").SetText("begin zero"))
-                        .Else(e => e.Element("begin-condition").SetText("begin nonzero"));
+                    p.When(args.Checked).Truthy()
+                        .Then(ready =>
+                        {
+                            var report = Report(ready);
+                            report.Disabled.Set(false);
+                            report.DataBind();
+                            report.FocusIn();
+                        })
+                        .Else(notReady =>
+                        {
+                            var report = Report(notReady);
+                            report.Disabled.Set(true);
+                            report.DataBind();
+                        });
+                }); }
+
+            @{ Html.InputField(plan, m => m.Pharmacy, o => o.Label("Pharmacy"))
+                .NativeDropDown(b => b
+                    .Items(pharmacies)
+                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    // A fax reports no upload progress, so the button only spins.
+                    p.When(args.Value).Eq("County")
+                        .Then(fax => Report(fax).EnableProgress.Set(false))
+                        .Else(upload => Report(upload).EnableProgress.Set(true));
+                    Report(p).DataBind();
+                }); }
+        </native-vstack>
+
+        <native-hstack gap="Base" align="Center" class="mt-6">
+            @(Html.FusionProgressButton(plan, SendId, b => b
+                .Content("Send to pharmacy")
+                .CssClass("e-primary")
+                .Disabled(true)
+                .EnableProgress(true)
+                .Duration(UploadMilliseconds))
+                .Reactive(evt => evt.Begin, (args, p) =>
+                {
+                    DescribeStart(p, args);
+                    ShowProgress(p, args);
+                    SendToPharmacy(p);
                 })
-                .Reactive(evt => evt.Progressed, (args, p) =>
+                .Reactive(evt => evt.Progress, (args, p) =>
                 {
-                    p.Element("progress-percent").SetText(args, x => x.Percent);
-                    p.Element("progress-duration").SetText(args, x => x.CurrentDuration);
-                    p.Element("progress-step").SetText(args, x => x.Step);
-                    p.When(args, x => x.Percent).Gte(60d)
-                        .Then(t => t.Element("progress-condition").SetText("at least sixty"))
-                        .Else(e => e.Element("progress-condition").SetText("below sixty"));
+                    // Only a resumed send's first moment has no time behind it; a fresh send starts with Begin.
+                    p.When(args.CurrentDuration).Eq(0d).Then(resumed => DescribeStart(resumed, args));
+                    ShowProgress(p, args);
                 })
-                .Reactive(evt => evt.Ended, (args, p) =>
+                .Reactive(evt => evt.End, (_, p) =>
                 {
-                    p.Element("end-percent").SetText(args, x => x.Percent);
-                    p.Element("end-duration").SetText(args, x => x.CurrentDuration);
-                    p.Element("end-step").SetText(args, x => x.Step);
-                    p.When(args, x => x.Percent).Eq(100d)
-                        .Then(t => t.Element("end-condition").SetText("complete"))
-                        .Else(e => e.Element("end-condition").SetText("incomplete"));
+                    var report = Report(p);
+                    report.Content.Set("Sent");
+                    report.CssClass.Set("e-success");
+                    report.DataBind();
+                    p.Element("send-progress").Hide();
+                    p.Element("send-faxing").Hide();
+                    p.Element("report-sent").Show();
+                    p.Element("saved-draft").Hide();
                 }))
         </native-hstack>
 
-        <native-hstack gap="Sm" class="mt-4 flex-wrap">
-            @(Html.NativeButton("set-content-btn", "Set Content")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetContent("Discharge Save");
-                    p.Element("content-echo").SetText(button.Content());
-                    p.Element("command-state").SetText("content set");
-                }))
-            @(Html.NativeButton("disable-progress-button-btn", "Disable")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetDisabled(true);
-                    p.Element("disabled-echo").SetText(button.Disabled());
-                    p.Element("command-state").SetText("disabled");
-                }))
-            @(Html.NativeButton("enable-progress-button-btn", "Enable")
-                .CssClass("rounded-md bg-secondary px-4 py-2 text-sm font-medium text-white hover:bg-secondary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetDisabled(false);
-                    p.Element("disabled-echo").SetText(button.Disabled());
-                    p.Element("command-state").SetText("enabled");
-                }))
-            @(Html.NativeButton("set-css-btn", "Set Css")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetCssClass("e-success extra-class");
-                    p.Element("css-echo").SetText(button.CssClass());
-                    p.Element("command-state").SetText("css set");
-                }))
-            @(Html.NativeButton("enable-progress-btn", "Enable Progress")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetProgressEnabled(true);
-                    p.Element("progress-enabled-echo").SetText(button.ProgressEnabled());
-                    p.Element("command-state").SetText("progress enabled");
-                }))
-            @(Html.NativeButton("disable-progress-btn", "Disable Progress")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var button = p.Component<FusionProgressButton>(buttonId);
-                    button.SetProgressEnabled(false);
-                    p.Element("progress-enabled-echo").SetText(button.ProgressEnabled());
-                    p.Element("command-state").SetText("progress disabled");
-                }))
-            @(Html.NativeButton("start-progress-btn", "Start")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionProgressButton>(buttonId).Start();
-                    p.Element("start-state").SetText("start called");
-                }))
-            @(Html.NativeButton("start-at-progress-btn", "Start At 60")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionProgressButton>(buttonId).StartAt(60d);
-                    p.Element("start-state").SetText("start at 60 called");
-                }))
-            @(Html.NativeButton("complete-progress-btn", "Complete")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionProgressButton>(buttonId).ProgressComplete();
-                    p.Element("complete-state").SetText("complete called");
-                }))
-            @(Html.NativeButton("focus-progress-btn", "Focus")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionProgressButton>(buttonId).FocusIn();
-                    p.Element("focus-state").SetText("focus called");
-                }))
-            @(Html.NativeButton("check-progress-enabled-btn", "Check Progress")
-                .CssClass("rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var button = p.Component<FusionProgressButton>(buttonId);
-                    p.When(button.ProgressEnabled()).Truthy()
-                        .Then(t => t.Element("progress-enabled-state").SetText("progress enabled"))
-                        .Else(e => e.Element("progress-enabled-state").SetText("progress disabled"));
-                }))
-        </native-hstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Gather</native-heading>
-        @(Html.NativeButton("gather-btn", "Gather ProgressButton")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var button = p.Component<FusionProgressButton>(buttonId);
-                p.Post(Url.SandboxRoute("Echo", "ProgressButton"))
-                    .Gather(g =>
-                    {
-                        g.Include(button.Content(), "content");
-                        g.Include(button.Disabled(), "disabled");
-                        g.Include(button.CssClass(), "cssClass");
-                        g.Include(button.ProgressEnabled(), "progressEnabled");
-                    })
-                    .Response(r => r.OnSuccess<FusionProgressButtonEchoResponse>((json, s) =>
-                    {
-                        s.Element("gather-content").SetText(json, x => x.Content);
-                        s.Element("gather-disabled").SetText(json, x => x.Disabled);
-                        s.Element("gather-css").SetText(json, x => x.CssClass);
-                        s.Element("gather-progress-enabled").SetText(json, x => x.ProgressEnabled);
-                        s.Element("gather-summary").SetText(json, x => x.Summary);
-                    }));
-            }))
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">Trace</native-heading>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Command: <span id="command-state" class="text-text-muted">pending</span></p>
-            <p>Content echo: <span id="content-echo" class="text-text-muted">pending</span></p>
-            <p>Disabled echo: <span id="disabled-echo" class="text-text-muted">pending</span></p>
-            <p>Css echo: <span id="css-echo" class="text-text-muted">pending</span></p>
-            <p>Progress enabled echo: <span id="progress-enabled-echo" class="text-text-muted">pending</span></p>
-            <p>Progress enabled state: <span id="progress-enabled-state" class="text-text-muted">pending</span></p>
-            <p>Start state: <span id="start-state" class="text-text-muted">pending</span></p>
-            <p>Complete state: <span id="complete-state" class="text-text-muted">pending</span></p>
-            <p>Focus state: <span id="focus-state" class="text-text-muted">pending</span></p>
-            <p>Begin percent: <span id="begin-percent" class="text-text-muted">pending</span></p>
-            <p>Begin duration: <span id="begin-duration" class="text-text-muted">pending</span></p>
-            <p>Begin step: <span id="begin-step" class="text-text-muted">pending</span></p>
-            <p>Begin condition: <span id="begin-condition" class="text-text-muted">pending</span></p>
-            <p>Progress percent: <span id="progress-percent" class="text-text-muted">pending</span></p>
-            <p>Progress duration: <span id="progress-duration" class="text-text-muted">pending</span></p>
-            <p>Progress step: <span id="progress-step" class="text-text-muted">pending</span></p>
-            <p>Progress condition: <span id="progress-condition" class="text-text-muted">pending</span></p>
-            <p>End percent: <span id="end-percent" class="text-text-muted">pending</span></p>
-            <p>End duration: <span id="end-duration" class="text-text-muted">pending</span></p>
-            <p>End step: <span id="end-step" class="text-text-muted">pending</span></p>
-            <p>End condition: <span id="end-condition" class="text-text-muted">pending</span></p>
-            <p>Gather content: <span id="gather-content" class="text-text-muted">pending</span></p>
-            <p>Gather disabled: <span id="gather-disabled" class="text-text-muted">pending</span></p>
-            <p>Gather css: <span id="gather-css" class="text-text-muted">pending</span></p>
-            <p>Gather progress enabled: <span id="gather-progress-enabled" class="text-text-muted">pending</span></p>
-            <p>Gather summary: <span id="gather-summary" class="text-text-muted">pending</span></p>
+        <native-vstack gap="Xs" class="mt-4">
+            <p id="send-whole" hidden class="text-sm font-medium">Sending the whole report.</p>
+            <p id="send-rest" hidden class="text-sm font-medium">Sending the rest of the report: <span id="send-rest-from"></span>% had already reached the pharmacy.</p>
+            <p id="send-progress" hidden class="text-sm"><span id="send-percent">0</span>% sent</p>
+            <p id="send-faxing" hidden class="text-sm">Faxing the report.</p>
+            <p id="report-sent" hidden class="text-sm font-medium text-green-700">Report sent.</p>
+            <p id="pharmacy-reply" hidden class="text-sm text-text-muted"></p>
         </native-vstack>
     </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </native-card-body></native-card>
+    <div id="saved-draft">
+        <native-card><native-card-body>
+            <native-heading level="H2">Saved draft</native-heading>
+            <p class="text-sm mt-2">Your 6:58 PM send stopped at @DraftPercentSent% when the connection dropped.</p>
+
+            <native-hstack gap="Sm" class="mt-4 flex-wrap">
+                @(Html.NativeButton("resume-draft-btn", "Resume sending")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                    {
+                        p.When(Report(p).Disabled).Truthy()
+                            .Then(notReady => notReady.Element("draft-warning").Show())
+                            .Else(ready =>
+                            {
+                                ready.Element("draft-warning").Hide();
+                                Report(ready).StartAt(DraftPercentSent);
+                                SendToPharmacy(ready);
+                            });
+                    }))
+                @(Html.NativeButton("send-again-btn", "Send it all again")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                    {
+                        p.When(Report(p).Disabled).Truthy()
+                            .Then(notReady => notReady.Element("draft-warning").Show())
+                            .Else(ready =>
+                            {
+                                ready.Element("draft-warning").Hide();
+                                Report(ready).Start();
+                            });
+                    }))
+            </native-hstack>
+            <p id="draft-warning" hidden class="mt-2 text-sm text-red-700">Check off the medication pass before sending it.</p>
+        </native-card-body></native-card>
+    </div>
 </native-vstack>
 
 @Html.RenderPlan(plan)

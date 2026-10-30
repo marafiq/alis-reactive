@@ -1,0 +1,27 @@
+@using Alis.Reactive.Framework.App.Slots
+@model KinCard
+@{
+    var plan = Html.ReactivePlan<KinCard>();
+}
+<section id="card">
+    <h2>Next of kin</h2>
+
+    @(plan.Slate("card-slate", title: "Visits", "Monday", "Tuesday")
+        .Reactive(slate => slate.RowAdded, (added, p) => p.Element("card-status").Text.Set(added.Label)))
+    <p>Card status: <span id="card-status"></span></p>
+
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Next of kin")).Entry(); }
+    <p>The endpoint bound: <span id="kin-bound"></span></p>
+
+    @(plan.Button("save-kin", "Save the next of kin")
+        .Reactive(button => button.Click, p => p.Post("/Slots/Kin")
+            .Gather(g => g.Form())
+            .Validate<KinRules>("card")
+            .Response(r => r
+                .OnSuccess<KinEcho>((echo, s) => s.Element("kin-bound").Text.Set(echo.Get(x => x.Summary)))
+                .OnError(400, e => e.ValidationErrors("card")))))
+</section>
+
+@{ Html.On(plan, t => t.CustomEvent(DeskEvents.Rang, (rang, p) => p.Element("card-heard").Text.Set(rang.Get(x => x.Times)))); }
+
+@Html.RenderPlan(plan)

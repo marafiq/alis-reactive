@@ -1,0 +1,190 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInPacket
+@model MoveInPacketModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.DropDowns
+@{
+    ViewData["Title"] = "Move-in Packet";
+
+    const string FormId = "move-in-packet";
+    const string InputCss = "rounded-md border border-border px-3 py-1.5 text-sm";
+    const string ButtonPrimary = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors";
+
+    var plan = Html.ReactivePlan<MoveInPacketModel>();
+    var mobility = new List<SelectListItem> { new("Walks unaided", "unaided"), new("Uses a walker", "walker"), new("Uses a wheelchair", "wheelchair") };
+    var physicians = new[] { "Dr. Anika Patel", "Dr. Samuel Okafor", "Dr. Helen Brooks" };
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Move-in Packet</native-heading>
+        <native-text color="Secondary">Maple Grove admissions. Complete the new resident's move-in packet, save it to her record, and send it to the business office.</native-text>
+    </div>
+
+    <div id="@FormId"><native-vstack gap="Lg">
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">Resident</native-heading>
+                @Html.HiddenFieldFor(plan, m => m.ResidentId)
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+                        .NativeTextBox(b => b.Placeholder("Full name").CssClass(InputCss)); }
+
+                    @{ Html.InputField(plan, m => m.FamilyPhone, o => o.Label("Family phone"))
+                        .FusionInputMask(b => b.Mask("(000) 000-0000").Placeholder("(555) 555-5555")); }
+                </native-grid>
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care level"))
+                        .NativeRadioGroup(b => b
+                            .Option("independent", "Independent living")
+                            .Option("assisted", "Assisted living")
+                            .Option("memory", "Memory care")); }
+
+                    @{ Html.InputField(plan, m => m.Mobility, o => o.Label("Mobility"))
+                        .NativeDropDown(b => b.Items(mobility).Placeholder("-- How does she get about? --").CssClass(InputCss)); }
+                </native-grid>
+            </native-vstack>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">Care</native-heading>
+                <native-grid cols="C2" gap="Base">
+                    <native-vstack gap="Sm">
+                        @{ Html.InputField(plan, m => m.HasAllergies, o => o.Label("Has allergies"))
+                            .NativeCheckBox(); }
+                        @{ Html.InputField(plan, m => m.Allergies, o => o.Label("Allergies"))
+                            .NativeCheckList(b => b
+                                .Option("Peanuts")
+                                .Option("Shellfish")
+                                .Option("Penicillin")
+                                .Option("Latex")); }
+                    </native-vstack>
+
+                    @{ Html.InputField(plan, m => m.Diet, o => o.Label("Diet"))
+                        .FusionMultiSelect(b => b
+                            .DataSource(PacketDiet.All)
+                            .Fields<PacketDiet>(t => t.Name, v => v.Code)
+                            .Placeholder("Regular diet")
+                            .Mode(VisualMode.Box)); }
+                </native-grid>
+
+                @{ Html.InputField(plan, m => m.CareNotes, o => o.Label("Care notes"))
+                    .NativeTextArea(b => b.Rows(3).Placeholder("What the care team should know on her first day").CssClass(InputCss + " w-full")); }
+
+                @{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care plan"))
+                    .FusionRichTextEditor(b => b.Placeholder("Her daily care plan")); }
+            </native-vstack>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">Schedule</native-heading>
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.MoveInDay, o => o.Label("Move-in day"))
+                        .FusionDatePicker(b => b.Placeholder("Choose the move-in day")); }
+
+                    @{ Html.InputField(plan, m => m.MedicationTime, o => o.Label("Morning medication"))
+                        .FusionTimePicker(b => b.Placeholder("Choose the time")); }
+                </native-grid>
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.PhysicianVisit, o => o.Label("First physician visit"))
+                        .FusionDateTimePicker(b => b.Placeholder("Choose the day and time")); }
+
+                    @{ Html.InputField(plan, m => m.TrialStay, o => o.Label("Trial stay"))
+                        .FusionDateRangePicker(b => b.Placeholder("Choose the first and last day")); }
+                </native-grid>
+            </native-vstack>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-vstack gap="Base">
+                <native-heading level="H2">Billing</native-heading>
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.Community, o => o.Label("Community"))
+                        .FusionDropDownList(b => b
+                            .DataSource(PacketCommunity.All)
+                            .Fields<PacketCommunity>(t => t.Name, v => v.Code)
+                            .Placeholder("Choose the community")); }
+
+                    @{ Html.InputField(plan, m => m.Insurance, o => o.Label("Insurance"))
+                        .FusionMultiColumnComboBox(b => b
+                            .DataSource(PacketInsurer.All)
+                            .Fields<PacketInsurer>(t => t.Name, v => v.Code)
+                            .Columns(col =>
+                            {
+                                col.Field(Field.Of((PacketInsurer i) => i.Name).Name).Header("Insurer").Width("160").Add();
+                                col.Field(Field.Of((PacketInsurer i) => i.Kind).Name).Header("Kind").Width("120").Add();
+                            })
+                            .Placeholder("Choose the insurer")
+                            .PopupWidth("300")); }
+                </native-grid>
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.Physician, o => o.Label("Attending physician"))
+                        .FusionAutoComplete(b => b
+                            .DataSource(physicians)
+                            .Placeholder("Search physicians")); }
+
+                    @{ Html.InputField(plan, m => m.MonthlyRate, o => o.Label("Monthly rate"))
+                        .FusionNumericTextBox(b => b.Min(0).Max(20000).Step(50).Format("c2")); }
+                </native-grid>
+                @{ Html.InputField(plan, m => m.TextFamilyUpdates, o => o.Label("Text the family when her care changes"))
+                    .FusionSwitch(); }
+            </native-vstack>
+        </native-card-body></native-card>
+    </native-vstack></div>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("save-packet-btn", "Save the packet")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Save", "MoveInPacket")).Gather(g => g.Form())
+                 .Validate<MoveInPacketValidator>(FormId)
+                 .Response(r => r.OnSuccess<PacketReceipt>((received, s) =>
+                 {
+                     s.Element("packet-status").Text.Set(received.Get(x => x.Status));
+                     s.Element("receipt-resident").Text.Set(received.Get(x => x.Resident));
+                     s.Element("receipt-care").Text.Set(received.Get(x => x.Care));
+                     s.Element("receipt-schedule").Text.Set(received.Get(x => x.Schedule));
+                     s.Element("receipt-billing").Text.Set(received.Get(x => x.Billing));
+                     s.Element("packet-receipt").Show();
+                 }));
+            }))
+        @(Html.NativeButton("send-packet-btn", "Send to the business office")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                // The business office's intake takes the packet as a form post.
+                p.Post(Url.SandboxRoute("SendToBusinessOffice", "MoveInPacket")).Gather(g => g.Form())
+                 .AsFormData()
+                 .Validate<MoveInPacketValidator>(FormId)
+                 .Response(r => r.OnSuccess<PacketReceipt>((received, s) =>
+                 {
+                     s.Element("packet-status").Text.Set(received.Get(x => x.Status));
+                     s.Element("receipt-resident").Text.Set(received.Get(x => x.Resident));
+                     s.Element("receipt-care").Text.Set(received.Get(x => x.Care));
+                     s.Element("receipt-schedule").Text.Set(received.Get(x => x.Schedule));
+                     s.Element("receipt-billing").Text.Set(received.Get(x => x.Billing));
+                     s.Element("packet-receipt").Show();
+                 }));
+            }))
+    </native-hstack>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <p id="packet-status" class="text-sm font-medium">Not saved yet.</p>
+            <div id="packet-receipt" hidden>
+                <native-vstack gap="Xs">
+                    <p id="receipt-resident" class="text-sm"></p>
+                    <p id="receipt-care" class="text-sm"></p>
+                    <p id="receipt-schedule" class="text-sm"></p>
+                    <p id="receipt-billing" class="text-sm"></p>
+                </native-vstack>
+            </div>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -8,6 +8,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public string? RoomCode { get; set; }
         public string? ProspectName { get; set; }
+
+        /// <summary>The family agrees that the hold lapses after 48 hours.</summary>
+        public bool FamilyAgreedToHoldTerms { get; set; }
     }
 
     /// <summary>The confirmation the server returns once the room is held.</summary>

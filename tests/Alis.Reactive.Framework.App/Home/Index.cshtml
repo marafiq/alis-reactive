@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Slices";
+}
+<h1>The framework, slice by slice</h1>
+<ul>
+    <li><a href="/Members/Properties">Members: properties read, written, and both</a></li>
+    <li><a href="/Members/Objects">Members: a nested object, a returned object, and lists</a></li>
+    <li><a href="/Members/Data">Members: data a component holds, fields named by member, and declared arguments</a></li>
+    <li><a href="/Members/Methods">Members: methods with and without arguments, results, and async</a></li>
+    <li><a href="/Members/Kinds">Members: values a component keeps as another kind than their member's type</a></li>
+    <li><a href="/Events/Slate">Events: a slate's events, their payloads, and a nested object's event</a></li>
+    <li><a href="/Vendors/CallbackProperties">Vendors: listeners as callback properties</a></li>
+    <li><a href="/Vendors/Element">Vendors: the element as the object, DOM events</a></li>
+    <li><a href="/Elements/Panel">Elements: shown, hidden and their classes; the app's banner; another model's input; an event with no payload</a></li>
+    <li><a href="/Vendors/SharedCallback">Vendors: one callback property heard by the page and by slots</a></li>
+    <li><a href="/Vendors/Unbuilt">Vendors: a component its script has not built</a></li>
+    <li><a href="/Vendors/UnbuiltInput">Vendors: an input whose component its script has not built</a></li>
+    <li><a href="/Vendors/NewerDeclaration">Vendors: a declaration newer than its component</a></li>
+    <li><a href="/Plugins/Tally">Plugins: a plugin the page registers by name</a></li>
+    <li><a href="/Plugins/Ledger">Plugins: a plugin no script registered</a></li>
+    <li><a href="/Plugins/Refused?bundle=SecondTally">Plugins: a plugin name registered twice, refused as the page starts</a></li>
+    <li><a href="/Inputs/Admit">Inputs: entries gathered, converted and validated</a></li>
+    <li><a href="/Inputs/Booking">Inputs: typed text sent as a day, a moment and a number, kept when it is none</a></li>
+    <li><a href="/Inputs/Arrival">Inputs: a field's wrapper by its options: a label, a required marker, none, hidden</a></li>
+    <li><a href="/Inputs/Room">Inputs: inputs labelled by the ids the framework gives them</a></li>
+    <li><a href="/Inputs/Care">Inputs: enum members chosen, checked, compared and set</a></li>
+    <li><a href="/Inputs/Contacts">Inputs: one card rendered for two members of the page</a></li>
+    <li><a href="/Inputs/Depart?rendering=TwiceOnOnePlan">Inputs: a member's field rendered twice on one plan, refused</a></li>
+    <li><a href="/Inputs/Depart?rendering=AgainInAPartial">Inputs: a member's field rendered again by a partial's plan, refused</a></li>
+    <li><a href="/Slots/Desk">Slots: a partial loaded into a slot and unloaded from it</a></li>
+    <li><a href="/Slots/Lounge">Slots: a slot released even when releasing one of its handlers fails</a></li>
+    <li><a href="/Slots/Hall">Slots: a slot inside a slot, answers that are not HTML or have no plan, and a vendor script</a></li>
+    <li><a href="/Slots/PassDesk">Slots: a step that writes beside a slot, and the writes over a slot a page is refused for</a></li>
+    <li><a href="/Plans/Contacts">Plans: two cards of one model, each starting a plan of its own</a></li>
+    <li><a href="/Plans/Noticeboard">Plans: the plans in loaded HTML, and HTML whose plan is not JSON</a></li>
+    <li><a href="/Rendering/Handover">Rendering: a plan rendered in the layout's last section takes what an earlier section wrote</a></li>
+    <li><a href="/Rendering/NotesInASection">Rendering: an input written after its plan rendered, refused</a></li>
+    <li><a href="/Rendering/SaveInASection">Rendering: behavior written after its plan rendered, refused</a></li>
+    <li><a href="/Rendering/RenderedTwice">Rendering: a plan rendered twice, refused</a></li>
+    <li><a href="/Rendering/Rounds?card=InTheCardsBody">Rendering: a partial's plan rendered in its body, beside the page's</a></li>
+    <li><a href="/Rendering/Rounds?card=WhenItsButtonIsWritten">Rendering: a partial's plan a helper renders when its markup is written</a></li>
+    <li><a href="/Rendering/Relief?prefix=BeforeThePlanStarts">Rendering: a view's field prefix taken before its plan starts</a></li>
+    <li><a href="/Rendering/Relief?prefix=AfterThePlanStarts">Rendering: a view's field prefix changed after its plan started, refused</a></li>
+    <li><a href="/Requests/Booking">Requests: any error read by its typed body</a></li>
+    <li><a href="/Requests/Desk">Requests: every verb, gather, format, answer and order</a></li>
+    <li><a href="/Requests/Outage">Requests: a request that cannot be built, an answer that cannot be handled, a dropped connection</a></li>
+    <li><a href="/Requests/Census">Requests: lists and left-out values in a query, a form post and JSON</a></li>
+    <li><a href="/Triggers/Arrival?resident=Ada&amp;wing=East&amp;floor=3">Triggers: the page ready, read with its URL</a></li>
+    <li><a href="/Triggers/Announcements">Triggers: the app's own events announced and heard</a></li>
+    <li><a href="/Validation/Visit">Validation: rules written once, checked on both sides</a></li>
+    <li><a href="/Validation/Checks">Validation: every check the validator offers</a></li>
+    <li><a href="/Validation/Household">Validation: a list's items, a child and included rules, on both sides</a></li>
+    <li><a href="/Validation/Escort">Validation: a rule under each form of condition the browser reads</a></li>
+    <li><a href="/Validation/Notice">Validation: the messages a rule says, in the browser and from the server</a></li>
+    <li><a href="/Validation/Bounds">Validation: a bound written every way a comparison is written</a></li>
+    <li><a href="/Validation/Sameness">Validation: equality and order under every shape</a></li>
+    <li><a href="/Validation/Guest">Validation: a generic validator registered for one model, and a rule with no guard</a></li>
+    <li><a href="/Validation/OutingNotes">Validation: a form's summary the page places with Html.FormSummary</a></li>
+    <li><a href="/Validation/OutingNotes?placedTwice=true">Validation: a form's summary placed twice, refused</a></li>
+    <li><a href="/Realtime/Round">Realtime: server-sent events and a SignalR hub</a></li>
+    <li><a href="/Arrays/Sources">Arrays: read from a response, a component, a method and an element</a></li>
+    <li><a href="/Arrays/Filters">Arrays: filtered by each kind of predicate</a></li>
+    <li><a href="/Arrays/Projections">Arrays: a member of each item, and a text method applied to it</a></li>
+    <li><a href="/Arrays/Orders">Arrays: ordered by text, number, date, moment and flag, and chained</a></li>
+    <li><a href="/Arrays/Questions">Arrays: a count, whether any or all, a sum, the first found</a></li>
+    <li><a href="/Arrays/Results">Arrays: a result passed to a method, written into a property, sent in a request</a></li>
+    <li><a href="/Arrays/Refused?mistake=OrderByARecord">Arrays: a lambda the browser cannot run, refused when the page renders</a></li>
+    <li><a href="/Conditions/Levels">Conditions: a number compared with fixed values, a range and truthiness</a></li>
+    <li><a href="/Conditions/Goal">Conditions: a number compared with another value read when the condition runs</a></li>
+    <li><a href="/Conditions/Names">Conditions: text compared, tested, matched and found in a set</a></li>
+    <li><a href="/Conditions/Round">Conditions: a list holding an item, and an empty list</a></li>
+    <li><a href="/Conditions/Shifts?starts=07:00:00">Conditions: a time of day and a flag ordered</a></li>
+    <li><a href="/Conditions/Visit">Conditions: a day that may be missing, compared with a fixed day</a></li>
+    <li><a href="/Conditions/Stay">Conditions: a day compared with another day read when the condition runs</a></li>
+    <li><a href="/Conditions/Triage">Conditions: and, or, not, and groups</a></li>
+    <li><a href="/Conditions/Groups">Conditions: a group at every place a condition takes one</a></li>
+    <li><a href="/Conditions/CarePlan">Conditions: When, ElseIf and Else in authored order</a></li>
+    <li><a href="/Conditions/Availability">Conditions: a term that awaits a method, asked only when reached</a></li>
+    <li><a href="/Conditions/Decisions">Conditions: a term that asks the user, asked only when reached</a></li>
+    <li><a href="/Conditions/ElseIfAfterElse">Conditions: an ElseIf after the Else, refused</a></li>
+    <li><a href="/Conditions/ElseTwice">Conditions: a second Else, refused</a></li>
+    <li><a href="/Conditions/NegativeMinLength">Conditions: a negative minimum length, refused</a></li>
+</ul>

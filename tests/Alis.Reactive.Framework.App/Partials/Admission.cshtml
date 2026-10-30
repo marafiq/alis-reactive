@@ -1,0 +1,37 @@
+@using Alis.Reactive.Framework.App.Partials
+@model AdmissionPage
+@{
+    ViewData["Title"] = "An admission";
+    var plan = Html.ReactivePlan<AdmissionPage>();
+}
+<h1>An admission</h1>
+
+<form id="admission-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    <div id="room-slot">
+        @* The room's line is a partial of the admission's own model: rendered with the page when it shows the
+           room at once, or loaded here when a room is chosen. The page's rule on the room is the only one. *@
+        @if (Model.ShowsRoom)
+        {
+            @await Html.PartialAsync("RoomLine", Model)
+        }
+    </div>
+</form>
+
+<p>The admission's endpoint bound: <span id="admitted"></span></p>
+
+@(plan.Button("choose-room", "Choose a room")
+    .Reactive(button => button.Click, p => p.Get("/Partials/RoomLine").Response(r => r.OnSuccess(s => s.Into("room-slot")))))
+@(plan.Button("clear-room", "Clear the room")
+    .Reactive(button => button.Click, p => p.Unload("room-slot")))
+@(plan.Button("admit", "Admit")
+    .Reactive(button => button.Click, p => p.Post("/Partials/Admit")
+        .Gather(g => g.Form())
+        .Validate<AdmissionRules>("admission-form")
+        .Response(r => r
+            .OnSuccess<PartialsEcho>((echo, s) => s.Element("admitted").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("admission-form")))))
+
+<section id="admission-messages" aria-label="The admission's messages">
+    @Html.RenderPlan(plan)
+</section>

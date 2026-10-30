@@ -1,4 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <!-- The Razor SDK makes this a Razor class library, so its stylesheet ships as a static web
+         asset. There are no Razor files to compile. -->
 
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
@@ -25,9 +28,18 @@
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
         <!-- Run the typed-DSL analyzer (ALIS009) on this slice's own source. -->
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <!-- Native components emit design-system classes; this flows the
-             design-system CSS package to Native consumers. -->
-        <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
+
+    <!-- The stylesheet Native's own markup needs (drawer, loader, check list, radio group), shipped
+         as written from Alis.Reactive.Assets/native: served at
+         ~/_content/AlisReactive.Native/css/native.css (net10) and copied to
+         Content\AlisReactive.Native\css\native.css (net48). Where and how:
+         build\AlisReactiveStaticWebAssets.targets. The look comes from whatever design system the
+         app links. -->
+    <ItemGroup>
+        <AlisReactiveStaticWebAsset Include="..\Alis.Reactive.Assets\native\native.css" RelativePath="css/native.css" />
+    </ItemGroup>
+
+    <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />
 
 </Project>

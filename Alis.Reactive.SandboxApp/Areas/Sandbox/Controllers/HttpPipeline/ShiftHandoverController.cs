@@ -16,6 +16,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         public IActionResult Index() =>
             View("~/Areas/Sandbox/Views/HttpPipeline/ShiftHandover/Index.cshtml", new ShiftHandoverPageModel());
 
+        // The link's own address, opened in a tab of its own (a Ctrl or Cmd click): the note, not a change.
+        [HttpGet("MarkRead/{resident}")]
+        public IActionResult OpenNote(string resident) =>
+            ResidentName(resident) is { } name
+                ? Content($"{name}'s handover note is open. Mark it read from the handover page.", "text/plain")
+                : NotFound();
+
         [HttpPost("MarkRead/{resident}")]
         public IActionResult MarkRead(string resident, [FromHeader(Name = "X-Shift")] string? shift)
         {

@@ -1,0 +1,18 @@
+@model DeliverySlipModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.AppLevel.PharmacyDelivery
+@{
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<DeliverySlipModel>();
+}
+
+<native-vstack gap="Base">
+    <native-text><span id="slip-summary">@Model.Items items from @Model.Pharmacy, delivered at 8:40 PM.</span></native-text>
+    @(Html.NativeButton("acknowledge-slip", "Acknowledge the slip")
+        .CssClass(ButtonSecondary)
+        .Reactive(plan, evt => evt.Click, (args, p) => p.Element("slip-status").Text.Set("Slip acknowledged by the night nurse.")))
+    <native-text><span id="slip-status">Slip not acknowledged.</span></native-text>
+</native-vstack>
+
+@Html.RenderPlan(plan)

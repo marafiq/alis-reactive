@@ -1,0 +1,21 @@
+using Microsoft.Playwright;
+
+namespace Alis.Reactive.PlaywrightTests.Locators;
+
+public static class LocatorInteractionExtensions
+{
+    public static async Task ClickWhenStableAsync(this ILocator locator, IPage page, int timeoutMs = 60000)
+    {
+        try
+        {
+            await locator.ClickAsync(new() { Timeout = timeoutMs });
+        }
+        catch (TimeoutException ex)
+        {
+            Console.WriteLine(
+                $"ClickWhenStableAsync retrying after timeout for locator '{locator}': {ex.Message}");
+            await page.WaitForTimeoutAsync(250);
+            await locator.ClickAsync(new() { Timeout = timeoutMs });
+        }
+    }
+}

@@ -41,14 +41,14 @@ public class RealTimeBroadcastService(
 
             try
             {
-                await notificationHub.Clients.All.SendAsync("ReceiveNotification", new NotificationPayload
+                await notificationHub.Clients.All.SendAsync(new NotificationFeed().ReceiveNotification.Name, new NotificationPayload
                 {
                     Count = broadcastCount,
                     Message = $"[{timestamp}] #{broadcastCount} — {Residents[residentIndex]} status update",
                     Priority = broadcastCount % 3 == 0 ? "high" : "normal"
                 }, stoppingToken);
 
-                await residentHub.Clients.All.SendAsync("StatusChanged", new ResidentStatusPayload
+                await residentHub.Clients.All.SendAsync(new ResidentStatusFeed().StatusChanged.Name, new ResidentStatusPayload
                 {
                     ResidentName = Residents[residentIndex],
                     Status = Statuses[residentIndex],

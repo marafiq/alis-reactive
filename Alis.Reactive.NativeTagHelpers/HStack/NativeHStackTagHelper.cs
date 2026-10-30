@@ -1,5 +1,3 @@
-using Alis.Reactive.DesignSystem.Layout;
-using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.HStack;
@@ -42,6 +40,33 @@ public class NativeHStackTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", HStackCss.Classes(Gap, Align, Justify, Wrap, CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join(
+            "alis-hstack",
+            LayoutClasses.Gap(Gap),
+            AlignClass(Align),
+            JustifyClass(Justify),
+            Wrap ? "alis-hstack--wrap" : "",
+            CssClass));
     }
+
+    private static string AlignClass(AlignItems align) => align switch
+    {
+        AlignItems.Start => "alis-align-start",
+        AlignItems.Center => "alis-align-center",
+        AlignItems.End => "alis-align-end",
+        AlignItems.Stretch => "alis-align-stretch",
+        AlignItems.Baseline => "alis-align-baseline",
+        _ => throw new ArgumentOutOfRangeException(nameof(align), align, "Not an alignment.")
+    };
+
+    private static string JustifyClass(JustifyContent justify) => justify switch
+    {
+        JustifyContent.Start => "alis-justify-start",
+        JustifyContent.Center => "alis-justify-center",
+        JustifyContent.End => "alis-justify-end",
+        JustifyContent.Between => "alis-justify-between",
+        JustifyContent.Around => "alis-justify-around",
+        JustifyContent.Evenly => "alis-justify-evenly",
+        _ => throw new ArgumentOutOfRangeException(nameof(justify), justify, "Not a justification.")
+    };
 }

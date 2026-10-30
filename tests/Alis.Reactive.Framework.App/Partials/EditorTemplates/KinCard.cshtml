@@ -1,0 +1,12 @@
+@using Alis.Reactive.Framework.App.Partials
+@model KinCard
+@{
+    // The next of kin's editor template: EditorFor renders it under the member's prefix, so its input binds as
+    // NextOfKin.Name, and its plan is its own.
+    var plan = Html.ReactivePlan<KinCard>();
+}
+<section id="kin-card">
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Next of kin")).Entry(); }
+</section>
+
+@Html.RenderPlan(plan)

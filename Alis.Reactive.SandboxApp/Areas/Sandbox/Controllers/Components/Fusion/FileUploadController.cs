@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.FileUpload;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -10,19 +10,23 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("")]
         public IActionResult Index()
         {
-            return View("~/Areas/Sandbox/Views/Components/Fusion/FileUpload/Index.cshtml", new FileUploadModel { ResidentName = "Margaret Thompson" });
+            return View("~/Areas/Sandbox/Views/Components/Fusion/FileUpload/Index.cshtml", new WoundAttachmentsModel
+            {
+                WoundSite = "Left heel"
+            });
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromForm] FileUploadModel? model)
+        [HttpPost("Attach")]
+        public IActionResult Attach([FromForm] WoundAttachmentsModel woundCare)
         {
-            var files = model?.Documents ?? Array.Empty<IFormFile>();
-            return Ok(new FileUploadEchoResponse
+            var result = new WoundAttachmentsValidator().Validate(woundCare);
+            if (!result.IsValid)
+                return BadRequest(new { errors = result.ErrorsByField });
+
+            var files = woundCare.Attachments!.Select(WoundAttachmentsValidator.Described);
+            return Ok(new WoundAttachmentsAnswer
             {
-                ResidentName = model?.ResidentName,
-                FileCount = files.Length,
-                FileNames = files.Select(f => f.FileName).ToArray(),
-                FileSizes = files.Select(f => f.Length).ToArray()
+                Message = $"Attached to Margaret Hale's record for the {woundCare.WoundSite!.ToLowerInvariant()} wound: {string.Join(" and ", files)}."
             });
         }
     }

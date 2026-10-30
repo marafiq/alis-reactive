@@ -1,101 +1,93 @@
 @model NativeTextBoxModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "NativeTextBox";
+    ViewData["Title"] = "Visitor Sign-in";
+
+    const string FormId = "visitor-sign-in";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string NoName = "No name yet";
+    const string LookupHint = "A returning visitor is found by their phone number.";
 
     var plan = Html.ReactivePlan<NativeTextBoxModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<NativeTextBox>(m => m.ResidentName).SetValue("Jane Doe");
-    }));
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var comp = p.Component<NativeTextBox>(m => m.ResidentName);
-        p.Element("value-echo").SetText(comp.Value());
-    }));
+    var residents = (SelectListItem[])ViewBag.Residents;
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">NativeTextBox — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises NativeTextBox vertical slice: property writes (SetValue),
-        property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
-        Senior living domain: resident names and emergency contacts.
-    </native-text>
+    <div>
+        <native-heading level="H1">Visitor Sign-in</native-heading>
+        <native-text color="Secondary">Maple Grove front desk. Sign every visitor in before they go up to see a resident.</native-text>
+    </div>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">1. Property Write (SetValue)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, sets resident name to "Jane Doe".
-        </p>
-        @{ Html.InputField(plan, m => m.ResidentName, o => o.Label("Resident Name"))
-            .NativeTextBox(b => b
-                .Placeholder("Enter resident name")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
-    </native-card-body></native-card>
+    <native-grid cols="C2" gap="Lg">
+        <native-card><native-card-body id="@FormId">
+            <native-vstack gap="Base">
+                @{ Html.InputField(plan, m => m.Phone, o => o.Label("Phone"))
+                    .NativeTextBox(b => b.Type("tel").Placeholder("555-0142").CssClass(Field))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.When(args.Value).NotEmpty()
+                            .Then(lookup => lookup.Get(Url.SandboxRoute("FindReturningVisitor", "NativeTextBox"))
+                                .Gather<ReturningVisitorQuery>(g => g.Set(x => x.Phone, args.Value))
+                                .Response(r => r
+                                    .OnSuccess<ReturningVisitor>((visitor, s) =>
+                                    {
+                                        // Writing the name raises no change, so the badge reads the name just written.
+                                        var name = s.Component<NativeTextBox>(m => m.VisitorName);
+                                        name.Value.Set(visitor.Get(x => x.Name));
+                                        s.Element("badge-name").Text.Set(name.Value);
+                                        s.Element("phone-lookup").Text.Set(visitor.Get(x => x.Welcome));
+                                    })
+                                    .OnError(404, unknown =>
+                                    {
+                                        unknown.Element("phone-lookup").Text.Set("No visit on file for this number. Write the visitor's name.");
+                                        unknown.Component<NativeTextBox>(m => m.VisitorName).Focus();
+                                    })))
+                            .Else(none => none.Element("phone-lookup").Text.Set(LookupHint))); }
+                <p id="phone-lookup" class="text-sm text-text-muted">@LookupHint</p>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the resident name component value and echoes it.
-        </p>
-        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                @{ Html.InputField(plan, m => m.VisitorName, o => o.Required().Label("Visitor's name"))
+                    .NativeTextBox(b => b.Placeholder("First and last name").CssClass(Field))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.When(args.Value).IsEmpty()
+                            .Then(unnamed => unnamed.Element("badge-name").Text.Set(NoName))
+                            .Else(named => named.Element("badge-name").Text.Set(args.Value))); }
 
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Emergency contact wires a Changed event with typed condition:
-            <code>When(args, x =&gt; x.Value).IsEmpty()</code> shows contact status.
-        </p>
-        @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Label("Emergency Contact"))
-            .NativeTextBox(b => b
-                .Placeholder("Enter emergency contact")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, x => x.Value).IsEmpty()
-                        .Then(t =>
-                        {
-                            t.Element("contact-status").SetText("contact required");
-                            t.Element("contact-status").AddClass("text-red-600");
-                            t.Element("contact-status").RemoveClass("text-green-600");
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("contact-status").SetText("contact provided");
-                            e.Element("contact-status").AddClass("text-green-600");
-                            e.Element("contact-status").RemoveClass("text-red-600");
-                        });
-                })); }
-        <p class="font-mono text-sm mt-2">Status: <span id="contact-status" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                @{ Html.InputField(plan, m => m.ResidentVisited, o => o.Required().Label("Visiting"))
+                    .NativeDropDown(b => b.Items(residents).Placeholder("-- Choose the resident --").CssClass(Field)); }
 
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads resident name via <code>When(comp.Value()).IsEmpty()</code>
-            and shows a warning or confirmation.
-        </p>
-        @(Html.NativeButton("check-name-btn", "Check Resident Name")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var comp = p.Component<NativeTextBox>(m => m.ResidentName);
-                p.When(comp.Value()).IsEmpty()
-                    .Then(t => t.Element("name-warning").SetText("name is required"))
-                    .Else(e => e.Element("name-warning").SetText("name set"));
-            }))
-        <p class="font-mono text-sm mt-2">Warning: <span id="name-warning" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                <native-hstack gap="Sm" align="Center" class="flex-wrap">
+                    @(Html.NativeButton("sign-in-btn", "Sign In")
+                        .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                        .Reactive(plan, evt => evt.Click, (args, p) =>
+                            p.Post(Url.SandboxRoute("SignIn", "NativeTextBox")).Gather(g => g.Form())
+                                .Validate<VisitorSignInValidator>(FormId)
+                                .Response(r => r
+                                    .OnSuccess<VisitorSignedIn>((signedIn, s) =>
+                                    {
+                                        s.Element("sign-in-status").Text.Set(signedIn.Get(x => x.Message));
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </native-card-body></native-card>
+                                        // Ready for the next visitor: an empty form, a blank badge, the cursor in the phone.
+                                        var phone = s.Component<NativeTextBox>(m => m.Phone);
+                                        phone.Value.Set("");
+                                        s.Component<NativeTextBox>(m => m.VisitorName).Value.Set("");
+                                        s.Component<NativeDropDown>(m => m.ResidentVisited).Value.Set("");
+                                        s.Element("badge-name").Text.Set(NoName);
+                                        s.Element("phone-lookup").Text.Set(LookupHint);
+                                        phone.Focus();
+                                    })
+                                    .OnError(400, e => e.ValidationErrors(FormId)))))
+                    <p id="sign-in-status" class="text-sm text-text-muted"></p>
+                </native-hstack>
+            </native-vstack>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-vstack gap="Xs">
+                <p class="text-xs font-medium uppercase tracking-wide text-text-muted">Visitor badge</p>
+                <p id="badge-name" class="text-2xl font-semibold">@NoName</p>
+                <native-text color="Secondary">Maple Grove. Wear this badge while in the building.</native-text>
+            </native-vstack>
+        </native-card-body></native-card>
+    </native-grid>
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -1,159 +1,155 @@
-@model AutoCompleteModel
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.AutoComplete
+@model FusionAutoCompleteModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    ViewData["Title"] = "AutoComplete";
+    ViewData["Title"] = "Notify Physician";
 
-    var plan = Html.ReactivePlan<AutoCompleteModel>();
-    var physicians = (List<PhysicianItem>)ViewBag.Physicians;
+    const string FormId = "physician-page-form";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string PrimaryButton = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string TextInput = "rounded-md border border-border px-3 py-1.5 text-sm";
 
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<FusionAutoComplete>(m => m.Physician).SetValue("smith");
-        var comp = p.Component<FusionAutoComplete>(m => m.Physician);
-        p.Element("value-echo").SetText(comp.Value());
-    }));
-
-    Html.On(plan, t => t.CustomEvent("do-gather", p =>
-    {
-        p.Post(Url.SandboxRoute("Echo", "AutoComplete"), g =>
-            g.Include<FusionAutoComplete, AutoCompleteModel>(m => m.Physician))
-         .Response(r => r
-            .OnSuccess(s =>
-            {
-                s.Element("gather-result").SetText("gathered");
-            }));
-    }));
-
+    var plan = Html.ReactivePlan<FusionAutoCompleteModel>();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionAutoComplete — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises all supported FusionAutoComplete API: property writes, method calls,
-        property reads, events, conditions, and gather.
-    </native-text>
+    <native-heading level="H1">Notify Physician</native-heading>
+    <native-text color="Secondary">Margaret Hale, Maple 214, evening shift. Report her change of condition to the physician who should hear about it.</native-text>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Property Write (SetValue)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, sets value="Dr. Smith" via structured prop on the Syncfusion ej2 instance.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.Physician, o => o.Label("Physician (SF AutoComplete)"))
-                .FusionAutoComplete(b => b
-                    .DataSource(physicians)
-                    .Fields<PhysicianItem>(t => t.Text, v => v.Value)
-                    .Placeholder("Select a physician")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("change-value").SetText(args, x => x.Value);
-                        p.When(args, x => x.Value).Eq("smith")
-                            .Then(t => t.Element("args-condition").SetText("dr smith selected"))
-                            .Else(e => e.Element("args-condition").SetText("other physician"));
-                        var comp = p.Component<FusionAutoComplete>(m => m.Physician);
-                        p.When(comp.Value()).NotNull()
-                            .Then(then =>
-                            {
-                                then.Element("selected-indicator").Show();
-                                then.Element("selected-indicator").SetText("selected");
-                            })
-                            .Else(else_ =>
-                            {
-                                else_.Element("selected-indicator").Hide();
-                            });
-                    })); }
-        </native-grid>
-        <native-hstack gap="Sm" class="mt-4">
-            @(Html.NativeButton("show-popup-btn", "Show Popup")
-                .CssClass("rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionAutoComplete>(m => m.Physician).ShowPopup();
-                }))
-            @(Html.NativeButton("hide-popup-btn", "Hide Popup")
-                .CssClass("rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionAutoComplete>(m => m.Physician).HidePopup();
-                }))
-        </native-hstack>
-        <p class="font-mono text-sm mt-4">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">4. Events (Changed)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            The Physician field wires the Changed event. Change shows the new value.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Change value: <span id="change-value" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
-            <p>Selected: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
-        </native-vstack>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">5. Conditions (Both Types)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Two condition types are exercised:
-            <code>When(args, x =&gt; x.Value).Eq("smith")</code> (typed event-args condition)
-            and <code>When(comp.Value()).NotNull()</code> (component-read condition).
-        </p>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">6. Gather (Include in POST)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Click to POST the Physician value gathered from the Syncfusion component via
-            <code>Include&lt;FusionAutoComplete&gt;</code>.
-        </p>
-        @(Html.NativeButton("gather-btn", "Gather Physician")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors mb-3")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
+    @* The page's commands sit above the physician field, where its list cannot cover them. *@
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("page-attending-btn", "Page Her Attending")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (_, p) =>
             {
-                p.Dispatch("do-gather");
+                // The field is emptied and her care team comes back to the list, whatever the last search or
+                // the on-call list left there; her attending is chosen from it, and the page says whom.
+                var physician = p.Component<FusionAutoComplete>(m => m.Physician);
+                physician.Clear();
+                physician.DataBind();
+                physician.Items<PhysicianListing>().Set(Model.CareTeam);
+                physician.Value.Set(Model.Attending);
+                physician.DataBind();
+                p.Element("attending-name").Text.Set(physician.Text);
+                p.Element("attending-filled").Show();
             }))
-        <p class="font-mono text-sm">Gather result: <span id="gather-result" class="text-text-muted">not gathered</span></p>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">7. Filtering Event (Server-Filtered HTTP)</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Type to search medications. The Filtering event fires on each keystroke (debounced 500ms),
-            sends the typed text to the server via HTTP GET, and updates the dropdown DataSource from the response.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.MedicationType, o => o.Label("Medication (Server-Filtered)"))
-                .FusionAutoComplete(b => b
-                    .Fields<MedicationTypeItem>(t => t.Text, v => v.Value)
-                    .Placeholder("Type to search medications...")
-                    .DebounceDelay(500)
-                    .AllowObjectBinding(true)
-                    .AllowCustom(false).ShowPopupButton().Highlight(true)
-                    .Reactive(plan, evt => evt.Filtering, (args, p) =>
+        @(Html.NativeButton("on-call-btn", "On Call Tonight")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+                p.Get(Url.SandboxRoute("OnCall", "AutoComplete"))
+                    .Response(r => r.OnSuccess<OnCallPhysicians>((onCall, s) =>
                     {
-                        args.PreventDefault(p);
-                        p.Get(Url.SandboxRoute("Medications", "AutoComplete"))
-                         .Gather(g => g.FromEvent(args, x => x.Text, "MedicationType"))
-                         .Response(r => r
-                            .OnSuccess<MedicationSearchResponse>((json, s) =>
-                            {
-                                args.UpdateData(s, json, j => j.Medications);
-                                s.Element("filter-status").SetText("results loaded");
-                            }));
-                    })); }
-        </native-grid>
-        <native-vstack gap="Xs" class="font-mono text-sm mt-2">
-            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
-        </native-vstack>
-    </section>
+                        // Tonight's on-call physicians replace her care team in the list, opened for the nurse.
+                        var physician = s.Component<FusionAutoComplete>(m => m.Physician);
+                        physician.Items<PhysicianListing>().Set(onCall.Get(x => x.Physicians));
+                        physician.DataBind();
+                        physician.ShowPopup();
+                    }))))
+        <p id="attending-filled" hidden class="text-sm">Her attending, <span id="attending-name" class="font-medium"></span>, is filled in.</p>
+    </native-hstack>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
+    <native-card><native-card-body id="@FormId">
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.Physician, o => o.Required().Label("Physician"))
+                .FusionAutoComplete(b => b
+                    .DataSource(Model.CareTeam)
+                    .Fields<PhysicianListing>(t => t.Name, v => v.Id)
+                    .AllowCustom(false)
+                    .DebounceDelay(300)
+                    .Highlight(true)
+                    .Placeholder("Type part of a name"))
+                .Reactive(evt => evt.Filtering, (args, p) =>
+                {
+                    // The directory answers for what was typed; until it does, her care team is not offered.
+                    args.PreventDefaultAction.Set(true);
+                    p.Get(Url.SandboxRoute("Search", "AutoComplete"))
+                        .Gather<DirectorySearch>(g => g.Set(x => x.Name, args.Text))
+                        .WhileLoading(l => l.Element("directory-status").Text.Set("Searching the physician directory..."))
+                        .Response(r => r.OnSuccess<DirectoryMatches>((found, s) =>
+                        {
+                            s.Element("directory-status").Text.Set(found.Get(x => x.Summary));
+                            // A name nobody in the directory has closes the list the last search left open.
+                            s.When(found.Get(x => x.Count)).Eq(0)
+                                .Then(none => none.Component<FusionAutoComplete>(m => m.Physician).HidePopup())
+                                .Else(some => args.UpdateData(found.Get(x => x.Physicians)));
+                        }));
+                })
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args.Value).IsEmpty()
+                        .Then(cleared =>
+                        {
+                            cleared.Element("physician-contact").Hide();
+                            cleared.Element("check-physician").Hide();
+                        })
+                        .Else(chosen =>
+                        {
+                            chosen.Get(Url.SandboxRoute("Contact", "AutoComplete"))
+                                .Gather<PhysicianContactQuery>(g => g.Set(x => x.Physician, args.Value))
+                                .Response(r => r.OnSuccess<PhysicianContact>((contact, s) =>
+                                {
+                                    s.Element("physician-specialty").Text.Set(contact.Get(x => x.Specialty));
+                                    s.Element("physician-callback").Text.Set(contact.Get(x => x.Callback));
+                                    s.Element("physician-contact").Show();
+                                }));
+                            // Two physicians can share part of a name: one the nurse chose by name is confirmed
+                            // with the answering service, and the keyboard goes away so the callback shows. The page
+                            // empties the field before it fills one in, so the note is already down for those.
+                            chosen.When(args.IsInteracted).Truthy()
+                                .Then(byName =>
+                                {
+                                    byName.Element("check-physician").Show();
+                                    byName.Component<FusionAutoComplete>(m => m.Physician).FocusOut();
+                                });
+                        });
+                }); }
+            <p id="directory-status" class="text-sm text-text-muted">Type part of a name to search the physician directory.</p>
+            <p id="check-physician" hidden class="text-sm text-amber-700">Chosen by name: confirm the physician's name with the answering service.</p>
+            <dl id="physician-contact" hidden class="grid grid-cols-2 gap-2 text-sm">
+                <dt class="text-text-muted">Specialty</dt>
+                <dd id="physician-specialty" class="font-medium"></dd>
+                <dt class="text-text-muted">Callback</dt>
+                <dd id="physician-callback" class="font-medium"></dd>
+            </dl>
+
+            @{ Html.InputField(plan, m => m.Concern, o => o.Required().Label("What changed"))
+                .NativeTextBox(b => b.CssClass(TextInput).Placeholder("Short of breath after lunch")); }
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("send-page-btn", "Send Page")
+                    .CssClass(PrimaryButton)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Post(Url.SandboxRoute("Send", "AutoComplete"))
+                            .Gather(g => g.Form())
+                            .Validate<PhysicianPageValidator>(FormId)
+                            .Response(r => r
+                                .OnSuccess<PhysicianPageSent>((sent, s) =>
+                                {
+                                    // The page is out: the physician it went to stays as it was sent.
+                                    s.Element("page-status").Text.Set(sent.Get(x => x.Message));
+                                    s.Component<FusionAutoComplete>(m => m.Physician).Enabled.Set(false);
+                                    s.Element("page-again").Show();
+                                })
+                                .OnError(400, e => e.ValidationErrors(FormId)))))
+                <div id="page-again" hidden>
+                    @(Html.NativeButton("page-again-btn", "Page Someone Else")
+                        .CssClass(Button)
+                        .Reactive(plan, evt => evt.Click, (_, p) =>
+                        {
+                            // The field opens again, empty, with the cursor in it for the next name.
+                            var physician = p.Component<FusionAutoComplete>(m => m.Physician);
+                            physician.Enabled.Set(true);
+                            physician.Clear();
+                            physician.DataBind();
+                            physician.FocusIn();
+                            p.Element("page-again").Hide();
+                        }))
+                </div>
+            </native-hstack>
+            <p id="page-status" class="text-sm">Not paged yet.</p>
+        </native-vstack>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -1,5 +1,4 @@
 @model ResidentModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -118,10 +117,10 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("Submit", "ValidationContract"), g => g.IncludeAll())
+                    p.Post(Url.SandboxRoute("Submit", "ValidationContract")).Gather(g => g.Form())
                      .Validate<ResidentValidator>("resident-form")
                      .Response(r => r
-                        .OnSuccess(s => s.Element("result").SetText("Admission saved"))
+                        .OnSuccess(s => s.Element("result").Text.Set("Admission saved"))
                         .OnError(400, e =>
                         {
                             e.ValidationErrors("resident-form");

@@ -1,0 +1,184 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Contact",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "Alis_Reactive_PlanTests_Support_Contact__NextOfKin_Name": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Contact__NextOfKin_Name",
+      "vendor": "native"
+    },
+    "$model": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "",
+      "data": {
+        "kind": "model",
+        "inputs": {
+          "Alis_Reactive_PlanTests_Support_Contact__NextOfKin_Name": {
+            "name": "NextOfKin.Name",
+            "body": [
+              "NextOfKin",
+              "Name"
+            ],
+            "value": {
+              "kind": "as",
+              "expr": {
+                "kind": "get",
+                "target": {
+                  "kind": "obj",
+                  "id": "Alis_Reactive_PlanTests_Support_Contact__NextOfKin_Name"
+                },
+                "path": [
+                  "value"
+                ]
+              },
+              "shape": {
+                "kind": "string"
+              }
+            },
+            "shape": {
+              "kind": "string"
+            },
+            "committed": "change",
+            "list": false
+          }
+        }
+      }
+    },
+    "$http": {
+      "kind": "plugin",
+      "name": "alis.http",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "let",
+          "name": "res1",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "$http"
+            },
+            "path": [
+              "send"
+            ],
+            "args": [
+              {
+                "kind": "record",
+                "fields": [
+                  {
+                    "name": "method",
+                    "value": {
+                      "kind": "lit",
+                      "value": "POST"
+                    }
+                  },
+                  {
+                    "name": "url",
+                    "value": {
+                      "kind": "lit",
+                      "value": "/contact"
+                    }
+                  },
+                  {
+                    "name": "route",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "value": {
+                      "kind": "record",
+                      "fields": [
+                        {
+                          "name": "NextOfKin",
+                          "value": {
+                            "kind": "record",
+                            "fields": [
+                              {
+                                "name": "Name",
+                                "value": {
+                                  "kind": "call",
+                                  "target": {
+                                    "kind": "obj",
+                                    "id": "$model"
+                                  },
+                                  "path": [
+                                    "boundValueOf"
+                                  ],
+                                  "args": [
+                                    {
+                                      "kind": "lit",
+                                      "value": "Alis_Reactive_PlanTests_Support_Contact__NextOfKin_Name"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "arrays",
+                    "value": {
+                      "kind": "list",
+                      "items": []
+                    }
+                  },
+                  {
+                    "name": "headers",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "format",
+                    "value": {
+                      "kind": "lit",
+                      "value": "json"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "await": true
+        }
+      ]
+    }
+  ]
+}

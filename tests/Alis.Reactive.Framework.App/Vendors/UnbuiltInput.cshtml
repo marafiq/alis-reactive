@@ -1,0 +1,21 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Framework.App.Vendors
+@model UnbuiltInputPage
+@{
+    ViewData["Title"] = "An input not built yet";
+    var plan = Html.ReactivePlan<UnbuiltInputPage>();
+}
+<h1>An input not built yet</h1>
+
+@* The note's entry element without the class its script builds an entry on, so no entry object is made for it. *@
+@{
+    var note = Html.InputField(plan, m => m.Note, o => o.Label("Note"));
+    note.Render<Entry>(new HtmlString($"<input id=\"{note.ElementId}\" type=\"text\">"));
+}
+
+<p>Greeting: <span id="greeting"></span></p>
+
+@(plan.Button("greet", "Say hello")
+    .Reactive(button => button.Click, p => p.Element("greeting").Text.Set("hello")))
+
+@Html.RenderPlan(plan)

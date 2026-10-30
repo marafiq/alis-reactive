@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders
@@ -11,270 +12,238 @@ namespace Alis.Reactive.Builders
     /// </summary>
     /// <remarks>
     /// Received as the <c>p</c> parameter inside trigger callbacks:
-    /// <c>t.DomReady(p =&gt; { p.Element("id").AddClass("x"); p.Dispatch("ready"); })</c>.
+    /// <c>t.DomReady(p =&gt; { p.Element("id").ClassList.Add("x"); p.Dispatch(CareEvents.Ready); })</c>.
     /// Reactions execute in declaration order.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs and validation/gather fields.</typeparam>
-    public partial class PipelineBuilder<TModel> : IReactionEmitter where TModel : class
+    public partial class PipelineBuilder<TModel> where TModel : class
     {
         internal PlanBuildContext Context { get; }
-
-        private readonly ReactionPipelineDraft<TModel> _draft = new ReactionPipelineDraft<TModel>();
 
         internal PipelineBuilder(PlanBuildContext context)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        /// <inheritdoc />
-        void IReactionEmitter.AddStep(ReactionGraph step) => AddStep(step);
-
-        /// <inheritdoc />
-        PlanBuildContext IReactionEmitter.BuildContext => Context;
-
-        internal void AddStep(ReactionGraph step)
+        /// <summary>
+        /// Builds a callback's steps. A step lands in the callback being built, whichever pipeline variable
+        /// or handle wrote it: a handle declared in a trigger and used inside OnSuccess writes into OnSuccess.
+        /// </summary>
+        internal static Block Build(PlanBuildContext context, Action<PipelineBuilder<TModel>> reactions)
         {
-            _draft.AddReaction(step);
+            if (reactions == null) throw new ArgumentNullException(nameof(reactions));
+            var pipeline = new PipelineBuilder<TModel>(context);
+            return context.Build(() => reactions(pipeline));
         }
 
-        /// <summary>Queues a <c>CustomEvent</c> reaction without a payload.</summary>
-        /// <param name="eventName">Event name matched by <c>t.CustomEvent(...)</c> triggers.</param>
+        /// <summary>Raises a declared document event with no payload.</summary>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare(string, string)"/>.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
-        public PipelineBuilder<TModel> Dispatch(string eventName)
+        public PipelineBuilder<TModel> Dispatch(AppEvent appEvent)
         {
-            AddStep(ReactionGraph.Dispatch(eventName));
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
+            Context.AddStep(new DispatchStep(appEvent.Name, NoPayload));
             return this;
         }
 
-        /// <summary>Queues a <c>CustomEvent</c> reaction with a build-time payload literal.</summary>
-        /// <typeparam name="TPayload">Payload contract consumed by matching custom event triggers.</typeparam>
-        /// <param name="eventName">Event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
-        /// <param name="payload">Payload object serialized into the generated plan.</param>
+        /// <summary>Raises a declared document event without its payload: a listener reads every member as missing.</summary>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
-        public PipelineBuilder<TModel> Dispatch<TPayload>(string eventName, TPayload payload)
+        public PipelineBuilder<TModel> Dispatch<TPayload>(AppEvent<TPayload> appEvent)
+            where TPayload : class, new()
         {
-            AddStep(ReactionGraph.Dispatch(
-                eventName,
-                ValueExpression.LiteralRaw(payload, Shape.FromClrType(typeof(TPayload)))));
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
+            Context.AddStep(new DispatchStep(appEvent.Name, NoPayload));
             return this;
         }
 
-        /// <summary>Dispatches a <c>CustomEvent</c> whose payload fields come from value sources.</summary>
+        // An event raised with nothing: a listener reads every member of the detail as missing.
+        private static readonly ValueExpression NoPayload = ValueExpression.Record(Array.Empty<(string Name, ValueExpression Value)>());
+
+        /// <summary>Raises a declared document event with a payload fixed when the view renders.</summary>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
+        /// <param name="payload">The payload, written into the plan.</param>
+        /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
+        public PipelineBuilder<TModel> Dispatch<TPayload>(AppEvent<TPayload> appEvent, TPayload payload)
+            where TPayload : class, new()
+        {
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
+            Context.AddStep(new DispatchStep(
+                appEvent.Name,
+                ValueExpression.LiteralFor(payload, Shape.FromClrType(typeof(TPayload)))));
+            return this;
+        }
+
+        /// <summary>Raises a declared document event whose payload fields come from value sources.</summary>
         /// <remarks>
-        /// <para>Use this when the payload needs current state from Reactive Plan
-        /// value sources, such as component values or URL parameters. The listener consumes the
-        /// payload via <c>t.CustomEvent&lt;TPayload&gt;(name, (payload, p) =&gt; ...)</c>.</para>
-        /// <para>Use <see cref="Dispatch{TPayload}(string, TPayload)"/> for a fixed build-time
-        /// payload object.</para>
+        /// Use this when the payload needs the page's current state, such as component values or URL
+        /// parameters; use <see cref="Dispatch{TPayload}(AppEvent{TPayload}, TPayload)"/> for a payload
+        /// fixed when the view renders.
         /// </remarks>
-        /// <typeparam name="TPayload">Payload contract consumed by matching custom event triggers.</typeparam>
-        /// <param name="eventName">Event name matched by <c>t.CustomEvent&lt;TPayload&gt;(...)</c> triggers.</param>
+        /// <typeparam name="TPayload">The payload the event declares.</typeparam>
+        /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare{TPayload}(string, string)"/>.</param>
         /// <param name="configure">Maps payload fields to value sources or literals.</param>
         /// <returns>This pipeline builder; chained reactions run after the dispatch.</returns>
-        public PipelineBuilder<TModel> DispatchWith<TPayload>(
-            string eventName,
+        public PipelineBuilder<TModel> Dispatch<TPayload>(
+            AppEvent<TPayload> appEvent,
             Action<DispatchPayloadBuilder<TPayload, TModel>> configure)
-            where TPayload : class
+            where TPayload : class, new()
         {
+            if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
             var builder = new DispatchPayloadBuilder<TPayload, TModel>();
             configure(builder);
-            AddStep(ReactionGraph.Dispatch(eventName, builder.Build()));
+            Context.AddStep(new DispatchStep(appEvent.Name, builder.Build()));
             return this;
         }
 
-        /// <summary>Targets a controlled DOM element for updates in this Reactive Plan pipeline.</summary>
-        /// <param name="elementId">Markup ID resolved directly by the runtime.</param>
-        /// <returns>Element update builder.</returns>
-        public ElementBuilder<TModel> Element(string elementId)
-        {
-            return new ElementBuilder<TModel>(this, elementId);
-        }
+        /// <summary>The element the view rendered with this id: its text, HTML, classes and whether it shows.</summary>
+        /// <param name="elementId">The element's id.</param>
+        /// <example><c>p.Element("status").Text.Set("Saved")</c></example>
+        public HtmlElement Element(string elementId) => new HtmlElement(Context, elementId);
 
-        /// <summary>Targets the component registered for a property on this plan's view model.</summary>
-        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
+        /// <summary>The component the view rendered for a member of this plan's model.</summary>
+        /// <typeparam name="TComponent">The component's declaration, whose members the page uses directly.</typeparam>
         /// <param name="expr">
-        /// Model property expression used to compute the same controlled ID as the markup helper.
+        /// The model member the component is bound to; its id is derived as the input field derives it, from the
+        /// class that declares the member and the member's path under the view's field prefix, so the page reaches
+        /// the input an editor template or a partial renders for the member: <c>m =&gt; m.NextOfKin.Name</c>.
         /// </param>
-        /// <returns>An authoring handle joined to the generated component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent>(
-            Expression<Func<TModel, object>> expr)
-            where TComponent : IComponent, new()
-        {
-            var elementId = IdGenerator.For<TModel, object>(expr);
-            return new ComponentRef<TComponent, TModel>(elementId, this);
-        }
+        /// <returns>The component: <c>rate.Min.Set(0m)</c>, <c>rate.Increment()</c>, <c>p.When(rate.Value).Gt(1m)</c>.</returns>
+        public TComponent Component<TComponent>(Expression<Func<TModel, object?>> expr)
+            where TComponent : JsObject, IComponent, new() =>
+            Live<TComponent>(IdGenerator.ForMember(
+                ExpressionPathHelper.ToDeclarer(expr),
+                HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
 
-        /// <summary>Targets the component registered for a property on another view model type.</summary>
-        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
-        /// <typeparam name="TOtherModel">View model type used when the component was rendered.</typeparam>
-        /// <param name="expr">
-        /// Other model's property expression used to compute the same controlled ID as the markup helper.
+        /// <summary>
+        /// A member of this plan's model as MVC binds it: the input rendered for it, whichever view rendered it,
+        /// read as the server binds what it posts; missing when no input on the page renders the member, as the
+        /// server sees a member no input posts.
+        /// </summary>
+        /// <remarks>
+        /// It reads a member a partial renders only sometimes, conditionally or loaded later, where a component
+        /// read fails because the component is not on the page:
+        /// <c>p.When(p.Bound(m =&gt; m.NextOfKin.Name)).IsNull()</c>. It is the read the form's rules and named
+        /// sends make, so the page judges the member as they do.
+        /// </remarks>
+        /// <typeparam name="TProp">The member's type.</typeparam>
+        /// <param name="member">
+        /// The model member; its input's id is derived as the input field derives it, from the class that declares
+        /// the member and the member's path under the view's field prefix: <c>m =&gt; m.NextOfKin.Name</c>.
         /// </param>
-        /// <returns>An authoring handle joined to the other model's generated component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent, TOtherModel>(
-            Expression<Func<TOtherModel, object>> expr)
-            where TComponent : IComponent, new()
-            where TOtherModel : class
+        /// <returns>The bound value, a source for any reaction, condition or request.</returns>
+        public TypedSource<TProp> Bound<TProp>(Expression<Func<TModel, TProp>> member)
         {
-            var elementId = IdGenerator.For<TOtherModel, object>(expr);
-            return new ComponentRef<TComponent, TModel>(elementId, this);
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            var binding = HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberBindingPath(member));
+            return new Conditions.BoundValue<TProp>(IdGenerator.ForMember(ExpressionPathHelper.ToDeclarer(member), binding.Value));
         }
 
-        /// <summary>Targets a component registered with an explicit markup ID.</summary>
-        /// <typeparam name="TComponent">Component contract that determines available reads, writes, and calls.</typeparam>
-        /// <param name="refId">Controlled component ID already present in markup.</param>
-        /// <returns>An authoring handle joined to the explicit component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)
-            where TComponent : IComponent, new()
+        /// <summary>
+        /// The component a view of another model rendered for one of its members with no field prefix, such as
+        /// a partial rendered at the top level. The id is derived as the input field derives it, from the class
+        /// that declares the member and the member's path; an input a partial rendered under a prefix is reached
+        /// by the member of this plan's model that holds it, <c>p.Component&lt;Entry&gt;(m =&gt; m.NextOfKin.Name)</c>.
+        /// </summary>
+        /// <typeparam name="TComponent">The component's declaration.</typeparam>
+        /// <typeparam name="TOtherModel">The model the component was rendered for.</typeparam>
+        /// <param name="expr">The other model's member the component is bound to.</param>
+        /// <returns>The component, whose members the page uses directly.</returns>
+        public TComponent Component<TComponent, TOtherModel>(Expression<Func<TOtherModel, object?>> expr)
+            where TComponent : JsObject, IComponent, new()
+            where TOtherModel : class =>
+            Live<TComponent>(IdGenerator.For(expr));
+
+        /// <summary>The component the view rendered with an id it chose.</summary>
+        /// <typeparam name="TComponent">The component's declaration.</typeparam>
+        /// <param name="refId">The component's element id.</param>
+        /// <returns>The component: <c>grid.Refresh()</c>, <c>grid.SelectRow(0)</c>.</returns>
+        public TComponent Component<TComponent>(string refId)
+            where TComponent : JsObject, IComponent, new() =>
+            Live<TComponent>(refId);
+
+        /// <summary>An app object the layout renders once, at the id its declaration names: Toast, Drawer, Loader.</summary>
+        /// <typeparam name="TComponent">The app object's declaration.</typeparam>
+        /// <returns>The app object: <c>toast.Content.Set("Saved")</c>, <c>toast.Show()</c>.</returns>
+        public TComponent Component<TComponent>()
+            where TComponent : JsObject, IAppLevelComponent, new()
         {
-            return new ComponentRef<TComponent, TModel>(refId, this);
+            var component = new TComponent();
+            component.BindTo(new ComponentBinding(component.DefaultId, component.Vendor, Context));
+            return component;
         }
 
-        /// <summary>Targets a layout-owned app component by the ID declared by its component contract.</summary>
-        /// <typeparam name="TComponent">App-level component contract that supplies its default ID.</typeparam>
-        /// <returns>An authoring handle joined to the contract's default component ID.</returns>
-        public ComponentRef<TComponent, TModel> Component<TComponent>()
-            where TComponent : IAppLevelComponent, new()
+        private TComponent Live<TComponent>(string componentId)
+            where TComponent : JsObject, IComponent, new()
         {
-            return new ComponentRef<TComponent, TModel>(
-                ComponentObjectTarget.ForLayout<TComponent>(),
-                this);
+            var component = new TComponent();
+            component.BindTo(new ComponentBinding(componentId, component.Vendor, Context));
+            return component;
         }
 
-        /// <summary>Reads a string value from the current URL query string at runtime.</summary>
-        /// <param name="paramName">Query parameter name read at runtime.</param>
-        /// <returns>URL value source for conditions, reactions, or gather.</returns>
-        public Conditions.TypedUrlSource<string> FromUrl(string paramName)
+        /// <summary>
+        /// The server-sent event stream a trigger listens to, by the declaration and URL the page handed
+        /// <c>t.ServerPush(..)</c>: <c>p.Stream(alerts).Close()</c>, <c>p.When(p.Stream(alerts).ReadyState).Eq(ServerPushStream.Closed)</c>.
+        /// </summary>
+        /// <typeparam name="TStream">The stream's declaration.</typeparam>
+        /// <param name="stream">The stream at its URL: <c>ServerPushStream.At&lt;TStream&gt;(url)</c>.</param>
+        /// <returns>The stream, whose members the page uses directly.</returns>
+        public TStream Stream<TStream>(ServerPushSource<TStream> stream)
+            where TStream : ServerPushStream, new()
         {
-            return new Conditions.TypedUrlSource<string>(paramName);
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            var live = new TStream();
+            live.BindTo(new ModuleBinding(Target.Stream(stream.Url), Context));
+            return live;
         }
 
-        /// <summary>Reads a typed value from the current URL query string at runtime.</summary>
-        /// <typeparam name="T">Value type expected by downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="paramName">Query parameter name read at runtime.</param>
-        /// <returns>URL value source for conditions, reactions, or gather.</returns>
-        public Conditions.TypedUrlSource<T> FromUrl<T>(string paramName)
+        /// <summary>
+        /// A declared hub, for its members and the methods the page calls on the server:
+        /// <c>p.Hub(residents).ClearBoard()</c>, <c>p.Element("link").Text.Set(p.Hub(residents).State)</c>.
+        /// </summary>
+        /// <remarks>
+        /// The plan holds the hub's connection, whether or not a trigger listens to it, for as long as its
+        /// owner lives: the page, or the slot the plan was loaded into. The connection closes when the last
+        /// plan holding it is unloaded.
+        /// </remarks>
+        /// <typeparam name="THub">The hub's declaration.</typeparam>
+        /// <param name="hub">The hub at its URL: <c>SignalRHub.At&lt;THub&gt;(url)</c>.</param>
+        /// <returns>The hub, whose members the page uses directly.</returns>
+        public THub Hub<THub>(SignalRSource<THub> hub)
+            where THub : SignalRHub, new()
         {
-            return new Conditions.TypedUrlSource<T>(paramName);
+            if (hub == null) throw new ArgumentNullException(nameof(hub));
+            var live = new THub();
+            live.BindTo(new ModuleBinding(Target.Hub(hub.Url), Context));
+            return live;
         }
 
-        /// <summary>Reads the return value from a named function member on a plan-registered plugin.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <param name="member">Function member invoked on the host-provided plugin object.</param>
-        /// <returns>Plugin function call builder.</returns>
-        public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-            var operation = PluginOperationId.Of(pluginName, member);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
-                operation,
-                PlanModel.Shape.FromClrType(typeof(T))));
-            return new PluginMemberBuilder<T, TModel>(
-                operation,
-                signature.Arguments);
-        }
+        /// <summary>
+        /// Reads the page's URL query string through <typeparamref name="TQuery"/>, the class the page's action
+        /// binds with <c>[FromQuery]</c>: <c>p.Url&lt;CensusQuery&gt;().Get(q =&gt; q.FacilityId)</c>.
+        /// </summary>
+        /// <typeparam name="TQuery">The query class.</typeparam>
+        /// <returns>The query, whose members are value sources.</returns>
+        public UrlQuery<TQuery> Url<TQuery>() where TQuery : class => new UrlQuery<TQuery>();
 
-        /// <summary>Reads the return value from a plan-registered plugin object that is itself callable.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <returns>Plugin root-function call builder.</returns>
-        public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            var operation = PluginOperationId.Root(pluginName);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(
-                operation,
-                PlanModel.Shape.FromClrType(typeof(T))));
-            return new PluginMemberBuilder<T, TModel>(
-                operation,
-                signature.Arguments);
-        }
-
-        /// <summary>Reads a property value from a plan-registered plugin.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <param name="member">Property member read from the host-provided plugin object.</param>
-        /// <returns>Typed plugin property value source.</returns>
-        public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-
-            var property = PluginPropertyId.Of(pluginName, member);
-            Context.DeclarePluginProperty(PluginPropertyRequirement.Read(property, PlanModel.Shape.FromClrType(typeof(T))));
-            return new Conditions.TypedPluginPropertySource<T>(property);
-        }
-
-        /// <summary>Reads the return value declared by a reusable plugin function.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="function">Plugin function carrying the plugin key, target member, argument contract, and return shape.</param>
-        /// <returns>Plugin function call builder.</returns>
-        public PluginMemberBuilder<T, TModel> Plugin<T>(PluginFunction<T> function)
-        {
-            if (function == null) throw new System.ArgumentNullException(nameof(function));
-            Context.DeclarePluginMethod(PluginMethodRequirement.Function(function));
-            return new PluginMemberBuilder<T, TModel>(function);
-        }
-
-        /// <summary>Reads the value declared by a reusable plugin property.</summary>
-        /// <typeparam name="T">Value type exposed to downstream conditions, reactions, or gather.</typeparam>
-        /// <param name="property">Plugin property carrying the plugin key, property member, and value shape.</param>
-        /// <returns>Typed plugin property value source.</returns>
-        public Conditions.TypedPluginPropertySource<T> Plugin<T>(PluginProperty<T> property)
-        {
-            if (property == null) throw new System.ArgumentNullException(nameof(property));
-            Context.DeclarePluginProperty(PluginPropertyRequirement.Read(property));
-            return new Conditions.TypedPluginPropertySource<T>(property.PropertyId);
-        }
-
-        /// <summary>Emits a plugin-call reaction against a named member on a plan-registered plugin.</summary>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <param name="member">Command member invoked on the host-provided plugin object.</param>
-        /// <returns>Plugin command call builder.</returns>
-        public PluginCallBuilder<TModel> Plugin(string pluginName, string member)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            if (string.IsNullOrWhiteSpace(member)) throw new System.ArgumentException("Member name required.", nameof(member));
-            var operation = PluginOperationId.Of(pluginName, member);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Command(operation));
-            return new PluginCallBuilder<TModel>(
-                operation,
-                this,
-                signature.Arguments);
-        }
-
-        /// <summary>Emits a plugin-call reaction against a plan-registered plugin object that is itself callable.</summary>
-        /// <param name="pluginName">Registered plugin key.</param>
-        /// <returns>Plugin root-command call builder.</returns>
-        public PluginCallBuilder<TModel> Plugin(string pluginName)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName)) throw new System.ArgumentException("Plugin name required.", nameof(pluginName));
-            var operation = PluginOperationId.Root(pluginName);
-            var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Command(operation));
-            return new PluginCallBuilder<TModel>(
-                operation,
-                this,
-                signature.Arguments);
-        }
-
-        /// <summary>Emits a plugin-call reaction from a reusable plugin command.</summary>
-        /// <param name="command">Plugin command carrying the plugin key, target member, and argument contract.</param>
-        /// <returns>Plugin command call builder.</returns>
-        public PluginCallBuilder<TModel> Plugin(PluginCommand command)
-        {
-            if (command == null) throw new System.ArgumentNullException(nameof(command));
-            Context.DeclarePluginMethod(PluginMethodRequirement.Command(command));
-            return new PluginCallBuilder<TModel>(command, this);
-        }
-
-        /// <summary>Appends a reaction that renders accumulated validation errors into a container.</summary>
-        /// <param name="formId">Validation error container element ID.</param>
+        /// <summary>
+        /// Shows the response's validation errors on the form's fields and summary. It belongs inside an
+        /// error route of the request that received them: <c>.OnError(400, e =&gt; e.ValidationErrors(FormId))</c>.
+        /// </summary>
+        /// <remarks>
+        /// A message goes beside the mounted input inside the form that binds the name the server reports it under,
+        /// whichever plan rendered it (the page, a partial, an editor template, a slot's content), and to the
+        /// form's summary (<c>{formId}_validation_summary</c>) when no such input shows it. The form need not be
+        /// validated.
+        /// </remarks>
+        /// <param name="formId">The element that holds the form's inputs.</param>
         /// <returns>This pipeline builder.</returns>
         public PipelineBuilder<TModel> ValidationErrors(string formId)
         {
-            AddStep(ReactionGraph.ShowValidationErrors(formId));
+            Context.AddStep(new ShowErrorsStep(formId));
+            Context.ShowErrorsOn(formId);
             return this;
         }
 
@@ -284,21 +253,23 @@ namespace Alis.Reactive.Builders
         /// <returns>This pipeline builder; chained reactions run after the injection.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            Context.DeclareElement(elementId);
-            var responseBody = ValueExpression.ReadWholePayload(PayloadSource.Success());
-            AddStep(ReactionGraph.Inject(elementId, responseBody));
+            Context.LoadsOrUnloads(elementId);
+            var responseBody = ValueExpression.Get(Target.Response(ResponseHandle.Innermost), Shape.None);
+            Context.AddStep(new InjectStep(elementId, responseBody));
             return this;
         }
 
-        internal void SetConditionalBranches(List<BranchCase> branches)
+        /// <summary>
+        /// Unloads a slot a partial was loaded into: what the partial brought (its components, rules and
+        /// behavior) is released, the slot is emptied, and what the page booted with stays.
+        /// </summary>
+        /// <param name="elementId">The slot's element id, the one <see cref="Into"/> loaded.</param>
+        /// <returns>This pipeline builder.</returns>
+        public PipelineBuilder<TModel> Unload(string elementId)
         {
-            _draft.SetConditionalBranches(branches);
+            Context.LoadsOrUnloads(elementId);
+            Context.AddStep(new UnloadStep(elementId));
+            return this;
         }
-
-        internal ReactionGraph BuildReaction()
-        {
-            return _draft.BuildReaction();
-        }
-
     }
 }

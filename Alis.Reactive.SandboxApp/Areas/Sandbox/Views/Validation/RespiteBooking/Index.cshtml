@@ -1,5 +1,4 @@
 @model RespiteBookingModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Respite Booking";
@@ -10,8 +9,9 @@
 <native-vstack gap="Lg">
     <native-heading level="H1">Book a Respite Stay</native-heading>
     <native-text color="Secondary">
-        Book a short stay for a resident. The community and daily rate are required;
-        leave the expected nights or transport unanswered while they are still open.
+        Book a short stay for a resident. The community and daily rate are required; leave the
+        expected nights open and say how the stay ends, or plan the nights and the last day's pickup.
+        Communities without a transport desk need the transport answer now.
     </native-text>
 
     <native-card>
@@ -27,6 +27,10 @@
                 .NativeTextBox(b => b.Type("number").Placeholder("0.00")); }
             @{ Html.InputField(plan, m => m.ExpectedNights, o => o.Label("Expected Nights"))
                 .NativeTextBox(b => b.Type("number").Placeholder("Leave blank if open-ended")); }
+            @{ Html.InputField(plan, m => m.EndOfStayPlan, o => o.Label("How an Open-Ended Stay Ends"))
+                .NativeTextBox(b => b.Placeholder("e.g. Ends when her daughter returns from travel")); }
+            @{ Html.InputField(plan, m => m.LastDayPickupTime, o => o.Label("Pickup Time on the Last Day"))
+                .NativeTextBox(b => b.Placeholder("e.g. 10:00 AM")); }
             @{ Html.InputField(plan, m => m.NeedsTransport, o => o.Label("Community Transport"))
                 .NativeRadioGroup(b => b
                     .Option("true", "Yes", "The community drives the resident in")
@@ -36,12 +40,12 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Book", "RespiteBooking"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Book", "RespiteBooking")).Gather(g => g.Form())
                  .Validate<RespiteBookingValidator>("respite-booking-form")
                  .Response(r => r
                     .OnSuccess<RespiteBookingConfirmation>((json, s) =>
                     {
-                        s.Element("respite-booking-status").SetText(json, x => x.Confirmation);
+                        s.Element("respite-booking-status").Text.Set(json.Get(x => x.Confirmation));
                     })
                     .OnError(400, e => e.ValidationErrors("respite-booking-form")));
             }))

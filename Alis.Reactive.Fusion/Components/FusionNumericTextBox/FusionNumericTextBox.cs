@@ -1,18 +1,99 @@
+using System;
+using System.Collections.Generic;
+using Syncfusion.EJ2;
+using Syncfusion.EJ2.Inputs;
+
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Fusion numeric text box component for entering numeric values.
+    /// The Syncfusion NumericTextBox, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as a type parameter in <c>p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount)</c>
-    /// to access FusionNumericTextBox-specific component operations and value reads.
+    /// Reach it with <c>var amount = p.Component&lt;FusionNumericTextBox&gt;(m =&gt; m.Amount);</c> and use its
+    /// members directly: <c>amount.Value.Set(14m);</c>, <c>amount.Increment();</c> or
+    /// <c>p.When(amount.Value).Gt(100m)</c>.
     /// </remarks>
     public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
     {
-        internal static InputComponentRegistrationProfile Registration { get; } =
-            InputComponentRegistrationProfile.For(new FusionNumericTextBox(), "numerictextbox");
+        /// <summary>The numeric value.</summary>
+        public Property<decimal> Value => Property<decimal>();
+
+        /// <summary>The minimum allowed value.</summary>
+        public Property<decimal> Min => Property<decimal>();
+
+        /// <summary>Moves focus into the input.</summary>
+        public void FocusIn() => Method();
+
+        /// <summary>Removes focus from the input.</summary>
+        public void FocusOut() => Method();
+
+        /// <summary>Increments the value by one step.</summary>
+        public void Increment() => Method();
+
+        /// <summary>Decrements the value by one step.</summary>
+        public void Decrement() => Method();
+
+        /// <summary>Raised when the value changes.</summary>
+        public Event<FusionNumericTextBoxChangeArgs> Change =>
+            Event<FusionNumericTextBoxChangeArgs>();
 
         /// <inheritdoc />
-        public string ValueMember => "value";
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
+
+        /// <summary>Raised when the input receives focus.</summary>
+        public Event<FusionNumericTextBoxFocusArgs> Focus =>
+            Event<FusionNumericTextBoxFocusArgs>();
+
+        /// <summary>Raised when the input loses focus.</summary>
+        public Event<FusionNumericTextBoxBlurArgs> Blur =>
+            Event<FusionNumericTextBoxBlurArgs>();
+    }
+
+    /// <summary>Payload of <see cref="FusionNumericTextBox.Change"/>.</summary>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).Gte(100m)</c>.</remarks>
+    public class FusionNumericTextBoxChangeArgs : JsObject
+    {
+        /// <summary>Numeric value after the change.</summary>
+        public ReadOnly<decimal> Value => ReadOnly<decimal>();
+
+        /// <summary>Numeric value before the change.</summary>
+        public ReadOnly<decimal> PreviousValue => ReadOnly<decimal>();
+
+        /// <summary>Whether user interaction triggered the change.</summary>
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
+    }
+
+    /// <summary>Payload of <see cref="FusionNumericTextBox.Focus"/>; carries no data.</summary>
+    public class FusionNumericTextBoxFocusArgs : JsObject
+    {
+    }
+
+    /// <summary>Payload of <see cref="FusionNumericTextBox.Blur"/>; carries no data.</summary>
+    public class FusionNumericTextBoxBlurArgs : JsObject
+    {
+    }
+
+    /// <summary>Renders a <see cref="FusionNumericTextBox"/> for a model-bound field.</summary>
+    public static class FusionNumericTextBoxHtmlExtensions
+    {
+        /// <summary>
+        /// Renders a FusionNumericTextBox bound to the field's model property, with the framework's
+        /// element ID and binding name.
+        /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
+        /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
+        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
+            this InputBoundField<TModel, TProp> field,
+            Action<NumericTextBoxBuilder> build)
+            where TModel : class
+        {
+            var builder = field.Helper.EJS().NumericTextBoxFor(field.Expression)
+                .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
+            build(builder);
+            return field.Render<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox>(builder.Render());
+        }
     }
 }

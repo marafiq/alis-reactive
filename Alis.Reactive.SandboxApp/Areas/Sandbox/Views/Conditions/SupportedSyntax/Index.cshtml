@@ -1,6 +1,5 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax.SupportedSyntaxModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax
 @{
@@ -8,40 +7,40 @@
 
     var plan = Html.ReactivePlan<SupportedSyntaxModel>();
 
-    Html.On(plan, t => t.CustomEvent<SupportedSyntaxTriggerPayload>("supported-trigger-review", (args, p) =>
+    Html.On(plan, t => t.CustomEvent<SupportedSyntaxTriggerPayload>(SupportedSyntaxEvents.SupportedTriggerReview, (args, p) =>
     {
-        p.Element("trigger-precheck").SetText("Review started");
-        p.Dispatch("supported-trigger-audited");
-        p.When(args, x => x.Score).Gte(90)
+        p.Element("trigger-precheck").Text.Set("Review started");
+        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerAudited);
+        p.When(args.Get(x => x.Score)).Gte(90)
             .Then(then =>
             {
-                then.Element("trigger-result").SetText("Priority review");
-                then.Element("trigger-badge").SetText("Priority");
+                then.Element("trigger-result").Text.Set("Priority review");
+                then.Element("trigger-badge").Text.Set("Priority");
                 then.Element("trigger-badge").Show();
             })
-            .ElseIf(args, x => x.Score).Gte(70)
+            .ElseIf(args.Get(x => x.Score)).Gte(70)
             .Then(then =>
             {
-                then.Element("trigger-result").SetText("Standard review");
-                then.Element("trigger-badge").SetText("Standard");
+                then.Element("trigger-result").Text.Set("Standard review");
+                then.Element("trigger-badge").Text.Set("Standard");
                 then.Element("trigger-badge").Show();
             })
             .Else(else_ =>
             {
-                else_.Element("trigger-result").SetText("Deferred review");
+                else_.Element("trigger-result").Text.Set("Deferred review");
                 else_.Element("trigger-badge").Hide();
             });
-        p.Element("trigger-summary").SetText("Workflow complete");
+        p.Element("trigger-summary").Text.Set("Workflow complete");
     }));
 
-    Html.On(plan, t => t.CustomEvent("supported-trigger-audited", p =>
+    Html.On(plan, t => t.CustomEvent(SupportedSyntaxEvents.SupportedTriggerAudited, p =>
     {
-        p.Element("trigger-audit").SetText("Audit logged");
+        p.Element("trigger-audit").Text.Set("Audit logged");
     }));
 
-    Html.On(plan, t => t.CustomEvent("supported-reactive-audited", p =>
+    Html.On(plan, t => t.CustomEvent(SupportedSyntaxEvents.SupportedReactiveAudited, p =>
     {
-        p.Element("reactive-audit").SetText("Audit logged");
+        p.Element("reactive-audit").Text.Set("Audit logged");
     }));
 }
 
@@ -69,21 +68,21 @@
                     .CssClass("px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Dispatch("supported-trigger-review", new { score = 95 });
+                        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerReview, new SupportedSyntaxTriggerPayload { Score = 95 });
                     }))
 
                 @(Html.NativeButton("btn-trigger-standard", "Standard Review")
                     .CssClass("px-3 py-1.5 rounded bg-slate-600 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Dispatch("supported-trigger-review", new { score = 75 });
+                        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerReview, new SupportedSyntaxTriggerPayload { Score = 75 });
                     }))
 
                 @(Html.NativeButton("btn-trigger-deferred", "Deferred Review")
                     .CssClass("px-3 py-1.5 rounded bg-stone-500 text-white text-xs font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Dispatch("supported-trigger-review", new { score = 40 });
+                        p.Dispatch(SupportedSyntaxEvents.SupportedTriggerReview, new SupportedSyntaxTriggerPayload { Score = 40 });
                     }))
             </native-hstack>
 
@@ -124,32 +123,32 @@
             <native-grid cols="C2" gap="Base" class="mb-4">
                 @{ Html.InputField(plan, m => m.RiskScore, o => o.Label("Risk Score"))
                     .FusionNumericTextBox(b => b
-                        .Min(0).Max(100).Step(1)
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("reactive-precheck").SetText("Risk evaluated");
-                            p.Dispatch("supported-reactive-audited");
-                            p.When(args, x => x.Value).Gte(90m)
-                                .Then(then =>
-                                {
-                                    then.Element("reactive-result").SetText("Urgent follow-up");
-                                    then.Element("reactive-badge").SetText("Urgent");
-                                    then.Element("reactive-badge").Show();
-                                })
-                                .ElseIf(args, x => x.Value).Gte(60m)
-                                .Then(then =>
-                                {
-                                    then.Element("reactive-result").SetText("Standard follow-up");
-                                    then.Element("reactive-badge").SetText("Standard");
-                                    then.Element("reactive-badge").Show();
-                                })
-                                .Else(else_ =>
-                                {
-                                    else_.Element("reactive-result").SetText("Routine follow-up");
-                                    else_.Element("reactive-badge").Hide();
-                                });
-                            p.Element("reactive-summary").SetText("Assessment complete");
-                        })); }
+                        .Min(0).Max(100).Step(1))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("reactive-precheck").Text.Set("Risk evaluated");
+                        p.Dispatch(SupportedSyntaxEvents.SupportedReactiveAudited);
+                        p.When(args.Value).Gte(90m)
+                            .Then(then =>
+                            {
+                                then.Element("reactive-result").Text.Set("Urgent follow-up");
+                                then.Element("reactive-badge").Text.Set("Urgent");
+                                then.Element("reactive-badge").Show();
+                            })
+                            .ElseIf(args.Value).Gte(60m)
+                            .Then(then =>
+                            {
+                                then.Element("reactive-result").Text.Set("Standard follow-up");
+                                then.Element("reactive-badge").Text.Set("Standard");
+                                then.Element("reactive-badge").Show();
+                            })
+                            .Else(else_ =>
+                            {
+                                else_.Element("reactive-result").Text.Set("Routine follow-up");
+                                else_.Element("reactive-badge").Hide();
+                            });
+                        p.Element("reactive-summary").Text.Set("Assessment complete");
+                    }); }
             </native-grid>
 
             <native-vstack gap="Sm" class="text-xs font-mono">
@@ -177,12 +176,6 @@
         </native-card-body>
     </native-card>
 
-    <native-card>
-        <native-card-body>
-            <native-heading level="H2">3. Plan JSON</native-heading>
-            <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-        </native-card-body>
-    </native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

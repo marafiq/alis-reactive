@@ -1,0 +1,90 @@
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.AgeCensusViewModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.Grids
+@{
+    ViewData["Title"] = "Census by Age";
+
+    const string GridId = "age-census";
+    const int PageSize = 10;
+
+    var plan = Html.ReactivePlan<AgeCensusViewModel>();
+
+    var columns = FusionGridColumns.Of<AgeCensusResident>();
+
+    // The residents the server answers with, how many the census counts, and what the last change did.
+    void ShowCensus(Data<AgeCensusPage> answer, PipelineBuilder<AgeCensusViewModel> s)
+    {
+        s.Component<FusionGrid>(GridId).Page<AgeCensusResident>().Set(answer);
+        s.Element("census-summary").Text.Set(answer.Get(x => x.Summary));
+        s.Element("census-change").Text.Set(answer.Get(x => x.Change));
+    }
+
+    Html.On(plan, t => t.DomReady(p =>
+        p.Post(Url.SandboxRoute("CensusResidents", "Grid"))
+            .Gather<AgeCensusQuery>(g => g
+                .Set(x => x.Skip, 0)
+                .Set(x => x.Take, PageSize)
+                .Set(x => x.RequiresCounts, true))
+            .Response(r => r.OnSuccess<AgeCensusPage>(ShowCensus))));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Census by Age</native-heading>
+        <native-text color="Secondary">
+            Maple Grove business office. The quarterly state census counts residents by age: list those at or over
+            an age, sort by any column, and page through the census as the server answers it.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <div class="mb-4 max-w-xs">
+            @* The grid asks the server again for its page and sort; the census answers for the age in this box. *@
+            @{ Html.InputField(plan, m => m.MinAge, o => o.Label("Aged at least"))
+                .FusionNumericTextBox(b => b
+                    .Format("n0")
+                    .Min(60)
+                    .Max(110)
+                    .Placeholder("Every age"))
+                .Reactive(evt => evt.Change, (_, p) => p.Component<FusionGrid>(GridId).Refresh()); }
+        </div>
+
+        <div class="mb-3 space-y-1 text-sm">
+            <p id="census-summary" class="font-medium">Loading the census.</p>
+            <p id="census-change" role="status" class="text-text-muted"></p>
+        </div>
+
+        @(Html.FusionGrid<AgeCensusViewModel, AgeCensusResident>(plan, GridId, b => b
+            .AllowPaging(true)
+            .AllowSorting(true)
+            .PageSettings(new GridPageSettings { PageSize = PageSize, PageSizes = new[] { 10, 25 } })
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = columns.Field(r => r.Name), HeaderText = "Name", Width = "190" },
+                new GridColumn { Field = columns.Field(r => r.Age), HeaderText = "Age", Width = "90", TextAlign = TextAlign.Right },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "160" },
+                new GridColumn { Field = columns.Field(r => r.Wing), HeaderText = "Wing", Width = "110" }
+            }))
+            .Reactive(evt => evt.DataStateChange, (args, p) =>
+                p.Post(Url.SandboxRoute("CensusResidents", "Grid"))
+                    .Gather<AgeCensusQuery>(g => g
+                        .Set(x => x.Skip, args.Skip)
+                        .Set(x => x.Take, args.Take)
+                        .Set(x => x.RequiresCounts, args.RequiresCounts)
+                        .Set(x => x.Sorted, args.Sorted)
+                        .Set(x => x.Change, args.Action.Get(a => a.RequestType))
+                        .Set(x => x.SortedColumn, args.Action.Get(a => a.ColumnName))
+                        .Set(x => x.SortedDirection, args.Action.Get(a => a.Direction))
+                        .Set(x => x.ToPage, args.Action.Get(a => a.CurrentPage))
+                        .Set(x => x.FromPage, args.Action.Get(a => a.PreviousPage))
+                        .Set(x => x.PageSize, args.Action.Get(a => a.PageSize))
+                        .Form(m => m.MinAge))
+                    .Response(r => r
+                        .OnSuccess<AgeCensusPage>(ShowCensus)
+                        .OnError(400, refused => refused.Element("census-change").Text.Set("The census could not read that request.")))))
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

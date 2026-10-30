@@ -1,0 +1,63 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders.Arrays
+@using Alis.Reactive.Framework.App.Arrays
+@model RefusalsPage
+@{
+    ViewData["Title"] = "A refused array operation";
+    var plan = Html.ReactivePlan<RefusalsPage>();
+    var eldest = 102;
+
+    // A button that reads the residents and lists them as the mistaken operation would.
+    IHtmlContent List<TListed>(Func<ReactiveArray<Resident>, TypedSource<TListed>> listed) =>
+        plan.Button("list", "List the residents").Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+            .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+                s.Element("listed").Text.Set(listed(s.From(residents))))));
+}
+<h1>A refused array operation</h1>
+
+<p>Listed: <span id="listed"></span></p>
+
+@switch (Model.Mistake)
+{
+    case Mistake.OrderByARecord:
+        @List(residents => residents.OrderBy(x => x.Keyworker).Select(x => x.Name))
+        break;
+    case Mistake.CallAMethodWithNoJavaScriptForm:
+        @List(residents => residents.Select(x => x.Name.Substring(1)))
+        break;
+    case Mistake.ComputeAProjection:
+        @List(residents => residents.Select(x => x.Name + ", " + x.Keyworker.Name))
+        break;
+    case Mistake.TestTextAgainstTheItem:
+        @List(residents => residents.Where(x => x.Name.StartsWith(x.Nickname!)).Select(x => x.Name))
+        break;
+    case Mistake.TestTextAgainstACharacter:
+        @List(residents => residents.Where(x => x.Name.Contains('H')).Select(x => x.Name))
+        break;
+    case Mistake.CompareWithoutTheItem:
+        @List(residents => residents.Where(x => eldest > 100).Select(x => x.Name))
+        break;
+    case Mistake.CastToAFlag:
+        @List(residents => residents.Where(x => (bool)x.Discharged!).Select(x => x.Name))
+        break;
+    case Mistake.ReadAMemberWithNoJavaScriptForm:
+        @List(residents => residents.Where(x => x.Admitted.DayOfYear > 40).Select(x => x.Name))
+        break;
+    case Mistake.ReadADayOfTheWeekAsAValue:
+        @List(residents => residents.Select(x => x.Admitted.DayOfWeek))
+        break;
+    case Mistake.CastToANarrowerNumber:
+        @List(residents => residents.Where(x => (byte)x.Age == 102).Select(x => x.Name))
+        break;
+    case Mistake.CastToAWholeNumber:
+        @List(residents => residents.Where(x => (int)x.Weight == 61).Select(x => x.Name))
+        break;
+    case Mistake.CompareALengthOfTime:
+        @List(residents => residents.Where(x => x.CareThisWeek > TimeSpan.FromHours(12)).Select(x => x.Name))
+        break;
+    case Mistake.OrderByALengthOfTime:
+        @List(residents => residents.OrderBy(x => x.LastOuting).Select(x => x.Name))
+        break;
+}
+
+@Html.RenderPlan(plan)

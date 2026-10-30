@@ -1,0 +1,90 @@
+@model NightCallModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
+@{
+    ViewData["Title"] = "Call Bell";
+
+    const string DeskSlotId = "desk-slot";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<NightCallModel>();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Call Bell</native-heading>
+        <native-text color="Secondary">
+            @Model.Resident's room on the night round. The desk hears the bell only while someone is on duty; the bell says so itself when no one is, and every answer is logged here.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            @(plan.CallBell(NightCallModel.BellId, room: Model.Room)
+                .Reactive(evt => evt.OnCleared, (call, p) =>
+                {
+                    p.Element("answered-room").Text.Set(call.Room);
+                    p.Element("answered-calls").Text.Set(call.Presses);
+                    p.Element("answered").Show();
+                }))
+
+            <native-vstack gap="Xs">
+                <p id="answered" class="text-sm text-success" hidden>Room <span id="answered-room"></span> answered after <span id="answered-calls"></span> calls.</p>
+                <p id="no-call" class="text-sm text-text-secondary" hidden>No call to answer.</p>
+                <native-text color="Secondary">The bell is in room <span id="room">@Model.Room</span>.</native-text>
+            </native-vstack>
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("answer", "Answer the call")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var bell = p.Component<CallBell>(NightCallModel.BellId);
+                        p.When(bell.Ringing).Truthy()
+                            .Then(ringing =>
+                            {
+                                ringing.Element("no-call").Hide();
+                                bell.Clear();
+                            })
+                            .Else(quiet => quiet.Element("no-call").Show());
+                    }))
+                @(Html.NativeButton("move", "Move the bell to the respite suite")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var bell = p.Component<CallBell>(NightCallModel.BellId);
+                        bell.Room.Set("Respite 3");
+                        p.Element("room").Text.Set(bell.Room);
+                    }))
+            </native-hstack>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Desk</native-heading>
+            <native-text color="Secondary">While someone is on duty, the desk hears each call and logs each answer.</native-text>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("desk-on", "Start desk coverage")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Get(Url.SandboxRoute("DeskOnDuty", "CallBell"))
+                            .Response(r => r.OnSuccess(s => s.Into(DeskSlotId)))))
+                @(Html.NativeButton("desk-off", "End desk coverage")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Get(Url.SandboxRoute("NoDesk", "CallBell"))
+                            .Response(r => r.OnSuccess(s => s.Into(DeskSlotId)))))
+            </native-hstack>
+            <div id="@DeskSlotId"><native-text color="Secondary">No one is at the desk tonight.</native-text></div>
+            <native-vstack gap="Xs">
+                <p id="desk-notified" class="text-sm" hidden>Desk notified of call <span id="desk-call"></span> from room <span id="desk-room"></span>.</p>
+                <p id="escalated" class="text-sm text-warning" hidden>Escalated to the charge nurse after three calls.</p>
+                <p id="desk-log" class="text-sm" hidden>Desk log: answered after <span id="desk-answered"></span> calls.</p>
+            </native-vstack>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,55 @@
+@using Alis.Reactive.Framework.App.Validation
+@model Notice
+@{
+    ViewData["Title"] = "A notice";
+    var plan = Html.ReactivePlan<Notice>();
+}
+<h1>A notice</h1>
+
+<div id="notice-form">
+    @{ Html.InputField(plan, m => m.Rooms, o => o.Label("Rooms")).Entry(); }
+    @{ Html.InputField(plan, m => m.FirstName, o => o.Label("First name")).Entry(); }
+    @{ Html.InputField(plan, m => m.Spare, o => o.Label("Spare")).Entry(); }
+    @{ Html.InputField(plan, m => m.Nickname, o => o.Label("Nickname")).Entry(); }
+    @{ Html.InputField(plan, m => m.Pin, o => o.Label("Pin")).Entry(); }
+    @{ Html.InputField(plan, m => m.Code, o => o.Label("Code")).Entry(); }
+    @{ Html.InputField(plan, m => m.Short, o => o.Label("Short")).Entry(); }
+    @{ Html.InputField(plan, m => m.Email, o => o.Label("Email")).Entry(); }
+    @{ Html.InputField(plan, m => m.Letters, o => o.Label("Letters")).Entry(); }
+    @{ Html.InputField(plan, m => m.Card, o => o.Label("Card")).Entry(); }
+    @{ Html.InputField(plan, m => m.Website, o => o.Label("Website")).Entry(); }
+    @{ Html.InputField(plan, m => m.Answer, o => o.Label("Answer")).Entry(); }
+    @{ Html.InputField(plan, m => m.Other, o => o.Label("Other")).Entry(); }
+    @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
+    @{ Html.InputField(plan, m => m.Floor, o => o.Label("Floor")).Entry(); }
+    @{ Html.InputField(plan, m => m.Level, o => o.Label("Level")).Entry(); }
+    @{ Html.InputField(plan, m => m.Bay, o => o.Label("Bay")).Entry(); }
+    @{ Html.InputField(plan, m => m.Stars, o => o.Label("Stars")).Entry(); }
+    @{ Html.InputField(plan, m => m.Score, o => o.Label("Score")).Entry(); }
+    @{ Html.InputField(plan, m => m.Repeat, o => o.Label("Repeat")).Entry(); }
+    @{ Html.InputField(plan, m => m.Address.City, o => o.Label("City")).Entry(); }
+    @{ Html.InputField(plan, m => m.Motto, o => o.Label("Motto")).Entry(); }
+    @{ Html.InputField(plan, m => m.Contact.Phone, o => o.Label("Contact phone")).Entry(); }
+    @{ Html.InputField(plan, m => m.Tagline, o => o.Label("Tagline")).Entry(); }
+    @{ Html.InputField(plan, m => m.Rating, o => o.Label("Rating")).Entry(); }
+    @{ Html.InputField(plan, m => m.Host, o => o.Label("Host")).Entry(); }
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Bed, o => o.Label("Bed")).Entry(); }
+    @{ Html.InputField(plan, m => m.Pass, o => o.Label("Pass")).Entry(); }
+    @{ Html.InputField(plan, m => m.Locker, o => o.Label("Locker")).Entry(); }
+    @{ Html.InputField(plan, m => m.Original, o => o.Label("Original")).Entry(); }
+    @{ Html.InputField(plan, m => m.Escort, o => o.Label("Escort")).Entry(); }
+    @{ Html.InputField(plan, m => m.Parking, o => o.Label("Parking")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Notice")
+        .Gather(g => g.Form())
+        .Validate<NoticeRules>("notice-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("notice-form")))))
+
+@Html.RenderPlan(plan)

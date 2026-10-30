@@ -1,335 +1,333 @@
-@model KanbanModel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Kanban
+@model MaintenanceBoardModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Syncfusion.EJ2.Kanban
 @{
-    ViewData["Title"] = "Kanban";
+    ViewData["Title"] = "Maintenance Board";
 
-    var plan = Html.ReactivePlan<KanbanModel>();
+    const string BoardId = "maintenance-board";
+    // The Blocked column goes between In Progress and Done.
+    const int BlockedColumnIndex = 2;
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string FinishedWorkIsClosed = "Finished work is closed. Open a new work order if the problem comes back.";
 
-    var cardTemplate = FusionTemplate.Create<KanbanTaskCard>()
-        .Class("kanban-task-card space-y-2 text-sm")
-        .Div(row => row.Class("flex items-start justify-between gap-2")
-            .Span(m => m.Summary, "font-semibold text-slate-900")
-            .Badge(m => m.Priority, "rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700"))
-        .Div(row => row.Class("text-xs text-slate-600")
-            .Span("Resident: ", "font-medium text-slate-500")
-            .Span(m => m.Resident))
-        .Div(row => row.Class("flex items-center justify-between text-xs")
-            .Span(m => m.Assignee, "text-slate-700")
-            .Span(m => m.Due, "font-medium text-slate-500"))
-        .When(m => m.IsEscalated,
-            then: t => t.Badge("ESCALATED", "rounded bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"),
-            @else: e => e.Badge(m => m.FacilityName, "rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700"))
+    var plan = Html.ReactivePlan<MaintenanceBoardModel>();
+
+    // The work order members the board reads, named by the work order's own members.
+    var number = Field.Of((WorkOrder w) => w.Number).Name;
+    var status = Field.Of((WorkOrder w) => w.Status).Name;
+    var wing = Field.Of((WorkOrder w) => w.Wing).Name;
+    var wingName = Field.Of((WorkOrder w) => w.WingName).Name;
+    var room = Field.Of((WorkOrder w) => w.Room).Name;
+    var summary = Field.Of((WorkOrder w) => w.Summary).Name;
+    var queue = Field.Of((WorkOrder w) => w.Queue).Name;
+
+    var workOrderCard = FusionTemplate.Create<WorkOrder>()
+        .Class("space-y-1 text-sm")
+        .Div(top => top.Class("flex items-start justify-between gap-2")
+            .Span(w => w.Summary, "font-semibold")
+            .When(w => w.Priority == WorkOrderPriority.Urgent,
+                urgent => urgent.Badge("Urgent", "rounded bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700")))
+        .Div(where => where.Class("flex items-center justify-between gap-2 text-xs text-text-muted")
+            .Span(w => w.Room)
+            .When(w => w.Technician == "",
+                unassigned => unassigned.Span("Unassigned", "italic"),
+                assigned => assigned.Span(w => w.Technician)))
         .Render();
 
+    // The work-order system holds the board's work orders; the board shows them once they arrive.
     Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Get("/api/kanban/board")
-         .Gather(g => g.Static("selectedFacilityId", "AL"))
-         .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
+        p.Get(Url.SandboxRoute("Board", "Kanban"))
+         .Response(r => r.OnSuccess<MaintenanceBoard>((json, s) =>
          {
-             s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
-             s.Element("kanban-status").SetText(json, x => x.Message);
-             s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
-             s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
-             s.Element("kanban-al-count").SetText(json, x => x.AssistedLivingCount);
-         }));
-    }));
+             var board = s.Component<FusionKanban>(BoardId);
+             board.Cards<WorkOrder>().Set(json.Get(x => x.WorkOrders));
+             board.DataBind();
+         }))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionKanban</native-heading>
+    <native-heading level="H1">Maintenance Board</native-heading>
+    <native-text color="Secondary">
+        Maple Grove, Maple and Birch wings. Drag a work order to its new column or double-click it to edit it;
+        the board shows each change once the work-order system has it.
+    </native-text>
+    <p class="text-sm font-medium"><span id="urgent-count">0</span> urgent work orders on the board</p>
 
-    <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
-        <native-hstack gap="Base" wrap="true" align="End">
-            @{ Html.InputField(plan, m => m.SelectedFacilityId, o => o.Label("Facility"))
-                    .FusionDropDownList(b => b
-                        .Placeholder("Select facility")
-                        .DataSource(KanbanSeedData.Facilities)
-                        .Fields<KanbanFacility>(t => t.Name, v => v.Id)
-                        .Value("AL")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("kanban-status").SetText("loading");
-                            p.Get("/api/kanban/board")
-                             .Gather(g => g.Include<FusionDropDownList, KanbanModel>(m => m.SelectedFacilityId))
-                             .Response(r => r.OnSuccess<KanbanBoardResponse>((json, s) =>
-                             {
-                                 s.Component<FusionKanban>("care-kanban").SetDataSource(json, x => x.Cards);
-                                 s.Element("kanban-status").SetText(json, x => x.Message);
-                                 s.Element("kanban-open-count").SetText(json, x => x.OpenCount);
-                                 s.Element("kanban-review-count").SetText(json, x => x.ReviewCount);
-                                 s.Element("kanban-al-count").SetText(json, x => x.AssistedLivingCount);
-                             }));
-                        })); }
+    <native-hstack gap="Sm" class="flex-wrap items-center">
+        @(Html.NativeButton("new-work-order-btn", "New work order")
+            .CssClass("rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                // The work-order system reserves the number; the lead describes the work in the card dialog.
+                p.Post(Url.SandboxRoute("Draft", "Kanban"))
+                 .Response(r => r.OnSuccess<WorkOrderDraft>((json, s) =>
+                     s.Component<FusionKanban>(BoardId).OpenDialog<WorkOrder>(BoardRequestType.AddDialog, json.Get(x => x.WorkOrder))));
+            }))
+        @(Html.NativeButton("front-desk-calls-btn", "Front desk calls")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                // An urgent call goes to the top of Open.
+                p.Get(Url.SandboxRoute("FrontDeskCall", "Kanban"))
+                 .Response(r => r
+                    .OnSuccess<FrontDeskCalls>((json, s) =>
+                        s.Component<FusionKanban>(BoardId).AddCard(json.Get(x => x.WorkOrder), 0))
+                    .OnError<FrontDeskCalls>(404, (json, e) =>
+                        e.Element("board-status").Text.Set(json.Get(x => x.Message))));
+            }))
+        @(Html.NativeButton("send-work-lists-btn", "Send work lists")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                // The board waits while the lists for the night technician go out.
+                var board = p.Component<FusionKanban>(BoardId);
+                board.ShowSpinner();
+                p.Post(Url.SandboxRoute("WorkLists", "Kanban"))
+                 .Gather<WorkLists>(g => g
+                     .Set(x => x.InProgress, board.GetColumnData<WorkOrder>(WorkOrderStatus.InProgress))
+                     .Set(x => x.MapleWing, board.GetSwimlaneData<WorkOrder>(MaintenanceWing.Maple)))
+                 .Response(r => r.OnSuccess<WorkListsSent>((json, s) =>
+                     s.Element("board-status").Text.Set(json.Get(x => x.Message))))
+                 .Finally(f => f.Component<FusionKanban>(BoardId).HideSpinner());
+            }))
+        @(Html.NativeButton("file-away-finished-work-btn", "File away finished work")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                var finished = p.Component<FusionKanban>(BoardId).GetColumnData<WorkOrder>(WorkOrderStatus.Done);
+                p.When(p.From(finished).Any()).Truthy()
+                    .Then(t => t.Component<FusionKanban>(BoardId).DeleteCard(finished))
+                    .Else(e => e.Element("board-status").Text.Set("There is no finished work to file away."));
+            }))
+        @{ Html.InputField(plan, m => m.ShowFinishedWork, o => o.Label("Show finished work"))
+            .NativeCheckBox(b => b.CssClass("rounded border-border"))
+            .Reactive(evt => evt.Change, (args, p) =>
+                p.When(args.Checked).Truthy()
+                    .Then(t => t.Component<FusionKanban>(BoardId).ShowColumn(WorkOrderStatus.Done))
+                    .Else(e => e.Component<FusionKanban>(BoardId).HideColumn(WorkOrderStatus.Done))); }
+    </native-hstack>
 
-            <native-hstack gap="Sm" class="ml-auto text-sm">
-                <span>Status: <span id="kanban-status" class="font-medium">booting</span></span>
-                <span>Open: <span id="kanban-open-count" class="font-medium">0</span></span>
-                <span>Review: <span id="kanban-review-count" class="font-medium">0</span></span>
-                <span>AL: <span id="kanban-al-count" class="font-medium">0</span></span>
-            </native-hstack>
-        </native-hstack>
-    </section>
+    <div class="space-y-1">
+        <p id="board-status" class="text-sm" role="status">The board is up to date.</p>
+        <p id="board-saving" hidden class="text-sm text-text-muted">Saving <span id="board-saving-work"></span> with the work-order system…</p>
+        <p id="drag-hint" hidden class="text-sm text-text-muted">Moving <span id="drag-hint-work"></span>: drop it in its new column.</p>
+    </div>
 
-    <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
-        <native-hstack gap="Sm" class="flex-wrap">
-            @(Html.NativeButton("kanban-add-card-btn", "Add Remote Card")
-                .CssClass("rounded-md bg-primary px-3 py-2 text-sm font-medium text-white")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Post("/api/kanban/cards")
-                     .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
-                     {
-                         s.Component<FusionKanban>("care-kanban").AddCard(json, x => x.Card, 0);
-                         s.Element("kanban-command-status").SetText(json, x => x.Message);
-                     }));
-                }))
-            @(Html.NativeButton("kanban-update-card-btn", "Update Remote Card")
-                .CssClass("rounded-md bg-secondary px-3 py-2 text-sm font-medium text-white")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Put("/api/kanban/cards/102", g => g.Static("source", "button"))
-                     .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
-                     {
-                         s.Component<FusionKanban>("care-kanban").UpdateCard(json, x => x.Card);
-                         s.Element("kanban-command-status").SetText(json, x => x.Message);
-                     }));
-                }))
-            @(Html.NativeButton("kanban-delete-card-btn", "Delete Remote Card")
-                .CssClass("rounded-md bg-rose-600 px-3 py-2 text-sm font-medium text-white")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Delete("/api/kanban/cards/101")
-                     .Response(r => r.OnSuccess<KanbanCardMutationResponse>((json, s) =>
-                     {
-                         s.Component<FusionKanban>("care-kanban").DeleteCard(json, x => x.CardId);
-                         s.Element("kanban-command-status").SetText(json, x => x.Message);
-                     }));
-                }))
-            @(Html.NativeButton("kanban-hide-done-btn", "Hide Done")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").HideColumn("Done");
-                    p.Element("kanban-column-status").SetText("done hidden");
-                }))
-            @(Html.NativeButton("kanban-show-done-btn", "Show Done")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").ShowColumn("Done");
-                    p.Element("kanban-column-status").SetText("done shown");
-                }))
-            @(Html.NativeButton("kanban-add-column-btn", "Add Blocked")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").AddColumn(
-                        new FusionKanbanColumn { HeaderText = "Blocked", KeyField = "Blocked" },
-                        2);
-                    p.Element("kanban-column-status").SetText("blocked added");
-                }))
-            @(Html.NativeButton("kanban-delete-column-btn", "Delete Blocked")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").DeleteColumn(2);
-                    p.Element("kanban-column-status").SetText("blocked deleted");
-                }))
-            @(Html.NativeButton("kanban-spinner-btn", "Spinner")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").ShowSpinner();
-                    p.Component<FusionKanban>("care-kanban").HideSpinner();
-                    p.Element("kanban-spinner-status").SetText("spinner toggled");
-                }))
-            @(Html.NativeButton("kanban-open-dialog-btn", "Open Dialog")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").OpenAddDialog(KanbanSeedData.NewCard(950, "AL"));
-                }))
-            @(Html.NativeButton("kanban-open-edit-dialog-btn", "Open Edit Dialog")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").OpenEditDialog(KanbanSeedData.UpdatedCard());
-                }))
-            @(Html.NativeButton("kanban-open-close-dialog-btn", "Open + Close Dialog")
-                .CssClass("rounded-md border border-border px-3 py-2 text-sm font-medium")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionKanban>("care-kanban").OpenAddDialog(KanbanSeedData.NewCard(951, "AL"));
-                    p.Component<FusionKanban>("care-kanban").CloseDialog();
-                    p.Element("kanban-dialog-status").SetText("open close requested");
-                }))
-            @(Html.NativeButton("kanban-audit-btn", "Audit Board")
-                .CssClass("rounded-md bg-accent px-3 py-2 text-sm font-medium text-white")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var board = p.Component<FusionKanban>("care-kanban");
-                    p.Post("/api/kanban/audit")
-                     .Gather(g => g
-                         .Include(board.Cards<KanbanModel, KanbanTaskCard>(), "cards")
-                         .Include(board.ColumnData<KanbanModel, KanbanTaskCard>("Open"), "openCards")
-                         .Include(board.SwimlaneData<KanbanModel, KanbanTaskCard>("AL"), "assistedLivingCards"))
-                     .Response(r => r.OnSuccess<KanbanAuditResponse>((json, s) =>
-                     {
-                         s.Element("kanban-audit-summary").SetText(json, x => x.Summary);
-                         s.Element("kanban-audit-total").SetText(json, x => x.TotalCards);
-                         s.Element("kanban-audit-open").SetText(json, x => x.OpenCards);
-                         s.Element("kanban-audit-al").SetText(json, x => x.AssistedLivingCards);
-                     }));
-                }))
-        </native-hstack>
+    <div id="parts-notice" hidden class="flex flex-wrap items-center gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm">
+        <span><span id="parts-column" class="font-medium"></span>: <span id="parts-count"></span>. The brake cable for Maple 118's wheelchair is on order.</span>
+        @(Html.NativeButton("part-arrived-btn", "Part arrived")
+            .CssClass(Button)
+            .Reactive(plan, evt => evt.Click, (_, p) =>
+            {
+                // The work order goes back in progress and the Blocked column goes away.
+                p.Post(Url.SandboxRoute("PartArrived", "Kanban"))
+                 .Response(r => r.OnSuccess<PartArrival>((json, s) =>
+                 {
+                     var board = s.Component<FusionKanban>(BoardId);
+                     board.UpdateCard(json.Get(x => x.WorkOrder));
+                     board.DeleteColumn(BlockedColumnIndex);
+                     s.Element("parts-notice").Hide();
+                 }));
+            }))
+    </div>
 
-        <native-vstack gap="Xs" class="mt-4 font-mono text-sm">
-            <p>Command: <span id="kanban-command-status">idle</span></p>
-            <p>Column: <span id="kanban-column-status">idle</span></p>
-            <p>Spinner: <span id="kanban-spinner-status">idle</span></p>
-            <p>Dialog: <span id="kanban-dialog-status">idle</span></p>
-            <p>Dialog close: <span id="kanban-dialog-close-status">none</span></p>
-            <p>Action begin: <span id="kanban-action-begin">none</span></p>
-            <p>Action: <span id="kanban-action-request">none</span></p>
-            <p>Data: <span id="kanban-data-binding-status">none</span>/<span id="kanban-data-bound-status">none</span></p>
-            <p>Query cell: <span id="kanban-query-cell-status">none</span></p>
-            <p>Drag start: <span id="kanban-drag-start-summary">none</span></p>
-            <p>Dragging: <span id="kanban-drag-status">none</span></p>
-            <p>Commit: <span id="kanban-commit-status">none</span></p>
-            <p>Move: <span id="kanban-move-status">none</span></p>
-            <p>Clicked: <span id="kanban-clicked-summary">none</span></p>
-            <p>Double clicked: <span id="kanban-double-clicked-summary">none</span></p>
-            <p>Rendered: <span id="kanban-rendered-summary">none</span></p>
-            <p>Route summary: <span id="kanban-route-summary">none</span></p>
-            <p>Audit: <span id="kanban-audit-summary">none</span></p>
-            <p>Audit counts: <span id="kanban-audit-total">0</span>/<span id="kanban-audit-open">0</span>/<span id="kanban-audit-al">0</span></p>
-        </native-vstack>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-4 shadow-sm" style="height: 640px;">
-        @(Html.FusionKanban(plan, "care-kanban", b =>
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+        <native-card class="min-w-0 flex-1"><native-card-body>
+            @(Html.FusionKanban(plan, BoardId, b =>
             {
                 b.Width("100%");
-                b.Height("100%");
-                b.KeyField("status");
-                b.DataSource(new List<KanbanTaskCard>());
+                b.Height("auto");
+                b.KeyField(status);
+                b.DataSource(new List<WorkOrder>());
                 b.AllowDragAndDrop(true);
-                b.AllowColumnDragAndDrop(true);
-                b.ShowEmptyColumn(true);
-                b.EnableTooltip(true);
-                b.CardSettings(new KanbanCardSettings
+                b.CardSettings(new KanbanCardSettings { HeaderField = number, ContentField = summary, Template = workOrderCard });
+                // Each column is a line: the work-order system keeps the place of every work order in it.
+                b.SortSettings(new KanbanSortSettings { SortBy = SortOrderBy.Custom, Field = queue });
+                b.SwimlaneSettings(new KanbanSwimlaneSettings { KeyField = wing, TextField = wingName, ShowItemCount = false });
+                b.DialogSettings(new KanbanDialogSettings
                 {
-                    HeaderField = "cardId",
-                    ContentField = "summary",
-                    TagsField = "tags",
-                    GrabberField = "cardColor",
-                    SelectionType = SelectionType.Multiple,
-                    Template = cardTemplate
-                });
-                b.SwimlaneSettings(new KanbanSwimlaneSettings
-                {
-                    KeyField = "facilityId",
-                    TextField = "facilityName",
-                    ShowEmptyRow = true,
-                    ShowItemCount = true
+                    Fields = new List<object>
+                    {
+                        new { key = number, text = "Work order", type = "TextBox" },
+                        new { key = status, text = "Status", type = "DropDown" },
+                        new { key = wing, text = "Wing", type = "DropDown" },
+                        new { key = room, text = "Room", type = "TextBox" },
+                        new { key = summary, text = "Problem", type = "TextArea" }
+                    }
                 });
                 b.Columns(new List<KanbanColumn>
                 {
-                    new KanbanColumn { HeaderText = "Open", KeyField = "Open", ShowAddButton = true },
-                    new KanbanColumn { HeaderText = "In Progress", KeyField = "InProgress" },
-                    new KanbanColumn { HeaderText = "Review", KeyField = "Review" },
-                    new KanbanColumn { HeaderText = "Done", KeyField = "Done" }
+                    new KanbanColumn { HeaderText = "Open", KeyField = WorkOrderStatus.Open },
+                    new KanbanColumn { HeaderText = "In Progress", KeyField = WorkOrderStatus.InProgress },
+                    // The board shows finished work only on the day it is finished, so the column counts nothing.
+                    new KanbanColumn { HeaderText = "Done", KeyField = WorkOrderStatus.Done, ShowItemCount = false }
                 });
             })
-            .Reactive(evt => evt.DataBinding<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Element("kanban-data-binding-status").SetText(args, x => x.Result[0].Summary);
-            })
-            .Reactive(evt => evt.DataBound, (args, p) =>
-            {
-                p.Element("kanban-data-bound-status").SetText("bound");
-            })
-            .Reactive(evt => evt.CardClick<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Element("kanban-clicked-summary").SetText(args, x => x.Data.Summary);
-                p.Get("/api/kanban/card/{cardId}/summary")
-                 .Gather(g => g.RouteParam("cardId", args, x => x.Data.Id))
-                 .Response(r => r.OnSuccess<KanbanCardSummaryResponse>((json, s) =>
-                 {
-                     s.Element("kanban-route-summary").SetText(json, x => x.Summary);
-                 }));
-            })
-            .Reactive(evt => evt.CardDoubleClick<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Element("kanban-double-clicked-summary").SetText(args, x => x.Data.Summary);
-            })
+            .Reactive(evt => evt.DataBinding<WorkOrder>(), (args, p) =>
+                p.Element("urgent-count").Text.Set(p.From(args.Result).Count(w => w.Priority == WorkOrderPriority.Urgent)))
+            .Reactive(evt => evt.DataBound, (_, p) => p.Element("board-saving").Hide())
+            .Reactive(evt => evt.CardRendered<WorkOrder>(), (args, p) =>
+                // Finished work stays on the board for its day.
+                p.When(args.Data.Get(w => w.Status)).Eq(WorkOrderStatus.Done).And(args.Data.Get(w => w.FinishedToday)).Falsy()
+                    .Then(_ => args.Cancel.Set(true)))
             .Reactive(evt => evt.QueryCellInfo, (args, p) =>
+                // The header of the Blocked column says how much work waits on parts.
+                p.When(args.RequestType).Eq(BoardRequestType.HeaderRow)
+                    .And(args.Data.Get(x => x[0].KeyField)).Eq(WorkOrderStatus.Blocked)
+                    .Then(t =>
+                    {
+                        t.Element("parts-column").Text.Set(args.Data.Get(x => x[0].TextField));
+                        t.Element("parts-count").Text.Set(args.Data.Get(x => x[0].Count));
+                        t.Element("parts-notice").Show();
+                    }))
+            .Reactive(evt => evt.CardClick<WorkOrder>(), (args, p) =>
             {
-                p.Element("kanban-query-cell-status").SetText(args, x => x.RequestType);
+                p.Element("work-order-hint").Hide();
+                p.Element("work-order-title").Text.Set(args.Data.Get(w => w.Summary));
+                p.Element("work-order-room").Text.Set(args.Data.Get(w => w.Room));
+                p.Element("work-order-technician").Text.Set(args.Data.Get(w => w.Technician));
+                p.Element("work-order-details").Show();
+                p.Get(Url.SandboxRouteTemplate("History", "Kanban", "workOrderNumber"))
+                 .Gather<WorkOrderLookup>(g => g.Set(x => x.WorkOrderNumber, args.Data.Get(w => w.Number)))
+                 .Response(r => r.OnSuccess<WorkOrderHistory>((json, s) =>
+                     s.Element("work-order-history").Text.Set(json.Get(x => x.History))));
             })
-            .Reactive(evt => evt.CardRendered<KanbanTaskCard>(), (args, p) =>
+            .Reactive(evt => evt.CardDoubleClick<WorkOrder>(), (args, p) =>
+                p.When(args.Data.Get(w => w.Status)).Eq(WorkOrderStatus.Done)
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-status").Text.Set(FinishedWorkIsClosed);
+                    }))
+            .Reactive(evt => evt.DragStart<WorkOrder>(), (args, p) =>
+                p.When(args.Data.Get(x => x[0].Status)).Eq(WorkOrderStatus.Done)
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-status").Text.Set(FinishedWorkIsClosed);
+                    })
+                    .Else(e => e.Element("drag-hint-work").Text.Set(args.Data.Get(x => x[0].Summary))))
+            .Reactive(evt => evt.Drag<WorkOrder>(), (_, p) => p.Element("drag-hint").Show())
+            .Reactive(evt => evt.DragStop<WorkOrder>(), (args, p) =>
             {
-                p.Element("kanban-rendered-summary").SetText(args, x => x.Data.Summary);
+                p.Element("drag-hint").Hide();
+                // Urgent work is the next job: it goes to the top of In Progress.
+                p.When(args.Data.Get(x => x[0].Priority)).Eq(WorkOrderPriority.Urgent)
+                    .And(args.Data.Get(x => x[0].Status)).Eq(WorkOrderStatus.InProgress)
+                    .And(args.DropIndex).Gt(0)
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-status").Text.Set("Urgent work goes to the top of In Progress.");
+                    });
             })
-            .Reactive(evt => evt.DragStart<KanbanTaskCard>(), (args, p) =>
+            .Reactive(evt => evt.ActionBegin<WorkOrder>(), (args, p) =>
             {
-                p.Element("kanban-drag-start-summary").SetText(args, x => x.Data[0].Summary);
+                p.When(args.RequestType).Eq(BoardRequestType.Changing)
+                    .And(args.ChangedRecords.Get(x => x[0].Status)).Eq(WorkOrderStatus.Done)
+                    .And(args.ChangedRecords.Get(x => x[0].Technician)).IsEmpty()
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-status").Text.Set("Assign a technician before marking the work done.");
+                    });
+                p.When(args.RequestType).Eq(BoardRequestType.Removing)
+                    .And(p.From(args.DeletedRecords).Any(w => !w.SignedOff)).Truthy()
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-status").Text.Set("Finished work is filed away only after the resident signs off.");
+                    });
             })
-            .Reactive(evt => evt.Drag<KanbanTaskCard>(), (args, p) =>
+            .Reactive(evt => evt.ActionComplete<WorkOrder>(), (args, p) =>
             {
-                p.Element("kanban-drag-status").SetText(args, x => x.Data[0].Summary);
+                // The board shows a change once the work-order system has it, so it does not draw it now.
+                p.When(args.RequestType).In(BoardRequestType.Added, BoardRequestType.Changed, BoardRequestType.Removed)
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-saving").Show();
+                    });
+                p.When(args.RequestType).Eq(BoardRequestType.Added)
+                    .Then(t => t.Element("board-saving-work").Text.Set(args.AddedRecords.Get(x => x[0].Summary)))
+                    .ElseIf(args.RequestType).Eq(BoardRequestType.Changed)
+                    .Then(t => t.Element("board-saving-work").Text.Set(args.ChangedRecords.Get(x => x[0].Summary)))
+                    .ElseIf(args.RequestType).Eq(BoardRequestType.Removed)
+                    .Then(t => t.Element("board-saving-work").Text.Set("the finished work"));
             })
-            .Reactive(evt => evt.ActionBegin<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Element("kanban-action-begin").SetText(args, x => x.RequestType);
-            })
-            .Reactive(evt => evt.ActionComplete<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Element("kanban-action-request").SetText(args, x => x.RequestType);
-            })
-            .Reactive(evt => evt.DataSourceChanged<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Post("/api/kanban/cards/commit")
-                 .Gather(g => g
-                     .FromEvent(args, x => x.RequestType, "requestType")
-                     .FromEvent(args, x => x.AddedRecords, "addedRecords")
-                     .FromEvent(args, x => x.ChangedRecords, "changedRecords")
-                     .FromEvent(args, x => x.DeletedRecords, "deletedRecords"))
-                 .Response(r => r.OnSuccess<KanbanCommitResponse>((json, s) =>
-                 {
-                     args.EndEdit(s);
-                     s.Element("kanban-commit-status").SetText(json, x => x.Message);
-                 }));
-            })
-            .Reactive(evt => evt.DragStop<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Put("/api/kanban/cards/move", g => g
-                     .FromEvent(args, x => x.Data, "cards")
-                     .FromEvent(args, x => x.DropIndex, "dropIndex"))
-                 .Response(r => r.OnSuccess<KanbanMoveResponse>((json, s) =>
-                 {
-                     s.Component<FusionKanban>("care-kanban").UpdateCard(json, x => x.Card);
-                     s.Element("kanban-move-status").SetText(json, x => x.Message);
-                 }));
-            })
-            .Reactive(evt => evt.DialogOpen<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Element("kanban-dialog-status").SetText(args, x => x.RequestType);
-            })
-            .Reactive(evt => evt.DialogClose<KanbanTaskCard>(), (args, p) =>
-            {
-                p.Element("kanban-dialog-close-status").SetText(args, x => x.RequestType);
-            }))
-    </section>
+            .Reactive(evt => evt.DataSourceChanged<WorkOrder>(), (args, p) =>
+                p.Post(Url.SandboxRoute("Commit", "Kanban"))
+                 .Gather<WorkOrderChange>(g => g
+                     .Set(x => x.RequestType, args.RequestType)
+                     .Set(x => x.AddedRecords, args.AddedRecords)
+                     .Set(x => x.ChangedRecords, args.ChangedRecords)
+                     .Set(x => x.DeletedRecords, args.DeletedRecords)
+                     .Set(x => x.Index, args.Index))
+                 .Response(r => r
+                    .OnSuccess<MaintenanceBoard>((json, s) =>
+                    {
+                        args.EndEdit();
+                        s.When(json.Get(x => x.BackOrdered)).Truthy()
+                            .Then(t => t.Component<FusionKanban>(BoardId).AddColumn(
+                                new FusionKanbanColumn { HeaderText = "Waiting on parts", KeyField = WorkOrderStatus.Blocked, AllowToggle = true, IsExpanded = false },
+                                BlockedColumnIndex));
+                        var board = s.Component<FusionKanban>(BoardId);
+                        board.Cards<WorkOrder>().Set(json.Get(x => x.WorkOrders));
+                        board.DataBind();
+                        s.Element("board-status").Text.Set(json.Get(x => x.Message));
+                    })
+                    .OnError<WorkOrderRefusal>(409, (refusal, e) =>
+                    {
+                        // The change never reached the board: it stops waiting and leaves the work order as it was.
+                        args.CancelEdit();
+                        e.Element("board-saving").Hide();
+                        e.Element("board-status").Text.Set(refusal.Get(x => x.Message));
+                    })))
+            .Reactive(evt => evt.DialogOpen<WorkOrder>(), (args, p) =>
+                p.When(args.RequestType).Eq(BoardRequestType.DeleteDialog)
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-status").Text.Set("Work orders leave the board when finished work is filed away.");
+                    })
+                    // A work order another technician is updating closes again and says who has it.
+                    .ElseIf(args.RequestType).Eq(BoardRequestType.EditDialog)
+                    .Then(t =>
+                        t.Get(Url.SandboxRouteTemplate("Hold", "Kanban", "workOrderNumber"))
+                         .Gather<WorkOrderLookup>(g => g.Set(x => x.WorkOrderNumber, args.Data.Get(w => w.Number)))
+                         .Response(r => r.OnSuccess<WorkOrderHold>((hold, s) =>
+                             s.When(hold.Get(x => x.HeldBy)).NotEmpty()
+                                 .Then(held =>
+                                 {
+                                     held.Component<FusionKanban>(BoardId).CloseDialog();
+                                     held.Element("board-status").Text.Set(hold.Get(x => x.Message));
+                                 })))))
+            .Reactive(evt => evt.DialogClose<WorkOrder>(), (args, p) =>
+                p.When(args.RequestType).Eq(BoardRequestType.EditDialog).And(args.Data.Get(w => w.Room)).IsEmpty()
+                    .Then(t =>
+                    {
+                        args.Cancel.Set(true);
+                        t.Element("board-status").Text.Set("A work order keeps its room. Name the room before saving.");
+                    })))
+        </native-card-body></native-card>
 
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
+        <aside class="rounded-lg border border-border bg-white p-4 text-sm lg:w-72" aria-label="Work order">
+            <p id="work-order-hint" class="text-text-muted">Click a work order to see its details.</p>
+            <div id="work-order-details" hidden class="space-y-2">
+                <h2 id="work-order-title" class="text-base font-semibold"></h2>
+                <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+                    <dt class="text-text-muted">Room</dt>
+                    <dd id="work-order-room"></dd>
+                    <dt class="text-text-muted">Technician</dt>
+                    <dd id="work-order-technician"></dd>
+                </dl>
+                <p id="work-order-history" class="text-text-muted"></p>
+            </div>
+        </aside>
+    </div>
 </native-vstack>
 
 @Html.RenderPlan(plan)

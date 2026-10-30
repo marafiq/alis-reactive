@@ -40,7 +40,7 @@ case "$current" in
     echo "" >&2
     echo "  BRANCH GUARD — refusing a direct commit on '$current'." >&2
     echo "  '$current' moves by pull request only (docs/BRANCHING.md)." >&2
-    echo "  Start a branch:  git switch -c feature/<name>   (or a worktree: CLAUDE.md Rule 14)" >&2
+    echo "  Start a branch:  git switch -c feature/<name>   (or a worktree: CLAUDE.md, Workflow)" >&2
     echo "  Override once:   ALIS_ALLOW_PROTECTED=1 git commit ..." >&2
     echo "" >&2
     [ "$ALIS_ALLOW_PROTECTED" = "1" ] || exit 1

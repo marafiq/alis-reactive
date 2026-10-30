@@ -4,8 +4,10 @@ using System.IO;
 using System.Text.Encodings.Web;
 #if NET48
 using System.Web;
+using System.Web.Mvc;
 #else
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
 namespace Alis.Reactive.Native.Components
@@ -13,6 +15,7 @@ namespace Alis.Reactive.Native.Components
     /// <summary>
     /// Builds the anchor element returned by <c>NativeActionLink</c>.
     /// </summary>
+    /// <typeparam name="TModel">The view's model.</typeparam>
     public sealed class NativeActionLinkBuilder<TModel> :
 #if NET48
         IHtmlString
@@ -21,19 +24,34 @@ namespace Alis.Reactive.Native.Components
 #endif
         where TModel : class
     {
+#if NET48
+        private readonly HtmlHelper<TModel> _html;
+#else
+        private readonly IHtmlHelper<TModel> _html;
+#endif
+        private readonly ReactivePlan<TModel> _plan;
         private readonly string _elementId;
         private readonly string _text;
         private readonly string _href;
-        private readonly string _payloadJson;
         private readonly Dictionary<string, string> _attributes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private string? _cssClass;
 
-        internal NativeActionLinkBuilder(string elementId, string text, string href, string payloadJson)
+        internal NativeActionLinkBuilder(
+#if NET48
+            HtmlHelper<TModel> html,
+#else
+            IHtmlHelper<TModel> html,
+#endif
+            ReactivePlan<TModel> plan,
+            string elementId,
+            string text,
+            string href)
         {
-            _elementId = elementId ?? throw new ArgumentNullException(nameof(elementId));
+            _html = html;
+            _plan = plan;
+            _elementId = elementId;
             _text = text ?? throw new ArgumentNullException(nameof(text));
             _href = href ?? throw new ArgumentNullException(nameof(href));
-            _payloadJson = payloadJson ?? throw new ArgumentNullException(nameof(payloadJson));
         }
 
         /// <summary>
@@ -52,8 +70,8 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <remarks>
         /// Use <c>Attr("class", value)</c> or <see cref="CssClass"/> for CSS classes.
-        /// Generated <c>id</c>, <c>href</c>, and <c>data-reactive-link</c> attributes
-        /// are reserved because they bind the anchor to the reactive runtime.
+        /// The generated <c>id</c> and <c>href</c> are reserved: the link's plan finds the anchor by
+        /// its id, and its request goes to its href.
         /// </remarks>
         /// <param name="name">Attribute name.</param>
         /// <param name="value">Attribute value encoded into the rendered anchor.</param>
@@ -98,9 +116,6 @@ namespace Alis.Reactive.Native.Components
             writer.Write(" href=\"");
             writer.Write(encoder.Encode(_href));
             writer.Write("\"");
-            writer.Write(" data-reactive-link=\"");
-            writer.Write(encoder.Encode(_payloadJson));
-            writer.Write("\"");
 
             if (HasCssClass(out var cssClass))
             {
@@ -121,13 +136,19 @@ namespace Alis.Reactive.Native.Components
             writer.Write(">");
             writer.Write(encoder.Encode(_text));
             writer.Write("</a>");
+
+            // The link's own plan, rendered beside it.
+#if NET48
+            writer.Write(_html.RenderPlan(_plan).ToHtmlString());
+#else
+            _html.RenderPlan(_plan).WriteTo(writer, encoder);
+#endif
         }
 
         private static bool IsReservedAttribute(string name)
         {
             return string.Equals(name, "id", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(name, "href", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(name, "data-reactive-link", StringComparison.OrdinalIgnoreCase);
+                || string.Equals(name, "href", StringComparison.OrdinalIgnoreCase);
         }
 
         private bool HasCssClass(out string cssClass)

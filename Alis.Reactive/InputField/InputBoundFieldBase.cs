@@ -20,7 +20,7 @@ namespace Alis.Reactive.InputField
         /// <summary>HTML helper used by component render factories.</summary>
         public THelper Helper { get; }
 
-        /// <summary>Reactive Plan that receives this field's component registration.</summary>
+        /// <summary>The plan the rendered input joins.</summary>
         public ReactivePlan<TModel> Plan { get; }
 
         /// <summary>Model expression used to derive the field binding path and component ID.</summary>
@@ -29,23 +29,21 @@ namespace Alis.Reactive.InputField
         /// <summary>Field wrapper options used for label and required markup.</summary>
         public InputFieldOptions Options { get; }
 
-        internal string ElementId => _componentSlot.ElementId;
+        /// <summary>The element ID the framework derives from the model expression. Render the component with it.</summary>
+        public string ElementId => _identity.ElementId;
 
-        internal string BindingPath => _componentSlot.BindingName;
-
-        internal InputComponentRenderTarget RenderTarget => _componentSlot.RenderTarget;
+        /// <summary>The binding path; render it as the component's <c>name</c> so the value posts back.</summary>
+        public string BindingPath => _identity.BindingName;
 
         internal TextWriter Writer { get; }
 
-        private readonly ModelBoundInputComponentSlot _componentSlot;
+        private readonly InputIdentity _identity;
 
-        internal void RegisterInputComponent(InputComponentRegistrationProfile profile)
-        {
-            if (profile == null) throw new ArgumentNullException(nameof(profile));
-            Plan.RegisterInputComponent(_componentSlot.Register(profile));
-        }
+        // The plan learns which component holds the input's value and which event commits it.
+        internal void AddRenderedInput(IInputComponent component) =>
+            Plan.AddRenderedInput(RenderedInput.Of(_identity, component));
 
-        // Internal because Html.InputField owns the component slot used by validation and gather.
+        // Internal because Html.InputField decides the input's identity, which validation and gather read.
         internal InputBoundFieldBase(
             THelper helper,
             BoundInputField<TModel, TProp> field,
@@ -56,25 +54,23 @@ namespace Alis.Reactive.InputField
             Plan = field.Plan;
             Expression = field.Expression;
             Options = field.Options;
-            _componentSlot = field.ComponentSlot;
+            _identity = field.Identity;
             Writer = writer;
         }
 
         /// <summary>
         /// Renders the field wrapper (label + validation error elements) around content
-        /// written by the callback. Throws if the component was not registered via
-        /// <c>RegisterInputComponent</c>: unregistered components are invisible to validation
-        /// and gather, causing silent failures.
+        /// written by the callback, or the content alone for a hidden field.
         /// </summary>
         internal void Render(Action writeContent)
         {
-            if (!Plan.HasRegisteredInputComponent(_componentSlot.BindingPath))
-                throw new InvalidOperationException(
-                    $"Input field '{BindingPath}' rendered without registering an input component. " +
-                    "Validation and gather depend on the registered input contract. " +
-                    "Call setup.RegisterInputComponent(...) in the component HtmlExtension before rendering the component.");
+            if (Options.IsHidden)
+            {
+                writeContent();
+                return;
+            }
 
-            var fieldMarkup = new InputFieldBuilder(Writer, BindingPath).ForInputId(ElementId);
+            var fieldMarkup = new InputFieldBuilder(Writer, BindingPath, ElementId);
             if (Options.LabelText != null) fieldMarkup.Label(Options.LabelText);
             if (Options.IsRequired) fieldMarkup.Required();
             using (fieldMarkup.Begin()) { writeContent(); }
@@ -87,24 +83,24 @@ namespace Alis.Reactive.InputField
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldOptions options,
-            ModelBoundInputComponentSlot componentSlot)
+            InputIdentity identity)
         {
             Plan = plan ?? throw new ArgumentNullException(nameof(plan));
             Expression = expression ?? throw new ArgumentNullException(nameof(expression));
             Options = options ?? throw new ArgumentNullException(nameof(options));
-            ComponentSlot = componentSlot ?? throw new ArgumentNullException(nameof(componentSlot));
+            Identity = identity ?? throw new ArgumentNullException(nameof(identity));
         }
 
         internal ReactivePlan<TModel> Plan { get; }
         internal Expression<Func<TModel, TProp>> Expression { get; }
         internal InputFieldOptions Options { get; }
-        internal ModelBoundInputComponentSlot ComponentSlot { get; }
+        internal InputIdentity Identity { get; }
 
         internal static BoundInputField<TModel, TProp> Create(
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldOptions options,
-            ModelBoundInputComponentSlot componentSlot) =>
-            new BoundInputField<TModel, TProp>(plan, expression, options, componentSlot);
+            InputIdentity identity) =>
+            new BoundInputField<TModel, TProp>(plan, expression, options, identity);
     }
 }

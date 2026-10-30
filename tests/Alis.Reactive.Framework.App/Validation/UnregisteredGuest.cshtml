@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Validation
+@model UnregisteredGuest
+@{
+    ViewData["Title"] = "A guest no rules are registered for";
+    var plan = Html.ReactivePlan<UnregisteredGuest>();
+}
+<h1>A guest no rules are registered for</h1>
+
+<div id="guest-form">
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Guest")).Entry(); }
+</div>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Guest")
+        .Gather(g => g.Form())
+        .Validate<GuestNameRules<UnregisteredGuest>>("guest-form")))
+
+@Html.RenderPlan(plan)

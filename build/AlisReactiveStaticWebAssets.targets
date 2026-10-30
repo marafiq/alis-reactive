@@ -1,0 +1,85 @@
+<Project>
+
+  <!--
+    Ships a package's browser assets the way a Razor class library does: as static web assets.
+
+    A project imports this file and names each asset as an AlisReactiveStaticWebAsset item, the file
+    and the RelativePath it is served at:
+
+      <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\design-system.dev.css" RelativePath="css/design-system.css" />
+
+    Where the files land:
+      net10.0  An ASP.NET Core app that references the package (or the project) serves each asset at
+               ~/_content/{PackageId}/{RelativePath}; publish copies it to wwwroot/_content/{PackageId}/.
+               The nupkg carries it under staticwebassets/{RelativePath}.
+      net48    ASP.NET MVC 5 has no static web assets. The package's build\net48\{PackageId}.targets
+               (AlisReactiveNetFrameworkContent.targets) copies the same staticwebassets/ files into the
+               web project at Content\{PackageId}\{RelativePath} after every build.
+
+    Most assets are bundles npm builds into Alis.Reactive.Assets/dist (AlisAssetsDist in
+    Directory.Build.props); the rest are stylesheets shipped as written. Each asset keeps its own folder
+    as its content root, so an app running in Development serves the file from where it is and a
+    watcher's rebuild shows on the next request. The SDK's own discovery cannot do that for these
+    files: it roots every asset at the project's wwwroot folder.
+
+    A build that needs no browser assets (the plan contract generator, a test listing) passes
+    -p:BuildReactiveBrowserAssets=false; every other build fails when an asset is missing, and pack
+    always does.
+  -->
+
+  <PropertyGroup>
+    <ResolveCoreStaticWebAssetsDependsOn>$(ResolveCoreStaticWebAssetsDependsOn);DefineAlisReactiveStaticWebAssets</ResolveCoreStaticWebAssetsDependsOn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(TargetFrameworks.Contains('net48'))">
+    <None Include="$(MSBuildThisFileDirectory)AlisReactiveNetFrameworkContent.targets"
+          Pack="true"
+          PackagePath="build\net48\$(PackageId).targets;buildTransitive\net48\$(PackageId).targets"
+          Visible="false" />
+  </ItemGroup>
+
+  <Target Name="DefineAlisReactiveStaticWebAssets" Condition="'@(AlisReactiveStaticWebAsset)' != ''">
+
+    <Error Condition="'$(BuildReactiveBrowserAssets)' != 'false' and '$(DesignTimeBuild)' != 'true' and !Exists('%(AlisReactiveStaticWebAsset.FullPath)')"
+           Text="$(PackageId) ships '%(AlisReactiveStaticWebAsset.FullPath)', which does not exist. Run 'npm run build:all' from the repo root (scripts/build.sh does), or pass -p:BuildReactiveBrowserAssets=false to a build that needs no browser assets." />
+
+    <ItemGroup>
+      <_AlisReactiveStaticWebAssetCandidate Include="@(AlisReactiveStaticWebAsset->'%(FullPath)')"
+                                            Condition="Exists('%(AlisReactiveStaticWebAsset.FullPath)')" />
+      <_AlisReactiveStaticWebAssetCandidate>
+        <OriginalItemSpec>%(Identity)</OriginalItemSpec>
+        <ContentRoot>%(RootDir)%(Directory)</ContentRoot>
+      </_AlisReactiveStaticWebAssetCandidate>
+    </ItemGroup>
+
+    <DefineStaticWebAssets Condition="'@(_AlisReactiveStaticWebAssetCandidate)' != ''"
+                           CandidateAssets="@(_AlisReactiveStaticWebAssetCandidate)"
+                           SourceId="$(PackageId)"
+                           SourceType="Discovered"
+                           ContentRoot="%(_AlisReactiveStaticWebAssetCandidate.ContentRoot)"
+                           BasePath="$(StaticWebAssetBasePath)"
+                           AssetKind="All"
+                           AssetMode="All"
+                           AssetRole="Primary"
+                           AssetMergeSource="$(StaticWebAssetMergeTarget)"
+                           PropertyOverrides="RelativePath"
+                           FingerprintCandidates="$(StaticWebAssetsFingerprintContent)"
+                           FingerprintPatterns="@(StaticWebAssetFingerprintPattern)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+      <Output TaskParameter="Assets" ItemName="_AlisReactiveStaticWebAsset" />
+    </DefineStaticWebAssets>
+
+    <DefineStaticWebAssetEndpoints Condition="'@(_AlisReactiveStaticWebAsset)' != ''"
+                                   CandidateAssets="@(_AlisReactiveStaticWebAsset)"
+                                   ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
+      <Output TaskParameter="Endpoints" ItemName="StaticWebAssetEndpoint" />
+    </DefineStaticWebAssetEndpoints>
+
+  </Target>
+
+  <Target Name="VerifyAlisReactiveStaticWebAssetsBeforePack" BeforeTargets="GenerateNuspec" Condition="'@(AlisReactiveStaticWebAsset)' != ''">
+    <Error Condition="!Exists('%(AlisReactiveStaticWebAsset.FullPath)')"
+           Text="$(PackageId) cannot pack without '%(AlisReactiveStaticWebAsset.FullPath)'. Run 'npm run build:all' from the repo root before packing; dotnet pack never runs npm." />
+  </Target>
+
+</Project>

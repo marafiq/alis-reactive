@@ -1,7 +1,6 @@
 @model FusionBreadcrumbModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Syncfusion.EJ2.Navigations
 @{
     ViewData["Title"] = "Resident Care Record";
@@ -28,11 +27,11 @@
     {
         var trailComponent = p.Component<FusionBreadcrumb>(TrailId);
 
-        p.When(trailComponent.ActiveItem()).Eq(carePlanUrl)
+        p.When(trailComponent.ActiveItem).Eq(carePlanUrl)
             .Then(open => open.Element("viewing-now")
-                .SetText("You are in this resident's Care Plan. Use the trail to step back up the record."))
+                .Text.Set("You are in this resident's Care Plan. Use the trail to step back up the record."))
             .Else(other => other.Element("viewing-now")
-                .SetText("You have stepped back up the record."));
+                .Text.Set("You have stepped back up the record."));
     }));
 }
 
@@ -55,20 +54,20 @@
             })
             .Reactive(evt => evt.ItemClick, (args, p) =>
             {
-                p.Element("open-section-heading").SetText(args, x => x.Item.Text);
-                p.Element("open-section-icon").SetText(args, x => x.Item.IconCss);
+                p.Element("open-section-heading").Text.Set(args.Item.Get(x => x.Text));
+                p.Element("open-section-icon").Text.Set(args.Item.Get(x => x.IconCss));
 
                 p.Post(openUrl)
-                    .Gather(g => g
-                        .FromEvent(args, x => x.Item.Text, "text")
-                        .FromEvent(args, x => x.Item.Id, "id")
-                        .FromEvent(args, x => x.Item.Url, "url")
-                        .FromEvent(args, x => x.Item.Disabled, "disabled"))
+                    .Gather<OpenCareSectionRequest>(g => g
+                        .Set(x => x.Text, args.Item.Get(x => x.Text))
+                        .Set(x => x.Id, args.Item.Get(x => x.Id))
+                        .Set(x => x.Url, args.Item.Get(x => x.Url))
+                        .Set(x => x.Disabled, args.Item.Get(x => x.Disabled)))
                     .Response(r => r.OnSuccess<OpenCareSectionResponse>((json, s) =>
                     {
-                        s.Element("open-section-summary").SetText(json, x => x.Summary);
-                        s.Element("open-section-code").SetText(json, x => x.SectionCode);
-                        s.Element("open-section-panel").RemoveClass("hidden");
+                        s.Element("open-section-summary").Text.Set(json.Get(x => x.Summary));
+                        s.Element("open-section-code").Text.Set(json.Get(x => x.SectionCode));
+                        s.Element("open-section-panel").ClassList.Remove("hidden");
                     }));
             }))
 
@@ -79,7 +78,9 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionBreadcrumb>(TrailId).SetActiveItem(residentUrl);
+                        var breadcrumb = p.Component<FusionBreadcrumb>(TrailId);
+                        breadcrumb.ActiveItem.Set(residentUrl);
+                        breadcrumb.DataBind();
                     }))
             </native-hstack>
         </native-vstack>

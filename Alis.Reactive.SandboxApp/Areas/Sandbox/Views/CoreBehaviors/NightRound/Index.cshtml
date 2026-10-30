@@ -1,0 +1,148 @@
+@model NightRoundModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CoreBehaviors.NightRound
+@{
+    ViewData["Title"] = "Night Round";
+
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var rooms = new List<SelectListItem>
+    {
+        new("Room 12 — Margaret Hale", "12"),
+        new("Room 14 — Arthur Lee", "14"),
+        new("Room 15 — Dorothy Lane", "15"),
+    };
+
+    var plan = Html.ReactivePlan<NightRoundModel>();
+
+    Html.On(plan, t => t
+        // The round opens as the page does: the wing is named, room 12's thermostat takes the wing's night
+        // setting, and the desk is told through an event that carries nothing.
+        .DomReady(p =>
+        {
+            p.Element("round-status").Text.Set("Round open on the Garden wing");
+            p.Component<Thermostat>(m => m.Target).Schedule.Night.Set(66);
+            p.Dispatch(NightRoundEvents.RoundOpened);
+        })
+        .CustomEvent(NightRoundEvents.RoundOpened, p =>
+            p.Element("desk-status").Text.Set("Desk told: the round is open"))
+        .CustomEvent(NightRoundEvents.RoomChecked, (check, p) =>
+        {
+            p.Element("checked-room").Text.Set(check.Get(x => x.Room));
+            p.Element("checked-note").Text.Set(check.Get(x => x.Note));
+            p.Element("checked").Show();
+        })
+        // A note filed unsigned carries no payload: its author reads as missing, and the round says so.
+        .CustomEvent(NightRoundEvents.NoteFiled, (note, p) =>
+            p.When(note.Get(x => x.Author)).IsEmpty()
+                .Then(unsigned =>
+                {
+                    unsigned.Element("note-unsigned").Show();
+                    unsigned.Element("note-signed").Hide();
+                })
+                .Else(signed =>
+                {
+                    signed.Element("note-author").Text.Set(note.Get(x => x.Author));
+                    signed.Element("note-signed").Show();
+                    signed.Element("note-unsigned").Hide();
+                }))
+        .CustomEvent(NightRoundEvents.ResidentFlagged, (flag, p) =>
+        {
+            p.Element("flag-room").Text.Set(flag.Get(x => x.Room));
+            p.Element("flag-reason").Text.Set(flag.Get(x => x.Reason));
+            p.Element("flagged").Show();
+        }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Night Round</native-heading>
+        <native-text color="Secondary">
+            The Garden wing at 9 PM. The round opens as the page does, each room is checked from here, room 12's bell and thermostat are heard, and the desk is kept told.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-text><span id="round-status">Round not started</span></native-text>
+            <native-text color="Secondary"><span id="desk-status">The desk has not been told.</span></native-text>
+
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.Room, o => o.Label("Room"))
+                    .NativeDropDown(b => b.Items(rooms).Placeholder("Choose a room").CssClass(Field))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.Element("room-now").Text.Set(args.Value);
+                        p.Element("room-line").Show();
+                    }); }
+                @{ Html.InputField(plan, m => m.Note, o => o.Label("What you saw"))
+                    .NativeTextBox(b => b.Placeholder("Asleep, call light within reach").CssClass(Field)); }
+            </native-grid>
+            <p id="room-line" class="text-sm" hidden>Checking room <span id="room-now"></span>.</p>
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("log-check", "Log the check")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Dispatch(NightRoundEvents.RoomChecked, d => d
+                            .Set(x => x.Room, p.Component<NativeDropDown>(m => m.Room).Value)
+                            .Set(x => x.Note, p.Component<NativeTextBox>(m => m.Note).Value))))
+                @(Html.NativeButton("file-unsigned", "File the handover note unsigned")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch<HandoverNote>(NightRoundEvents.NoteFiled)))
+                @(Html.NativeButton("file-signed", "File the handover note as Nurse Patel")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Dispatch(NightRoundEvents.NoteFiled, new HandoverNote { Author = "Nurse Patel" })))
+                @* The chart's own flag button raises the declared event with the flag, as its markup carries it. *@
+                <button type="button" id="flag-fall-risk" class="@ButtonSecondary"
+                        @Html.Raises(NightRoundEvents.ResidentFlagged, new ResidentFlag { Room = "14", Reason = "Fall risk" })>Flag Arthur Lee as a fall risk</button>
+            </native-hstack>
+
+            <native-vstack gap="Xs">
+                <p id="checked" class="text-sm" hidden>Room <span id="checked-room"></span> checked: <span id="checked-note"></span></p>
+                <p id="note-unsigned" class="text-sm text-warning" hidden>Handover note filed without an author.</p>
+                <p id="note-signed" class="text-sm text-success" hidden>Handover note filed by <span id="note-author"></span>.</p>
+                <p id="flagged" class="text-sm text-warning" hidden>Room <span id="flag-room"></span> flagged: <span id="flag-reason"></span>.</p>
+            </native-vstack>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Room 12</native-heading>
+            <native-text color="Secondary">Margaret Hale's bell and thermostat, heard from the round.</native-text>
+
+            <native-grid cols="C2" gap="Base">
+                @(plan.CallBell(NightRoundModel.BellId, room: "12")
+                    .Reactive(evt => evt.OnPressed, (call, p) =>
+                    {
+                        p.Element("bell-room").Text.Set(call.Room);
+                        p.Element("bell-count").Text.Set(call.Presses);
+                        p.Element("bell-heard").Show();
+                    }))
+                @{ Html.InputField(plan, m => m.Target, o => o.Label("Target temperature"))
+                    .Thermostat(currentTemperature: 68, pin: "1234", locked: true, zones: new[] { "Bedroom" })
+                    // The schedule's own event: the thermostat's nested object raises it.
+                    .Reactive(evt => evt.Schedule.Applied, (args, p) =>
+                    {
+                        p.Element("night-target").Text.Set(args.Target);
+                        p.Element("night-applied").Show();
+                    }); }
+            </native-grid>
+
+            @(Html.NativeButton("night-mode", "Night mode")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<Thermostat>(m => m.Target).Schedule.Apply()))
+
+            <native-vstack gap="Xs">
+                <p id="bell-heard" class="text-sm text-warning" hidden>Bell heard from room <span id="bell-room"></span>, call <span id="bell-count"></span> tonight.</p>
+                <p id="night-applied" class="text-sm text-success" hidden>Night setting applied: <span id="night-target"></span>°F.</p>
+            </native-vstack>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,186 +1,58 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Linq;
 
 namespace Alis.Reactive.PlanModel
 {
+    /// <summary>One step of a path: a member by name, an item by position, or each item of a list.</summary>
+    internal sealed class PathSegment
+    {
+        private readonly string _text;
+        private readonly int _index;
+
+        private PathSegment(string kind, string text, int index)
+        {
+            Kind = kind;
+            _text = text;
+            _index = index;
+        }
+
+        internal string Kind { get; }
+
+        internal static PathSegment Property(string name) => new PathSegment("property", MemberName.Of(name).Value, -1);
+
+        internal static PathSegment AtIndex(int index)
+        {
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, "Path index must not be negative.");
+            return new PathSegment("index", index.ToString(CultureInfo.InvariantCulture), index);
+        }
+
+        internal static PathSegment EachItem { get; } = new PathSegment("each", "[]", -1);
+
+        internal bool IsEachItem => Kind == "each";
+
+        internal bool IsIndex => Kind == "index";
+
+        /// <summary>The position an index step names.</summary>
+        internal int Index => IsIndex
+            ? _index
+            : throw new InvalidOperationException($"'{_text}' names a member, not a position.");
+
+        /// <summary>The step as the plan carries it: the member's name, the position's digits, or <c>[]</c> for each item.</summary>
+        internal string ToPathText() => _text;
+    }
+
     /// <summary>
-    /// Serializes Path as a bare JSON array of PathSegments.
-    /// Plan wire format: [{ "kind": "property", "name": "value" }]
+    /// The one path model: from an object or a value, step by step, to a member. Every module builds a path
+    /// from typed steps; the plan reads it as <see cref="Text"/>, a request body as <see cref="Body"/>.
     /// </summary>
-    internal sealed class PathJsonConverter : JsonConverter<Path>
-    {
-        public override void Write(Utf8JsonWriter writer, Path value, JsonSerializerOptions options)
-        {
-            writer.WriteStartArray();
-            foreach (var segment in value.Segments)
-                segment.WriteJson(writer);
-            writer.WriteEndArray();
-        }
-
-        public override Path Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => throw new NotSupportedException("Plan types are write-only.");
-    }
-
-    internal sealed class PathSegmentJsonConverter : JsonConverter<PathSegment>
-    {
-        public override void Write(Utf8JsonWriter writer, PathSegment value, JsonSerializerOptions options)
-            => value.WriteJson(writer);
-
-        public override PathSegment Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => throw new NotSupportedException("Plan types are write-only.");
-    }
-
-    /// <summary>Property navigation segment: a property name or array index.</summary>
-    [JsonConverter(typeof(PathSegmentJsonConverter))]
-    internal sealed class PathSegment : IEquatable<PathSegment>
-    {
-        private readonly PathSegmentBody _body;
-
-        /// <summary>JSON discriminator for path segments: <c>property</c> or <c>index</c>.</summary>
-        public string Kind => _body.KindForJson;
-
-        private PathSegment(PathSegmentBody body)
-        {
-            _body = body ?? throw new ArgumentNullException(nameof(body));
-        }
-
-        internal static PathSegment Property(string name) =>
-            new PathSegment(PathSegmentBody.Property(name));
-
-        internal static PathSegment AtIndex(int index) =>
-            new PathSegment(PathSegmentBody.Index(index));
-
-        public bool Equals(PathSegment? other) =>
-            other != null
-            && _body.HasSamePath(other._body);
-
-        public override bool Equals(object? obj) => Equals(obj as PathSegment);
-
-        public override int GetHashCode()
-            => _body.GetPathHashCode();
-
-        internal void WriteJson(Utf8JsonWriter writer) => _body.WriteJson(writer);
-
-        internal string ToPathText() => _body.PathText;
-    }
-
-    internal abstract class PathSegmentBody
-    {
-        private protected PathSegmentBody() { }
-
-        internal abstract string KindForJson { get; }
-        internal abstract string PathText { get; }
-        internal abstract bool HasSamePath(PathSegmentBody other);
-        internal abstract int GetPathHashCode();
-        internal abstract void WriteJson(Utf8JsonWriter writer);
-
-        internal static PathSegmentBody Property(string name) =>
-            new PropertyPathSegmentBody(MemberName.Of(name));
-
-        internal static PathSegmentBody Index(int index) =>
-            new IndexPathSegmentBody(PathIndex.Of(index));
-
-        private sealed class PropertyPathSegmentBody : PathSegmentBody
-        {
-            private readonly MemberName _name;
-
-            internal PropertyPathSegmentBody(MemberName name)
-            {
-                _name = name ?? throw new ArgumentNullException(nameof(name));
-            }
-
-            internal override string KindForJson => "property";
-            internal override string PathText => _name.Value;
-            internal override bool HasSamePath(PathSegmentBody other) =>
-                other is PropertyPathSegmentBody property && _name.Equals(property._name);
-            internal override int GetPathHashCode()
-            {
-                unchecked
-                {
-                    return (KindForJson.GetHashCode() * 397) ^ _name.GetHashCode();
-                }
-            }
-            internal override void WriteJson(Utf8JsonWriter writer)
-            {
-                writer.WriteStartObject();
-                writer.WriteString("kind", KindForJson);
-                writer.WriteString("name", _name.Value);
-                writer.WriteEndObject();
-            }
-        }
-
-        private sealed class IndexPathSegmentBody : PathSegmentBody
-        {
-            private readonly PathIndex _index;
-
-            internal IndexPathSegmentBody(PathIndex index)
-            {
-                _index = index;
-            }
-
-            internal override string KindForJson => "index";
-            internal override string PathText => _index.Text;
-            internal override bool HasSamePath(PathSegmentBody other) =>
-                other is IndexPathSegmentBody index && _index == index._index;
-            internal override int GetPathHashCode()
-            {
-                unchecked
-                {
-                    return (KindForJson.GetHashCode() * 397) ^ _index.GetHashCode();
-                }
-            }
-            internal override void WriteJson(Utf8JsonWriter writer)
-            {
-                writer.WriteStartObject();
-                writer.WriteString("kind", KindForJson);
-                writer.WriteNumber("index", _index.Value);
-                writer.WriteEndObject();
-            }
-        }
-    }
-
-    internal readonly struct PathIndex : IEquatable<PathIndex>
-    {
-        private PathIndex(int value)
-        {
-            Value = value;
-        }
-
-        internal int Value { get; }
-
-        internal string Text => Value.ToString(CultureInfo.InvariantCulture);
-
-        internal static PathIndex Of(int value)
-        {
-            if (value < 0)
-                throw new ArgumentOutOfRangeException(nameof(value), value, "Path index must not be negative.");
-
-            return new PathIndex(value);
-        }
-
-        public bool Equals(PathIndex other) => Value == other.Value;
-
-        public override bool Equals(object? obj) => obj is PathIndex other && Equals(other);
-
-        public override int GetHashCode() => Value;
-
-        public static bool operator ==(PathIndex left, PathIndex right) => left.Equals(right);
-
-        public static bool operator !=(PathIndex left, PathIndex right) => !left.Equals(right);
-    }
-
-    /// <summary>Ordered path segments for navigating nested properties on a value.</summary>
-    [JsonConverter(typeof(PathJsonConverter))]
-    internal sealed class Path : IEquatable<Path>
+    internal sealed class Path
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
 
-        /// <summary>Ordered path segments used by runtime path traversal.</summary>
-        [JsonIgnore]
-        public IReadOnlyList<PathSegment> Segments { get; }
+        internal IReadOnlyList<PathSegment> Segments { get; }
 
         internal bool IsNone => Segments.Count == 0;
 
@@ -188,9 +60,6 @@ namespace Alis.Reactive.PlanModel
         {
             Segments = segments;
         }
-
-        internal static Path Property(string name) =>
-            new Path(new[] { PathSegment.Property(name) });
 
         internal Path Then(string name)
         {
@@ -204,6 +73,13 @@ namespace Alis.Reactive.PlanModel
             return new Path(list);
         }
 
+        /// <summary>The path to each item of the list this path reads.</summary>
+        internal Path Each()
+        {
+            var list = new List<PathSegment>(Segments) { PathSegment.EachItem };
+            return new Path(list);
+        }
+
         internal Path Append(Path tail)
         {
             var list = new List<PathSegment>(Segments);
@@ -211,55 +87,50 @@ namespace Alis.Reactive.PlanModel
             return new Path(list);
         }
 
-        internal static Path Parse(string dotPath)
+        internal bool ReadsEachItem => Segments.Any(segment => segment.IsEachItem);
+
+        /// <summary>The path as the plan carries it: one text per step; <c>[]</c> reads each item of a list.</summary>
+        internal IReadOnlyList<string> Text => Segments.Select(segment => segment.ToPathText()).ToList();
+
+        /// <summary>The path of a member that is written, called or listened to: the items of a list as a whole are none of those.</summary>
+        internal IReadOnlyList<string> TargetText => ReadsEachItem
+            ? throw new InvalidOperationException($"'{this}' reads each item of a list; it can be read, not written, called or subscribed to.")
+            : Text;
+
+        /// <summary>The path a JSON body is built along: a name makes an object, a position makes an array.</summary>
+        internal IReadOnlyList<object> Body => Segments
+            .Select(segment => segment.IsEachItem
+                ? throw new InvalidOperationException($"'{this}' reads each item of a list; a body names members and positions.")
+                : segment.IsIndex ? (object)segment.Index : segment.ToPathText())
+            .ToList();
+
+        /// <summary>
+        /// Reads a path from text, at the boundaries that hand the framework text: an MVC field prefix
+        /// (<c>NextOfKin</c>, <c>Members[1].Address</c>) and a vendor's object path (<c>slate</c>,
+        /// <c>ej2_instances.0</c>). A step of digits, or digits in brackets as MVC names a list item, is a
+        /// position; any other step is a member. Everywhere else a path is built from typed steps.
+        /// </summary>
+        internal static Path Parse(string text)
         {
-            if (string.IsNullOrEmpty(dotPath)) return None;
+            if (string.IsNullOrEmpty(text)) return None;
 
-            var parts = dotPath.Split(new[] { '.' }, StringSplitOptions.None);
-            var segments = new List<PathSegment>(parts.Length);
-            for (var index = 0; index < parts.Length; index++)
+            var steps = text.Replace("]", "").Replace('[', '.').Split('.');
+            var segments = new List<PathSegment>(steps.Length);
+            for (var index = 0; index < steps.Length; index++)
             {
-                var part = parts[index];
-                if (string.IsNullOrWhiteSpace(part))
+                var step = steps[index];
+                if (string.IsNullOrWhiteSpace(step))
                     throw new ArgumentException(
-                        $"Path '{dotPath}' contains an empty segment at index {index}. " +
+                        $"Path '{text}' contains an empty segment at index {index}. " +
                         "Use dot-separated property names without consecutive, leading, or trailing dots.",
-                        nameof(dotPath));
+                        nameof(text));
 
-                if (int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedIndex))
-                    segments.Add(PathSegment.AtIndex(parsedIndex));
-                else
-                    segments.Add(PathSegment.Property(part));
+                segments.Add(int.TryParse(step, NumberStyles.None, CultureInfo.InvariantCulture, out var position)
+                    ? PathSegment.AtIndex(position)
+                    : PathSegment.Property(step));
             }
 
             return new Path(segments);
-        }
-
-        public bool Equals(Path? other)
-        {
-            if (other == null) return false;
-            if (ReferenceEquals(this, other)) return true;
-            if (Segments.Count != other.Segments.Count) return false;
-
-            for (var segmentIndex = 0; segmentIndex < Segments.Count; segmentIndex++)
-            {
-                if (!Segments[segmentIndex].Equals(other.Segments[segmentIndex])) return false;
-            }
-
-            return true;
-        }
-
-        public override bool Equals(object? obj) => Equals(obj as Path);
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hash = 17;
-                foreach (var segment in Segments)
-                    hash = (hash * 31) + segment.GetHashCode();
-                return hash;
-            }
         }
 
         public override string ToString()
@@ -268,7 +139,10 @@ namespace Alis.Reactive.PlanModel
 
             var parts = new List<string>(Segments.Count);
             foreach (var segment in Segments)
-                parts.Add(segment.ToPathText());
+            {
+                if (segment.IsEachItem && parts.Count > 0) parts[parts.Count - 1] += "[]";
+                else parts.Add(segment.ToPathText());
+            }
 
             return string.Join(".", parts);
         }

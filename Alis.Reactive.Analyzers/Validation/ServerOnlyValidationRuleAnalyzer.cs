@@ -8,8 +8,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Alis.Reactive.Analyzers.Validation
 {
     /// <summary>
-    /// Reports <c>ReactiveValidator&lt;T&gt;</c> rules that cannot be serialized for
-    /// client-side validation.
+    /// Reports the <c>ReactiveValidator&lt;T&gt;</c> checks only the server can run: C# predicates, which
+    /// the page's plan cannot carry.
     /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyValidationRuleAnalyzer : DiagnosticAnalyzer
@@ -19,24 +19,17 @@ namespace Alis.Reactive.Analyzers.Validation
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "Server-only validation rule in ReactiveValidator",
-            messageFormat: "'{0}' is server-only \u2014 not extractable for client-side validation in ReactiveValidator",
+            messageFormat: "'{0}' is server-only \u2014 the browser cannot run C#, so ReactiveValidator keeps it on the server",
             category: "Alis.Reactive.Validation",
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
-            description: "This FluentValidation rule type cannot be serialized to JSON for client-side execution. " +
-                         "It will only run during server-side validation. If you need client-side validation, use " +
-                         "supported rules (NotEmpty, MinLength, MaxLength, EmailAddress, Matches, InclusiveBetween, " +
-                         "GreaterThan, LessThan, Equal, NotEqual, CreditCard).",
+            description: "A predicate rule is compiled C#, so it runs only during server-side validation. The browser " +
+                         "evaluates NotNull, NotEmpty, Empty, MinimumLength, MaximumLength, Length, EmailAddress, Url, CreditCard, " +
+                         "Matches, InclusiveBetween, ExclusiveBetween, and comparisons with a value or another member.",
             helpLinkUri: null);
 
         private static readonly ImmutableHashSet<string> ServerOnlyMethods =
-            ImmutableHashSet.Create(StringComparer.Ordinal,
-                "IsInEnum",
-                "Must",
-                "MustAsync",
-                "Custom",
-                "CustomAsync"
-            );
+            ImmutableHashSet.Create(StringComparer.Ordinal, "Must", "MustAsync");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);

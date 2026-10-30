@@ -3,10 +3,10 @@ name: gate
 # The one verification gate. Every workflow that asks "is this commit good?" calls this file —
 # ci.yml on pull requests and pushes, nightly.yml on a schedule, nuget-publish.yml on a release
 # tag — so there is exactly one definition of the steps, the tool versions
-# (.github/actions/setup-toolchain), the shard partition (scripts/playwright.sh --shard) and the
-# timeouts. Locally the same gate is `scripts/test.sh` (`--parallel` runs the same five shards). In
-# CI it is split into one deterministic job, five browser shards (about 20 minutes instead of about
-# 80), and the behavioral coverage gate (0b) over all five shards' TRX files.
+# (.github/actions/setup-toolchain), the shard partition (each Playwright project's
+# playwright.project.sh, run through scripts/playwright.sh --shard) and the timeouts. Locally the same
+# gate is `scripts/test.sh` (`--parallel` runs the same shards). In CI it is split into one
+# deterministic job and one job per browser shard (about 20 minutes instead of about 80).
 # Design rationale, the evidence behind the numbers, and the change checklist: docs/CI.md.
 on:
   workflow_call:
@@ -52,8 +52,8 @@ jobs:
     name: playwright (${{ matrix.shard }})
     if: ${{ inputs.playwright }}
     runs-on: ubuntu-latest
-    # Observed: 14-18 minutes of tests per shard plus about 2 minutes of setup, single worker
-    # (docs/CI.md, "Sharding"). 60 leaves 3x headroom for a slow runner and one re-run pass.
+    # Expected: at most about 300 sandbox tests per shard, about 37 minutes on a slow runner, plus
+    # about 3 minutes of setup, single worker (docs/CI.md, "Sharding"). 60 leaves room for one re-run pass.
     timeout-minutes: 60
     permissions:
       contents: read
@@ -62,11 +62,15 @@ jobs:
       fail-fast: false   # every shard reports; one red shard must not hide the others
       matrix:
         shard:
-          - fusion-a-f-and-core
-          - fusion-g-l-and-http
-          - fusion-m-z
-          - components-and-validation
-          - conditions-patterns-and-rest
+          - framework
+          - fusion-a-f
+          - fusion-grid
+          - fusion-h-r
+          - fusion-s-z
+          - http-core-and-patterns
+          - components
+          - validation
+          - conditions-and-rest
     env:
       # Without a registered license, EJ2 overlays a trial modal that intercepts every interaction:
       # the actual cause of the historical red legs (fixed in 2d5f9562).
@@ -82,7 +86,9 @@ jobs:
       - name: Install Playwright browsers
         # Deliberately not cached: Playwright's CI guide says restoring a browser cache takes about
         # as long as the download, and the OS dependencies are not cacheable (docs/CI.md).
-        run: pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+        # The script's own errors do not stop pwsh, so a failed install would pass and every test would then
+        # meet no browser: stop on the first error.
+        run: pwsh -NoProfile -Command '$ErrorActionPreference = "Stop"; & tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium; exit $LASTEXITCODE'
 
       - name: Run shard ${{ matrix.shard }}
         run: scripts/playwright.sh --no-build --shard "${{ matrix.shard }}" --retry-failed "${{ inputs.retry-failed }}"
@@ -92,7 +98,7 @@ jobs:
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
         with:
           name: Playwright results (${{ matrix.shard }})
-          path: tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
+          path: tests/*/TestResults/observable/*.trx
           reporter: dotnet-trx
           use-actions-summary: true
           list-suites: failed
@@ -107,49 +113,10 @@ jobs:
           name: playwright-${{ matrix.shard }}
           overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
           path: |
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.log
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.diag.log
-            tests/Alis.Reactive.PlaywrightTests/TestResults/observable/flaky-*.txt
-            tests/Alis.Reactive.PlaywrightTests/bin/TestResults/playwright-traces/*
+            tests/*/TestResults/observable/*.log
+            tests/*/TestResults/observable/*.trx
+            tests/*/TestResults/observable/*.diag.log
+            tests/*/TestResults/observable/flaky-*.txt
+            tests/*/bin/TestResults/playwright-traces/*
           retention-days: 14
           if-no-files-found: warn
-
-      - name: Hand the shard's TRX to the behavioral coverage gate
-        if: success()
-        uses: actions/upload-artifact@v7
-        with:
-          name: trx-${{ matrix.shard }}
-          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
-          path: tests/Alis.Reactive.PlaywrightTests/TestResults/observable/*.trx
-          retention-days: 7
-          if-no-files-found: error
-
-  behavioral-coverage:
-    # 0b: every member a behaviorally-audited Fusion component claims is covered names a Playwright
-    # test, and that test must exist and pass in THIS run. It reads all five shards' TRX files (a
-    # retry attempt supersedes the attempt before it), the same gate `scripts/test.sh` runs locally.
-    # Runs only when every shard is green (the implicit success() of `needs`).
-    name: behavioral coverage (0b)
-    needs: [playwright]
-    if: ${{ inputs.playwright }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: ./.github/actions/setup-toolchain
-
-      - name: Download every shard's TRX
-        uses: actions/download-artifact@v8
-        with:
-          pattern: trx-*
-          path: trx
-
-      - name: Behavioral coverage gate (0b) over all shards
-        shell: bash   # -eo pipefail, so the gate's exit code survives the tee
-        run: |
-          files="$(find trx -name '*.trx' | sort | paste -sd, -)"
-          echo "TRX files: ${files}"
-          node .claude/skills/onboard-fusion-component/scripts/verify-behavioral-coverage.mjs --all --trx "${files}" \
-            | tee -a "${GITHUB_STEP_SUMMARY}"

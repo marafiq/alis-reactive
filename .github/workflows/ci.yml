@@ -25,9 +25,6 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'scripts/**'
-      # The behavioral coverage gate (0b) and the coverage maps it reads.
-      - '.claude/skills/onboard-fusion-component/**'
-      - 'tools/FusionOnboarding/**'
       - '.github/workflows/ci.yml'
       - '.github/workflows/gate.yml'
       - '.github/actions/**'
@@ -36,7 +33,7 @@ on:
   workflow_dispatch:
 
 # One live run per pull request: a new push supersedes the previous run, so a stale commit never
-# keeps five browser shards busy. Pushes to main and release/* are never cancelled (each commit is
+# keeps the browser shards busy. Pushes to main and release/* are never cancelled (each commit is
 # a signal), and release tags have their own workflow with cancel-in-progress: false.
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}

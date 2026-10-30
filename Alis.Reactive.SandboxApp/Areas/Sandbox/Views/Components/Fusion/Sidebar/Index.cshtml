@@ -1,7 +1,6 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Sidebar.FusionSidebarModel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Sidebar
 @using Syncfusion.EJ2.Navigations
 @{
@@ -89,33 +88,33 @@
                         var panel = pp.Component<FusionSidebar>(SidebarId);
                         panel.Hide();
                         pp.Post(closeActivityUrl)
-                            .Gather(g => g.Include(panel.IsOpen(), "isOpen"))
+                            .Gather<FusionSidebarCloseRequest>(g => g.Set(x => x.IsOpen, panel.IsOpen))
                             .Response(r => r.OnSuccess<FusionSidebarCloseResponse>((json, s) =>
                             {
-                                s.Element("activity-note").SetText(json, x => x.ActivityNote);
+                                s.Element("activity-note").Text.Set(json.Get(x => x.ActivityNote));
                             }));
                     }))
             </div>
         </text>);
     })
-    .Reactive(evt => evt.Opened, (args, p) =>
+    .Reactive(evt => evt.Open, (args, p) =>
     {
-        p.Element("menu-state").SetText("Care-services menu is open.");
+        p.Element("menu-state").Text.Set("Care-services menu is open.");
         p.Post(openPanelUrl)
-            .Gather(g => g.FromEvent(args, x => x.IsInteracted, "openedByCoordinator"))
+            .Gather<FusionSidebarOpenRequest>(g => g.Set(x => x.OpenedByCoordinator, args.IsInteracted))
             .Response(r => r.OnSuccess<FusionSidebarOpenResponse>((json, s) =>
             {
-                s.Element("services-summary").SetText(json, x => x.ServicesSummary);
-                s.Element("activity-note").SetText(json, x => x.OpenedNote);
+                s.Element("services-summary").Text.Set(json.Get(x => x.ServicesSummary));
+                s.Element("activity-note").Text.Set(json.Get(x => x.OpenedNote));
             }));
     })
-    .Reactive(evt => evt.Closed, (args, p) =>
+    .Reactive(evt => evt.Close, (args, p) =>
     {
-        p.When(args, x => x.IsInteracted).Truthy()
+        p.When(args.IsInteracted).Truthy()
             .Then(byUser => byUser.Element("menu-state")
-                .SetText("You closed the care-services menu."))
+                .Text.Set("You closed the care-services menu."))
             .Else(byApp => byApp.Element("menu-state")
-                .SetText("Care-services menu closed automatically."));
+                .Text.Set("Care-services menu closed automatically."));
     }))
 </native-vstack>
 

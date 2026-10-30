@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Toolbar;
 
 // Journey: a resident manages their account from a command bar. They can request
@@ -122,11 +120,11 @@ public class WhenUsingFusionToolbar : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"commandId\":\"pay-balance\""),
+        Assert.That(body, Does.Contain("\"CommandId\":\"pay-balance\""),
             "the gather must carry the clicked Item.Id under its declared key");
-        Assert.That(body, Does.Contain("\"commandText\":\"Pay balance\""),
+        Assert.That(body, Does.Contain("\"CommandText\":\"Pay balance\""),
             "the gather must carry the clicked Item.Text under its declared key");
-        Assert.That(body, Does.Contain("\"commandDisabled\":false"),
+        Assert.That(body, Does.Contain("\"CommandDisabled\":false"),
             "the gather must carry the clicked Item.Disabled under its declared key");
 
         AssertNoConsoleErrors();

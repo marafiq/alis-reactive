@@ -1,4 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.SupportedSyntax;

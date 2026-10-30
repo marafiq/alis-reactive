@@ -1,191 +1,159 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Kanban
 {
-    public sealed class KanbanModel
+    /// <summary>
+    /// Maple Grove's maintenance board: the facilities lead's work orders for the Maple and Birch wings, by
+    /// the column they are in.
+    /// </summary>
+    public sealed class MaintenanceBoardModel
     {
-        public string SelectedFacilityId { get; set; } = "AL";
+        /// <summary>The board shows the Done column; the lead hides it to see only the work that is left.</summary>
+        public bool ShowFinishedWork { get; set; } = true;
     }
 
-    public sealed class KanbanFacility
+    /// <summary>The board's columns, by the status a work order is in.</summary>
+    public static class WorkOrderStatus
     {
-        public string Id { get; init; } = "";
-        public string Name { get; init; } = "";
+        public const string Open = "Open";
+        public const string InProgress = "InProgress";
+        public const string Done = "Done";
+
+        /// <summary>The column a work order waits in while its part is on order; it appears when one is.</summary>
+        public const string Blocked = "Blocked";
     }
 
-    public sealed class KanbanTaskCard
+    public static class WorkOrderPriority
     {
-        public int Id { get; init; }
-        public int CardId => Id;
-        public string Status { get; init; } = "";
+        public const string Urgent = "Urgent";
+        public const string Routine = "Routine";
+    }
+
+    /// <summary>The board's rows, one for each wing.</summary>
+    public static class MaintenanceWing
+    {
+        public const string Maple = "Maple";
+        public const string Birch = "Birch";
+    }
+
+    /// <summary>
+    /// The names the Kanban gives what it is doing: the request type of its action and change events
+    /// (ej2-kanban crud.js), of its card dialog (dialog.js) and of the column header it renders
+    /// (layout-render.js).
+    /// </summary>
+    public static class BoardRequestType
+    {
+        public const string Added = "cardCreated";
+        public const string Changing = "cardChange";
+        public const string Changed = "cardChanged";
+        public const string Removing = "cardRemove";
+        public const string Removed = "cardRemoved";
+        public const string AddDialog = "Add";
+        public const string EditDialog = "Edit";
+        public const string DeleteDialog = "Delete";
+        public const string HeaderRow = "headerRow";
+    }
+
+    /// <summary>A work order: what is wrong, in which room, who fixes it, and its place in its column's line.</summary>
+    public sealed record WorkOrder
+    {
+        /// <summary>
+        /// The number the work-order system gives it, the board's key for it. It is not named <c>Id</c>: the card
+        /// dialog names each field's input by its member, and an input named <c>id</c> hides the dialog form's own
+        /// <c>id</c>, which EJ2 looks the form up by before it saves (ej2-kanban dialog.js:334-335), so Save would
+        /// do nothing.
+        /// </summary>
+        public int Number { get; init; }
+        public string Status { get; init; } = WorkOrderStatus.Open;
         public string Summary { get; init; } = "";
-        public string Priority { get; init; } = "";
-        public string Assignee { get; init; } = "";
-        public string FacilityId { get; init; } = "";
-        public string FacilityName { get; init; } = "";
-        public string Resident { get; init; } = "";
-        public string Due { get; init; } = "";
-        public string Tags { get; init; } = "";
-        public string CardColor { get; init; } = "";
-        public bool IsEscalated { get; init; }
+        public string Room { get; init; } = "";
+        public string Wing { get; init; } = "";
+        public string WingName { get; init; } = "";
+        public string Priority { get; init; } = WorkOrderPriority.Routine;
+        public string Technician { get; init; } = "";
+
+        /// <summary>Its place in the line of work orders in its column and wing, first at 0.</summary>
+        public int Queue { get; init; }
+
+        /// <summary>The resident has signed off on the finished work.</summary>
+        public bool SignedOff { get; init; }
+
+        /// <summary>The work was finished today; the board shows only today's finished work.</summary>
+        public bool FinishedToday { get; init; }
     }
 
-    public sealed class KanbanBoardResponse
+    /// <summary>The work orders the work-order system holds for the board, and what it says about a change.</summary>
+    public sealed class MaintenanceBoard
     {
+        public WorkOrder[] WorkOrders { get; init; } = [];
         public string Message { get; init; } = "";
-        public IReadOnlyList<KanbanTaskCard> Cards { get; init; } = Array.Empty<KanbanTaskCard>();
-        public int OpenCount { get; init; }
-        public int ReviewCount { get; init; }
-        public int AssistedLivingCount { get; init; }
+
+        /// <summary>The change put a work order in the Blocked column: its part is on order.</summary>
+        public bool BackOrdered { get; init; }
     }
 
-    public sealed class KanbanAuditRequest
-    {
-        public List<KanbanTaskCard> Cards { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> OpenCards { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> AssistedLivingCards { get; init; } = new List<KanbanTaskCard>();
-    }
-
-    public sealed class KanbanAuditResponse
-    {
-        public string Summary { get; init; } = "";
-        public int TotalCards { get; init; }
-        public int OpenCards { get; init; }
-        public int AssistedLivingCards { get; init; }
-    }
-
-    public sealed class KanbanCardMutationResponse
-    {
-        public string Message { get; init; } = "";
-        public KanbanTaskCard Card { get; init; } = new KanbanTaskCard();
-        public int CardId { get; init; }
-    }
-
-    public sealed class KanbanCommitRequest
+    /// <summary>A change the board asks the work-order system to make, as the board reports it.</summary>
+    public sealed class WorkOrderChange
     {
         public string RequestType { get; init; } = "";
-        public List<KanbanTaskCard> AddedRecords { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> ChangedRecords { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> DeletedRecords { get; init; } = new List<KanbanTaskCard>();
+        public List<WorkOrder> AddedRecords { get; init; } = new();
+        public List<WorkOrder> ChangedRecords { get; init; } = new();
+        public List<WorkOrder> DeletedRecords { get; init; } = new();
+
+        /// <summary>The place in its column's line the change puts a work order, when the board gives one.</summary>
+        public int? Index { get; init; }
     }
 
-    public sealed class KanbanCommitResponse
+    /// <summary>Why the work-order system did not make a change.</summary>
+    public sealed class WorkOrderRefusal
     {
         public string Message { get; init; } = "";
-        public int TotalChanged { get; init; }
     }
 
-    public sealed class KanbanMoveRequest
+    /// <summary>One work order, by the number in the path.</summary>
+    public sealed class WorkOrderLookup
     {
-        public List<KanbanTaskCard> Cards { get; init; } = new List<KanbanTaskCard>();
-        public int DropIndex { get; init; }
+        public int WorkOrderNumber { get; init; }
     }
 
-    public sealed class KanbanMoveResponse
+    public sealed class WorkOrderHistory
+    {
+        public string History { get; init; } = "";
+    }
+
+    /// <summary>Who is updating a work order at another desk; empty when no one is.</summary>
+    public sealed class WorkOrderHold
+    {
+        public string HeldBy { get; init; } = "";
+        public string Message { get; init; } = "";
+    }
+
+    /// <summary>A new work order with its number reserved, for the lead to describe in the card dialog.</summary>
+    public sealed class WorkOrderDraft
+    {
+        public WorkOrder WorkOrder { get; init; } = new();
+    }
+
+    /// <summary>The front desk's newest call, or why there is none.</summary>
+    public sealed class FrontDeskCalls
+    {
+        public WorkOrder WorkOrder { get; init; } = new();
+        public string Message { get; init; } = "";
+    }
+
+    /// <summary>The work order whose part arrived, ready to go back in progress.</summary>
+    public sealed class PartArrival
+    {
+        public WorkOrder WorkOrder { get; init; } = new();
+    }
+
+    /// <summary>The lists the night technician gets: the work in progress and the Maple wing's work.</summary>
+    public sealed class WorkLists
+    {
+        public List<WorkOrder> InProgress { get; init; } = new();
+        public List<WorkOrder> MapleWing { get; init; } = new();
+    }
+
+    public sealed class WorkListsSent
     {
         public string Message { get; init; } = "";
-        public KanbanTaskCard Card { get; init; } = new KanbanTaskCard();
-        public int DropIndex { get; init; }
-    }
-
-    public sealed class KanbanCardSummaryResponse
-    {
-        public string Summary { get; init; } = "";
-    }
-
-    public static class KanbanSeedData
-    {
-        public static IReadOnlyList<KanbanFacility> Facilities { get; } =
-            new List<KanbanFacility>
-            {
-                new KanbanFacility { Id = "AL", Name = "Assisted Living" },
-                new KanbanFacility { Id = "MC", Name = "Memory Care" },
-                new KanbanFacility { Id = "SNF", Name = "Skilled Nursing" }
-            };
-
-        public static IReadOnlyList<KanbanTaskCard> Cards { get; } =
-            new List<KanbanTaskCard>
-            {
-                Card(101, "Open", "Assess fall risk", "High", "Ava Stone", "AL", "Assisted Living", "Eleanor Reed", "Today 10:00", "fall,assessment", "#ef4444", true),
-                Card(102, "InProgress", "Medication reconciliation", "High", "Mateo Cruz", "AL", "Assisted Living", "Harold Lane", "Today 13:00", "meds", "#f97316", true),
-                Card(103, "Review", "Care plan review", "Normal", "Nora Gray", "MC", "Memory Care", "Lena Brooks", "Tomorrow", "care-plan", "#3b82f6", false),
-                Card(104, "Done", "Hydration follow-up", "Low", "Leah Kim", "SNF", "Skilled Nursing", "Walter Finch", "Yesterday", "hydration", "#22c55e", false),
-                Card(105, "Open", "Room transfer checklist", "Normal", "Ira Bell", "MC", "Memory Care", "Miriam Chen", "Friday", "move-in", "#8b5cf6", false),
-                Card(106, "Review", "Therapy handoff", "High", "Dana Fox", "SNF", "Skilled Nursing", "Oscar Hale", "Today 16:00", "therapy", "#06b6d4", true)
-            };
-
-        public static IReadOnlyList<KanbanTaskCard> ForFacility(string? facilityId)
-        {
-            if (string.IsNullOrWhiteSpace(facilityId) || facilityId == "ALL")
-                return Cards;
-
-            return Cards
-                .Where(card => string.Equals(card.FacilityId, facilityId, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-
-        public static KanbanTaskCard NewCard(int id, string facilityId)
-        {
-            var facility = Facilities.FirstOrDefault(x => x.Id == facilityId) ?? Facilities[0];
-            return Card(
-                id,
-                "Open",
-                "Remote wound consult",
-                "High",
-                "Rina Patel",
-                facility.Id,
-                facility.Name,
-                "Grace Taylor",
-                "Today 15:30",
-                "wound,remote",
-                "#dc2626",
-                true);
-        }
-
-        public static KanbanTaskCard UpdatedCard()
-        {
-            return Card(
-                102,
-                "Review",
-                "Medication reconciliation updated",
-                "High",
-                "Mateo Cruz",
-                "AL",
-                "Assisted Living",
-                "Harold Lane",
-                "Today 13:30",
-                "meds,updated",
-                "#2563eb",
-                true);
-        }
-
-        private static KanbanTaskCard Card(
-            int id,
-            string status,
-            string summary,
-            string priority,
-            string assignee,
-            string facilityId,
-            string facilityName,
-            string resident,
-            string due,
-            string tags,
-            string color,
-            bool escalated)
-        {
-            return new KanbanTaskCard
-            {
-                Id = id,
-                Status = status,
-                Summary = summary,
-                Priority = priority,
-                Assignee = assignee,
-                FacilityId = facilityId,
-                FacilityName = facilityName,
-                Resident = resident,
-                Due = due,
-                Tags = tags,
-                CardColor = color,
-                IsEscalated = escalated
-            };
-        }
     }
 }

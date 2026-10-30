@@ -1,0 +1,140 @@
+@model PharmacyDeliveryModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Fusion.AppLevel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.AppLevel.PharmacyDelivery
+@{
+    ViewData["Title"] = "Pharmacy Delivery";
+
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<PharmacyDeliveryModel>();
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Pharmacy Delivery</native-heading>
+        <native-text color="Secondary">
+            The evening delivery from Garden Pharmacy: open the slip, sign for it, return what is damaged, check the manifest, and mark it delivered.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Delivery slip</native-heading>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("open-slip", "Open the slip")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var drawer = p.Component<NativeDrawer>();
+                        p.Element("alis-drawer-title").Text.Set("Delivery slip");
+                        drawer.Size.Set(DrawerSize.Lg);
+                        p.Get(Url.SandboxRoute("DeliverySlip", "PharmacyDelivery"))
+                            .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                        drawer.Open();
+                        // The size is read back from the drawer: only a wide panel shows the whole slip.
+                        p.When(drawer.Size).Eq(DrawerSize.Lg)
+                            .Then(wide => wide.Element("slip-wide").Show())
+                            .Else(narrow => narrow.Element("slip-wide").Hide());
+                    }))
+                @(Html.NativeButton("close-slip", "Close the slip")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) => p.Component<NativeDrawer>().Close()))
+            </native-hstack>
+            <p id="slip-wide" class="text-sm text-text-secondary" hidden>The slip is open in the wide panel, so every line shows.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Signature</native-heading>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("sign-delivery", "Sign for the delivery")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        var toast = p.Component<FusionToast>();
+                        toast.Title.Set("Delivery signed");
+                        toast.Content.Set("Signed for by the night nurse at 8:40 PM.");
+                        toast.Tone.Set(FusionToastTone.Success);
+                        toast.TimeOut.Set(0);
+                        toast.ShowCloseButton.Set(true);
+                        toast.Show();
+                    }))
+                @(Html.NativeButton("dismiss-notice", "Dismiss the notice")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) => p.Component<FusionToast>().Hide()))
+            </native-hstack>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Returns</native-heading>
+            @(Html.NativeButton("return-item", "Return the damaged item")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    // The question is asked first; the return goes out only on yes, the cart keeps the item on no, and
+                    // the cart is marked reviewed once the question is answered either way.
+                    p.Confirm("Return the damaged item to the pharmacy?")
+                        .Then(yes => yes.Post(Url.SandboxRoute("ReturnItem", "PharmacyDelivery"))
+                            .Response(r => r.OnSuccess<ReturnResult>((returned, s) =>
+                                s.Element("return-status").Text.Set(returned.Get(x => x.Confirmation)))))
+                        .Else(no => no.Element("return-status").Text.Set("Return cancelled; the item stays on the cart."));
+                    p.Element("cart-review").Text.Set("Cart reviewed by the night nurse.");
+                }))
+            <native-text><span id="return-status">No returns tonight.</span></native-text>
+            <native-text color="Secondary"><span id="cart-review">Cart not reviewed yet.</span></native-text>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body id="manifest-card">
+        <native-vstack gap="Base">
+            <native-heading level="H2">Manifest</native-heading>
+            @(Html.NativeButton("check-manifest", "Check the manifest")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Get(Url.SandboxRoute("Manifest", "PharmacyDelivery"))
+                        .WhileLoading(l =>
+                        {
+                            var loader = l.Component<NativeLoader>();
+                            loader.Target.Set("manifest-card");
+                            loader.Timeout.Set(8000);
+                            loader.Show();
+                            // Read back from the loader: with the manifest card covered for a good while, the nurse is told to wait.
+                            l.When(loader.Target).Eq("manifest-card").And(loader.Timeout).Gte(5000)
+                                .Then(covered => covered.Element("manifest-wait").Show());
+                        })
+                        .Response(r => r.OnSuccess<ManifestSummary>((manifest, s) =>
+                            s.Element("manifest").Text.Set(manifest.Get(x => x.Summary))))
+                        .Finally(f => f.Component<NativeLoader>().Hide())))
+            <p id="manifest-wait" class="text-sm text-text-secondary" hidden>The pharmacy can take a few seconds; only the manifest card is covered while it answers.</p>
+            <native-text><span id="manifest">Manifest not checked.</span></native-text>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body id="delivery-receipt">
+        <native-vstack gap="Base">
+            <native-heading level="H2">Delivery</native-heading>
+            @{ Html.InputField(plan, m => m.ReceivedBy, o => o.Label("Received by"))
+                .NativeTextBox(b => b.CssClass(Field)); }
+            <native-hstack gap="Sm" align="Center" class="flex-wrap">
+                @* The link starts a plan of its own; its request checks the page's rule and sends the page's input,
+                   both inside the receipt it names. *@
+                @(Html.NativeActionLink("mark-delivered", "Mark delivered", Url.SandboxRoute("MarkDelivered", "PharmacyDelivery"), link => link
+                    .Post()
+                    .Gather<DeliveryReceipt>(g => g.Form())
+                    .Validate<DeliveryReceiptValidator>("delivery-receipt")
+                    .Response(r => r.OnSuccess<DeliveryMarked>((marked, s) =>
+                        s.Element("delivery-status").Text.Set(marked.Get(x => x.Confirmation)))))
+                    .CssClass("text-sm font-medium text-accent hover:text-accent/80"))
+                <native-text><span id="delivery-status">Not marked delivered.</span></native-text>
+            </native-hstack>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

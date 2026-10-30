@@ -1,0 +1,5 @@
+@model string
+<label for="custom-clipboard" class="block text-sm font-medium text-text-primary mb-1">Referral letter</label>
+@* Syncfusion's Smart Paste reads the letter from the element with this ID, and from the clipboard only when it is empty. *@
+<textarea id="custom-clipboard" rows="7" class="w-full rounded-md border border-border p-3 text-sm"
+          placeholder="Paste the referral letter here">@Model</textarea>

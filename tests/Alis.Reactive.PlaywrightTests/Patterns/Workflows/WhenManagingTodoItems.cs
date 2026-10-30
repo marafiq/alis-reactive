@@ -1,4 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
@@ -7,7 +6,6 @@ namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 public class WhenManagingTodoItems : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Patterns/Todo";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TodoModel__";
 
     private PagePlan<TodoModel> _plan = null!;
 
@@ -21,8 +19,9 @@ public class WhenManagingTodoItems : PlaywrightTestBase
     private ILocator SaveBtn => Page.Locator("#save-btn");
     private ILocator Result => _plan.Element("todo-result");
     private ILocator DueDateSection => Page.Locator("#due-date-section");
-    private ILocator UrgentCheckbox => Page.Locator($"#{ModelIdPrefix}IsUrgent");
+    private ILocator UrgentCheckbox => Page.Locator($"#{IdGenerator.For<TodoModel>(m => m.IsUrgent)}");
     private ILocator SaveToast => Page.Locator(".e-toast").First;
+    private ILocator SaveToastTitle => SaveToast.Locator(".e-toast-title");
 
     [Test]
     public async Task page_loads_with_empty_form_and_save_button()
@@ -101,6 +100,8 @@ public class WhenManagingTodoItems : PlaywrightTestBase
 
         await Expect(SaveToast)
             .ToContainTextAsync("Todo saved successfully", new() { Timeout = 5000 });
+        await Expect(SaveToastTitle).ToHaveTextAsync("Todo");
+        await Expect(SaveToast).ToHaveClassAsync(new System.Text.RegularExpressions.Regex(@"\be-toast-success\b"));
         AssertNoConsoleErrors();
     }
 

@@ -1,0 +1,76 @@
+@model MoveInReviewModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Move-in Review";
+    var plan = Html.ReactivePlan<MoveInReviewModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Move-in Review</native-heading>
+    <native-text color="Secondary">
+        Complete the review before the resident's move-in day. A high fall-risk score needs a mobility plan.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="move-in-review-form" class="flex flex-col gap-4">
+            @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+                .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.MoveInDate, o => o.Label("Move-in day"))
+                .FusionDatePicker(b => b.Placeholder("Choose the move-in day")); }
+            @{ Html.InputField(plan, m => m.FallRiskScore, o => o.Label("Fall risk score (0 to 10)"))
+                .NativeTextBox(b => b.Type("number").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.MobilityNotes, o => o.Label("Mobility plan"))
+                .NativeTextBox(b => b.Placeholder("Walker, two-person assist, ...").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.ReassessmentPlan, o => o.Label("Reassessment plan (moderate risk)"))
+                .NativeTextBox(b => b.Placeholder("Reassess in 30 days with physical therapy").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.TherapistReviewer, o => o.Label("Therapist reviewing the mobility plan"))
+                .NativeTextBox(b => b.Placeholder("Physical therapist").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.UsesWheelchair, o => o.Label("Uses a wheelchair"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.UsesOxygen, o => o.Label("Uses oxygen"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.EvacuationAssist, o => o.Label("Evacuation assistant"))
+                .NativeTextBox(b => b.Placeholder("Night shift aide, ...").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.AssignedRoom, o => o.Label("Assigned room"))
+                .NativeTextBox(b => b.Placeholder("MA-214").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.SecuredUnitConsentBy, o => o.Label("Secured unit consent given by"))
+                .NativeTextBox(b => b.Placeholder("Family member's name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.FamilyPortalLink, o => o.Label("Family portal link"))
+                .NativeTextBox(b => b.Placeholder("https://").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.WristbandCode, o => o.Label("Wristband code"))
+                .NativeTextBox(b => b.Placeholder("WB-104233").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.TemporaryBandReason, o => o.Label("Temporary wristband reason"))
+                .NativeTextBox(b => b.Placeholder("Band printer down, ...").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Pharmacy.Name, o => o.Label("Pharmacy"))
+                .NativeTextBox(b => b.Placeholder("Pharmacy name").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Pharmacy.Phone, o => o.Label("Pharmacy phone"))
+                .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.Pharmacy.FirstDelivery, o => o.Label("Pharmacy's first delivery"))
+                .FusionDatePicker(b => b.Placeholder("Choose the first delivery day")); }
+            @{ Html.InputField(plan, m => m.IsReturning, o => o.Label("Returning resident"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.PreviousRoom, o => o.Label("Previous room"))
+                .NativeTextBox(b => b.Placeholder("Maple 214").CssClass(Field)); }
+            @{ Html.InputField(plan, m => m.ForwardingZip, o => o.Label("Mail forwarding ZIP"))
+                .NativeTextBox(b => b.Placeholder("02139").CssClass(Field)); }
+        </form>
+        @(Html.NativeButton("save-review-btn", "Save Review")
+            .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Save", "MoveInReview")).Gather(g => g.Form().Set(x => x.Pharmacy.Network, "Riverside Health"))
+                 .Validate<MoveInReviewValidator>("move-in-review-form")
+                 .Response(r => r
+                    .OnSuccess<MoveInReviewSaved>((json, s) =>
+                    {
+                        s.Element("review-status").Text.Set(json.Get(x => x.Confirmation));
+                    })
+                    .OnError(400, e => e.ValidationErrors("move-in-review-form")));
+            }))
+        <p id="review-status" class="mt-3 text-sm text-text-muted">Not saved yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

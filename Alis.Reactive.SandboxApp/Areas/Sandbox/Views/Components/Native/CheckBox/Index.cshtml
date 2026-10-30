@@ -1,103 +1,99 @@
-@model CheckBoxModel
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.CheckBox
+@model ShowerLog
 @using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "NativeCheckBox";
+    ViewData["Title"] = "Shower Log";
 
-    var plan = Html.ReactivePlan<CheckBoxModel>();
+    const string FormId = "shower-log-form";
+    const string Box = "h-4 w-4 rounded border-border text-accent";
 
+    var plan = Html.ReactivePlan<ShowerLog>();
+
+    // The shower chair note follows the care plan's answer when the log opens.
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<NativeCheckBox>(m => m.ReceivesMedication).SetChecked(false);
-    }));
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var comp = p.Component<NativeCheckBox>(m => m.AllowsVisitors);
-        p.Element("value-echo").SetText(comp.Value());
+        var showerChair = p.Component<NativeCheckBox>(m => m.UsesShowerChair);
+        p.When(showerChair.Checked).Truthy()
+            .Then(chair => chair.Element("shower-chair-note").Show());
     }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">NativeCheckBox — Full API</native-heading>
+    <native-heading level="H1">Shower Log</native-heading>
     <native-text color="Secondary">
-        Exercises NativeCheckBox vertical slice: property writes (SetChecked),
-        property reads (Value), events (Changed with typed condition), and component-read conditions.
-        Senior living domain: resident medication, visitors, and dietary restrictions.
+        Evening showers, Willow wing. Dorothy Reyes, Willow 108. Tick what happened and save the log before
+        the end of the shift.
     </native-text>
 
     <native-card><native-card-body>
-        <native-heading level="H2">1. Property Write (SetChecked)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Checkbox starts checked. On DomReady, <code>SetChecked(false)</code> unchecks it.
-        </p>
-        @{ Html.InputField(plan, m => m.ReceivesMedication, o => o.Label("Receives Medication"))
-            .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the AllowsVisitors checkbox value and echoes it.
-        </p>
-        @{ Html.InputField(plan, m => m.AllowsVisitors, o => o.Label("Allows Visitors"))
-            .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
-        <p class="font-mono text-sm mt-2">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Dietary restrictions checkbox wires a Changed event with typed condition:
-            <code>When(args, x =&gt; x.Checked).Truthy()</code> shows/hides the restrictions panel.
-        </p>
-        @{ Html.InputField(plan, m => m.HasDietaryRestrictions, o => o.Label("Has Dietary Restrictions"))
-            .NativeCheckBox(b => b
-                .CssClass("h-4 w-4 rounded border-border text-accent")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
+        <form id="@FormId" class="flex flex-col gap-4">
+            @{ Html.InputField(plan, m => m.ShowerDeclined, o => o.Label("Dorothy declined the shower"))
+                .NativeCheckBox(b => b.CssClass(Box))
+                .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    p.When(args, a => a.Checked).Truthy()
-                        .Then(t =>
+                    p.When(args.Checked).Truthy()
+                        .Then(declined =>
                         {
-                            t.Element("restrictions-panel").Show();
-                            t.Element("restrictions-status").SetText("checked");
-                            t.Element("restrictions-status").AddClass("text-green-600");
-                            t.Element("restrictions-status").RemoveClass("text-text-muted");
+                            declined.Component<NativeCheckBox>(m => m.WaterTemperatureChecked).Checked.Set(false);
+                            declined.Element("shower-details").Hide();
+                            declined.Element("offer-again").Show();
                         })
-                        .Else(e =>
+                        .Else(taken =>
                         {
-                            e.Element("restrictions-panel").Hide();
-                            e.Element("restrictions-status").SetText("unchecked");
-                            e.Element("restrictions-status").RemoveClass("text-green-600");
+                            taken.Element("shower-details").Show();
+                            taken.Element("offer-again").Hide();
                         });
-                })); }
-        <p class="font-mono text-sm mt-2">Status: <span id="restrictions-status" class="text-text-muted">&mdash;</span></p>
-        <div id="restrictions-panel" hidden class="rounded-md bg-slate-100 p-4 text-sm mt-2">
-            Resident has dietary restrictions on file. Review care plan.
-        </div>
-    </native-card-body></native-card>
+                }); }
+            <p id="offer-again" hidden class="text-sm text-text-secondary">Offer the shower again before 9 pm.</p>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads medication checkbox via <code>When(comp.Value()).Truthy()</code>
-            and shows a confirmation or warning.
-        </p>
-        @(Html.NativeButton("check-medication-btn", "Check Medication Status")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var comp = p.Component<NativeCheckBox>(m => m.ReceivesMedication);
-                p.When(comp.Value()).Truthy()
-                    .Then(t => t.Element("medication-warning").SetText("resident receives medication"))
-                    .Else(e => e.Element("medication-warning").SetText("no medication on record"));
-            }))
-        <p class="font-mono text-sm mt-2">Status: <span id="medication-warning" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+            <div id="shower-details" class="flex flex-col gap-4">
+                @{ Html.InputField(plan, m => m.UsesShowerChair, o => o.Label("Uses a shower chair"))
+                    .NativeCheckBox(b => b.CssClass(Box))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.When(args.Checked).Truthy()
+                            .Then(chair => chair.Element("shower-chair-note").Show())
+                            .Else(noChair => noChair.Element("shower-chair-note").Hide());
+                    }); }
+                <p id="shower-chair-note" hidden class="text-sm text-text-secondary">
+                    Bring the shower chair from the Willow supply room.
+                </p>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+                @{ Html.InputField(plan, m => m.WaterTemperatureChecked, o => o.Label("Water temperature checked"))
+                    .NativeCheckBox(b => b.CssClass(Box)); }
+            </div>
+
+            @{ Html.InputField(plan, m => m.SkinConcern, o => o.Label("Skin concern noticed"))
+                .NativeCheckBox(b => b.CssClass(Box))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args.Checked).Truthy()
+                        .Then(concern =>
+                        {
+                            concern.Element("skin-concern-step").Show();
+                            concern.Component<NativeCheckBox>(m => m.NurseTold).Focus();
+                        })
+                        .Else(noConcern => noConcern.Element("skin-concern-step").Hide());
+                }); }
+            <div id="skin-concern-step" hidden class="flex flex-col gap-2 rounded-md bg-slate-100 p-4">
+                <p class="text-sm">Tell the nurse on duty what you saw before the end of the shift.</p>
+                @{ Html.InputField(plan, m => m.NurseTold, o => o.Label("Nurse on duty told"))
+                    .NativeCheckBox(b => b.CssClass(Box)); }
+            </div>
+        </form>
+
+        <native-hstack gap="Base" align="Center" class="mt-6">
+            @(Html.NativeButton("save-shower-log-btn", "Save Shower Log")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("SaveShowerLog", "CheckBox")).Gather(g => g.Form())
+                     .Validate<ShowerLogValidator>(FormId)
+                     .Response(r => r
+                        .OnSuccess<ShowerLogSaved>((json, s) => s.Element("shower-log-status").Text.Set(json.Get(x => x.Summary))));
+                }))
+            <p id="shower-log-status" class="text-sm text-text-muted">The shower log is not saved yet.</p>
+        </native-hstack>
     </native-card-body></native-card>
 </native-vstack>
 

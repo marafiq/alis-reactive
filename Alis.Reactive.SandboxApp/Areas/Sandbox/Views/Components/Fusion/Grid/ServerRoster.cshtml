@@ -1,132 +1,121 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentRosterViewModel
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Server-Backed Roster";
+    ViewData["Title"] = "Resident Roster";
 
-    const string GridId = "server-roster-grid";
-    const string KeyedGridId = "server-keyed-grid";
-    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
-    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string RosterId = "record-roster";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+    // Grace Bennett's suite move is the one the record has approved today.
+    const int GraceBennett = 6703;
 
-    List<GridColumn> RosterColumns() => new List<GridColumn>
-    {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
-        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
-        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
-    };
+    var plan = Html.ReactivePlan<ResidentRosterViewModel>();
+    var columns = FusionGridColumns.Of<RecordRosterResident>();
+
+    // A wing's tab: the record answers with the wing and its page of residents.
+    void ShowWing(PipelineBuilder<ResidentRosterViewModel> p, string wing) =>
+        p.Post(Url.SandboxRoute("RecordRosterWingResidents", "Grid"))
+            .Gather<RecordRosterWingQuery>(g => g.Set(x => x.Wing, wing))
+            .Response(r => r.OnSuccess<RecordRosterWing>((answer, s) =>
+            {
+                s.Component<FusionGrid>(RosterId).Rows<RecordRosterResident>().Set(answer.Get(x => x.Page.Result));
+                s.Element("roster-wing").Text.Set(answer.Get(x => x.Wing));
+                s.Element("roster-record-status").Text.Set(answer.Get(x => x.Page.Summary));
+            }));
 
     Html.On(plan, t => t.DomReady(p =>
-    {
-        // SetDataSource [response path]: read the Result array out of the {Result, Count} body.
-        p.Post(Url.SandboxRoute("DirectoryData", "Grid"))
-            .Response(r => r.OnSuccess<ResidentDirectoryResponse>((json, s) =>
+        p.Get(Url.SandboxRoute("RecordRosterCedar", "Grid"))
+            .Response(r => r.OnSuccess<RecordRosterPage>((page, s) =>
             {
-                s.Component<FusionGrid>(GridId).SetDataSource(json, x => x.Result);
-                s.Element("server-load-status").SetText("loaded via response path");
-            }));
-        // Keyed grid loads from the whole-array body so server update/patch can replace rows.
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(KeyedGridId).SetDataSource(json);
-                s.Element("server-keyed-load-status").SetText("keyed grid loaded");
-            }));
-    }));
+                s.Component<FusionGrid>(RosterId).Rows<RecordRosterResident>().Set(page.Get(x => x.Result));
+                s.Element("roster-record-status").Text.Set(page.Get(x => x.Summary));
+            }))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Server-Backed Roster</native-heading>
-    <native-text color="Secondary">
-        The roster binds from the server's <code>{ Result, Count }</code> response and applies server-driven
-        admit, row update, and keyed patch by reading the typed <code>Row</code> out of each response.
-    </native-text>
+    <div>
+        <native-heading level="H1">Resident Roster</native-heading>
+        <native-text color="Secondary">
+            Resident services. The roster comes from the resident record; bring today's changes in the record onto it
+            as they are approved.
+        </native-text>
+    </div>
 
-    <p class="font-mono text-sm">Load status: <span id="server-load-status" class="text-text-muted">waiting</span></p>
-    <p class="font-mono text-sm">Keyed load: <span id="server-keyed-load-status" class="text-text-muted">waiting</span></p>
+    <native-card><native-card-body>
+        <native-heading level="H2">Today in the record</native-heading>
+        <ul class="mt-3 space-y-3">
+            <li class="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span><span class="font-medium">Rosa Diaz</span> moves into Cedar wing today</span>
+                @(Html.NativeButton("roster-add-arrival", "Add to the roster")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Post(Url.SandboxRoute("RecordRosterTodaysArrival", "Grid"))
+                            .Response(r => r.OnSuccess<RecordRosterArrival>((arrival, s) =>
+                            {
+                                s.Component<FusionGrid>(RosterId).AddRecordAt(arrival.Get(x => x.Resident), arrival.Get(x => x.Position));
+                                s.Element("roster-record-status").Text.Set(arrival.Get(x => x.Summary));
+                            }))))
+            </li>
+            <li class="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span><span class="font-medium">Henry Liu</span>'s care level changed after his hospital stay</span>
+                @(Html.NativeButton("roster-apply-care-level", "Apply the new care level")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Post(Url.SandboxRoute("RecordRosterCareLevel", "Grid"))
+                            .Response(r => r.OnSuccess<RecordRosterUpdate>((update, s) =>
+                            {
+                                var roster = s.Component<FusionGrid>(RosterId);
+                                roster.UpdateRow(roster.GetRowIndexByPrimaryKey(update.Get(x => x.Resident.ResidentId)), update.Get(x => x.Resident));
+                                s.Element("roster-record-status").Text.Set(update.Get(x => x.Summary));
+                            }))))
+            </li>
+            <li class="flex flex-wrap items-center justify-between gap-2 text-sm">
+                <span><span class="font-medium">Grace Bennett</span>'s move to a larger suite is approved</span>
+                @(Html.NativeButton("roster-show-suite-move", "Show the new suite")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Post(Url.SandboxRoute("RecordRosterSuiteMove", "Grid"))
+                            .Response(r => r.OnSuccess<RecordRosterUpdate>((move, s) =>
+                            {
+                                s.Component<FusionGrid>(RosterId).SetRowData(GraceBennett, move.Get(x => x.Resident));
+                                s.Element("roster-record-status").Text.Set(move.Get(x => x.Summary));
+                            }))))
+            </li>
+        </ul>
+    </native-card-body></native-card>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("server-admit", "Admit Server Resident")
-            .CssClass(ButtonPrimary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Post(Url.SandboxRoute("CreateEditResident", "Grid"))
-                    .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
-                    {
-                        s.Component<FusionGrid>(GridId).AddRecord(json, x => x.Row, 0);
-                        s.Element("server-command").SetText("server resident admitted");
-                    }));
-            }))
-        @(Html.NativeButton("server-update", "Update Keyed Row 0")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Post(Url.SandboxRoute("UpdateFirstResidentRow", "Grid"))
-                    .Response(r => r.OnSuccess<ResidentGridEditResponse>((json, s) =>
-                    {
-                        s.Component<FusionGrid>(KeyedGridId).UpdateRow(0, json, x => x.Row);
-                        s.Element("server-command").SetText("server row updated");
-                    }));
-            }))
-        @(Html.NativeButton("server-patch", "Patch Resident 6005")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Post(Url.SandboxRoute("PatchResidentRow", "Grid"))
-                    .Response(r => r.OnSuccess<ResidentGridOperationsResponse>((json, s) =>
-                    {
-                        s.Component<FusionGrid>(KeyedGridId).SetRowData(6005, json, x => x.Row);
-                        s.Element("server-command").SetText("server row patched");
-                    }));
-            }))
-        @(Html.NativeButton("server-nested", "Load Nested Page")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                // SetDataSource [nested data-source property path]: read Page.Result out of the envelope.
-                p.Post(Url.SandboxRoute("NestedRoster", "Grid"))
-                    .Response(r => r.OnSuccess<ResidentRosterEnvelope>((json, s) =>
-                    {
-                        s.Component<FusionGrid>(KeyedGridId).SetDataSource(json, x => x.Page.Result);
-                        s.Element("server-command").SetText("loaded nested path");
-                    }));
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <h2 class="text-lg font-semibold"><span id="roster-wing">Cedar</span> wing</h2>
+        <native-hstack gap="Sm" class="mt-2 mb-4 flex-wrap">
+            @(Html.NativeButton("roster-cedar-wing", "Cedar wing")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => ShowWing(p, "Cedar")))
+            @(Html.NativeButton("roster-birch-wing", "Birch wing")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => ShowWing(p, "Birch")))
+        </native-hstack>
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <native-heading level="H2">Admit (server add)</native-heading>
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
-            .AllowSelection(true)
+        @(Html.FusionGrid<ResidentRosterViewModel, RecordRosterResident>(plan, RosterId, b => b
             .EditSettings(new GridEditSettings
             {
-                AllowEditing = true,
                 AllowAdding = true,
-                AllowDeleting = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Normal
-            })
-            .Columns(RosterColumns())))
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        <native-heading level="H2">Keyed Update (server update + patch)</native-heading>
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, KeyedGridId, b => b
-            .AllowSelection(true)
-            .EditSettings(new GridEditSettings
-            {
                 AllowEditing = true,
                 AllowEditOnDblClick = false,
                 Mode = EditMode.Normal
             })
-            .Columns(RosterColumns())))
+            .Columns(new List<GridColumn>
+            {
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180" },
+                new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "90" },
+                new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "170" }
+            })))
 
-        <p class="mt-4 font-mono text-sm">Command: <span id="server-command" class="text-text-muted">waiting</span></p>
-    </section>
+        <p id="roster-record-status" role="status" class="mt-4 text-sm">Loading the roster from the record.</p>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

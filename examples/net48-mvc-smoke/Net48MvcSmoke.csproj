@@ -72,9 +72,11 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <!-- The shipped net48 NuGet packages under test. Their build/buildTransitive targets copy the
-         runtime JS + design-system CSS into Content\alisreactive\ at build. AlisReactiveVersion
-         defaults to the rc.1 below; CI packs that same version into the local feed it restores from. -->
+    <!-- The shipped net48 NuGet packages under test. Each one's buildTransitive\net48 targets copies
+         its browser assets into Content\{PackageId}\ at build (the runtime JS, Native's CSS, the
+         design-system CSS this app chose). AlisReactiveVersion defaults to the rc.1 below. NuGet
+         never re-extracts a version its cache already holds, so CI packs a version of its own per
+         run and passes it as /p:AlisReactiveVersion (verify-net48.yml). -->
     <PackageReference Include="AlisReactive" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.Native" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.DesignSystem" Version="$(AlisReactiveVersion)" />

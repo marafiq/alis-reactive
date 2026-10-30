@@ -1,74 +1,83 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.DayTaskBoardViewModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Batch Task Update";
+    ViewData["Title"] = "Day Task Board";
 
-    const string GridId = "batch-task-grid";
+    const string BoardId = "day-task-board";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
+    var plan = Html.ReactivePlan<DayTaskBoardViewModel>();
+    var columns = FusionGridColumns.Of<DayTaskBoardResident>();
+    var openTasks = Field.Of((DayTaskBoardResident r) => r.OpenTasks);
 
-    // Focused scenario: a care lead edits a resident's open-task count in batch mode and commits the cell.
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("batch-status").SetText("loaded");
-            }))));
+        p.Get(Url.SandboxRoute("DayTaskBoardResidents", "Grid"))
+            .Response(r => r.OnSuccess<List<DayTaskBoardResident>>((residents, s) =>
+                s.Component<FusionGrid>(BoardId).Rows<DayTaskBoardResident>().Set(residents)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Batch Task Update</native-heading>
-    <native-text color="Secondary">
-        Edit a resident's open-task cell in batch mode, set the value, and save the cell.
-    </native-text>
+    <div>
+        <native-heading level="H1">Day Task Board</native-heading>
+        <native-text color="Secondary">
+            Birch wing, day shift. Keep each resident's open tasks current as you work through the wing, then hand the
+            board over to the evening shift.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("batch-edit-cell", "Edit Tasks Cell")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).EditCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks);
-                p.Element("batch-status").SetText("editCell called");
-            }))
-        @(Html.NativeButton("batch-update-cell", "Set Tasks To 6")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).UpdateCell(0, (ResidentDirectoryGridItem x) => x.OpenTasks, 6);
-                p.Element("batch-status").SetText("updateCell called");
-            }))
-        @(Html.NativeButton("batch-save-cell", "Save Cell")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).SaveCell();
-                p.Element("batch-status").SetText("saveCell called");
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("board-start", "Start with the first resident")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(BoardId).EditCell(0, openTasks)))
+            @(Html.NativeButton("board-all-done", "All tasks done")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var board = p.Component<FusionGrid>(BoardId);
+                    var chosen = p.From(board.GetSelectedRowIndexes());
+                    p.When(chosen.Any()).Truthy()
+                        .Then(done =>
+                        {
+                            done.Element("board-choose").Hide();
+                            board.UpdateCell(chosen.Find(row => true), openTasks, 0);
+                        })
+                        .Else(none => none.Element("board-choose").Show());
+                }))
+            @(Html.NativeButton("board-hand-over", "Hand over to the evening shift")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var board = p.Component<FusionGrid>(BoardId);
+                    board.SaveCell();
+                    p.Post(Url.SandboxRoute("DayTaskBoardHandover", "Grid"))
+                        .Gather<DayTaskBoardChanges>(g => g.Set(x => x.Changes, board.GetBatchChanges<DayTaskBoardResident>()))
+                        .Response(r => r.OnSuccess<DayTaskBoardHandedOver>((handedOver, s) =>
+                        {
+                            s.Component<FusionGrid>(BoardId).Rows<DayTaskBoardResident>().Set(handedOver.Get(x => x.Residents));
+                            s.Element("board-status").Text.Set(handedOver.Get(x => x.Summary));
+                        }));
+                }))
+        </native-hstack>
 
-    <p class="font-mono text-sm">Status: <span id="batch-status" class="text-text-muted">waiting</span></p>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
-            .EditSettings(new GridEditSettings
-            {
-                AllowEditing = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Batch,
-                ShowConfirmDialog = false
-            })
+        @(Html.FusionGrid<DayTaskBoardViewModel, DayTaskBoardResident>(plan, BoardId, b => b
+            .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Batch, ShowConfirmDialog = false })
             .Columns(new List<GridColumn>
             {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, AllowEditing = false, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "220", AllowEditing = false },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "140", TextAlign = TextAlign.Right, EditType = "numericedit" }
+                new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "180", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.Room), HeaderText = "Room", Width = "90", AllowEditing = false },
+                new GridColumn { Field = columns.Field(r => r.OpenTasks), HeaderText = "Open tasks", Width = "130", TextAlign = TextAlign.Right, EditType = "numericedit" }
             })))
-    </section>
+
+        <div class="mt-4 space-y-1 text-sm">
+            <p id="board-choose" hidden class="text-red-700">Choose a resident on the board, then mark their tasks done.</p>
+            <p id="board-status" role="status">The board has not been handed over yet.</p>
+        </div>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

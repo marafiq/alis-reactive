@@ -16,7 +16,7 @@ A real .NET Framework 4.8 consumer hits the same issues. Each is captured here w
 
 | # | Problem | Fix (see file) |
 |---|---------|----------------|
-| 1 | **Asset delivery.** The package targets copy the runtime JS + design-system CSS to `Content\alisreactive\{name}.{version}.{ext}` (this fixture is **native-only**, so it does not pull the Fusion/Syncfusion CSS). There is no `asp-append-version` Tag Helper on net48. | Reference the version-stamped files directly: `@Url.Content("~/Content/alisreactive/alis-reactive.<version>.js")` (`Views/Shared/_Layout.cshtml`). |
+| 1 | **Asset delivery.** MVC 5 has no static web assets: each package's `build\net48\{PackageId}.targets` copies its files into `Content\{PackageId}\` on build (`Content\AlisReactive\js\alis-reactive.js`, `Content\AlisReactive.Native\css\native.css`, `Content\AlisReactive.DesignSystem\css\design-system.css`; this fixture is **native-only**, so it does not pull the Fusion CSS). There is no `asp-append-version` Tag Helper on net48. | Reference the copied files directly: `@Url.Content("~/Content/AlisReactive/js/alis-reactive.js")` (`Views/Shared/_Layout.cshtml`), and include the `Content\AlisReactive*` folders as Content so publish deploys them. |
 | 2 | **Binding redirects.** `System.Text.Json` 9 and its transitive chain (`System.Buffers`, `System.Memory`, `System.Runtime.CompilerServices.Unsafe`, `System.Numerics.Vectors`, `System.Threading.Tasks.Extensions`, `Microsoft.Bcl.AsyncInterfaces`) need assembly binding redirects on .NET Framework, or you get `FileLoadException: ... manifest definition does not match the assembly reference`. Classic `packages.config` apps do **not** auto-add them. | `Web.config` `<runtime><assemblyBinding>`. A real consumer runs NuGet's `Add-BindingRedirect` or adds them by hand; this fixture's CI **auto-generates** them from the actual `bin\` assembly versions, so they are always exact. |
 | 3 | **`WebApplication.targets` / `VSToolsPath`.** A classic web app imports `$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets`; on a bare build agent `$(VSToolsPath)` defaults wrong (`MSB4226`). | Set `VisualStudioVersion` + `VSToolsPath` in the `.csproj`. |
 | 4 | **Native components are Html helpers, not Tag Helpers.** `<native-*>` Tag Helpers live in the net10-only `AlisReactive.NativeTagHelpers` package and do not exist under System.Web MVC 5. | Use `Html.InputField(plan, m => m.X).NativeTextBox(...)` / `.NativeCheckBox(...)` (`Views/Home/Index.cshtml`). |
@@ -27,8 +27,9 @@ A real .NET Framework 4.8 consumer hits the same issues. Each is captured here w
 
 ```powershell
 npm ci; npm run build:all
-bash scripts/pack.sh 1.0.0-rc.1            # builds the local rc.1 feed in ./nupkgs
-msbuild examples/net48-mvc-smoke/Net48MvcSmoke.csproj /p:Configuration=Release /restore /t:Build
+$v = "0.0.0-local.$(Get-Date -Format yyyyMMddHHmmss)"   # a new version each time: NuGet keeps the first package of a version
+bash scripts/pack.sh $v                   # builds the local feed in ./nupkgs
+msbuild examples/net48-mvc-smoke/Net48MvcSmoke.csproj /p:Configuration=Release /p:AlisReactiveVersion=$v /restore /t:Build
 & "$env:ProgramFiles\IIS Express\iisexpress.exe" /path:(Resolve-Path examples/net48-mvc-smoke) /port:5000
 # browse http://localhost:5000/ , tick the checkbox, the green proof box appears
 ```

@@ -1,5 +1,4 @@
 @model TextBoxModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -14,7 +13,7 @@
     // resident: a search icon appended inside the preferred-name field.
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Component<FusionTextBox>(m => m.PreferredName).AddAppendIcon("e-icons e-search");
+        p.Component<FusionTextBox>(m => m.PreferredName).AddIcon("append", "e-icons e-search");
     }));
 }
 
@@ -33,33 +32,33 @@
             @{ Html.InputField(plan, m => m.PreferredName, o => o.Label("Name this resident goes by"))
                 .FusionTextBox(b => b
                     .Placeholder("Search residents by name")
-                    .ShowClearButton(true)
-                    .Reactive(plan, evt => evt.Input, (args, p) =>
-                    {
-                        // Live preview of the name as the coordinator types it, and what the
-                        // current keystrokes are replacing on the resident's record.
-                        p.Element("name-preview").SetText(args, x => x.Value);
-                        p.Element("name-replacing").SetText(args, x => x.PreviousValue);
+                    .ShowClearButton(true))
+                .Reactive(evt => evt.Input, (args, p) =>
+                {
+                    // Live preview of the name as the coordinator types it, and what the
+                    // current keystrokes are replacing on the resident's record.
+                    p.Element("name-preview").Text.Set(args.Value);
+                    p.Element("name-replacing").Text.Set(args.PreviousValue);
 
-                        p.When(args, x => x.Value).NotEmpty()
-                            .Then(named => named.Element("name-preview-hint")
-                                .SetText("This is how staff will see the resident on the directory."))
-                            .Else(empty => empty.Element("name-preview-hint")
-                                .SetText("Enter the name the resident prefers."));
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        // On commit (focus leaves), record the saved name, what it changed from,
-                        // and whether the coordinator made the edit or it was filled for them.
-                        p.Element("name-committed").SetText(args, x => x.Value);
-                        p.Element("name-changed-from").SetText(args, x => x.PreviousValue);
+                    p.When(args.Value).NotEmpty()
+                        .Then(named => named.Element("name-preview-hint")
+                            .Text.Set("This is how staff will see the resident on the directory."))
+                        .Else(empty => empty.Element("name-preview-hint")
+                            .Text.Set("Enter the name the resident prefers."));
+                })
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    // On commit (focus leaves), record the saved name, what it changed from,
+                    // and whether the coordinator made the edit or it was filled for them.
+                    p.Element("name-committed").Text.Set(args.Value);
+                    p.Element("name-changed-from").Text.Set(args.PreviousValue);
 
-                        p.When(args, x => x.IsInteracted).Truthy()
-                            .Then(edited => edited.Element("name-edit-source")
-                                .SetText("Edited by you."))
-                            .Else(filled => filled.Element("name-edit-source")
-                                .SetText("Filled from the resident's record."));
-                    })); }
+                    p.When(args.IsInteracted).Truthy()
+                        .Then(edited => edited.Element("name-edit-source")
+                            .Text.Set("Edited by you."))
+                        .Else(filled => filled.Element("name-edit-source")
+                            .Text.Set("Filled from the resident's record."));
+                }); }
 
             <native-vstack gap="Xs">
                 <native-text>
@@ -82,9 +81,11 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionTextBox>(m => m.PreferredName).SetValue(Model.LegalName);
-                        p.Element("name-preview").SetText(
-                            p.Component<FusionTextBox>(m => m.PreferredName).Value());
+                        var preferredName = p.Component<FusionTextBox>(m => m.PreferredName);
+                        preferredName.Value.Set(Model.LegalName);
+                        preferredName.DataBind();
+                        p.Element("name-preview").Text.Set(
+                            p.Component<FusionTextBox>(m => m.PreferredName).Value);
                     }))
                 @(Html.NativeButton("start-editing-name", "Edit name")
                     .CssClass(ButtonSecondary)
@@ -110,21 +111,21 @@
                 .FusionTextBox(b => b
                     .Value(Model.DietaryNote)
                     .Placeholder("e.g. low sodium, no shellfish")
-                    .ShowClearButton(true)
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        // When the coordinator starts editing, show kitchen-staff guidance and the
-                        // note that was already on file when they opened the field.
-                        p.Element("dietary-guidance")
-                            .SetText("Kitchen staff read this exactly as written. Be specific.");
-                        p.Element("dietary-on-open").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        // When focus leaves, confirm the note that was captured.
-                        p.Element("dietary-guidance").SetText("Dietary note captured for kitchen staff.");
-                        p.Element("dietary-captured").SetText(args, x => x.Value);
-                    })); }
+                    .ShowClearButton(true))
+                .Reactive(evt => evt.Focus, (args, p) =>
+                {
+                    // When the coordinator starts editing, show kitchen-staff guidance and the
+                    // note that was already on file when they opened the field.
+                    p.Element("dietary-guidance")
+                        .Text.Set("Kitchen staff read this exactly as written. Be specific.");
+                    p.Element("dietary-on-open").Text.Set(args.Value);
+                })
+                .Reactive(evt => evt.Blur, (args, p) =>
+                {
+                    // When focus leaves, confirm the note that was captured.
+                    p.Element("dietary-guidance").Text.Set("Dietary note captured for kitchen staff.");
+                    p.Element("dietary-captured").Text.Set(args.Value);
+                }); }
 
             <native-vstack gap="Xs">
                 <native-text color="Secondary"><span id="dietary-guidance">Add anything kitchen staff should know before meals.</span></native-text>
@@ -145,18 +146,18 @@
                     var diet = p.Component<FusionTextBox>(m => m.DietaryNote);
 
                     // A profile must carry a name before it can be saved.
-                    p.When(name.Value()).NotEmpty()
+                    p.When(name.Value).NotEmpty()
                         .Then(ok => ok.Post(Url.SandboxRoute("Save", "TextBox"))
-                            .Gather(g => g
-                                .Include(name.Value(), "preferredName")
-                                .Include(diet.Value(), "dietaryNote"))
+                            .Gather<ProfileSaveRequest>(g => g
+                                .Set(x => x.PreferredName, name.Value)
+                                .Set(x => x.DietaryNote, diet.Value))
                             .Response(r => r.OnSuccess<ProfileSaveResponse>((json, s) =>
                             {
-                                s.Element("save-confirmation").SetText(json, x => x.Confirmation);
-                                s.Element("save-confirmation-panel").RemoveClass("hidden");
+                                s.Element("save-confirmation").Text.Set(json.Get(x => x.Confirmation));
+                                s.Element("save-confirmation-panel").ClassList.Remove("hidden");
                             })))
                         .Else(missing => missing.Element("save-status")
-                            .SetText("Add a preferred name before saving the profile."));
+                            .Text.Set("Add a preferred name before saving the profile."));
                 }))
             <div id="save-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
                 <native-text><span id="save-confirmation" class="font-medium text-green-800"></span></native-text>

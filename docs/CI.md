@@ -6,15 +6,15 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 ## Facts this design rests on
 
 - **The local full gate is the release-grade browser proof.** `scripts/test.sh` runs typecheck,
-  assets, vitest, the gate-script self-tests, `dotnet build`, the non-Playwright dotnet tests, the
-  whole Playwright suite, and the behavioral-coverage gate (0b). `scripts/test.sh --parallel` runs
-  the Playwright leg as the five CI shards side by side (each with its own sandbox) and hands every
-  shard's TRX to 0b: about 20 minutes instead of about 60 on a 12-core machine. CI runs the same
-  scripts; it never defines a second gate.
+  assets, vitest, the consistency checks, `dotnet build`, the non-Playwright dotnet tests, and the
+  whole Playwright suite. `scripts/test.sh --parallel` runs the Playwright leg as the CI
+  shards side by side (each with its own sandbox): about 20 minutes instead of about 60 on a
+  12-core machine. CI runs the same scripts; it never defines a second gate.
 - **CI Playwright is single-worker.** `tests/Alis.Reactive.PlaywrightTests/GlobalUsings.cs:4-5`
   declares `[assembly: Parallelizable(ParallelScope.Fixtures)]` and
   `[assembly: LevelOfParallelism(1)]`; one Kestrel sandbox per test assembly run
-  (`WebServerFixture.cs:10-33`, a `[SetUpFixture]` on a free port). Playwright's own CI guide
+  (`tests/Alis.Reactive.Playwright.TestHost/AppServer.cs` on a free port, started by the
+  `[SetUpFixture]` each test project declares over it). Playwright's own CI guide
   recommends one worker on CI "to prioritize stability and reproducibility"
   ([playwright.dev/docs/ci](https://playwright.dev/docs/ci)).
 - **The unsharded suite takes about 80 minutes on `ubuntu-latest`.** The last green CI run before
@@ -42,12 +42,11 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
-| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5; `behavioral coverage (0b)` over all shards' TRX | the one gate definition | never |
-| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)`, `gate / behavioral coverage (0b)` | PR merge (required: `gate / test`) | never |
+| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5 | the one gate definition | never |
+| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, six packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
-| `deploy-docs.yml` | pushes to `main` touching docs or public C#; pull requests touching the same paths (build only); manual | `build-docs`; `deploy` (skipped on pull requests) | the docs still build (PR); Pages deployment (`main`) | GitHub Pages, from `main` only |
 
 ## One gate definition
 
@@ -62,20 +61,9 @@ uses the same action, so a toolchain bump is one edit. Every job still runs the 
 (`scripts/test.sh --no-e2e`, `scripts/build.sh`, `scripts/playwright.sh`), so local and CI stay
 one entry point.
 
-Check names on a pull request are `gate / test`, `gate / playwright (<shard>)` and
-`gate / behavioral coverage (0b)` (GitHub names a reusable workflow's jobs
-`<caller job> / <called job>`); confirm with `gh pr checks <n>` before wiring required checks.
-
-The 0b job runs only when all five shards are green. Each shard uploads its TRX files (the first
-attempt and any `-retryN` attempt) as `trx-<shard>`; the job downloads them all and runs
-`verify-behavioral-coverage.mjs --all --trx <every file>`. For each test the highest attempt's
-outcome stands. A lost shard cannot shrink the proof: the job only starts when every shard passed
-(`needs`), each shard's upload fails when it finds no TRX (`if-no-files-found: error`), and a test
-a coverage map names but no TRX contains is reported "not found" and turns 0b red. (The gate's own
-exit 2 for a listed-but-missing file or an empty list guards local callers.) Because
-`nuget-publish.yml` needs the whole gate, a release is blocked by 0b too.
-The gate's own behavior is proven by `verify-behavioral-coverage.selftest.mjs`, which
-`scripts/test.sh` runs in every `gate / test` job.
+Check names on a pull request are `gate / test` and `gate / playwright (<shard>)` (GitHub names a
+reusable workflow's jobs `<caller job> / <called job>`); confirm with `gh pr checks <n>` before
+wiring required checks.
 
 ## Playwright on GitHub-hosted runners: designed for choppiness
 
@@ -86,36 +74,45 @@ The gate's own behavior is proven by `verify-behavioral-coverage.selftest.mjs`, 
 `~` contains, `!~` does not contain, `|` or, `&` and, parentheses). VSTest filters have no
 wildcards, so Fusion component namespaces are split by their **first letter**
 (`FullyQualifiedName~.Components.Fusion.A` matches `AutoComplete`, `AIAssistView`, `Accordion`);
-every letter A-Z is listed across the three Fusion shards, so a new component lands in exactly one.
+every letter A-Z is listed across the four Fusion shards, so a new component lands in exactly one.
+A shard's filters never overlap another's: `components` leaves out `.Validation.`, which the
+`validation` shard selects.
 The last shard is the complement of the others, so a new top-level namespace can never fall outside
 every shard. `scripts/playwright.sh --shard <name> --print-filter` prints the exact filter.
 Sharding is the Playwright-recommended way to parallelize across machines
 ([playwright.dev/docs/test-sharding](https://playwright.dev/docs/test-sharding)).
 
-Expected time per shard, from the per-test `elapsed=` markers of run 29164122260 (single worker,
-`ubuntu-latest`, 2026-07-11):
+Expected time per shard, from the per-test `elapsed=` markers of two runs on `ubuntu-latest`, single
+worker, 2026-10-28: run 40694273254 and run 40723324275. The same test took about 5.5 s on one
+runner and about 7.3 s on another, so the partition is balanced by test count: at 7.3 s, 300 tests
+are about 37 minutes against the 60-minute limit. The five sandbox shards before these ran 52-58
+minutes for `components-and-validation` (589 tests), which ran out on run 40711754374.
 
-| Shard | Filter (summary) | Tests (`--list`) | Test time (2026-07-11 log) | Expected job time |
-|-------|------------------|------------------|----------------------------|-------------------|
-| `fusion-a-f-and-core` | Fusion A-F, `CoreBehaviors` | 217 | 719 s + 129 s = 848 s | ~16 min |
-| `fusion-g-l-and-http` | Fusion G-L, `HttpPipeline` | 256 | 543 s + 385 s = 928 s | ~18 min |
-| `fusion-m-z` | Fusion M-Z | 213 | 809 s | ~16 min |
-| `components-and-validation` | `Components.*` except Fusion (Native, AppLevel), `Validation` | 274 | 504 s + 553 s = 1057 s | ~20 min |
-| `conditions-patterns-and-rest` | everything not in the others (`Conditions`, `Patterns`, future namespaces) | 272 | 574 s + 478 s = 1052 s | ~20 min |
+| Shard | Filter (summary) | Tests (`--list`) | Test time, run 40694273254 | Test time, run 40723324275 |
+|-------|------------------|------------------|----------------------------|----------------------------|
+| `framework` | the framework project, whole | 624 | 195 s (498 tests) | 205 s (576 tests) |
+| `fusion-a-f` | Fusion A-F | 215 | 1635 s | 1737 s |
+| `fusion-grid` | Fusion G (Grid alone) | 247 | 1322 s | 1803 s |
+| `fusion-h-r` | Fusion H-R | 208 | 1393 s | 1227 s |
+| `fusion-s-z` | Fusion S-Z | 168 | 1275 s | 650 s |
+| `http-core-and-patterns` | `HttpPipeline`, `CoreBehaviors`, `Patterns` | 276 | 1577 s | 1986 s |
+| `components` | `Components.*` except Fusion (Native, AppLevel, Brought) | 286 | 1633 s | 2097 s |
+| `validation` | `Validation` | 303 | 1681 s | 2274 s |
+| `conditions-and-rest` | everything not in the others (`Conditions`, `Plugins`, future namespaces) | 265 | 1220 s | 1838 s |
 
-The test counts are the `--list` output at the commit that introduced the shards: sum 1232 = the
-discovered set, union identical to the full list, zero duplicates.
+The test counts are the `--list` output at the commit that introduced this partition: sum 2592 = the
+discovered set of both projects, union identical to the full list, zero duplicates.
 
 `scripts/playwright.sh --shard <name> --list --no-build` prints the fully qualified names a shard
 selects without running them: `dotnet test --list-tests` (with the NUnit adapter's
 `DisplayName=FullName`) gives the discovered set, and because `--list-tests` ignores `--filter`
 (observed: every shard listed all 1232 tests), `scripts/vstest-filter.mjs` applies the shard's
 expression with the VSTest grammar (`~ !~ = != | &`, parentheses, case-insensitive values). The
-partition proof is: the five lists concatenated equal the full list
+partition proof is: every shard's list concatenated equals the full list of every project
 (`scripts/playwright.sh --list --no-build`), every test exactly once:
 
 ```bash
-for s in fusion-a-f-and-core fusion-g-l-and-http fusion-m-z components-and-validation conditions-patterns-and-rest; do
+for s in $(scripts/playwright.sh --list-shards); do
   scripts/playwright.sh --shard "$s" --list --no-build > "/tmp/shard-$s.txt"; wc -l < "/tmp/shard-$s.txt"
 done
 scripts/playwright.sh --list --no-build > /tmp/all.txt
@@ -123,11 +120,11 @@ cat /tmp/shard-*.txt | sort > /tmp/union.txt
 diff <(sort /tmp/all.txt) /tmp/union.txt && echo "no gaps"; sort /tmp/union.txt | uniq -d | wc -l   # 0 = no duplicates
 ```
 
-Job time adds about 2 min of setup (checkout, toolchain, `scripts/build.sh` 76 s, browser install
-28 s). Wall clock for the browser leg: about 20 minutes instead of about 80, at roughly the same
-total runner minutes. Times are from one run and will drift. Re-balance by moving a letter or a
-namespace between shards in `shard_filter()`; keep every letter present exactly once and one
-complement shard, then re-run the partition proof above.
+Job time adds about 3 min of setup (checkout, toolchain, `scripts/build.sh`, browser install).
+Wall clock for the browser leg is the slowest shard, about 40 minutes on a slow runner, at roughly
+the same total runner minutes. Times are from one run and will drift. Re-balance by moving a letter or a
+namespace between shards in the project's `playwright.project.sh` (`playwright_shard_filter`); keep
+every letter present exactly once and one complement shard, then re-run the partition proof above.
 
 ### Retries: only what failed, with artifacts only on failure
 
@@ -136,8 +133,10 @@ complement shard, then re-run the partition proof above.
 `FullyQualifiedName=<fqn>|...`). The gate passes `retry-failed: 1` on PRs, nightly and releases.
 Every attempt keeps its own log, TRX and diag file. Tests that fail and then pass are the **flaky
 list**: `[playwright:flaky]` lines, `TestResults/observable/flaky-<stamp>.txt`, a block in the
-GitHub job summary, and, under GitHub Actions, one `::warning` annotation per flaky test. The
-annotation shows on the pull request's checks, so a green job can't hide a re-run. The
+GitHub job summary, and, under GitHub Actions, one `::warning` annotation per flaky test carrying
+the start of the failure the re-run hid (`scripts/trx-failed-tests.mjs <trx> flaky <rerun.trx>`).
+The annotation shows on the pull request's checks, so a green job can't hide a re-run, and the
+flake can be root-caused from the check: a green job uploads no failure artifacts. The
 `if: failure()` artifact upload carries logs, TRX, diagnostics, and the
 traces and screenshots `PlaywrightTestBase` saved for the failed tests. This is the
 Playwright-recommended shape (retry in CI, keep the trace of the failure:
@@ -147,8 +146,7 @@ is listed in `RetryExceptions` (NUnit 4.6.1,
 [RetryAttribute](https://docs.nunit.org/articles/nunit/writing-tests/attributes/retry.html)),
 and Playwright timeouts are exceptions, not assertions.
 
-PR #58 (2026-03-25) had a 4x retry loop living in `deploy-docs.yml`; it did not survive the
-workflow split. The retry now lives in the wrapper so it is the same locally and in CI.
+The retry lives in the wrapper so it is the same locally and in CI.
 
 ### Timeouts
 
@@ -166,7 +164,18 @@ commit of `v3.0.0`, `reporter: dotnet-trx`, `use-actions-summary: true`, `fail-o
 because the test step already carries the verdict). The job needs `checks: write`
 ([job summaries](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#adding-a-job-summary),
 [dorny/test-reporter](https://github.com/dorny/test-reporter)). The wrapper appends the flaky list
-to the same summary.
+to the same summary. When the last attempt is still red, the wrapper also prints one
+`::error title=Failed test::` annotation per failing test with the start of its failure message
+(`scripts/trx-failed-tests.mjs <trx> annotations`), so the pull request's checks, and the
+check-run annotations API, name the failures without opening the log or the artifact. The
+annotation, like the flaky warning, also carries the page console the failed test wrote to its
+output (`PlaywrightTestBase` writes it on failure): its error lines, then its last thirty lines.
+Every shard also prints one `::notice` naming each fixture and how many of its tests passed on
+the first attempt (`scripts/trx-failed-tests.mjs <trx> summary`), so a green shard's check-run
+annotations say what it proved.
+The deterministic gate (`scripts/test.sh`) does the same for its own steps: a failing step prints
+`::error title=Gate step failed::<step>`, and a failing test in a non-Playwright test project
+prints the same per-test `::error` annotation from its TRX.
 
 ### Flaky tests: quarantine is temporary
 
@@ -174,10 +183,10 @@ A test that fails and passes on re-run is flaky. A test that fails twice in a ro
 until proven otherwise. The convention:
 
 1. Open an issue with the trace, name the root cause hypothesis, and fix the wait strategy or the
-   test. Widening a timeout is not a fix (CLAUDE.md Rule 9).
+   test. Widening a timeout is not a fix (CLAUDE.md, Rules: root cause, not patch).
 2. If it cannot be fixed within the PR, quarantine it: add `[Category("Quarantine")]`
    ([NUnit Category](https://docs.nunit.org/articles/nunit/writing-tests/attributes/category.html)),
-   add the shard exclusion `&TestCategory!=Quarantine` to every `shard_filter()` case and a sixth,
+   add the shard exclusion `&TestCategory!=Quarantine` to every `playwright_shard_filter` case and a sixth,
    non-blocking `quarantine` shard with `TestCategory=Quarantine`, and add the row below. The PR that
    quarantines must show the shard's test count dropping by exactly the quarantined tests.
 3. Quarantine expires after **14 days**: fix and remove the category, or delete the test with the
@@ -201,15 +210,15 @@ until proven otherwise. The convention:
   Scheduled workflows run on the default branch only and are disabled after 60 days without
   repository activity ([schedule](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule)).
 - **Tag releases: the browser shards block publishing.** Recommendation and the workflow agree
-  (`nuget-publish.yml`: `pack-and-publish` needs `gate`, which includes all five shards). Evidence:
+  (`nuget-publish.yml`: `pack-and-publish` needs `gate`, which includes every shard). Evidence:
   (1) ten consecutive green legs since the license fix (2026-06-10 to 2026-07-11) plus the
-  `v1.0.0-rc.2` publish leg, which meets the repo's own re-arm criterion (`high-quality-bar-tasks.md`
-  T10/T14: three consecutive green runs); (2) sharding plus one in-shard re-run changes the cost of
+  `v1.0.0-rc.2` publish leg, which meets the repo's re-arm criterion (three consecutive green
+  runs); (2) sharding plus one in-shard re-run changes the cost of
   a flake from an 80-minute re-run to a 20-minute re-run of the failed shard
   (`gh run rerun <run-id> --failed`); (3) publishing is idempotent (`--skip-duplicate`), so a re-run
   after a flake never double-ships; (4) the alternative, "the local gate is the proof", leaves no
-  recorded evidence next to the GitHub Release, which the Definition of Done
-  (`.claude/rules/definition-of-done.md`) does not accept. What would justify going back to
+  recorded evidence next to the GitHub Release, which `CLAUDE.md` ("Playwright is the proof") does
+  not accept. What would justify going back to
   non-blocking: a shard that fails on two consecutive releases with no test at fault and a
   documented runner-side cause. Until then, red means stop.
 
@@ -217,7 +226,7 @@ until proven otherwise. The convention:
 
 - **Least privilege.** Every workflow declares `permissions: contents: read` at the top; jobs widen
   only what they need (`checks: write` for the shard summary, `contents: write` for the GitHub
-  Release, `issues: write` for the nightly reporter, Pages scopes in `deploy-docs.yml`)
+  Release, `issues: write` for the nightly reporter)
   ([security hardening](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions)).
 - **Pinning policy.** GitHub-owned `actions/*` stay on major tags (`@v4`), the accepted trade-off
   for first-party actions; every third-party action is pinned to a full commit SHA with the version
@@ -245,7 +254,7 @@ until proven otherwise. The convention:
   and block the merge, which is why the `pull_request` trigger has no filter. The filter lists the
   gate's own files (`gate.yml`, `.github/actions/**`) so a CI change is tested by CI.
 - **Dependabot.** `.github/dependabot.yml`: monthly, grouped minor/patch updates for GitHub
-  Actions, npm (root workspaces and `docs-site`) and NuGet. Details in "Dependency updates" below.
+  Actions, npm and NuGet. Details in "Dependency updates" below.
 
 ## Dependency updates
 
@@ -265,9 +274,6 @@ until proven otherwise. The convention:
   never Syncfusion (npm and NuGet move together, deliberately, one patch behind the newest weekly
   release, with a new license key per major), never `Microsoft.CodeAnalysis.*` (the analyzers'
   Roslyn version is the minimum compiler every consumer needs).
-- **What proves a `docs-site` update.** The gate and `scripts/test.sh` never build `docs-site`. A PR
-  that touches it is proven by the `build-docs` check that `deploy-docs.yml` runs on pull requests
-  (Node 22, `npm ci`, `npm run build`), not by the gate's green.
 - **The secret it needs.** Workflows started by Dependabot read **Dependabot secrets**, not Actions
   secrets. Without `SYNCFUSION_LICENSE_KEY` in that store the job log shows
   `Syncfusion__LicenseKey:` empty and the InPlaceEditor and Drawer tests time out behind the
@@ -293,8 +299,9 @@ the check names.
 1. Read the workflow you are changing and this page. If the change is a new step in the gate, it
    goes in `gate.yml` (once), not in a caller.
 2. A tool version changes in `.github/actions/setup-toolchain/action.yml` or `global.json`, nowhere else.
-3. A new shard or a re-balance changes `shard_filter()` in `scripts/playwright.sh` **and** the matrix
-   in `gate.yml` **and** the table above. Every letter A-Z must appear in exactly one Fusion shard,
+3. A new shard or a re-balance changes its project's `playwright.project.sh` **and** the matrix in
+   `gate.yml` **and** the table above. A new Playwright project adds its own `playwright.project.sh`
+   (name, shards, bundles, sources); the runner finds it by that file. Every letter A-Z must appear in exactly one Fusion shard,
    and one shard must remain the complement. Prove the partition with
    `scripts/playwright.sh --shard <name> --print-filter` for each shard.
 4. A third-party action is pinned to a commit SHA with a version comment; resolve it with
@@ -307,10 +314,10 @@ the check names.
 
 ## Open decisions (owner)
 
-- `npm run lint` as a blocking step in `gate / test` (`high-quality-bar-tasks.md` T7; the ledger
-  records lint clean on 2026-06-09).
-- `verify-net48.yml` packs and asserts the fixture version `1.0.0-rc.1` (`verify-net48.yml`,
-  `examples/net48-mvc-smoke/Net48MvcSmoke.csproj:84`, `_Layout.cshtml:10,18`); rename to a fixture
-  version such as `0.0.0-net48smoke` in a separate PR so CI logs stop reading like a release.
+- `npm run lint` as a blocking step in `gate / test` (lint was clean on 2026-06-09).
+- `verify-net48.yml`'s pack job still packs `1.0.0-rc.1` for its artifact; rename it to a fixture
+  version in a separate PR so CI logs stop reading like a release. The IIS job packs
+  `0.0.0-ci.{run}.{attempt}`: the NuGet cache brought back an earlier run's rc.1 package, and NuGet
+  never re-extracts a version it already holds.
 - Committed `packages.lock.json` files for locked NuGet restores (see "Caching").
 - A `.nvmrc` (`22`) so local Node matches CI (the dev box runs 24).

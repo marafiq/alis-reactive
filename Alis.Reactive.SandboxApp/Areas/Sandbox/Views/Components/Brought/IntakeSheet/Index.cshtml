@@ -1,0 +1,323 @@
+@model MoveInNoticeModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Conditions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
+@functions {
+    private static void Line(GuardBuilder<MoveInNoticeModel> rule, string id, string holds, string fails) =>
+        rule.Then(then => then.Element(id).Text.Set(holds))
+            .Else(otherwise => otherwise.Element(id).Text.Set(fails));
+
+    // The sandbox's letter plugin (Scripts/sandbox-plugins.ts): each line is written only from facts that
+    // arrive as their declared kind, so a fact sent in the wrong kind reads "?".
+    private sealed class MoveInLetterPlugin : Plugin
+    {
+        public MoveInLetterPlugin()
+            : base("moveInLetter")
+        {
+        }
+
+        /// <summary>Who moves in where and when.</summary>
+        public TypedSource<string> Opening(Arg<string> applicant, Arg<string> wing, Arg<DateTime> moveIn) => Method<string>(applicant, wing, moveIn);
+
+        /// <summary>The applicant's age, service and number on the waiting list.</summary>
+        public TypedSource<string> Standing(Arg<int> age, Arg<bool> veteran, Arg<int?> position) => Method<string>(age, veteran, position);
+
+        /// <summary>Whom to call, the contact on file, and the summary.</summary>
+        public TypedSource<string> Contact(Arg<string> phone, Arg<ApplicantContact> onFile, Arg<string> summary) => Method<string>(phone, onFile, summary);
+
+        /// <summary>The allergies, and where they were read from.</summary>
+        public TypedSource<string> Allergies(Arg<IReadOnlyList<string>> allergies, Arg<string> source) => Method<string>(allergies, source);
+
+        /// <summary>The notice's own line: the applicant it names and the relation of the contact.</summary>
+        public TypedSource<string> Notice(Arg<string> applicant, Arg<string> relation) => Method<string>(applicant, relation);
+    }
+
+    private sealed class DeskCodePlugin : Plugin
+    {
+        public DeskCodePlugin()
+            : base("slugify")
+        {
+        }
+
+        /// <summary>The desk's code for a name: lower case, hyphenated.</summary>
+        public TypedSource<string> Code(Arg<string> text) => Method<string>(text, name: "");
+    }
+}
+@{
+    ViewData["Title"] = "Move-in Notice";
+
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string Check = "flex justify-between gap-4 border-b border-border/60 py-1";
+
+    var plan = Html.ReactivePlan<MoveInNoticeModel>();
+    var letter = plan.RegisterPlugin<MoveInLetterPlugin>();
+    var deskCode = plan.RegisterPlugin<DeskCodePlugin>();
+    var waitingListUrl = Url.SandboxRouteTemplate("WaitingList", "IntakeSheet", "resident");
+    var noticeUrl = Url.SandboxRouteTemplate("Notice", "IntakeSheet", "wing", "desk", "applicant", "age", "phone", "days", "position", "relation");
+
+    // The notice the page raised, heard here: each fact shown as it arrived, then sent to the wing's night
+    // desk with every fact in the address, the headers and the body, read from where it lives.
+    Html.On(plan, t => t.CustomEvent<MoveInNotice>(MoveInEvents.NoticeRequested, (notice, p) =>
+    {
+        var sheet = p.Component<IntakeSheet>(MoveInNoticeModel.SheetId);
+        var link = p.Url<MoveInLink>();
+
+        p.Element("notice-applicant").Text.Set(notice.Get(x => x.Applicant));
+        p.Element("notice-phone").Text.Set(notice.Get(x => x.Phone));
+        p.Element("notice-summary").Text.Set(notice.Get(x => x.Summary));
+        p.Element("notice-position").Text.Set(notice.Get(x => x.Position));
+        p.Element("notice-wing").Text.Set(notice.Get(x => x.Wing));
+        p.Element("notice-source").Text.Set(notice.Get(x => x.Source));
+        p.Element("notice-allergies").Text.Set(notice.Get(x => x.Allergies));
+        p.Element("notice-services").Text.Set(notice.Get(x => x.Services));
+        p.Element("notice-relation").Text.Set(notice.Get(x => x.Contact.Relation));
+        p.Element("notice-record").Text.Set(notice.Get(x => x.Record!.Name));
+        p.Element("notice-age").Text.Set(notice.Get(x => x.Age));
+        p.Element("notice-veteran").Text.Set(notice.Get(x => x.Veteran));
+        Line(p.When(notice.Get(x => x.CareLevel)).Eq(CareLevel.Assisted), "notice-care", "Assisted living.", "Not assisted living.");
+        Line(p.When(notice.Get(x => x.MoveInDate)).Eq(new DateTime(2026, 7, 1)), "notice-opening-day", "On opening day.", "Not on opening day.");
+        Line(p.When(notice.Get(x => x.Record)).IsNull(), "notice-record-held", "No record attached.", "Record attached.");
+        p.Element("letter-notice").Text.Set(letter.Notice(notice.Get(x => x.Applicant), notice.Get(x => x.Contact.Relation)));
+
+        var summary = sheet.Summary();
+        p.Post(noticeUrl)
+            .Gather<NoticeRequest>(g => g
+                .Set(x => x.Wing, link.Get(q => q.Wing))
+                .Set(x => x.Desk, "night")
+                .Set(x => x.Applicant, notice.Get(x => x.Applicant))
+                .Set(x => x.Age, sheet.Age)
+                .Set(x => x.Phone, sheet.Contact.Phone)
+                .Set(x => x.Days, sheet.DaysUntilMoveIn())
+                .Set(x => x.Position, sheet.WaitlistPosition())
+                .Set(x => x.Relation, notice.Get(x => x.Contact.Relation))
+                .Set(x => x.Name, sheet.Name)
+                .Set(x => x.ContactPhone, sheet.Contact.Phone)
+                .Set(x => x.Summary, summary)
+                .Set(x => x.ListPosition, sheet.WaitlistPosition())
+                .Set(x => x.WingName, link.Get(q => q.Wing))
+                .Set(x => x.Source, "intake-sheet")
+                .Set(x => x.Notice, notice.Get(x => x.Source))
+                .Set(x => x.ContactRelation, notice.Get(x => x.Contact.Relation))
+                .Set(x => x.Allergies, sheet.Allergies)
+                .Set(x => x.Services, new List<string> { "Transport", "Meals" })
+                .Set(x => x.Code, deskCode.Code(sheet.Name))
+                .Set(x => x.CareLevel, sheet.CareLevel)
+                .Set(x => x.MoveInDate, sheet.MoveInDate)
+                .Set(x => x.Veteran, sheet.Veteran)
+                .Set(x => x.Facts, new ApplicantContact { Phone = "555-0199", Relation = "Son" })
+                .Set(x => x.Years, sheet.YearsOver(62))
+                .Header("X-Wing", link.Get(q => q.Wing))
+                .Header("X-Applicant", sheet.Name)
+                .Header("X-Phone", sheet.Contact.Phone)
+                .Header("X-Summary", summary)
+                .Header("X-Position", sheet.WaitlistPosition())
+                .Header("X-Source", "intake-sheet")
+                .Header("X-Notice", notice.Get(x => x.Source))
+                .Header("X-Relation", notice.Get(x => x.Contact.Relation))
+                .Header("X-Code", deskCode.Code(sheet.Name))
+                .Header("X-Years", sheet.YearsOver(62)))
+            .Response(r => r.OnSuccess<NoticeReceipt>((receipt, s) =>
+            {
+                s.Element("receipt-route").Text.Set(receipt.Get(x => x.Route));
+                s.Element("receipt-headers").Text.Set(receipt.Get(x => x.Headers));
+                s.Element("receipt-body").Text.Set(receipt.Get(x => x.Body));
+            }));
+    }));
+
+    // An edit of the sheet, raised with the applicant as an object, and read back member by member.
+    Html.On(plan, t => t.CustomEvent<SheetEdit>(MoveInEvents.SheetEdited, (edit, p) =>
+    {
+        p.Element("edit-field").Text.Set(edit.Get(x => x.Field));
+        p.Element("edit-name").Text.Set(edit.Get(x => x.Applicant.Name));
+        p.Element("edit-age").Text.Set(edit.Get(x => x.Applicant.Age));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Move-in notice</native-heading>
+        <native-text color="Secondary">
+            The wing's night desk is told of Margaret Hale's move-in. Every fact comes from where it lives: the intake sheet, its contact, what it works out, the link that opened this page, the notice itself, and the desk's own plugins.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Intake sheet</native-heading>
+        <div class="mt-3">
+            @(plan.IntakeSheet(MoveInNoticeModel.SheetId, Model.Applicant, waitlist: Model.WaitlistPosition)
+                .Reactive(evt => evt.Changed, (args, p) =>
+                    p.Dispatch(MoveInEvents.SheetEdited, e => e
+                        .Set(x => x.Field, args.Field)
+                        .Set(x => x.Applicant, args.Applicant))))
+        </div>
+        <native-text color="Secondary">
+            Last edit: <span id="edit-field">none</span> for <span id="edit-name">nobody</span>, aged <span id="edit-age">0</span>
+        </native-text>
+        <native-hstack gap="Sm" class="flex-wrap mt-3">
+            @(Html.NativeButton("reload", "Reload from the waiting list")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var link = p.Url<MoveInLink>();
+                    p.Get(waitingListUrl)
+                        .Gather<WaitingListQuery>(g => g
+                            .Set(x => x.Resident, link.Get(q => q.Resident))
+                            .Set(x => x.Wing, link.Get(q => q.Wing)))
+                        .Response(r => r.OnSuccess<WaitingListEntry>((entry, s) =>
+                        {
+                            var sheet = s.Component<IntakeSheet>(MoveInNoticeModel.SheetId);
+                            sheet.Load(entry.Get(x => x.Applicant));
+                            sheet.Waitlist.Set(entry.Get(x => x.Position));
+                            s.Element("record-wing").Text.Set(entry.Get(x => x.Wing));
+                            s.Element("record-first-allergy").Text.Set(entry.Get(x => x.Applicant.Allergies[0]));
+                        }));
+                }))
+            <native-text color="Secondary">Record from the <span id="record-wing">—</span>, first allergy <span id="record-first-allergy">—</span></native-text>
+        </native-hstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Preview</native-heading>
+        @(Html.NativeButton("preview", "Preview the notice")
+            .CssClass(Button + " mt-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                var sheet = p.Component<IntakeSheet>(MoveInNoticeModel.SheetId);
+                var link = p.Url<MoveInLink>();
+
+                p.Element("preview-name").Text.Set(sheet.Name);
+                p.Element("preview-phone").Text.Set(sheet.Contact.Phone);
+                p.Element("preview-summary").Text.Set(sheet.Summary());
+                p.Element("preview-position").Text.Set(sheet.WaitlistPosition());
+                p.Element("preview-wing").Text.Set(link.Get(q => q.Wing));
+                p.Element("preview-visitors").Text.Set(link.Get(q => q.Visitors));
+                p.Element("preview-source").Text.Set("Intake sheet");
+                p.Element("preview-years").Text.Set(sheet.YearsOver(62));
+                p.Element("preview-allergies").Text.Set(sheet.Allergies);
+                p.Element("preview-code").Text.Set(deskCode.Code(sheet.Name));
+                sheet.RoomPreference.Set(link.Get(q => q.Room));
+
+                Line(p.When(sheet.Contact.Phone).StartsWith("555"), "preview-local", "The desk can call the family locally.", "A long-distance call to the family.");
+                Line(p.When(sheet.Contact.Phone).IsEmpty(), "preview-phone-missing", "No family phone: the desk cannot call.", "The desk has the family's number.");
+                Line(p.When(sheet.YearsOver(62)).Gte(0), "preview-eligible", "Of age for the wing.", "Under the wing's age.");
+                Line(p.When(sheet.WaitlistPosition()).Lte(3), "preview-near-top", "Near the top of the list.", "Further down the list, or unknown.");
+                Line(p.When(link.Get(q => q.Wing)).Eq("garden"), "preview-garden", "The Garden wing's desk.", "Another wing's desk, or none named.");
+                Line(p.When(link.Get(q => q.Visitors)).Gt(2), "preview-party", "A large party on move-in day: book the family room.", "A small party, or none named.");
+                Line(p.When(deskCode.Code(sheet.Name)).Eq("margaret-hale"), "preview-known-code", "Her desk code is on file.", "A new desk code.");
+                Line(p.When(sheet.Allergies).ArrayContains("Latex"), "preview-latex", "Latex-free gloves at the desk.", "Standard gloves.");
+
+                p.Element("letter-opening").Text.Set(letter.Opening(sheet.Name, link.Get(q => q.Wing), sheet.MoveInDate));
+                p.Element("letter-standing").Text.Set(letter.Standing(sheet.Age, sheet.Veteran, sheet.WaitlistPosition()));
+                p.Element("letter-contact").Text.Set(letter.Contact(sheet.Contact.Phone, new ApplicantContact { Phone = "555-0199", Relation = "Son" }, sheet.Summary()));
+                p.Element("letter-allergies").Text.Set(letter.Allergies(sheet.Allergies, "the intake sheet"));
+            }))
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Applicant</dt><dd id="preview-name"></dd></div>
+            <div class="@Check"><dt>Family phone</dt><dd id="preview-phone"></dd></div>
+            <div class="@Check"><dt>Summary</dt><dd id="preview-summary"></dd></div>
+            <div class="@Check"><dt>Waiting list</dt><dd id="preview-position"></dd></div>
+            <div class="@Check"><dt>Wing</dt><dd id="preview-wing"></dd></div>
+            <div class="@Check"><dt>Visitors</dt><dd id="preview-visitors"></dd></div>
+            <div class="@Check"><dt>Source</dt><dd id="preview-source"></dd></div>
+            <div class="@Check"><dt>Years over 62</dt><dd id="preview-years"></dd></div>
+            <div class="@Check"><dt>Allergies</dt><dd id="preview-allergies"></dd></div>
+            <div class="@Check"><dt>Desk code</dt><dd id="preview-code"></dd></div>
+            <div class="@Check"><dt>Calling the family</dt><dd id="preview-local"></dd></div>
+            <div class="@Check"><dt>Family phone on file</dt><dd id="preview-phone-missing"></dd></div>
+            <div class="@Check"><dt>Age</dt><dd id="preview-eligible"></dd></div>
+            <div class="@Check"><dt>List</dt><dd id="preview-near-top"></dd></div>
+            <div class="@Check"><dt>Desk</dt><dd id="preview-garden"></dd></div>
+            <div class="@Check"><dt>Party</dt><dd id="preview-party"></dd></div>
+            <div class="@Check"><dt>Code on file</dt><dd id="preview-known-code"></dd></div>
+            <div class="@Check"><dt>Gloves</dt><dd id="preview-latex"></dd></div>
+        </dl>
+        <native-heading level="H3" class="mt-4">Letter to the desk</native-heading>
+        <p id="letter-opening" class="text-sm"></p>
+        <p id="letter-standing" class="text-sm"></p>
+        <p id="letter-contact" class="text-sm"></p>
+        <p id="letter-allergies" class="text-sm"></p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Notify the desk</native-heading>
+        <native-hstack gap="Sm" class="flex-wrap mt-3">
+            @(Html.NativeButton("notify", "Notify the wing")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var sheet = p.Component<IntakeSheet>(MoveInNoticeModel.SheetId);
+                    var link = p.Url<MoveInLink>();
+                    p.When(link.Get(q => q.Wing)).IsNull()
+                        .Then(stop => stop.Element("notice-status").Text.Set("Name the wing in the link before notifying."))
+                        .Else(send =>
+                        {
+                            send.Element("notice-status").Text.Set("Notice raised.");
+                            send.Dispatch(MoveInEvents.NoticeRequested, e => e
+                                .Set(x => x.Applicant, sheet.Name)
+                                .Set(x => x.Phone, sheet.Contact.Phone)
+                                .Set(x => x.Summary, sheet.Summary())
+                                .Set(x => x.Position, sheet.WaitlistPosition())
+                                .Set(x => x.Wing, link.Get(q => q.Wing))
+                                .Set(x => x.Source, "intake-sheet")
+                                .Set(x => x.Allergies, sheet.Allergies)
+                                .Set(x => x.Services, new List<string> { "Transport", "Meals" })
+                                .Set(x => x.Contact.Relation, sheet.Contact.Relation)
+                                .Set(x => x.Record, new Applicant { Name = "Margaret Hale's record", Age = 62 })
+                                .Set(x => x.CareLevel, sheet.CareLevel)
+                                .Set(x => x.MoveInDate, sheet.MoveInDate)
+                                .Set(x => x.Veteran, sheet.Veteran)
+                                .Set(x => x.Age, sheet.Age));
+                        });
+                }))
+            @(Html.NativeButton("notify-standard", "Send the standard notice")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Dispatch(MoveInEvents.NoticeRequested, new MoveInNotice
+                    {
+                        Applicant = "Standard notice",
+                        Phone = "555-0000",
+                        Summary = "A standard move-in",
+                        Position = 9,
+                        Wing = "garden",
+                        Source = "standard",
+                        Allergies = new List<string> { "None" },
+                        Services = new List<string> { "Meals" },
+                        Contact = new NoticeContact { Relation = "Family" },
+                        Record = null,
+                        CareLevel = CareLevel.MemoryCare,
+                        MoveInDate = new DateTime(2026, 7, 1),
+                        Veteran = false,
+                        Age = 80,
+                    })))
+            <native-text color="Secondary"><span id="notice-status"></span></native-text>
+        </native-hstack>
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Applicant</dt><dd id="notice-applicant"></dd></div>
+            <div class="@Check"><dt>Phone</dt><dd id="notice-phone"></dd></div>
+            <div class="@Check"><dt>Summary</dt><dd id="notice-summary"></dd></div>
+            <div class="@Check"><dt>Waiting list</dt><dd id="notice-position"></dd></div>
+            <div class="@Check"><dt>Wing</dt><dd id="notice-wing"></dd></div>
+            <div class="@Check"><dt>Source</dt><dd id="notice-source"></dd></div>
+            <div class="@Check"><dt>Allergies</dt><dd id="notice-allergies"></dd></div>
+            <div class="@Check"><dt>Services</dt><dd id="notice-services"></dd></div>
+            <div class="@Check"><dt>Contact</dt><dd id="notice-relation"></dd></div>
+            <div class="@Check"><dt>Record</dt><dd id="notice-record"></dd></div>
+            <div class="@Check"><dt>Age</dt><dd id="notice-age"></dd></div>
+            <div class="@Check"><dt>Veteran</dt><dd id="notice-veteran"></dd></div>
+            <div class="@Check"><dt>Care</dt><dd id="notice-care"></dd></div>
+            <div class="@Check"><dt>Move-in</dt><dd id="notice-opening-day"></dd></div>
+            <div class="@Check"><dt>Record attached</dt><dd id="notice-record-held"></dd></div>
+            <div class="@Check"><dt>Letter</dt><dd id="letter-notice"></dd></div>
+        </dl>
+        <native-heading level="H3" class="mt-4">The desk's receipt</native-heading>
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Address</dt><dd id="receipt-route">Not sent yet.</dd></div>
+            <div class="@Check"><dt>Headers</dt><dd id="receipt-headers">Not sent yet.</dd></div>
+            <div class="@Check"><dt>Body</dt><dd id="receipt-body">Not sent yet.</dd></div>
+        </dl>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

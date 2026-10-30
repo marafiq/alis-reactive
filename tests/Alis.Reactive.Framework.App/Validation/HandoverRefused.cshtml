@@ -1,0 +1,35 @@
+@using Alis.Reactive.Framework.App.Validation
+@model HandoverNote
+@{
+    ViewData["Title"] = "A handover checked by two validators";
+    var plan = Html.ReactivePlan<HandoverNote>();
+    var mistake = (HandoverMistake)ViewData["Mistake"]!;
+}
+<h1>A handover checked by two validators</h1>
+
+<div id="handover-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    @{ Html.InputField(plan, m => m.Note, o => o.Label("Note")).Entry(); }
+</div>
+
+@switch (mistake)
+{
+    case HandoverMistake.DraftAndHandoverRules:
+        @(plan.Button("save-draft", "Save the draft").Reactive(button => button.Click, p => p.Post("/Validation/Handover/Draft")
+            .Gather(g => g.Form())
+            .Validate<HandoverDraftRules>("handover-form")))
+        @(plan.Button("hand-over", "Hand over").Reactive(button => button.Click, p => p.Post("/Validation/Handover")
+            .Gather(g => g.Form())
+            .Validate<HandoverRules>("handover-form")))
+        break;
+    case HandoverMistake.OneRulesForTwoNotes:
+        @(plan.Button("save-draft", "Save the draft").Reactive(button => button.Click, p => p.Post("/Validation/Handover/Draft")
+            .Gather(g => g.Form())
+            .Validate<NoteRules<HandoverNote>>("handover-form")))
+        @(plan.Button("hand-over", "Hand over").Reactive(button => button.Click, p => p.Post("/Validation/Handover")
+            .Gather(g => g.Form())
+            .Validate<NoteRules<IncidentNote>>("handover-form")))
+        break;
+}
+
+@Html.RenderPlan(plan)

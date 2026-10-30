@@ -1,0 +1,57 @@
+namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
+
+/// <summary>
+/// One retry offer for every connection the server closed for good, a hub and a stream on one page: one click
+/// takes the offer and retries each of them, and a connection whose retry fails is offered again while the
+/// others come back. The server numbers the calls it takes on each. The board is closed first, so the offer it
+/// shows proves the board closed before the line is hung up.
+/// </summary>
+[TestFixture]
+public sealed class WhenSeveralConnectionsDrop : AppPageTest
+{
+    private ILocator Line(string id) => Page.Locator($"#{id}");
+
+    private ILocator Button(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true });
+
+    private ILocator RetryOffer => Page.GetByText("The connection dropped.");
+
+    [Test]
+    public async Task one_click_on_retry_retries_every_connection_the_server_closed()
+    {
+        await Open("/Realtime/Line");
+        await Expect(Line("line-call")).ToHaveTextAsync("1");
+        await Expect(Line("board-call")).ToHaveTextAsync("1");
+        await Button("Close the board for good").ClickAsync();
+        await Expect(RetryOffer).ToBeVisibleAsync();
+        await Button("Hang up the line").ClickAsync();
+        await Expect(Line("line-closed")).ToHaveTextAsync("closed");
+        await Button("Answer the line again").ClickAsync();
+        await Expect(Line("line-answered")).ToHaveTextAsync("answered");
+        await Button("Take the board back").ClickAsync();
+        await Expect(Line("board-taken-back")).ToHaveTextAsync("taken back");
+
+        await Button("Retry").ClickAsync();
+
+        await Expect(Line("line-call")).ToHaveTextAsync("2");
+        await Expect(Line("board-call")).ToHaveTextAsync("2");
+    }
+
+    [Test]
+    public async Task a_connection_whose_retry_fails_is_offered_again_while_the_others_come_back()
+    {
+        await Open("/Realtime/Line");
+        await Expect(Line("line-call")).ToHaveTextAsync("1");
+        await Expect(Line("board-call")).ToHaveTextAsync("1");
+        await Button("Close the board for good").ClickAsync();
+        await Expect(RetryOffer).ToBeVisibleAsync();
+        await Button("Hang up the line").ClickAsync();
+        await Expect(Line("line-closed")).ToHaveTextAsync("closed");
+        await Button("Answer the line again").ClickAsync();
+        await Expect(Line("line-answered")).ToHaveTextAsync("answered");
+
+        await Button("Retry").ClickAsync();
+
+        await Expect(Line("line-call")).ToHaveTextAsync("2");
+        await Expect(RetryOffer).ToBeVisibleAsync();
+    }
+}

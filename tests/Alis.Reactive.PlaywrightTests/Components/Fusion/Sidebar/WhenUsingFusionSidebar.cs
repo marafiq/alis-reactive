@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Sidebar;
 
 // Journey: a care coordinator works the Resident Care Dashboard. Care-services
@@ -142,7 +140,7 @@ public class WhenUsingFusionSidebar : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"isOpen\":false"),
+        Assert.That(body, Does.Contain("\"IsOpen\":false"),
             "the gather pipeline must carry the sidebar IsOpen() source under its declared key");
 
         AssertNoConsoleErrors();

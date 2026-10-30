@@ -1,0 +1,59 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "status": {
+      "kind": "element",
+      "id": "status",
+      "vendor": "native"
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "set",
+          "target": {
+            "kind": "obj",
+            "id": "status"
+          },
+          "path": [
+            "textContent"
+          ],
+          "value": {
+            "kind": "as",
+            "expr": {
+              "kind": "lit",
+              "value": "Round open"
+            },
+            "shape": {
+              "kind": "string"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

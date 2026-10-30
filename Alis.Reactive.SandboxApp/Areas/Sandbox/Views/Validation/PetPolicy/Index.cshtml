@@ -1,0 +1,48 @@
+@model PetPolicyModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.PetPolicy
+@{
+    ViewData["Title"] = "Pet Policy";
+    var plan = Html.ReactivePlan<PetPolicyModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Pet Policy</native-heading>
+    <native-text color="Secondary">
+        A resident brings a pet. A tag longer than three letters asks for the pet's name; the server alone
+        reads the tags, so the page sends the policy as it is and the server answers.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="pet-policy-form" class="flex flex-col gap-4">
+            @for (var i = 0; i < Model.Tags.Count; i++)
+            {
+                var index = i;
+                <div>
+                    @{ Html.InputField(plan, m => m.Tags[index], o => o.Label($"Tag {index + 1}"))
+                        .NativeTextBox(b => b.CssClass(Field)); }
+                </div>
+            }
+            @{ Html.InputField(plan, m => m.PetName, o => o.Label("Pet's name"))
+                .NativeTextBox(b => b.CssClass(Field)); }
+        </form>
+        @(Html.NativeButton("save-policy-btn", "Save the policy")
+            .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Save", "PetPolicy")).Gather(g => g.Form())
+                 .Validate<PetPolicyValidator>("pet-policy-form")
+                 .Response(r => r
+                    .OnSuccess<PetPolicySaved>((json, s) => s.Element("policy-status").Text.Set(json.Get(x => x.Confirmation)))
+                    .OnError(400, e =>
+                    {
+                        e.Element("policy-status").Text.Set("The policy was not saved.");
+                        e.ValidationErrors("pet-policy-form");
+                    }));
+            }))
+        <native-text><span id="policy-status">Not saved yet.</span></native-text>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

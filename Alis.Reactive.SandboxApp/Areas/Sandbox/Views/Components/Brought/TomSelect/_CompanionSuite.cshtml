@@ -1,0 +1,31 @@
+@model CompanionSuiteModel
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
+@{
+    var plan = Html.ReactivePlan<CompanionSuiteModel>();
+    var rateUrl = Url.SandboxRouteTemplate("Rate", "TomSelect", "suiteType");
+    var suites = new[]
+    {
+        new TomSelectOption("studio", "Studio"),
+        new TomSelectOption("one-bedroom", "One Bedroom"),
+        new TomSelectOption("companion", "Companion Suite"),
+    };
+}
+
+<native-vstack gap="Sm">
+    <native-grid cols="C2" gap="Base">
+        @{ Html.InputField(plan, m => m.CompanionSuiteType, o => o.Label("Companion's suite type"))
+            .TomSelect(suites, "Choose the companion's suite")
+            .Reactive(evt => evt.Change, (args, p) =>
+            {
+                var suite = p.Component<TomSelect>(m => m.CompanionSuiteType);
+                p.Get(rateUrl)
+                    .Gather<SuiteQuery>(g => g.Set(x => x.SuiteType, suite.Value))
+                    .Response(r => r.OnSuccess<SuiteRateResponse>((rate, s) =>
+                        s.Element("companion-rate").Text.Set(rate.Get(x => x.MonthlyRate))));
+            }); }
+    </native-grid>
+    <native-text color="Secondary">Companion's monthly rate: $<span id="companion-rate">not quoted yet</span></native-text>
+</native-vstack>
+
+@Html.RenderPlan(plan)

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Fusion.Components
 {
     /// <summary>
-    /// Runtime icon placement values supported by Syncfusion EJ2 Button.
+    /// Where a <see cref="FusionButton"/> places its icon relative to its text.
     /// </summary>
     public enum FusionButtonIconPosition
     {

@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.RoomHold;
@@ -9,8 +8,10 @@ namespace Alis.Reactive.PlaywrightTests.Validation.RoomHold;
 /// about the room rather than anything I typed, so that I choose another room instead of guessing.
 /// </summary>
 /// <remarks>
-/// The room travels in a hidden field, so the server's refusal has no message slot beside an input;
-/// the page's validation summary is where it shows.
+/// The room travels in a hidden field, so neither the page's own "choose a room" check nor the
+/// server's refusal has a message slot beside an input; the hold form's summary, which the page places in
+/// the hold's card, is where both show. Which rooms are held is known only to the server's hold book, which it asks asynchronously.
+/// The reservations office's own validator, registered by its module, never reaches the page either.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
@@ -27,6 +28,7 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
     private ILocator PlaceHold => Page.Locator("#place-hold-btn");
     private ILocator RoomHoldStatus => Page.Locator("#room-hold-status");
     private NativeTextBoxLocator ProspectName => _plan.TextBox(m => m.ProspectName);
+    private NativeCheckBoxLocator HoldTermsAgreed => _plan.NativeCheckBox(m => m.FamilyAgreedToHoldTerms);
 
     private async Task NavigateAndBoot()
     {
@@ -54,25 +56,47 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         await Expect(ValidationSummary).ToBeHiddenAsync();
         await ClickWhenStable(ChooseMaple214);
         await WriteProspectName("Jane Smith");
+        await HoldTermsAgreed.Check();
 
         await ClickWhenStable(PlaceHold);
 
+        // The room has a browser rule but no message slot, so the server's refusal of it goes to the summary.
         await Expect(ValidationSummary).ToBeVisibleAsync();
         await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
         await Expect(_plan.ErrorFor(m => m.ProspectName)).ToBeHiddenAsync();
         await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
 
-        await ClickWhenStable(PlaceHold);
-        await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
+        // Only the server knows which rooms are held, so placing the hold again asks it again.
+        await Page.RunAndWaitForResponseAsync(
+            async () => await ClickWhenStable(PlaceHold),
+            "**/Sandbox/Validation/RoomHold/Hold**");
         Assert.That(_holdsSent, Has.Count.EqualTo(2), "Each Place Hold asks the server once.");
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+    }
+
+    // The page places the hold form's summary in the hold's card, above the form, so the reason is read where
+    // the coordinator is working, not after the page.
+    [Test]
+    public async Task the_reason_shows_in_the_holds_card_where_the_page_places_it()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(ChooseMaple214);
+        await WriteProspectName("Jane Smith");
+        await HoldTermsAgreed.Check();
+
+        await ClickWhenStable(PlaceHold);
+
+        await Expect(Page.GetByRole(AriaRole.Region, new() { Name = "The hold" }).GetByText(RoomHeldElsewhere)).ToBeVisibleAsync();
     }
 
     [Test]
     public async Task choosing_a_free_room_after_a_refusal_holds_it_and_clears_the_reason()
     {
         await NavigateAndBoot();
+        await ClickWhenStable(ChooseMaple214);
         await WriteProspectName("Jane Smith");
+        await HoldTermsAgreed.Check();
         await ClickWhenStable(PlaceHold);
         await Expect(ValidationSummary).ToBeVisibleAsync();
         await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
@@ -83,7 +107,53 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_holdsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+    }
+
+    // The office's one-hold-per-prospect rule asks the office's hold book, which only the server can:
+    // the hold is sent and the server answers by the name.
+    [Test]
+    public async Task a_prospect_who_already_holds_a_room_is_refused_by_the_reservations_office()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(ChooseMaple216);
+        await WriteProspectName(ReservationsOfficeValidator.ProspectWithHold);
+        await HoldTermsAgreed.Check();
+
+        await ClickWhenStable(PlaceHold);
+
+        await Expect(_plan.ErrorFor(m => m.ProspectName))
+            .ToHaveTextAsync("Ruth Carter already holds Maple 218. Release that hold before placing another.");
+        await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
+        Assert.That(_holdsSent, Has.Count.EqualTo(1), "The office's rule is the server's alone, so the hold is sent.");
+
+        await WriteProspectName("Jane Smith");
+        await ClickWhenStable(PlaceHold);
+        await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
+        await Expect(_plan.ErrorFor(m => m.ProspectName)).ToBeHiddenAsync();
+        Assert.That(_holdsSent, Has.Count.EqualTo(2));
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+    }
+
+    [Test]
+    public async Task placing_a_hold_without_choosing_a_room_asks_for_a_room_in_the_summary()
+    {
+        await NavigateAndBoot();
+        await WriteProspectName("Jane Smith");
+        await HoldTermsAgreed.Check();
+
+        await ClickWhenStable(PlaceHold);
+
+        await Expect(ValidationSummary).ToBeVisibleAsync();
+        await Expect(ValidationSummary).ToHaveTextAsync("Choose a room to hold.");
+        await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
+
+        await ClickWhenStable(ChooseMaple216);
+        await ClickWhenStable(PlaceHold);
+        await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        Assert.That(_holdsSent, Has.Count.EqualTo(1), "A hold with no room is not sent.");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -91,6 +161,7 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await ClickWhenStable(ChooseMaple216);
+        await HoldTermsAgreed.Check();
 
         await ClickWhenStable(PlaceHold);
 
@@ -102,6 +173,27 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         await ClickWhenStable(PlaceHold);
         await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
         Assert.That(_holdsSent, Has.Count.EqualTo(1), "Only the named hold may be sent.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_hold_the_family_has_not_agreed_to_is_asked_for_beside_the_agreement()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(ChooseMaple216);
+        await WriteProspectName("Jane Smith");
+
+        await ClickWhenStable(PlaceHold);
+
+        await Expect(_plan.ErrorFor(m => m.FamilyAgreedToHoldTerms))
+            .ToHaveTextAsync("The family must agree that the hold lapses after 48 hours.");
+        await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
+
+        await HoldTermsAgreed.Check();
+        await ClickWhenStable(PlaceHold);
+        await Expect(RoomHoldStatus).ToHaveTextAsync("Maple 216 is held for Jane Smith.");
+        await Expect(_plan.ErrorFor(m => m.FamilyAgreedToHoldTerms)).ToHaveTextAsync("");
+        Assert.That(_holdsSent, Has.Count.EqualTo(1), "A hold the family has not agreed to is not sent.");
         AssertNoConsoleErrors();
     }
 }

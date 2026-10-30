@@ -20,7 +20,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public IncidentReportValidator()
         {
-            ClientRule(x => x.Summary).Required("Describe what happened.");
+            RuleFor(x => x.Summary).NotEmpty().WithMessage("Describe what happened.");
         }
     }
 

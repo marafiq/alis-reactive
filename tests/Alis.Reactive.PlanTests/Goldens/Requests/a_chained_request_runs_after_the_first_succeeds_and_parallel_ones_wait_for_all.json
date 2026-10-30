@@ -1,0 +1,345 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {},
+  "objects": {
+    "$http": {
+      "kind": "plugin",
+      "name": "alis.http",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "let",
+          "name": "res1",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "$http"
+            },
+            "path": [
+              "send"
+            ],
+            "args": [
+              {
+                "kind": "record",
+                "fields": [
+                  {
+                    "name": "method",
+                    "value": {
+                      "kind": "lit",
+                      "value": "GET"
+                    }
+                  },
+                  {
+                    "name": "url",
+                    "value": {
+                      "kind": "lit",
+                      "value": "/first"
+                    }
+                  },
+                  {
+                    "name": "route",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "arrays",
+                    "value": {
+                      "kind": "list",
+                      "items": []
+                    }
+                  },
+                  {
+                    "name": "headers",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "format",
+                    "value": {
+                      "kind": "lit",
+                      "value": "json"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "await": true
+        },
+        {
+          "kind": "if",
+          "arms": [
+            {
+              "when": {
+                "kind": "get",
+                "target": {
+                  "kind": "ref",
+                  "name": "res1"
+                },
+                "path": [
+                  "ok"
+                ]
+              },
+              "then": [
+                {
+                  "kind": "let",
+                  "name": "res2",
+                  "expr": {
+                    "kind": "call",
+                    "target": {
+                      "kind": "obj",
+                      "id": "$http"
+                    },
+                    "path": [
+                      "send"
+                    ],
+                    "args": [
+                      {
+                        "kind": "record",
+                        "fields": [
+                          {
+                            "name": "method",
+                            "value": {
+                              "kind": "lit",
+                              "value": "GET"
+                            }
+                          },
+                          {
+                            "name": "url",
+                            "value": {
+                              "kind": "lit",
+                              "value": "/second"
+                            }
+                          },
+                          {
+                            "name": "route",
+                            "value": {
+                              "kind": "record",
+                              "fields": []
+                            }
+                          },
+                          {
+                            "name": "values",
+                            "value": {
+                              "kind": "record",
+                              "fields": []
+                            }
+                          },
+                          {
+                            "name": "arrays",
+                            "value": {
+                              "kind": "list",
+                              "items": []
+                            }
+                          },
+                          {
+                            "name": "headers",
+                            "value": {
+                              "kind": "record",
+                              "fields": []
+                            }
+                          },
+                          {
+                            "name": "format",
+                            "value": {
+                              "kind": "lit",
+                              "value": "json"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "await": true
+                }
+              ]
+            }
+          ],
+          "else": []
+        },
+        {
+          "kind": "all",
+          "blocks": [
+            [
+              {
+                "kind": "let",
+                "name": "res3",
+                "expr": {
+                  "kind": "call",
+                  "target": {
+                    "kind": "obj",
+                    "id": "$http"
+                  },
+                  "path": [
+                    "send"
+                  ],
+                  "args": [
+                    {
+                      "kind": "record",
+                      "fields": [
+                        {
+                          "name": "method",
+                          "value": {
+                            "kind": "lit",
+                            "value": "GET"
+                          }
+                        },
+                        {
+                          "name": "url",
+                          "value": {
+                            "kind": "lit",
+                            "value": "/a"
+                          }
+                        },
+                        {
+                          "name": "route",
+                          "value": {
+                            "kind": "record",
+                            "fields": []
+                          }
+                        },
+                        {
+                          "name": "values",
+                          "value": {
+                            "kind": "record",
+                            "fields": []
+                          }
+                        },
+                        {
+                          "name": "arrays",
+                          "value": {
+                            "kind": "list",
+                            "items": []
+                          }
+                        },
+                        {
+                          "name": "headers",
+                          "value": {
+                            "kind": "record",
+                            "fields": []
+                          }
+                        },
+                        {
+                          "name": "format",
+                          "value": {
+                            "kind": "lit",
+                            "value": "json"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "await": true
+              }
+            ],
+            [
+              {
+                "kind": "let",
+                "name": "res4",
+                "expr": {
+                  "kind": "call",
+                  "target": {
+                    "kind": "obj",
+                    "id": "$http"
+                  },
+                  "path": [
+                    "send"
+                  ],
+                  "args": [
+                    {
+                      "kind": "record",
+                      "fields": [
+                        {
+                          "name": "method",
+                          "value": {
+                            "kind": "lit",
+                            "value": "GET"
+                          }
+                        },
+                        {
+                          "name": "url",
+                          "value": {
+                            "kind": "lit",
+                            "value": "/b"
+                          }
+                        },
+                        {
+                          "name": "route",
+                          "value": {
+                            "kind": "record",
+                            "fields": []
+                          }
+                        },
+                        {
+                          "name": "values",
+                          "value": {
+                            "kind": "record",
+                            "fields": []
+                          }
+                        },
+                        {
+                          "name": "arrays",
+                          "value": {
+                            "kind": "list",
+                            "items": []
+                          }
+                        },
+                        {
+                          "name": "headers",
+                          "value": {
+                            "kind": "record",
+                            "fields": []
+                          }
+                        },
+                        {
+                          "name": "format",
+                          "value": {
+                            "kind": "lit",
+                            "value": "json"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "await": true
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

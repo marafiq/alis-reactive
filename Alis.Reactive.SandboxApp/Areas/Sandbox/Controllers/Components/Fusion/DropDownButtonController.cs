@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.DropDownButton;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -13,15 +13,28 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View("~/Areas/Sandbox/Views/Components/Fusion/DropDownButton/Index.cshtml", new FusionDropDownButtonModel());
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] FusionDropDownButtonEchoRequest request)
+        // No incident was logged this shift, so the incident summary has nothing to print.
+        [HttpPost("Print")]
+        public IActionResult Print([FromBody] ShiftReportRequest request)
         {
-            return Ok(new FusionDropDownButtonEchoResponse
+            var report = ShiftReports.All.FirstOrDefault(r => r.Id == request.Report);
+            if (report is null || report.AfterMidnightCount)
+                return Ok(new ShiftReportAnswer { Message = "Choose a report from the menu." });
+
+            if (report.Id == ShiftReports.IncidentSummary)
             {
-                Content = request.Content,
-                Disabled = request.Disabled,
-                CssClass = request.CssClass,
-                Summary = request.Content + ":" + request.Disabled + ":" + request.CssClass
+                return Ok(new ShiftReportAnswer
+                {
+                    Message = $"No incidents were logged on {request.Wing} wing this shift.",
+                    EmptyReportNames = [report.Name]
+                });
+            }
+
+            return Ok(new ShiftReportAnswer
+            {
+                Printed = true,
+                Message = $"Sent to the {request.Wing} nurses' station printer.",
+                PrintedReportIds = [report.Id]
             });
         }
     }

@@ -1,6 +1,5 @@
 @model IdGeneratorModel
 @using Alis.Reactive
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -31,7 +30,7 @@
     </native-text>
 
     <section>
-        <h2 class="text-sm font-semibold mb-2">1. JSON POST — Include (gathers by name)</h2>
+        <h2 class="text-sm font-semibold mb-2">1. JSON POST — Form (gathers by name)</h2>
         <form id="json-form" class="grid grid-cols-2 gap-4 mb-4">
             @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
                 .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
@@ -56,17 +55,18 @@
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveJson", "IdGenerator"), g => g
-                    .Include(m => m.Name)
-                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
-                    .Include(m => m.Status)
-                    .Include(m => m.Address!.City)
-                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Address!.PostalCode))
+                p.Post(Url.SandboxRoute("SaveJson", "IdGenerator"))
+                 .Gather(g => g.Form(
+                    m => m.Name,
+                    m => m.Amount,
+                    m => m.Status,
+                    m => m.Address!.City,
+                    m => m.Address!.PostalCode))
                  .Response(r => r
                     .OnSuccess<IdGeneratorJsonResponse>((json, s) =>
                     {
-                        s.Element("json-result").SetText(json, j => j.Summary);
-                        s.Element("json-result").AddClass("text-green-600");
+                        s.Element("json-result").Text.Set(json.Get(j => j.Summary));
+                        s.Element("json-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -74,33 +74,20 @@
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-2">2. FormData POST — Include (gathers by name)</h2>
-        <form id="form-form" class="grid grid-cols-2 gap-4 mb-4">
-            @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))
-                .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
-            @{ Html.InputField(plan, m => m.Amount, o => o.Required().Label("Amount (SF)"))
-                .FusionNumericTextBox(b => b
-                    .Min(0).Max(99999).Step(1)); }
-            @{ Html.InputField(plan, m => m.Status, o => o.Label("Status (Native)"))
-                .NativeDropDown(b => b
-                    .Items(statusItems)
-                    .Placeholder("-- Select --")
-                    .CssClass("rounded-md border border-border px-3 py-1.5 text-sm w-full")); }
-        </form>
+        <h2 class="text-sm font-semibold mb-2">2. FormData POST — the same fields (gathers by name)</h2>
+        @* An element id names one element, so the fields render once, above, and this request sends them as form data. *@
         @(Html.NativeButton("form-submit-btn", "Submit FormData")
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveForm", "IdGenerator"), g => g
-                    .Include(m => m.Name)
-                    .Include<FusionNumericTextBox, IdGeneratorModel>(m => m.Amount)
-                    .Include(m => m.Status))
+                p.Post(Url.SandboxRoute("SaveForm", "IdGenerator"))
+                 .Gather(g => g.Form(m => m.Name, m => m.Amount, m => m.Status))
                  .AsFormData()
                  .Response(r => r
                     .OnSuccess<IdGeneratorJsonResponse>((json, s) =>
                     {
-                        s.Element("form-result").SetText(json, j => j.Summary);
-                        s.Element("form-result").AddClass("text-green-600");
+                        s.Element("form-result").Text.Set(json.Get(j => j.Summary));
+                        s.Element("form-result").ClassList.Add("text-green-600");
                     })
                  );
             }))
@@ -110,10 +97,6 @@
     <section>
         <h2 class="text-sm font-semibold mb-2">3. Generated IDs</h2>
         <native-vstack gap="Sm" id="id-inspection" class="text-xs font-mono">
-            <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
-                <span class="text-text-secondary">IdGenerator prefix</span>
-                <span class="text-emerald-700" id="id-prefix">@(IdGenerator.TypeScope(typeof(IdGeneratorModel)))</span>
-            </native-hstack>
             <native-hstack gap="None" justify="Between" class="bg-slate-50 rounded px-3 py-2">
                 <span class="text-text-secondary">m => m.Amount</span>
                 <span class="text-emerald-700">@(IdGenerator.For<IdGeneratorModel>(m => m.Amount))</span>

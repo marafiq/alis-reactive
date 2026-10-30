@@ -1,142 +1,131 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ResidentGridEditingModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.MoveInDayViewModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Ops Resident Admission Audit";
+    ViewData["Title"] = "Move-in Day";
 
-    const string GridId = "admission-audit-grid";
-    const string ButtonPrimary = "rounded-md bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90";
-    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+    const string GridId = "move-in-roster";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<ResidentGridEditingModel>();
-
-    List<GridColumn> AuditColumns() => new List<GridColumn>
-    {
-        new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true, IsIdentity = false, AllowEditing = false },
-        new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "200" },
-        new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "160" },
-        new GridColumn { Field = "wing", HeaderText = "Wing", Width = "120" }
-    };
-
-    Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("EditingRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("audit-load-status").SetText("loaded audit rows");
-            }))));
+    var plan = Html.ReactivePlan<MoveInDayViewModel>();
+    var columns = FusionGridColumns.Of<MoveInDayResident>();
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Ops Resident Admission Audit</native-heading>
-    <native-text color="Secondary">
-        Every resident record change is audited: admitting a resident fires the add edit-action and
-        discharging fires the delete edit-action. The audit reads the typed edit-action payload, and a
-        blocked admission is cancelled before it persists.
-    </native-text>
+    <div>
+        <native-heading level="H1">Move-in Day</native-heading>
+        <native-text color="Secondary">
+            North wing roster. Move today's arrivals in and today's departures out; nobody moves in before their
+            residency agreement is signed.
+        </native-text>
+    </div>
 
-    <p class="font-mono text-sm">Load status: <span id="audit-load-status" class="text-text-muted">waiting</span></p>
-
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("audit-admit", "Admit Zara")
-            .CssClass(ButtonPrimary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+    <native-grid cols="C2" gap="Base">
+        <native-card><native-card-body>
+            <native-heading level="H2">Arriving today</native-heading>
+            <ul class="mt-3 space-y-3">
+                @foreach (var arrival in Model.Arrivals)
                 {
-                    ResidentId = 9100, ResidentName = "Zara Added", Age = 71, CareLevel = "Assisted Living",
-                    Wing = "North", Suite = "N-120", RiskLevel = "Low", PrimaryNurse = "Nora Ellis",
-                    OpenTasks = 1, NextReviewDate = "2026-06-30"
-                });
-                p.Element("audit-command").SetText("admit issued");
-            }))
-        @(Html.NativeButton("audit-admit-blocked", "Admit Blocked Resident")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).AddRecord(new ResidentDirectoryGridItem
+                    <li class="flex flex-wrap items-center justify-between gap-2 text-sm">
+                        <span>
+                            <span class="font-medium">@arrival.ResidentName</span>,
+                            @arrival.CareLevel, suite @arrival.Suite
+                            (@(arrival.AgreementSigned ? "agreement signed" : "agreement not signed"))
+                        </span>
+                        @(Html.NativeButton($"move-in-{arrival.ResidentId}", "Move in")
+                            .CssClass(Button)
+                            .Reactive(plan, evt => evt.Click, (_, p) =>
+                                p.Component<FusionGrid>(GridId).AddRecord<MoveInDayResident>(arrival)))
+                    </li>
+                }
+            </ul>
+            <p id="move-in-refused" hidden class="mt-3 text-sm text-red-700">
+                <span id="move-in-refused-resident"></span> cannot move in until the residency agreement is signed.
+            </p>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-heading level="H2">Leaving today</native-heading>
+            <ul class="mt-3 space-y-3">
+                @foreach (var departure in Model.Departures)
                 {
-                    ResidentId = 9200, ResidentName = "Blocked Admission", Age = 80, CareLevel = "Memory Care",
-                    Wing = "South", Suite = "S-120", RiskLevel = "High", PrimaryNurse = "Owen Park",
-                    OpenTasks = 2, NextReviewDate = "2026-07-01"
-                });
-                p.Element("audit-command").SetText("blocked admit issued");
-            }))
-        @(Html.NativeButton("audit-discharge", "Discharge First Resident")
-            .CssClass(ButtonSecondary)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var grid = p.Component<FusionGrid>(GridId);
-                grid.SelectRow(0);
-                grid.DeleteSelectedRecord();
-                p.Element("audit-command").SetText("discharge issued");
-            }))
-    </native-hstack>
+                    <li class="flex flex-wrap items-center justify-between gap-2 text-sm">
+                        <span>
+                            <span class="font-medium">@departure.ResidentName</span>, suite @departure.Suite,
+                            @departure.Destination
+                        </span>
+                        @(Html.NativeButton($"move-out-{departure.ResidentId}", "Move out")
+                            .CssClass(Button)
+                            .Reactive(plan, evt => evt.Click, (_, p) =>
+                            {
+                                var roster = p.Component<FusionGrid>(GridId);
+                                p.Component<NativeHiddenField>(m => m.MovingOut).Value.Set(departure.ResidentName);
+                                roster.SelectRow(roster.GetRowIndexByPrimaryKey(departure.ResidentId));
+                                roster.DeleteRecord();
+                            }))
+                    </li>
+                }
+            </ul>
+            @Html.HiddenFieldFor(plan, m => m.MovingOut)
+        </native-card-body></native-card>
+    </native-grid>
 
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<ResidentGridEditingModel, ResidentDirectoryGridItem>(plan, GridId, b => b
-            .AllowSelection(true)
-            .Toolbar(new List<string> { "Add", "Delete", "Update", "Cancel" })
-            .EditSettings(new GridEditSettings
-            {
-                AllowEditing = true,
-                AllowAdding = true,
-                AllowDeleting = true,
-                AllowEditOnDblClick = false,
-                Mode = EditMode.Normal,
-                ShowDeleteConfirmDialog = false
-            })
-            .Columns(AuditColumns()))
-            .Reactive(evt => evt.ActionBegin<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                // Guard each variant so a trailing refresh action does not overwrite the reads.
-                p.When(args, x => x.RequestType).Eq("save")
-                    .Then(t =>
-                    {
-                        t.Element("audit-begin-request").SetText(args, x => x.RequestType);
-                        t.Element("audit-begin-action").SetText(args, x => x.Action);
-                        t.Element("audit-begin-type").SetText(args, x => x.Type);
-                        t.Element("audit-begin-name").SetText(args, x => x.Name);
-                        t.Element("audit-begin-cancel").SetText(args, x => x.Cancel);
-                    });
-                p.When(args, x => x.RequestType).Eq("delete")
-                    .Then(t =>
-                    {
-                        t.Element("audit-begin-request").SetText(args, x => x.RequestType);
-                        t.Element("audit-begin-type").SetText(args, x => x.Type);
-                        t.Element("audit-begin-name").SetText(args, x => x.Name);
-                        t.Element("audit-begin-cancel").SetText(args, x => x.Cancel);
-                    });
-                p.When(args, x => x.Data.ResidentName).Eq("Blocked Admission")
-                    .Then(t =>
-                    {
-                        args.Cancel(t);
-                        t.Element("audit-blocked").SetText("admission blocked");
-                    });
-            })
-            .Reactive(evt => evt.ActionComplete<ResidentDirectoryGridItem>(), (args, p) =>
-            {
-                p.Element("audit-complete-request").SetText(args, x => x.RequestType);
-                p.Element("audit-complete-action").SetText(args, x => x.Action);
-                p.When(args, x => x.RequestType).Eq("save")
-                    .Then(t => t.Element("audit-complete-resident").SetText(args, x => x.Data.ResidentName));
-            }))
+    <native-card><native-card-body>
+        <native-heading level="H2">North wing roster</native-heading>
+        <p id="roster-change" hidden role="status" class="mt-1 text-sm text-text-secondary">
+            Last change: <span id="roster-change-resident"></span> <span id="roster-change-what"></span>.
+        </p>
 
-        <native-grid cols="C3" gap="Base" class="mt-4 font-mono text-sm">
-            <p>Command: <span id="audit-command" class="text-text-muted">waiting</span></p>
-            <p>Begin request: <span id="audit-begin-request" class="text-text-muted">waiting</span></p>
-            <p>Begin action: <span id="audit-begin-action" class="text-text-muted">waiting</span></p>
-            <p>Begin type: <span id="audit-begin-type" class="text-text-muted">waiting</span></p>
-            <p>Begin name: <span id="audit-begin-name" class="text-text-muted">waiting</span></p>
-            <p>Begin cancel: <span id="audit-begin-cancel" class="text-text-muted">waiting</span></p>
-            <p>Complete request: <span id="audit-complete-request" class="text-text-muted">waiting</span></p>
-            <p>Complete action: <span id="audit-complete-action" class="text-text-muted">waiting</span></p>
-            <p>Complete resident: <span id="audit-complete-resident" class="text-text-muted">waiting</span></p>
-            <p>Blocked: <span id="audit-blocked" class="text-text-muted">not blocked</span></p>
-        </native-grid>
-    </section>
+        <div class="mt-4">
+            @(Html.FusionGrid<MoveInDayViewModel, MoveInDayResident>(plan, GridId, b => b
+                .DataSource(Model.Roster)
+                .AllowSelection(true)
+                .EditSettings(new GridEditSettings
+                {
+                    AllowAdding = true,
+                    AllowDeleting = true,
+                    Mode = EditMode.Normal,
+                    ShowDeleteConfirmDialog = false
+                })
+                .Columns(new List<GridColumn>
+                {
+                    new GridColumn { Field = columns.Field(r => r.ResidentId), HeaderText = "ID", Width = "80", TextAlign = TextAlign.Right, IsPrimaryKey = true },
+                    new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "200" },
+                    new GridColumn { Field = columns.Field(r => r.CareLevel), HeaderText = "Care level", Width = "170" },
+                    new GridColumn { Field = columns.Field(r => r.Suite), HeaderText = "Suite", Width = "110" }
+                }))
+                .Reactive(evt => evt.ActionBegin<MoveInDayResident>(), (args, p) =>
+                {
+                    p.When(args.RequestType).Eq("save").And(args.Action).Eq("add").And(args.Data.Get(r => r.AgreementSigned)).Falsy()
+                        .Then(refused =>
+                        {
+                            args.Cancel.Set(true);
+                            refused.Element("move-in-refused-resident").Text.Set(args.Data.Get(r => r.ResidentName));
+                            refused.Element("move-in-refused").Show();
+                        })
+                        .ElseIf(args.RequestType).Eq("save").And(args.Action).Eq("add")
+                        .Then(admitted => admitted.Element("move-in-refused").Hide());
+                })
+                .Reactive(evt => evt.ActionComplete<MoveInDayResident>(), (args, p) =>
+                {
+                    p.When(args.RequestType).Eq("save").And(args.Action).Eq("add")
+                        .Then(movedIn =>
+                        {
+                            movedIn.Element("roster-change-resident").Text.Set(args.Data.Get(r => r.ResidentName));
+                            movedIn.Element("roster-change-what").Text.Set("moved in");
+                            movedIn.Element("roster-change").Show();
+                        })
+                        .ElseIf(args.RequestType).Eq("delete")
+                        .Then(movedOut =>
+                        {
+                            movedOut.Element("roster-change-resident").Text.Set(movedOut.Component<NativeHiddenField>(m => m.MovingOut).Value);
+                            movedOut.Element("roster-change-what").Text.Set("moved out");
+                            movedOut.Element("roster-change").Show();
+                        });
+                }))
+        </div>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -1,4 +1,3 @@
-using Alis.Reactive.DesignSystem.Layout;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.Container;
@@ -21,6 +20,6 @@ public class NativeContainerTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", ContainerCss.Classes(CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join("alis-container", CssClass));
     }
 }

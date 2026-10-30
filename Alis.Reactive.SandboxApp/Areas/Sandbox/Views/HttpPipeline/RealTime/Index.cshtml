@@ -1,7 +1,7 @@
 @model RealTimeModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Hubs
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 @{
     ViewData["Title"] = "Real-Time Triggers";
 
@@ -10,32 +10,78 @@
     // Each page load gets its own outage-drill world: the drill id scopes the SSE stream
     // and the Break/Restore buttons, so drills never leak across pages, tests, or sessions.
     var drillId = Guid.NewGuid().ToString("N");
+    var alerts = ServerPushStream.At<FacilityAlertStream>($"/api/facility-alerts?drill={drillId}");
+    var notifications = SignalRHub.At<NotificationFeed>("/hubs/notifications");
+    var residents = SignalRHub.At<ResidentStatusFeed>($"/hubs/resident-status?drill={drillId}");
 
     // ServerPush uses native EventSource, so reconnect behavior belongs to the browser boundary.
-    Html.On(plan, t => t.ServerPush<FacilityAlert>($"/api/facility-alerts?drill={drillId}", "facility-alert",
-        (alert, p) =>
+    Html.On(plan, t => t.ServerPush(alerts, s => s.Alert, (alert, p) =>
     {
-        p.Element("alert-message").SetText(alert, x => x.Message);
-        p.Element("alert-level").SetText(alert, x => x.Level);
-        p.Element("alert-status").RemoveClass("text-text-muted");
-        p.Element("alert-status").AddClass("text-success");
-        p.Element("alert-status").SetText("Connected");
+        p.Element("alert-message").Text.Set(alert.Message);
+        p.Element("alert-level").Text.Set(alert.Level);
+        p.Element("alert-status").ClassList.Remove("text-text-muted");
+        p.Element("alert-status").ClassList.Add("text-success");
+        p.Element("alert-status").Text.Set("Connected");
     }));
 
-    Html.On(plan, t => t.SignalR<NotificationPayload>("/hubs/notifications", "ReceiveNotification",
-        (payload, p) =>
+    // The all-clear carries no payload: the page writes what it means.
+    Html.On(plan, t => t.ServerPush(alerts, s => s.AllClear, p =>
     {
-        p.Element("notif-count").SetText(payload, x => x.Count);
-        p.Element("notif-message").SetText(payload, x => x.Message);
-        p.Element("notif-priority").SetText(payload, x => x.Priority);
+        p.Element("alert-message").Text.Set("All clear: the facility check found nothing to act on.");
+        p.Element("alert-level").Text.Set("clear");
     }));
 
-    Html.On(plan, t => t.SignalR<ResidentStatusPayload>($"/hubs/resident-status?drill={drillId}", "StatusChanged",
-        (payload, p) =>
+    Html.On(plan, t => t.SignalR(notifications, h => h.ReceiveNotification, (notification, p) =>
     {
-        p.Element("resident-name").SetText(payload, x => x.ResidentName);
-        p.Element("resident-status").SetText(payload, x => x.Status);
-        p.Element("resident-care-level").SetText(payload, x => x.CareLevel);
+        p.Element("notif-count").Text.Set(notification.Count);
+        p.Element("notif-message").Text.Set(notification.Message);
+        p.Element("notif-priority").Text.Set(notification.Priority);
+    }));
+
+    // The link line reads the hub's own state on load, and again with each status, which lands only
+    // over a live connection, under the id the server knows this screen by.
+    Html.On(plan, t => t.DomReady(p => p.Element("resident-hub-state").Text.Set(p.Hub(residents).State)));
+
+    Html.On(plan, t => t.SignalR(residents, h => h.StatusChanged, (status, p) =>
+    {
+        var hub = p.Hub(residents);
+        p.Element("resident-name").Text.Set(status.ResidentName);
+        p.Element("resident-status").Text.Set(status.Status);
+        p.Element("resident-care-level").Text.Set(status.CareLevel);
+        p.Element("resident-hub-state").Text.Set(hub.State);
+        p.Element("resident-connection").Text.Set(hub.ConnectionId);
+    }));
+
+    // The server calls BoardCleared with no argument at shift change.
+    Html.On(plan, t => t.SignalR(residents, h => h.BoardCleared, p =>
+    {
+        p.Element("resident-name").Text.Set("—");
+        p.Element("resident-status").Text.Set("—");
+        p.Element("resident-care-level").Text.Set("—");
+        p.Element("resident-board-note").Text.Set("The board was cleared at shift change.");
+    }));
+
+    // While a dropped connection is re-established the board says so; once it is back, it is back
+    // under a new id, which the event carries.
+    Html.On(plan, t => t.SignalR(residents, h => h.Reconnecting, p =>
+    {
+        p.Element("resident-hub-state").Text.Set(p.Hub(residents).State);
+        p.Element("resident-board-note").Text.Set("Live updates paused while the connection is restored.");
+    }));
+
+    Html.On(plan, t => t.SignalR(residents, h => h.Reconnected, (link, p) =>
+    {
+        p.Element("resident-hub-state").Text.Set(p.Hub(residents).State);
+        p.Element("resident-connection").Text.Set(link.ConnectionId);
+        p.Element("resident-board-note").Text.Set("Live updates resumed.");
+    }));
+
+    // Once the automatic reconnects are exhausted the connection closes for good; the banner at the
+    // top of the page is the way back.
+    Html.On(plan, t => t.SignalR(residents, h => h.Close, p =>
+    {
+        p.Element("resident-hub-state").Text.Set(p.Hub(residents).State);
+        p.Element("resident-board-note").Text.Set("Live updates stopped: reconnect from the banner at the top of the page.");
     }));
 }
 
@@ -70,7 +116,8 @@
             <native-text color="Secondary" size="Sm">
                 Outage drill: Break ends the stream and 404s reconnects (EventSource gives up
                 permanently); the retry indicator at the top of the page appears. Restore heals
-                the endpoint so clicking the retry indicator reconnects.
+                the endpoint so clicking the retry indicator reconnects. Stop Alerts closes the
+                stream from this screen: nothing further arrives, and nothing is retried.
             </native-text>
             <native-hstack gap="Sm">
                 @(Html.NativeButton("btn-break-stream", "Break Live Connection")
@@ -78,7 +125,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("BreakFacilityStream", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
                 @(Html.NativeButton("btn-restore-stream", "Restore Endpoint")
@@ -86,8 +133,31 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("RestoreFacilityStream", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
+                    }))
+                @(Html.NativeButton("btn-all-clear", "Sound All Clear")
+                    .CssClass("px-4 py-2 rounded-lg bg-success text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("SoundAllClear", "RealTime"))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
+                         .Response(r => r.OnSuccess(s => { }));
+                    }))
+                @(Html.NativeButton("btn-stop-alerts", "Stop Alerts")
+                    .CssClass("px-4 py-2 rounded-lg border border-border bg-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // The status says "Stopped" only once the stream reads as closed.
+                        var stream = p.Stream(alerts);
+                        stream.Close();
+                        p.When(stream.ReadyState).Eq(ServerPushStream.Closed)
+                            .Then(stopped =>
+                            {
+                                stopped.Element("alert-status").ClassList.Remove("text-success");
+                                stopped.Element("alert-status").ClassList.Add("text-text-muted");
+                                stopped.Element("alert-status").Text.Set("Stopped");
+                            });
                     }))
             </native-hstack>
         </native-card-body>
@@ -118,10 +188,10 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("PushNotification", "RealTime"))
-                         .Gather(g => g
-                             .Static("count", 99)
-                             .Static("message", "Manual push at " + DateTime.Now.ToString("HH:mm:ss"))
-                             .Static("priority", "high"))
+                         .Gather<NotificationPayload>(g => g
+                             .Set(x => x.Count, 99)
+                             .Set(x => x.Message, "Manual push at " + DateTime.Now.ToString("HH:mm:ss"))
+                             .Set(x => x.Priority, "high"))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
             </native-hstack>
@@ -137,6 +207,10 @@
             <native-text color="Secondary" size="Sm">
                 Second hub proving independent connections. Resident details cycle automatically.
             </native-text>
+            <p class="text-sm text-text-secondary">
+                Live link: <span id="resident-hub-state" class="font-medium text-text-primary">—</span>
+                · connection <span id="resident-connection" class="font-mono text-xs">—</span>
+            </p>
             <native-divider />
             <native-grid cols="C3" gap="Sm">
                 <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Resident</dt>
@@ -146,12 +220,27 @@
                 <native-vstack gap="None"><dt class="text-xs font-medium text-text-muted uppercase tracking-wide">Care Level</dt>
                     <dd id="resident-care-level" class="mt-1 text-sm text-text-primary">—</dd></native-vstack>
             </native-grid>
+            <p id="resident-board-note" class="text-sm text-text-secondary">Live resident updates appear here.</p>
+            <native-divider />
+            <native-hstack gap="Sm" align="End">
+                @{ Html.InputField(plan, m => m.AcknowledgedBy, o => o.Label("Acknowledged by"))
+                    .NativeTextBox(b => b
+                        .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
+                        .Placeholder("Your initials")); }
+                @(Html.NativeButton("btn-acknowledge", "Acknowledge Status")
+                    .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        // The hub answers with the receipt: who acknowledged, on how many screens.
+                        p.Element("resident-board-note").Text.Set(
+                            p.Hub(residents).Acknowledge(p.Component<NativeTextBox>(m => m.AcknowledgedBy).Value))))
+            </native-hstack>
             <native-divider />
             <native-text color="Secondary" size="Sm">
                 Outage drill: Break aborts this page's hub connection and refuses its reconnect
-                attempts; after the client's automatic reconnect schedule is exhausted (~40s),
-                the retry indicator at the top of the page appears. Restore heals the hub so
-                clicking the retry indicator reconnects.
+                attempts; the link line says the connection is being restored, and after the
+                client's automatic reconnect schedule is exhausted (~40s) the retry indicator at
+                the top of the page appears. Restore heals the hub: an automatic reconnect still
+                due succeeds, or clicking the retry indicator reconnects.
             </native-text>
             <native-hstack gap="Sm">
                 @(Html.NativeButton("btn-break-hub", "Break Hub Connection")
@@ -159,7 +248,7 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("BreakResidentHub", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
                 @(Html.NativeButton("btn-restore-hub", "Restore Hub")
@@ -167,19 +256,22 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("RestoreResidentHub", "RealTime"))
-                         .Gather(g => g.Static("drillId", drillId))
+                         .Gather<RealTimeController.OutageDrillRequest>(g => g.Set(x => x.DrillId, drillId))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
+                @(Html.NativeButton("btn-clear-board", "Clear Board")
+                    .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) => p.Hub(residents).ClearBoard()))
                 @(Html.NativeButton("btn-push-status", "Push Manual Status")
                     .CssClass("px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("PushResidentStatus", "RealTime"))
-                         .Gather(g => g
-                             .Static("residentName", "Helen Martinez (Manual)")
-                             .Static("status", "Under Review")
-                             .Static("careLevel", "Memory Care")
-                             .Static("updatedAt", DateTime.UtcNow.ToString("O")))
+                        p.Post(Url.SandboxRoute("PushResidentStatus", "RealTime", new { drill = drillId }))
+                         .Gather<ResidentStatusPayload>(g => g
+                             .Set(x => x.ResidentName, "Helen Martinez (Manual)")
+                             .Set(x => x.Status, "Under Review")
+                             .Set(x => x.CareLevel, "Memory Care")
+                             .Set(x => x.UpdatedAt, DateTime.UtcNow))
                          .Response(r => r.OnSuccess(s => { }));
                     }))
             </native-hstack>
@@ -192,6 +284,7 @@
             <native-text color="Secondary" size="Sm">
                 Loads a partial view with its own plan and SignalR trigger.
                 The runtime reuses the existing /hubs/resident-status connection — no duplicate WebSocket.
+                Closing the panel stops its live updates; the page's own stay live.
             </native-text>
             <native-divider />
             <native-hstack gap="Sm">
@@ -202,7 +295,19 @@
                         p.Get(Url.SandboxRoute("ResidentPanel", "RealTime") + $"?drill={drillId}")
                          .Response(r => r.OnSuccess(s => s.Into("panel-container")));
                     }))
+                @(Html.NativeButton("close-panel", "Close Resident Panel")
+                    .CssClass("px-4 py-2 rounded-lg border border-border bg-white text-sm font-medium")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("ResidentPanelClosed", "RealTime"))
+                         .Response(r => r.OnSuccess(s =>
+                         {
+                             s.Into("panel-container");
+                             s.Element("panel-summary").Text.Set("Resident panel closed.");
+                         }));
+                    }))
             </native-hstack>
+            <p id="panel-summary" class="mt-2 text-sm text-text-secondary">No resident panel open.</p>
             <div id="panel-container" class="mt-4"></div>
         </native-card-body>
     </native-card>

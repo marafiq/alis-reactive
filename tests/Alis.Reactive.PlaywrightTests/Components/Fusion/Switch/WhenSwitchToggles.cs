@@ -1,4 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Switch;
 
@@ -11,10 +11,9 @@ public class WhenSwitchToggles : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Switch";
 
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SwitchModel";
-    private const string ReceiveCareAlertsId = GeneratedTypeScope + "__ReceiveCareAlerts";
-    private const string EmailRemindersId = GeneratedTypeScope + "__EmailReminders";
-    private const string TextMessageAlertsId = GeneratedTypeScope + "__TextMessageAlerts";
+    private static readonly string ReceiveCareAlertsId = IdGenerator.For<SwitchModel>(m => m.ReceiveCareAlerts);
+    private static readonly string EmailRemindersId = IdGenerator.For<SwitchModel>(m => m.EmailReminders);
+    private static readonly string TextMessageAlertsId = IdGenerator.For<SwitchModel>(m => m.TextMessageAlerts);
 
     private SwitchLocator ReceiveCareAlerts => new(Page, ReceiveCareAlertsId);
     private SwitchLocator EmailReminders => new(Page, EmailRemindersId);
@@ -183,11 +182,11 @@ public class WhenSwitchToggles : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"receiveCareAlerts\":true"),
+        Assert.That(body, Does.Contain("\"ReceiveCareAlerts\":true"),
             "the gather pipeline must carry the master switch Value() under its declared key");
-        Assert.That(body, Does.Contain("\"emailReminders\":false"),
+        Assert.That(body, Does.Contain("\"EmailReminders\":false"),
             "the gather pipeline must carry the email switch Value() (toggled off) under its declared key");
-        Assert.That(body, Does.Contain("\"textMessageAlerts\":false"),
+        Assert.That(body, Does.Contain("\"TextMessageAlerts\":false"),
             "the gather pipeline must carry the text switch Value() under its declared key");
 
         AssertNoConsoleErrors();

@@ -1,0 +1,187 @@
+@model MedicationListModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Arrays
+@using Alis.Reactive.Builders.Conditions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
+@functions {
+    private static void Line(GuardBuilder<MedicationListModel> rule, string id, string holds, string fails) =>
+        rule.Then(then => then.Element(id).Text.Set(holds))
+            .Else(otherwise => otherwise.Element(id).Text.Set(fails));
+
+    // The figures the nurse reads off a list of lines, the resident's or the pharmacy's alike.
+    private static void Figures(PipelineBuilder<MedicationListModel> p, ReactiveArray<MedicationItem> lines, string of)
+    {
+        var noon = new DateTime(2026, 6, 2, 12, 0, 0);
+        const string prefix = "L";
+        const int minimumUnits = 2;
+
+        p.Element($"{of}-count").Text.Set(lines.Count());
+        p.Element($"{of}-controlled").Text.Set(lines.Count(l => l.Controlled));
+        p.Element($"{of}-units").Text.Set(lines.Sum(l => l.Units));
+        p.Element($"{of}-cost").Text.Set(lines.Sum(l => l.DailyCost));
+        p.Element($"{of}-hours").Text.Set(lines.Sum(l => l.HoursApart));
+        Line(p.When(lines.Any()).Truthy(), $"{of}-any", "Lines to reconcile.", "Nothing on the list.");
+        Line(p.When(lines.Any(l => l.Route == MedicationRoute.Injection)).Truthy(), $"{of}-injection", "An injection: a nurse gives it.", "No injections.");
+        p.When(lines.Any()).Truthy().And(lines.All(l => l.Reconciled)).Truthy()
+            .Then(done => done.Element($"{of}-all").Text.Set("Every line reconciled."))
+            .ElseIf(lines.Any()).Falsy()
+            .Then(none => none.Element($"{of}-all").Text.Set("Nothing to reconcile."))
+            .Else(some => some.Element($"{of}-all").Text.Set("Lines still to reconcile."));
+        Line(p.When(lines.Find(l => l.Controlled)).NotNull(), $"{of}-controlled-first", "A controlled medication is on the list: count it with a witness.", "No controlled medication.");
+        p.Element($"{of}-first-injection").Text.Set(lines.Find(l => l.Route == MedicationRoute.Injection, l => l.Name));
+        p.Element($"{of}-names").Text.Set(lines.OrderBy(l => l.Name).Select(l => l.Name));
+        p.Element($"{of}-by-cost").Text.Set(lines.OrderByDescending(l => l.DailyCost).Select(l => l.Name));
+        p.Element($"{of}-earliest").Text.Set(lines.OrderBy(l => l.ScheduledAt).Find(l => true, l => l.Name));
+        p.Element($"{of}-latest").Text.Set(lines.OrderByDescending(l => l.ScheduledAt).Find(l => true, l => l.Name));
+        p.Element($"{of}-morning").Text.Set(lines.Where(l => l.ScheduledAt < noon).Count());
+        p.Element($"{of}-starting-l").Text.Set(lines.Count(l => l.Name.StartsWith(prefix)));
+        p.Element($"{of}-high-dose").Text.Set(lines.Count(l => 10 <= l.Units));
+        p.Element($"{of}-at-least").Text.Set(lines.Count(l => l.Units >= minimumUnits));
+        p.Element($"{of}-trimmed").Text.Set(lines.Count(l => l.Name.Trim() == "Warfarin 2 mg"));
+        Line(p.When(lines.Where(l => l.Name == "Lidocaine patch")).IsEmpty(), $"{of}-lidocaine", "No lidocaine patch.", "Lidocaine patch on hand.");
+        Line(p.When(lines.Select(l => l.Name)).ArrayContains("Warfarin 2 mg"), $"{of}-warfarin", "Warfarin, as written.", "No warfarin as written.");
+    }
+
+    // The resident's list: its lines as data for the figures, and as objects with members of their own.
+    private static void ListFigures(PipelineBuilder<MedicationListModel> p)
+    {
+        var list = p.Component<MedicationList>(MedicationListModel.ListId);
+        Figures(p, p.From(list.Items), "list");
+        p.Element("list-size").Text.Set(list.Count);
+        Line(p.When(list.Lines.Each(l => l.Name)).ArrayContains("Lorazepam 0.5 mg"), "list-lorazepam", "A benzodiazepine on the list: lock it in the cart.", "No benzodiazepine on the list.");
+        p.Element("list-line-names").Text.Set(list.Lines.Each(l => l.Name));
+        p.Element("list-units-each").Text.Set(p.From(list.Lines.Each(l => l.Units)).Sum(u => u));
+    }
+
+    // The pharmacy's delivery: its lines as the response carries them, recorded on the list.
+    private static void RecordTheDelivery(Data<DeliveryResponse> delivery, PipelineBuilder<MedicationListModel> s)
+    {
+        var list = s.Component<MedicationList>(MedicationListModel.ListId);
+        list.Deliveries.Set(delivery.Get(x => x.Deliveries));
+        Figures(s, s.From(delivery.Get(x => x.Lines)), "delivery");
+        Line(s.When(list.Deliveries.Each(d => d.Pharmacy)).ArrayContains("Maple Grove Pharmacy"), "delivery-pharmacy", "Maple Grove Pharmacy delivered.", "No delivery from Maple Grove Pharmacy.");
+        s.Element("delivery-pharmacies").Text.Set(list.Deliveries.Each(d => d.Pharmacy));
+    }
+}
+@{
+    ViewData["Title"] = "Medication Reconciliation";
+
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string Figure = "flex justify-between gap-4 border-b border-border/60 py-1";
+
+    var plan = Html.ReactivePlan<MedicationListModel>();
+
+    void LoadDelivery(PipelineBuilder<MedicationListModel> p, string pharmacy) =>
+        p.Get(Url.SandboxRoute("Delivery", "MedicationList", new { pharmacy }))
+            .Response(r => r.OnSuccess<DeliveryResponse>((delivery, s) => RecordTheDelivery(delivery, s)));
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        ListFigures(p);
+        LoadDelivery(p, "maplegrove");
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Medication reconciliation</native-heading>
+        <native-text color="Secondary">
+            Margaret Hale's list from the hospital discharge, reconciled line by line against what Maple Grove Pharmacy delivered.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">The resident's list</native-heading>
+        <div class="mt-3">
+            @(plan.MedicationList(MedicationListModel.ListId, Model.Lines)
+                .Reactive(evt => evt.Changed, (args, p) =>
+                {
+                    ListFigures(p);
+                    p.Element("changed-line").Text.Set(args.Changed);
+                    p.Element("changed-count").Text.Set(p.From(args.Items).Count());
+                    p.Element("changed-reconciled").Text.Set(p.From(args.Items).Count(l => l.Reconciled));
+                }))
+        </div>
+        <native-hstack gap="Sm" class="flex-wrap mt-3">
+            @(Html.NativeButton("reconcile-all", "Mark every line reconciled")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) => p.Component<MedicationList>(MedicationListModel.ListId).ReconcileAll()))
+            @(Html.NativeButton("add-aspirin", "Add the daily aspirin")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<MedicationList>(MedicationListModel.ListId).Add("Aspirin 81 mg", 1, MedicationRoute.Oral)))
+            @(Html.NativeButton("load-empty-delivery", "Record the empty delivery")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) => LoadDelivery(p, "none")))
+        </native-hstack>
+        <native-text color="Secondary">
+            Last change: <span id="changed-line">none</span> · <span id="changed-count">0</span> lines, <span id="changed-reconciled">0</span> reconciled
+        </native-text>
+    </native-card-body></native-card>
+
+    <native-grid cols="C2" gap="Base">
+        <native-card><native-card-body>
+            <native-heading level="H2">On the list</native-heading>
+            <dl class="mt-3 text-sm">
+                <div class="@Figure"><dt>Lines</dt><dd id="list-count"></dd></div>
+                <div class="@Figure"><dt>Lines the list counts</dt><dd id="list-size"></dd></div>
+                <div class="@Figure"><dt>Controlled</dt><dd id="list-controlled"></dd></div>
+                <div class="@Figure"><dt>Units a day</dt><dd id="list-units"></dd></div>
+                <div class="@Figure"><dt>Units, line by line</dt><dd id="list-units-each"></dd></div>
+                <div class="@Figure"><dt>Cost a day ($)</dt><dd id="list-cost"></dd></div>
+                <div class="@Figure"><dt>Hours between doses, summed</dt><dd id="list-hours"></dd></div>
+                <div class="@Figure"><dt>Anything to reconcile</dt><dd id="list-any"></dd></div>
+                <div class="@Figure"><dt>Injections</dt><dd id="list-injection"></dd></div>
+                <div class="@Figure"><dt>Reconciliation</dt><dd id="list-all"></dd></div>
+                <div class="@Figure"><dt>Controlled medication</dt><dd id="list-controlled-first"></dd></div>
+                <div class="@Figure"><dt>First injection</dt><dd id="list-first-injection"></dd></div>
+                <div class="@Figure"><dt>A to Z</dt><dd id="list-names"></dd></div>
+                <div class="@Figure"><dt>Dearest first</dt><dd id="list-by-cost"></dd></div>
+                <div class="@Figure"><dt>Earliest dose</dt><dd id="list-earliest"></dd></div>
+                <div class="@Figure"><dt>Latest dose</dt><dd id="list-latest"></dd></div>
+                <div class="@Figure"><dt>Before noon</dt><dd id="list-morning"></dd></div>
+                <div class="@Figure"><dt>Starting with L</dt><dd id="list-starting-l"></dd></div>
+                <div class="@Figure"><dt>Ten units or more</dt><dd id="list-high-dose"></dd></div>
+                <div class="@Figure"><dt>Two units or more</dt><dd id="list-at-least"></dd></div>
+                <div class="@Figure"><dt>Warfarin, trimmed</dt><dd id="list-trimmed"></dd></div>
+                <div class="@Figure"><dt>Lidocaine</dt><dd id="list-lidocaine"></dd></div>
+                <div class="@Figure"><dt>Warfarin</dt><dd id="list-warfarin"></dd></div>
+                <div class="@Figure"><dt>Benzodiazepine</dt><dd id="list-lorazepam"></dd></div>
+                <div class="@Figure"><dt>Lines as the list holds them</dt><dd id="list-line-names"></dd></div>
+            </dl>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-heading level="H2">Delivered by the pharmacy</native-heading>
+            <dl class="mt-3 text-sm">
+                <div class="@Figure"><dt>Lines</dt><dd id="delivery-count"></dd></div>
+                <div class="@Figure"><dt>Controlled</dt><dd id="delivery-controlled"></dd></div>
+                <div class="@Figure"><dt>Units a day</dt><dd id="delivery-units"></dd></div>
+                <div class="@Figure"><dt>Cost a day ($)</dt><dd id="delivery-cost"></dd></div>
+                <div class="@Figure"><dt>Hours between doses, summed</dt><dd id="delivery-hours"></dd></div>
+                <div class="@Figure"><dt>Anything delivered</dt><dd id="delivery-any"></dd></div>
+                <div class="@Figure"><dt>Injections</dt><dd id="delivery-injection"></dd></div>
+                <div class="@Figure"><dt>Reconciliation</dt><dd id="delivery-all"></dd></div>
+                <div class="@Figure"><dt>Controlled medication</dt><dd id="delivery-controlled-first"></dd></div>
+                <div class="@Figure"><dt>First injection</dt><dd id="delivery-first-injection"></dd></div>
+                <div class="@Figure"><dt>A to Z</dt><dd id="delivery-names"></dd></div>
+                <div class="@Figure"><dt>Dearest first</dt><dd id="delivery-by-cost"></dd></div>
+                <div class="@Figure"><dt>Earliest dose</dt><dd id="delivery-earliest"></dd></div>
+                <div class="@Figure"><dt>Latest dose</dt><dd id="delivery-latest"></dd></div>
+                <div class="@Figure"><dt>Before noon</dt><dd id="delivery-morning"></dd></div>
+                <div class="@Figure"><dt>Starting with L</dt><dd id="delivery-starting-l"></dd></div>
+                <div class="@Figure"><dt>Ten units or more</dt><dd id="delivery-high-dose"></dd></div>
+                <div class="@Figure"><dt>Two units or more</dt><dd id="delivery-at-least"></dd></div>
+                <div class="@Figure"><dt>Warfarin, trimmed</dt><dd id="delivery-trimmed"></dd></div>
+                <div class="@Figure"><dt>Lidocaine</dt><dd id="delivery-lidocaine"></dd></div>
+                <div class="@Figure"><dt>Warfarin</dt><dd id="delivery-warfarin"></dd></div>
+                <div class="@Figure"><dt>Pharmacy</dt><dd id="delivery-pharmacy"></dd></div>
+                <div class="@Figure"><dt>Delivered by</dt><dd id="delivery-pharmacies"></dd></div>
+            </dl>
+        </native-card-body></native-card>
+    </native-grid>
+</native-vstack>
+
+@Html.RenderPlan(plan)

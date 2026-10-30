@@ -1,0 +1,65 @@
+@using Alis.Reactive.Framework.App.Requests
+@model CensusPage
+@{
+    ViewData["Title"] = "The census";
+    var plan = Html.ReactivePlan<CensusPage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>The census</h1>
+
+@plan.Slate("untitled", title: "")
+@plan.Slate("cards", title: "Cards")
+
+<dl>
+    <dt>A list, in a query</dt><dd id="listed"></dd>
+    <dt>The address's wing and wings, in a query</dt><dd id="queried"></dd>
+    <dt>The address's wing and wings, as form data</dt><dd id="posted"></dd>
+    <dt>A slate's blank title, as JSON</dt><dd id="blank-title"></dd>
+    <dt>A list holding a blank label, as JSON</dt><dd id="labels"></dd>
+    <dt>The cards, in a query</dt>
+    <dd>tried <span id="cards-tried"></span> · <span id="cards-asked"></span> · went on <span id="cards-after"></span></dd>
+</dl>
+
+@(plan.Button("ask-wings", "Ask about two wings")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Census/Asked")
+        .Gather<CensusQuery>(g => g.Set(x => x.Wings, new List<string> { "East", "West" }))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("listed").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("ask-address", "Ask about the address's wings")
+    .Reactive(button => button.Click, p =>
+    {
+        var address = p.Url<CensusQuery>();
+        p.Get("/Requests/Census/Asked")
+            .Gather<CensusQuery>(g => g.Set(x => x.Wing, address.Get(q => q.Wing)).Set(x => x.Wings, address.Get(q => q.Wings)))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("queried").Text.Set(echo.Get(x => x.Summary))));
+    }))
+@(plan.Button("post-address", "Post the address's wings")
+    .Reactive(button => button.Click, p =>
+    {
+        var address = p.Url<CensusQuery>();
+        p.Post("/Requests/Census/Posted")
+            .Gather<CensusQuery>(g => g.Set(x => x.Wing, address.Get(q => q.Wing)).Set(x => x.Wings, address.Get(q => q.Wings)))
+            .AsFormData()
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("posted").Text.Set(echo.Get(x => x.Summary))));
+    }))
+@(plan.Button("send-blank-title", "Send the untitled slate's title")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Ledger")
+        .Gather<LedgerNote>(g => g.Set(x => x.Title, p.Component<Slate>("untitled").Title))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("blank-title").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("send-labels", "Send a blank label and Ada")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Census/Labels")
+        .Gather<CensusLabels>(g => g.Set(x => x.Labels, new List<string?> { "", "Ada" }))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("labels").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("fill-card", "Fill a card")
+    .Reactive(button => button.Click, p => p.Component<Slate>("cards").Fill(new SlateCard { Name = "Ada", Due = new DateTime(2026, 10, 27) })))
+@(plan.Button("ask-cards", "Ask about the cards")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("cards-tried").Text.Set(tally.Total);
+        p.Get("/Requests/Census/Cards")
+            .Gather<CensusCards>(g => g.Set(x => x.Cards, p.Component<Slate>("cards").Cards))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("cards-asked").Text.Set(echo.Get(x => x.Summary))));
+        p.Element("cards-after").Text.Set(tally.Total);
+    }))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,127 @@
+@model HospitalTransferModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@functions {
+    // A refused transfer: the desk's reason, and what the nurse does next for that kind of refusal.
+    private static void Refused(PipelineBuilder<HospitalTransferModel> e, Data<TransferRefusal> refusal, string next)
+    {
+        e.Element("transfer-status").Text.Set(refusal.Get(x => x.Message));
+        e.Element("transfer-status").ClassList.Add("text-danger");
+        e.Element("transfer-next").Text.Set(next);
+    }
+}
+@{
+    ViewData["Title"] = "Hospital Transfer";
+
+    const string FormId = "transfer-form";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+
+    var plan = Html.ReactivePlan<HospitalTransferModel>();
+    var transferUrl = Url.SandboxRoute("Transfer", "HospitalTransfer");
+    var notifyUrl = Url.SandboxRoute("NotifyFamily", "HospitalTransfer");
+    var residents = new List<SelectListItem>
+    {
+        new SelectListItem("Helen Park", "1042"),
+        new SelectListItem("Arthur Bell", "1043"),
+        new SelectListItem("Rosa Diaz", "1044"),
+        new SelectListItem("Walter Cho", "1045"),
+        new SelectListItem("Frank Moore", "1046"),
+    };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Hospital Transfer</native-heading>
+    <native-text color="Secondary">
+        Maple Grove, second floor. Send a resident to the hospital: the transfer desk books the bed, and
+        the family is told where the resident is going once the hospital accepts.
+    </native-text>
+
+    <native-card><native-card-body>
+        <div id="@FormId">
+            <native-vstack gap="Base">
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.ResidentId, o => o.Required().Label("Resident"))
+                        .NativeDropDown(b => b.Items(residents).Placeholder("-- Choose a resident --").CssClass(Field)); }
+                    @{ Html.InputField(plan, m => m.Ambulance, o => o.Label("By ambulance"))
+                        .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border")); }
+                </native-grid>
+                @{ Html.InputField(plan, m => m.Reason, o => o.Required().Label("Reason"))
+                    .NativeTextArea(b => b.Rows(2).Placeholder("What happened").CssClass(Field)); }
+                <native-grid cols="C2" gap="Base">
+                    @{ Html.InputField(plan, m => m.Destination.Hospital, o => o.Label("Hospital"))
+                        .NativeTextBox(b => b.Placeholder("e.g. St. Luke's").CssClass(Field)); }
+                    @{ Html.InputField(plan, m => m.Destination.Ward, o => o.Label("Ward requested"))
+                        .NativeTextBox(b => b.Placeholder("e.g. Orthopedics").CssClass(Field)); }
+                </native-grid>
+                <native-grid cols="C2" gap="Base">
+                    @for (var i = 0; i < Model.Escorts.Count; i++)
+                    {
+                        var escortIndex = i;
+                        Html.InputField(plan, m => m.Escorts[escortIndex].Name, o => o.Label($"Escort {i + 1}"))
+                            .NativeTextBox(b => b.Placeholder("Staff member").CssClass(Field));
+                    }
+                </native-grid>
+                @{ Html.InputField(plan, m => m.Packing, o => o.Label("Goes with the resident"))
+                    .NativeCheckList(b => b
+                        .Option("meds", "Medication list")
+                        .Option("facesheet", "Face sheet")
+                        .Option("glasses", "Glasses")
+                        .Option("hearing", "Hearing aids")); }
+            </native-vstack>
+        </div>
+        @(Html.NativeButton("send-transfer-btn", "Send to the Hospital")
+            .CssClass("mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                // The whole form goes to the desk as one JSON body once the page has checked it; the
+                // loader covers the page until the desk has answered, and only then is the family told,
+                // from the hospital's own answer.
+                p.Post(transferUrl).Gather(g => g.Form())
+                 .Validate<HospitalTransferValidator>(FormId)
+                 .WhileLoading(l => l.Component<NativeLoader>().Show())
+                 .Response(r => r
+                    .OnSuccess<TransferAccepted>((accepted, s) =>
+                    {
+                        s.Element("transfer-status").Text.Set(accepted.Get(x => x.Summary));
+                        s.Element("transfer-status").ClassList.Remove("text-danger");
+                        s.Element("transfer-next").Text.Set("");
+                        s.Element("transfer-ward").Text.Set(accepted.Get(x => x.Receiving.Ward));
+                        s.Component<NativeCheckList>(m => m.Packing).Value.Set(accepted.Get(x => x.Packing));
+                        s.Element("packing-count").Text.Set(s.From(accepted.Get(x => x.Packing)).Count());
+                    })
+                    .OnError(400, e => e.ValidationErrors(FormId))
+                    .OnError<TransferRefusal>(404, (refusal, e) => Refused(e, refusal, "Update the register before the next transfer."))
+                    .OnError<TransferRefusal>(409, (refusal, e) => Refused(e, refusal, "Call St. Luke's to confirm the earlier transfer."))
+                    .OnError<TransferRefusal>(503, (refusal, e) => Refused(e, refusal, "Call the dispatcher on 555-0199."))
+                    .OnError(e =>
+                    {
+                        e.Element("transfer-status").Text.Set("The transfer desk did not answer; call it on 555-0100.");
+                        e.Element("transfer-status").ClassList.Add("text-danger");
+                    })
+                    .Chained<TransferAccepted>((accepted, notify) => notify
+                        .Post(notifyUrl)
+                        .Gather<TransferFamilyNotice>(g => g
+                            .Set(x => x.TransferId, accepted.Get(x => x.TransferId))
+                            .Set(x => x.Transfer, accepted))
+                        .Response(n => n.OnSuccess<FamilyNoticeSent>((sent, s) =>
+                            s.Element("family-notice").Text.Set(sent.Get(x => x.Message))))))
+                 .Finally(f => f.Component<NativeLoader>().Hide());
+            }))
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <p id="transfer-status" class="text-sm">No transfer sent.</p>
+            <p id="transfer-next" class="text-sm text-text-secondary"></p>
+            <p class="text-sm">
+                Receiving ward: <span id="transfer-ward" class="font-medium"></span> ·
+                <span id="packing-count" class="font-medium">0</span> items to pack
+            </p>
+            <p id="family-notice" class="text-sm text-text-muted">The family has not been told.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

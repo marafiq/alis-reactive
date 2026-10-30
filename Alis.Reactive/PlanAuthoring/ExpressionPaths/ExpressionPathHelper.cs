@@ -3,108 +3,185 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Text;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
 {
-    // Converts property expressions into the four framework path shapes:
-    // Reactive Plan value paths, MVC model-binding names, MVC element IDs,
-    // and JSON request-body paths.
-    // Only property chains and MVC-style constant indexers are valid.
+    // The one walk of a member chain. A chain from a lambda's parameter is read once into steps, a
+    // member by name, a list item by position or a dictionary entry by key, and written in the three
+    // forms the framework uses: a JSON path (camel-cased names, read in the browser), a body path (the
+    // members' own names, sent to the server) and an MVC binding name (text, the boundary MVC reads).
+    // Its last member names the class that declares it, which scopes the id of the member's input.
     internal static class ExpressionPathHelper
     {
-        public static string ToEventPath<TPayload>(Expression<Func<TPayload, object?>> expression)
+        /// <summary>The JSON path a member chain reads in the browser: a response, a payload, an item.</summary>
+        internal static Path ToJsonPath(LambdaExpression expression)
         {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return JsonPath(Steps(expression.Body));
         }
 
-        public static string ToEventPath<TPayload, TProp>(Expression<Func<TPayload, TProp>> expression)
+        /// <summary>The JSON path of a member chain rooted at <paramref name="root"/>; false for any other expression.</summary>
+        internal static bool TryJsonPath(Expression expression, ParameterExpression root, out Path path)
         {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
-        }
-
-        public static string ToResponsePath<TResponse>(Expression<Func<TResponse, object?>> expression)
-        {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
-        }
-
-        public static string ToResponsePath<TResponse, TProp>(Expression<Func<TResponse, TProp>> expression)
-        {
-            var members = ExtractRuntimeMemberChain(expression.Body);
-            return ToRuntimePath(members);
-        }
-
-        // A runtime path reads JSON: a response body, a dispatched or pushed payload, or a component's
-        // event arguments. The framework and ASP.NET Core write members with System.Text.Json's camel-case
-        // naming ("MRN" is "mrn"), and browser and component events already name theirs in camel case.
-        private static List<string> ExtractRuntimeMemberChain(Expression expr) => ExtractMemberChain(expr, JsonMemberName.Of);
-
-        // MVC binding names and element IDs are rebuilt from these by restoring the first letter.
-        private static List<string> ExtractMemberChain(Expression expr) => ExtractMemberChain(expr, LowerFirstLetter);
-
-        private static List<string> ExtractMemberChain(Expression expr, Func<string, string> memberName)
-        {
-            expr = UnwrapConvert(expr);
-
-            if (expr is ParameterExpression)
-                return new List<string>();
-
-            if (expr is MemberExpression member)
+            if (TrySteps(expression, out var steps, out var parameter) && parameter == root)
             {
-                var members = ExtractMemberChain(member.Expression!, memberName);
-                members.Add(memberName(member.Member.Name));
-                return members;
+                path = JsonPath(steps);
+                return true;
             }
 
-            if (TryIndexAccess(expr, out var collection, out var index))
-            {
-                var members = ExtractMemberChain(collection, memberName);
-                var suffix = "[" + index.ToString(CultureInfo.InvariantCulture) + "]";
-                if (members.Count == 0)
-                    members.Add(suffix);
-                else
-                    members[members.Count - 1] += suffix;
-                return members;
-            }
-
-            throw UnsupportedExpression(expr);
+            path = Path.None;
+            return false;
         }
 
-        // A gathered model member: its MVC binding name, and its body path read from the member's types.
-        internal static BindingPath ToMemberBindingPath<TModel, TProp>(Expression<Func<TModel, TProp>> expression) =>
-            BindingPath.ForMember(ToPropertyName(expression), ToBodyPath(expression));
-
-        // A JSON request body needs the member's structure, which the MVC name text cannot carry:
-        // Lines[0] and Administered[1042] read alike, yet one is a list item and the other a
-        // dictionary entry. The expression's types tell them apart.
+        /// <summary>The body path a gathered member is sent along: the members' own names, list positions, dictionary keys as names.</summary>
         internal static Path ToBodyPath(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return BodyPathOf(expression.Body);
+            return BodyPath(Steps(expression.Body));
         }
 
-        private static Path BodyPathOf(Expression expr)
+        /// <summary>The MVC binding name of a member chain: <c>Address.City</c>, <c>Lines[0].Sku</c>, <c>Administered[1042]</c>.</summary>
+        internal static string ToMemberName(Expression memberChain)
         {
-            expr = UnwrapConvert(expr);
+            if (memberChain == null) throw new ArgumentNullException(nameof(memberChain));
+            return MvcName(Steps(memberChain));
+        }
 
-            if (expr is ParameterExpression)
-                return Path.None;
+        /// <summary>The MVC binding name of a chain of members from <paramref name="root"/>; false for any other expression, the root itself included.</summary>
+        internal static bool TryMemberName(Expression memberChain, ParameterExpression root, out string name)
+        {
+            name = TrySteps(memberChain, out var steps, out var parameter) && parameter == root ? MvcName(steps) : "";
+            return name.Length > 0;
+        }
 
-            if (expr is MemberExpression member)
-                return BodyPathOf(member.Expression!).Then(member.Member.Name);
+        /// <summary>
+        /// The class whose scope the id of the member's input takes: the class that declares the chain's last
+        /// member, by its base definition (<c>KinCard</c> for <c>m =&gt; m.NextOfKin.Name</c>, the class that
+        /// declares <c>Phones</c> for <c>m =&gt; m.Phones[0]</c>). A member an interface declares, read on a class,
+        /// is declared by the class that implements it; read on the interface itself it is the interface, which
+        /// scopes no id.
+        /// </summary>
+        /// <remarks>
+        /// A lambda with no member (<c>m =&gt; m</c> in a template of a text member) is refused: the view's own
+        /// model is the member's type, not the class that declares the member, so its id would be one the page's
+        /// rules, sends and reads never derive.
+        /// </remarks>
+        internal static Type ToDeclarer(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            var bound = Steps(expression.Body).LastOrDefault(step => step.IsMember);
+            if (!bound.IsMember)
+                throw new InvalidOperationException(
+                    $"{expression} binds no member. An input's id is scoped by the class that declares the member it binds: " +
+                    "render the input in a view of that class, like m => m.Name.");
+            return DeclarerOf(bound.Access!);
+        }
+
+        // Component IDs match MVC's Html.IdFor(), including nested-property underscores.
+        internal static string ToMvcElementId(string propertyPath) =>
+            propertyPath
+                .Replace(".", "_")
+                .Replace("[", "_")
+                .Replace("]", "_");
+
+        internal static Type ToPropertyType(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return Expressions.TypeOf(expression.Body);
+        }
+
+        // A gathered model member: its MVC binding name, and its body path read from the member's types.
+        internal static BindingPath ToMemberBindingPath(LambdaExpression expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return BindingPath.ForMember(ToMemberName(expression.Body), ToBodyPath(expression));
+        }
+
+        private static Type DeclarerOf(MemberExpression access)
+        {
+            if (!(access.Member is PropertyInfo property)) return access.Member.DeclaringType!;
+
+            var getter = property.GetMethod!;
+            var owner = Expressions.TypeOf(access.Expression!);
+            var interfaceMemberReadOnAClass = getter.DeclaringType!.IsInterface && !owner.IsInterface && !owner.IsArray;
+            if (interfaceMemberReadOnAClass)
+            {
+                var map = owner.GetInterfaceMap(getter.DeclaringType);
+                getter = map.TargetMethods[Array.IndexOf(map.InterfaceMethods, getter)];
+            }
+            return getter.GetBaseDefinition().DeclaringType!;
+        }
+
+        private static Path JsonPath(IReadOnlyList<AccessStep> steps) =>
+            steps.Aggregate(Path.None, (path, step) => step.IsPosition
+                ? path.AtIndex(step.Position)
+                : path.Then(step.IsKey ? step.Key : JsonMemberName.Of(step.Name)));
+
+        // A JSON body needs the member's structure, which the MVC name text cannot carry: Lines[0] and
+        // Administered[1042] read alike, yet one is a list item and the other a dictionary entry.
+        private static Path BodyPath(IReadOnlyList<AccessStep> steps) =>
+            steps.Aggregate(Path.None, (path, step) => step.IsPosition
+                ? path.AtIndex(step.Position)
+                : path.Then(step.IsKey ? step.Key : step.Name));
+
+        private static string MvcName(IReadOnlyList<AccessStep> steps)
+        {
+            var name = new StringBuilder();
+            foreach (var step in steps)
+            {
+                if (step.IsMember)
+                {
+                    if (name.Length > 0) name.Append('.');
+                    name.Append(step.Name);
+                }
+                else
+                {
+                    name.Append('[').Append(step.IsKey ? step.Key : step.Position.ToString(CultureInfo.InvariantCulture)).Append(']');
+                }
+            }
+
+            return name.ToString();
+        }
+
+        private static List<AccessStep> Steps(Expression expr)
+        {
+            if (TrySteps(expr, out var steps, out _)) return steps;
+            throw new InvalidOperationException(
+                $"Select a member by its path, like m => m.Address.City or m => m.Items[0].Sku; '{Expressions.StripConvert(expr)}' is not one.");
+        }
+
+        // The steps from the parameter the chain starts at; false when the expression is not such a chain.
+        private static bool TrySteps(Expression expr, out List<AccessStep> steps, out ParameterExpression? parameter)
+        {
+            expr = Expressions.StripConvert(expr);
+
+            if (expr is ParameterExpression root)
+            {
+                steps = new List<AccessStep>();
+                parameter = root;
+                return true;
+            }
+
+            if (expr is MemberExpression { Expression: { } owner } member)
+            {
+                if (!TrySteps(owner, out steps, out parameter)) return false;
+                steps.Add(AccessStep.Member(member));
+                return true;
+            }
 
             if (TryIndexAccess(expr, out var collection, out var index))
             {
-                var collectionPath = BodyPathOf(collection);
-                return IsDictionary(collection.Type)
-                    ? collectionPath.Then(index.ToString(CultureInfo.InvariantCulture))
-                    : collectionPath.AtIndex(index);
+                if (!TrySteps(collection, out steps, out parameter)) return false;
+                steps.Add(IsDictionary(collection.Type) ? AccessStep.ForKey(index) : AccessStep.AtPosition(index));
+                return true;
             }
 
-            throw UnsupportedExpression(expr);
+            steps = new List<AccessStep>();
+            parameter = null;
+            return false;
         }
 
         // A dictionary indexer takes a key, not a position, so its entries are named in a JSON body.
@@ -118,79 +195,6 @@ namespace Alis.Reactive
 
             var definition = contract.GetGenericTypeDefinition();
             return definition == typeof(IDictionary<,>) || definition == typeof(IReadOnlyDictionary<,>);
-        }
-
-        private static InvalidOperationException UnsupportedExpression(Expression expr) =>
-            new InvalidOperationException(
-                $"ExpressionPathHelper only supports property-access chains and MVC indexer paths " +
-                $"(e.g. m => m.Address.City or m => m.Items[0].Sku). Got unsupported expression node: {expr.NodeType}.");
-
-        // HTTP gather needs MVC model-binding names such as "Address.City".
-        public static string ToPropertyName<TModel>(Expression<Func<TModel, object?>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members.ConvertAll(PascalRestore));
-        }
-
-        internal static Type ToPropertyType(LambdaExpression expression)
-        {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return UnwrapConvert(expression.Body).Type;
-        }
-
-        public static string ToPropertyName<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return string.Join(".", members.ConvertAll(PascalRestore));
-        }
-
-        // Component IDs must match MVC Html.IdFor(), including nested-property underscores.
-        public static string ToElementId<TModel>(Expression<Func<TModel, object?>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return ToMvcElementId(string.Join(".", members.ConvertAll(PascalRestore)));
-        }
-
-        public static string ToElementId<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
-        {
-            var members = ExtractMemberChain(expression.Body);
-            return ToMvcElementId(string.Join(".", members.ConvertAll(PascalRestore)));
-        }
-
-        internal static string ToMvcElementId(string propertyPath) =>
-            propertyPath
-                .Replace(".", "_")
-                .Replace("[", "_")
-                .Replace("]", "_");
-
-        private static string ToRuntimePath(List<string> members)
-        {
-            var segments = new List<string>();
-            foreach (var member in members)
-                AddRuntimePathSegments(member, segments);
-
-            return string.Join(".", segments);
-        }
-
-        private static void AddRuntimePathSegments(string member, List<string> segments)
-        {
-            var position = 0;
-            while (position < member.Length)
-            {
-                var bracket = member.IndexOf('[', position);
-                if (bracket < 0)
-                {
-                    segments.Add(member.Substring(position));
-                    return;
-                }
-
-                if (bracket > position)
-                    segments.Add(member.Substring(position, bracket - position));
-
-                var close = member.IndexOf(']', bracket + 1);
-                segments.Add(member.Substring(bracket + 1, close - bracket - 1));
-                position = close + 1;
-            }
         }
 
         private static bool TryIndexAccess(
@@ -208,13 +212,6 @@ namespace Alis.Reactive
                 return true;
             }
 
-            if (expr is IndexExpression indexer && indexer.Object != null && indexer.Arguments.Count == 1)
-            {
-                collection = indexer.Object;
-                index = EvaluateIndex(indexer.Arguments[0]);
-                return true;
-            }
-
             if (expr is MethodCallExpression call &&
                 call.Method.Name == "get_Item" &&
                 call.Object != null &&
@@ -228,34 +225,42 @@ namespace Alis.Reactive
             return false;
         }
 
-        private static int EvaluateIndex(Expression expression)
-        {
-            var value = Expression.Lambda(UnwrapConvert(expression)).Compile().DynamicInvoke();
-            return Convert.ToInt32(value);
-        }
+        private static int EvaluateIndex(Expression expression) =>
+            Convert.ToInt32(Expressions.Evaluate(expression), CultureInfo.InvariantCulture);
 
-        private static string PascalRestore(string camel)
+        // One step of a member chain: a member by name, a list item by position, or a dictionary entry by key.
+        private readonly struct AccessStep
         {
-            if (string.IsNullOrEmpty(camel)) return camel;
-            return char.ToUpperInvariant(camel[0]) + camel.Substring(1);
-        }
+            private readonly string _kind;
 
-        private static string LowerFirstLetter(string name)
-        {
-            if (string.IsNullOrEmpty(name)) return name;
-            return char.ToLowerInvariant(name[0]) + name.Substring(1);
-        }
-
-        private static Expression UnwrapConvert(Expression expr)
-        {
-            while (expr is UnaryExpression unary &&
-                   (unary.NodeType == ExpressionType.Convert ||
-                    unary.NodeType == ExpressionType.ConvertChecked))
+            private AccessStep(string kind, string name, int position, MemberExpression? access)
             {
-                expr = unary.Operand;
+                _kind = kind;
+                Name = name;
+                Position = position;
+                Access = access;
             }
 
-            return expr;
+            internal static AccessStep Member(MemberExpression access) => new AccessStep("member", access.Member.Name, -1, access);
+
+            internal static AccessStep AtPosition(int position) => new AccessStep("position", "", position, null);
+
+            internal static AccessStep ForKey(int key) => new AccessStep("key", key.ToString(CultureInfo.InvariantCulture), -1, null);
+
+            internal bool IsMember => _kind == "member";
+
+            internal bool IsPosition => _kind == "position";
+
+            internal bool IsKey => _kind == "key";
+
+            internal string Name { get; }
+
+            internal string Key => Name;
+
+            internal int Position { get; }
+
+            // The member read, on the owner it is read on: what names the class that declares it.
+            internal MemberExpression? Access { get; }
         }
     }
 }

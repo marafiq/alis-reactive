@@ -9,15 +9,17 @@ namespace Alis.Reactive.Components
     /// framework does not own). Every use carries a concrete reason and is greppable, so the set
     /// of sanctioned untyped escapes stays small, visible, and auditable — never a silent loophole.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-    internal sealed class TypedDslExemptionAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    public sealed class TypedDslExemptionAttribute : Attribute
     {
-        internal TypedDslExemptionAttribute(string reason)
+        /// <summary>Exempts the method, for the given reason.</summary>
+        /// <param name="reason">Why the untyped surface is a legitimate exception, and what refinement is owed.</param>
+        public TypedDslExemptionAttribute(string reason)
         {
             Reason = reason ?? throw new ArgumentNullException(nameof(reason));
         }
 
         /// <summary>Why this untyped public surface is a legit exception, and what refinement is owed.</summary>
-        internal string Reason { get; }
+        public string Reason { get; }
     }
 }

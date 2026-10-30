@@ -1,5 +1,4 @@
 @model ButtonModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -17,9 +16,11 @@
     Html.On(plan, t => t.DomReady(p =>
     {
         var action = p.Component<FusionButton>(actionButtonId);
-        action.SetContent("Begin check-in for " + Model.ResidentName);
-        action.SetDisabled(true);
-        p.Element("action-ready").SetText(action.Content());
+        action.Content.Set("Begin check-in for " + Model.ResidentName);
+        action.DataBind();
+        action.Disabled.Set(true);
+        action.DataBind();
+        p.Element("action-ready").Text.Set(action.Content);
     }));
 }
 
@@ -55,26 +56,30 @@
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetDisabled(false);
-                        p.Element("readiness").SetText("Identity confirmed — you can begin the check-in.");
+                        var actionButton = p.Component<FusionButton>(actionButtonId);
+                        actionButton.Disabled.Set(false);
+                        actionButton.DataBind();
+                        p.Element("readiness").Text.Set("Identity confirmed — you can begin the check-in.");
                     }))
                 @(Html.NativeButton("lock-visit", "Lock visit")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetDisabled(true);
-                        p.Element("readiness").SetText("Visit locked — confirm the resident's identity to begin.");
+                        var actionButton = p.Component<FusionButton>(actionButtonId);
+                        actionButton.Disabled.Set(true);
+                        actionButton.DataBind();
+                        p.Element("readiness").Text.Set("Visit locked — confirm the resident's identity to begin.");
                     }))
                 @(Html.NativeButton("check-readiness", "Check readiness")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var action = p.Component<FusionButton>(actionButtonId);
-                        p.When(action.Disabled()).Eq(true)
+                        p.When(action.Disabled).Eq(true)
                             .Then(locked => locked.Element("readiness")
-                                .SetText("This visit is locked. Confirm the resident's identity to begin."))
+                                .Text.Set("This visit is locked. Confirm the resident's identity to begin."))
                             .Else(ready => ready.Element("readiness")
-                                .SetText("This visit is ready. You can begin the check-in now."));
+                                .Text.Set("This visit is ready. You can begin the check-in now."));
                     }))
             </native-hstack>
         </native-vstack>
@@ -89,36 +94,45 @@
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetIcon("e-icons e-check", FusionButtonIconPosition.Right);
-                        p.Element("priority-state").SetText("Marked complete.");
+                        var actionButton = p.Component<FusionButton>(actionButtonId);
+                        actionButton.IconCss.Set("e-icons e-check");
+                        actionButton.IconPosition.Set(FusionButtonIconPosition.Right);
+                        actionButton.DataBind();
+                        p.Element("priority-state").Text.Set("Marked complete.");
                     }))
                 @(Html.NativeButton("flag-urgent", "Flag as urgent")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetCssClass("e-warning urgent-visit");
-                        p.Element("priority-state").SetText("Flagged urgent.");
+                        var actionButton = p.Component<FusionButton>(actionButtonId);
+                        actionButton.CssClass.Set("e-warning urgent-visit");
+                        actionButton.DataBind();
+                        p.Element("priority-state").Text.Set("Flagged urgent.");
                     }))
                 @(Html.NativeButton("recommend-action", "Make this the recommended action")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetPrimary(true);
-                        p.Element("priority-state").SetText("Set as recommended.");
+                        var actionButton = p.Component<FusionButton>(actionButtonId);
+                        actionButton.IsPrimary.Set(true);
+                        actionButton.DataBind();
+                        p.Element("priority-state").Text.Set("Set as recommended.");
                     }))
                 @(Html.NativeButton("enable-followup", "Enable follow-up tracking")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Component<FusionButton>(actionButtonId).SetToggle(true);
-                        p.Element("priority-state").SetText("Follow-up tracking enabled.");
+                        var actionButton = p.Component<FusionButton>(actionButtonId);
+                        actionButton.IsToggle.Set(true);
+                        actionButton.DataBind();
+                        p.Element("priority-state").Text.Set("Follow-up tracking enabled.");
                     }))
                 @(Html.NativeButton("remind-me", "Remind me to begin")
                     .CssClass(CareControl)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Component<FusionButton>(actionButtonId).Click();
-                        p.Element("priority-state").SetText("Reminder placed on the action.");
+                        p.Element("priority-state").Text.Set("Reminder placed on the action.");
                     }))
                 @(Html.NativeButton("jump-to-action", "Jump to the action")
                     .CssClass(CareControl)
@@ -140,18 +154,16 @@
                 {
                     var action = p.Component<FusionButton>(actionButtonId);
                     p.Post(Url.SandboxRoute("RecordCheckIn", "Button"))
-                        .Gather(g =>
-                        {
-                            g.Include(action.Content(), "action");
-                            g.Include(action.Disabled(), "locked");
-                            g.Include(action.CssClass(), "priority");
-                            g.Include(action.IsPrimary(), "recommended");
-                            g.Include(action.IsToggle(), "followUp");
-                        })
+                        .Gather<ButtonCheckInRequest>(g => g
+                            .Set(x => x.Action, action.Content)
+                            .Set(x => x.Locked, action.Disabled)
+                            .Set(x => x.Priority, action.CssClass)
+                            .Set(x => x.Recommended, action.IsPrimary)
+                            .Set(x => x.FollowUp, action.IsToggle))
                         .Response(r => r.OnSuccess<ButtonCheckInResponse>((json, s) =>
                         {
-                            s.Element("checkin-confirmation").SetText(json, x => x.Confirmation);
-                            s.Element("checkin-confirmation-panel").RemoveClass("hidden");
+                            s.Element("checkin-confirmation").Text.Set(json.Get(x => x.Confirmation));
+                            s.Element("checkin-confirmation-panel").ClassList.Remove("hidden");
                         }));
                 }))
             <div id="checkin-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">

@@ -1,0 +1,29 @@
+@using Alis.Reactive.Framework.App.Validation
+@model RegisteredGuest
+@{
+    ViewData["Title"] = "A guest";
+    var plan = Html.ReactivePlan<RegisteredGuest>();
+}
+<h1>A guest</h1>
+
+<div id="guest-form">
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Guest")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Guest")
+        .Gather(g => g.Form())
+        .Validate<GuestNameRules<RegisteredGuest>>("guest-form")
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+@(plan.Button("save-unguarded", "Save with the unguarded rule")
+    .Reactive(button => button.Click, p => p.Post("/Validation/GuestUnguarded")
+        .Gather(g => g.Form("guest-form"))
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+@(plan.Button("save-unwaited", "Save without waiting for the rule that waits")
+    .Reactive(button => button.Click, p => p.Post("/Validation/GuestUnwaited")
+        .Gather(g => g.Form("guest-form"))
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

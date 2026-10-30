@@ -1,10 +1,12 @@
+using System.Linq.Expressions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 
 [TestFixture]
 public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/Contract/ServerPartial";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
@@ -13,18 +15,18 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
-    private ILocator Input(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}");
+    private ILocator Input(Expression<Func<ResidentModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
 
     private async Task FillAllRequired()
     {
-        await Input("Name").FillAsync("Jane Smith");
-        await Input("Email").FillAsync("jane@care.com");
-        await Input("ConfirmEmail").FillAsync("jane@care.com");
-        await Input("CareLevel").SelectOptionAsync("Independent");
-        await Input("Address_Street").FillAsync("123 Main St");
-        await Input("Address_City").FillAsync("Springfield");
-        await Input("Address_ZipCode").FillAsync("62704");
-        await Input("ReasonForNoContact").FillAsync("No relatives nearby");
+        await Input(m => m.Name).FillAsync("Jane Smith");
+        await Input(m => m.Email).FillAsync("jane@care.com");
+        await Input(m => m.ConfirmEmail).FillAsync("jane@care.com");
+        await Input(m => m.CareLevel).SelectOptionAsync("Independent");
+        await Input(m => m.Address.Street).FillAsync("123 Main St");
+        await Input(m => m.Address.City).FillAsync("Springfield");
+        await Input(m => m.Address.ZipCode).FillAsync("62704");
+        await Input(m => m.ReasonForNoContact).FillAsync("No relatives nearby");
     }
 
     [Test]
@@ -35,10 +37,11 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Name")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' is required.");
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
-        await Expect(ErrorFor("Email")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Email")).ToHaveTextAsync("'Email' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         AssertNoConsoleErrors();
     }
@@ -51,11 +54,12 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
-        await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.City")).ToHaveTextAsync("'City' is required.");
+        await Expect(ErrorFor("Address.ZipCode")).ToHaveTextAsync("'Zip Code' is required.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
         AssertNoConsoleErrors();
     }
@@ -87,12 +91,13 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("IsVeteran").CheckAsync();
+        await Input(m => m.IsVeteran).CheckAsync();
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(ErrorFor("VeteranId")).ToHaveTextAsync("'Veteran ID' is required when veteran.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -103,12 +108,13 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_ZipCode").FillAsync("abc");
+        await Input(m => m.Address.ZipCode).FillAsync("abc");
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("5 digits");
+        await Expect(ErrorFor("Address.ZipCode")).ToHaveTextAsync("'Zip Code' must be 5 digits.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -119,13 +125,14 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Email").FillAsync("a@b.com");
-        await Input("ConfirmEmail").FillAsync("x@y.com");
+        await Input(m => m.Email).FillAsync("a@b.com");
+        await Input(m => m.ConfirmEmail).FillAsync("x@y.com");
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
+        await Expect(ErrorFor("ConfirmEmail")).ToHaveTextAsync("'Confirm Email' must match 'Email'.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -136,8 +143,8 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Tab is required to fire the native change event.
-        await Input("Address_ZipCode").ClickAsync();
-        await Input("Address_ZipCode").PressSequentiallyAsync("90210");
+        await Input(m => m.Address.ZipCode).ClickAsync();
+        await Input(m => m.Address.ZipCode).PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");
 
         // Wait for the change-triggered dispatch to reach the matching CustomEvent behavior.
@@ -153,8 +160,8 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Tab is required to fire the native change event.
-        await Input("EmergencyPhone").ClickAsync();
-        await Input("EmergencyPhone").PressSequentiallyAsync("555-0123");
+        await Input(m => m.EmergencyPhone).ClickAsync();
+        await Input(m => m.EmergencyPhone).PressSequentiallyAsync("555-0123");
         await Page.Keyboard.PressAsync("Tab");
 
         var status = Page.Locator("#phone-format-status");
@@ -169,8 +176,8 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         // Partial dispatch should run before the parent validation submit path.
-        await Input("Address_ZipCode").ClickAsync();
-        await Input("Address_ZipCode").PressSequentiallyAsync("90210");
+        await Input(m => m.Address.ZipCode).ClickAsync();
+        await Input(m => m.Address.ZipCode).PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");
         await Expect(Page.Locator("#zipcode-status"))
             .ToContainTextAsync("Zip validated", new() { Timeout = 5000 });

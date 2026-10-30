@@ -1,0 +1,75 @@
+@model MoveInContactsModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInContacts
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@{
+    ViewData["Title"] = "Move-in Contacts";
+
+    const string ContactRow = "~/Areas/Sandbox/Views/Patterns/MoveInContacts/_ContactRow.cshtml";
+    const string ContactCard = "~/Areas/Sandbox/Views/Patterns/MoveInContacts/_ContactCard.cshtml";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string ButtonSubmit = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+
+    var plan = Html.ReactivePlan<MoveInContactsModel>();
+
+    // The next of kin card binds under its own prefix: its inputs post as NextOfKin.Name and NextOfKin.Phone.
+    var nextOfKinView = new ViewDataDictionary(ViewData) { { "Heading", "Next of kin" } };
+    nextOfKinView.TemplateInfo.HtmlFieldPrefix = nameof(MoveInContactsModel.NextOfKin);
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Move-in Contacts</native-heading>
+        <native-text color="Secondary">
+            The contacts on a new resident's move-in packet: the resident, two emergency contacts, and the next of kin.
+        </native-text>
+    </div>
+
+    <div id="move-in-packet">
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Resident</native-heading>
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.Resident.First, o => o.Required().Label("First name"))
+                    .NativeTextBox(b => b.CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.Resident.Last, o => o.Required().Label("Last name"))
+                    .NativeTextBox(b => b.CssClass(Field)); }
+            </native-grid>
+
+            <native-heading level="H2">Emergency contacts</native-heading>
+            @for (var index = 0; index < Model.Contacts.Count; index++)
+            {
+                @await Html.PartialAsync(ContactRow, Model, new ViewDataDictionary(ViewData) { { "Index", index } })
+            }
+
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("save-packet", "Save the packet")
+                    .CssClass(ButtonSubmit)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Post(Url.SandboxRoute("SavePacket", "MoveInContacts")).Gather(g => g.Form("move-in-packet"))
+                            .Response(r => r.OnSuccess<ContactsSaved>((saved, s) =>
+                                s.Element("packet-status").Text.Set(saved.Get(x => x.Confirmation))))))
+                @(Html.NativeButton("send-form", "Send the packet as a form")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Post(Url.SandboxRoute("SaveForm", "MoveInContacts")).Gather(g => g.Form("move-in-packet")).AsFormData()
+                            .Response(r => r.OnSuccess<ContactsSaved>((saved, s) =>
+                                s.Element("form-status").Text.Set(saved.Get(x => x.Confirmation))))))
+            </native-hstack>
+            <native-text>Saved: <span id="packet-status">not yet</span></native-text>
+            <native-text>Sent as a form: <span id="form-status">not yet</span></native-text>
+        </native-vstack>
+    </native-card-body></native-card>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Next of kin</native-heading>
+            @await Html.PartialAsync(ContactCard, Model.NextOfKin, nextOfKinView)
+            <a id="add-alternate" href="@Url.SandboxRoute("Alternate", "MoveInContacts")" class="text-sm font-medium text-accent hover:text-accent/80">Add an alternate contact</a>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

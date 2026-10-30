@@ -1,5 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
-
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Tab;
 
 // Journey: a care coordinator works a resident's Care Workspace — a tabbed surface with

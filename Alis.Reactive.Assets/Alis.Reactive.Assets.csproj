@@ -2,7 +2,8 @@
 
   <!--
     This project compiles nothing. It exists so the framework browser assets -
-    the TypeScript runtime, the design-system CSS, and the Syncfusion CSS - are
+    the TypeScript runtime, the framework's own components, the design-system CSS,
+    the Syncfusion CSS, and the component stylesheets - are
     a first-class, navigable node in the solution instead of a loose folder.
 
     The bundles are built by esbuild/vite via npm (see CLAUDE.md "Build & Run").
@@ -18,8 +19,12 @@
   <ItemGroup>
     <!-- Source areas + workspace config. dist/ is gitignored build output. -->
     <None Include="runtime/**/*" />
+    <None Include="components/**/*" />
+    <None Include="bundle.ts" />
     <None Include="design-system/**/*" />
     <None Include="fusion/**/*" />
+    <None Include="native/**/*" />
+    <None Include="native-tag-helpers/**/*" />
     <None Include="*.json" />
     <None Include="*.mjs" />
     <None Include="*.config.ts" />

@@ -7,14 +7,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
     {
         public NestedBugAddressValidator()
         {
-            WhenFieldNotEmpty(x => x.City, () =>
+            When(x => !string.IsNullOrEmpty(x.City), () =>
             {
-                ClientRule(x => x.ConfirmCity)
-                    .Required("Confirm city is required when city is set.");
+                RuleFor(x => x.ConfirmCity).NotEmpty().WithMessage("Confirm city is required when city is set.");
             });
 
-            ClientRule(x => x.ConfirmCity)
-                .EqualTo(x => x.City, "Confirm city must match city.");
+            RuleFor(x => x.ConfirmCity).Equal(x => x.City).WithMessage("Confirm city must match city.");
         }
     }
 
@@ -22,9 +20,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
     {
         public NestedAddressParentValidator()
         {
-            ClientRule(x => x.Name)
-                .Required("Name is required.");
-            ClientRule(x => x.Address, new NestedBugAddressValidator());
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+            RuleFor(x => x.Address).SetValidator(new NestedBugAddressValidator());
         }
     }
 
@@ -32,10 +29,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
     {
         public ChildSectionValidator()
         {
-            WhenField(x => x.ChildFlag, () =>
+            When(x => x.ChildFlag, () =>
             {
-                ClientRule(x => x.ChildName)
-                    .Required("Child name required when child flag is checked.");
+                RuleFor(x => x.ChildName).NotEmpty().WithMessage("Child name required when child flag is checked.");
             });
         }
     }
@@ -45,9 +41,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
     {
         public ParentChildBugValidator()
         {
-            WhenField(x => x.ParentFlag, () =>
+            When(x => x.ParentFlag, () =>
             {
-                ClientRule(x => x.Child, new ChildSectionValidator());
+                RuleFor(x => x.Child).SetValidator(new ChildSectionValidator());
             });
         }
     }
@@ -56,21 +52,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
     {
         public SharedEmploymentRulesValidator()
         {
-            ClientRule(x => x.JobTitle)
-                .Required("Job title is required.");
-            ClientRule(x => x.Department)
-                .Required("Department is required.");
+            RuleFor(x => x.JobTitle).NotEmpty().WithMessage("Job title is required.");
+            RuleFor(x => x.Department).NotEmpty().WithMessage("Department is required.");
         }
     }
 
-    // Rules imported inside WhenField must inherit the outer condition.
+    // Rules included inside When must inherit the outer condition.
     public class IncludeBugValidator : ReactiveValidator<IncludeModel>
     {
         public IncludeBugValidator()
         {
-            WhenField(x => x.IsEmployed, () =>
+            When(x => x.IsEmployed, () =>
             {
-                ClientRulesFrom(new SharedEmploymentRulesValidator());
+                Include(new SharedEmploymentRulesValidator());
             });
         }
     }

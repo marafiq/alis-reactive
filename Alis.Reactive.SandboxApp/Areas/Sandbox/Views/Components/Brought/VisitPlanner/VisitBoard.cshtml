@@ -1,0 +1,194 @@
+@model VisitBoardModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
+@{
+    ViewData["Title"] = "Visit Board";
+
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm";
+
+    var plan = Html.ReactivePlan<VisitBoardModel>();
+    var slugify = plan.RegisterPlugin<VisitBoardSlugPlugin>();
+    var visitLog = plan.RegisterPlugin<VisitLogPlugin>();
+    var announcer = plan.RegisterPlugin<BoardAnnouncerPlugin>();
+    var weekUrl = Url.SandboxRouteTemplate("FrontDeskWeek", "VisitPlanner", "residentId");
+    var takeUrl = Url.SandboxRouteTemplate("TakeVisit", "VisitPlanner", "slotId");
+    var streamUrl = Url.Action("BoardStream", "VisitPlanner", new { area = "Sandbox", family = Context.Request.Query["family"].ToString() })
+        ?? throw new InvalidOperationException("Could not resolve the visit board stream.");
+    var board = ServerPushStream.At<VisitBoardStream>(streamUrl);
+
+    // The board opens on the resident's week, and reads facts back off the planner: the wing's board
+    // code through a plugin, and the quiet, weekend and afternoon times through arrays over the slots.
+    Html.On(plan, t => t.DomReady(p =>
+        p.Get(weekUrl)
+            .Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, p.Url<VisitBoardQuery>().Get(q => q.Resident)))
+            .Response(r => r.OnSuccess<ResidentWeekResponse>((week, s) =>
+            {
+                var planner = s.Component<VisitPlanner>(m => m.VisitSlots);
+                planner.Wing.Set(week.Get(x => x.Wing));
+                planner.Capacity.Set(week.Get(x => x.WeeklyVisits));
+                planner.Slots.Set(week.Get(x => x.Slots));
+                TypedSource<string> boardCode = slugify.Slug(planner.Wing);
+                s.Element("board-code").Text.Set(boardCode);
+                s.Component<NativeTextBox>(m => m.DeskCode).Value.Set(boardCode);
+                s.Element("board-quiet").Text.Set(s.From(planner.Slots).Count(slot => slot.Quiet));
+                s.Element("board-first-weekend").Text.Set(
+                    s.From(planner.Slots).Where(slot => slot.Day == "Saturday" || slot.Day == "Sunday").Select(slot => slot.Label).Find(label => label != ""));
+                s.Element("board-first-afternoon").Text.Set(
+                    s.From(planner.Slots).Select(slot => slot.Label).Find(label => label.EndsWith("PM")));
+                visitLog.Record("Board opened for this week");
+                s.Element("board-activity-count").Text.Set(visitLog.Entries);
+            }))));
+
+    // Another desk's family took a time: if this family had it booked, release it and say so; either
+    // way the planner shows the time as taken, the change goes to the board's log and activity list,
+    // and the status line reads it out.
+    Html.On(plan, t => t.ServerPush(board, s => s.SlotTaken, (taken, p) =>
+    {
+        var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+
+        void TellTheLog(PipelineBuilder<VisitBoardModel> branch, bool releasedHere, int released) =>
+            branch.Dispatch<BoardChange>(VisitBoardEvents.BoardChanged, change => change
+                .Set(x => x.Summary, taken.Message)
+                .Set(x => x.Booked, planner.Count)
+                .Set(x => x.Desk, slugify.Slug(planner.Wing))
+                .Set(x => x.ReleasedHere, releasedHere)
+                .Set(x => x.Released, released));
+
+        p.When(planner.IsBooked(taken.Slot)).Truthy()
+            .Then(mine =>
+            {
+                mine.Component<VisitPlanner>(m => m.VisitSlots).Release(taken.Slot);
+                mine.Element("board-alert").Text.Set(taken.Message);
+                mine.Element("board-alert").ClassList.Add("text-danger");
+                TellTheLog(mine, releasedHere: true, released: 1);
+            })
+            .Else(other =>
+            {
+                other.Element("board-alert").Text.Set(taken.Message);
+                other.Element("board-alert").ClassList.Remove("text-danger");
+                TellTheLog(other, releasedHere: false, released: 0);
+            });
+        planner.MarkTaken(taken.Slot, taken.Family);
+        visitLog.Record(taken.Message);
+        p.Element("board-activity-count").Text.Set(visitLog.Entries);
+        announcer.Say(taken.Message);
+    }));
+
+    // The same stream says how many desks watch the week; this trigger hears only that event.
+    Html.On(plan, t => t.ServerPush(board, s => s.DesksWatching, (desks, p) =>
+        p.Element("board-desks").Text.Set(desks.Summary)));
+
+    Html.On(plan, t => t.CustomEvent<BoardChange>(VisitBoardEvents.BoardChanged, (change, p) =>
+    {
+        p.Element("board-log").Text.Set(change.Get(x => x.Summary));
+        p.Element("board-log-booked").Text.Set(change.Get(x => x.Booked));
+        p.Element("board-log-desk").Text.Set(change.Get(x => x.Desk));
+        p.Element("board-log-released").Text.Set(change.Get(x => x.Released));
+        p.When(change.Get(x => x.ReleasedHere)).Truthy()
+            .Then(lost => lost.Element("board-log-lost").Show())
+            .Else(kept => kept.Element("board-log-lost").Hide());
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Visit Board</native-heading>
+        <native-text color="Secondary">
+            Every desk sees the week as it is: when a family at another desk takes a time, it shows here at once.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-text>
+                Board <span id="board-code" class="font-mono">—</span> ·
+                quiet times this week: <span id="board-quiet">0</span> ·
+                first weekend time: <span id="board-first-weekend">—</span> ·
+                first afternoon time: <span id="board-first-afternoon">—</span>
+            </native-text>
+            <native-text color="Secondary"><span id="board-desks">—</span></native-text>
+
+            @{ Html.InputField(plan, m => m.DeskCode, o => o.Label("Desk code"))
+                .NativeTextBox(b => b.CssClass(Field)); }
+
+            @{ Html.InputField(plan, m => m.VisitSlots, o => o.Label("This family's visit times"))
+                .VisitPlanner(capacity: 1)
+                .Reactive(evt => evt.WeekChanged, (args, p) =>
+                {
+                    var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+                    var link = p.Url<VisitBoardQuery>();
+                    p.Element("board-weekend").Text.Set(
+                        p.From(args.Value).Count(id => id.StartsWith("sat") || id.StartsWith("sun")));
+
+                    p.When(planner.Remaining()).Eq(0)
+                        .Then(full =>
+                        {
+                            full.Element("board-capacity").Text.Set("This week is full.");
+                            full.Element("board-capacity").ClassList.Add("text-warning");
+                        })
+                        .ElseIf(planner.Remaining()).Eq(1)
+                        .Then(one =>
+                        {
+                            one.Element("board-capacity").Text.Set("One visit left this week.");
+                            one.Element("board-capacity").ClassList.Remove("text-warning");
+                        })
+                        .Else(more =>
+                        {
+                            more.Element("board-capacity").Text.Set("More than one visit left this week.");
+                            more.Element("board-capacity").ClassList.Remove("text-warning");
+                        });
+
+                    // The weekend greeter meets a family named in the desk's link, in the Garden wing, that
+                    // holds Saturday 11:00.
+                    p.When(args.Count).Gt(0)
+                        .And(g => g.When(planner.IsBooked("sat-11")).Truthy()
+                            .And(slugify.Slug(planner.Wing)).Eq("garden-wing")
+                            .And(link.Get(q => q.Family)).NotEmpty())
+                        .Then(greet => greet.Element("board-greeter").Show())
+                        .Else(none => none.Element("board-greeter").Hide());
+
+                    p.When(args.Added).NotEmpty()
+                        .Then(added => added.Post(takeUrl)
+                            .Gather<TakeVisitRequest>(g => g
+                                .Set(x => x.SlotId, args.Added)
+                                .Set(x => x.Family, added.Url<VisitBoardQuery>().Get(q => q.Family))
+                                .Set(x => x.WeekendVisits, added.From(args.Value).Count(id => id.StartsWith("sat") || id.StartsWith("sun")))
+                                .Header("X-Booked", added.From(args.Value).Count()))
+                            .Response(r => r.OnSuccess<DeskMessage>((held, s) =>
+                                s.Element("board-status").Text.Set(held.Get(x => x.Message)))));
+                }); }
+
+            <native-vstack gap="Xs">
+                <native-text>Weekend visits booked: <span id="board-weekend">0</span> · <span id="board-capacity">No visits booked yet.</span></native-text>
+                <native-text><span id="board-status">Nothing taken at this desk yet.</span></native-text>
+                <native-text><span id="board-alert">No other desk has taken a time.</span></native-text>
+                <native-text color="Secondary">
+                    Last change on the board: <span id="board-log">none</span>, seen at the <span id="board-log-desk">—</span> desk
+                    (this family now has <span id="board-log-booked">0</span> booked; times taken from this family: <span id="board-log-released">—</span>)
+                </native-text>
+                <p id="board-log-lost" class="text-sm text-danger" hidden>This family lost a booked time to another desk.</p>
+                <p id="board-greeter" class="text-sm text-success" hidden>The weekend greeter meets this family on Saturday at 11:00 AM.</p>
+                <p id="board-announcer" class="text-sm text-text-secondary" role="status" aria-live="polite"></p>
+            </native-vstack>
+
+            <native-vstack gap="Xs">
+                <native-text>Board activity (<span id="board-activity-count">0</span>)</native-text>
+                <ul id="board-activity" class="list-disc pl-5 text-sm text-text-secondary"></ul>
+            </native-vstack>
+
+            @(Html.NativeButton("board-legend-toggle", "Show the legend")
+                .CssClass(ButtonSecondary)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Element("board-legend").ClassList.Toggle("hidden");
+                    p.Element("board-legend").Html.Set("<strong>Taken</strong> times belong to another desk's family; <em>dashed</em> times are quiet hours.");
+                }))
+            <p id="board-legend" class="hidden text-sm text-text-secondary"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

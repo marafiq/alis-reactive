@@ -1,46 +1,23 @@
 using Alis.Reactive.FluentValidator;
-using FluentValidation;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
-    /// Full validator — all fields across all sections.
+    /// What the office needs before move-in day: a care level, a room type and a meal plan. Only the office
+    /// refuses a suite on the memory care floor, which has none.
     /// </summary>
-    public class NativeRadioGroupValidator : ReactiveValidator<NativeRadioGroupModel>
+    public sealed class MoveInPreferencesValidator : ReactiveValidator<NativeRadioGroupModel>
     {
-        public NativeRadioGroupValidator()
+        public MoveInPreferencesValidator()
         {
-            RuleFor(x => x.ResidentName).NotEmpty().WithMessage("'Resident Name' is required.");
-            ClientRule(x => x.ResidentName).Required("'Resident Name' is required.");
-            RuleFor(x => x.CareLevel).NotEmpty().WithMessage("'Care Level' is required.");
-            ClientRule(x => x.CareLevel).Required("'Care Level' is required.");
-            RuleFor(x => x.RoomType).NotEmpty().WithMessage("'Room Type' is required.");
-            ClientRule(x => x.RoomType).Required("'Room Type' is required.");
-            RuleFor(x => x.MealPlan).NotEmpty().WithMessage("'Meal Plan' is required.");
-            ClientRule(x => x.MealPlan).Required("'Meal Plan' is required.");
+            RuleFor(x => x.CareLevel).NotEmpty().WithMessage("Choose the care level.");
 
-            WhenField(x => x.CareLevel, "Memory Care", () =>
-            {
-                RuleFor(x => x.ResidentName).MinimumLength(3)
-                    .WithMessage("'Resident Name' must be at least 3 characters for Memory Care records.");
-                ClientRule(x => x.ResidentName)
-                    .MinLength(3, "'Resident Name' must be at least 3 characters for Memory Care records.");
-            });
-        }
-    }
+            RuleFor(x => x.RoomType)
+                .NotEmpty().WithMessage("Choose the room type.")
+                .Must((preferences, room) => !(preferences.CareLevel == "Memory Care" && room == "Private suite"))
+                .WithMessage("The memory care floor has no suites. Choose a private or shared room.");
 
-    /// <summary>
-    /// Scoped validator — only the form fields (ResidentName + RoomType).
-    /// CareLevel and MealPlan are in demo sections outside the form.
-    /// </summary>
-    public class NativeRadioGroupFormValidator : ReactiveValidator<NativeRadioGroupModel>
-    {
-        public NativeRadioGroupFormValidator()
-        {
-            RuleFor(x => x.ResidentName).NotEmpty().WithMessage("'Resident Name' is required.");
-            ClientRule(x => x.ResidentName).Required("'Resident Name' is required.");
-            RuleFor(x => x.RoomType).NotEmpty().WithMessage("'Room Type' is required.");
-            ClientRule(x => x.RoomType).Required("'Room Type' is required.");
+            RuleFor(x => x.MealPlan).NotEmpty().WithMessage("Choose the meal plan.");
         }
     }
 }

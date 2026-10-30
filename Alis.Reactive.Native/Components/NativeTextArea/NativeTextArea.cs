@@ -1,19 +1,69 @@
+using System;
+
 namespace Alis.Reactive.Native.Components
 {
     /// <summary>
-    /// Native HTML <c>&lt;textarea&gt;</c> component for model-bound multi-line text.
+    /// The native HTML <c>&lt;textarea&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use with <see cref="InputBoundField{TModel,TProp}"/> via the
-    /// <c>.NativeTextArea()</c> factory to create a model-bound textarea with
-    /// label, validation, and Reactive Plan event support.
+    /// Render it with <c>Html.InputField(plan, m =&gt; m.CareNote).NativeTextArea(b =&gt; ...)</c>; reach it with
+    /// <c>p.Component&lt;NativeTextArea&gt;(m =&gt; m.CareNote)</c> and use its members directly:
+    /// <code>
+    /// var careNote = p.Component&lt;NativeTextArea&gt;(m =&gt; m.CareNote);
+    /// p.When(careNote.Value).IsEmpty().Then(t =&gt; careNote.Focus());
+    /// </code>
     /// </remarks>
     public sealed class NativeTextArea : NativeComponent, IInputComponent
     {
-        internal static InputComponentRegistrationProfile Registration { get; } =
-            InputComponentRegistrationProfile.For(new NativeTextArea(), "textarea");
+        /// <summary>The textarea value; empty text when nothing is entered.</summary>
+        public Property<string> Value => Property<string>();
+
+        /// <summary>Moves focus to the element.</summary>
+        public void Focus() => Method();
+
+        /// <summary>Raised when the value changes and the element loses focus.</summary>
+        public Event<NativeTextAreaChangeArgs> Change =>
+            Event<NativeTextAreaChangeArgs>();
 
         /// <inheritdoc />
-        public string ValueMember => "value";
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
+    }
+
+    /// <summary>Payload of <see cref="NativeTextArea.Change"/>, read from the element.</summary>
+    public class NativeTextAreaChangeArgs : JsObject
+    {
+        /// <summary>The textarea value after the change.</summary>
+        public ReadOnly<string> Value => ReadOnly<string>();
+    }
+
+    /// <summary>Renders a <see cref="NativeTextArea"/> for a model-bound field.</summary>
+    public static class NativeTextAreaHtmlExtensions
+    {
+        /// <summary>Renders a NativeTextArea with its defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
+        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
+            this InputBoundField<TModel, TProp> field)
+            where TModel : class
+            => field.NativeTextArea(_ => { });
+
+        /// <summary>
+        /// Renders a NativeTextArea bound to the field's model property, with the framework's element ID and
+        /// binding name.
+        /// </summary>
+        /// <typeparam name="TModel">The view's model.</typeparam>
+        /// <typeparam name="TProp">The type of the bound model property.</typeparam>
+        /// <param name="field">The model-bound field the textarea renders into.</param>
+        /// <param name="build">Configures the textarea, for example <c>b =&gt; b.Rows(6)</c>.</param>
+        /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
+        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
+            this InputBoundField<TModel, TProp> field,
+            Action<NativeTextAreaBuilder<TModel, TProp>> build)
+            where TModel : class
+        {
+            var builder = new NativeTextAreaBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
+            build(builder);
+            return field.Render<global::Alis.Reactive.Native.Components.NativeTextArea>(builder);
+        }
     }
 }

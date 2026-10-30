@@ -1,30 +1,31 @@
-using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
+/// <summary>
+/// The admissions nurse's screening, one step at a time. Each step's draft is saved under the screening's id in
+/// the browser session, so each browser keeps its own screenings and no other browser sees them.
+/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Conditions/AdmissionAssessment")]
 public class AdmissionAssessmentController : Controller
 {
-    // In-memory drafts are keyed by screeningId so each step can save independently.
-    private static readonly ConcurrentDictionary<string, Step1DemographicsModel> Step1Drafts = new();
-    private static readonly ConcurrentDictionary<string, Step2ClinicalModel> Step2Drafts = new();
-    private static readonly ConcurrentDictionary<string, Step3FunctionalModel> Step3Drafts = new();
-    private static readonly ConcurrentDictionary<string, Step4ReviewModel> Step4Drafts = new();
+    private const string DraftKeyPrefix = "admission-assessment:";
 
-    private static string EnsureScreeningId(string? id) =>
-        string.IsNullOrEmpty(id) ? $"SCR-{DateTime.UtcNow:yyyyMMddHHmmssffff}" : id;
+    private static string NewScreeningId() => $"SCR-{DateTime.UtcNow:yyyyMMddHHmmssffff}";
 
     [HttpGet("")]
     public IActionResult Index([FromQuery] string? screeningId)
     {
         var id = screeningId ?? "";
 
-        Step1Drafts.TryGetValue(id, out var step1);
-        Step2Drafts.TryGetValue(id, out var step2);
-        Step3Drafts.TryGetValue(id, out var step3);
+        TryGetDraft<Step1DemographicsModel>(id, out var step1);
+        TryGetDraft<Step2ClinicalModel>(id, out var step2);
+        TryGetDraft<Step3FunctionalModel>(id, out var step3);
 
         step1 ??= new Step1DemographicsModel();
         step2 ??= new Step2ClinicalModel();
@@ -42,22 +43,15 @@ public class AdmissionAssessmentController : Controller
             RiskTier = step1.RiskTier,
             CareUnit = step2.CareUnit,
             MonitoringLevel = step3.MonitoringLevel,
-            Step1Saved = Step1Drafts.ContainsKey(id),
-            Step2Saved = Step2Drafts.ContainsKey(id),
-            Step3Saved = Step3Drafts.ContainsKey(id),
+            Step1Saved = HasDraft<Step1DemographicsModel>(id),
+            Step2Saved = HasDraft<Step2ClinicalModel>(id),
+            Step3Saved = HasDraft<Step3FunctionalModel>(id),
         };
-        if (Step4Drafts.TryGetValue(id, out var step4Draft))
-            step4.EmergencyContact = step4Draft.EmergencyContact;
 
         ViewBag.Diagnoses = new[] { "Alzheimer's", "Parkinson's", "Heart Disease", "Diabetes", "Stroke", "Other" };
         ViewBag.FallOptions = new[] { "None", "1-2 falls", "3+ falls" };
         ViewBag.MobilityAids = new[] { "None", "Cane", "Walker", "Wheelchair" };
-        ViewBag.WanderFreqs = new[] { "Rarely", "Sometimes", "Frequently" };
-        ViewBag.InsulinSchedules = new[] { "Morning", "Evening", "Both", "As Needed" };
-        ViewBag.InjuryTypes = new[] { "Bruise", "Fracture", "Head Injury", "Other" };
-        ViewBag.DiabetesTypes = new[] { "Type 1", "Type 2" };
         ViewBag.ServiceBranches = new[] { "Army", "Navy", "Air Force", "Marines", "Coast Guard" };
-        ViewBag.ScreeningId = id;
 
         var model = new WizardShellModel
         {
@@ -75,8 +69,8 @@ public class AdmissionAssessmentController : Controller
     public async Task<IActionResult> SaveStep1([FromBody] Step1DemographicsModel model)
     {
         await Task.Delay(200);
-        var id = EnsureScreeningId(null);
-        Step1Drafts[id] = model;
+        var id = NewScreeningId();
+        SaveDraft(id, model);
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 1 saved" });
     }
 
@@ -95,7 +89,7 @@ public class AdmissionAssessmentController : Controller
 
         var id = model.ScreeningId;
         if (!string.IsNullOrEmpty(id))
-            Step2Drafts[id] = model;
+            SaveDraft(id, model);
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 2 saved" });
     }
 
@@ -105,7 +99,7 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(200);
         var id = model.ScreeningId;
         if (!string.IsNullOrEmpty(id))
-            Step3Drafts[id] = model;
+            SaveDraft(id, model);
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 3 saved" });
     }
 
@@ -131,30 +125,14 @@ public class AdmissionAssessmentController : Controller
         return Ok(new PhysicianSearchResponse { Physicians = filtered });
     }
 
-    [HttpPost("VerifyVeteran")]
-    public async Task<IActionResult> VerifyVeteran([FromBody] VerifyVeteranRequest? request)
-    {
-        await Task.Delay(600);
-
-        var eligible = request?.VaId?.StartsWith("VA-", StringComparison.OrdinalIgnoreCase) == true;
-
-        return Ok(new VerifyVaResponse
-        {
-            Message = eligible
-                ? $"VA eligibility confirmed for {request?.VaId}"
-                : $"VA ID '{request?.VaId}' not recognized — must start with VA-",
-            Eligible = eligible
-        });
-    }
-
+    // Each alert names what the page sent it, so an alert missing a field reads differently.
     [HttpPost("AlertElopement")]
     public async Task<IActionResult> AlertElopement([FromBody] AlertElopementRequest? request)
     {
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Elopement risk flagged for {request?.ResidentName}",
-            Urgency = "high"
+            Message = $"Elopement risk flagged for {request?.ResidentName}: wanders {request?.WanderFrequency.ToLowerInvariant()}"
         });
     }
 
@@ -164,8 +142,8 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Hypertension flagged: {request?.SystolicBP}mmHg — cardiology referral",
-            Urgency = "moderate"
+            Message = FormattableString.Invariant(
+                $"Hypertension flagged for {request?.ResidentName}: systolic {request?.SystolicBP:0} mmHg, cardiology referral")
         });
     }
 
@@ -175,8 +153,8 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Uncontrolled {request?.DiabetesType} diabetes: A1C {request?.A1cLevel} — endocrinology referral",
-            Urgency = "high"
+            Message = FormattableString.Invariant(
+                $"Uncontrolled {request?.DiabetesType} diabetes: A1C {request?.A1cLevel:0.0}%, endocrinology referral")
         });
     }
 
@@ -186,8 +164,7 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Neuro consult ordered for {request?.ResidentName} — {request?.InjuryType}",
-            Urgency = "immediate"
+            Message = $"Neuro consult ordered for {request?.ResidentName}: {request?.InjuryType}"
         });
     }
 
@@ -197,8 +174,8 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(400);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Pain management required: level {request?.PainLevel} at {request?.PainLocation}",
-            Urgency = "immediate"
+            Message = FormattableString.Invariant(
+                $"Pain management required: level {request?.PainLevel:0} at {request?.PainLocation}")
         });
     }
 
@@ -208,8 +185,7 @@ public class AdmissionAssessmentController : Controller
         await Task.Delay(500);
         return Ok(new ScreeningAlertResponse
         {
-            Message = $"Accessible room scheduled for {request?.ResidentName}",
-            Urgency = "routine"
+            Message = $"Accessible room scheduled for {request?.ResidentName}, who uses a {request?.MobilityAid.ToLowerInvariant()}"
         });
     }
 
@@ -226,7 +202,7 @@ public class AdmissionAssessmentController : Controller
         if (string.IsNullOrEmpty(id))
             return BadRequest(new { errors });
 
-        if (!Step1Drafts.TryGetValue(id, out var step1))
+        if (!TryGetDraft<Step1DemographicsModel>(id, out var step1))
         {
             errors["Step1"] = ["Step 1 (Demographics) must be saved before submission"];
         }
@@ -235,7 +211,7 @@ public class AdmissionAssessmentController : Controller
             CollectErrors(new Step1Validator().Validate(step1), errors);
         }
 
-        Step2Drafts.TryGetValue(id, out var step2);
+        TryGetDraft<Step2ClinicalModel>(id, out var step2);
         if (step2 != null)
             CollectErrors(new Step2Validator().Validate(step2), errors);
 
@@ -254,7 +230,7 @@ public class AdmissionAssessmentController : Controller
                 errors["DiabetesAssessmentId"] = ["Diabetes assessment must be saved"];
         }
 
-        Step3Drafts.TryGetValue(id, out var step3);
+        TryGetDraft<Step3FunctionalModel>(id, out var step3);
         if (step3 != null)
             CollectErrors(new Step3Validator().Validate(step3), errors);
 
@@ -281,17 +257,26 @@ public class AdmissionAssessmentController : Controller
         });
     }
 
-    private static void CollectErrors(FluentValidation.Results.ValidationResult result,
-        Dictionary<string, string[]> errors)
+    // The submit answers to every step's rules: each step's messages join the others' by field.
+    private static void CollectErrors(ValidationResult result, Dictionary<string, string[]> errors)
     {
-        foreach (var failure in result.Errors)
-        {
-            var key = failure.PropertyName;
-            if (!errors.ContainsKey(key))
-                errors[key] = [failure.ErrorMessage];
-            else
-                errors[key] = [..errors[key], failure.ErrorMessage];
-        }
+        foreach (var field in result.ErrorsByField)
+            errors[field.Key] = errors.TryGetValue(field.Key, out var earlier) ? [.. earlier, .. field.Value] : field.Value;
     }
 
+    // A step this browser has not saved for the screening has no draft.
+    private bool TryGetDraft<TStep>(string screeningId, [NotNullWhen(true)] out TStep? draft) where TStep : class
+    {
+        var json = HttpContext.Session.GetString(DraftKey<TStep>(screeningId));
+        draft = json == null ? null : JsonSerializer.Deserialize<TStep>(json);
+        return draft != null;
+    }
+
+    private bool HasDraft<TStep>(string screeningId) =>
+        HttpContext.Session.GetString(DraftKey<TStep>(screeningId)) != null;
+
+    private void SaveDraft<TStep>(string screeningId, TStep draft) =>
+        HttpContext.Session.SetString(DraftKey<TStep>(screeningId), JsonSerializer.Serialize(draft));
+
+    private static string DraftKey<TStep>(string screeningId) => $"{DraftKeyPrefix}{typeof(TStep).Name}:{screeningId}";
 }

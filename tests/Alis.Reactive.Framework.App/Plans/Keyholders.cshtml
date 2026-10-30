@@ -1,0 +1,14 @@
+@using Alis.Reactive.Framework.App.Plans
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model KeyholdersPage
+@{
+    ViewData["Title"] = "Keyholders";
+
+    // The card is rendered for the page's Primary member, so its input binds as Primary.Name.
+    var card = new ViewDataDictionary(ViewData);
+    card.TemplateInfo.HtmlFieldPrefix = nameof(KeyholdersPage.Primary);
+}
+<h1>Keyholders</h1>
+
+@* The page has no plan of its own: the card starts one. *@
+@await Html.PartialAsync("KeyholderCard", Model.Primary, card)

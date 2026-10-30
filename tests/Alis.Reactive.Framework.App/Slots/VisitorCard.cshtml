@@ -1,0 +1,19 @@
+@using Alis.Reactive.Framework.App.Slots
+@model VisitorCard
+@{
+    var plan = Html.ReactivePlan<VisitorCard>();
+}
+@* Written first, so the card's bell handler is released before it when the card goes. *@
+@{ Html.On(plan, t => t.CustomEvent(LoungeEvents.LoungeBellRang, (rang, p) => p.Element("card-heard").Text.Set(rang.Get(x => x.Times)))); }
+
+<section id="visitor-card">
+    <h2>The visitor card</h2>
+
+    @* The card's own bell, destroyed with the card: it takes its callback property away, so releasing the
+       handler assigned to it fails. *@
+    @(plan.Bell("visitor-bell")
+        .Reactive(bell => bell.OnRung, (ring, p) => p.Element("visitor-bell-heard").Text.Set(ring.Times)))
+    <p>The card's own bell rang: <span id="visitor-bell-heard"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

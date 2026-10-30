@@ -1,128 +1,115 @@
-@model TextAreaModel
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.TextArea
+@model DailyCareLogModel
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    ViewData["Title"] = "FusionTextArea";
+    ViewData["Title"] = "Daily Care Log";
 
-    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
-    const string SubmitReady = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string Button = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+    const string PrimaryButton = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
 
-    var lastShiftNote = Model.CareNote;
-
-    var plan = Html.ReactivePlan<TextAreaModel>();
+    var nightShiftNote = Model.NightShiftNote;
+    var plan = Html.ReactivePlan<DailyCareLogModel>();
 }
 
 <native-vstack gap="Lg">
     <div>
-        <native-heading level="H1">Resident Daily Care Log</native-heading>
-        <native-text color="Secondary">
-            We carried over last shift's note. Update it for this shift, then save it to the resident's daily log.
-        </native-text>
+        <native-heading level="H1">Daily Care Log</native-heading>
+        <native-text color="Secondary">Margaret Hale · Maple 214 · Day shift</native-text>
     </div>
 
     <native-card><native-card-body>
+        <native-heading level="H2">The night shift wrote</native-heading>
+        <p id="night-shift-note" class="mt-2 text-sm">@nightShiftNote</p>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body id="care-log">
         <native-vstack gap="Base">
-            @{ Html.InputField(plan, m => m.CareNote, o => o.Label("Care note for this shift"))
+            @{ Html.InputField(plan, m => m.CareNote, o => o.Label("Day shift note"))
                 .FusionTextArea(b => b
-                    .Placeholder("Describe how the resident's shift went")
-                    .Rows(4)
-                    .ShowClearButton(true)
-                    .Reactive(plan, evt => evt.Input, (args, p) =>
-                    {
-                        p.Element("note-draft").SetText(args, x => x.Value);
-                        p.Element("note-draft-previous").SetText(args, x => x.PreviousValue);
-                    })
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("note-committed").SetText(args, x => x.Value);
-                        p.Element("note-replaced").SetText(args, x => x.PreviousValue);
+                    .Placeholder("How did Margaret's day go?")
+                    .Rows(5))
+                .Reactive(evt => evt.Input, (args, p) =>
+                {
+                    p.When(args.Value).Contains("fell")
+                        .Then(fell => fell.Element("incident-reminder").Show())
+                        .Else(none => none.Element("incident-reminder").Hide());
+                    p.When(args.Value).IsEmpty().And(args.PreviousValue).NotEmpty()
+                        .Then(cleared => cleared.Element("care-log-status").Text.Set("You cleared the note."));
+                })
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    // A note that changes is no longer the note that was signed.
+                    p.Component<NativeCheckBox>(m => m.Signed).Checked.Set(false);
+                    p.Element("signed-note-locked").Hide();
+                    p.When(args.IsInteracted).Falsy()
+                        .Then(started => started.Element("care-log-status").Text.Set("This is the night shift's note. Update it for the day shift."))
+                        .ElseIf(args.Value).IsEmpty()
+                        .Then(erased => erased.Element("care-log-status").Text.Set("Nothing written for the day shift yet."))
+                        .ElseIf(args.PreviousValue).Eq(nightShiftNote)
+                        .Then(updated => updated.Element("care-log-status").Text.Set("Updated the night shift's note for the day shift. Sign it when it is complete."))
+                        .Else(edited => edited.Element("care-log-status").Text.Set("Edited for the day shift. Sign it when it is complete."));
+                })
+                .Reactive(evt => evt.Focus, (args, p) =>
+                {
+                    // A signed note is locked: the cursor does not stay in it.
+                    p.When(p.Component<NativeCheckBox>(m => m.Signed).Checked).Truthy()
+                        .Then(signed =>
+                        {
+                            signed.Component<FusionTextArea>(m => m.CareNote).FocusOut();
+                            signed.Element("signed-note-locked").Show();
+                        })
+                        .ElseIf(args.Value).IsEmpty()
+                        .Then(empty => empty.Element("writing-tips").Show());
+                })
+                .Reactive(evt => evt.Blur, (args, p) =>
+                {
+                    p.Element("writing-tips").Hide();
+                    p.Post(Url.SandboxRoute("KeepDraft", "TextArea"))
+                        .Gather<CareLogDraft>(g => g.Set(x => x.Note, args.Value))
+                        .Response(r => r.OnSuccess<CareLogAnswer>((kept, s) =>
+                            s.Element("draft-status").Text.Set(kept.Get(x => x.Message))));
+                }); }
 
-                        p.When(args, x => x.IsInteracted).Truthy()
-                            .Then(edited => edited.Element("note-commit-status")
-                                .SetText("Edited by you this shift — ready to save."))
-                            .Else(carried => carried.Element("note-commit-status")
-                                .SetText("Filled from last shift's note, not edited by hand."));
-                    })
-                    .Reactive(plan, evt => evt.Focus, (args, p) =>
-                    {
-                        p.Element("note-presence").SetText("You are editing this note now.");
-                        p.Element("note-focus-snapshot").SetText(args, x => x.Value);
-                    })
-                    .Reactive(plan, evt => evt.Blur, (args, p) =>
-                    {
-                        p.Element("note-presence").SetText("Autosave pending — your changes are held.");
-                        p.Element("note-blur-snapshot").SetText(args, x => x.Value);
-                    })); }
+            <p id="writing-tips" hidden class="text-sm text-text-secondary">Note her meals, mood and mobility, and anything the evening shift should watch for.</p>
+            <p id="incident-reminder" hidden class="text-sm text-amber-700">Margaret fell? File an incident report before the end of the shift.</p>
+            <p id="signed-note-locked" hidden class="text-sm text-amber-700">This note is signed. Clear "I sign this note" to change it.</p>
+            <p id="draft-status" class="text-xs text-text-muted">No draft kept yet.</p>
 
-            <native-vstack gap="Xs">
-                <native-text color="Secondary">Status: <span id="note-presence" class="font-medium text-text">Open the note to start editing.</span></native-text>
-                <native-text color="Secondary">Committed note: <span id="note-committed" class="font-medium text-text">@Model.CareNote</span></native-text>
-                <native-text color="Secondary"><span id="note-commit-status">Carried over from last shift.</span></native-text>
-                <native-text color="Secondary">Note in the field now: <span id="note-restored" class="text-text-muted">@Model.CareNote</span></native-text>
-            </native-vstack>
+            @{ Html.InputField(plan, m => m.Signed, o => o.Label("I sign this note as complete"))
+                .NativeCheckBox(b => b.CssClass("rounded border-border"))
+                .Reactive(evt => evt.Change, (_, p) => p.Element("signed-note-locked").Hide()); }
+
+            <p id="care-log-status" class="text-sm font-medium">Nothing written for the day shift yet.</p>
 
             <native-hstack gap="Sm" class="flex-wrap">
-                @(Html.NativeButton("resume-editing", "Resume editing the note")
-                    .CssClass(ButtonSecondary)
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                @(Html.NativeButton("start-from-night-note-btn", "Start from the night shift's note")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
-                        p.Component<FusionTextArea>(m => m.CareNote).FocusIn();
+                        // The night shift's note goes in at once, so the note is unsigned before the cursor enters it.
+                        var note = p.Component<FusionTextArea>(m => m.CareNote);
+                        note.Value.Set(nightShiftNote);
+                        note.DataBind();
+                        note.FocusIn();
                     }))
-                @(Html.NativeButton("close-note", "Done documenting — close the note")
-                    .CssClass(ButtonSecondary)
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
-                    {
-                        p.Component<FusionTextArea>(m => m.CareNote).FocusOut();
-                    }))
-                @(Html.NativeButton("restore-note", "Use last shift's note")
-                    .CssClass(ButtonSecondary)
-                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                @(Html.NativeButton("save-care-log-btn", "Save to the daily log")
+                    .CssClass(PrimaryButton)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
                     {
                         var note = p.Component<FusionTextArea>(m => m.CareNote);
-                        note.SetValue(lastShiftNote);
-                        p.Element("note-restored").SetText(note.Value());
+                        var signed = p.Component<NativeCheckBox>(m => m.Signed);
+                        p.Post(Url.SandboxRoute("Save", "TextArea"))
+                            .Gather<CareLogEntry>(g => g
+                                .Set(x => x.CareNote, note.Value)
+                                .Set(x => x.Signed, signed.Checked))
+                            .Validate<DailyCareLogValidator>("care-log")
+                            .Response(r => r
+                                .OnSuccess<CareLogAnswer>((saved, s) =>
+                                    s.Element("care-log-status").Text.Set(saved.Get(x => x.Message)))
+                                .OnError(400, e => e.ValidationErrors("care-log")));
                     }))
             </native-hstack>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-vstack gap="Base">
-            <native-heading level="H2">Undo context</native-heading>
-            <native-text color="Secondary">Live preview as you type: <span id="note-draft" class="font-medium text-text">@Model.CareNote</span></native-text>
-            <native-text color="Secondary">Before this keystroke: <span id="note-draft-previous" class="text-text-muted">@Model.CareNote</span></native-text>
-            <native-text color="Secondary">This save will replace: <span id="note-replaced" class="text-text-muted">@Model.CareNote</span></native-text>
-            <native-text color="Secondary">Snapshot when you opened the note: <span id="note-focus-snapshot" class="text-text-muted">—</span></native-text>
-            <native-text color="Secondary">Snapshot when you left the note: <span id="note-blur-snapshot" class="text-text-muted">—</span></native-text>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-vstack gap="Base">
-            <native-text color="Secondary">When the note is complete, save it to the resident's daily log.</native-text>
-            @(Html.NativeButton("save-note", "Save note to daily log")
-                .CssClass(SubmitReady)
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    var note = p.Component<FusionTextArea>(m => m.CareNote);
-                    p.When(note.Value()).IsEmpty()
-                        .Then(empty => empty.Element("note-save-guard")
-                            .SetText("Please write a care note before saving."))
-                        .Else(ready =>
-                            ready.Post(Url.SandboxRoute("Echo", "TextArea"))
-                                .Gather(g => g.Include(note.Value(), "careNote"))
-                                .Response(r => r.OnSuccess<CareNoteEchoResponse>((json, s) =>
-                                {
-                                    s.Element("note-save-guard").SetText("");
-                                    s.Element("note-confirmation").SetText(json, x => x.Summary);
-                                    s.Element("note-confirmation-panel").RemoveClass("hidden");
-                                })));
-                }))
-            <native-text color="Secondary"><span id="note-save-guard" class="text-amber-700"></span></native-text>
-            <div id="note-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">
-                <native-text><span id="note-confirmation" class="font-medium text-green-800"></span></native-text>
-            </div>
         </native-vstack>
     </native-card-body></native-card>
 </native-vstack>

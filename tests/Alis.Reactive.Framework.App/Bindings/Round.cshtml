@@ -1,0 +1,138 @@
+@using Alis.Reactive.Framework.App.Bindings
+@model RoundPage
+@{
+    ViewData["Title"] = "The night round";
+    var plan = Html.ReactivePlan<RoundPage>();
+}
+<h1>The night round</h1>
+
+@* Ben is the slate's second row, and the slate finds a row a moment after it is asked. The standby
+   slate is not on the desk tonight. *@
+@plan.Slate("slate", title: "Night", "Ada", "Ben")
+
+<div id="round-form">
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+</div>
+
+<dl>
+    <dt>While telling the desk</dt><dd id="telling"></dd>
+    <dt>The desk</dt><dd id="told"></dd>
+    <dt>After the round closed</dt><dd id="closed"></dd>
+    <dt>After the check</dt><dd id="after-check"></dd>
+    <dt>After the second step</dt><dd id="after-chain"></dd>
+    <dt>The day desk</dt><dd id="day-desk"></dd>
+    <dt>The night desk</dt><dd id="night-desk"></dd>
+    <dt>The branch</dt><dd id="branch"></dd>
+    <dt>After the branch</dt><dd id="after-branch"></dd>
+</dl>
+
+@(plan.Button("tell", "Tell the desk where Ben is")
+    .Reactive(button => button.Click, p =>
+    {
+        var ben = p.Component<Slate>("slate").Lookup("Ben");
+        p.Post("/Bindings/Findings")
+            .Gather<Finding>(g => g.Set(x => x.Found, ben))
+            .WhileLoading(w => w.Element("telling").Text.Set(ben))
+            .Response(r => r.OnSuccess<Answer>((answer, s) => s.Element("told").Text.Set(answer.Get(x => x.Summary))));
+    }))
+@(plan.Button("tell-with-standby", "Tell the desk with the standby slate")
+    .Reactive(button => button.Click, p =>
+    {
+        var ben = p.Component<Slate>("slate").Lookup("Ben");
+        var standby = p.Component<Slate>("standby").Lookup("Ben");
+        p.Post("/Bindings/Findings")
+            .Gather<Finding>(g => g.Set(x => x.Standby, standby).Set(x => x.Found, ben))
+            .Finally(f => f.Element("closed").Text.Set(ben));
+    }))
+@(plan.Button("check-and-tell", "Check the room and tell the desk")
+    .Reactive(button => button.Click, p =>
+    {
+        var ben = p.Component<Slate>("slate").Lookup("Ben");
+        p.Post("/Bindings/Findings")
+            .Validate<RoundRules>("round-form")
+            .Gather<Finding>(g => g.Set(x => x.Found, ben))
+            .Response(r => r.OnSuccess<Answer>((answer, s) => s.Element("told").Text.Set(answer.Get(x => x.Summary))));
+        p.Element("after-check").Text.Set(ben);
+    }))
+@(plan.Button("open-and-tell", "Open the round, then tell the desk")
+    .Reactive(button => button.Click, p =>
+    {
+        var ben = p.Component<Slate>("slate").Lookup("Ben");
+        p.Get("/Bindings/Opened")
+            .Response(r => r.Chained(next => next.Post("/Bindings/Findings")
+                .Gather<Finding>(g => g.Set(x => x.Found, ben))
+                .Response(told => told.OnSuccess<Answer>((answer, s) => s.Element("told").Text.Set(answer.Get(x => x.Summary))))));
+        p.Element("after-chain").Text.Set(ben);
+    }))
+@(plan.Button("tell-both", "Tell both desks at once")
+    .Reactive(button => button.Click, p =>
+    {
+        var ben = p.Component<Slate>("slate").Lookup("Ben");
+        p.Parallel(
+            day => day.Post("/Bindings/Findings")
+                .Gather<Finding>(g => g.Set(x => x.Desk, "the day desk").Set(x => x.Found, ben))
+                .Response(r => r.OnSuccess<Answer>((answer, s) => s.Element("day-desk").Text.Set(answer.Get(x => x.Summary)))),
+            night => night.Post("/Bindings/Findings")
+                .Gather<Finding>(g => g.Set(x => x.Desk, "the night desk").Set(x => x.Found, ben))
+                .Response(r => r.OnSuccess<Answer>((answer, s) => s.Element("night-desk").Text.Set(answer.Get(x => x.Summary)))));
+    }))
+@(plan.Button("find-ben", "Find Ben")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        var ben = slate.Lookup("Ben");
+        p.When(slate.Has("Zed")).Truthy()
+            .Then(t => t.Element("branch").Text.Set("Zed is on the round"))
+            .ElseIf(ben).Eq("Ben is row 2")
+            .Then(t => t.Element("branch").Text.Set("Ben is on the round"));
+        p.Element("after-branch").Text.Set(ben);
+    }))
+@(plan.Button("find-ben-with-ada", "Find Ben with Ada")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        var ben = slate.Lookup("Ben");
+        p.When(slate.Has("Ada")).Truthy().And(ben).Eq("Ben is row 2")
+            .Then(t => t.Element("branch").Text.Set("Ada and Ben are on the round"));
+        p.Element("after-branch").Text.Set(ben);
+    }))
+@(plan.Button("find-zed-or-ben", "Find Zed or Ben")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        var ben = slate.Lookup("Ben");
+        p.When(slate.Has("Zed")).Truthy().Or(ben).Eq("Ben is row 2")
+            .Then(t => t.Element("branch").Text.Set("Zed or Ben is on the round"));
+        p.Element("after-branch").Text.Set(ben);
+    }))
+@(plan.Button("look-for-zed-then-ben", "Look for Zed, then find Ben")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        var ben = slate.Lookup("Ben");
+        p.When(slate.Lookup("Zed")).Eq("Zed is row 1")
+            .Then(t => t.Element("branch").Text.Set("Zed is on the round"))
+            .ElseIf(ben).Eq("Ben is row 2")
+            .Then(t => t.Element("branch").Text.Set("Ben is on the round"));
+        p.Element("after-branch").Text.Set(ben);
+    }))
+@(plan.Button("look-for-ada-and-ben", "Look for Ada and Ben")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        var ben = slate.Lookup("Ben");
+        p.When(slate.Lookup("Ada")).Eq("Ada is row 1").And(ben).Eq("Ben is row 2")
+            .Then(t => t.Element("branch").Text.Set("Ada and Ben are on the round"));
+        p.Element("after-branch").Text.Set(ben);
+    }))
+@(plan.Button("look-for-zed-or-ben", "Look for Zed or Ben")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        var ben = slate.Lookup("Ben");
+        p.When(slate.Lookup("Zed")).Eq("Zed is row 1").Or(ben).Eq("Ben is row 2")
+            .Then(t => t.Element("branch").Text.Set("Zed or Ben is on the round"));
+        p.Element("after-branch").Text.Set(ben);
+    }))
+
+@Html.RenderPlan(plan)

@@ -1,3 +1,7 @@
+using System;
+using System.Linq.Expressions;
+using System.Text;
+
 namespace Alis.Reactive.Fusion.Templates
 {
     /// <summary>
@@ -31,22 +35,54 @@ namespace Alis.Reactive.Fusion.Templates
         }
 
         /// <summary>
-        /// Injects <paramref name="onClick"/> directly into the <c>onclick</c> attribute; callers must ensure it is safe.
+        /// Renders a button whose click raises a document event with one payload member bound from the
+        /// row. The template carries no script and no JSON: the runtime raises the event named by
+        /// <c>data-alis-raise</c> with a record of the member the button's <c>data-alis-detail-</c> attribute
+        /// names, holding the text the template engine writes for the row's value. The listener's typed read
+        /// converts that text by the member's type (grammar.md 5.2, 6.1 D4), so a number, a Guid, an enum or
+        /// any text reaches the plan the same way.
         /// </summary>
-        internal static string Button(string text, string onClick, TemplateCss css)
-        {
-            return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClick}\">{text}</button>";
-        }
+        internal static string EventButton(string text, string eventName, string detailAttribute, string valueBinding, TemplateCss css) =>
+            $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
+            $"{detailAttribute}=\"{valueBinding}\">{text}</button>";
 
         /// <summary>
-        /// Renders a button that dispatches a CustomEvent with the bound <c>detail.id</c> value.
-        /// Uses <c>&amp;quot;</c> for event name quoting to survive Syncfusion template engine
-        /// single-to-double quote conversion.
+        /// The attribute that carries the payload member a template button fills: a direct member, and one that
+        /// always holds a value, since the template engine writes a missing value as the text <c>null</c>.
         /// </summary>
-        internal static string EventButton(string text, string eventName, string idBinding, TemplateCss css)
+        internal static string DetailAttribute<TPayload, TProperty>(string text, Expression<Func<TPayload, TProperty>> member)
         {
-            var onClick = $"document.dispatchEvent(new CustomEvent(&quot;{eventName}&quot;,{{detail:{{id:{idBinding}}}}}))";
-            return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClick}\">{text}</button>";
+            var path = FusionTemplateExpression.ToPropertyPath(member);
+            if (path.IndexOf('.') >= 0)
+                throw new ArgumentException($"A template button fills a direct payload member; '{path}' is nested.", nameof(member));
+
+            var held = Nullable.GetUnderlyingType(typeof(TProperty));
+            if (held != null)
+            {
+                var memberName = ((MemberExpression)(member.Body is UnaryExpression convert ? convert.Operand : member.Body)).Member.Name;
+                throw new ArgumentException(
+                    $"Template button '{text}' fills '{typeof(TPayload).Name}.{memberName}' of type {held.Name}?, and the template " +
+                    "engine writes a missing value as the text \"null\", which the listener would read as that text. Fill it from " +
+                    $"a member of type {held.Name}, which always holds a value.",
+                    nameof(member));
+            }
+
+            return DatasetAttribute(path);
+        }
+
+        // The attribute the DOM's dataset names alisDetail followed by the member's JSON name with its first letter
+        // capitalized: each capital is a dash and the small letter (residentId is data-alis-detail-resident-id),
+        // as the core writes a view's markup (grammar.md 6.1, D4).
+        private static string DatasetAttribute(string member)
+        {
+            var key = "alisDetail" + char.ToUpperInvariant(member[0]) + member.Substring(1);
+            var attribute = new StringBuilder("data-");
+            foreach (var letter in key)
+            {
+                if (letter >= 'A' && letter <= 'Z') attribute.Append('-').Append(char.ToLowerInvariant(letter));
+                else attribute.Append(letter);
+            }
+            return attribute.ToString();
         }
     }
 
@@ -76,7 +112,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal TemplateCssClass(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string ClassAttribute =>
@@ -108,7 +144,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal PresentTemplateAltText(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string Attribute => $" alt=\"{_value}\"";
@@ -136,7 +172,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal PresentTemplateElementId(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string Attribute => $" id=\"{_value}\"";

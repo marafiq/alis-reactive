@@ -1,0 +1,301 @@
+// The grammar's meaning (grammar.md sections 1-3): the browser computes what the developer's C# would.
+
+import { afterEach, describe, expect, it } from "vitest";
+import { Environment } from "../grammar/environment";
+import { evaluate, type Scope, type Objects } from "../grammar/evaluate";
+import { executeBlock } from "../grammar/execute";
+import { e, s, st } from "./support/plan";
+
+function scopeWith(located: Record<string, unknown> = {}, bindings: Record<string, unknown> = {}): Scope {
+  const env = Environment.root();
+  for (const [name, value] of Object.entries(bindings)) env.bind(name, value);
+  const objects: Objects = {
+    object: id => {
+      if (!(id in located)) throw new Error(`no object ${id}`);
+      return located[id];
+    },
+  };
+  return { env, objects };
+}
+
+const value = (expr: Parameters<typeof evaluate>[0], scope = scopeWith()) => evaluate(expr, scope);
+
+afterEach(() => {
+  document.body.innerHTML = "";
+});
+
+describe("values convert at the boundary, by shape", () => {
+  it("reads text as a number the way MVC binds a number, and keeps what cannot convert", () => {
+    expect(value(e.as(e.lit("42"), s.number))).toBe(42);
+    expect(value(e.as(e.lit(""), s.number))).toBe(0);
+    expect(value(e.as(e.lit("abc"), s.number))).toBe("abc");
+  });
+
+  it("reads a nullable number's blank text as null", () => {
+    expect(value(e.as(e.lit("  "), s.nullable(s.number)))).toBeNull();
+    expect(value(e.as(e.lit(undefined), s.nullable(s.string)))).toBeNull();
+  });
+
+  it("reads a date-only text as local midnight", () => {
+    const date = value(e.as(e.lit("2026-06-01"), s.date)) as Date;
+    expect(date).toBeInstanceOf(Date);
+    expect([date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()]).toEqual([2026, 5, 1, 0]);
+  });
+
+  it("reads an instant as the exact moment its text names, and writes it back in UTC", () => {
+    const arrives = value(e.as(e.lit("2026-10-11T10:30:00+05:00"), s.instant)) as Date;
+    expect(arrives.toISOString()).toBe("2026-10-11T05:30:00.000Z");
+    expect(value(e.op("toText", e.as(e.lit("2026-10-11T10:30:00+05:00"), s.instant)))).toBe("2026-10-11T05:30:00.000Z");
+    expect(value(e.op("eq", e.as(e.lit("2026-10-11T05:30:00Z"), s.instant), e.as(e.lit(Date.UTC(2026, 9, 11, 5, 30)), s.date)))).toBe(true);
+  });
+
+  it("keeps a missing value missing", () => {
+    expect(value(e.as(e.lit(null), s.number))).toBeNull();
+    expect(value(e.as(e.lit(undefined), s.string))).toBeUndefined();
+  });
+
+  // A server's class handed to a method: its date members become Dates, the rest stays as it arrived.
+  it("passes a record argument with its date members as Dates and every other member kept", () => {
+    const shift = { id: 7, subject: "Jane Blonde (CNA)", startTime: "2026-10-13T16:00:00", guid: "kept" };
+    let received: Record<string, unknown> | undefined;
+    const schedule = { saveEvent: (data: Record<string, unknown>) => { received = data; } };
+    const shiftShape = s.object({ id: s.number, subject: s.string, startTime: s.date });
+
+    value(e.call(e.obj("schedule"), ["saveEvent"], [e.as(e.lit(shift), shiftShape)]), scopeWith({ schedule }));
+
+    expect(received!["startTime"]).toBeInstanceOf(Date);
+    expect((received!["startTime"] as Date).getHours()).toBe(16);
+    expect(received!["subject"]).toBe("Jane Blonde (CNA)");
+    expect(received!["guid"]).toBe("kept");
+    expect(shift.startTime).toBe("2026-10-13T16:00:00");
+  });
+
+  it("passes a record argument that needs no conversion as the same object", () => {
+    const card = { id: 101, summary: "Assess fall risk", isEscalated: false };
+    let received: unknown;
+    const kanban = { addCard: (data: unknown) => { received = data; } };
+    const cardShape = s.object({ id: s.number, summary: s.string, isEscalated: s.boolean });
+
+    value(e.call(e.obj("kanban"), ["addCard"], [e.as(e.lit(card), cardShape)]), scopeWith({ kanban }));
+
+    expect(received).toBe(card);
+  });
+});
+
+describe("operators answer as C#'s lifted operators do", () => {
+  it("treats null and undefined as one missing value", () => {
+    expect(value(e.op("eq", e.lit(null), e.lit(undefined)))).toBe(true);
+    expect(value(e.op("eq", e.lit(null), e.lit(0)))).toBe(false);
+  });
+
+  it("never orders a missing value, NaN or mixed kinds", () => {
+    expect(value(e.op("lt", e.lit(null), e.lit(15)))).toBe(false);
+    expect(value(e.op("gte", e.lit(null), e.lit(0)))).toBe(false);
+    expect(value(e.op("gt", e.lit("10"), e.lit(9)))).toBe(false);
+    expect(value(e.op("gt", e.lit(10), e.lit(9)))).toBe(true);
+  });
+
+  it("orders dates by their time and compares them for equality by time", () => {
+    const earlier = e.as(e.lit("2026-01-01"), s.date);
+    const later = e.as(e.lit("2026-02-01"), s.date);
+    expect(value(e.op("lt", earlier, later))).toBe(true);
+    expect(value(e.op("eq", e.as(e.lit("2026-01-01"), s.date), e.as(e.lit("2026-01-01"), s.date)))).toBe(true);
+  });
+
+  it("short-circuits && and || left to right", () => {
+    const throws = e.call(e.ref("boom"), []);
+    const scope = scopeWith({}, { boom: () => { throw new Error("evaluated"); } });
+    expect(value(e.op("and", e.lit(false), throws), scope)).toBe(false);
+    expect(value(e.op("or", e.lit(true), throws), scope)).toBe(true);
+  });
+
+  it("treats only \"\", missing and an empty array as empty", () => {
+    expect(value(e.op("empty", e.lit("")))).toBe(true);
+    expect(value(e.op("empty", e.lit([])))).toBe(true);
+    expect(value(e.op("empty", e.lit(" ")))).toBe(false);
+    expect(value(e.op("empty", e.lit(0)))).toBe(false);
+  });
+
+  it("tests a pattern on text and never on a missing value", () => {
+    expect(value(e.op("matches", e.lit("A-12"), e.lit("^[A-Z]-\\d+$"), e.lit("")))).toBe(true);
+    expect(value(e.op("matches", e.lit(undefined), e.lit(".*"), e.lit("")))).toBe(false);
+  });
+
+  it("sums with text that is not a number as 0, never concatenating", () => {
+    const rows = e.lit([{ n: 2 }, { n: "3" }, { n: "x" }]);
+    const sum = e.call(e.op("toArray", rows), ["reduce"], [
+      e.fn(["total", "row"], e.op("add", e.ref("total"), e.op("finite", e.get(e.ref("row"), ["n"])))),
+      e.lit(0),
+    ]);
+    expect(value(sum)).toBe(5);
+  });
+
+  it("orders numbers by value with non-finite last, and everything else by text", () => {
+    const sorted = e.call(e.lit([3, Infinity, 1, 2]), ["toSorted"], [e.fn(["a", "b"], e.op("order", e.ref("a"), e.ref("b")))]);
+    expect(value(sorted)).toEqual([1, 2, 3, Infinity]);
+  });
+});
+
+describe("paths", () => {
+  it("fails loudly on a member a located object does not have", () => {
+    const scope = scopeWith({ grid: { dataSource: [] } });
+    expect(() => value(e.get(e.obj("grid"), ["pageSize"]), scope)).toThrow(/has no member "pageSize"/);
+  });
+
+  it("reads a missing link of data as missing, as JavaScript's ?. does", () => {
+    const scope = scopeWith({}, { args: { data: undefined } });
+    expect(value(e.get(e.ref("args"), ["data", "id"]), scope)).toBeUndefined();
+    expect(value(e.call(e.ref("args"), ["data", "includes"], [e.lit("x")]), scope)).toBeUndefined();
+  });
+
+  it("creates a payload member that is absent, but never a member a located object lacks", () => {
+    const args: Record<string, unknown> = {};
+    const scope = scopeWith({ widget: {} }, { args });
+    executeBlock([st.set(e.ref("args"), ["cancel"], e.lit(true))], scope);
+    expect(args.cancel).toBe(true);
+    expect(() => executeBlock([st.set(e.obj("widget"), ["value"], e.lit(1))], scope)).toThrow(/has no member "value"/);
+  });
+
+  it("calls a text method on text", () => {
+    const scope = scopeWith({}, { name: "Margaret Hill" });
+    expect(value(e.call(e.ref("name"), ["startsWith"], [e.lit("Marg")]), scope)).toBe(true);
+  });
+
+  it("reads each item of a located object's list, checked like the object", () => {
+    const uploads = { filesData: [{ rawFile: "a.pdf" }, { rawFile: "b.pdf" }] };
+    const renamed = { filesData: [{ file: "a.pdf" }] };
+    const scope = scopeWith({ uploads, renamed });
+    expect(value(e.get(e.obj("uploads"), ["filesData", "[]", "rawFile"]), scope)).toEqual(["a.pdf", "b.pdf"]);
+    expect(() => value(e.get(e.obj("renamed"), ["filesData", "[]", "rawFile"]), scope))
+      .toThrow('[alis] #renamed.filesData[] has no member "rawFile"');
+  });
+
+  it("reads each item of data optionally, and a missing list as no items", () => {
+    const scope = scopeWith({}, { args: { rows: [{ id: 1 }, {}], none: null } });
+    expect(value(e.get(e.ref("args"), ["rows", "[]", "id"]), scope)).toEqual([1, undefined]);
+    expect(value(e.get(e.ref("args"), ["none", "[]", "id"]), scope)).toEqual([]);
+  });
+});
+
+describe("statements", () => {
+  it("writes the value converted to the member's shape", () => {
+    const el = document.createElement("p");
+    const scope = scopeWith({ status: el });
+    executeBlock([st.set(e.obj("status"), ["textContent"], e.as(e.lit(5), s.string))], scope);
+    expect(el.textContent).toBe("5");
+  });
+
+  it("runs synchronously until the first awaited statement", async () => {
+    const events: string[] = [];
+    let release!: () => void;
+    const slow = new Promise<void>(resolve => { release = resolve; });
+    const scope = scopeWith({}, {
+      log: (entry: string) => events.push(entry),
+      wait: () => slow,
+    });
+    const completion = executeBlock([
+      st.do(e.call(e.ref("log"), [], [e.lit("before")])),
+      st.do(e.call(e.ref("wait"), []), true),
+      st.do(e.call(e.ref("log"), [], [e.lit("after")])),
+    ], scope);
+
+    expect(events).toEqual(["before"]);
+    release();
+    await completion;
+    expect(events).toEqual(["before", "after"]);
+  });
+
+  it("never returns a promise from a block that awaits nothing", () => {
+    const scope = scopeWith({}, { noop: () => undefined });
+    expect(executeBlock([st.do(e.call(e.ref("noop"), []))], scope)).toBeUndefined();
+  });
+
+  it("binds an awaited value for the rest of the block, and keeps a try body's bindings after it", async () => {
+    const seen: unknown[] = [];
+    const scope = scopeWith({}, {
+      fetchRow: () => Promise.resolve({ id: 7 }),
+      record: (v: unknown) => seen.push(v),
+    });
+    await executeBlock([
+      st.try([st.let("res", e.call(e.ref("fetchRow"), []), true)], []),
+      st.do(e.call(e.ref("record"), [], [e.get(e.ref("res"), ["id"])])),
+    ], scope);
+    expect(seen).toEqual([7]);
+  });
+
+  it("runs finally after the body, and after a failure before rethrowing it", async () => {
+    const events: string[] = [];
+    const scope = scopeWith({}, {
+      log: (entry: string) => events.push(entry),
+      fail: () => Promise.reject(new Error("no route value")),
+    });
+    await expect(executeBlock([
+      st.try(
+        [st.do(e.call(e.ref("fail"), []), true), st.do(e.call(e.ref("log"), [], [e.lit("unreached")]))],
+        [st.do(e.call(e.ref("log"), [], [e.lit("finally")]))],
+      ),
+    ], scope)).rejects.toThrow("no route value");
+    expect(events).toEqual(["finally"]);
+  });
+
+  it("takes the first arm whose condition holds, else the else block", () => {
+    const events: string[] = [];
+    const scope = scopeWith({}, { log: (entry: string) => events.push(entry) });
+    const say = (text: string) => st.do(e.call(e.ref("log"), [], [e.lit(text)]));
+    executeBlock([st.if([[e.lit(false), [say("a")]], [e.lit(true), [say("b")]], [e.lit(true), [say("c")]]], [say("else")])], scope);
+    executeBlock([st.if([[e.lit(null), [say("a")]]], [say("else")])], scope);
+    expect(events).toEqual(["b", "else"]);
+  });
+
+  it("settles every parallel block, logging a failure without stopping the others", async () => {
+    const events: string[] = [];
+    const scope = scopeWith({}, {
+      log: (entry: string) => events.push(entry),
+      later: (entry: string) => Promise.resolve().then(() => { events.push(entry); }),
+      fail: () => Promise.reject(new Error("one branch failed")),
+    });
+    await executeBlock([
+      st.all(
+        [st.do(e.call(e.ref("fail"), []), true)],
+        [st.do(e.call(e.ref("later"), [], [e.lit("second")]), true)],
+      ),
+      st.do(e.call(e.ref("log"), [], [e.lit("completed")])),
+    ], scope);
+    expect(events).toEqual(["second", "completed"]);
+  });
+
+  it("converts an awaited result where it is read", async () => {
+    const seen: unknown[] = [];
+    const scope = scopeWith({}, {
+      census: () => Promise.resolve("12"),
+      record: (v: unknown) => seen.push(v),
+    });
+    await executeBlock([
+      st.let("count", e.call(e.ref("census"), []), true),
+      st.do(e.call(e.ref("record"), [], [e.as(e.ref("count"), s.number)])),
+    ], scope);
+    expect(seen).toEqual([12]);
+  });
+
+  it("merges records left to right, later fields winning", () => {
+    const merged = e.op("merge", e.record({ a: e.lit(1), b: e.lit(2) }), e.record({ b: e.lit(3), c: e.lit(4) }));
+    expect(value(merged)).toEqual({ a: 1, b: 3, c: 4 });
+  });
+
+  it("refuses a promise from a member the plan reads as a value, naming the member", () => {
+    const planner = { isBooked: () => Promise.resolve(false), status: "" };
+    const scope = scopeWith({ planner });
+    const isBooked = e.call(e.obj("planner"), ["isBooked"], [e.lit("sat-11")]);
+
+    expect(() => executeBlock([st.if([[isBooked, [st.set(e.obj("planner"), ["status"], e.lit("booked"))]]])], scope))
+      .toThrow("[alis] #planner.isBooked returned a promise where the plan reads a value; declare it with MethodAsync");
+    expect(() => executeBlock([st.set(e.obj("planner"), ["status"], isBooked)], scope)).toThrow("declare it with MethodAsync");
+    expect(() => executeBlock([st.let("booked", isBooked)], scope)).toThrow("declare it with MethodAsync");
+    expect(planner.status).toBe("");
+  });
+
+  it("lets a statement call a member that returns a promise without waiting for it", () => {
+    const scope = scopeWith({ grid: { refresh: () => Promise.resolve() } });
+    expect(executeBlock([st.do(e.call(e.obj("grid"), ["refresh"], []))], scope)).toBeUndefined();
+  });
+});

@@ -12,6 +12,8 @@
     <ProjectReference Include="..\..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
     <ProjectReference Include="..\..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj" />
     <ProjectReference Include="..\..\Alis.Reactive.NativeTagHelpers\Alis.Reactive.NativeTagHelpers.csproj" />
+    <!-- The look this app chose; the component packages do not bring one. -->
+    <ProjectReference Include="..\..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     <PackageReference Include="Newtonsoft.Json" Version="13.*" />
   </ItemGroup>
 

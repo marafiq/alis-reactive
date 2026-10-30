@@ -18,7 +18,7 @@ First Playwright browser install:
 
 ```bash
 dotnet build tests/Alis.Reactive.PlaywrightTests
-pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
+pwsh tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium
 ```
 
 ## Command Table
@@ -28,14 +28,14 @@ pwsh tests/Alis.Reactive.PlaywrightTests/bin/Debug/net10.0/playwright.ps1 instal
 | Check CLI environment | `scripts/doctor.sh` | Read-only. Reports missing tools, missing bundles, missing test DLL, and dirty git state. |
 | Build everything | `scripts/build.sh` | Installs npm deps if needed, builds all JS/CSS bundles, then runs `dotnet build`. |
 | Run sandbox | `scripts/run.sh` | Builds assets first, then starts `http://localhost:5220`. Stop with `Ctrl+C`. |
-| Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> gate-script self-tests -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright -> behavioral coverage gate (0b). |
-| Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the five CI shards side by side, each with its own sandbox, then 0b over every shard's TRX. About 20 minutes instead of about 60. |
+| Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> consistency checks -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright. |
+| Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the CI shards side by side, each with its own sandbox. About 20 minutes instead of about 60. |
 | Upgrade Syncfusion | `node scripts/pin-syncfusion.mjs <version>` then `npm ci` | Moves the npm and NuGet pins together and locks every control package at the version the umbrella shipped with; `--check` verifies (runs in every gate). |
-| Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright and 0b. |
+| Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright. |
 | Full Playwright | `scripts/playwright.sh` | Use this instead of raw `dotnet test` for browser tests. |
 | Filtered Playwright | `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"` | Supports any VSTest filter. |
 | Pack NuGets | `scripts/pack.sh <version>` | Builds assets and Release binaries, clears old packages from `./nupkgs`, then packs the six shipped NuGets. Local inspection only: publishing is tag-driven (`docs/RELEASING.md`). |
-| One CI shard of Playwright | `scripts/playwright.sh --shard fusion-m-z` | Runs the same fixed partition CI runs (`docs/CI.md`). `--print-filter` shows the VSTest filter; `--list` prints the selected test names without running them; `--retry-failed 1` re-runs only the failures once and lists what then passed. |
+| One CI shard of Playwright | `scripts/playwright.sh --shard fusion-s-z` | Runs the same fixed partition CI runs (`docs/CI.md`). `--print-filter` shows the VSTest filter; `--list` prints the selected test names without running them; `--retry-failed 1` re-runs only the failures once and lists what then passed. |
 | Prove the release-tag guard | `scripts/verify-release-tag.sh v1.0.0-rc.1` | The check `nuget-publish.yml` runs before a release, on your clone: annotated, SemVer, reachable from `main` / `release/*`. Exit codes and probe recipe in `docs/RELEASING.md`, "Prove the guard". |
 
 Every wrapper supports `--help`.
@@ -57,9 +57,10 @@ For live UI work, run the relevant watcher plus the sandbox:
 |-----------|---------------|----------|
 | Framework runtime TypeScript | `npm run watch:runtime` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Framework design-system CSS | `npm run watch:design-system` | `dotnet watch --project Alis.Reactive.SandboxApp` |
-| Framework Syncfusion CSS | `npm run watch:fusion` | `dotnet watch --project Alis.Reactive.SandboxApp` |
+| Framework Fusion (Syncfusion) CSS | `npm run watch:fusion` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only plugin JS | `npm run watch:sandbox-plugins` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only CSS | `npm run watch:sandbox-css` | `dotnet watch --project Alis.Reactive.SandboxApp` |
+| Native or tag helper CSS | none (shipped as written) | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Razor or C# view/demo changes | none | `dotnet watch --project Alis.Reactive.SandboxApp` |
 
 Browser refresh is enough after TS/CSS watcher output changes. Restart the
@@ -69,9 +70,11 @@ Asset ownership:
 
 | Asset | Source | Output | Ships to consumers |
 |-------|--------|--------|--------------------|
-| Runtime JS | `Alis.Reactive.Assets/runtime/` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | yes, `AlisReactive` |
-| Design-system CSS | `Alis.Reactive.Assets/design-system/` | `Alis.Reactive.Assets/dist/css/design-system.dev.css` | yes, `AlisReactive.DesignSystem` |
-| Syncfusion CSS | `Alis.Reactive.Assets/fusion/` | `Alis.Reactive.Assets/dist/css/syncfusion.dev.css` | yes, `AlisReactive.Fusion` |
+| Runtime JS | `Alis.Reactive.Assets/runtime/` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | yes, `AlisReactive`: `_content/AlisReactive/js/alis-reactive.js` |
+| Design-system CSS | `Alis.Reactive.Assets/design-system/` | `Alis.Reactive.Assets/dist/css/design-system.dev.css`, `design-system-fusion.dev.css` | yes, `AlisReactive.DesignSystem`: `css/design-system.css`, `css/design-system-fusion.css` |
+| Fusion CSS (Syncfusion theme) | `Alis.Reactive.Assets/fusion/` | `Alis.Reactive.Assets/dist/css/syncfusion.dev.css` | yes, `AlisReactive.Fusion`: `css/fusion.css` |
+| Native CSS | `Alis.Reactive.Assets/native/native.css` | none, shipped as written | yes, `AlisReactive.Native`: `css/native.css` |
+| Native tag helper CSS | `Alis.Reactive.Assets/native-tag-helpers/native-tag-helpers.css` | none, shipped as written | yes, `AlisReactive.NativeTagHelpers`: `css/native-tag-helpers.css` |
 | Sandbox plugin JS | `Alis.Reactive.SandboxApp/Scripts/` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` | no |
 | Sandbox CSS | `Alis.Reactive.SandboxApp/Styles/` | `Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css` | no |
 
@@ -92,15 +95,14 @@ then run the full `scripts/test.sh` before push or release work.
 Use `scripts/test.sh` before push. It runs the gates in this order:
 
 ```text
-npm run typecheck -> npm run build:all -> npm test -> gate-script self-tests -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build -> behavioral coverage gate (0b)
+npm run typecheck -> npm run build:all -> npm test -> consistency checks -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
 ```
 
-`scripts/test.sh --parallel` runs the same gate with the Playwright leg split into the five CI
+`scripts/test.sh --parallel` runs the same gate with the Playwright leg split into every project's CI
 shards (`scripts/playwright.sh --list-shards`) running side by side; each shard's console output is
-written to `tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-<stamp>/<shard>.log`.
-All shards of one run share its stamp in their TRX names (`playwright-<stamp>.<shard>.trx`), so the
-onboarding tools read the whole run as the newest one. Ctrl-C stops every shard with its sandbox and
-browser.
+written to `tests/TestResults/playwright/parallel-<stamp>/<shard>.log`.
+All shards of one run share its stamp in their TRX names (`playwright-<stamp>.<shard>.trx`). Ctrl-C
+stops every shard with its sandbox and browser.
 
 Use `scripts/test.sh --no-e2e` only when the browser leg is intentionally out of
 scope. Before merge or release work, run the full gate. Releases themselves are
@@ -119,7 +121,7 @@ filter, logs the exact `dotnet test` command, writes live output, TRX, and VSTes
 diagnostics under:
 
 ```text
-tests/Alis.Reactive.PlaywrightTests/TestResults/observable/
+tests/<Project>/TestResults/observable/
 ```
 
 Progress markers identify the active test:

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Framework.App.Boundaries
+@model DeskPage
+@{
+    Layout = null;
+    var plan = Html.ReactivePlan<DeskPage>();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>The late desk · Alis.Reactive framework</title>
+    @* Deferred, as an app's head scripts often are: they run once the document is parsed, in this order. *@
+    <script src="/js/framework-components.js" defer></script>
+    <script src="/scripts/alis-reactive.dev.js" defer></script>
+</head>
+<body>
+    <h1>The late desk</h1>
+
+    <p>Desk: <span id="desk"></span></p>
+
+    @{ Html.On(plan, t => t.DomReady(p => p.Element("desk").Text.Set("open"))); }
+
+    @Html.RenderPlan(plan)
+</body>
+</html>

@@ -1,0 +1,23 @@
+@using Alis.Reactive.Framework.App.Realtime
+@model BedCard
+@{
+    var plan = Html.ReactivePlan<BedCard>();
+    var line = SignalRHub.At<WardLine>($"/hubs/line?world={Model.World}");
+    var board = ServerPushStream.At<WardBoard>($"/Realtime/Board?world={Model.World}");
+}
+<section id="bed">
+    <h2>Bed 4</h2>
+    <p>The bed's monitor listens to the ward's line and board while the bed is open.</p>
+</section>
+
+@{ Html.On(plan, t => t
+    .SignalR(line, h => h.Welcomed, (welcome, p) => p.Element("bed-call").Text.Set(welcome.Call))
+    .SignalR(line, h => h.Reconnecting, p => p.Element("bed-dropped").Text.Set("dropped"))
+    .SignalR(line, h => h.Noted, (note, p) => p.Element("bed-note").Text.Set(note.Text))
+    .ServerPush(board, s => s.Welcome, (welcome, p) => p.Element("bed-board-call").Text.Set(welcome.Call))
+    .ServerPush(board, s => s.News, (news, p) => p.Element("bed-news").Text.Set(news.Text))); }
+
+@(plan.Button("hang-up-line", "Hang up the line")
+    .Reactive(button => button.Click, p => p.Hub(line).HangUp()))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,54 @@
+@using Alis.Reactive.Framework.App.Members
+@model DataPage
+@{
+    ViewData["Title"] = "Data";
+    var plan = Html.ReactivePlan<DataPage>();
+}
+<h1>Data</h1>
+
+@plan.Slate("slate", title: "Day round", "Ada", "Ben")
+
+<p>Last card's name: <span id="last-card"></span></p>
+
+@(plan.Button("fill-cy", "Fill Cy's card")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Fill(new SlateCard { Name = "Cy", Due = new DateTime(2026, 10, 29) })))
+@(plan.Button("fill-ada", "Fill Ada's card")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Fill(new SlateCard { Name = "Ada", Due = new DateTime(2026, 10, 30) })))
+@(plan.Button("fill-ben", "Fill Ben's card")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Fill(new SlateCard { Name = "Ben", Due = new DateTime(2026, 10, 27) })))
+@(plan.Button("read-last-card", "Read the last card's name")
+    .Reactive(button => button.Click, p => p.Element("last-card").Text.Set(p.Component<Slate>("slate").LastCard.Get(card => card.Name))))
+@(plan.Button("summarize-cards", "Summarize the cards")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.Summarize(slate.Cards.Each(card => card.Name));
+    }))
+@(plan.Button("limit", "Limit to the rows")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.Limit.Set(slate.Count);
+    }))
+@(plan.Button("note-title", "Note the title")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.Note.Set(slate.Title);
+    }))
+@(plan.Button("rename-card", "Rename the first card Bea")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").SetCard(0, Field.Of((SlateCard card) => card.Name), "Bea")))
+@(plan.Button("sort-by-name", "Sort the cards by name")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").SortCards(Field.Of((SlateCard card) => card.Name))))
+@(plan.Button("sort-by-due", "Sort the cards by due day")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").SortCards(Field.Of((SlateCard card) => card.Due))))
+@(plan.Button("add-dot", "Add a row for Dot")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").AddRowBy("Dot")))
+@(plan.Button("summarize-any", "Summarize the rows as any list")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<Slate>("slate");
+        slate.SummarizeAny(slate.Rows.Each(row => row.Label));
+    }))
+
+@Html.RenderPlan(plan)

@@ -1,4 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextBox;
 
@@ -12,9 +12,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextBox;
 public class WhenUsingFusionTextBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/TextBox";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TextBoxModel";
-    private const string PreferredNameId = GeneratedTypeScope + "__PreferredName";
-    private const string DietaryNoteId = GeneratedTypeScope + "__DietaryNote";
+    private static readonly string PreferredNameId = IdGenerator.For<TextBoxModel>(m => m.PreferredName);
+    private static readonly string DietaryNoteId = IdGenerator.For<TextBoxModel>(m => m.DietaryNote);
 
     private FusionTextBoxLocator PreferredName => new(Page, PreferredNameId);
     private FusionTextBoxLocator DietaryNote => new(Page, DietaryNoteId);
@@ -219,9 +218,9 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"preferredName\":\"Margie\""),
+        Assert.That(body, Does.Contain("\"PreferredName\":\"Margie\""),
             "the gather pipeline must carry the preferred-name Value() source under its declared key");
-        Assert.That(body, Does.Contain("\"dietaryNote\":\"Low sodium, no shellfish\""),
+        Assert.That(body, Does.Contain("\"DietaryNote\":\"Low sodium, no shellfish\""),
             "the gather pipeline must carry the dietary-note Value() source under its declared key");
 
         AssertNoConsoleErrors();

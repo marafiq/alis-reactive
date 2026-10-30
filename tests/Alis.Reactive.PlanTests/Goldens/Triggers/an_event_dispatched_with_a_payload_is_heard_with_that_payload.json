@@ -1,0 +1,98 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "room": {
+      "kind": "element",
+      "id": "room",
+      "vendor": "native"
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "do",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "$document"
+            },
+            "path": [
+              "raise"
+            ],
+            "args": [
+              {
+                "kind": "lit",
+                "value": "roomChecked"
+              },
+              {
+                "kind": "lit",
+                "value": {
+                  "room": "214"
+                }
+              }
+            ]
+          },
+          "await": false
+        }
+      ]
+    },
+    {
+      "on": "$document",
+      "path": [],
+      "event": "roomChecked",
+      "do": [
+        {
+          "kind": "set",
+          "target": {
+            "kind": "obj",
+            "id": "room"
+          },
+          "path": [
+            "textContent"
+          ],
+          "value": {
+            "kind": "as",
+            "expr": {
+              "kind": "get",
+              "target": {
+                "kind": "ref",
+                "name": "e"
+              },
+              "path": [
+                "room"
+              ]
+            },
+            "shape": {
+              "kind": "string"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

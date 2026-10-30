@@ -1,4 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 
@@ -10,9 +10,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 public class WhenUsingFusionSlider : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Slider";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SliderModel";
-    private const string RoomTemperatureId = GeneratedTypeScope + "__RoomTemperature";
-    private const string QuietHoursId = GeneratedTypeScope + "__QuietHours";
+    private static readonly string RoomTemperatureId = IdGenerator.For<SliderModel>(m => m.RoomTemperature);
+    private static readonly string QuietHoursId = IdGenerator.For<SliderModel>(m => m.QuietHours);
 
     private FusionSliderLocator RoomTemperature => new(Page, RoomTemperatureId);
     private FusionSliderLocator QuietHours => new(Page, QuietHoursId);
@@ -182,9 +181,9 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"roomTemperature\":68"),
+        Assert.That(body, Does.Contain("\"RoomTemperature\":68"),
             "the gather pipeline must carry the Value() source under its declared key");
-        Assert.That(body, Does.Contain("\"quietHours\":[13,15]"),
+        Assert.That(body, Does.Contain("\"QuietHours\":[13,15]"),
             "the gather pipeline must carry the RangeValue() source under its declared key");
 
         AssertNoConsoleErrors();

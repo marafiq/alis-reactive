@@ -1,0 +1,162 @@
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.RoomOffer
+@model RoomOfferModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@{
+    ViewData["Title"] = "Room Offer";
+
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string ButtonPrimary = "rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+
+    var plan = Html.ReactivePlan<RoomOfferModel>();
+    var careLevels = new List<SelectListItem> { new("Assisted living", "assisted"), new("Respite stay", "respite"), new("Memory care", "memory") };
+    var wings = new List<SelectListItem> { new("Maple", "Maple"), new("Oak", "Oak"), new("Cedar", "Cedar") };
+    var floors = new List<SelectListItem> { new("First floor", "1"), new("Second floor", "2"), new("Third floor", "3") };
+
+    // Starting over clears the offer for the next prospective resident.
+    Html.On(plan, t => t.CustomEvent(RoomOfferEvents.StartedOver, p =>
+    {
+        p.Component<NativeDropDown>(m => m.CareLevel).Value.Set("");
+        p.Component<FusionNumericTextBox>(m => m.Deposit).Value.Set(0);
+        p.Component<NativeDropDown>(m => m.Room.Wing).Value.Set("");
+        p.Component<NativeDropDown>(m => m.Room.Floor).Value.Set("");
+        p.Component<FusionNumericTextBox>(m => m.Room.MonthlyRate).Value.Set(0);
+        p.Element("offer-summary").Text.Set("Choose a care level to start the offer.");
+        p.Element("wing-note").Text.Set("Choose a wing to see its floor and rate.");
+        p.Element("offer-status").Text.Set("Not sent yet.");
+        p.Element("room-section").Show();
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Room Offer</native-heading>
+        <native-text color="Secondary">Maple Grove admissions. Prepare the room offer for a prospective resident, then send it.</native-text>
+    </div>
+
+    <div id="room-offer-form" class="flex flex-col gap-6">
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Care level and deposit</native-heading>
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care level"))
+                    .NativeDropDown(b => b.Items(careLevels).Placeholder("-- Choose a care level --").CssClass(Field))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.When(args.Value).Eq("assisted")
+                            .Then(assisted =>
+                            {
+                                assisted.Component<FusionNumericTextBox>(m => m.Deposit).Value.Set(2500);
+                                assisted.Element("offer-summary").Text.Set("Assisted living: a $2,500 deposit holds the room.");
+                                assisted.Element("room-section").Show();
+                            })
+                            .ElseIf(args.Value).Eq("respite")
+                            .Then(respite =>
+                            {
+                                respite.Component<FusionNumericTextBox>(m => m.Deposit).Value.Set(0);
+                                respite.Element("offer-summary").Text.Set("A respite stay takes no deposit; the respite suite is assigned on arrival.");
+                                respite.Element("room-section").Hide();
+                            })
+                            .Else(other =>
+                            {
+                                other.Element("offer-summary").Text.Set("Choose the room and the deposit for this offer.");
+                                other.Element("room-section").Show();
+                            });
+                    }); }
+
+                @{ Html.InputField(plan, m => m.Deposit, o => o.Label("Move-in deposit"))
+                    .FusionNumericTextBox(b => b.Min(0).Max(20000).Step(100).Format("c0"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.When(args.Value).Gte(5000m)
+                            .Then(large =>
+                            {
+                                large.Element("deposit-signoff").Text.Set("The executive director signs off on a deposit of $5,000 or more.");
+                                large.Element("deposit-signoff").ClassList.Add("text-red-700");
+                            })
+                            .ElseIf(args.Value).Gte(1000m)
+                            .Then(standard =>
+                            {
+                                standard.Element("deposit-signoff").Text.Set("The business office signs off on this deposit.");
+                                standard.Element("deposit-signoff").ClassList.Remove("text-red-700");
+                            })
+                            .Else(small =>
+                            {
+                                small.Element("deposit-signoff").Text.Set("No sign-off is needed for this deposit.");
+                                small.Element("deposit-signoff").ClassList.Remove("text-red-700");
+                            });
+                    }); }
+            </native-grid>
+            <p id="offer-summary" class="text-sm">Choose a care level to start the offer.</p>
+            <p id="deposit-signoff" class="text-sm">No sign-off is needed for this deposit.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <div id="room-section"><native-vstack gap="Base">
+            <native-heading level="H2">Room</native-heading>
+            <native-grid cols="C3" gap="Base">
+                @{ Html.InputField(plan, m => m.Room.Wing, o => o.Label("Wing"))
+                    .NativeDropDown(b => b.Items(wings).Placeholder("-- Choose a wing --").CssClass(Field))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                    {
+                        p.When(args.Value).Eq("Maple")
+                            .Then(maple =>
+                            {
+                                maple.Component<NativeDropDown>(m => m.Room.Floor).Value.Set("1");
+                                maple.Component<FusionNumericTextBox>(m => m.Room.MonthlyRate).Value.Set(4200);
+                                maple.Element("wing-note").Text.Set("Maple rooms are on the first floor, beside the dining room.");
+                            })
+                            .ElseIf(args.Value).Eq("Oak")
+                            .Then(oak =>
+                            {
+                                oak.Component<NativeDropDown>(m => m.Room.Floor).Value.Set("2");
+                                oak.Component<FusionNumericTextBox>(m => m.Room.MonthlyRate).Value.Set(4800);
+                                oak.Element("wing-note").Text.Set("Oak rooms are on the second floor, with garden views.");
+                            })
+                            .ElseIf(args.Value).Eq("Cedar")
+                            .Then(cedar =>
+                            {
+                                cedar.Component<NativeDropDown>(m => m.Room.Floor).Value.Set("3");
+                                cedar.Component<FusionNumericTextBox>(m => m.Room.MonthlyRate).Value.Set(6100);
+                                cedar.Element("wing-note").Text.Set("Cedar is the secured memory care wing, on the third floor.");
+                            })
+                            .Else(none =>
+                            {
+                                none.Component<NativeDropDown>(m => m.Room.Floor).Value.Set("");
+                                none.Component<FusionNumericTextBox>(m => m.Room.MonthlyRate).Value.Set(0);
+                                none.Element("wing-note").Text.Set("Choose a wing to see its floor and rate.");
+                            });
+                    }); }
+
+                @{ Html.InputField(plan, m => m.Room.Floor, o => o.Label("Floor"))
+                    .NativeDropDown(b => b.Items(floors).Placeholder("-- Choose a floor --").CssClass(Field)); }
+
+                @{ Html.InputField(plan, m => m.Room.MonthlyRate, o => o.Label("Monthly rate"))
+                    .FusionNumericTextBox(b => b.Min(0).Max(20000).Step(50).Format("c0"))
+                    .Reactive(evt => evt.Change, (args, p) => p.Element("offer-rate").Text.Set(args.Value)); }
+            </native-grid>
+            <p id="wing-note" class="text-sm text-text-secondary">Choose a wing to see its floor and rate.</p>
+            <native-text>Monthly rate on the offer letter: $<span id="offer-rate">0</span></native-text>
+        </native-vstack></div>
+    </native-card-body></native-card>
+    </div>
+
+    <native-hstack gap="Sm" class="flex-wrap">
+        @(Html.NativeButton("send-offer-btn", "Send the offer")
+            .CssClass(ButtonPrimary)
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+            {
+                p.Post(Url.SandboxRoute("Send", "RoomOffer")).Gather(g => g.Form("room-offer-form"))
+                 .Response(r => r.OnSuccess<RoomOfferSent>((sent, s) =>
+                     s.Element("offer-status").Text.Set(sent.Get(x => x.Confirmation))));
+            }))
+        @(Html.NativeButton("start-over-btn", "Start over")
+            .CssClass(ButtonSecondary)
+            .Reactive(plan, evt => evt.Click, (args, p) => p.Dispatch(RoomOfferEvents.StartedOver)))
+    </native-hstack>
+    <p id="offer-status" class="text-sm text-text-muted">Not sent yet.</p>
+</native-vstack>
+
+@Html.RenderPlan(plan)

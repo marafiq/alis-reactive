@@ -1,0 +1,20 @@
+@using Alis.Reactive.Framework.App.Partials
+@model HandoverPage
+@{
+    ViewData["Title"] = "A handover";
+    var plan = Html.ReactivePlan<HandoverPage>();
+}
+<h1>A room's handover</h1>
+
+<form id="handover-form">
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+    @* The keyholder's line is the editor template of its own model, rendered under the member's prefix; it carries
+       the handover's save, which checks this form. *@
+    @Html.EditorFor(m => m.Keyholder)
+</form>
+
+<p>The handover's endpoint bound: <span id="handed-over"></span></p>
+
+<section id="handover-messages" aria-label="The handover's messages">
+    @Html.RenderPlan(plan)
+</section>

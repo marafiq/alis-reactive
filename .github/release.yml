@@ -26,7 +26,6 @@ changelog:
     - title: Refactoring and code quality
       labels:
         - refactor
-        - sonarqube
     - title: Documentation
       labels:
         - documentation

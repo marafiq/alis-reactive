@@ -1,109 +1,93 @@
 @model DateRangePickerModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    ViewData["Title"] = "FusionDateRangePicker";
+    ViewData["Title"] = "Respite Stay";
+
+    const string ButtonPrimary = "self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    const string ButtonSecondary = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
 
     var plan = Html.ReactivePlan<DateRangePickerModel>();
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
-        p.Element("start-echo").SetText(comp.StartDate());
-        p.Element("end-echo").SetText(comp.EndDate());
-    }));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">FusionDateRangePicker — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises all supported FusionDateRangePicker API: property reads (startDate + endDate),
-        events with typed conditions, and component-read conditions.
-        Senior living domain: resident stay periods.
-    </native-text>
+    <div>
+        <native-heading level="H1">Respite Stay</native-heading>
+        <native-text color="Secondary">
+            Eleanor Voss comes to Garden Suite 3 while her daughter travels. Respite is $245 a night, and a stay
+            covers at most 30 days.
+        </native-text>
+    </div>
 
     <native-card><native-card-body>
-        <native-heading level="H2">1. Property Read (StartDate + EndDate)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the date range component's <code>startDate</code> and <code>endDate</code>
-            properties and displays them in text elements.
-        </p>
-        <native-grid cols="C2" gap="Base">
-            @{ Html.InputField(plan, m => m.StayPeriod, o => o.Label("Stay Period"))
-                .FusionDateRangePicker(b => b
-                    .Placeholder("Select stay period")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.Element("change-start").SetText(args, x => x.StartDate);
-                        p.Element("change-end").SetText(args, x => x.EndDate);
-                        p.When(args, x => x.StartDate).NotNull()
-                            .Then(t => t.Element("args-condition").SetText("stay period selected"))
-                            .Else(e => e.Element("args-condition").SetText("no period"));
-                        var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
-                        p.When(comp.StartDate()).NotNull()
-                            .Then(then =>
-                            {
-                                then.Element("selected-indicator").Show();
-                                then.Element("selected-indicator").SetText("stay period confirmed");
-                            })
-                            .Else(else_ =>
-                            {
-                                else_.Element("selected-indicator").Hide();
-                            });
-                    })); }
-        </native-grid>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Sources)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the date range component's <code>startDate</code> and <code>endDate</code>
-            via component sources.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Start echo: <span id="start-echo" class="text-text-muted">&mdash;</span></p>
-            <p>End echo: <span id="end-echo" class="text-text-muted">&mdash;</span></p>
+        <native-vstack gap="Sm">
+            <native-hstack gap="Sm" align="Center" class="flex-wrap">
+                <p class="text-sm">The family asked for Thursday, December 10 to Thursday, December 17.</p>
+                @(Html.NativeButton("use-family-dates-btn", "Use the Family's Dates")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Component<FusionDateRangePicker>(m => m.StayPeriod).Value
+                            .Set(new[] { DateRangePickerModel.FamilyArrival, DateRangePickerModel.FamilyDeparture })))
+            </native-hstack>
+            <native-hstack gap="Sm" align="Center" class="flex-wrap">
+                <p class="text-sm">Garden Suite 3 is free from Monday, December 7 through Sunday, December 20.</p>
+                @(Html.NativeButton("arrive-when-free-btn", "Arrive Monday, December 7")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Component<FusionDateRangePicker>(m => m.StayPeriod).StartDate.Set(DateRangePickerModel.SuiteFreeFrom)))
+                @(Html.NativeButton("stay-until-booked-btn", "Stay Through Sunday, December 20")
+                    .CssClass(ButtonSecondary)
+                    .Reactive(plan, evt => evt.Click, (_, p) =>
+                        p.Component<FusionDateRangePicker>(m => m.StayPeriod).EndDate.Set(DateRangePickerModel.SuiteFreeThrough)))
+            </native-hstack>
         </native-vstack>
-    </native-card-body></native-card>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Events (Changed + Typed Condition)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            The stay period field wires a Changed event. Change shows start and end dates.
-            <code>When(args, x =&gt; x.StartDate).NotNull()</code> tests typed event-args condition.
-        </p>
-        <native-vstack gap="Xs" class="font-mono text-sm">
-            <p>Change start: <span id="change-start" class="text-text-muted">&mdash;</span></p>
-            <p>Change end: <span id="change-end" class="text-text-muted">&mdash;</span></p>
-            <p>Args condition: <span id="args-condition" class="text-text-muted">&mdash;</span></p>
-            <p>Confirmed: <span id="selected-indicator" hidden class="text-emerald-600">&mdash;</span></p>
-        </native-vstack>
-    </native-card-body></native-card>
-
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads stay start via <code>When(comp.StartDate()).IsEmpty()</code>
-            and shows a warning or confirmation.
-        </p>
-        <native-hstack gap="None" class="mt-3">
-            @(Html.NativeButton("check-stay-btn", "Check Stay Period")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
+        <div id="respite-form" class="mt-4">
+            @{ Html.InputField(plan, m => m.StayPeriod, o => o.Required().Label("Stay"))
+                .FusionDateRangePicker(b => b.Placeholder("Choose the arrival and departure days"))
+                .Reactive(evt => evt.Change, (args, p) =>
                 {
-                    var comp = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
-                    p.When(comp.StartDate()).IsEmpty()
-                        .Then(t => t.Element("stay-warning").SetText("stay period is required"))
-                        .Else(e => e.Element("stay-warning").SetText("stay period set"));
-                }))
-        </native-hstack>
-        <p class="font-mono text-sm mt-2">Warning: <span id="stay-warning" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                    p.Element("stay-length").Text.Set(args.DaySpan);
+                    p.When(args.DaySpan).Gt(30)
+                        .Then(admission => admission.Element("long-stay-note").Show())
+                        .Else(respite => respite.Element("long-stay-note").Hide());
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+                    p.When(args.IsInteracted).Truthy()
+                        .Then(picked => picked.Element("stay-source").Text.Set("Dates you picked."))
+                        .Else(filled => filled.Element("stay-source").Text.Set("Dates filled in for you. Read them back to the family."));
+
+                    p.When(args.StartDate).NotNull().And(args.EndDate).NotNull()
+                        .Then(stay => stay.Get(Url.SandboxRoute("Quote", "DateRangePicker"))
+                            .Gather<RespiteStayDates>(g => g.Set(x => x.Arrives, args.StartDate).Set(x => x.Leaves, args.EndDate))
+                            .Response(r => r.OnSuccess<RespiteQuote>((quote, s) =>
+                                s.Element("stay-quote").Text.Set(quote.Get(x => x.Quote)))))
+                        .Else(none => none.Element("stay-quote").Text.Set("Pick the stay dates to see the price."));
+                }); }
+            <p id="stay-source" class="mt-1 text-xs text-text-muted"></p>
+        </div>
+
+        <native-vstack gap="Xs" class="mt-4 text-sm">
+            <p>Length of stay: <span id="stay-length">0</span> days</p>
+            <p id="stay-quote">Pick the stay dates to see the price.</p>
+            <p id="long-stay-note" hidden class="text-amber-700">A stay over 30 days is an admission, not respite. Call the admissions office.</p>
+        </native-vstack>
+
+        <native-hstack gap="Sm" align="Center" class="mt-4 flex-wrap">
+            @(Html.NativeButton("reserve-stay-btn", "Reserve Stay")
+                .CssClass(ButtonPrimary)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                {
+                    var stay = p.Component<FusionDateRangePicker>(m => m.StayPeriod);
+                    p.Post(Url.SandboxRoute("Reserve", "DateRangePicker"))
+                        .Gather<RespiteStayDates>(g => g.Set(x => x.Arrives, stay.StartDate).Set(x => x.Leaves, stay.EndDate))
+                        .Validate<StayReservationValidator>("respite-form")
+                        .Response(r => r
+                            .OnSuccess<StayReservation>((reserved, s) =>
+                                s.Element("stay-reservation-status").Text.Set(reserved.Get(x => x.Confirmation)))
+                            .OnError(400, e => e.ValidationErrors("respite-form")));
+                }))
+            <p id="stay-reservation-status" class="text-sm text-text-muted">No stay reserved yet.</p>
+        </native-hstack>
     </native-card-body></native-card>
 </native-vstack>
 

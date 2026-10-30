@@ -1,18 +1,12 @@
-using Alis.Reactive.PlanModel;
-
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive
 {
     /// <summary>
-    /// Preserves the property type through condition and reaction authoring
-    /// for compile-time type safety.
+    /// A value read when a step runs, typed by C#: an object's property, what a method returns, an event's
+    /// payload, a response, the URL or an array. It goes wherever the DSL takes a value, a method's
+    /// argument included.
     /// </summary>
-    public abstract class TypedSource<TProp>
+    /// <typeparam name="TProp">The value's type.</typeparam>
+    public abstract class TypedSource<TProp> : Arg<TProp>
     {
-        internal abstract ValueExpression ToValueExpression();
-
-        internal Shape Shape => Shape.FromClrType(typeof(TProp));
-
-        internal Shape ElementShape =>
-            Shape.CollectionItemShapeOrNone(typeof(TProp));
     }
 }

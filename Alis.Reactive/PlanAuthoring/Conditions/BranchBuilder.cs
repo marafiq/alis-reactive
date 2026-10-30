@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
@@ -15,92 +13,28 @@ namespace Alis.Reactive.Builders.Conditions
     /// <typeparam name="TModel">View model that owns the branch pipeline.</typeparam>
     public sealed class BranchBuilder<TModel> where TModel : class
     {
-        private readonly List<BranchCase> _cases;
-        private bool _hasDefaultCase;
+        private readonly PlanBuildContext _context;
+        private readonly BranchStep _branch;
 
-        internal PipelineBuilder<TModel> Pipeline { get; }
-
-        internal BranchBuilder(PipelineBuilder<TModel> pipeline, List<BranchCase> cases)
+        internal BranchBuilder(PlanBuildContext context, BranchStep branch)
         {
-            Pipeline = pipeline;
-            _cases = cases;
-        }
-
-        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
-        /// <param name="payload">Trigger payload placeholder.</param>
-        /// <param name="path">Payload value compared at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> ElseIf<TPayload, TProp>(
-            TPayload payload,
-            Expression<Func<TPayload, TProp>> path)
-        {
-            EnsureElseIfCanBeAdded();
-
-            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
-        }
-
-        /// <summary>Adds the next ordered <c>ElseIf</c> branch from the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
-        /// <param name="path">Selects the response value to compare at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> ElseIf<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody,
-            Expression<Func<TResponse, TProp>> path)
-            where TResponse : class
-        {
-            EnsureElseIfCanBeAdded();
-
-            var source = responseBody.Read(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
+            _context = context;
+            _branch = branch;
         }
 
         /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">Typed condition value source.</param>
-        public ConditionSourceBuilder<TModel, TProp> ElseIf<TProp>(TypedSource<TProp> source)
-        {
-            EnsureElseIfCanBeAdded();
-
-            return new ConditionSourceBuilder<TModel, TProp>(source, this);
-        }
+        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> ElseIf<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
+                source, graph => new GuardBuilder<TModel>(graph, ConditionContinuation<TModel>.ForBranch(this)));
 
         /// <summary>Adds the default branch that runs when no earlier branch matched.</summary>
         /// <param name="pipeline">Builds the reactions for the default branch.</param>
-        public void Else(Action<PipelineBuilder<TModel>> pipeline)
-        {
-            EnsureDefaultCanBeAdded();
+        public void Else(Action<PipelineBuilder<TModel>> pipeline) =>
+            _branch.SetElse(PipelineBuilder<TModel>.Build(_context, pipeline));
 
-            var reactionPipeline = new PipelineBuilder<TModel>(Pipeline.Context);
-            pipeline(reactionPipeline);
-            _cases.Add(BranchCase.Default(reactionPipeline.BuildReaction()));
-            _hasDefaultCase = true;
-        }
-
-        internal void AddBranch(BranchCase branchCase)
-        {
-            EnsureBranchCanBeAdded();
-            _cases.Add(branchCase);
-        }
-
-        private void EnsureElseIfCanBeAdded()
-        {
-            if (_hasDefaultCase)
-                throw new InvalidOperationException("Cannot add ElseIf after Else.");
-        }
-
-        private void EnsureDefaultCanBeAdded()
-        {
-            if (_hasDefaultCase)
-                throw new InvalidOperationException("Else already called.");
-        }
-
-        private void EnsureBranchCanBeAdded()
-        {
-            if (_hasDefaultCase)
-                throw new InvalidOperationException("Cannot add branches after Else.");
-        }
+        internal void AddArm(Condition condition, Action<PipelineBuilder<TModel>> pipeline) =>
+            _branch.AddArm(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
     }
 }

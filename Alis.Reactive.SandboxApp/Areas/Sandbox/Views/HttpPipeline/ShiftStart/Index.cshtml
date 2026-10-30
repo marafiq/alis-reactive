@@ -1,0 +1,135 @@
+@model ShiftStartModel
+@using Alis.Reactive.Native.Components
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Shift Start";
+
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string Button = "self-start rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<ShiftStartModel>();
+    var partnersUrl = Url.SandboxRoute("Partners", "ShiftStart");
+    var sheetUrl = Url.SandboxRoute("Sheet", "ShiftStart");
+    var orderUrl = Url.SandboxRoute("Order", "ShiftStart");
+    var signUrl = Url.SandboxRoute("Sign", "ShiftStart");
+    var wings = new List<SelectListItem> { new SelectListItem("Maple", "Maple"), new SelectListItem("Cedar", "Cedar") };
+    var snacks = new List<SelectListItem> { new SelectListItem("Warm milk", "Warm milk"), new SelectListItem("Crackers", "Crackers") };
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Shift Start</native-heading>
+    <native-text color="Secondary">
+        Night shift, 11 PM. Check the floor's partners, open the wing's handover sheet, order the night
+        snacks and sign the board.
+    </native-text>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Partners</native-heading>
+            @(Html.NativeButton("check-partners-btn", "Check the pharmacy, the lab and the kitchen")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    // The gateway forwards each check to the partner its X-Partner header names; all
+                    // three are asked side by side, and the line below waits for all three.
+                    p.Element("checks-status").Text.Set("Checking with the pharmacy, the lab and the kitchen...");
+                    p.Parallel(
+                            pharmacy => pharmacy.Get(partnersUrl)
+                                .Gather(g => g.Header("X-Partner", "pharmacy"))
+                                .Response(r => r
+                                    .OnSuccess<PartnerAnswer>((answer, s) => s.Element("pharmacy-answer").Text.Set(answer.Get(x => x.Answer)))
+                                    .OnError(e => e.Element("pharmacy-answer").Text.Set("The pharmacy cannot be reached; call extension 21."))),
+                            lab => lab.Get(partnersUrl)
+                                .Gather(g => g.Header("X-Partner", "lab"))
+                                .Response(r => r
+                                    .OnSuccess<PartnerAnswer>((answer, s) => s.Element("lab-answer").Text.Set(answer.Get(x => x.Answer)))
+                                    .OnError<PartnerAnswer>(404, (nothing, e) => e.Element("lab-answer").Text.Set(nothing.Get(x => x.Answer)))
+                                    .OnError(e => e.Element("lab-answer").Text.Set("The lab cannot be reached; call extension 31."))),
+                            kitchen => kitchen.Get(partnersUrl)
+                                .Gather(g => g.Header("X-Partner", "kitchen"))
+                                .Response(r => r
+                                    .OnSuccess<PartnerAnswer>((answer, s) => s.Element("kitchen-answer").Text.Set(answer.Get(x => x.Answer)))
+                                    .OnError(e => e.Element("kitchen-answer").Text.Set("The kitchen cannot be reached; call extension 42."))))
+                        .OnAllSettled(done => done.Element("checks-status").Text.Set("All three checked."));
+                }))
+            <p id="checks-status" class="text-sm text-text-muted">Not checked this shift.</p>
+            <p id="pharmacy-answer" class="text-sm"></p>
+            <p id="lab-answer" class="text-sm"></p>
+            <p id="kitchen-answer" class="text-sm"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Handover sheet</native-heading>
+            @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing"))
+                .NativeDropDown(b => b.Items(wings).Placeholder("-- Choose a wing --").CssClass(Field)); }
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("open-sheet-btn", "Open the handover sheet")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(sheetUrl)
+                         .Gather<SheetRequest>(g => g.Set(x => x.Wing, p.Component<NativeDropDown>(m => m.Wing).Value))
+                         .Response(r => r
+                            .OnSuccess(s =>
+                            {
+                                s.Into("handover-sheet");
+                                s.Element("sheet-status").Text.Set("Handover sheet opened.");
+                            })
+                            .OnError<SheetMessage>(400, (choose, e) => e.Element("sheet-status").Text.Set(choose.Get(x => x.Message)))
+                            .OnError<SheetMessage>(404, (missing, e) => e.Element("sheet-status").Text.Set(missing.Get(x => x.Message))));
+                    }))
+                @(Html.NativeButton("sign-board-btn", "Sign the board")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // The board is signed for the wing chosen above; the desk answers with nothing to read.
+                        p.Post(signUrl)
+                         .Gather<BoardSignature>(g => g
+                             .Set(x => x.Nurse, "Nora Ellis")
+                             .Set(x => x.Wing, p.Component<NativeDropDown>(m => m.Wing).Value))
+                         .AsJson()
+                         .WhileLoading(l => l.Element("sign-status").Text.Set("Signing the board..."))
+                         .Response(r => r
+                            .OnSuccess(s => s.Element("sign-status").Text.Set("Board signed for the shift."))
+                            .OnError(400, e => e.Element("sign-status").Text.Set("Choose a wing before signing the board.")));
+                    }))
+            </native-hstack>
+            <p id="sheet-status" class="text-sm text-text-muted">No handover sheet open.</p>
+            <div id="handover-sheet"></div>
+            <p id="sign-status" class="text-sm text-text-muted">The board is not signed.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-heading level="H2">Night snacks</native-heading>
+            <native-grid cols="C3" gap="Base">
+                @{ Html.InputField(plan, m => m.Snack, o => o.Label("Snack"))
+                    .NativeDropDown(b => b.Items(snacks).Placeholder("-- Choose a snack --").CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.SnackCount, o => o.Label("How many"))
+                    .NativeTextBox(b => b.Type("number").CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.FloorNote, o => o.Label("Floor note"))
+                    .NativeTextBox(b => b.Placeholder("Stays on the floor").CssClass(Field)); }
+            </native-grid>
+            @(Html.NativeButton("order-snacks-btn", "Order from the kitchen")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    // The kitchen takes the order as a form post of the snack and the count; the floor
+                    // note is not part of the order.
+                    p.Post(orderUrl).Gather(g => g.Form(m => m.Snack, m => m.SnackCount))
+                     .AsFormData()
+                     .WhileLoading(l => l.Element("order-status").Text.Set("Ordering from the kitchen..."))
+                     .Response(r => r
+                        .OnSuccess<KitchenAnswer>((order, s) => s.Element("order-status").Text.Set(order.Get(x => x.Message)))
+                        .OnError<KitchenAnswer>(400, (refused, e) => e.Element("order-status").Text.Set(refused.Get(x => x.Message)))
+                        .OnError(e => e.Element("order-status").Text.Set("The kitchen's answer could not be read; call extension 42.")));
+                }))
+            <p id="order-status" class="text-sm text-text-muted">Nothing ordered yet.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

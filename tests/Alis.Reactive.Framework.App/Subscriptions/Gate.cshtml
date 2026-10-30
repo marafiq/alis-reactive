@@ -1,0 +1,40 @@
+@using Alis.Reactive.Framework.App.Subscriptions
+@model GatePage
+@{
+    ViewData["Title"] = "The front gate";
+    var plan = Html.ReactivePlan<GatePage>();
+}
+<h1>The front gate</h1>
+
+<p>The gate is <span id="gate">shut</span>.</p>
+<p>Last announcement: <span id="announcement"></span>, <span id="party"></span>, <span id="urgency"></span></p>
+
+@{ Html.On(plan, t => t
+    .CustomEvent(GateEvents.Opened, p => p.Element("gate").Text.Set("open"))
+    .CustomEvent(GateEvents.Announced, (announced, p) =>
+    {
+        p.When(announced.Get(x => x.Type)).IsNull()
+            .Then(none => none.Element("announcement").Text.Set("an announcement of no type"))
+            .Else(typed => typed.Element("announcement").Text.Set(announced.Get(x => x.Type)));
+        p.When(announced.Get(x => x.PartySize)).Gt(9)
+            .Then(large => large.Element("party").Text.Set("a large party"))
+            .Else(small => small.Element("party").Text.Set("a small party"));
+        p.When(announced.Get(x => x.Urgency)).Eq(GateUrgency.Urgent)
+            .Then(urgent => urgent.Element("urgency").Text.Set("urgent"))
+            .Else(routine => routine.Element("urgency").Text.Set("routine"));
+    })); }
+
+@* Markup that raises the app's events when clicked (grammar.md 6.1, D4): the gate's button raises an event that
+   carries nothing; the bell raises the announcement without its payload; each row raises it with its own, and a
+   click on the visitor's Details button is a click on the visitor's row. *@
+<button type="button" @Html.Raises(GateEvents.Opened)>Open the gate</button>
+<button type="button" @Html.Raises(GateEvents.Announced)>Ring the gate bell</button>
+<ul>
+    <li @Html.Raises(GateEvents.Announced, new Announcement { Type = "a visitor", PartySize = 1 })>
+        A visitor at the gate <button type="button">Details</button>
+    </li>
+    <li><button type="button" @Html.Raises(GateEvents.Announced, new Announcement { Type = "a delivery", PartySize = 1 })>A delivery at the gate</button></li>
+    <li><button type="button" @Html.Raises(GateEvents.Announced, new Announcement { Type = "a coach party", PartySize = 12, Urgency = GateUrgency.Urgent })>A coach party at the gate</button></li>
+</ul>
+
+@Html.RenderPlan(plan)

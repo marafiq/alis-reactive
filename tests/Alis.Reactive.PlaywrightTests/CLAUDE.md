@@ -1,6 +1,6 @@
 # Playwright Behavior Tests
 
-Root CLAUDE.md is authoritative. Load the `bdd-testing` skill before writing or
+Root CLAUDE.md is authoritative. Read `memory/bdd-principles.md` before writing or
 modifying any test here. Fixtures are C# — `modern-csharp` standards apply to
 them like any production code.
 
@@ -25,14 +25,14 @@ journey and owns its nested slice — model, view, fixture
 - Deterministic and hermetic. A test owns its world — per-page world keys, no
   process-global flags, no dependence on ambient server events. If a test
   passes only in isolation or only in sequence, it is broken.
-- Locators: prefer `PagePlan<TModel>` expressions; `ComponentScope` when the
-  model type is unavailable; raw locators only for explicit-ID elements.
+- Locators: prefer `PagePlan<TModel>` expressions (`Locators/`); raw locators only for
+  explicit-ID elements.
 
 ## When a test fails
 
 Triage in order: is the criterion right, the arrangement right, the tooling
 right? All yes → verify manually in browser to classify locator bug vs app bug.
-Locator bugs are fixed in `Playwright.Extensions`, app bugs in the app.
+Locator bugs are fixed in `Locators/`, app bugs in the app.
 Never hack the test to pass. After two fail-fix rounds, stop coding and
 research.
 

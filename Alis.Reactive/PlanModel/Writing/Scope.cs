@@ -1,0 +1,294 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Alis.Reactive.Grammar;
+
+namespace Alis.Reactive.PlanModel
+{
+    /// <summary>
+    /// Where a step or a value is written: the plan's objects and fresh names, and the names a callback
+    /// binds (its event parameter, the responses of the requests it sits in, an array item).
+    /// </summary>
+    internal sealed class Scope
+    {
+        private readonly PlanWriter _plan;
+        private readonly string? _item;
+        private readonly ResponseFrame? _responses;
+        private readonly ResultFrame _results;
+
+        private Scope(PlanWriter plan, string eventParam, ResponseFrame? responses, string? item, ResultFrame results)
+        {
+            _plan = plan;
+            EventParam = eventParam;
+            _responses = responses;
+            _item = item;
+            _results = results;
+        }
+
+        internal static Scope ForHandler(PlanWriter plan, string eventParam) => new Scope(plan, eventParam, null, null, new ResultFrame(null));
+
+        /// <summary>The scope of a block: it binds the method results its statements use, and sees its parent's.</summary>
+        internal Scope ForBlock() => new Scope(_plan, EventParam, _responses, _item, new ResultFrame(_results));
+
+        internal PlanObjects Objects => _plan.Objects;
+
+        internal string PlanId => _plan.PlanId;
+
+        internal string EventParam { get; }
+
+        internal string Item =>
+            _item ?? throw new InvalidOperationException("An array element is read outside an array operation.");
+
+        internal string Fresh(string stem) => _plan.Fresh(stem);
+
+        internal Scope WithResponse(ResponseHandle handle, string binding) =>
+            new Scope(_plan, EventParam, new ResponseFrame(handle, binding, _responses), _item, _results);
+
+        internal Scope WithItem(string name) => new Scope(_plan, EventParam, _responses, name, _results);
+
+        /// <summary>
+        /// What a method returned, bound once per block by a <c>let</c> hoisted before the statement that
+        /// first reads it; a later read in the block, or in a block inside it, is the name (grammar.md 3.1).
+        /// </summary>
+        internal Expr Result(object result, string stem, bool awaits, Func<Expr> call)
+        {
+            for (ResultFrame? frame = _results; frame != null; frame = frame.Outer)
+                if (frame.TryGet(result, out var bound)) return G.Ref(bound);
+
+            var name = Fresh(stem);
+            _plan.Hoist(G.Let(name, call(), awaits));
+            _results.Add(result, name);
+            _plan.Written(result);
+            return G.Ref(name);
+        }
+
+        /// <summary>
+        /// A promise's own line: written at the end of the block, at <paramref name="index"/>, unless a
+        /// statement of the block or of a block inside it bound the result first (grammar.md 3.1).
+        /// </summary>
+        internal void DeferOwnLine(object result, int index, Func<IReadOnlyList<Statement>> write) =>
+            _results.Defer(result, index, write);
+
+        internal void WriteDeferred(List<Statement> block)
+        {
+            foreach (var (result, index, write) in _results.Deferred)
+            {
+                if (_plan.WasWritten(result)) continue;
+                block.InsertRange(index, write());
+            }
+        }
+
+        /// <summary>The binding of the response the handle names; the innermost one for <see cref="ResponseHandle.Innermost"/>.</summary>
+        internal string Response(ResponseHandle handle)
+        {
+            if (handle == ResponseHandle.Innermost && _responses != null) return _responses.Binding;
+            for (var frame = _responses; frame != null; frame = frame.Outer)
+                if (frame.Handle == handle) return frame.Binding;
+            throw new InvalidOperationException(
+                $"Plan '{PlanId}' reads a response outside the routes of the request that receives it. Read a " +
+                "response inside OnSuccess, OnError or Chained of its request; Finally runs whether or not one came.");
+        }
+
+        /// <summary>
+        /// Writes one statement's worth of steps; the let that binds a method result the statement reads,
+        /// awaited when the method returns a promise, lands just before them.
+        /// </summary>
+        internal IReadOnlyList<Statement> WithHoisted(Func<IReadOnlyList<Statement>> write) => _plan.WithHoisted(write);
+
+        private sealed class ResultFrame
+        {
+            private readonly Dictionary<object, string> _bound = new Dictionary<object, string>();
+            private readonly List<(object Result, int Index, Func<IReadOnlyList<Statement>> Write)> _deferred =
+                new List<(object, int, Func<IReadOnlyList<Statement>>)>();
+
+            internal ResultFrame(ResultFrame? outer)
+            {
+                Outer = outer;
+            }
+
+            internal ResultFrame? Outer { get; }
+
+            internal bool TryGet(object result, out string name) => _bound.TryGetValue(result, out name!);
+
+            internal void Add(object result, string name) => _bound.Add(result, name);
+
+            internal void Defer(object result, int index, Func<IReadOnlyList<Statement>> write) => _deferred.Add((result, index, write));
+
+            // Later lines first, so an insertion never moves an earlier line's index.
+            internal IEnumerable<(object Result, int Index, Func<IReadOnlyList<Statement>> Write)> Deferred =>
+                _deferred.OrderByDescending(deferred => deferred.Index);
+        }
+
+        private sealed class ResponseFrame
+        {
+            internal ResponseFrame(ResponseHandle handle, string binding, ResponseFrame? outer)
+            {
+                Handle = handle;
+                Binding = binding;
+                Outer = outer;
+            }
+
+            internal ResponseHandle Handle { get; }
+
+            internal string Binding { get; }
+
+            internal ResponseFrame? Outer { get; }
+        }
+    }
+
+    /// <summary>
+    /// A request's response, named by the routes that read it. A body read inside a nested route still
+    /// reads the response of the request it names; <see cref="Innermost"/> reads the nearest one.
+    /// </summary>
+    internal sealed class ResponseHandle
+    {
+        internal static ResponseHandle Innermost { get; } = new ResponseHandle();
+    }
+
+    /// <summary>The plan being written: its objects, its fresh names and the statements hoisted before the one being written.</summary>
+    internal sealed class PlanWriter
+    {
+        private int _names;
+
+        // The method results a let has bound anywhere in the plan being written.
+        private readonly HashSet<object> _written = new HashSet<object>();
+
+        // The statements hoisted before the statement being written, such as the let that binds a method's
+        // result; null outside a statement, where no value reads a method's result.
+        private List<Statement>? _hoisted;
+
+        internal PlanWriter(string planId, PlanObjects objects)
+        {
+            PlanId = planId;
+            Objects = objects;
+        }
+
+        internal string PlanId { get; }
+
+        internal PlanObjects Objects { get; }
+
+        internal string Fresh(string stem) => stem + (++_names).ToString(CultureInfo.InvariantCulture);
+
+        internal void Written(object result) => _written.Add(result);
+
+        internal bool WasWritten(object result) => _written.Contains(result);
+
+        internal IReadOnlyList<Statement> WithHoisted(Func<IReadOnlyList<Statement>> write)
+        {
+            var outer = _hoisted;
+            var hoisted = new List<Statement>();
+            _hoisted = hoisted;
+            try
+            {
+                var statements = write();
+                return hoisted.Count == 0 ? statements : hoisted.Concat(statements).ToList();
+            }
+            finally
+            {
+                _hoisted = outer;
+            }
+        }
+
+        internal void Hoist(Statement statement) => _hoisted!.Add(statement);
+    }
+
+    /// <summary>
+    /// The objects a plan names, in the order it first names them: elements by id and vendor, and the
+    /// modules a bundle registered (the document, HTTP, forms, slots, streams, hubs, plugins).
+    /// </summary>
+    internal sealed class PlanObjects
+    {
+        internal const string DocumentId = "$document";
+        internal const string HttpId = "$http";
+        internal const string ModelId = "$model";
+        internal const string ConfirmId = "$confirm";
+
+        private readonly Dictionary<string, ObjectLocator> _objects = new Dictionary<string, ObjectLocator>(StringComparer.Ordinal);
+        private readonly List<string> _order = new List<string>();
+        private readonly Dictionary<string, ComponentVendor> _elementVendors = new Dictionary<string, ComponentVendor>(StringComparer.Ordinal);
+        private readonly Dictionary<string, Vendor> _vendors = new Dictionary<string, Vendor>(StringComparer.Ordinal);
+
+        internal PlanObjects(IEnumerable<DeclaredObject> declared)
+        {
+            foreach (var element in declared)
+            {
+                _elementVendors[element.Id] = element.Vendor;
+                Element(element.Id);
+            }
+        }
+
+        internal string Element(string id)
+        {
+            if (_objects.ContainsKey(id)) return id;
+            if (!_elementVendors.TryGetValue(id, out var vendor))
+                throw new InvalidOperationException($"Element '{id}' is used by a step before the plan declared it.");
+            AddVendor(vendor.Name, vendor.ToGrammar());
+            Add(id, new ElementLocator(id, vendor.Name));
+            return id;
+        }
+
+        internal string Document() => PluginObject(DocumentId, "alis.document", "", PluginData.None);
+
+        internal string Http() => PluginObject(HttpId, "alis.http", "", PluginData.None);
+
+        internal string Confirm() => PluginObject(ConfirmId, "alis.confirm", "", PluginData.None);
+
+        // The page's one table of mounted inputs, which every plan joins with the inputs it rendered (grammar.md 6.3).
+        internal string Model(ModelPluginData data) => PluginObject(ModelId, "alis.model", "", data);
+
+        internal string Model() => PluginObject(ModelId, "alis.model", "", PluginData.None);
+
+        /// <summary>The mounted inputs inside the element with this id, whichever plan rendered them (grammar.md M1).</summary>
+        internal string Inputs(string containerId) => PluginObject("$inputs:" + containerId, "alis.model", containerId, PluginData.None);
+
+        internal string Form(string containerId, FormPluginData data) => PluginObject("$form:" + containerId, "alis.form", containerId, data);
+
+        internal string Form(string containerId) => PluginObject("$form:" + containerId, "alis.form", containerId, PluginData.None);
+
+        internal string Slot(string containerId) => PluginObject("$slot:" + containerId, "alis.slot", containerId, PluginData.None);
+
+        internal string Stream(string url) => PluginObject("$stream:" + url, "alis.stream", url, PluginData.None);
+
+        internal string Hub(string url) => PluginObject("$hub:" + url, "alis.hub", url, new HubPluginData());
+
+        internal string Plugin(string name) => PluginObject("$plugin:" + name, name, "", PluginData.None);
+
+        internal IReadOnlyDictionary<string, ObjectLocator> Snapshot()
+        {
+            var snapshot = new Dictionary<string, ObjectLocator>(StringComparer.Ordinal);
+            foreach (var id in _order) snapshot.Add(id, _objects[id]);
+            return snapshot;
+        }
+
+        internal IReadOnlyDictionary<string, Vendor> Vendors() =>
+            _vendors.OrderBy(v => v.Key, StringComparer.Ordinal).ToDictionary(v => v.Key, v => v.Value, StringComparer.Ordinal);
+
+        // A plugin object is declared once, with its data where it has any: the plan writes the model's
+        // inputs and each form's rules before any step names them.
+        private string PluginObject(string id, string name, string key, PluginData data)
+        {
+            if (!_objects.ContainsKey(id))
+                Add(id, new PluginLocator(name, key, data));
+            return id;
+        }
+
+        private void Add(string id, ObjectLocator locator)
+        {
+            _objects.Add(id, locator);
+            _order.Add(id);
+        }
+
+        private void AddVendor(string name, Vendor vendor)
+        {
+            if (_vendors.TryGetValue(name, out var declared))
+            {
+                if (!declared.SameAs(vendor))
+                    throw new InvalidOperationException($"Two different vendors are named '{name}'. Give each vendor its own name.");
+                return;
+            }
+
+            _vendors.Add(name, vendor);
+        }
+    }
+}

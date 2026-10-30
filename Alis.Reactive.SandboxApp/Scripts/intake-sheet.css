@@ -1,0 +1,49 @@
+/* The intake sheet the sandbox wrote itself (intake-sheet.ts). */
+.intake-sheet {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d6dde6;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  font-size: 0.875rem;
+}
+
+.intake-sheet .is-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.intake-sheet .is-field {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.intake-sheet .is-label {
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+.intake-sheet input[type="text"],
+.intake-sheet input[type="number"],
+.intake-sheet input[type="date"],
+.intake-sheet select {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background: #fff;
+}
+
+.intake-sheet input[type="checkbox"] {
+  justify-self: start;
+  width: 1rem;
+  height: 1rem;
+}
+
+.intake-sheet .is-footer {
+  display: flex;
+  gap: 1rem;
+  color: #64748b;
+  font-size: 0.75rem;
+}

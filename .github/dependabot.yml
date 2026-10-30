@@ -1,7 +1,7 @@
 # Monthly, grouped dependency updates: at most one PR per ecosystem per month. npm and NuGet get minor
 # and patch only; GitHub Actions get every version, majors included, because an action's major tracks
 # the runner's Node runtime and the PR's own CI run is the proof.
-# Every Dependabot PR runs the full gate (five browser shards), so fewer, bigger PRs save runner time;
+# Every Dependabot PR runs the full gate (every browser shard), so fewer, bigger PRs save runner time;
 # the maintainer may also cherry-pick several of them onto one branch, prove it locally with
 # scripts/test.sh, and land them in a single PR (docs/CI.md, "Dependency updates").
 # npm and NuGet majors are never proposed automatically: they are upgraded deliberately, one at a time.
@@ -44,25 +44,6 @@ updates:
       # versions move together to the same exact version, one patch behind the newest weekly
       # release, and every major needs a new license key.
       - dependency-name: "@syncfusion/*"
-
-  - package-ecosystem: npm
-    directory: /docs-site
-    schedule:
-      interval: monthly
-      time: "06:00"
-      timezone: Etc/UTC
-    labels: [dependencies]
-    open-pull-requests-limit: 2
-    groups:
-      docs-site-minor-and-patch:
-        patterns: ["*"]
-        update-types: [minor, patch]
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-      # Starlight is 0.x, so its "minor" releases can raise the Astro major it needs (0.42 requires
-      # Astro 7): it moves together with Astro in one deliberate docs-site upgrade.
-      - dependency-name: "@astrojs/starlight"
 
   - package-ecosystem: nuget
     directory: /

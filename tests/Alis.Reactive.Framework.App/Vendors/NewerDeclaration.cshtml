@@ -1,0 +1,54 @@
+@using Alis.Reactive.Framework.App.Vendors
+@model NewerDeclarationPage
+@{
+    ViewData["Title"] = "A declaration newer than its component";
+    var plan = Html.ReactivePlan<NewerDeclarationPage>();
+}
+<h1>A declaration newer than its component</h1>
+
+@(plan.NewerSlate("slate", title: "Round", "Monday")
+    .Reactive(slate => slate.RowAdded, (added, p) =>
+    {
+        p.Element("added-count").Text.Set(added.Count);
+        p.Element("added-row").Text.Set(added.Row.Label);
+        p.Element("added-read").Text.Set("read");
+    }))
+
+<p>Rows now: <span id="added-count"></span> · the row passed: <span id="added-row">not read yet</span> · the payload was <span id="added-read"></span></p>
+<p>Tried: <span id="tried"></span> · finished: <span id="finished"></span> · read: <span id="read"></span></p>
+<p>Title read: <span id="title-read"></span></p>
+
+@(plan.Button("read-pins", "Read the pins")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<NewerSlate>("slate");
+        p.Element("tried").Text.Set("reading the pins");
+        p.Element("read").Text.Set(slate.Pins);
+        p.Element("finished").Text.Set("reading the pins");
+    }))
+@(plan.Button("pin", "Mark the slate pinned")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("marking it pinned");
+        p.Component<NewerSlate>("slate").Pinned.Set(true);
+        p.Element("finished").Text.Set("marking it pinned");
+    }))
+@(plan.Button("call-pin", "Pin the slate")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("pinning it");
+        p.Component<NewerSlate>("slate").Pin();
+        p.Element("finished").Text.Set("pinning it");
+    }))
+@(plan.Button("read-last-card", "Read the last card's name")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<NewerSlate>("slate");
+        p.Element("tried").Text.Set("reading the last card");
+        p.Element("read").Text.Set(slate.LastCard.Name);
+        p.Element("finished").Text.Set("reading the last card");
+    }))
+@(plan.Button("read-title", "Read the title")
+    .Reactive(button => button.Click, p => p.Element("title-read").Text.Set(p.Component<NewerSlate>("slate").Title)))
+
+@Html.RenderPlan(plan)

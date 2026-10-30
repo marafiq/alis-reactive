@@ -1,0 +1,64 @@
+@model OutingModel
+@using Alis.Reactive.Native.Components
+@{
+    ViewData["Title"] = "Outing Companion";
+    var plan = Html.ReactivePlan<OutingModel>();
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string Action = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Resident Outing</native-heading>
+    <native-text color="Secondary">
+        Plan an outing for Helen Park. Add a companion when one comes along: their details are asked
+        for only while they are on the outing.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="outing-form" class="flex flex-col gap-4">
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))
+                    .NativeTextBox(b => b.Placeholder("Full name").CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.Destination, o => o.Required().Label("Destination"))
+                    .NativeTextBox(b => b.Placeholder("Where the outing goes").CssClass(Field)); }
+            </native-grid>
+
+            @* The companion is a partial loaded into this slot and replaced when removed. *@
+            <div id="companion-slot">
+                @await Html.PartialAsync("~/Areas/Sandbox/Views/Validation/OutingCompanion/_NoCompanion.cshtml")
+            </div>
+        </form>
+        <native-hstack gap="Base" class="mt-4">
+            @(Html.NativeButton("add-companion-btn", "Add a companion")
+                .CssClass(Action)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(Url.SandboxRoute("Companion", "OutingCompanion"))
+                     .Response(r => r.OnSuccess(s => s.Into("companion-slot")));
+                }))
+            @(Html.NativeButton("remove-companion-btn", "Remove the companion")
+                .CssClass(Action)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Get(Url.SandboxRoute("NoCompanion", "OutingCompanion"))
+                     .Response(r => r.OnSuccess(s => s.Into("companion-slot")));
+                }))
+            @(Html.NativeButton("save-outing-btn", "Save outing")
+                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    p.Post(Url.SandboxRoute("Save", "OutingCompanion")).Gather(g => g.Form())
+                     .Validate<OutingValidator>("outing-form")
+                     .Response(r => r
+                        .OnSuccess<OutingConfirmation>((json, s) =>
+                        {
+                            s.Element("outing-status").Text.Set(json.Get(x => x.Confirmation));
+                        })
+                        .OnError(400, e => e.ValidationErrors("outing-form")));
+                }))
+        </native-hstack>
+        <p id="outing-status" class="mt-3 text-sm text-text-muted">No outing saved yet.</p>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

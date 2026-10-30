@@ -2,7 +2,7 @@
 bin/
 obj/
 packages/
-# Runtime JS/CSS the package targets copy in at build (version-stamped).
-Content/alisreactive/
+# Browser files each package's net48 targets copy in at build: Content\{PackageId}\.
+Content/AlisReactive*/
 *.user
 *.suo

@@ -1,0 +1,104 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Framework.App.Plans
+@model PlanRefusalsPage
+@{
+    ViewData["Title"] = "A refused plan";
+    var plan = Html.ReactivePlan<PlanRefusalsPage>();
+}
+<h1>A refused plan</h1>
+
+@switch (Model.Mistake)
+{
+    case PlanMistake.RenderAComponentWithNoId:
+        @(plan.Render<Button>("", new HtmlString("<button type=\"button\">Send</button>")))
+        break;
+    case PlanMistake.NameAPluginWithASpace:
+        plan.RegisterPlugin<SpacedNightLog>();
+        break;
+    case PlanMistake.GiveAPluginNoName:
+        plan.RegisterPlugin<UnnamedNightLog>();
+        break;
+    case PlanMistake.GiveAHeaderNoName:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits").Gather(g => g.Header("", "night"))))
+        break;
+    case PlanMistake.NameARoutePlaceholderWithADash:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Get("/Plans/Rooms/{room-number}")))
+        break;
+    case PlanMistake.ReadAnotherPlansComponent:
+        var board = Html.ReactivePlan<PlanRefusalsPage>();
+        TypedSource<string>? title = null;
+        @plan.Slate("slate", title: "Round")
+        @(plan.Button("read-title", "Read the title").Reactive(button => button.Click, p => title = p.Component<Slate>("slate").Title))
+        @(board.Button("copy-title", "Copy the title").Reactive(button => button.Click, p => p.Element("copied").Text.Set(title!)))
+        <span id="copied"></span>
+        @Html.RenderPlan(board)
+        break;
+    case PlanMistake.ReadAResponseOutsideItsRoutes:
+        TypedSource<string>? summary = null;
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p =>
+        {
+            p.Post("/Plans/Visits").Response(r => r.OnSuccess<Booked>((booked, s) => summary = booked.Get(x => x.Summary)));
+            p.Element("booked").Text.Set(summary!);
+        }))
+        <span id="booked"></span>
+        break;
+    case PlanMistake.ReadTheResponseInFinally:
+        TypedSource<string>? answer = null;
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r.OnSuccess<Booked>((booked, s) => answer = booked.Get(x => x.Summary)))
+            .Finally(f => f.Element("booked").Text.Set(answer!))))
+        <span id="booked"></span>
+        break;
+    case PlanMistake.LoadTheResponseInFinally:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Get("/Plans/Notice")
+            .Finally(f => f.Into("notice"))))
+        <div id="notice"></div>
+        break;
+    case PlanMistake.RouteAStatusHttpDoesNotHave:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r.OnError(600, e => e.Element("refused").Text.Set("refused")))))
+        break;
+    case PlanMistake.RouteASuccessTwice:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r
+                .OnSuccess(s => s.Element("booked").Text.Set("booked"))
+                .OnSuccess(s => s.Element("booked").Text.Set("booked again")))))
+        <span id="booked"></span>
+        break;
+    case PlanMistake.RouteEveryErrorTwice:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r
+                .OnError(e => e.Element("refused").Text.Set("refused"))
+                .OnError(e => e.Element("refused").Text.Set("refused again")))))
+        <span id="refused"></span>
+        break;
+    case PlanMistake.RouteAStatusTwice:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r
+                .OnError(409, e => e.Element("refused").Text.Set("taken"))
+                .OnError(409, e => e.Element("refused").Text.Set("taken again")))))
+        <span id="refused"></span>
+        break;
+    case PlanMistake.ChainTwoRequests:
+        @* ALIS007 refuses .Chained(..).Chained(..) at compile time; written as two statements, the builder refuses it. *@
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r =>
+            {
+                r.Chained(next => next.Get("/Plans/Notice"));
+                r.Chained(next => next.Get("/Plans/Notice"));
+            })))
+        break;
+    case PlanMistake.WriteAStepAfterItsCallbackReturned:
+        PipelineBuilder<PlanRefusalsPage>? kept = null;
+        Html.On(plan, t => t.DomReady(p => kept = p));
+        kept!.Element("status").Text.Set("late");
+        <span id="status"></span>
+        break;
+    case PlanMistake.RegisterAPluginTwice:
+        plan.RegisterPlugin<NightLog>();
+        plan.RegisterPlugin<NightLog>();
+        break;
+}
+
+@Html.RenderPlan(plan)

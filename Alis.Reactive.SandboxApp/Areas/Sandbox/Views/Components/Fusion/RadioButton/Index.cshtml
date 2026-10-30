@@ -1,5 +1,4 @@
 @model FusionRadioButtonModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -32,37 +31,37 @@
                     .Name("roomChoice")
                     .Value("Studio Apartment")
                     .Label("Studio apartment"))
-                    .Reactive(evt => evt.Changed, (args, p) =>
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("chosen-room").SetText(args, x => x.Value);
-                        p.Element("room-detail").SetText("A studio suits a resident who wants a compact, easy-to-navigate space.");
-                        p.Element("companion-availability").SetText("");
+                        p.Element("chosen-room").Text.Set(args.Value);
+                        p.Element("room-detail").Text.Set("A studio suits a resident who wants a compact, easy-to-navigate space.");
+                        p.Element("companion-availability").Text.Set("");
                     }))
 
                 @(Html.FusionRadioButton(plan, oneBedroomId, b => b
                     .Name("roomChoice")
                     .Value("One-Bedroom Apartment")
                     .Label("One-bedroom apartment"))
-                    .Reactive(evt => evt.Changed, (args, p) =>
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("chosen-room").SetText(args, x => x.Value);
-                        p.Element("room-detail").SetText("A one-bedroom gives a separate living area for visiting family.");
-                        p.Element("companion-availability").SetText("");
+                        p.Element("chosen-room").Text.Set(args.Value);
+                        p.Element("room-detail").Text.Set("A one-bedroom gives a separate living area for visiting family.");
+                        p.Element("companion-availability").Text.Set("");
                     }))
 
                 @(Html.FusionRadioButton(plan, companionId, b => b
                     .Name("roomChoice")
                     .Value("Shared Companion Suite")
                     .Label("Shared companion suite"))
-                    .Reactive(evt => evt.Changed, (args, p) =>
+                    .Reactive(evt => evt.Change, (args, p) =>
                     {
-                        p.Element("chosen-room").SetText(args, x => x.Value);
+                        p.Element("chosen-room").Text.Set(args.Value);
 
-                        p.When(args, x => x.Value).Eq("Shared Companion Suite")
+                        p.When(args.Value).Eq("Shared Companion Suite")
                             .Then(t => t.Element("room-detail")
-                                .SetText("A companion suite pairs two residents who prefer not to live alone."))
+                                .Text.Set("A companion suite pairs two residents who prefer not to live alone."))
                             .Else(e => e.Element("room-detail")
-                                .SetText("Choose a room to see what it includes."));
+                                .Text.Set("Choose a room to see what it includes."));
                     }))
             </native-vstack>
 
@@ -85,14 +84,15 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var companion = p.Component<FusionRadioButton>(companionId);
-                        companion.SetChecked(true);
-                        p.Element("chosen-room").SetText(companion.SelectedValue());
+                        companion.Checked.Set(true);
+                        companion.DataBind();
+                        p.Element("chosen-room").Text.Set(companion.GetSelectedValue());
 
-                        p.When(companion.SelectedValue()).Eq("Shared Companion Suite")
+                        p.When(companion.GetSelectedValue()).Eq("Shared Companion Suite")
                             .Then(t => t.Element("room-detail")
-                                .SetText("Her last assessment recommended the shared companion suite."))
+                                .Text.Set("Her last assessment recommended the shared companion suite."))
                             .Else(e => e.Element("room-detail")
-                                .SetText("Choose a room to see what it includes."));
+                                .Text.Set("Choose a room to see what it includes."));
                     }))
 
                 @(Html.NativeButton("recommend-studio", "Pick her recommended studio and take me to it")
@@ -119,13 +119,14 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var companion = p.Component<FusionRadioButton>(companionId);
-                        companion.SetDisabled(true);
+                        companion.Disabled.Set(true);
+                        companion.DataBind();
 
-                        p.When(companion.Disabled()).Truthy()
+                        p.When(companion.Disabled).Truthy()
                             .Then(t => t.Element("companion-availability")
-                                .SetText("The companion suite is full this month and can't be chosen."))
+                                .Text.Set("The companion suite is full this month and can't be chosen."))
                             .Else(e => e.Element("companion-availability")
-                                .SetText("The companion suite is open for move-in."));
+                                .Text.Set("The companion suite is open for move-in."));
                     }))
 
                 @(Html.NativeButton("reopen-companion", "Companion suite opened up")
@@ -133,13 +134,14 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var companion = p.Component<FusionRadioButton>(companionId);
-                        companion.SetDisabled(false);
+                        companion.Disabled.Set(false);
+                        companion.DataBind();
 
-                        p.When(companion.Disabled()).Truthy()
+                        p.When(companion.Disabled).Truthy()
                             .Then(t => t.Element("companion-availability")
-                                .SetText("The companion suite is full this month and can't be chosen."))
+                                .Text.Set("The companion suite is full this month and can't be chosen."))
                             .Else(e => e.Element("companion-availability")
-                                .SetText("The companion suite is open for move-in."));
+                                .Text.Set("The companion suite is open for move-in."));
                     }))
             </native-hstack>
         </native-vstack>
@@ -153,16 +155,14 @@
                 {
                     var companion = p.Component<FusionRadioButton>(companionId);
                     p.Post(Url.SandboxRoute("ConfirmPlan", "RadioButton"))
-                        .Gather(g =>
-                        {
-                            g.Include(companion.SelectedValue(), "room");
-                            g.Include(companion.Checked(), "companionSuiteChosen");
-                            g.Include(companion.Disabled(), "companionSuiteUnavailable");
-                        })
+                        .Gather<RoomPlanRequest>(g => g
+                            .Set(x => x.Room, companion.GetSelectedValue())
+                            .Set(x => x.CompanionSuiteChosen, companion.Checked)
+                            .Set(x => x.CompanionSuiteUnavailable, companion.Disabled))
                         .Response(r => r.OnSuccess<RoomPlanResponse>((json, s) =>
                         {
-                            s.Element("desk-confirmation").SetText(json, x => x.Confirmation);
-                            s.Element("desk-confirmation-panel").RemoveClass("hidden");
+                            s.Element("desk-confirmation").Text.Set(json.Get(x => x.Confirmation));
+                            s.Element("desk-confirmation-panel").ClassList.Remove("hidden");
                         }));
                 }))
             <div id="desk-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">

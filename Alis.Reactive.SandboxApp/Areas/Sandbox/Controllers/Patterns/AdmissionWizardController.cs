@@ -1,4 +1,6 @@
-using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.AdmissionWizard;
 
@@ -13,22 +15,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 ///   Previous → POST LoadStep(X-1) → Into()
 ///   Submit   → POST Submit (JSON) → validates all drafts server-side
 ///
-/// Draft persistence: static ConcurrentDictionary per step, keyed by screeningId.
+/// Draft persistence: each step's draft is saved under the screening's id in the browser session, so each
+/// browser keeps its own screenings and no other browser sees them.
 /// Edit scenario: LoadStep reads from draft, model carries saved values, Syncfusion components render them.
 /// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Patterns/AdmissionWizard")]
 public class AdmissionWizardController : Controller
 {
-    private static readonly ConcurrentDictionary<string, Step1DemographicsModel> Step1Drafts = new();
-    private static readonly ConcurrentDictionary<string, Step2ClinicalModel> Step2Drafts = new();
-    private static readonly ConcurrentDictionary<string, Step3FunctionalModel> Step3Drafts = new();
-    private static readonly ConcurrentDictionary<string, Step4ReviewModel> Step4Drafts = new();
+    private const string DraftKeyPrefix = "admission-wizard:";
 
     private static string NewScreeningId() => $"SCR-{DateTime.UtcNow:yyyyMMddHHmmssffff}";
 
-    private static T GetDraft<T>(ConcurrentDictionary<string, T> store, string id) where T : new()
-        => !string.IsNullOrEmpty(id) && store.TryGetValue(id, out var draft) ? draft : new T();
+    // A step this browser has not saved for the screening starts empty.
+    private T GetDraft<T>(string id) where T : class, new()
+        => TryGetDraft<T>(id, out var draft) ? draft : new T();
 
     private static string EnsureId(string? existing) =>
         string.IsNullOrEmpty(existing) ? NewScreeningId() : existing;
@@ -62,7 +63,7 @@ public class AdmissionWizardController : Controller
 
         var id = EnsureId(model.ScreeningId);
         model.ScreeningId = id;
-        Step1Drafts[id] = model;
+        SaveDraft(id, model);
         return Ok(new SaveStepResponse { ScreeningId = id, Message = $"Step 1 saved for {model.ResidentName}" });
     }
 
@@ -82,7 +83,7 @@ public class AdmissionWizardController : Controller
         if (model.PrimaryDiagnosis == "Diabetes" && !string.IsNullOrEmpty(model.DiabetesType))
             model.DiabetesAssessmentId = $"DIA-{ts}";
 
-        Step2Drafts[id] = model;
+        SaveDraft(id, model);
         return Ok(new SaveStepResponse { ScreeningId = id, Message = $"Step 2 saved — {model.PrimaryDiagnosis}" });
     }
 
@@ -93,7 +94,7 @@ public class AdmissionWizardController : Controller
 
         var id = EnsureId(model.ScreeningId);
         model.ScreeningId = id;
-        Step3Drafts[id] = model;
+        SaveDraft(id, model);
         return Ok(new SaveStepResponse { ScreeningId = id, Message = "Step 3 saved" });
     }
 
@@ -107,7 +108,7 @@ public class AdmissionWizardController : Controller
 
         return request.Step switch
         {
-            1 => StepPartial("_Step1Content.cshtml", GetDraft(Step1Drafts, id)),
+            1 => StepPartial("_Step1Content.cshtml", GetDraft<Step1DemographicsModel>(id)),
             2 => StepPartial("_Step2Content.cshtml", BuildStep2Model(id)),
             3 => StepPartial("_Step3Content.cshtml", BuildStep3Model(id)),
             4 => StepPartial("_Step4Content.cshtml", BuildStep4Model(id)),
@@ -120,8 +121,8 @@ public class AdmissionWizardController : Controller
 
     private Step2ClinicalModel BuildStep2Model(string id)
     {
-        var step1 = GetDraft(Step1Drafts, id);
-        var model = GetDraft(Step2Drafts, id);
+        var step1 = GetDraft<Step1DemographicsModel>(id);
+        var model = GetDraft<Step2ClinicalModel>(id);
         model.ScreeningId = id;
         model.PrimaryDiagnosis = step1.PrimaryDiagnosis;
         model.ResidentName = step1.ResidentName;
@@ -130,8 +131,8 @@ public class AdmissionWizardController : Controller
 
     private Step3FunctionalModel BuildStep3Model(string id)
     {
-        var step1 = GetDraft(Step1Drafts, id);
-        var model = GetDraft(Step3Drafts, id);
+        var step1 = GetDraft<Step1DemographicsModel>(id);
+        var model = GetDraft<Step3FunctionalModel>(id);
         model.ScreeningId = id;
         model.Age = step1.Age;
         model.ResidentName = step1.ResidentName;
@@ -140,18 +141,19 @@ public class AdmissionWizardController : Controller
 
     private Step4ReviewModel BuildStep4Model(string id)
     {
-        var step1 = GetDraft(Step1Drafts, id);
-        var step2 = GetDraft(Step2Drafts, id);
-        var step3 = GetDraft(Step3Drafts, id);
-        var model = GetDraft(Step4Drafts, id);
-        model.ScreeningId = id;
-        model.RiskTier = step1.RiskTier;
-        model.CareUnit = step2.CareUnit;
-        model.MonitoringLevel = step3.MonitoringLevel;
-        model.Step1Saved = !string.IsNullOrEmpty(id) && Step1Drafts.ContainsKey(id);
-        model.Step2Saved = !string.IsNullOrEmpty(id) && Step2Drafts.ContainsKey(id);
-        model.Step3Saved = !string.IsNullOrEmpty(id) && Step3Drafts.ContainsKey(id);
-        return model;
+        var step1 = GetDraft<Step1DemographicsModel>(id);
+        var step2 = GetDraft<Step2ClinicalModel>(id);
+        var step3 = GetDraft<Step3FunctionalModel>(id);
+        return new Step4ReviewModel
+        {
+            ScreeningId = id,
+            RiskTier = step1.RiskTier,
+            CareUnit = step2.CareUnit,
+            MonitoringLevel = step3.MonitoringLevel,
+            Step1Saved = TryGetDraft<Step1DemographicsModel>(id, out _),
+            Step2Saved = TryGetDraft<Step2ClinicalModel>(id, out _),
+            Step3Saved = TryGetDraft<Step3FunctionalModel>(id, out _),
+        };
     }
 
     [HttpPost("Submit")]
@@ -166,15 +168,15 @@ public class AdmissionWizardController : Controller
         if (string.IsNullOrEmpty(id))
             return BadRequest(new { errors });
 
-        if (Step1Drafts.TryGetValue(id, out var step1))
+        if (TryGetDraft<Step1DemographicsModel>(id, out var step1))
             CollectErrors(new Step1Validator().Validate(step1), errors);
         else
             errors["Step1"] = ["Complete Step 1 before submitting"];
 
-        if (Step2Drafts.TryGetValue(id, out var step2))
+        if (TryGetDraft<Step2ClinicalModel>(id, out var step2))
             CollectErrors(new Step2Validator().Validate(step2), errors);
 
-        if (Step3Drafts.TryGetValue(id, out var step3))
+        if (TryGetDraft<Step3FunctionalModel>(id, out var step3))
             CollectErrors(new Step3Validator().Validate(step3), errors);
 
         if (errors.Count > 0) return BadRequest(new { errors });
@@ -242,29 +244,30 @@ public class AdmissionWizardController : Controller
     public async Task<IActionResult> RequestRoomSetup([FromBody] RequestRoomSetupRequest? r)
     { await Task.Delay(500); return Ok(new ScreeningAlertResponse { Message = $"Room setup for {r?.ResidentName}", Urgency = "routine" }); }
 
-    private bool TryValidate<T>(FluentValidation.IValidator<T> validator, T model, out IActionResult error)
+    private bool TryValidate<T>(IValidator<T> validator, T model, out IActionResult error)
     {
         var result = validator.Validate(model);
-        if (result.IsValid)
-        {
-            error = null!;
-            return true;
-        }
-
-        var errors = new Dictionary<string, string[]>();
-        CollectErrors(result, errors);
-        error = BadRequest(new { errors });
-        return false;
+        error = result.IsValid ? null! : BadRequest(new { errors = result.ErrorsByField });
+        return result.IsValid;
     }
 
-    private static void CollectErrors(FluentValidation.Results.ValidationResult result, Dictionary<string, string[]> errors)
+    // The submit answers to every step's rules: each step's messages join the others' by field.
+    private static void CollectErrors(ValidationResult result, Dictionary<string, string[]> errors)
     {
-        foreach (var f in result.Errors)
-        {
-            if (!errors.ContainsKey(f.PropertyName))
-                errors[f.PropertyName] = [f.ErrorMessage];
-            else
-                errors[f.PropertyName] = [..errors[f.PropertyName], f.ErrorMessage];
-        }
+        foreach (var field in result.ErrorsByField)
+            errors[field.Key] = errors.TryGetValue(field.Key, out var earlier) ? [.. earlier, .. field.Value] : field.Value;
     }
+
+    // A screening with no id, or a step this browser has not saved for it, has no draft.
+    private bool TryGetDraft<TStep>(string screeningId, [NotNullWhen(true)] out TStep? draft) where TStep : class
+    {
+        var json = string.IsNullOrEmpty(screeningId) ? null : HttpContext.Session.GetString(DraftKey<TStep>(screeningId));
+        draft = json == null ? null : JsonSerializer.Deserialize<TStep>(json);
+        return draft != null;
+    }
+
+    private void SaveDraft<TStep>(string screeningId, TStep draft) =>
+        HttpContext.Session.SetString(DraftKey<TStep>(screeningId), JsonSerializer.Serialize(draft));
+
+    private static string DraftKey<TStep>(string screeningId) => $"{DraftKeyPrefix}{typeof(TStep).Name}:{screeningId}";
 }

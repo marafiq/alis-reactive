@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.FallRiskScreening;
@@ -7,7 +6,7 @@ namespace Alis.Reactive.PlaywrightTests.Validation.FallRiskScreening;
 /// <summary>
 /// As a nurse, I want "No" to be accepted as the answer to a required yes/no screening question
 /// so that a resident who has not fallen is screened and saved, while an unanswered question
-/// and an unticked attestation are still asked for.
+/// and an unticked attestation are still asked for, and the fall details agree with the answer.
 /// </summary>
 /// <remarks>
 /// An "asks for" test then answers and saves: exactly one save request proves the first Save sent
@@ -25,6 +24,9 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
     private ILocator SaveScreening => Page.Locator("#save-screening-btn");
     private NativeRadioGroupLocator FellInLast90Days => _plan.NativeRadioGroup(m => m.FellInLast90Days);
     private NativeCheckBoxLocator ObservedWalkingInPerson => _plan.NativeCheckBox(m => m.ObservedWalkingInPerson);
+
+    // A contributing factor is the checkbox the nurse reads by its label.
+    private ILocator FallFactor(string name) => Page.GetByRole(AriaRole.Checkbox, new() { Name = name, Exact = true });
 
     private async Task NavigateAndBoot()
     {
@@ -105,6 +107,86 @@ public class WhenNurseRecordsFallRiskScreening : PlaywrightTestBase
         await ObservedWalkingInPerson.Check();
         await ClickWhenStable(SaveScreening);
         await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: no fall in the last 90 days.");
+        AssertTheScreeningWasSentOnce();
+    }
+
+    [Test]
+    public async Task a_resident_who_has_not_fallen_keeps_the_fall_count_at_zero()
+    {
+        await NavigateAndBoot();
+        await FellInLast90Days.Choose("No");
+        await ObservedWalkingInPerson.Check();
+        // Leaving the count may show its message at once, which moves what is below it, so the
+        // count is filled last.
+        await _plan.TextBox(m => m.FallsCount).FillAndBlur("2");
+
+        await ClickWhenStable(SaveScreening);
+
+        await Expect(_plan.ErrorFor(m => m.FallsCount))
+            .ToHaveTextAsync("Leave the number of falls at 0 when the resident has not fallen.");
+        await Expect(ScreeningStatus).ToHaveTextAsync("Not screened yet.");
+
+        // 0 is what Empty() asks of a number, so a count of 0 is accepted.
+        await _plan.TextBox(m => m.FallsCount).Fill("0");
+        await ClickWhenStable(SaveScreening);
+        await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: no fall in the last 90 days.");
+        AssertTheScreeningWasSentOnce();
+    }
+
+    [Test]
+    public async Task a_resident_who_has_not_fallen_has_no_fall_injury_to_report()
+    {
+        await NavigateAndBoot();
+        await FellInLast90Days.Choose("No");
+        await _plan.NativeCheckBox(m => m.InjuryReported).Check();
+        await ObservedWalkingInPerson.Check();
+
+        await ClickWhenStable(SaveScreening);
+
+        await Expect(_plan.ErrorFor(m => m.InjuryReported))
+            .ToHaveTextAsync("Clear the injury box when the resident has not fallen.");
+        await Expect(ScreeningStatus).ToHaveTextAsync("Not screened yet.");
+
+        // An unticked box is false, which is what Empty() asks of a yes/no.
+        await _plan.NativeCheckBox(m => m.InjuryReported).Input.UncheckAsync();
+        await ClickWhenStable(SaveScreening);
+        await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: no fall in the last 90 days.");
+        AssertTheScreeningWasSentOnce();
+    }
+
+    [Test]
+    public async Task an_unwitnessed_fall_needs_the_time_neuro_checks_started()
+    {
+        await NavigateAndBoot();
+        await FellInLast90Days.Choose("Yes");
+        await FallFactor("Unwitnessed fall").CheckAsync();
+        await ObservedWalkingInPerson.Check();
+
+        await ClickWhenStable(SaveScreening);
+
+        await Expect(_plan.ErrorFor(m => m.NeuroChecksStartedAt))
+            .ToHaveTextAsync("Record when neuro checks started after the unwitnessed fall.");
+        await Expect(ScreeningStatus).ToHaveTextAsync("Not screened yet.");
+
+        await _plan.TextBox(m => m.NeuroChecksStartedAt).Fill("2:15 PM");
+        await ClickWhenStable(SaveScreening);
+        await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: a fall in the last 90 days.");
+        AssertTheScreeningWasSentOnce();
+    }
+
+    [Test]
+    public async Task a_fall_after_a_medication_change_needs_no_neuro_check_time()
+    {
+        await NavigateAndBoot();
+        await FellInLast90Days.Choose("Yes");
+        await FallFactor("Medication change").CheckAsync();
+        await ObservedWalkingInPerson.Check();
+
+        await ClickWhenStable(SaveScreening);
+
+        // The factors hold an item, but not "Unwitnessed fall", so no neuro check time is asked for.
+        await Expect(ScreeningStatus).ToHaveTextAsync("Screening saved for Helen Park: a fall in the last 90 days.");
+        await Expect(_plan.ErrorFor(m => m.NeuroChecksStartedAt)).ToHaveTextAsync("");
         AssertTheScreeningWasSentOnce();
     }
 

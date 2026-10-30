@@ -1,0 +1,20 @@
+@using Alis.Reactive.Framework.App.Plans
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model ContactsPage
+@{
+    ViewData["Title"] = "Move-in contacts";
+
+    // Each card is rendered for one member of the contacts, so its input binds under that member.
+    ViewDataDictionary CardFor(string member, string heading)
+    {
+        var card = new ViewDataDictionary(ViewData);
+        card.TemplateInfo.HtmlFieldPrefix = member;
+        card["Heading"] = heading;
+        return card;
+    }
+}
+<h1>Move-in contacts</h1>
+
+@* The page has no plan of its own: each card starts one. *@
+@await Html.PartialAsync("ContactCard", Model.NextOfKin, CardFor(nameof(ContactsPage.NextOfKin), "next of kin"))
+@await Html.PartialAsync("ContactCard", Model.Alternate, CardFor(nameof(ContactsPage.Alternate), "alternate"))

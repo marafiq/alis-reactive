@@ -1,0 +1,10 @@
+@using Alis.Reactive.Framework.App.Subscriptions
+@model GatePage
+@{
+    ViewData["Title"] = "An escorted visit";
+}
+<h1>An escorted visit</h1>
+
+@* The visit's payload holds a record, the visitor, which no attribute's text can carry: this markup is refused as the
+   view renders (grammar.md 6.1, D4). *@
+<button type="button" @Html.Raises(GateEvents.Escorted, new EscortedVisit { Visitor = new GateVisitor { Name = "Ann" } })>Escort Ann in</button>

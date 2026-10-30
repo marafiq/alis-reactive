@@ -1,10 +1,12 @@
+using System.Linq.Expressions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 
 [TestFixture]
 public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/Contract/ConditionalHide";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
@@ -13,17 +15,17 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
     private ILocator ErrorFor(string fieldName) =>
         Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
-    private ILocator Input(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}");
+    private ILocator Input(Expression<Func<ResidentModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
 
     private async Task FillAllRequired()
     {
-        await Input("Name").FillAsync("Jane Smith");
-        await Input("Email").FillAsync("jane@care.com");
-        await Input("ConfirmEmail").FillAsync("jane@care.com");
-        await Input("CareLevel").SelectOptionAsync("Independent");
-        await Input("Address_Street").FillAsync("123 Main St");
-        await Input("Address_City").FillAsync("Springfield");
-        await Input("Address_ZipCode").FillAsync("62704");
+        await Input(m => m.Name).FillAsync("Jane Smith");
+        await Input(m => m.Email).FillAsync("jane@care.com");
+        await Input(m => m.ConfirmEmail).FillAsync("jane@care.com");
+        await Input(m => m.CareLevel).SelectOptionAsync("Independent");
+        await Input(m => m.Address.Street).FillAsync("123 Main St");
+        await Input(m => m.Address.City).FillAsync("Springfield");
+        await Input(m => m.Address.ZipCode).FillAsync("62704");
     }
 
     [Test]
@@ -37,8 +39,11 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
+        // The page did check the form: the reason for no contact is asked for, the veteran ID is not.
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -48,12 +53,12 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("IsVeteran").CheckAsync();
+        await Input(m => m.IsVeteran).CheckAsync();
         await Expect(Page.Locator("#veteran-section")).ToBeVisibleAsync();
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(ErrorFor("VeteranId")).ToHaveTextAsync("'Veteran ID' is required when veteran.");
         await Expect(ErrorFor("VeteranId")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -68,18 +73,19 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await FillAllRequired();
 
         await ClickWhenStable(SubmitBtn);
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
-        await Input("IsVeteran").CheckAsync();
+        await Input(m => m.IsVeteran).CheckAsync();
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(ErrorFor("VeteranId")).ToHaveTextAsync("'Veteran ID' is required when veteran.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        await Input("VeteranId").FillAsync("V12345");
+        await Input(m => m.VeteranId).FillAsync("V12345");
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
-        await Input("IsVeteran").UncheckAsync();
+        await Input(m => m.IsVeteran).UncheckAsync();
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
@@ -97,10 +103,12 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await Expect(Page.Locator("#physician-section")).ToBeHiddenAsync();
         await Expect(Page.Locator("#memory-section")).ToBeHiddenAsync();
         await ClickWhenStable(SubmitBtn);
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
+        await Expect(Result).ToHaveTextAsync("");
 
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -110,12 +118,12 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Assisted Living");
+        await Input(m => m.CareLevel).SelectOptionAsync("Assisted Living");
 
         await Expect(Page.Locator("#physician-section")).ToBeVisibleAsync();
 
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
+        await Expect(ErrorFor("PhysicianName")).ToHaveTextAsync("'Physician' is required unless Independent.");
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
@@ -129,13 +137,13 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Memory Care");
+        await Input(m => m.CareLevel).SelectOptionAsync("Memory Care");
 
         await Expect(Page.Locator("#memory-section")).ToBeVisibleAsync();
 
         await ClickWhenStable(SubmitBtn);
-        await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
-        await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
+        await Expect(ErrorFor("MemoryAssessmentScore")).ToHaveTextAsync("'Memory Assessment' is required for Memory Care.");
+        await Expect(ErrorFor("PhysicianName")).ToHaveTextAsync("'Physician' is required unless Independent.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         AssertNoConsoleErrors();
@@ -151,7 +159,7 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("ReasonForNoContact")).ToContainTextAsync("required");
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
@@ -165,15 +173,15 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("HasEmergencyContact").CheckAsync();
+        await Input(m => m.HasEmergencyContact).CheckAsync();
 
         await Expect(Page.Locator("#emergency-section")).ToBeVisibleAsync();
         await Expect(Page.Locator("#no-contact-section")).ToBeHiddenAsync();
 
         await ClickWhenStable(SubmitBtn);
 
-        await Expect(ErrorFor("EmergencyName")).ToContainTextAsync("required");
-        await Expect(ErrorFor("EmergencyPhone")).ToContainTextAsync("required");
+        await Expect(ErrorFor("EmergencyName")).ToHaveTextAsync("'Emergency Name' is required.");
+        await Expect(ErrorFor("EmergencyPhone")).ToHaveTextAsync("'Emergency Phone' is required.");
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
@@ -193,13 +201,13 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        await Input("HasEmergencyContact").CheckAsync();
+        await Input(m => m.HasEmergencyContact).CheckAsync();
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("EmergencyName")).ToBeVisibleAsync();
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        await Input("HasEmergencyContact").UncheckAsync();
+        await Input(m => m.HasEmergencyContact).UncheckAsync();
         await ClickWhenStable(SubmitBtn);
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();

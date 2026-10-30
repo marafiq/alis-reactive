@@ -1,0 +1,208 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "Alis_Reactive_PlanTests_Support_Admission__Name": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Admission__Name",
+      "vendor": "native"
+    },
+    "greeting": {
+      "kind": "element",
+      "id": "greeting",
+      "vendor": "native"
+    },
+    "$model": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "",
+      "data": {
+        "kind": "model",
+        "inputs": {
+          "Alis_Reactive_PlanTests_Support_Admission__Name": {
+            "name": "Name",
+            "body": [
+              "Name"
+            ],
+            "value": {
+              "kind": "as",
+              "expr": {
+                "kind": "get",
+                "target": {
+                  "kind": "obj",
+                  "id": "Alis_Reactive_PlanTests_Support_Admission__Name"
+                },
+                "path": [
+                  "value"
+                ]
+              },
+              "shape": {
+                "kind": "string"
+              }
+            },
+            "shape": {
+              "kind": "string"
+            },
+            "committed": "change",
+            "list": false
+          }
+        }
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "if",
+          "arms": [
+            {
+              "when": {
+                "kind": "op",
+                "op": "eq",
+                "args": [
+                  {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "get",
+                      "target": {
+                        "kind": "obj",
+                        "id": "Alis_Reactive_PlanTests_Support_Admission__Name"
+                      },
+                      "path": [
+                        "value"
+                      ]
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "kind": "lit",
+                    "value": "Helen"
+                  }
+                ]
+              },
+              "then": [
+                {
+                  "kind": "set",
+                  "target": {
+                    "kind": "obj",
+                    "id": "greeting"
+                  },
+                  "path": [
+                    "textContent"
+                  ],
+                  "value": {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "lit",
+                      "value": "Hello Helen"
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "when": {
+                "kind": "op",
+                "op": "eq",
+                "args": [
+                  {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "get",
+                      "target": {
+                        "kind": "obj",
+                        "id": "Alis_Reactive_PlanTests_Support_Admission__Name"
+                      },
+                      "path": [
+                        "value"
+                      ]
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "kind": "lit",
+                    "value": "Tom"
+                  }
+                ]
+              },
+              "then": [
+                {
+                  "kind": "set",
+                  "target": {
+                    "kind": "obj",
+                    "id": "greeting"
+                  },
+                  "path": [
+                    "textContent"
+                  ],
+                  "value": {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "lit",
+                      "value": "Hello Tom"
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "else": [
+            {
+              "kind": "set",
+              "target": {
+                "kind": "obj",
+                "id": "greeting"
+              },
+              "path": [
+                "textContent"
+              ],
+              "value": {
+                "kind": "as",
+                "expr": {
+                  "kind": "lit",
+                  "value": "Hello"
+                },
+                "shape": {
+                  "kind": "string"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

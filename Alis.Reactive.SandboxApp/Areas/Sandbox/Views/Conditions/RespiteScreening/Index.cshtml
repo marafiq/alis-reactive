@@ -1,0 +1,326 @@
+@model RespiteScreeningModel
+@using Alis.Reactive.Builders
+@using Alis.Reactive.Builders.Conditions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.RespiteScreening
+@functions {
+    // A rule's line: what it says when the fact holds, and when it does not.
+    private static void Line(GuardBuilder<RespiteScreeningModel> rule, string id, string holds, string fails) =>
+        rule.Then(then => then.Element(id).Text.Set(holds))
+            .Else(otherwise => otherwise.Element(id).Text.Set(fails));
+
+    // Every rule reads one fact off the sheet; the lines are written when the page opens and again on
+    // every edit the coordinator commits.
+    private static void ScreenTheSheet(PipelineBuilder<RespiteScreeningModel> p)
+    {
+        var sheet = p.Component<IntakeSheet>(RespiteScreeningModel.SheetId);
+        var services = p.Component<NativeCheckList>(m => m.Services);
+
+        // The applicant's name: text.
+        Line(p.When(sheet.Name).Eq("Margaret Hale"), "name-waiting", "On the waiting list.", "Not on the waiting list.");
+        Line(p.When(sheet.Name).NotEq("Margaret Hale"), "name-expected", "Not the applicant the wing expected.", "The applicant the wing expected.");
+        Line(p.When(sheet.Name).In("Margaret Hale", "Harold Benson"), "name-returning", "A returning resident: pull the old chart.", "A first stay with us.");
+        Line(p.When(sheet.Name).NotIn("Walter Brooks", "Agnes Moore"), "name-barred", "Clear to admit.", "Barred: speak to the director.");
+        Line(p.When(sheet.Name).Truthy(), "name-recorded", "Name recorded.", "Record the applicant's name.");
+        Line(p.When(sheet.Name).IsEmpty(), "name-blank", "The name is blank.", "The name is filled in.");
+        Line(p.When(sheet.Name).NotNull(), "name-present", "Name field present.", "Name field missing from the sheet.");
+        Line(p.When(sheet.Name).Contains("Hale"), "name-hale", "Of the Hale family.", "Not a Hale.");
+        Line(p.When(sheet.Name).StartsWith("Dr "), "name-doctor", "Address as Doctor.", "Address by name.");
+        Line(p.When(sheet.Name).EndsWith(" Jr"), "name-junior", "A junior: check it is not the father's record.", "No suffix.");
+        Line(p.When(sheet.Name).Matches(@"^[A-Z][a-z]+ [A-Z][a-z]+$"), "name-full", "First and last name.", "Give first and last name.");
+        Line(p.When(sheet.Name).MinLength(12), "name-length", "A full name (12 or more characters).", "Too short for a full name.");
+
+        // Age: a number.
+        Line(p.When(sheet.Age).Eq(100), "age-centenarian", "A centenarian: the director visits.", "Not a centenarian.");
+        Line(p.When(sheet.Age).Truthy(), "age-given", "Age given.", "Give the applicant's age.");
+        Line(p.When(sheet.Age).Gte(62), "age-respite", "Old enough for respite care (62 and over).", "Under 62: needs the director's approval.");
+        Line(p.When(sheet.Age).Gt(89), "age-wellness", "Over 89: a wellness visit before move-in.", "No wellness visit needed.");
+        Line(p.When(sheet.Age).Lt(65), "age-medicare", "Under 65: check Medicare eligibility.", "65 or over: Medicare age.");
+        Line(p.When(sheet.Age).Lte(55), "age-young", "55 or under: note why a stay is sought.", "Over 55.");
+        Line(p.When(sheet.Age).Between(62, 89), "age-usual", "In the usual range for a stay.", "Outside the usual range.");
+        Line(p.When(sheet.Age).In(65, 70, 75, 80, 85, 90), "age-milestone", "A milestone birthday this year: plan a celebration.", "No milestone birthday.");
+
+        // The monthly rate: a number with cents.
+        Line(p.When(sheet.MonthlyRate).NotEq(5000.00m), "rate-standard", "Not the standard rate: note why.", "The standard rate.");
+        Line(p.When(sheet.MonthlyRate).NotIn(4500.00m, 5000.00m, 5500.00m), "rate-published", "A custom rate: the director signs it.", "A published rate.");
+        Line(p.When(sheet.MonthlyRate).Lte(5000.00m), "rate-budget", "Within the family's $5,000 budget.", "Over the family's budget.");
+        Line(p.When(sheet.MonthlyRate).Between(4500.00m, 5500.00m), "rate-range", "Within the published range.", "Outside the published range.");
+        Line(p.When(sheet.MonthlyRate).Gt(5500.00m), "rate-premium", "A premium suite rate.", "A standard suite rate.");
+        Line(p.When(sheet.MonthlyRate).Gte(4500.00m), "rate-minimum", "At or above the minimum rate.", "Below the minimum rate.");
+
+        // The move-in date: a date.
+        Line(p.When(sheet.MoveInDate).Eq(new DateTime(2026, 7, 1)), "move-in-opening", "Moving in on opening day.", "Not on opening day.");
+        Line(p.When(sheet.MoveInDate).NotEq(new DateTime(2026, 7, 4)), "move-in-holiday", "Not a holiday move-in.", "Independence Day: no move-ins.");
+        Line(p.When(sheet.MoveInDate).Gte(new DateTime(2026, 7, 1)), "move-in-open", "After the wing opens on 1 July.", "Before the wing opens.");
+        Line(p.When(sheet.MoveInDate).Gt(new DateTime(2026, 7, 15)), "move-in-after-inspection", "After the mid-July inspection.", "Not after the inspection.");
+        Line(p.When(sheet.MoveInDate).Lt(new DateTime(2026, 7, 15)), "move-in-before-inspection", "Before the mid-July inspection.", "Not before the inspection.");
+        Line(p.When(sheet.MoveInDate).Lte(new DateTime(2026, 7, 31)), "move-in-month-end", "By the end of July.", "August or later.");
+        Line(p.When(sheet.MoveInDate).Between(new DateTime(2026, 7, 1), new DateTime(2026, 7, 31)), "move-in-july", "A July move-in.", "Not a July move-in.");
+        Line(p.When(sheet.MoveInDate).In(new DateTime(2026, 7, 6), new DateTime(2026, 7, 13), new DateTime(2026, 7, 20), new DateTime(2026, 7, 27)), "move-in-orientation", "An orientation Monday.", "Not an orientation day.");
+        Line(p.When(sheet.MoveInDate).NotIn(new DateTime(2026, 7, 3), new DateTime(2026, 7, 4)), "move-in-holiday-weekend", "Clear of the holiday weekend.", "On the holiday weekend.");
+
+        // Veteran: yes or no.
+        Line(p.When(sheet.Veteran).Eq(true), "veteran-va", "A veteran: the VA liaison is told.", "Not a veteran.");
+        Line(p.When(sheet.Veteran).NotEq(true), "veteran-billing", "Standard billing.", "VA billing.");
+        Line(p.When(sheet.Veteran).Falsy(), "veteran-civilian", "A civilian.", "Served.");
+
+        // Care level: an option.
+        Line(p.When(sheet.CareLevel).Eq(CareLevel.MemoryCare), "care-secured", "Memory care: the secured wing.", "Not the secured wing.");
+        Line(p.When(sheet.CareLevel).NotEq(CareLevel.Independent), "care-staff", "Care staff assigned.", "Independent living: no care staff.");
+        Line(p.When(sheet.CareLevel).In(CareLevel.Assisted, CareLevel.MemoryCare), "care-plan", "A care plan is written.", "No care plan needed.");
+        Line(p.When(sheet.CareLevel).NotIn(CareLevel.MemoryCare), "care-garden", "Eligible for the Garden wing.", "The Garden wing is not secured.");
+
+        // Room preference: text, or nothing.
+        Line(p.When(sheet.RoomPreference).IsNull(), "room-preference", "No room preference recorded.", "Room preference recorded.");
+        Line(p.When(sheet.RoomPreference).NotEmpty(), "room-noted", "Preference noted.", "No preference.");
+        Line(p.When(sheet.RoomPreference).Eq("Garden view"), "room-garden", "Prefers the garden side.", "No garden-side request.");
+        Line(p.When(sheet.RoomPreference).EndsWith("view"), "room-view", "Asked for a view.", "No view asked for.");
+        Line(p.When(sheet.RoomPreference).Falsy(), "room-any", "Any room will do.", "A particular room.");
+
+        // Pets: a number, or nothing.
+        Line(p.When(sheet.PetCount).IsNull(), "pets-unknown", "Pets: not asked yet.", "Pets: asked.");
+        Line(p.When(sheet.PetCount).NotNull(), "pets-known", "Pets recorded.", "Ask about pets.");
+        Line(p.When(sheet.PetCount).Eq(0), "pets-none", "No pets.", "Pets, or not asked.");
+        Line(p.When(sheet.PetCount).Gt(0), "pets-brings", "Brings a pet.", "No pet to settle in.");
+        Line(p.When(sheet.PetCount).Lte(1), "pets-limit", "Within the one-pet limit.", "Over the limit, or not asked.");
+        Line(p.When(sheet.PetCount).Between(1, 2), "pets-pair", "One or two pets.", "Not one or two pets.");
+        Line(p.When(sheet.PetCount).Falsy(), "pets-settle", "No pet to settle, or not asked.", "A pet comes along.");
+
+        // The previous stay: a date, or nothing.
+        Line(p.When(sheet.PriorStayEnded).IsNull(), "prior-first-stay", "A first stay with us.", "A returning resident.");
+        Line(p.When(sheet.PriorStayEnded).NotNull(), "prior-chart", "Pull the previous chart.", "No previous chart.");
+        Line(p.When(sheet.PriorStayEnded).Eq(new DateTime(2025, 12, 31)), "prior-year-end", "Left on the last day of 2025.", "Did not leave on the last day of 2025.");
+        Line(p.When(sheet.PriorStayEnded).Gte(new DateTime(2026, 1, 1)), "prior-this-year", "Stayed with us this year.", "Not this year, or never.");
+        Line(p.When(sheet.PriorStayEnded).Lt(new DateTime(2025, 7, 1)), "prior-reassess", "More than a year since the last stay: reassess.", "Recent enough, or no previous stay.");
+
+        // The flu shot: yes or no, or nothing.
+        Line(p.When(sheet.FluShot).IsNull(), "flu-not-asked", "Flu shot: not asked.", "Flu shot: asked.");
+        Line(p.When(sheet.FluShot).NotNull(), "flu-recorded", "Flu shot answered.", "Flu shot unanswered.");
+        Line(p.When(sheet.FluShot).Eq(true), "flu-given", "Flu shot given.", "No flu shot on record.");
+        Line(p.When(sheet.FluShot).Eq(false), "flu-declined", "Flu shot declined: offer it at move-in.", "Not declined.");
+        Line(p.When(sheet.FluShot).Falsy(), "flu-offer", "Offer the flu shot.", "Flu shot done.");
+
+        // The diet: an option, or nothing.
+        Line(p.When(sheet.Diet).IsNull(), "diet-none", "No diet recorded.", "Diet recorded.");
+        Line(p.When(sheet.Diet).NotNull(), "diet-known", "Diet known.", "Diet unknown.");
+        Line(p.When(sheet.Diet).Eq(Diet.Diabetic), "diet-diabetic", "Diabetic diet: tell the kitchen.", "Not a diabetic diet.");
+        Line(p.When(sheet.Diet).In(Diet.Diabetic, Diet.Pureed), "diet-special", "A special diet.", "No special diet.");
+        Line(p.When(sheet.Diet).NotIn(Diet.Pureed), "diet-textures", "Regular textures.", "Pureed textures.");
+        Line(p.When(sheet.Diet).Falsy(), "diet-kitchen", "Nothing for the kitchen yet.", "The kitchen has a diet to prepare.");
+
+        // Allergies and services: lists.
+        Line(p.When(sheet.Allergies).IsEmpty(), "allergies-none", "No allergies recorded.", "Allergies recorded.");
+        Line(p.When(sheet.Allergies).ArrayContains("Penicillin"), "allergies-penicillin", "Penicillin allergy: flag the pharmacy.", "No penicillin allergy.");
+        Line(p.When(sheet.AllergySequence).ArrayContains("Latex"), "allergies-latex", "Latex allergy: tell housekeeping.", "No latex allergy.");
+        Line(p.When(services.Value).ArrayContains(RespiteServices.Transport), "services-transport", "Transport arranged.", "No transport.");
+    }
+
+    // What the edit itself says: the field edited, and the facts as the sheet hands them with the event.
+    private static void ScreenTheChange(IntakeChangedArgs args, PipelineBuilder<RespiteScreeningModel> p)
+    {
+        Line(p.When(args.Field).Eq("age"), "edited-age", "Age just edited.", "Another fact edited.");
+        Line(p.When(args.Contact.Phone).StartsWith("555"), "contact-local", "A local family number.", "A long-distance family number.");
+        Line(p.When(args.Applicant.Get(a => a.Contact.Relation)).In("Daughter", "Son"), "contact-child", "A child is the contact.", "The contact is not a child.");
+        Line(p.When(args.Applicant.Get(a => a.Allergies)).ArrayContains("Codeine"), "allergies-codeine", "Codeine allergy: tell the physician.", "No codeine allergy.");
+        Line(p.When(args.Applicant.Get(a => a.Allergies)).NotEmpty(), "allergies-any", "Allergies on file.", "No allergies on file.");
+    }
+
+    // The sheet against the Garden wing's policy: each fact compared with the wing's, read when the check runs.
+    private static void CheckTheWing(Data<WingPolicy> policy, PipelineBuilder<RespiteScreeningModel> p)
+    {
+        var sheet = p.Component<IntakeSheet>(RespiteScreeningModel.SheetId);
+        Line(p.When(sheet.Name).Eq(policy.Get(x => x.ExpectedResident)), "policy-expected", "The applicant the wing expects.", "Not the applicant the wing expects.");
+        Line(p.When(sheet.Age).Gte(policy.Get(x => x.MinimumAge)), "policy-min-age", "Meets the wing's minimum age.", "Under the wing's minimum age.");
+        Line(p.When(sheet.Age).Eq(policy.Get(x => x.MinimumAge)), "policy-exact-age", "Exactly the minimum age.", "Not exactly the minimum age.");
+        Line(p.When(sheet.MonthlyRate).Eq(policy.Get(x => x.MonthlyRate)), "policy-rate", "Quoted at the wing's rate.", "Quoted off the wing's rate.");
+        Line(p.When(sheet.MonthlyRate).Gt(policy.Get(x => x.MonthlyRate)), "policy-rate-over", "Over the wing's rate.", "Not over the wing's rate.");
+        Line(p.When(sheet.MoveInDate).Gte(policy.Get(x => x.OpensOn)), "policy-opens", "Moves in once the wing is open.", "Moves in before the wing opens.");
+        Line(p.When(sheet.MoveInDate).Eq(policy.Get(x => x.OpensOn)), "policy-opening-day", "Moves in on the wing's opening day.", "Not on the wing's opening day.");
+        Line(p.When(sheet.Veteran).Eq(policy.Get(x => x.VeteranOnRecord)), "policy-veteran", "Veteran status matches the VA record.", "Veteran status differs from the VA record.");
+        Line(p.When(sheet.CareLevel).Eq(policy.Get(x => x.CareLevel)), "policy-care", "The wing's care level fits.", "The wing offers a different care level.");
+        Line(p.When(sheet.RoomPreference).NotEq(policy.Get(x => x.RoomOffered)), "policy-room", "Prefers a different room than the one offered.", "Happy with the room offered.");
+        Line(p.When(sheet.PetCount).Eq(policy.Get(x => x.PetLimit)), "policy-pets", "At the wing's pet limit.", "Not at the pet limit.");
+        Line(p.When(sheet.PetCount).Gt(policy.Get(x => x.PetLimit)), "policy-pets-over", "Over the wing's pet limit.", "Within the pet limit, or not asked.");
+        Line(p.When(sheet.PriorStayEnded).Eq(policy.Get(x => x.LastStayOnRecord)), "policy-prior", "The previous stay matches our record.", "The previous stay differs from our record.");
+        Line(p.When(sheet.FluShot).Eq(policy.Get(x => x.FluShotOnRecord)), "policy-flu", "Flu shot matches the clinic's record.", "Flu shot differs from the clinic's record.");
+        Line(p.When(sheet.Diet).Eq(policy.Get(x => x.DietOnRecord)), "policy-diet", "Diet matches the dietitian's record.", "Diet differs from the dietitian's record.");
+    }
+}
+@{
+    ViewData["Title"] = "Respite Screening";
+
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string Check = "flex justify-between gap-4 border-b border-border/60 py-1";
+
+    var plan = Html.ReactivePlan<RespiteScreeningModel>();
+
+    Html.On(plan, t => t.DomReady(p => ScreenTheSheet(p)));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Respite screening</native-heading>
+        <native-text color="Secondary">
+            Admissions. Margaret Hale asks for a respite stay in the Garden wing; her intake sheet is checked against the community's rules as you fill it in.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Intake sheet</native-heading>
+        <div class="mt-3">
+            @(plan.IntakeSheet(RespiteScreeningModel.SheetId, Model.Applicant, waitlist: null)
+                .Reactive(evt => evt.Changed, (args, p) =>
+                {
+                    ScreenTheSheet(p);
+                    ScreenTheChange(args, p);
+                }))
+        </div>
+        <div class="mt-3">
+            @{ Html.InputField(plan, m => m.Services, o => o.Label("Services asked for"))
+                .NativeCheckList(b => b
+                    .Option(RespiteServices.Transport)
+                    .Option(RespiteServices.Laundry)
+                    .Option(RespiteServices.Meals))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    ScreenTheSheet(p);
+                    Line(p.When(args.Value).ArrayContains(RespiteServices.Laundry), "services-laundry", "Laundry arranged.", "No laundry.");
+                }); }
+        </div>
+        <native-text color="Secondary"><span id="services-transport"></span> <span id="services-laundry"></span></native-text>
+    </native-card-body></native-card>
+
+    <native-grid cols="C2" gap="Base">
+        <native-card><native-card-body>
+            <native-heading level="H2">Applicant</native-heading>
+            <dl class="mt-3 text-sm">
+                <div class="@Check"><dt>Waiting list</dt><dd id="name-waiting"></dd></div>
+                <div class="@Check"><dt>Expected by the wing</dt><dd id="name-expected"></dd></div>
+                <div class="@Check"><dt>Stayed before</dt><dd id="name-returning"></dd></div>
+                <div class="@Check"><dt>Do-not-admit list</dt><dd id="name-barred"></dd></div>
+                <div class="@Check"><dt>Name</dt><dd id="name-recorded"></dd></div>
+                <div class="@Check"><dt>Blank</dt><dd id="name-blank"></dd></div>
+                <div class="@Check"><dt>Sheet</dt><dd id="name-present"></dd></div>
+                <div class="@Check"><dt>Family</dt><dd id="name-hale"></dd></div>
+                <div class="@Check"><dt>Title</dt><dd id="name-doctor"></dd></div>
+                <div class="@Check"><dt>Suffix</dt><dd id="name-junior"></dd></div>
+                <div class="@Check"><dt>Full name</dt><dd id="name-full"></dd></div>
+                <div class="@Check"><dt>Length</dt><dd id="name-length"></dd></div>
+                <div class="@Check"><dt>Last edit</dt><dd id="edited-age"></dd></div>
+                <div class="@Check"><dt>Family phone</dt><dd id="contact-local"></dd></div>
+                <div class="@Check"><dt>Family contact</dt><dd id="contact-child"></dd></div>
+            </dl>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-heading level="H2">The stay</native-heading>
+            <dl class="mt-3 text-sm">
+                <div class="@Check"><dt>Centenarian</dt><dd id="age-centenarian"></dd></div>
+                <div class="@Check"><dt>Age</dt><dd id="age-given"></dd></div>
+                <div class="@Check"><dt>Respite age</dt><dd id="age-respite"></dd></div>
+                <div class="@Check"><dt>Wellness visit</dt><dd id="age-wellness"></dd></div>
+                <div class="@Check"><dt>Medicare</dt><dd id="age-medicare"></dd></div>
+                <div class="@Check"><dt>Young applicant</dt><dd id="age-young"></dd></div>
+                <div class="@Check"><dt>Usual range</dt><dd id="age-usual"></dd></div>
+                <div class="@Check"><dt>Milestone</dt><dd id="age-milestone"></dd></div>
+                <div class="@Check"><dt>Rate</dt><dd id="rate-standard"></dd></div>
+                <div class="@Check"><dt>Published rate</dt><dd id="rate-published"></dd></div>
+                <div class="@Check"><dt>Budget</dt><dd id="rate-budget"></dd></div>
+                <div class="@Check"><dt>Rate range</dt><dd id="rate-range"></dd></div>
+                <div class="@Check"><dt>Suite</dt><dd id="rate-premium"></dd></div>
+                <div class="@Check"><dt>Minimum rate</dt><dd id="rate-minimum"></dd></div>
+                <div class="@Check"><dt>Opening day</dt><dd id="move-in-opening"></dd></div>
+                <div class="@Check"><dt>Holiday</dt><dd id="move-in-holiday"></dd></div>
+                <div class="@Check"><dt>Wing open</dt><dd id="move-in-open"></dd></div>
+                <div class="@Check"><dt>After inspection</dt><dd id="move-in-after-inspection"></dd></div>
+                <div class="@Check"><dt>Before inspection</dt><dd id="move-in-before-inspection"></dd></div>
+                <div class="@Check"><dt>Month end</dt><dd id="move-in-month-end"></dd></div>
+                <div class="@Check"><dt>July</dt><dd id="move-in-july"></dd></div>
+                <div class="@Check"><dt>Orientation</dt><dd id="move-in-orientation"></dd></div>
+                <div class="@Check"><dt>Holiday weekend</dt><dd id="move-in-holiday-weekend"></dd></div>
+                <div class="@Check"><dt>VA liaison</dt><dd id="veteran-va"></dd></div>
+                <div class="@Check"><dt>Billing</dt><dd id="veteran-billing"></dd></div>
+                <div class="@Check"><dt>Service</dt><dd id="veteran-civilian"></dd></div>
+                <div class="@Check"><dt>Secured wing</dt><dd id="care-secured"></dd></div>
+                <div class="@Check"><dt>Care staff</dt><dd id="care-staff"></dd></div>
+                <div class="@Check"><dt>Care plan</dt><dd id="care-plan"></dd></div>
+                <div class="@Check"><dt>Garden wing</dt><dd id="care-garden"></dd></div>
+            </dl>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-heading level="H2">Household</native-heading>
+            <dl class="mt-3 text-sm">
+                <div class="@Check"><dt>Room preference</dt><dd id="room-preference"></dd></div>
+                <div class="@Check"><dt>Preference</dt><dd id="room-noted"></dd></div>
+                <div class="@Check"><dt>Garden side</dt><dd id="room-garden"></dd></div>
+                <div class="@Check"><dt>View</dt><dd id="room-view"></dd></div>
+                <div class="@Check"><dt>Any room</dt><dd id="room-any"></dd></div>
+                <div class="@Check"><dt>Pets asked</dt><dd id="pets-unknown"></dd></div>
+                <div class="@Check"><dt>Pets recorded</dt><dd id="pets-known"></dd></div>
+                <div class="@Check"><dt>No pets</dt><dd id="pets-none"></dd></div>
+                <div class="@Check"><dt>Pet</dt><dd id="pets-brings"></dd></div>
+                <div class="@Check"><dt>Pet limit</dt><dd id="pets-limit"></dd></div>
+                <div class="@Check"><dt>Pet pair</dt><dd id="pets-pair"></dd></div>
+                <div class="@Check"><dt>Settling in</dt><dd id="pets-settle"></dd></div>
+                <div class="@Check"><dt>Previous stay</dt><dd id="prior-first-stay"></dd></div>
+                <div class="@Check"><dt>Previous chart</dt><dd id="prior-chart"></dd></div>
+                <div class="@Check"><dt>Year end</dt><dd id="prior-year-end"></dd></div>
+                <div class="@Check"><dt>This year</dt><dd id="prior-this-year"></dd></div>
+                <div class="@Check"><dt>Reassessment</dt><dd id="prior-reassess"></dd></div>
+                <div class="@Check"><dt>Allergies</dt><dd id="allergies-none"></dd></div>
+                <div class="@Check"><dt>Penicillin</dt><dd id="allergies-penicillin"></dd></div>
+                <div class="@Check"><dt>Latex</dt><dd id="allergies-latex"></dd></div>
+                <div class="@Check"><dt>Codeine</dt><dd id="allergies-codeine"></dd></div>
+                <div class="@Check"><dt>On file</dt><dd id="allergies-any"></dd></div>
+            </dl>
+        </native-card-body></native-card>
+
+        <native-card><native-card-body>
+            <native-heading level="H2">Health</native-heading>
+            <dl class="mt-3 text-sm">
+                <div class="@Check"><dt>Flu shot asked</dt><dd id="flu-not-asked"></dd></div>
+                <div class="@Check"><dt>Flu shot answered</dt><dd id="flu-recorded"></dd></div>
+                <div class="@Check"><dt>Flu shot given</dt><dd id="flu-given"></dd></div>
+                <div class="@Check"><dt>Flu shot declined</dt><dd id="flu-declined"></dd></div>
+                <div class="@Check"><dt>Flu shot offer</dt><dd id="flu-offer"></dd></div>
+                <div class="@Check"><dt>Diet recorded</dt><dd id="diet-none"></dd></div>
+                <div class="@Check"><dt>Diet known</dt><dd id="diet-known"></dd></div>
+                <div class="@Check"><dt>Diabetic</dt><dd id="diet-diabetic"></dd></div>
+                <div class="@Check"><dt>Special diet</dt><dd id="diet-special"></dd></div>
+                <div class="@Check"><dt>Textures</dt><dd id="diet-textures"></dd></div>
+                <div class="@Check"><dt>Kitchen</dt><dd id="diet-kitchen"></dd></div>
+            </dl>
+        </native-card-body></native-card>
+    </native-grid>
+
+    <native-card><native-card-body>
+        <native-heading level="H2">Against the Garden wing</native-heading>
+        <native-text color="Secondary">The wing's policy is asked for each time; every fact on the sheet is held against it.</native-text>
+        @(Html.NativeButton("check-wing", "Check against the Garden wing")
+            .CssClass(Button + " mt-3")
+            .Reactive(plan, evt => evt.Click, (args, p) =>
+                p.Get(Url.SandboxRoute("Policy", "RespiteScreening"))
+                    .Response(r => r.OnSuccess<WingPolicy>((policy, s) => CheckTheWing(policy, s)))))
+        <dl class="mt-3 text-sm">
+            <div class="@Check"><dt>Expected resident</dt><dd id="policy-expected"></dd></div>
+            <div class="@Check"><dt>Minimum age</dt><dd id="policy-min-age"></dd></div>
+            <div class="@Check"><dt>Exact minimum</dt><dd id="policy-exact-age"></dd></div>
+            <div class="@Check"><dt>Wing rate</dt><dd id="policy-rate"></dd></div>
+            <div class="@Check"><dt>Over the rate</dt><dd id="policy-rate-over"></dd></div>
+            <div class="@Check"><dt>Wing open</dt><dd id="policy-opens"></dd></div>
+            <div class="@Check"><dt>Opening day</dt><dd id="policy-opening-day"></dd></div>
+            <div class="@Check"><dt>VA record</dt><dd id="policy-veteran"></dd></div>
+            <div class="@Check"><dt>Care level</dt><dd id="policy-care"></dd></div>
+            <div class="@Check"><dt>Room offered</dt><dd id="policy-room"></dd></div>
+            <div class="@Check"><dt>Pet limit</dt><dd id="policy-pets"></dd></div>
+            <div class="@Check"><dt>Over the pet limit</dt><dd id="policy-pets-over"></dd></div>
+            <div class="@Check"><dt>Previous stay</dt><dd id="policy-prior"></dd></div>
+            <div class="@Check"><dt>Clinic record</dt><dd id="policy-flu"></dd></div>
+            <div class="@Check"><dt>Dietitian record</dt><dd id="policy-diet"></dd></div>
+        </dl>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

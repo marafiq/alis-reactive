@@ -1,0 +1,22 @@
+@using Alis.Reactive.Framework.App.Plans
+@model ContactCard
+@{
+    var heading = (string)ViewData["Heading"]!;
+    var slug = ViewData.TemplateInfo.HtmlFieldPrefix.ToLowerInvariant();
+
+    // The card starts a plan of its own model, as the other card does: each plan stands alone, and the save
+    // sends the inputs inside its own card.
+    var plan = Html.ReactivePlan<ContactCard>();
+}
+<section id="@(slug)-card" aria-label="The @heading">
+    <h2>The @heading</h2>
+    @{ Html.InputField(plan, m => m.Name, o => o.Label($"The {heading}'s name")).Entry(); }
+
+    @(plan.Button($"save-{slug}", $"Save the {heading}")
+        .Reactive(button => button.Click, p => p.Post("/Plans/Contacts")
+            .Gather(g => g.Form($"{slug}-card"))
+            .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element($"{slug}-saved").Text.Set(saved.Get(x => x.Summary))))))
+    <p>The endpoint bound: <span id="@(slug)-saved"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

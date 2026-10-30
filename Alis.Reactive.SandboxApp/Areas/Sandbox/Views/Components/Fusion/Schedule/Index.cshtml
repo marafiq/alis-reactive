@@ -1,22 +1,27 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.PointInTimeScheduleModel
-@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Builders
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Schedule
 @using Alis.Reactive.Fusion.Templates
 @{
-    ViewData["Title"] = "Point-in-Time Schedule";
+    ViewData["Title"] = "Shift Schedule";
+
+    const string ScheduleId = "shift-schedule";
+    const string Button = "px-3 py-1.5 rounded-md border border-border text-sm font-medium hover:bg-slate-50";
 
     var plan = Html.ReactivePlan<PointInTimeScheduleModel>();
+    var shiftsUrl = Url.SandboxRouteTemplate("Shifts", "Schedule", "currentView");
 
     var quickInfoContent = FusionTemplate.Create<ShiftAssignment>()
         .Class("p-3 space-y-2")
         .Div(d => d.Class("font-semibold text-base").Text(m => m.Subject))
         .Div(d => d.Class("text-sm text-gray-600").Text(m => m.Description))
         .When(m => m.IsUnassigned,
-            then: t => t.Badge("NEEDS COVERAGE", "px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-700"),
-            @else: e => e.Div(d => d.Class("text-xs text-gray-500")
+            then: t => t.Badge("NEEDS COVERAGE", "px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-700"))
+        .When(m => m.IsStaffedShift,
+            then: t => t.Div(d => d.Class("text-xs text-gray-500")
                 .Span(m => m.StaffRole, "font-medium")
                 .Span(" | ")
                 .Span(m => m.StaffPhone)))
@@ -25,69 +30,72 @@
     var quickInfoFooter = FusionTemplate.Create<ShiftAssignment>()
         .Class("flex gap-2 p-2 border-t")
         .When(m => m.IsUnassigned,
+            then: t => t.EventButton("Assign Staff", PointInTimeScheduleEvents.ScheduleEdit, e => e.Id, m => m.Id, "e-primary e-small"))
+        .When(m => m.IsStaffedShift,
             then: t => t
-                .EventButton("Assign Staff", "schedule:edit", m => m.Id, "e-primary e-small"),
-            @else: e => e
-                .EventButton("Edit", "schedule:edit", m => m.Id, "e-small")
-                .EventButton("Reassign", "schedule:reassign", m => m.Id, "e-small"))
+                .EventButton("Edit", PointInTimeScheduleEvents.ScheduleEdit, e => e.Id, m => m.Id, "e-small")
+                .EventButton("Reassign", PointInTimeScheduleEvents.ScheduleReassign, e => e.Id, m => m.Id, "e-small"))
+        .When(m => m.IsInService,
+            then: t => t.Span("Double-click the in-service to change or delete it.", "text-xs text-gray-500"))
         .Render();
 
-    Html.On(plan, t => t.CustomEvent("schedule:assignment-saved", p =>
+    // The shifts of the dates the schedule shows, for the chosen facility; the schedule binds them, and
+    // the server's summary says what it answered for.
+    void ShowShifts(Data<ScheduleDataResponse> week, PipelineBuilder<PointInTimeScheduleModel> s)
     {
-        p.Element("status").SetText("Refreshing after save...");
-        p.Get("/api/schedule/assignments")
-         .Gather(g => g
-             .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-             .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-             .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
-         .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-         {
-             s.Component<FusionSchedule>("shift-schedule")
-                 .SetDataSource(json, j => j.Assignments);
-             s.Element("status").SetText("Refreshed after assignment");
-             s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-         }));
-    }));
+        var schedule = s.Component<FusionSchedule>(ScheduleId);
+        schedule.EventSettings.Events<ShiftAssignment>().Set(week.Get(w => w.Assignments));
+        schedule.DataBind();
+        s.Element("schedule-summary").Text.Set(week.Get(w => w.Summary));
+    }
+
+    // Asks for the shifts of the view and date the schedule shows now.
+    void LoadShownShifts(PipelineBuilder<PointInTimeScheduleModel> p)
+    {
+        var schedule = p.Component<FusionSchedule>(ScheduleId);
+        p.Element("schedule-loading").Show();
+        p.Get(shiftsUrl)
+         .Gather<ScheduleAssignmentsQuery>(g => g
+             .Set(x => x.CurrentView, schedule.CurrentView)
+             .Set(x => x.CurrentDate, schedule.SelectedDate)
+             .Form(m => m.SelectedFacilityId))
+         .Response(r => r.OnSuccess<ScheduleDataResponse>(ShowShifts));
+    }
+
+    // The server's word on an in-service it saved or took off, then the week as the server now has it.
+    void ShowInServiceAnswer(Data<InServiceAnswer> answer, PipelineBuilder<PointInTimeScheduleModel> s)
+    {
+        s.Element("in-service-note").Text.Set(answer.Get(x => x.Note));
+        s.Element("in-service-note").Show();
+        LoadShownShifts(s);
+    }
+
+    // A shift's assignment, staffed in the drawer.
+    void OpenAssignmentDrawer(PipelineBuilder<PointInTimeScheduleModel> p, string title, TypedSource<int> assignmentId)
+    {
+        p.Element("alis-drawer-title").Text.Set(title);
+        p.Component<NativeDrawer>().Size.Set(DrawerSize.Md);
+        p.Get(Url.SandboxRoute("EditForm", "Schedule"))
+         .Gather<EditAssignmentQuery>(g => g.Set(x => x.AssignmentId, assignmentId))
+         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+        p.Component<NativeDrawer>().Open();
+    }
 
     // FusionTemplate.EventButton dispatches detail.id for the parent Active Plan to load the drawer form.
-    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:edit", (payload, p) =>
-    {
-        p.Element("alis-drawer-title").SetText("Edit Shift Assignment");
-        p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-        p.Get(Url.SandboxRoute("EditForm", "Schedule"))
-         .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
-         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-        p.Component<NativeDrawer>().Open();
-    }));
+    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>(PointInTimeScheduleEvents.ScheduleEdit, (payload, p) =>
+        OpenAssignmentDrawer(p, "Edit Shift Assignment", payload.Get(a => a.Id))));
 
-    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>("schedule:reassign", (payload, p) =>
-    {
-        p.Element("alis-drawer-title").SetText("Reassign Shift");
-        p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-        p.Get(Url.SandboxRoute("EditForm", "Schedule"))
-         .Gather(g => g.FromEvent(payload, x => x.Id, "assignmentId"))
-         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-        p.Component<NativeDrawer>().Open();
-    }));
+    Html.On(plan, t => t.CustomEvent<ScheduleActionPayload>(PointInTimeScheduleEvents.ScheduleReassign, (payload, p) =>
+        OpenAssignmentDrawer(p, "Reassign Shift", payload.Get(a => a.Id))));
 
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Get("/api/schedule/assignments?selectedFacilityId=mystery-manor")
-         .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-         {
-             s.Component<FusionSchedule>("shift-schedule")
-                 .SetDataSource(json, j => j.Assignments);
-             s.Element("status").SetText("Schedule loaded");
-             s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-         }));
-    }));
+    Html.On(plan, t => t.DomReady(LoadShownShifts));
 }
 
 <native-vstack gap="Base">
-    <native-heading level="H1">Point-in-Time Schedule</native-heading>
+    <native-heading level="H1">Shift Schedule</native-heading>
     <native-text color="Secondary">
-        Senior living shift schedule. Double-click an assignment to edit via SF's built-in editor.
-        Change facility to load different data. Navigate weeks to see different assignments.
+        Keep every AM, PM and night shift covered. Click an open hour to add a shift and a shift to staff it;
+        double-click an in-service to change or delete it in the schedule's editor.
     </native-text>
 
     <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
@@ -97,76 +105,64 @@
                         .Placeholder("Select facility")
                         .DataSource(FakeScheduleData.Facilities)
                         .Fields<Facility>(t => t.Name, v => v.Id)
-                        .Value("mystery-manor")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("status").SetText("Loading...");
-                            p.Get("/api/schedule/assignments")
-                             .Gather(g => g
-                                 .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                                 .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-                                 .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
-                             .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-                             {
-                                 s.Component<FusionSchedule>("shift-schedule")
-                                     .SetDataSource(json, j => j.Assignments);
-                                 s.Element("status").SetText("Facility changed");
-                                 s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-                             }));
-                        })); }
-            <native-hstack gap="Sm" class="ml-auto text-sm">
-                <span class="text-text-secondary">Unassigned:</span>
-                <span id="unassigned-count" class="font-bold text-red-600">--</span>
-                <span class="mx-1 text-border">|</span>
-                <span class="text-text-secondary">Status:</span>
-                <span id="status" class="font-medium text-text-muted">Loading...</span>
-            </native-hstack>
-            @(Html.NativeButton("print-btn", "Print Schedule")
-                .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Component<FusionSchedule>("shift-schedule").Print();
-                }))
-            @(Html.NativeButton("route-template-schedule-btn", "Audit View Route")
-                .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Get("/api/schedule/view/{currentView}/echo")
-                     .Gather(g => g.RouteParam(
-                         "currentView",
-                         p.Component<FusionSchedule>("shift-schedule").CurrentView()))
-                     .Response(r => r.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
-                     {
-                         s.Element("route-view").SetText(json, x => x.CurrentView);
-                     })
-                     .Chained(c => c
-                         .Get("/api/schedule/view/{currentView}/summary")
-                         .Gather(g => g.RouteParam(
-                             "currentView",
-                             p.Component<FusionSchedule>("shift-schedule").CurrentView()))
-                         .Response(r2 => r2.OnSuccess<ScheduleViewRouteResponse>((json, s) =>
-                         {
-                             s.Element("route-view-summary").SetText(json, x => x.Summary);
-                         }))));
-                }))
-            @(Html.NativeButton("audit-events-btn", "Audit Events")
-                .CssClass("px-4 py-2 rounded-md border border-border text-sm font-medium hover:bg-slate-50")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Post("/api/schedule/events/audit")
-                     .Gather(g => g.Include(
-                         p.Component<FusionSchedule>("shift-schedule").GetEvents(),
-                         "events"))
-                     .Response(r => r.OnSuccess<ScheduleEventsAuditResponse>((json, s) =>
-                     {
-                         s.Element("schedule-events-count").SetText(json, x => x.Count);
-                     }));
-                }))
+                        .Value("maple-grove"))
+                    .Reactive(evt => evt.Change, (args, p) => LoadShownShifts(p)); }
+            @{ Html.InputField(plan, m => m.ScheduleLocked, o => o.Label("Lock the schedule for payroll"))
+                    .NativeCheckBox(b => b.CssClass("rounded border-border")); }
+            @{ Html.InputField(plan, m => m.NeedsCoverageOnly, o => o.Label("Show only shifts that need coverage"))
+                    .NativeCheckBox(b => b.CssClass("rounded border-border"))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.Component<FusionSchedule>(ScheduleId).RefreshEvents()); }
         </native-hstack>
+
+        <native-hstack gap="Sm" wrap="true" class="mt-3">
+            @* Opens the editor on the first shift no one covers; the page's editor for a shift is its drawer. *@
+            @(Html.NativeButton("cover-next-open-shift", "Cover the next open shift")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    var entries = p.From(p.Component<FusionSchedule>(ScheduleId).GetEvents<ShiftAssignment>());
+                    p.When(entries.Any(x => x.IsUnassigned)).Truthy()
+                     .Then(t => t.Component<FusionSchedule>(ScheduleId).OpenEditor(entries.Find(x => x.IsUnassigned), ScheduleAction.Save))
+                     .Else(e => e.Element("all-covered-note").Show());
+                }))
+            @(Html.NativeButton("schedule-show-morning", "Jump to the AM shift")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionSchedule>(ScheduleId).ScrollTo("06:00")))
+            @(Html.NativeButton("schedule-show-night", "Jump to the night shift")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionSchedule>(ScheduleId).ScrollTo("22:00")))
+            @(Html.NativeButton("ask-agency-btn", "Ask the agency to cover open shifts")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Post(Url.SandboxRoute("AgencyRequest", "Schedule"))
+                     .Gather<AgencyCoverRequest>(g => g.Set(
+                         x => x.Shifts,
+                         p.Component<FusionSchedule>(ScheduleId).GetEvents<ShiftAssignment>()))
+                     .Response(r => r.OnSuccess<AgencyCoverAnswer>((answer, s) =>
+                         s.Element("agency-status").Text.Set(answer.Get(x => x.Summary))))))
+            @(Html.NativeButton("print-btn", "Print Schedule")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                    p.Component<FusionSchedule>(ScheduleId).Print()))
+        </native-hstack>
+
+        <native-vstack gap="Xs" class="mt-3 text-sm">
+            <p id="schedule-summary" class="font-medium"></p>
+            <p id="schedule-loading" class="text-text-muted">Loading the schedule&hellip;</p>
+            <p>Selected: <span id="schedule-selection" class="font-medium">Nothing selected.</span></p>
+            <p id="agency-status"></p>
+            <p id="all-covered-note" hidden>Every shift on the schedule is covered.</p>
+            <p id="add-shift-hint" hidden>A shift starts at an hour: open a day or a week and click the hour it starts.</p>
+            <p id="in-service-note" hidden></p>
+            <p id="schedule-locked-note" class="text-warning" hidden></p>
+        </native-vstack>
     </section>
 
     <section class="rounded-lg border border-border bg-white shadow-sm" style="height: 600px;">
-        @(Html.FusionSchedule(plan, "shift-schedule", b =>
+        @(Html.FusionSchedule(plan, ScheduleId, b =>
             {
                 b.Width("100%"); b.Height("100%"); b.CurrentView(View.Week); b.SelectedDate(DateTime.Today);
                 b.Views(new List<ScheduleView>
@@ -208,117 +204,152 @@
                 b.WorkHours(new ScheduleWorkHours { Highlight = true, Start = "06:00", End = "22:00" });
                 b.StartHour("05:00"); b.EndHour("23:00");
                 b.TimeScale(new ScheduleTimeScale { Enable = true, Interval = 60, SlotCount = 1 });
-                b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(true);
+                // A shift keeps its hours; staff move between shifts in the drawer, not by dragging.
+                b.ShowHeaderBar(true); b.ShowTimeIndicator(true); b.AllowDragAndDrop(false); b.AllowResizing(false);
             })
-            .Reactive(evt => evt.CellClicked, (args, p) =>
+            .Reactive(evt => evt.CellClick, (args, p) =>
             {
-                p.Element("event-trace").SetText(args, x => x.StartTime);
-                p.Element("event-shift").SetText(args, x => x.GroupIndex);
-
-                p.Get(Url.SandboxRoute("NewAssignmentForm", "Schedule"))
-                 .Gather(g => g
-                     .FromEvent(args, x => x.StartTime, "startTime")
-                     .FromEvent(args, x => x.EndTime, "endTime")
-                     .FromEvent(args, x => x.GroupIndex, "shiftId")
-                     .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId))
-                 .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
-                p.Component<FusionDialog>("new-assignment-dialog").Show();
-            })
-            .Reactive(evt => evt.PopupOpen, (args, p) =>
-            {
-                // Syncfusion opens QuickInfo for empty cells too; cancel only those so event QuickInfo keeps the custom template.
-                p.When(args, x => x.Type).Eq("QuickInfo")
-                 .And(args, x => x.Data.Id).Eq(0)
-                 .Then(t => { args.PreventDefault(t); });
-
-                // Replace Syncfusion's built-in editor with the app-level drawer.
-                p.When(args, x => x.Type).Eq("Editor")
-                 .Then(t =>
+                // A whole day (a month's day, or the all-day row) has no hour for a shift to start at.
+                p.When(args.IsAllDay).Truthy()
+                 .Then(day => day.Element("add-shift-hint").Show())
+                 .Else(hour =>
                  {
-                     args.PreventDefault(t);
-                     t.Element("alis-drawer-title").SetText("Edit Shift Assignment");
-                     t.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-                     t.Get(Url.SandboxRoute("EditForm", "Schedule"))
-                      .Gather(g => g.FromEvent(args, x => x.Data.Id, "assignmentId"))
-                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                     t.Component<NativeDrawer>().Open();
-                 })
-                 .Else(e =>
-                 {
-                     e.Element("event-shift").SetText("NOT Editor");
+                     hour.Element("add-shift-hint").Hide();
+                     hour.Get(Url.SandboxRoute("NewAssignmentForm", "Schedule"))
+                      .Gather<NewAssignmentQuery>(g => g
+                          .Set(x => x.StartTime, args.StartTime)
+                          .Set(x => x.EndTime, args.EndTime)
+                          .Set(x => x.GroupIndex, args.GroupIndex)
+                          .Form(m => m.SelectedFacilityId))
+                      .Response(r => r.OnSuccess(s => s.Into("new-assignment-content")));
+                     hour.Component<FusionDialog>("new-assignment-dialog").Show();
                  });
             })
-            .Reactive(evt => evt.ActionBegin, (args, p) =>
+            .Reactive(evt => evt.PopupOpen<ShiftAssignment>(), (args, p) =>
             {
-                p.When(args, x => x.RequestType).Eq("eventChange")
+                var opened = args.Data.Get(x => x.Id);
+
+                // Syncfusion opens QuickInfo for empty cells too, with data that carries no id; an empty cell
+                // opens the new-shift dialog instead.
+                p.When(args.Type).Eq("QuickInfo").And(opened).Falsy()
+                 .Then(t => { args.Cancel.Set(true); })
+                 .ElseIf(args.Type).Eq("QuickInfo")
+                 .Then(t => t.Element("schedule-selection").Text.Set(args.Data.Get(x => x.Subject)));
+
+                // An in-service keeps Syncfusion's own editor, unless someone else has it open: the server
+                // says so, and the editor closes. A shift opens its assignment in the drawer instead, and an
+                // empty hour, whose first click opened the new-shift dialog, opens no editor.
+                p.When(args.Type).Eq("Editor").And(args.Data.Get(x => x.IsInService)).Truthy()
+                 .Then(t => t.Post(Url.SandboxRoute("InServiceClaim", "Schedule"))
+                     .Gather<InServiceClaimRequest>(g => g.Set(x => x.InServiceId, opened))
+                     .Response(r => r
+                         .OnSuccess<InServiceAnswer>((claim, s) =>
+                         {
+                             s.Element("in-service-note").Text.Set(claim.Get(x => x.Note));
+                             s.Element("in-service-note").Show();
+                         })
+                         .OnError<InServiceAnswer>(409, (refusal, e) =>
+                         {
+                             e.Component<FusionSchedule>(ScheduleId).CloseEditor();
+                             e.Element("in-service-note").Text.Set(refusal.Get(x => x.Note));
+                             e.Element("in-service-note").Show();
+                         })))
+                 .ElseIf(args.Type).Eq("Editor").And(opened).Truthy()
                  .Then(t =>
                  {
-                     t.Element("status").SetText("Saving...");
+                     args.Cancel.Set(true);
+                     OpenAssignmentDrawer(t, "Edit Shift Assignment", opened);
+                 })
+                 .ElseIf(args.Type).Eq("Editor")
+                 .Then(t => { args.Cancel.Set(true); });
+            })
+            .Reactive(evt => evt.PopupClose, (args, p) =>
+            {
+                p.When(args.Type).Eq("QuickInfo")
+                 .Then(t => t.Element("schedule-selection").Text.Set("Nothing selected."))
+                 .ElseIf(args.Type).Eq("Editor")
+                 .Then(t => t.Element("in-service-note").Hide());
+            })
+            .Reactive(evt => evt.EventClick, (args, p) =>
+            {
+                p.When(p.Component<NativeCheckBox>(m => m.ScheduleLocked).Checked).Truthy()
+                 .Then(locked =>
+                 {
+                     args.Cancel.Set(true);
+                     locked.Element("schedule-locked-note").Text.Set("The schedule is locked for payroll; unlock it to open a shift.");
+                     locked.Element("schedule-locked-note").Show();
+                 });
+            })
+            .Reactive(evt => evt.EventRendered<ShiftAssignment>(), (args, p) =>
+            {
+                p.When(p.Component<NativeCheckBox>(m => m.NeedsCoverageOnly).Checked).Truthy()
+                 .And(args.Data.Get(x => x.IsUnassigned)).Falsy()
+                 .Then(t => { args.Cancel.Set(true); });
+            })
+            .Reactive(evt => evt.ActionBegin<ShiftAssignment>(), (args, p) =>
+            {
+                p.When(args.RequestType).Eq("dateNavigate")
+                 .And(p.Component<NativeCheckBox>(m => m.ScheduleLocked).Checked).Truthy()
+                 .Then(locked =>
+                 {
+                     args.Cancel.Set(true);
+                     locked.Element("schedule-locked-note").Text.Set("The schedule is locked for payroll; it stays on this week.");
+                     locked.Element("schedule-locked-note").Show();
+                 });
+
+                // An in-service saved or deleted in the schedule's editor is the server's to change: the schedule's
+                // own change is cancelled, the server is asked, and the week reloads with what it saved. A shift
+                // saved or cancelled in the drawer passes here too (SaveEvent, DeleteEvent), after the server
+                // already has it; it is no in-service, so it is not sent again.
+                var changed = p.From(args.ChangedRecords);
+                var deleted = p.From(args.DeletedRecords);
+                p.When(args.RequestType).Eq("eventChange").And(changed.Any(x => x.IsInService)).Truthy()
+                 .Then(save =>
+                 {
+                     args.Cancel.Set(true);
+                     save.Post(Url.SandboxRoute("SaveInService", "Schedule"))
+                      .Gather<InServiceChange>(g => g
+                          .Set(x => x.InServiceId, changed.Find(x => x.IsInService, x => x.Id))
+                          .Set(x => x.Subject, changed.Find(x => x.IsInService, x => x.Subject))
+                          .Set(x => x.Description, changed.Find(x => x.IsInService, x => x.Description)))
+                      .Response(r => r.OnSuccess<InServiceAnswer>(ShowInServiceAnswer));
+                 })
+                 .ElseIf(args.RequestType).Eq("eventRemove").And(deleted.Any(x => x.IsInService)).Truthy()
+                 .Then(remove =>
+                 {
+                     args.Cancel.Set(true);
+                     remove.Post(Url.SandboxRoute("RemoveInService", "Schedule"))
+                      .Gather<InServiceRemoval>(g => g.Set(x => x.InServiceId, deleted.Find(x => x.IsInService, x => x.Id)))
+                      .Response(r => r.OnSuccess<InServiceAnswer>(ShowInServiceAnswer));
                  });
             })
             .Reactive(evt => evt.ActionComplete, (args, p) =>
             {
-                // Syncfusion emits eventChanged after CRUD; reload authoritative assignments then.
-                p.When(args, x => x.RequestType).Eq("eventChanged")
-                 .Then(t =>
-                 {
-                     t.Element("status").SetText("Saved — reloading...");
-                     t.Get("/api/schedule/assignments")
-                      .Gather(g => g
-                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                          .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView())
-                          .Include(p.Component<FusionSchedule>("shift-schedule").SelectedDate(), "currentDate"))
-                      .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-                      {
-                          s.Component<FusionSchedule>("shift-schedule")
-                              .SetDataSource(json, j => j.Assignments);
-                          s.Element("status").SetText("Refreshed after save");
-                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-                      }));
-                 });
+                // A shift staffed in the drawer is saved through the schedule; the server's shifts and their
+                // summary come back with it.
+                p.When(args.RequestType).Eq("eventChanged")
+                 .Then(LoadShownShifts);
             })
             .Reactive(evt => evt.Navigating, (args, p) =>
             {
-                p.Element("status").SetText("Navigating...");
+                p.Element("schedule-loading").Show();
 
-                // For view switches, Syncfusion args carry the new currentView.
-                p.When(args, x => x.Action).Eq("view")
-                 .Then(t =>
-                 {
-                     t.Get("/api/schedule/assignments")
-                      .Gather(g => g
-                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                          .FromEvent(args, x => x.CurrentDate, "currentDate")
-                          .FromEvent(args, x => x.CurrentView, "currentView"))
-                      .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-                      {
-                          s.Component<FusionSchedule>("shift-schedule")
-                              .SetDataSource(json, j => j.Assignments);
-                          s.Element("status").SetText("View loaded");
-                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-                      }));
-                 })
-                 // For date navigation, read the unchanged view from the component.
-                 .Else(e =>
-                 {
-                     e.Get("/api/schedule/assignments")
-                      .Gather(g => g
-                          .Include<FusionDropDownList, PointInTimeScheduleModel>(m => m.SelectedFacilityId)
-                          .FromEvent(args, x => x.CurrentDate, "currentDate")
-                          .Include(p.Component<FusionSchedule>("shift-schedule").CurrentView()))
-                      .Response(r => r.OnSuccess<ScheduleDataResponse>((json, s) =>
-                      {
-                          s.Component<FusionSchedule>("shift-schedule")
-                              .SetDataSource(json, j => j.Assignments);
-                          s.Element("status").SetText("Date loaded");
-                          s.Element("unassigned-count").SetText(json, j => j.UnassignedCount);
-                      }));
-                 });
+                // A view switch hands over the view it moves to; a date move keeps the schedule's own view.
+                p.When(args.Action).Eq("view")
+                 .Then(view => view.Get(shiftsUrl)
+                     .Gather<ScheduleAssignmentsQuery>(g => g
+                         .Set(x => x.CurrentView, args.CurrentView)
+                         .Set(x => x.CurrentDate, args.CurrentDate)
+                         .Form(m => m.SelectedFacilityId))
+                     .Response(r => r.OnSuccess<ScheduleDataResponse>(ShowShifts)))
+                 .Else(date => date.Get(shiftsUrl)
+                     .Gather<ScheduleAssignmentsQuery>(g => g
+                         .Set(x => x.CurrentView, date.Component<FusionSchedule>(ScheduleId).CurrentView)
+                         .Set(x => x.CurrentDate, args.CurrentDate)
+                         .Form(m => m.SelectedFacilityId))
+                     .Response(r => r.OnSuccess<ScheduleDataResponse>(ShowShifts)));
             })
-            .Reactive(evt => evt.DataBound, (args, p) =>
-            {
-                p.Element("status").SetText("Ready");
-            }))
+            .Reactive(evt => evt.DataBound, (args, p) => p.Element("schedule-loading").Hide()))
     </section>
 
     @(Html.FusionDialog(plan, "new-assignment-dialog", b =>
@@ -335,22 +366,6 @@
     {
         p.Component<FusionDialog>("new-assignment-dialog").Hide();
     }))
-
-    <section class="rounded-lg border border-border bg-white p-4 shadow-sm">
-        <h3 class="text-sm font-semibold mb-2">Event Trace</h3>
-        <native-vstack gap="Xs" class="font-mono text-xs">
-            <p>Last cell click: <span id="event-trace" class="text-text-muted">--</span></p>
-            <p>Shift group: <span id="event-shift" class="text-text-muted">--</span></p>
-            <p>Route view: <span id="route-view" class="text-text-muted">--</span></p>
-            <p>Route view summary: <span id="route-view-summary" class="text-text-muted">--</span></p>
-            <p>Schedule events: <span id="schedule-events-count" class="text-text-muted">--</span></p>
-        </native-vstack>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code>@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
 </native-vstack>
 
 @Html.RenderPlan(plan)

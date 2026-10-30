@@ -1,60 +1,56 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridOperationsModel
+@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.MedPassSheetViewModel
 @using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.Grids
 @{
-    ViewData["Title"] = "Care-Staff Column Fit";
+    ViewData["Title"] = "Evening Med Pass";
 
-    const string GridId = "column-fit-grid";
+    const string GridId = "med-pass-sheet";
     const string Button = "rounded-md border border-border bg-white px-3 py-2 text-sm font-medium text-text hover:bg-surface-subtle";
 
-    var plan = Html.ReactivePlan<GridOperationsModel>();
+    var plan = Html.ReactivePlan<MedPassSheetViewModel>();
+
+    var columns = FusionGridColumns.Of<MedPassDose>();
 
     Html.On(plan, t => t.DomReady(p =>
-        p.Get(Url.SandboxRoute("OperationRows", "Grid"))
-            .Response(r => r.OnSuccess<List<ResidentDirectoryGridItem>>((json, s) =>
-            {
-                s.Component<FusionGrid>(GridId).SetDataSource(json);
-                s.Element("fit-status").SetText("loaded");
-            }))));
+        p.Get(Url.SandboxRoute("ColumnFitDoses", "Grid"))
+            .Response(r => r.OnSuccess<List<MedPassDose>>((doses, s) =>
+                s.Component<FusionGrid>(GridId).Rows<MedPassDose>().Set(doses)))));
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">Care-Staff Column Fit</native-heading>
-    <native-text color="Secondary">
-        Auto-fit one wide column, then auto-fit all columns to their content.
-    </native-text>
+    <div>
+        <native-heading level="H1">Evening Med Pass</native-heading>
+        <native-text color="Secondary">
+            Birch wing, 8:00 and 9:00 PM doses. The sheet is laid out for the med cart's tablet, so long names are cut
+            short: hover a name to read it, or widen the columns to fit.
+        </native-text>
+    </div>
 
-    <native-hstack gap="Sm" class="flex-wrap">
-        @(Html.NativeButton("fit-risk", "Fit Risk Column")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).AutoFitColumn((ResidentDirectoryGridItem x) => x.RiskLevel);
-                p.Element("fit-status").SetText("autoFitColumn called");
-            }))
-        @(Html.NativeButton("fit-all", "Fit All Columns")
-            .CssClass(Button)
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                p.Component<FusionGrid>(GridId).AutoFitColumns();
-                p.Element("fit-status").SetText("autoFitColumns called");
-            }))
-    </native-hstack>
+    <native-card><native-card-body>
+        <native-hstack gap="Sm" class="mb-4 flex-wrap">
+            @(Html.NativeButton("fit-medication", "Show full medication names")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) =>
+                    p.Component<FusionGrid>(GridId).AutoFitColumn(Field.Of((MedPassDose d) => d.Medication))))
+            @(Html.NativeButton("fit-every-column", "Fit every column")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (_, p) => p.Component<FusionGrid>(GridId).AutoFitColumns()))
+        </native-hstack>
 
-    <p class="font-mono text-sm">Status: <span id="fit-status" class="text-text-muted">waiting</span></p>
-
-    <section class="rounded-lg border border-border bg-white p-5 shadow-sm">
-        @(Html.FusionGrid<GridOperationsModel, ResidentDirectoryGridItem>(plan, GridId, b => b
-            .Columns(new List<GridColumn>
-            {
-                new GridColumn { Field = "residentId", HeaderText = "ID", Width = "80", IsPrimaryKey = true, TextAlign = TextAlign.Right, Visible = false },
-                new GridColumn { Field = "residentName", HeaderText = "Resident", Width = "400" },
-                new GridColumn { Field = "riskLevel", HeaderText = "Risk", Width = "400" },
-                new GridColumn { Field = "openTasks", HeaderText = "Open Tasks", Width = "130", TextAlign = TextAlign.Right }
-            })))
-    </section>
+        <div class="max-w-2xl">
+            @(Html.FusionGrid<MedPassSheetViewModel, MedPassDose>(plan, GridId, b => b
+                .Columns(new List<GridColumn>
+                {
+                    new GridColumn { Field = columns.Field(r => r.DoseId), HeaderText = "ID", IsPrimaryKey = true, Visible = false },
+                    new GridColumn { Field = columns.Field(r => r.Room), HeaderText = "Room", Width = "70" },
+                    new GridColumn { Field = columns.Field(r => r.ResidentName), HeaderText = "Resident", Width = "120", ClipMode = ClipMode.EllipsisWithTooltip },
+                    new GridColumn { Field = columns.Field(r => r.Medication), HeaderText = "Medication", Width = "150", ClipMode = ClipMode.EllipsisWithTooltip },
+                    new GridColumn { Field = columns.Field(r => r.Dose), HeaderText = "Dose", Width = "90" },
+                    new GridColumn { Field = columns.Field(r => r.Due), HeaderText = "Due", Width = "80" }
+                })))
+        </div>
+    </native-card-body></native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full" data-alis-trace="trace">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] — Alis.Reactive Sandbox</title>
-    <link rel="stylesheet" href="~/css/design-system.dev.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/css/syncfusion.dev.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/_content/AlisReactive.Native/css/native.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/_content/AlisReactive.Fusion/css/fusion.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/sandbox.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/js/sandbox-components.css" asp-append-version="true"/>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 </head>
 <body class="alis-root h-full">
 
@@ -58,10 +62,19 @@
 @Html.EJS().ScriptManager()
 @await RenderSectionAsync("Scripts", required: false)
 
-@Html.FusionConfirmDialog()
+@* A page may bring its own confirmation (section Confirm); every other page asks the Syncfusion one. *@
+@if (IsSectionDefined("Confirm"))
+{
+    @await RenderSectionAsync("Confirm")
+}
+else
+{
+    @Html.FusionConfirmDialog()
+}
 @Html.NativeLoader()
 @Html.NativeDrawer()
 <script src="~/js/sandbox-plugins.js" asp-append-version="true"></script>
-<script src="~/scripts/alis-reactive.dev.js" asp-append-version="true"></script>
+<script src="~/js/sandbox-components.js" asp-append-version="true"></script>
+<script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
 </body>
 </html>

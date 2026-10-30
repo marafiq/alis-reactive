@@ -10,14 +10,20 @@ namespace Alis.Reactive.Analyzers
         internal static readonly ImmutableHashSet<string> HttpMethodNames =
             ImmutableHashSet.Create("Get", "Post", "Put", "Delete");
 
-        /// <summary>Identifies Razor-generated files that view-only analyzers should inspect.</summary>
+        /// <summary>
+        /// Identifies a view's C#, which the view-only analyzers inspect. The Razor source generator names
+        /// it after the view with every character that is not a letter or a digit as an underscore
+        /// (<c>Views_Home_Index_cshtml.g.cs</c>); the build-time Razor pipeline keeps the view's name
+        /// (<c>Index.cshtml.g.cs</c>); a view compiled under its own path keeps it (<c>Index.cshtml</c>).
+        /// </summary>
         internal static bool IsRazorGeneratedFile(SyntaxTree tree)
         {
             var path = tree.FilePath;
             if (string.IsNullOrEmpty(path)) return false;
 
             return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith("_cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
 
         internal static ClassDeclarationSyntax? FindContainingClass(SyntaxNode node)

@@ -1,5 +1,4 @@
 using System.Text.Encodings.Web;
-using Alis.Reactive.DesignSystem.Layout;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Alis.Reactive.NativeTagHelpers.Kv;
@@ -52,21 +51,11 @@ public class NativeKvTagHelper : TagHelper
         var encodedLabel = HtmlEncoder.Default.Encode(Label);
         var encodedValue = HtmlEncoder.Default.Encode(Value);
 
-        if (Layout == KvLayout.Inline)
-        {
-            output.Attributes.SetAttribute("class", KvCss.InlineWrapperClasses(CssClass));
-            output.Content.SetHtmlContent(
-                $"<dt class=\"{KvCss.InlineDtClasses()}\">{encodedLabel}:</dt>" +
-                $"<dd class=\"{KvCss.InlineDdClasses()}\">{encodedValue}</dd>");
-            return;
-        }
-
-        var wrapperClasses = KvCss.StackedWrapperClasses(CssClass);
-        if (!string.IsNullOrEmpty(wrapperClasses))
-            output.Attributes.SetAttribute("class", wrapperClasses);
-
+        var layoutClass = Layout == KvLayout.Inline ? "alis-kv--inline" : "alis-kv--stacked";
+        var separator = Layout == KvLayout.Inline ? ":" : "";
+        output.Attributes.SetAttribute("class", LayoutClasses.Join("alis-kv", layoutClass, CssClass));
         output.Content.SetHtmlContent(
-            $"<dt class=\"{KvCss.StackedDtClasses()}\">{encodedLabel}</dt>" +
-            $"<dd class=\"{KvCss.StackedDdClasses()}\">{encodedValue}</dd>");
+            $"<dt class=\"alis-kv__label\">{encodedLabel}{separator}</dt>" +
+            $"<dd class=\"alis-kv__value\">{encodedValue}</dd>");
     }
 }

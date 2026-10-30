@@ -1,0 +1,45 @@
+name: regenerate plan contract
+
+# runtime/types/plan.ts is generated from the C# plan domain by PlanContractGenerator and is never
+# hand-edited. Sessions that cannot run the .NET SDK (cloud agents) change the C# domain and push;
+# this job runs the generator on the branch and commits plan.ts when it moved, so the committed
+# contract always matches the generator's output. The gate regenerates it again before typecheck,
+# so the gate never depends on this job. It runs on every branch push, so a push that loses a race
+# with a newer commit is repaired by the next one. Never runs on main: main changes only by pull
+# request.
+on:
+  push:
+    branches-ignore:
+      - main
+      - 'release/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: regenerate-plan-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-toolchain
+
+      - name: Run PlanContractGenerator
+        # The generator needs the core's C# only; the runtime bundle the core ships is not built here.
+        run: dotnet run --project tools/PlanContractGenerator/PlanContractGenerator.csproj --property:BuildReactiveBrowserAssets=false -- Alis.Reactive.Assets/runtime/types/plan.ts
+
+      - name: Commit plan.ts when the contract moved
+        run: |
+          if git diff --quiet -- Alis.Reactive.Assets/runtime/types/plan.ts; then
+            echo "plan.ts already matches the generator."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(contract): regenerate runtime/types/plan.ts from the C# plan domain" -- Alis.Reactive.Assets/runtime/types/plan.ts
+          git push origin "HEAD:${GITHUB_REF_NAME}"

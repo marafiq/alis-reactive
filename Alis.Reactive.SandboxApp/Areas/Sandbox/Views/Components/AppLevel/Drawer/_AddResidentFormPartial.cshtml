@@ -1,10 +1,9 @@
 @model DrawerResidentModel
 @using Alis.Reactive.Native.AppLevel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.AppLevel
 @{
-    var plan = Html.ResolvePlan<DrawerResidentModel>();
+    var plan = Html.ReactivePlan<DrawerResidentModel>();
 
     var careLevels = new[]
     {
@@ -34,19 +33,25 @@
                 .CssClass("px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Element("alis-loader-message").SetText("Saving resident...");
-                    p.Post(Url.SandboxRoute("SubmitResident", "Drawer"), g => g.IncludeAll())
+                    p.Element("alis-loader-message").Text.Set("Saving resident...");
+                    p.Post(Url.SandboxRoute("SubmitResident", "Drawer")).Gather(g => g.Form())
                      .Validate<DrawerResidentValidator>("drawer-resident-form")
-                     .WhileLoading(loader=> loader.Component<NativeLoader>().SetTarget("drawer-resident-form").SetTimeout(1000).Show())
+                     .WhileLoading(l =>
+                     {
+                         var loader = l.Component<NativeLoader>();
+                         loader.Target.Set("drawer-resident-form");
+                         loader.Timeout.Set(1000);
+                         loader.Show();
+                     })
                      .Response(r => r
                         .OnSuccess(s =>
                         {
                             s.Component<NativeLoader>().Hide();
-                            s.Component<FusionToast>()
-                                .SetTitle("Admission")
-                                .SetContent("Resident saved successfully")
-                                .Success()
-                                .Show();
+                            var toast = s.Component<FusionToast>();
+                            toast.Title.Set("Admission");
+                            toast.Content.Set("Resident saved successfully");
+                            toast.Tone.Set(FusionToastTone.Success);
+                            toast.Show();
                             s.Component<NativeDrawer>().Close();
                         })
                         .OnError(400, e =>

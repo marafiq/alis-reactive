@@ -4,107 +4,22 @@
     <File Path=".claude/settings.json" />
   </Folder>
   <Folder Name="/.claude/memory/">
-    <File Path=".claude/memory/quality-principles.md" />
     <File Path=".claude/memory/bdd-principles.md" />
     <File Path=".claude/memory/coding-principles.md" />
     <File Path=".claude/memory/docs-principles.md" />
-    <File Path=".claude/memory/forensic-master-index.md" />
-    <File Path=".claude/memory/validation-roadmap.md" />
-    <File Path=".claude/memory/project_docs_site.md" />
-    <File Path=".claude/memory/solid-ts-research.md" />
-    <File Path=".claude/memory/vision_working_principles.md" />
   </Folder>
-  <Folder Name="/.claude/skills/reactive-dsl/">
-    <File Path=".claude/skills/reactive-dsl/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/http-pipeline/">
-    <File Path=".claude/skills/http-pipeline/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/conditions-dsl/">
-    <File Path=".claude/skills/conditions-dsl/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/onboard-fusion-component/">
-    <File Path=".claude/skills/onboard-fusion-component/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/solid-ts-audit/">
-    <File Path=".claude/skills/solid-ts-audit/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/modern-csharp/">
-    <File Path=".claude/skills/modern-csharp/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/" />
-  <Folder Name="/.claude/skills/bdd-testing/">
-    <File Path=".claude/skills/bdd-testing/SKILL.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/bdd-testing/references/">
-    <File Path=".claude/skills/bdd-testing/references/patterns.md" />
-    <File Path=".claude/skills/bdd-testing/references/first-principles.md" />
-  </Folder>
-  <Folder Name="/.claude/skills/validation-rules/">
-    <File Path=".claude/skills/validation-rules/SKILL.md" />
-  </Folder>
-  <Folder Name="/docs-site/">
-    <File Path="docs-site/astro.config.mjs" />
-    <File Path="docs-site/package.json" />
-    <File Path="docs-site/tsconfig.json" />
-    <File Path="docs-site/.gitignore" />
-  </Folder>
-  <Folder Name="/docs-site/content/">
-    <File Path="docs-site/src/content/docs/index.mdx" />
-    <File Path="docs-site/src/content/docs/why.mdx" />
-  </Folder>
-  <Folder Name="/docs-site/content/getting-started/">
-    <File Path="docs-site/src/content/docs/getting-started/your-first-plan.md" />
-  </Folder>
-  <Folder Name="/docs-site/content/architecture/">
-    <File Path="docs-site/src/content/docs/architecture/component-model.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/descriptors-and-plan.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/error-behavior.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/fluent-builders.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/onboarding-component.md" />
-    <File Path="docs-site/src/content/docs/architecture/plan-composition.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/runtime.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/sandbox-demo.md" />
-    <File Path="docs-site/src/content/docs/architecture/the-builders.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/the-contract.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/three-layers.mdx" />
-    <File Path="docs-site/src/content/docs/architecture/vertical-slice.mdx" />
-  </Folder>
-  <Folder Name="/docs-site/content/csharp-modules/">
-    <File Path="docs-site/src/content/docs/csharp-modules/mental-model.mdx" />
-    <File Path="docs-site/src/content/docs/csharp-modules/plan-and-entries.md" />
-  </Folder>
-  <Folder Name="/docs-site/content/csharp-modules/reactivity/">
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/component-api.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/conditions.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/element-mutations.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/http-pipeline.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/http-pipeline-extensions.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/plugins.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/server-push.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/signalr.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/triggers-and-reactions.md" />
-    <File Path="docs-site/src/content/docs/csharp-modules/reactivity/validation.md" />
-  </Folder>
-  <Folder Name="/docs-site/content/components/">
-    <File Path="docs-site/src/content/docs/components/overview.md" />
-    <File Path="docs-site/src/content/docs/components/native-components.md" />
-    <File Path="docs-site/src/content/docs/components/design-system.md" />
-    <File Path="docs-site/src/content/docs/components/fusion/index.md" />
-  </Folder>
-  <Folder Name="/docs-site/content/testing/">
-    <File Path="docs-site/src/content/docs/testing/strategy.mdx" />
-    <File Path="docs-site/src/content/docs/testing/writing-tests.md" />
-  </Folder>
-  <Folder Name="/docs-site/content/reference/">
-    <File Path="docs-site/src/content/docs/reference/api-reference.md" />
-    <File Path="docs-site/src/content/docs/reference/guard-operators.md" />
-    <File Path="docs-site/src/content/docs/reference/build-commands.md" />
+  <Folder Name="/docs/">
+    <File Path="docs/design/grammar.md" />
+    <File Path="docs/design/bring-your-own-component.md" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Alis.Reactive.AnalyzerTests/Alis.Reactive.AnalyzerTests.csproj" />
     <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />
+    <Project Path="tests/Alis.Reactive.Framework.App/Alis.Reactive.Framework.App.csproj" />
+    <Project Path="tests/Alis.Reactive.Framework.PlaywrightTests/Alis.Reactive.Framework.PlaywrightTests.csproj" />
+    <Project Path="tests/Alis.Reactive.PlanTests/Alis.Reactive.PlanTests.csproj" />
     <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
+    <Project Path="tests/Alis.Reactive.Playwright.TestHost/Alis.Reactive.Playwright.TestHost.csproj" />
   </Folder>
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
@@ -116,9 +31,7 @@
   <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
   <Project Path="Alis.Reactive.FluentValidator/Alis.Reactive.FluentValidator.csproj" />
   <Folder Name="/tools/">
-    <Project Path="tools/ApiDocGenerator/ApiDocGenerator.csproj" />
     <Project Path="tools/PlanContractGenerator/PlanContractGenerator.csproj" />
-    <Project Path="tools/FusionCoverage/FusionCoverage.csproj" />
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/resident-intake/ResidentIntake.csproj" />
@@ -127,6 +40,8 @@
     <File Path="package.json" />
     <File Path="eslint.config.js" />
     <File Path="Directory.Build.props" />
-    <File Path="build/AlisReactiveAssets.targets" />
+    <File Path="build/AlisReactiveStaticWebAssets.targets" />
+    <File Path="build/AlisReactiveNetFrameworkContent.targets" />
+    <File Path="build/AlisReactiveBrowserAssets.targets" />
   </Folder>
 </Solution>

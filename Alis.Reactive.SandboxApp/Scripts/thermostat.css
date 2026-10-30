@@ -1,0 +1,87 @@
+/* The thermostat the sandbox wrote itself (thermostat.ts). */
+.thermostat {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 20rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d6dde6;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  font-size: 0.875rem;
+}
+
+.thermostat .th-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.thermostat .th-target {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.thermostat .th-mode {
+  text-transform: capitalize;
+  color: #475569;
+}
+
+.thermostat .th-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  color: #475569;
+}
+
+.thermostat .th-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.thermostat .th-up,
+.thermostat .th-down {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #94a3b8;
+  border-radius: 9999px;
+  background: #fff;
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.thermostat .th-up:disabled,
+.thermostat .th-down:disabled {
+  color: #94a3b8;
+  border-color: #cbd5e1;
+}
+
+.thermostat .th-lock {
+  margin-left: auto;
+  color: #64748b;
+}
+
+.thermostat .th-status {
+  min-height: 1.25rem;
+  margin: 0;
+  color: #b45309;
+}
+
+.thermostat .th-zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #475569;
+}
+
+.thermostat .th-zone {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.thermostat .th-zone-boost {
+  color: #b45309;
+}

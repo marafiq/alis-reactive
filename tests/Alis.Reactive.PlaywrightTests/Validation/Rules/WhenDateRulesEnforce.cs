@@ -1,4 +1,5 @@
-using Alis.Reactive.Playwright.Extensions;
+using System.Linq.Expressions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 
@@ -6,13 +7,19 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 public class WhenDateRulesEnforce : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/DateRules";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_DateValidationModel__";
 
     private ILocator ValidateBtn => Page.Locator("#validate-dates-btn");
     private ILocator Result => Page.Locator("#date-result");
-    private ILocator ErrorFor(string suffix) => Page.Locator($"#{ModelIdPrefix}{suffix}_error");
+    private ILocator ErrorFor(Expression<Func<DateValidationModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}_error");
 
-    private DatePickerLocator DatePicker(string suffix) => new(Page, ModelIdPrefix + suffix);
+    private DatePickerLocator DatePicker(Expression<Func<DateValidationModel, object?>> member) => new(Page, IdGenerator.For(member));
+
+    // Typed dates reach any year without paging the calendar; leaving each one lets its message settle.
+    private async Task EnterStay(string admission, string discharge)
+    {
+        await DatePicker(m => m.AdmissionDate).FillAndBlur(admission);
+        await DatePicker(m => m.DischargeDate).FillAndBlur(discharge);
+    }
 
     [Test]
     public async Task empty_dates_show_required_errors_on_submit()
@@ -22,12 +29,14 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
-        await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.AdmissionDate)).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.DischargeDate)).ToHaveTextAsync("Discharge date is required.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
 
+    // The last day of 2019 is before the earliest admission day; the first day of 2020 is it.
     [Test]
     public async Task admission_date_before_2020_shows_min_error()
     {
@@ -35,15 +44,18 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.AdmissionDate)).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
 
-        // Set date before 2020 using text input instead of calendar navigation.
-        // Calendar navigation to 2019 would require 80+ month clicks from 2026.
-        await DatePicker("AdmissionDate").FillAndBlur("06/15/2019");
+        // Typed dates reach 2019 without paging the calendar back from 2026.
+        await DatePicker(m => m.AdmissionDate).FillAndBlur("12/31/2019");
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("2020", new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.AdmissionDate)).ToHaveTextAsync("Admission date must be on or after January 1, 2020.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker(m => m.AdmissionDate).FillAndBlur("01/01/2020");
+        await Expect(ErrorFor(m => m.AdmissionDate)).ToBeHiddenAsync(new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
     }
@@ -55,13 +67,13 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await ClickWhenStable(ValidateBtn);
-        await Expect(ErrorFor("AdmissionDate")).ToContainTextAsync("required", new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.AdmissionDate)).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
 
-        await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
+        await DatePicker(m => m.AdmissionDate).SelectDate(2025, 3, 15);
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("AdmissionDate")).ToBeHiddenAsync(new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.AdmissionDate)).ToBeHiddenAsync(new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
     }
@@ -72,12 +84,13 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
-        await DatePicker("DischargeDate").SelectDate(2025, 3, 10);
+        await DatePicker(m => m.AdmissionDate).SelectDate(2025, 3, 15);
+        await DatePicker(m => m.DischargeDate).SelectDate(2025, 3, 10);
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("after admission", new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.DischargeDate)).ToHaveTextAsync("Discharge date must be after admission date.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
@@ -88,12 +101,13 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
-        await DatePicker("DischargeDate").SelectDate(2025, 3, 15);
+        await DatePicker(m => m.AdmissionDate).SelectDate(2025, 3, 15);
+        await DatePicker(m => m.DischargeDate).SelectDate(2025, 3, 15);
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(ErrorFor("DischargeDate")).ToContainTextAsync("after admission", new() { Timeout = 2000 });
+        await Expect(ErrorFor(m => m.DischargeDate)).ToHaveTextAsync("Discharge date must be after admission date.", new() { Timeout = 2000 });
+        await Expect(Result).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
     }
@@ -104,13 +118,138 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await DatePicker("AdmissionDate").SelectDate(2025, 3, 15);
-        await DatePicker("DischargeDate").SelectDate(2025, 3, 20);
+        await DatePicker(m => m.AdmissionDate).SelectDate(2025, 3, 15);
+        await DatePicker(m => m.DischargeDate).SelectDate(2025, 3, 20);
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(Result).ToContainTextAsync("valid", new() { Timeout = 5000 });
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
 
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_care_plan_review_dated_december_31_2024_is_refused_and_january_1_2025_is_accepted()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("12/01/2024", "03/31/2025");
+        await DatePicker(m => m.CarePlanReviewDate).FillAndBlur("12/31/2024");
+
+        await ClickWhenStable(ValidateBtn);
+
+        // GreaterThan(December 31, 2024): the day itself is not after it.
+        await Expect(ErrorFor(m => m.CarePlanReviewDate)).ToHaveTextAsync("Date the care plan review after December 31, 2024.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker(m => m.CarePlanReviewDate).FillAndBlur("01/01/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_care_plan_review_before_admission_is_refused_and_one_on_the_admission_day_is_accepted()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker(m => m.CarePlanReviewDate).FillAndBlur("02/28/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor(m => m.CarePlanReviewDate)).ToHaveTextAsync("The care plan review cannot come before admission.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker(m => m.CarePlanReviewDate).FillAndBlur("03/01/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_care_plan_review_on_the_discharge_day_is_refused()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker(m => m.CarePlanReviewDate).FillAndBlur("03/31/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor(m => m.CarePlanReviewDate)).ToHaveTextAsync("The care plan review must come before discharge.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker(m => m.CarePlanReviewDate).FillAndBlur("03/30/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_follow_up_visit_after_discharge_is_refused_and_one_on_the_discharge_day_is_accepted()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker(m => m.FollowUpVisitDate).FillAndBlur("04/01/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor(m => m.FollowUpVisitDate)).ToHaveTextAsync("The follow-up visit cannot come after discharge.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker(m => m.FollowUpVisitDate).FillAndBlur("03/31/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_follow_up_visit_on_the_care_plan_review_day_is_refused()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker(m => m.CarePlanReviewDate).FillAndBlur("03/10/2025");
+        await DatePicker(m => m.FollowUpVisitDate).FillAndBlur("03/10/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor(m => m.FollowUpVisitDate))
+            .ToHaveTextAsync("Book the follow-up visit on a different day from the care plan review.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker(m => m.FollowUpVisitDate).FillAndBlur("03/11/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_move_out_inspection_off_the_discharge_day_is_refused()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+        await EnterStay("03/01/2025", "03/31/2025");
+        await DatePicker(m => m.MoveOutInspectionDate).FillAndBlur("03/30/2025");
+
+        await ClickWhenStable(ValidateBtn);
+
+        await Expect(ErrorFor(m => m.MoveOutInspectionDate)).ToHaveTextAsync("The move-out inspection happens on the discharge day.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        // A day after discharge is off the discharge day too.
+        await DatePicker(m => m.MoveOutInspectionDate).FillAndBlur("03/31/2025");
+        await Expect(ErrorFor(m => m.MoveOutInspectionDate)).ToHaveTextAsync("");
+        await DatePicker(m => m.MoveOutInspectionDate).FillAndBlur("04/01/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(ErrorFor(m => m.MoveOutInspectionDate)).ToHaveTextAsync("The move-out inspection happens on the discharge day.");
+        await Expect(Result).ToHaveTextAsync("Click to validate");
+
+        await DatePicker(m => m.MoveOutInspectionDate).FillAndBlur("03/31/2025");
+        await ClickWhenStable(ValidateBtn);
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -120,12 +259,12 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await DatePicker("AdmissionDate").SelectDate(2025, 1, 10);
-        await DatePicker("DischargeDate").SelectDate(2025, 2, 15);
+        await DatePicker(m => m.AdmissionDate).SelectDate(2025, 1, 10);
+        await DatePicker(m => m.DischargeDate).SelectDate(2025, 2, 15);
 
         await ClickWhenStable(ValidateBtn);
 
-        await Expect(Result).ToContainTextAsync("valid", new() { Timeout = 5000 });
+        await Expect(Result).ToHaveTextAsync("All dates valid!", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }

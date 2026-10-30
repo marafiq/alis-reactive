@@ -1,0 +1,21 @@
+@using Alis.Reactive.Framework.App.Validation
+@model ResidentOuting
+@{
+    ViewData["Title"] = "An outing";
+
+    var plan = Html.ReactivePlan<ResidentOuting>();
+}
+<h1>Sign a resident out</h1>
+
+@* No request validates the card's form: the server checks the outing and says what is wrong. *@
+<section id="outing-card" aria-label="The outing">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    @{ Html.InputField(plan, m => m.Companion, o => o.Label("Companion")).Entry(); }
+
+    @(plan.Button("sign-out", "Sign the resident out")
+        .Reactive(button => button.Click, p => p.Post("/Validation/Outing")
+            .Gather(g => g.Form("outing-card"))
+            .Response(r => r.OnError(400, e => e.ValidationErrors("outing-card")))))
+</section>
+
+@Html.RenderPlan(plan)

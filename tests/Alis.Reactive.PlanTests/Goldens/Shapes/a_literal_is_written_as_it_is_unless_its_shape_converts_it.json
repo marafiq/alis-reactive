@@ -1,0 +1,124 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Vitals",
+  "vendors": {},
+  "objects": {
+    "$http": {
+      "kind": "plugin",
+      "name": "alis.http",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "let",
+          "name": "res1",
+          "expr": {
+            "kind": "call",
+            "target": {
+              "kind": "obj",
+              "id": "$http"
+            },
+            "path": [
+              "send"
+            ],
+            "args": [
+              {
+                "kind": "record",
+                "fields": [
+                  {
+                    "name": "method",
+                    "value": {
+                      "kind": "lit",
+                      "value": "POST"
+                    }
+                  },
+                  {
+                    "name": "url",
+                    "value": {
+                      "kind": "lit",
+                      "value": "/vitals"
+                    }
+                  },
+                  {
+                    "name": "route",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "value": {
+                      "kind": "record",
+                      "fields": [
+                        {
+                          "name": "Weight",
+                          "value": {
+                            "kind": "lit",
+                            "value": 70
+                          }
+                        },
+                        {
+                          "name": "MeasuredOn",
+                          "value": {
+                            "kind": "as",
+                            "expr": {
+                              "kind": "lit",
+                              "value": "2026-10-27T00:00:00.0000000"
+                            },
+                            "shape": {
+                              "kind": "date"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "arrays",
+                    "value": {
+                      "kind": "list",
+                      "items": []
+                    }
+                  },
+                  {
+                    "name": "headers",
+                    "value": {
+                      "kind": "record",
+                      "fields": []
+                    }
+                  },
+                  {
+                    "name": "format",
+                    "value": {
+                      "kind": "lit",
+                      "value": "json"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "await": true
+        }
+      ]
+    }
+  ]
+}

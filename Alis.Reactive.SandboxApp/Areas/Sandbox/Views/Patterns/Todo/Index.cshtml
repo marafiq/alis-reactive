@@ -1,5 +1,4 @@
 @model TodoModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.AppLevel
@@ -24,13 +23,13 @@
 
             @{ Html.InputField(plan, m => m.IsUrgent, o => o.Label("Urgent"))
                 .NativeCheckBox(b => b
-                    .CssClass("h-4 w-4 rounded border-border text-accent")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, a => a.Checked).Truthy()
-                            .Then(t => t.Element("due-date-section").Show())
-                            .Else(e => e.Element("due-date-section").Hide());
-                    })); }
+                    .CssClass("h-4 w-4 rounded border-border text-accent"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args.Checked).Truthy()
+                        .Then(t => t.Element("due-date-section").Show())
+                        .Else(e => e.Element("due-date-section").Hide());
+                }); }
 
             <div id="due-date-section" hidden>
                 @{ Html.InputField(plan, m => m.DueDate, o => o.Label("Due Date"))
@@ -42,16 +41,16 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Save", "Todo"), g => g.IncludeAll())
+                p.Post(Url.SandboxRoute("Save", "Todo")).Gather(g => g.Form())
                  .Validate<TodoValidator>("todo-form")
                  .Response(r => r
                     .OnSuccess(s =>
                     {
-                        s.Component<FusionToast>()
-                            .SetTitle("Todo")
-                            .SetContent("Todo saved successfully")
-                            .Success()
-                            .Show();
+                        var toast = s.Component<FusionToast>();
+                        toast.Title.Set("Todo");
+                        toast.Content.Set("Todo saved successfully");
+                        toast.Tone.Set(FusionToastTone.Success);
+                        toast.Show();
                     })
                     .OnError(400, e => e.ValidationErrors("todo-form")));
             }))
@@ -60,12 +59,6 @@
     </native-card-body>
     </native-card>
 
-    <native-card>
-    <native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="text-xs overflow-auto"><code>@Html.Raw(plan.RenderFormatted())</code></pre>
-    </native-card-body>
-    </native-card>
 </native-vstack>
 
 @Html.RenderPlan(plan)

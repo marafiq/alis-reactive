@@ -1,0 +1,48 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model TriagePage
+@{
+    ViewData["Title"] = "Triage";
+    var plan = Html.ReactivePlan<TriagePage>();
+}
+<h1>Triage</h1>
+
+<h2>Pain</h2>
+@plan.Meter("pain", level: 0, max: 5)
+<h2>Fall risk</h2>
+@plan.Meter("risk", level: 0, max: 5)
+@{ Html.InputField(plan, m => m.Ward, o => o.Label("Ward")).Entry(); }
+
+<p>Urgent, when pain is over 3, fall risk over 2 and a ward is given: <span id="urgent"></span></p>
+<p>Review, when pain is over 3, fall risk over 2 or the ward is Isolation: <span id="review"></span></p>
+<p>Comfortable, when pain is not over 1: <span id="comfortable"></span></p>
+<p>Escalate, when on North and either pain or fall risk is 5: <span id="escalate"></span></p>
+<p>Call the doctor, when pain is 5, or fall risk is over 3 on North: <span id="call-doctor"></span></p>
+<p>Settled, when a ward is given and neither pain nor fall risk is above 0: <span id="settled"></span></p>
+
+@(plan.Button("triage", "Triage")
+    .Reactive(button => button.Click, p =>
+    {
+        var pain = p.Component<Meter>("pain").Level;
+        var risk = p.Component<Meter>("risk").Level;
+        var ward = p.Component<Entry>(m => m.Ward).Value;
+        p.When(pain).Gt(3).And(risk).Gt(2).And(ward).NotEmpty()
+            .Then(t => t.Element("urgent").Text.Set("urgent"))
+            .Else(e => e.Element("urgent").Text.Set("not urgent"));
+        p.When(pain).Gt(3).Or(risk).Gt(2).Or(ward).Eq("Isolation")
+            .Then(t => t.Element("review").Text.Set("review"))
+            .Else(e => e.Element("review").Text.Set("no review"));
+        p.When(pain).Gt(1).Not()
+            .Then(t => t.Element("comfortable").Text.Set("comfortable"))
+            .Else(e => e.Element("comfortable").Text.Set("not comfortable"));
+        p.When(ward).Eq("North").And(g => g.When(pain).Eq(5).Or(risk).Eq(5))
+            .Then(t => t.Element("escalate").Text.Set("escalate"))
+            .Else(e => e.Element("escalate").Text.Set("do not escalate"));
+        p.When(pain).Eq(5).Or(g => g.When(risk).Gt(3).And(ward).Eq("North"))
+            .Then(t => t.Element("call-doctor").Text.Set("call the doctor"))
+            .Else(e => e.Element("call-doctor").Text.Set("no call"));
+        p.When(ward).NotEmpty().And(g => g.Not(n => n.When(pain).Gt(0).Or(risk).Gt(0)))
+            .Then(t => t.Element("settled").Text.Set("settled"))
+            .Else(e => e.Element("settled").Text.Set("not settled"));
+    }))
+
+@Html.RenderPlan(plan)

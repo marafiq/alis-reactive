@@ -1,5 +1,4 @@
 @model MedicationPassModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
     ViewData["Title"] = "Medication Pass";
@@ -27,13 +26,23 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("Record", "MedicationPass"), g => g.IncludeAll())
-                 .Response(r => r.OnSuccess<MedicationPassConfirmation>((json, s) =>
+                p.Post(Url.SandboxRoute("Record", "MedicationPass")).Gather(g => g.Form("medication-pass-form"))
+                 .Response(r => r.OnSuccess<MedicationPassConfirmation>((pass, s) =>
                  {
-                     s.Element("medication-pass-status").SetText(json, x => x.Confirmation);
+                     s.Element("medication-pass-status").Text.Set(pass.Get(x => x.Confirmation));
+                     // The next pass is given once the pharmacy has ordered the refills: the refill
+                     // route reads the pass confirmation, the response its own handle names.
+                     s.Get(Url.SandboxRoute("Refills", "MedicationPass"))
+                      .Response(refills => refills.OnSuccess<RefillOrder>((order, ordered) =>
+                      {
+                          ordered.Element("medication-pass-refills").Text.Set(order.Get(x => x.Status));
+                          ordered.Element("medication-pass-next").Text.Set(pass.Get(x => x.NextPass));
+                      }));
                  }));
             }))
         <p id="medication-pass-status" class="mt-3 text-sm text-text-muted">No pass recorded yet.</p>
+        <p id="medication-pass-refills" class="text-sm text-text-muted"></p>
+        <p id="medication-pass-next" class="text-sm font-medium"></p>
     </native-card-body>
     </native-card>
 </native-vstack>

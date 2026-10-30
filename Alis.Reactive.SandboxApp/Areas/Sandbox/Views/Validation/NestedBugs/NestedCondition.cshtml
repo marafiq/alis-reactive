@@ -1,5 +1,4 @@
 @model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs.NestedAddressModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
 @{
@@ -24,10 +23,10 @@
     @(Html.NativeButton("submit-btn", "Submit")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post(Url.SandboxRoute("SubmitNestedAddress", "NestedBugs"), g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("SubmitNestedAddress", "NestedBugs")).Gather(g => g.Form())
              .Validate<NestedAddressParentValidator>("nested-form")
              .Response(r => r
-                .OnSuccess(s => s.Element("result").SetText("Saved"))
+                .OnSuccess(s => s.Element("result").Text.Set("Saved"))
                 .OnError(400, e => e.ValidationErrors("nested-form")));
         }))
 

@@ -1,0 +1,39 @@
+@using Alis.Reactive.Framework.App.Slots
+@model HallPage
+@{
+    ViewData["Title"] = "The hall";
+    var plan = Html.ReactivePlan<HallPage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>The hall</h1>
+
+@(plan.Bell("hall-bell")
+    .Reactive(bell => bell.OnRung, (ring, p) =>
+    {
+        p.Element("page-heard").Text.Set(ring.Times);
+        p.Dispatch(HallEvents.Rang, rang => rang.Set(x => x.Times, ring.Times));
+    }))
+
+<p>The page heard ring: <span id="page-heard"></span> · the board heard ring: <span id="board-heard"></span> · the note heard ring: <span id="note-heard"></span></p>
+<p>Pinning tried <span id="pin-tried"></span> · went on <span id="pin-after"></span></p>
+
+<div id="board-slot"></div>
+
+@(plan.Button("open-board", "Open the board")
+    .Reactive(button => button.Click, p => p.Get("/Slots/Board").Response(r => r.OnSuccess(s => s.Into("board-slot")))))
+@(plan.Button("close-board", "Close the board")
+    .Reactive(button => button.Click, p => p.Unload("board-slot")))
+@(plan.Button("pin-note", "Pin a note to the board")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("pin-tried").Text.Set(tally.Total);
+        p.Get("/Slots/Note").Response(r => r.OnSuccess(s => s.Into("note-slot")));
+        p.Element("pin-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("empty-answer", "Put an empty answer on the board")
+    .Reactive(button => button.Click, p => p.Get("/Slots/Nothing").Response(r => r.OnSuccess(s => s.Into("board-slot")))))
+@(plan.Button("plain-notice", "Put a plain notice on the board")
+    .Reactive(button => button.Click, p => p.Get("/Slots/Plain").Response(r => r.OnSuccess(s => s.Into("board-slot")))))
+
+@Html.RenderPlan(plan)

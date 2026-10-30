@@ -1,5 +1,4 @@
 @model SwitchModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
@@ -26,15 +25,15 @@
             @{ Html.InputField(plan, m => m.ReceiveCareAlerts, o => o.Label("Receive care alerts"))
                 .FusionSwitch(b => b
                     .OnLabel("On")
-                    .OffLabel("Off")
-                    .Reactive(plan, evt => evt.Changed, (args, p) =>
-                    {
-                        p.When(args, x => x.Checked).Truthy()
-                            .Then(on => on.Element("alerts-status")
-                                .SetText("Care alerts are on. Choose how we should reach you below."))
-                            .Else(off => off.Element("alerts-status")
-                                .SetText("Care alerts are paused. We will not send reminders until you turn them back on."));
-                    })); }
+                    .OffLabel("Off"))
+                .Reactive(evt => evt.Change, (args, p) =>
+                {
+                    p.When(args.Checked).Truthy()
+                        .Then(on => on.Element("alerts-status")
+                            .Text.Set("Care alerts are on. Choose how we should reach you below."))
+                        .Else(off => off.Element("alerts-status")
+                            .Text.Set("Care alerts are paused. We will not send reminders until you turn them back on."));
+                }); }
 
             <native-text color="Secondary"><span id="alerts-status">Care alerts are on. Choose how we should reach you below.</span></native-text>
 
@@ -42,9 +41,9 @@
                 .CssClass(ButtonSecondary)
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Component<FusionSwitch>(m => m.ReceiveCareAlerts).SetChecked(false);
+                    p.Component<FusionSwitch>(m => m.ReceiveCareAlerts).Checked.Set(false);
                     p.Element("alerts-status")
-                        .SetText("Care alerts are paused. We will not send reminders until you turn them back on.");
+                        .Text.Set("Care alerts are paused. We will not send reminders until you turn them back on.");
                 }))
         </native-vstack>
     </native-card-body></native-card>
@@ -65,18 +64,18 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var email = p.Component<FusionSwitch>(m => m.EmailReminders);
-                        p.When(email.Value()).Truthy()
-                            .Then(on => on.Element("email-review").SetText("Email reminders are on."))
-                            .Else(off => off.Element("email-review").SetText("Email reminders are off."));
+                        p.When(email.Checked).Truthy()
+                            .Then(on => on.Element("email-review").Text.Set("Email reminders are on."))
+                            .Else(off => off.Element("email-review").Text.Set("Email reminders are off."));
                     }))
                 @(Html.NativeButton("review-text", "Review text-message alerts")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         var text = p.Component<FusionSwitch>(m => m.TextMessageAlerts);
-                        p.When(text.Value()).Truthy()
-                            .Then(on => on.Element("text-review").SetText("Text-message alerts are on."))
-                            .Else(off => off.Element("text-review").SetText("Text-message alerts are off."));
+                        p.When(text.Checked).Truthy()
+                            .Then(on => on.Element("text-review").Text.Set("Text-message alerts are on."))
+                            .Else(off => off.Element("text-review").Text.Set("Text-message alerts are off."));
                     }))
             </native-hstack>
 
@@ -97,14 +96,14 @@
                     var email = p.Component<FusionSwitch>(m => m.EmailReminders);
                     var text = p.Component<FusionSwitch>(m => m.TextMessageAlerts);
                     p.Post(Url.SandboxRoute("Save", "Switch"))
-                        .Gather(g => g
-                            .Include(receive.Value(), "receiveCareAlerts")
-                            .Include(email.Value(), "emailReminders")
-                            .Include(text.Value(), "textMessageAlerts"))
+                        .Gather<CareAlertPreferencesRequest>(g => g
+                            .Set(x => x.ReceiveCareAlerts, receive.Checked)
+                            .Set(x => x.EmailReminders, email.Checked)
+                            .Set(x => x.TextMessageAlerts, text.Checked))
                         .Response(r => r.OnSuccess<CareAlertPreferencesResponse>((json, s) =>
                         {
-                            s.Element("save-confirmation").SetText(json, x => x.Summary);
-                            s.Element("save-confirmation-panel").RemoveClass("hidden");
+                            s.Element("save-confirmation").Text.Set(json.Get(x => x.Summary));
+                            s.Element("save-confirmation-panel").ClassList.Remove("hidden");
                         }));
                 }))
             <div id="save-confirmation-panel" class="hidden rounded-md border border-green-300 bg-green-50 p-4">

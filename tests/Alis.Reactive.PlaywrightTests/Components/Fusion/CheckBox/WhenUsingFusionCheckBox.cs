@@ -1,4 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.CheckBox;
 
@@ -10,9 +10,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.CheckBox;
 public class WhenUsingFusionCheckBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionCheckBox";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionCheckBoxModel";
-    private const string AgreementId = GeneratedTypeScope + "__AgreementAccepted";
-    private const string HousekeepingId = GeneratedTypeScope + "__WeeklyHousekeeping";
+    private static readonly string AgreementId = IdGenerator.For<FusionCheckBoxModel>(m => m.AgreementAccepted);
+    private static readonly string HousekeepingId = IdGenerator.For<FusionCheckBoxModel>(m => m.WeeklyHousekeeping);
 
     private FusionCheckBoxLocator Agreement => new(Page, AgreementId);
     private FusionCheckBoxLocator Housekeeping => new(Page, HousekeepingId);
@@ -207,9 +206,9 @@ public class WhenUsingFusionCheckBox : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"agreementAccepted\":true"),
+        Assert.That(body, Does.Contain("\"AgreementAccepted\":true"),
             "the gather must carry the agreement Checked() source under its declared key");
-        Assert.That(body, Does.Contain("\"housekeepingNeedsFollowUp\":true"),
+        Assert.That(body, Does.Contain("\"HousekeepingNeedsFollowUp\":true"),
             "the gather must carry the housekeeping Indeterminate() source under its declared key");
 
         AssertNoConsoleErrors();

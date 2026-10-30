@@ -1,0 +1,152 @@
+@model VisitEscortModel
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.SandboxApp.BroughtComponents
+@{
+    ViewData["Title"] = "Visit Escorts";
+
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
+    const string Button = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
+
+    var plan = Html.ReactivePlan<VisitEscortModel>();
+    var weekUrl = Url.SandboxRouteTemplate("Week", "VisitEscort", "resident");
+    var escortUrl = Url.SandboxRouteTemplate("Escort", "VisitEscort", "slot");
+    var shareUrl = Url.SandboxRoute("Share", "VisitEscort");
+    var partyUrl = Url.SandboxRouteTemplate("Party", "VisitEscort", "slot");
+    var seatingUrl = Url.SandboxRoute("Seating", "VisitEscort");
+
+    // The link names the resident; the week of times comes from the wing's desk.
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        var link = p.Url<VisitEscortLink>();
+        var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+        p.Get(weekUrl)
+         .Gather<EscortWeekRequest>(g => g.Set(x => x.Resident, link.Get(q => q.Resident)))
+         .Response(r => r
+            .OnSuccess<EscortWeek>((week, s) =>
+            {
+                planner.Wing.Set(week.Get(x => x.Wing));
+                planner.Capacity.Set(week.Get(x => x.Capacity));
+                planner.Slots.Set(week.Get(x => x.Slots));
+                s.Element("escort-resident").Text.Set(week.Get(x => x.Resident));
+            })
+            .OnError<EscortMessage>(404, (unknown, e) =>
+            {
+                planner.Labels.Empty.Set(unknown.Get(x => x.Message));
+                e.Element("escort-resident").Text.Set("Unknown resident");
+            }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Visit Escorts</native-heading>
+        <native-text color="Secondary">
+            Memory care. <span id="escort-resident" class="font-medium">The resident</span>'s family visits need an
+            escort from the wing's desk: each time booked here asks the desk for one, each time released lets it go.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            @{ Html.InputField(plan, m => m.VisitSlots, o => o.Label("Visit times this week"))
+                .VisitPlanner(capacity: 1)
+                .Reactive(evt => evt.WeekChanged, (args, p) =>
+                {
+                    var link = p.Url<VisitEscortLink>();
+                    var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+
+                    // A time booked: the desk the link names is asked for an escort at that time, for the
+                    // wing in the link and for whichever visit of the week this now is.
+                    p.When(args.Added).NotEmpty()
+                        .Then(booked => booked.Get(escortUrl)
+                            .Gather<EscortRequest>(g => g
+                                .Set(x => x.Slot, args.Added)
+                                .Set(x => x.Wing, link.Get(q => q.Wing))
+                                .Set(x => x.Visit, planner.Count)
+                                .Header("X-Desk", link.Get(q => q.Desk)))
+                            .Response(r => r
+                                .OnSuccess<EscortMessage>((answer, s) => s.Element("escort-status").Text.Set(answer.Get(x => x.Message)))
+                                .OnError<EscortMessage>(400, (noDesk, e) => e.Element("escort-status").Text.Set(noDesk.Get(x => x.Message)))));
+
+                    // A time released: its escort is released too.
+                    p.When(args.Removed).NotEmpty()
+                        .Then(released => released.Delete(escortUrl)
+                            .Gather<EscortRelease>(g => g
+                                .Set(x => x.Slot, args.Removed)
+                                .Set(x => x.Reason, "the family released the time"))
+                            .Response(r => r.OnSuccess<EscortMessage>((freed, s) =>
+                                s.Element("escort-status").Text.Set(freed.Get(x => x.Message)))));
+                }); }
+            <p id="escort-status" class="text-sm">No escort asked for yet.</p>
+
+            @(Html.NativeButton("share-week-btn", "Share the week with the family")
+                .CssClass(Button)
+                .Reactive(plan, evt => evt.Click, (args, p) =>
+                {
+                    // The planner prepares its summary, which takes a moment; the request waits for it,
+                    // and for the summary itself, before it is sent.
+                    var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+                    planner.PrepareSummary();
+                    p.Post(shareUrl)
+                     .Gather<WeekShare>(g => g
+                         .Set(x => x.Summary, planner.Summary())
+                         .Set(x => x.VisitsLeft, planner.Remaining()))
+                     .Response(r => r.OnSuccess<EscortMessage>((shared, s) =>
+                         s.Element("share-status").Text.Set(shared.Get(x => x.Message))));
+                }))
+            <p id="share-status" class="text-sm text-text-muted">The family has not been sent the week.</p>
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">The party at the earliest visit</native-heading>
+            <native-grid cols="C3" gap="Base">
+                @{ Html.InputField(plan, m => m.Visitors, o => o.Label("Visitors"))
+                    .NativeTextBox(b => b.Type("number").CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.Companion, o => o.Label("Companion"))
+                    .NativeTextBox(b => b.Placeholder("Who comes along").CssClass(Field)); }
+                @{ Html.InputField(plan, m => m.Note, o => o.Label("Note for the desk"))
+                    .NativeTextBox(b => b.Placeholder("e.g. Bring the album").CssClass(Field)); }
+            </native-grid>
+            <native-hstack gap="Sm" class="flex-wrap">
+                @(Html.NativeButton("update-party-btn", "Name the party")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // The party goes to the desk as one JSON body: the visitors and the note inside
+                        // the party, the companion as the first of the companions.
+                        var planner = p.Component<VisitPlanner>(m => m.VisitSlots);
+                        var earliestTime = planner.FirstBooked();
+                        p.When(earliestTime).NotEmpty()
+                            .Then(earliest => earliest.Put(partyUrl)
+                                .Gather<PartyUpdate>(g => g
+                                    .Set(x => x.Slot, earliestTime)
+                                    .Set(x => x.Party.Visitors, earliest.Component<NativeTextBox>(m => m.Visitors).Value)
+                                    .Set(x => x.Party.Note, earliest.Component<NativeTextBox>(m => m.Note).Value)
+                                    .Set(x => x.Companions[0].Name, earliest.Component<NativeTextBox>(m => m.Companion).Value))
+                                .Response(r => r.OnSuccess<EscortMessage>((updated, s) =>
+                                    s.Element("party-status").Text.Set(updated.Get(x => x.Message)))))
+                            .Else(none => none.Element("party-status").Text.Set("Book a time before naming the party."));
+                    }))
+                @(Html.NativeButton("check-seating-btn", "Check the family room seats the party")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        // The same party, asked about in a query string: the nested and indexed members
+                        // travel as the keys MVC reads.
+                        p.Get(seatingUrl)
+                         .Gather<PartyQuery>(g => g
+                             .Set(x => x.Party.Visitors, p.Component<NativeTextBox>(m => m.Visitors).Value)
+                             .Set(x => x.Companions[0].Name, p.Component<NativeTextBox>(m => m.Companion).Value))
+                         .Response(r => r.OnSuccess<EscortMessage>((seats, s) =>
+                             s.Element("seating-status").Text.Set(seats.Get(x => x.Message))));
+                    }))
+            </native-hstack>
+            <p id="party-status" class="text-sm text-text-muted">No party named yet.</p>
+            <p id="seating-status" class="text-sm text-text-muted"></p>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

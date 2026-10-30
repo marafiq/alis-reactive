@@ -1,0 +1,130 @@
+@using Alis.Reactive.Framework.App.Requests
+@model RequestsPage
+@{
+    ViewData["Title"] = "Requests";
+    var plan = Html.ReactivePlan<RequestsPage>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<h1>Requests</h1>
+
+@plan.Slate("slate", title: "Night", "Ada", "Ben")
+
+<dl>
+    <dt>Route and query</dt><dd id="resident"></dd>
+    <dt>JSON body</dt><dd id="note"></dd>
+    <dt>Put</dt><dd id="put"></dd>
+    <dt>Delete</dt><dd id="deleted"></dd>
+    <dt>Form data</dt><dd id="uploaded"></dd>
+    <dt>Headers</dt><dd id="headers"></dd>
+    <dt>A method's result</dt><dd id="total"></dd>
+    <dt>An estimate</dt><dd id="estimate"></dd>
+    <dt>Refused</dt><dd id="refused"></dd>
+    <dt>Chained</dt><dd id="chained"></dd>
+    <dt>Parallel</dt><dd><span id="slow-one"></span> · <span id="slow-two"></span> · settled after: <span id="settled"></span></dd>
+    <dt>While loading</dt><dd id="loading"></dd>
+    <dt>Finally</dt><dd id="finished"></dd>
+    <dt>Finally inside a route</dt><dd id="finished-inside"></dd>
+</dl>
+
+@(plan.Button("get-resident", "Get the resident")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Residents/{id}")
+        .Gather<ResidentQuery>(g => g.Set(x => x.Id, 1042).Set(x => x.Wing, "Garden"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("resident").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("post-note", "Post a note")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Notes")
+        .Gather<NoteRequest>(g => g
+            .Set(x => x.Text, "Back at three")
+            .Set(x => x.Title, p.Component<Slate>("slate").Title)
+            .Set(x => x.Tally, tally.Total))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("note").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("put-note", "Put the note")
+    .Reactive(button => button.Click, p => p.Put("/Requests/Notes/{id}")
+        .Gather<NoteRequest>(g => g.Set(x => x.Id, 7).Set(x => x.Text, "Changed"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("put").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("delete-note", "Delete the note")
+    .Reactive(button => button.Click, p => p.Delete("/Requests/Notes/{id}")
+        .Gather<NoteRequest>(g => g.Set(x => x.Id, 7))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("deleted").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("upload", "Send as form data")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Upload")
+        .Gather<NoteRequest>(g => g.Set(x => x.Text, "On paper").Set(x => x.Amount, 12.5m))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("uploaded").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("send-headers", "Send with headers")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Headers")
+        .Gather(g => g.Header("X-Shift", "Night").Header("X-Desk", p.Component<Slate>("slate").Title))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("headers").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("place", "Place a line")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Place("Ada", 40.5m, true, new DateTime(2026, 10, 27))))
+@(plan.Button("send-total", "Send the total")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Totals/{total}")
+        .Gather<TotalRoute>(g => g.Set(x => x.Total, p.Component<Slate>("slate").Total()))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("total").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("post-total", "Post the total")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Notes")
+        .Gather<NoteRequest>(g => g.Set(x => x.Text, "Totals").Set(x => x.Amount, p.Component<Slate>("slate").Total()))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("note").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("post-estimate", "Post the total as an estimate")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Estimates")
+        .Gather<EstimateRequest>(g => g.Set(x => x.Estimate, p.Component<Slate>("slate").Total()))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("estimate").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("post-no-estimate", "Post the estimate left empty")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Estimates")
+        .Gather<EstimateRequest>(g => g.Set(x => x.Estimate, (decimal?)null))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("estimate").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("refuse-409", "Ask for a taken room")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Refuse")
+        .Gather<RefuseQuery>(g => g.Set(x => x.Status, 409))
+        .Response(r => r
+            .OnSuccess(s => s.Element("refused").Text.Set("answered"))
+            .OnError<Refusal>(409, (refusal, e) => e.Element("refused").Text.Set(refusal.Get(x => x.Reason)))
+            .OnError(e => e.Element("refused").Text.Set("refused for another reason")))))
+@(plan.Button("refuse-500", "Ask a broken endpoint")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Refuse")
+        .Gather<RefuseQuery>(g => g.Set(x => x.Status, 500))
+        .Response(r => r
+            .OnError<Refusal>(409, (refusal, e) => e.Element("refused").Text.Set(refusal.Get(x => x.Reason)))
+            .OnError(e => e.Element("refused").Text.Set("refused for another reason")))
+        .Finally(f => f.Element("finished").Text.Set("finished after the refusal"))))
+@(plan.Button("chain", "Take both steps")
+    .Reactive(button => button.Click, p => p.Get("/Requests/First")
+        .Response(r => r.Chained<FirstAnswer>((first, next) => next.Get("/Requests/Second")
+            .Gather<SecondQuery>(g => g.Set(x => x.From, first.Get(x => x.Next)))
+            .Response(second => second.OnSuccess<Echo>((echo, s) => s.Element("chained").Text.Set(echo.Get(x => x.Summary))))))))
+@(plan.Button("chain-after-refusal", "Take a step after a refusal")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Refuse")
+        .Gather<RefuseQuery>(g => g.Set(x => x.Status, 409))
+        .Response(r => r
+            .OnError(e => e.Element("chained").Text.Set("the first step was refused"))
+            .Chained(next => next.Get("/Requests/Second")
+                .Gather<SecondQuery>(g => g.Set(x => x.From, "a refusal"))
+                .Response(second => second.OnSuccess<Echo>((echo, s) => s.Element("chained").Text.Set(echo.Get(x => x.Summary))))))))
+@(plan.Button("parallel", "Ask both at once")
+    .Reactive(button => button.Click, p => p.Parallel(
+            one => one.Get("/Requests/Slow").Gather<SlowQuery>(g => g.Set(x => x.Delay, 600).Set(x => x.Name, "the slow one"))
+                .Response(r => r.OnSuccess<Echo>((echo, s) =>
+                {
+                    s.Element("slow-one").Text.Set(echo.Get(x => x.Summary));
+                    s.Component<Slate>("slate").Header.Rename(echo.Get(x => x.Summary));
+                })),
+            two => two.Get("/Requests/Slow").Gather<SlowQuery>(g => g.Set(x => x.Delay, 50).Set(x => x.Name, "the quick one"))
+                .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("slow-two").Text.Set(echo.Get(x => x.Summary)))))
+        .OnAllSettled(s => s.Element("settled").Text.Set(s.Component<Slate>("slate").Header.Caption))))
+@(plan.Button("load", "Load slowly")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Slow")
+        .Gather<SlowQuery>(g => g.Set(x => x.Delay, 600).Set(x => x.Name, "the slow endpoint"))
+        .WhileLoading(w => w.Element("loading").Text.Set("loading"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("loading").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("finish", "Load and finish")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Residents/{id}")
+        .Gather<ResidentQuery>(g => g.Set(x => x.Id, 3))
+        .Finally(f => f.Element("finished").Text.Set("finished after the answer"))))
+@(plan.Button("finish-inside", "Finish inside the first answer")
+    .Reactive(button => button.Click, p => p.Get("/Requests/First")
+        .Response(r => r.OnSuccess<FirstAnswer>((first, s) => s.Get("/Requests/Second")
+            .Gather<SecondQuery>(g => g.Set(x => x.From, "the inner request"))
+            .Finally(f => f.Element("finished-inside").Text.Set(first.Get(x => x.Next)))))))
+@(plan.Button("add-four", "Add 4 to the tally")
+    .Reactive(button => button.Click, p => tally.Add(4)))
+
+@Html.RenderPlan(plan)

@@ -1,105 +1,82 @@
 @model NativeDropDownModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @{
-    ViewData["Title"] = "NativeDropDown";
+    ViewData["Title"] = "Van Booking";
+
+    const string FormId = "van-booking";
+    const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
 
     var plan = Html.ReactivePlan<NativeDropDownModel>();
-
-    var careLevelItems = (SelectListItem[])ViewBag.CareLevelItems;
-    var facilityTypeItems = (SelectListItem[])ViewBag.FacilityTypeItems;
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Component<NativeDropDown>(m => m.CareLevel).SetValue("Memory Care");
-    }));
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        var comp = p.Component<NativeDropDown>(m => m.CareLevel);
-        p.Element("value-echo").SetText(comp.Value());
-    }));
+    var residents = (SelectListItem[])ViewBag.Residents;
+    var trips = (SelectListItem[])ViewBag.Trips;
+    var departures = (SelectListItem[])ViewBag.Departures;
+    var escorts = (SelectListItem[])ViewBag.Escorts;
 }
 
 <native-vstack gap="Lg">
-    <native-heading level="H1">NativeDropDown — Full API</native-heading>
-    <native-text color="Secondary">
-        Exercises NativeDropDown vertical slice: property writes (SetValue),
-        property reads (Value), events (Changed), typed conditions (When), and reactive wiring.
-        Senior living domain: care levels and facility types.
-    </native-text>
+    <div>
+        <native-heading level="H1">Van Booking</native-heading>
+        <native-text color="Secondary">Book the community van for a resident's trip. The van seats one wheelchair and four riders.</native-text>
+    </div>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">1. Property Write (SetValue)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, sets care level to "Memory Care".
-        </p>
-        @{ Html.InputField(plan, m => m.CareLevel, o => o.Label("Care Level"))
-            .NativeDropDown(b => b
-                .Items(careLevelItems)
-                .Placeholder("-- Select Care Level --")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
-    </native-card-body></native-card>
+    <native-card><native-card-body id="@FormId">
+        <native-vstack gap="Base">
+            <native-grid cols="C2" gap="Base">
+                @{ Html.InputField(plan, m => m.ResidentId, o => o.Required().Label("Resident"))
+                    .NativeDropDown(b => b.Items(residents).Placeholder("-- Choose the resident --").CssClass(Field)); }
 
-    <native-card><native-card-body>
-        <native-heading level="H2">2. Property Read (Value as Source)</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            On DomReady, reads the care level component value and echoes it.
-        </p>
-        <p class="font-mono text-sm">Value echo: <span id="value-echo" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                @{ Html.InputField(plan, m => m.Trip, o => o.Required().Label("Trip"))
+                    .NativeDropDown(b => b.Items(trips).Placeholder("-- Choose the trip --").CssClass(Field))
+                    .Reactive(evt => evt.Change, (args, p) =>
+                        p.When(args.Value).Eq("Medical appointment")
+                            .Then(medical =>
+                            {
+                                // A nurse aide goes with every medical appointment.
+                                medical.Component<NativeDropDown>(m => m.Escort).Value.Set("Nurse aide");
+                                medical.Element("medical-note").Show();
+                            })
+                            .Else(other => other.Element("medical-note").Hide())); }
 
-    <native-card><native-card-body>
-        <native-heading level="H2">3. Changed Event with Typed Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Facility type wires a Changed event with typed condition:
-            <code>When(args, x =&gt; x.Value).Eq("Medical")</code> shows medical notice.
-        </p>
-        @{ Html.InputField(plan, m => m.FacilityType, o => o.Label("Facility Type"))
-            .NativeDropDown(b => b
-                .Items(facilityTypeItems)
-                .Placeholder("-- Select Facility Type --")
-                .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")
-                .Reactive(plan, evt => evt.Changed, (args, p) =>
-                {
-                    p.When(args, x => x.Value).Eq("Medical")
-                        .Then(t =>
-                        {
-                            t.Element("medical-notice").SetText("medical facility selected");
-                            t.Element("medical-notice").AddClass("text-green-600");
-                            t.Element("medical-notice").RemoveClass("text-text-muted");
-                        })
-                        .Else(e =>
-                        {
-                            e.Element("medical-notice").SetText("not a medical facility");
-                            e.Element("medical-notice").RemoveClass("text-green-600");
-                            e.Element("medical-notice").AddClass("text-text-muted");
-                        });
-                })); }
-        <p class="font-mono text-sm mt-2">Notice: <span id="medical-notice" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                @{ Html.InputField(plan, m => m.Departure, o => o.Required().Label("Leaves at"))
+                    .NativeDropDown(b => b.Items(departures).Placeholder("-- Choose the time --").CssClass(Field)); }
 
-    <native-card><native-card-body>
-        <native-heading level="H2">4. Component Value Condition</native-heading>
-        <p class="text-sm text-text-secondary mb-4">
-            Button reads care level via <code>When(comp.Value()).NotEmpty()</code>
-            and shows a confirmation or warning.
-        </p>
-        @(Html.NativeButton("check-care-btn", "Check Care Level")
-            .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
-            .Reactive(plan, evt => evt.Click, (args, p) =>
-            {
-                var comp = p.Component<NativeDropDown>(m => m.CareLevel);
-                p.When(comp.Value()).NotEmpty()
-                    .Then(t => t.Element("care-confirmation").SetText("care level confirmed"))
-                    .Else(e => e.Element("care-confirmation").SetText("care level is required"));
-            }))
-        <p class="font-mono text-sm mt-2">Status: <span id="care-confirmation" class="text-text-muted">&mdash;</span></p>
-    </native-card-body></native-card>
+                @{ Html.InputField(plan, m => m.Escort, o => o.Label("Escort"))
+                    .NativeDropDown(b => b.Items(escorts).CssClass(Field)); }
+            </native-grid>
 
-    <native-card><native-card-body>
-        <native-heading level="H2">Plan JSON</native-heading>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
+            <p id="medical-note" hidden class="text-sm text-text-secondary">
+                A nurse aide goes with every medical appointment. Bring the resident's medication list and insurance card.
+            </p>
+            <p id="van-busy" hidden class="text-sm text-amber-700">
+                The van is out at <span id="van-busy-time"></span>. <span id="van-next-free"></span> is free and now chosen; book again to confirm.
+            </p>
+
+            <native-hstack gap="Sm" align="Center" class="flex-wrap">
+                @(Html.NativeButton("book-van-btn", "Book the Van")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                        p.Post(Url.SandboxRoute("Book", "NativeDropDown")).Gather(g => g.Form())
+                            .Validate<VanBookingValidator>(FormId)
+                            .Response(r => r
+                                .OnSuccess<VanBooked>((booked, s) =>
+                                {
+                                    s.Element("van-busy").Hide();
+                                    s.Element("booking-status").Text.Set(booked.Get(x => x.Message));
+                                })
+                                .OnError<VanBusy>(409, (busy, e) =>
+                                {
+                                    // Say which time was asked for, choose the next free one, and leave the cursor there.
+                                    var departure = e.Component<NativeDropDown>(m => m.Departure);
+                                    e.Element("van-busy-time").Text.Set(departure.Value);
+                                    departure.Value.Set(busy.Get(x => x.NextFree));
+                                    e.Element("van-next-free").Text.Set(departure.Value);
+                                    e.Element("van-busy").Show();
+                                    departure.Focus();
+                                })
+                                .OnError(400, e => e.ValidationErrors(FormId)))))
+                <p id="booking-status" class="text-sm text-text-muted"></p>
+            </native-hstack>
+        </native-vstack>
     </native-card-body></native-card>
 </native-vstack>
 

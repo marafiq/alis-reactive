@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Text.Json;
 
 namespace Alis.Reactive.Fusion.Templates
 {
@@ -69,7 +70,7 @@ namespace Alis.Reactive.Fusion.Templates
             while (current != null)
             {
                 // Template data carries the same camel-case JSON names the runtime reads.
-                parts.Insert(0, JsonMemberName.Of(current.Member.Name));
+                parts.Insert(0, JsonNamingPolicy.CamelCase.ConvertName(current.Member.Name));
                 current = current.Expression as MemberExpression;
             }
 

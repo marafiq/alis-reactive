@@ -12,6 +12,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     [Route("Sandbox/Validation/RoomRate")]
     public class RoomRateController : Controller
     {
+        private readonly RoomRateValidator _validator;
+
+        // The validator depends on the community's rate policy, so the server takes it from DI, as the page does.
+        public RoomRateController(RoomRateValidator validator)
+        {
+            _validator = validator;
+        }
+
         [HttpGet("")]
         public IActionResult Index() =>
             View("~/Areas/Sandbox/Views/Validation/RoomRate/Index.cshtml", new RoomRateModel());
@@ -21,14 +29,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         {
             if (room == null) return BadRequest();
 
-            var result = new RoomRateValidator().Validate(room);
+            var result = _validator.Validate(room);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             var rate = room.MonthlyRate.ToString("#,##0.00", CultureInfo.InvariantCulture);
             // The validator requires the community fee.

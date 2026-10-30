@@ -1,237 +1,125 @@
+using System;
+using System.Linq;
+using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// Authors comparison nodes for a typed value source.
+    /// The left side of a comparison: a value source waiting for its operator.
     /// </summary>
     /// <remarks>
-    /// Obtained via <c>p.When(source)</c> or <c>p.When(args, x =&gt; x.Prop)</c>.
-    /// Chain an operator such as <c>.Eq(5)</c> or <c>.Truthy()</c> to produce a
-    /// <see cref="GuardBuilder{TModel}"/>. Operators are serialized into the
-    /// Reactive Plan and evaluated by the runtime; they do not read values on the server.
-    /// Literal and source comparisons use <typeparamref name="TProp"/> and the source
-    /// shape for compile-time and runtime type context.
+    /// Obtained from <c>p.When(..)</c>, <c>ElseIf(..)</c>, <c>And(..)</c>, <c>Or(..)</c> or a group's
+    /// <c>g.When(..)</c>. Equality, membership and emptiness apply to every type. Ordering
+    /// (<c>Gt</c>, <c>Gte</c>, <c>Lt</c>, <c>Lte</c>, <c>Between</c>) applies only to comparable values
+    /// (numbers, dates, times of day and their nullable forms; a <see cref="System.TimeSpan"/> is refused where
+    /// the page renders, because its text does not order as its length does), text operators (<c>Contains</c>,
+    /// <c>StartsWith</c>, <c>EndsWith</c>, <c>Matches</c>, <c>MinLength</c>) only to text, and
+    /// <c>ArrayContains</c> only to collections; they are extension methods in <see cref="Alis.Reactive"/>.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
-    /// <typeparam name="TProp">Source value type, providing compile-time operator type safety.</typeparam>
-    public sealed class ConditionSourceBuilder<TModel, TProp> where TModel : class
+    /// <typeparam name="TProp">The source's type.</typeparam>
+    /// <typeparam name="TNext">What the comparison continues as: a guard that offers <c>Then</c>, or a group term.</typeparam>
+    public sealed class ConditionSourceBuilder<TModel, TProp, TNext>
+        where TModel : class
+        where TNext : Condition<TModel>
     {
-        private readonly TypedSource<TProp> _leftSource;
-        private readonly Shape _shape;
-        private readonly System.Func<ConditionGraph, ConditionGraph> _composeCondition;
-        private readonly ConditionContinuation<TModel> _continuation;
+        private readonly TypedSource<TProp> _left;
+        private readonly Func<Condition, TNext> _next;
 
-        internal ConditionSourceBuilder(TypedSource<TProp> source, PipelineBuilder<TModel> pipeline)
-            : this(source, ConditionContinuation<TModel>.ForPipeline(pipeline), ConditionComposition.None)
+        internal ConditionSourceBuilder(TypedSource<TProp> source, Func<Condition, TNext> next)
         {
+            _left = source ?? throw new ArgumentNullException(nameof(source));
+            _next = next ?? throw new ArgumentNullException(nameof(next));
         }
 
-        internal ConditionSourceBuilder(TypedSource<TProp> source)
-            : this(source, ConditionContinuation<TModel>.Standalone, ConditionComposition.None)
+        /// <summary>Matches when the source equals <paramref name="operand"/>.</summary>
+        /// <param name="operand">The value compared with the source.</param>
+        public TNext Eq(TProp operand) => CompareWith(Comparison.Equal, operand);
+
+        /// <summary>Matches when the source differs from <paramref name="operand"/>.</summary>
+        /// <param name="operand">The value compared with the source.</param>
+        public TNext NotEq(TProp operand) => CompareWith(Comparison.NotEqual, operand);
+
+        /// <summary>Matches when the source equals another value read when the condition runs.</summary>
+        /// <param name="right">The value compared with the source.</param>
+        public TNext Eq(TypedSource<TProp> right) => CompareWith(Comparison.Equal, right);
+
+        /// <summary>Matches when the source differs from another value read when the condition runs.</summary>
+        /// <param name="right">The value compared with the source.</param>
+        public TNext NotEq(TypedSource<TProp> right) => CompareWith(Comparison.NotEqual, right);
+
+        /// <summary>Matches a truthy value: not null, not zero, not empty.</summary>
+        public TNext Truthy() => Unary(ValueTest.Truthy);
+
+        /// <summary>Matches a falsy value: null, zero or empty.</summary>
+        public TNext Falsy() => Unary(ValueTest.Falsy);
+
+        /// <summary>Matches null.</summary>
+        public TNext IsNull() => Unary(ValueTest.IsNull);
+
+        /// <summary>Matches any value but null.</summary>
+        public TNext NotNull() => Unary(ValueTest.NotNull);
+
+        /// <summary>Matches an empty value: null, empty text or an empty collection.</summary>
+        public TNext IsEmpty() => Unary(ValueTest.IsEmpty);
+
+        /// <summary>Matches a value that is not empty.</summary>
+        public TNext NotEmpty() => Unary(ValueTest.NotEmpty);
+
+        /// <summary>Matches when the source is one of <paramref name="values"/>.</summary>
+        /// <param name="values">The accepted values.</param>
+        public TNext In(params TProp[] values) => Among(values, negated: false);
+
+        /// <summary>Matches when the source is none of <paramref name="values"/>.</summary>
+        /// <param name="values">The rejected values.</param>
+        public TNext NotIn(params TProp[] values) => Among(values, negated: true);
+
+        internal Shape Shape => _left.Shape;
+
+        internal TNext CompareWith(Comparison op, object? literal)
         {
+            if (!op.IsEquality) BrowserOrder.Require(typeof(TProp));
+            return _next(Condition.Ordered(op, Left, ValueExpression.LiteralFor(literal, Shape), Shape));
         }
 
-        internal ConditionSourceBuilder(TypedSource<TProp> source, BranchBuilder<TModel> branchBuilder)
-            : this(source, ConditionContinuation<TModel>.ForBranch(branchBuilder), ConditionComposition.None)
+        internal TNext CompareWith<TRight>(Comparison op, TypedSource<TRight> right)
         {
+            if (right == null) throw new ArgumentNullException(nameof(right));
+            if (!op.IsEquality) BrowserOrder.Require(typeof(TProp));
+            return _next(Condition.Ordered(op, Left, right.Expression, Shape));
         }
 
-        internal ConditionSourceBuilder(
-            TypedSource<TProp> source,
-            ConditionContinuation<TModel> continuation,
-            System.Func<ConditionGraph, ConditionGraph> composeCondition)
+        internal TNext CompareWithText(TextTest test, string text) =>
+            _next(Condition.Text(test, Left, text ?? throw new ArgumentNullException(nameof(text)), Shape));
+
+        internal TNext CompareWithLength(int length)
         {
-            _leftSource = source ?? throw new System.ArgumentNullException(nameof(source));
-            _shape = source.Shape;
-            _continuation = continuation ?? throw new System.ArgumentNullException(nameof(continuation));
-            _composeCondition = composeCondition ?? throw new System.ArgumentNullException(nameof(composeCondition));
+            var minimum = MinimumTextLength.From(length, nameof(length));
+            return _next(Condition.MinLength(Left, minimum.Value, Shape));
         }
 
-        /// <summary>Compares the source with a typed literal using equality.</summary>
-        /// <param name="operand">Literal value to compare with the source value.</param>
-        public GuardBuilder<TModel> Eq(TProp operand) => BuildLiteral(CompareOperator.Eq, operand);
-        /// <summary>Compares the source with a typed literal using inequality.</summary>
-        /// <param name="operand">Literal value to compare with the source value.</param>
-        public GuardBuilder<TModel> NotEq(TProp operand) => BuildLiteral(CompareOperator.Neq, operand);
-        /// <summary>Compares the source with a typed literal using an ordered greater-than check.</summary>
-        /// <param name="operand">Literal value to compare with the source value.</param>
-        public GuardBuilder<TModel> Gt(TProp operand) => BuildLiteral(CompareOperator.Gt, operand);
-        /// <summary>Compares the source with a typed literal using an ordered greater-than-or-equal check.</summary>
-        /// <param name="operand">Literal value to compare with the source value.</param>
-        public GuardBuilder<TModel> Gte(TProp operand) => BuildLiteral(CompareOperator.Gte, operand);
-        /// <summary>Compares the source with a typed literal using an ordered less-than check.</summary>
-        /// <param name="operand">Literal value to compare with the source value.</param>
-        public GuardBuilder<TModel> Lt(TProp operand) => BuildLiteral(CompareOperator.Lt, operand);
-        /// <summary>Compares the source with a typed literal using an ordered less-than-or-equal check.</summary>
-        /// <param name="operand">Literal value to compare with the source value.</param>
-        public GuardBuilder<TModel> Lte(TProp operand) => BuildLiteral(CompareOperator.Lte, operand);
-
-        /// <summary>Evaluates runtime truthiness: non-null, non-zero, and non-empty.</summary>
-        public GuardBuilder<TModel> Truthy() => BuildUnary(CompareOperator.Truthy);
-        /// <summary>Evaluates runtime falsiness: null, zero, or empty.</summary>
-        public GuardBuilder<TModel> Falsy() => BuildUnary(CompareOperator.Falsy);
-        /// <summary>Matches null source values.</summary>
-        public GuardBuilder<TModel> IsNull() => BuildUnary(CompareOperator.IsNull);
-        /// <summary>Matches non-null source values.</summary>
-        public GuardBuilder<TModel> NotNull() => BuildUnary(CompareOperator.NotNull);
-        /// <summary>Matches empty source values, including empty strings and empty collections.</summary>
-        public GuardBuilder<TModel> IsEmpty() => BuildUnary(CompareOperator.IsEmpty);
-        /// <summary>Matches source values that are not empty.</summary>
-        public GuardBuilder<TModel> NotEmpty() => BuildUnary(CompareOperator.NotEmpty);
-
-        /// <summary>Compares the source against a typed literal set.</summary>
-        /// <param name="values">Literal values accepted by the comparison.</param>
-        public GuardBuilder<TModel> In(params TProp[] values) => BuildArray(CompareOperator.In, values);
-        /// <summary>Compares the source against values outside a typed literal set.</summary>
-        /// <param name="values">Literal values rejected by the comparison.</param>
-        public GuardBuilder<TModel> NotIn(params TProp[] values) => BuildArray(CompareOperator.NotIn, values);
-
-        /// <summary>Compares the source against an inclusive typed range.</summary>
-        /// <param name="low">Inclusive lower endpoint.</param>
-        /// <param name="high">Inclusive upper endpoint.</param>
-        public GuardBuilder<TModel> Between(TProp low, TProp high) =>
-            Build(CompareOperator.Between, RangeOperands(low, high));
-
-        /// <summary>Compares the source as text and matches when it contains <paramref name="substring"/>.</summary>
-        /// <param name="substring">Text that must appear in the source value.</param>
-        public GuardBuilder<TModel> Contains(string substring) =>
-            BuildTextLiteral(CompareOperator.Contains, substring);
-        /// <summary>Compares the source as text and matches when it starts with <paramref name="prefix"/>.</summary>
-        /// <param name="prefix">Text that must appear at the start of the source value.</param>
-        public GuardBuilder<TModel> StartsWith(string prefix) =>
-            BuildTextLiteral(CompareOperator.StartsWith, prefix);
-        /// <summary>Compares the source as text and matches when it ends with <paramref name="suffix"/>.</summary>
-        /// <param name="suffix">Text that must appear at the end of the source value.</param>
-        public GuardBuilder<TModel> EndsWith(string suffix) =>
-            BuildTextLiteral(CompareOperator.EndsWith, suffix);
-        /// <summary>Compares the source as text and matches it with the regular expression <paramref name="pattern"/>.</summary>
-        /// <param name="pattern">Regular expression pattern matched against the source value.</param>
-        public GuardBuilder<TModel> Matches(string pattern) =>
-            BuildTextLiteral(CompareOperator.Matches, pattern);
-        /// <summary>Compares the source text length against the minimum <paramref name="length"/>.</summary>
-        /// <param name="length">Minimum accepted text length.</param>
-        public GuardBuilder<TModel> MinLength(int length) =>
-            Build(CompareOperator.MinLength, MinimumLengthOperands(length));
-
-        /// <summary>Tests array membership using the source element shape for <paramref name="item"/>.</summary>
-        /// <param name="item">Array item to find.</param>
-        public GuardBuilder<TModel> ArrayContains(object item)
+        internal TNext CompareWithRange(object low, object high)
         {
-            return Build(CompareOperator.ArrayContains, CollectionItemOperands(item));
+            BrowserOrder.Require(typeof(TProp));
+            return _next(Condition.Range(Left, ValueExpression.LiteralFor(low, Shape), ValueExpression.LiteralFor(high, Shape), Shape));
         }
 
-        /// <summary>Compares this source with another typed source using equality.</summary>
-        /// <param name="right">Right-side source read at runtime.</param>
-        public GuardBuilder<TModel> Eq(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Eq, right);
-        /// <summary>Compares this source with another typed source using inequality.</summary>
-        /// <param name="right">Right-side source read at runtime.</param>
-        public GuardBuilder<TModel> NotEq(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Neq, right);
-        /// <summary>Compares this source with another typed source using an ordered greater-than check.</summary>
-        /// <param name="right">Right-side source read at runtime.</param>
-        public GuardBuilder<TModel> Gt(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Gt, right);
-        /// <summary>Compares this source with another typed source using an ordered greater-than-or-equal check.</summary>
-        /// <param name="right">Right-side source read at runtime.</param>
-        public GuardBuilder<TModel> Gte(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Gte, right);
-        /// <summary>Compares this source with another typed source using an ordered less-than check.</summary>
-        /// <param name="right">Right-side source read at runtime.</param>
-        public GuardBuilder<TModel> Lt(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Lt, right);
-        /// <summary>Compares this source with another typed source using an ordered less-than-or-equal check.</summary>
-        /// <param name="right">Right-side source read at runtime.</param>
-        public GuardBuilder<TModel> Lte(TypedSource<TProp> right) => BuildVsSource(CompareOperator.Lte, right);
-
-        private GuardBuilder<TModel> BuildVsSource(CompareOperator op, TypedSource<TProp> right)
+        internal TNext ContainsItem<TItem>(TItem item)
         {
-            if (right == null) throw new System.ArgumentNullException(nameof(right));
-            return Build(op, SourceOperands(right));
+            var itemShape = Grammar.Shape.FromClrType(typeof(TItem));
+            return _next(Condition.ArrayContains(Left, ValueExpression.LiteralFor(item, itemShape), Shape, itemShape));
         }
 
-        private GuardBuilder<TModel> BuildLiteral(CompareOperator op, object? operand) =>
-            Build(op, LiteralOperands(operand));
+        private ValueExpression Left => _left.Expression;
 
-        private GuardBuilder<TModel> BuildTextLiteral(CompareOperator op, string operand) =>
-            Build(op, TextLiteralOperands(operand));
+        private TNext Unary(ValueTest test) => _next(Condition.Unary(test, Left, Shape));
 
-        private GuardBuilder<TModel> BuildUnary(CompareOperator op) =>
-            Build(op, UnaryOperands());
-
-        private GuardBuilder<TModel> BuildArray(CompareOperator op, System.Array values) =>
-            Build(op, ArrayOperands(values));
-
-        private GuardBuilder<TModel> Build(CompareOperator op, ComparisonOperands operands)
+        private TNext Among(TProp[] values, bool negated)
         {
-            var condition = ConditionGraph.Compare(op, operands);
-            return ComposeAndWrap(condition);
-        }
-
-        private ValueExpression LeftValue() => _leftSource.ToValueExpression();
-
-        private ComparisonOperands UnaryOperands() =>
-            ComparisonOperands.Unary(LeftValue(), _shape);
-
-        private ComparisonOperands LiteralOperands(object? operand) =>
-            ComparisonOperands.Binary(
-                LeftValue(),
-                ValueExpression.LiteralRaw(operand, _shape),
-                _shape);
-
-        private ComparisonOperands TextLiteralOperands(string operand) =>
-            ComparisonOperands.Binary(
-                LeftValue(),
-                ValueExpression.LiteralRaw(operand, Shape.String),
-                _shape);
-
-        private ComparisonOperands MinimumLengthOperands(int length)
-        {
-            var minimumLength = MinimumTextLength.From(length, nameof(length));
-            return ComparisonOperands.Binary(
-                LeftValue(),
-                ValueExpression.LiteralRaw(minimumLength.Value, Shape.Number),
-                _shape);
-        }
-
-        private ComparisonOperands ArrayOperands(System.Array values)
-        {
-            if (values == null) throw new System.ArgumentNullException(nameof(values));
-
-            var items = new System.Collections.Generic.List<ValueExpression>();
-            foreach (var item in values)
-                items.Add(ValueExpression.LiteralRaw(item, _shape));
-
-            return ComparisonOperands.Binary(
-                LeftValue(),
-                ValueExpression.Array(items, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
-                _shape);
-        }
-
-        private ComparisonOperands SourceOperands(TypedSource<TProp> right) =>
-            ComparisonOperands.Binary(LeftValue(), right.ToValueExpression(), _shape);
-
-        private ComparisonOperands CollectionItemOperands(object item) =>
-            ComparisonOperands.CollectionItem(
-                LeftValue(),
-                ValueExpression.LiteralRaw(item, _leftSource.ElementShape),
-                _shape,
-                _leftSource.ElementShape);
-
-        private ComparisonOperands RangeOperands(TProp low, TProp high)
-        {
-            var endpoints = new System.Collections.Generic.List<ValueExpression>
-            {
-                ValueExpression.LiteralRaw(low, _shape),
-                ValueExpression.LiteralRaw(high, _shape)
-            };
-
-            return ComparisonOperands.Binary(
-                LeftValue(),
-                ValueExpression.Array(endpoints, Shape.ArrayOf(_shape.IsNone ? Shape.Any : _shape)),
-                _shape);
-        }
-
-        private GuardBuilder<TModel> ComposeAndWrap(ConditionGraph newCondition)
-        {
-            return _continuation.Wrap(_composeCondition(newCondition));
+            if (values == null) throw new ArgumentNullException(nameof(values));
+            var items = values.Select(value => ValueExpression.LiteralFor(value, Shape)).ToList();
+            return _next(Condition.Membership(Left, items, negated, Shape));
         }
     }
-
 }

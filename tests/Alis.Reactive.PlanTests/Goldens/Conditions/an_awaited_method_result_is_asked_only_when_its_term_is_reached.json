@@ -1,0 +1,179 @@
+{
+  "version": 5,
+  "planId": "Alis.Reactive.PlanTests.Support.Admission",
+  "vendors": {
+    "native": {
+      "objectPath": [],
+      "listen": {
+        "kind": "method",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener"
+      },
+      "payload": "element"
+    }
+  },
+  "objects": {
+    "Alis_Reactive_PlanTests_Support_Admission__Name": {
+      "kind": "element",
+      "id": "Alis_Reactive_PlanTests_Support_Admission__Name",
+      "vendor": "native"
+    },
+    "desk": {
+      "kind": "element",
+      "id": "desk",
+      "vendor": "native"
+    },
+    "status": {
+      "kind": "element",
+      "id": "status",
+      "vendor": "native"
+    },
+    "$document": {
+      "kind": "plugin",
+      "name": "alis.document",
+      "key": "",
+      "data": {
+        "kind": "none"
+      }
+    }
+  },
+  "handlers": [
+    {
+      "on": "$document",
+      "path": [],
+      "event": "ready",
+      "do": [
+        {
+          "kind": "if",
+          "arms": [
+            {
+              "when": {
+                "kind": "op",
+                "op": "eq",
+                "args": [
+                  {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "get",
+                      "target": {
+                        "kind": "obj",
+                        "id": "Alis_Reactive_PlanTests_Support_Admission__Name"
+                      },
+                      "path": [
+                        "value"
+                      ]
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  },
+                  {
+                    "kind": "lit",
+                    "value": "Helen"
+                  }
+                ]
+              },
+              "then": [
+                {
+                  "kind": "set",
+                  "target": {
+                    "kind": "obj",
+                    "id": "status"
+                  },
+                  "path": [
+                    "textContent"
+                  ],
+                  "value": {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "lit",
+                      "value": "Admit"
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "else": [
+            {
+              "kind": "let",
+              "name": "isFree1",
+              "expr": {
+                "kind": "call",
+                "target": {
+                  "kind": "obj",
+                  "id": "desk"
+                },
+                "path": [
+                  "isFree"
+                ],
+                "args": [
+                  {
+                    "kind": "as",
+                    "expr": {
+                      "kind": "lit",
+                      "value": "214"
+                    },
+                    "shape": {
+                      "kind": "string"
+                    }
+                  }
+                ]
+              },
+              "await": true
+            },
+            {
+              "kind": "if",
+              "arms": [
+                {
+                  "when": {
+                    "kind": "op",
+                    "op": "truthy",
+                    "args": [
+                      {
+                        "kind": "as",
+                        "expr": {
+                          "kind": "ref",
+                          "name": "isFree1"
+                        },
+                        "shape": {
+                          "kind": "boolean"
+                        }
+                      }
+                    ]
+                  },
+                  "then": [
+                    {
+                      "kind": "set",
+                      "target": {
+                        "kind": "obj",
+                        "id": "status"
+                      },
+                      "path": [
+                        "textContent"
+                      ],
+                      "value": {
+                        "kind": "as",
+                        "expr": {
+                          "kind": "lit",
+                          "value": "Admit"
+                        },
+                        "shape": {
+                          "kind": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "else": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

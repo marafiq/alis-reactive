@@ -6,6 +6,12 @@ public class LoadStepRequest
     public int Step { get; set; }
 }
 
+/// <summary>A physician search to the SearchPhysicians endpoint: <c>?q=</c>, the text typed so far.</summary>
+public sealed class PhysicianSearchQuery
+{
+    public string? Q { get; set; }
+}
+
 public class AlertElopementRequest
 {
     public string ResidentName { get; set; } = "";

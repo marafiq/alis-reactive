@@ -5,53 +5,26 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive.Builders.Conditions
 {
     /// <summary>
-    /// Entry point for nested condition expressions composed inside <c>And</c> and <c>Or</c> guards.
+    /// Starts a group inside <c>And(g =&gt; ..)</c> or <c>Or(g =&gt; ..)</c>. A group is evaluated as one
+    /// term and has no <c>Then</c>.
     /// </summary>
     /// <typeparam name="TModel">View model that owns the condition being authored.</typeparam>
     public sealed class ConditionStart<TModel> where TModel : class
     {
         internal ConditionStart() { }
 
-        /// <summary>Starts a nested condition from the triggering event payload.</summary>
-        /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
-        /// <typeparam name="TProp">Selected event-payload value type.</typeparam>
-        /// <param name="payload">Trigger payload placeholder.</param>
-        /// <param name="path">Payload value compared at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> When<TPayload, TProp>(
-            TPayload payload,
-            Expression<Func<TPayload, TProp>> path)
-        {
-            var source = PayloadTypedSource<TPayload, TProp>.FromEvent(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source);
-        }
+        /// <summary>Starts the group with a comparison of a value read when the condition runs.</summary>
+        public ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>> When<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>>(source, graph => new GroupCondition<TModel>(graph));
 
-        /// <summary>Starts a nested condition from the active HTTP response body.</summary>
-        /// <typeparam name="TResponse">Response body contract for the active response route.</typeparam>
-        /// <typeparam name="TProp">Selected response-body value type.</typeparam>
-        /// <param name="responseBody">Response body placeholder supplied by the response route callback.</param>
-        /// <param name="path">Selects the response value to compare at runtime.</param>
-        public ConditionSourceBuilder<TModel, TProp> When<TResponse, TProp>(
-            ResponseBody<TResponse> responseBody,
-            Expression<Func<TResponse, TProp>> path)
-            where TResponse : class
-        {
-            var source = responseBody.Read(path);
-            return new ConditionSourceBuilder<TModel, TProp>(source);
-        }
+        /// <summary>Asks the user, and holds when they confirm.</summary>
+        /// <param name="message">The question.</param>
+        public GroupCondition<TModel> Confirm(string message) =>
+            new GroupCondition<TModel>(Condition.Confirm(message));
 
-        /// <summary>Starts a nested condition from a typed value source.</summary>
-        /// <typeparam name="TProp">Source value type.</typeparam>
-        /// <param name="source">Typed condition value source.</param>
-        public ConditionSourceBuilder<TModel, TProp> When<TProp>(TypedSource<TProp> source)
-        {
-            return new ConditionSourceBuilder<TModel, TProp>(source);
-        }
-
-        /// <summary>Creates a user-decision guard for a nested condition expression.</summary>
-        /// <param name="message">User-decision confirmation message.</param>
-        public GuardBuilder<TModel> Confirm(string message)
-        {
-            return new GuardBuilder<TModel>(ConditionGraph.Confirm(message));
-        }
+        /// <summary>Holds when the nested group does not: <c>g.Not(n =&gt; n.When(a).Eq(1).And(b).Truthy())</c>.</summary>
+        /// <param name="group">The group to negate.</param>
+        public GroupCondition<TModel> Not(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+            new GroupCondition<TModel>(Condition.Not(ConditionComposition.Group(group)));
     }
 }

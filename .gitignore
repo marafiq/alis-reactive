@@ -11,28 +11,13 @@ node_modules/
 .vs/
 .worktrees/
 /tools/*
-!/tools/md-viewer/
-!/tools/ApiDocGenerator/
-!/tools/FusionCoverage/
-!/tools/PlanTypeGenerator/
-!/tools/FusionOnboarding/
-!/tools/FusionOnboarding/**
-tools/md-viewer/node_modules/
-tools/md-viewer/reader.db*
-tools/md-viewer-mockup.html
+!/tools/PlanContractGenerator/
 
-# docs-site (Starlight)
-docs-site/node_modules/
-docs-site/dist/
-docs-site/.astro/
-docs-site/public/d2/
+# SonarQube scanner output
+.sonarqube/
 .DS_Store
 tests/Alis.Reactive.PlaywrightTests/TestResults/
 TestResults/
-
-# SonarQube
-.sonarqube/
-.scannerwork/
 
 # Built JS/CSS bundles — produced by `npm run build:all`.
 # All three framework bundles (runtime JS, design-system CSS, Syncfusion CSS)
@@ -42,19 +27,14 @@ TestResults/
 # live in SandboxApp/wwwroot/.
 Alis.Reactive.Assets/dist/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
+Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js
+Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.css
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 
-# The downloadable example zip is regenerated fresh on every docs deploy
-# (see .github/workflows/deploy-docs.yml — runs rebuild-example-app.sh
-# before `npm run build`). Tracking the zip would only serve a stale copy
-# until someone manually rebuilds and commits; CI is the source of truth.
-# Local dev regenerates on demand by running scripts/rebuild-example-app.sh.
-docs-site/public/downloads/resident-intake.zip
-
-# AlisReactive NuGet copies versioned bundles into consumer wwwroot after every
-# build (see Alis.Reactive/build/AlisReactive.targets CopyAlisReactiveAssets).
-# Source of truth is the NuGet package; tracked copies only produce phantom
-# diffs and orphaned files when the AlisReactive version bumps.
-examples/resident-intake/wwwroot/scripts/alis-reactive.*.js
-examples/resident-intake/wwwroot/css/design-system.*.css
-examples/resident-intake/wwwroot/css/syncfusion.*.css
+# On .NET Framework each AlisReactive package copies its browser assets into the
+# web project's Content\{PackageId}\ after every build
+# (build/AlisReactiveNetFrameworkContent.targets). The package is the source of
+# truth; tracked copies only produce phantom diffs.
+examples/net48-mvc-smoke/Content/AlisReactive*/
+# The framework test app's components bundle, built by npm run build:all.
+tests/Alis.Reactive.Framework.App/wwwroot/js/

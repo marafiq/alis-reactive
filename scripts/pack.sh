@@ -55,7 +55,7 @@ PACKAGES=(
   Alis.Reactive                 # core plan model, builders, serialization, runtime JS bundle
   Alis.Reactive.Native          # native HTML components
   Alis.Reactive.Fusion          # Syncfusion EJ2 integration + syncfusion CSS bundle
-  Alis.Reactive.FluentValidator # FluentValidation client-metadata adapter
+  Alis.Reactive.FluentValidator # validation rules for server and browser
   Alis.Reactive.DesignSystem    # design-system tokens + layout helpers + CSS bundle
   Alis.Reactive.NativeTagHelpers # ASP.NET Core tag helpers (net10.0 only)
 )

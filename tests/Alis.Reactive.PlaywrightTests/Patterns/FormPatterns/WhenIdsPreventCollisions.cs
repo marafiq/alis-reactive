@@ -16,7 +16,6 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
         await Expect(nameField).ToBeAttachedAsync(new() { Timeout = 5000 });
         var id = await nameField.GetAttributeAsync("id");
         Assert.That(id, Is.Not.Null.And.Not.Empty, "Field must have a generated ID");
-        // Both forms render the same generated IDs, so scope the selector to the JSON form.
         var foundById = Page.Locator($"#json-form #{id}");
         await Expect(foundById).ToBeAttachedAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -90,8 +89,7 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
     [Test]
     public async Task form_data_post_round_trips_exact_field_values_to_server()
     {
-        // TODO: Give each rendered form its own component ID scope; gather currently resolves
-        // by document.getElementById, so this test fills the first shared IDs in #json-form.
+        // The fields render once, in #json-form; the form data request sends them by name.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 

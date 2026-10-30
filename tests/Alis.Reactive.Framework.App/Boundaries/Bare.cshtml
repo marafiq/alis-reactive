@@ -1,0 +1,25 @@
+@using Alis.Reactive.Framework.App.Boundaries
+@model DeskPage
+@{
+    Layout = null;
+    var plan = Html.ReactivePlan<DeskPage>();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>The bare desk · Alis.Reactive framework</title>
+</head>
+<body>
+    <h1>The bare desk</h1>
+
+    <p>Desk: <span id="desk"></span></p>
+
+    @{ Html.On(plan, t => t.DomReady(p => p.Element("desk").Text.Set("open"))); }
+
+    @Html.RenderPlan(plan)
+
+    @* The runtime alone: the page brings no components and no plugins of its own. *@
+    <script src="/scripts/alis-reactive.dev.js"></script>
+</body>
+</html>

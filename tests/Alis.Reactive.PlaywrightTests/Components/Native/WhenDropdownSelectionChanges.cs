@@ -1,264 +1,180 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
+/// <summary>
+/// As the front-desk coordinator, I want to book the community van for a resident's trip, have a nurse
+/// aide sent with every medical appointment, and be offered the next free time when the van is already
+/// out, so that no resident waits at the door for a van that is not coming.
+/// </summary>
+/// <remarks>
+/// The van is out at 10:00 AM (the dialysis run); 11:00 AM is the next free time. A drop-down raises change
+/// as soon as the coordinator picks an option, without leaving it (HTML, the select element's input and
+/// change events); a value the page writes raises none. Every member of the drop-down is exercised: its
+/// value written (the nurse aide, the next free time) and read (the time the van is out, the booking the
+/// server answers), Focus, Change with its value, and its value committed for the trip check the moment
+/// the coordinator picks an option.
+/// </remarks>
 [TestFixture]
 public class WhenDropdownSelectionChanges : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeDropDown";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeDropDownModel__";
+    private const string VanOut = "the server responded with a status of 409";
+
+    private PagePlan<NativeDropDownModel> _plan = null!;
+
+    private NativeDropDownLocator Resident => _plan.NativeDropDown(m => m.ResidentId);
+    private NativeDropDownLocator Trip => _plan.NativeDropDown(m => m.Trip);
+    private NativeDropDownLocator Departure => _plan.NativeDropDown(m => m.Departure);
+    private NativeDropDownLocator Escort => _plan.NativeDropDown(m => m.Escort);
+    private ILocator ResidentError => _plan.ErrorFor(m => m.ResidentId);
+    private ILocator TripError => _plan.ErrorFor(m => m.Trip);
+    private ILocator DepartureError => _plan.ErrorFor(m => m.Departure);
+    private ILocator MedicalNote => Page.Locator("#medical-note");
+    private ILocator VanBusy => Page.Locator("#van-busy");
+    private ILocator BookTheVan => Page.Locator("#book-van-btn");
+    private ILocator Status => Page.Locator("#booking-status");
 
     private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<NativeDropDownModel>.FromPage(Page);
+    }
+
+    private async Task Choose(string resident, string trip, string departure)
+    {
+        await Resident.Select(resident);
+        await Trip.Select(trip);
+        await Departure.Select(departure);
+    }
+
+    // Margaret Hale's medical appointment at 10:00 AM, when the van is out.
+    private async Task BookWhileTheVanIsOut()
+    {
+        await Choose("Margaret Hale", "Medical appointment", "10:00 AM");
+        await ClickWhenStable(BookTheVan);
+        await Expect(VanBusy).ToBeVisibleAsync();
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task a_medical_appointment_sends_a_nurse_aide_and_asks_for_the_medication_list()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("NativeDropDown — Alis.Reactive Sandbox");
+        await Expect(Escort.Input).ToHaveValueAsync("No escort");
+
+        await Trip.Select("Medical appointment");
+
+        await Expect(Escort.Input).ToHaveValueAsync("Nurse aide");
+        await Expect(MedicalNote).ToBeVisibleAsync();
+        await Expect(MedicalNote).ToHaveTextAsync("A nurse aide goes with every medical appointment. Bring the resident's medication list and insurance card.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task domready_sets_initial_care_level()
+    public async Task other_trips_do_not_ask_for_the_medication_list()
     {
         await NavigateAndBoot();
+        await Trip.Select("Medical appointment");
+        await Expect(MedicalNote).ToBeVisibleAsync();
 
-        var select = Page.Locator($"#{ModelIdPrefix}CareLevel");
-        await Expect(select).ToHaveValueAsync("Memory Care");
+        await Trip.Select("Shopping");
+
+        await Expect(MedicalNote).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task value_echoed_from_component_read()
+    public async Task booking_the_van_confirms_the_resident_the_trip_the_time_and_the_escort()
     {
         await NavigateAndBoot();
+        await Choose("Harold Benson", "Shopping", "9:00 AM");
 
-        var echo = Page.Locator("#value-echo");
-        await Expect(echo).ToHaveTextAsync("Memory Care", new() { Timeout = 3000 });
+        await ClickWhenStable(BookTheVan);
+
+        await Expect(Status).ToHaveTextAsync("Van booked for Harold Benson: Shopping at 9:00 AM, no escort.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task changed_event_with_condition_shows_medical_notice()
+    public async Task when_the_van_is_out_the_next_free_time_is_chosen_instead()
+    {
+        await NavigateAndBoot();
+        await Choose("Margaret Hale", "Medical appointment", "10:00 AM");
+
+        await ClickWhenStable(BookTheVan);
+
+        await Expect(VanBusy).ToBeVisibleAsync();
+        await Expect(VanBusy).ToHaveTextAsync("The van is out at 10:00 AM. 11:00 AM is free and now chosen; book again to confirm.");
+        await Expect(Departure.Input).ToHaveValueAsync("11:00 AM");
+        await Expect(Status).ToHaveTextAsync("");
+        AssertNoConsoleErrorsExcept(VanOut);
+    }
+
+    // The click leaves the cursor on the button; the server's answer moves it to the time to change.
+    [Test]
+    public async Task when_the_van_is_out_the_cursor_waits_on_the_departure_time()
     {
         await NavigateAndBoot();
 
-        var select = Page.Locator($"#{ModelIdPrefix}FacilityType");
-        await select.SelectOptionAsync("Medical");
+        await BookWhileTheVanIsOut();
 
-        var notice = Page.Locator("#medical-notice");
-        await Expect(notice).ToHaveTextAsync("medical facility selected", new() { Timeout = 3000 });
+        await Expect(Departure.Input).ToBeFocusedAsync();
+        AssertNoConsoleErrorsExcept(VanOut);
+    }
+
+    [Test]
+    public async Task booking_again_at_the_free_time_books_the_van()
+    {
+        await NavigateAndBoot();
+        await BookWhileTheVanIsOut();
+
+        await ClickWhenStable(BookTheVan);
+
+        await Expect(Status).ToHaveTextAsync("Van booked for Margaret Hale: Medical appointment at 11:00 AM, with a nurse aide.");
+        await Expect(VanBusy).ToBeHiddenAsync();
+        AssertNoConsoleErrorsExcept(VanOut);
+    }
+
+    // Refused in the browser: a booking sent to the server would answer 400, a console error.
+    [Test]
+    public async Task booking_with_nothing_chosen_says_what_is_missing()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(BookTheVan);
+
+        await Expect(ResidentError).ToHaveTextAsync("Choose the resident.");
+        await Expect(TripError).ToHaveTextAsync("Choose what the trip is for.");
+        await Expect(DepartureError).ToHaveTextAsync("Choose when the van leaves.");
+        await Expect(Status).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task changed_event_with_condition_shows_else_for_non_medical()
+    public async Task choosing_the_resident_clears_its_refusal_without_booking_again()
     {
         await NavigateAndBoot();
+        await ClickWhenStable(BookTheVan);
+        await Expect(ResidentError).ToHaveTextAsync("Choose the resident.");
 
-        var select = Page.Locator($"#{ModelIdPrefix}FacilityType");
-        await select.SelectOptionAsync("Residential");
+        await Resident.Select("Ruth Coleman");
 
-        var notice = Page.Locator("#medical-notice");
-        await Expect(notice).ToHaveTextAsync("not a medical facility", new() { Timeout = 3000 });
+        await Expect(ResidentError).ToBeHiddenAsync();
+        await Expect(TripError).ToHaveTextAsync("Choose what the trip is for.");
         AssertNoConsoleErrors();
     }
 
+    // Picking an option commits it without leaving the drop-down, so the trip is checked on the pick.
     [Test]
-    public async Task component_value_condition_confirms_when_selected()
+    public async Task putting_the_trip_back_to_choose_is_refused_at_once()
     {
         await NavigateAndBoot();
+        await Trip.Select("Shopping");
+        await Expect(TripError).ToBeHiddenAsync();
 
-        await Page.Locator("#check-care-btn").ClickAsync();
+        await Trip.Select("-- Choose the trip --");
 
-        var status = Page.Locator("#care-confirmation");
-        await Expect(status).ToHaveTextAsync("care level confirmed", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task component_value_condition_warns_when_empty()
-    {
-        await NavigateAndBoot();
-
-        var select = Page.Locator($"#{ModelIdPrefix}CareLevel");
-        await select.SelectOptionAsync("");
-
-        await Page.Locator("#check-care-btn").ClickAsync();
-
-        var status = Page.Locator("#care-confirmation");
-        await Expect(status).ToHaveTextAsync("care level is required", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task changing_selection_multiple_times_updates_status_each_time()
-    {
-        await NavigateAndBoot();
-
-        var select = Page.Locator($"#{ModelIdPrefix}FacilityType");
-        var notice = Page.Locator("#medical-notice");
-
-        await select.SelectOptionAsync("Medical");
-        await Expect(notice).ToHaveTextAsync("medical facility selected", new() { Timeout = 3000 });
-
-        await select.SelectOptionAsync("Residential");
-        await Expect(notice).ToHaveTextAsync("not a medical facility", new() { Timeout = 3000 });
-
-        await select.SelectOptionAsync("Medical");
-        await Expect(notice).ToHaveTextAsync("medical facility selected", new() { Timeout = 3000 });
-
-        await select.SelectOptionAsync("Rehabilitation");
-        await Expect(notice).ToHaveTextAsync("not a medical facility", new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task clearing_care_level_then_reselecting_updates_condition_both_ways()
-    {
-        await NavigateAndBoot();
-
-        var select = Page.Locator($"#{ModelIdPrefix}CareLevel");
-        var checkCareButton = Page.Locator("#check-care-btn");
-        var status = Page.Locator("#care-confirmation");
-
-        await checkCareButton.ClickAsync();
-        await Expect(status).ToHaveTextAsync("care level confirmed", new() { Timeout = 3000 });
-
-        await select.SelectOptionAsync("");
-        await checkCareButton.ClickAsync();
-        await Expect(status).ToHaveTextAsync("care level is required", new() { Timeout = 3000 });
-
-        await select.SelectOptionAsync("Skilled Nursing");
-        await checkCareButton.ClickAsync();
-        await Expect(status).ToHaveTextAsync("care level confirmed", new() { Timeout = 3000 });
-
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_json_is_rendered()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"set\""),
-            "Plan must contain set reactions");
-        Assert.That(planJson, Does.Contain("\"property\""),
-            "Plan must contain structured property field for SetValue");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_native_vendor_for_dropdown_set_reactions()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"vendor\": \"native\""),
-            "Plan must carry vendor 'native' for dropdown set reactions — " +
-            "runtime uses this to choose resolveRoot strategy");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_value_value_member_for_component_source()
-    {
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"member\": \"value\""),
-            "Plan must carry property member 'value' for NativeDropDown component sources — " +
-            "runtime reads this property to get the selected value");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task plan_carries_prop_value_for_setvalue_reaction()
-    {
-        // TODO: This raw JSON assertion can match DOM text updates instead of NativeDropDown SetValue.
-        // Replace it with a focused value-property proof in a test-design slice.
-        await NavigateAndBoot();
-
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
-        Assert.That(planJson, Does.Contain("\"property\": \"text\""),
-            "Plan must carry property .text. for SetValue reaction — " +
-            "runtime uses bracket notation root[prop] = val");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task both_dropdowns_render_with_correct_element_ids()
-    {
-        // Generated IDs are the DOM/Reactive Plan join keys.
-        await NavigateAndBoot();
-
-        await Expect(Page.Locator($"#{ModelIdPrefix}CareLevel")).ToBeVisibleAsync();
-        await Expect(Page.Locator($"#{ModelIdPrefix}FacilityType")).ToBeVisibleAsync();
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task both_dropdowns_render_as_select_elements()
-    {
-        // Native dropdown runtime reads and writes el.value.
-        await NavigateAndBoot();
-
-        var careLevel = Page.Locator($"select#{ModelIdPrefix}CareLevel");
-        var facilityType = Page.Locator($"select#{ModelIdPrefix}FacilityType");
-
-        await Expect(careLevel).ToHaveCountAsync(1);
-        await Expect(facilityType).ToHaveCountAsync(1);
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task care_level_dropdown_has_all_expected_options()
-    {
-        await NavigateAndBoot();
-
-        var careLevelOptions = Page.Locator($"#{ModelIdPrefix}CareLevel option");
-        const int expectedOptionsIncludingPlaceholder = 5;
-
-        await Expect(careLevelOptions).ToHaveCountAsync(expectedOptionsIncludingPlaceholder);
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task facility_type_dropdown_has_all_expected_options()
-    {
-        await NavigateAndBoot();
-
-        var facilityTypeOptions = Page.Locator($"#{ModelIdPrefix}FacilityType option");
-        const int expectedOptionsIncludingPlaceholder = 4;
-
-        await Expect(facilityTypeOptions).ToHaveCountAsync(expectedOptionsIncludingPlaceholder);
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task care_level_placeholder_has_empty_value()
-    {
-        // Placeholder option must have value="" so clearing the dropdown
-        // via SelectOptionAsync("") works for the component-read condition test.
-        await NavigateAndBoot();
-
-        var placeholder = Page.Locator($"#{ModelIdPrefix}CareLevel option").First;
-        await Expect(placeholder).ToHaveAttributeAsync("value", "");
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task boot_trace_is_emitted_on_page_load()
-    {
-        await NavigateAndBoot();
-
-        var hasBootTrace = _consoleMessages.Any(m => m.Contains("booted"));
-        Assert.That(hasBootTrace, Is.True,
-            "Boot trace must be emitted — confirms runtime boot discovered and executed the plan");
+        await Expect(TripError).ToHaveTextAsync("Choose what the trip is for.");
         AssertNoConsoleErrors();
     }
 }

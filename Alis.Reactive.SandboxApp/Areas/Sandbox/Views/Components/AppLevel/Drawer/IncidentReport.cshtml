@@ -1,5 +1,4 @@
 @model IncidentReportPageModel
-@using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
 @{
@@ -23,8 +22,8 @@
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Element("alis-drawer-title").SetText("New Incident Report");
-                    p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+                    p.Element("alis-drawer-title").Text.Set("New Incident Report");
+                    p.Component<NativeDrawer>().Size.Set(DrawerSize.Md);
                     p.Get(Url.SandboxRoute("IncidentReportForm", "Drawer"))
                      .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
                     p.Component<NativeDrawer>().Open();
