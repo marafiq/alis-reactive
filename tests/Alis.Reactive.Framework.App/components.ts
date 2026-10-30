@@ -13,4 +13,5 @@ import "./Components/ConfirmDialog/confirm-dialog";
 import "./Components/FilePicker/file-picker";
 import "./Components/Banner/banner";
 import "./Components/Choice/choice";
+import "./Components/Checklist/checklist";
 import "./Components/Stamp/stamp";

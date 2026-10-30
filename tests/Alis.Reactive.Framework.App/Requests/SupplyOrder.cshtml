@@ -1,0 +1,38 @@
+@using Alis.Reactive.Framework.App.Requests
+@model SupplyOrderPage
+@{
+    ViewData["Title"] = "A supply order";
+    var plan = Html.ReactivePlan<SupplyOrderPage>();
+}
+<h1>A supply order</h1>
+
+<form id="supply-order">
+    @for (var line = 0; line < Model.Lines.Count; line++)
+    {
+        <fieldset>
+            <legend>Line @(line + 1)</legend>
+            @{ Html.InputField(plan, m => m.Lines[line].Sku, o => o.Label($"Item on line {line + 1}")).Entry(); }
+            @{ Html.InputField(plan, m => m.Lines[line].Quantity, o => o.Label($"Quantity on line {line + 1}")).Entry(); }
+        </fieldset>
+    }
+    @{ Html.InputField(plan, m => m.Address.City, o => o.Label("Deliver to")).Entry(); }
+    <fieldset>
+        <legend>For the wings</legend>
+        @{ Html.InputField(plan, m => m.Wings).Checklist("East", "West", "North"); }
+    </fieldset>
+</form>
+
+<p>The store received: <span id="received"></span></p>
+
+@(plan.Button("send-order", "Send the order")
+    .Reactive(button => button.Click, p => p.Post("/Requests/SupplyOrders")
+        .Gather(g => g.Form("supply-order"))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("reorder-usual", "Reorder the usual gloves")
+    .Reactive(button => button.Click, p => p.Post("/Requests/SupplyOrders")
+        .Gather(g => g.Set(x => x.Lines[0].Sku, "GLV-1").Set(x => x.Lines[0].Quantity, 2).Set(x => x.Address.City, "Albany"))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

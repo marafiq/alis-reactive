@@ -144,6 +144,14 @@ public sealed class RequestsController : Controller
     [HttpPost("/Requests/Spellings/Streets")]
     public IActionResult PostStreet([FromForm] SpelledAddress address) => Said($"form Straße [{address.Straße ?? "none"}]");
 
+    public IActionResult SupplyOrder() => View(new SupplyOrderPage { Lines = [new(), new()] });
+
+    /// <summary>Says each line, the city and the wings it bound from the form post, and how many fields carried the wings.</summary>
+    [HttpPost("/Requests/SupplyOrders")]
+    public IActionResult SupplyOrders([FromForm] SupplyOrderPage order) =>
+        Said($"lines {string.Join(" and ", order.Lines.Select(line => $"{line.Sku ?? "nothing"} x {line.Quantity}"))}; " +
+             $"city {order.Address.City ?? "none"}; wings {Listed(order.Wings)} from {Request.Form["Wings"].Count} Wings fields");
+
     private string QueryText() => Request.QueryString.HasValue ? Request.QueryString.Value! : "nothing";
 
     private static string Listed(List<string>? items) =>
