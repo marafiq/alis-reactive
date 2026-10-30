@@ -123,7 +123,7 @@ namespace Alis.Reactive
         private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan, RenderedPage page) where TModel : class
         {
             var markup = new System.Text.StringBuilder(
-                $"<script type=\"application/json\" data-reactive-plan>{plan.Render()}</script>");
+                $"<script type=\"application/json\" data-reactive-plan>{plan.Serialize()}</script>");
             foreach (var form in plan.Forms)
                 if (page.SummaryRenders(form, $"after the plan of {plan.Context.View}")) markup.Append(FormSummaries.Markup(form));
             return markup.ToString();

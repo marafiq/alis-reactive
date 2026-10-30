@@ -12,7 +12,7 @@ public class WhenARequestCannotBeSent
         var plan = Page.Plan<Admission>();
         plan.Triggers().DomReady(p => p.Get("/residents/{id}").Gather<ResidentQuery>(g => g.Set(x => x.Wing, "Garden")));
 
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Render());
+        var refused = Assert.Throws<InvalidOperationException>(() => plan.Serialize());
 
         Assert.That(refused!.Message, Does.Contain("placeholder '{id}'"));
         Assert.That(refused.Message, Does.Contain("g.Set(x => x.Id, ..)"));
@@ -24,7 +24,7 @@ public class WhenARequestCannotBeSent
         var plan = Page.Plan<Admission>();
         plan.Triggers().DomReady(p => p.Get("/residents/{Tags}").Gather<Admission>(g => g.Set(x => x.Tags, new List<string> { "fall-risk" })));
 
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Render());
+        var refused = Assert.Throws<InvalidOperationException>(() => plan.Serialize());
 
         Assert.That(refused!.Message, Does.Contain("needs a scalar value"));
         Assert.That(refused.Message, Does.Contain("array<string>"));

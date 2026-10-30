@@ -20,10 +20,10 @@ public class WhenAPageCannotRender
     [Test]
     public void a_condition_the_browser_cannot_read_is_refused_naming_it_and_the_way_out()
     {
-        var plan = Page.Plan<Admission>().TextInput(m => m.Age);
+        var plan = Page.Plan<Admission>(Registered.Validator<UnreadableAdmissionRules>()).TextInput(m => m.Age);
         plan.Triggers().DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<UnreadableAdmissionRules>("admission"));
 
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Render(Registered.Validator<UnreadableAdmissionRules>()));
+        var refused = Assert.Throws<InvalidOperationException>(() => plan.Serialize());
 
         Assert.That(refused!.Message, Does.Contain("has no browser form"));
         Assert.That(refused.Message, Does.Contain("WhenOnServer"));
@@ -40,7 +40,7 @@ public class WhenAPageCannotRender
             p.Element("status").Text.Set(kept!.Get(x => x.Confirmation));
         });
 
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Render());
+        var refused = Assert.Throws<InvalidOperationException>(() => plan.Serialize());
 
         Assert.That(refused!.Message, Does.Contain("reads a response outside the routes of the request"));
     }

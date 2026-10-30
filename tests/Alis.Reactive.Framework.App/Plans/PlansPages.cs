@@ -51,21 +51,6 @@ public sealed class NoticeboardPage;
 /// <summary>A notice pinned to the board: a partial that starts two plans of its model, the notice's and its share button's.</summary>
 public sealed class Notice;
 
-/// <summary>A page whose plan is rendered by the view itself, with the services the view hands it.</summary>
-public sealed class ServicedPage
-{
-    public string? Visitor { get; set; }
-}
-
-/// <summary>The serviced page's rule: a visitor the browser can check is named.</summary>
-public sealed class ServicedRules : ReactiveValidator<ServicedPage>
-{
-    public ServicedRules()
-    {
-        RuleFor(x => x.Visitor).NotEmpty().WithMessage("Name the visitor.");
-    }
-}
-
 /// <summary>A page that makes one mistake a plan cannot take, so it is refused when it renders.</summary>
 public sealed class PlanRefusalsPage
 {

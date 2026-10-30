@@ -91,36 +91,20 @@ namespace Alis.Reactive
             RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>();
 
-        /// <summary>
-        /// Registers components, resolves validation, and serializes the Reactive Plan as compact JSON. A plan renders
-        /// once, after everything written to it: an input or behavior written to it later, and a second rendering, are
-        /// refused.
-        /// </summary>
-        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
-        public string Render()
+        // The plan as its script carries it, once, after everything written to it: the rendered inputs join it, each
+        // validated form is bound to its validator's rules from the services the plan started with, and the grammar is
+        // serialized. Html.RenderPlan is the one caller, so a plan always renders with the page's record.
+        internal string Serialize()
         {
             _context.Seal();
-            ResolveAll(_services);
-            return GrammarSerializer.Serialize(_context.Write());
-        }
-
-        /// <summary>
-        /// Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as
-        /// compact JSON. A plan renders once, after everything written to it, as <see cref="Render()"/> does.
-        /// </summary>
-        /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
-        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
-        public string Render(IServiceProvider services)
-        {
-            _context.Seal();
-            ResolveAll(services);
+            ResolveAll();
             return GrammarSerializer.Serialize(_context.Write());
         }
 
         // Every rendered input joins the plan, then each validated form is bound to its one validator's rules:
         // every request that validates a form names the same validator, so the form is bound once. A form only the
         // server checks has no fields: its messages land beside the mounted inputs inside it (grammar.md F8).
-        private void ResolveAll(IServiceProvider? services)
+        private void ResolveAll()
         {
             _context.DeclareRenderedInputs();
             var renderedInputs = _renderedInputs.Snapshot();
@@ -134,7 +118,7 @@ namespace Alis.Reactive
             if (oneByForm.Count > 0)
             {
                 var ruleSource = RequireBrowserRuleSource(
-                    services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
+                    _services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
                 foreach (var validation in oneByForm)
                 {
                     var fields = validation.Rules(ruleSource);

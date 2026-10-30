@@ -16,8 +16,9 @@ namespace Alis.Reactive.PlanTests.Support;
 /// </summary>
 internal static class Page
 {
-    internal static ReactivePlan<TModel> Plan<TModel>() where TModel : class =>
-        new(services: null, HtmlFieldPrefix.None, ViewOf<TModel>());
+    /// <summary>A page's plan, with the services its view renders with: the validators the app registered.</summary>
+    internal static ReactivePlan<TModel> Plan<TModel>(IServiceProvider? services = null) where TModel : class =>
+        new(services, HtmlFieldPrefix.None, ViewOf<TModel>());
 
     /// <summary>A partial's plan, rendered for the member of the page's model the prefix names.</summary>
     internal static ReactivePlan<TModel> Partial<TModel>(string fieldPrefix) where TModel : class =>
@@ -44,8 +45,8 @@ internal static class Page
         plan.Render<TComponent>(id, Microsoft.AspNetCore.Html.HtmlString.Empty);
 
     /// <summary>The plan as the view embeds it, parsed.</summary>
-    internal static JsonNode Rendered<TModel>(this ReactivePlan<TModel> plan, IServiceProvider? services = null) where TModel : class =>
-        JsonNode.Parse(services == null ? plan.Render() : plan.Render(services))!;
+    internal static JsonNode Rendered<TModel>(this ReactivePlan<TModel> plan) where TModel : class =>
+        JsonNode.Parse(plan.Serialize())!;
 
     internal static JsonArray Handlers(this JsonNode plan) => plan["handlers"]!.AsArray();
 
