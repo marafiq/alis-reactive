@@ -23,9 +23,9 @@ namespace Alis.Reactive.PlanModel
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<(RequestStep Request, FormValidation Validation)> _validatedRequests =
             new List<(RequestStep, FormValidation)>();
-        // The forms of this plan by container id, with the inputs each places messages on. A form an error
-        // route shows the server's errors on joins when the route is written, a form a request validates when
-        // the plan renders; every form's fields are bound when the plan renders (Check).
+        // The forms of this plan by container id, with the fields each checks. A form an error route shows the
+        // server's errors on joins when the route is written, with no fields until a request validates it; a
+        // validated form's fields are bound when the plan renders (Check).
         private readonly Dictionary<string, IReadOnlyList<CheckedField>> _forms =
             new Dictionary<string, IReadOnlyList<CheckedField>>(StringComparer.Ordinal);
 
@@ -183,7 +183,8 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>
         /// A form an error route shows the server's errors on is a form of the plan, as a validated form is: the
-        /// plan writes its fields, so each message is placed by the binding name the server reports it under.
+        /// plan writes its summary, and its fields when a request validates it. Each message is placed beside the
+        /// mounted input inside the form that binds the name the server reports it under.
         /// </summary>
         internal void ShowErrorsOn(string formId)
         {
@@ -199,10 +200,7 @@ namespace Alis.Reactive.PlanModel
                 .Distinct(StringComparer.Ordinal)
                 .ToList();
 
-        /// <summary>
-        /// The inputs a form places messages on, with its one validator's checks when a request validates it,
-        /// bound again each time the plan renders.
-        /// </summary>
+        /// <summary>The fields a validated form checks, with its one validator's rules, bound when the plan renders.</summary>
         internal void Check(string formId, IReadOnlyList<CheckedField> fields)
         {
             DeclareElement(formId);

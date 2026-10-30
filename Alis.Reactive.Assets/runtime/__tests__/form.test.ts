@@ -45,14 +45,20 @@ function field(id: string, value = ""): string {
   return `<input id="${id}" value="${value}"><span><span id="${id}_error" hidden></span></span>`;
 }
 
+// The view renders each field's input, so the page's table holds it under its binding name (6.3).
 function startForm(
   fields: FormField[],
   containerId = "admission",
-  summary = "Test_Plan_validation_summary",
+  summary = "admission_validation_summary",
   others: string[] = [],
 ): FormObject {
   const data: FormPluginData = { kind: "form", summary, fields };
-  const objects: Record<string, ReturnType<typeof element>> = { form: plugin("alis.form", containerId, data) };
+  const inputs: ModelPluginData["inputs"] = {};
+  for (const f of fields) inputs[f.id] = { name: f.name, body: [f.name], value: f.value, shape: s.string, committed: "change", list: false };
+  const objects: Record<string, ReturnType<typeof element>> = {
+    model: plugin("alis.model", "", { kind: "model", inputs } as ModelPluginData),
+    form: plugin("alis.form", containerId, data),
+  };
   for (const id of [...fields.map(f => f.id), ...others]) objects[id] = element(id, "native");
   startOwner(Owner.page(), [plan(objects, [])]);
   return formPlugin.object(containerId, data) as FormObject;
@@ -62,7 +68,7 @@ const errorText = (id: string) => document.getElementById(`${id}_error`)?.textCo
 
 describe("validate", () => {
   it("shows the first failing test's message inline and returns false", () => {
-    render(`<form id="admission">${field("Name")}</form><div id="Test_Plan_validation_summary" hidden></div>`);
+    render(`<form id="admission">${field("Name")}</form><div id="admission_validation_summary" hidden></div>`);
     const form = startForm([requiredField("Name", "Name", "Enter the resident's name.")]);
     expect(form.validate()).toBe(false);
     expect(errorText("Name")).toBe("Enter the resident's name.");
@@ -73,7 +79,7 @@ describe("validate", () => {
     render(`<form id="admission">${field("VaId")}<input id="IsVeteran" type="checkbox"></form>`);
     const veteran = e.as(e.get(e.obj("IsVeteran"), ["checked"]), s.boolean);
     const form = startForm([requiredField("VaId", "VaId", "'VA ID' is required.", veteran)], "admission",
-      "Test_Plan_validation_summary", ["IsVeteran"]);
+      "admission_validation_summary", ["IsVeteran"]);
     (document.getElementById("IsVeteran") as HTMLInputElement).checked = false;
     expect(form.validate()).toBe(true);
   });
@@ -85,21 +91,21 @@ describe("validate", () => {
 
   it("puts a message in the summary when the inline slot cannot render", () => {
     render(`<form id="admission"><input id="Name"><div hidden><span id="Name_error"></span></div></form>` +
-      `<div id="Test_Plan_validation_summary" hidden></div>`);
+      `<div id="admission_validation_summary" hidden></div>`);
     const form = startForm([requiredField("Name", "Name", "Enter the resident's name.")]);
     form.validate();
-    const summary = document.getElementById("Test_Plan_validation_summary")!;
+    const summary = document.getElementById("admission_validation_summary")!;
     expect(summary.hidden).toBe(false);
     expect(summary.textContent).toBe("Enter the resident's name.");
   });
 
   it("fails an unmounted field whose test is active, as the server fails a missing required member", () => {
-    render(`<form id="admission"></form><div id="Test_Plan_validation_summary" hidden></div>`);
+    render(`<form id="admission"></form><div id="admission_validation_summary" hidden></div>`);
     expect(startForm([requiredField("Ghost", "Ghost", "Ghost is required.")]).validate()).toBe(false);
   });
 
   it("passes an unmounted field whose every test is inactive", () => {
-    render(`<form id="admission"></form><div id="Test_Plan_validation_summary" hidden></div>`);
+    render(`<form id="admission"></form><div id="admission_validation_summary" hidden></div>`);
     expect(startForm([requiredField("Ghost", "Ghost", "Ghost is required.", e.lit(false))]).validate()).toBe(true);
   });
 
@@ -111,11 +117,11 @@ describe("validate", () => {
 
 describe("server errors", () => {
   it("places each error on the field with that binding name, joining messages, else in the summary", () => {
-    render(`<form id="admission">${field("Ns__Name")}</form><div id="Test_Plan_validation_summary" hidden></div>`);
+    render(`<form id="admission">${field("Ns__Name")}</form><div id="admission_validation_summary" hidden></div>`);
     const form = startForm([requiredField("Ns__Name", "Name", "msg")]);
     form.showErrors({ errors: { Name: ["Too short.", "Not unique."], Room: "Taken" } });
     expect(errorText("Ns__Name")).toBe("Too short. Not unique.");
-    expect(document.getElementById("Test_Plan_validation_summary")!.textContent).toBe("Taken");
+    expect(document.getElementById("admission_validation_summary")!.textContent).toBe("Taken");
   });
 
   it("shows nothing when the response carried no problem record: the body is not errors", () => {
@@ -151,8 +157,8 @@ describe("live", () => {
       requiredField("ContactPhone", "ContactPhone", "Enter the contact's phone."),
     ];
     const objects = {
-      sectionForm: plugin("alis.form", "contacts", { kind: "form", summary: "Test_Plan_validation_summary", fields } as FormPluginData),
-      wholeForm: plugin("alis.form", "intake", { kind: "form", summary: "Test_Plan_validation_summary", fields } as FormPluginData),
+      sectionForm: plugin("alis.form", "contacts", { kind: "form", summary: "admission_validation_summary", fields } as FormPluginData),
+      wholeForm: plugin("alis.form", "intake", { kind: "form", summary: "admission_validation_summary", fields } as FormPluginData),
       ResidentName: element("ResidentName", "native"),
       ContactPhone: element("ContactPhone", "native"),
     };
@@ -181,7 +187,7 @@ describe("live", () => {
       kind: "model",
       inputs: { Rating: { name: "Rating", body: ["Rating"], value: scored.value, shape: s.number, committed: "valueChanged", list: false } },
     };
-    const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [scored] };
+    const form: FormPluginData = { kind: "form", summary: "admission_validation_summary", fields: [scored] };
     startOwner(Owner.page(), [plan({
       Rating: element("Rating", "fake"),
       model: plugin("alis.model", "", model),
@@ -213,7 +219,7 @@ describe("live", () => {
       kind: "model",
       inputs: { Phone: { name: "Phone", body: ["Phone"], value: required.value, shape: s.string, committed: "valueChanged", list: false } },
     };
-    const form: FormPluginData = { kind: "form", summary: "Test_Plan_validation_summary", fields: [required] };
+    const form: FormPluginData = { kind: "form", summary: "admission_validation_summary", fields: [required] };
     startOwner(Owner.page(), [plan({
       Phone: element("Phone", "fake"),
       model: plugin("alis.model", "", model),

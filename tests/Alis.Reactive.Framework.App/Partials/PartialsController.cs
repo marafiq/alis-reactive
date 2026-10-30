@@ -79,6 +79,14 @@ public sealed class PartialsController : Controller
 
     public IActionResult Refused(PartialMistake mistake) => View("Refused", new PartialRefusalsPage { Mistake = mistake });
 
+    public IActionResult Sitting() => View(new SittingPage());
+
+    /// <summary>Checks the next of kin against the resident's file, by the member's binding name; the browser checks nothing.</summary>
+    [HttpPost]
+    public IActionResult BookSitting([FromBody] SittingPage sitting) => sitting.NextOfKin.Name is "Bo" or "Cy"
+        ? Said($"{sitting.Visitor ?? "no one"} sits with the resident beside {sitting.NextOfKin.Name}")
+        : BadRequest(new { errors = new Dictionary<string, string[]> { ["NextOfKin.Name"] = ["That name is not on the resident's file."] } });
+
     public IActionResult Handover() => View(new HandoverPage());
 
     /// <summary>Refuses every handover whose keyholder's relationship is not given, by the member's binding name.</summary>

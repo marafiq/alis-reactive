@@ -19,6 +19,9 @@
 //    no single request can render) both read the element the DOM finds by that id, the first in document
 //    order; each owner's release removes only its own entry, so the other slot's input is read once the
 //    first leaves.
+// M7 `ids`: the element id of each mounted input inside a container, keyed by binding name, so the form
+//    places a server message beside the input that binds the name the server reports, and clears every
+//    message inside it, whichever plan rendered the input.
 
 import type { InputBinding, ModelPluginData } from "../types/index";
 import type { Contribution, Plugin } from "../objects/plugins";
@@ -50,6 +53,8 @@ export interface ContainedInputs {
   fill(record: Record<string, unknown>): Record<string, unknown>;
   readonly fields: Record<string, unknown>;
   readonly arrays: string[];
+  /** The element id of every mounted input inside the container, keyed by MVC binding name (M7). */
+  readonly ids: Record<string, string>;
 }
 
 // Every live entry for an id, in the order contributed (M6).
@@ -76,7 +81,7 @@ const pageModel: PageModel = {
   },
 };
 
-function containedInputs(containerId: string): ContainedInputs {
+export function containedInputs(containerId: string): ContainedInputs {
   const inside = (): ModelInput[] => {
     const container = document.getElementById(containerId);
     if (container === null) throw new Error(`[alis] form #${containerId} is not on the page`);
@@ -99,6 +104,11 @@ function containedInputs(containerId: string): ContainedInputs {
     },
     get arrays() {
       return inside().filter(input => input.binding.list).map(input => input.binding.name);
+    },
+    get ids() {
+      const ids: Record<string, string> = {};
+      for (const input of inside()) ids[input.binding.name] = input.id;
+      return ids;
     },
   };
 }

@@ -1,0 +1,27 @@
+@using Alis.Reactive.Framework.App.Partials
+@model SittingPage
+@{
+    ViewData["Title"] = "A sitting";
+    var plan = Html.ReactivePlan<SittingPage>();
+}
+<h1>A sitting with the resident</h1>
+
+@* No request validates the sitting's form: the server checks the next of kin against the resident's file. *@
+<form id="sitting-form">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+    @* The next of kin's own editor template, rendered under the member's prefix: its input binds as NextOfKin.Name. *@
+    @Html.EditorFor(m => m.NextOfKin)
+</form>
+
+<p>The sitting's endpoint bound: <span id="sitting-booked"></span></p>
+
+@(plan.Button("book-sitting", "Book the sitting")
+    .Reactive(button => button.Click, p => p.Post("/Partials/BookSitting")
+        .Gather(g => g.Form("sitting-form"))
+        .Response(r => r
+            .OnSuccess<PartialsEcho>((echo, s) => s.Element("sitting-booked").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("sitting-form")))))
+
+<section id="sitting-messages" aria-label="The sitting's messages">
+    @Html.RenderPlan(plan)
+</section>

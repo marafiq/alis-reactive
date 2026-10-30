@@ -54,8 +54,8 @@ That is the whole document. The grammar names no feature.
     rendered item of a collection a rule checks, whether or not the browser can check it (a rule under
     a condition only the server decides still names its members), so `tests` is empty when every
     check is the server's. An item's field carries the checks of every rule on its collection. A form
-    the plan shows server errors for (F8) that no validator of the plan names has one field per input
-    the plan rendered, each with no tests. `name` is
+    the plan shows server errors for (F8) that no validator of the plan names has no fields: its
+    messages are placed by the mounted inputs inside it (M7). `name` is
     the input's binding name, under the view's field prefix, as the server reports it. `rule` names the
     declaration a test came from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
@@ -585,6 +585,10 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   DOM finds by the id, the first in document order, so both read the same input; and each owner's
   release removes only its own entry, so the other slot's input is read once the first leaves. A
   second entry for an id logs `input.duplicate-id`.
+- **M7 `ids`.** On `plugin("alis.model", containerId)`: the element id of each mounted input inside the
+  element, keyed by binding name, whichever plan rendered it. The form places a server message and
+  clears the messages inside the container by it (F8), and wires those inputs for live validation
+  (F7).
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
   commits a value (`ComponentInput.Of(Value, committedBy: ...)`,
   `Alis.Reactive/Components/Contracts/ComponentInput.cs:41`). When the plan that renders the
@@ -618,7 +622,8 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   the form; a plan that does neither renders none. A request of its own whose plan names a form the
   page already holds (a slot's answer) renders the form's summary again; the DOM's first in document
   order shows the messages, as M6 reads an input, and the copy leaves with the slot (F9).
-- **F7 Live.** At creation (boot or slot load):
+- **F7 Live.** At creation (boot or slot load), for each field of the form and each mounted input inside
+  its container (M7), so a form only the server checks wires the inputs its messages land beside:
   - the DOM `input` event on a field clears its inline message;
   - DOM `blur` and `alis:commit` (M4) revalidate that one field, against every container that
     holds it (a section saved on its own sits inside the whole form), and the first failing test
@@ -628,12 +633,16 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   - The wiring follows the element, wired once whichever plan's field names it, and is released when
     HTML around the element unmounts (`alis:unmount`, 3.5), not when the owner of that field is: a page's
     field that a slot's content renders lets go of that content's element when the slot unloads.
-- **F8 Server errors.** `showErrors(problem)` clears first. A form a plan shows server errors for is a
-  form of that plan, written as a validated form is (1.1); when no validator of the plan names it, its
-  fields are the plan's rendered inputs with no tests, so its messages are placed the same way.
-  - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a
-    sentence) and matches a form field by its exact binding name, whatever its tests, then places
-    the message as F6 does. Anything else goes to the summary.
+- **F8 Server errors.** `showErrors(problem)` clears first: the inline message of every field of the
+  form and of every mounted input inside the container (M7), and the summary. A form a plan shows server
+  errors for is a form of that plan (1.1); when no validator of the plan names it, it has no fields. A
+  container not on the page is a boundary error (3.4), as in M1.
+  - When `problem` is a record with `errors`, it joins each name's messages with a space (each is a
+    sentence) and places them beside the mounted input inside the container with that exact binding
+    name, whichever plan rendered it (the page, a partial, an editor template, a slot's content), as F6
+    does; a name no such input binds, or whose slot cannot render, goes to the summary. Of two inputs
+    inside one container with one binding name, the message goes beside the one contributed last, the
+    one a request sends (M2).
   - When `problem` is not a record (an empty or non-JSON body), it logs `server-errors.not-a-record`
     and shows nothing: the server said nothing the form can place.
 - **F9 Composition.** The tests every plan writes for a container are joined per owner, whatever the

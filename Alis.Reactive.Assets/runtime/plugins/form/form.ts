@@ -14,8 +14,10 @@
 //    revalidate it against every container that holds it. Each element is wired once, and the wiring
 //    follows the element: it is released when HTML around the element unmounts, whichever owner's
 //    field wired it.
-// F8 showErrors(problem) places server errors by exact binding name; a body that is not a record is
-//    logged and shows nothing.
+// F8 showErrors(problem) clears first, then places each server error beside the mounted input inside the
+//    container with that exact binding name, whichever plan rendered it (alis.model M7), else in the
+//    summary; a form only the server checks needs no fields. A body that is not a record is logged and
+//    shows nothing.
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the form's summary.
 
 import type { FormField, FormPluginData, FormTest, PluginData } from "../../types/index";
@@ -26,6 +28,7 @@ import { asText } from "../../grammar/shape";
 import { isRecord } from "../../shared/record";
 import { logger } from "../../diagnostics/trace";
 import { COMMIT_EVENT, MOUNT_EVENT, UNMOUNT_EVENT, type MountEventDetail } from "../../plans/mount-events";
+import { containedInputs } from "../model";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
   showInline, showServerInline, showsServerMessage, showSummaryDiv, summaryHasEntries,
@@ -193,9 +196,10 @@ function showErrors(containerId: string, summaryId: string, problem: unknown): v
     return;
   }
 
-  const entries = entriesOf(containerId);
+  // The mounted inputs inside the form, whichever plan rendered them; a form not on the page fails here (M1).
+  const inputs = containedInputs(containerId).ids;
   const summary = document.getElementById(summaryId);
-  for (const entry of entries) clearInline(entry.field.id);
+  clearInlineMessages(entriesOf(containerId), inputs);
   clearAndHide(summary);
 
   const errors = problem["errors"];
@@ -208,15 +212,20 @@ function showErrors(containerId: string, summaryId: string, problem: unknown): v
   // one after another.
   for (const [name, messages] of Object.entries(errors)) {
     const message = Array.isArray(messages) ? messages.join(" ") : asText(messages) ?? "";
-    const entry = entries.find(candidate => candidate.field.name === name);
-    const element = entry ? document.getElementById(entry.field.id) : null;
-    if (entry && element !== null && canRenderInline(entry.field.id)) {
-      showServerInline(entry.field.id, message);
+    const id = inputs[name];
+    if (id !== undefined && canRenderInline(id)) {
+      showServerInline(id, message);
     } else {
       addSummaryError(summary, name, message);
     }
   }
   log.debug("server-errors.shown", { id: containerId });
+}
+
+// Every inline message the form may show: its fields', and every mounted input's inside it (M7).
+function clearInlineMessages(entries: readonly Entry[], inputs: Record<string, string>): void {
+  for (const entry of entries) clearInline(entry.field.id);
+  for (const id of Object.values(inputs)) clearInline(id);
 }
 
 // ── live wiring ────────────────────────────────────────────────────────────
@@ -245,10 +254,18 @@ function wireLive(id: string): void {
   });
 }
 
+// Every mounted input inside a form is wired too, whichever plan rendered it: a form only the server checks
+// has no fields, and the message the server placed beside an input still clears as the user types.
+function wireInputsInside(containerId: string): void {
+  if (document.getElementById(containerId) === null) return;
+  for (const id of Object.values(containedInputs(containerId).ids)) wireLive(id);
+}
+
 // Fields a partial renders appear after their form was contributed: wire them when they mount.
 function wireMountedFields(): void {
-  for (const entries of formsByContainer.values()) {
+  for (const [containerId, entries] of formsByContainer) {
     for (const entry of entries) wireLive(entry.field.id);
+    wireInputsInside(containerId);
   }
 }
 
@@ -288,6 +305,7 @@ export const formPlugin: Plugin = {
     entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
     for (const entry of added) wireLive(entry.field.id);
+    wireInputsInside(key);
     listenForMounts();
 
     owner.onDispose(() => {

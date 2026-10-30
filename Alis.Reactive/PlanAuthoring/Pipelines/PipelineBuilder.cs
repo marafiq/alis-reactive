@@ -233,9 +233,10 @@ namespace Alis.Reactive.Builders
         /// error route of the request that received them: <c>.OnError(400, e =&gt; e.ValidationErrors(FormId))</c>.
         /// </summary>
         /// <remarks>
-        /// A message goes beside the input the plan rendered for the member the server names, and to the plan's
-        /// summary when the plan renders none. The form need not be validated: a form no request validates
-        /// places the server's messages on the inputs the plan rendered.
+        /// A message goes beside the mounted input inside the form that binds the name the server reports it under,
+        /// whichever plan rendered it (the page, a partial, an editor template, a slot's content), and to the
+        /// form's summary (<c>{formId}_validation_summary</c>) when no such input shows it. The form need not be
+        /// validated.
         /// </remarks>
         /// <param name="formId">The element that holds the form's inputs.</param>
         /// <returns>This pipeline builder.</returns>

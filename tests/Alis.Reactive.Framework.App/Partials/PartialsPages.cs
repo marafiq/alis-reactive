@@ -138,6 +138,17 @@ public sealed class AdmissionRules : ReactiveValidator<AdmissionPage>
 }
 
 /// <summary>
+/// A visitor's sitting with a resident: the page renders the visitor, and the next of kin is edited through the
+/// member's editor template (KinCard); only the server checks the sitting.
+/// </summary>
+public sealed class SittingPage
+{
+    public string? Visitor { get; set; }
+
+    public KinCard NextOfKin { get; set; } = new();
+}
+
+/// <summary>
 /// A room handed over to a keyholder: the page renders the room, and the keyholder's line is the editor template
 /// of its own model, which carries the handover's save.
 /// </summary>
