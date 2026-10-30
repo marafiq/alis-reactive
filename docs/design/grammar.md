@@ -625,6 +625,9 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
     shows. A message the server placed (F8) stays on `blur`: no input and no commit came since, so
     the value it judged has not changed; typing clears it and a commit re-checks the field. The form never names a component's event, so the order in which the form and the
     input's plan start does not matter, and neither does the order the containers were declared.
+  - The wiring follows the element, wired once whichever plan's field names it, and is released when
+    HTML around the element unmounts (`alis:unmount`, 3.5), not when the owner of that field is: a page's
+    field that a slot's content renders lets go of that content's element when the slot unloads.
 - **F8 Server errors.** `showErrors(problem)` clears first. A form a plan shows server errors for is a
   form of that plan, written as a validated form is (1.1); when no validator of the plan names it, its
   fields are the plan's rendered inputs with no tests, so its messages are placed the same way.

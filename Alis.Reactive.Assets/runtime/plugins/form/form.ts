@@ -11,20 +11,21 @@
 //    element the form's data names ({formId}_validation_summary), which the server renders.
 // F7 At creation, and whenever HTML mounts (a field a partial loads): DOM `input` clears a field's
 //    message; DOM `blur` and alis:commit (the model re-raises each input's own commit event as it)
-//    revalidate it against every container that holds it. Each element is wired once.
+//    revalidate it against every container that holds it. Each element is wired once, and the wiring
+//    follows the element: it is released when HTML around the element unmounts, whichever owner's
+//    field wired it.
 // F8 showErrors(problem) places server errors by exact binding name; a body that is not a record is
 //    logged and shows nothing.
 // F9 A slot's load or unload removes exactly its own fields, then clears and hides the form's summary.
 
 import type { FormField, FormPluginData, FormTest, PluginData } from "../../types/index";
 import type { Contribution, Plugin } from "../../objects/plugins";
-import type { Owner } from "../../objects/owner";
 import type { PlanObjects } from "../../objects/plan-objects";
 import { evaluate, rootScope } from "../../grammar/evaluate";
 import { asText } from "../../grammar/shape";
 import { isRecord } from "../../shared/record";
 import { logger } from "../../diagnostics/trace";
-import { COMMIT_EVENT, MOUNT_EVENT } from "../../plans/mount-events";
+import { COMMIT_EVENT, MOUNT_EVENT, UNMOUNT_EVENT, type MountEventDetail } from "../../plans/mount-events";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
   showInline, showServerInline, showsServerMessage, showSummaryDiv, summaryHasEntries,
@@ -35,7 +36,6 @@ const log = logger("validation");
 interface Entry {
   readonly field: FormField;
   readonly objects: PlanObjects;
-  readonly owner: Owner;
   /** The id of the form's summary, from the data the field came with. */
   readonly summary: string;
 }
@@ -46,10 +46,10 @@ export interface FormObject {
 }
 
 const formsByContainer = new Map<string, Entry[]>();
-// The elements wired for live validation. A partial that reloads brings new elements under the same
-// ids, so wiring is remembered per element, not per id.
-let liveWiredElements = new WeakSet<HTMLElement>();
-let mountListened = false;
+// The elements wired for live validation, each with what unwires it. A partial that reloads brings new
+// elements under the same ids, so wiring is kept per element, not per id, until the element unmounts.
+const wiredElements = new Map<HTMLElement, () => void>();
+let mountsListened = false;
 
 function entriesOf(containerId: string): Entry[] {
   let entries = formsByContainer.get(containerId);
@@ -221,17 +221,16 @@ function showErrors(containerId: string, summaryId: string, problem: unknown): v
 
 // ── live wiring ────────────────────────────────────────────────────────────
 
-function wireLive(entry: Entry): void {
-  const { field, owner } = entry;
-  const element = document.getElementById(field.id);
-  if (element === null || liveWiredElements.has(element)) return;
+function wireLive(id: string): void {
+  const element = document.getElementById(id);
+  if (element === null || wiredElements.has(element)) return;
 
-  const clear = (): void => clearInline(field.id);
+  const clear = (): void => clearInline(id);
   const recheck = (): void => revalidate(element);
   // Leaving a field the server judged keeps the server's message: no input and no commit came since,
   // so the value it judged has not changed.
   const recheckOnLeave = (): void => {
-    if (!showsServerMessage(field.id)) revalidate(element);
+    if (!showsServerMessage(id)) revalidate(element);
   };
   // Typing clears the message before the component hears the keystroke (capture runs first), so a
   // commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks
@@ -239,26 +238,35 @@ function wireLive(entry: Entry): void {
   element.addEventListener("input", clear, true);
   element.addEventListener("blur", recheckOnLeave);
   element.addEventListener(COMMIT_EVENT, recheck);
-  liveWiredElements.add(element);
-  owner.onDispose(() => {
+  wiredElements.set(element, () => {
     element.removeEventListener("input", clear, true);
     element.removeEventListener("blur", recheckOnLeave);
     element.removeEventListener(COMMIT_EVENT, recheck);
-    liveWiredElements.delete(element);
   });
 }
 
 // Fields a partial renders appear after their form was contributed: wire them when they mount.
 function wireMountedFields(): void {
   for (const entries of formsByContainer.values()) {
-    for (const entry of entries) wireLive(entry);
+    for (const entry of entries) wireLive(entry.field.id);
+  }
+}
+
+// HTML about to go takes the wiring of the elements inside it along, whichever owner's field wired them: a
+// page's field that a slot's content renders is released with that content.
+function releaseWithin(root: HTMLElement): void {
+  for (const [element, unwire] of wiredElements) {
+    if (!root.contains(element)) continue;
+    unwire();
+    wiredElements.delete(element);
   }
 }
 
 function listenForMounts(): void {
-  if (mountListened) return;
-  mountListened = true;
+  if (mountsListened) return;
+  mountsListened = true;
   document.addEventListener(MOUNT_EVENT, wireMountedFields);
+  document.addEventListener(UNMOUNT_EVENT, event => releaseWithin((event as CustomEvent<MountEventDetail>).detail.root));
 }
 
 // A plan writes a form's data on every form it validates or shows the server's errors on, so the plan that
@@ -276,10 +284,10 @@ export const formPlugin: Plugin = {
   contribute({ key, data: contributed, owner, objects }: Contribution) {
     const data = contributed as FormPluginData;
     const entries = entriesOf(key);
-    const added = data.fields.map(field => ({ field, objects, owner, summary: data.summary }));
+    const added = data.fields.map(field => ({ field, objects, summary: data.summary }));
     entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
-    for (const entry of added) wireLive(entry);
+    for (const entry of added) wireLive(entry.field.id);
     listenForMounts();
 
     owner.onDispose(() => {
