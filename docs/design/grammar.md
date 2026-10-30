@@ -565,8 +565,10 @@ no key (H2) and no entry (H4).
 - **H1 Route.** Each `{name}` is filled from `route[name]` with `encodeURIComponent`, so a value
   stays inside its path segment and every character reaches the endpoint as written, but one:
   ASP.NET Core's routing decodes everything in a route value except `%2F`, so a slash arrives as
-  `%2F`, and text that may hold one goes in the query. A missing route value throws before anything
-  is sent.
+  `%2F`, and text that may hold one goes in the query. A missing route value, or one that leaves its
+  path segment empty, `.` or `..`, throws before anything is sent: routing matches no empty segment,
+  and the browser drops a dot segment as it resolves the address, so the request would reach
+  another endpoint (`..` the one above).
 - **H2 GET.** `values` become the query string, joined with `&` when the URL already has a `?`.
   - Each name and value is encoded with `encodeURIComponent`, so every character, ASCII or not,
     reaches `[FromQuery]` as written.

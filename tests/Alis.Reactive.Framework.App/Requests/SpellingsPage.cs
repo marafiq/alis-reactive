@@ -3,9 +3,13 @@ namespace Alis.Reactive.Framework.App.Requests;
 /// <summary>
 /// Names as families spell them, and a street as a German address writes it: text holding every character a
 /// path, a query or a form treats as its own (a slash, an ampersand, an equals sign, a plus, a space, quotes,
-/// a percent sign, a hash, a question mark) and text beyond ASCII, sent in a route, a query and form data.
+/// a percent sign, a hash, a question mark) and text beyond ASCII, sent in a route, a query and form data; and
+/// a name typed to open its page, which may be no name a path can hold.
 /// </summary>
-public sealed class SpellingsPage;
+public sealed class SpellingsPage
+{
+    public string? Name { get; set; }
+}
 
 /// <summary>A resident's name, in a route, a query or a form post.</summary>
 public sealed class SpelledName

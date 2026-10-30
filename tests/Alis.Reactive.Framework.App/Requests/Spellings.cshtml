@@ -6,12 +6,15 @@
 }
 <h1>Spellings</h1>
 
+@{ Html.InputField(plan, m => m.Name, o => o.Label("Name")).Entry(); }
+
 <dl>
     <dt>The name, in a query</dt><dd id="looked-up"></dd>
     <dt>The name, in the path</dt><dd id="routed"></dd>
     <dt>The name, as form data</dt><dd id="posted"></dd>
     <dt>The street, in a query</dt><dd id="street-looked-up"></dd>
     <dt>The street, as form data</dt><dd id="street-posted"></dd>
+    <dt>The page of the name typed</dt><dd><span id="typed-found"></span> <span id="typed-routed"></span> · <span id="typed-done"></span></dd>
 </dl>
 
 @(plan.Button("look-up-name", "Look up the name")
@@ -28,6 +31,17 @@
         .Response(r => r
             .OnSuccess<Echo>((echo, s) => s.Element("routed").Text.Set(echo.Get(x => x.Summary)))
             .OnError(404, e => e.Element("routed").Text.Set("no page at that address")))))
+@(plan.Button("open-typed-name", "Open the page of the name typed")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Spellings/Names/{name}")
+        .Gather<SpelledName>(g => g.Set(x => x.Name, p.Component<Entry>(m => m.Name).Value))
+        .Response(r => r
+            .OnSuccess<Echo>((echo, s) =>
+            {
+                s.Element("typed-found").Text.Set("found:");
+                s.Element("typed-routed").Text.Set(echo.Get(x => x.Summary));
+            })
+            .OnError(e => e.Element("typed-found").Text.Set("not found")))
+        .Finally(f => f.Element("typed-done").Text.Set("looked up"))))
 @(plan.Button("post-name", "Post the name")
     .Reactive(button => button.Click, p => p.Post("/Requests/Spellings")
         .Gather<SpelledName>(g => g.Set(x => x.Name, "Zoë & \"Rose\" O'Neil / 1+1=2, 50% #3?"))

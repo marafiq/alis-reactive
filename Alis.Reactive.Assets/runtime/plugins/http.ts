@@ -1,8 +1,10 @@
 // alis.http (grammar.md 6.2). `send(request)` resolves to { status, ok, body }. The C# request builder
 // decides everything else at render: which values fill the route, which go to the query or body, the
 // body format, and the order of validation, WhileLoading, routes, Finally and Chained around this call.
-// H1 Each {name} is filled from route[name] with encodeURIComponent; a missing route value throws
-//    before anything is sent.
+// H1 Each {name} is filled from route[name] with encodeURIComponent, so a slash stays inside its
+//    segment. A missing route value, or one that leaves its path segment empty, "." or "..", throws
+//    before anything is sent: routing matches no empty segment, and the browser drops a dot segment as
+//    it resolves the address, so the request would reach another endpoint.
 // H2 GET: values become the query string. An array becomes repeated keys, a missing scalar is sent
 //    empty, a missing array sends no key, and a File is a boundary error.
 // H3 JSON: values is the body, each value as the plan built it: an input read as MVC binds it (a blank
@@ -41,6 +43,10 @@ export interface HttpResponse {
 }
 
 const ROUTE_PLACEHOLDER = /\{(\w+)\}/g;
+
+// The path segments no value can fill: routing matches no empty one, and the browser drops "." and ".."
+// as it resolves the address.
+const UNCARRIED_SEGMENTS = new Set(["", ".", ".."]);
 
 export async function send(request: HttpRequest): Promise<HttpResponse> {
   const { url, init } = prepare(request);
@@ -95,11 +101,26 @@ function prepare(request: HttpRequest): { url: string; init: RequestInit } {
 }
 
 function fillRoute(template: string, route: Record<string, unknown>): string {
-  return template.replace(ROUTE_PLACEHOLDER, (_match, name: string) => {
-    const value = route[name];
-    if (isMissing(value)) throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
-    return encodeURIComponent(wireText(value, name));
-  });
+  const queryStart = template.indexOf("?");
+  const path = queryStart === -1 ? template : template.slice(0, queryStart);
+  const query = queryStart === -1 ? "" : template.slice(queryStart);
+  const filledPath = path.split("/").map(segment => fillSegment(segment, route, template)).join("/");
+  return filledPath + query.replace(ROUTE_PLACEHOLDER, (_match, name: string) => routeValue(route, name));
+}
+
+// Every "{" of a template opens a placeholder: the C# template reader refuses any other.
+function fillSegment(segment: string, route: Record<string, unknown>, template: string): string {
+  if (!segment.includes("{")) return segment;
+  const filled = segment.replace(ROUTE_PLACEHOLDER, (_match, name: string) => routeValue(route, name));
+  if (UNCARRIED_SEGMENTS.has(filled))
+    throw new Error(`[alis] route segment "${segment}" of "${template}" was filled as "${filled}", which no URL path carries; cannot build URL`);
+  return filled;
+}
+
+function routeValue(route: Record<string, unknown>, name: string): string {
+  const value = route[name];
+  if (isMissing(value)) throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
+  return encodeURIComponent(wireText(value, name));
 }
 
 function headersOf(source: Record<string, unknown>): Record<string, string> {

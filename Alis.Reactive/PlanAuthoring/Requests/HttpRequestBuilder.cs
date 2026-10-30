@@ -38,7 +38,10 @@ namespace Alis.Reactive.Builders.Requests
         /// Each value reaches the endpoint as it was read, whatever characters it holds: a route value is encoded as
         /// one path segment, and the names and values of a query or form data as the browser encodes them. ASP.NET
         /// Core's routing decodes every character of a route value but a slash, which it binds as <c>%2F</c>, so text
-        /// that may hold a slash is sent in the query, by a member no placeholder names.
+        /// that may hold a slash is sent in the query, by a member no placeholder names. A route value that is
+        /// missing, or that would leave its path segment empty, <c>.</c> or <c>..</c>, stops the request before it is
+        /// sent, since routing matches no empty segment and the browser drops a dot segment, which would send the
+        /// request elsewhere; <see cref="Finally"/> still runs.
         /// </remarks>
         /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>
         /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
