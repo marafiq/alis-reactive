@@ -623,9 +623,12 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   view places it (`<native-validation-summary form="formId">`, before the plan that would render it;
   a second placement, or one after that plan, is refused), else `Html.RenderPlan` writes it after the
   plan's script for each form the plan validates or shows server errors on (F8), so it sits after the
-  first plan of the request that names the form; a plan that does neither renders none. A request of its own whose plan names a form the
-  page already holds (a slot's answer) renders the form's summary again; the DOM's first in document
-  order shows the messages, as M6 reads an input, and the copy leaves with the slot (F9).
+  first plan of the request that names the form; a plan that does neither renders none. A summary
+  rendered after a plan whose script sits inside a slot's container is that slot's content (3.5) and
+  leaves with it: a page whose first such plan is slot content places the summary where it stays. A
+  request of its own whose plan names a form the page already holds (a slot's answer) renders the
+  form's summary again; the DOM's first in document order shows the messages, as M6 reads an input,
+  and the copy leaves with the slot (F9).
 - **F7 Live.** At creation (boot or slot load), for each field of the form and each mounted input inside
   its container (M7), so a form only the server checks wires the inputs its messages land beside:
   - the DOM `input` event on a field clears its inline message;
