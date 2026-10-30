@@ -767,7 +767,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 | `Matches` | null passes; the regex matches | `v == null` or `matches(v, pattern, flags)`, flags from `RegexOptions`, when JavaScript reads the pattern the same way |
 | comparison with a literal | ordered: null passes; equality: no null skip | ordered: `v == null` or `v op literal`; equality: `v op literal` |
 | comparison with another member | the member is read by its path from the model | the peer is read by that path; ordered: `v == null` or (peer present and `v op peer`); equality: `v op peer` |
-| `InclusiveBetween`, `ExclusiveBetween` | null passes; within the bounds | `v == null` or within the bounds |
+| `InclusiveBetween`, `ExclusiveBetween` | null passes; within the bounds; bounds written upper first are refused where the validator is built | `v == null` or within the bounds |
 | `SetValidator`, `ChildRules`, `RuleForEach(..).SetValidator`, `Include` | the child's rules, paths prefixed | the child's browser rules, prefixed, under the enclosing conditions |
 | `Must`, `MustAsync` | the predicate | none: server-only |
 

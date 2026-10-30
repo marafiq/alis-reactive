@@ -352,7 +352,10 @@ namespace Alis.Reactive.FluentValidator
             if (from == null) throw new ArgumentNullException(nameof(from), "A range needs both bounds.");
             if (to == null) throw new ArgumentNullException(nameof(to), "A range needs both bounds.");
             if (Comparer.Default.Compare(to, from) < 0)
-                throw new ArgumentOutOfRangeException(nameof(to), "The upper bound is below the lower bound.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(to),
+                    $"{(inclusive ? "InclusiveBetween" : "ExclusiveBetween")}({from}, {to}) has its upper bound below its lower bound: " +
+                    "write the lower bound first.");
             _from = from;
             _to = to;
             _inclusive = inclusive;

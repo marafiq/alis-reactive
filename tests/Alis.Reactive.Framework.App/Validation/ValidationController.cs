@@ -29,6 +29,9 @@ public sealed class ValidationController : Controller
 
     public IActionResult Bounds() => View(new BoundsForm());
 
+    /// <summary>The bounds page, checked by a range written with its bounds the wrong way round.</summary>
+    public IActionResult BoundsRefused() => View(new BoundsForm());
+
     public IActionResult Sameness() => View(new SamenessForm());
 
     public IActionResult Guest() => View(new RegisteredGuest());
