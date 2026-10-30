@@ -1,0 +1,46 @@
+@using Alis.Reactive.Framework.App.Requests
+@model SpellingsPage
+@{
+    ViewData["Title"] = "Spellings";
+    var plan = Html.ReactivePlan<SpellingsPage>();
+}
+<h1>Spellings</h1>
+
+<dl>
+    <dt>The name, in a query</dt><dd id="looked-up"></dd>
+    <dt>The name, in the path</dt><dd id="routed"></dd>
+    <dt>The name, as form data</dt><dd id="posted"></dd>
+    <dt>The street, in a query</dt><dd id="street-looked-up"></dd>
+    <dt>The street, as form data</dt><dd id="street-posted"></dd>
+</dl>
+
+@(plan.Button("look-up-name", "Look up the name")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Spellings/Lookup")
+        .Gather<SpelledName>(g => g.Set(x => x.Name, "Zoë & \"Rose\" O'Neil / 1+1=2, 50% #3?"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("looked-up").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("open-name", "Open the name's page")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Spellings/Names/{name}")
+        .Gather<SpelledName>(g => g.Set(x => x.Name, "Zoë & \"Rose\" O'Neil 1+1=2, 50% #3?"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("routed").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("open-ward", "Open the ward's page")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Spellings/Names/{name}")
+        .Gather<SpelledName>(g => g.Set(x => x.Name, "Ward 2/B"))
+        .Response(r => r
+            .OnSuccess<Echo>((echo, s) => s.Element("routed").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(404, e => e.Element("routed").Text.Set("no page at that address")))))
+@(plan.Button("post-name", "Post the name")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Spellings")
+        .Gather<SpelledName>(g => g.Set(x => x.Name, "Zoë & \"Rose\" O'Neil / 1+1=2, 50% #3?"))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("posted").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("look-up-street", "Look up the street")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Spellings/Streets")
+        .Gather<SpelledAddress>(g => g.Set(x => x.Straße, "Hauptstraße 1"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("street-looked-up").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("post-street", "Post the street")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Spellings/Streets")
+        .Gather<SpelledAddress>(g => g.Set(x => x.Straße, "Hauptstraße 1"))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("street-posted").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

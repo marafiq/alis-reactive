@@ -34,6 +34,12 @@ namespace Alis.Reactive.Builders.Requests
         /// Builds the request the endpoint binds: a member named like a URL <c>{placeholder}</c> fills the path,
         /// and the others go to the query string for GET and to the body otherwise.
         /// </summary>
+        /// <remarks>
+        /// Each value reaches the endpoint as it was read, whatever characters it holds: a route value is encoded as
+        /// one path segment, and the names and values of a query or form data as the browser encodes them. ASP.NET
+        /// Core's routing decodes every character of a route value but a slash, which it binds as <c>%2F</c>, so text
+        /// that may hold a slash is sent in the query, by a member no placeholder names.
+        /// </remarks>
         /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>
         /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
         public HttpRequestBuilder<TModel> Gather<TRequest>(Action<GatherBuilder<TRequest, TModel>> gather)

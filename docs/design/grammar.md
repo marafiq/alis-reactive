@@ -562,13 +562,18 @@ imports none of them. The obligations are numbered so that tests and code can ci
 `{ status, ok, body }`. `arrays` names the members of `values` that hold arrays, so a missing one sends
 no key (H2) and no entry (H4).
 
-- **H1 Route.** Each `{name}` is filled from `route[name]` with `encodeURIComponent`. A missing
-  route value throws before anything is sent.
+- **H1 Route.** Each `{name}` is filled from `route[name]` with `encodeURIComponent`, so a value
+  stays inside its path segment and every character reaches the endpoint as written, but one:
+  ASP.NET Core's routing decodes everything in a route value except `%2F`, so a slash arrives as
+  `%2F`, and text that may hold one goes in the query. A missing route value throws before anything
+  is sent.
 - **H2 GET.** `values` become the query string, joined with `&` when the URL already has a `?`.
+  - Each name and value is encoded with `encodeURIComponent`, so every character, ASCII or not,
+    reaches `[FromQuery]` as written.
   - An array becomes repeated keys.
   - A missing scalar is sent empty (`name=`).
   - A missing array sends no key, because `name=` binds as a collection holding one null
-    (`Alis.Reactive.Assets/runtime/plugins/http.ts:112-128`).
+    (`Alis.Reactive.Assets/runtime/plugins/http.ts`, `queryPairs`).
   - A `File` cannot be sent in a GET; it is a boundary error.
 - **H3 JSON.** `values` is the body, each value as the plan built it; the plugin converts no text.
   - The inputs a request sends (`Form()` through `model.fill`, `Form(m => m.X)` through
@@ -579,11 +584,13 @@ no key (H2) and no entry (H4).
     `""` for a text member, and a nullable member's shape has already made blank text `null`.
   - A date is sent as its local text and an instant as its UTC instant
     (`Alis.Reactive.Assets/runtime/plugins/http.ts`, `jsonValue`). An empty record sends no body.
-- **H4 Form data.** One entry per key.
+- **H4 Form data.** One entry per key, sent as the browser's `FormData` writes it, so every
+  character of a value, and of a name (a member's name, ASCII or not), reaches `[FromForm]` as
+  written.
   - Arrays repeat the key.
   - A `File` is appended with its name, and a date is its local text.
   - A missing scalar is sent empty.
-  - A missing array sends no entry (`Alis.Reactive.Assets/runtime/plugins/http.ts:136-153`).
+  - A missing array sends no entry (`Alis.Reactive.Assets/runtime/plugins/http.ts`, `formData`).
 - **H5 Headers.** A header whose value is missing is omitted.
 - **H6 Body.** The body is read by Content-Type: JSON is parsed, text and HTML stay text, and an
   empty or other body is missing.

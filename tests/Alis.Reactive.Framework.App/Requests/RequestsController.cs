@@ -127,6 +127,23 @@ public sealed class RequestsController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult HandOver([FromBody] HandoverNote handover) => Said($"'{handover.Note}', accepted");
 
+    public IActionResult Spellings() => View(new SpellingsPage());
+
+    [HttpGet("/Requests/Spellings/Lookup")]
+    public IActionResult LookUpSpelling([FromQuery] SpelledName spelled) => Said($"query name [{spelled.Name}]");
+
+    [HttpGet("/Requests/Spellings/Names/{name}")]
+    public IActionResult RouteSpelling(string name) => Said($"route name [{name}]");
+
+    [HttpPost("/Requests/Spellings")]
+    public IActionResult PostSpelling([FromForm] SpelledName spelled) => Said($"form name [{spelled.Name}]");
+
+    [HttpGet("/Requests/Spellings/Streets")]
+    public IActionResult LookUpStreet([FromQuery] SpelledAddress address) => Said($"query Straße [{address.Straße ?? "none"}]");
+
+    [HttpPost("/Requests/Spellings/Streets")]
+    public IActionResult PostStreet([FromForm] SpelledAddress address) => Said($"form Straße [{address.Straße ?? "none"}]");
+
     private string QueryText() => Request.QueryString.HasValue ? Request.QueryString.Value! : "nothing";
 
     private static string Listed(List<string>? items) =>
