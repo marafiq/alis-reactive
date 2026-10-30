@@ -18,7 +18,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "Duplicate .Chained() call on ResponseBuilder",
-            messageFormat: "Duplicate .Chained() call — a response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..)).",
+            messageFormat: "Duplicate .Chained() call — a response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..))",
             category: "Alis.Reactive.HttpPipeline",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,

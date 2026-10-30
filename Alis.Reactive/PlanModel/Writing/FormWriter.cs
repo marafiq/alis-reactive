@@ -26,7 +26,7 @@ namespace Alis.Reactive.PlanModel
 
         /// <summary>The form's data: its summary, the form's own whichever plan renders it, and its fields.</summary>
         internal FormPluginData Form(string formId, IReadOnlyList<CheckedField> fields) =>
-            new FormPluginData(FormSummary.IdOf(formId), fields.Select(Field).ToList());
+            new FormPluginData(FormSummaries.IdOf(formId), fields.Select(Field).ToList());
 
         private FormField Field(CheckedField field)
         {

@@ -16,7 +16,7 @@ namespace Alis.Reactive.NativeTagHelpers.ValidationSummary;
 /// </remarks>
 /// <example><c>&lt;native-validation-summary form="room-hold-form" /&gt;</c></example>
 [HtmlTargetElement("native-validation-summary")]
-public class NativeValidationSummaryTagHelper : TagHelper
+public class NativeValidationSummaryTagHelper(IHtmlHelper html) : TagHelper
 {
     /// <summary>
     /// Required element id of the form whose summary this is: the container a request validates
@@ -44,21 +44,9 @@ public class NativeValidationSummaryTagHelper : TagHelper
                 "The native-validation-summary tag helper requires a form attribute: the element id of the form a request " +
                 "validates (Validate<TValidator>(\"formId\")) or shows the server's errors on (e.ValidationErrors(\"formId\")).");
 
-        var page = RenderedPage.Of(ViewContext);
-        var view = RenderedPage.ViewPathOf(ViewContext);
-        if (!page.SummaryRenders(Form, $"by native-validation-summary in {view}"))
-            throw new InvalidOperationException(
-                $"<native-validation-summary form=\"{Form}\"> in {view} renders the summary of form '{Form}' a second time on " +
-                $"this page: it was rendered {page.SummaryPlaceOf(Form)}. A form's summary renders once: place the tag before " +
-                "the @Html.RenderPlan(plan) of the first plan that validates the form or shows its errors, and only once.");
-
-        output.TagName = "div";
-        output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("id", FormSummary.IdOf(Form));
-        output.Attributes.SetAttribute("data-reactive-validation-summary", Form);
-        output.Attributes.SetAttribute("hidden", "");
-
-        if (!string.IsNullOrWhiteSpace(CssClass))
-            output.Attributes.SetAttribute("class", CssClass);
+        // The same placement as Html.FormSummary, which records the summary with the page so it renders once.
+        ((IViewContextAware)html).Contextualize(ViewContext);
+        output.TagName = null;
+        output.Content.SetHtmlContent(html.FormSummary(Form, CssClass));
     }
 }

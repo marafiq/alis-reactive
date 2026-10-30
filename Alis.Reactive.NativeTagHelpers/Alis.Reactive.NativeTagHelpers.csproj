@@ -19,7 +19,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <!-- native-validation-summary records the form's summary with the page the core renders plans into. -->
+    <!-- native-validation-summary places a form's summary through the core's Html.FormSummary. -->
     <ProjectReference Include="../Alis.Reactive/Alis.Reactive.csproj" />
     <ProjectReference Include="../Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>

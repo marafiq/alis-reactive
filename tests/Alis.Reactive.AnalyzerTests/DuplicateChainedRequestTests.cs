@@ -8,7 +8,7 @@ namespace Alis.Reactive.AnalyzerTests;
 public class DuplicateChainedRequestTests
 {
     private const string Message =
-        "Duplicate .Chained() call — a response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..)).";
+        "Duplicate .Chained() call — a response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..))";
 
     [Test]
     public Task a_second_chained_on_one_response_is_reported() =>

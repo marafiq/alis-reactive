@@ -56,8 +56,6 @@
     <ItemGroup>
         <InternalsVisibleTo Include="Alis.Reactive.PlanContractGenerator" />
         <InternalsVisibleTo Include="Alis.Reactive.FluentValidator" />
-        <!-- native-validation-summary places a form's summary, and the page's record of summaries is internal. -->
-        <InternalsVisibleTo Include="Alis.Reactive.NativeTagHelpers" />
         <InternalsVisibleTo Include="Alis.Reactive.PlanTests" />
     </ItemGroup>
 

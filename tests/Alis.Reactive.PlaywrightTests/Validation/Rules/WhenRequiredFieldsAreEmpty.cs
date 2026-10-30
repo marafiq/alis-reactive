@@ -293,9 +293,9 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         var serverResult = Page.Locator("#server-result");
         await Expect(serverResult).ToHaveTextAsync("Server returned validation errors", new() { Timeout = 5000 });
         await Expect(serverResult).ToHaveClassAsync(new Regex("text-red-600"));
-        await Expect(ValidationSummary).ToBeVisibleAsync();
-        await Expect(ValidationSummary.Locator("[data-valmsg-summary-for='AllRules.Name']")).ToHaveTextAsync("Name is required.");
-        await Expect(ValidationSummary.Locator("[data-valmsg-summary-for='Db.Email']")).ToHaveTextAsync("Email is required.");
+        await Expect(SummaryOf("server-form")).ToBeVisibleAsync();
+        await Expect(SummaryOf("server-form").Locator("[data-valmsg-summary-for='AllRules.Name']")).ToHaveTextAsync("Name is required.");
+        await Expect(SummaryOf("server-form").Locator("[data-valmsg-summary-for='Db.Email']")).ToHaveTextAsync("Email is required.");
         await Expect(ErrorFor(m => m.Server.Name)).ToHaveTextAsync("");
         await Expect(ErrorFor(m => m.Server.Email)).ToHaveTextAsync("");
 
@@ -367,7 +367,8 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    private ILocator ValidationSummary => Page.Locator("[data-reactive-validation-summary]");
+    // Each form on the page has a summary of its own: the messages no field of that form shows.
+    private ILocator SummaryOf(string formId) => Page.Locator($"#{formId}_validation_summary");
     private const string PhoneFormat = "Phone must match format 123-456-7890.";
 
     // A phone typed into the extra fields, which are then hidden, is reported in the page's summary:
@@ -384,8 +385,8 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
 
         await ClickWhenStable(HiddenBtn);
 
-        await Expect(ValidationSummary).ToBeVisibleAsync();
-        await Expect(ValidationSummary).ToHaveTextAsync(PhoneFormat);
+        await Expect(SummaryOf("hidden-fields-form")).ToBeVisibleAsync();
+        await Expect(SummaryOf("hidden-fields-form")).ToHaveTextAsync(PhoneFormat);
         await Input(m => m.Hidden.ShowExtras).CheckAsync();
     }
 
@@ -397,7 +398,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await Input(m => m.Hidden.Phone).FillAsync("123-456-7890");
         await Input(m => m.Hidden.Phone).PressAsync("Tab");
 
-        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(SummaryOf("hidden-fields-form")).ToBeHiddenAsync();
         await Expect(ErrorFor(m => m.Hidden.Phone)).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
@@ -411,7 +412,7 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         await Input(m => m.Hidden.Phone).PressAsync("Tab");
 
         await Expect(ErrorFor(m => m.Hidden.Phone)).ToHaveTextAsync(PhoneFormat);
-        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(SummaryOf("hidden-fields-form")).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 

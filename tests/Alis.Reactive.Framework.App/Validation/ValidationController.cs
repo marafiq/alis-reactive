@@ -42,6 +42,13 @@ public sealed class ValidationController : Controller
 
     public IActionResult Outing() => View(new ResidentOuting());
 
+    /// <summary>The outing whose form's summary the page places in the desk's notes, once or, as a defect, twice.</summary>
+    public IActionResult OutingNotes(bool placedTwice = false)
+    {
+        ViewData["PlacedTwice"] = placedTwice;
+        return View(new ResidentOuting());
+    }
+
     /// <summary>The outing signed out from a card whose sign-out button carries a plan of its own.</summary>
     public IActionResult OutingCard() => View(new ResidentOuting());
 

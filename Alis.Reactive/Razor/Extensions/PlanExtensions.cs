@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive
 {
@@ -144,6 +145,42 @@ namespace Alis.Reactive
             new HtmlString(PlanMarkup(plan, RenderedPage.Of(html.ViewContext)));
 #endif
 
+        /// <summary>
+        /// Places the summary of a form: the element that shows the messages no field of the form can show (a hidden
+        /// field's, a member no input renders), hidden until one arrives.
+        /// </summary>
+        /// <remarks>
+        /// A form's summary renders once per page. Without this call it renders after the first plan that validates
+        /// the form or shows its errors; with it, that plan renders none, so write it before the plan's
+        /// <c>@Html.RenderPlan(plan)</c>. A second placement of the form's summary, or one after the plan rendered it,
+        /// is refused.
+        /// </remarks>
+        /// <example><c>@Html.FormSummary("room-hold-form")</c></example>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="formId">The element id of the form a request validates or shows the server's errors on.</param>
+        /// <param name="cssClass">Classes the summary element carries.</param>
+        /// <returns>The summary's element.</returns>
+#if NET48
+        public static IHtmlString FormSummary(this HtmlHelper html, string formId, string? cssClass = null) =>
+            new MvcHtmlString(PlacedSummary(html.ViewContext, formId, cssClass));
+#else
+        public static IHtmlContent FormSummary(this IHtmlHelper html, string formId, string? cssClass = null) =>
+            new HtmlString(PlacedSummary(html.ViewContext, formId, cssClass));
+#endif
+
+        private static string PlacedSummary(ViewContext view, string formId, string? cssClass)
+        {
+            if (string.IsNullOrWhiteSpace(formId)) throw new System.ArgumentException("Form ID required.", nameof(formId));
+            var page = RenderedPage.Of(view);
+            var place = $"where {RenderedPage.ViewPathOf(view)} placed it";
+            if (!page.SummaryRenders(formId, place))
+                throw new System.InvalidOperationException(
+                    $"The summary of form '{formId}' placed in {RenderedPage.ViewPathOf(view)} renders a second time on this " +
+                    $"page: it was rendered {page.SummaryPlaceOf(formId)}. A form's summary renders once: place it before the " +
+                    "@Html.RenderPlan(plan) of the first plan that validates the form or shows its errors, and only once.");
+            return FormSummaries.Markup(formId, cssClass);
+        }
+
         // The plan's script, then the summary of each of its forms the page holds none of yet, where the messages
         // no field of the form can show go (a hidden field's, an unloaded partial's, a member no input renders).
         private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan, RenderedPage page) where TModel : class
@@ -151,7 +188,7 @@ namespace Alis.Reactive
             var markup = new System.Text.StringBuilder(
                 $"<script type=\"application/json\" id=\"alis-plan-{PlanElementId.For(plan.PlanId)}\" data-reactive-plan>{plan.Render()}</script>");
             foreach (var form in plan.Forms)
-                if (page.SummaryRenders(form, $"after the plan of {plan.Context.View}")) markup.Append(FormSummary.Markup(form));
+                if (page.SummaryRenders(form, $"after the plan of {plan.Context.View}")) markup.Append(FormSummaries.Markup(form));
             return markup.ToString();
         }
     }
