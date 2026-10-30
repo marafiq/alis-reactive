@@ -21,7 +21,7 @@ namespace Alis.Reactive
         private static readonly object Key = new object();
 
         private readonly Dictionary<string, string> _viewByElementId = new Dictionary<string, string>(StringComparer.Ordinal);
-        private readonly HashSet<string> _summarizedForms = new HashSet<string>(StringComparer.Ordinal);
+        private readonly Dictionary<string, string> _summaryPlaceByForm = new Dictionary<string, string>(StringComparer.Ordinal);
 
         private RenderedPage()
         {
@@ -64,7 +64,18 @@ namespace Alis.Reactive
             _viewByElementId.Add(elementId, viewPath);
         }
 
-        /// <summary>The summary of a form renders: true the first time on the page, false once the page holds it.</summary>
-        internal bool SummaryRenders(string formId) => _summarizedForms.Add(formId);
+        /// <summary>
+        /// The summary of a form renders at <paramref name="place"/>: true the first time on the page, false once the
+        /// page holds it.
+        /// </summary>
+        internal bool SummaryRenders(string formId, string place)
+        {
+            if (_summaryPlaceByForm.ContainsKey(formId)) return false;
+            _summaryPlaceByForm.Add(formId, place);
+            return true;
+        }
+
+        /// <summary>Where the page rendered a form's summary, as a refusal names it.</summary>
+        internal string SummaryPlaceOf(string formId) => _summaryPlaceByForm[formId];
     }
 }

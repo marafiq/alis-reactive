@@ -9,8 +9,8 @@ namespace Alis.Reactive.PlaywrightTests.Validation.RoomHold;
 /// </summary>
 /// <remarks>
 /// The room travels in a hidden field, so neither the page's own "choose a room" check nor the
-/// server's refusal has a message slot beside an input; the page's validation summary is where both
-/// show. Which rooms are held is known only to the server's hold book, which it asks asynchronously.
+/// server's refusal has a message slot beside an input; the hold form's summary, which the page places in
+/// the hold's card, is where both show. Which rooms are held is known only to the server's hold book, which it asks asynchronously.
 /// The reservations office's own validator, registered by its module, never reaches the page either.
 /// </remarks>
 [TestFixture]
@@ -73,6 +73,21 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         Assert.That(_holdsSent, Has.Count.EqualTo(2), "Each Place Hold asks the server once.");
         await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+    }
+
+    // The page places the hold form's summary in the hold's card, above the form, so the reason is read where
+    // the coordinator is working, not after the page.
+    [Test]
+    public async Task the_reason_shows_in_the_holds_card_where_the_page_places_it()
+    {
+        await NavigateAndBoot();
+        await ClickWhenStable(ChooseMaple214);
+        await WriteProspectName("Jane Smith");
+        await HoldTermsAgreed.Check();
+
+        await ClickWhenStable(PlaceHold);
+
+        await Expect(Page.GetByRole(AriaRole.Region, new() { Name = "The hold" }).GetByText(RoomHeldElsewhere)).ToBeVisibleAsync();
     }
 
     [Test]

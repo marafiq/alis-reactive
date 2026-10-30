@@ -618,11 +618,12 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   parent, and no ancestor has `hidden` or `display: none`. Then the field gets `alis-has-error`.
   Otherwise the message goes to the form's summary, `{formId}_validation_summary`, the element the
   data of the plan that asks names (1.1), one entry per key, replaced and never duplicated; each form
-  has its own, so one form's messages never clear another's. The server renders the summary, and the
-  runtime never creates it: `Html.RenderPlan` writes it after the plan's script for each form the plan
-  validates or shows server errors on (F8), once per form per request
-  (`Alis.Reactive/Razor/RenderedPage.cs`), so it sits after the first plan of the request that names
-  the form; a plan that does neither renders none. A request of its own whose plan names a form the
+  has its own, so one form's messages never clear another's. The server renders the summary, once per
+  form per request (`Alis.Reactive/Razor/RenderedPage.cs`), and the runtime never creates it: where the
+  view places it (`<native-validation-summary form="formId">`, before the plan that would render it;
+  a second placement, or one after that plan, is refused), else `Html.RenderPlan` writes it after the
+  plan's script for each form the plan validates or shows server errors on (F8), so it sits after the
+  first plan of the request that names the form; a plan that does neither renders none. A request of its own whose plan names a form the
   page already holds (a slot's answer) renders the form's summary again; the DOM's first in document
   order shows the messages, as M6 reads an input, and the copy leaves with the slot (F9).
 - **F7 Live.** At creation (boot or slot load), for each field of the form and each mounted input inside

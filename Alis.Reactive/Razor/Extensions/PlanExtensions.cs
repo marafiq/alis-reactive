@@ -125,7 +125,8 @@ namespace Alis.Reactive
         /// produces no runtime behavior. After the plan it renders the summary of each form the plan validates
         /// or shows the server's errors on (<c>e.ValidationErrors(formId)</c>) that the page holds none of yet:
         /// <c>{formId}_validation_summary</c>, where the messages no field of the form shows go. A form's
-        /// summary renders once per request, so it sits after the first plan that names the form. A plan
+        /// summary renders once per request: where the view places it (<c>&lt;native-validation-summary
+        /// form="formId"&gt;</c>, before this call), else after the first plan that names the form. A plan
         /// renders once, after everything written to it: an input or behavior written to it later (a
         /// <c>@section</c> the layout renders after the call) and a second call are refused. Write it in the
         /// view's body or in a section the layout renders: Razor never renders a partial's own <c>@section</c>.
@@ -150,7 +151,7 @@ namespace Alis.Reactive
             var markup = new System.Text.StringBuilder(
                 $"<script type=\"application/json\" id=\"alis-plan-{PlanElementId.For(plan.PlanId)}\" data-reactive-plan>{plan.Render()}</script>");
             foreach (var form in plan.Forms)
-                if (page.SummaryRenders(form)) markup.Append(FormSummary.Markup(form));
+                if (page.SummaryRenders(form, $"after the plan of {plan.Context.View}")) markup.Append(FormSummary.Markup(form));
             return markup.ToString();
         }
     }
