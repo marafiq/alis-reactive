@@ -70,6 +70,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Summary { get; set; } = "";
     }
 
+    /// <summary>A resident waiting for a bed on the wing, one row of the waiting list.</summary>
+    public class WingReviewWaitingResident
+    {
+        public string ResidentName { get; set; } = "";
+
+        /// <summary>The bed kept for the resident, missing until one is free.</summary>
+        public int? Bed { get; set; }
+    }
+
+    /// <summary>The bed the director asks the front desk to keep, named from a waiting resident's row.</summary>
+    public class WingReviewBedHold
+    {
+        public int? Bed { get; set; }
+    }
+
     /// <summary>The document events the wing's review list raises and hears.</summary>
     public static class WingReviewEvents
     {
@@ -78,5 +93,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         /// <summary>Raised by a resident's Ready the suite button with that resident's suite.</summary>
         public static readonly AppEvent<WingReviewSuiteVisit> ReadySuite = AppEvent.Declare<WingReviewSuiteVisit>();
+
+        /// <summary>Raised by a waiting resident's Keep the bed button with the bed on their row.</summary>
+        public static readonly AppEvent<WingReviewBedHold> KeepBed = AppEvent.Declare<WingReviewBedHold>();
     }
 }

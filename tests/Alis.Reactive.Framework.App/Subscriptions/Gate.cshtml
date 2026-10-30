@@ -6,24 +6,35 @@
 }
 <h1>The front gate</h1>
 
-<p>Last announcement: <span id="announcement"></span></p>
+<p>The gate is <span id="gate">shut</span>.</p>
+<p>Last announcement: <span id="announcement"></span>, <span id="party"></span>, <span id="urgency"></span></p>
 
 @{ Html.On(plan, t => t
-    .CustomEvent(GateEvents.Announced, (announced, p) => p.When(announced.Get(x => x.Type)).IsNull()
-        .Then(none => none.Element("announcement").Text.Set("an announcement of no type"))
-        .Else(typed => typed.Element("announcement").Text.Set(announced.Get(x => x.Type))))); }
+    .CustomEvent(GateEvents.Opened, p => p.Element("gate").Text.Set("open"))
+    .CustomEvent(GateEvents.Announced, (announced, p) =>
+    {
+        p.When(announced.Get(x => x.Type)).IsNull()
+            .Then(none => none.Element("announcement").Text.Set("an announcement of no type"))
+            .Else(typed => typed.Element("announcement").Text.Set(announced.Get(x => x.Type)));
+        p.When(announced.Get(x => x.PartySize)).Gt(9)
+            .Then(large => large.Element("party").Text.Set("a large party"))
+            .Else(small => small.Element("party").Text.Set("a small party"));
+        p.When(announced.Get(x => x.Urgency)).Eq(GateUrgency.Urgent)
+            .Then(urgent => urgent.Element("urgency").Text.Set("urgent"))
+            .Else(routine => routine.Element("urgency").Text.Set("routine"));
+    })); }
 
-@* Markup that raises the app's event when clicked (grammar.md 6.1, D4): the bell carries no detail; the
-   visitor's row carries one, and its Details button names no event, so a click on it is the row's; the
-   delivery's row names one member and carries its text, as a vendor template's button does. *@
-<button type="button" data-alis-raise="@GateEvents.Announced.Name">Ring the gate bell</button>
+@* Markup that raises the app's events when clicked (grammar.md 6.1, D4): the gate's button raises an event that
+   carries nothing; the bell raises the announcement without its payload; each row raises it with its own, and a
+   click on the visitor's Details button is a click on the visitor's row. *@
+<button type="button" @Html.Raises(GateEvents.Opened)>Open the gate</button>
+<button type="button" @Html.Raises(GateEvents.Announced)>Ring the gate bell</button>
 <ul>
-    <li data-alis-raise="@GateEvents.Announced.Name"
-        data-alis-detail="@System.Text.Json.JsonSerializer.Serialize(new Announcement { Type = "a visitor" }, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web))">
-        A visitor at the gate <button type="button" data-alis-raise="">Details</button>
+    <li @Html.Raises(GateEvents.Announced, new Announcement { Type = "a visitor", PartySize = 1 })>
+        A visitor at the gate <button type="button">Details</button>
     </li>
-    <li><button type="button" data-alis-raise="@GateEvents.Announced.Name"
-                data-alis-detail-member="type" data-alis-detail-text="a delivery">A delivery at the gate</button></li>
+    <li><button type="button" @Html.Raises(GateEvents.Announced, new Announcement { Type = "a delivery", PartySize = 1 })>A delivery at the gate</button></li>
+    <li><button type="button" @Html.Raises(GateEvents.Announced, new Announcement { Type = "a coach party", PartySize = 12, Urgency = GateUrgency.Urgent })>A coach party at the gate</button></li>
 </ul>
 
 @Html.RenderPlan(plan)

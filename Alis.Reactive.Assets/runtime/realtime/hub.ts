@@ -4,8 +4,9 @@
 //    that names the hub holds its connection for as long as the plan's owner lives (its data
 //    contribution). The connection stops, a start still trying it makes no further attempt, and its
 //    retry offer is withdrawn, when the last owner holding it is disposed.
-// B2 Starting retries at 0, 2, 10 and 30 seconds, then shows the retry indicator. A click on the
-//    offer takes it and starts again; the offer comes back only if every attempt of that start fails.
+// B2 A start tries four times: at once, at once again, then 2 and 10 seconds after the try before, and
+//    shows the retry indicator as soon as the fourth try fails. A click on the offer takes it and starts
+//    again; the offer comes back only if every try of that start fails.
 // B3 Client methods are events, matched without regard to case; the payload is the single argument.
 // B4 invoke(method, ...args) and send(method, ...args) are async; state and connectionId are
 //    properties; reconnecting, reconnected and close are events.
@@ -30,23 +31,27 @@ interface Managed {
 }
 
 const hubs = new Map<string, Managed>();
-const startDelays = [0, 2000, 10000, 30000] as const;
+// The wait before each try after the first.
+const retryDelays = [0, 2000, 10000] as const;
+const tries = retryDelays.length + 1;
 
 async function startWithRetry(managed: Managed, url: string): Promise<void> {
-  for (const [attempt, delay] of startDelays.entries()) {
+  for (let attempt = 1; ; attempt += 1) {
     try {
       await managed.connection.start();
       log.info("connected", { hubUrl: url });
       removeRetryIndicator(url);
       return;
     } catch (error) {
-      log.warn("start.retry", { hubUrl: url, attempt: attempt + 1, delay, error: toJavaScriptString(error) });
-      await new Promise(resolve => setTimeout(resolve, delay));
+      log.warn("start.retry", { hubUrl: url, attempt, error: toJavaScriptString(error) });
     }
     // Released meanwhile: a start never outlives its holders, so it tries no more and offers nothing.
     if (managed.stopping) return;
+    if (attempt === tries) break;
+    await new Promise(resolve => setTimeout(resolve, retryDelays[attempt - 1]));
+    if (managed.stopping) return;
   }
-  log.error("start.failed", { hubUrl: url, attempts: startDelays.length });
+  log.error("start.failed", { hubUrl: url, attempts: tries });
   showRetryIndicator(url, () => retry(managed, url));
 }
 

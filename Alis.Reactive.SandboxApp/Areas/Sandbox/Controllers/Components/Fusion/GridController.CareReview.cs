@@ -19,6 +19,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml",
                 new WingReviewViewModel { Wing = "East", Director = "Joan Avery, RN", PageSize = 6 });
 
+        // A waiting resident's bed is missing until one is free, and the page's row button fills its payload from
+        // it: the view is refused as it renders.
+        [HttpGet("CareReviewWaitingList")]
+        public IActionResult WingReviewWaitingList() =>
+            View(
+                "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReviewWaitingList.cshtml",
+                new WingReviewViewModel { Wing = "East", Director = "Joan Avery, RN", PageSize = 6 });
+
         [HttpGet("WingReviewResidents")]
         public IActionResult WingReviewResidents() => Ok(WingReviewsOnFile());
 

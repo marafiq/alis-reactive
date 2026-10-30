@@ -22,9 +22,9 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
     // pass when the test moves it on rather than in real seconds.
     private Task TakeThePagesClock() => Page.Clock.InstallAsync();
 
-    // A start tries at once and at once again, then waits 2 and 10 seconds before its third and fourth tries,
-    // and 30 more before it offers to retry. The server counts each try it refuses, and page time moves past a
-    // wait only once the try before it was refused.
+    // A start tries at once and at once again, then waits 2 and 10 seconds before its third and fourth tries, and
+    // offers to retry as soon as the fourth is refused. The server counts each try it refuses, and page time moves
+    // past a wait only once the try before it was refused.
     private async Task PassTheWaitsOfAStartTheServerRefuses()
     {
         await Page.GetByText("The server refused 2 calls to the line.", new() { Exact = true }).WaitForAsync();
@@ -32,7 +32,6 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
         await Page.GetByText("The server refused 3 calls to the line.", new() { Exact = true }).WaitForAsync();
         await Page.Clock.FastForwardAsync(10_000);
         await Page.GetByText("The server refused 4 calls to the line.", new() { Exact = true }).WaitForAsync();
-        await Page.Clock.FastForwardAsync(30_000);
     }
 
     [Test]

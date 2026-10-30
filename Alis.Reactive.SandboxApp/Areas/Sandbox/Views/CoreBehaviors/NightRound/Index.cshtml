@@ -1,5 +1,4 @@
 @model NightRoundModel
-@using System.Text.Json
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.SandboxApp.BroughtComponents
 @using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CoreBehaviors.NightRound
@@ -15,12 +14,6 @@
         new("Room 14 — Arthur Lee", "14"),
         new("Room 15 — Dorothy Lane", "15"),
     };
-
-    // The chart's own flag button raises a document event by name, with the flag as its detail, through
-    // the two attributes the runtime reads; the event is the declared one, so its name cannot drift.
-    var arthurFallRisk = JsonSerializer.Serialize(
-        new ResidentFlag { Room = "14", Reason = "Fall risk" },
-        new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
     var plan = Html.ReactivePlan<NightRoundModel>();
 
@@ -103,9 +96,9 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                         p.Dispatch(NightRoundEvents.NoteFiled, new HandoverNote { Author = "Nurse Patel" })))
+                @* The chart's own flag button raises the declared event with the flag, as its markup carries it. *@
                 <button type="button" id="flag-fall-risk" class="@ButtonSecondary"
-                        data-alis-raise="@NightRoundEvents.ResidentFlagged.Name"
-                        data-alis-detail="@arthurFallRisk">Flag Arthur Lee as a fall risk</button>
+                        @Html.Raises(NightRoundEvents.ResidentFlagged, new ResidentFlag { Room = "14", Reason = "Fall risk" })>Flag Arthur Lee as a fall risk</button>
             </native-hstack>
 
             <native-vstack gap="Xs">

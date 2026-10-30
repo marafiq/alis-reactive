@@ -500,11 +500,12 @@ A button inside a vendor template (`FusionTemplate.Create<TRow>()` … `.EventBu
 `.EventButton("Start review", WingReviewEvents.StartReview, e => e.ResidentId, m => m.ResidentId, "e-small")`
 for a number and `.EventButton("Ready the suite", WingReviewEvents.ReadySuite, e => e.Suite, m => m.Suite, "e-small")`
 for text) raises a declared `AppEvent<T>` and fills one payload member from the row. It renders
-`data-alis-raise="name"`, `data-alis-detail-member="member"` and `data-alis-detail-text="${row}"` as
-attributes, not an inline `onclick` and not JSON: the template engine knows the row's value only as the
-text it writes, so the button carries that text and the listener's read converts it by the member's
-shape (2.1), as it converts any value it reads. The document plugin raises the event when it is clicked
-(6.1, D4), and handlers hear it with `on(document, name)`.
+`data-alis-raise="name"` and the member's own attribute (D4), `data-alis-detail-resident-id="${residentId}"`,
+not an inline `onclick` and not JSON: the template engine knows the row's value only as the text it
+writes, so the button carries that text and the listener's read converts it by the member's shape (2.1),
+as it converts any value it reads. The engine writes a missing value as the text `null`, so a member of
+a nullable type (`int?`) is refused when the template is built. The document plugin raises the event
+when it is clicked (6.1, D4), and handlers hear it with `on(document, name)`.
 
 ## 6. The vocabulary: built-in objects and what each must do
 
@@ -525,16 +526,21 @@ imports none of them. The obligations are numbered so that tests and code can ci
   - an array member reads every value;
   - a scalar member reads the first value;
   - an absent key reads as missing.
-- **D4 Markup-raised events.** A click on an element carrying `data-alis-raise` raises that event
-  with the element's detail:
-  - the record `data-alis-detail` holds as JSON, which markup the server renders serializes from the
-    payload's class;
-  - else a record of the one member `data-alis-detail-member` names, holding the text of
-    `data-alis-detail-text` (a template's button, 5.2), which the listener's typed read converts;
-  - else an empty record.
+- **D4 Markup-raised events.** A click on an element carrying `data-alis-raise`, or on an element
+  inside one, raises the event the nearest such element names, with the record of that element's
+  `data-alis-detail-` attributes. Each is one payload member, named as the DOM's `dataset` names it
+  (`data-alis-detail-resident-id` is `residentId`) and holding the member's value as text, which the
+  listener's typed read converts by the member's shape (2.1); an element with none hands an empty
+  record. Two typed producers write them, and nothing else does:
+  - `Html.Raises(appEvent)` (an `AppEvent`, or an `AppEvent<T>` raised without its payload) and
+    `Html.Raises(appEvent, payload)` write them into a view's own element. A payload member is text, a
+    number, a bool, a date, a Guid or an enum, written as JSON writes it, an enum by its member's name;
+    a member left null carries no attribute, so it reads as missing; a member that is a record or a
+    list is refused when the view renders, naming `p.Dispatch`.
+  - A template's button (5.2) writes one member's attribute holding the text the template engine
+    writes for the row's value.
 
-  An element whose `data-alis-raise` is empty names no event, so the click goes on to the element
-  around it. The listener is delegated, and it reads only attributes the framework stamped
+  The listener is delegated, and it reads only attributes the framework stamped
   (`Alis.Reactive.Assets/runtime/plugins/document.ts`).
 
 ### 6.2 `http` (`plugin("alis.http")`)
@@ -677,8 +683,8 @@ no key (H2) and no entry (H4).
   a start still trying it makes no further attempt, and its marker is withdrawn (R3), when the last
   owner holding it is disposed.
 - **B2 Start.** A start tries four times: at once, at once again, then 2 and 10 seconds after the try
-  before; 30 seconds after the fourth try fails it shows the retry indicator (R3)
-  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:33-51`). A click on the indicator starts the same way,
+  before; as soon as the fourth try fails it shows the retry indicator (R3)
+  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:34-56`). A click on the indicator starts the same way,
   and offers again only if all four tries fail.
 - **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
   method's single argument.

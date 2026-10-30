@@ -45,10 +45,8 @@
         .Set(x => x.Room, tally.Total))))
 @(plan.Button("add-four", "Add 4 to the tally")
     .Reactive(button => button.Click, p => tally.Add(4)))
-@* Markup that raises the app's event itself when clicked, carrying its payload as JSON (grammar.md 6.1, D4). *@
-<button type="button" id="admit-from-board"
-        data-alis-raise="@RoundEvents.Admitted.Name"
-        data-alis-detail="@System.Text.Json.JsonSerializer.Serialize(new Admitted { Name = "Bea", Room = 4 }, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web))">Admit Bea from the board</button>@(plan.Button("move", "Announce a move")
+@* Markup that raises the app's event itself when clicked, carrying its payload (grammar.md 6.1, D4). *@
+<button type="button" id="admit-from-board" @Html.Raises(RoundEvents.Admitted, new Admitted { Name = "Bea", Room = 4 })>Admit Bea from the board</button>@(plan.Button("move", "Announce a move")
     .Reactive(button => button.Click, p => p.Dispatch(RoundEvents.Moved, moved => moved
         .Set(x => x.From.Room, 12)
         .Set(x => x.Lines[0].Name, "Ada")
