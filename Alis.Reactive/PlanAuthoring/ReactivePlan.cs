@@ -16,26 +16,16 @@ namespace Alis.Reactive
     {
         private readonly RenderedInputs _renderedInputs = new RenderedInputs();
 
-        private readonly PlanId _planId;
         private readonly PlanBuildContext _context;
         private readonly IServiceProvider? _services;
 
-        private readonly ReactivePlanScope _scope;
-
-        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services, PlanId planId, string fieldPrefix, string view)
+        // The plan id names the plan in traces only: the model's type, which many plans of a page may share.
+        internal ReactivePlan(IServiceProvider? services, string fieldPrefix, string view)
         {
-            if (scope == null) throw new ArgumentNullException(nameof(scope));
-
-            _planId = planId ?? throw new ArgumentNullException(nameof(planId));
-            _scope = scope;
             _services = services;
-            _context = new PlanBuildContext(_planId.Value, _renderedInputs, fieldPrefix, view);
+            _context = new PlanBuildContext(PlanId.ForModel(typeof(TModel)).Value, _renderedInputs, fieldPrefix, view);
         }
 
-        /// <summary>The plan's identifier: the model type's full name, or the element's id for an element plan.</summary>
-        public string PlanId => _planId.Value;
-        /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
-        public bool IsPartial => _scope.IsPartial;
         /// <summary>The forms this plan validates or shows the server's errors on, by container id.</summary>
         internal IReadOnlyList<string> Forms => _context.Forms;
         internal PlanBuildContext Context => _context;
@@ -184,37 +174,5 @@ namespace Alis.Reactive
                 "or register your own IBrowserRuleSource.");
 #endif
         }
-    }
-
-    internal abstract class ReactivePlanScope
-    {
-        internal static ReactivePlanScope RootView { get; } =
-            new RootViewPlanScope();
-
-        internal static ReactivePlanScope PartialView { get; } =
-            new PartialViewPlanScope();
-
-        internal static ReactivePlanScope Element { get; } =
-            new ElementPlanScope();
-
-        internal abstract bool IsPartial { get; }
-    }
-
-    // The plan the page's partials of the same model join.
-    internal sealed class RootViewPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => false;
-    }
-
-    // A partial joins the plan of its model.
-    internal sealed class PartialViewPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => true;
-    }
-
-    // A plan of its own for one element composes with no other plan.
-    internal sealed class ElementPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => false;
     }
 }

@@ -2,7 +2,7 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 
 /// <summary>
 /// The names a page gives its plan, and the behavior it writes, that the plan cannot take, each refused when the
-/// page renders with the message the developer reads: a component or an element plan with no id, a plugin named
+/// page renders with the message the developer reads: a component with no id, a plugin named
 /// with a space or not named, a plugin registered twice, a header with no name, a route placeholder no route value
 /// can be named, an error route for a status HTTP does not have, a second route for one outcome of a response or a
 /// second chained request, a value read through another plan's component, a response read outside the routes of
@@ -20,14 +20,6 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
     public async Task a_component_rendered_with_no_id_is_refused()
     {
         await Render("RenderAComponentWithNoId");
-
-        await Expect(Message("Element ID required.")).ToBeVisibleAsync();
-    }
-
-    [Test]
-    public async Task an_element_plan_with_no_id_is_refused()
-    {
-        await Render("GiveAnElementPlanNoId");
 
         await Expect(Message("Element ID required.")).ToBeVisibleAsync();
     }

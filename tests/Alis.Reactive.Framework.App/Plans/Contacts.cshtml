@@ -15,6 +15,6 @@
 }
 <h1>Move-in contacts</h1>
 
-@* The page has no plan of its own: each card's save button carries one. *@
+@* The page has no plan of its own: each card starts one. *@
 @await Html.PartialAsync("ContactCard", Model.NextOfKin, CardFor(nameof(ContactsPage.NextOfKin), "next of kin"))
 @await Html.PartialAsync("ContactCard", Model.Alternate, CardFor(nameof(ContactsPage.Alternate), "alternate"))

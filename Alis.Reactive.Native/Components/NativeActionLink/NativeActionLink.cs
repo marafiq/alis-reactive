@@ -105,7 +105,7 @@ namespace Alis.Reactive.Native.Components
             if (url == null) throw new ArgumentNullException(nameof(url));
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var plan = html.ElementPlan(id);
+            var plan = html.ReactivePlan();
             var link = new NativeActionLinkBuilder<TModel>(html, plan, id, linkText, url);
             var sent = new LinkRequestCount();
 

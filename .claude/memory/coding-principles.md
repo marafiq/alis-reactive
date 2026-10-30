@@ -45,15 +45,16 @@ values propagate silently. A fallback is a rare, deliberate, justified exception
 
 ## Plan-Render Rule
 
-Every view that creates or resolves a plan MUST call `@Html.RenderPlan(plan)`.
+Every view that starts a plan MUST call `@Html.RenderPlan(plan)`.
 
-- `ReactivePlan<T>()` — creates a new plan (parent view or independent partial).
-- `ResolvePlan<T>()` — creates a plan that merges by planId (partial sharing same model).
-- Both MUST end with `@Html.RenderPlan(plan)`.
+- `ReactivePlan<T>()` is the one plan call: a page, and a partial with its own model, each start a plan
+  with it (ADR-0003 rule 3). Every plan stands alone; the plan id keys nothing.
+- A partial's inputs join the page's forms by the ids their members give them and by the element that
+  holds them, whichever plan rendered them.
 
-The runtime discovers all `[data-reactive-plan]` blocks and merges them by planId. Without
-RenderPlan, entries are lost — components register but reactive behaviors (conditions, HTTP,
-validation) never serialize.
+The runtime discovers every `[data-reactive-plan]` block and starts it under its owner (the page, or the
+slot whose element holds its script). Without RenderPlan, entries are lost: components register but
+reactive behaviors (conditions, HTTP, validation) never serialize.
 
 No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
 No inline `<script>` blocks. `root.ts` handles discovery and boot automatically.

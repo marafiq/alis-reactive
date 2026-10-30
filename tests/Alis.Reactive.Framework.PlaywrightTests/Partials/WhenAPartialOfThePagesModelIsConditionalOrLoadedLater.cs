@@ -3,7 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 /// <summary>
 /// The page's validator names a member that a partial of the page's own model renders, and the partial is on the
 /// page only sometimes: rendered with the page when a condition holds, or loaded into a slot later and unloaded
-/// again (ADR-0003). The page's rule is the only one: it checks the partial's input while it is mounted and
+/// again (ADR-0003). The partial starts a plan of its own with the page's model, and no plan id joins the two: the
+/// page's rule is the only one, it checks the partial's input while it is mounted, by the id the member gives it, and
 /// reads the member as missing while it is not, as the server does, and the page's save sends the input.
 /// </summary>
 [TestFixture]
@@ -59,6 +60,19 @@ public sealed class WhenAPartialOfThePagesModelIsConditionalOrLoadedLater : AppP
         await Button("Admit").ClickAsync();
 
         await Expect(Page.Locator("#admitted")).ToHaveTextAsync("Ann admitted to room 12");
+    }
+
+    [Test]
+    public async Task when_the_page_renders_the_partial_with_itself_and_its_field_is_empty_the_pages_rule_holds_the_save()
+    {
+        await Open("/Partials/Admission?showsRoom=true");
+        await Input("Resident").FillAsync("Ann");
+
+        await Button("Admit").ClickAsync();
+
+        await Expect(RoomField.GetByText("Choose the resident's room.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_admissions) Assert.That(_admissions, Is.Empty, "the browser held the request");
     }
 
     [Test]

@@ -2,8 +2,8 @@
 @model KeyholderLine
 @{
     // The keyholder's editor template: EditorFor renders it under the member's prefix, so its input binds as
-    // Keyholder.Name. A partial, its plan joins its model's, and no view on the page starts a plan of that model.
-    var plan = Html.ResolvePlan<KeyholderLine>();
+    // Keyholder.Name. It starts a plan of its own model, which no other view on the page starts.
+    var plan = Html.ReactivePlan<KeyholderLine>();
 }
 <section id="keyholder-line">
     @{ Html.InputField(plan, m => m.Name, o => o.Label("Keyholder")).Entry(); }

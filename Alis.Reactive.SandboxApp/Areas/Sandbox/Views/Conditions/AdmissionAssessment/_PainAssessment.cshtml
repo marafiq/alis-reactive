@@ -2,7 +2,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = Html.ResolvePlan<Step3FunctionalModel>();
+    var plan = Html.ReactivePlan<Step3FunctionalModel>();
     var alertPainUrl = Url.Action("AlertPain", "AdmissionAssessment", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.AlertPain.");
 }

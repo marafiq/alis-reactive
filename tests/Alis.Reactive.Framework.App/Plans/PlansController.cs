@@ -2,25 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Plans;
 
-/// <summary>How a page's plans compose: by the plan id they share, on their own, and found in loaded HTML.</summary>
+/// <summary>
+/// Every plan of a page stands alone: cards of one model that each start a plan, the plans found in loaded HTML, a
+/// plan rendered with the services the view hands it, and the mistakes a plan is refused for when it renders.
+/// </summary>
 public sealed class PlansController : Controller
 {
-    public IActionResult Visit() => View(new VisitPage());
-
-    /// <summary>The room field, a partial of the visit's own model, loaded into the page's slot.</summary>
-    public IActionResult RoomField() => PartialView("RoomField", new VisitPage());
-
-    /// <summary>Binds the visit as any endpoint does and says whom and what it bound.</summary>
-    [HttpPost("/Plans/Visits")]
-    public IActionResult Visits([FromBody] VisitPage visit) => Said(
-        $"visitor {visit.Visitor ?? "none"}, resident {visit.Resident ?? "none"}, " +
-        $"room {visit.Room ?? "none"}, companion {visit.Companion.Name ?? "none"}");
-
-    /// <summary>Refuses every visit for a member the page renders no field for.</summary>
-    [HttpPost("/Plans/Visits/Unreasoned")]
-    public IActionResult Unreasoned() =>
-        BadRequest(new { errors = new Dictionary<string, string[]> { ["Reason"] = ["Say why the visit is booked."] } });
-
     public IActionResult Contacts() => View(new ContactsPage());
 
     /// <summary>Binds the contacts as any endpoint does and says whom it bound for each.</summary>

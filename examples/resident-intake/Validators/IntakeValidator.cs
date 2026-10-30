@@ -39,7 +39,7 @@ public class IntakeValidator : ReactiveValidator<ResidentIntakeModel>
             RuleFor(x => x.CognitiveAssessmentDate).NotEmpty().WithMessage("Cognitive assessment date is required for memory care residents");
         });
 
-        // Rendered by the facility requirements partial after ResolvePlan joins it to the Active Plan.
+        // Rendered by the facility requirements partial, which starts a plan of its own with the intake's model.
         RuleFor(x => x.RoomPreference)
             .NotEmpty().WithMessage("Room preference is required for this facility")
             .MaximumLength(200).WithMessage("'Room Preference' must be at most 200 characters.");

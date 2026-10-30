@@ -2,43 +2,13 @@ using Alis.Reactive.FluentValidator;
 
 namespace Alis.Reactive.Framework.App.Plans;
 
-/// <summary>
-/// A visit booked at the front desk. The page renders the visitor; a partial of the same model renders the
-/// resident, and another, loaded into a slot, the room; the companion is a card of its own model.
-/// </summary>
-public sealed class VisitPage
-{
-    public string? Visitor { get; set; }
-
-    public string? Resident { get; set; }
-
-    public string? Room { get; set; }
-
-    public CompanionCard Companion { get; set; } = new();
-}
-
-/// <summary>The companion who comes along: a card of its own model, rendered for the visit's Companion member.</summary>
-public sealed class CompanionCard
-{
-    public string? Name { get; set; }
-}
-
-/// <summary>The visit's rule: a visitor the browser can check is named.</summary>
-public sealed class VisitRules : ReactiveValidator<VisitPage>
-{
-    public VisitRules()
-    {
-        RuleFor(x => x.Visitor).NotEmpty().WithMessage("Name the visitor.");
-    }
-}
-
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class Booked
 {
     public string Summary { get; set; } = "";
 }
 
-/// <summary>The contacts of a move-in: two cards of one model, each saved on its own.</summary>
+/// <summary>The contacts of a move-in: two cards of one model, each starting a plan of its own and saved on its own.</summary>
 public sealed class ContactsPage
 {
     public ContactCard NextOfKin { get; set; } = new();
@@ -52,7 +22,7 @@ public sealed class ContactCard
     public string? Name { get; set; }
 }
 
-/// <summary>The keyholders of a room: a card for the primary keyholder, saved by its own plan and checked by the server.</summary>
+/// <summary>The keyholders of a room: a card for the primary keyholder, saved by the card's own plan and checked by the server.</summary>
 public sealed class KeyholdersPage
 {
     public KeyholderCard Primary { get; set; } = new();
@@ -78,7 +48,7 @@ public sealed class KeyholderRules : ReactiveValidator<KeyholderCard>
 /// <summary>A noticeboard with a slot a notice is pinned into.</summary>
 public sealed class NoticeboardPage;
 
-/// <summary>A notice pinned to the board: a partial with a plan of its own and a button with a plan of its own.</summary>
+/// <summary>A notice pinned to the board: a partial that starts two plans of its model, the notice's and its share button's.</summary>
 public sealed class Notice;
 
 /// <summary>A page whose plan is rendered by the view itself, with the services the view hands it.</summary>
@@ -106,7 +76,6 @@ public sealed class PlanRefusalsPage
 public enum PlanMistake
 {
     RenderAComponentWithNoId,
-    GiveAnElementPlanNoId,
     NameAPluginWithASpace,
     GiveAPluginNoName,
     GiveAHeaderNoName,

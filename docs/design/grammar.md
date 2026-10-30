@@ -370,7 +370,8 @@ A failing handler is logged and stops no other handler.
    plugin data contributions (a hub's connection is held by one), and the stream subscriptions those
    plugins made for it. It knows nothing about what they are.
 2. **Starting an owner.** For the owners at boot, or a slot at load:
-   1. discover the plan scripts and compose the ones that share a `planId`;
+   1. discover the plan scripts; each plan stands alone, whatever its `planId`, which names the plan
+      in traces only;
    2. locate the objects;
    3. pass each plugin its data contribution under the plan's owner;
    4. subscribe every handler;

@@ -3,8 +3,7 @@
 @{
     ViewData["Title"] = "An outing";
 
-    // The card's plan is its sign-out button's own; the page has no plan of its own.
-    var plan = Html.ElementPlan<ResidentOuting>("sign-out");
+    var plan = Html.ReactivePlan<ResidentOuting>();
 }
 <h1>Sign a resident out</h1>
 

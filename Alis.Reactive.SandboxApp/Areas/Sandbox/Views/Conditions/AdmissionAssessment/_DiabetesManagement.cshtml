@@ -1,7 +1,7 @@
 @model Step2ClinicalModel
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = Html.ResolvePlan<Step2ClinicalModel>();
+    var plan = Html.ReactivePlan<Step2ClinicalModel>();
     var alertUncontrolledUrl = Url.Action("AlertUncontrolled", "AdmissionAssessment", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.AlertUncontrolled.");
 }
