@@ -1,8 +1,8 @@
 @using Alis.Reactive.Framework.App.Plans
 @model KeyholderCard
 @{
-    // The card's plan is its save button's own; the card renders the keyholder's name, not how they are related.
-    var plan = Html.ElementPlan<KeyholderCard>("save-keyholder");
+    // The card starts a plan of its own; it renders the keyholder's name, not how they are related.
+    var plan = Html.ReactivePlan<KeyholderCard>();
 }
 <section id="keyholder" aria-label="The keyholder">
     <h2>The keyholder</h2>

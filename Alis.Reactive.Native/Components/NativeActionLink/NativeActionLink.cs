@@ -73,8 +73,9 @@ namespace Alis.Reactive.Native.Components
         /// </summary>
         /// <remarks>
         /// The id is the developer's: a link in a loop takes its row's key. The link carries a plan of
-        /// its own, so it sees no page inputs: its request does not validate a form or send
-        /// <c>Form()</c> (analyzer ALIS002).
+        /// its own, and like every plan it reaches the page's inputs by the form that holds them: its request
+        /// checks a form with <c>Validate&lt;TValidator&gt;(formId)</c> and sends the inputs inside it with
+        /// <c>Gather(g =&gt; g.Form())</c>, whichever plan rendered them.
         /// <code>
         /// @Html.NativeActionLink($"mark-read-{note.Key}", "Mark Read", markReadUrl, link =&gt; link
         ///     .Post()
@@ -105,7 +106,7 @@ namespace Alis.Reactive.Native.Components
             if (url == null) throw new ArgumentNullException(nameof(url));
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            var plan = html.ElementPlan(id);
+            var plan = html.ReactivePlan();
             var link = new NativeActionLinkBuilder<TModel>(html, plan, id, linkText, url);
             var sent = new LinkRequestCount();
 

@@ -18,7 +18,7 @@
         new("Friend", "Friend"),
     };
 
-    var plan = Html.ResolvePlan<RoomEveningModel>();
+    var plan = Html.ReactivePlan<RoomEveningModel>();
 
     // The bell is on the page already, so the card writes no markup for it: its plan joins the bell by id
     // and hears it only while the card is loaded.

@@ -253,7 +253,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This pipeline builder; chained reactions run after the injection.</returns>
         public PipelineBuilder<TModel> Into(string elementId)
         {
-            Context.DeclareElement(elementId);
+            Context.LoadsOrUnloads(elementId);
             var responseBody = ValueExpression.Get(Target.Response(ResponseHandle.Innermost), Shape.None);
             Context.AddStep(new InjectStep(elementId, responseBody));
             return this;
@@ -267,7 +267,7 @@ namespace Alis.Reactive.Builders
         /// <returns>This pipeline builder.</returns>
         public PipelineBuilder<TModel> Unload(string elementId)
         {
-            Context.DeclareElement(elementId);
+            Context.LoadsOrUnloads(elementId);
             Context.AddStep(new UnloadStep(elementId));
             return this;
         }

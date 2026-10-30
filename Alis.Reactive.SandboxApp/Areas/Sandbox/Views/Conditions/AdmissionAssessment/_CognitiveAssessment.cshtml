@@ -2,7 +2,7 @@
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Fusion.Components
 @{
-    var plan = Html.ResolvePlan<Step2ClinicalModel>();
+    var plan = Html.ReactivePlan<Step2ClinicalModel>();
     var alertElopementUrl = Url.Action("AlertElopement", "AdmissionAssessment", new { area = "Sandbox" })
         ?? throw new InvalidOperationException("Could not resolve AdmissionAssessment.AlertElopement.");
 }

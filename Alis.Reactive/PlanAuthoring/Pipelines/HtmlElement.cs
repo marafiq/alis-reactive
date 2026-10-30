@@ -28,15 +28,15 @@ namespace Alis.Reactive
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _id = id ?? throw new ArgumentNullException(nameof(id));
             context.DeclareElement(id);
-            Text = new ElementContent(this, BrowserElementMembers.Text);
-            Html = new ElementContent(this, BrowserElementMembers.Html);
+            Text = new ElementContent(this, BrowserElementMembers.Text, "text");
+            Html = new ElementContent(this, BrowserElementMembers.Html, "HTML");
             ClassList = new ElementClassList(this);
         }
 
-        /// <summary>The element's text (<c>textContent</c>).</summary>
+        /// <summary>The element's text (<c>textContent</c>). A slot's is refused: <c>p.Unload</c> empties a slot.</summary>
         public ElementContent Text { get; }
 
-        /// <summary>The element's HTML (<c>innerHTML</c>).</summary>
+        /// <summary>The element's HTML (<c>innerHTML</c>). A slot's is refused: <c>p.Unload</c> empties a slot.</summary>
         public ElementContent Html { get; }
 
         /// <summary>The element's classes (<c>classList</c>).</summary>
@@ -59,25 +59,38 @@ namespace Alis.Reactive
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value) =>
             _context.AddStep(new SetStep(Target.Element(_id), property.Path.TargetText, property.Shape, value));
 
+        // The element's text or HTML: the page's record refuses it on a slot some plan of the page loads into.
+        internal void SetContent(ComponentProperty<string> property, string content, ValueExpression value)
+        {
+            _context.SetsContentOf(_id, content);
+            Set(property, value);
+        }
+
         internal void Call(ComponentMethod method, ValueExpression argument) =>
             _context.AddStep(new CallStep(Target.Element(_id), method.Path.TargetText, new[] { argument }, method.ArgumentShapes, method.Awaits));
     }
 
-    /// <summary>An element's text or HTML: set to a literal, or to a value read when the step runs, shown as it arrives.</summary>
+    /// <summary>
+    /// An element's text or HTML: set to a literal, or to a value read when the step runs, shown as it arrives. Setting a
+    /// slot's, an element some plan of the page loads into or unloads, is refused when the page renders: what the slot
+    /// loaded would keep running under it, so the slot is emptied with <c>p.Unload</c>.
+    /// </summary>
     public sealed class ElementContent
     {
         private readonly HtmlElement _element;
         private readonly ComponentProperty<string> _property;
+        private readonly string _content;
 
-        internal ElementContent(HtmlElement element, ComponentProperty<string> property)
+        internal ElementContent(HtmlElement element, ComponentProperty<string> property, string content)
         {
             _element = element;
             _property = property;
+            _content = content;
         }
 
         /// <summary>Sets it to text fixed when the view renders.</summary>
         /// <param name="value">The text.</param>
-        public void Set(string value) => _element.Set(_property, ValueExpression.Literal(value));
+        public void Set(string value) => _element.SetContent(_property, _content, ValueExpression.Literal(value));
 
         /// <summary>Sets it to a value read when the step runs: a number, a date or any text, shown as it arrives.</summary>
         /// <typeparam name="TValue">The value's type.</typeparam>
@@ -85,7 +98,7 @@ namespace Alis.Reactive
         public void Set<TValue>(TypedSource<TValue> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            _element.Set(_property, source.Expression.AsArrived());
+            _element.SetContent(_property, _content, source.Expression.AsArrived());
         }
     }
 

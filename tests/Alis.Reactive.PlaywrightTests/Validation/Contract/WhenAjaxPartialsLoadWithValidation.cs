@@ -191,8 +191,8 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Choosing the facility address empties the address container without unloading its slot, so its
-    // inputs stay registered while they are off the page; Form() sends only the inputs on the page.
+    // Choosing the facility address unloads the address slot: its inputs leave the page with it, and Form()
+    // sends only the inputs on the page.
     [Test]
     public async Task address_fields_cleared_by_choosing_the_facility_address_are_not_saved()
     {

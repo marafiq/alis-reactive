@@ -16,26 +16,16 @@ namespace Alis.Reactive
     {
         private readonly RenderedInputs _renderedInputs = new RenderedInputs();
 
-        private readonly PlanId _planId;
         private readonly PlanBuildContext _context;
         private readonly IServiceProvider? _services;
 
-        private readonly ReactivePlanScope _scope;
-
-        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services, PlanId planId, string fieldPrefix, string view)
+        // The plan id names the plan in traces only: the model's type, which many plans of a page may share.
+        internal ReactivePlan(IServiceProvider? services, string fieldPrefix, string view)
         {
-            if (scope == null) throw new ArgumentNullException(nameof(scope));
-
-            _planId = planId ?? throw new ArgumentNullException(nameof(planId));
-            _scope = scope;
             _services = services;
-            _context = new PlanBuildContext(_planId.Value, _renderedInputs, fieldPrefix, view);
+            _context = new PlanBuildContext(PlanId.ForModel(typeof(TModel)).Value, _renderedInputs, fieldPrefix, view);
         }
 
-        /// <summary>The plan's identifier: the model type's full name, or the element's id for an element plan.</summary>
-        public string PlanId => _planId.Value;
-        /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
-        public bool IsPartial => _scope.IsPartial;
         /// <summary>The forms this plan validates or shows the server's errors on, by container id.</summary>
         internal IReadOnlyList<string> Forms => _context.Forms;
         internal PlanBuildContext Context => _context;
@@ -101,36 +91,20 @@ namespace Alis.Reactive
             RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>();
 
-        /// <summary>
-        /// Registers components, resolves validation, and serializes the Reactive Plan as compact JSON. A plan renders
-        /// once, after everything written to it: an input or behavior written to it later, and a second rendering, are
-        /// refused.
-        /// </summary>
-        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
-        public string Render()
+        // The plan as its script carries it, once, after everything written to it: the rendered inputs join it, each
+        // validated form is bound to its validator's rules from the services the plan started with, and the grammar is
+        // serialized. Html.RenderPlan is the one caller, so a plan always renders with the page's record.
+        internal string Serialize()
         {
             _context.Seal();
-            ResolveAll(_services);
-            return GrammarSerializer.Serialize(_context.Write());
-        }
-
-        /// <summary>
-        /// Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as
-        /// compact JSON. A plan renders once, after everything written to it, as <see cref="Render()"/> does.
-        /// </summary>
-        /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
-        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
-        public string Render(IServiceProvider services)
-        {
-            _context.Seal();
-            ResolveAll(services);
+            ResolveAll();
             return GrammarSerializer.Serialize(_context.Write());
         }
 
         // Every rendered input joins the plan, then each validated form is bound to its one validator's rules:
         // every request that validates a form names the same validator, so the form is bound once. A form only the
         // server checks has no fields: its messages land beside the mounted inputs inside it (grammar.md F8).
-        private void ResolveAll(IServiceProvider? services)
+        private void ResolveAll()
         {
             _context.DeclareRenderedInputs();
             var renderedInputs = _renderedInputs.Snapshot();
@@ -144,11 +118,11 @@ namespace Alis.Reactive
             if (oneByForm.Count > 0)
             {
                 var ruleSource = RequireBrowserRuleSource(
-                    services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
+                    _services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
                 foreach (var validation in oneByForm)
                 {
                     var fields = validation.Rules(ruleSource);
-                    _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, typeof(TModel), _context.FieldPrefix).ToList());
+                    _context.Check(validation.Form, CheckedField.Bind(fields, renderedInputs, _context.FieldPrefix).ToList());
                 }
             }
         }
@@ -184,37 +158,5 @@ namespace Alis.Reactive
                 "or register your own IBrowserRuleSource.");
 #endif
         }
-    }
-
-    internal abstract class ReactivePlanScope
-    {
-        internal static ReactivePlanScope RootView { get; } =
-            new RootViewPlanScope();
-
-        internal static ReactivePlanScope PartialView { get; } =
-            new PartialViewPlanScope();
-
-        internal static ReactivePlanScope Element { get; } =
-            new ElementPlanScope();
-
-        internal abstract bool IsPartial { get; }
-    }
-
-    // The plan the page's partials of the same model join.
-    internal sealed class RootViewPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => false;
-    }
-
-    // A partial joins the plan of its model.
-    internal sealed class PartialViewPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => true;
-    }
-
-    // A plan of its own for one element composes with no other plan.
-    internal sealed class ElementPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => false;
     }
 }

@@ -11,6 +11,9 @@ public sealed class SlotsController : Controller
 
     public IActionResult Hall() => View(new HallPage());
 
+    /// <summary>The pass desk, with the one step it writes about its slot.</summary>
+    public IActionResult PassDesk(PassDeskStep step) => View(new PassDeskPage { Step = step });
+
     /// <summary>The notice board, loaded into the hall's slot; it holds a slot of its own.</summary>
     public IActionResult Board() => PartialView("Board", new HallBoard());
 

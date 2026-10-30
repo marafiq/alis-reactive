@@ -27,8 +27,6 @@ namespace Alis.Reactive.PlanModel
             return new PlanId(modelType.FullName
                 ?? throw new ArgumentException("Model type must have a full name.", nameof(modelType)));
         }
-
-        internal static PlanId Of(string value) => new PlanId(value);
     }
 
     internal sealed class ComponentId : PlanString

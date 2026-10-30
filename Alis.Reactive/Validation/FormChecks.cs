@@ -45,7 +45,6 @@ namespace Alis.Reactive.Validation
         internal static IEnumerable<CheckedField> Bind(
             IReadOnlyList<BrowserField> fields,
             IReadOnlyDictionary<string, RenderedInput> renderedInputs,
-            Type modelType,
             string fieldPrefix)
         {
             // The checks are written relative to the validator's model; the view's field prefix is applied

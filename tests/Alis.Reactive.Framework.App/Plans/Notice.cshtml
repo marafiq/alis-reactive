@@ -1,9 +1,9 @@
 @using Alis.Reactive.Framework.App.Plans
 @model Notice
 @{
-    // Two plans in one partial: the notice's own, and its share button's.
+    // Two plans of one model in one partial: the notice's, and its share button's.
     var plan = Html.ReactivePlan<Notice>();
-    var share = Html.ElementPlan<Notice>("share-notice");
+    var share = Html.ReactivePlan<Notice>();
 }
 <section id="notice">
     <h2>Visiting hours change on Sunday</h2>

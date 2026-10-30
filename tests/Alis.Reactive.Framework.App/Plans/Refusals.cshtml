@@ -13,9 +13,6 @@
     case PlanMistake.RenderAComponentWithNoId:
         @(plan.Render<Button>("", new HtmlString("<button type=\"button\">Send</button>")))
         break;
-    case PlanMistake.GiveAnElementPlanNoId:
-        @(Html.RenderPlan(Html.ElementPlan<PlanRefusalsPage>("")))
-        break;
     case PlanMistake.NameAPluginWithASpace:
         plan.RegisterPlugin<SpacedNightLog>();
         break;
@@ -29,7 +26,7 @@
         @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Get("/Plans/Rooms/{room-number}")))
         break;
     case PlanMistake.ReadAnotherPlansComponent:
-        var board = Html.ElementPlan<PlanRefusalsPage>("copy-title");
+        var board = Html.ReactivePlan<PlanRefusalsPage>();
         TypedSource<string>? title = null;
         @plan.Slate("slate", title: "Round")
         @(plan.Button("read-title", "Read the title").Reactive(button => button.Click, p => title = p.Component<Slate>("slate").Title))

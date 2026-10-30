@@ -9,9 +9,6 @@
     const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
     const string ButtonSecondary = "rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle transition-colors";
 
-    // The link's plan is its own and sees no page input; it reads the receiver's name by the input's id.
-    var receivedById = IdGenerator.For<PharmacyDeliveryModel>(m => m.ReceivedBy);
-
     var plan = Html.ReactivePlan<PharmacyDeliveryModel>();
 }
 
@@ -119,15 +116,18 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    <native-card><native-card-body>
+    <native-card><native-card-body id="delivery-receipt">
         <native-vstack gap="Base">
             <native-heading level="H2">Delivery</native-heading>
             @{ Html.InputField(plan, m => m.ReceivedBy, o => o.Label("Received by"))
                 .NativeTextBox(b => b.CssClass(Field)); }
             <native-hstack gap="Sm" align="Center" class="flex-wrap">
+                @* The link starts a plan of its own; its request checks the page's rule and sends the page's input,
+                   both inside the receipt it names. *@
                 @(Html.NativeActionLink("mark-delivered", "Mark delivered", Url.SandboxRoute("MarkDelivered", "PharmacyDelivery"), link => link
                     .Post()
-                    .Gather<DeliveryReceipt>(g => g.Set(x => x.ReceivedBy, link.Component<NativeTextBox>(receivedById).Value))
+                    .Gather<DeliveryReceipt>(g => g.Form())
+                    .Validate<DeliveryReceiptValidator>("delivery-receipt")
                     .Response(r => r.OnSuccess<DeliveryMarked>((marked, s) =>
                         s.Element("delivery-status").Text.Set(marked.Get(x => x.Confirmation)))))
                     .CssClass("text-sm font-medium text-accent hover:text-accent/80"))

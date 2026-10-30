@@ -1,7 +1,7 @@
 @model IntakeStepsModel
 @using Alis.Reactive.Native.Components
 @{
-    var plan = Html.ResolvePlan<IntakeStepsModel>();
+    var plan = Html.ReactivePlan<IntakeStepsModel>();
     const string Field = "rounded-md border border-border px-3 py-1.5 text-sm w-full";
     var careLevels = new[]
     {

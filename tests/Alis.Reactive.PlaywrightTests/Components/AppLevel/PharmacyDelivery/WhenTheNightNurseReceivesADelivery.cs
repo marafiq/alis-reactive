@@ -12,8 +12,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.AppLevel.PharmacyDelivery;
 /// </summary>
 /// <remarks>
 /// The drawer, toast, confirm and loader are the page's app-level objects, reached without an id; the slip
-/// is a partial loaded into the drawer; Mark delivered is a link with a plan of its own that reads the
-/// receiver's name from a page input by its id.
+/// is a partial loaded into the drawer; Mark delivered is a link with a plan of its own whose request checks the
+/// page's rule on the receiver's input and sends it, both inside the receipt the request names.
 /// </remarks>
 [TestFixture]
 public class WhenTheNightNurseReceivesADelivery : PlaywrightTestBase
@@ -45,6 +45,7 @@ public class WhenTheNightNurseReceivesADelivery : PlaywrightTestBase
     private ILocator Manifest => Page.Locator("#manifest");
     private ILocator DeliveryStatus => Page.Locator("#delivery-status");
     private ILocator ReceivedBy => Page.Locator($"#{IdGenerator.For<PharmacyDeliveryModel>(m => m.ReceivedBy)}");
+    private ILocator ReceivedByMessage => Page.Locator("span[data-valmsg-for='ReceivedBy']");
 
     private ILocator OpenSlip => Page.Locator("#open-slip");
     private ILocator CloseSlip => Page.Locator("#close-slip");
@@ -184,6 +185,22 @@ public class WhenTheNightNurseReceivesADelivery : PlaywrightTestBase
         await Expect(Manifest).ToHaveTextAsync("12 items on the manifest, 4 of them controlled.");
         await Expect(Loader).ToHaveAttributeAsync("aria-hidden", "true");
         await Expect(LoaderOverManifest).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task marking_the_delivery_with_no_receiver_asks_who_received_it_and_sends_nothing()
+    {
+        await OpenTheDelivery();
+        var posts = CapturePosts();
+        await ReceivedBy.FillAsync("");
+
+        await MarkDelivered.ClickAsync();
+
+        await Expect(ReceivedByMessage).ToHaveTextAsync("Say who received the delivery.");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(DeliveryStatus).ToHaveTextAsync("Not marked delivered.");
+        Assert.That(posts, Is.Empty, "The link holds its request until someone is named as the receiver.");
         AssertNoConsoleErrors();
     }
 

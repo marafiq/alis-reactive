@@ -2,7 +2,7 @@
 @{
     // The night notes hear the desk call the round, for as long as they are in the drawer: closing the
     // drawer, or unloading its content, releases them with their HTML.
-    var plan = Html.ResolvePlan<DrawerModel>();
+    var plan = Html.ReactivePlan<DrawerModel>();
     Html.On(plan, t => t.CustomEvent(DrawerEvents.RoundCalled, p =>
         p.Element("drawer-round-status").Text.Set("The round was called; the notes heard it.")));
 }

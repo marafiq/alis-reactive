@@ -59,7 +59,7 @@ public class WhenAComponentIsDeclaredWrong
         plan.Render<Gauge>("pressure", HtmlString.Empty).Reactive(g => g.Tick, p => p.Element("status").Text.Set("tick"));
         plan.Render<GaugeAlike>("flow", HtmlString.Empty).Reactive(g => g.Tick, p => p.Element("status").Text.Set("tick"));
 
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Render());
+        var refused = Assert.Throws<InvalidOperationException>(() => plan.Serialize());
 
         Assert.That(refused!.Message, Does.Contain("Two different vendors are named 'gauge'"));
     }

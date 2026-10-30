@@ -65,7 +65,8 @@ namespace Alis.Reactive.Validation
 
         /// <summary>
         /// The same member and its item fields with no rule the browser checks: what a rule under a condition
-        /// only the server decides still names, so the server's message for it lands beside its input.
+        /// only the server decides still names, so the validator's browser rules list the member with no check, as
+        /// they list a member whose every check is the server's.
         /// </summary>
         internal BrowserField WithoutRules() =>
             new BrowserField(Reference, Array.Empty<BrowserRule>(), ItemFields.Select(field => field.WithoutRules()), IsChecked, _ownerCondition);
@@ -104,8 +105,8 @@ namespace Alis.Reactive.Validation
         private readonly List<Entry> _order = new List<Entry>();
 
         /// <summary>
-        /// Names a member a rule is written on, whether or not the browser can check the rule: the form then
-        /// carries the member's field, so a message the server sends for it lands beside its input.
+        /// Names a member a rule is written on, whether or not the browser can check the rule: the validator's
+        /// browser rules then list the member, with no check when the browser can make none.
         /// </summary>
         /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
         public void Declare(LambdaExpression member) => Ensure(FieldReference.Of(member)).Checked = true;

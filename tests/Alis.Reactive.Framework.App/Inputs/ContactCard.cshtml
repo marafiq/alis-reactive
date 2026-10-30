@@ -2,10 +2,10 @@
 @model ContactCard
 @{
     // The card is rendered for a member of the contacts page (Primary, Alternate): its inputs bind under that
-    // member, and its plan is its own save button's, composing with no other card's.
+    // member, and it starts a plan of its own, whose save checks and sends the card alone.
     var heading = (string)ViewData["Heading"]!;
     var slug = ViewData.TemplateInfo.HtmlFieldPrefix.ToLowerInvariant();
-    var plan = Html.ElementPlan<ContactCard>($"save-{slug}");
+    var plan = Html.ReactivePlan<ContactCard>();
 }
 <section id="card-@slug">
     <h2>@heading</h2>
