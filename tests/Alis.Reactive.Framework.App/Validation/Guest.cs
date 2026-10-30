@@ -47,3 +47,13 @@ public sealed class UnguardedGuestRules : ReactiveValidator<RegisteredGuest>
         RuleFor(x => x.Address!.City).Must(city => city != "Nowhere").WithMessage("Give a real city.");
     }
 }
+
+/// <summary>A rule that waits for the guest list before it decides whether the guest is expected.</summary>
+public sealed class WaitingGuestRules : ReactiveValidator<RegisteredGuest>
+{
+    public WaitingGuestRules()
+    {
+        RuleFor(x => x.Name).MustAsync(async (name, cancellation) => { await Task.Yield(); return name != "Nobody"; })
+            .WithMessage("That guest is not expected.");
+    }
+}

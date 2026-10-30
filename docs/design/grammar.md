@@ -725,7 +725,8 @@ validator instance the server resolves for that request.
 ### 7.2 Server-only by what a rule is
 
 A rule reaches the browser unless something in it only the server can do. No list is kept:
-- `Must` and `MustAsync` are C# (a lookup, a service); they have no browser term.
+- `Must` and `MustAsync` are C# (a lookup, a service); they have no browser term. A validator that holds
+  a `MustAsync` rule validates with `ValidateAsync`; its `Validate` refuses, naming `ValidateAsync`.
 - `WithMessage(model => ...)` builds its text from the model; only the server can say it.
 - A message with nothing left to say once the sentence naming the entered value is dropped.
 - `Matches` with an option JavaScript lacks or syntax it reads differently (`\A`, `\z`, `\G`,

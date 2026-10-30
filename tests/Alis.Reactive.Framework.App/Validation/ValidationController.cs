@@ -156,6 +156,21 @@ public sealed class ValidationController : Controller
         }
     }
 
+    /// <summary>Checks the guest by a rule that waits, without waiting for it, and says what the validator said of it.</summary>
+    [HttpPost("/Validation/GuestUnwaited")]
+    public IActionResult SaveGuestUnwaited([FromBody] RegisteredGuest guest, [FromServices] WaitingGuestRules rules)
+    {
+        try
+        {
+            rules.Validate(guest);
+            return Json(new Booked { Summary = "saved" });
+        }
+        catch (InvalidOperationException refused)
+        {
+            return Json(new Booked { Summary = refused.Message });
+        }
+    }
+
     /// <summary>Checks the comparisons with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Sameness")]
     public IActionResult SaveSameness([FromBody] SamenessForm form, [FromServices] SamenessRules rules)

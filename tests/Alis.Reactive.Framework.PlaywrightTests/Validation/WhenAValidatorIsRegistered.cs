@@ -2,8 +2,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
 /// <summary>
 /// A validator the app registers by name (a generic one, which scanning does not find) checks the page that
-/// names it; one never registered refuses the page that names it, saying how to register it; and a rule that
-/// reads through a null says which rule and how to guard it.
+/// names it; one never registered refuses the page that names it, saying how to register it; a rule that reads
+/// through a null says which rule and how to guard it; and a validator with a rule that waits refuses to validate
+/// without waiting, naming ValidateAsync.
 /// </summary>
 [TestFixture]
 public sealed class WhenAValidatorIsRegistered : AppPageTest
@@ -41,5 +42,16 @@ public sealed class WhenAValidatorIsRegistered : AppPageTest
 
         await Expect(Page.Locator("#saved")).ToHaveTextAsync(
             "A rule read x => x.Address.City through a null. If a member on the way can be missing, guard the rule with When(x => x.Member != null, ...).");
+    }
+
+    [Test]
+    public async Task a_validator_with_a_rule_that_waits_refuses_to_validate_without_waiting()
+    {
+        await Open("/Validation/Guest");
+
+        await Click("Save without waiting for the rule that waits");
+
+        await Expect(Page.Locator("#saved")).ToHaveTextAsync(
+            "WaitingGuestRules has a rule that waits (MustAsync); validate with ValidateAsync.");
     }
 }
