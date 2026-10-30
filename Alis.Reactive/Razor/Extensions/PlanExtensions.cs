@@ -122,8 +122,9 @@ namespace Alis.Reactive
         // no field of the form can show go (a hidden field's, an unloaded partial's, a member no input renders).
         private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan, RenderedPage page) where TModel : class
         {
-            var markup = new System.Text.StringBuilder(
-                $"<script type=\"application/json\" data-reactive-plan>{plan.Serialize()}</script>");
+            var json = plan.Serialize();
+            page.PlanRenders(plan.Context);
+            var markup = new System.Text.StringBuilder($"<script type=\"application/json\" data-reactive-plan>{json}</script>");
             foreach (var form in plan.Forms)
                 if (page.SummaryRenders(form, $"after the plan of {plan.Context.View}")) markup.Append(FormSummaries.Markup(form));
             return markup.ToString();

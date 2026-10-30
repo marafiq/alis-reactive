@@ -28,6 +28,10 @@ namespace Alis.Reactive.PlanModel
         // validated form's fields are bound when the plan renders (Check).
         private readonly Dictionary<string, IReadOnlyList<CheckedField>> _forms =
             new Dictionary<string, IReadOnlyList<CheckedField>>(StringComparer.Ordinal);
+        // The elements this plan loads into or unloads, and the elements whose text or HTML its steps set, with which
+        // of the two the first such step sets: the page's record refuses a step that writes over a slot.
+        private readonly HashSet<string> _slots = new HashSet<string>(StringComparer.Ordinal);
+        private readonly Dictionary<string, string> _contentSetById = new Dictionary<string, string>(StringComparer.Ordinal);
 
         // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
@@ -142,6 +146,25 @@ namespace Alis.Reactive.PlanModel
 
             Add(new DeclaredObject(componentId, vendor));
         }
+
+        /// <summary>A slot this plan loads into or unloads (<c>Into</c>, <c>Unload</c>).</summary>
+        internal void LoadsOrUnloads(string slotId)
+        {
+            DeclareElement(slotId);
+            _slots.Add(slotId);
+        }
+
+        /// <summary>A step sets the text or the HTML of the element with this id.</summary>
+        internal void SetsContentOf(string elementId, string content)
+        {
+            if (!_contentSetById.ContainsKey(elementId)) _contentSetById.Add(elementId, content);
+        }
+
+        /// <summary>The slots this plan loads into or unloads.</summary>
+        internal IReadOnlyCollection<string> Slots => _slots;
+
+        /// <summary>The elements whose text or HTML a step of this plan sets, with which of the two.</summary>
+        internal IReadOnlyDictionary<string, string> ContentSetById => _contentSetById;
 
         internal void RegisterPlugin(string name)
         {

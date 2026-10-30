@@ -444,8 +444,8 @@ form lowers to fixed productions.
 | a method declared with `MethodAsync()` or `MethodAsync<T>()` | `do await call(…)`; a read is `let t = await call(…)` before the statement that first reads it, and the value is `ref t` |
 | `args.A.Get(x => x.B)`, `json.Get(x => x.A.B)` | `as(get(v, ["a", "b"]), shape)` |
 | `args.Cancel.Set(true)`, `args.UpdateData(items)` | `set(v, ["cancel"], ..)`, `do(call(v, ["updateData"], [..]))` on the handler's parameter |
-| `p.Element(id).Text.Set(v)` | `set(el, ["textContent"], text, v)` |
-| `Html.Set(v)` | `set(el, ["innerHTML"], text, v)` |
+| `p.Element(id).Text.Set(v)` | `set(el, ["textContent"], text, v)`; on a slot some plan of the request loads into or unloads, refused when the page renders, naming `p.Unload` |
+| `Html.Set(v)` | `set(el, ["innerHTML"], text, v)`; refused on a slot as `Text.Set` is |
 | `Show()`, `Hide()` | `set(el, ["hidden"], boolean, false)` and `true` |
 | `ClassList.Add`, `ClassList.Remove`, `ClassList.Toggle` | `do(call(el, ["classList", "add"], [..]))`, and so on |
 | `p.Dispatch(appEvent, payload)`, `p.Dispatch(appEvent, d => d.Set(..))` | `do(call(document, ["raise"], [lit name, record]))` |

@@ -52,8 +52,7 @@
                    .Then(t =>
                        t.Get(Url.SandboxRoute("AddressPartial", "ValidationContract"))
                         .Response(r => r.OnSuccess(s => s.Into("address-container"))))
-                   .Else(e =>
-                       e.Element("address-container").Html.Set(""));
+                   .Else(e => e.Unload("address-container"));
            }); }
 
         <div id="address-container" class="mt-4"></div>
