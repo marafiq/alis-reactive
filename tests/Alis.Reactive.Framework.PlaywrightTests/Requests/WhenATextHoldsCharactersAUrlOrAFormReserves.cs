@@ -8,7 +8,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 /// endpoint its template names; ASP.NET Core's routing leaves that slash encoded (<c>%2F</c>) in the value it
 /// binds. A value that would leave its segment empty, <c>.</c> or <c>..</c>, which routing matches no endpoint
 /// for or the browser drops as it resolves the address, stops its request before it is sent, as a missing one
-/// does (H1). A member named beyond ASCII is sent by its own name in a query and in form data.
+/// does (H1); so does a header value the browser cannot send, which is not a network failure (H5, H7). A
+/// member named beyond ASCII is sent by its own name in a query and in form data.
 /// </summary>
 [TestFixture]
 public sealed class WhenATextHoldsCharactersAUrlOrAFormReserves : AppPageTest
@@ -104,6 +105,30 @@ public sealed class WhenATextHoldsCharactersAUrlOrAFormReserves : AppPageTest
 
         await Expect(Line("typed-done")).ToHaveTextAsync("looked up");
         await Expect(Line("typed-found")).ToHaveTextAsync("");
+    }
+
+    [Test]
+    public async Task a_desk_typed_reaches_the_endpoint_in_its_header()
+    {
+        await Open("/Requests/Spellings");
+        await Type("Desk", "East");
+
+        await Click("Call the desk");
+
+        await Expect(Line("called")).ToHaveTextAsync("shift Night at the East desk");
+        await Expect(Line("call-done")).ToHaveTextAsync("call ended");
+    }
+
+    [Test]
+    public async Task a_header_value_the_browser_cannot_send_stops_its_request_and_runs_no_error_route()
+    {
+        await Open("/Requests/Spellings");
+        await Type("Desk", "Łódź");
+
+        await Click("Call the desk");
+
+        await Expect(Line("call-done")).ToHaveTextAsync("call ended");
+        await Expect(Line("called")).ToHaveTextAsync("");
     }
 
     [Test]

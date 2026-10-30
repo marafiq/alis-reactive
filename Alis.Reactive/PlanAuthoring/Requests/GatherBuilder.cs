@@ -202,6 +202,11 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Sends an HTTP header whose value is read when the request is sent.</summary>
+        /// <remarks>
+        /// A value that is missing sends no header. A value the browser cannot send in a header, text beyond
+        /// ISO-8859-1 such as <c>Łódź</c>, stops the request before it is sent, as a request that cannot be built:
+        /// no response route runs, and <c>Finally</c> does.
+        /// </remarks>
         /// <typeparam name="TValue">A scalar value type.</typeparam>
         /// <param name="name">The header name.</param>
         /// <param name="source">The value source.</param>

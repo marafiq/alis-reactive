@@ -64,7 +64,7 @@ describe("JSON", () => {
     }));
     expect(calls[0]!.init.body).toBe(
       '{"name":"","tags":["","a"],"due":"2026-06-01","dose":"2026-06-01T21:30:00.250","visits":["2026-06-02"]}');
-    expect((calls[0]!.init.headers as Record<string, string>)["Content-Type"]).toBe("application/json");
+    expect(new Headers(calls[0]!.init.headers).get("Content-Type")).toBe("application/json");
   });
 
   it("sends an instant (a DateTimeOffset) as the exact moment, in JSON and as text", async () => {
@@ -85,7 +85,7 @@ describe("JSON", () => {
   it("omits a header whose value is missing", async () => {
     const calls = respondWith(null, null);
     await send(request({ method: "POST", headers: { "X-Shift": "Night", "X-Ward": undefined } }));
-    expect(calls[0]!.init.headers).toEqual({ "X-Shift": "Night" });
+    expect(Object.fromEntries(new Headers(calls[0]!.init.headers))).toEqual({ "x-shift": "Night" });
   });
 });
 

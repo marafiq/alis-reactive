@@ -7,6 +7,7 @@
 <h1>Spellings</h1>
 
 @{ Html.InputField(plan, m => m.Name, o => o.Label("Name")).Entry(); }
+@{ Html.InputField(plan, m => m.Desk, o => o.Label("Desk")).Entry(); }
 
 <dl>
     <dt>The name, in a query</dt><dd id="looked-up"></dd>
@@ -15,6 +16,7 @@
     <dt>The street, in a query</dt><dd id="street-looked-up"></dd>
     <dt>The street, as form data</dt><dd id="street-posted"></dd>
     <dt>The page of the name typed</dt><dd><span id="typed-found"></span> <span id="typed-routed"></span> · <span id="typed-done"></span></dd>
+    <dt>The desk typed, in a header</dt><dd><span id="called"></span> · <span id="call-done"></span></dd>
 </dl>
 
 @(plan.Button("look-up-name", "Look up the name")
@@ -42,6 +44,13 @@
             })
             .OnError(e => e.Element("typed-found").Text.Set("not found")))
         .Finally(f => f.Element("typed-done").Text.Set("looked up"))))
+@(plan.Button("call-desk", "Call the desk")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Headers")
+        .Gather(g => g.Header("X-Shift", "Night").Header("X-Desk", p.Component<Entry>(m => m.Desk).Value))
+        .Response(r => r
+            .OnSuccess<Echo>((echo, s) => s.Element("called").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(e => e.Element("called").Text.Set("the desk could not be reached")))
+        .Finally(f => f.Element("call-done").Text.Set("call ended"))))
 @(plan.Button("post-name", "Post the name")
     .Reactive(button => button.Click, p => p.Post("/Requests/Spellings")
         .Gather<SpelledName>(g => g.Set(x => x.Name, "Zoë & \"Rose\" O'Neil / 1+1=2, 50% #3?"))

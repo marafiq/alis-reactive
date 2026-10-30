@@ -593,11 +593,15 @@ no key (H2) and no entry (H4).
   - A `File` is appended with its name, and a date is its local text.
   - A missing scalar is sent empty.
   - A missing array sends no entry (`Alis.Reactive.Assets/runtime/plugins/http.ts`, `formData`).
-- **H5 Headers.** A header whose value is missing is omitted.
+- **H5 Headers.** A header whose value is missing is omitted. The headers are built as the
+  browser's `Headers` before anything is sent, so a value the browser cannot send in a header (text
+  beyond ISO-8859-1) throws as a request that cannot be built: no response route runs, and Finally
+  does (`Alis.Reactive.Assets/runtime/plugins/http.ts`, `headersOf`).
 - **H6 Body.** The body is read by Content-Type: JSON is parsed, text and HTML stay text, and an
   empty or other body is missing.
-- **H7 Status 0.** Status 0 means no usable response: the network failed, or a JSON body could not
-  be parsed. `ok` is false, and no exact-status route matches it.
+- **H7 Status 0.** Status 0 means a request was sent and no usable response came: the network
+  failed, or a JSON body could not be parsed. `ok` is false, and no exact-status route matches it.
+  A request that cannot be built (H1, H5) is never sent and has no status.
 
 ### 6.3 `model` (`plugin("alis.model", "")`, `plugin("alis.model", containerId)`)
 

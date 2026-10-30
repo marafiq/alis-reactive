@@ -12,9 +12,11 @@
 //    instant its UTC instant; an empty record sends no body.
 // H4 Form data: one entry per key; arrays repeat the key, a File is appended with its name, a date is
 //    its local calendar text, a missing scalar is sent empty and a missing array sends no entry.
-// H5 A header whose value is missing is omitted.
+// H5 A header whose value is missing is omitted; a value the browser cannot send in a header (text
+//    beyond ISO-8859-1) throws before anything is sent.
 // H6 The body is read by Content-Type: JSON parsed, text and HTML kept as text, anything else missing.
-// H7 Status 0 means no usable response: the network failed, or a JSON body could not be parsed.
+// H7 Status 0 means a request was sent and no usable response came: the network failed, or a JSON
+//    body could not be parsed. A request that cannot be built is never sent and has no status.
 
 import type { Plugin } from "../objects/plugins";
 import { asText, isMissing } from "../grammar/shape";
@@ -80,23 +82,21 @@ export async function send(request: HttpRequest): Promise<HttpResponse> {
 
 function prepare(request: HttpRequest): { url: string; init: RequestInit } {
   const routed = fillRoute(request.url, request.route);
-  const init: RequestInit = { method: request.method };
   const headers = headersOf(request.headers);
+  const init: RequestInit = { method: request.method, headers };
 
   if (request.method === "GET") {
     const query = queryPairs(request.values, request.arrays);
     const url = query.length === 0 ? routed : `${routed}${routed.includes("?") ? "&" : "?"}${query.join("&")}`;
-    if (Object.keys(headers).length > 0) init.headers = headers;
     return { url, init };
   }
 
   if (request.format === "form-data") {
     init.body = formData(request.values, request.arrays);
   } else if (Object.keys(request.values).length > 0) {
-    headers["Content-Type"] = "application/json";
+    headers.set("Content-Type", "application/json");
     init.body = JSON.stringify(request.values, jsonValue);
   }
-  if (Object.keys(headers).length > 0) init.headers = headers;
   return { url: routed, init };
 }
 
@@ -123,11 +123,18 @@ function routeValue(route: Record<string, unknown>, name: string): string {
   return encodeURIComponent(wireText(value, name));
 }
 
-function headersOf(source: Record<string, unknown>): Record<string, string> {
-  const headers: Record<string, string> = {};
+// The browser's own Headers, so a value it cannot send in a header throws as the request is built,
+// before anything is sent, and never reads as a network failure (H5, H7).
+function headersOf(source: Record<string, unknown>): Headers {
+  const headers = new Headers();
   for (const [name, value] of Object.entries(source)) {
     if (isMissing(value)) continue;
-    headers[name] = wireText(value, name);
+    const text = wireText(value, name);
+    try {
+      headers.set(name, text);
+    } catch (error) {
+      throw new Error(`[alis] header "${name}" cannot carry "${text}" (${toJavaScriptString(error)}); cannot build the request`);
+    }
   }
   return headers;
 }
