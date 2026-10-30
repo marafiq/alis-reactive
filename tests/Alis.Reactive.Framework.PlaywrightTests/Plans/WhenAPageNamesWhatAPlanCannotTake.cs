@@ -108,6 +108,15 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
     }
 
     [Test]
+    public async Task a_second_error_route_without_a_status_on_one_response_is_refused()
+    {
+        await Render("RouteEveryErrorTwice");
+
+        await Expect(Message(
+            "A response has one OnError without a status; write every step of it in that one callback, and route a status of its own with OnError(status, ..).")).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task an_error_route_for_a_status_http_does_not_have_is_refused()
     {
         await Render("RouteAStatusHttpDoesNotHave");

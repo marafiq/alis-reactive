@@ -68,6 +68,13 @@
                 .OnSuccess(s => s.Element("booked").Text.Set("booked again")))))
         <span id="booked"></span>
         break;
+    case PlanMistake.RouteEveryErrorTwice:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")
+            .Response(r => r
+                .OnError(e => e.Element("refused").Text.Set("refused"))
+                .OnError(e => e.Element("refused").Text.Set("refused again")))))
+        <span id="refused"></span>
+        break;
 }
 
 @Html.RenderPlan(plan)

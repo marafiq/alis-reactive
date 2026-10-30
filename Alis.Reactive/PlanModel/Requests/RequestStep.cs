@@ -160,7 +160,9 @@ namespace Alis.Reactive.PlanModel
         internal void OnError(Block route)
         {
             if (_error != null)
-                throw new InvalidOperationException("A response has one OnError for every status; write every step of it in that one callback.");
+                throw new InvalidOperationException(
+                    "A response has one OnError without a status; write every step of it in that one callback, and route " +
+                    "a status of its own with OnError(status, ..).");
             _error = route;
         }
 
