@@ -55,19 +55,6 @@ public class WhenARequestCannotBeSent
     }
 
     [Test]
-    public void a_second_on_success_on_one_response_is_refused()
-    {
-        var plan = Page.Plan<Admission>();
-
-        var refused = Assert.Throws<InvalidOperationException>(() =>
-            plan.Triggers().DomReady(p => p.Post("/admit").Response(r => r
-                .OnSuccess(s => s.Element("status").Text.Set("Saved"))
-                .OnSuccess(s => s.Element("status").Text.Set("Saved again")))));
-
-        Assert.That(refused!.Message, Does.Contain("one OnSuccess"));
-    }
-
-    [Test]
     public void a_second_chained_request_on_one_response_is_refused()
     {
         var plan = Page.Plan<Admission>();

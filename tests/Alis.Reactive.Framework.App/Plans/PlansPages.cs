@@ -116,6 +116,7 @@ public enum PlanMistake
     ReadAResponseOutsideItsRoutes,
     ReadTheResponseInFinally,
     LoadTheResponseInFinally,
+    RouteASuccessTwice,
 }
 
 /// <summary>A night log the page registers as a plugin under a name with a space in it.</summary>
