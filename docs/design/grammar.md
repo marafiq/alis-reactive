@@ -677,8 +677,8 @@ no key (H2) and no entry (H4).
   a start still trying it makes no further attempt, and its marker is withdrawn (R3), when the last
   owner holding it is disposed.
 - **B2 Start.** A start tries four times: at once, at once again, then 2 and 10 seconds after the try
-  before; 30 seconds after the fourth try fails it shows the retry indicator (R3)
-  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:33-51`). A click on the indicator starts the same way,
+  before; as soon as the fourth try fails it shows the retry indicator (R3)
+  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:34-56`). A click on the indicator starts the same way,
   and offers again only if all four tries fail.
 - **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
   method's single argument.
