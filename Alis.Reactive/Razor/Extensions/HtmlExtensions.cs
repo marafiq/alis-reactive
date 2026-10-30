@@ -1,6 +1,6 @@
 using System;
 using Alis.Reactive.Builders;
-using Alis.Reactive.Razor;
+using Alis.Reactive.Razor.Extensions;
 #if NET48
 using System.Web;
 using System.Web.Mvc;

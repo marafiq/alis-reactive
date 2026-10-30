@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
 
-namespace Alis.Reactive.Razor
+namespace Alis.Reactive.Razor.Extensions
 {
     /// <summary>
     /// The attributes that make an element raise a declared event when it is clicked (grammar.md 6.1, D4):
