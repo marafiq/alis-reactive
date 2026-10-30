@@ -206,7 +206,7 @@ exactly whatever the zone of the browser or the server.
   blank is sent as `null` in a JSON body, which the server cannot bind; give it a nullable type, or
   check it with `NotEmpty` so the browser holds it.
 - **Elsewhere** a read keeps its shape conversion alone, so `p.When(name.Value).IsEmpty()` still sees
-  `""`.
+  `""`, and `g.Set(x => x.Note, name.Value)` sends `""` in a JSON body (H3).
 
 ### 2.2 Operators
 
@@ -546,8 +546,15 @@ no key (H2) and no entry (H4).
   - A missing array sends no key, because `name=` binds as a collection holding one null
     (`Alis.Reactive.Assets/runtime/plugins/http.ts:112-128`).
   - A `File` cannot be sent in a GET; it is a boundary error.
-- **H3 JSON.** `values` is the body. It is a binding read (2.1): dates serialize as their local text, and `""`
-  is sent as `null` (`Alis.Reactive.Assets/runtime/plugins/http.ts:168-178`). An empty record sends no body.
+- **H3 JSON.** `values` is the body, each value as the plan built it; the plugin converts no text.
+  - The inputs a request sends (`Form()` through `model.fill`, `Form(m => m.X)` through
+    `model.boundValueOf`) are binding reads (2.1), so an input left blank or holding only spaces is
+    already `null`, as MVC's form binding makes it.
+  - Every other value (a literal, a component's or a plugin's member, a payload, a method's result) is
+    converted to its member's shape (2.1) and sent as it is, `""` included: MVC's JSON binding keeps
+    `""` for a text member, and a nullable member's shape has already made blank text `null`.
+  - A date is sent as its local text and an instant as its UTC instant
+    (`Alis.Reactive.Assets/runtime/plugins/http.ts`, `jsonValue`). An empty record sends no body.
 - **H4 Form data.** One entry per key.
   - Arrays repeat the key.
   - A `File` is appended with its name, and a date is its local text.

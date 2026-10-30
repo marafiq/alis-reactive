@@ -47,9 +47,26 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
         await Type("Visitor", "   ");
         await Type("Party", "");
 
-        await Button("Sign in").ClickAsync();
+        var request = await Page.RunAndWaitForRequestAsync(
+            () => Button("Sign in").ClickAsync(),
+            sent => sent.Url.EndsWith("/Requests/SignIns"));
 
+        Assert.That(request.PostData, Is.EqualTo("{\"Visitor\":null,\"Party\":0}"));
         await Expect(Line("signed-in")).ToHaveTextAsync("no one, party of 0, note none");
+    }
+
+    [Test]
+    public async Task a_named_text_input_left_empty_is_sent_as_null_in_the_json_body()
+    {
+        await Open("/Requests/SignIn");
+        await Type("Party", "3");
+
+        var request = await Page.RunAndWaitForRequestAsync(
+            () => Button("Sign in").ClickAsync(),
+            sent => sent.Url.EndsWith("/Requests/SignIns"));
+
+        Assert.That(request.PostData, Is.EqualTo("{\"Visitor\":null,\"Party\":3}"));
+        await Expect(Line("signed-in")).ToHaveTextAsync("no one, party of 3, note none");
     }
 
     [Test]

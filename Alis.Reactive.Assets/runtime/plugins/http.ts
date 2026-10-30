@@ -5,8 +5,9 @@
 //    before anything is sent.
 // H2 GET: values become the query string. An array becomes repeated keys, a missing scalar is sent
 //    empty, a missing array sends no key, and a File is a boundary error.
-// H3 JSON: values is the body; a date is its local calendar text, an instant its UTC instant, and ""
-//    is null; an empty record sends no body.
+// H3 JSON: values is the body, each value as the plan built it: an input read as MVC binds it (a blank
+//    one is already null), anything else as it is, "" included; a date is its local calendar text, an
+//    instant its UTC instant; an empty record sends no body.
 // H4 Form data: one entry per key; arrays repeat the key, a File is appended with its name, a date is
 //    its local calendar text, a missing scalar is sent empty and a missing array sends no entry.
 // H5 A header whose value is missing is omitted.
@@ -166,15 +167,14 @@ function wireText(value: unknown, name: string): string {
   return text;
 }
 
-// "" in a JSON body is a cleared field: the server binds it as null. Array items keep their text.
 // A date is sent as asText writes it (an instant as its UTC instant, any other date as its local
 // calendar text); the holder still has the Date, which toJSON has already turned into a UTC instant
-// by the time it reaches here. A file has no JSON form.
+// by the time it reaches here. A file has no JSON form. Text goes as the plan built it (H3): a blank
+// input was read as MVC binds it, and "" a request sets stays "", as MVC's JSON binding keeps it.
 function jsonValue(this: unknown, key: string, value: unknown): unknown {
   if (fileOf(value) !== undefined) throw new Error("[alis] File objects require form-data body format");
   const held = (this as Record<string, unknown>)[key];
   if (held instanceof Date) return asText(held) ?? null;
-  if (value === "" && !Array.isArray(this)) return null;
   return value;
 }
 

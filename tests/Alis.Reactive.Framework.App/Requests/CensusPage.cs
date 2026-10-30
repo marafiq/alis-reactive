@@ -4,8 +4,8 @@ namespace Alis.Reactive.Framework.App.Requests;
 
 /// <summary>
 /// The census the desk takes: what a query string and a form post carry for a list, for a value the
-/// address leaves out and for a list it leaves out; what a JSON body carries for blank text; and a query
-/// member whose items have no text form.
+/// address leaves out and for a list it leaves out; what a JSON body carries for empty text the request
+/// sets; and a query member whose items have no text form.
 /// </summary>
 public sealed class CensusPage;
 
