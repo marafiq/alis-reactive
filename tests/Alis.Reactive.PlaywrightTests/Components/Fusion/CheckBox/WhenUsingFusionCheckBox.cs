@@ -1,3 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.CheckBox;
 
 // Journey: a new resident completes their Move-In Services Agreement with a move-in
@@ -8,9 +10,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.CheckBox;
 public class WhenUsingFusionCheckBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionCheckBox";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_FusionCheckBoxModel";
-    private const string AgreementId = GeneratedTypeScope + "__AgreementAccepted";
-    private const string HousekeepingId = GeneratedTypeScope + "__WeeklyHousekeeping";
+    private static readonly string AgreementId = IdGenerator.For<FusionCheckBoxModel>(m => m.AgreementAccepted);
+    private static readonly string HousekeepingId = IdGenerator.For<FusionCheckBoxModel>(m => m.WeeklyHousekeeping);
 
     private FusionCheckBoxLocator Agreement => new(Page, AgreementId);
     private FusionCheckBoxLocator Housekeeping => new(Page, HousekeepingId);

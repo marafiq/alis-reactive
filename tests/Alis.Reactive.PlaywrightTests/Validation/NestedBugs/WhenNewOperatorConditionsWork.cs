@@ -1,13 +1,15 @@
+using System.Linq.Expressions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs;
+
 namespace Alis.Reactive.PlaywrightTests.Validation.NestedBugs;
 
 [TestFixture]
 public class WhenNewOperatorConditionsWork : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/NestedBugs/OperatorConditions";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Validation_NestedBugs_OperatorConditionModel__";
     private const string AdultAgeOutsideLessThanRule = "25";
 
-    private ILocator Input(string field) => Page.Locator($"#{ModelIdPrefix}{field}");
+    private ILocator Input(Expression<Func<OperatorConditionModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator Result => Page.Locator("#result");
     private ILocator ErrorFor(string field) =>
@@ -16,8 +18,8 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     // An adult with a job title: every other condition is off, so a "skips" test can end in a save.
     private async Task EnterAnEmployedAdult()
     {
-        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
-        await Input("JobTitle").FillAsync("Care Coordinator");
+        await Input(m => m.Age).FillAsync(AdultAgeOutsideLessThanRule);
+        await Input(m => m.JobTitle).FillAsync("Care Coordinator");
     }
 
     private async Task AssertSaved()
@@ -31,7 +33,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync(AdultAgeOutsideLessThanRule);
+        await Input(m => m.Age).FillAsync(AdultAgeOutsideLessThanRule);
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("JobTitle")).ToHaveTextAsync("Adults must provide job title.");
@@ -44,8 +46,8 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync("15");
-        await Input("Name").FillAsync("Jane Smith");
+        await Input(m => m.Age).FillAsync("15");
+        await Input(m => m.Name).FillAsync("Jane Smith");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("JobTitle")).ToHaveTextAsync("");
@@ -57,7 +59,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
 
-        await Input("Age").FillAsync("15");
+        await Input(m => m.Age).FillAsync("15");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).ToHaveTextAsync("Guardian name required for minors.");
@@ -97,7 +99,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await NavigateToAndWaitForBoot(Path);
 
         await EnterAnEmployedAdult();
-        await Input("CareLevel").SelectOptionAsync("memory-care");
+        await Input(m => m.CareLevel).SelectOptionAsync("memory-care");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Notes")).ToHaveTextAsync("Notes required for high-acuity care.");
@@ -111,7 +113,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await NavigateToAndWaitForBoot(Path);
 
         await EnterAnEmployedAdult();
-        await Input("CareLevel").SelectOptionAsync("independent");
+        await Input(m => m.CareLevel).SelectOptionAsync("independent");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Notes")).ToHaveTextAsync("");
@@ -124,7 +126,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await NavigateToAndWaitForBoot(Path);
 
         await EnterAnEmployedAdult();
-        await Input("Notes").FillAsync("This is an urgent matter");
+        await Input(m => m.Notes).FillAsync("This is an urgent matter");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Phone")).ToHaveTextAsync("Phone required for urgent cases.");
@@ -138,7 +140,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await NavigateToAndWaitForBoot(Path);
 
         await EnterAnEmployedAdult();
-        await Input("Notes").FillAsync("routine checkup");
+        await Input(m => m.Notes).FillAsync("routine checkup");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Phone")).ToHaveTextAsync("");
@@ -151,7 +153,7 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         await NavigateToAndWaitForBoot(Path);
 
         await EnterAnEmployedAdult();
-        await Input("Email").FillAsync("jane@care.com");
+        await Input(m => m.Email).FillAsync("jane@care.com");
         await ClickWhenStable(SubmitBtn);
 
         await Expect(ErrorFor("Name")).ToHaveTextAsync("Name required when email provided.");

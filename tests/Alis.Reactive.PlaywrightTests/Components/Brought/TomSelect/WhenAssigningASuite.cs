@@ -37,8 +37,7 @@ public class WhenAssigningASuite : PlaywrightTestBase
 
     // The companion partial renders CompanionSuiteModel.CompanionSuiteType; its ID is the
     // framework's deterministic ID for that model member.
-    private const string CompanionSuiteTypeId =
-        "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_Components_Brought_CompanionSuiteModel__CompanionSuiteType";
+    private static readonly string CompanionSuiteTypeId = IdGenerator.For<CompanionSuiteModel>(m => m.CompanionSuiteType);
 
     private async Task OpenAssignment()
     {

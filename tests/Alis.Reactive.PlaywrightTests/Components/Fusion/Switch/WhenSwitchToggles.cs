@@ -1,3 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Switch;
 
 // Journey: a resident manages their Care Alert Preferences. A master "receive care alerts"
@@ -9,10 +11,9 @@ public class WhenSwitchToggles : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Switch";
 
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SwitchModel";
-    private const string ReceiveCareAlertsId = GeneratedTypeScope + "__ReceiveCareAlerts";
-    private const string EmailRemindersId = GeneratedTypeScope + "__EmailReminders";
-    private const string TextMessageAlertsId = GeneratedTypeScope + "__TextMessageAlerts";
+    private static readonly string ReceiveCareAlertsId = IdGenerator.For<SwitchModel>(m => m.ReceiveCareAlerts);
+    private static readonly string EmailRemindersId = IdGenerator.For<SwitchModel>(m => m.EmailReminders);
+    private static readonly string TextMessageAlertsId = IdGenerator.For<SwitchModel>(m => m.TextMessageAlerts);
 
     private SwitchLocator ReceiveCareAlerts => new(Page, ReceiveCareAlertsId);
     private SwitchLocator EmailReminders => new(Page, EmailRemindersId);
