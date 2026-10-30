@@ -1,0 +1,32 @@
+@using Alis.Reactive.Framework.App.Slots
+@model HandoverPage
+@{
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<HandoverPage>();
+}
+<h1>Shift handover</h1>
+<p>Handover: <span id="handover-status"></span></p>
+
+@* The night shift's draft is rendered with the page, inside the container the page clears. *@
+<div id="handover-draft">
+    @await Html.PartialAsync("/Slots/HandoverDraft.cshtml", new HandoverDraft())
+</div>
+
+@* Opened afresh, the page clears the draft as it starts, before the draft would start. *@
+@if (Model.Afresh)
+{
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Unload("handover-draft");
+        p.Element("handover-status").Text.Set("started afresh");
+    }));
+}
+else
+{
+    Html.On(plan, t => t.DomReady(p => p.Element("handover-status").Text.Set("picked up from the night shift")));
+}
+
+@(plan.Button("discard-draft", "Discard the draft")
+    .Reactive(button => button.Click, p => p.Unload("handover-draft")))
+
+@Html.RenderPlan(plan)

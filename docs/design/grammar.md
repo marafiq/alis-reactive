@@ -388,7 +388,9 @@ A failing handler is logged and stops no other handler.
    unload then releases it as it releases loaded content (6.5 S1, S2): its handlers, its model inputs
    and its form tests (F9). The owners start as loads would have started them: the page's first, then
    each slot's, an outer slot's before the slot inside it. Only plan data decides it, and only boot:
-   every plan in HTML a slot loads starts under that slot's owner, wherever it sits in that HTML.
+   every plan in HTML a slot loads starts under that slot's owner, wherever it sits in that HTML. A
+   released owner starts nothing: a slot a ready handler unloads before the slot's owner starts (the
+   page's ready handler, or an outer slot's) never runs its own ready handlers.
 4. **Booted mark.** After the owners start, the root element gets `data-alis-booted="true"`, the one
    mark of a booted page, readable by whoever arrives later (`Alis.Reactive.Assets/runtime/root.ts`).
    The Playwright tests wait on it.

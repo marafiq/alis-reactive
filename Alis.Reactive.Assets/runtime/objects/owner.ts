@@ -2,7 +2,8 @@
 // (handler subscriptions, plugin data contributions, connection subscriptions) and knows nothing about
 // what they are. Starting an owner runs the work waiting for its start: the document's `ready`. An
 // owner starts once, after its plans have subscribed and contributed (plans/start.ts), and is
-// disposed at most once, when its slot is released (plugins/slot.ts).
+// disposed at most once, when its slot is released (plugins/slot.ts). A released owner starts nothing:
+// a slot unloaded by a ready handler that runs before the slot's owner starts never runs its own.
 
 import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
@@ -37,6 +38,7 @@ export class Owner {
   }
 
   dispose(): void {
+    this.startHooks.length = 0;
     // A disposer that throws stops no other; the owner ends either way.
     for (const disposer of this.disposers.splice(0).reverse()) {
       try {

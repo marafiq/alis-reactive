@@ -1,0 +1,13 @@
+@using Alis.Reactive.Framework.App.Slots
+@model HandoverDraft
+@{
+    var plan = Html.ReactivePlan<HandoverDraft>();
+}
+<section>
+    <h2>The night shift's draft</h2>
+    <p>Room 12 slept well; recheck room 4 at seven.</p>
+</section>
+
+@{ Html.On(plan, t => t.DomReady(p => p.Element("handover-status").Text.Set("the night shift's draft is restored"))); }
+
+@Html.RenderPlan(plan)
