@@ -32,11 +32,12 @@ namespace Alis.Reactive.Builders.Requests
     ///  .Gather&lt;DischargeRequest&gt;(g =&gt; g
     ///      .Form()
     ///      .Set(x =&gt; x.FacilityId, p.Url&lt;CensusQuery&gt;().Get(q =&gt; q.FacilityId))
-    ///      .Header("X-Category", args.Category));
+    ///      .Header("X-Category", args.Category))
+    ///  .Validate&lt;DischargeRules&gt;("discharge-form");
     /// </code>
     /// </remarks>
     /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>
-    /// <typeparam name="TModel">The view model whose inputs <see cref="Form()"/> reads.</typeparam>
+    /// <typeparam name="TModel">The view model whose members name the inputs <see cref="Form(Expression{Func{TModel, object}}[])"/> sends.</typeparam>
     public sealed class GatherBuilder<TRequest, TModel>
         where TRequest : class
         where TModel : class
@@ -109,21 +110,45 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>
-        /// Sends every input of the form, by its binding name, as MVC binds it: the inputs this view and the
-        /// partials that compose with it rendered through <c>Html.InputField</c>, while they are on the page.
+        /// Sends every input inside the form this request validates, by its binding name, as MVC binds it,
+        /// whichever view rendered it through <c>Html.InputField</c>: this view, a partial, an editor template,
+        /// or a partial loaded into a slot, while it is on the page.
         /// </summary>
         /// <remarks>
+        /// A form is an element, and it sends what it holds, as an HTML form posts its inputs: an input outside
+        /// it is not sent. The form is the one <c>Validate&lt;TValidator&gt;(formId)</c> names; a request that
+        /// validates none is refused when the view renders, and names its element with <see cref="Form(string)"/>.
         /// A member set with <c>Set</c> is sent beside the inputs; an input bound to the same name wins.
         /// </remarks>
         public GatherBuilder<TRequest, TModel> Form()
         {
-            _draft.IncludeForm();
+            _draft.SendForm(SentForm.Validated);
             return this;
         }
 
         /// <summary>
-        /// Sends the named inputs of the form, each by its binding name, as MVC binds it: under the view's field
-        /// prefix when the view is a partial rendered for a member of the page's model.
+        /// Sends every input inside the element with this id, by its binding name, as MVC binds it, whichever
+        /// view rendered it through <c>Html.InputField</c>, while it is on the page: a section saved on its own
+        /// names its section, <c>g.Form("companion-section")</c>.
+        /// </summary>
+        /// <remarks>
+        /// The element is found when the request is sent; a request whose element is not on the page fails, as a
+        /// step naming a missing element does. A member set with <c>Set</c> is sent beside the inputs; an input
+        /// bound to the same name wins.
+        /// </remarks>
+        /// <param name="formId">The id of the element whose inputs are sent: a form, or a section inside one.</param>
+        public GatherBuilder<TRequest, TModel> Form(string formId)
+        {
+            if (string.IsNullOrWhiteSpace(formId))
+                throw new ArgumentException("Form(formId) names the element whose inputs are sent.", nameof(formId));
+            _draft.SendForm(SentForm.Named(formId));
+            return this;
+        }
+
+        /// <summary>
+        /// Sends the named inputs, each by its binding name, as MVC binds it, wherever on the page they are
+        /// rendered: under the view's field prefix when the view is a partial rendered for a member of the page's
+        /// model.
         /// </summary>
         /// <remarks>
         /// A request other than the view model must have a member for each binding name, prefix included, of a
@@ -133,7 +158,7 @@ namespace Alis.Reactive.Builders.Requests
         public GatherBuilder<TRequest, TModel> Form(params Expression<Func<TModel, object?>>[] fields)
         {
             if (fields == null || fields.Length == 0)
-                throw new ArgumentException("Form(..) takes at least one field; Form() sends every input.", nameof(fields));
+                throw new ArgumentException("Form(..) takes at least one field; Form() sends the inputs of the form the request validates.", nameof(fields));
 
             foreach (var field in fields)
             {

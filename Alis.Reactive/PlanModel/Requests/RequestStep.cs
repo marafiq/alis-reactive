@@ -46,7 +46,7 @@ namespace Alis.Reactive.PlanModel
             // A request its form checks first runs inside the check, so what it binds is its own.
             var scope = Validation == null ? around : around.ForBlock();
             var method = _method;
-            var input = Gather.Resolve(_url);
+            var input = Gather.Resolve(method, _url, Validation);
             var response = scope.Fresh("res");
             var routeScope = scope.WithResponse(Routes.Handle, response);
 
@@ -94,18 +94,17 @@ namespace Alis.Reactive.PlanModel
             var nested = method != "GET" && format == "json";
             var body = nested ? Nested(input.Payload).Write(scope) : G.Record(FlatValues(input.Payload, scope));
 
-            // Form() writes each input at its own key: nested, leaf by leaf into the authored record
-            // (model.fill), so an authored value beside an input survives; flat, merged in by binding name.
-            if (input.IncludesForm && nested)
-                body = G.Call(G.Obj(scope.Objects.Model()), "fill", body);
-            else if (input.IncludesForm)
-                body = G.Op(Operator.Merge, body, G.Get(G.Obj(scope.Objects.Model()), "fields"));
-
+            // Form() writes each mounted input inside its form at its own key: nested, leaf by leaf into the
+            // authored record (fill), so an authored value beside an input survives; flat, merged in by binding name.
             Expr arrays = G.List(input.Payload
                 .Where(member => member.Value.OutputShape.DescribesArray)
                 .Select(member => (Expr)G.Lit(member.Name.Value)));
-            if (input.IncludesForm)
-                arrays = G.Call(arrays, "concat", G.Get(G.Obj(scope.Objects.Model()), new[] { "arrays" }, Shape.None));
+            if (input.Form is { } form)
+            {
+                var inputs = G.Obj(scope.Objects.Inputs(form));
+                body = nested ? G.Call(inputs, "fill", body) : G.Op(Operator.Merge, body, G.Get(inputs, "fields"));
+                arrays = G.Call(arrays, "concat", G.Get(inputs, new[] { "arrays" }, Shape.None));
+            }
 
             return G.Record(
                 ("method", G.Lit(method)),

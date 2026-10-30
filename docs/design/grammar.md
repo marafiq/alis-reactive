@@ -43,17 +43,19 @@ That is the whole document. The grammar names no feature.
   contributes its data under its owner, and the plugin joins the contributions per key. The C#
   declaration of each plugin states its data type, so the generated contract types it too.
 - **Inputs and forms are plugin data.**
-  - The inputs of a view are `alis.model` data: `{ inputs: { id: { name, body, value, shape,
+  - The inputs of a view are `alis.model` data, contributed to the page's one table of inputs
+    (`plugin("alis.model", "")`, 6.3): `{ inputs: { id: { name, body, value, shape,
     committed, list } } }`: the MVC binding name, the JSON body path, the value as an expression of
     the located object, the shape it reads as, the event that commits a value (M4), and whether the
     input binds a list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ id, name, value,
-    tests: [{ rule, check: fn(v), when, message }] }] }`: one per member a rule is written on, and per
+    tests: [{ rule, check: fn(v), when, message }] }] }`. `summary` is the id of the form's summary,
+    `{formId}_validation_summary` (F6), the same whichever plan writes the form. A field is one per member a rule is written on, and per
     rendered item of a collection a rule checks, whether or not the browser can check it (a rule under
     a condition only the server decides still names its members), so `tests` is empty when every
     check is the server's. An item's field carries the checks of every rule on its collection. A form
-    the plan shows server errors for (F8) that no validator of the plan names has one field per input
-    the plan rendered, each with no tests. `name` is
+    the plan shows server errors for (F8) that no validator of the plan names has no fields: its
+    messages are placed by the mounted inputs inside it (M7). `name` is
     the input's binding name, under the view's field prefix, as the server reports it. `rule` names the
     declaration a test came from, for traces only. An input
     does not name its form; membership is decided by containment (6.4), because a partial cannot
@@ -194,9 +196,10 @@ exactly whatever the zone of the browser or the server.
 
 **Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
 - **Where:** the `alis.model` values a request body carries (`fill`, `fields`, so
-  `Form()` sends them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`), and every
-  input a validation rule reads: its field, a peer, and each
-  member its condition reads, through `model.boundValueOf(id)`.
+  `Form()` and `Form(formId)` send them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`),
+  every input a validation rule reads: its field, a peer, and each
+  member its condition reads, through `model.boundValueOf(id)`, and `p.Bound(m => m.X)`, which reads the
+  same way.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
   makes it, under every shape: text, a nullable of any shape (a `Guid?`, a `TimeSpan?`, a `char?`),
   and `any` (a `char`, a `Uri`). A non-nullable number, boolean or date left empty is its type's
@@ -410,6 +413,7 @@ A failing handler is logged and stops no other handler.
 | A plugin is registered once in a plan | builder, naming the plugin and the view |
 | A lambda uses only members the compiler maps | analyzer at compile time; render as a backstop |
 | Every route placeholder is filled from the request | render |
+| A request that sends `Form()`, the inputs of the form it validates, validates a form; otherwise it names its element with `Form(formId)` | render |
 | A regular expression is in JavaScript's dialect | render |
 | Input IDs come from `IdGenerator`; other IDs are explicit; no ID repeats in a plan | render |
 | A validation rule reaches the browser only when the page can evaluate it (7.5) | render |
@@ -471,14 +475,21 @@ if (form.validate()) {                            // .Validate<V>(container); ou
 ```
 
 - **Gather.** `Gather<TRequest>(g => ..)` builds the request the endpoint binds: `Set(x => x.M, v)`
-  sets a member, `Form()` sends every input of the composed form, `Form(m => m.A, ..)` named inputs,
-  and `Header(name, v)` a header. `.Gather(g => ..)` takes the view model as the request. Where a
+  sets a member, `Form()` sends the inputs inside the form the request validates, `Form(formId)` the
+  inputs inside the element named, `Form(m => m.A, ..)` named inputs, and `Header(name, v)` a header.
+  `.Gather(g => ..)` takes the view model as the request. Where a
   member goes is decided in C# when the request is built, by MVC's rule for route values: a top-level
   member named like a `{placeholder}` (ignoring case) fills the path (`route`, keyed by the
   placeholder's own spelling); every other member goes to `values`, which is the query string for GET
-  and the body otherwise. Every placeholder must be filled, a member is set once, a `Form` field
-  must be a member of `TRequest` of a type its value binds to, and a request sent as form data
-  (`AsFormData()`) gathers something; each is checked at render.
+  and the body otherwise. Every placeholder must be filled, a member is set once, a request sends one
+  form's inputs, a request that sends `Form()` validates a form (`Validate<TValidator>(formId)`), a
+  `Form` field must be a member of `TRequest` of a type its value binds to, and a request sent as form
+  data (`AsFormData()`) gathers something; each is checked at render.
+- **A form is an element.** What `Form()` and `Form(formId)` send is decided by containment, as an
+  HTML form posts the inputs it holds: every mounted input inside the element (6.3 M1), whichever
+  plan rendered it: the page, a partial, a member's editor template, or a partial a slot loaded in a
+  request of its own. An input outside the element is not sent, whatever plan rendered it, and a
+  section saved on its own names its section.
 - **Keys.** A member's key is its MVC binding name. `values` is a nested record for JSON
   (`{"Address":{"City":..}}`). For a query string or form data it is flat (`Address.City`,
   `Lines[0].Sku`), because only C# knows a dictionary from an object.
@@ -488,10 +499,10 @@ if (form.validate()) {                            // .Validate<V>(container); ou
   third item. A partial rendered for an entry of a dictionary keyed by a number (`Doses[1042]`) posts
   as form data (`AsFormData()`), whose flat name `Doses[1042].Amount` MVC binds into the entry; as
   JSON its body holds a list at `Doses`, which a dictionary does not bind.
-- **`Form()`** writes every input into the authored JSON record leaf by leaf with
-  `model.fill(record)`, so an authored value beside an input (`Address.Verified` next to
-  `Address.City`) is kept and an input wins only its own leaf. A query string or form data spreads
-  `model.fields`.
+- **`Form()`** writes every input inside its form into the authored JSON record leaf by leaf with
+  `inputs.fill(record)`, where `inputs` is `plugin("alis.model", formId)`, so an authored value beside
+  an input (`Address.Verified` next to `Address.City`) is kept and an input wins only its own leaf. A
+  query string or form data spreads `inputs.fields`.
 
 ### 5.2 Templates
 
@@ -577,17 +588,36 @@ no key (H2) and no entry (H4).
 - **H7 Status 0.** Status 0 means no usable response: the network failed, or a JSON body could not
   be parsed. `ok` is false, and no exact-status route matches it.
 
-### 6.3 `model` (`plugin("alis.model", planId)`)
+### 6.3 `model` (`plugin("alis.model", "")`, `plugin("alis.model", containerId)`)
 
-- **M1 Values.** Every mounted input of the composed plan, read through each input's `value`
-  expression as a binding read (2.1). An unmounted input is skipped. A request carries them through
-  M2 or M3.
-- **M2 `fields`.** The values of M1, flat, keyed by MVC binding name.
+The page holds one table of inputs, keyed by element id. Every plan contributes the inputs it
+rendered (1.1) under its owner, whichever view or request rendered them: the page, a partial, a
+member's editor template, a partial a slot loaded. The plan id keys nothing. An owner's release (a
+slot's load or unload, 3.5) removes exactly the entries it contributed and keeps every other.
+
+- **M1 Values.** `plugin("alis.model", containerId)` is the mounted inputs inside the element with
+  that id, whichever plan rendered them, each read through its `value` expression as a binding read
+  (2.1). An input that is not on the page, or not inside the element, is not sent. An element that is
+  not on the page is a boundary error (3.4): the request is not sent. A request carries the values
+  through M2 or M3.
+- **M2 `fields`.** The values of M1, flat, keyed by MVC binding name; `arrays` names those that bind
+  a list.
 - **M3 `fill(record)`.** Writes the values of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
-- **M5 `boundValueOf(id)`.** One input's value as a binding read (2.1), for a validation rule or a
-  gathered `Form(m => ..)` field, wherever in the composition it was rendered; missing when no plan
-  renders it.
+- **M5 `boundValueOf(id)`.** On the page's table (`plugin("alis.model", "")`): the value of the
+  mounted input with that id, whichever plan rendered it, as a binding read (2.1), for a validation
+  rule, a gathered `Form(m => ..)` field and `p.Bound(m => ..)`; missing when no input with that id
+  is on the page, as the server sees a member no input posts.
+- **M6 One element per id.** The server refuses an element id rendered twice in one request
+  (`Alis.Reactive/Razor/RenderedPage.cs`). Two requests can still bring one twice, as two slots that
+  each load one partial do. The table keeps both entries; every read goes through the element the
+  DOM finds by the id, the first in document order, so both read the same input; and each owner's
+  release removes only its own entry, so the other slot's input is read once the first leaves. A
+  second entry for an id logs `input.duplicate-id`.
+- **M7 `ids`.** On `plugin("alis.model", containerId)`: the element id of each mounted input inside the
+  element, keyed by binding name, whichever plan rendered it. The form places a server message by it
+  (F8), clears the messages inside the container by it (F4, F8), and wires those inputs for live
+  validation (F7).
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
   commits a value (`ComponentInput.Of(Value, committedBy: ...)`,
   `Alis.Reactive/Components/Contracts/ComponentInput.cs:41`). When the plan that renders the
@@ -599,39 +629,64 @@ no key (H2) and no entry (H4).
 `validate()` returns a bool; `showErrors(problem)`; the tests are the form's `alis.form` data (1.1).
 
 - **F1 Scope.** A test applies only when its field's element is inside the container element. A
-  missing container fails validation when the form has tests.
+  missing container fails validation when the form has tests. A field's value, and every value its
+  tests read, is read through M5, so a rule of the page's validator checks the input a partial, an
+  editor template or a slot's content renders for its member, whichever plan rendered it: the same
+  containment decides what the form checks and what its `Form()` sends (5.1).
 - **F3 First failure wins.** For each field, tests whose `when` is false are skipped, and the first
   failing `check` decides.
-- **F4 Validate.** First clear every inline message and the summary, then evaluate every field,
-  then return the AND.
+- **F4 Validate.** `validate()` checks the tests written for its container, so a section saved on its
+  own is checked by its own validator and the whole form by the form's (one container, one validator,
+  one server decision). First clear the inline message of every field of the form and of every mounted
+  input inside the container (M7), whichever form showed it, so a section's message does not outlive
+  the whole form's save, and the summary; then evaluate every field, then return the AND.
 - **F5 Unmounted field.** A field with no element posts no value, so each active test checks
   nothing, as the server checks a missing member: a required test fails, a length or a pattern
   passes. The first failing test's message goes to the summary.
 - **F6 Display.** A message goes inline into `{id}_error` when that slot is renderable: it has a
   parent, and no ancestor has `hidden` or `display: none`. Then the field gets `alis-has-error`.
-  Otherwise the message goes to the summary, `{planId with . and + as _}_validation_summary`, one
-  entry per key, replaced and never duplicated. `Html.RenderPlan` renders the summary for a root
-  view's plan always, since the partials that join it (same `planId`) show their messages there, and
-  for an element plan when its request validates a form or it shows a form's server errors (F8); an
-  element plan that does neither renders none.
-- **F7 Live.** At creation (boot or slot load):
+  Otherwise the message goes to the form's summary, `{formId}_validation_summary`, the element the
+  data of the plan that asks names (1.1), one entry per key, replaced and never duplicated; each form
+  has its own, so one form's messages never clear another's. The server renders the summary, once per
+  form per request (`Alis.Reactive/Razor/RenderedPage.cs`), and the runtime never creates it: where the
+  view places it (`<native-validation-summary form="formId">`, before the plan that would render it;
+  a second placement, or one after that plan, is refused), else `Html.RenderPlan` writes it after the
+  plan's script for each form the plan validates or shows server errors on (F8), so it sits after the
+  first plan of the request that names the form; a plan that does neither renders none. A summary
+  rendered after a plan whose script sits inside a slot's container is that slot's content (3.5) and
+  leaves with it: a page whose first such plan is slot content places the summary where it stays. A
+  request of its own whose plan names a form the page already holds (a slot's answer) renders the
+  form's summary again; the DOM's first in document order shows the messages, as M6 reads an input,
+  and the copy leaves with the slot (F9).
+- **F7 Live.** At creation (boot or slot load), for each field of the form and each mounted input inside
+  its container (M7), so a form only the server checks wires the inputs its messages land beside:
   - the DOM `input` event on a field clears its inline message;
   - DOM `blur` and `alis:commit` (M4) revalidate that one field, against every container that
     holds it (a section saved on its own sits inside the whole form), and the first failing test
     shows. A message the server placed (F8) stays on `blur`: no input and no commit came since, so
     the value it judged has not changed; typing clears it and a commit re-checks the field. The form never names a component's event, so the order in which the form and the
     input's plan start does not matter, and neither does the order the containers were declared.
-- **F8 Server errors.** `showErrors(problem)` clears first. A form a plan shows server errors for is a
-  form of that plan, written as a validated form is (1.1); when no validator of the plan names it, its
-  fields are the plan's rendered inputs with no tests, so its messages are placed the same way.
-  - When `problem` is a record with `errors`, it joins each field's messages with a space (each is a
-    sentence) and matches a form field by its exact binding name, whatever its tests, then places
-    the message as F6 does. Anything else goes to the summary.
+  - The wiring follows the element, wired once whichever plan's field names it, and is released when
+    HTML around the element unmounts (`alis:unmount`, 3.5), not when the owner of that field is: a page's
+    field that a slot's content renders lets go of that content's element when the slot unloads.
+- **F8 Server errors.** `showErrors(problem)` clears first: the inline message of every field of the
+  form and of every mounted input inside the container (M7), and the summary. A form a plan shows server
+  errors for is a form of that plan (1.1); when no validator of the plan names it, it has no fields. A
+  container not on the page is a boundary error (3.4), as in M1.
+  - When `problem` is a record with `errors`, it joins each name's messages with a space (each is a
+    sentence) and places them beside the mounted input inside the container with that exact binding
+    name, whichever plan rendered it (the page, a partial, an editor template, a slot's content), as F6
+    does; a name no such input binds, or whose slot cannot render, goes to the summary. Of two inputs
+    inside one container with one binding name, the message goes beside the one contributed last, the
+    one a request sends (M2).
   - When `problem` is not a record (an empty or non-JSON body), it logs `server-errors.not-a-record`
     and shows nothing: the server said nothing the form can place.
-- **F9 Composition.** Tests from plans that share a `planId` are joined per owner. A slot's load or
-  unload removes exactly its own tests and subscriptions, then clears and hides the summary of the
-  plans it touched (the form plugin's contribution in `Alis.Reactive.Assets/runtime/plugins/form/form.ts`). Content the server rendered inside a slot's container
+- **F9 Composition.** The tests every plan writes for a container are joined per owner, whatever the
+  plan's `planId`. A slot's load or unload removes exactly its own tests and subscriptions, then
+  clears and hides the summary of each form it touched (the form plugin's contribution in
+  `Alis.Reactive.Assets/runtime/plugins/form/form.ts`). The summary is the form's, not the slot's
+  plan's, so the form's own requests show their messages there after the slot leaves
+  (`Forms/WhenALoadedLineJoinsTheFormAndLeaves`). Content the server rendered inside a slot's container
   belongs to the slot (3.5), so a form whose steps replace each other in one slot may render its
   first step with the page: the first load or unload there removes that step's tests as it removes a
   loaded step's (`Slots/WhenASlotStartsWithServerRenderedContent`).

@@ -1,0 +1,34 @@
+@using Alis.Reactive.Framework.App.Partials
+@model DeskPage
+@{
+    ViewData["Title"] = "A double-booked reception";
+    var plan = Html.ReactivePlan<DeskPage>();
+}
+<h1>A double-booked reception</h1>
+
+@* Each slot loads the next of kin's template in a request of its own, so the server cannot refuse the second
+   copy: the page then holds the template's input twice, under one id. *@
+<form id="double-form">
+    <div id="first-kin-slot" aria-label="The first next of kin" role="group"></div>
+    <div id="second-kin-slot" aria-label="The second next of kin" role="group"></div>
+</form>
+
+<p>The reception's endpoint bound: <span id="double-saved"></span></p>
+
+@(plan.Button("add-first-kin", "Add the first next of kin")
+    .Reactive(button => button.Click, p => p.Get("/Partials/NextOfKin").Response(r => r.OnSuccess(s => s.Into("first-kin-slot")))))
+@(plan.Button("add-second-kin", "Add the second next of kin")
+    .Reactive(button => button.Click, p => p.Get("/Partials/NextOfKin").Response(r => r.OnSuccess(s => s.Into("second-kin-slot")))))
+@(plan.Button("remove-second-kin", "Remove the second next of kin")
+    .Reactive(button => button.Click, p => p.Unload("second-kin-slot")))
+@(plan.Button("save-double", "Save the visit")
+    .Reactive(button => button.Click, p => p.Post("/Partials/SaveDesk")
+        .Gather(g => g.Form())
+        .Validate<DeskRules>("double-form")
+        .Response(r => r
+            .OnSuccess<PartialsEcho>((echo, s) => s.Element("double-saved").Text.Set(echo.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("double-form")))))
+
+<section id="double-messages" aria-label="The reception's messages">
+    @Html.RenderPlan(plan)
+</section>

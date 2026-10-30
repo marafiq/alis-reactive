@@ -5,16 +5,18 @@
 }
 
 <native-vstack gap="Base">
+    <div id="shift-note-form">
     @Html.HiddenFieldFor(plan, m => m.ResidentId)
     @{ Html.InputField(plan, m => m.Note, o => o.Label("Shift Note"))
         .NativeTextArea(b => b.Rows(4).Placeholder("What happened this shift...")); }
+    </div>
 
     <native-hstack gap="Sm" align="Center">
         @(Html.NativeButton("save-shift-note-btn", "Save Note")
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SaveShiftNote", "Drawer")).Gather(g => g.Form())
+                p.Post(Url.SandboxRoute("SaveShiftNote", "Drawer")).Gather(g => g.Form("shift-note-form"))
                  .Response(r => r.OnSuccess<ShiftNoteSaved>((json, s) =>
                  {
                      s.Element("shift-note-status").Text.Set(json.Get(x => x.Confirmation));
@@ -27,7 +29,7 @@
                 p.Confirm("Discharge Margaret Hill from the community?")
                  .Then(then =>
                  {
-                     then.Post(Url.SandboxRoute("DischargeResident", "Drawer")).Gather(g => g.Form())
+                     then.Post(Url.SandboxRoute("DischargeResident", "Drawer")).Gather(g => g.Form("shift-note-form"))
                          .Response(r => r.OnSuccess<ResidentDischarged>((json, s) =>
                          {
                              s.Element("shift-note-status").Text.Set(json.Get(x => x.Confirmation));

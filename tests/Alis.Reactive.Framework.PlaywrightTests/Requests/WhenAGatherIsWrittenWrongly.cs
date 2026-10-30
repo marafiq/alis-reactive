@@ -68,7 +68,7 @@ public sealed class WhenAGatherIsWrittenWrongly : AppPageTest
     {
         await Render("/Requests/Refused?mistake=NameNoInput");
 
-        await Expect(Message("Form(..) takes at least one field; Form() sends every input.")).ToBeVisibleAsync();
+        await Expect(Message("Form(..) takes at least one field; Form() sends the inputs of the form the request validates.")).ToBeVisibleAsync();
     }
 
     [Test]

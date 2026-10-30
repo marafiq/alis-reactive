@@ -7,13 +7,13 @@
     // The card's plan is its save button's own, so it composes with no other card's.
     var plan = Html.ElementPlan<ContactCard>($"save-{slug}");
 }
-<section aria-label="The @heading">
+<section id="@(slug)-card" aria-label="The @heading">
     <h2>The @heading</h2>
     @{ Html.InputField(plan, m => m.Name, o => o.Label($"The {heading}'s name")).Entry(); }
 
     @(plan.Button($"save-{slug}", $"Save the {heading}")
         .Reactive(button => button.Click, p => p.Post("/Plans/Contacts")
-            .Gather(g => g.Form())
+            .Gather(g => g.Form($"{slug}-card"))
             .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element($"{slug}-saved").Text.Set(saved.Get(x => x.Summary))))))
     <p>The endpoint bound: <span id="@(slug)-saved"></span></p>
     <p>The card's plan merges into another: <span id="@(slug)-plan-merges">@(plan.IsPartial ? "yes" : "no")</span></p>

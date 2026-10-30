@@ -230,7 +230,7 @@ namespace Alis.Reactive.Grammar
 
         public string Kind => "form";
 
-        /// <summary>The element id of the plan's validation summary.</summary>
+        /// <summary>The element id of the form's validation summary, <c>{formId}_validation_summary</c>, which the server renders.</summary>
         public string Summary { get; }
 
         public IReadOnlyList<FormField> Fields { get; }

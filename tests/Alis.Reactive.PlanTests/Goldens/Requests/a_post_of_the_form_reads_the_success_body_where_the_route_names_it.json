@@ -26,7 +26,7 @@
     "$model": {
       "kind": "plugin",
       "name": "alis.model",
-      "key": "Alis.Reactive.PlanTests.Support.Admission",
+      "key": "",
       "data": {
         "kind": "model",
         "inputs": {
@@ -64,6 +64,14 @@
       "kind": "plugin",
       "name": "alis.http",
       "key": "",
+      "data": {
+        "kind": "none"
+      }
+    },
+    "$inputs:admission": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "admission",
       "data": {
         "kind": "none"
       }
@@ -126,7 +134,7 @@
                       "kind": "call",
                       "target": {
                         "kind": "obj",
-                        "id": "$model"
+                        "id": "$inputs:admission"
                       },
                       "path": [
                         "fill"
@@ -155,7 +163,7 @@
                           "kind": "get",
                           "target": {
                             "kind": "obj",
-                            "id": "$model"
+                            "id": "$inputs:admission"
                           },
                           "path": [
                             "arrays"

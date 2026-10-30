@@ -21,7 +21,7 @@
     "$model": {
       "kind": "plugin",
       "name": "alis.model",
-      "key": "Alis.Reactive.PlanTests.Support.Contact",
+      "key": "",
       "data": {
         "kind": "model",
         "inputs": {

@@ -120,10 +120,19 @@ describe("requests", () => {
     expect(sent[0]).toMatchObject({ method: "GET", url: "/residents/1042?Wing=Garden" });
   });
 
+  // The view lays the form out: the inputs inside the element the request's Form(formId) names.
+  function formHolding(formId: string, inputs: HTMLElement[]): void {
+    const form = document.createElement("form");
+    form.id = formId;
+    document.body.appendChild(form);
+    for (const held of inputs) form.appendChild(held);
+  }
+
   it("a POST of the form sends the input's value and reads the success body", async () => {
     const plan = authored("Requests", "a_post_of_the_form_reads_the_success_body_where_the_route_names_it");
     const sent = server({ "/admit": { json: { confirmation: "ADM-7" } } });
     const elements = mount(plan);
+    formHolding("admission", [input(elements, "Name")]);
     type(input(elements, "Name"), "Helen");
     startOwner(Owner.page(), [plan]);
     await vi.waitFor(() => expect(elements["status"]!.textContent).toBe("ADM-7"));
@@ -134,6 +143,7 @@ describe("requests", () => {
     const plan = authored("Shapes", "an_input_binds_under_the_shape_mvc_binds_its_member_with");
     const sent = server();
     const elements = mount(plan);
+    formHolding("vitals", ["Weight", "MeasuredOn", "RecordedAt", "Notes"].map(member => input(elements, member)));
     type(input(elements, "Weight"), "70");
     type(input(elements, "MeasuredOn"), "2026-10-27");
     type(input(elements, "RecordedAt"), "2026-10-27T05:30:00Z");
@@ -146,8 +156,8 @@ describe("requests", () => {
 
 describe("validation", () => {
   // The view lays the form out: the input inside the container the plan validates, an error slot
-  // beside it, and the page's summary.
-  function layOut(elements: Record<string, HTMLElement>, planId: string): { error: HTMLElement } {
+  // beside it, and the form's summary.
+  function layOut(elements: Record<string, HTMLElement>): { error: HTMLElement } {
     const container = elements["admission"]!;
     const name = input(elements, "Name");
     container.appendChild(name);
@@ -155,7 +165,7 @@ describe("validation", () => {
     error.id = `${name.id}_error`;
     container.appendChild(error);
     const summary = document.createElement("div");
-    summary.id = `${planId.replaceAll(".", "_")}_validation_summary`;
+    summary.id = `${container.id}_validation_summary`;
     document.body.append(summary);
     return { error };
   }
@@ -164,7 +174,7 @@ describe("validation", () => {
     const plan = authored("Validation", "a_check_the_browser_can_make_lands_on_the_input_that_renders_the_member");
     const sent = server();
     const elements = mount(plan);
-    const { error } = layOut(elements, plan.planId);
+    const { error } = layOut(elements);
     startOwner(Owner.page(), [plan]);
     await vi.waitFor(() => expect(error.textContent).toBe("Name the resident."));
     expect(input(elements, "Name").classList.contains("alis-has-error")).toBe(true);
@@ -175,7 +185,7 @@ describe("validation", () => {
     const plan = authored("Validation", "a_check_the_browser_can_make_lands_on_the_input_that_renders_the_member");
     const sent = server();
     const elements = mount(plan);
-    const { error } = layOut(elements, plan.planId);
+    const { error } = layOut(elements);
     type(input(elements, "Name"), "Helen");
     startOwner(Owner.page(), [plan]);
     await vi.waitFor(() => expect(sent).toHaveLength(1));

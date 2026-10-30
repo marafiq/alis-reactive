@@ -32,7 +32,9 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     private ConcurrentQueue<string> _finishesSent = null!;
     private ConcurrentQueue<string> _nurseReviewsSent = null!;
 
-    private ILocator ValidationSummary => Page.Locator("[data-reactive-validation-summary]");
+    // The intake form and the nurse's care needs are two forms, each with a summary of its own.
+    private ILocator IntakeSummary => Page.Locator("#intake-form_validation_summary");
+    private ILocator VisibleSummaries => Page.Locator("[data-reactive-validation-summary]:visible");
     private ILocator StepHeading => Page.Locator("#intake-step h2");
     private ILocator ResidentName => Input(m => m.ResidentName);
     private ILocator FamilyPhone => Input(m => m.FamilyPhone);
@@ -116,7 +118,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
             Assert.That(body.RootElement.GetProperty("MobilityAid").GetString(), Is.EqualTo("Walker"), finish.PostData);
         }
         await Expect(IntakeStatus).ToHaveTextAsync("Assisted living intake saved for Jane Smith.", new() { Timeout = 5000 });
-        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(VisibleSummaries).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 
@@ -130,7 +132,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
 
         await Expect(_plan.ErrorFor(m => m.CareLevel)).ToHaveTextAsync("Choose a care level.");
         // The mobility questions are not on the page yet, so what they need is said in the summary.
-        await Expect(ValidationSummary).ToHaveTextAsync(MobilityAidMissing);
+        await Expect(IntakeSummary).ToHaveTextAsync(MobilityAidMissing);
         await Expect(IntakeStatus).ToHaveTextAsync("No intake saved yet.");
         Assert.That(_finishesSent, Is.Empty, "A care step without a care level may not be sent.");
         AssertNoConsoleErrors();
@@ -151,7 +153,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
 
         await ClickWhenStable(FinishIntake);
 
-        await Expect(ValidationSummary).ToHaveTextAsync(MobilityAidMissing);
+        await Expect(IntakeSummary).ToHaveTextAsync(MobilityAidMissing);
         await Expect(_plan.ErrorFor(m => m.CareLevel)).ToHaveTextAsync("");
         Assert.That(_finishesSent, Is.Empty, "An intake whose mobility questions have not arrived is not sent.");
 
@@ -160,7 +162,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await MobilityAid.SelectOptionAsync("Cane");
         await ClickWhenStable(FinishIntake);
         await Expect(IntakeStatus).ToHaveTextAsync("Assisted living intake saved for Jane Smith.", new() { Timeout = 5000 });
-        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(VisibleSummaries).ToHaveCountAsync(0);
         Assert.That(_finishesSent, Has.Count.EqualTo(1), "Only the complete intake is sent.");
         AssertNoConsoleErrors();
     }
@@ -175,7 +177,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await ClickWhenStable(AskNurseToReview);
 
         await Expect(NurseReviewStatus).ToHaveTextAsync("Not sent to the nurse yet.");
-        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(VisibleSummaries).ToHaveCountAsync(0);
         await Expect(StepHeading).ToHaveTextAsync("Step 1 of 2: Resident");
 
         await CompleteResidentStep("Jane Smith");
@@ -198,7 +200,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
 
         await Expect(_plan.ErrorFor(m => m.CareLevel)).ToHaveTextAsync(NoOpenRoom, new() { Timeout = 5000 });
         await Expect(CareLevel).ToHaveClassAsync(new Regex(@"\balis-has-error\b"));
-        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(VisibleSummaries).ToHaveCountAsync(0);
         await Expect(IntakeStatus).ToHaveTextAsync("No intake saved yet.");
 
         await ChooseCareLevelAndAid("Assisted living", "Walker");
@@ -238,9 +240,9 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await ClickWhenStable(FinishIntake);
 
         // The care step does not check the phone in the browser, so the server answers with the
-        // resident step's rule, in the same words.
-        await Expect(ValidationSummary).ToHaveTextAsync(FamilyPhoneFormat, new() { Timeout = 5000 });
-        await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToHaveTextAsync("");
+        // resident step's rule, in the same words, beside the phone the care step renders.
+        await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToHaveTextAsync(FamilyPhoneFormat, new() { Timeout = 5000 });
+        await Expect(VisibleSummaries).ToHaveCountAsync(0);
         await Expect(IntakeStatus).ToHaveTextAsync("No intake saved yet.");
         Assert.That(_finishesSent, Has.Count.EqualTo(1), "The care step leaves the family phone to the server.");
 
@@ -248,7 +250,7 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await Page.Keyboard.PressAsync("Tab");
         await ClickWhenStable(FinishIntake);
         await Expect(IntakeStatus).ToHaveTextAsync("Assisted living intake saved for Jane Smith.", new() { Timeout = 5000 });
-        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(VisibleSummaries).ToHaveCountAsync(0);
         Assert.That(_finishesSent, Has.Count.EqualTo(2));
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }

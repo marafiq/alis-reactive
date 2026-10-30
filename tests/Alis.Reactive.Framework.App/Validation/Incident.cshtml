@@ -23,7 +23,7 @@
 @(plan.Button("ask-desk", "Ask the desk to file it")
     .Reactive(button => button.Click, p => p.Post("/Validation/Incident")
         .AsFormData()
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("incident-form"))
         .Response(r => r
             .OnSuccess<Booked>((filed, s) => s.Element("filed").Text.Set(filed.Get(x => x.Summary)))
             .OnError(400, e => e.ValidationErrors("incident-form")))))

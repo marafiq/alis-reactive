@@ -11,7 +11,7 @@
 
     @(plan.Button("book-companion", "Book the companion")
         .Reactive(button => button.Click, p => p.Post("/Plans/Visits")
-            .Gather(g => g.Form())
+            .Gather(g => g.Form("companion-card"))
             .Response(r => r.OnSuccess<Booked>((booked, s) => s.Element("companion-booked").Text.Set(booked.Get(x => x.Summary))))))
 </section>
 

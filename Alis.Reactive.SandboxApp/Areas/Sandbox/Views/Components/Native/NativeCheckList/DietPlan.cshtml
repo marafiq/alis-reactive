@@ -14,15 +14,17 @@
 
     <native-card><native-card-body>
         <native-vstack gap="Base">
+            <div id="diet-plan-form">
             @Html.HiddenFieldFor(plan, m => m.ResidentId)
             @{ Html.InputField(plan, m => m.DietaryRestrictions, o => o.Label("Dietary Restrictions"))
                 .NativeCheckList(b => b.Items(restrictionOptions)); }
+            </div>
 
             @(Html.NativeButton("save-diet-plan-btn", "Save Diet Plan")
                 .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                 {
-                    p.Post(Url.SandboxRoute("SaveDietPlan", "NativeCheckList")).Gather(g => g.Form())
+                    p.Post(Url.SandboxRoute("SaveDietPlan", "NativeCheckList")).Gather(g => g.Form("diet-plan-form"))
                      .Response(r => r.OnSuccess<DietPlanSaved>((json, s) =>
                      {
                          s.Element("diet-plan-status").Text.Set(json.Get(x => x.Confirmation));

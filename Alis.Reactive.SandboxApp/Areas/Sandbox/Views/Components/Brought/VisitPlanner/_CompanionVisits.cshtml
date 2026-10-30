@@ -18,17 +18,19 @@
             }))));
 }
 
+<div id="companion-visits">
 <native-vstack gap="Sm">
     @{ Html.InputField(plan, m => m.VisitSlots, o => o.Label("Companion's visit times"))
         .VisitPlanner(capacity: 1)
         .Reactive(evt => evt.WeekChanged, (args, p) =>
         {
             p.Element("companion-planned").Text.Set(args.Count);
-            p.Post(Url.SandboxRoute("CompanionHold", "VisitPlanner")).Gather(g => g.Form())
+            p.Post(Url.SandboxRoute("CompanionHold", "VisitPlanner")).Gather(g => g.Form("companion-visits"))
                 .Response(r => r.OnSuccess<CompanionHoldResponse>((hold, s) =>
                     s.Element("companion-held").Text.Set(hold.Get(x => x.Held))));
         }); }
     <native-text color="Secondary">Companion's visits planned: <span id="companion-planned">0</span> · Front desk holds: <span id="companion-held">nothing yet</span></native-text>
 </native-vstack>
+</div>
 
 @Html.RenderPlan(plan)

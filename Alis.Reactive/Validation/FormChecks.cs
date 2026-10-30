@@ -56,9 +56,8 @@ namespace Alis.Reactive.Validation
                 .Where(path => path != null)
                 .Select(path => path!)
                 .ToList();
-            // A checked member is carried whether or not this plan renders it (a partial or the member's editor template may)
-            // and whether or not the browser can check it: a message the server sends for it then lands
-            // beside its input wherever the input is.
+            // A checked member is carried whether or not this plan renders it (a partial or the member's editor
+            // template may) and whether or not the browser can check it.
             var bound = new List<CheckedField>();
             foreach (var field in fields)
             {
@@ -69,20 +68,6 @@ namespace Alis.Reactive.Validation
                     Join(bound, values.Check(itemField));
             }
             return bound;
-        }
-
-        /// <summary>
-        /// The inputs a form no validator of the plan names places the server's messages on: every input the plan
-        /// rendered, named as it binds, with no check of the browser's.
-        /// </summary>
-        internal static IEnumerable<CheckedField> Rendered(
-            IReadOnlyDictionary<string, RenderedInput> renderedInputs,
-            Type modelType,
-            string fieldPrefix)
-        {
-            var values = new FormFieldValues(renderedInputs, fieldPrefix);
-            return renderedInputs.Values.Select(input =>
-                new CheckedField(input.ComponentId, input.BindingPath, input.Shape, Array.Empty<BrowserRule>(), values));
         }
 
         // Several rules on one collection each name its items: an item's field carries the checks of all of them.

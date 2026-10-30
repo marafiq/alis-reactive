@@ -25,7 +25,7 @@
             }))))
 @(plan.Button("ask-kitchen", "Ask the kitchen to make it")
     .Reactive(button => button.Click, p => p.Post("/Validation/GuestMeal")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("meal-form"))
         .Response(r => r
             .OnSuccess<Booked>((ordered, s) => s.Element("meal-status").Text.Set(ordered.Get(x => x.Summary)))
             .OnError(400, e =>

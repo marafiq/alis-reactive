@@ -118,6 +118,30 @@ namespace Alis.Reactive.Builders
                 HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
 
         /// <summary>
+        /// A member of this plan's model as MVC binds it: the input rendered for it, whichever view rendered it,
+        /// read as the server binds what it posts; missing when no input on the page renders the member, as the
+        /// server sees a member no input posts.
+        /// </summary>
+        /// <remarks>
+        /// It reads a member a partial renders only sometimes, conditionally or loaded later, where a component
+        /// read fails because the component is not on the page:
+        /// <c>p.When(p.Bound(m =&gt; m.NextOfKin.Name)).IsNull()</c>. It is the read the form's rules and named
+        /// sends make, so the page judges the member as they do.
+        /// </remarks>
+        /// <typeparam name="TProp">The member's type.</typeparam>
+        /// <param name="member">
+        /// The model member; its input's id is derived as the input field derives it, from the class that declares
+        /// the member and the member's path under the view's field prefix: <c>m =&gt; m.NextOfKin.Name</c>.
+        /// </param>
+        /// <returns>The bound value, a source for any reaction, condition or request.</returns>
+        public TypedSource<TProp> Bound<TProp>(Expression<Func<TModel, TProp>> member)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            var binding = HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberBindingPath(member));
+            return new Conditions.BoundValue<TProp>(IdGenerator.ForMember(ExpressionPathHelper.ToDeclarer(member), binding.Value));
+        }
+
+        /// <summary>
         /// The component a view of another model rendered for one of its members with no field prefix, such as
         /// a partial rendered at the top level. The id is derived as the input field derives it, from the class
         /// that declares the member and the member's path; an input a partial rendered under a prefix is reached
@@ -209,9 +233,10 @@ namespace Alis.Reactive.Builders
         /// error route of the request that received them: <c>.OnError(400, e =&gt; e.ValidationErrors(FormId))</c>.
         /// </summary>
         /// <remarks>
-        /// A message goes beside the input the plan rendered for the member the server names, and to the plan's
-        /// summary when the plan renders none. The form need not be validated: a form no request validates
-        /// places the server's messages on the inputs the plan rendered.
+        /// A message goes beside the mounted input inside the form that binds the name the server reports it under,
+        /// whichever plan rendered it (the page, a partial, an editor template, a slot's content), and to the
+        /// form's summary (<c>{formId}_validation_summary</c>) when no such input shows it. The form need not be
+        /// validated.
         /// </remarks>
         /// <param name="formId">The element that holds the form's inputs.</param>
         /// <returns>This pipeline builder.</returns>

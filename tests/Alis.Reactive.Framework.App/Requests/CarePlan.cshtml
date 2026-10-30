@@ -7,7 +7,9 @@
 }
 <h1>A care plan</h1>
 
-@{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care plan")).FilePicker(); }
+<form id="care-plan-form">
+    @{ Html.InputField(plan, m => m.CarePlan, o => o.Label("Care plan")).FilePicker(); }
+</form>
 
 <dl>
     <dt>Checked</dt><dd id="checked"></dd>
@@ -32,7 +34,7 @@
     }))
 @(plan.Button("send", "Send the care plan")
     .Reactive(button => button.Click, p => p.Post("/Requests/CarePlans")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("care-plan-form"))
         .AsFormData()
         .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
 @(plan.Button("send-sequence", "Send the care plan as a sequence")
@@ -57,7 +59,7 @@
         tally.Add(1);
         p.Element("lookup-tried").Text.Set(tally.Total);
         p.Get("/Requests/CarePlans/Lookup")
-            .Gather(g => g.Form())
+            .Gather(g => g.Form("care-plan-form"))
             .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("looked-up").Text.Set(echo.Get(x => x.Summary))));
         p.Element("lookup-after").Text.Set(tally.Total);
     }))
@@ -67,7 +69,7 @@
         tally.Add(1);
         p.Element("json-tried").Text.Set(tally.Total);
         p.Post("/Requests/CarePlans/Json")
-            .Gather(g => g.Form())
+            .Gather(g => g.Form("care-plan-form"))
             .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("posted-json").Text.Set(echo.Get(x => x.Summary))));
         p.Element("json-after").Text.Set(tally.Total);
     }))

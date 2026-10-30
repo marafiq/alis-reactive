@@ -13,7 +13,7 @@
     </native-text>
 
     <native-card><native-card-body>
-        <form class="mb-4">
+        <form id="care-level-form" class="mb-4">
             @Html.HiddenFieldFor(plan, m => m.ResidentId)
             @Html.HiddenFieldFor(plan, m => m.RequiresPhysicianSignOff)
             @{ Html.InputField(plan, m => m.RequestedCareLevel, o => o.Label("New Care Level"))
@@ -23,7 +23,7 @@
             .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(Url.SandboxRoute("SubmitCareLevelChange", "NativeHiddenField")).Gather(g => g.Form())
+                p.Post(Url.SandboxRoute("SubmitCareLevelChange", "NativeHiddenField")).Gather(g => g.Form("care-level-form"))
                  .Response(r => r.OnSuccess<CareLevelChangeConfirmation>((json, s) =>
                  {
                      s.Element("care-level-change-status").Text.Set(json.Get(x => x.Confirmation));

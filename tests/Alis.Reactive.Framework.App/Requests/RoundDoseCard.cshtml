@@ -12,7 +12,7 @@
     @* A JSON body names a list position by a number, so an entry keyed by a number is posted as form data. *@
     @(plan.Button("record-dose", "Record the dose")
         .Reactive(button => button.Click, p => p.Post("/Requests/Rounds")
-            .Gather(g => g.Form())
+            .Gather(g => g.Form("dose-card"))
             .AsFormData()
             .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("dose-bound").Text.Set(echo.Get(x => x.Summary))))))
 </section>

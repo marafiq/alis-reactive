@@ -3,8 +3,9 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 /// <summary>
 /// A page edits a member of its model through the member's editor template, a partial of the member's own
 /// model rendered under the member's prefix (ADR-0003 rule 1: an input's id follows its member). The page
-/// reads the template's input by the member, and a rule of the page's validator on the member, the browser's
-/// or the server's, shows its message beside the template's field.
+/// reads the template's input by the member, a rule of the page's validator on the member, the browser's or the
+/// server's, checks what the template holds and shows its message beside the template's field, and the page's
+/// save sends the template's input with the form that holds it (rules 2 and 3).
 /// </summary>
 [TestFixture]
 public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
@@ -28,7 +29,7 @@ public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
 
     private ILocator KinField => Page.Locator("#kin-card > div").Filter(new() { Has = Input("Next of kin") });
 
-    private ILocator DeskSummary => Page.Locator("#desk-messages [data-reactive-validation-summary]");
+    private ILocator SummaryOf(string formId) => Page.Locator($"#{formId}_validation_summary");
 
     [Test]
     public async Task the_page_reads_the_templates_input_by_the_member()
@@ -49,7 +50,7 @@ public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
         await Button("Save the desk").ClickAsync();
 
         await Expect(KinField.GetByText("Name the next of kin.")).ToBeVisibleAsync();
-        await Expect(DeskSummary).ToBeHiddenAsync();
+        await Expect(SummaryOf("desk-form")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -61,11 +62,10 @@ public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
         await Button("Check the next of kin on file").ClickAsync();
 
         await Expect(KinField.GetByText("That name is not on the resident's file.")).ToBeVisibleAsync();
-        await Expect(DeskSummary).ToBeHiddenAsync();
+        await Expect(SummaryOf("kin-section")).ToBeHiddenAsync();
     }
 
-    // The page's rule reads the template's input through alis.model, which keys inputs by plan id today.
-    [Test, Explicit("ADR-0003 wave 2: the model table by id")]
+    [Test]
     public async Task the_pages_rule_on_the_member_checks_what_the_template_holds()
     {
         await Open("/Partials/Desk");
@@ -78,8 +78,7 @@ public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
         lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
     }
 
-    // The page's Form() sends its own plan's inputs, and its rule reads the template's through the plan id, today.
-    [Test, Explicit("ADR-0003 wave 2: the model table by id")]
+    [Test]
     public async Task the_pages_save_sends_what_the_members_template_rendered()
     {
         await Open("/Partials/Desk");

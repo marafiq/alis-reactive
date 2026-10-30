@@ -27,7 +27,7 @@
 @(plan.Button("ask-desk", "Ask the desk to file it")
     .Reactive(button => button.Click, p => p.Post("/Validation/Unphotographed")
         .AsFormData()
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("unphotographed-form"))
         .Response(r => r
             .OnSuccess<Booked>((filed, s) => s.Element("report-status").Text.Set(filed.Get(x => x.Summary)))
             .OnError(400, e =>

@@ -26,6 +26,7 @@
         </native-text>
     </div>
 
+    <div id="move-in-packet">
     <native-card><native-card-body>
         <native-vstack gap="Base">
             <native-heading level="H2">Resident</native-heading>
@@ -46,13 +47,13 @@
                 @(Html.NativeButton("save-packet", "Save the packet")
                     .CssClass(ButtonSubmit)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
-                        p.Post(Url.SandboxRoute("SavePacket", "MoveInContacts")).Gather(g => g.Form())
+                        p.Post(Url.SandboxRoute("SavePacket", "MoveInContacts")).Gather(g => g.Form("move-in-packet"))
                             .Response(r => r.OnSuccess<ContactsSaved>((saved, s) =>
                                 s.Element("packet-status").Text.Set(saved.Get(x => x.Confirmation))))))
                 @(Html.NativeButton("send-form", "Send the packet as a form")
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
-                        p.Post(Url.SandboxRoute("SaveForm", "MoveInContacts")).Gather(g => g.Form()).AsFormData()
+                        p.Post(Url.SandboxRoute("SaveForm", "MoveInContacts")).Gather(g => g.Form("move-in-packet")).AsFormData()
                             .Response(r => r.OnSuccess<ContactsSaved>((saved, s) =>
                                 s.Element("form-status").Text.Set(saved.Get(x => x.Confirmation))))))
             </native-hstack>
@@ -60,6 +61,7 @@
             <native-text>Sent as a form: <span id="form-status">not yet</span></native-text>
         </native-vstack>
     </native-card-body></native-card>
+    </div>
 
     <native-card><native-card-body>
         <native-vstack gap="Base">

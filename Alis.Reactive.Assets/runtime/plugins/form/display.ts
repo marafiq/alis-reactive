@@ -1,5 +1,5 @@
 // Validation messages live in generated HTML: an inline slot {id}_error beside each field and one
-// summary per plan. These helpers reach them by ID only.
+// summary per form, which the server renders. These helpers reach them by ID only.
 
 const ERR_CLASS = "alis-has-error";
 

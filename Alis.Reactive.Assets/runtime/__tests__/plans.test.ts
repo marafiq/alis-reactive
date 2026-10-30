@@ -154,7 +154,7 @@ describe("slots", () => {
     )]);
     expect(pageRuns.textContent).toBe("1");
 
-    const slot = slotPlugin.object("panel") as { load(html: string): void };
+    const slot = slotPlugin.object("panel", { kind: "none" }) as { load(html: string): void };
     slot.load(slotPlanHtml("from the slot"));
     expect(document.getElementById("inside")?.textContent).toBe("loaded");
     expect(panel.querySelector("[data-reactive-plan]")).toBeNull();
@@ -175,7 +175,7 @@ describe("slots", () => {
     document.addEventListener("alis:unmount", onUnmount);
     document.addEventListener("alis:mount", onMount);
 
-    (slotPlugin.object("panel") as { load(html: string): void }).load("<p>new</p>");
+    (slotPlugin.object("panel", { kind: "none" }) as { load(html: string): void }).load("<p>new</p>");
     document.removeEventListener("alis:unmount", onUnmount);
     document.removeEventListener("alis:mount", onMount);
     expect(seen).toEqual(["unmount:<p>old</p>", "mount:<p>new</p>"]);
@@ -186,7 +186,7 @@ describe("slots", () => {
     outer.id = "outer";
     document.body.appendChild(outer);
     const status = paragraph("status");
-    const slots = (id: string) => slotPlugin.object(id) as { load(html: string): void; unload(): void };
+    const slots = (id: string) => slotPlugin.object(id, { kind: "none" }) as { load(html: string): void; unload(): void };
     const innerPlan = plan(
       { document: plugin("alis.document"), status: element("status") },
       [on("document", "shiftChanged", setText("status", e.get(e.ref("e"), ["shift"])))],
@@ -220,7 +220,7 @@ describe("slots", () => {
     const grid = fakeWidget("roster");
     const slotPlan = plan({ roster: element("roster", "fake") }, [on("roster", "rowSelected")]);
     const html = `<script type="application/json" data-reactive-plan>${JSON.stringify(slotPlan)}</script>`;
-    const slot = slotPlugin.object("panel") as { load(html: string): void; unload(): void };
+    const slot = slotPlugin.object("panel", { kind: "none" }) as { load(html: string): void; unload(): void };
 
     slot.load(html);
     slot.load(html);

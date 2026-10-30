@@ -37,7 +37,7 @@
 
 @(plan.Button("ask-desk", "Ask the desk what is wrong")
     .Reactive(button => button.Click, p => p.Post("/Validation/Book/Failures")
-        .Gather(g => g.Form())
+        .Gather(g => g.Form("visit-form"))
         .Response(r => r.OnSuccess<Booked>((said, s) => s.Element("failures").Text.Set(said.Get(x => x.Summary))))))
 
 @Html.RenderPlan(plan)

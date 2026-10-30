@@ -19,8 +19,8 @@ export interface Contribution {
 }
 
 export interface Plugin {
-  /** The object for a key: the singleton when the key is empty. */
-  object(key: string): unknown;
+  /** The object for a key, with the data the plan that names it wrote for it: the singleton when the key is empty. */
+  object(key: string, data: PluginData): unknown;
   /** A plan's data under its owner; the plugin joins contributions per key and registers disposers on the owner. */
   contribute?(contribution: Contribution): void;
   /** Subscribes a handler to one of the key's events, under its owner. */

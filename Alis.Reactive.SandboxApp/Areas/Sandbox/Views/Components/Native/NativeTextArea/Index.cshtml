@@ -18,6 +18,7 @@
 
     <native-card><native-card-body>
         <native-vstack gap="Base">
+            <div id="handover-form" class="flex flex-col gap-4">
             @{ Html.InputField(plan, m => m.HandoverNote, o => o.Label("Handover for the night nurse"))
                 .NativeTextArea(b => b.Rows(8).Placeholder("How the shift went, resident by resident").CssClass(Field)); }
 
@@ -36,6 +37,7 @@
                             incident.Element("incident-flag").Show();
                             incident.Element("incident-none").Hide();
                         })); }
+            </div>
             <p id="incident-none" class="text-sm text-text-muted">No incidents this shift.</p>
             <p id="incident-flag" hidden class="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
                 The night nurse reads this first: <span id="incident-flag-text"></span>
@@ -61,7 +63,7 @@
                                 empty.Element("handover-status").Text.Set("Write the handover before sending it.");
                                 empty.Component<NativeTextArea>(m => m.HandoverNote).Focus();
                             })
-                            .Else(written => written.Post(Url.SandboxRoute("Send", "NativeTextArea")).Gather(g => g.Form())
+                            .Else(written => written.Post(Url.SandboxRoute("Send", "NativeTextArea")).Gather(g => g.Form("handover-form"))
                                 .Response(r => r.OnSuccess<ShiftHandoverSent>((sent, s) =>
                                     s.Element("handover-status").Text.Set(sent.Get(x => x.Message)))));
                     }))
