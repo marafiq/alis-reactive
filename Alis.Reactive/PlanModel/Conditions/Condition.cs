@@ -184,11 +184,7 @@ namespace Alis.Reactive.PlanModel
 
         internal override Condition PrefixedBy(string prefix) => new MemberTest(_field.PrefixedBy(prefix), _test);
 
-        internal override Condition Bound(FormFieldValues fields)
-        {
-            var input = fields.Resolve(_field);
-            return _test(ValueExpression.ReadBound(input.Id, Shape.None), input.Shape);
-        }
+        internal override Condition Bound(FormFieldValues fields) => _test(fields.Value(_field), _field.Shape);
 
         internal override Expr Write(Scope scope) =>
             throw new InvalidOperationException($"The test of '{_field.Path}' is bound to the form's inputs before it is written.");

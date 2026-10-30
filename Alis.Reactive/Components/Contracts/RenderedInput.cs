@@ -47,9 +47,6 @@ namespace Alis.Reactive
     {
         private readonly Dictionary<string, RenderedInput> _inputs = new Dictionary<string, RenderedInput>(StringComparer.Ordinal);
 
-        internal IReadOnlyDictionary<string, RenderedInput> Snapshot() =>
-            new Dictionary<string, RenderedInput>(_inputs, StringComparer.Ordinal);
-
         internal IReadOnlyList<KeyValuePair<string, RenderedInput>> Entries =>
             new List<KeyValuePair<string, RenderedInput>>(_inputs);
 

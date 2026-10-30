@@ -236,31 +236,32 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<FormField> Fields { get; }
     }
 
-    /// <summary>A field of a form: its element, the name the server reports errors under, its value and tests.</summary>
+    /// <summary>
+    /// A field of a form: the binding name the server reports errors under, and its tests. An item's name stands
+    /// for every item, each <c>[*]</c> for an index (<c>Lines[*].Qty</c>): the form checks each mounted input the
+    /// name names (grammar.md F1).
+    /// </summary>
     internal sealed class FormField
     {
-        internal FormField(string id, string name, Expr value, IReadOnlyList<FormTest> tests)
+        internal FormField(string name, IReadOnlyList<FormTest> tests)
         {
-            if (string.IsNullOrEmpty(id)) throw new ArgumentException("Field id required.", nameof(id));
-            Id = id;
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Value = value ?? throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrEmpty(name)) throw new ArgumentException("Field name required.", nameof(name));
+            Name = name;
             Tests = tests ?? throw new ArgumentNullException(nameof(tests));
         }
 
-        public string Id { get; }
         public string Name { get; }
-        public Expr Value { get; }
         public IReadOnlyList<FormTest> Tests { get; }
     }
 
     /// <summary>
-    /// A test of a field: the check its value must pass while the condition holds. The rule names
-    /// the declaration it came from, for traces; the check alone decides.
+    /// A test of a field: the check its value must pass while the condition holds, each a lambda of the indexes
+    /// of the item it checks (<c>check(v, i)</c>, <c>when(i)</c>). The rule names the declaration it came from,
+    /// for traces; the check alone decides.
     /// </summary>
     internal sealed class FormTest
     {
-        internal FormTest(string rule, FnExpr check, Expr when, string message)
+        internal FormTest(string rule, FnExpr check, FnExpr when, string message)
         {
             if (string.IsNullOrEmpty(rule)) throw new ArgumentException("Rule name required.", nameof(rule));
             Rule = rule;
@@ -271,7 +272,7 @@ namespace Alis.Reactive.Grammar
 
         public string Rule { get; }
         public FnExpr Check { get; }
-        public Expr When { get; }
+        public FnExpr When { get; }
         public string Message { get; }
     }
 

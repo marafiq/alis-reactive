@@ -10,11 +10,10 @@
 //    is kept.
 // M4 Each input's `committed` event is re-raised on its element as alis:commit, once per element and
 //    for as long as its owner lives. The plan that renders an input contributes it, so the widget
-//    exists by then, whenever the form that validates it was wired.
+//    exists by then.
 // M5 `boundValueOf(id)` on the page's table (`plugin("alis.model", "")`): the value of the mounted input
-//    with that id, whichever plan rendered it, as a binding read, for a rule, a bound read or a named
-//    gather: what validation checks, so the browser judges what the server will; missing when none is
-//    on the page.
+//    with that id, whichever plan rendered it, as a binding read, for a bound read or a named gather;
+//    missing when none is on the page.
 // M6 An id names one element. Two live entries for one id (two slots that each loaded one partial, which
 //    no single request can render) both read the element the DOM finds by that id, the first in document
 //    order; each owner's release removes only its own entry, so the other slot's input is read once the
@@ -22,6 +21,13 @@
 // M7 `ids`: the element id of each mounted input inside a container, keyed by binding name, so the form
 //    places a server message beside the input that binds the name the server reports, and clears every
 //    message inside it, whichever plan rendered the input.
+// M8 Names. A binding-name pattern names the mounted inputs whose binding name it spells, each `[*]` standing
+//    for an index: Contacts[*].Name names Contacts[0].Name and Contacts[12].Name, Tags[*] each tag. `namedInputs`
+//    lists every one on the page, with the index each `[*]` stood for, whichever plan rendered it (the form's
+//    fields, F1). `valueOf(pattern, indexes)` on a container reads, as a binding read, the input that binds the
+//    pattern at those indexes, the first `[*]` the first index: the one inside the container, else the one
+//    elsewhere on the page (a member the request sends beside the form), the one contributed last of several;
+//    missing when none is on the page, as the server sees a member no input posts.
 
 import type { InputBinding, ModelPluginData } from "../types/index";
 import type { Contribution, Plugin } from "../objects/plugins";
@@ -55,6 +61,20 @@ export interface ContainedInputs {
   readonly arrays: string[];
   /** The element id of every mounted input inside the container, keyed by MVC binding name (M7). */
   readonly ids: Record<string, string>;
+  /** The value, as MVC binds it, of the input that binds the pattern at these indexes: inside the container, else on the page (M8). */
+  valueOf(pattern: string, indexes: readonly number[]): unknown;
+}
+
+/** A mounted input a binding-name pattern names (M8). */
+export interface NamedInput {
+  readonly id: string;
+  readonly element: HTMLElement;
+  /** Its binding name, the pattern's `[*]` filled in. */
+  readonly name: string;
+  /** What each `[*]` of the pattern stood for, left to right. */
+  readonly indexes: readonly number[];
+  /** Its value as MVC binds it, read when asked. */
+  readonly value: unknown;
 }
 
 // Every live entry for an id, in the order contributed (M6).
@@ -81,18 +101,58 @@ const pageModel: PageModel = {
   },
 };
 
+/** Whether the element is a mounted input of the page's table: the element the DOM finds by its id (M6). */
+export function isMountedInput(element: HTMLElement): boolean {
+  if (element.id === "") return false;
+  return mountedInput(element.id)?.objects.element(element.id) === element;
+}
+
+/** Every mounted input on the page whose binding name the pattern names, whichever plan rendered it (M8). */
+export function namedInputs(pattern: string): NamedInput[] {
+  const names = new RegExp(`^${pattern.split("[*]").map(escapedForPattern).join("\\[(\\d+)\\]")}$`);
+  const named: NamedInput[] = [];
+  for (const id of inputsById.keys()) {
+    const input = mountedInput(id);
+    const match = input === undefined ? null : names.exec(input.binding.name);
+    if (input === undefined || match === null) continue;
+    named.push({
+      id,
+      element: input.objects.element(id)!,
+      name: input.binding.name,
+      indexes: match.slice(1).map(Number),
+      get value() { return bindInput(input); },
+    });
+  }
+  return named;
+}
+
+function escapedForPattern(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export function containedInputs(containerId: string): ContainedInputs {
+  const container = (): HTMLElement => {
+    const element = document.getElementById(containerId);
+    if (element === null) throw new Error(`[alis] form #${containerId} is not on the page`);
+    return element;
+  };
   const inside = (): ModelInput[] => {
-    const container = document.getElementById(containerId);
-    if (container === null) throw new Error(`[alis] form #${containerId} is not on the page`);
+    const holder = container();
     const held: ModelInput[] = [];
     for (const id of inputsById.keys()) {
       const input = mountedInput(id);
-      if (input !== undefined && container.contains(input.objects.element(id))) held.push(input);
+      if (input !== undefined && holder.contains(input.objects.element(id))) held.push(input);
     }
     return held;
   };
   return {
+    valueOf(pattern: string, indexes: readonly number[]) {
+      const holder = container();
+      const at = namedInputs(pattern).filter(input => input.indexes.every((index, position) => index === indexes[position]));
+      const held = at.filter(input => holder.contains(input.element));
+      const read = held.length > 0 ? held[held.length - 1] : at[at.length - 1];
+      return read?.value;
+    },
     fill(record: Record<string, unknown>) {
       for (const input of inside()) assignAt(record, input.binding.body, bindInput(input));
       return record;
