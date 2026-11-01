@@ -25,7 +25,7 @@
       <!-- AddReactiveFusion() extends IServiceCollection on both TFMs; net10 gets it from the
            ASP.NET Core framework reference. Accept the same minimum as AlisReactive.FluentValidator
            and allow newer DI versions. -->
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[9.0.0,)" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.22" />
       <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
       <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
       <Reference Include="System.Web" />
