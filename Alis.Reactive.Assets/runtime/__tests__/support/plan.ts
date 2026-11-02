@@ -11,7 +11,6 @@ export const s = {
   date: { kind: "date" } as Shape,
   instant: { kind: "instant" } as Shape,
   any: { kind: "any" } as Shape,
-  none: { kind: "none" } as Shape,
   array: (item: Shape): Shape => ({ kind: "array", item }),
   nullable: (inner: Shape): Shape => ({ kind: "nullable", inner }),
   object: (fields: Record<string, Shape>): Shape => ({ kind: "object", fields }),

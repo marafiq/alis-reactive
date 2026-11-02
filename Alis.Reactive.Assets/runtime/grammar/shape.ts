@@ -28,8 +28,7 @@ function convert(value: unknown, shape: Shape): unknown {
     case "array":    return asArrayOf(value, shape.item);
     case "object":   return asObjectOf(value, shape);
     case "nullable": return asNullable(value, shape.inner);
-    case "any":
-    case "none":     return value;
+    case "any":      return value;
     default:         return assertNever(shape, "shape");
   }
 }

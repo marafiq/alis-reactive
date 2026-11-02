@@ -8,8 +8,8 @@ namespace Alis.Reactive.Grammar
 {
     /// <summary>
     /// The type of a value in the plan, as MVC binds it (grammar.md 2.1): a scalar (string, number,
-    /// boolean, date, instant), an array of a shape, a nullable shape, an object of named shapes, any
-    /// value, or none. Ten productions, one node each, written and declared like every other node.
+    /// boolean, date, instant), an array of a shape, a nullable shape, an object of named shapes, or any
+    /// value. Nine productions, one node each, written and declared like every other node.
     /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<Shape>))]
     internal abstract class Shape : IEquatable<Shape>
@@ -20,15 +20,16 @@ namespace Alis.Reactive.Grammar
         internal static readonly Shape Date = new DateShape();
         /// <summary>A moment in time with its offset (<see cref="DateTimeOffset"/>), sent as the exact instant.</summary>
         internal static readonly Shape Instant = new InstantShape();
+        /// <summary>
+        /// A value of no declared shape, converted by nothing: a class the plan does not describe, a method
+        /// without a result, a payload without a body, a literal null.
+        /// </summary>
         internal static readonly Shape Any = new AnyShape();
-        internal static readonly Shape None = new NoneShape();
 
         private protected Shape() { }
 
         /// <summary>JSON shape kind, such as <c>string</c>, <c>array</c>, <c>object</c>, or <c>nullable</c>.</summary>
         public abstract string Kind { get; }
-
-        internal bool IsNone => this is NoneShape;
 
         /// <summary>Whether a value of this shape is a list, through a nullable wrapper too.</summary>
         internal bool DescribesArray => this is NullableShape nullable ? nullable.Inner.DescribesArray : this is ArrayShape;
@@ -54,22 +55,18 @@ namespace Alis.Reactive.Grammar
             return new ObjectShape(new ReadOnlyDictionary<string, Shape>(fields));
         }
 
-        private static Shape Wrappable(Shape shape, string parameter)
-        {
-            if (shape is null || shape.IsNone)
-                throw new ArgumentException($"The {parameter} shape is required.", parameter);
-            return shape;
-        }
+        private static Shape Wrappable(Shape shape, string parameter) =>
+            shape ?? throw new ArgumentNullException(parameter);
 
         internal bool TryGetArrayItemShape(out Shape item)
         {
-            item = this is ArrayShape array ? array.Item : None;
+            item = this is ArrayShape array ? array.Item : Any;
             return this is ArrayShape;
         }
 
         internal bool TryGetNullableInnerShape(out Shape inner)
         {
-            inner = this is NullableShape nullable ? nullable.Inner : None;
+            inner = this is NullableShape nullable ? nullable.Inner : Any;
             return this is NullableShape;
         }
 
@@ -141,16 +138,9 @@ namespace Alis.Reactive.Grammar
         public override string Kind => "instant";
     }
 
-    /// <summary>A value of no declared shape, converted by nothing.</summary>
     internal sealed class AnyShape : Shape
     {
         public override string Kind => "any";
-    }
-
-    /// <summary>No value: what a method without a result or a payload without a body reads.</summary>
-    internal sealed class NoneShape : Shape
-    {
-        public override string Kind => "none";
     }
 
     /// <summary>A list whose items are one shape.</summary>

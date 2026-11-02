@@ -121,6 +121,6 @@ namespace Alis.Reactive.PlanModel.Validation
         // The model hands the value back as MVC binds it, already in the input's shape: the plan converts it no
         // second time.
         internal override Expr Write(Scope scope) =>
-            G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "valueOf" }, new Expr[] { G.Lit(_name), G.Ref(Indexes) }, Shape.None);
+            G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "valueOf" }, new Expr[] { G.Lit(_name), G.Ref(Indexes) }, Shape.Any);
     }
 }

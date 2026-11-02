@@ -261,7 +261,7 @@ namespace Alis.Reactive
         public PipelineBuilder<TModel> Into(string elementId)
         {
             Context.LoadsOrUnloads(elementId);
-            var responseBody = ValueExpression.Get(Target.Response(ResponseHandle.Innermost), Shape.None);
+            var responseBody = ValueExpression.Get(Target.Response(ResponseHandle.Innermost), Shape.Any);
             Context.AddStep(new InjectStep(elementId, responseBody));
             return this;
         }

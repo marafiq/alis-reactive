@@ -31,7 +31,7 @@ namespace Alis.Reactive.PlanModel.Validation
         private FormField Field(CheckedField field)
         {
             var tests = field.Rules
-                .Select(rule => new FormTest(rule.Name, Check(rule, field), When(rule, field.Values), rule.Message))
+                .Select(rule => new FormTest(Check(rule, field), When(rule, field.Values), rule.Message))
                 .ToList();
             return new FormField(field.Name, tests);
         }

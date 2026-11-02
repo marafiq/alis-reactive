@@ -69,7 +69,6 @@ export interface FormField {
 }
 
 export interface FormTest {
-  rule: string;
   check: FnExpr;
   when: FnExpr;
   message: string;
@@ -105,7 +104,6 @@ export type Shape =
   | BooleanShape
   | DateShape
   | InstantShape
-  | NoneShape
   | NullableShape
   | NumberShape
   | ObjectShape
@@ -130,10 +128,6 @@ export interface DateShape {
 
 export interface InstantShape {
   kind: "instant";
-}
-
-export interface NoneShape {
-  kind: "none";
 }
 
 export interface NullableShape {

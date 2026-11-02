@@ -101,7 +101,7 @@ namespace Alis.Reactive.Grammar
 
         internal static Statement All(IReadOnlyList<IReadOnlyList<Statement>> blocks) => new AllStatement(blocks);
 
-        internal static bool IsUnconverted(Shape shape) => shape is NoneShape or AnyShape;
+        internal static bool IsUnconverted(Shape shape) => shape is AnyShape;
 
         // A value the conversion would hand back as it is: a missing value, or text, a boolean or a number
         // under its own scalar shape, nullable or not (grammar.md 2.1).

@@ -226,9 +226,6 @@
     "FormTest": {
       "type": "object",
       "properties": {
-        "rule": {
-          "type": "string"
-        },
         "check": {
           "$ref": "#/$defs/FnExpr"
         },
@@ -240,7 +237,6 @@
         }
       },
       "required": [
-        "rule",
         "check",
         "when",
         "message"
@@ -342,9 +338,6 @@
           "$ref": "#/$defs/InstantShape"
         },
         {
-          "$ref": "#/$defs/NoneShape"
-        },
-        {
           "$ref": "#/$defs/NullableShape"
         },
         {
@@ -415,18 +408,6 @@
       "properties": {
         "kind": {
           "const": "instant"
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "additionalProperties": false
-    },
-    "NoneShape": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "none"
         }
       },
       "required": [

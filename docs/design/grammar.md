@@ -49,7 +49,7 @@ That is the whole document. The grammar names no feature.
     the located object, the shape it reads as, the event that commits a value (M4), and whether the
     input binds a list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ name,
-    tests: [{ rule, check: fn(v, i), when: fn(i), message }] }] }`. `summary` is the id of the form's
+    tests: [{ check: fn(v, i), when: fn(i), message }] }] }`. `summary` is the id of the form's
     summary, `{formId}_validation_summary` (F6), the same whichever plan writes the form. A field is one
     per member a rule is written on, and one per item field of a collection a rule checks, whether or not
     the browser can check it (a rule under a condition only the server decides still names its members),
@@ -59,8 +59,7 @@ That is the whole document. The grammar names no feature.
     binding name, under the view's field prefix, as the server reports it; an item field's name stands
     for every item, each index a `[*]` (`Contacts[*].Name`, M8), and the form checks each mounted input
     its name names (F1). `i` is the indexes of the item a test checks (`[]` for a member), which every
-    member the test reads by an item's name takes (M8). `rule` names the declaration a test came from,
-    for traces only. An input does not name its form; membership is decided by containment (6.4),
+    member the test reads by an item's name takes (M8). An input does not name its form; membership is decided by containment (6.4),
     because a partial cannot know which form will contain it.
 - **A hub is plugin data.** `alis.hub` data is `{}`: it carries nothing, and every plan that names a
   hub writes it, so the plan holds the hub's connection under its owner (B1).
@@ -129,7 +128,7 @@ A shape is the C# type's view of a JavaScript value. The generated contract (`pl
 kinds:
 
 `string`, `number`, `boolean`, `date`, `instant`, `array(shape)`, `nullable(shape)`,
-`object(fields)`, `any`, `none`.
+`object(fields)`, `any`.
 
 - `any` is a value taken as it is: a live JavaScript object, or data whose members the plan does not
   name. It is never converted.
@@ -158,7 +157,7 @@ it where a conversion is due and nowhere else:
   instant written as text, a list or a record with members to convert. Text under `string`, a boolean
   under `boolean`, a number under `number`, and a missing value are written bare.
 
-A shape that converts nothing (`any`, `none`) is never written. Nothing else converts.
+A shape that converts nothing (`any`) is never written. Nothing else converts.
 
 | Shape | From | Result |
 |---|---|---|
@@ -188,7 +187,7 @@ A shape that converts nothing (`any`, `none`) is never written. Nothing else con
 | | otherwise | converted to `s` |
 | `object(fields)` | an object | each named member converted to its shape, every other member kept; the object itself when no member changed (a library that keeps it by reference still has it) |
 | | otherwise | kept |
-| `any`, `none` | any | itself |
+| `any` | any | itself |
 
 - A missing value (`null` or `undefined`) passes through unchanged, except for `nullable`, where it
   becomes `null`.

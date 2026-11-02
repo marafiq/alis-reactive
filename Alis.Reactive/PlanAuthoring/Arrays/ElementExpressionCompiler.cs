@@ -349,7 +349,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             if (call.Object != null && PureMethodName(call.Method) is string methodName)
             {
                 var methodArgs = call.Arguments.Select(argument => CompileValue(argument, element)).ToList();
-                var unconverted = methodArgs.Select(_ => Shape.None).ToList();
+                var unconverted = methodArgs.Select(_ => Shape.Any).ToList();
                 return ValueExpression.Call(
                     Target.Returned(CompileValue(call.Object, element)), new[] { methodName }, methodArgs, unconverted, ClrShape.Of(call.Type), methodName);
             }

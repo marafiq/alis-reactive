@@ -28,7 +28,7 @@ namespace Alis.Reactive.Components
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
         {
             var target = Locate();
-            Context.AddStep(new SetStep(target, property.Path.TargetText, target.IsData ? Shape.None : property.Shape, value));
+            Context.AddStep(new SetStep(target, property.Path.TargetText, target.IsData ? Shape.Any : property.Shape, value));
         }
 
         /// <summary>Reads the member at <paramref name="path"/>: a declared property, or a member of the data it holds.</summary>

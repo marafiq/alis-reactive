@@ -19,8 +19,6 @@ namespace Alis.Reactive
         {
         }
 
-        internal override string Name => "required";
-
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = field.Shape is ArrayShape ? new AtLeastOneRule(Message, Condition)
@@ -45,8 +43,6 @@ namespace Alis.Reactive
         {
         }
 
-        internal override string Name => "required";
-
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = this;
@@ -68,8 +64,6 @@ namespace Alis.Reactive
         /// <summary>The member the type's default binds as, which the rule refuses.</summary>
         public string DefaultMember { get; }
 
-        internal override string Name => "required";
-
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Not(G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember))));
     }
@@ -82,12 +76,10 @@ namespace Alis.Reactive
         {
         }
 
-        internal override string Name => "atLeastOne";
-
         // The value is the list as the field's shape reads it: an array, or the list the input keeps when it is
         // no array (a file input's FileList), each counting its items; a missing one has none.
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0));
+            G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0));
     }
 
     /// <summary>
@@ -100,8 +92,6 @@ namespace Alis.Reactive
             : base(message, condition)
         {
         }
-
-        internal override string Name => "empty";
 
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
@@ -123,12 +113,10 @@ namespace Alis.Reactive
         {
         }
 
-        internal override string Name => "noItems";
-
         // The list as AtLeastOneRule reads it, an array or the input's own list (a FileList), with no items
         // counted; a missing one has none, as the server's Empty passes null.
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.None), G.Lit(0)));
+            G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0)));
     }
 
     /// <summary>Nothing chosen, or the enum member the type's default binds as: what <see cref="BrowserRule.Empty"/> asks of an enum.</summary>
@@ -142,8 +130,6 @@ namespace Alis.Reactive
 
         /// <summary>The member the type's default binds as, which the rule takes.</summary>
         public string DefaultMember { get; }
-
-        internal override string Name => "empty";
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember)));
@@ -161,8 +147,6 @@ namespace Alis.Reactive
         /// <summary>The fewest characters.</summary>
         public int Length { get; }
 
-        internal override string Name => "minLength";
-
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), G.Op(Operator.Gte, TextLength(value), G.Lit(Length)));
     }
@@ -178,8 +162,6 @@ namespace Alis.Reactive
 
         /// <summary>The most characters.</summary>
         public int Length { get; }
-
-        internal override string Name => "maxLength";
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), G.Op(Operator.Lte, TextLength(value), G.Lit(Length)));
@@ -207,8 +189,6 @@ namespace Alis.Reactive
         /// <summary>JavaScript flags: <c>i</c>, <c>m</c>, <c>s</c>; empty for none.</summary>
         public string Flags { get; }
 
-        internal override string Name => _name;
-
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), G.Op(Operator.Matches, value, G.Lit(Pattern), G.Lit(Flags)));
     }
@@ -220,8 +200,6 @@ namespace Alis.Reactive
             : base(message, condition)
         {
         }
-
-        internal override string Name => "creditCard";
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), CardNumber(value, scope));
@@ -277,14 +255,6 @@ namespace Alis.Reactive
 
         /// <summary>The shape both sides are converted to.</summary>
         internal Shape Shape { get; }
-
-        internal override string Name =>
-            Comparison == Comparison.Equal ? "equalTo"
-            : Comparison == Comparison.NotEqual ? (ComparesWithMember ? "notEqualTo" : "notEqual")
-            : Comparison == Comparison.GreaterThan ? "gt"
-            : Comparison == Comparison.GreaterThanOrEqual ? "min"
-            : Comparison == Comparison.LessThan ? "lt"
-            : "max";
 
         // Equality has no skip for nothing bound, as the server's Equal and NotEqual; an ordering passes
         // on nothing bound, as the server's comparisons do.
@@ -386,8 +356,6 @@ namespace Alis.Reactive
         /// <summary>The bounds as numbers, which is what a component's numeric range takes; null for dates or text.</summary>
         public (decimal From, decimal To)? NumericBounds =>
             AsNumber(_from) is decimal from && AsNumber(_to) is decimal to ? (from, to) : null;
-
-        internal override string Name => Inclusive ? "range" : "exclusiveRange";
 
         // A range of text stays with the server, which orders text by its culture.
         internal override bool TryFor(FieldReference field, out BrowserRule rule)

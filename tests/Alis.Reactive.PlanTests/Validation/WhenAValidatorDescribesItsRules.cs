@@ -16,7 +16,6 @@ public class WhenAValidatorDescribesItsRules
 
         var form = rendered.Objects()["$form:admission"]!["data"]!;
         var field = form["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Name")!;
-        Assert.That(field["tests"]!.AsArray().Single()!["rule"]!.GetValue<string>(), Is.EqualTo("required"));
         Assert.That(field["tests"]!.AsArray().Single()!["message"]!.GetValue<string>(), Is.EqualTo("Name the resident."));
         Golden.Matches(rendered, "Validation", nameof(a_check_the_browser_can_make_lands_on_the_input_that_renders_the_member));
     }

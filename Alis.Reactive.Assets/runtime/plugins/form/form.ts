@@ -127,7 +127,7 @@ function evaluateInput(entry: Entry, input: NamedInput, summary: HTMLElement | n
     if (!evaluateWhen(entry, test, input.indexes)) continue;
     if (checkPasses(entry, test, value, input.indexes)) continue;
 
-    log.trace("rule.failed", { field: input.name, rule: test.rule, value, message: test.message });
+    log.trace("test.failed", { field: input.name, value, message: test.message });
     if (inlineHidden) {
       addSummaryError(summary, input.name, test.message);
     } else {

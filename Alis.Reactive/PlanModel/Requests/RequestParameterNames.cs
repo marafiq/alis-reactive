@@ -17,7 +17,7 @@ namespace Alis.Reactive.PlanModel.Requests
         // result or a payload read typed as object) is the developer's to keep scalar.
         internal static void RouteParameter(string placeholder, Shape shape)
         {
-            var undeclared = shape is NoneShape or AnyShape;
+            var undeclared = shape is AnyShape;
             if (undeclared || shape.IsScalar) return;
 
             throw new InvalidOperationException(

@@ -43,7 +43,7 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal static ValueExpression Literal(DateTime value) => new LiteralExpression(Scalar.Of(value.ToString("O")), Shape.Date);
 
-        internal static ValueExpression Null() => new LiteralExpression(Scalar.Null, Shape.None);
+        internal static ValueExpression Null() => new LiteralExpression(Scalar.Null, Shape.Any);
 
         private static ValueExpression LiteralRaw(object value, Shape shape) => new LiteralExpression(Scalar.Of(value), shape);
 
@@ -210,7 +210,7 @@ namespace Alis.Reactive.PlanModel.Values
         // Data a callback received is shown as the server or the event sent it; an object's member, the URL
         // and a method read keep their type, which decides how they are read.
         internal override ValueExpression AsArrived() =>
-            _target.IsData ? new GetExpression(_target, _path, Shape.None) : this;
+            _target.IsData ? new GetExpression(_target, _path, Shape.Any) : this;
 
         internal override Expr Write(Scope scope)
         {
@@ -252,7 +252,7 @@ namespace Alis.Reactive.PlanModel.Values
         internal override Expr Write(Scope scope) => WriteCall(scope, _shape);
 
         /// <summary>The call with its result as it arrives: what a <c>let</c> binds, converted where the name is read.</summary>
-        internal Expr WriteUnconverted(Scope scope) => WriteCall(scope, Shape.None);
+        internal Expr WriteUnconverted(Scope scope) => WriteCall(scope, Shape.Any);
 
         private Expr WriteCall(Scope scope, Shape shape)
         {
@@ -305,7 +305,7 @@ namespace Alis.Reactive.PlanModel.Values
         internal override Expr Write(Scope scope)
         {
             var values = _shape.DescribesArray ? "queryAll" : "query";
-            return G.Get(G.Get(G.Obj(scope.Objects.Document()), new[] { values }, Shape.None), new[] { _key }, _shape);
+            return G.Get(G.Get(G.Obj(scope.Objects.Document()), new[] { values }, Shape.Any), new[] { _key }, _shape);
         }
 
     }
@@ -326,7 +326,7 @@ namespace Alis.Reactive.PlanModel.Values
         // The model hands the value back as MVC binds it, already in the input's shape (grammar.md M5): the
         // plan converts it no second time.
         internal override Expr Write(Scope scope) =>
-            G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, Shape.None);
+            G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, Shape.Any);
     }
 
     internal sealed class RecordExpression : ValueExpression

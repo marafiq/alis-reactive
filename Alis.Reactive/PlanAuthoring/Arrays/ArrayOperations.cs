@@ -193,7 +193,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             G.As(Found(items, _predicate, scope), OutputShape);
 
         internal static Expr Found(Expr items, Condition predicate, Scope scope) =>
-            G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.None), G.Null);
+            G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.Any), G.Null);
     }
 
     /// <summary>Find gives null when nothing matches, then applies the selector to what it found.</summary>

@@ -83,7 +83,7 @@ namespace Alis.Reactive.PlanModel.Requests
             return sentence;
         }
 
-        internal static Expr Ok(string response) => G.Get(G.Ref(response), new[] { "ok" }, Shape.None);
+        internal static Expr Ok(string response) => G.Get(G.Ref(response), new[] { "ok" }, Shape.Any);
 
         // ── the request alis.http sends ──────────────────────────────────────────
 
@@ -105,7 +105,7 @@ namespace Alis.Reactive.PlanModel.Requests
             {
                 var inputs = G.Obj(scope.Objects.Inputs(form));
                 body = nested ? G.Call(inputs, "fill", body) : G.Op(Operator.Merge, body, G.Get(inputs, "fields"));
-                arrays = G.Call(arrays, "concat", G.Get(inputs, new[] { "arrays" }, Shape.None));
+                arrays = G.Call(arrays, "concat", G.Get(inputs, new[] { "arrays" }, Shape.Any));
             }
 
             return G.Record(
@@ -196,7 +196,7 @@ namespace Alis.Reactive.PlanModel.Requests
         private static IReadOnlyList<Statement> Route(
             IReadOnlyList<(int Status, Block Route)> statuses, Block? catchAll, string response, Scope routeScope)
         {
-            var status = G.Get(G.Ref(response), new[] { "status" }, Shape.None);
+            var status = G.Get(G.Ref(response), new[] { "status" }, Shape.Any);
             var arms = statuses
                 .Select(route => new Arm(G.Eq(status, G.Lit(route.Status)), route.Route.Write(routeScope)))
                 .ToList();

@@ -114,7 +114,7 @@ namespace Alis.Reactive.PlanModel.Reactions
             {
                 var args = _args.Select(arg => arg.Write(scope)).ToList();
                 var (root, prefix) = _target.Write(scope);
-                return new[] { G.Do(G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, Shape.None), _awaits) };
+                return new[] { G.Do(G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, Shape.Any), _awaits) };
             }));
     }
 
@@ -184,7 +184,7 @@ namespace Alis.Reactive.PlanModel.Reactions
         {
             var form = G.Obj(scope.Objects.Form(_form));
             var response = scope.Response(ResponseHandle.Innermost);
-            block.Add(G.Do(G.Call(form, "showErrors", G.Get(G.Ref(response), new[] { "body" }, Shape.None))));
+            block.Add(G.Do(G.Call(form, "showErrors", G.Get(G.Ref(response), new[] { "body" }, Shape.Any))));
         }
     }
 

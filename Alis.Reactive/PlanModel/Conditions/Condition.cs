@@ -330,7 +330,7 @@ namespace Alis.Reactive
             var items = scope.Fresh("c");
             var item = scope.Fresh("i");
             var matches = G.Fn(G.Eq(G.As(G.Ref(item), _itemShape), _item.WriteAs(_itemShape, scope)), item);
-            var some = G.Call(G.Ref(items), new[] { "some" }, new Expr[] { matches }, Shape.None);
+            var some = G.Call(G.Ref(items), new[] { "some" }, new Expr[] { matches }, Shape.Any);
             return G.Apply(G.Fn(G.Op(Operator.Truthy, some), items), left);
         }
     }
@@ -351,7 +351,7 @@ namespace Alis.Reactive
         {
             var left = Left(scope);
             if (_test.IsPattern) return G.Op(Operator.Matches, left, G.Lit(_text), G.Lit(""));
-            return G.Op(Operator.Truthy, G.Call(G.Op(Operator.ToText, left), new[] { _test.Method }, new Expr[] { G.Lit(_text) }, Shape.None));
+            return G.Op(Operator.Truthy, G.Call(G.Op(Operator.ToText, left), new[] { _test.Method }, new Expr[] { G.Lit(_text) }, Shape.Any));
         }
     }
 
@@ -366,7 +366,7 @@ namespace Alis.Reactive
         }
 
         internal override Expr Write(Scope scope) =>
-            G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.None), G.Lit(_length));
+            G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.Any), G.Lit(_length));
     }
 
     internal sealed class TrueCondition : Condition

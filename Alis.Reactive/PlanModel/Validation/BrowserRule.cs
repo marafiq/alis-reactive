@@ -128,9 +128,6 @@ namespace Alis.Reactive
 
         internal Condition Condition { get; private set; }
 
-        /// <summary>The test's name in the plan.</summary>
-        internal abstract string Name { get; }
-
         /// <summary>The other members the rule reads, besides the one it is on.</summary>
         internal virtual IEnumerable<FieldReference> Fields => Array.Empty<FieldReference>();
 
@@ -178,7 +175,7 @@ namespace Alis.Reactive
 
         private protected static Expr Matches(Expr v, string pattern) => G.Op(Operator.Matches, v, G.Lit(pattern), G.Lit(""));
 
-        private protected static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.None);
+        private protected static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.Any);
 
         // What NotEmpty rejects, as far as the field's shape tells: nothing entered (the binding read already
         // reads text of only whitespace as nothing), and the type's default: false, 0, or 0001-01-01 for a date.

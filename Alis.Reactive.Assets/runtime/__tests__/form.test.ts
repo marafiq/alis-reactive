@@ -38,7 +38,7 @@ function requiredField(id: string, name: string, message: string, when = e.lit(t
 }
 
 function required(message: string, when = e.lit(true)): FormField["tests"][number] {
-  return { rule: "required", check: e.fn(["v", "i"], e.op("not", e.op("empty", e.ref("v")))) as never, when: e.fn(["i"], when) as never, message };
+  return { check: e.fn(["v", "i"], e.op("not", e.op("empty", e.ref("v")))) as never, when: e.fn(["i"], when) as never, message };
 }
 
 function textInput(id: string, name: string): ModelPluginData["inputs"][string] {
@@ -216,7 +216,7 @@ describe("live", () => {
     document.getElementById("admission")!.append(rating, Object.assign(document.createElement("span"), { id: "Rating_error" }));
     const scored: FormField = {
       name: "Rating",
-      tests: [{ rule: "min", check: e.fn(["v", "i"], e.op("gte", e.ref("v"), e.lit(1))) as never, when: e.fn(["i"], e.lit(true)) as never, message: "Rate the visit." }],
+      tests: [{ check: e.fn(["v", "i"], e.op("gte", e.ref("v"), e.lit(1))) as never, when: e.fn(["i"], e.lit(true)) as never, message: "Rate the visit." }],
     };
     const model: ModelPluginData = {
       kind: "model",

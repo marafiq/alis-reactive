@@ -17,7 +17,7 @@ namespace Alis.Reactive.Members
     {
         internal static Shape Of(Type type) => Of(type, _ => Shape.Any);
 
-        internal static Shape OfValue(object? value) => value == null ? Shape.None : Of(value.GetType());
+        internal static Shape OfValue(object? value) => value == null ? Shape.Any : Of(value.GetType());
 
         /// <param name="type">The CLR type.</param>
         /// <param name="ofClass">The shape of a class that is not a scalar, a nullable or a collection.</param>
