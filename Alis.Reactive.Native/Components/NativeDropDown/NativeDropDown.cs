@@ -31,7 +31,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeDropDown.Change"/>, read from the element.</summary>
-    public class NativeDropDownChangeArgs : JsObject
+    public sealed class NativeDropDownChangeArgs : JsObject
     {
         /// <summary>The selected option value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

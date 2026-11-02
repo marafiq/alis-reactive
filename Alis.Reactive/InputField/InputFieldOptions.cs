@@ -7,7 +7,7 @@ namespace Alis.Reactive
     /// Passed to <c>Html.InputField</c> when the field wrapper needs label text
     /// or a required marker. Fields render without either option by default.
     /// </remarks>
-    public class InputFieldOptions
+    public sealed class InputFieldOptions
     {
         internal string? LabelText { get; private set; }
 

@@ -34,7 +34,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionRichTextEditor.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
-    public class FusionRichTextEditorChangeArgs : JsObject
+    public sealed class FusionRichTextEditorChangeArgs : JsObject
     {
         /// <summary>Content after the change, as HTML.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

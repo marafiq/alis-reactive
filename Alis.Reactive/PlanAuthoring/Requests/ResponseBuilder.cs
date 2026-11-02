@@ -14,7 +14,7 @@ namespace Alis.Reactive
     /// Exact error-status routes are matched before any-status error routes.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
-    public class ResponseBuilder<TModel> where TModel : class
+    public sealed class ResponseBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
 

@@ -36,14 +36,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionBreadcrumb.ItemClick"/>.</summary>
-    public class FusionBreadcrumbItemClickArgs : JsObject
+    public sealed class FusionBreadcrumbItemClickArgs : JsObject
     {
         /// <summary>The clicked item.</summary>
         public ReadOnly<FusionBreadcrumbItem> Item => ReadOnly<FusionBreadcrumbItem>();
     }
 
     /// <summary>A breadcrumb item as the <see cref="FusionBreadcrumb.ItemClick"/> payload reports it.</summary>
-    public class FusionBreadcrumbItem
+    public sealed class FusionBreadcrumbItem
     {
         /// <summary>The item text.</summary>
         public string Text { get; set; } = string.Empty;

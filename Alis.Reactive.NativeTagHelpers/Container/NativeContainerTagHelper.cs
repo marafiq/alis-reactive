@@ -7,7 +7,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// its content and caps its maximum width.
 /// </summary>
 [HtmlTargetElement("native-container")]
-public class NativeContainerTagHelper : TagHelper
+public sealed class NativeContainerTagHelper : TagHelper
 {
     /// <summary>
     /// Additional HTML classes merged with the generated container classes.

@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionDateTimePicker.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
-    public class FusionDateTimePickerChangeArgs : JsObject
+    public sealed class FusionDateTimePickerChangeArgs : JsObject
     {
         /// <summary>Date and time after the change.</summary>
         public ReadOnly<DateTime?> Value => ReadOnly<DateTime?>();

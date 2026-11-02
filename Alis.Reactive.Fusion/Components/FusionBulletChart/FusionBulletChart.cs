@@ -39,7 +39,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionBulletChart.TooltipRender"/>.</summary>
     /// <remarks>Rewrite the tooltip: <c>args.Text.Set("On target")</c>.</remarks>
-    public class FusionBulletChartTooltipRenderArgs : JsObject
+    public sealed class FusionBulletChartTooltipRenderArgs : JsObject
     {
         /// <summary>Actual value of the feature bar.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -58,7 +58,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionBulletChart.BulletChartMouseClick"/>.</summary>
-    public class FusionBulletChartMouseClickArgs : JsObject
+    public sealed class FusionBulletChartMouseClickArgs : JsObject
     {
         /// <summary>ID of the clicked element.</summary>
         public ReadOnly<string> Target => ReadOnly<string>();

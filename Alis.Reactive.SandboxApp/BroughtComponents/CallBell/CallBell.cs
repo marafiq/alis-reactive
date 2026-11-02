@@ -55,7 +55,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>What the bell hands <see cref="CallBell.OnPressed"/> and <see cref="CallBell.OnCleared"/>.</summary>
-    public class CallBellCallArgs : JsObject
+    public sealed class CallBellCallArgs : JsObject
     {
         /// <summary>The room the bell is in.</summary>
         public ReadOnly<string> Room => ReadOnly<string>();

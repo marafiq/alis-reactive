@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionMultiSelect.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
-    public class FusionMultiSelectChangeArgs : JsObject
+    public sealed class FusionMultiSelectChangeArgs : JsObject
     {
         /// <summary>Selected values after the change.</summary>
         public ReadOnly<string[]> Value => ReadOnly<string[]>();
@@ -60,7 +60,7 @@ namespace Alis.Reactive.Fusion
     /// request the matches, and hand them over in the success callback with
     /// <c>args.UpdateData(json.Get(x =&gt; x.Items))</c>.
     /// </remarks>
-    public class FusionMultiSelectFilteringArgs : JsObject
+    public sealed class FusionMultiSelectFilteringArgs : JsObject
     {
         /// <summary>Text the user typed.</summary>
         public ReadOnly<string> Text => ReadOnly<string>();

@@ -54,19 +54,19 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionPivotView.DataBound"/>; carries no data.</summary>
-    public class FusionPivotViewDataBoundArgs : JsObject
+    public sealed class FusionPivotViewDataBoundArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionPivotView.CellSelecting"/>.</summary>
-    public class FusionPivotViewCellSelectingArgs : JsObject
+    public sealed class FusionPivotViewCellSelectingArgs : JsObject
     {
         /// <summary>The selected cell.</summary>
         public ReadOnly<FusionPivotViewCellData> Data => ReadOnly<FusionPivotViewCellData>();
     }
 
     /// <summary>A pivot cell as the <see cref="FusionPivotView.CellSelecting"/> payload reports it.</summary>
-    public class FusionPivotViewCellData
+    public sealed class FusionPivotViewCellData
     {
         /// <summary>The axis the cell belongs to.</summary>
         public string Axis { get; set; } = "";

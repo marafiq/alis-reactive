@@ -59,7 +59,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>A prompt with its response, for <see cref="FusionAIAssistView.AddPromptResponseModel"/>.</summary>
-    public class FusionAIAssistViewPromptModel
+    public sealed class FusionAIAssistViewPromptModel
     {
         /// <summary>The prompt text.</summary>
         public string Prompt { get; set; } = "";
@@ -73,7 +73,7 @@ namespace Alis.Reactive.Fusion
     /// The assistant has already shown the prompt when it raises the event, and reads nothing back from it,
     /// so a prompt cannot be refused here.
     /// </remarks>
-    public class FusionAIAssistViewPromptRequestArgs : JsObject
+    public sealed class FusionAIAssistViewPromptRequestArgs : JsObject
     {
         /// <summary>The prompt the user sent.</summary>
         public ReadOnly<string> Prompt => ReadOnly<string>();
@@ -83,7 +83,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionAIAssistView.PromptChanged"/>.</summary>
-    public class FusionAIAssistViewPromptChangedArgs : JsObject
+    public sealed class FusionAIAssistViewPromptChangedArgs : JsObject
     {
         /// <summary>The prompt text after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionAIAssistView.StopRespondingClick"/>.</summary>
-    public class FusionAIAssistViewStopRespondingClickArgs : JsObject
+    public sealed class FusionAIAssistViewStopRespondingClickArgs : JsObject
     {
         /// <summary>The prompt whose response stopped.</summary>
         public ReadOnly<string> Prompt => ReadOnly<string>();

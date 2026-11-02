@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type rendered through the text input.</typeparam>
-    public class NativeTextBoxBuilder<TModel, TProp> :
+    public sealed class NativeTextBoxBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
     {

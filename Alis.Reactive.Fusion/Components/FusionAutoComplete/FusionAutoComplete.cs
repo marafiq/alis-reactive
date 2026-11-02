@@ -66,7 +66,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionAutoComplete.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).Eq("smith")</c>.</remarks>
-    public class FusionAutoCompleteChangeArgs : JsObject
+    public sealed class FusionAutoCompleteChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -96,7 +96,7 @@ namespace Alis.Reactive.Fusion
     ///     }));
     /// </code>
     /// </remarks>
-    public class FusionAutoCompleteFilteringArgs : JsObject
+    public sealed class FusionAutoCompleteFilteringArgs : JsObject
     {
         /// <summary>Text the user typed.</summary>
         public ReadOnly<string> Text => ReadOnly<string>();

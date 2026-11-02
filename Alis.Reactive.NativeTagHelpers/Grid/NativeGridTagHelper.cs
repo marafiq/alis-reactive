@@ -7,7 +7,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// columns.
 /// </summary>
 [HtmlTargetElement("native-grid")]
-public class NativeGridTagHelper : TagHelper
+public sealed class NativeGridTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the number of grid columns. Defaults to <see cref="GridCols.C2"/>.

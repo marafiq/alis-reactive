@@ -38,7 +38,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeHiddenField.Change"/>, read from the element.</summary>
-    public class NativeHiddenFieldChangeArgs : JsObject
+    public sealed class NativeHiddenFieldChangeArgs : JsObject
     {
         /// <summary>The hidden value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

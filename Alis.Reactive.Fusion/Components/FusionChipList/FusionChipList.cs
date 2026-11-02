@@ -103,7 +103,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionChipList.Click"/>.</summary>
-    public class FusionChipListClickArgs : JsObject
+    public sealed class FusionChipListClickArgs : JsObject
     {
         /// <summary>Text of the clicked chip.</summary>
         public ReadOnly<string> Text => ReadOnly<string>();
@@ -116,7 +116,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionChipList.Deleted"/>.</summary>
-    public class FusionChipListDeletedArgs : JsObject
+    public sealed class FusionChipListDeletedArgs : JsObject
     {
         /// <summary>Text of the deleted chip.</summary>
         public ReadOnly<string> Text => ReadOnly<string>();
@@ -126,7 +126,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>A chip as <see cref="FusionChipList.Find"/> returns it.</summary>
-    public class FusionChipData
+    public sealed class FusionChipData
     {
         /// <summary>The chip text.</summary>
         public string Text { get; set; } = "";
@@ -137,7 +137,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>A selected chip's data as <see cref="FusionSelectedChip"/> and <see cref="FusionSelectedChips"/> report it: the chip as the list was given it.</summary>
     /// <remarks>A list given its chips as plain texts reports each chip's data as its text, not as this object.</remarks>
-    public class FusionChipItem
+    public sealed class FusionChipItem
     {
         /// <summary>The chip text.</summary>
         public string Text { get; set; } = "";
@@ -161,7 +161,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>The selected chips of a list with <c>Selection.Multiple</c>, as <see cref="FusionChipList.GetSelectedChips"/> returns them.</summary>
-    public class FusionSelectedChips
+    public sealed class FusionSelectedChips
     {
         /// <summary>Texts of the selected chips.</summary>
         public string[] Texts { get; set; } = Array.Empty<string>();

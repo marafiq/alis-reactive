@@ -13,7 +13,7 @@ namespace Alis.Reactive
     /// or failed.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
-    public class ParallelBuilder<TModel> where TModel : class
+    public sealed class ParallelBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
 

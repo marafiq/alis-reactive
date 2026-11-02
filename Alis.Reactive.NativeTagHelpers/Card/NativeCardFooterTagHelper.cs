@@ -6,7 +6,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// Renders a <c>native-card-footer</c> element as the footer section of a card.
 /// </summary>
 [HtmlTargetElement("native-card-footer", ParentTag = "native-card")]
-public class NativeCardFooterTagHelper : TagHelper
+public sealed class NativeCardFooterTagHelper : TagHelper
 {
     /// <summary>
     /// Selects which footer edges show a separating border. Defaults to <see cref="CardDivider.None"/>.

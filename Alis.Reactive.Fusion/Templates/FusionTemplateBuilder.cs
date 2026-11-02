@@ -28,7 +28,7 @@ namespace Alis.Reactive.Fusion
     /// and raw HTML are emitted as supplied; use trusted developer-authored values.
     /// </remarks>
     /// <typeparam name="TModel">Object shape exposed by the Syncfusion template context.</typeparam>
-    public class FusionTemplateBuilder<TModel>
+    public sealed class FusionTemplateBuilder<TModel>
     {
         internal FusionTemplateBuilder() { }
         private readonly List<Func<string>> _childRenderers = new List<Func<string>>();

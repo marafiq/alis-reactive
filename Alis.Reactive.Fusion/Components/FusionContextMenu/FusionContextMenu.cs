@@ -57,14 +57,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeItemRender"/>.</summary>
-    public class FusionContextMenuBeforeItemRenderArgs : JsObject
+    public sealed class FusionContextMenuBeforeItemRenderArgs : JsObject
     {
         /// <summary>The item about to render.</summary>
         public ReadOnly<FusionContextMenuItem> Item => ReadOnly<FusionContextMenuItem>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeOpen"/>.</summary>
-    public class FusionContextMenuBeforeOpenArgs : JsObject
+    public sealed class FusionContextMenuBeforeOpenArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
         public ReadOnly<List<FusionContextMenuItem>> Items => ReadOnly<List<FusionContextMenuItem>>();
@@ -83,7 +83,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.OnOpen"/> and <see cref="FusionContextMenu.OnClose"/>.</summary>
-    public class FusionContextMenuOpenCloseArgs : JsObject
+    public sealed class FusionContextMenuOpenCloseArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
         public ReadOnly<List<FusionContextMenuItem>> Items => ReadOnly<List<FusionContextMenuItem>>();
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeClose"/>.</summary>
-    public class FusionContextMenuBeforeCloseArgs : JsObject
+    public sealed class FusionContextMenuBeforeCloseArgs : JsObject
     {
         /// <summary>The items of the menu level involved.</summary>
         public ReadOnly<List<FusionContextMenuItem>> Items => ReadOnly<List<FusionContextMenuItem>>();
@@ -106,14 +106,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.Select"/>.</summary>
-    public class FusionContextMenuSelectArgs : JsObject
+    public sealed class FusionContextMenuSelectArgs : JsObject
     {
         /// <summary>The selected item.</summary>
         public ReadOnly<FusionContextMenuItem> Item => ReadOnly<FusionContextMenuItem>();
     }
 
     /// <summary>A menu item as the <see cref="FusionContextMenu"/> payloads report it.</summary>
-    public class FusionContextMenuItem
+    public sealed class FusionContextMenuItem
     {
         /// <summary>The item ID.</summary>
         public string Id { get; set; } = string.Empty;

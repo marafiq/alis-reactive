@@ -31,7 +31,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionInputMask.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
-    public class FusionInputMaskChangeArgs : JsObject
+    public sealed class FusionInputMaskChangeArgs : JsObject
     {
         /// <summary>Value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

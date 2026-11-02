@@ -33,7 +33,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionRating.ValueChanged"/>.</summary>
-    public class FusionRatingValueChangedArgs : JsObject
+    public sealed class FusionRatingValueChangedArgs : JsObject
     {
         /// <summary>Rating after the change.</summary>
         public ReadOnly<double> Value => ReadOnly<double>();

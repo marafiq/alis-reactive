@@ -159,13 +159,13 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of an event that carries no data.</summary>
-    public class FusionKanbanEmptyArgs : JsObject
+    public sealed class FusionKanbanEmptyArgs : JsObject
     {
     }
 
     /// <summary>Payload of <c>ActionBegin</c> and <c>ActionComplete</c>.</summary>
     /// <typeparam name="TCard">Your card class.</typeparam>
-    public class FusionKanbanActionArgs<TCard> : JsObject
+    public sealed class FusionKanbanActionArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The kind of action.</summary>
@@ -186,7 +186,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>DataBinding</c>.</summary>
     /// <typeparam name="TCard">Your card class.</typeparam>
-    public class FusionKanbanDataBindingArgs<TCard> : JsObject
+    public sealed class FusionKanbanDataBindingArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The cards about to bind.</summary>
@@ -198,7 +198,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>CardClick</c> and <c>CardDoubleClick</c>.</summary>
     /// <typeparam name="TCard">Your card class.</typeparam>
-    public class FusionKanbanCardClickArgs<TCard> : JsObject
+    public sealed class FusionKanbanCardClickArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The clicked card.</summary>
@@ -210,7 +210,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>CardRendered</c>.</summary>
     /// <typeparam name="TCard">Your card class.</typeparam>
-    public class FusionKanbanCardRenderedArgs<TCard> : JsObject
+    public sealed class FusionKanbanCardRenderedArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The rendered card.</summary>
@@ -222,7 +222,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>DialogOpen</c> and <c>DialogClose</c>.</summary>
     /// <typeparam name="TCard">Your card class.</typeparam>
-    public class FusionKanbanDialogArgs<TCard> : JsObject
+    public sealed class FusionKanbanDialogArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The card in the dialog.</summary>
@@ -237,7 +237,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>DragStart</c>, <c>Drag</c> and <c>DragStop</c>.</summary>
     /// <typeparam name="TCard">Your card class.</typeparam>
-    public class FusionKanbanDragArgs<TCard> : JsObject
+    public sealed class FusionKanbanDragArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The dragged cards.</summary>
@@ -251,7 +251,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>A column header as <see cref="FusionKanbanQueryCellInfoArgs"/> reports it.</summary>
-    public class FusionKanbanHeaderArgs
+    public sealed class FusionKanbanHeaderArgs
     {
         /// <summary>The column key.</summary>
         public string KeyField { get; set; } = "";
@@ -264,7 +264,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionKanban.QueryCellInfo"/>.</summary>
-    public class FusionKanbanQueryCellInfoArgs : JsObject
+    public sealed class FusionKanbanQueryCellInfoArgs : JsObject
     {
         /// <summary>The column headers.</summary>
         public ReadOnly<List<FusionKanbanHeaderArgs>> Data => ReadOnly<List<FusionKanbanHeaderArgs>>();
@@ -283,7 +283,7 @@ namespace Alis.Reactive.Fusion
     /// (<c>board.Cards&lt;T&gt;().Set(..)</c>).
     /// </remarks>
     /// <typeparam name="TCard">Your card class.</typeparam>
-    public class FusionKanbanDataSourceChangedArgs<TCard> : JsObject
+    public sealed class FusionKanbanDataSourceChangedArgs<TCard> : JsObject
         where TCard : class, new()
     {
         /// <summary>The kind of change.</summary>
@@ -314,7 +314,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>A column for <see cref="FusionKanban.AddColumn"/>.</summary>
-    public class FusionKanbanColumn
+    public sealed class FusionKanbanColumn
     {
         /// <summary>The column header.</summary>
         public string HeaderText { get; set; } = "";

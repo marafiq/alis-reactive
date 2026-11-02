@@ -6,7 +6,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// Renders a <c>native-text</c> element as a styled paragraph or inline span.
 /// </summary>
 [HtmlTargetElement("native-text")]
-public class NativeTextTagHelper : TagHelper
+public sealed class NativeTextTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the rendered text size. Defaults to <see cref="TextSize.Base"/>.

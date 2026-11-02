@@ -320,7 +320,7 @@ namespace Alis.Reactive.Fusion
     /// and <c>search</c> appear only on the trigger variants that emit them.
     /// Do not infer missing fields from another variant.
     /// </remarks>
-    public class FusionGridDataStateChangeArgs : JsObject
+    public sealed class FusionGridDataStateChangeArgs : JsObject
     {
         /// <summary>Syncfusion event name injected by the EJ2 event observer.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
@@ -357,7 +357,7 @@ namespace Alis.Reactive.Fusion
     /// One sort column in the grid's sorted state.
     /// Syncfusion uses lowercase direction values: <c>ascending</c> and <c>descending</c>.
     /// </summary>
-    public class FusionGridSortColumn
+    public sealed class FusionGridSortColumn
     {
         /// <summary>Field name being sorted.</summary>
         public string Name { get; set; } = "";
@@ -369,7 +369,7 @@ namespace Alis.Reactive.Fusion
     /// <summary>
     /// Text filter criterion emitted by Grid dataStateChange for filter-bar/menu text filters.
     /// </summary>
-    public class FusionGridTextFilterCriterion
+    public sealed class FusionGridTextFilterCriterion
     {
         /// <summary>Field being filtered.</summary>
         public string Field { get; set; } = "";
@@ -399,7 +399,7 @@ namespace Alis.Reactive.Fusion
     /// <summary>
     /// Search criteria emitted by Grid dataStateChange for toolbar/search method operations.
     /// </summary>
-    public class FusionGridSearchDescriptor
+    public sealed class FusionGridSearchDescriptor
     {
         /// <summary>Fields included in the search.</summary>
         public List<string> Fields { get; set; } = new List<string>();
@@ -422,7 +422,7 @@ namespace Alis.Reactive.Fusion
     /// Contains <c>requestType</c> plus context-specific parameters.
     /// </summary>
     /// <remarks>Compare <see cref="RequestType"/> with the constants, such as <see cref="Sorting"/>, in <c>When</c> conditions.</remarks>
-    public class FusionGridAction
+    public sealed class FusionGridAction
     {
         /// <summary>The request type of a sort.</summary>
         public const string Sorting = "sorting";
@@ -478,7 +478,7 @@ namespace Alis.Reactive.Fusion
     /// Fires when any toolbar item is clicked, including custom items.
     /// Read <see cref="Item"/> to branch on which button was pressed.
     /// </summary>
-    public class FusionGridToolbarClickArgs : JsObject
+    public sealed class FusionGridToolbarClickArgs : JsObject
     {
         /// <summary>Toolbar item that raised the click event.</summary>
         public ReadOnly<FusionGridToolbarItem> Item => ReadOnly<FusionGridToolbarItem>();
@@ -494,7 +494,7 @@ namespace Alis.Reactive.Fusion
     /// Toolbar item carried by a Grid "toolbarClick" event.
     /// Custom items expose the id and text declared on the builder Toolbar.
     /// </summary>
-    public class FusionGridToolbarItem
+    public sealed class FusionGridToolbarItem
     {
         /// <summary>Toolbar item id, such as a custom command id or <c>{gridId}_excelexport</c>.</summary>
         public string Id { get; set; } = "";
@@ -507,7 +507,7 @@ namespace Alis.Reactive.Fusion
     /// Event args for the Syncfusion Grid "recordClick" event.
     /// </summary>
     /// <typeparam name="TRow">Grid row DTO type.</typeparam>
-    public class FusionGridRecordClickArgs<TRow> : JsObject
+    public sealed class FusionGridRecordClickArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>Row data for the clicked record.</summary>
@@ -527,7 +527,7 @@ namespace Alis.Reactive.Fusion
     /// Event args for the Syncfusion Grid "rowSelected" event.
     /// </summary>
     /// <typeparam name="TRow">Grid row DTO type.</typeparam>
-    public class FusionGridRowSelectedArgs<TRow> : JsObject
+    public sealed class FusionGridRowSelectedArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>Row data carried by the selected row event.</summary>
@@ -548,7 +548,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>The pending batch edits, as <see cref="FusionGrid.GetBatchChanges{TRow}"/> returns them.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
-    public class FusionGridBatchChanges<TRow>
+    public sealed class FusionGridBatchChanges<TRow>
         where TRow : class
     {
         /// <summary>Rows the user added.</summary>
@@ -563,7 +563,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>BeginEdit</c>; set <c>Cancel</c> to keep the row out of edit mode.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
-    public class FusionGridBeginEditArgs<TRow> : JsObject
+    public sealed class FusionGridBeginEditArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>The row about to be edited.</summary>
@@ -581,7 +581,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>ActionBegin</c> and <c>ActionComplete</c>; set <c>Cancel</c> in <c>ActionBegin</c> to stop the action.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
-    public class FusionGridEditActionArgs<TRow> : JsObject
+    public sealed class FusionGridEditActionArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>The event name.</summary>
@@ -615,7 +615,7 @@ namespace Alis.Reactive.Fusion
     /// <summary>Payload of <c>CellSave</c>; set <c>Cancel</c> to keep the cell from saving.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
     /// <typeparam name="TValue">The type of the cell value.</typeparam>
-    public class FusionGridCellSaveArgs<TRow, TValue> : JsObject
+    public sealed class FusionGridCellSaveArgs<TRow, TValue> : JsObject
         where TRow : class
     {
         /// <summary>The row of the cell.</summary>
@@ -637,7 +637,7 @@ namespace Alis.Reactive.Fusion
     /// <summary>Payload of <c>CellSaved</c>.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
     /// <typeparam name="TValue">The type of the cell value.</typeparam>
-    public class FusionGridCellSavedArgs<TRow, TValue> : JsObject
+    public sealed class FusionGridCellSavedArgs<TRow, TValue> : JsObject
         where TRow : class
     {
         /// <summary>The row of the cell.</summary>
@@ -655,7 +655,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <c>BeforeBatchSave</c>; set <c>Cancel</c> to keep the pending edits unsaved.</summary>
     /// <typeparam name="TRow">Your row class.</typeparam>
-    public class FusionGridBeforeBatchSaveArgs<TRow> : JsObject
+    public sealed class FusionGridBeforeBatchSaveArgs<TRow> : JsObject
         where TRow : class
     {
         /// <summary>The pending edits.</summary>

@@ -48,7 +48,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.Input"/>.</summary>
-    public class FusionOtpInputInputArgs : JsObject
+    public sealed class FusionOtpInputInputArgs : JsObject
     {
         /// <summary>Passcode after the edit.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.ValueChanged"/>.</summary>
-    public class FusionOtpInputValueChangedArgs : JsObject
+    public sealed class FusionOtpInputValueChangedArgs : JsObject
     {
         /// <summary>Passcode after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -74,7 +74,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.Focus"/>.</summary>
-    public class FusionOtpInputFocusArgs : JsObject
+    public sealed class FusionOtpInputFocusArgs : JsObject
     {
         /// <summary>Passcode when the field receives focus.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -87,7 +87,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionOtpInput.Blur"/>.</summary>
-    public class FusionOtpInputBlurArgs : JsObject
+    public sealed class FusionOtpInputBlurArgs : JsObject
     {
         /// <summary>Passcode when the field loses focus.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeTextBox.Change"/>, read from the element.</summary>
-    public class NativeTextBoxChangeArgs : JsObject
+    public sealed class NativeTextBoxChangeArgs : JsObject
     {
         /// <summary>The input value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

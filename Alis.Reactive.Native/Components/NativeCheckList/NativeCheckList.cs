@@ -26,7 +26,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeCheckList.Change"/>, read from the container.</summary>
-    public class NativeCheckListChangeArgs : JsObject
+    public sealed class NativeCheckListChangeArgs : JsObject
     {
         /// <summary>The checked values after the change.</summary>
         public ReadOnly<string[]> Value => ReadOnly<string[]>();

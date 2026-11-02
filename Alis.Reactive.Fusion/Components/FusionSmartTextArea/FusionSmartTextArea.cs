@@ -43,7 +43,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.Change"/>.</summary>
-    public class FusionSmartTextAreaChangeArgs : JsObject
+    public sealed class FusionSmartTextAreaChangeArgs : JsObject
     {
         /// <summary>Text after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -56,7 +56,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.BeforeSuggestionInsert"/>.</summary>
-    public class FusionSmartTextAreaBeforeSuggestionInsertArgs : JsObject
+    public sealed class FusionSmartTextAreaBeforeSuggestionInsertArgs : JsObject
     {
         /// <summary>The suggestion about to be inserted.</summary>
         public ReadOnly<string> Text => ReadOnly<string>();
@@ -66,7 +66,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.AfterSuggestionInsert"/>.</summary>
-    public class FusionSmartTextAreaAfterSuggestionInsertArgs : JsObject
+    public sealed class FusionSmartTextAreaAfterSuggestionInsertArgs : JsObject
     {
         /// <summary>The inserted suggestion.</summary>
         public ReadOnly<string> InsertedText => ReadOnly<string>();

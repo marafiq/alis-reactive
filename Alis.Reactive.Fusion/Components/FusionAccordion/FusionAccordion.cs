@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionAccordion.Expanded"/>.</summary>
-    public class FusionAccordionExpandedArgs : JsObject
+    public sealed class FusionAccordionExpandedArgs : JsObject
     {
         /// <summary>Index of the item that changed.</summary>
         public ReadOnly<int> Index => ReadOnly<int>();

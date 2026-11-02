@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type represented by the checked state, typically <see cref="bool"/>.</typeparam>
-    public class NativeCheckBoxBuilder<TModel, TProp> :
+    public sealed class NativeCheckBoxBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
 #else

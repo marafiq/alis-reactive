@@ -67,7 +67,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionDropDownList.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).Eq("US")</c>.</remarks>
-    public class FusionDropDownListChangeArgs : JsObject
+    public sealed class FusionDropDownListChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -77,12 +77,12 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionDropDownList.Focus"/>; carries no data.</summary>
-    public class FusionDropDownListFocusArgs : JsObject
+    public sealed class FusionDropDownListFocusArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionDropDownList.Blur"/>; carries no data.</summary>
-    public class FusionDropDownListBlurArgs : JsObject
+    public sealed class FusionDropDownListBlurArgs : JsObject
     {
     }
 

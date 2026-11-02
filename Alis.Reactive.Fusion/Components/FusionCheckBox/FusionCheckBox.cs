@@ -47,7 +47,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionCheckBox.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Checked).Truthy()</c>.</remarks>
-    public class FusionCheckBoxChangeArgs : JsObject
+    public sealed class FusionCheckBoxChangeArgs : JsObject
     {
         /// <summary>Whether the box is checked after the change.</summary>
         public ReadOnly<bool> Checked => ReadOnly<bool>();

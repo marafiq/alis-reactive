@@ -30,14 +30,14 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionToolbar.Clicked"/>.</summary>
     /// <remarks>Read the clicked item: <c>p.When(args.Item.Get(i =&gt; i.Id)).Eq("save")</c>.</remarks>
-    public class FusionToolbarClickedArgs : JsObject
+    public sealed class FusionToolbarClickedArgs : JsObject
     {
         /// <summary>The clicked item.</summary>
         public ReadOnly<FusionToolbarItem> Item => ReadOnly<FusionToolbarItem>();
     }
 
     /// <summary>A toolbar item as the <see cref="FusionToolbar.Clicked"/> payload reports it.</summary>
-    public class FusionToolbarItem
+    public sealed class FusionToolbarItem
     {
         /// <summary>The item ID.</summary>
         public string Id { get; set; } = string.Empty;

@@ -7,7 +7,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// children out side by side.
 /// </summary>
 [HtmlTargetElement("native-hstack")]
-public class NativeHStackTagHelper : TagHelper
+public sealed class NativeHStackTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.

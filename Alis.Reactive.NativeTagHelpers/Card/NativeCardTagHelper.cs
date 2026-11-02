@@ -7,7 +7,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// body, and footer sections.
 /// </summary>
 [HtmlTargetElement("native-card")]
-public class NativeCardTagHelper : TagHelper
+public sealed class NativeCardTagHelper : TagHelper
 {
     /// <summary>
     /// Controls how prominently the card lifts off the page. Defaults to <see cref="CardElevation.Low"/>.

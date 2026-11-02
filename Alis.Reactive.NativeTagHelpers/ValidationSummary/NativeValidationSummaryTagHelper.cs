@@ -16,7 +16,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// </remarks>
 /// <example><c>&lt;native-validation-summary form="room-hold-form" /&gt;</c></example>
 [HtmlTargetElement("native-validation-summary")]
-public class NativeValidationSummaryTagHelper(IHtmlHelper html) : TagHelper
+public sealed class NativeValidationSummaryTagHelper(IHtmlHelper html) : TagHelper
 {
     /// <summary>
     /// Required element id of the form whose summary this is: the container a request validates

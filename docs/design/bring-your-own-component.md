@@ -158,7 +158,7 @@ public sealed class ThermostatReading : JsObject                    // what read
     public TypedSource<string> Label() => Method<string>();
 }
 
-public class ThermostatTargetChangingArgs : JsObject                // a payload the page reads, writes and calls
+public sealed class ThermostatTargetChangingArgs : JsObject                // a payload the page reads, writes and calls
 {
     public ReadOnly<int> Requested => ReadOnly<int>();
     public ReadOnly<int> Previous => ReadOnly<int>();
@@ -168,7 +168,7 @@ public class ThermostatTargetChangingArgs : JsObject                // a payload
     public void Accept() => Method();
 }
 
-public class ThermostatTargetChangedArgs : JsObject
+public sealed class ThermostatTargetChangedArgs : JsObject
 {
     public ReadOnly<int> Value => ReadOnly<int>();
     public ReadOnly<int> Previous => ReadOnly<int>();

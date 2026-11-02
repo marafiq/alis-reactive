@@ -62,7 +62,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionProgressButton.Begin"/>, <see cref="FusionProgressButton.Progress"/> and <see cref="FusionProgressButton.End"/>.</summary>
-    public class FusionProgressButtonProgressArgs : JsObject
+    public sealed class FusionProgressButtonProgressArgs : JsObject
     {
         /// <summary>Progress completed, in percent.</summary>
         public ReadOnly<double> Percent => ReadOnly<double>();

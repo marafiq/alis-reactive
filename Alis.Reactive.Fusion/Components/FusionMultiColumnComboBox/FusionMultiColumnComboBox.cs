@@ -50,7 +50,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionMultiColumnComboBox.Change"/>.</summary>
-    public class FusionMultiColumnComboBoxChangeArgs : JsObject
+    public sealed class FusionMultiColumnComboBoxChangeArgs : JsObject
     {
         /// <summary>Selected value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

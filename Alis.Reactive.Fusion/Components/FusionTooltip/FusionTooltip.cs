@@ -51,31 +51,31 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeOpen"/>.</summary>
-    public class FusionTooltipBeforeOpenArgs : JsObject
+    public sealed class FusionTooltipBeforeOpenArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeClose"/>.</summary>
-    public class FusionTooltipBeforeCloseArgs : JsObject
+    public sealed class FusionTooltipBeforeCloseArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.AfterOpen"/>; carries no data.</summary>
-    public class FusionTooltipAfterOpenArgs : JsObject
+    public sealed class FusionTooltipAfterOpenArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.AfterClose"/>; carries no data.</summary>
-    public class FusionTooltipAfterCloseArgs : JsObject
+    public sealed class FusionTooltipAfterCloseArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeRender"/>.</summary>
-    public class FusionTooltipBeforeRenderArgs : JsObject
+    public sealed class FusionTooltipBeforeRenderArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Property<bool> Cancel => Property<bool>();

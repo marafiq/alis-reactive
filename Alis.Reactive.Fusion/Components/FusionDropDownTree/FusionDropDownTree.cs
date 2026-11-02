@@ -46,7 +46,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionDropDownTree.Change"/>.</summary>
-    public class FusionDropDownTreeChangeArgs : JsObject
+    public sealed class FusionDropDownTreeChangeArgs : JsObject
     {
         /// <summary>Selected values after the change.</summary>
         public ReadOnly<string[]> Value => ReadOnly<string[]>();

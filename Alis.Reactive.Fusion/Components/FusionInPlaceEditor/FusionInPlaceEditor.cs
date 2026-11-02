@@ -88,7 +88,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.BeginEdit"/>.</summary>
-    public class FusionInPlaceEditorBeginEditArgs : JsObject
+    public sealed class FusionInPlaceEditorBeginEditArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Property<bool> Cancel => Property<bool>();
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.EndEdit"/>.</summary>
-    public class FusionInPlaceEditorEndEditArgs : JsObject
+    public sealed class FusionInPlaceEditorEndEditArgs : JsObject
     {
         /// <summary>Why the editor is closing.</summary>
         public ReadOnly<string> Action => ReadOnly<string>();
@@ -120,7 +120,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.Change"/>.</summary>
-    public class FusionInPlaceEditorChangeArgs : JsObject
+    public sealed class FusionInPlaceEditorChangeArgs : JsObject
     {
         /// <summary>The value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -133,7 +133,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.ActionBegin"/>.</summary>
-    public class FusionInPlaceEditorActionBeginArgs : JsObject
+    public sealed class FusionInPlaceEditorActionBeginArgs : JsObject
     {
         /// <summary>What is about to be submitted: the field's name, the record's key and the value.</summary>
         public ReadOnly<FusionInPlaceEditorSubmission> Data => ReadOnly<FusionInPlaceEditorSubmission>();
@@ -156,7 +156,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.ActionSuccess"/>.</summary>
-    public class FusionInPlaceEditorActionSuccessArgs : JsObject
+    public sealed class FusionInPlaceEditorActionSuccessArgs : JsObject
     {
         /// <summary>The server's answer, typed by the class the editor's own request returns.</summary>
         /// <typeparam name="TResponse">The answer's class.</typeparam>
@@ -170,14 +170,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.SubmitClick"/>.</summary>
-    public class FusionInPlaceEditorSubmitClickArgs : JsObject
+    public sealed class FusionInPlaceEditorSubmitClickArgs : JsObject
     {
         /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionInPlaceEditor.CancelClick"/>.</summary>
-    public class FusionInPlaceEditorCancelClickArgs : JsObject
+    public sealed class FusionInPlaceEditorCancelClickArgs : JsObject
     {
         /// <summary>The event's own name, which EJ2 sets on every payload; the edited field's name is not sent.</summary>
         public ReadOnly<string> Name => ReadOnly<string>();

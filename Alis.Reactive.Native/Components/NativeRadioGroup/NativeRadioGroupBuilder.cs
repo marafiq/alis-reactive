@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type represented by the selected radio option.</typeparam>
-    public class NativeRadioGroupBuilder<TModel, TProp> :
+    public sealed class NativeRadioGroupBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
     {

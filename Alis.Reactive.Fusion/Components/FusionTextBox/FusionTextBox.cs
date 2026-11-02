@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Input"/>.</summary>
-    public class FusionTextBoxInputArgs : JsObject
+    public sealed class FusionTextBoxInputArgs : JsObject
     {
         /// <summary>Text reported by the input event.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Change"/>.</summary>
-    public class FusionTextBoxChangeArgs : JsObject
+    public sealed class FusionTextBoxChangeArgs : JsObject
     {
         /// <summary>Text after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -76,14 +76,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Focus"/>.</summary>
-    public class FusionTextBoxFocusArgs : JsObject
+    public sealed class FusionTextBoxFocusArgs : JsObject
     {
         /// <summary>Text when the input receives focus.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Blur"/>.</summary>
-    public class FusionTextBoxBlurArgs : JsObject
+    public sealed class FusionTextBoxBlurArgs : JsObject
     {
         /// <summary>Text when the input loses focus.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

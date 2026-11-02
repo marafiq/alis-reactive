@@ -7,7 +7,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// children top to bottom.
 /// </summary>
 [HtmlTargetElement("native-vstack")]
-public class NativeVStackTagHelper : TagHelper
+public sealed class NativeVStackTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.

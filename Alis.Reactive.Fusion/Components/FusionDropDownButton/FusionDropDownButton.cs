@@ -53,14 +53,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionDropDownButton.Select"/>.</summary>
-    public class FusionDropDownButtonSelectArgs : JsObject
+    public sealed class FusionDropDownButtonSelectArgs : JsObject
     {
         /// <summary>The selected item.</summary>
         public ReadOnly<FusionDropDownButtonItem> Item => ReadOnly<FusionDropDownButtonItem>();
     }
 
     /// <summary>A popup item as the <see cref="FusionDropDownButton.Select"/> payload reports it.</summary>
-    public class FusionDropDownButtonItem
+    public sealed class FusionDropDownButtonItem
     {
         /// <summary>The item ID.</summary>
         public string Id { get; set; } = string.Empty;

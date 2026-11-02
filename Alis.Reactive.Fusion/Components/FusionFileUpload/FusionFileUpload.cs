@@ -43,7 +43,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionFileUpload.Selected"/>.</summary>
-    public class FusionFileUploadSelectedArgs : JsObject
+    public sealed class FusionFileUploadSelectedArgs : JsObject
     {
         /// <summary>The files just selected: <c>p.From(args.FilesData).Count()</c> counts them.</summary>
         public ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
@@ -53,14 +53,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionFileUpload.FilesChanged"/>.</summary>
-    public class FusionFileUploadFilesChangedArgs : JsObject
+    public sealed class FusionFileUploadFilesChangedArgs : JsObject
     {
         /// <summary>The files the uploader holds now: <c>p.From(args.FilesData).Count()</c> counts them.</summary>
         public ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
     }
 
     /// <summary>A file the uploader lists, by the names its JavaScript API uses.</summary>
-    public class FusionUploaderFile
+    public sealed class FusionUploaderFile
     {
         /// <summary>The file's name.</summary>
         public string Name { get; set; } = "";

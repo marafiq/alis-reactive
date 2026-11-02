@@ -42,7 +42,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionCarousel.SlideChanging"/>.</summary>
-    public class FusionCarouselSlideChangingArgs : JsObject
+    public sealed class FusionCarouselSlideChangingArgs : JsObject
     {
         /// <summary>Index of the slide shown now.</summary>
         public ReadOnly<int> CurrentIndex => ReadOnly<int>();
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionCarousel.SlideChanged"/>.</summary>
-    public class FusionCarouselSlideChangedArgs : JsObject
+    public sealed class FusionCarouselSlideChangedArgs : JsObject
     {
         /// <summary>Index of the slide shown now.</summary>
         public ReadOnly<int> CurrentIndex => ReadOnly<int>();

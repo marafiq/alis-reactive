@@ -93,7 +93,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="MedicationList.Changed"/>.</summary>
-    public class MedicationListChangedArgs : JsObject
+    public sealed class MedicationListChangedArgs : JsObject
     {
         /// <summary>The medication whose line changed; empty when the whole list did.</summary>
         public ReadOnly<string> Changed => ReadOnly<string>();

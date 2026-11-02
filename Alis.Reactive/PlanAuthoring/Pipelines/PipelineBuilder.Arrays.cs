@@ -5,7 +5,7 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
-    public partial class PipelineBuilder<TModel> where TModel : class
+    public sealed partial class PipelineBuilder<TModel> where TModel : class
     {
         /// <summary>
         /// Begins a typed array transform over a component/method array source, e.g.

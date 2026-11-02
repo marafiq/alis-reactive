@@ -49,7 +49,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionMention.Change"/>.</summary>
-    public class FusionMentionChangeArgs : JsObject
+    public sealed class FusionMentionChangeArgs : JsObject
     {
         /// <summary>The picked suggestion's value.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();
@@ -59,7 +59,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionMention.Opened"/> and <see cref="FusionMention.Closed"/>; carries no data.</summary>
-    public class FusionMentionPopupArgs : JsObject
+    public sealed class FusionMentionPopupArgs : JsObject
     {
     }
 

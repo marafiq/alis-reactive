@@ -53,14 +53,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeOpen"/>.</summary>
-    public class FusionDialogBeforeOpenArgs : JsObject
+    public sealed class FusionDialogBeforeOpenArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Property<bool> Cancel => Property<bool>();
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeClose"/>.</summary>
-    public class FusionDialogBeforeCloseArgs : JsObject
+    public sealed class FusionDialogBeforeCloseArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Property<bool> Cancel => Property<bool>();
@@ -70,17 +70,17 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionDialog.Open"/>; carries no data.</summary>
-    public class FusionDialogOpenArgs : JsObject
+    public sealed class FusionDialogOpenArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionDialog.Close"/>; carries no data.</summary>
-    public class FusionDialogCloseArgs : JsObject
+    public sealed class FusionDialogCloseArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionDialog.OverlayClick"/>; carries no data.</summary>
-    public class FusionDialogOverlayClickArgs : JsObject
+    public sealed class FusionDialogOverlayClickArgs : JsObject
     {
     }
 

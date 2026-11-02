@@ -53,19 +53,19 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSplitButton.Click"/>; carries no data.</summary>
-    public class FusionSplitButtonClickArgs : JsObject
+    public sealed class FusionSplitButtonClickArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionSplitButton.Select"/>.</summary>
-    public class FusionSplitButtonSelectArgs : JsObject
+    public sealed class FusionSplitButtonSelectArgs : JsObject
     {
         /// <summary>The selected item.</summary>
         public ReadOnly<FusionSplitButtonItem> Item => ReadOnly<FusionSplitButtonItem>();
     }
 
     /// <summary>A popup item as the <see cref="FusionSplitButton.Select"/> payload reports it.</summary>
-    public class FusionSplitButtonItem
+    public sealed class FusionSplitButtonItem
     {
         /// <summary>The item ID.</summary>
         public string Id { get; set; } = string.Empty;

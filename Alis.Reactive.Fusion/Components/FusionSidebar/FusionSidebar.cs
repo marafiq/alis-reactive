@@ -41,7 +41,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSidebar.Open"/> and <see cref="FusionSidebar.Close"/>.</summary>
-    public class FusionSidebarTransitionArgs : JsObject
+    public sealed class FusionSidebarTransitionArgs : JsObject
     {
         /// <summary>Whether user interaction caused the transition.</summary>
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();

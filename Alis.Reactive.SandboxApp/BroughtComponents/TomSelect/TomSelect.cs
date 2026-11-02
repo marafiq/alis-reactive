@@ -73,7 +73,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     /// which has no members to declare; read it from the component instead:
     /// <c>p.When(suite.Value).NotEmpty()</c>.
     /// </summary>
-    public class TomSelectChangeArgs : JsObject
+    public sealed class TomSelectChangeArgs : JsObject
     {
     }
 

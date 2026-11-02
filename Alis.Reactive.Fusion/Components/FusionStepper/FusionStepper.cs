@@ -48,7 +48,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepChanged"/>.</summary>
-    public class FusionStepperChangedArgs : JsObject
+    public sealed class FusionStepperChangedArgs : JsObject
     {
         /// <summary>Index of the step active before the change.</summary>
         public ReadOnly<int> PreviousStep => ReadOnly<int>();
@@ -61,7 +61,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepChanging"/>.</summary>
-    public class FusionStepperChangingArgs : JsObject
+    public sealed class FusionStepperChangingArgs : JsObject
     {
         /// <summary>Index of the step active now.</summary>
         public ReadOnly<int> PreviousStep => ReadOnly<int>();
@@ -77,7 +77,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepClick"/>.</summary>
-    public class FusionStepperClickArgs : JsObject
+    public sealed class FusionStepperClickArgs : JsObject
     {
         /// <summary>Index of the step active before the click.</summary>
         public ReadOnly<int> PreviousStep => ReadOnly<int>();

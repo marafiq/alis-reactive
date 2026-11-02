@@ -47,7 +47,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionListBox.Change"/>.</summary>
-    public class FusionListBoxChangeArgs : JsObject
+    public sealed class FusionListBoxChangeArgs : JsObject
     {
         /// <summary>Selected values after the change.</summary>
         public ReadOnly<string[]> Value => ReadOnly<string[]>();

@@ -37,7 +37,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionTab.Selected"/>.</summary>
-    public class FusionTabSelectedArgs : JsObject
+    public sealed class FusionTabSelectedArgs : JsObject
     {
         /// <summary>Index of the selected tab.</summary>
         public ReadOnly<int> SelectedIndex => ReadOnly<int>();

@@ -14,7 +14,7 @@ namespace Alis.Reactive
     /// </summary>
     /// <typeparam name="TPayload">The payload the event declares.</typeparam>
     /// <typeparam name="TModel">View model type providing component registrations.</typeparam>
-    public class DispatchPayloadBuilder<TPayload, TModel>
+    public sealed class DispatchPayloadBuilder<TPayload, TModel>
         where TPayload : class
         where TModel : class
     {

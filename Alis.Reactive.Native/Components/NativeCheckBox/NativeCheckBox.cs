@@ -31,7 +31,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeCheckBox.Change"/>, read from the element.</summary>
-    public class NativeCheckBoxChangeArgs : JsObject
+    public sealed class NativeCheckBoxChangeArgs : JsObject
     {
         /// <summary>Whether the box is checked after the change.</summary>
         public ReadOnly<bool?> Checked => ReadOnly<bool?>();

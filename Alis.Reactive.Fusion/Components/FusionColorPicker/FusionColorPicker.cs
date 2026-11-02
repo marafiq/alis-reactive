@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionColorPicker.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
-    public class FusionColorPickerChangeArgs : JsObject
+    public sealed class FusionColorPickerChangeArgs : JsObject
     {
         /// <summary>Color after the change, as a hex string with alpha such as <c>#1dc7e1ff</c>.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

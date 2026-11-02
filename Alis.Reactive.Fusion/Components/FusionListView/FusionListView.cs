@@ -39,7 +39,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionListView.Select"/>.</summary>
-    public class FusionListViewSelectArgs : JsObject
+    public sealed class FusionListViewSelectArgs : JsObject
     {
         /// <summary>Text of the selected item.</summary>
         public ReadOnly<string> Text => ReadOnly<string>();

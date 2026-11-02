@@ -21,7 +21,7 @@ namespace Alis.Reactive
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
-    public class InputBoundField<TModel, TProp>
+    public sealed class InputBoundField<TModel, TProp>
 #if NET48
         : InputBoundFieldBase<HtmlHelper<TModel>, TModel, TProp>
 #else

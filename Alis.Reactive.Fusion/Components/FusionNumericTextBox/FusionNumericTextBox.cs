@@ -51,7 +51,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Change"/>.</summary>
     /// <remarks>Read in conditions: <c>p.When(args.Value).Gte(100m)</c>.</remarks>
-    public class FusionNumericTextBoxChangeArgs : JsObject
+    public sealed class FusionNumericTextBoxChangeArgs : JsObject
     {
         /// <summary>Numeric value after the change.</summary>
         public ReadOnly<decimal> Value => ReadOnly<decimal>();
@@ -64,12 +64,12 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Focus"/>; carries no data.</summary>
-    public class FusionNumericTextBoxFocusArgs : JsObject
+    public sealed class FusionNumericTextBoxFocusArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Blur"/>; carries no data.</summary>
-    public class FusionNumericTextBoxBlurArgs : JsObject
+    public sealed class FusionNumericTextBoxBlurArgs : JsObject
     {
     }
 

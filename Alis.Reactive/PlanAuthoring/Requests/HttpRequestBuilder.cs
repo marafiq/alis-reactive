@@ -13,7 +13,7 @@ namespace Alis.Reactive
     /// <c>p.Post("/url")</c>. A branch of <c>p.Parallel(...)</c> and a <c>Chained</c> request start the same way.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
-    public class HttpRequestBuilder<TModel> where TModel : class
+    public sealed class HttpRequestBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
 

@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeRadioGroup.Change"/>, read from the hidden input.</summary>
-    public class NativeRadioGroupChangeArgs : JsObject
+    public sealed class NativeRadioGroupChangeArgs : JsObject
     {
         /// <summary>The chosen option value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

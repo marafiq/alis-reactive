@@ -8,7 +8,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// centered label.
 /// </summary>
 [HtmlTargetElement("native-divider")]
-public class NativeDividerTagHelper : TagHelper
+public sealed class NativeDividerTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the visual treatment of the rule. Defaults to <see cref="DividerStyle.Plain"/>.

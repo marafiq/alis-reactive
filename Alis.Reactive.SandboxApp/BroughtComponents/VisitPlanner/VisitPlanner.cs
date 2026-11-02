@@ -151,7 +151,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.WeekChanged"/>.</summary>
-    public class VisitPlannerWeekChangedArgs : JsObject
+    public sealed class VisitPlannerWeekChangedArgs : JsObject
     {
         /// <summary>The booked time ids after the change.</summary>
         public ReadOnly<List<string>> Value => ReadOnly<List<string>>();
@@ -170,7 +170,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.Full"/>; it carries a method as well as data.</summary>
-    public class VisitPlannerFullArgs : JsObject
+    public sealed class VisitPlannerFullArgs : JsObject
     {
         /// <summary>How many visits the week allows.</summary>
         public ReadOnly<int> Capacity => ReadOnly<int>();
@@ -183,7 +183,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.BeforeBook"/>; the planner reads <see cref="Cancel"/> back.</summary>
-    public class VisitPlannerBeforeBookArgs : JsObject
+    public sealed class VisitPlannerBeforeBookArgs : JsObject
     {
         /// <summary>The time about to be booked; read into it with <c>args.Slot.Get(x =&gt; x.Quiet)</c>.</summary>
         public ReadOnly<VisitSlot> Slot => ReadOnly<VisitSlot>();
@@ -193,7 +193,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="VisitPlanner.SlotsLoaded"/>.</summary>
-    public class VisitPlannerSlotsLoadedArgs : JsObject
+    public sealed class VisitPlannerSlotsLoadedArgs : JsObject
     {
         /// <summary>How many times are offered.</summary>
         public ReadOnly<int> Count => ReadOnly<int>();

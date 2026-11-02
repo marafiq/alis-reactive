@@ -102,7 +102,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="Whiteboard.NoteAdded"/>.</summary>
-    public class WhiteboardNoteArgs : JsObject
+    public sealed class WhiteboardNoteArgs : JsObject
     {
         /// <summary>The note's number.</summary>
         public ReadOnly<int> Number => ReadOnly<int>();

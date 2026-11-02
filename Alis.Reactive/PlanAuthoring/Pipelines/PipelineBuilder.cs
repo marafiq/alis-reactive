@@ -23,7 +23,7 @@ namespace Alis.Reactive
     /// Reactions execute in declaration order.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs and validation/gather fields.</typeparam>
-    public partial class PipelineBuilder<TModel> where TModel : class
+    public sealed partial class PipelineBuilder<TModel> where TModel : class
     {
         internal PlanBuildContext Context { get; }
 

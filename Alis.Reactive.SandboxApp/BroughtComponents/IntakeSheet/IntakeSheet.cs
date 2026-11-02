@@ -132,7 +132,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="IntakeSheet.Changed"/>.</summary>
-    public class IntakeChangedArgs : JsObject
+    public sealed class IntakeChangedArgs : JsObject
     {
         /// <summary>The field the coordinator edited, by its JavaScript name.</summary>
         public ReadOnly<string> Field => ReadOnly<string>();

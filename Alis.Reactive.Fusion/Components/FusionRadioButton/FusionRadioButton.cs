@@ -44,7 +44,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionRadioButton.Change"/>.</summary>
-    public class FusionRadioButtonChangeArgs : JsObject
+    public sealed class FusionRadioButtonChangeArgs : JsObject
     {
         /// <summary>Value of the checked radio button.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

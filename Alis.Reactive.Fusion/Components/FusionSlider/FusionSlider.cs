@@ -38,7 +38,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSlider.Change"/> and <see cref="FusionSlider.Changed"/>.</summary>
-    public class FusionSliderChangeArgs : JsObject
+    public sealed class FusionSliderChangeArgs : JsObject
     {
         /// <summary>The value after the move.</summary>
         public ReadOnly<double> Value => ReadOnly<double>();

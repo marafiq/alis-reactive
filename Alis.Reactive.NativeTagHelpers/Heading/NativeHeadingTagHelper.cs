@@ -8,7 +8,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// a small overline label.
 /// </summary>
 [HtmlTargetElement("native-heading")]
-public class NativeHeadingTagHelper : TagHelper
+public sealed class NativeHeadingTagHelper : TagHelper
 {
     /// <summary>
     /// Selects both the heading tag (<c>h1</c> through <c>h6</c>) and its type

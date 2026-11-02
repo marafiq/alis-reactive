@@ -6,7 +6,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// Renders a <c>native-card-body</c> element as the main content section of a card.
 /// </summary>
 [HtmlTargetElement("native-card-body", ParentTag = "native-card")]
-public class NativeCardBodyTagHelper : TagHelper
+public sealed class NativeCardBodyTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the inner padding of the body section. Defaults to <see cref="CardPadding.Standard"/>.

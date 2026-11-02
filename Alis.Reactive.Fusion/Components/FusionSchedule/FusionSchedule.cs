@@ -129,7 +129,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.CellClick"/>.</summary>
-    public class FusionScheduleCellClickArgs : JsObject
+    public sealed class FusionScheduleCellClickArgs : JsObject
     {
         /// <summary>Start of the clicked cell.</summary>
         public ReadOnly<DateTime> StartTime => ReadOnly<DateTime>();
@@ -145,7 +145,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.EventClick"/>.</summary>
-    public class FusionScheduleEventClickArgs : JsObject
+    public sealed class FusionScheduleEventClickArgs : JsObject
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>
         public Property<bool> Cancel => Property<bool>();
@@ -164,7 +164,7 @@ namespace Alis.Reactive.Fusion
     /// pairs for a recurring event).
     /// </remarks>
     /// <typeparam name="TEvent">Your event class.</typeparam>
-    public class FusionScheduleActionBeginArgs<TEvent> : JsObject
+    public sealed class FusionScheduleActionBeginArgs<TEvent> : JsObject
         where TEvent : class
     {
         /// <summary>
@@ -187,14 +187,14 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.ActionComplete"/>.</summary>
-    public class FusionScheduleActionCompleteArgs : JsObject
+    public sealed class FusionScheduleActionCompleteArgs : JsObject
     {
         /// <summary>The kind of action.</summary>
         public ReadOnly<string> RequestType => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.Navigating"/>.</summary>
-    public class FusionScheduleNavigatingArgs : JsObject
+    public sealed class FusionScheduleNavigatingArgs : JsObject
     {
         /// <summary><c>"date"</c> or <c>"view"</c>.</summary>
         public ReadOnly<string> Action => ReadOnly<string>();
@@ -220,7 +220,7 @@ namespace Alis.Reactive.Fusion
 
     /// <summary>Payload of <see cref="FusionSchedule.PopupOpen{TEvent}"/>.</summary>
     /// <typeparam name="TEvent">Your event class.</typeparam>
-    public class FusionSchedulePopupOpenArgs<TEvent> : JsObject
+    public sealed class FusionSchedulePopupOpenArgs<TEvent> : JsObject
         where TEvent : class
     {
         /// <summary>The popup: <c>"QuickInfo"</c>, <c>"Editor"</c>, <c>"DeleteAlert"</c>, ...</summary>
@@ -237,20 +237,20 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.PopupClose"/>.</summary>
-    public class FusionSchedulePopupCloseArgs : JsObject
+    public sealed class FusionSchedulePopupCloseArgs : JsObject
     {
         /// <summary>The popup that closes.</summary>
         public ReadOnly<string> Type => ReadOnly<string>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.DataBound"/>; carries no data.</summary>
-    public class FusionScheduleDataBoundArgs : JsObject
+    public sealed class FusionScheduleDataBoundArgs : JsObject
     {
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.EventRendered{TEvent}"/>.</summary>
     /// <typeparam name="TEvent">Your event class.</typeparam>
-    public class FusionScheduleEventRenderedArgs<TEvent> : JsObject
+    public sealed class FusionScheduleEventRenderedArgs<TEvent> : JsObject
         where TEvent : class, new()
     {
         /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to stop the action.</summary>

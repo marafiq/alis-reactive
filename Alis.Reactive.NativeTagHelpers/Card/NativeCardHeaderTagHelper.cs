@@ -6,7 +6,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// Renders a <c>native-card-header</c> element as the header section of a card.
 /// </summary>
 [HtmlTargetElement("native-card-header", ParentTag = "native-card")]
-public class NativeCardHeaderTagHelper : TagHelper
+public sealed class NativeCardHeaderTagHelper : TagHelper
 {
     /// <summary>
     /// Selects which header edges show a separating border. Defaults to <see cref="CardDivider.None"/>.

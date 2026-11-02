@@ -7,7 +7,7 @@ namespace Alis.Reactive.NativeTagHelpers;
 /// Renders a <c>native-kv</c> element as a key/value pair using a <c>dl</c> definition list.
 /// </summary>
 [HtmlTargetElement("native-kv")]
-public class NativeKvTagHelper : TagHelper
+public sealed class NativeKvTagHelper : TagHelper
 {
     /// <summary>
     /// Required label shown for the pair. The tag helper throws when this attribute

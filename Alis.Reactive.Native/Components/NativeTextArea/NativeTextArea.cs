@@ -30,7 +30,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeTextArea.Change"/>, read from the element.</summary>
-    public class NativeTextAreaChangeArgs : JsObject
+    public sealed class NativeTextAreaChangeArgs : JsObject
     {
         /// <summary>The textarea value after the change.</summary>
         public ReadOnly<string> Value => ReadOnly<string>();

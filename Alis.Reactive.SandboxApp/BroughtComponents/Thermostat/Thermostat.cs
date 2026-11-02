@@ -152,7 +152,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="ThermostatSchedule.Applied"/>.</summary>
-    public class ThermostatScheduleAppliedArgs : JsObject
+    public sealed class ThermostatScheduleAppliedArgs : JsObject
     {
         /// <summary>The target the schedule applied.</summary>
         public ReadOnly<int> Target => ReadOnly<int>();
@@ -191,7 +191,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     /// Payload of <see cref="Thermostat.TargetChanging"/>. The thermostat reads <see cref="Cancel"/> and
     /// <see cref="Reason"/> back once the page's handler ran.
     /// </summary>
-    public class ThermostatTargetChangingArgs : JsObject
+    public sealed class ThermostatTargetChangingArgs : JsObject
     {
         /// <summary>The target that was asked for.</summary>
         public ReadOnly<int> Requested => ReadOnly<int>();
@@ -213,7 +213,7 @@ namespace Alis.Reactive.SandboxApp.BroughtComponents
     }
 
     /// <summary>Payload of <see cref="Thermostat.TargetChanged"/>.</summary>
-    public class ThermostatTargetChangedArgs : JsObject
+    public sealed class ThermostatTargetChangedArgs : JsObject
     {
         /// <summary>The target after the change.</summary>
         public ReadOnly<int> Value => ReadOnly<int>();

@@ -14,7 +14,7 @@ namespace Alis.Reactive.Fusion
     /// emitted as supplied; use trusted developer-authored values.
     /// </remarks>
     /// <typeparam name="TModel">Syncfusion template context shape.</typeparam>
-    public class FusionConditionalBuilder<TModel>
+    public sealed class FusionConditionalBuilder<TModel>
     {
         private readonly List<Func<string>> _childRenderers = new List<Func<string>>();
 

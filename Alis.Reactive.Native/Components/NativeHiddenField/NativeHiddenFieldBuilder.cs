@@ -25,7 +25,7 @@ namespace Alis.Reactive.Native
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type rendered through the hidden input.</typeparam>
-    public class NativeHiddenFieldBuilder<TModel, TProp> :
+    public sealed class NativeHiddenFieldBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
     {

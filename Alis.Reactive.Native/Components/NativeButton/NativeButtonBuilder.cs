@@ -16,7 +16,7 @@ namespace Alis.Reactive.Native
     /// element ID is the Reactive Plan event target.
     /// </remarks>
     /// <typeparam name="TModel">The view's model, whose plan the button's events join.</typeparam>
-    public class NativeButtonBuilder<TModel> :
+    public sealed class NativeButtonBuilder<TModel> :
 #if NET48
         IHtmlString
 #else

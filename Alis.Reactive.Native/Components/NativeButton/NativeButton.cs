@@ -33,7 +33,7 @@ namespace Alis.Reactive.Native
     }
 
     /// <summary>Payload of <see cref="NativeButton.Click"/>; carries no data.</summary>
-    public class NativeButtonClickArgs : JsObject
+    public sealed class NativeButtonClickArgs : JsObject
     {
     }
 
