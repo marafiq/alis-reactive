@@ -31,7 +31,7 @@ public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
     {
         await Render("CallAMethodWithNoJavaScriptForm");
 
-        await Expect(Message("'String.Substring' has no pure JavaScript form the plan can call on an item; the lambda may call ChildElement.GetAttribute, ChildElement.HasAttribute, String.Trim, String.TrimStart, String.TrimEnd, String.ToUpper, String.ToUpperInvariant, String.ToLower, String.ToLowerInvariant, and test with String.Contains, String.StartsWith, String.EndsWith, String.IsNullOrEmpty, Enumerable.Contains and Regex.IsMatch.")).ToBeVisibleAsync();
+        await Expect(Message("'String.Substring' has no pure JavaScript form the plan can call on an item; the lambda may call String.Trim, String.TrimStart, String.TrimEnd, String.ToUpper, String.ToUpperInvariant, String.ToLower, String.ToLowerInvariant, and test with String.Contains, String.StartsWith, String.EndsWith, String.IsNullOrEmpty, Enumerable.Contains and Regex.IsMatch.")).ToBeVisibleAsync();
     }
 
     [Test]

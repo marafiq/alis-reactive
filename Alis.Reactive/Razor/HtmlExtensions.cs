@@ -63,7 +63,7 @@ namespace Alis.Reactive
             ReactivePlan<TModel> plan,
             Action<TriggerBuilder<TModel>> trigger) where TModel : class
         {
-            var builder = new TriggerBuilder<TModel>(plan, plan.Context);
+            var builder = new TriggerBuilder<TModel>(plan.Context);
             trigger(builder);
         }
 

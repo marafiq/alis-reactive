@@ -36,12 +36,14 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             {
                 var pipelineBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
                     "Alis.Reactive.Builders.PipelineBuilder`1");
+                var requestExtensionsType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.RequestExtensions");
 
-                if (pipelineBuilderType == null)
+                if (pipelineBuilderType == null || requestExtensionsType == null)
                     return;
 
                 compilationCtx.RegisterSyntaxNodeAction(
-                    nodeCtx => AnalyzeLambda(nodeCtx, pipelineBuilderType),
+                    nodeCtx => AnalyzeLambda(nodeCtx, pipelineBuilderType, requestExtensionsType),
                     SyntaxKind.SimpleLambdaExpression,
                     SyntaxKind.ParenthesizedLambdaExpression);
             });
@@ -49,7 +51,8 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
 
         private static void AnalyzeLambda(
             SyntaxNodeAnalysisContext context,
-            INamedTypeSymbol pipelineBuilderType)
+            INamedTypeSymbol pipelineBuilderType,
+            INamedTypeSymbol requestExtensionsType)
         {
             var lambda = (LambdaExpressionSyntax)context.Node;
 
@@ -72,7 +75,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
                     continue;
 
                 if (!StartsHttpChainOnParameter(exprStatement.Expression, pipelineParamName,
-                    context.SemanticModel, pipelineBuilderType, context.CancellationToken))
+                    context.SemanticModel, requestExtensionsType, context.CancellationToken))
                     continue;
 
                 httpStatementCount++;
@@ -88,7 +91,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             ExpressionSyntax expression,
             string parameterName,
             SemanticModel semanticModel,
-            INamedTypeSymbol pipelineBuilderType,
+            INamedTypeSymbol requestExtensionsType,
             System.Threading.CancellationToken cancellationToken)
         {
             var current = expression;
@@ -100,10 +103,11 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
                     && memberAccess.Expression is IdentifierNameSyntax identifier
                     && identifier.Identifier.Text == parameterName)
                 {
+                    // Get, Post, Put and Delete extend the pipeline from RequestExtensions.
                     var symbol = semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol;
                     return symbol is IMethodSymbol methodSymbol
                         && SymbolEqualityComparer.Default.Equals(
-                            methodSymbol.ContainingType.OriginalDefinition, pipelineBuilderType);
+                            (methodSymbol.ReducedFrom ?? methodSymbol).ContainingType, requestExtensionsType);
                 }
 
                 current = memberAccess.Expression;

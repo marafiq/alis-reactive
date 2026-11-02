@@ -28,7 +28,7 @@ internal static class Page
     private static string ViewOf<TModel>() => $"/{typeof(TModel).Name}.cshtml";
 
     internal static TriggerBuilder<TModel> Triggers<TModel>(this ReactivePlan<TModel> plan) where TModel : class =>
-        new(plan, plan.Context);
+        new(plan.Context);
 
     /// <summary>A text input rendered for a member: the element id and binding name <c>Html.InputField</c> gives it.</summary>
     internal static ReactivePlan<TModel> TextInput<TModel, TValue>(this ReactivePlan<TModel> plan, Expression<Func<TModel, TValue>> member)

@@ -18,9 +18,9 @@ namespace Alis.Reactive.Builders
     {
         private readonly PlanBuildContext _context;
 
-        internal TriggerBuilder(ReactivePlan<TModel> plan, PlanBuildContext context)
+        internal TriggerBuilder(PlanBuildContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         /// <summary>Runs a reaction pipeline after the DOM is ready and Reactive Plan listeners are wired.</summary>

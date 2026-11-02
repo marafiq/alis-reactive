@@ -24,13 +24,11 @@ namespace Alis.Reactive.Builders.Arrays
     internal static class ElementExpressionCompiler
     {
         // The methods a lambda may call on an item's value, each a C# method with a JavaScript equivalent that is
-        // pure: a per-item call is a value projection, so it must not mutate. The text methods, and the child
-        // element's own. The table is read by the method the lambda calls, so a C# name never misses its
-        // JavaScript one in silence.
+        // pure: a per-item call is a value projection, so it must not mutate. The text methods are tabled here; a
+        // framework type marks its own with PureMethodAttribute. The table is read by the method the lambda calls,
+        // so a C# name never misses its JavaScript one in silence.
         private static readonly IReadOnlyDictionary<MethodInfo, string> PureMethods = new Dictionary<MethodInfo, string>
         {
-            [MethodOf<ChildElement>(child => child.GetAttribute(""))] = "getAttribute",
-            [MethodOf<ChildElement>(child => child.HasAttribute(""))] = "hasAttribute",
             [MethodOf<string>(text => text.Trim())] = "trim",
             [MethodOf<string>(text => text.TrimStart())] = "trimStart",
             [MethodOf<string>(text => text.TrimEnd())] = "trimEnd",
@@ -63,6 +61,16 @@ namespace Alis.Reactive.Builders.Arrays
         private static readonly MethodInfo IsMatch = StaticMethodOf(() => Regex.IsMatch("", ""));
 
         private const string Tests = "String.Contains, String.StartsWith, String.EndsWith, String.IsNullOrEmpty, Enumerable.Contains and Regex.IsMatch";
+
+        // A method of the table, or one its type marks with its JavaScript name.
+        private static string? PureMethodName(MethodInfo method) =>
+            PureMethods.TryGetValue(method, out var name) ? name : method.GetCustomAttribute<PureMethodAttribute>()?.JavaScriptName;
+
+        private static IEnumerable<string> PureMethodNames(Type? objectType) =>
+            PureMethods.Keys
+                .Concat(objectType?.GetMethods().Where(method => method.GetCustomAttribute<PureMethodAttribute>() != null) ?? Enumerable.Empty<MethodInfo>())
+                .Select(NameOf)
+                .Distinct();
 
         private static MethodInfo MethodOf<T>(Expression<Func<T, object?>> call) =>
             ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
@@ -338,7 +346,7 @@ namespace Alis.Reactive.Builders.Arrays
         // JavaScript equivalent on the value before it; or a test, as the boolean it gives.
         private static ValueExpression CompileCall(MethodCallExpression call, ParameterExpression element)
         {
-            if (call.Object != null && PureMethods.TryGetValue(call.Method, out var methodName))
+            if (call.Object != null && PureMethodName(call.Method) is string methodName)
             {
                 var methodArgs = call.Arguments.Select(argument => CompileValue(argument, element)).ToList();
                 var unconverted = methodArgs.Select(_ => Shape.None).ToList();
@@ -351,7 +359,7 @@ namespace Alis.Reactive.Builders.Arrays
 
             throw new InvalidOperationException(
                 $"'{NameOf(call.Method)}' has no pure JavaScript form the plan can call on an item; " +
-                "the lambda may call " + string.Join(", ", PureMethods.Keys.Select(NameOf).Distinct()) +
+                "the lambda may call " + string.Join(", ", PureMethodNames(call.Object?.Type)) +
                 ", and test with " + Tests + ". Project the value on the server, or write a reaction for a call that " +
                 "changes the item. Got: " + call);
         }

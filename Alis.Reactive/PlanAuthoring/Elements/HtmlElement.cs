@@ -148,11 +148,13 @@ namespace Alis.Reactive
 
         /// <summary>The value of the child's attribute, read in the browser: <c>seat =&gt; seat.GetAttribute("data-supervision")</c>.</summary>
         /// <param name="name">The attribute's name.</param>
+        [PureMethod("getAttribute")]
         public string? GetAttribute(string name) =>
             throw new InvalidOperationException("A child element is read in the browser, inside an array predicate or projection.");
 
         /// <summary>Whether the child has the attribute, with a value or none, read in the browser: <c>seat =&gt; seat.HasAttribute("data-wheelchair")</c>.</summary>
         /// <param name="name">The attribute's name.</param>
+        [PureMethod("hasAttribute")]
         public bool HasAttribute(string name) =>
             throw new InvalidOperationException("A child element is read in the browser, inside an array predicate or projection.");
     }
