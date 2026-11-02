@@ -1,8 +1,9 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.Members;
+using Alis.Reactive.PlanAuthoring.Pipelines;
 
-namespace Alis.Reactive.Builders
+namespace Alis.Reactive
 {
     /// <summary>
     /// The page's URL query string, typed by the class its action binds with <c>[FromQuery]</c>. Returned by

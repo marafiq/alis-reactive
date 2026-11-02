@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Reactions;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive.PlanAuthoring.Conditions
 {
     internal static class ConditionComposition
     {

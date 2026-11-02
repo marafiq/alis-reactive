@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
+using Alis.Reactive.PlanModel.Reactions;
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Components
 {
     /// <summary>
     /// Where a live declaration's object is and the plan it writes into. A write or a call lands in the

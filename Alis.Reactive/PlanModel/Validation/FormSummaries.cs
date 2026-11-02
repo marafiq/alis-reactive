@@ -1,4 +1,4 @@
-namespace Alis.Reactive.Validation
+namespace Alis.Reactive.PlanModel.Validation
 {
     /// <summary>
     /// The summary of a form: the element that shows the messages no field of the form can show (a hidden field's,

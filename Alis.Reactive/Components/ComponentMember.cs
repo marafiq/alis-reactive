@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Components;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Components
 {
     /// <summary>
     /// A declared property: its path from the object a page holds, and the one shape of its value, which a

@@ -2,7 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Alis.Reactive.Serialization
+namespace Alis.Reactive.Grammar
 {
     /// <summary>
     /// Serializes a polymorphic plan node by writing its concrete runtime type's properties, so the

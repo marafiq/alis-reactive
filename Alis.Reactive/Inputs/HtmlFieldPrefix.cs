@@ -1,6 +1,7 @@
 using System;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.Inputs
 {
     /// <summary>
     /// The MVC field prefix a view renders under (<c>TemplateInfo.HtmlFieldPrefix</c>): a partial rendered for a

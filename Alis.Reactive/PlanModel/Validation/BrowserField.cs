@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Inputs;
 
-namespace Alis.Reactive.Validation
+namespace Alis.Reactive
 {
     /// <summary>
     /// One member of a validator's model and the rules the browser checks on it. A collection member

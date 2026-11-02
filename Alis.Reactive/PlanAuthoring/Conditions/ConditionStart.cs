@@ -1,8 +1,8 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanAuthoring.Conditions;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive
 {
     /// <summary>
     /// Starts a group inside <c>And(g =&gt; ..)</c> or <c>Or(g =&gt; ..)</c>. A group is evaluated as one

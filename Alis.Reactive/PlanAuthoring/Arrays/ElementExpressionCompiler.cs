@@ -6,12 +6,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Alis.Reactive.Builders.Conditions;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.Builders.Arrays
+namespace Alis.Reactive.PlanAuthoring.Arrays
 {
     /// <summary>
     /// Compiles a per-item lambda into the plan's closed algebra, by the member table of grammar.md 2.3. A

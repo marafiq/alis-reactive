@@ -1,11 +1,10 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.Builders
+namespace Alis.Reactive
 {
     /// <summary>
     /// Composes the payload of a declared <see cref="AppEvent{TPayload}"/> from value sources and

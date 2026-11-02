@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Components;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {

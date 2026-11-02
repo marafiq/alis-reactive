@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Alis.Reactive.WireTerms;
 using Alis.Reactive.Grammar;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Values
 {
     /// <summary>
     /// A record assembled from values at paths, in the order they were assigned: a name makes a field, an

@@ -80,7 +80,6 @@ public class ControlFlowInReactiveCallbackTests
     private static string View(string pipeline) => $$"""
         using System.Threading.Tasks;
         using Alis.Reactive;
-        using Alis.Reactive.Builders;
         using Microsoft.AspNetCore.Mvc.Razor;
         using Microsoft.AspNetCore.Mvc.Rendering;
 

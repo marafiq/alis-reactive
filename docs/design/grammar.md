@@ -424,12 +424,12 @@ A failing handler is logged and stops no other handler.
 | A response routes each outcome once: one `OnSuccess`, one `OnError` without a status, one `OnError(status)` for each status, and one `Chained` request | builder, where the second is written; ALIS007 reports a second `Chained` in one fluent chain as the view compiles |
 | Exact-status routes match before catch-alls; error routes sit behind `!res.ok` | construction: the request builder orders them |
 
-## 5. Lowering: each fluent method, as productions
+## 5. What each fluent method writes
 
 The owner's fluent API uses each object as the object (`rate.Min.Set(0m)`, `grid.Refresh()`). Every
-form lowers to fixed productions.
+form writes fixed productions.
 
-| Fluent API | Lowers to |
+| Fluent API | Writes |
 |---|---|
 | `.Reactive(evt => evt.E, (args, p) => …)`, on a rendered component | `on(o, "e", args) { … }` |
 | `t.DomReady(p => …)` | `on(document, "ready", _)` |
@@ -621,7 +621,7 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   (F8) and clears the messages inside the container by it (F4, F8).
 - **M4 Commit.** Each input carries `committed`, the event its component declares as the one that
   commits a value (`ComponentInput.Of(Value, committedBy: ...)`,
-  `Alis.Reactive/Components/Contracts/ComponentInput.cs:41`). When the plan that renders the
+  `Alis.Reactive/Components/ComponentInput.cs`). When the plan that renders the
   input starts, the model subscribes it and re-raises it on the input's element as the bubbling DOM
   event `alis:commit`, once per element and for as long as the owner lives.
 - **M8 Names.** A binding-name pattern names the mounted inputs whose binding name it spells, each
@@ -902,24 +902,38 @@ The Fusion grid maps a validator's browser rules (`plan.BrowserRules<TValidator>
 column rules, keeping only those EJ2 decides as the server does: `required`, `minLength`,
 `maxLength`, numeric `min`, `max` and `range`, and one pattern per column. `EmailAddress()` and
 `Url()` reach the cell as EJ2's `regex` with the patterns the form tests them with (`PatternRule.Pattern`,
-`Alis.Reactive/Validation/BrowserRules.cs`), because EJ2's own `email` and `url` rules decide differently.
+`Alis.Reactive/PlanModel/Validation/BrowserRules.cs`), because EJ2's own `email` and `url` rules decide differently.
 It reads the rules by their classes, not the plan.
 
 ## 8. Where the code is
 
-**C#** (`Alis.Reactive`)
+**C#** (`Alis.Reactive`), one slice per folder, each using only the slices below it (ADR-0004; the
+architecture test `CoreLayerTests` reads the folders from source and the references from the IL of both
+targets). Every public type is in the namespace `Alis.Reactive`; an internal type's namespace is its folder.
 - `Grammar`: one sealed class per production in 1.1 and 1.2, with internal constructors, invariants
-  checked in the constructor, and one-to-one serialization. This is the plan contract; the generator
-  (`tools/PlanContractGenerator`) reads these classes.
-- `Components/Contracts`: the object contract every declaration is written with (`JsObject`,
-  `Component`, `Property<T>`, `ReadOnly<T>`, `WriteOnly<T>`, `Objects<T>`, `Arg<T>`,
-  `ComponentVendor`, `ComponentInput`; `Event<TArgs>` and `Event` are in `PlanAuthoring/Events`).
-- `PlanAuthoring`: the fluent API (handlers, conditions, requests, dispatch, parallel, URL, plugins)
-  and the lambda compiler (`Arrays/ElementExpressionCompiler.cs`) through the one member table (2.3).
-- `PlanModel`: the one model that writes the grammar: steps (`Reactions/Steps.cs`), requests
-  (`Requests/RequestStep.cs`), values (`Values/ValueExpression.cs`), conditions
-  (`Conditions/Condition.cs`, one model for a validator's conditions over members and a reaction's over values), the form writer and the scope that binds responses and method
-  results (`Writing/`). `PlanBuildContext.Write` writes the plan once at render.
+  checked in the constructor, one-to-one serialization and its discriminator. This is the plan contract;
+  the generator (`tools/PlanContractGenerator`) reads these classes. `WireTerms`: the plan's terms
+  (ids, names, paths).
+- `Members`: how C# members reach the wire: expression paths, JSON member names, C# type names, enum
+  members, `Field`, the CLR type to shape mapping (`ClrShape`) and the browser's order rule.
+- `Vendors`: `ComponentVendor` and the typed-DSL exemption. `Inputs`: what the framework dictates for
+  an input before any component renders it (`IdGenerator`, `HtmlFieldPrefix`, `InputIdentity`,
+  `RenderedInput`, `FieldReference`).
+- `PlanModel`: the one model that writes the grammar, bottom up: `Writing` (the scope that binds
+  responses and method results, the declared objects), `Values`, `Conditions` (one model for a
+  validator's conditions over members and a reaction's over values), `Reactions` (the steps) beside
+  `Validation` (browser fields and rules, form checks and summaries, the form writer), `Requests` (the
+  request step, its gather model, routes and the parallel step), `Document` (`PlanBuildContext.Write`
+  writes the plan once at render).
+- `Components`: the object contract every declaration is written with (`JsObject`, `Component`,
+  `Property<T>`, `ReadOnly<T>`, `WriteOnly<T>`, `Objects<T>`, `Arg<T>`, `Event<TArgs>`, `ComponentInput`),
+  its typed sources, `Plugin` and `BrowserFile`.
+- `PlanAuthoring`: the fluent API. `Events` and `Arrays` (with the lambda compiler
+  `ElementExpressionCompiler.cs` through the one member table (2.3), and the array value nodes), `Elements`,
+  `Pipelines` (`PipelineBuilder`, `TriggerBuilder`), then `Conditions` and `Requests`, which extend the
+  pipeline (`ConditionExtensions`, `RequestExtensions`); `ReactivePlan` and `RenderedComponent` at the top.
+- `InputField`, then `Razor`: the one MVC boundary (`Html.ReactivePlan`, `Html.On`, `Html.InputField`,
+  `Html.RenderPlan`, the rendered page's record).
 - `Alis.Reactive.FluentValidator`: the projection of section 7 and its typed model.
 - `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: vendors, declarations, render helpers, Confirm,
   Toast, Drawer, Loader, and the grid's column rules.

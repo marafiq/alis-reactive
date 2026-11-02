@@ -1,9 +1,9 @@
 using System;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive.PlanModel.Requests
 {
     internal static class RequestScalarTarget
     {

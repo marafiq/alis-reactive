@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Writing;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Reactions
 {
     /// <summary>
     /// The steps a callback runs, in the order they were written. A step is placed where it is written,

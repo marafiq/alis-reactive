@@ -1,6 +1,7 @@
-using Alis.Reactive.Validation;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Values;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Conditions
 {
     /// <summary>
     /// Where a condition written over members reads a member's value once it is bound to a container: the

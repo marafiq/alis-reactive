@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Validation;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.FluentValidator
 {

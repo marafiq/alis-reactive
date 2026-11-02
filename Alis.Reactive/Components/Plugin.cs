@@ -1,4 +1,4 @@
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive
 {

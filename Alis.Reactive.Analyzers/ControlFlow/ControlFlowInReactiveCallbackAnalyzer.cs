@@ -77,9 +77,9 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             context.RegisterCompilationStartAction(compilationCtx =>
             {
                 var pipelineBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.PipelineBuilder`1");
+                    "Alis.Reactive.PipelineBuilder`1");
                 var triggerBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.TriggerBuilder`1");
+                    "Alis.Reactive.TriggerBuilder`1");
 
                 if (pipelineBuilderType == null && triggerBuilderType == null)
                     return;

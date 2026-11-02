@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Writing;
 
-namespace Alis.Reactive.Builders.Arrays
+namespace Alis.Reactive.PlanAuthoring.Arrays
 {
     internal sealed class HoldsExpression : ValueExpression
     {

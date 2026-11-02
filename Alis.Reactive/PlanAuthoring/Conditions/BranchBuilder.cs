@@ -1,7 +1,9 @@
 using System;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Reactions;
+using Alis.Reactive.PlanAuthoring.Conditions;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive
 {
     /// <summary>
     /// Continues an ordered condition branch after a matching <c>Then</c> case.

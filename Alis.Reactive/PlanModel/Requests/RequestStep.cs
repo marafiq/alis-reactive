@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Alis.Reactive.Builders.Requests;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.Validation;
+using Alis.Reactive.PlanModel.Reactions;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Writing;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Requests
 {
     /// <summary>
     /// One HTTP request and what happens around it, written as the sentence the runtime runs: the form

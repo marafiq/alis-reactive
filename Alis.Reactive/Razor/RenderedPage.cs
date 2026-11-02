@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.Members;
 #if NET48
 using System.Web.Mvc;
 #else
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Razor
 {
     /// <summary>
     /// What the views of one request rendered, kept in the request's items so that a page, its layout and its

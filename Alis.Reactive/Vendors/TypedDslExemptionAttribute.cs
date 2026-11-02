@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Components
+namespace Alis.Reactive
 {
     /// <summary>
     /// Marks a component-slice public API that the typed-DSL analyzer (ALIS009) must not flag,

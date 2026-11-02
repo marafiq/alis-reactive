@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Alis.Reactive.Validation;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.FluentValidator
 {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.Grammar
 {

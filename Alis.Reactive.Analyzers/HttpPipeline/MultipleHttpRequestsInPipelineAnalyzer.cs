@@ -35,7 +35,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             context.RegisterCompilationStartAction(compilationCtx =>
             {
                 var pipelineBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.PipelineBuilder`1");
+                    "Alis.Reactive.PipelineBuilder`1");
                 var requestExtensionsType = compilationCtx.Compilation.GetTypeByMetadataName(
                     "Alis.Reactive.RequestExtensions");
 

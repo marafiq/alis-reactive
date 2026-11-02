@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive.PlanModel.Requests
 {
     // The members a gather sets, by binding name, its headers, and the form whose inputs it sends. Where a member
     // goes is decided when the request is written, because only then is the URL known: MVC's route-value rule sends

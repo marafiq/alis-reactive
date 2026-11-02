@@ -1,10 +1,10 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.InputField
+namespace Alis.Reactive.Inputs
 {
     /// <summary>
     /// What the framework dictates for an input before any component renders it: the element id

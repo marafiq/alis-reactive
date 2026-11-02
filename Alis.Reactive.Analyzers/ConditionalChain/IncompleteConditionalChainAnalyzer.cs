@@ -26,10 +26,10 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
         // The DSL's chains that are not yet in the plan: a source chosen without an operator, and a
         // condition built without .Then(), whether a guard or the all-guard and any-guard .And and .Or build.
         private static readonly ImmutableArray<string> IncompleteChainTypes = ImmutableArray.Create(
-            "Alis.Reactive.Builders.Conditions.ConditionSourceBuilder`3",
-            "Alis.Reactive.Builders.Conditions.GuardBuilder`1",
-            "Alis.Reactive.Builders.Conditions.AllGuard`1",
-            "Alis.Reactive.Builders.Conditions.AnyGuard`1");
+            "Alis.Reactive.ConditionSourceBuilder`3",
+            "Alis.Reactive.GuardBuilder`1",
+            "Alis.Reactive.AllGuard`1",
+            "Alis.Reactive.AnyGuard`1");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);

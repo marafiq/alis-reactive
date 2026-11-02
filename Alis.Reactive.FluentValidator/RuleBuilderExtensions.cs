@@ -3,8 +3,6 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.FluentValidator
 {

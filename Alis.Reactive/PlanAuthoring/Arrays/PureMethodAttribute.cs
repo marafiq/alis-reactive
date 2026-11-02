@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Builders.Arrays
+namespace Alis.Reactive.PlanAuthoring.Arrays
 {
     /// <summary>
     /// Marks a method a lambda over an array's items may call, by the JavaScript method that gives the same

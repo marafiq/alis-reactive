@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Conditions;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Writing;
 
-namespace Alis.Reactive.Validation
+namespace Alis.Reactive.PlanModel.Validation
 {
     /// <summary>
     /// One member, or the items of a collection, that a form checks: the binding name the server reports it under,

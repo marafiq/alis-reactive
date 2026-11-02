@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Members
 {
     // The name a member has in the JSON the browser reads: System.Text.Json's camel-case naming, which
     // ASP.NET Core, the plan serializer and SignalR use ("MRN" is "mrn", "URLPath" is "urlPath").

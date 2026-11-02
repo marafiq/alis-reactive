@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.PlanModel.Writing;
+using Alis.Reactive.Members;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Values
 {
     /// <summary>
     /// One value the plan reads: a literal, a member of an object (a component, a plugin, an element,

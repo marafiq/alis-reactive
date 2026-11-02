@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.Validation;
+using Alis.Reactive.PlanModel.Writing;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Validation
 {
     /// <summary>
     /// Writes a validation container's rules as <c>alis.form</c> data: per field the binding name the server

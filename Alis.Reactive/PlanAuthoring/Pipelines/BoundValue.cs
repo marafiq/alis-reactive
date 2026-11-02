@@ -1,6 +1,6 @@
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive.PlanAuthoring.Pipelines
 {
     /// <summary>
     /// A member of the view's model as MVC binds it, read when the reaction runs from the input rendered for it,

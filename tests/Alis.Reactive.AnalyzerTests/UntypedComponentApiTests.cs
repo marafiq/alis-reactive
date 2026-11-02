@@ -99,7 +99,6 @@ public class UntypedComponentApiTests
     private static string Shipped(string member) => $$"""
         using System;
         using Alis.Reactive;
-        using Alis.Reactive.Components;
 
         namespace Alis.Reactive.Fusion
         {

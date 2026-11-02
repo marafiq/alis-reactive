@@ -5,9 +5,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Members
 {
     // The one walk of a member chain. A chain from a lambda's parameter is read once into steps, a
     // member by name, a list item by position or a dictionary entry by key, and written in the three

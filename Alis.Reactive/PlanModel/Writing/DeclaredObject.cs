@@ -1,4 +1,4 @@
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Writing
 {
     /// <summary>An element the plan names, with the vendor whose object it holds.</summary>
     internal sealed class DeclaredObject

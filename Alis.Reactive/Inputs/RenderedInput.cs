@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.InputField;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Inputs
 {
     /// <summary>
     /// An input a page rendered through <c>Html.InputField</c>: its identity, and what its component declares

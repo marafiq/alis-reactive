@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.Members
 {
     /// <summary>
     /// The enum behind a member's type, and a value as that enum's member. A member binds as its name

@@ -1,8 +1,8 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanAuthoring.Conditions;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive
 {
     /// <summary>A condition built so far: what a group callback returns.</summary>
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>

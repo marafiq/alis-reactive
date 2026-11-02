@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.PlanModel.Writing;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Values
 {
     /// <summary>
     /// The object a read, a write or a call goes to: an element, a plugin, or data a callback was handed

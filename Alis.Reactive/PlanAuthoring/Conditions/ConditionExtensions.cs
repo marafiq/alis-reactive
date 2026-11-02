@@ -1,7 +1,5 @@
 using System;
-using Alis.Reactive.Builders;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanAuthoring.Conditions;
 
 namespace Alis.Reactive
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Conditions
 {
     internal sealed class MinimumTextLength
     {

@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Alis.Reactive.Grammar;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Writing
 {
     /// <summary>
     /// Where a step or a value is written: the plan's objects and fresh names, and the names a callback

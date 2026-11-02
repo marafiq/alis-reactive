@@ -1,6 +1,6 @@
 using Alis.Reactive.Grammar;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive
 {
     /// <summary>An ordering of a value against another of its shape: the six comparisons the grammar has.</summary>
     public sealed class Comparison

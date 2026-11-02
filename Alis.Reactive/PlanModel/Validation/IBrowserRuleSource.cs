@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Alis.Reactive.Validation
+namespace Alis.Reactive
 {
     /// <summary>
     /// The browser rules of a validator, by its type: what a plan's forms check and what

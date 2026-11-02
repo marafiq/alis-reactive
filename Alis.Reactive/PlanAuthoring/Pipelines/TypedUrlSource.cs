@@ -1,8 +1,7 @@
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Builders.Requests;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Requests;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive.PlanAuthoring.Pipelines
 {
     /// <summary>A key of the page's URL query string, read when the reaction runs; see <see cref="UrlQuery{TQuery}"/>.</summary>
     internal sealed class TypedUrlSource<TProp> : TypedSource<TProp>

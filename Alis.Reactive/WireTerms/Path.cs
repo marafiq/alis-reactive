@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.WireTerms
 {
     /// <summary>One step of a path: a member by name, an item by position, or each item of a list.</summary>
     internal sealed class PathSegment

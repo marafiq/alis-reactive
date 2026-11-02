@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.WireTerms
 {
     internal abstract class PlanString
     {

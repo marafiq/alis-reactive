@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Validation;
+using Alis.Reactive.PlanModel.Writing;
 
-namespace Alis.Reactive.Validation
+namespace Alis.Reactive
 {
     /// <summary>
     /// A value is entered: not blank, and not the type's default. On a list, at least one item; on an

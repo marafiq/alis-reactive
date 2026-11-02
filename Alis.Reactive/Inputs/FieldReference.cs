@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.Validation
+namespace Alis.Reactive.Inputs
 {
     /// <summary>A member of the validator's model: its path and the shape of its value.</summary>
     internal sealed class FieldReference

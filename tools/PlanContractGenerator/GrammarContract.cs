@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.ContractGeneration
 {

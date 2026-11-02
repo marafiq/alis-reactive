@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.Validation;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Conditions;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive
 {
     /// <summary>
     /// A condition as the plan evaluates it: one node per comparison family, each carrying exactly its

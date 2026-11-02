@@ -1,11 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Reactions;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Inputs;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Writing;
+using Alis.Reactive.PlanAuthoring.Pipelines;
 
-namespace Alis.Reactive.Builders
+namespace Alis.Reactive
 {
     /// <summary>
     /// Builds the ordered reactions that execute when a trigger fires: element updates,
@@ -139,7 +145,7 @@ namespace Alis.Reactive.Builders
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
             var binding = HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberBindingPath(member));
-            return new Conditions.BoundValue<TProp>(IdGenerator.ForMember(ExpressionPathHelper.ToDeclarer(member), binding.Value));
+            return new BoundValue<TProp>(IdGenerator.ForMember(ExpressionPathHelper.ToDeclarer(member), binding.Value));
         }
 
         /// <summary>

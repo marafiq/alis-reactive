@@ -1,8 +1,7 @@
 using System;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
 
-namespace Alis.Reactive.Builders.Arrays
+namespace Alis.Reactive
 {
     /// <summary>
     /// Scalar value produced by an array operation, such as <c>Count</c> or <c>Sum</c>.

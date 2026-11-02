@@ -1,8 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
-using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive
 {

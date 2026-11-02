@@ -51,7 +51,7 @@ namespace Alis.Reactive.Analyzers.TypedDsl
                 "field", "fieldName", "peer", "collection", "owner", "path", "propertyPath",
                 "memberPath", "selector", "objectPath", "subscribe", "unsubscribe");
 
-        private const string ExemptionAttribute = "Alis.Reactive.Components.TypedDslExemptionAttribute";
+        private const string ExemptionAttribute = "Alis.Reactive.TypedDslExemptionAttribute";
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             ImmutableArray.Create(Rule);

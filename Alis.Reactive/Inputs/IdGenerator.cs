@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Text;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {

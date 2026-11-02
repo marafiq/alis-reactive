@@ -1,6 +1,6 @@
 # ADR-0004: The core is an inverted dependency tree of concept slices
 
-**Status:** accepted
+**Status:** accepted; implemented (U1 74fcb65f6, U2 e66dc0ae3, U3 d2cbb0138, U4 the commit that adds `CoreLayerTests`)
 **Date:** 2026-10-29
 **Domain:** structure | encapsulation | public namespaces
 

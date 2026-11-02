@@ -1,7 +1,8 @@
 using System;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Requests;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive
 {
     /// <summary>
     /// Configures one HTTP request reaction: endpoint, request input,

@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Validation;
+using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Validation;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive
 {

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Validation;
+using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.Validation
+namespace Alis.Reactive
 {
     /// <summary>
     /// One check a validator gives the browser, with the message it shows: the browser's form of a rule

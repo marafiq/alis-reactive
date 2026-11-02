@@ -1,8 +1,10 @@
 using System;
 using System.IO;
 using System.Linq.Expressions;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.InputField;
 
-namespace Alis.Reactive.InputField
+namespace Alis.Reactive
 {
     /// <summary>
     /// Framework-agnostic base for a model-bound input field.

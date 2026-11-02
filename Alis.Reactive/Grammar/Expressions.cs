@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Serialization;
 
 namespace Alis.Reactive.Grammar
 {

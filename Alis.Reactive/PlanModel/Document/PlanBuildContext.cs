@@ -2,9 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.Validation;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Reactions;
+using Alis.Reactive.PlanModel.Requests;
+using Alis.Reactive.PlanModel.Validation;
+using Alis.Reactive.PlanModel.Writing;
+using Alis.Reactive.Members;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Document
 {
     /// <summary>
     /// The plan a view is building: the elements it names, the handlers its triggers start, the forms

@@ -1,11 +1,11 @@
 using System;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanAuthoring.Arrays;
 
-namespace Alis.Reactive.Builders.Arrays
+namespace Alis.Reactive
 {
     /// <summary>
     /// An array read when the step runs, transformed and tested in the browser:

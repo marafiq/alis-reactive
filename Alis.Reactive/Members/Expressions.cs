@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Members
 {
     /// <summary>What every reader of a lambda needs of its expression tree, in one place.</summary>
     internal static class Expressions

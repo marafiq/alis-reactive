@@ -1,8 +1,8 @@
 using System;
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive
+namespace Alis.Reactive.Components
 {
     /// <summary>
     /// A member of an object, read when the step runs: the object is located then, and the member is the

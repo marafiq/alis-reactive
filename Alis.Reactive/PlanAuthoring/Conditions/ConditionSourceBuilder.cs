@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Conditions;
 
-namespace Alis.Reactive.Builders.Conditions
+namespace Alis.Reactive
 {
     /// <summary>
     /// The left side of a comparison: a value source waiting for its operator.

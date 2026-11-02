@@ -1,8 +1,11 @@
 using System;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Writing;
+using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Values;
 
-namespace Alis.Reactive.Builders
+namespace Alis.Reactive
 {
     /// <summary>
     /// Authors trigger-to-reaction entries for a Reactive Plan.

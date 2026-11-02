@@ -1,4 +1,4 @@
-namespace Alis.Reactive.InputField
+namespace Alis.Reactive
 {
     /// <summary>
     /// Configures the label, the required marker and the visibility of an input field wrapper.

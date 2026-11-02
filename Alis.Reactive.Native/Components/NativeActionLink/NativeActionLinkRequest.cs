@@ -1,7 +1,4 @@
 using System;
-using Alis.Reactive.Builders;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Builders.Requests;
 
 namespace Alis.Reactive.Native.Components
 {

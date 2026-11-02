@@ -1,6 +1,6 @@
 using System;
-using Alis.Reactive.InputField;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive
 {

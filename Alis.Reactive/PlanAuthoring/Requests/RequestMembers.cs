@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
+using Alis.Reactive.Members;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive.PlanAuthoring.Requests
 {
     // A form input is sent by its binding name, under the view's field prefix. When the endpoint binds a class
     // other than the view model, that name must be a member of the class too, of a type the input's value binds

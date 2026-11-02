@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Members;
 using Alis.Reactive.Components;
+using Alis.Reactive.Grammar;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {

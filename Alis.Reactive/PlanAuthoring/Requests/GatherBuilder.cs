@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Requests;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.Inputs;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanAuthoring.Requests;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive
 {
     /// <summary>
     /// Builds the request an endpoint binds, member by member, from values read when the request is sent.

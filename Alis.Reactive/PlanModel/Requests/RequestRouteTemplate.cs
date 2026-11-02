@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive.PlanModel.Requests
 {
     internal sealed class RequestRouteTemplate
     {

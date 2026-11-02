@@ -1,7 +1,9 @@
 using System;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Requests;
+using Alis.Reactive.PlanModel.Values;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive
 {
     /// <summary>
     /// Configures success routes, error routes, and the optional follow-up

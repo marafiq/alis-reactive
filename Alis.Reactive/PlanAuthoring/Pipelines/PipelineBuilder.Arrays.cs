@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.Builders.Arrays;
-using Alis.Reactive.Builders.Conditions;
-using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.Builders
+namespace Alis.Reactive
 {
     public partial class PipelineBuilder<TModel> where TModel : class
     {
