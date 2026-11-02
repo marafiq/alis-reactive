@@ -73,7 +73,7 @@ namespace Alis.Reactive.Validation
     /// applied: each is read from the input that binds it, whichever view rendered it (this plan, a partial, a
     /// member's editor template, a slot's content), as MVC binds it.
     /// </summary>
-    internal sealed class FormFieldValues
+    internal sealed class FormFieldValues : FieldValues
     {
         private readonly string _formId;
         private readonly string _fieldPrefix;
@@ -84,7 +84,7 @@ namespace Alis.Reactive.Validation
             _fieldPrefix = fieldPrefix;
         }
 
-        internal ValueExpression Value(FieldReference field) => new FormInputRead(_formId, NameOf(field), field.Shape);
+        internal override ValueExpression Value(FieldReference field) => new FormInputRead(_formId, NameOf(field), field.Shape);
 
         internal CheckedField Check(BrowserField field) =>
             new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);

@@ -258,13 +258,13 @@ namespace Alis.Reactive.Builders.Arrays
                 case ConditionalExpression conditional:
                     return ValueExpression.Operation(
                         Operator.Cond, ClrShape.Of(conditional.Type),
-                        ValueExpression.Holds(CompileCondition(conditional.Test, element)),
+                        new HoldsExpression(CompileCondition(conditional.Test, element)),
                         CompileValue(conditional.IfTrue, element),
                         CompileValue(conditional.IfFalse, element));
             }
 
             if (node.Type == typeof(bool) && IsTest(node.NodeType))
-                return ValueExpression.Holds(CompileCondition(node, element));
+                return new HoldsExpression(CompileCondition(node, element));
 
             throw new InvalidOperationException(
                 "An array lambda reads the item (x => x), its members (x => x.Field, x => x.A.B), and the members, " +
@@ -310,7 +310,7 @@ namespace Alis.Reactive.Builders.Arrays
 
                 if (member.Member.Name == nameof(Nullable<int>.HasValue))
                 {
-                    read = ValueExpression.Holds(Condition.Unary(ValueTest.NotNull, CompileValue(owner, element), ClrShape.Of(owner.Type)));
+                    read = new HoldsExpression(Condition.Unary(ValueTest.NotNull, CompileValue(owner, element), ClrShape.Of(owner.Type)));
                     return true;
                 }
             }
@@ -347,7 +347,7 @@ namespace Alis.Reactive.Builders.Arrays
             }
 
             if (TryTest(call, element, out var test))
-                return ValueExpression.Holds(test);
+                return new HoldsExpression(test);
 
             throw new InvalidOperationException(
                 $"'{NameOf(call.Method)}' has no pure JavaScript form the plan can call on an item; " +

@@ -34,7 +34,7 @@ namespace Alis.Reactive.Builders.Arrays
         /// <returns>The matching elements, in their order.</returns>
         public ReactiveArray<TElement> Where(Expression<Func<TElement, bool>> predicate) =>
             new ReactiveArray<TElement>(
-                ValueExpression.ArrayFilter(_source, Predicate(predicate), _elementShape),
+                ArrayOperation.Filter(_source, Predicate(predicate), _elementShape),
                 _elementShape);
 
         /// <summary>Projects each element through a per-element selector.</summary>
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Builders.Arrays
         {
             var resultShape = ClrShape.Of(typeof(TResult));
             return new ReactiveArray<TResult>(
-                ValueExpression.ArrayMap(_source, Projection(selector), resultShape),
+                ArrayOperation.Map(_source, Projection(selector), resultShape),
                 resultShape);
         }
 
@@ -86,14 +86,14 @@ namespace Alis.Reactive.Builders.Arrays
                     "not .OrderBy(x => x.Address).");
 
             return new ReactiveArray<TElement>(
-                ValueExpression.ArrayOrderBy(_source, Projection(key), _elementShape, descending),
+                ArrayOperation.OrderBy(_source, Projection(key), _elementShape, descending),
                 _elementShape);
         }
 
         /// <summary>Counts all elements.</summary>
         /// <returns>The count, read when the step runs.</returns>
         public ReactiveValue<int> Count() =>
-            new ReactiveValue<int>(ValueExpression.ArrayCount(_source));
+            new ReactiveValue<int>(ArrayOperation.Count(_source));
 
         /// <summary>Counts the elements that match the predicate.</summary>
         /// <param name="predicate">The test each counted element passes.</param>
@@ -104,43 +104,43 @@ namespace Alis.Reactive.Builders.Arrays
         /// <summary>True when the array is non-empty.</summary>
         /// <returns>Whether any element exists, read when the step runs.</returns>
         public ReactiveValue<bool> Any() =>
-            new ReactiveValue<bool>(ValueExpression.ArrayAny(_source));
+            new ReactiveValue<bool>(ArrayOperation.Any(_source));
 
         /// <summary>True when any element matches the predicate.</summary>
         /// <param name="predicate">The test an element passes.</param>
         /// <returns>Whether any element passes, read when the step runs.</returns>
         public ReactiveValue<bool> Any(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<bool>(ValueExpression.ArrayAny(_source, Predicate(predicate)));
+            new ReactiveValue<bool>(ArrayOperation.Any(_source, Predicate(predicate)));
 
         /// <summary>True when every element matches the predicate.</summary>
         /// <param name="predicate">The test every element passes.</param>
         /// <returns>Whether every element passes, read when the step runs.</returns>
         public ReactiveValue<bool> All(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<bool>(ValueExpression.ArrayEvery(_source, Predicate(predicate)));
+            new ReactiveValue<bool>(ArrayOperation.Every(_source, Predicate(predicate)));
 
         /// <summary>Sums an integer per-element selector.</summary>
         /// <param name="selector">The number each element adds, for example <c>r =&gt; r.OpenTasks</c>.</param>
         /// <returns>The sum, read when the step runs.</returns>
         public ReactiveValue<int> Sum(Expression<Func<TElement, int>> selector) =>
-            new ReactiveValue<int>(ValueExpression.ArraySum(_source, Projection(selector)));
+            new ReactiveValue<int>(ArrayOperation.Sum(_source, Projection(selector)));
 
         /// <summary>Sums a decimal per-element selector.</summary>
         /// <param name="selector">The number each element adds.</param>
         /// <returns>The sum, read when the step runs.</returns>
         public ReactiveValue<decimal> Sum(Expression<Func<TElement, decimal>> selector) =>
-            new ReactiveValue<decimal>(ValueExpression.ArraySum(_source, Projection(selector)));
+            new ReactiveValue<decimal>(ArrayOperation.Sum(_source, Projection(selector)));
 
         /// <summary>Sums a double per-element selector.</summary>
         /// <param name="selector">The number each element adds.</param>
         /// <returns>The sum, read when the step runs.</returns>
         public ReactiveValue<double> Sum(Expression<Func<TElement, double>> selector) =>
-            new ReactiveValue<double>(ValueExpression.ArraySum(_source, Projection(selector)));
+            new ReactiveValue<double>(ArrayOperation.Sum(_source, Projection(selector)));
 
         /// <summary>Finds the first element matching the predicate, or null when none match.</summary>
         /// <param name="predicate">The test the element passes.</param>
         /// <returns>The element, read when the step runs.</returns>
         public ReactiveValue<TElement> Find(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<TElement>(ValueExpression.ArrayFind(_source, Predicate(predicate), _elementShape));
+            new ReactiveValue<TElement>(ArrayOperation.Find(_source, Predicate(predicate), _elementShape));
 
         /// <summary>Finds a per-element field from the first element matching the predicate.</summary>
         /// <typeparam name="TField">The field's type.</typeparam>
@@ -152,7 +152,7 @@ namespace Alis.Reactive.Builders.Arrays
         {
             var fieldShape = ClrShape.Of(typeof(TField));
             return new ReactiveValue<TField>(
-                ValueExpression.ArrayFind(_source, Predicate(predicate), Projection(selector), fieldShape));
+                ArrayOperation.Find(_source, Predicate(predicate), Projection(selector), fieldShape));
         }
 
         internal override ValueExpression Expression => _source;

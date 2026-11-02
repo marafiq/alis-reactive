@@ -139,7 +139,7 @@ namespace Alis.Reactive.PlanModel
         internal virtual Condition PrefixedBy(string prefix) => this;
 
         /// <summary>The condition over the inputs that hold the members it reads.</summary>
-        internal virtual Condition Bound(FormFieldValues fields) => this;
+        internal virtual Condition Bound(FieldValues fields) => this;
 
         internal virtual bool IsSynchronous => true;
 
@@ -185,7 +185,7 @@ namespace Alis.Reactive.PlanModel
 
         internal override Condition PrefixedBy(string prefix) => new MemberTest(_field.PrefixedBy(prefix), _test);
 
-        internal override Condition Bound(FormFieldValues fields) => _test(fields.Value(_field), _field.Shape);
+        internal override Condition Bound(FieldValues fields) => _test(fields.Value(_field), _field.Shape);
 
         internal override Expr Write(Scope scope) =>
             throw new InvalidOperationException($"The test of '{_field.Path}' is bound to the form's inputs before it is written.");
@@ -386,7 +386,7 @@ namespace Alis.Reactive.PlanModel
 
         internal override Condition PrefixedBy(string prefix) => new AllCondition(Terms.Select(term => term.PrefixedBy(prefix)).ToList());
 
-        internal override Condition Bound(FormFieldValues fields) => new AllCondition(Terms.Select(term => term.Bound(fields)).ToList());
+        internal override Condition Bound(FieldValues fields) => new AllCondition(Terms.Select(term => term.Bound(fields)).ToList());
 
         internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
 
@@ -424,7 +424,7 @@ namespace Alis.Reactive.PlanModel
 
         internal override Condition PrefixedBy(string prefix) => new AnyCondition(Terms.Select(term => term.PrefixedBy(prefix)).ToList());
 
-        internal override Condition Bound(FormFieldValues fields) => new AnyCondition(Terms.Select(term => term.Bound(fields)).ToList());
+        internal override Condition Bound(FieldValues fields) => new AnyCondition(Terms.Select(term => term.Bound(fields)).ToList());
 
         internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
 
@@ -460,7 +460,7 @@ namespace Alis.Reactive.PlanModel
 
         internal override Condition PrefixedBy(string prefix) => new NotCondition(_term.PrefixedBy(prefix));
 
-        internal override Condition Bound(FormFieldValues fields) => new NotCondition(_term.Bound(fields));
+        internal override Condition Bound(FieldValues fields) => new NotCondition(_term.Bound(fields));
 
         internal override bool IsSynchronous => _term.IsSynchronous;
 
