@@ -14,14 +14,14 @@ public class WhenAValueCrossesTheBoundary
     [Test]
     public void an_input_binds_under_the_shape_mvc_binds_its_member_with()
     {
-        var plan = Page.Plan<Vitals>()
-            .TextInput(m => m.Weight)
-            .TextInput(m => m.MeasuredOn)
-            .TextInput(m => m.RecordedAt)
-            .TextInput(m => m.Notes);
-        plan.Triggers().DomReady(p => p.Post("/vitals").Gather(g => g.Form("vitals")));
+        var (html, plan) = Page.Of<Vitals>();
+        html.TextInput(plan, m => m.Weight);
+        html.TextInput(plan, m => m.MeasuredOn);
+        html.TextInput(plan, m => m.RecordedAt);
+        html.TextInput(plan, m => m.Notes);
+        html.On(plan, t => t.DomReady(p => p.Post("/vitals").Gather(g => g.Form("vitals"))));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var inputs = rendered.Objects()["$model"]!["data"]!["inputs"]!.AsObject()
             .ToDictionary(input => input.Value!["name"]!.GetValue<string>(), input => input.Value!);
@@ -44,12 +44,12 @@ public class WhenAValueCrossesTheBoundary
     [Test]
     public void a_method_argument_converts_to_the_record_the_method_declares()
     {
-        var plan = Page.Plan<Admission>();
+        var (html, plan) = Page.Of<Admission>();
         plan.Render<Desk>("desk", HtmlString.Empty);
-        plan.Triggers().CustomEvent(AdmissionEvents.RoomChecked, (check, p) =>
-            p.When(p.Component<Desk>("desk").Reserve(check)).Truthy().Then(t => t.Element("status").Text.Set("Reserved")));
+        html.On(plan, t => t.CustomEvent(AdmissionEvents.RoomChecked, (check, p) =>
+            p.When(p.Component<Desk>("desk").Reserve(check)).Truthy().Then(t => t.Element("status").Text.Set("Reserved"))));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var reserve = rendered.Nodes().OfType<JsonObject>().Single(node =>
             node["kind"]?.GetValue<string>() == "call" && node["path"]![0]!.GetValue<string>() == "reserve");
@@ -62,11 +62,11 @@ public class WhenAValueCrossesTheBoundary
     [Test]
     public void a_literal_is_written_as_it_is_unless_its_shape_converts_it()
     {
-        var plan = Page.Plan<Vitals>();
-        plan.Triggers().DomReady(p =>
-            p.Post("/vitals").Gather<Vitals>(g => g.Set(x => x.Weight, 70).Set(x => x.MeasuredOn, new DateTime(2026, 10, 27))));
+        var (html, plan) = Page.Of<Vitals>();
+        html.On(plan, t => t.DomReady(p =>
+            p.Post("/vitals").Gather<Vitals>(g => g.Set(x => x.Weight, 70).Set(x => x.MeasuredOn, new DateTime(2026, 10, 27)))));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var fields = rendered.Nodes().OfType<JsonObject>()
             .Where(node => node["name"] is JsonValue && node["value"] is JsonObject)

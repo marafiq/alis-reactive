@@ -2,11 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Alis.Reactive.PlanTests.Support;
 
-/// <summary>The services a page renders with, as an app registers them.</summary>
+/// <summary>What an app registers beyond MVC, as its startup registers it.</summary>
 internal static class Registered
 {
-    internal static IServiceProvider Validator<TValidator>() where TValidator : ReactiveValidator =>
-        new ServiceCollection().AddReactiveFluentValidation(validation => validation.Add<TValidator>()).BuildServiceProvider();
+    internal static Action<IServiceCollection> Validator<TValidator>() where TValidator : ReactiveValidator =>
+        services => services.AddReactiveFluentValidation(validation => validation.Add<TValidator>());
 
-    internal static IServiceProvider Nothing() => new ServiceCollection().BuildServiceProvider();
+    internal static Action<IServiceCollection> Nothing() => _ => { };
 }

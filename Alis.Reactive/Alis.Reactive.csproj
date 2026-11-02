@@ -55,8 +55,4 @@
         <AdditionalFiles Include="SliceTree.txt" />
     </ItemGroup>
 
-    <ItemGroup>
-        <InternalsVisibleTo Include="Alis.Reactive.PlanTests" />
-    </ItemGroup>
-
 </Project>

@@ -9,10 +9,11 @@ public class WhenAValidatorCannotServeThePage
     [Test]
     public void a_page_naming_a_validator_with_no_rule_source_registered_is_refused()
     {
-        var plan = Page.Plan<Admission>(Registered.Nothing()).TextInput(m => m.Name);
-        plan.Triggers().DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission"));
+        var (html, plan) = Page.Of<Admission>(Registered.Nothing());
+        html.TextInput(plan, m => m.Name);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission")));
 
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Serialize());
+        var refused = Assert.Throws<InvalidOperationException>(() => html.Rendered(plan));
 
         Assert.That(refused!.Message, Does.Contain("no IBrowserRuleSource is registered"));
         Assert.That(refused.Message, Does.Contain("AddReactiveFluentValidation"));
@@ -21,10 +22,11 @@ public class WhenAValidatorCannotServeThePage
     [Test]
     public void a_page_naming_a_validator_the_app_did_not_register_is_refused()
     {
-        var plan = Page.Plan<Admission>(Registered.Validator<UnreadableAdmissionRules>()).TextInput(m => m.Name);
-        plan.Triggers().DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission"));
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<UnreadableAdmissionRules>());
+        html.TextInput(plan, m => m.Name);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission")));
 
-        var refused = Assert.Throws<InvalidOperationException>(() => plan.Serialize());
+        var refused = Assert.Throws<InvalidOperationException>(() => html.Rendered(plan));
 
         Assert.That(refused!.Message, Does.Contain($"No validator '{typeof(AdmissionRules).FullName}' is registered"));
         Assert.That(refused.Message, Does.Contain("validation.Add<TValidator>()"));

@@ -26,9 +26,8 @@ run.
 Tests of the framework itself follow `.claude/memory/framework-test-principles.md`: one promise per
 test, arranged through the public surface, against a real browser and a real server, with no test
 doubles and no component library on the page. Read it before writing or judging a framework test.
-`tests/Alis.Reactive.PlanTests` and the runtime's vitest suites do not meet it yet (they arrange
-through internals, assert recorded plans, or run in jsdom with stubs), so they are feedback while
-coding, like typecheck.
+`tests/Alis.Reactive.PlanTests` and the runtime's vitest suites do not meet it yet (they assert
+recorded plans, or run in jsdom with stubs), so they are feedback while coding, like typecheck.
 
 ```bash
 scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"  # focused proof

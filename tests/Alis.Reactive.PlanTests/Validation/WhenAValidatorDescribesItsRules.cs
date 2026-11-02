@@ -9,10 +9,11 @@ public class WhenAValidatorDescribesItsRules
     [Test]
     public void a_check_the_browser_can_make_lands_on_the_input_that_renders_the_member()
     {
-        var plan = Page.Plan<Admission>(Registered.Validator<AdmissionRules>()).TextInput(m => m.Name);
-        plan.Triggers().DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission"));
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<AdmissionRules>());
+        html.TextInput(plan, m => m.Name);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission")));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var form = rendered.Objects()["$form:admission"]!["data"]!;
         var field = form["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Name")!;
@@ -23,10 +24,12 @@ public class WhenAValidatorDescribesItsRules
     [Test]
     public void a_rule_under_a_condition_the_server_alone_decides_stays_with_the_server()
     {
-        var plan = Page.Plan<Admission>(Registered.Validator<AdmissionRules>()).TextInput(m => m.Name).TextInput(m => m.Age);
-        plan.Triggers().DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission"));
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<AdmissionRules>());
+        html.TextInput(plan, m => m.Name);
+        html.TextInput(plan, m => m.Age);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<AdmissionRules>("admission")));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var fields = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray()
             .ToDictionary(field => field!["name"]!.GetValue<string>(), field => field!["tests"]!.AsArray().Count);
@@ -38,12 +41,13 @@ public class WhenAValidatorDescribesItsRules
     [Test]
     public void two_requests_that_validate_one_form_describe_it_once()
     {
-        var plan = Page.Plan<Admission>(Registered.Validator<AdmissionRules>()).TextInput(m => m.Name);
-        plan.Triggers()
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<AdmissionRules>());
+        html.TextInput(plan, m => m.Name);
+        html.On(plan, t => t
             .DomReady(p => p.Post("/save").Gather(g => g.Form()).Validate<AdmissionRules>("admission"))
-            .DomReady(p => p.Post("/close").Gather(g => g.Form()).Validate<AdmissionRules>("admission"));
+            .DomReady(p => p.Post("/close").Gather(g => g.Form()).Validate<AdmissionRules>("admission")));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         Assert.That(rendered.Handlers().Count, Is.EqualTo(2));
         var names = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Select(field => field!["name"]!.GetValue<string>());

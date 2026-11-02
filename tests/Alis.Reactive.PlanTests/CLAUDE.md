@@ -2,15 +2,19 @@
 
 Root CLAUDE.md is authoritative.
 
-**Status:** these tests do not meet `.claude/memory/framework-test-principles.md`. Every page here is
-arranged through internals (`Support/Page.cs` constructs the plan and registers inputs directly), and
-the goldens assert the plan JSON, which a behavior-keeping refactor changes. They are feedback while
-coding until they are rebuilt on the public surface; the refusal tests are the closest to the rules,
-since a refusal's message is what a developer sees.
+**Status:** these tests do not meet `.claude/memory/framework-test-principles.md`: no browser runs
+the plan, and the goldens assert the plan JSON, which a behavior-keeping refactor changes. They are
+feedback while coding; the refusal tests are the closest to the rules, since a refusal's message is
+what a developer sees.
 
-This project authors the plan a page carries with the plan builders, with Razor left out
-(`Support/Page.cs` stands in for `Html.InputField` and `plan.Render`). No component library, no browser,
-no sandbox: a change to what a page carries is a diff to read here, in under a second.
+This project authors the plan a page carries the way a view does, with Razor left out. `Support/Page.cs`
+starts the app's host (`WebApplication.CreateBuilder`, `AddControllersWithViews`, what the app
+registered) and hands back the view's own `IHtmlHelper<TModel>` and the plan `Html.ReactivePlan` starts;
+the view is named, never run. A test then writes `html.On(plan, ...)`, `html.TextInput(plan, m => m.Name)`
+(a brought component and its render helper over `Html.InputField`), `plan.Render<Button>(...)`, and reads
+`html.Rendered(plan)`, the JSON `Html.RenderPlan` embeds. The core grants this project no internals. No
+component library, no browser, no sandbox: a change to what a page carries is a diff to read here, in
+seconds.
 
 ## What a test is
 

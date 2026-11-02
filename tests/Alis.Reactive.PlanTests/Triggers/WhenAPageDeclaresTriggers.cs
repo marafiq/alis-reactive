@@ -11,10 +11,10 @@ public class WhenAPageDeclaresTriggers
     [Test]
     public void a_ready_trigger_is_one_handler_of_the_document_run_at_boot()
     {
-        var plan = Page.Plan<Admission>();
-        plan.Triggers().DomReady(p => p.Element("status").Text.Set("Round open"));
+        var (html, plan) = Page.Of<Admission>();
+        html.On(plan, t => t.DomReady(p => p.Element("status").Text.Set("Round open")));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var handler = rendered.Handlers().Single()!;
         Assert.That(handler["on"]!.GetValue<string>(), Is.EqualTo("$document"));
@@ -25,10 +25,10 @@ public class WhenAPageDeclaresTriggers
     [Test]
     public void a_click_on_a_declared_element_runs_the_pipeline_written_for_it()
     {
-        var plan = Page.Plan<Admission>();
+        var (html, plan) = Page.Of<Admission>();
         plan.Render<Button>("save", HtmlString.Empty).Reactive(button => button.Click, p => p.Element("status").Text.Set("Saved"));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var handler = rendered.Handlers().Single()!;
         Assert.That(handler["on"]!.GetValue<string>(), Is.EqualTo("save"));
@@ -40,12 +40,12 @@ public class WhenAPageDeclaresTriggers
     [Test]
     public void an_event_dispatched_with_a_payload_is_heard_with_that_payload()
     {
-        var plan = Page.Plan<Admission>();
-        plan.Triggers()
+        var (html, plan) = Page.Of<Admission>();
+        html.On(plan, t => t
             .DomReady(p => p.Dispatch(AdmissionEvents.RoomChecked, new RoomCheck { Room = "214" }))
-            .CustomEvent(AdmissionEvents.RoomChecked, (check, p) => p.Element("room").Text.Set(check.Get(x => x.Room)));
+            .CustomEvent(AdmissionEvents.RoomChecked, (check, p) => p.Element("room").Text.Set(check.Get(x => x.Room))));
 
-        var rendered = plan.Rendered();
+        var rendered = html.Rendered(plan);
 
         var hearing = rendered.Handlers()[1]!;
         Assert.That(hearing["on"]!.GetValue<string>(), Is.EqualTo("$document"));

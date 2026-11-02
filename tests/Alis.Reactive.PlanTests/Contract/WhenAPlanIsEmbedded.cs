@@ -30,8 +30,9 @@ public class WhenAPlanIsEmbedded
             .Select(path => Path.GetRelativePath(Golden.Root, path))
             .OrderBy(path => path, StringComparer.Ordinal);
 
+    // Details are absent only under the flag output format; the evaluation asks for the list.
     private static string Errors(EvaluationResults result) =>
-        string.Join("\n", result.Details
+        string.Join("\n", (result.Details ?? [])
             .Where(detail => detail.Errors != null)
             .Select(detail => $"  {detail.InstanceLocation}: {string.Join("; ", detail.Errors!.Select(error => error.Key + ": " + error.Value))}"));
 }
