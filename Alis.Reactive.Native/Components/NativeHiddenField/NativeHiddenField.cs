@@ -5,6 +5,7 @@ using System.Web.Mvc;
 #else
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
+using Alis.Reactive.Native.Components.NativeHiddenField;
 
 namespace Alis.Reactive.Native
 {

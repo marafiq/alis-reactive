@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native
+namespace Alis.Reactive.Native.Components.NativeHiddenField
 {
     /// <summary>
     /// Renders a native HTML <c>&lt;input type="hidden"&gt;</c> bound to a model property.
@@ -25,7 +25,7 @@ namespace Alis.Reactive.Native
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type rendered through the hidden input.</typeparam>
-    public sealed class NativeHiddenFieldBuilder<TModel, TProp> :
+    internal sealed class NativeHiddenFieldBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
     {
