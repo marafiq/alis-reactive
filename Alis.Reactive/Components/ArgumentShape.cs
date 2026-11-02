@@ -20,6 +20,9 @@ namespace Alis.Reactive.Components
             ClrShape.Of(type, candidate =>
                 IsDataClass(candidate) && enclosingRecords.Add(candidate) ? RecordOf(candidate, enclosingRecords) : Shape.Any);
 
+        // A declaration is a live JavaScript object, not data.
+        private static bool IsDataClass(Type type) => ClrShape.IsDataClass(type) && !typeof(JsObject).IsAssignableFrom(type);
+
         private static Shape RecordOf(Type type, HashSet<Type> enclosingRecords)
         {
             var fields = new Dictionary<string, Shape>(StringComparer.Ordinal);
@@ -27,19 +30,6 @@ namespace Alis.Reactive.Components
                 fields[JsonMemberName.Of(property.Name)] = Of(property.PropertyType, enclosingRecords);
             enclosingRecords.Remove(type);
             return Shape.ObjectOf(fields);
-        }
-
-        private static bool IsDataClass(Type type)
-        {
-            var ns = type.Namespace ?? "";
-            return type.IsClass
-                   && type != typeof(object)
-                   && !type.IsAbstract
-                   && !typeof(JsObject).IsAssignableFrom(type)
-                   && !typeof(Delegate).IsAssignableFrom(type)
-                   && !ClrShape.IsDictionaryLike(type)
-                   && !ns.StartsWith("System", StringComparison.Ordinal)
-                   && !ns.StartsWith("Microsoft", StringComparison.Ordinal);
         }
     }
 }

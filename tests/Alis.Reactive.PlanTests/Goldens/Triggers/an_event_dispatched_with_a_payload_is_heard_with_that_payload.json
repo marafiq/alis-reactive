@@ -50,10 +50,16 @@
                 "value": "roomChecked"
               },
               {
-                "kind": "lit",
-                "value": {
-                  "room": "214"
-                }
+                "kind": "record",
+                "fields": [
+                  {
+                    "name": "room",
+                    "value": {
+                      "kind": "lit",
+                      "value": "214"
+                    }
+                  }
+                ]
               }
             ]
           },

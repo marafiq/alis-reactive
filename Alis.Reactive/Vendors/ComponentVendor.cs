@@ -57,7 +57,7 @@ namespace Alis.Reactive
             "native",
             Path.None,
             new MethodVendorListening("addEventListener", "removeEventListener"),
-            VendorEventPayload.DomEvent);
+            VendorEventPayload.Element);
 
         /// <summary>
         /// Declares a vendor whose objects add and remove a listener through a pair of methods:
@@ -117,12 +117,8 @@ namespace Alis.Reactive
                 payload);
         }
 
-        /// <summary>The vendor as the plan carries it; a DOM event hands the listener the element that raised it.</summary>
-        internal Vendor ToGrammar() =>
-            new Vendor(
-                _objectPath.TargetText,
-                _listening,
-                Vendor.PayloadOf(_payload));
+        /// <summary>The vendor as the plan carries it.</summary>
+        internal Vendor ToGrammar() => new Vendor(_objectPath.TargetText, _listening, _payload);
 
         /// <inheritdoc />
         public override string ToString() => Name;

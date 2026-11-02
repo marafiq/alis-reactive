@@ -56,7 +56,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Alis.Reactive.PlanContractGenerator" />
         <InternalsVisibleTo Include="Alis.Reactive.PlanTests" />
     </ItemGroup>
 

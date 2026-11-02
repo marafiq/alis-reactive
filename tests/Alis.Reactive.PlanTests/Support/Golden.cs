@@ -9,7 +9,7 @@ namespace Alis.Reactive.PlanTests.Support;
 /// </summary>
 internal static class Golden
 {
-    private static readonly string Root = Path.Combine(FindRepository(AppContext.BaseDirectory), "tests", "Alis.Reactive.PlanTests", "Goldens");
+    internal static readonly string Root = Path.Combine(Repository.Root, "tests", "Alis.Reactive.PlanTests", "Goldens");
 
     internal static void Matches(JsonNode plan, string fixture, string test)
     {
@@ -24,12 +24,5 @@ internal static class Golden
 
         Assert.That(File.Exists(path), Is.True, $"No golden at {path}; write it with ALIS_UPDATE_GOLDENS=1 and review it.");
         Assert.That(written, Is.EqualTo(File.ReadAllText(path)), $"The plan differs from {path}: a change of the grammar the page carries.");
-    }
-
-    private static string FindRepository(string from)
-    {
-        for (var directory = new DirectoryInfo(from); directory != null; directory = directory.Parent)
-            if (File.Exists(Path.Combine(directory.FullName, "Alis.Reactive.slnx"))) return directory.FullName;
-        throw new InvalidOperationException("The repository root, the folder holding Alis.Reactive.slnx, was not found above " + from);
     }
 }

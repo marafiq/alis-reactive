@@ -14,7 +14,7 @@ public sealed class Meter : Component
         objectPath: "",
         subscribe: "addEventListener",
         unsubscribe: "removeEventListener",
-        payload: VendorEventPayload.DomEvent);
+        payload: VendorEventPayload.Element);
 
     public override ComponentVendor Vendor => MeterVendor;
 

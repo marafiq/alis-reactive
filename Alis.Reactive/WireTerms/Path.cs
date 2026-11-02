@@ -97,13 +97,6 @@ namespace Alis.Reactive.WireTerms
             ? throw new InvalidOperationException($"'{this}' reads each item of a list; it can be read, not written, called or subscribed to.")
             : Text;
 
-        /// <summary>The path a JSON body is built along: a name makes an object, a position makes an array.</summary>
-        internal IReadOnlyList<object> Body => Segments
-            .Select(segment => segment.IsEachItem
-                ? throw new InvalidOperationException($"'{this}' reads each item of a list; a body names members and positions.")
-                : segment.IsIndex ? (object)segment.Index : segment.ToPathText())
-            .ToList();
-
         /// <summary>
         /// Reads a path from text, at the boundaries that hand the framework text: an MVC field prefix
         /// (<c>NextOfKin</c>, <c>Members[1].Address</c>) and a vendor's object path (<c>slate</c>,

@@ -10,14 +10,14 @@ namespace Alis.Reactive.Grammar
         internal static readonly IReadOnlyList<string> NoPath = Array.Empty<string>();
         internal static readonly IReadOnlyList<Statement> NoStatements = Array.Empty<Statement>();
 
-        internal static LitExpr Lit(object? value) => new LitExpr(value);
+        internal static LitExpr Lit(object? value) => new LitExpr(Scalar.Of(value));
 
         /// <summary>A literal read in a shape: converted when it is read, unless it is already a value of that shape.</summary>
-        internal static Expr Lit(object? value, Shape shape) => AlreadyIn(value, shape) ? new LitExpr(value) : As(new LitExpr(value), shape);
+        internal static Expr Lit(Scalar value, Shape shape) => AlreadyIn(value, shape) ? new LitExpr(value) : As(new LitExpr(value), shape);
 
-        internal static LitExpr Null => new LitExpr(null);
-        internal static LitExpr True => new LitExpr(true);
-        internal static LitExpr False => new LitExpr(false);
+        internal static LitExpr Null => new LitExpr(Scalar.Null);
+        internal static LitExpr True => new LitExpr(Scalar.Of(true));
+        internal static LitExpr False => new LitExpr(Scalar.Of(false));
 
         internal static ObjExpr Obj(string id) => new ObjExpr(id);
         internal static RefExpr Ref(string name) => new RefExpr(name);
@@ -105,17 +105,16 @@ namespace Alis.Reactive.Grammar
 
         // A value the conversion would hand back as it is: a missing value, or text, a boolean or a number
         // under its own scalar shape, nullable or not (grammar.md 2.1).
-        private static bool AlreadyIn(object? value, Shape shape)
+        private static bool AlreadyIn(Scalar scalar, Shape shape)
         {
+            var value = scalar.Value;
             if (value == null) return true;
             var kind = shape.TryGetNullableInnerShape(out var inner) ? inner.Kind : shape.Kind;
             switch (kind)
             {
                 case "string": return value is string;
                 case "boolean": return value is bool;
-                case "number":
-                    return value is byte || value is sbyte || value is short || value is ushort || value is int || value is uint
-                        || value is long || value is ulong || value is float || value is double || value is decimal;
+                case "number": return Scalar.IsNumber(value);
                 default: return false;
             }
         }

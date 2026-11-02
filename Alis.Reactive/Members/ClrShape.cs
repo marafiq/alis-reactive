@@ -56,6 +56,22 @@ namespace Alis.Reactive.Members
             new[] { type }.Concat(type.GetInterfaces())
                 .Any(candidate => candidate.IsGenericType && IsDictionaryDefinition(candidate.GetGenericTypeDefinition()));
 
+        /// <summary>
+        /// A class of the app's own data (a server's class, a row, an event): an object of its members. A
+        /// delegate, a dictionary and a framework or library type are not.
+        /// </summary>
+        internal static bool IsDataClass(Type type)
+        {
+            var ns = type.Namespace ?? "";
+            return type.IsClass
+                   && type != typeof(object)
+                   && !type.IsAbstract
+                   && !typeof(Delegate).IsAssignableFrom(type)
+                   && !IsDictionaryLike(type)
+                   && !ns.StartsWith("System", StringComparison.Ordinal)
+                   && !ns.StartsWith("Microsoft", StringComparison.Ordinal);
+        }
+
         private static bool IsDateType(Type type)
             => type == typeof(DateTime)
 #if NET6_0_OR_GREATER

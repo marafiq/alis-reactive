@@ -1,6 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel.Writing;
@@ -32,26 +35,70 @@ namespace Alis.Reactive.PlanModel.Values
 
         // ── literals ─────────────────────────────────────────────────────────────
 
-        internal static ValueExpression Literal(bool value) => new LiteralExpression(value, Shape.Boolean);
+        internal static ValueExpression Literal(bool value) => new LiteralExpression(Scalar.Of(value), Shape.Boolean);
 
-        internal static ValueExpression Literal(string value) => new LiteralExpression(value, Shape.String);
+        internal static ValueExpression Literal(string value) => new LiteralExpression(Scalar.Of(value), Shape.String);
 
-        internal static ValueExpression Literal(int value) => new LiteralExpression(value, Shape.Number);
+        internal static ValueExpression Literal(int value) => new LiteralExpression(Scalar.Of(value), Shape.Number);
 
-        internal static ValueExpression Literal(DateTime value) => new LiteralExpression(value.ToString("O"), Shape.Date);
+        internal static ValueExpression Literal(DateTime value) => new LiteralExpression(Scalar.Of(value.ToString("O")), Shape.Date);
 
-        internal static ValueExpression Null() => new LiteralExpression(null, Shape.None);
+        internal static ValueExpression Null() => new LiteralExpression(Scalar.Null, Shape.None);
 
-        private static ValueExpression LiteralRaw(object? value, Shape shape) => new LiteralExpression(value, shape);
+        private static ValueExpression LiteralRaw(object value, Shape shape) => new LiteralExpression(Scalar.Of(value), shape);
 
-        internal static ValueExpression LiteralFor(object? value, Shape shape)
+        /// <summary>
+        /// A value fixed when the view renders, written as the plan carries it (grammar.md 1.2): text, a number, a
+        /// boolean and null as a literal; a date, a Guid, a time or a char as the text JSON gives it; an enum by its
+        /// JSON name; a data class as a record of its members by their JSON names; a dictionary as a record of its
+        /// keys; a collection as a list. A member's value is read under the member's shape.
+        /// </summary>
+        internal static ValueExpression LiteralFor(object? value, Shape shape) => LiteralFor(value, shape, depth: 0);
+
+        private static ValueExpression LiteralFor(object? value, Shape shape, int depth)
         {
             if (value == null) return Null();
             if (value is DateTime date) return Literal(date);
             if (value is Field field) return Literal(field.Name);
             if (value is Enum option) return LiteralRaw(JavaScriptTextOf(option), shape);
-            return LiteralRaw(value, shape);
+            if (value is string || value is bool || Scalar.IsNumber(value)) return LiteralRaw(value, shape);
+            if (value is char || ClrShape.Of(value.GetType()).IsScalar) return LiteralRaw(JsonTextOf(value), shape);
+            if (depth > 32)
+                throw new InvalidOperationException(
+                    $"A {CSharpTypeName.Of(value.GetType())} nests more than 32 levels deep, or holds itself; a plan carries a value once.");
+
+            if (ClrShape.IsDictionaryLike(value.GetType()))
+                return Record(((IEnumerable)value).Cast<object>()
+                    .Select(entry => (KeyText(entry), LiteralFor(ValueOf(entry), Shape.Any, depth + 1)))
+                    .ToList());
+            if (value is IEnumerable items)
+            {
+                var itemShape = shape.TryGetArrayItemShape(out var declared) ? declared : Shape.Any;
+                return List(items.Cast<object?>().Select(item => LiteralFor(item, itemShape, depth + 1)).ToList(), shape);
+            }
+            if (ClrShape.IsDataClass(value.GetType()))
+                return Record(ClrShape.SerializedProperties(value.GetType())
+                    .Select(member => (JsonMemberName.Of(member.Name), LiteralFor(member.GetValue(value), ClrShape.Of(member.PropertyType), depth + 1)))
+                    .ToList());
+
+            throw new InvalidOperationException(
+                $"A {CSharpTypeName.Of(value.GetType())} cannot be written into a plan. A value fixed when the view renders is text, " +
+                "a number, a boolean, a date, a Guid, a time, an enum, a data class, a dictionary or a collection of those.");
         }
+
+        // The text JSON gives a value MVC binds from text: a DateTimeOffset, a Guid, a TimeSpan, a DateOnly, a TimeOnly, a char.
+        private static string JsonTextOf(object value) =>
+            JsonSerializer.SerializeToElement(value, value.GetType()).GetString()
+            ?? throw new InvalidOperationException($"A {CSharpTypeName.Of(value.GetType())} is not written as text.");
+
+        private static string KeyText(object entry) =>
+            Convert.ToString(Property(entry, "Key"), CultureInfo.InvariantCulture)
+            ?? throw new InvalidOperationException("A dictionary written into a plan has no null key.");
+
+        private static object? ValueOf(object entry) => Property(entry, "Value");
+
+        private static object? Property(object entry, string name) =>
+            entry.GetType().GetProperty(name)!.GetValue(entry);
 
         // An option is its member name ("Descending"), unless the enum names the JavaScript text the
         // way System.Text.Json does: [JsonStringEnumMemberName("notequal")] NotEqual.
@@ -122,22 +169,19 @@ namespace Alis.Reactive.PlanModel.Values
         // ── operators and tests, per item of an array lambda, which never waits ──
 
         /// <summary>An operator of grammar.md 2.2 over values (<c>??</c>, <c>?:</c>, a date's month counted from 1), its result read in a shape.</summary>
-        internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands)
-        {
-            if (op == null) throw new ArgumentNullException(nameof(op));
-            return new OperationExpression(op, operands, shape);
-        }
+        internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands) =>
+            new OperationExpression(op, operands, shape);
     }
 
     internal sealed class LiteralExpression : ValueExpression
     {
-        internal LiteralExpression(object? value, Shape shape)
+        internal LiteralExpression(Scalar value, Shape shape)
         {
-            Value = value;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        internal object? Value { get; }
+        internal Scalar Value { get; }
 
         internal Shape Shape { get; }
 

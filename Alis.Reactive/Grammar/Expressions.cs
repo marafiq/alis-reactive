@@ -14,19 +14,16 @@ namespace Alis.Reactive.Grammar
         private protected Expr() { }
     }
 
-    /// <summary><c>lit(json)</c>: a value written in the plan, as it is.</summary>
+    /// <summary><c>lit(scalar)</c>: text, a number, a boolean or null, written in the plan as it is.</summary>
     internal sealed class LitExpr : Expr
     {
-        internal LitExpr(object? value)
+        internal LitExpr(Scalar value)
         {
-            Value = value;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public string Kind => "lit";
-
-        [JsonInclude]
-        [ContractType("JsonValue")]
-        public object? Value { get; }
+        public Scalar Value { get; }
     }
 
     /// <summary><c>obj(id)</c>: an object the plan locates (grammar.md 1.1).</summary>
@@ -160,19 +157,15 @@ namespace Alis.Reactive.Grammar
     {
         internal OpExpr(Operator op, IReadOnlyList<Expr> args)
         {
-            Operator = op ?? throw new ArgumentNullException(nameof(op));
+            Op = op;
             Args = args ?? throw new ArgumentNullException(nameof(args));
         }
 
         public string Kind => "op";
 
         [JsonPropertyName("op")]
-        [ContractType("Operator")]
-        public string Op => Operator.Token;
+        public Operator Op { get; }
 
         public IReadOnlyList<Expr> Args { get; }
-
-        [JsonIgnore]
-        internal Operator Operator { get; }
     }
 }

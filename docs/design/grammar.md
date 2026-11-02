@@ -78,7 +78,7 @@ stmt    := set(target: expr, path, value: expr)
          | all(block+)
          | try(block, finally: block)
 
-expr    := lit(json)
+expr    := lit(scalar)                       scalar := text | number | boolean | null
          | obj(id)
          | ref(name)
          | get(expr, path)
@@ -91,7 +91,11 @@ expr    := lit(json)
 ```
 
 Six statements, ten expressions. JSON names each node by `kind` with exactly these names, and
-carries nothing else: a node has exactly the members its production lists.
+carries nothing else: a node has exactly the members its production lists. A literal is a scalar;
+a value fixed when the view renders that is a data class, a dictionary or a collection is written
+as the `record` or `list` it is. `Alis.Reactive.Assets/runtime/types/plan.schema.json` is this
+grammar as a JSON Schema, generated from the node classes with `plan.ts`; every plan validates
+against it.
 
 ### 1.3 Paths
 

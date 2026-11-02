@@ -1,12 +1,13 @@
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Grammar
 {
     /// <summary>
     /// Writes a plan as camelCase JSON. Each node's public properties are its JSON members, in
     /// declaration order, and a node's <c>Kind</c> is its discriminator; the contract generator reads
-    /// the same properties, so the JSON and the TypeScript contract cannot disagree.
+    /// the same properties, so the JSON, the TypeScript contract and the schema cannot disagree.
     /// </summary>
     internal static class GrammarSerializer
     {
@@ -19,15 +20,16 @@ namespace Alis.Reactive.Grammar
         internal static string Serialize(PlanDocument plan) => JsonSerializer.Serialize(plan, Compact);
     }
 
-    /// <summary>The TypeScript type of a node property when its CLR type does not say it exactly.</summary>
-    [AttributeUsage(AttributeTargets.Property)]
-    internal sealed class ContractTypeAttribute : Attribute
+    /// <summary>Writes an enum member by its camelCase name, the name the plan and the contract carry: <c>ToNumber</c> is <c>toNumber</c>.</summary>
+    /// <typeparam name="TEnum">The enum: a closed set of names.</typeparam>
+    internal sealed class CamelCaseEnum<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
     {
-        internal ContractTypeAttribute(string typeScript)
-        {
-            TypeScript = typeScript;
-        }
+        /// <inheritdoc/>
+        public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options) =>
+            writer.WriteStringValue(JsonNamingPolicy.CamelCase.ConvertName(value.ToString()));
 
-        internal string TypeScript { get; }
+        /// <inheritdoc/>
+        public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => throw new NotSupportedException("Plan types are write-only.");
     }
 }

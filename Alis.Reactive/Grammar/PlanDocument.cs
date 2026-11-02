@@ -34,26 +34,16 @@ namespace Alis.Reactive.Grammar
     /// <summary>Where a vendor's objects live on an element, how they take a listener, and what a listener receives.</summary>
     internal sealed class Vendor
     {
-        /// <summary>What a vendor's listener receives, as the plan names it: one name per declared kind.</summary>
-        internal static string PayloadOf(VendorEventPayload payload) => payload switch
-        {
-            VendorEventPayload.Argument => "argument",
-            VendorEventPayload.DomEvent => "element",
-            _ => throw new ArgumentOutOfRangeException(nameof(payload), payload, "A vendor payload the plan has no name for."),
-        };
-
-        internal Vendor(IReadOnlyList<string> objectPath, VendorListening listen, string payload)
+        internal Vendor(IReadOnlyList<string> objectPath, VendorListening listen, VendorEventPayload payload)
         {
             ObjectPath = objectPath ?? throw new ArgumentNullException(nameof(objectPath));
             Listen = listen ?? throw new ArgumentNullException(nameof(listen));
-            Payload = payload ?? throw new ArgumentNullException(nameof(payload));
+            Payload = payload;
         }
 
         public IReadOnlyList<string> ObjectPath { get; }
         public VendorListening Listen { get; }
-
-        [ContractType("VendorPayload")]
-        public string Payload { get; }
+        public VendorEventPayload Payload { get; }
 
         internal bool SameAs(Vendor other) =>
             string.Join(".", ObjectPath) == string.Join(".", other.ObjectPath)
@@ -185,12 +175,12 @@ namespace Alis.Reactive.Grammar
     }
 
     /// <summary>
-    /// An input bound to the model: its MVC name, its JSON body path, how its value reads, and the
-    /// event its component raises when a value is committed.
+    /// An input bound to the model: its MVC name, its JSON body path (grammar.md 1.3: a name makes an object,
+    /// a position makes an array), how its value reads, and the event its component raises when a value is committed.
     /// </summary>
     internal sealed class InputBinding
     {
-        internal InputBinding(string name, IReadOnlyList<object> body, Expr value, Shape shape, string committed)
+        internal InputBinding(string name, IReadOnlyList<string> body, Expr value, Shape shape, string committed)
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentException("Binding name required.", nameof(name));
             if (string.IsNullOrEmpty(committed)) throw new ArgumentException("Commit event required.", nameof(committed));
@@ -204,8 +194,8 @@ namespace Alis.Reactive.Grammar
 
         public string Name { get; }
 
-        [ContractType("(string | number)[]")]
-        public IReadOnlyList<object> Body { get; }
+        /// <summary>The JSON body path the input binds under, one text per step; a step of digits is a list position.</summary>
+        public IReadOnlyList<string> Body { get; }
 
         public Expr Value { get; }
         public Shape Shape { get; }

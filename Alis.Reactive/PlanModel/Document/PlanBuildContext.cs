@@ -287,11 +287,17 @@ namespace Alis.Reactive.PlanModel.Document
                 var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.ValuePath.Text, rendered.Shape);
                 inputs.Add(
                     declared.Id,
-                    new InputBinding(rendered.BindingPath, rendered.Binding.Path.Body, value, rendered.Shape, rendered.CommittedBy.Value));
+                    new InputBinding(rendered.BindingPath, BodyOf(rendered.Binding.Path), value, rendered.Shape, rendered.CommittedBy.Value));
             }
 
             return inputs;
         }
+
+        // The JSON body path an input binds under: a name makes an object, a position makes an array. An input is
+        // one member, so its path never reads each item of a list.
+        private static IReadOnlyList<string> BodyOf(Path path) => path.ReadsEachItem
+            ? throw new InvalidOperationException($"'{path}' reads each item of a list; a body names members and positions.")
+            : path.Text;
 
     }
 }

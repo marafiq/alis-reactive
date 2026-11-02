@@ -10,7 +10,7 @@ Usage:
   scripts/test.sh --no-e2e
 
 Runs the ordered verification gate:
-  1. npm run typecheck
+  1. npm run typecheck, then the committed plan contract (plan.ts, plan.schema.json) must match what it regenerated
   2. npm run build:all
   3. npm test
   4. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
@@ -184,6 +184,17 @@ gate "ensuring npm dependencies"
 
 gate "checking generated TS contract and TypeScript"
 npm run typecheck
+
+# typecheck regenerated plan.ts and plan.schema.json from the grammar. A copy that differs from the index was
+# not regenerated after the grammar moved, or was regenerated and not staged: the contract is committed as the
+# generator writes it, never by hand.
+gate "checking the committed plan contract matches the generator"
+contract_files=(Alis.Reactive.Assets/runtime/types/plan.ts Alis.Reactive.Assets/runtime/types/plan.schema.json)
+if ! git ls-files --error-unmatch -- "${contract_files[@]}" >/dev/null 2>&1 || ! git diff --quiet -- "${contract_files[@]}"; then
+  echo "[test] the generated plan contract differs from the staged one; stage the regenerated files:" >&2
+  git --no-pager status --short -- "${contract_files[@]}" >&2
+  exit 1
+fi
 
 gate "building browser assets"
 npm run build:all

@@ -21,7 +21,7 @@ public sealed class Gauge : Component
 public sealed class GaugeAlike : Component
 {
     public static readonly ComponentVendor Library =
-        ComponentVendor.Define("gauge", "", "addEventListener", "removeEventListener", VendorEventPayload.DomEvent);
+        ComponentVendor.Define("gauge", "", "addEventListener", "removeEventListener", VendorEventPayload.Element);
 
     public override ComponentVendor Vendor => Library;
 
