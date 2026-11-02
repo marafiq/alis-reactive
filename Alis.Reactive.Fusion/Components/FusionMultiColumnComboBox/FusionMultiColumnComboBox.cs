@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.MultiColumnComboBox;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion MultiColumnComboBox, declared by the names its JavaScript API uses.
@@ -111,7 +111,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionMultiColumnComboBox with its defaults; see the overload that takes the configuration.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox, TModel> FusionMultiColumnComboBox<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionMultiColumnComboBox, TModel> FusionMultiColumnComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
             => setup.FusionMultiColumnComboBox(_ => { });
@@ -123,7 +123,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
         /// <param name="setup">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="build">Configures the Syncfusion builder before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox, TModel> FusionMultiColumnComboBox<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionMultiColumnComboBox, TModel> FusionMultiColumnComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<MultiColumnComboBoxBuilder> build)
             where TModel : class
@@ -131,7 +131,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = setup.Helper.EJS().MultiColumnComboBoxFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
             build(builder);
-            return setup.Render<global::Alis.Reactive.Fusion.Components.FusionMultiColumnComboBox>(builder.Render());
+            return setup.Render<global::Alis.Reactive.Fusion.FusionMultiColumnComboBox>(builder.Render());
         }
     }
 }

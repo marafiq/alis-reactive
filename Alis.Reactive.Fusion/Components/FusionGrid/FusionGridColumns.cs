@@ -1,7 +1,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// Names a grid's columns by the members of its row class, so the compiler checks each column's field.

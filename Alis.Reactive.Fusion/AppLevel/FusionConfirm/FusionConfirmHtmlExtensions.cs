@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Fusion.AppLevel
+namespace Alis.Reactive.Fusion
 {
     /// <summary>Renders the host of the confirm dialog that <c>p.Confirm("...")</c> asks through.</summary>
     public static class FusionConfirmHtmlExtensions

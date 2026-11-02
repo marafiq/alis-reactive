@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Notifications;
 
-namespace Alis.Reactive.Fusion.AppLevel
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The page's Syncfusion Toast, declared by the names its JavaScript API uses.
@@ -87,7 +87,7 @@ namespace Alis.Reactive.Fusion.AppLevel
         public static IHtmlContent FusionToast(this IHtmlHelper html)
 #endif
         {
-            return html.EJS().Toast(AppLevel.FusionToast.ElementId)
+            return html.EJS().Toast(Alis.Reactive.Fusion.FusionToast.ElementId)
                 .Target("body")
                 .Position(new ToastToastPosition { X = "Right", Y = "Bottom" })
                 .NewestOnTop(true)

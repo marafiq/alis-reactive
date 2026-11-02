@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.InPlaceEditor;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion InPlaceEditor, declared by the names its JavaScript API uses.
@@ -197,7 +197,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionInPlaceEditor with its defaults; see the overload that takes the configuration.</summary>
         /// <typeparam name="TModel">The view model the plan is authored for.</typeparam>
         /// <typeparam name="TProp">Model value type rendered by the in-place editor.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionInPlaceEditor, TModel> FusionInPlaceEditor<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionInPlaceEditor, TModel> FusionInPlaceEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
             => setup.FusionInPlaceEditor(_ => { });
@@ -210,7 +210,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures the editor on the Syncfusion builder: type, mode, editable-on and the rest.</param>
         /// <returns>The rendered editor; wire its events with <c>.Reactive(evt =&gt; evt.ActionBegin, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionInPlaceEditor, TModel> FusionInPlaceEditor<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionInPlaceEditor, TModel> FusionInPlaceEditor<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<InPlaceEditorBuilder> build)
             where TModel : class
@@ -226,7 +226,7 @@ namespace Alis.Reactive.Fusion.Components
             builder = initialValue.ApplyTo(builder);
 
             build(builder);
-            return setup.Render<global::Alis.Reactive.Fusion.Components.FusionInPlaceEditor>(builder.Render());
+            return setup.Render<global::Alis.Reactive.Fusion.FusionInPlaceEditor>(builder.Render());
         }
     }
 

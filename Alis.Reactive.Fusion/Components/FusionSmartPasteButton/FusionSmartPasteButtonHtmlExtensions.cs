@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>Renders a <see cref="FusionSmartPasteButton"/>.</summary>
     public static class FusionSmartPasteButtonHtmlExtensions

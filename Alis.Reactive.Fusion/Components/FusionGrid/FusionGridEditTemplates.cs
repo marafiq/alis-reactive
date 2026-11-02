@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.Encodings.Web;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// Creates typed <see cref="FusionGrid"/> cell editors rendered as Syncfusion

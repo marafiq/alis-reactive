@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Kanban;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Kanban, declared by the names its JavaScript API uses.
@@ -344,7 +344,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="elementId">The element ID, shared by the markup and <c>p.Component&lt;FusionKanban&gt;(elementId)</c>.</param>
         /// <param name="build">Configures columns, cards, swimlanes and the rest on the Syncfusion builder.</param>
         /// <returns>The rendered board; wire its events with <c>.Reactive(evt =&gt; evt.CardClick&lt;CareCard&gt;(), ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionKanban, TModel> FusionKanban<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionKanban, TModel> FusionKanban<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -358,7 +358,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Kanban(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionKanban>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionKanban>(elementId, builder.Render());
         }
     }
 }

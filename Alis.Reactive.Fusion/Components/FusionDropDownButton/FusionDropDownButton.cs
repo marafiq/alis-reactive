@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.SplitButtons;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion DropDownButton, declared by the names its JavaScript API uses.
@@ -85,7 +85,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">Reactive Plan receiving drop-down button event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDropDownButton, TModel> FusionDropDownButton<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionDropDownButton, TModel> FusionDropDownButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -99,7 +99,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().DropDownButton(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionDropDownButton>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionDropDownButton>(elementId, builder.Render());
         }
     }
 }

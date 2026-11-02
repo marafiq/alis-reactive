@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion TextArea, declared by the names its JavaScript API uses.
@@ -90,7 +90,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionTextArea with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionTextArea, TModel> FusionTextArea<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionTextArea, TModel> FusionTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
             => field.FusionTextArea(_ => { });
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Input, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionTextArea, TModel> FusionTextArea<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionTextArea, TModel> FusionTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<TextAreaBuilder> build)
             where TModel : class
@@ -112,7 +112,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = field.Helper.EJS().TextAreaFor(field.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
-            return field.Render<global::Alis.Reactive.Fusion.Components.FusionTextArea>(builder.Render());
+            return field.Render<global::Alis.Reactive.Fusion.FusionTextArea>(builder.Render());
         }
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion ListBox, declared by the names its JavaScript API uses.
@@ -66,7 +66,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">Reactive Plan receiving list box event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionListBox, TModel> FusionListBox<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionListBox, TModel> FusionListBox<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -80,7 +80,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().ListBox(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionListBox>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionListBox>(elementId, builder.Render());
         }
     }
 }

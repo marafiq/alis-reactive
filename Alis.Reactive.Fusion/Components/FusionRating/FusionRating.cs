@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Rating, declared by the names its JavaScript API uses.
@@ -50,7 +50,7 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Renders a FusionRating with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionRating, TModel> FusionRating<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionRating, TModel> FusionRating<TModel>(
             this InputBoundField<TModel, double> field)
             where TModel : class
             => field.FusionRating(_ => { });
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.ValueChanged, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionRating, TModel> FusionRating<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionRating, TModel> FusionRating<TModel>(
             this InputBoundField<TModel, double> field,
             Action<RatingBuilder> build)
             where TModel : class
@@ -71,7 +71,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = field.Helper.EJS().Rating(field.ElementId)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
-            return field.Render<global::Alis.Reactive.Fusion.Components.FusionRating>(builder.Render());
+            return field.Render<global::Alis.Reactive.Fusion.FusionRating>(builder.Render());
         }
     }
 }

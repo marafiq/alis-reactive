@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion OTP Input, declared by the names its JavaScript API uses.
@@ -104,7 +104,7 @@ namespace Alis.Reactive.Fusion.Components
     {
         /// <summary>Renders a FusionOtpInput with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionOtpInput, TModel> FusionOtpInput<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionOtpInput, TModel> FusionOtpInput<TModel>(
             this InputBoundField<TModel, string?> field)
             where TModel : class
             => field.FusionOtpInput(_ => { });
@@ -117,7 +117,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Input, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionOtpInput, TModel> FusionOtpInput<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionOtpInput, TModel> FusionOtpInput<TModel>(
             this InputBoundField<TModel, string?> field,
             Action<OtpInputBuilder> build)
             where TModel : class
@@ -125,7 +125,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = field.Helper.EJS().OtpInput(field.ElementId)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
-            return field.Render<global::Alis.Reactive.Fusion.Components.FusionOtpInput>(builder.Render());
+            return field.Render<global::Alis.Reactive.Fusion.FusionOtpInput>(builder.Render());
         }
     }
 }

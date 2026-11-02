@@ -1,4 +1,4 @@
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion SmartPasteButton, declared by the names its JavaScript API uses.

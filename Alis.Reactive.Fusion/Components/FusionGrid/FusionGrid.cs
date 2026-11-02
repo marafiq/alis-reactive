@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Grids;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Grid, declared by the names its JavaScript API uses.
@@ -678,7 +678,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="elementId">The element ID, shared by the markup and <c>p.Component&lt;FusionGrid&gt;(elementId)</c>.</param>
         /// <param name="build">Configures columns, paging, sorting and the rest on the Syncfusion builder.</param>
         /// <returns>The rendered grid; wire its events with <c>.Reactive(evt =&gt; evt.RowSelected&lt;TRow&gt;(), ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionGrid, TModel> FusionGrid<TModel, TRow>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionGrid, TModel> FusionGrid<TModel, TRow>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -693,7 +693,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Grid<TRow>(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionGrid>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionGrid>(elementId, builder.Render());
         }
     }
 }

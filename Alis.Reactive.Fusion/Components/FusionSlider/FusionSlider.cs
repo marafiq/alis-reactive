@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Slider, declared by the names its JavaScript API uses.
@@ -64,7 +64,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionSlider with its defaults; see the overload that takes the configuration.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSlider, TModel> FusionSlider<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionSlider, TModel> FusionSlider<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
             => setup.FusionSlider(_ => { });
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TProp">Model value type rendered by the slider.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures initial Slider options before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSlider, TModel> FusionSlider<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionSlider, TModel> FusionSlider<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<SliderBuilder> build)
             where TModel : class
@@ -84,7 +84,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = setup.Helper.EJS().Slider(setup.ElementId)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
             build(builder);
-            return setup.Render<global::Alis.Reactive.Fusion.Components.FusionSlider>(builder.Render());
+            return setup.Render<global::Alis.Reactive.Fusion.FusionSlider>(builder.Render());
         }
     }
 }

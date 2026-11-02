@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.PivotView;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion PivotView, declared by the names its JavaScript API uses.
@@ -121,7 +121,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">The plan the component's events are wired into.</param>
         /// <param name="elementId">The component's element ID, chosen by the view.</param>
         /// <param name="build">Configures the Syncfusion builder before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionPivotView, TModel> FusionPivotView<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionPivotView, TModel> FusionPivotView<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -135,7 +135,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().PivotView(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionPivotView>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionPivotView>(elementId, builder.Render());
         }
     }
 }

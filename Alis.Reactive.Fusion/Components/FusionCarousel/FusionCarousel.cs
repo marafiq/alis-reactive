@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Carousel, declared by the names its JavaScript API uses.
@@ -89,7 +89,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">Reactive Plan receiving carousel event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionCarousel, TModel> FusionCarousel<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionCarousel, TModel> FusionCarousel<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -103,7 +103,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Carousel(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionCarousel>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionCarousel>(elementId, builder.Render());
         }
     }
 }

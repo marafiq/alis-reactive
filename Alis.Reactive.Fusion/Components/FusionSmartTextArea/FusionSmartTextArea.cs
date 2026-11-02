@@ -8,7 +8,7 @@ using System.Web;
 using Microsoft.AspNetCore.Html;
 #endif
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion SmartTextArea, declared by the names its JavaScript API uses.
@@ -78,7 +78,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionSmartTextArea with its defaults; see the overload that takes the configuration.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSmartTextArea, TModel> FusionSmartTextArea<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionSmartTextArea, TModel> FusionSmartTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
             => setup.FusionSmartTextArea(_ => { });
@@ -91,7 +91,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
         /// <param name="setup">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="configure">Sets the text area's starting text, rows, suggestions and look.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSmartTextArea, TModel> FusionSmartTextArea<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionSmartTextArea, TModel> FusionSmartTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<FusionSmartTextAreaOptions> configure)
             where TModel : class
@@ -114,7 +114,7 @@ namespace Alis.Reactive.Fusion.Components
             attributes["data-alis-smart-text-area"] = ConstructionOptions(options);
 
             var content = new HtmlString(RenderTextArea(attributes, options.Value));
-            return setup.Render<global::Alis.Reactive.Fusion.Components.FusionSmartTextArea>(content);
+            return setup.Render<global::Alis.Reactive.Fusion.FusionSmartTextArea>(content);
         }
 
         private static string RenderTextArea(

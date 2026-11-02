@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Tab, declared by the names its JavaScript API uses.
@@ -62,7 +62,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">Reactive Plan receiving tab event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionTab, TModel> FusionTab<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionTab, TModel> FusionTab<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -76,7 +76,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Tab(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionTab>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionTab>(elementId, builder.Render());
         }
     }
 }

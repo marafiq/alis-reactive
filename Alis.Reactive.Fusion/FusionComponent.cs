@@ -4,8 +4,8 @@ namespace Alis.Reactive.Fusion
     /// Base type for all Syncfusion-backed components.
     /// </summary>
     /// <remarks>
-    /// Sealed subclasses (e.g. <see cref="Components.FusionDropDownList"/>,
-    /// <see cref="Components.FusionDatePicker"/>) serve as type parameters in
+    /// Sealed subclasses (e.g. <see cref="FusionDropDownList"/>,
+    /// <see cref="FusionDatePicker"/>) serve as type parameters in
     /// <c>p.Component&lt;T&gt;()</c> and declare the Syncfusion object's members with the
     /// names its JavaScript API uses.
     /// </remarks>

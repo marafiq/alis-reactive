@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// One page of a grid's rows, as EJ2's data manager reads a remote result: the rows, and how many

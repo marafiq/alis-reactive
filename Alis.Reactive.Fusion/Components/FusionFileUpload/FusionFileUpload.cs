@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Uploader, declared by the names its JavaScript API uses.
@@ -88,7 +88,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionFileUpload with its defaults; see the overload that takes the configuration.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionFileUpload, TModel> FusionFileUpload<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionFileUpload, TModel> FusionFileUpload<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
             => setup.FusionFileUpload(_ => { });
@@ -100,7 +100,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TProp">Model value type represented by the file upload input.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures initial uploader options before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionFileUpload, TModel> FusionFileUpload<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionFileUpload, TModel> FusionFileUpload<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<UploaderBuilder> build)
             where TModel : class
@@ -114,7 +114,7 @@ namespace Alis.Reactive.Fusion.Components
                     ["data-alis-file-upload"] = ""
                 });
             build(builder);
-            return setup.Render<global::Alis.Reactive.Fusion.Components.FusionFileUpload>(builder.Render());
+            return setup.Render<global::Alis.Reactive.Fusion.FusionFileUpload>(builder.Render());
         }
     }
 }

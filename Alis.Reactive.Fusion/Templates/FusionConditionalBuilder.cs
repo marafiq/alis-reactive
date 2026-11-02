@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using Alis.Reactive.Fusion.Templates;
 
-namespace Alis.Reactive.Fusion.Templates
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// Builds the content emitted inside a Syncfusion template conditional block.

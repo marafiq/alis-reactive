@@ -1,6 +1,6 @@
 @model Step3FunctionalModel
 @using Alis.Reactive.Native
-@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion
 @{
     var plan = Html.ReactivePlan<Step3FunctionalModel>();
     var alertNeuroUrl = Url.Action("AlertNeuro", "AdmissionAssessment", new { area = "Sandbox" })

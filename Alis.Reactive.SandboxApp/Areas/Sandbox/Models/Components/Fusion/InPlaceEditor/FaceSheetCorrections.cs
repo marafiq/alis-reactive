@@ -1,4 +1,4 @@
-using Alis.Reactive.Fusion.Components;
+using Alis.Reactive.Fusion;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor
 {

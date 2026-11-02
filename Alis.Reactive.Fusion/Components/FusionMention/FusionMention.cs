@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Mention, declared by the names its JavaScript API uses.
@@ -72,7 +72,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">The plan the component's events are wired into.</param>
         /// <param name="elementId">The component's element ID, chosen by the view.</param>
         /// <param name="build">Configures the Syncfusion builder before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionMention, TModel> FusionMention<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionMention, TModel> FusionMention<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -95,7 +95,7 @@ namespace Alis.Reactive.Fusion.Components
             content.AppendHtml(builder.Render());
 #endif
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionMention>(elementId, content);
+            return plan.Render<global::Alis.Reactive.Fusion.FusionMention>(elementId, content);
         }
 
         /// <summary>Maps display text and value fields using typed item expressions.</summary>

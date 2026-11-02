@@ -53,6 +53,12 @@ public class SliceTreeTests
             ["Tokens"],
             ["Layout"],
         ]),
+        new("Alis.Reactive.Fusion", BothTargets,
+        [
+            ["."],
+            ["Templates"],
+            ["AppLevel/*", "Components/*"],
+        ]),
         new("Alis.Reactive.Native", BothTargets,
         [
             ["."],

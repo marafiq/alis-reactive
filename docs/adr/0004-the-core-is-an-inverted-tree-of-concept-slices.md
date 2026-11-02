@@ -68,6 +68,7 @@ each other; `.` is the package's root files.
 | Package | Rows, bottom up |
 |---|---|
 | `Alis.Reactive.DesignSystem` | `Tokens`; `Layout` |
+| `Alis.Reactive.Fusion` | `.` (`FusionComponent`, the vendor base, `AddReactiveFusion`); `Templates`; `AppLevel/*`, `Components/*` (one slice per component, none using another) |
 | `Alis.Reactive.Native` | `.` (`NativeComponent`, the vendor base); `AppLevel/*`, `Components/*` (one slice per component, none using another) |
 | `Alis.Reactive.NativeTagHelpers` | `.` (the spacing enums and the class joiner); `*` (one slice per tag helper) |
 

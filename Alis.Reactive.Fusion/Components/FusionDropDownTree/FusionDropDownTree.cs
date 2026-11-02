@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion DropDownTree, declared by the names its JavaScript API uses.
@@ -70,7 +70,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionDropDownTree with its defaults; see the overload that takes the configuration.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDropDownTree, TModel> FusionDropDownTree<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionDropDownTree, TModel> FusionDropDownTree<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup)
             where TModel : class
             => setup.FusionDropDownTree(_ => { });
@@ -82,7 +82,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <typeparam name="TProp">Model value type rendered by the drop-down tree.</typeparam>
         /// <param name="setup">Field wrapper created by <c>Html.InputField()</c>.</param>
         /// <param name="build">Configures initial DropDownTree options before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDropDownTree, TModel> FusionDropDownTree<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionDropDownTree, TModel> FusionDropDownTree<TModel, TProp>(
             this InputBoundField<TModel, TProp> setup,
             Action<DropDownTreeBuilder> build)
             where TModel : class
@@ -90,7 +90,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = setup.Helper.EJS().DropDownTreeFor(setup.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = setup.ElementId, ["name"] = setup.BindingPath });
             build(builder);
-            return setup.Render<global::Alis.Reactive.Fusion.Components.FusionDropDownTree>(builder.Render());
+            return setup.Render<global::Alis.Reactive.Fusion.FusionDropDownTree>(builder.Render());
         }
     }
 }

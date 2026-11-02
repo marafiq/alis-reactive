@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Buttons;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Button, declared by the names its JavaScript API uses.
@@ -69,7 +69,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="elementId">Controlled DOM element ID used as the runtime join key.</param>
         /// <param name="build">Configures initial Syncfusion Button options.</param>
         /// <returns>Builder that renders the Syncfusion button and carries its Reactive Plan ID.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionButton, TModel> FusionButton<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionButton, TModel> FusionButton<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -83,7 +83,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Button(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionButton>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionButton>(elementId, builder.Render());
         }
     }
 }

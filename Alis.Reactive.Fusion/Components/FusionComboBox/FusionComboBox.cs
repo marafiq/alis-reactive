@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.DropDowns;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion ComboBox, declared by the names its JavaScript API uses.
@@ -107,7 +107,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionComboBox with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionComboBox, TModel> FusionComboBox<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionComboBox, TModel> FusionComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
             => field.FusionComboBox(_ => { });
@@ -121,7 +121,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="build">Configures the component before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionComboBox, TModel> FusionComboBox<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionComboBox, TModel> FusionComboBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<ComboBoxBuilder> build)
             where TModel : class
@@ -129,7 +129,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = field.Helper.EJS().ComboBoxFor(field.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
-            return field.Render<global::Alis.Reactive.Fusion.Components.FusionComboBox>(builder.Render());
+            return field.Render<global::Alis.Reactive.Fusion.FusionComboBox>(builder.Render());
         }
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     public sealed class FusionSmartTextAreaOptions
     {

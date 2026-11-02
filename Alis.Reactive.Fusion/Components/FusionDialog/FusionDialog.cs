@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Popups;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Dialog, declared by the names its JavaScript API uses.
@@ -97,7 +97,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">Reactive Plan receiving dialog event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDialog, TModel> FusionDialog<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionDialog, TModel> FusionDialog<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -111,7 +111,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Dialog(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionDialog>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionDialog>(elementId, builder.Render());
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.Json;
 
-namespace Alis.Reactive.Fusion.Templates
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// Converts supported C# expressions to Syncfusion template syntax.

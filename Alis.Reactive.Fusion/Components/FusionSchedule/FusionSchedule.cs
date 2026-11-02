@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Schedule;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Schedule, declared by the names its JavaScript API uses.
@@ -310,7 +310,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">Reactive Plan receiving schedule event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionSchedule, TModel> FusionSchedule<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionSchedule, TModel> FusionSchedule<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -324,7 +324,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Schedule(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionSchedule>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionSchedule>(elementId, builder.Render());
         }
     }
 }

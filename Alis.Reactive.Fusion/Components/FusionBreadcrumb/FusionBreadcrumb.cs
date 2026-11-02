@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Navigations;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion Breadcrumb, declared by the names its JavaScript API uses.
@@ -74,7 +74,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="plan">Reactive Plan receiving breadcrumb event wiring.</param>
         /// <param name="elementId">Controlled component ID shared by markup and Reactive Plan behavior.</param>
         /// <param name="build">Configures the component before rendering.</param>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionBreadcrumb, TModel> FusionBreadcrumb<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionBreadcrumb, TModel> FusionBreadcrumb<TModel>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else
@@ -88,7 +88,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = html.EJS().Breadcrumb(elementId);
             build(builder);
 
-            return plan.Render<global::Alis.Reactive.Fusion.Components.FusionBreadcrumb>(elementId, builder.Render());
+            return plan.Render<global::Alis.Reactive.Fusion.FusionBreadcrumb>(elementId, builder.Render());
         }
     }
 }

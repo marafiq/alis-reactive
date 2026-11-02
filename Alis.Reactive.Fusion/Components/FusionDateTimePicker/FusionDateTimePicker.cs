@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Calendars;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion DateTimePicker, declared by the names its JavaScript API uses.
@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <summary>Renders a FusionDateTimePicker with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model type.</typeparam>
         /// <typeparam name="TProp">The bound model property's type.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDateTimePicker, TModel> FusionDateTimePicker<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionDateTimePicker, TModel> FusionDateTimePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
             => field.FusionDateTimePicker(_ => { });
@@ -67,7 +67,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="build">Configures the component before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionDateTimePicker, TModel> FusionDateTimePicker<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionDateTimePicker, TModel> FusionDateTimePicker<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<DateTimePickerBuilder> build)
             where TModel : class
@@ -75,7 +75,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = field.Helper.EJS().DateTimePickerFor(field.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
-            return field.Render<global::Alis.Reactive.Fusion.Components.FusionDateTimePicker>(builder.Render());
+            return field.Render<global::Alis.Reactive.Fusion.FusionDateTimePicker>(builder.Render());
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Syncfusion.EJ2;
 using Syncfusion.EJ2.Inputs;
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// The Syncfusion NumericTextBox, declared by the names its JavaScript API uses.
@@ -85,7 +85,7 @@ namespace Alis.Reactive.Fusion.Components
         /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
         /// <param name="build">Configures the Syncfusion builder before rendering.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionNumericTextBox, TModel> FusionNumericTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<NumericTextBoxBuilder> build)
             where TModel : class
@@ -93,7 +93,7 @@ namespace Alis.Reactive.Fusion.Components
             var builder = field.Helper.EJS().NumericTextBoxFor(field.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath });
             build(builder);
-            return field.Render<global::Alis.Reactive.Fusion.Components.FusionNumericTextBox>(builder.Render());
+            return field.Render<global::Alis.Reactive.Fusion.FusionNumericTextBox>(builder.Render());
         }
     }
 }

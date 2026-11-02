@@ -1,4 +1,4 @@
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
     /// Where a <see cref="FusionButton"/> places its icon relative to its text.
