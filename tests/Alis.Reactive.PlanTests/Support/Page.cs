@@ -35,7 +35,7 @@ internal static class Page
         where TModel : class
     {
         var bindingName = HtmlFieldPrefix.Join(plan.Context.FieldPrefix, ExpressionPathHelper.ToMemberBindingPath(member).Value);
-        plan.AddRenderedInput(RenderedInput.Of(InputIdentity.For(member, bindingName, plan.Context.FieldPrefix), new TextInput()));
+        plan.AddRenderedInput(new TextInput().RenderedAs(InputIdentity.For(member, bindingName, plan.Context.FieldPrefix)));
         return plan;
     }
 

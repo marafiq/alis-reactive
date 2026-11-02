@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.InputField;
 using Alis.Reactive.PlanModel;
 
 namespace Alis.Reactive
@@ -44,6 +45,16 @@ namespace Alis.Reactive
             if (value == null) throw new ArgumentNullException(nameof(value));
             if (committedBy == null) throw new ArgumentNullException(nameof(committedBy));
             return new ComponentInput(value.Member.Path, EventName.Of(committedBy.Name));
+        }
+    }
+
+    /// <summary>What a plan carries for an input a component renders under an identity.</summary>
+    internal static class InputComponentExtensions
+    {
+        internal static RenderedInput RenderedAs(this IInputComponent component, InputIdentity identity)
+        {
+            if (component == null) throw new ArgumentNullException(nameof(component));
+            return new RenderedInput(identity, component.Vendor, component.Input.ValuePath, component.Input.CommittedBy);
         }
     }
 }

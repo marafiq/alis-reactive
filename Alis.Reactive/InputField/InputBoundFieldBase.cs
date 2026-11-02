@@ -40,11 +40,8 @@ namespace Alis.Reactive.InputField
         private readonly InputIdentity _identity;
 
         // The plan learns which component holds the input's value and which event commits it.
-        internal void AddRenderedInput(IInputComponent component)
-        {
-            if (component == null) throw new ArgumentNullException(nameof(component));
-            Plan.AddRenderedInput(new RenderedInput(_identity, component.Vendor, component.Input.ValuePath, component.Input.CommittedBy));
-        }
+        internal void AddRenderedInput(IInputComponent component) =>
+            Plan.AddRenderedInput(component.RenderedAs(_identity));
 
         // Internal because Html.InputField decides the input's identity, which validation and gather read.
         internal InputBoundFieldBase(
