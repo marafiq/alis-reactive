@@ -7,6 +7,7 @@
 // The framework supports exactly one Syncfusion version. It is pinned in three places that must
 // move together: the npm umbrella `@syncfusion/ej2` (Alis.Reactive.Assets/package.json, the browser
 // bundle and CSS), and `Syncfusion.EJ2.AspNet.Core` + `Syncfusion.EJ2.MVC5` (Alis.Reactive.Fusion.csproj).
+// NuGet uses [version] for an exact pin; a bare version only declares a minimum.
 // The umbrella depends on ~50 control packages through `~` ranges, which npm resolves to the NEWEST
 // patch of the line, not the set the umbrella was published with. So every control package is pinned
 // exactly through root `overrides`, copied from the umbrella's own dependency list.
@@ -20,6 +21,7 @@ import { execFileSync } from "node:child_process";
 import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ASSETS_PACKAGE = "Alis.Reactive.Assets/package.json";
 const FUSION_CSPROJ = "Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj";
@@ -55,11 +57,14 @@ function check() {
   const problems = [];
   const npmPin = readJson(ASSETS_PACKAGE).devDependencies?.[UMBRELLA];
   const csproj = readFileSync(FUSION_CSPROJ, "utf8");
-  const pins = { [`${ASSETS_PACKAGE} ${UMBRELLA}`]: npmPin };
-  for (const id of NUGET_IDS) pins[`${FUSION_CSPROJ} ${id}`] = csprojVersion(csproj, id);
-  const distinct = new Set(Object.values(pins));
-  if (distinct.size !== 1 || distinct.has(null) || distinct.has(undefined)) {
-    problems.push(`the three Syncfusion pins disagree: ${Object.entries(pins).map(([where, v]) => `${where}=${v}`).join(", ")}`);
+  if (!/^\d+\.\d+\.\d+$/.test(npmPin)) {
+    problems.push(`${ASSETS_PACKAGE} ${UMBRELLA} must use an exact version, got ${npmPin}`);
+  }
+  for (const id of NUGET_IDS) {
+    const nugetPin = csprojVersion(csproj, id);
+    if (nugetPin !== `[${npmPin}]`) {
+      problems.push(`${FUSION_CSPROJ} ${id} must use [${npmPin}], got ${nugetPin}`);
+    }
   }
 
   const overrides = Object.fromEntries(Object.entries(readJson("package.json").overrides ?? {})
@@ -129,7 +134,7 @@ async function pin(version) {
   for (const id of NUGET_IDS) {
     const pattern = new RegExp(`(Include="${id.replace(/\./g, "\\.")}" Version=")[^"]+(")`);
     if (!pattern.test(csproj)) throw new Error(`${FUSION_CSPROJ} has no PackageReference for ${id}`);
-    csproj = csproj.replace(pattern, `$1${version}$2`);
+    csproj = csproj.replace(pattern, `$1[${version}]$2`);
   }
   writeFileSync(FUSION_CSPROJ, csproj);
 
@@ -154,7 +159,7 @@ async function pin(version) {
   console.log("next: npm ci && node scripts/pin-syncfusion.mjs --check && scripts/test.sh --parallel");
 }
 
-process.chdir(join(dirname(new URL(import.meta.url).pathname), ".."));
+process.chdir(join(dirname(fileURLToPath(import.meta.url)), ".."));
 const [argument] = process.argv.slice(2);
 if (argument === "--check") {
   check();

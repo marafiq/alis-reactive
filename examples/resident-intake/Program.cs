@@ -1,18 +1,12 @@
 using Alis.Reactive.FluentValidator;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-
-// Syncfusion EJ2 DataSource rendering reads Newtonsoft defaults, so example API payloads stay camelCase.
-JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-{
-    ContractResolver = new CamelCasePropertyNamesContractResolver()
-};
+using Alis.Reactive.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
+builder.Services.AddReactiveFusion();
 
 var app = builder.Build();
 

@@ -18,6 +18,27 @@ and `Alis.Reactive.DesignSystem` multi-target **`net48` and `net10.0`** — the 
 runtimes (bridged by `#if` shims, never a divergent API). Only `Alis.Reactive.NativeTagHelpers` is
 **`net10.0`-only** (ASP.NET Core Tag Helpers).
 
+### In your application
+
+Register the packages you use in `Program.cs` (MVC 5 on net48: in `Global.asax` or your container's
+startup). `examples/resident-intake/Program.cs` is the worked example.
+
+```csharp
+using Alis.Reactive.FluentValidator;
+using Alis.Reactive.Fusion;
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddReactiveFluentValidation(validation =>
+    validation.AddFromAssemblyContaining<Program>());   // your ReactiveValidator<T> classes
+builder.Services.AddReactiveFusion();                   // only with Alis.Reactive.Fusion
+```
+
+`AddReactiveFusion()` sets the Newtonsoft naming Syncfusion renders with: your data sources reach the
+browser in camel case, so `Fields<TItem>(...)` finds each item's members, and the names Syncfusion pins
+(the toast's and dialog's `X`/`Y` position) keep their spelling. Call it after any line of yours that
+assigns `JsonConvert.DefaultSettings`; it keeps the rest of those settings. Without it, a plain
+camel-case resolver renames the pinned names and the toast falls back to the top left.
+
 ## Getting Started
 
 Prerequisites: **.NET SDK 10.0.x** and **Node.js 22+**.
