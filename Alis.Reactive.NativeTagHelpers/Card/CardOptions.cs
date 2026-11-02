@@ -1,4 +1,4 @@
-namespace Alis.Reactive.NativeTagHelpers.Card;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// How far a <c>native-card</c> lifts off the page.

@@ -68,6 +68,7 @@ each other; `.` is the package's root files.
 | Package | Rows, bottom up |
 |---|---|
 | `Alis.Reactive.DesignSystem` | `Tokens`; `Layout` |
+| `Alis.Reactive.NativeTagHelpers` | `.` (the spacing enums and the class joiner); `*` (one slice per tag helper) |
 
 **The lock.** `tests/Alis.Reactive.ArchitectureTests/SliceTreeTests.cs` reads, per package, the type-to-folder map
 from source (both `NET48` and `NET10_0`) and the references from IL (generic arguments, attributes, locals and

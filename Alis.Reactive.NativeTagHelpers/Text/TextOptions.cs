@@ -1,4 +1,4 @@
-namespace Alis.Reactive.NativeTagHelpers.Text;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// Type size of a <c>native-text</c>.

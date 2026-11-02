@@ -1,4 +1,4 @@
-namespace Alis.Reactive.NativeTagHelpers.Kv;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// Arrangement of a <c>native-kv</c> label and value.

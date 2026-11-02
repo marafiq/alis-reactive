@@ -1,4 +1,4 @@
-namespace Alis.Reactive.NativeTagHelpers.Heading;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// The heading tag (<c>h1</c> through <c>h6</c>) a <c>native-heading</c> renders, and its type scale.

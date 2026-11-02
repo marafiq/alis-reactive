@@ -53,6 +53,11 @@ public class SliceTreeTests
             ["Tokens"],
             ["Layout"],
         ]),
+        new("Alis.Reactive.NativeTagHelpers", ["net10.0"],
+        [
+            ["."],
+            ["*"],
+        ]),
     ];
 
     public static IEnumerable<TestCaseData> Cases =>

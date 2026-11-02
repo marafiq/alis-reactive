@@ -1,4 +1,4 @@
-namespace Alis.Reactive.NativeTagHelpers.HStack;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// How the children of a <c>native-hstack</c> align across the row.

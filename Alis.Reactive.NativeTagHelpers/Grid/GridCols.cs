@@ -1,4 +1,4 @@
-namespace Alis.Reactive.NativeTagHelpers.Grid;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// Number of columns in a <c>native-grid</c>.
