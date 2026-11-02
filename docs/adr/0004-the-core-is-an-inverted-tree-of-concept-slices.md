@@ -72,10 +72,16 @@ each other; `.` is the package's root files.
 | `Alis.Reactive.Native` | `.` (`NativeComponent`, the vendor base); `AppLevel/*`, `Components/*` (one slice per component, none using another) |
 | `Alis.Reactive.NativeTagHelpers` | `.` (the spacing enums and the class joiner); `*` (one slice per tag helper) |
 
+**Sealed.** A public class that no type in its package derives from is sealed; the open classes are the bases with a
+subclass beside them (`ReadOnly<T>` under `Property<T>`, `InputBoundFieldBase`, `Event<TArgs>`, the vendor bases).
+Features extend the pipeline through extension classes, not subclasses, and a brought component derives the core's
+`Component` and `JsObject`, never a shipped declaration or payload.
+
 **The lock.** `tests/Alis.Reactive.ArchitectureTests/SliceTreeTests.cs` reads, per package, the type-to-folder map
 from source (both `NET48` and `NET10_0`) and the references from IL (generic arguments, attributes, locals and
 operands included) of each target, and fails naming every reference that points up the table, every folder with no row,
-every row that names no folder, and every file whose namespace breaks the rule above.
+every row that names no folder, every file whose namespace breaks the rule above, and every public class that
+nothing in the package derives from and that is not sealed.
 
 ## Consequences
 

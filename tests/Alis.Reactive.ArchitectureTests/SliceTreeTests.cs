@@ -11,9 +11,10 @@ namespace Alis.Reactive.ArchitectureTests;
 /// source folder of the package; the rows below are the ADR's tables, bottom up. A slice uses only
 /// slices in lower rows, slices in one row never use each other, every folder has a row and every row
 /// names a folder. A file that declares a public type has the package's namespace; every other file's
-/// namespace is its folder. The type-to-folder map is read from source, and the references from the IL
-/// of each target (Mono.Cecil): base types, interfaces, attributes, generic constraints and arguments,
-/// fields, properties, events, signatures, locals and the operands of every instruction.
+/// namespace is its folder. A public class that no type in the package derives from is sealed. The
+/// type-to-folder map is read from source, and the references from the IL of each target (Mono.Cecil):
+/// base types, interfaces, attributes, generic constraints and arguments, fields, properties, events,
+/// signatures, locals and the operands of every instruction.
 /// </summary>
 [TestFixture]
 public class SliceTreeTests
@@ -126,6 +127,18 @@ public class SliceTreeTests
         var edges = new Dictionary<(string From, string To), string>();
         using (var module = ModuleDefinition.ReadModule(dll))
         {
+            var baseTypes = new HashSet<TypeDefinition>();
+            foreach (var type in AllTypes(module))
+            {
+                var baseType = type.BaseType is GenericInstanceType generic ? generic.ElementType : type.BaseType;
+                if (baseType is { Scope: ModuleDefinition scope } && scope == module) baseTypes.Add(baseType.Resolve());
+            }
+            foreach (var type in AllTypes(module))
+            {
+                if ((type.IsPublic || type.IsNestedPublic) && type.IsClass && !type.IsValueType && !type.IsSealed && !type.IsAbstract
+                    && !type.Name.StartsWith("<", StringComparison.Ordinal) && !baseTypes.Contains(type))
+                    violations.Add($"unsealed: {type.FullName} (no type in the package derives from it)");
+            }
             foreach (var type in AllTypes(module))
             {
                 var from = FolderOf(type, package.Name, folderOfType, violations);
@@ -161,7 +174,8 @@ public class SliceTreeTests
                       + $"{rowOf.Count} slices, {edges.Count} slice edges, {upward} upward, {sameRow} same-row, "
                       + $"{violations.Count(v => v.StartsWith("folder without", StringComparison.Ordinal))} folders without a row, "
                       + $"{violations.Count(v => v.StartsWith("row entry", StringComparison.Ordinal))} row entries without a folder, "
-                      + $"{violations.Count(v => v.StartsWith("namespace:", StringComparison.Ordinal))} namespace mismatches.";
+                      + $"{violations.Count(v => v.StartsWith("namespace:", StringComparison.Ordinal))} namespace mismatches, "
+                      + $"{violations.Count(v => v.StartsWith("unsealed:", StringComparison.Ordinal))} unsealed public classes without a subclass.";
         TestContext.Out.WriteLine(summary);
         Assert.That(violations, Is.Empty, summary + "\n" + string.Join("\n", violations));
     }
