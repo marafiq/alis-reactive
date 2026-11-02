@@ -1,4 +1,4 @@
-using Alis.Reactive.FluentValidator;
+using Alis.Reactive;
 using Alis.Reactive.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);

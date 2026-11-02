@@ -127,9 +127,9 @@ jobs:
         # pack.sh runs npm ci + npm run build:all itself, then packs all six at -p:Version.
         run: scripts/pack.sh "${PACKAGE_VERSION}"
 
-      - name: Verify the six packages were produced at the tagged version
+      - name: Verify the five packages were produced at the tagged version
         run: |
-          EXPECTED=(AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.FluentValidator AlisReactive.DesignSystem AlisReactive.NativeTagHelpers)
+          EXPECTED=(AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.DesignSystem AlisReactive.NativeTagHelpers)
           fail=0
           for id in "${EXPECTED[@]}"; do
             if [ ! -f "./nupkgs/${id}.${PACKAGE_VERSION}.nupkg" ]; then

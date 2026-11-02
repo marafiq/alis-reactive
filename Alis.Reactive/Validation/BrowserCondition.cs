@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// The browser's form of a <c>When</c> condition. A C# condition has a browser form when every part of it

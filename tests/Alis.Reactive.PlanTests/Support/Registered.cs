@@ -1,4 +1,3 @@
-using Alis.Reactive.FluentValidator;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Alis.Reactive.PlanTests.Support;

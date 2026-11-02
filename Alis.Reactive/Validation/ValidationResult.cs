@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Alis.Reactive.Validation;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive
 {
     /// <summary>One rule a value broke: the field it names and what the rule says.</summary>
     public sealed class ValidationFailure

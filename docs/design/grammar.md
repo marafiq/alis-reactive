@@ -934,7 +934,7 @@ targets). Every public type is in the namespace `Alis.Reactive`; an internal typ
   pipeline (`ConditionExtensions`, `RequestExtensions`); `ReactivePlan` and `RenderedComponent` at the top.
 - `InputField`, then `Razor`: the one MVC boundary (`Html.ReactivePlan`, `Html.On`, `Html.InputField`,
   `Html.RenderPlan`, the rendered page's record).
-- `Alis.Reactive.FluentValidator`: the projection of section 7 and its typed model.
+- `Validation`: the projection of section 7 and its typed model (`ReactiveValidator<T>`).
 - `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: vendors, declarations, render helpers, Confirm,
   Toast, Drawer, Loader, and the grid's column rules.
 

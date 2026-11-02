@@ -14,7 +14,7 @@ command -v dotnet-coverage > /dev/null || { echo "dotnet-coverage is not install
 out="$PWD/tests/TestResults/framework-coverage/$(date +%Y%m%d-%H%M%S)"
 bin="tests/Alis.Reactive.Framework.PlaywrightTests/bin/Debug/net10.0"
 session="alis-framework-coverage-$$"
-core=(Alis.Reactive Alis.Reactive.FluentValidator)
+core=(Alis.Reactive)
 mkdir -p "$out/js" "$out/original"
 
 dotnet build tests/Alis.Reactive.Framework.PlaywrightTests/Alis.Reactive.Framework.PlaywrightTests.csproj --nologo -v q

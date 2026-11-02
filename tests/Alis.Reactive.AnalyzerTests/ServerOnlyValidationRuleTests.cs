@@ -37,7 +37,7 @@ public class ServerOnlyValidationRuleTests
     public Task a_predicate_outside_a_validator_is_left_alone() =>
         Fixture.ReportsNothing<ServerOnlyValidationRuleAnalyzer>("Validators/PhysicianRules.cs",
             """
-            using Alis.Reactive.FluentValidator;
+            using Alis.Reactive;
 
             public class Admission
             {
@@ -54,7 +54,7 @@ public class ServerOnlyValidationRuleTests
     private static string ValidatorWith(string rule) => $$"""
         using System.Threading;
         using System.Threading.Tasks;
-        using Alis.Reactive.FluentValidator;
+        using Alis.Reactive;
 
         public class Admission
         {

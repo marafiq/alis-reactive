@@ -38,6 +38,7 @@ public class CoreLayerTests
         ["PlanAuthoring"],
         ["InputField"],
         ["Razor"],
+        ["Validation"],
     ];
 
     private const string PublicNamespace = "Alis.Reactive";

@@ -1,4 +1,4 @@
-using Alis.Reactive.FluentValidator;
+using Alis.Reactive;
 using ResidentIntake.Models;
 
 namespace ResidentIntake.Validators;

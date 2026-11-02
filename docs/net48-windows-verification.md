@@ -29,7 +29,6 @@ Visual Studio (or MSBuild + IIS Express) and .NET Framework 4.8 installed.
 4. Add `./nupkgs` as a local NuGet source and install (these pull the `net48` lib + MVC5 deps):
    ```
    AlisReactive, AlisReactive.DesignSystem, AlisReactive.Fusion, AlisReactive.Native,
-   AlisReactive.FluentValidator   (all 1.0.0-rc.1)
    ```
 
 ## The five checks

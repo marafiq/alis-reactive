@@ -1,4 +1,3 @@
-using Alis.Reactive.FluentValidator;
 using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models

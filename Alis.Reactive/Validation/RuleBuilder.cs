@@ -1,7 +1,8 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Validation;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive
 {
     /// <summary>
     /// The rules of one member, from <c>RuleFor(x =&gt; x.Member)</c>: its checks follow as

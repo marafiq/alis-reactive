@@ -43,7 +43,7 @@ reaches no cycle at all, and the one a new engineer reads as obviously right.
 | 15 | `PlanAuthoring` (`ReactivePlan`, `RenderedComponent`) |
 | 16 | `InputField` |
 | 17 | `Razor` (`Razor/Extensions` merged into it: one MVC boundary) |
-| 18 | `Alis.Reactive.FluentValidator` |
+| 18 | `Validation` (`ReactiveValidator<T>`, the FluentValidation grammar, its checks and messages, `AddReactiveFluentValidation`) |
 
 **Placement rule.** A type lives in its concept's folder, in the lowest slice that uses it; a caller passes a
 value instead of a low slice reaching up. A concept gets a model folder (`PlanModel/<Concept>`) beside its builder
@@ -56,8 +56,8 @@ folder (`p.When`, `p.Confirm` in `ConditionExtensions`; `p.Get`, `p.Post`, `p.Pu
 `RequestExtensions`), so the pipeline knows nothing of the features and the features depend on it. Call sites do
 not change.
 
-**Public namespaces.** A file that declares a public type has namespace `Alis.Reactive` (or
-`Alis.Reactive.FluentValidator`): a page and a component import one namespace. Every other file's namespace is
+**Public namespaces.** A file that declares a public type has namespace `Alis.Reactive`: a page, a
+component and a validator import one namespace. Every other file's namespace is
 its folder (`Alis.Reactive.PlanModel.Conditions`). The eight public namespaces `Builders`, `Builders.Conditions`,
 `Builders.Requests`, `Builders.Arrays`, `PlanModel`, `Validation`, `InputField` and `Components` are retired.
 

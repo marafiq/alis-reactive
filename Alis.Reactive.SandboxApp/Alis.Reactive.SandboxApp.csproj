@@ -12,7 +12,6 @@
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <!-- The look this app chose; the component packages do not bring one. -->
         <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
-        <ProjectReference Include="..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
         <ProjectReference Include="..\Alis.Reactive.NativeTagHelpers\Alis.Reactive.NativeTagHelpers.csproj" />

@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// A rule's <c>When</c> or <c>Unless</c>: the server's test, and the browser's form of it when it has one. A

@@ -13,7 +13,6 @@ on:
       - 'Alis.Reactive.Native/**'
       - 'Alis.Reactive.DesignSystem/**'
       - 'Alis.Reactive.Fusion/**'
-      - 'Alis.Reactive.FluentValidator/**'
       - 'Alis.Reactive.NativeTagHelpers/**'
       - 'Alis.Reactive.Analyzers/**'
       - 'Alis.Reactive.SandboxApp/**'

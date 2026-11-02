@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// A rule's message: a template with placeholders (<c>{PropertyName}</c>, <c>{MaxLength}</c>), or text the

@@ -164,7 +164,6 @@ check_no_build_is_fresh() {
   local sources=(
     Alis.Reactive
     Alis.Reactive.Analyzers
-    Alis.Reactive.FluentValidator
     build
     tests/Alis.Reactive.Playwright.TestHost
     "$project_dir"

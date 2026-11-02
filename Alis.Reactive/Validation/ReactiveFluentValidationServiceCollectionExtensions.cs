@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Alis.Reactive.Validation;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive
 {
     /// <summary>Registers an app's validators, for its controllers and for the browser rules its pages render.</summary>
     public static class ReactiveFluentValidationServiceCollectionExtensions

@@ -1,4 +1,4 @@
-using Alis.Reactive.FluentValidator;
+using Alis.Reactive;
 using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Hubs;
 using Microsoft.Extensions.FileProviders;

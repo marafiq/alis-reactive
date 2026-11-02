@@ -6,16 +6,14 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce React
 
 | Package | Description |
 |---------|-------------|
-| `Alis.Reactive` | Core plan model, builders, and serialization |
+| `Alis.Reactive` | Core plan model, builders, serialization, and validation rules in FluentValidation's grammar (server and browser) |
 | `Alis.Reactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
 | `Alis.Reactive.Fusion` | Syncfusion EJ2 component integration |
-| `Alis.Reactive.FluentValidator` | Validation rules in FluentValidation's grammar, run by the server and the browser |
 | `Alis.Reactive.DesignSystem` | The look an app chooses: tokens, stylesheets, and C# layout class helpers. No component package depends on it |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
-`Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, `Alis.Reactive.FluentValidator`,
-and `Alis.Reactive.DesignSystem` multi-target **`net48` and `net10.0`** — the *same* DSL on both
-runtimes (bridged by `#if` shims, never a divergent API). Only `Alis.Reactive.NativeTagHelpers` is
+`Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, and `Alis.Reactive.DesignSystem`
+multi-target **`net48` and `net10.0`** — the *same* DSL on both runtimes (bridged by `#if` shims, never a divergent API). Only `Alis.Reactive.NativeTagHelpers` is
 **`net10.0`-only** (ASP.NET Core Tag Helpers).
 
 ### In your application
@@ -24,7 +22,6 @@ Register the packages you use in `Program.cs` (MVC 5 on net48: in `Global.asax` 
 startup). `examples/resident-intake/Program.cs` is the worked example.
 
 ```csharp
-using Alis.Reactive.FluentValidator;
 using Alis.Reactive.Fusion;
 
 builder.Services.AddControllersWithViews();
@@ -201,7 +198,6 @@ touch the framework internals.
 Alis.Reactive/                    C# core library (packed as AlisReactive NuGet)
 Alis.Reactive.Native/             C# native-component library
 Alis.Reactive.Fusion/             C# Syncfusion-component library
-Alis.Reactive.FluentValidator/    C# validation rules in FluentValidation's grammar, server and browser
 Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
 Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
 Alis.Reactive.DesignSystem/       C# design-system tokens + layout class helpers; ships the design-system CSS

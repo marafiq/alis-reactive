@@ -5,8 +5,9 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Alis.Reactive.Members;
+using Alis.Reactive.Validation;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive
 {
     /// <summary>Validates a model: the service a controller asks for to validate what a page sent.</summary>
     /// <typeparam name="T">The model it validates.</typeparam>

@@ -206,7 +206,7 @@ version so nobody's build breaks.
 
 ```bash
 # Unlist every one of the six package ids at the bad version (dotnet nuget delete unlists on nuget.org).
-for id in AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.FluentValidator AlisReactive.DesignSystem AlisReactive.NativeTagHelpers; do
+for id in AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.DesignSystem AlisReactive.NativeTagHelpers; do
   dotnet nuget delete "$id" 1.0.0-rc.4 --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --non-interactive
 done
 

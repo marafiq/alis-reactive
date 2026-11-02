@@ -38,7 +38,6 @@ namespace Alis.Reactive.Analyzers.TypedDsl
                 "Alis.Reactive",
                 "Alis.Reactive.Fusion",
                 "Alis.Reactive.Native",
-                "Alis.Reactive.FluentValidator",
                 "Alis.Reactive.DesignSystem",
                 "Alis.Reactive.NativeTagHelpers");
 

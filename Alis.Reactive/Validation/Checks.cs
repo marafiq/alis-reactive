@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// One term of the rule vocabulary: what the server decides about a value, and the message it says when
@@ -326,7 +326,7 @@ namespace Alis.Reactive.FluentValidator
 
             internal override object? ValueIn(T instance) => _member.ValueIn(instance);
 
-            internal override string DisplayName => Alis.Reactive.FluentValidator.DisplayName.Of(_member.Name);
+            internal override string DisplayName => Alis.Reactive.Validation.DisplayName.Of(_member.Name);
 
             internal override object? RenderName => DisplayName;
 

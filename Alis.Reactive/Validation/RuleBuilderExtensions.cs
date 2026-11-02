@@ -3,8 +3,9 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.Validation;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive
 {
     /// <summary>
     /// The rule vocabulary, in FluentValidation's grammar. Each check says what the server decides; the

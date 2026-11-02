@@ -43,7 +43,7 @@ namespace Alis.Reactive.Analyzers.Validation
             context.RegisterCompilationStartAction(compilationCtx =>
             {
                 var reactiveValidatorType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.FluentValidator.ReactiveValidator`1");
+                    "Alis.Reactive.ReactiveValidator`1");
 
                 if (reactiveValidatorType == null)
                     return;

@@ -1,4 +1,4 @@
-using Alis.Reactive.FluentValidator;
+using Alis.Reactive;
 using Alis.Reactive.Framework.App.Realtime;
 using Alis.Reactive.Framework.App.Validation;
 using Microsoft.Extensions.FileProviders;

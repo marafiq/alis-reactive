@@ -1,5 +1,5 @@
 // What the framework's own tests run of the framework: the runtime (runtime/**, through the bundle's
-// source map) and the core's C# (Alis.Reactive, Alis.Reactive.FluentValidator, from Cobertura).
+// source map) and the core's C# (Alis.Reactive, from Cobertura).
 //
 // usage: node scripts/framework-coverage.mjs <js coverage dir> <cobertura file> <report.md>
 //
@@ -68,7 +68,7 @@ const xml = readFileSync(cobertura, "utf8");
 const csharp = new Map();
 for (const klass of xml.matchAll(/<class [^>]*filename="([^"]+)"[^>]*>([\s\S]*?)<\/class>/g)) {
   const relative = path.relative(repo, klass[1]).replaceAll("\\", "/");
-  if (!/^Alis\.Reactive(\.FluentValidator)?\//.test(relative)) continue;
+  if (!/^Alis\.Reactive\//.test(relative)) continue;
   const file = csharp.get(relative) ?? { lines: new Map() };
   for (const line of klass[2].matchAll(/<line number="(\d+)" hits="(\d+)"/g)) {
     const number = Number(line[1]);
@@ -117,7 +117,7 @@ const lines = [
   "| Code | Run | Of | Share |",
   "|---|---|---|---|",
   `| Runtime (runtime/**, source-map segments) | ${jsRun} | ${jsTotal} | ${percent(jsRun, jsTotal)}% |`,
-  `| Core C# (Alis.Reactive, Alis.Reactive.FluentValidator; coverable lines) | ${csRunTotal} | ${csTotal} | ${percent(csRunTotal, csTotal)}% |`,
+  `| Core C# (Alis.Reactive; coverable lines) | ${csRunTotal} | ${csTotal} | ${percent(csRunTotal, csTotal)}% |`,
   "",
   "## Runtime, by file",
   "",

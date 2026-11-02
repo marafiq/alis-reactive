@@ -1,4 +1,3 @@
-using Alis.Reactive.FluentValidator;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Validation;

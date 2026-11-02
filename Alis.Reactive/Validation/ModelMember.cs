@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.FluentValidator
+namespace Alis.Reactive.Validation
 {
     /// <summary>
     /// A member of the model a rule reads, from the expression that names it: <c>x =&gt; x.Address.City</c> is

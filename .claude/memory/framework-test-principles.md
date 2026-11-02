@@ -10,8 +10,8 @@ The framework's tests are its specification. A change that keeps every promise p
 that breaks a promise fails the test named for it. They are held to a higher bar than the code they
 test, because every page an app builds rests on them.
 
-These rules govern the tests of the framework itself: the core packages (`Alis.Reactive`,
-`Alis.Reactive.FluentValidator`) and the runtime. Tests of a component, shipped (Fusion, Native) or
+These rules govern the tests of the framework itself: the core package (`Alis.Reactive`, its validation
+slice included) and the runtime. Tests of a component, shipped (Fusion, Native) or
 brought by an app, follow `bdd-principles.md`; they are consumers of the framework, and a framework
 test never depends on them.
 
