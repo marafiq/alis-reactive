@@ -1,4 +1,6 @@
-using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Mono.Cecil;
 using NUnit.Framework;
 
@@ -10,7 +12,7 @@ namespace Alis.Reactive.ArchitectureTests;
 /// only slices in lower rows, slices in one row never use each other, every folder has a row and every
 /// row names a folder. A file that declares a public type has namespace <c>Alis.Reactive</c>; every
 /// other file's namespace is its folder. The type-to-folder map is read from source, and the references
-/// from the IL of both targets: base types, interfaces, attributes, generic constraints and arguments,
+/// from the IL of both targets (Mono.Cecil): base types, interfaces, attributes, generic constraints and arguments,
 /// fields, properties, events, signatures, locals and the operands of every instruction.
 /// </summary>
 [TestFixture]
@@ -115,9 +117,17 @@ public class CoreLayerTests
         Assert.That(violations, Is.Empty, summary + "\n" + string.Join("\n", violations));
     }
 
-    // ── source: type -> folder, namespace per file ──────────────────────────────────────────────────
+    // ── source: type -> folder, namespace per file, read through Roslyn's parser ─────────────────────
 
     private sealed record SourceFile(string RelativePath, string Folder, string Namespace, bool DeclaresPublicType, IReadOnlyList<string> TopLevelTypes);
+
+    // The core compiles for both targets with #if splits, so each file is parsed under each target's symbols
+    // and the declarations are the union.
+    private static readonly CSharpParseOptions[] Targets =
+    [
+        new CSharpParseOptions(LanguageVersion.Preview, preprocessorSymbols: ["NET48", "NETFRAMEWORK"]),
+        new CSharpParseOptions(LanguageVersion.Preview, preprocessorSymbols: ["NET10_0", "NET10_0_OR_GREATER", "NET6_0_OR_GREATER", "NET"]),
+    ];
 
     private static IEnumerable<SourceFile> SourceFiles(string coreDir)
     {
@@ -126,108 +136,45 @@ public class CoreLayerTests
             var relative = Path.GetRelativePath(coreDir, path).Replace('\\', '/');
             if (relative.StartsWith("bin/", StringComparison.Ordinal) || relative.StartsWith("obj/", StringComparison.Ordinal)) continue;
             var folder = Path.GetDirectoryName(relative)!.Replace('\\', '/');
-            var code = StripCommentsStringsAndDirectives(File.ReadAllText(path));
-            var ns = Regex.Match(code, @"\bnamespace\s+([\w.]+)\s*([;{])");
-            if (!ns.Success) throw new InvalidOperationException($"{relative} declares no namespace.");
-            var namespaceDepth = ns.Groups[2].Value == ";" ? 0 : 1;
+            var text = File.ReadAllText(path);
+            var namespaces = new HashSet<string>(StringComparer.Ordinal);
             var types = new List<string>();
             var declaresPublic = false;
-            foreach (Match declaration in TypeDeclaration.Matches(code))
+            foreach (var options in Targets)
             {
-                if (DepthAt(code, declaration.Index) != namespaceDepth) continue;
-                types.Add(declaration.Groups["name"].Value + Arity(declaration.Groups["arity"].Value));
-                if (declaration.Groups["visibility"].Value == "public") declaresPublic = true;
+                var root = CSharpSyntaxTree.ParseText(text, options, path).GetCompilationUnitRoot();
+                foreach (var ns in root.DescendantNodes().OfType<BaseNamespaceDeclarationSyntax>())
+                {
+                    namespaces.Add(ns.Name.ToString());
+                    foreach (var member in ns.Members)
+                    {
+                        switch (member)
+                        {
+                            case TypeDeclarationSyntax type:
+                                types.Add(type.Identifier.Text + Arity(type.TypeParameterList));
+                                declaresPublic |= type.Modifiers.Any(SyntaxKind.PublicKeyword);
+                                break;
+                            case EnumDeclarationSyntax @enum:
+                                types.Add(@enum.Identifier.Text);
+                                declaresPublic |= @enum.Modifiers.Any(SyntaxKind.PublicKeyword);
+                                break;
+                            case DelegateDeclarationSyntax @delegate:
+                                types.Add(@delegate.Identifier.Text + Arity(@delegate.TypeParameterList));
+                                declaresPublic |= @delegate.Modifiers.Any(SyntaxKind.PublicKeyword);
+                                break;
+                        }
+                    }
+                }
             }
+            if (namespaces.Count != 1) throw new InvalidOperationException($"{relative} declares {namespaces.Count} namespaces; a file declares one.");
             if (types.Count == 0) throw new InvalidOperationException($"{relative} declares no type.");
-            yield return new SourceFile(relative, folder, ns.Groups[1].Value, declaresPublic, types.Distinct(StringComparer.Ordinal).ToList());
+            yield return new SourceFile(relative, folder, namespaces.Single(), declaresPublic, types.Distinct(StringComparer.Ordinal).ToList());
         }
     }
-
-    // A declaration starts its line; a constraint's "where T : class" never does.
-    private static readonly Regex TypeDeclaration = new(
-        @"^[ \t]*(?:(?<visibility>public|internal|private|protected)\s+)?(?:(?:sealed|static|abstract|partial|readonly|ref|unsafe|new|protected|internal|public|private)\s+)*"
-        + @"(?:(?:class|struct|interface|enum|record(?:\s+(?:class|struct))?)\s+(?<name>\w+)(?<arity><[^<>]*>)?|delegate\s+[\w<>\[\],?.]+\s+(?<name>\w+)(?<arity><[^<>]*>)?\s*\()",
-        RegexOptions.Compiled | RegexOptions.Multiline);
 
     // The arity suffix IL uses: Condition<TModel> is Condition`1.
-    private static string Arity(string typeParameters) =>
-        typeParameters.Length == 0 ? "" : "`" + (typeParameters.Count(c => c == ',') + 1);
-
-    private static int DepthAt(string code, int index)
-    {
-        var depth = 0;
-        for (var i = 0; i < index; i++)
-        {
-            if (code[i] == '{') depth++;
-            else if (code[i] == '}') depth--;
-        }
-        return depth;
-    }
-
-    // Comments, string and character literals, and preprocessor lines carry braces and keywords that are
-    // not code. Each is replaced by spaces of the same length so indexes stay comparable.
-    private static string StripCommentsStringsAndDirectives(string text)
-    {
-        var chars = text.ToCharArray();
-        var i = 0;
-        while (i < chars.Length)
-        {
-            var c = chars[i];
-            if (c == '/' && i + 1 < chars.Length && chars[i + 1] == '/') { i = BlankUntil(chars, i, "\n"); continue; }
-            if (c == '/' && i + 1 < chars.Length && chars[i + 1] == '*') { i = BlankUntil(chars, i, "*/", includeEnd: true); continue; }
-            if (c == '#' && IsLineStart(chars, i)) { i = BlankUntil(chars, i, "\n"); continue; }
-            if (c == '"' && i + 2 < chars.Length && chars[i + 1] == '"' && chars[i + 2] == '"') { i = BlankUntil(chars, i + 3, "\"\"\"", includeEnd: true); continue; }
-            if (c == '@' && i + 1 < chars.Length && chars[i + 1] == '"') { i = BlankVerbatim(chars, i + 2); continue; }
-            if (c == '$' && i + 1 < chars.Length && chars[i + 1] == '@' && i + 2 < chars.Length && chars[i + 2] == '"') { i = BlankVerbatim(chars, i + 3); continue; }
-            if (c == '$' && i + 1 < chars.Length && chars[i + 1] == '"') { i = BlankEscaped(chars, i + 2); continue; }
-            if (c == '"') { i = BlankEscaped(chars, i + 1); continue; }
-            if (c == '\'') { i = BlankEscaped(chars, i + 1, '\''); continue; }
-            i++;
-        }
-        return new string(chars);
-    }
-
-    private static bool IsLineStart(char[] chars, int index)
-    {
-        for (var i = index - 1; i >= 0 && chars[i] != '\n'; i--)
-            if (!char.IsWhiteSpace(chars[i])) return false;
-        return true;
-    }
-
-    private static int BlankUntil(char[] chars, int start, string terminator, bool includeEnd = false)
-    {
-        var text = new string(chars);
-        var end = text.IndexOf(terminator, start, StringComparison.Ordinal);
-        var stop = end < 0 ? chars.Length : includeEnd ? end + terminator.Length : end;
-        for (var i = start; i < stop; i++) if (chars[i] != '\n') chars[i] = ' ';
-        return stop;
-    }
-
-    private static int BlankEscaped(char[] chars, int start, char quote = '"')
-    {
-        var i = start;
-        while (i < chars.Length && chars[i] != quote)
-        {
-            if (chars[i] == '\\') { chars[i] = ' '; i++; }
-            if (i < chars.Length && chars[i] != '\n') chars[i] = ' ';
-            i++;
-        }
-        if (i < chars.Length) chars[i] = ' ';
-        return i + 1;
-    }
-
-    private static int BlankVerbatim(char[] chars, int start)
-    {
-        var i = start;
-        while (i < chars.Length)
-        {
-            if (chars[i] == '"' && i + 1 < chars.Length && chars[i + 1] == '"') { chars[i] = ' '; chars[i + 1] = ' '; i += 2; continue; }
-            if (chars[i] == '"') { chars[i] = ' '; return i + 1; }
-            if (chars[i] != '\n') chars[i] = ' ';
-            i++;
-        }
-        return i;
-    }
+    private static string Arity(TypeParameterListSyntax? typeParameters) =>
+        typeParameters == null || typeParameters.Parameters.Count == 0 ? "" : "`" + typeParameters.Parameters.Count;
 
     private static Dictionary<(string Namespace, string Name), string> TypeFolders(IEnumerable<SourceFile> sources)
     {
