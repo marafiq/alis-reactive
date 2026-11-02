@@ -4,7 +4,7 @@ using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// The native HTML <c>&lt;button&gt;</c>, declared by the names its JavaScript API uses.

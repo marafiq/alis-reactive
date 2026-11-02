@@ -6,7 +6,7 @@ using System.Web;
 #else
 using Microsoft.AspNetCore.Html;
 #endif
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// Configures and renders a native HTML <c>&lt;button&gt;</c> element with an explicit ID.

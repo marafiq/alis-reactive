@@ -5,7 +5,7 @@ using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// A native <c>&lt;a&gt;</c> whose unmodified left click runs a request pipeline instead of

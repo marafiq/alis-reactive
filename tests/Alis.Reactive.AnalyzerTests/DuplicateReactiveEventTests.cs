@@ -59,7 +59,7 @@ public class DuplicateReactiveEventTests
     private static string View(string components) => $$"""
         using System.Threading.Tasks;
         using Alis.Reactive;
-        using Alis.Reactive.Native.Components;
+        using Alis.Reactive.Native;
         using Microsoft.AspNetCore.Html;
         using Microsoft.AspNetCore.Mvc.Razor;
         using Microsoft.AspNetCore.Mvc.Rendering;

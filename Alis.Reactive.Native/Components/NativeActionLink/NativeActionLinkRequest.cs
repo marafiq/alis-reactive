@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// What a <see cref="NativeActionLink"/>'s click does: one request to the link's own <c>href</c>,

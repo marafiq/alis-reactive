@@ -1,4 +1,4 @@
-using Alis.Reactive.Native.Components;
+using Alis.Reactive.Native;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +12,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
     {
         private const int HaroldJenningsId = 3051;
 
-        private static readonly RadioButtonItem[] DietaryRestrictionOptions =
+        private static readonly CheckListItem[] DietaryRestrictionOptions =
         {
-            new RadioButtonItem("Gluten-free", "Gluten-free"),
-            new RadioButtonItem("Low sodium", "Low sodium"),
-            new RadioButtonItem("Pureed texture", "Pureed texture"),
-            new RadioButtonItem("Diabetic", "Diabetic"),
+            new CheckListItem("Gluten-free", "Gluten-free"),
+            new CheckListItem("Low sodium", "Low sodium"),
+            new CheckListItem("Pureed texture", "Pureed texture"),
+            new CheckListItem("Diabetic", "Diabetic"),
         };
 
         [HttpGet("DietPlan")]

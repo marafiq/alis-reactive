@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// The native HTML <c>&lt;input&gt;</c>, declared by the names its JavaScript API uses.
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Renders a NativeTextBox with its defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model.</typeparam>
         /// <typeparam name="TProp">The type of the bound model property.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextBox, TModel> NativeTextBox<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeTextBox, TModel> NativeTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
             => field.NativeTextBox(_ => { });
@@ -56,14 +56,14 @@ namespace Alis.Reactive.Native.Components
         /// <param name="field">The model-bound field the input renders into.</param>
         /// <param name="build">Configures the input, for example <c>b =&gt; b.Placeholder("Preferred name")</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextBox, TModel> NativeTextBox<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeTextBox, TModel> NativeTextBox<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<NativeTextBoxBuilder<TModel, TProp>> build)
             where TModel : class
         {
             var builder = new NativeTextBoxBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
             build(builder);
-            return field.Render<global::Alis.Reactive.Native.Components.NativeTextBox>(builder);
+            return field.Render<global::Alis.Reactive.Native.NativeTextBox>(builder);
         }
     }
 }

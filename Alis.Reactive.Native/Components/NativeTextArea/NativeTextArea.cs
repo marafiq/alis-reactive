@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// The native HTML <c>&lt;textarea&gt;</c>, declared by the names its JavaScript API uses.
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Renders a NativeTextArea with its defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model.</typeparam>
         /// <typeparam name="TProp">The type of the bound model property.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
             => field.NativeTextArea(_ => { });
@@ -56,14 +56,14 @@ namespace Alis.Reactive.Native.Components
         /// <param name="field">The model-bound field the textarea renders into.</param>
         /// <param name="build">Configures the textarea, for example <c>b =&gt; b.Rows(6)</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeTextArea, TModel> NativeTextArea<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<NativeTextAreaBuilder<TModel, TProp>> build)
             where TModel : class
         {
             var builder = new NativeTextAreaBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
             build(builder);
-            return field.Render<global::Alis.Reactive.Native.Components.NativeTextArea>(builder);
+            return field.Render<global::Alis.Reactive.Native.NativeTextArea>(builder);
         }
     }
 }

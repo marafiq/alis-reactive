@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// Configures and renders a native HTML checkbox list bound to a model property.
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Native.Components
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
         private readonly string _bindingPath;
-        private readonly List<RadioButtonItem> _options = new List<RadioButtonItem>();
+        private readonly List<CheckListItem> _options = new List<CheckListItem>();
         private string _cssClass = "alis-check-list";
         private string _optionCssClass = "alis-check-list__option";
 
@@ -72,7 +72,7 @@ namespace Alis.Reactive.Native.Components
         /// controller or view-model option lists.
         /// </summary>
         /// <param name="items">Checkbox items to display.</param>
-        public NativeCheckListBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
+        public NativeCheckListBuilder<TModel, TProp> Items(IEnumerable<CheckListItem> items)
         {
             foreach (var item in items)
                 _options.Add(item);
@@ -85,7 +85,7 @@ namespace Alis.Reactive.Native.Components
         /// <param name="value">Option value and display text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value)
         {
-            _options.Add(new RadioButtonItem(value, value));
+            _options.Add(new CheckListItem(value, value));
             return this;
         }
 
@@ -96,7 +96,7 @@ namespace Alis.Reactive.Native.Components
         /// <param name="text">Checkbox display text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value, string text)
         {
-            _options.Add(new RadioButtonItem(value, text));
+            _options.Add(new CheckListItem(value, text));
             return this;
         }
 
@@ -108,7 +108,7 @@ namespace Alis.Reactive.Native.Components
         /// <param name="description">Secondary description shown below the text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value, string text, string description)
         {
-            _options.Add(new RadioButtonItem(value, text, description));
+            _options.Add(new CheckListItem(value, text, description));
             return this;
         }
 

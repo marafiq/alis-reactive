@@ -1,9 +1,9 @@
 @model DietPlanModel
-@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native
 @{
     ViewData["Title"] = "Diet Plan";
     var plan = Html.ReactivePlan<DietPlanModel>();
-    var restrictionOptions = (RadioButtonItem[])ViewBag.DietaryRestrictionOptions;
+    var restrictionOptions = (CheckListItem[])ViewBag.DietaryRestrictionOptions;
 }
 
 <native-vstack gap="Lg">

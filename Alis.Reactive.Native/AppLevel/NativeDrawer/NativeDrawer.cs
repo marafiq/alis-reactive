@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.AppLevel
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// The page's slide-out drawer, declared by the members its element carries.
@@ -69,7 +69,7 @@ namespace Alis.Reactive.Native.AppLevel
         {
             return new HtmlString(
 #endif
-                "<aside id=\"" + AppLevel.NativeDrawer.ElementId + "\" class=\"alis-drawer\" aria-hidden=\"true\">\n" +
+                "<aside id=\"" + Alis.Reactive.Native.NativeDrawer.ElementId + "\" class=\"alis-drawer\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-drawer__panel\">\n" +
                 "    <div class=\"alis-drawer__header\">\n" +
                 "      <h2 id=\"alis-drawer-title\" class=\"alis-drawer__title\"></h2>\n" +

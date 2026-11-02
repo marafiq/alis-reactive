@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// The native HTML <c>&lt;select&gt;</c>, declared by the names its JavaScript API uses.
@@ -43,7 +43,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Renders a NativeDropDown with its defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model.</typeparam>
         /// <typeparam name="TProp">The type of the bound model property.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeDropDown, TModel> NativeDropDown<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeDropDown, TModel> NativeDropDown<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
             => field.NativeDropDown(_ => { });
@@ -57,14 +57,14 @@ namespace Alis.Reactive.Native.Components
         /// <param name="field">The model-bound field the select renders into.</param>
         /// <param name="build">Configures the select, for example <c>b =&gt; b.Items(levels).Placeholder("-- Select --")</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeDropDown, TModel> NativeDropDown<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeDropDown, TModel> NativeDropDown<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<NativeDropDownBuilder<TModel, TProp>> build)
             where TModel : class
         {
             var builder = new NativeDropDownBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
             build(builder);
-            return field.Render<global::Alis.Reactive.Native.Components.NativeDropDown>(builder);
+            return field.Render<global::Alis.Reactive.Native.NativeDropDown>(builder);
         }
     }
 }

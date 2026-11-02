@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// A native group of radio buttons whose value is the chosen option, declared by the names its element uses.
@@ -39,7 +39,7 @@ namespace Alis.Reactive.Native.Components
         /// <summary>Renders a NativeRadioGroup with its defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model.</typeparam>
         /// <typeparam name="TProp">The type of the bound model property.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeRadioGroup, TModel> NativeRadioGroup<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeRadioGroup, TModel> NativeRadioGroup<TModel, TProp>(
             this InputBoundField<TModel, TProp> field)
             where TModel : class
             => field.NativeRadioGroup(_ => { });
@@ -53,14 +53,14 @@ namespace Alis.Reactive.Native.Components
         /// <param name="field">The model-bound field the radio group renders into.</param>
         /// <param name="build">Configures the radio group, for example <c>b =&gt; b.Option("Independent")</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeRadioGroup, TModel> NativeRadioGroup<TModel, TProp>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeRadioGroup, TModel> NativeRadioGroup<TModel, TProp>(
             this InputBoundField<TModel, TProp> field,
             Action<NativeRadioGroupBuilder<TModel, TProp>> build)
             where TModel : class
         {
             var builder = new NativeRadioGroupBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
             build(builder);
-            return field.Render<global::Alis.Reactive.Native.Components.NativeRadioGroup>(builder);
+            return field.Render<global::Alis.Reactive.Native.NativeRadioGroup>(builder);
         }
     }
 }

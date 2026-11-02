@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.AppLevel
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// The page's loading overlay, declared by the members its element carries.
@@ -55,7 +55,7 @@ namespace Alis.Reactive.Native.AppLevel
         {
             return new HtmlString(
 #endif
-                "<div id=\"" + AppLevel.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
+                "<div id=\"" + Alis.Reactive.Native.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-loader__spinner\"></div>\n" +
                 "  <p id=\"alis-loader-message\" class=\"alis-loader__message\"></p>\n" +
                 "</div>\n");

@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// The native HTML checkbox, declared by the names its JavaScript API uses.
@@ -42,7 +42,7 @@ namespace Alis.Reactive.Native.Components
     {
         /// <summary>Renders a NativeCheckBox with its defaults; see the overload that takes <c>build</c>.</summary>
         /// <typeparam name="TModel">The view's model.</typeparam>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckBox, TModel> NativeCheckBox<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeCheckBox, TModel> NativeCheckBox<TModel>(
             this InputBoundField<TModel, bool> field)
             where TModel : class
             => field.NativeCheckBox(_ => { });
@@ -55,14 +55,14 @@ namespace Alis.Reactive.Native.Components
         /// <param name="field">The model-bound field the checkbox renders into.</param>
         /// <param name="build">Configures the checkbox, for example <c>b =&gt; b.CssClass("...")</c>.</param>
         /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
-        public static RenderedComponent<global::Alis.Reactive.Native.Components.NativeCheckBox, TModel> NativeCheckBox<TModel>(
+        public static RenderedComponent<global::Alis.Reactive.Native.NativeCheckBox, TModel> NativeCheckBox<TModel>(
             this InputBoundField<TModel, bool> field,
             Action<NativeCheckBoxBuilder<TModel, bool>> build)
             where TModel : class
         {
             var builder = new NativeCheckBoxBuilder<TModel, bool>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
             build(builder);
-            return field.Render<global::Alis.Reactive.Native.Components.NativeCheckBox>(builder);
+            return field.Render<global::Alis.Reactive.Native.NativeCheckBox>(builder);
         }
     }
 }

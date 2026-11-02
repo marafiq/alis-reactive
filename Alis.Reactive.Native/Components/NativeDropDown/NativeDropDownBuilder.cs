@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// Configures and renders a native HTML <c>&lt;select&gt;</c> element bound to a model property.
