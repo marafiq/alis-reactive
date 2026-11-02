@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Validation
 {
@@ -89,7 +90,7 @@ namespace Alis.Reactive.Validation
         public static BrowserRule Compare<TValue>(Comparison comparison, TValue value, string message)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
-            return new FixedComparisonRule(comparison, value, Shape.FromClrType(value.GetType()), message, Condition.Always);
+            return new FixedComparisonRule(comparison, value, ClrShape.Of(value.GetType()), message, Condition.Always);
         }
 
         /// <summary>The value compares with another member of the model, read as the page binds it.</summary>
@@ -109,11 +110,11 @@ namespace Alis.Reactive.Validation
         {
             if (from == null) throw new ArgumentNullException(nameof(from));
             if (to == null) throw new ArgumentNullException(nameof(to));
-            var shape = Shape.FromClrType(from.GetType());
-            if (!shape.Equals(Shape.FromClrType(to.GetType())))
+            var shape = ClrShape.Of(from.GetType());
+            if (!shape.Equals(ClrShape.Of(to.GetType())))
                 throw new ArgumentException(
                     "Client validation range bounds must have the same shape. " +
-                    $"Lower bound is '{shape.Kind}', upper bound is '{Shape.FromClrType(to.GetType()).Kind}'.");
+                    $"Lower bound is '{shape.Kind}', upper bound is '{ClrShape.Of(to.GetType()).Kind}'.");
             return new RangeRule(from, to, inclusive, shape, message, Condition.Always);
         }
 

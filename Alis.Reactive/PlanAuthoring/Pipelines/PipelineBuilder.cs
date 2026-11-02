@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Builders
 {
@@ -72,7 +73,7 @@ namespace Alis.Reactive.Builders
             if (appEvent == null) throw new ArgumentNullException(nameof(appEvent));
             Context.AddStep(new DispatchStep(
                 appEvent.Name,
-                ValueExpression.LiteralFor(payload, Shape.FromClrType(typeof(TPayload)))));
+                ValueExpression.LiteralFor(payload, ClrShape.Of(typeof(TPayload)))));
             return this;
         }
 

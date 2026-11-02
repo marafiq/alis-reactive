@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.InputField
 {
@@ -46,7 +47,7 @@ namespace Alis.Reactive.InputField
             return new InputIdentity(
                 ComponentId.Of(id),
                 BindingPath.ForMember(bindingName, bodyPath),
-                Shape.FromClrType(typeof(TValue)));
+                ClrShape.Of(typeof(TValue)));
         }
     }
 }

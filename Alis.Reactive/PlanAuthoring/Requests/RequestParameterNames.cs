@@ -1,6 +1,7 @@
 using System;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Builders.Requests
 {
@@ -27,14 +28,14 @@ namespace Alis.Reactive.Builders.Requests
         // A query key may repeat, and MVC binds an array from every value; a scalar takes the first.
         internal static Shape UrlQueryParameter<TProp>(string name)
         {
-            var shape = Shape.FromClrType(typeof(TProp));
+            var shape = ClrShape.Of(typeof(TProp));
             var isArrayOfScalars = shape.TryGetArrayItemShape(out var item) && item.IsScalar;
             return isArrayOfScalars ? shape : RequireShape<TProp>("URL param", name);
         }
 
         private static Shape RequireShape<TProp>(string label, string name)
         {
-            var shape = Shape.FromClrType(typeof(TProp));
+            var shape = ClrShape.Of(typeof(TProp));
             if (!shape.IsScalar)
                 throw new InvalidOperationException(
                     $"{label} '{name}' requires a scalar type, but got shape '{shape.DescribeContract()}'. " +

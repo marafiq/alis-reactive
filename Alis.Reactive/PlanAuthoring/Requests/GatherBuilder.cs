@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Builders.Requests
 {
@@ -106,7 +107,7 @@ namespace Alis.Reactive.Builders.Requests
             Expression<Func<TRequest, TValue>> member,
             TValue value)
         {
-            return Assign(member, ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(TValue))));
+            return Assign(member, ValueExpression.LiteralFor(value, ClrShape.Of(typeof(TValue))));
         }
 
         /// <summary>
@@ -167,7 +168,7 @@ namespace Alis.Reactive.Builders.Requests
                 if (typeof(TRequest) != typeof(TModel))
                     RequestMembers.Require(typeof(TRequest), binding, fieldType);
                 var inputId = IdGenerator.ForMember(ExpressionPathHelper.ToDeclarer(field), binding.Value);
-                _draft.Add(binding, ValueExpression.ReadBound(inputId, Shape.FromClrType(fieldType)));
+                _draft.Add(binding, ValueExpression.ReadBound(inputId, ClrShape.Of(fieldType)));
             }
 
             return this;

@@ -8,19 +8,21 @@ using Alis.Reactive.PlanModel;
 namespace Alis.Reactive
 {
     /// <summary>
-    /// An input a page rendered through <c>Html.InputField</c>: its identity, and what its component
-    /// declares. The plan carries it so that validation reads the value where the component holds it
-    /// and the form re-checks the field on the event the component commits with.
+    /// An input a page rendered through <c>Html.InputField</c>: its identity, and what its component declares
+    /// as its input, the path of its value and the event that commits it. The plan carries it so that
+    /// validation reads the value where the component holds it and the form re-checks the field on the event
+    /// the component commits with.
     /// </summary>
     internal sealed class RenderedInput
     {
         private readonly InputIdentity _identity;
 
-        private RenderedInput(InputIdentity identity, ComponentVendor vendor, ComponentInput input)
+        internal RenderedInput(InputIdentity identity, ComponentVendor vendor, Path valuePath, EventName committedBy)
         {
             _identity = identity ?? throw new ArgumentNullException(nameof(identity));
             ComponentVendor = vendor ?? throw new ArgumentNullException(nameof(vendor));
-            Input = input ?? throw new ArgumentNullException(nameof(input));
+            ValuePath = valuePath ?? throw new ArgumentNullException(nameof(valuePath));
+            CommittedBy = committedBy ?? throw new ArgumentNullException(nameof(committedBy));
         }
 
         internal string ComponentId => _identity.ElementId;
@@ -31,15 +33,13 @@ namespace Alis.Reactive
 
         internal BindingPath Binding => _identity.Binding;
 
-        internal ComponentInput Input { get; }
+        /// <summary>The path from the component's object to its value; the model reads the value in the model's type.</summary>
+        internal Path ValuePath { get; }
+
+        /// <summary>The event the component raises when the person commits a value; the form re-checks the field on it.</summary>
+        internal EventName CommittedBy { get; }
 
         internal Shape Shape => _identity.ValueShape;
-
-        internal static RenderedInput Of(InputIdentity identity, IInputComponent component)
-        {
-            if (component == null) throw new ArgumentNullException(nameof(component));
-            return new RenderedInput(identity, component.Vendor, component.Input);
-        }
     }
 
     /// <summary>The inputs one plan rendered, by binding path.</summary>

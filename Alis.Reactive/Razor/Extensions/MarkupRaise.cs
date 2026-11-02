@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Razor.Extensions
 {
@@ -27,7 +28,7 @@ namespace Alis.Reactive.Razor.Extensions
         internal static string Of<TPayload>(string eventName, TPayload payload)
         {
             var attributes = new StringBuilder(Of(eventName));
-            foreach (var member in Shape.SerializedProperties(typeof(TPayload)))
+            foreach (var member in ClrShape.SerializedProperties(typeof(TPayload)))
             {
                 var value = Carried<TPayload>(member).GetValue(payload);
                 if (value == null) continue;
@@ -40,7 +41,7 @@ namespace Alis.Reactive.Razor.Extensions
 
         private static PropertyInfo Carried<TPayload>(PropertyInfo member)
         {
-            if (Shape.FromClrType(member.PropertyType).IsScalar) return member;
+            if (ClrShape.Of(member.PropertyType).IsScalar) return member;
             throw new InvalidOperationException(
                 $"'{CSharpTypeName.Of(typeof(TPayload))}.{member.Name}' is a {CSharpTypeName.Of(member.PropertyType)}, and markup " +
                 "carries each member of the payload it raises as the text of one attribute, so a member it carries is text, a " +

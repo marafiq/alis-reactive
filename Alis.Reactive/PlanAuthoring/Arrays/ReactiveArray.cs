@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Builders.Arrays
 {
@@ -42,7 +43,7 @@ namespace Alis.Reactive.Builders.Arrays
         /// <returns>The projected elements, in their order.</returns>
         public ReactiveArray<TResult> Select<TResult>(Expression<Func<TElement, TResult>> selector)
         {
-            var resultShape = Shape.FromClrType(typeof(TResult));
+            var resultShape = ClrShape.Of(typeof(TResult));
             return new ReactiveArray<TResult>(
                 ValueExpression.ArrayMap(_source, Projection(selector), resultShape),
                 resultShape);
@@ -76,7 +77,7 @@ namespace Alis.Reactive.Builders.Arrays
             // serializes as Shape.Any, and the runtime would fall back to lexicographic
             // String(value) order, where every object becomes "[object Object]".
             // Reject it where it is authored rather than emit a silently wrong runtime sort.
-            var keyShape = Shape.FromClrType(typeof(TKey));
+            var keyShape = ClrShape.Of(typeof(TKey));
             var keyIsSortableScalar = keyShape is StringShape or NumberShape or BooleanShape or DateShape or InstantShape or NullableShape;
             if (!keyIsSortableScalar)
                 throw new InvalidOperationException(
@@ -149,7 +150,7 @@ namespace Alis.Reactive.Builders.Arrays
         public ReactiveValue<TField> Find<TField>(
             Expression<Func<TElement, bool>> predicate, Expression<Func<TElement, TField>> selector)
         {
-            var fieldShape = Shape.FromClrType(typeof(TField));
+            var fieldShape = ClrShape.Of(typeof(TField));
             return new ReactiveValue<TField>(
                 ValueExpression.ArrayFind(_source, Predicate(predicate), Projection(selector), fieldShape));
         }

@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Builders
 {
@@ -46,7 +47,7 @@ namespace Alis.Reactive.Builders
             Expression<Func<TPayload, TProp>> field,
             TProp value)
         {
-            _draft.Assign(Member(field), ValueExpression.LiteralFor(value, Shape.FromClrType(typeof(TProp))));
+            _draft.Assign(Member(field), ValueExpression.LiteralFor(value, ClrShape.Of(typeof(TProp))));
             return this;
         }
 

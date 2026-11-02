@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Validation;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.PlanModel
 {
@@ -78,7 +79,7 @@ namespace Alis.Reactive.PlanModel
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
             var itemType = Expressions.TypeOf(item);
-            var itemShape = Shape.FromClrType(itemType);
+            var itemShape = ClrShape.Of(itemType);
             var fixedItem = LiteralOf(itemType, Expressions.Evaluate(item));
             return new MemberTest(FieldReference.Of(collection), (left, shape) =>
                 ArrayContains(left, ValueExpression.LiteralFor(fixedItem, itemShape), shape, itemShape));

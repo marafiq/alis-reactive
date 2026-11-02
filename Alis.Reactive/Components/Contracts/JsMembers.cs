@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
+using Alis.Reactive.Components;
 
 namespace Alis.Reactive
 {
@@ -194,14 +196,14 @@ namespace Alis.Reactive
         internal static Arg Fixed(object value)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
-            return new DeclaredArg(value, Shape.FromValue(value));
+            return new DeclaredArg(value, ClrShape.OfValue(value));
         }
 
         internal static Arg Declared<TDeclared, TSource>(TypedSource<TSource> source)
             where TSource : TDeclared
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            return new DeclaredArg(source, Shape.OfArgument(typeof(TDeclared)));
+            return new DeclaredArg(source, ArgumentShape.Of(typeof(TDeclared)));
         }
 
         /// <summary>A field is passed as its JavaScript name.</summary>
@@ -209,7 +211,7 @@ namespace Alis.Reactive
         public static implicit operator Arg(Field field)
         {
             if (field == null) throw new ArgumentNullException(nameof(field));
-            return new DeclaredArg(field, Shape.FromValue(field));
+            return new DeclaredArg(field, ClrShape.OfValue(field));
         }
 
         // A literal, or a value read when the step runs, in the shape the declaration gives it.
@@ -241,7 +243,7 @@ namespace Alis.Reactive
     {
         private protected Arg() { }
 
-        internal override Shape Shape => Shape.OfArgument(typeof(T));
+        internal override Shape Shape => ArgumentShape.Of(typeof(T));
 
         /// <summary>A literal is passed as it is.</summary>
         /// <param name="value">The literal.</param>

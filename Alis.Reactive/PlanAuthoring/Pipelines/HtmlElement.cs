@@ -3,6 +3,7 @@ using Alis.Reactive.Builders.Arrays;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
@@ -46,7 +47,7 @@ namespace Alis.Reactive
         /// <c>var seats = p.Element($"{table}-seats").Children;</c> counts the seats needing close supervision
         /// with <c>seats.Count(seat =&gt; seat.GetAttribute("data-supervision") == "close")</c>.</summary>
         public ReactiveArray<ChildElement> Children =>
-            new ReactiveArray<ChildElement>(Read("children"), Shape.FromClrType(typeof(ChildElement)));
+            new ReactiveArray<ChildElement>(Read("children"), ClrShape.Of(typeof(ChildElement)));
 
         /// <summary>Shows the element: removes its <c>hidden</c> attribute.</summary>
         public void Show() => Set(BrowserElementMembers.Hidden, ValueExpression.Literal(false));

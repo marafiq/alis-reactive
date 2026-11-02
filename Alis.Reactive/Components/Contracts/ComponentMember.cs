@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Components;
 
 namespace Alis.Reactive
 {
@@ -18,7 +19,7 @@ namespace Alis.Reactive
             if (path.IsNone) throw new ArgumentException("Property path required.", nameof(path));
 
             Path = path;
-            Shape = Shape.OfArgument(typeof(TValue));
+            Shape = ArgumentShape.Of(typeof(TValue));
         }
 
         internal Path Path { get; }

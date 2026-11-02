@@ -278,10 +278,10 @@ namespace Alis.Reactive.PlanModel
             {
                 if (!_inputs.TryFindForComponent(ComponentId.Of(declared.Id), out var rendered)) continue;
 
-                var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.Input.ValuePath.Text, rendered.Shape);
+                var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.ValuePath.Text, rendered.Shape);
                 inputs.Add(
                     declared.Id,
-                    new InputBinding(rendered.BindingPath, rendered.Binding.Path.Body, value, rendered.Shape, rendered.Input.CommittedBy.Value));
+                    new InputBinding(rendered.BindingPath, rendered.Binding.Path.Body, value, rendered.Shape, rendered.CommittedBy.Value));
             }
 
             return inputs;

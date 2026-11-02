@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Alis.Reactive.Builders.Conditions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Builders.Arrays
 {
@@ -156,7 +157,7 @@ namespace Alis.Reactive.Builders.Arrays
             if (Expressions.TryContains(call, out var source, out var candidate) && !Expressions.Reads(source, element))
             {
                 var item = Unconverted(candidate);
-                var shape = Shape.FromClrType(item.Type);
+                var shape = ClrShape.Of(item.Type);
                 var values = Expressions.Evaluate(source) as IEnumerable
                     ?? throw new InvalidOperationException("Contains needs the values to look in. Got: " + source);
                 var literals = values.Cast<object?>().Select(value => ValueExpression.LiteralFor(value, shape)).ToList();
@@ -192,7 +193,7 @@ namespace Alis.Reactive.Builders.Arrays
             if (IsDayOfWeek(left) || IsDayOfWeek(right))
                 return Condition.Ordered(ComparisonFor(binary.NodeType), DayNumber(left, element), DayNumber(right, element), Shape.Number);
 
-            var shape = Shape.FromClrType(memberOperand.Type);
+            var shape = ClrShape.Of(memberOperand.Type);
 
             return Condition.Ordered(
                 ComparisonFor(binary.NodeType),
@@ -211,7 +212,7 @@ namespace Alis.Reactive.Builders.Arrays
 
             var value = Expressions.Evaluate(operand);
             var member = value == null ? null : EnumMember.Of(enumType, value);
-            return ValueExpression.LiteralFor(member, Shape.FromClrType(memberType));
+            return ValueExpression.LiteralFor(member, ClrShape.Of(memberType));
         }
 
         // A side of a comparison with a date's DayOfWeek, as the number C# compares: the day an item's date falls
@@ -234,12 +235,12 @@ namespace Alis.Reactive.Builders.Arrays
             if (!Expressions.Reads(node, element))
             {
                 var value = Expressions.Evaluate(node);
-                return ValueExpression.LiteralFor(value, Shape.FromValue(value));
+                return ValueExpression.LiteralFor(value, ClrShape.OfValue(value));
             }
 
             if (TryDataPath(node, element, out var path))
             {
-                var shape = Shape.FromClrType(node.Type);
+                var shape = ClrShape.Of(node.Type);
                 return path.IsNone
                     ? ValueExpression.Get(Target.Item, shape)
                     : ValueExpression.Get(Target.Item, path.Text, shape);
@@ -253,10 +254,10 @@ namespace Alis.Reactive.Builders.Arrays
                     return CompileCall(call, element);
                 case BinaryExpression { NodeType: ExpressionType.Coalesce, Conversion: null } coalesce:
                     return ValueExpression.Operation(
-                        Operator.Coalesce, Shape.FromClrType(coalesce.Type), CompileValue(coalesce.Left, element), CompileValue(coalesce.Right, element));
+                        Operator.Coalesce, ClrShape.Of(coalesce.Type), CompileValue(coalesce.Left, element), CompileValue(coalesce.Right, element));
                 case ConditionalExpression conditional:
                     return ValueExpression.Operation(
-                        Operator.Cond, Shape.FromClrType(conditional.Type),
+                        Operator.Cond, ClrShape.Of(conditional.Type),
                         ValueExpression.Holds(CompileCondition(conditional.Test, element)),
                         CompileValue(conditional.IfTrue, element),
                         CompileValue(conditional.IfFalse, element));
@@ -309,7 +310,7 @@ namespace Alis.Reactive.Builders.Arrays
 
                 if (member.Member.Name == nameof(Nullable<int>.HasValue))
                 {
-                    read = ValueExpression.Holds(Condition.Unary(ValueTest.NotNull, CompileValue(owner, element), Shape.FromClrType(owner.Type)));
+                    read = ValueExpression.Holds(Condition.Unary(ValueTest.NotNull, CompileValue(owner, element), ClrShape.Of(owner.Type)));
                     return true;
                 }
             }
@@ -342,7 +343,7 @@ namespace Alis.Reactive.Builders.Arrays
                 var methodArgs = call.Arguments.Select(argument => CompileValue(argument, element)).ToList();
                 var unconverted = methodArgs.Select(_ => Shape.None).ToList();
                 return ValueExpression.Call(
-                    Target.Returned(CompileValue(call.Object, element)), new[] { methodName }, methodArgs, unconverted, Shape.FromClrType(call.Type), methodName);
+                    Target.Returned(CompileValue(call.Object, element)), new[] { methodName }, methodArgs, unconverted, ClrShape.Of(call.Type), methodName);
             }
 
             if (TryTest(call, element, out var test))

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Validation
 {
@@ -32,7 +33,7 @@ namespace Alis.Reactive.Validation
             if (member.Parameters.Count != 1 || !ExpressionPathHelper.TryMemberName(body, member.Parameters[0], out var name))
                 throw new ArgumentException(
                     $"A browser rule names a member of the model, like x => x.Address.City; {member} does not.", nameof(member));
-            return new FieldReference(name, body.Type, Shape.FromClrType(body.Type));
+            return new FieldReference(name, body.Type, ClrShape.Of(body.Type));
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Alis.Reactive.Validation
         {
             var itemType = ItemTypeOf(collection.Type)
                 ?? throw new ArgumentException($"'{collection.Path}' is not a collection.", nameof(collection));
-            return new FieldReference("", itemType, Shape.FromClrType(itemType));
+            return new FieldReference("", itemType, ClrShape.Of(itemType));
         }
 
         internal FieldReference PrefixedBy(string prefix) =>
