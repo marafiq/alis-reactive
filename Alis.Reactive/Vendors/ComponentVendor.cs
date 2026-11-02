@@ -56,7 +56,7 @@ namespace Alis.Reactive
         public static ComponentVendor Native { get; } = new ComponentVendor(
             "native",
             Path.None,
-            new MethodListening("addEventListener", "removeEventListener"),
+            new MethodVendorListening("addEventListener", "removeEventListener"),
             VendorEventPayload.DomEvent);
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Alis.Reactive
             return new ComponentVendor(
                 ValidName(name),
                 Path.Parse(objectPath),
-                new MethodListening(MemberName.Of(subscribe).Value, MemberName.Of(unsubscribe).Value),
+                new MethodVendorListening(MemberName.Of(subscribe).Value, MemberName.Of(unsubscribe).Value),
                 payload);
         }
 
@@ -113,7 +113,7 @@ namespace Alis.Reactive
             return new ComponentVendor(
                 ValidName(name),
                 Path.Parse(objectPath),
-                new AssignmentListening(),
+                new AssignmentVendorListening(),
                 payload);
         }
 

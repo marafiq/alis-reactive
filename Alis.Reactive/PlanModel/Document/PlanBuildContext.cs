@@ -244,7 +244,7 @@ namespace Alis.Reactive.PlanModel.Document
         /// Writes the plan: every element by id and vendor, the inputs <c>alis.model</c> binds, each form's
         /// fields and their checks as <c>alis.form</c> data, then each handler.
         /// </summary>
-        internal GrammarPlan Write()
+        internal PlanDocument Write()
         {
             var objects = new PlanObjects(_declared);
             var plan = new PlanWriter(_planId, objects);
@@ -265,7 +265,7 @@ namespace Alis.Reactive.PlanModel.Document
                 })
                 .ToList();
 
-            return new GrammarPlan(_planId, objects.Vendors(), objects.Snapshot(), handlers);
+            return new PlanDocument(_planId, objects.Vendors(), objects.Snapshot(), handlers);
         }
 
         /// <summary>Every input the view rendered is an element of the plan, after the elements its steps name.</summary>

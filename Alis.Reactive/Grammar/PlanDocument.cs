@@ -8,9 +8,9 @@ namespace Alis.Reactive.Grammar
     /// The plan a view renders (grammar.md 1.1): the vendors its components come from, the objects it
     /// locates, and the handlers it subscribes. The document names no feature.
     /// </summary>
-    internal sealed class GrammarPlan
+    internal sealed class PlanDocument
     {
-        internal GrammarPlan(
+        internal PlanDocument(
             string planId,
             IReadOnlyDictionary<string, Vendor> vendors,
             IReadOnlyDictionary<string, ObjectLocator> objects,
@@ -75,9 +75,9 @@ namespace Alis.Reactive.Grammar
     }
 
     /// <summary><c>method(subscribe, unsubscribe)</c>: <c>object.on(event, fn)</c> adds a listener and <c>object.off(event, fn)</c> removes it.</summary>
-    internal sealed class MethodListening : VendorListening
+    internal sealed class MethodVendorListening : VendorListening
     {
-        internal MethodListening(string subscribe, string unsubscribe)
+        internal MethodVendorListening(string subscribe, string unsubscribe)
         {
             if (string.IsNullOrEmpty(subscribe)) throw new ArgumentException("Subscribe method required.", nameof(subscribe));
             if (string.IsNullOrEmpty(unsubscribe)) throw new ArgumentException("Unsubscribe method required.", nameof(unsubscribe));
@@ -90,20 +90,20 @@ namespace Alis.Reactive.Grammar
         public string Unsubscribe { get; }
 
         internal override bool SameAs(VendorListening other) =>
-            other is MethodListening method && method.Subscribe == Subscribe && method.Unsubscribe == Unsubscribe;
+            other is MethodVendorListening method && method.Subscribe == Subscribe && method.Unsubscribe == Unsubscribe;
     }
 
     /// <summary>
     /// <c>assignment</c>: <c>object.onEvent = fn</c> adds the listener after the function the property
     /// already holds, and what the property held is put back when the handler's owner unloads.
     /// </summary>
-    internal sealed class AssignmentListening : VendorListening
+    internal sealed class AssignmentVendorListening : VendorListening
     {
-        internal AssignmentListening() { }
+        internal AssignmentVendorListening() { }
 
         public string Kind => "assignment";
 
-        internal override bool SameAs(VendorListening other) => other is AssignmentListening;
+        internal override bool SameAs(VendorListening other) => other is AssignmentVendorListening;
     }
 
     /// <summary>How the runtime finds an object: on an element, or made by a registered plugin.</summary>
@@ -114,9 +114,9 @@ namespace Alis.Reactive.Grammar
     }
 
     /// <summary><c>element(id, vendor)</c>: the vendor's object on the element with this id.</summary>
-    internal sealed class ElementLocator : ObjectLocator
+    internal sealed class ElementObjectLocator : ObjectLocator
     {
-        internal ElementLocator(string id, string vendor)
+        internal ElementObjectLocator(string id, string vendor)
         {
             if (string.IsNullOrEmpty(id)) throw new ArgumentException("Element id required.", nameof(id));
             if (string.IsNullOrEmpty(vendor)) throw new ArgumentException("Vendor required.", nameof(vendor));
@@ -130,9 +130,9 @@ namespace Alis.Reactive.Grammar
     }
 
     /// <summary><c>plugin(name, key, data)</c>: an object of the plugin a bundle registered under the name.</summary>
-    internal sealed class PluginLocator : ObjectLocator
+    internal sealed class PluginObjectLocator : ObjectLocator
     {
-        internal PluginLocator(string name, string key, PluginData data)
+        internal PluginObjectLocator(string name, string key, PluginData data)
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentException("Plugin name required.", nameof(name));
             Name = name;
@@ -152,11 +152,11 @@ namespace Alis.Reactive.Grammar
     {
         private protected PluginData() { }
 
-        internal static PluginData None { get; } = new NoPluginData();
+        internal static PluginData None { get; } = new NonePluginData();
     }
 
     /// <summary>A plugin object that takes no data from the plan.</summary>
-    internal sealed class NoPluginData : PluginData
+    internal sealed class NonePluginData : PluginData
     {
         public string Kind => "none";
     }

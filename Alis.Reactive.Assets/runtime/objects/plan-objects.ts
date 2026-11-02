@@ -2,7 +2,7 @@
 // plugin registered under its name (grammar.md 1.1). Elements are looked up at every use and never
 // cached, so a slot's content can change underneath a plan (grammar.md E1).
 
-import type { ElementLocator, ObjectLocator, PlanDocument, PluginLocator, Vendor } from "../types/index";
+import type { ElementObjectLocator, ObjectLocator, PlanDocument, PluginObjectLocator, Vendor } from "../types/index";
 import type { Objects } from "../grammar/evaluate";
 import { read } from "../grammar/paths";
 import { assertNever } from "../shared/assert-never";
@@ -24,7 +24,7 @@ export class PlanObjects implements Objects {
 
   /** The element of an input, or null when it is not on the page. An input is always an element. */
   element(id: string): HTMLElement | null {
-    return document.getElementById((this.locator(id) as ElementLocator).id);
+    return document.getElementById((this.locator(id) as ElementObjectLocator).id);
   }
 
   /** Subscribes on the object, or on the object at `path` under it: a nested object's own event. */
@@ -37,7 +37,7 @@ export class PlanObjects implements Objects {
     }
   }
 
-  private subscribeElement(locator: ElementLocator, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
+  private subscribeElement(locator: ElementObjectLocator, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const vendor = this.vendor(locator);
     const root = vendorObject(this.requireElement(locator), locator.vendor, vendor);
     const target = path.length === 0 ? root : read(root, path, "checked", `#${locator.id}`);
@@ -49,11 +49,11 @@ export class PlanObjects implements Objects {
     return this.plan.objects[id] as ObjectLocator;
   }
 
-  private vendor(locator: ElementLocator): Vendor {
+  private vendor(locator: ElementObjectLocator): Vendor {
     return this.plan.vendors[locator.vendor] as Vendor;
   }
 
-  private requireElement(locator: ElementLocator): HTMLElement {
+  private requireElement(locator: ElementObjectLocator): HTMLElement {
     const element = document.getElementById(locator.id);
     if (!element) throw new Error(`[alis] #${locator.id} is not on the page`);
     return element;
@@ -62,6 +62,6 @@ export class PlanObjects implements Objects {
 
 // A handler subscribes to the plugin itself, never to an object it holds (the C# refuses one), and only
 // the framework's own plugins raise events: alis.document, alis.stream and alis.hub, each with subscribe.
-function subscribePlugin(locator: PluginLocator, event: string, listener: Listener, owner: Owner): void {
+function subscribePlugin(locator: PluginObjectLocator, event: string, listener: Listener, owner: Owner): void {
   pluginNamed(locator.name).subscribe!(locator.key, event, listener, owner);
 }

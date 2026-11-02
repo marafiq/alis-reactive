@@ -25,30 +25,30 @@ export interface Vendor {
 }
 
 export type VendorListening =
-  | AssignmentListening
-  | MethodListening;
+  | AssignmentVendorListening
+  | MethodVendorListening;
 
-export interface AssignmentListening {
+export interface AssignmentVendorListening {
   kind: "assignment";
 }
 
-export interface MethodListening {
+export interface MethodVendorListening {
   kind: "method";
   subscribe: string;
   unsubscribe: string;
 }
 
 export type ObjectLocator =
-  | ElementLocator
-  | PluginLocator;
+  | ElementObjectLocator
+  | PluginObjectLocator;
 
-export interface ElementLocator {
+export interface ElementObjectLocator {
   kind: "element";
   id: string;
   vendor: string;
 }
 
-export interface PluginLocator {
+export interface PluginObjectLocator {
   kind: "plugin";
   name: string;
   key: string;
@@ -59,7 +59,7 @@ export type PluginData =
   | FormPluginData
   | HubPluginData
   | ModelPluginData
-  | NoPluginData;
+  | NonePluginData;
 
 export interface FormPluginData {
   kind: "form";
@@ -225,7 +225,7 @@ export interface InputBinding {
   list: boolean;
 }
 
-export interface NoPluginData {
+export interface NonePluginData {
   kind: "none";
 }
 

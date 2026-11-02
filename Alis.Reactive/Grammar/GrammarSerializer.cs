@@ -16,7 +16,7 @@ namespace Alis.Reactive.Grammar
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default,
         };
 
-        internal static string Serialize(GrammarPlan plan) => JsonSerializer.Serialize(plan, Compact);
+        internal static string Serialize(PlanDocument plan) => JsonSerializer.Serialize(plan, Compact);
     }
 
     /// <summary>The TypeScript type of a node property when its CLR type does not say it exactly.</summary>

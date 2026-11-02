@@ -30,7 +30,7 @@ namespace Alis.Reactive.ContractGeneration
                 "JsonValue",
                 "export type JsonValue =\n" +
                 "  | string\n  | number\n  | boolean\n  | null\n  | JsonValue[]\n  | { [key: string]: JsonValue };");
-            writer.Visit(typeof(GrammarPlan));
+            writer.Visit(typeof(PlanDocument));
             writer.Declare("VendorPayload", LiteralUnion("VendorPayload",
                 Enum.GetValues(typeof(VendorEventPayload)).Cast<VendorEventPayload>().Select(Vendor.PayloadOf)));
             writer.Declare("Operator", LiteralUnion("Operator", Operator.Table.Select(op => op.Token)));
@@ -55,14 +55,14 @@ namespace Alis.Reactive.ContractGeneration
 
             internal void Visit(Type type)
             {
-                var name = TypeName(type);
+                var name = type.Name;
                 if (_declared.Contains(name)) return;
 
                 if (IsUnion(type))
                 {
                     var variants = Variants(type);
                     Declare(name, "export type " + name + " =\n" +
-                        string.Join("\n", variants.Select(v => "  | " + TypeName(v))) + ";");
+                        string.Join("\n", variants.Select(v => "  | " + v.Name)) + ";");
                     foreach (var variant in variants) Visit(variant);
                     return;
                 }
@@ -90,14 +90,24 @@ namespace Alis.Reactive.ContractGeneration
                 && converter.ConverterType.GetGenericTypeDefinition() == typeof(PlanNodeDiscriminator<>);
         }
 
-        private static List<Type> Variants(Type union) =>
-            union.Assembly.GetTypes()
+        // A variant is named for its kind and its family, so one name runs from the C# class through the contract to
+        // the JSON: "lit" of Expr is LitExpr, "none" of PluginData is NonePluginData.
+        private static List<Type> Variants(Type union)
+        {
+            var variants = union.Assembly.GetTypes()
                 .Where(t => !t.IsAbstract && union.IsAssignableFrom(t))
-                .OrderBy(TypeName, StringComparer.Ordinal)
+                .OrderBy(t => t.Name, StringComparer.Ordinal)
                 .ToList();
-
-        private static string TypeName(Type type) =>
-            type == typeof(GrammarPlan) ? "PlanDocument" : type.Name;
+            foreach (var variant in variants)
+            {
+                var kind = (string)ConstantOf(variant, variant.GetProperty("Kind")!);
+                var expected = char.ToUpperInvariant(kind[0]) + kind.Substring(1) + union.Name;
+                if (variant.Name != expected)
+                    throw new InvalidOperationException(
+                        $"{variant.Name} writes kind \"{kind}\" of {union.Name}; the class is named {expected}.");
+            }
+            return variants;
+        }
 
         private static List<PropertyInfo> ContractProperties(Type type) =>
             type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -133,7 +143,7 @@ namespace Alis.Reactive.ContractGeneration
             if (type == typeof(int) || type == typeof(long) || type == typeof(double)) return "number";
             if (TryElementOf(type, out var item)) return ArrayOf(TypeScriptOf(item));
             if (TryValueOf(type, out var value)) return "Record<string, " + TypeScriptOf(value) + ">";
-            if (type.Namespace == typeof(GrammarPlan).Namespace) return TypeName(type);
+            if (type.Namespace == typeof(PlanDocument).Namespace) return type.Name;
             throw new InvalidOperationException("The grammar contract has no TypeScript type for " + type.FullName + ".");
         }
 
@@ -143,7 +153,7 @@ namespace Alis.Reactive.ContractGeneration
         {
             if (TryElementOf(type, out var item)) return ReferencedNodeTypes(item);
             if (TryValueOf(type, out var value)) return ReferencedNodeTypes(value);
-            return type.Namespace == typeof(GrammarPlan).Namespace && type.IsClass && type != typeof(object)
+            return type.Namespace == typeof(PlanDocument).Namespace && type.IsClass && type != typeof(object)
                 ? new[] { type }
                 : Array.Empty<Type>();
         }

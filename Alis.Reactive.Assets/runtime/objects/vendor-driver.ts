@@ -2,7 +2,7 @@
 // listener (a pair of methods, or assignment to the property the event names), and what a listener
 // receives (grammar.md 6.9). This driver follows that data, so the runtime holds no code for any vendor.
 
-import type { MethodListening, Vendor } from "../types/index";
+import type { MethodVendorListening, Vendor } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { call, read, write } from "../grammar/paths";
 import { isMissing } from "../grammar/shape";
@@ -38,7 +38,7 @@ export function subscribeVendor(
 function subscribeByMethod(
   root: unknown,
   vendorName: string,
-  listen: MethodListening,
+  listen: MethodVendorListening,
   event: string,
   vendorListener: VendorListener,
 ): () => void {

@@ -224,7 +224,7 @@ namespace Alis.Reactive.PlanModel.Writing
             if (!_elementVendors.TryGetValue(id, out var vendor))
                 throw new InvalidOperationException($"Element '{id}' is used by a step before the plan declared it.");
             AddVendor(vendor.Name, vendor.ToGrammar());
-            Add(id, new ElementLocator(id, vendor.Name));
+            Add(id, new ElementObjectLocator(id, vendor.Name));
             return id;
         }
 
@@ -269,7 +269,7 @@ namespace Alis.Reactive.PlanModel.Writing
         private string PluginObject(string id, string name, string key, PluginData data)
         {
             if (!_objects.ContainsKey(id))
-                Add(id, new PluginLocator(name, key, data));
+                Add(id, new PluginObjectLocator(name, key, data));
             return id;
         }
 
