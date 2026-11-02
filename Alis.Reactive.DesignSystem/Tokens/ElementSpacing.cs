@@ -1,4 +1,4 @@
-namespace Alis.Reactive.DesignSystem.Tokens
+namespace Alis.Reactive.DesignSystem
 {
     public enum ElementSpacing
     {

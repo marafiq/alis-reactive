@@ -56,14 +56,22 @@ folder (`p.When`, `p.Confirm` in `ConditionExtensions`; `p.Get`, `p.Post`, `p.Pu
 `RequestExtensions`), so the pipeline knows nothing of the features and the features depend on it. Call sites do
 not change.
 
-**Public namespaces.** A file that declares a public type has namespace `Alis.Reactive`: a page, a
-component and a validator import one namespace. Every other file's namespace is
+**Public namespaces.** A file that declares a public type has its package's namespace (`Alis.Reactive` in the
+core): a page, a component and a validator import one namespace. Every other file's namespace is
 its folder (`Alis.Reactive.PlanModel.Conditions`). The eight public namespaces `Builders`, `Builders.Conditions`,
 `Builders.Requests`, `Builders.Arrays`, `PlanModel`, `Validation`, `InputField` and `Components` are retired.
 
-**The lock.** `tests/Alis.Reactive.ArchitectureTests/CoreLayerTests.cs` reads the type-to-folder map from source
-(both `NET48` and `NET10_0`) and the references from IL (generic arguments, attributes, locals and operands
-included) of both targets, and fails naming every reference that points up the table, every folder with no row,
+**The packages.** Each shipped package is the same kind of tree with rows of its own, in the lock's table. A row
+entry `X/*` makes every subfolder of `X` a slice of its own in that row, so slices under one folder never use
+each other; `.` is the package's root files.
+
+| Package | Rows, bottom up |
+|---|---|
+| `Alis.Reactive.DesignSystem` | `Tokens`; `Layout` |
+
+**The lock.** `tests/Alis.Reactive.ArchitectureTests/SliceTreeTests.cs` reads, per package, the type-to-folder map
+from source (both `NET48` and `NET10_0`) and the references from IL (generic arguments, attributes, locals and
+operands included) of each target, and fails naming every reference that points up the table, every folder with no row,
 every row that names no folder, and every file whose namespace breaks the rule above.
 
 ## Consequences
@@ -84,5 +92,6 @@ every row that names no folder, and every file whose namespace breaks the rule a
 After ADR-0003 waves 2 and 3 land (they rewrite and delete many of the files this moves):
 U1 the bottom rows (Grammar, WireTerms, Members, Vendors, Inputs); U2 the plan model (Values, Conditions,
 Reactions, Validation, Requests, Document); U3 components and authoring (Components, Events, Arrays, Elements,
-Pipelines, the extension classes, Razor); U4 namespaces and the lock. Each lands as pure-rename commits where it
-moves files, so history follows them.
+Pipelines, the extension classes, Razor); U4 namespaces and the lock; U5 the validator as the top slice; U6 the packages take the rule one commit each,
+smallest first (DesignSystem, NativeTagHelpers, Native, Fusion), each adding its rows to the lock's table. Each
+lands as pure-rename commits where it moves files, so history follows them.

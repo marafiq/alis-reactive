@@ -1,6 +1,6 @@
-using Alis.Reactive.DesignSystem.Tokens;
+using Alis.Reactive.DesignSystem;
 
-namespace Alis.Reactive.DesignSystem.Layout
+namespace Alis.Reactive.DesignSystem
 {
     public static class ContainerCss
     {

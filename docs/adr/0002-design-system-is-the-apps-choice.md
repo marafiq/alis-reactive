@@ -35,6 +35,6 @@ not be swapped.
   stylesheets; the sandbox does both.
 - `AlisReactive.NativeTagHelpers` has its own enums (`SpacingScale`, `ElementSpacing`, and one per
   tag helper), not the design system's. Razor attributes (`gap="Base"`) are unchanged; C# that named
-  `Alis.Reactive.DesignSystem.Tokens.*` for a tag helper property must use the new types.
+  the design system's token enums for a tag helper property must use the new types.
 - The design system's C# class helpers (`CardCss`, `TokenMap`, ...) stay, for apps that write raw
   markup in its utility classes.

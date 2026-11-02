@@ -908,7 +908,7 @@ It reads the rules by their classes, not the plan.
 ## 8. Where the code is
 
 **C#** (`Alis.Reactive`), one slice per folder, each using only the slices below it (ADR-0004; the
-architecture test `CoreLayerTests` reads the folders from source and the references from the IL of both
+architecture test `SliceTreeTests` reads the folders from source and the references from the IL of both
 targets). Every public type is in the namespace `Alis.Reactive`; an internal type's namespace is its folder.
 - `Grammar`: one sealed class per production in 1.1 and 1.2, with internal constructors, invariants
   checked in the constructor, one-to-one serialization and its discriminator. This is the plan contract;

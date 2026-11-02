@@ -7,87 +7,118 @@ using NUnit.Framework;
 namespace Alis.Reactive.ArchitectureTests;
 
 /// <summary>
-/// ADR-0004 made mechanical: the core is an inverted dependency tree of concept slices. A slice is a
-/// source folder of <c>Alis.Reactive</c>; the rows below are the ADR's table, bottom up. A slice uses
-/// only slices in lower rows, slices in one row never use each other, every folder has a row and every
-/// row names a folder. A file that declares a public type has namespace <c>Alis.Reactive</c>; every
-/// other file's namespace is its folder. The type-to-folder map is read from source, and the references
-/// from the IL of both targets (Mono.Cecil): base types, interfaces, attributes, generic constraints and arguments,
+/// ADR-0004 made mechanical: a package is an inverted dependency tree of concept slices. A slice is a
+/// source folder of the package; the rows below are the ADR's tables, bottom up. A slice uses only
+/// slices in lower rows, slices in one row never use each other, every folder has a row and every row
+/// names a folder. A file that declares a public type has the package's namespace; every other file's
+/// namespace is its folder. The type-to-folder map is read from source, and the references from the IL
+/// of each target (Mono.Cecil): base types, interfaces, attributes, generic constraints and arguments,
 /// fields, properties, events, signatures, locals and the operands of every instruction.
 /// </summary>
 [TestFixture]
-public class CoreLayerTests
+public class SliceTreeTests
 {
-    private static readonly string[][] Rows =
+    // A row entry names a folder. "X/*" makes each immediate subfolder of X a slice of its own, all in
+    // that row; "*" does the same at the package root; "." is the package root's own files.
+    private sealed record Package(string Name, string[] Targets, string[][] Rows);
+
+    private static readonly string[] BothTargets = ["net48", "net10.0"];
+
+    private static readonly Package[] Packages =
     [
-        ["Grammar", "WireTerms"],
-        ["Members"],
-        ["Vendors"],
-        ["Inputs"],
-        ["PlanModel/Writing"],
-        ["PlanModel/Values"],
-        ["PlanModel/Conditions"],
-        ["PlanModel/Reactions", "PlanModel/Validation"],
-        ["PlanModel/Requests"],
-        ["PlanModel/Document"],
-        ["Components"],
-        ["PlanAuthoring/Events", "PlanAuthoring/Arrays"],
-        ["PlanAuthoring/Elements"],
-        ["PlanAuthoring/Pipelines"],
-        ["PlanAuthoring/Conditions", "PlanAuthoring/Requests"],
-        ["PlanAuthoring"],
-        ["InputField"],
-        ["Razor"],
-        ["Validation"],
+        new("Alis.Reactive", BothTargets,
+        [
+            ["Grammar", "WireTerms"],
+            ["Members"],
+            ["Vendors"],
+            ["Inputs"],
+            ["PlanModel/Writing"],
+            ["PlanModel/Values"],
+            ["PlanModel/Conditions"],
+            ["PlanModel/Reactions", "PlanModel/Validation"],
+            ["PlanModel/Requests"],
+            ["PlanModel/Document"],
+            ["Components"],
+            ["PlanAuthoring/Events", "PlanAuthoring/Arrays"],
+            ["PlanAuthoring/Elements"],
+            ["PlanAuthoring/Pipelines"],
+            ["PlanAuthoring/Conditions", "PlanAuthoring/Requests"],
+            ["PlanAuthoring"],
+            ["InputField"],
+            ["Razor"],
+            ["Validation"],
+        ]),
+        new("Alis.Reactive.DesignSystem", BothTargets,
+        [
+            ["Tokens"],
+            ["Layout"],
+        ]),
     ];
 
-    private const string PublicNamespace = "Alis.Reactive";
+    public static IEnumerable<TestCaseData> Cases =>
+        Packages.SelectMany(p => p.Targets.Select(t => new TestCaseData(p.Name, t).SetArgDisplayNames(p.Name, t)));
 
-    [TestCase("net10.0")]
-    [TestCase("net48")]
-    public void core_slices_depend_only_downward_and_files_sit_in_their_namespace(string targetFramework)
+    [TestCaseSource(nameof(Cases))]
+    public void slices_depend_only_downward_and_files_sit_in_their_namespace(string packageName, string targetFramework)
     {
+        var package = Packages.Single(p => p.Name == packageName);
         var repo = RepositoryRoot();
-        var coreDir = Path.Combine(repo, "Alis.Reactive");
-        var sources = SourceFiles(coreDir).ToList();
+        var packageDir = Path.Combine(repo, package.Name);
+        var sources = SourceFiles(packageDir).ToList();
         var folders = sources.Select(s => s.Folder).Distinct(StringComparer.Ordinal).ToList();
-        var rowOf = Rows.SelectMany((row, index) => row.Select(folder => (folder, index)))
-            .ToDictionary(pair => pair.folder, pair => pair.index, StringComparer.Ordinal);
         var folderOfType = TypeFolders(sources);
 
         var violations = new List<string>();
 
-        foreach (var folder in folders.Where(f => !rowOf.ContainsKey(f)))
+        var rowOf = new Dictionary<string, int>(StringComparer.Ordinal);
+        var sliceOfFolder = new Dictionary<string, string>(StringComparer.Ordinal);
+        for (var row = 0; row < package.Rows.Length; row++)
+        foreach (var entry in package.Rows[row])
+        {
+            var matched = false;
+            foreach (var (folder, slice) in Expand(entry, folders))
+            {
+                matched = true;
+                if (sliceOfFolder.TryGetValue(folder, out var other) && other != slice)
+                    throw new InvalidOperationException($"{Display(folder)} falls under {other} and {slice}; the table names it twice.");
+                sliceOfFolder[folder] = slice;
+                if (rowOf.TryGetValue(slice, out var otherRow) && otherRow != row)
+                    throw new InvalidOperationException($"{slice} is in rows {otherRow} and {row}.");
+                rowOf[slice] = row;
+            }
+            if (!matched) violations.Add($"row entry without a folder: {entry}");
+        }
+        foreach (var folder in folders.Where(f => !sliceOfFolder.ContainsKey(f)))
         {
             var sample = string.Join(", ", sources.Where(s => s.Folder == folder).SelectMany(s => s.TopLevelTypes).Take(3));
-            violations.Add($"folder without a row: {folder} ({sample})");
+            violations.Add($"folder without a row: {Display(folder)} ({sample})");
         }
-        foreach (var entry in rowOf.Keys.Where(k => !folders.Contains(k)))
-            violations.Add($"row entry without a folder: {entry}");
 
         foreach (var source in sources)
         {
-            var expected = source.DeclaresPublicType ? PublicNamespace : PublicNamespace + "." + source.Folder.Replace('/', '.');
+            var expected = source.DeclaresPublicType || source.Folder.Length == 0
+                ? package.Name
+                : package.Name + "." + source.Folder.Replace('/', '.');
             if (source.Namespace != expected)
                 violations.Add($"namespace: {source.RelativePath} is {source.Namespace}, expected {expected}");
         }
 
-        var dll = Path.Combine(coreDir, "bin", Configuration(), targetFramework, "Alis.Reactive.dll");
+        var dll = Path.Combine(packageDir, "bin", Configuration(), targetFramework, package.Name + ".dll");
         if (!File.Exists(dll))
-            Assert.Fail($"{dll} is missing. Build both targets first: dotnet build Alis.Reactive/Alis.Reactive.csproj");
+            Assert.Fail($"{dll} is missing. Build the targets first: dotnet build {package.Name}/{package.Name}.csproj");
 
         var edges = new Dictionary<(string From, string To), string>();
         using (var module = ModuleDefinition.ReadModule(dll))
         {
             foreach (var type in AllTypes(module))
             {
-                var from = FolderOf(type, folderOfType, violations);
-                if (from == null) continue;
+                var from = FolderOf(type, package.Name, folderOfType, violations);
+                if (from == null || !sliceOfFolder.TryGetValue(from, out var fromSlice)) continue;
                 foreach (var referenced in ReferencedTypes(type, module))
                 {
-                    var to = FolderOf(referenced, folderOfType, violations);
-                    if (to == null || to == from) continue;
-                    edges.TryAdd((from, to), $"{TopLevel(type).FullName} -> {TopLevel(referenced).FullName}");
+                    var to = FolderOf(referenced, package.Name, folderOfType, violations);
+                    if (to == null || !sliceOfFolder.TryGetValue(to, out var toSlice) || toSlice == fromSlice) continue;
+                    edges.TryAdd((fromSlice, toSlice), $"{TopLevel(type).FullName} -> {TopLevel(referenced).FullName}");
                 }
             }
         }
@@ -96,7 +127,8 @@ public class CoreLayerTests
         var sameRow = 0;
         foreach (var edge in edges.OrderBy(e => e.Key.From, StringComparer.Ordinal).ThenBy(e => e.Key.To, StringComparer.Ordinal))
         {
-            if (!rowOf.TryGetValue(edge.Key.From, out var fromRow) || !rowOf.TryGetValue(edge.Key.To, out var toRow)) continue;
+            var fromRow = rowOf[edge.Key.From];
+            var toRow = rowOf[edge.Key.To];
             if (toRow > fromRow)
             {
                 upward++;
@@ -109,8 +141,8 @@ public class CoreLayerTests
             }
         }
 
-        var summary = $"ADR-0004 lock ({targetFramework}): {sources.Count} files in {folders.Count} folders, {edges.Count} folder edges, "
-                      + $"{upward} upward, {sameRow} same-row, "
+        var summary = $"ADR-0004 lock ({package.Name}, {targetFramework}): {sources.Count} files in {folders.Count} folders, "
+                      + $"{rowOf.Count} slices, {edges.Count} slice edges, {upward} upward, {sameRow} same-row, "
                       + $"{violations.Count(v => v.StartsWith("folder without", StringComparison.Ordinal))} folders without a row, "
                       + $"{violations.Count(v => v.StartsWith("row entry", StringComparison.Ordinal))} row entries without a folder, "
                       + $"{violations.Count(v => v.StartsWith("namespace:", StringComparison.Ordinal))} namespace mismatches.";
@@ -118,23 +150,52 @@ public class CoreLayerTests
         Assert.That(violations, Is.Empty, summary + "\n" + string.Join("\n", violations));
     }
 
+    // ── the table: a row entry against the folders that exist ───────────────────────────────────────
+
+    private static IEnumerable<(string Folder, string Slice)> Expand(string entry, IEnumerable<string> folders)
+    {
+        foreach (var folder in folders)
+        {
+            if (entry == ".")
+            {
+                if (folder.Length == 0) yield return (folder, ".");
+            }
+            else if (entry == "*")
+            {
+                if (folder.Length > 0) yield return (folder, folder.Split('/')[0]);
+            }
+            else if (entry.EndsWith("/*", StringComparison.Ordinal))
+            {
+                var parent = entry[..^2] + "/";
+                if (folder.StartsWith(parent, StringComparison.Ordinal))
+                    yield return (folder, parent + folder[parent.Length..].Split('/')[0]);
+            }
+            else if (folder == entry)
+            {
+                yield return (folder, entry);
+            }
+        }
+    }
+
+    private static string Display(string folder) => folder.Length == 0 ? "." : folder;
+
     // ── source: type -> folder, namespace per file, read through Roslyn's parser ─────────────────────
 
     private sealed record SourceFile(string RelativePath, string Folder, string Namespace, bool DeclaresPublicType, IReadOnlyList<string> TopLevelTypes);
 
-    // The core compiles for both targets with #if splits, so each file is parsed under each target's symbols
-    // and the declarations are the union.
+    // The packages compile for both targets with #if splits, so each file is parsed under each target's
+    // symbols and the declarations are the union.
     private static readonly CSharpParseOptions[] Targets =
     [
         new CSharpParseOptions(LanguageVersion.Preview, preprocessorSymbols: ["NET48", "NETFRAMEWORK"]),
         new CSharpParseOptions(LanguageVersion.Preview, preprocessorSymbols: ["NET10_0", "NET10_0_OR_GREATER", "NET6_0_OR_GREATER", "NET"]),
     ];
 
-    private static IEnumerable<SourceFile> SourceFiles(string coreDir)
+    private static IEnumerable<SourceFile> SourceFiles(string packageDir)
     {
-        foreach (var path in Directory.EnumerateFiles(coreDir, "*.cs", SearchOption.AllDirectories).OrderBy(p => p, StringComparer.Ordinal))
+        foreach (var path in Directory.EnumerateFiles(packageDir, "*.cs", SearchOption.AllDirectories).OrderBy(p => p, StringComparer.Ordinal))
         {
-            var relative = Path.GetRelativePath(coreDir, path).Replace('\\', '/');
+            var relative = Path.GetRelativePath(packageDir, path).Replace('\\', '/');
             if (relative.StartsWith("bin/", StringComparison.Ordinal) || relative.StartsWith("obj/", StringComparison.Ordinal)) continue;
             var folder = Path.GetDirectoryName(relative)!.Replace('\\', '/');
             var text = File.ReadAllText(path);
@@ -210,19 +271,18 @@ public class CoreLayerTests
         return type;
     }
 
-    private static string? FolderOf(TypeDefinition type, Dictionary<(string, string), string> folderOfType, List<string> violations)
+    private static string? FolderOf(TypeDefinition type, string packageName, Dictionary<(string, string), string> folderOfType, List<string> violations)
     {
         var top = TopLevel(type);
         if (top.Name.StartsWith("<", StringComparison.Ordinal)) return null;
         if (folderOfType.TryGetValue((top.Namespace, top.Name), out var folder)) return folder;
-        if (top.Namespace.StartsWith(PublicNamespace, StringComparison.Ordinal))
+        if (top.Namespace.StartsWith(packageName, StringComparison.Ordinal))
         {
             var message = $"type without a source file: {top.FullName}";
             if (!violations.Contains(message)) violations.Add(message);
         }
         return null;
     }
-
     private static IEnumerable<TypeDefinition> ReferencedTypes(TypeDefinition type, ModuleDefinition module)
     {
         var seen = new HashSet<TypeDefinition>();

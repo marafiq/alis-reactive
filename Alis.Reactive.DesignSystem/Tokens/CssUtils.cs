@@ -1,4 +1,4 @@
-namespace Alis.Reactive.DesignSystem.Tokens
+namespace Alis.Reactive.DesignSystem
 {
     /// <summary>Composes generated design-system classes with caller-supplied classes.</summary>
     public static class CssUtils
