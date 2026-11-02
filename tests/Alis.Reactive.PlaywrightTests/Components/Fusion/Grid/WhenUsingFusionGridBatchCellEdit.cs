@@ -103,6 +103,7 @@ public class WhenUsingFusionGridBatchCellEdit : PlaywrightTestBase
         await Expect(Editor("openTasks")).ToBeVisibleAsync();
         await Expect(Unsaved).ToBeHiddenAsync();
 
+        await ClickWhenStable(Editor("openTasks"));
         await Editor("openTasks").FillAsync("9");
         await MoveOn(Amina);
 
