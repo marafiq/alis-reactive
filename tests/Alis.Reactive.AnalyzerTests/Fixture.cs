@@ -53,6 +53,91 @@ internal static class Fixture
             Is.Empty);
     }
 
+    /// <summary>Where a package fixture's files and its slice table sit; the analyzer takes the table's directory as the package root.</summary>
+    public const string PackageRoot = "/pkg/";
+
+    /// <summary>
+    /// The analyzer, run over a package laid out under <see cref="PackageRoot"/> with its slice table, reports
+    /// exactly one diagnostic: this id and message, on the one span marked <c>[|like this|]</c> in the table or in a
+    /// file; with no mark, a diagnostic with no location. A null table is a package without one.
+    /// </summary>
+    public static async Task ReportsInPackage<TAnalyzer>(string assemblyName, string? table, string id, string message, params (string Path, string Source)[] files)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var package = UnmarkPackage(table, files);
+        var reported = await AnalyzePackage<TAnalyzer>(assemblyName, package.Table, package.Files);
+
+        Assert.That(
+            reported.Select(diagnostic => DescribeInPackage(diagnostic.Id, diagnostic.Location.GetLineSpan().Path ?? "", diagnostic.Location.SourceSpan, diagnostic.GetMessage())),
+            Is.EqualTo(new[] { DescribeInPackage(id, package.MarkedPath, package.MarkedSpan, message) }));
+    }
+
+    /// <summary>The analyzer, run over a package laid out under <see cref="PackageRoot"/>, reports nothing.</summary>
+    public static async Task ReportsNothingInPackage<TAnalyzer>(string assemblyName, string? table, params (string Path, string Source)[] files)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var package = UnmarkPackage(table, files);
+        var reported = await AnalyzePackage<TAnalyzer>(assemblyName, package.Table, package.Files);
+
+        Assert.That(
+            reported.Select(diagnostic => DescribeInPackage(diagnostic.Id, diagnostic.Location.GetLineSpan().Path ?? "", diagnostic.Location.SourceSpan, diagnostic.GetMessage())),
+            Is.Empty);
+    }
+
+    private static async Task<ImmutableArray<Diagnostic>> AnalyzePackage<TAnalyzer>(string assemblyName, string? table, (string Path, string Source)[] files)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var compilation = CSharpCompilation.Create(
+            assemblyName,
+            files.Select(file => CSharpSyntaxTree.ParseText(file.Source, path: PackageRoot + file.Path)),
+            References,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+
+        var errors = compilation.GetDiagnostics().Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error).ToList();
+        Assert.That(errors, Is.Empty, "The fixture must compile.\n" + string.Join("\n", errors));
+
+        var options = table == null ? null : new AnalyzerOptions([new TableText(PackageRoot + "SliceTree.txt", table)]);
+        return await compilation
+            .WithAnalyzers([new TAnalyzer()], options)
+            .GetAnalyzerDiagnosticsAsync();
+    }
+
+    private static string DescribeInPackage(string id, string path, TextSpan span, string message) =>
+        $"{id} {path} ({span.Start}..{span.End}) {message}";
+
+    // At most one of the table and the files carries the mark; the marked text and its span name the expected location.
+    private static (string? Table, (string Path, string Source)[] Files, string MarkedPath, TextSpan MarkedSpan) UnmarkPackage(string? table, (string Path, string Source)[] files)
+    {
+        var markedPath = "";
+        var markedSpan = new TextSpan(0, 0);
+        if (table != null && table.Contains("[|"))
+        {
+            (table, markedSpan) = Unmark(table);
+            markedPath = PackageRoot + "SliceTree.txt";
+        }
+        var unmarked = new (string Path, string Source)[files.Length];
+        for (var i = 0; i < files.Length; i++)
+        {
+            var (path, source) = files[i];
+            if (source.Contains("[|"))
+            {
+                Assert.That(markedPath, Is.Empty, "A package fixture marks one span.");
+                (source, markedSpan) = Unmark(source);
+                markedPath = PackageRoot + path;
+            }
+            unmarked[i] = (path, source);
+        }
+        return (table, unmarked, markedPath, markedSpan);
+    }
+
+    // A slice table handed to the analyzer the way the compiler hands an AdditionalFiles item.
+    private sealed class TableText(string path, string text) : AdditionalText
+    {
+        public override string Path => path;
+
+        public override SourceText? GetText(CancellationToken cancellationToken = default) => SourceText.From(text);
+    }
+
     private static async Task<ImmutableArray<Diagnostic>> Analyze<TAnalyzer>(string source, string path, string assemblyName)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {

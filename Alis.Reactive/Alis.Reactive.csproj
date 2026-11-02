@@ -51,6 +51,8 @@
     <!-- The typed-API analyzer (ALIS009) runs on the core's own public surface. -->
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <!-- The package's slice rows, bottom row first; ALIS010-ALIS013 lock ADR-0004 against them in every build. -->
+        <AdditionalFiles Include="SliceTree.txt" />
     </ItemGroup>
 
     <ItemGroup>

@@ -31,16 +31,6 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             description: "The shipped packages and every component declaration expose typed DSL only. A bare object or System.Type, an untyped Arg on a public member, or a member-naming string in an exposed signature lets JS-style untyped access creep into views.",
             helpLinkUri: null);
 
-        // The packages whose whole exposed surface is the developer's API.
-        private static readonly ImmutableHashSet<string> ShippedAssemblies =
-            ImmutableHashSet.Create(
-                StringComparer.Ordinal,
-                "Alis.Reactive",
-                "Alis.Reactive.Fusion",
-                "Alis.Reactive.Native",
-                "Alis.Reactive.DesignSystem",
-                "Alis.Reactive.NativeTagHelpers");
-
         // A string parameter with one of these names names a member, not a value.
         private static readonly ImmutableHashSet<string> MemberNamingParameters =
             ImmutableHashSet.Create(
@@ -115,7 +105,7 @@ namespace Alis.Reactive.Analyzers.TypedDsl
         // a declaration class, and the render helpers that put a component on a page.
         private static bool InScope(ISymbol symbol)
         {
-            if (ShippedAssemblies.Contains(symbol.ContainingAssembly?.Name ?? ""))
+            if (AnalyzerHelpers.ShippedAssemblies.Contains(symbol.ContainingAssembly?.Name ?? ""))
                 return true;
 
             var containingType = symbol.ContainingType;
@@ -139,11 +129,11 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             {
                 var root = method;
                 while (root.OverriddenMethod != null) root = root.OverriddenMethod;
-                return !ShippedAssemblies.Contains(root.ContainingAssembly?.Name ?? "");
+                return !AnalyzerHelpers.ShippedAssemblies.Contains(root.ContainingAssembly?.Name ?? "");
             }
 
             return method.ExplicitInterfaceImplementations
-                .Any(implemented => !ShippedAssemblies.Contains(implemented.ContainingAssembly?.Name ?? ""));
+                .Any(implemented => !AnalyzerHelpers.ShippedAssemblies.Contains(implemented.ContainingAssembly?.Name ?? ""));
         }
 
         private static bool HasExemption(ISymbol symbol)

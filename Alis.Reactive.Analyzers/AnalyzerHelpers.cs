@@ -11,6 +11,19 @@ namespace Alis.Reactive.Analyzers
             ImmutableHashSet.Create("Get", "Post", "Put", "Delete");
 
         /// <summary>
+        /// The packages whose whole exposed surface is the developer's API (ALIS009) and whose folders are a slice
+        /// tree with a <c>SliceTree.txt</c> beside them (ALIS010-ALIS013).
+        /// </summary>
+        internal static readonly ImmutableHashSet<string> ShippedAssemblies =
+            ImmutableHashSet.Create(
+                StringComparer.Ordinal,
+                "Alis.Reactive",
+                "Alis.Reactive.Fusion",
+                "Alis.Reactive.Native",
+                "Alis.Reactive.DesignSystem",
+                "Alis.Reactive.NativeTagHelpers");
+
+        /// <summary>
         /// Identifies a view's C#, which the view-only analyzers inspect. The Razor source generator names
         /// it after the view with every character that is not a letter or a digit as an underscore
         /// (<c>Views_Home_Index_cshtml.g.cs</c>); the build-time Razor pipeline keeps the view's name
