@@ -29,7 +29,7 @@
 //    elsewhere on the page (a member the request sends beside the form), the one contributed last of several;
 //    missing when none is on the page, as the server sees a member no input posts.
 
-import type { InputBinding, ModelPluginData } from "../types/index";
+import type { BodyStep, InputBinding, ModelPluginData } from "../types/index";
 import type { Contribution, Plugin } from "../objects/plugins";
 import type { PlanObjects } from "../objects/plan-objects";
 import { Environment } from "../grammar/environment";
@@ -176,21 +176,18 @@ export function containedInputs(containerId: string): ContainedInputs {
 // A JSON body path: an index segment (Lines[0]) needs an array, a name needs an object. A matching
 // node already there keeps its other members, copied first so an object the request read from a
 // component is never written into; anything else is replaced.
-function assignAt(root: Record<string, unknown>, path: readonly string[], value: unknown): void {
-  let parent: Record<string, unknown> = root;
+function assignAt(root: Record<string, unknown>, path: readonly BodyStep[], value: unknown): void {
+  let parent: Record<string | number, unknown> = root;
   for (let index = 0; index < path.length - 1; index++) {
     const segment = path[index]!;
-    const nextIsIndex = isPosition(path[index + 1]!);
+    const nextIsIndex = typeof path[index + 1] === "number";
     const existing = parent[segment];
     if (nextIsIndex) parent[segment] = Array.isArray(existing) ? [...existing] : [];
     else parent[segment] = isRecord(existing) ? { ...existing } : {};
-    parent = parent[segment] as Record<string, unknown>;
+    parent = parent[segment] as Record<string | number, unknown>;
   }
   parent[path[path.length - 1]!] = value;
 }
-
-// A step of digits is a list position (grammar.md 1.3), as every path the plan carries reads one.
-const isPosition = (step: string): boolean => /^\d+$/.test(step);
 
 function join(input: ModelInput): void {
   const entries = inputsById.get(input.id);

@@ -8,14 +8,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="JsonSchema.Net" Version="9.1.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        
         <PackageReference Include="NUnit" Version="4.6.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
     </ItemGroup>
 
     <ItemGroup>
+        <!-- The two apps whose pages are swept in process: every GET action, every plan it renders. -->
         <ProjectReference Include="../../Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
+        <ProjectReference Include="../Alis.Reactive.Framework.App/Alis.Reactive.Framework.App.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Inputs;
 using Alis.Reactive.PlanModel.Validation;
 using Alis.Reactive.PlanModel.Writing;
@@ -337,7 +338,9 @@ namespace Alis.Reactive
 
         private protected override bool ComparesWithMember => false;
 
-        private protected override Expr Target(FormFieldValues values, Scope scope) => G.Lit(_value);
+        // The fixed value as every literal is written: a date as its text, an enum by its JSON name.
+        private protected override Expr Target(FormFieldValues values, Scope scope) =>
+            ValueExpression.LiteralFor(_value, Shape).Write(scope);
     }
 
     /// <summary>The value compares with another member of the model, read as the page binds it.</summary>
@@ -407,8 +410,8 @@ namespace Alis.Reactive
             var compared = G.Apply(
                 G.Fn(inRange, a, low, high),
                 Comparable(value, _shape),
-                Comparable(G.Lit(_from), _shape),
-                Comparable(G.Lit(_to), _shape));
+                Comparable(ValueExpression.LiteralFor(_from, _shape).Write(scope), _shape),
+                Comparable(ValueExpression.LiteralFor(_to, _shape).Write(scope), _shape));
             return G.Or(Absent(value), compared);
         }
     }

@@ -295,9 +295,11 @@ namespace Alis.Reactive.PlanModel.Document
 
         // The JSON body path an input binds under: a name makes an object, a position makes an array. An input is
         // one member, so its path never reads each item of a list.
-        private static IReadOnlyList<string> BodyOf(Path path) => path.ReadsEachItem
-            ? throw new InvalidOperationException($"'{path}' reads each item of a list; a body names members and positions.")
-            : path.Text;
+        private static IReadOnlyList<BodyStep> BodyOf(Path path) => path.Segments
+            .Select(segment => segment.IsEachItem
+                ? throw new InvalidOperationException($"'{path}' reads each item of a list; a body names members and positions.")
+                : segment.IsIndex ? BodyStep.At(segment.Index) : BodyStep.Member(segment.ToPathText()))
+            .ToList();
 
     }
 }

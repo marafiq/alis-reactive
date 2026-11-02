@@ -750,7 +750,7 @@
         "body": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/BodyStep"
           }
         },
         "value": {
@@ -775,6 +775,12 @@
         "list"
       ],
       "additionalProperties": false
+    },
+    "BodyStep": {
+      "type": [
+        "string",
+        "integer"
+      ]
     },
     "NonePluginData": {
       "type": "object",

@@ -249,12 +249,16 @@ export interface ModelPluginData {
 
 export interface InputBinding {
   name: string;
-  body: string[];
+  body: BodyStep[];
   value: Expr;
   shape: Shape;
   committed: string;
   list: boolean;
 }
+
+export type BodyStep =
+  | string
+  | number;
 
 export interface NonePluginData {
   kind: "none";

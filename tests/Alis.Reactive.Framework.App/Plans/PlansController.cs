@@ -29,11 +29,12 @@ public sealed class PlansController : Controller
 
     /// <summary>
     /// A notice whose HTML the framework did not write: its plan script holds text that is not JSON, as a
-    /// hand-edited or truncated response would.
+    /// hand-edited or truncated response would. The attribute's value says so; the runtime discovers the
+    /// script by the attribute alone.
     /// </summary>
     public IActionResult TornNotice() => Content(
         "<section><h2>A torn notice</h2>" +
-        "<script type=\"application/json\" data-reactive-plan>{\"planId\":\"torn\",</script></section>",
+        "<script type=\"application/json\" data-reactive-plan=\"torn\">{\"planId\":\"torn\",</script></section>",
         "text/html");
 
     public IActionResult Refused(PlanMistake mistake) => View("Refusals", new PlanRefusalsPage { Mistake = mistake });
