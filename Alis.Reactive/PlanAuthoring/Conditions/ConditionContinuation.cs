@@ -24,7 +24,7 @@ namespace Alis.Reactive.PlanAuthoring.Conditions
             return Condition.Any(terms.ToArray());
         }
 
-        internal static Condition Group<TModel>(Func<ConditionStart<TModel>, Condition<TModel>> group)
+        internal static Condition Group<TModel>(Func<ConditionStart<TModel>, Guard<TModel>> group)
             where TModel : class
         {
             if (group == null) throw new ArgumentNullException(nameof(group));

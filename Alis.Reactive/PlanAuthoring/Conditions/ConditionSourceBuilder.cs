@@ -24,7 +24,7 @@ namespace Alis.Reactive
     /// <typeparam name="TNext">What the comparison continues as: a guard that offers <c>Then</c>, or a group term.</typeparam>
     public sealed class ConditionSourceBuilder<TModel, TProp, TNext>
         where TModel : class
-        where TNext : Condition<TModel>
+        where TNext : Guard<TModel>
     {
         private readonly TypedSource<TProp> _left;
         private readonly Func<Condition, TNext> _next;

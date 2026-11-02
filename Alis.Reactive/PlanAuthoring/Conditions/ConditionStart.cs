@@ -14,17 +14,17 @@ namespace Alis.Reactive
         internal ConditionStart() { }
 
         /// <summary>Starts the group with a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>> When<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, GroupCondition<TModel>>(source, graph => new GroupCondition<TModel>(graph));
+        public ConditionSourceBuilder<TModel, TProp, GroupGuard<TModel>> When<TProp>(TypedSource<TProp> source) =>
+            new ConditionSourceBuilder<TModel, TProp, GroupGuard<TModel>>(source, graph => new GroupGuard<TModel>(graph));
 
         /// <summary>Asks the user, and holds when they confirm.</summary>
         /// <param name="message">The question.</param>
-        public GroupCondition<TModel> Confirm(string message) =>
-            new GroupCondition<TModel>(Condition.Confirm(message));
+        public GroupGuard<TModel> Confirm(string message) =>
+            new GroupGuard<TModel>(Condition.Confirm(message));
 
         /// <summary>Holds when the nested group does not: <c>g.Not(n =&gt; n.When(a).Eq(1).And(b).Truthy())</c>.</summary>
         /// <param name="group">The group to negate.</param>
-        public GroupCondition<TModel> Not(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
-            new GroupCondition<TModel>(Condition.Not(ConditionComposition.Group(group)));
+        public GroupGuard<TModel> Not(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
+            new GroupGuard<TModel>(Condition.Not(ConditionComposition.Group(group)));
     }
 }

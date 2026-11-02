@@ -4,11 +4,11 @@ using Alis.Reactive.PlanAuthoring.Conditions;
 
 namespace Alis.Reactive
 {
-    /// <summary>A condition built so far: what a group callback returns.</summary>
+    /// <summary>A guard built so far: what a group callback returns.</summary>
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
-    public abstract class Condition<TModel> where TModel : class
+    public abstract class Guard<TModel> where TModel : class
     {
-        private protected Condition(Condition graph)
+        private protected Guard(Condition graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
         }
@@ -26,7 +26,7 @@ namespace Alis.Reactive
     /// <c>p.When(a).Eq(1).And(g =&gt; g.When(b).Gt(2).Or(c).Truthy()).Then(..)</c>.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
-    public sealed class GuardBuilder<TModel> : Condition<TModel> where TModel : class
+    public sealed class GuardBuilder<TModel> : Guard<TModel> where TModel : class
     {
         private readonly ConditionContinuation<TModel> _continuation;
 
@@ -41,7 +41,7 @@ namespace Alis.Reactive
                 source, next => new AllGuard<TModel>(ConditionComposition.All(Graph, next), _continuation));
 
         /// <summary>Also requires a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
@@ -50,7 +50,7 @@ namespace Alis.Reactive
                 source, next => new AnyGuard<TModel>(ConditionComposition.Any(Graph, next), _continuation));
 
         /// <summary>Alternatively accepts a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Negates this one comparison.</summary>
@@ -67,7 +67,7 @@ namespace Alis.Reactive
 
     /// <summary>Comparisons that must all hold: continue with <c>And</c>, or run reactions with <c>Then</c>.</summary>
     /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
-    public sealed class AllGuard<TModel> : Condition<TModel> where TModel : class
+    public sealed class AllGuard<TModel> : Guard<TModel> where TModel : class
     {
         private readonly ConditionContinuation<TModel> _continuation;
 
@@ -82,7 +82,7 @@ namespace Alis.Reactive
                 source, next => new AllGuard<TModel>(ConditionComposition.All(Graph, next), _continuation));
 
         /// <summary>Also requires a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Runs <paramref name="pipeline"/> when every comparison holds.</summary>
@@ -96,7 +96,7 @@ namespace Alis.Reactive
 
     /// <summary>Comparisons of which one must hold: continue with <c>Or</c>, or run reactions with <c>Then</c>.</summary>
     /// <typeparam name="TModel">View model that owns the guarded pipeline.</typeparam>
-    public sealed class AnyGuard<TModel> : Condition<TModel> where TModel : class
+    public sealed class AnyGuard<TModel> : Guard<TModel> where TModel : class
     {
         private readonly ConditionContinuation<TModel> _continuation;
 
@@ -111,7 +111,7 @@ namespace Alis.Reactive
                 source, next => new AnyGuard<TModel>(ConditionComposition.Any(Graph, next), _continuation));
 
         /// <summary>Alternatively accepts a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Runs <paramref name="pipeline"/> when any comparison holds.</summary>
@@ -125,9 +125,9 @@ namespace Alis.Reactive
 
     /// <summary>One comparison inside a group: continue with <c>And</c> or <c>Or</c>, or negate it with <c>Not</c>. A group has no <c>Then</c>.</summary>
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
-    public sealed class GroupCondition<TModel> : Condition<TModel> where TModel : class
+    public sealed class GroupGuard<TModel> : Guard<TModel> where TModel : class
     {
-        internal GroupCondition(Condition graph) : base(graph) { }
+        internal GroupGuard(Condition graph) : base(graph) { }
 
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
         public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
@@ -135,7 +135,7 @@ namespace Alis.Reactive
                 source, next => new GroupAll<TModel>(ConditionComposition.All(Graph, next)));
 
         /// <summary>Also requires a nested group.</summary>
-        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
@@ -144,16 +144,16 @@ namespace Alis.Reactive
                 source, next => new GroupAny<TModel>(ConditionComposition.Any(Graph, next)));
 
         /// <summary>Alternatively accepts a nested group.</summary>
-        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
 
         /// <summary>Negates this one comparison.</summary>
-        public GroupCondition<TModel> Not() => new GroupCondition<TModel>(Condition.Not(Graph));
+        public GroupGuard<TModel> Not() => new GroupGuard<TModel>(Condition.Not(Graph));
     }
 
     /// <summary>Comparisons inside a group that must all hold: continue with <c>And</c>.</summary>
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
-    public sealed class GroupAll<TModel> : Condition<TModel> where TModel : class
+    public sealed class GroupAll<TModel> : Guard<TModel> where TModel : class
     {
         internal GroupAll(Condition graph) : base(graph) { }
 
@@ -163,13 +163,13 @@ namespace Alis.Reactive
                 source, next => new GroupAll<TModel>(ConditionComposition.All(Graph, next)));
 
         /// <summary>Also requires a nested group.</summary>
-        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
     }
 
     /// <summary>Comparisons inside a group of which one must hold: continue with <c>Or</c>.</summary>
     /// <typeparam name="TModel">View model that owns the condition.</typeparam>
-    public sealed class GroupAny<TModel> : Condition<TModel> where TModel : class
+    public sealed class GroupAny<TModel> : Guard<TModel> where TModel : class
     {
         internal GroupAny(Condition graph) : base(graph) { }
 
@@ -179,7 +179,7 @@ namespace Alis.Reactive
                 source, next => new GroupAny<TModel>(ConditionComposition.Any(Graph, next)));
 
         /// <summary>Alternatively accepts a nested group.</summary>
-        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Condition<TModel>> group) =>
+        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
             new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
     }
 }
