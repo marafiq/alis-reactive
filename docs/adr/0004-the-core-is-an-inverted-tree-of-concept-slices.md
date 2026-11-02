@@ -61,7 +61,7 @@ core): a page, a component and a validator import one namespace. Every other fil
 its folder (`Alis.Reactive.PlanModel.Conditions`). The eight public namespaces `Builders`, `Builders.Conditions`,
 `Builders.Requests`, `Builders.Arrays`, `PlanModel`, `Validation`, `InputField` and `Components` are retired.
 
-**The packages.** Each shipped package is the same kind of tree with rows of its own, in the lock's table. A row
+**The packages.** Each shipped package is the same kind of tree with rows of its own, in its `SliceTree.txt`. A row
 entry `X/*` makes every subfolder of `X` a slice of its own in that row, so slices under one folder never use
 each other; `.` is the package's root files.
 
@@ -77,11 +77,19 @@ subclass beside them (`ReadOnly<T>` under `Property<T>`, `InputBoundFieldBase`, 
 Features extend the pipeline through extension classes, not subclasses, and a brought component derives the core's
 `Component` and `JsObject`, never a shipped declaration or payload.
 
-**The lock.** `tests/Alis.Reactive.ArchitectureTests/SliceTreeTests.cs` reads, per package, the type-to-folder map
-from source (both `NET48` and `NET10_0`) and the references from IL (generic arguments, attributes, locals and
-operands included) of each target, and fails naming every reference that points up the table, every folder with no row,
-every row that names no folder, every file whose namespace breaks the rule above, and every public class that
-nothing in the package derives from and that is not sealed.
+**The lock.** Analyzer ALIS010-ALIS013 (`Alis.Reactive.Analyzers/SliceTree`) runs in every build of each shipped
+package, for each target, and in the editor. A package's rows are its `SliceTree.txt`, bottom row first, listed as
+an additional file in its csproj; the file's directory is the package root. The analyzer fails the build naming
+every reference that points up the table or sideways in a row, at the reference; every file whose namespace
+breaks the rule above, at the namespace; every public class that nothing in the package derives from and that is
+not sealed, at the class; and every folder with no row, every entry that names no folder, every type declared in
+two slices and every shipped package without a table. `tests/Alis.Reactive.AnalyzerTests/SliceTreeTests.cs` proves
+each rule fires and stays silent. The IL test that preceded it (Mono.Cecil over both targets) is retired: what the
+compiler's model reads that IL did not (a const read, a nameof) is a real source dependency, and what IL read that
+the model does not (the members the compiler binds by pattern: foreach, await, using, deconstruction) lives on a
+type the source names directly or on a slice below it, so no upward edge is lost. The counts the test printed
+(files, slices, edges per package) are printed by nothing now; files and slices are countable from the tree, the
+edge count is not.
 
 ## Consequences
 
@@ -102,5 +110,5 @@ After ADR-0003 waves 2 and 3 land (they rewrite and delete many of the files thi
 U1 the bottom rows (Grammar, WireTerms, Members, Vendors, Inputs); U2 the plan model (Values, Conditions,
 Reactions, Validation, Requests, Document); U3 components and authoring (Components, Events, Arrays, Elements,
 Pipelines, the extension classes, Razor); U4 namespaces and the lock; U5 the validator as the top slice; U6 the packages take the rule one commit each,
-smallest first (DesignSystem, NativeTagHelpers, Native, Fusion), each adding its rows to the lock's table. Each
+smallest first (DesignSystem, NativeTagHelpers, Native, Fusion), each adding its rows to the lock's table; U7 the lock as the analyzer, the IL test retired. Each
 lands as pure-rename commits where it moves files, so history follows them.

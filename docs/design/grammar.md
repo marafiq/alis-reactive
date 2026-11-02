@@ -907,9 +907,9 @@ It reads the rules by their classes, not the plan.
 
 ## 8. Where the code is
 
-**C#** (`Alis.Reactive`), one slice per folder, each using only the slices below it (ADR-0004; the
-architecture test `SliceTreeTests` reads the folders from source and the references from the IL of both
-targets). Every public type is in the namespace `Alis.Reactive`; an internal type's namespace is its folder.
+**C#** (`Alis.Reactive`), one slice per folder, each using only the slices below it (ADR-0004; analyzer
+ALIS010 reads the rows from `Alis.Reactive/SliceTree.txt` and fails the build at a reference that points up
+or sideways). Every public type is in the namespace `Alis.Reactive`; an internal type's namespace is its folder.
 - `Grammar`: one sealed class per production in 1.1 and 1.2, with internal constructors, invariants
   checked in the constructor, one-to-one serialization and its discriminator. This is the plan contract;
   the generator (`tools/PlanContractGenerator`) reads these classes. `WireTerms`: the plan's terms
