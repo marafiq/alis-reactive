@@ -68,12 +68,7 @@
       "data": {
         "kind": "form",
         "summary": "admission_validation_summary",
-        "fields": [
-          {
-            "name": "Name",
-            "tests": []
-          }
-        ]
+        "fields": []
       }
     },
     "$http": {

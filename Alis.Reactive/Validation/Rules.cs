@@ -377,17 +377,10 @@ namespace Alis.Reactive.Validation
             }
         }
 
-        // A check on the member reports under the member's name, so the member is declared whether or not
-        // the browser can make the check; a child validator alone reports under its own members.
         public override void DescribeFor(BrowserRuleSet browser, RuleSetSelection selection)
         {
             foreach (var part in Parts)
-            {
                 if (TryBrowserCondition(part, out var when)) part.DescribeFor(browser, Member, FieldDisplayName, when, selection);
-                else if (part is ChildPart<T, TValue> child) child.DeclareFor(browser, Member, selection);
-            }
-            if (Parts.Any(part => part is CheckPart<T, TValue> || part is CustomPart<T, TValue>))
-                browser.Declare(Member.Expression);
         }
     }
 
@@ -418,23 +411,16 @@ namespace Alis.Reactive.Validation
         }
 
         // The browser validates an item through the item's own validator, or by the checks written on the
-        // item itself, at every item on the page when the form checks.
-        // Under a condition only the server decides, the items and the child's members are still named.
         public override void DescribeFor(BrowserRuleSet browser, RuleSetSelection selection)
         {
             foreach (var part in Parts)
             {
-                var inBrowser = TryBrowserCondition(part, out var when);
+                if (!TryBrowserCondition(part, out var when)) continue;
                 if (part is ChildPart<T, TElement> child && child.TryItemFields(selection, out var itemFields))
-                {
-                    if (inBrowser) browser.AddItems(Member.Expression, itemFields, when);
-                    else browser.AddItems(Member.Expression, itemFields.Select(field => field.WithoutRules()), Condition.Always);
-                }
-                if (inBrowser && part is CheckPart<T, TElement> check)
+                    browser.AddItems(Member.Expression, itemFields, when);
+                if (part is CheckPart<T, TElement> check)
                     check.DescribeForItems(browser, Member, FieldDisplayName, when);
             }
-            if (Parts.Any(part => part is CheckPart<T, TElement>))
-                browser.DeclareItems(Member.Expression);
         }
     }
 
@@ -467,12 +453,10 @@ namespace Alis.Reactive.Validation
             await Validators.Run(_included, instance, prefix, run).ConfigureAwait(false);
         }
 
-        // Under a condition only the server decides, the included rules' members are still named.
         public void DescribeFor(BrowserRuleSet browser, RuleSetSelection selection)
         {
             if (!(_included is ReactiveValidator rules)) return;
             if (_scope.TryForBrowser(out var scope)) browser.Add(rules.BrowserRules(selection), scope);
-            else browser.Add(rules.BrowserRules(selection).Select(field => field.WithoutRules()), Condition.Always);
         }
     }
 
@@ -588,12 +572,6 @@ namespace Alis.Reactive.Validation
         internal override void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when, RuleSetSelection selection)
         {
             if (TryItemFields(selection, out var fields)) browser.Add(member.Expression, fields, when);
-        }
-
-        // Under a condition only the server decides, the child's members are still named, with no browser check.
-        internal void DeclareFor(BrowserRuleSet browser, ModelMember<T> member, RuleSetSelection selection)
-        {
-            if (TryItemFields(selection, out var fields)) browser.Add(member.Expression, fields.Select(field => field.WithoutRules()), Condition.Always);
         }
 
         internal bool TryItemFields(RuleSetSelection selection, out IReadOnlyList<BrowserField> fields)

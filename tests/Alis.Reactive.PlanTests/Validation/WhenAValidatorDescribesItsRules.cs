@@ -35,7 +35,7 @@ public class WhenAValidatorDescribesItsRules
         var fields = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray()
             .ToDictionary(field => field!["name"]!.GetValue<string>(), field => field!["tests"]!.AsArray().Count);
         Assert.That(fields["Name"], Is.EqualTo(1));
-        Assert.That(fields["Age"], Is.Zero, "the age's rule is the server's, so the page carries its field and no check for it");
+        Assert.That(fields.ContainsKey("Age"), Is.False, "the age's rule is the server's, so the page carries no field for it");
         Golden.Matches(rendered, "Validation", nameof(a_rule_under_a_condition_the_server_alone_decides_stays_with_the_server));
     }
 
@@ -52,7 +52,7 @@ public class WhenAValidatorDescribesItsRules
 
         Assert.That(rendered.Handlers().Count, Is.EqualTo(2));
         var names = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Select(field => field!["name"]!.GetValue<string>());
-        Assert.That(names, Is.EqualTo(new[] { "Name", "Age" }), "each member a rule is written on, once");
+        Assert.That(names, Is.EqualTo(new[] { "Name" }), "each member the browser checks, once");
         Golden.Matches(rendered, "Validation", nameof(two_requests_that_validate_one_form_describe_it_once));
     }
 
@@ -129,7 +129,7 @@ public class WhenAValidatorDescribesItsRules
     }
 
     [Test]
-    public void a_custom_check_declares_its_member_to_the_page_and_leaves_it_no_test()
+    public void a_custom_check_is_the_servers_so_the_page_carries_no_field_for_its_member()
     {
         var (html, plan) = Page.Of<Admission>(Registered.Validator<CustomAdmissionRules>());
         html.TextInput(plan, m => m.Name);
@@ -137,9 +137,9 @@ public class WhenAValidatorDescribesItsRules
 
         var rendered = html.Rendered(plan);
 
-        var field = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Name")!;
-        Assert.That(field["tests"]!.AsArray(), Is.Empty);
-        Golden.Matches(rendered, "Validation", nameof(a_custom_check_declares_its_member_to_the_page_and_leaves_it_no_test));
+        var names = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Select(each => each!["name"]!.GetValue<string>());
+        Assert.That(names, Does.Not.Contain("Name"));
+        Golden.Matches(rendered, "Validation", nameof(a_custom_check_is_the_servers_so_the_page_carries_no_field_for_its_member));
     }
 
     [Test]
@@ -172,8 +172,7 @@ public class WhenAValidatorDescribesItsRules
         var rendered = html.Rendered(plan);
 
         var fields = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray();
-        var name = fields.Single(each => each!["name"]!.GetValue<string>() == "Name");
-        Assert.That(name!["tests"]!.AsArray(), Is.Empty, "the name's rule waits on the server's condition");
+        Assert.That(fields.Select(each => each!["name"]!.GetValue<string>()), Does.Not.Contain("Name"), "the name's rule waits on the server's condition");
         var age = fields.Single(each => each!["name"]!.GetValue<string>() == "Age");
         Assert.That(age!["tests"]!.AsArray(), Has.Count.EqualTo(1));
         Golden.Matches(rendered, "Validation", nameof(a_rule_under_a_condition_that_waits_is_the_servers));

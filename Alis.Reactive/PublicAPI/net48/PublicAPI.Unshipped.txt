@@ -42,8 +42,6 @@ Alis.Reactive.BrowserRuleSet.Add(System.Linq.Expressions.LambdaExpression! owner
 Alis.Reactive.BrowserRuleSet.AddItemRules(System.Linq.Expressions.LambdaExpression! collection, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserRule!>! rules, Alis.Reactive.Condition! when) -> void
 Alis.Reactive.BrowserRuleSet.AddItems(System.Linq.Expressions.LambdaExpression! collection, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserField!>! itemFields, Alis.Reactive.Condition! when) -> void
 Alis.Reactive.BrowserRuleSet.BrowserRuleSet() -> void
-Alis.Reactive.BrowserRuleSet.Declare(System.Linq.Expressions.LambdaExpression! member) -> void
-Alis.Reactive.BrowserRuleSet.DeclareItems(System.Linq.Expressions.LambdaExpression! collection) -> void
 Alis.Reactive.BrowserRuleSet.Fields.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
 Alis.Reactive.ChildElement
 Alis.Reactive.ChildElement.GetAttribute(string! name) -> string?

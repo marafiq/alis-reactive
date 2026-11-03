@@ -57,11 +57,13 @@ namespace Alis.Reactive.Fusion
 
         /// <summary>
         /// EJ2 <c>column.validationRules</c> object for a typed row field, or
-        /// <see langword="null"/> when no declared rule maps client-side (every rule on
-        /// the field is conditional, cross-field, or otherwise server-only).
+        /// <see langword="null"/> when none of the field's browser rules maps to an EJ2 rule
+        /// (each is conditional or cross-field).
         /// </summary>
         /// <remarks>
-        /// Assign it to Syncfusion's <c>GridColumn.ValidationRules</c>, which takes any object.
+        /// Assign it to Syncfusion's <c>GridColumn.ValidationRules</c>, which takes any object. A field the
+        /// validator gives the browser no rule for (it has none, or only checks the server makes) is refused:
+        /// its column takes no <c>ValidationRules</c>.
         /// </remarks>
         /// <typeparam name="TField">The type of the column's member.</typeparam>
         /// <param name="field">The column's member, for example <c>r =&gt; r.OpenTasks</c>.</param>

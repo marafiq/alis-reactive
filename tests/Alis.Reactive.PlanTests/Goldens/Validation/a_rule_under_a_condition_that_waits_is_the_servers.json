@@ -287,10 +287,6 @@
                 "message": "Give the age."
               }
             ]
-          },
-          {
-            "name": "Name",
-            "tests": []
           }
         ]
       }

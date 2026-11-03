@@ -36,8 +36,10 @@ namespace Alis.Reactive.PlanModel.Validation
             new CheckedField(Name, Shape, Rules.Concat(rules).ToArray(), Values);
 
         /// <summary>
-        /// The fields a validator's rules check on a form: every member with rules, whether or not this plan renders
-        /// it (a partial or the member's editor template may), and each item field of a collection, named for every item.
+        /// The fields a validator's rules check on a form: every member with a rule the browser checks, whether or not
+        /// this plan renders it (a partial or the member's editor template may), and each item field of a collection,
+        /// named for every item. A member only the server checks carries no field: the server's message for it finds
+        /// its input by binding name (grammar.md F8).
         /// </summary>
         internal static IEnumerable<CheckedField> Bind(string formId, IReadOnlyList<BrowserField> fields, string fieldPrefix)
         {
@@ -52,7 +54,7 @@ namespace Alis.Reactive.PlanModel.Validation
         {
             foreach (var field in fields)
             {
-                if (field.IsChecked) yield return field;
+                if (field.Rules.Count > 0) yield return field;
 
                 var items = field.ItemFields.Select(itemField => itemField.UnderItem(field.FieldName + "[*]"));
                 foreach (var itemField in Checked(items))

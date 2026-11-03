@@ -7,7 +7,7 @@ namespace Alis.Reactive.Framework.App.Validation;
 public enum RuleSetMistake
 {
     NameARuleForACallOnAMember,
-    DeclareItemsOfAMemberThatHoldsNone,
+    RuleTheItemsOfAMemberThatHoldsNone,
     BoundARangeByTwoKindsOfValue,
 }
 

@@ -19,9 +19,8 @@ namespace Alis.Reactive
         internal BrowserField(
             FieldReference field,
             IEnumerable<BrowserRule> rules,
-            IEnumerable<BrowserField> itemFields,
-            bool isChecked)
-            : this(field, rules, itemFields, isChecked, Condition.Always)
+            IEnumerable<BrowserField> itemFields)
+            : this(field, rules, itemFields, Condition.Always)
         {
         }
 
@@ -29,13 +28,11 @@ namespace Alis.Reactive
             FieldReference field,
             IEnumerable<BrowserRule> rules,
             IEnumerable<BrowserField> itemFields,
-            bool isChecked,
             Condition ownerCondition)
         {
             Reference = field;
             Rules = rules.ToArray();
             ItemFields = itemFields.ToArray();
-            IsChecked = isChecked;
             _ownerCondition = ownerCondition;
         }
 
@@ -49,35 +46,20 @@ namespace Alis.Reactive
 
         internal FieldReference Reference { get; }
 
-        /// <summary>
-        /// A rule is written on the member, so the server reports under the member's name, whether or not the
-        /// browser can check it. A member only a condition reads, or only a rule compares with, is not checked.
-        /// </summary>
-        internal bool IsChecked { get; }
-
         internal BrowserField PrefixedBy(string prefix, Condition outer) =>
             new BrowserField(
                 Reference.PrefixedBy(prefix),
                 Rules.Select(rule => rule.PrefixedBy(prefix, outer)),
-                ItemFields.Select(field => field.OwnedUnder(prefix, outer)),
-                IsChecked);
-
-        /// <summary>
-        /// The same member and its item fields with no rule the browser checks: what a rule under a condition
-        /// only the server decides still names, so the validator's browser rules list the member with no check, as
-        /// they list a member whose every check is the server's.
-        /// </summary>
-        internal BrowserField WithoutRules() =>
-            new BrowserField(Reference, Array.Empty<BrowserRule>(), ItemFields.Select(field => field.WithoutRules()), IsChecked, _ownerCondition);
+                ItemFields.Select(field => field.OwnedUnder(prefix, outer)));
 
         internal BrowserField UnderItem(string itemName) =>
             PrefixedBy(itemName, _ownerCondition);
 
         internal BrowserField ScopedBy(Condition condition) =>
-            new BrowserField(Reference, Rules, ItemFields, IsChecked, Condition.Combine(condition, _ownerCondition));
+            new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition));
 
         private BrowserField OwnedUnder(string prefix, Condition condition) =>
-            new BrowserField(Reference, Rules, ItemFields, IsChecked, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
+            new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
     }
 
     /// <summary>
@@ -98,25 +80,6 @@ namespace Alis.Reactive
     {
         private readonly Dictionary<string, Entry> _fields = new Dictionary<string, Entry>(StringComparer.Ordinal);
         private readonly List<Entry> _order = new List<Entry>();
-
-        /// <summary>
-        /// Names a member a rule is written on, whether or not the browser can check the rule: the validator's
-        /// browser rules then list the member, with no check when the browser can make none.
-        /// </summary>
-        /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
-        public void Declare(LambdaExpression member) => Ensure(FieldReference.Of(member)).Checked = true;
-
-        /// <summary>
-        /// Names the items of a collection member a rule checks, whether or not the browser can check the rule:
-        /// <c>RuleForEach(x =&gt; x.Rooms).Must(..)</c>. The form then carries the items' field, <c>Rooms[*]</c>.
-        /// </summary>
-        /// <param name="collection">The collection member, as a path from the validator's model.</param>
-        public void DeclareItems(LambdaExpression collection)
-        {
-            var member = FieldReference.Of(collection);
-            Ensure(member).ItemFields.Add(
-                new BrowserField(FieldReference.ItemOf(member), Array.Empty<BrowserRule>(), Array.Empty<BrowserField>(), isChecked: true));
-        }
 
         /// <summary>Adds a rule on a member.</summary>
         /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
@@ -146,7 +109,7 @@ namespace Alis.Reactive
             foreach (var rule in rules)
                 if (rule.TryFor(item, out var resolved)) itemRules.Add(resolved);
             if (itemRules.Count == 0) return;
-            Ensure(member).ItemFields.Add(new BrowserField(item, itemRules, Array.Empty<BrowserField>(), isChecked: true).ScopedBy(when));
+            Ensure(member).ItemFields.Add(new BrowserField(item, itemRules, Array.Empty<BrowserField>()).ScopedBy(when));
         }
 
         /// <summary>Adds the rules of each item of a collection member: a validator applied to every item.</summary>
@@ -184,7 +147,6 @@ namespace Alis.Reactive
             {
                 var target = field.PrefixedBy(prefix, when);
                 var entry = Ensure(target.Reference);
-                if (target.IsChecked) entry.Checked = true;
                 foreach (var rule in target.Rules)
                     AddRule(target.Reference, rule);
                 entry.ItemFields.AddRange(target.ItemFields);
@@ -193,14 +155,12 @@ namespace Alis.Reactive
 
         /// <summary>Every member the validator names, with its rules, where it first named it.</summary>
         public IReadOnlyList<BrowserField> Fields =>
-            _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields, entry.Checked)).ToArray();
+            _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields)).ToArray();
 
         private void AddRule(FieldReference field, BrowserRule rule)
         {
             Ensure(rule.Fields);
-            var entry = Ensure(field);
-            entry.Rules.Add(rule);
-            entry.Checked = true;
+            Ensure(field).Rules.Add(rule);
         }
 
         private void Ensure(IEnumerable<FieldReference> fields)
@@ -234,8 +194,6 @@ namespace Alis.Reactive
             }
 
             internal FieldReference Field { get; }
-
-            internal bool Checked { get; set; }
 
             internal List<BrowserRule> Rules { get; } = new List<BrowserRule>();
 

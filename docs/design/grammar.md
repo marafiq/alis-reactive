@@ -54,11 +54,11 @@ That is the whole document. The grammar names no feature.
   - A form's fields are `alis.form` data: `{ summary, fields: [{ name,
     tests: [{ check: fn(v, i), when: fn(i), message }] }] }`. `summary` is the id of the form's
     summary, `{formId}_validation_summary` (F6), the same whichever plan writes the form. A field is one
-    per member a rule is written on, and one per item field of a collection a rule checks, whether or not
-    the browser can check it (a rule under a condition only the server decides still names its members),
-    so `tests` is empty when every check is the server's. An item's field carries the checks of every
-    rule on its collection. A form the plan shows server errors for (F8) that no validator of the plan
-    names has no fields: its messages are placed by the mounted inputs inside it (M7). `name` is the
+    per member the browser checks, and one per item field of a collection whose items it checks; a
+    member whose every check is the server's has no field. An item's field carries the checks of every
+    rule on its collection. The server's messages are placed by the mounted inputs inside the form (M7,
+    F8), whether or not a field names them, so a form the plan shows server errors for that no validator
+    of the plan names has no fields. `name` is the
     binding name, under the view's field prefix, as the server reports it; an item field's name stands
     for every item, each index a `[*]` (`Contacts[*].Name`, M8), and the form checks each mounted input
     its name names (F1). `i` is the indexes of the item a test checks (`[]` for a member), which every

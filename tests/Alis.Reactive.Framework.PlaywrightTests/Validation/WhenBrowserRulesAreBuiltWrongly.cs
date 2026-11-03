@@ -25,7 +25,7 @@ public sealed class WhenBrowserRulesAreBuiltWrongly : AppPageTest
     [Test]
     public async Task the_items_of_a_member_that_holds_no_list_are_refused()
     {
-        await Render("DeclareItemsOfAMemberThatHoldsNone");
+        await Render("RuleTheItemsOfAMemberThatHoldsNone");
 
         await Expect(Message("'Guests' is not a collection.")).ToBeVisibleAsync();
     }

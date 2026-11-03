@@ -156,10 +156,6 @@
                 "message": "Name the resident."
               }
             ]
-          },
-          {
-            "name": "Age",
-            "tests": []
           }
         ]
       }

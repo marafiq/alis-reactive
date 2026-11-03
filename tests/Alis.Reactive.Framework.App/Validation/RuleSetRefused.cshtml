@@ -8,8 +8,8 @@
         case RuleSetMistake.NameARuleForACallOnAMember:
             rules.Add((VisitBooking x) => x.Visitor!.Trim(), BrowserRule.NotEmpty("Name the visitor."));
             break;
-        case RuleSetMistake.DeclareItemsOfAMemberThatHoldsNone:
-            rules.DeclareItems((VisitBooking x) => x.Guests);
+        case RuleSetMistake.RuleTheItemsOfAMemberThatHoldsNone:
+            rules.AddItemRules((VisitBooking x) => x.Guests, new[] { BrowserRule.NotEmpty("Name each guest.") }, Condition.Always);
             break;
         case RuleSetMistake.BoundARangeByTwoKindsOfValue:
             rules.Add((VisitBooking x) => x.Guests, BrowserRule.Between<IComparable>(1, new DateTime(2026, 1, 1), inclusive: true, "Out of range."));
