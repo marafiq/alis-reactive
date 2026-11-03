@@ -29,6 +29,9 @@
 
   <Target Name="BuildBrowserAssets" BeforeTargets="Build" Inputs="@(BrowserAssetInput)" Outputs="wwwroot\css\app.css;wwwroot\vendor\syncfusion\ej2.min.js">
     <Exec Command="npm run build" />
+    <!-- Tailwind leaves an output it would write unchanged as it was; stamping the outputs keeps the next
+         build incremental. -->
+    <Touch Files="wwwroot\css\app.css;wwwroot\vendor\syncfusion\ej2.min.js" />
   </Target>
 
 </Project>

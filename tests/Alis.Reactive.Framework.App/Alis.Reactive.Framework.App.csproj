@@ -33,6 +33,9 @@
     <Target Name="BuildBrowserAssets" BeforeTargets="Build" Condition="'$(BuildReactiveBrowserAssets)' != 'false'"
             Inputs="@(BrowserAssetInput)" Outputs="@(BrowserAssetOutput)">
         <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\.." Command="npm run build -w tests/Alis.Reactive.Framework.App" />
+        <!-- Tailwind leaves an output it would write unchanged as it was; stamping the outputs keeps the next
+             build incremental and the runner's freshness check true. -->
+        <Touch Files="@(BrowserAssetOutput)" />
     </Target>
 
 </Project>
