@@ -148,6 +148,11 @@ jobs:
       - name: Pack this run's packages, build the example against them, run it and drive it
         run: scripts/example.sh --smoke "$EXAMPLE_VERSION"
 
+      - name: Confirm the build left nothing git lists in the example
+        run: |
+          listed="$(git status --porcelain -- examples/resident-intake)"
+          if [ -n "$listed" ]; then printf '%s\n' "$listed"; echo "::error::the packages' delivery left files git lists in the example"; exit 1; fi
+
       - name: Upload the smoke's screenshot
         if: always()
         uses: actions/upload-artifact@v7

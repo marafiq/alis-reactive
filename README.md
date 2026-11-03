@@ -164,8 +164,10 @@ The app serves them with `app.UseStaticFiles()`, as the sandbox does. Running fr
 output outside Development needs `builder.WebHost.UseStaticWebAssets()`; a published app does not.
 
 On net48, link the copied files with `Url.Content("~/Content/AlisReactive/js/alis-reactive.js")`.
-They are build output: keep `Content\AlisReactive*\` out of source control, and include the folder
-as `Content` in the web project so publish deploys it. MVC 5 has no `asp-append-version`; bundle
+They are build output, and each `Content\{PackageId}\` folder carries a `.gitignore` the package
+writes, so git never lists them; include the folders as `Content` in the web project so publish
+deploys them. A copy an app committed before stays tracked, since an ignore never untracks a file:
+`git rm -r --cached` it once. MVC 5 has no `asp-append-version`; bundle
 them with System.Web.Optimization or add the package version to the URL to bust caches on upgrade.
 
 ## For UI developers — the design system
@@ -187,14 +189,14 @@ markup, and the brand on Syncfusion components, all scoped to `.alis-root`.
    ```
 
 3. **With your own Tailwind build, import the theme.** On every `dotnet build` the package copies
-   `theme.css` to `Styles/alis-reactive.theme.css` in your project (`<AlisReactiveTheme>` names another
-   path; `none` turns the copy off); keep the copy out of source control. Your stylesheet imports it
-   after Tailwind, so your utilities (`bg-primary`, `text-text-muted`, `border-border`) resolve to the
+   `theme.css` into `Styles/AlisReactive.DesignSystem/` in your project, a folder the package owns and
+   marks ignored with its own `.gitignore` (`<AlisReactiveThemeFolder>` names another folder; `none`
+   turns the copy off). Your stylesheet imports it after Tailwind, so your utilities (`bg-primary`, `text-text-muted`, `border-border`) resolve to the
    tokens the components read, and a later `@theme` block re-brands:
 
    ```css
    @import "tailwindcss";
-   @import "./alis-reactive.theme.css";
+   @import "./AlisReactive.DesignSystem/theme.css";
    @theme { --color-primary: #0f766e; }
    ```
 

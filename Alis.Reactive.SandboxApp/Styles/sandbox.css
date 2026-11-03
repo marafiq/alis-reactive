@@ -1,9 +1,9 @@
 /* The sandbox's stylesheet: Tailwind's utilities for its own views, resolved against the design
-   system's theme. AlisReactive.DesignSystem copies the theme to ./alis-reactive.theme.css on every
-   build (its .targets, imported by the csproj); the copy is build output. */
+   system's theme. AlisReactive.DesignSystem copies the theme into ./AlisReactive.DesignSystem/ on
+   every build (its .targets, imported by the csproj), a folder that ignores itself. */
 @import "tailwindcss" source(none);
 @plugin "@tailwindcss/forms";
-@import "./alis-reactive.theme.css";
+@import "./AlisReactive.DesignSystem/theme.css";
 
 @source "../Views/**/*.cshtml";
 @source "../Areas/**/*.cshtml";

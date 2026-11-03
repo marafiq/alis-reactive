@@ -2,7 +2,5 @@
 bin/
 obj/
 packages/
-# Browser files each package's net48 targets copy in at build: Content\{PackageId}\.
-Content/AlisReactive*/
 *.user
 *.suo

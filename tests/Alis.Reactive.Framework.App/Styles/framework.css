@@ -1,8 +1,8 @@
 /* The framework test app's stylesheet, as an app's: Tailwind over the theme the design system copies
-   to ./alis-reactive.theme.css on every build (its .targets, imported by the csproj; the copy is build
-   output). The pages use no utilities, so the build emits Preflight and the theme's tokens: the reset
+   into ./AlisReactive.DesignSystem/ on every build (its .targets, imported by the csproj; a folder that
+   ignores itself). The pages use no utilities, so the build emits Preflight and the theme's tokens: the reset
    and the brand a consumer's page has. */
 @import "tailwindcss" source(none);
-@import "./alis-reactive.theme.css";
+@import "./AlisReactive.DesignSystem/theme.css";
 
 @source "../**/*.cshtml";

@@ -10,8 +10,10 @@
     into the web project at Content\{PackageId}\. Link them from a view with
     Url.Content("~/Content/{PackageId}/{path}"), for example ~/Content/AlisReactive/js/alis-reactive.js.
 
-    The copied files are build output: keep Content\AlisReactive*\ out of source control, and include
-    the folder as Content in the web project so publish deploys it.
+    The copied files are build output and each folder says so itself: the target writes a .gitignore
+    into Content\{PackageId}\ that ignores everything there, only when it changes, so git never lists
+    the copies and the project configures nothing. Include the folders as Content in the web project so
+    publish deploys them.
 
     Every Alis.Reactive package imports this same file under its own name. The item gathers each
     package's files with that package's destination; the target is defined once per import, the last
@@ -21,6 +23,7 @@
   <ItemGroup>
     <AlisReactivePackageContent Include="$(MSBuildThisFileDirectory)..\..\staticwebassets\**\*">
       <DestinationFolder>$(MSBuildProjectDirectory)\Content\$(MSBuildThisFileName)\</DestinationFolder>
+      <PackageId>$(MSBuildThisFileName)</PackageId>
     </AlisReactivePackageContent>
   </ItemGroup>
 
@@ -28,6 +31,10 @@
     <Copy SourceFiles="@(AlisReactivePackageContent)"
           DestinationFiles="@(AlisReactivePackageContent->'%(DestinationFolder)%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="%(AlisReactivePackageContent.DestinationFolder).gitignore"
+                      Lines="# Written by %(AlisReactivePackageContent.PackageId) on every build: the browser files it ships, copied for IIS to serve. Build output, so git ignores this folder.;*"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
   </Target>
 
 </Project>

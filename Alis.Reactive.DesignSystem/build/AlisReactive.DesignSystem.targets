@@ -1,28 +1,34 @@
 <Project>
 
   <!--
-    Imported into every project that references AlisReactive.DesignSystem (NuGet: build\ and
-    buildTransitive\; the sandbox: an <Import> of this file). Before each build it copies the theme,
-    css/theme.css, into the project, so the project's own Tailwind stylesheet can `@import` it:
+    Imported into every .NET project that references AlisReactive.DesignSystem (NuGet: build\ and
+    buildTransitive\; the sandbox and the framework test app: an <Import> of this file). Before each build
+    it copies the theme, css/theme.css, into a folder the package owns, Styles\AlisReactive.DesignSystem\
+    under the project, so the project's own Tailwind stylesheet can `@import` it:
 
       @import "tailwindcss";
-      @import "./alis-reactive.theme.css";
+      @import "./AlisReactive.DesignSystem/theme.css";
 
-    The copy is build output: keep it out of source control. AlisReactiveTheme names where it lands
-    (default: Styles\alis-reactive.theme.css under the project); `none` turns the copy off. On .NET
-    Framework the same file lands at Content\AlisReactive.DesignSystem\css\theme.css with the
-    package's other browser assets (build\net48\AlisReactive.DesignSystem.targets), and this file is
-    not imported.
+    The folder is build output and says so itself: the package writes a .gitignore into it that ignores
+    everything there, so git never lists the copy and the project configures nothing. Both files are
+    written only when they change. AlisReactiveThemeFolder names another folder (the package owns it and
+    writes its .gitignore); `none` turns the copy off. On .NET Framework the theme lands at
+    Content\AlisReactive.DesignSystem\css\theme.css with the package's other browser assets
+    (build\net48\AlisReactive.DesignSystem.targets), and this file is not imported.
   -->
 
   <PropertyGroup>
-    <AlisReactiveTheme Condition="'$(AlisReactiveTheme)' == ''">$(MSBuildProjectDirectory)\Styles\alis-reactive.theme.css</AlisReactiveTheme>
+    <AlisReactiveThemeFolder Condition="'$(AlisReactiveThemeFolder)' == ''">$(MSBuildProjectDirectory)\Styles\AlisReactive.DesignSystem\</AlisReactiveThemeFolder>
     <_AlisReactiveThemeSource Condition="Exists('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css')">$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css</_AlisReactiveThemeSource>
     <_AlisReactiveThemeSource Condition="'$(_AlisReactiveThemeSource)' == ''">$(MSBuildThisFileDirectory)..\css\theme.css</_AlisReactiveThemeSource>
   </PropertyGroup>
 
-  <Target Name="CopyAlisReactiveTheme" BeforeTargets="BeforeBuild" Condition="'$(AlisReactiveTheme)' != 'none'">
-    <Copy SourceFiles="$(_AlisReactiveThemeSource)" DestinationFiles="$(AlisReactiveTheme)" SkipUnchangedFiles="true" />
+  <Target Name="CopyAlisReactiveTheme" BeforeTargets="BeforeBuild" Condition="'$(AlisReactiveThemeFolder)' != 'none'">
+    <Copy SourceFiles="$(_AlisReactiveThemeSource)" DestinationFolder="$(AlisReactiveThemeFolder)" SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$([MSBuild]::EnsureTrailingSlash('$(AlisReactiveThemeFolder)')).gitignore"
+                      Lines="# Written by AlisReactive.DesignSystem on every build: the theme it ships, for this project's stylesheet to import. Build output, so git ignores this folder.;*"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
   </Target>
 
 </Project>

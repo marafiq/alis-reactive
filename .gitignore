@@ -24,26 +24,18 @@ TestResults/
 # sandbox's copy of the Syncfusion files it links (copy-vendor.mjs).
 Alis.Reactive.Assets/dist/
 Alis.Reactive.DesignSystem/dist/
-Alis.Reactive.SandboxApp/Styles/alis-reactive.theme.css
 Alis.Reactive.SandboxApp/wwwroot/vendor/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.css
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 
-# On .NET Framework each AlisReactive package copies its browser assets into the
-# web project's Content\{PackageId}\ after every build
-# (build/AlisReactiveNetFrameworkContent.targets). The package is the source of
-# truth; tracked copies only produce phantom diffs.
-examples/net48-mvc-smoke/Content/AlisReactive*/
 # The framework test app's components bundle and stylesheet, built by its own npm build before each
-# dotnet build, and the theme the design system copies into it.
+# dotnet build.
 tests/Alis.Reactive.Framework.App/wwwroot/js/
 tests/Alis.Reactive.Framework.App/wwwroot/css/
-tests/Alis.Reactive.Framework.App/Styles/alis-reactive.theme.css
-# The example builds as an app outside this repository would (scripts/example.sh): the theme the
-# design system copies into it, its stylesheet, its Syncfusion copy and the smoke's output.
-examples/resident-intake/Styles/alis-reactive.theme.css
+# The example builds as an app outside this repository would (scripts/example.sh): its stylesheet,
+# its Syncfusion copy and the smoke's output.
 examples/resident-intake/wwwroot/css/app.css
 examples/resident-intake/wwwroot/vendor/
 examples/resident-intake/ci/app.log

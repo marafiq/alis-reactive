@@ -106,6 +106,9 @@ jobs:
           if (-not (Test-Path "$dir/AlisReactive.Native/css/native.css")) { throw "Native CSS did not land in Content\AlisReactive.Native\css" }
           if (-not (Test-Path "$dir/AlisReactive.DesignSystem/css/design-system.css")) { throw "design-system CSS did not land in Content\AlisReactive.DesignSystem\css" }
           if (-not (Test-Path "$dir/AlisReactive.DesignSystem/css/theme.css")) { throw "the theme did not land in Content\AlisReactive.DesignSystem\css" }
+          # Each package marks its folder ignored; the build leaves nothing git lists (Web.config is rewritten later).
+          $listed = git status --porcelain -- examples/net48-mvc-smoke
+          if ($listed) { $listed; throw "the packages' delivery left files git lists in the smoke app" }
 
       - name: Generate web.config binding redirects from the built bin assemblies
         shell: pwsh
