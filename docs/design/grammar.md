@@ -830,8 +830,9 @@ validator instance the server resolves for that request.
 ### 7.2 Server-only by what a rule is
 
 A rule reaches the browser unless something in it only the server can do. No list is kept:
-- `Must` and `MustAsync` are C# (a lookup, a service); they have no browser term. A validator that holds
-  a `MustAsync` rule validates with `ValidateAsync`; its `Validate` refuses, naming `ValidateAsync`.
+- `Must`, `MustAsync`, `Custom` and `CustomAsync` are C# (a lookup, a service); they have no browser term. A
+  validator that holds a rule that waits validates with `ValidateAsync`; its `Validate` refuses, naming
+  `ValidateAsync`. A `Custom` check adds its own failures, under the member or another member of the model.
 - `WithMessage(model => ...)` builds its text from the model; only the server can say it.
 - A message with nothing left to say once the sentence naming the entered value is dropped.
 - `Matches` with an option JavaScript lacks or syntax it reads differently (`\A`, `\z`, `\G`,
@@ -877,6 +878,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 | `IsInEnum` | null passes; a declared value, or for a `[Flags]` enum a combination of them | `v == null` or `matches(v, pattern, "i")`, the pattern naming every declared name and number with the whitespace the server's binding ignores; a `[Flags]` enum: none, server-only |
 | `SetValidator`, `ChildRules`, `RuleForEach(..).SetValidator`, `Include` | the child's rules, paths prefixed | the child's browser rules, prefixed, under the enclosing conditions |
 | `Must`, `MustAsync` | the predicate | none: server-only |
+| `Custom`, `CustomAsync` | the check's own failures, under the member or another member of the model | none: server-only; the member is declared, so the server's answer lands beside its input |
 
 - **Custom checks** are extension methods that compose the vocabulary, so they run in both places:
   `WristbandCode()` is `Matches(@"^WB-\d{6}$").WithMessage(..)`

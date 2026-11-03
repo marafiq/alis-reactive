@@ -296,6 +296,23 @@ namespace Alis.Reactive
         public static IRuleBuilderOptions<T, TProperty> MustAsync<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Func<T, TProperty, CancellationToken, Task<bool>> predicate) =>
             Add(rule, new AsyncPredicateCheck<T, TProperty>(predicate));
 
+        /// <summary>
+        /// A C# check that adds its own failures, each with its own message, under the member or under another
+        /// member of the model. Only the server runs C#, so only the server checks it.
+        /// </summary>
+        public static IRuleBuilderOptions<T, TProperty> Custom<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Action<TProperty, CustomContext<T>> check)
+        {
+            if (check == null) throw new ArgumentNullException(nameof(check));
+            return RuleTarget.Of(rule).Add(new CustomPart<T, TProperty>((value, context, _) => { check(value, context); return Task.CompletedTask; }, waits: false));
+        }
+
+        /// <summary>A C# check that waits (a database, a service) and adds its own failures. Only the server checks it, in <c>ValidateAsync</c>.</summary>
+        public static IRuleBuilderOptions<T, TProperty> CustomAsync<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Func<TProperty, CustomContext<T>, CancellationToken, Task> check)
+        {
+            if (check == null) throw new ArgumentNullException(nameof(check));
+            return RuleTarget.Of(rule).Add(new CustomPart<T, TProperty>(check, waits: true));
+        }
+
         // ---- Nested objects --------------------------------------------------------------------------
 
         /// <summary>Rules for the members of a nested object, written in place; the browser runs those it can.</summary>

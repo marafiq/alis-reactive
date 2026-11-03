@@ -200,7 +200,13 @@ namespace Alis.Reactive.Validation
         public IRuleBuilderOptions<T, TValue> Add(Check<T, TValue> check)
         {
             if (check == null) throw new ArgumentNullException(nameof(check));
-            Parts.Add(new CheckPart<T, TValue>(check));
+            return Add(new CheckPart<T, TValue>(check));
+        }
+
+        public IRuleBuilderOptions<T, TValue> Add(RulePart<T, TValue> part)
+        {
+            if (part == null) throw new ArgumentNullException(nameof(part));
+            Parts.Add(part);
             return this;
         }
 
@@ -281,9 +287,13 @@ namespace Alis.Reactive.Validation
             return this;
         }
 
-        private CheckPart<T, TValue> LastCheck(string option) =>
-            Parts.LastOrDefault() as CheckPart<T, TValue>
-            ?? throw new InvalidOperationException($"{option} names the check written just before it; write a check first, like .NotEmpty().{option}(..).");
+        private CheckPart<T, TValue> LastCheck(string option)
+        {
+            if (Parts.LastOrDefault() is CheckPart<T, TValue> check) return check;
+            if (Parts.LastOrDefault() is CustomPart<T, TValue>)
+                throw new InvalidOperationException($"{option} has nothing to say after Custom: a custom check names its messages where it adds a failure, context.AddFailure(..).");
+            throw new InvalidOperationException($"{option} names the check written just before it; write a check first, like .NotEmpty().{option}(..).");
+        }
     }
 
     /// <summary><c>RuleFor(x =&gt; x.Member)</c>: the checks of one member.</summary>
@@ -313,7 +323,7 @@ namespace Alis.Reactive.Validation
             foreach (var part in Parts)
             {
                 var failures = run.Failures.Count;
-                await part.Validate(instance, value, prefix + FieldPath, FieldDisplayName, run).ConfigureAwait(false);
+                await part.Validate(instance, value, prefix, FieldPath, FieldDisplayName, run).ConfigureAwait(false);
                 if (StopsAtFirstFailure && run.Failures.Count > failures) return;
             }
         }
@@ -327,7 +337,7 @@ namespace Alis.Reactive.Validation
                 if (TryBrowserCondition(part, out var when)) part.DescribeFor(browser, Member, FieldDisplayName, when);
                 else if (part is ChildPart<T, TValue> child) child.DeclareFor(browser, Member);
             }
-            if (Parts.Any(part => part is CheckPart<T, TValue>))
+            if (Parts.Any(part => part is CheckPart<T, TValue> || part is CustomPart<T, TValue>))
                 browser.Declare(Member.Expression);
         }
     }
@@ -348,11 +358,11 @@ namespace Alis.Reactive.Validation
             var index = 0;
             foreach (var item in items)
             {
-                var path = prefix + FieldPath + "[" + index++ + "]";
+                var path = FieldPath + "[" + index++ + "]";
                 foreach (var part in Parts)
                 {
                     var failures = run.Failures.Count;
-                    await part.Validate(instance, item, path, FieldDisplayName, run).ConfigureAwait(false);
+                    await part.Validate(instance, item, prefix, path, FieldDisplayName, run).ConfigureAwait(false);
                     if (StopsAtFirstFailure && run.Failures.Count > failures) break;
                 }
             }
@@ -415,9 +425,35 @@ namespace Alis.Reactive.Validation
 
         internal abstract bool IsAsync { get; }
 
-        internal abstract Task Validate(T instance, TValue value, string path, string displayName, ValidationRun run);
+        internal abstract Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run);
 
         internal abstract void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when);
+    }
+
+    /// <summary>A C# check that adds its own failures, under the member or another: the server's alone.</summary>
+    internal sealed class CustomPart<T, TValue> : RulePart<T, TValue>
+    {
+        private readonly Func<TValue, CustomContext<T>, CancellationToken, Task> _check;
+        private readonly bool _waits;
+
+        internal CustomPart(Func<TValue, CustomContext<T>, CancellationToken, Task> check, bool waits)
+        {
+            _check = check ?? throw new ArgumentNullException(nameof(check));
+            _waits = waits;
+        }
+
+        internal override bool IsAsync => _waits;
+
+        internal override async Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run)
+        {
+            if (!Conditions.Hold(instance)) return;
+            var arguments = new MessageArguments(displayName).With("PropertyValue", value);
+            await _check(value, new CustomContext<T>(instance, run, prefix, fieldPath, arguments), run.Cancellation).ConfigureAwait(false);
+        }
+
+        internal override void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when)
+        {
+        }
     }
 
     internal sealed class CheckPart<T, TValue> : RulePart<T, TValue>
@@ -434,7 +470,7 @@ namespace Alis.Reactive.Validation
 
         internal override bool IsAsync => _check.IsAsync;
 
-        internal override async Task Validate(T instance, TValue value, string path, string displayName, ValidationRun run)
+        internal override async Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run)
         {
             if (!Conditions.Hold(instance)) return;
             var arguments = new MessageArguments(displayName).With("PropertyValue", value);
@@ -442,7 +478,7 @@ namespace Alis.Reactive.Validation
             var passes = run.Synchronous
                 ? _check.Passes(instance, value, arguments)
                 : await _check.PassesAsync(instance, value, arguments, run.Cancellation).ConfigureAwait(false);
-            if (!passes) run.Fail(path, Message.For(instance, arguments));
+            if (!passes) run.Fail(prefix + fieldPath, Message.For(instance, arguments));
         }
 
         // A check reaches the browser when the vocabulary has its term and its message is known before any
@@ -488,10 +524,10 @@ namespace Alis.Reactive.Validation
         internal override bool IsAsync => _child is ReactiveValidator rules && rules.IsAsync;
 
         // A missing value has no members to validate; NotNull says it is missing.
-        internal override async Task Validate(T instance, TValue value, string path, string displayName, ValidationRun run)
+        internal override async Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run)
         {
             if (!Conditions.Hold(instance) || value == null) return;
-            await Validators.Run(_child, value, path + ".", run).ConfigureAwait(false);
+            await Validators.Run(_child, value, prefix + fieldPath + ".", run).ConfigureAwait(false);
         }
 
         internal override void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when)

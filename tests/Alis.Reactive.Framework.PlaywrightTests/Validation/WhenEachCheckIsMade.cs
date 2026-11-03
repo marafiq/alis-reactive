@@ -244,6 +244,28 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     }
 
     [Test]
+    public async Task a_custom_check_is_the_servers_and_its_failure_comes_back_beside_the_member_with_its_name_and_value()
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Code", new() { Exact = true }).FillAsync("taken");
+        await Save();
+        await Expect(Field("Code").GetByText("'Code' cannot be taken.", new() { Exact = true })).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make this check, so the request goes");
+        await Expect(Saved).ToHaveTextAsync("");
+    }
+
+    [Test]
+    public async Task a_custom_checks_failure_under_another_member_comes_back_beside_that_member()
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Code", new() { Exact = true }).FillAsync("pinned");
+        await Save();
+        await Expect(Field("Pin").GetByText("Give the pin that goes with the code.")).ToBeVisibleAsync();
+        await Expect(Field("Code").GetByText("Give the pin that goes with the code.")).ToBeHiddenAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make this check, so the request goes");
+    }
+
+    [Test]
     public async Task a_rule_that_continues_after_a_failing_check_answers_with_every_failing_check_one_after_another()
     {
         await Open("/Validation/Checks");

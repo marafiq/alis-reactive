@@ -122,7 +122,11 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
     {
         RuleFor(x => x.Count).NotNull().WithMessage("Give a count.");
         RuleFor(x => x.Spare).Empty().WithMessage("Leave the spare field empty.");
-        RuleFor(x => x.Code).MinimumLength(3).WithMessage("Use at least 3 characters.");
+        RuleFor(x => x.Code).MinimumLength(3).WithMessage("Use at least 3 characters.").Custom((code, context) =>
+        {
+            if (code == "taken") context.AddFailure("'{PropertyName}' cannot be {PropertyValue}.");
+            if (code == "pinned") context.AddFailure(x => x.Pin, "Give the pin that goes with the code.");
+        });
         RuleFor(x => x.Pin).Length(4).WithMessage("Use exactly 4 characters.");
         RuleFor(x => x.Nickname).Length(2, 5).WithMessage("Use 2 to 5 characters.");
         RuleFor(x => x.Website).Url().WithMessage("Give a web address.");

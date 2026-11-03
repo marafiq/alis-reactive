@@ -118,6 +118,18 @@ public sealed class DependentAdmissionRules : ReactiveValidator<Admission>
     }
 }
 
+/// <summary>A check written in C# with failures of its own.</summary>
+public sealed class CustomAdmissionRules : ReactiveValidator<Admission>
+{
+    public CustomAdmissionRules()
+    {
+        RuleFor(x => x.Name).Custom((name, context) =>
+        {
+            if (name == "Nobody") context.AddFailure("Name a person.");
+        });
+    }
+}
+
 /// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
 public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
 {

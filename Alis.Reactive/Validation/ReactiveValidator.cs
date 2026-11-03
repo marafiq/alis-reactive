@@ -62,8 +62,8 @@ namespace Alis.Reactive
     /// otherwise they are the server's.
     /// </para>
     /// <para>
-    /// Some rules only the server can check, and they stay there by what they are: <c>Must</c> and
-    /// <c>MustAsync</c> (C# code, a database lookup), a message built from the model, a pattern with .NET-only
+    /// Some rules only the server can check, and they stay there by what they are: <c>Must</c>, <c>MustAsync</c>,
+    /// <c>Custom</c> and <c>CustomAsync</c> (C# code, a database lookup), a message built from the model, a pattern with .NET-only
     /// syntax, and a rule under a condition declared the server's (<c>WhenOnServer</c>, <c>UnlessOnServer</c>).
     /// <c>.ServerOnly()</c> keeps any other rule on the server, for a member the page has no input for. A
     /// condition the browser cannot read that is not declared the server's is refused when a page describes

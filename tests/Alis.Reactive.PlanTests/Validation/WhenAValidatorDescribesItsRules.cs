@@ -127,4 +127,18 @@ public class WhenAValidatorDescribesItsRules
         Assert.That(name["when"]!.ToJsonString(), Is.EqualTo("""{"kind":"fn","params":["i"],"body":{"kind":"lit","value":true}}"""), "the name's own test applies always");
         Golden.Matches(rendered, "Validation", nameof(a_dependent_rule_applies_in_the_browser_only_while_the_rule_before_it_passes));
     }
+
+    [Test]
+    public void a_custom_check_declares_its_member_to_the_page_and_leaves_it_no_test()
+    {
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<CustomAdmissionRules>());
+        html.TextInput(plan, m => m.Name);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<CustomAdmissionRules>("admission")));
+
+        var rendered = html.Rendered(plan);
+
+        var field = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Name")!;
+        Assert.That(field["tests"]!.AsArray(), Is.Empty);
+        Golden.Matches(rendered, "Validation", nameof(a_custom_check_declares_its_member_to_the_page_and_leaves_it_no_test));
+    }
 }
