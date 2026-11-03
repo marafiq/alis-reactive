@@ -75,4 +75,24 @@ public class WhenAValidatorDescribesItsRules
         Assert.That(patterns, Is.EqualTo(new[] { @"^\s*(?:Independent|Assisted|Memory|0|1|2)\s*$" }));
         Golden.Matches(rendered, "Validation", nameof(an_enum_check_is_the_pattern_of_every_value_the_server_binds_with_its_default_message));
     }
+
+    [Test]
+    public void a_digit_count_is_the_pattern_of_the_number_the_page_binds_which_carries_no_trailing_zero()
+    {
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<DepositRules>());
+        html.TextInput(plan, m => m.Deposit);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<DepositRules>("admission")));
+
+        var rendered = html.Rendered(plan);
+
+        var field = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Deposit")!;
+        var test = field["tests"]!.AsArray().Single()!;
+        Assert.That(test["message"]!.GetValue<string>(), Is.EqualTo("'Deposit' must not be more than 5 digits in total, with allowance for 2 decimals."));
+        var patterns = test["check"]!.Nodes().OfType<JsonObject>()
+            .Select(node => node["value"] as JsonValue)
+            .Select(value => value != null && value.TryGetValue<string>(out var text) ? text : null)
+            .Where(text => text != null && text.StartsWith("^", StringComparison.Ordinal));
+        Assert.That(patterns, Is.EqualTo(new[] { @"^-?(?:0|[1-9]\d{0,2})(?:\.\d{1,2})?$" }));
+        Golden.Matches(rendered, "Validation", nameof(a_digit_count_is_the_pattern_of_the_number_the_page_binds_which_carries_no_trailing_zero));
+    }
 }

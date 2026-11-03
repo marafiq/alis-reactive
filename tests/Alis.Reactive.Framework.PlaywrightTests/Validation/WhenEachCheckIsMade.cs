@@ -67,6 +67,12 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     [TestCase("Later", "soon", "2026-10-03", "Later comes after earlier.", TestName = "an_ordered_date_check_refuses_text_that_is_no_date")]
     [TestCase("Menu", "7", "Pureed", "Pick a menu on the list.", TestName = "an_enum_check_refuses_a_number_that_names_no_value_and_takes_a_name")]
     [TestCase("Menu", "Vegan", "lowsodium", "Pick a menu on the list.", TestName = "an_enum_check_refuses_an_unknown_name_and_takes_a_name_in_any_case")]
+    [TestCase("Price", "1234.5", "123.45", "Up to five digits, two of them decimals.", TestName = "a_digit_count_refuses_a_fourth_digit_before_the_point_and_takes_three")]
+    [TestCase("Price", "12.345", "0.05", "Up to five digits, two of them decimals.", TestName = "a_digit_count_refuses_a_third_decimal_and_takes_two")]
+    [TestCase("Rate", "1.34", "0.34", "Decimals only, two at most.", TestName = "a_digit_count_of_decimals_alone_refuses_a_digit_before_the_point_and_takes_none")]
+    [TestCase("Rate", "1", "0", "Decimals only, two at most.", TestName = "a_digit_count_of_decimals_alone_refuses_a_whole_number_and_takes_zero")]
+    [TestCase("Discount", "156.3", "12.34", "'Discount' must not be more than 4 digits in total, with allowance for 2 decimals.", TestName = "a_digit_counts_default_message_reaches_the_browser_without_the_digits_it_found")]
+    [TestCase("Discount", "1.2345", "1.230", "'Discount' must not be more than 4 digits in total, with allowance for 2 decimals.", TestName = "a_trailing_zero_never_reaches_the_server_through_the_form_so_a_count_of_them_takes_it")]
     public async Task a_check_refuses_what_its_rule_refuses_and_takes_what_it_takes(string field, string refused, string taken, string message)
     {
         await Open("/Validation/Checks");
@@ -114,6 +120,37 @@ public sealed class WhenEachCheckIsMade : AppPageTest
         await Save();
         await Expect(Saved).ToHaveTextAsync("saved");
         await Expect(Field("Diets").GetByText("Diets on the list only.")).ToBeHiddenAsync();
+    }
+
+    private const string FourDigitsTwoDecimals = "'Fee' must not be more than 4 digits in total, with allowance for 2 decimals.";
+
+    [TestCase("123.456778", "9 digits and 6 decimals were found.")]
+    [TestCase("12.3414", "6 digits and 4 decimals were found.")]
+    [TestCase("1.344", "4 digits and 3 decimals were found.")]
+    [TestCase("156.3", "5 digits and 2 decimals were found.")]
+    [TestCase("0.003", "4 digits and 3 decimals were found.")]
+    [TestCase("0.030303", "7 digits and 6 decimals were found.")]
+    public async Task a_digit_count_the_server_alone_makes_refuses_what_fluentvalidation_refuses_and_says_what_it_found(string refused, string found)
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Fee", new() { Exact = true }).FillAsync(refused);
+        await Save();
+        await Expect(Field("Fee").GetByText(FourDigitsTwoDecimals + " " + found, new() { Exact = true })).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the page does not carry this rule, so the request goes");
+        await Expect(Saved).ToHaveTextAsync("");
+    }
+
+    [TestCase("12.34")]
+    [TestCase("2.34")]
+    [TestCase("-2.34")]
+    [TestCase("0.34")]
+    [TestCase("0.04")]
+    public async Task a_digit_count_the_server_alone_makes_takes_what_fluentvalidation_takes(string taken)
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Fee", new() { Exact = true }).FillAsync(taken);
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
     }
 
     [Test]

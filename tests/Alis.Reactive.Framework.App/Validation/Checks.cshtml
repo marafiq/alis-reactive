@@ -44,6 +44,10 @@
     @{ Html.InputField(plan, m => m.Called, o => o.Label("Called")).Entry(); }
     @{ Html.InputField(plan, m => m.Menu, o => o.Label("Menu")).Entry(); }
     @{ Html.InputField(plan, m => m.Diets, o => o.Label("Diets")).Entry(); }
+    @{ Html.InputField(plan, m => m.Price, o => o.Label("Price")).Entry(); }
+    @{ Html.InputField(plan, m => m.Rate, o => o.Label("Rate")).Entry(); }
+    @{ Html.InputField(plan, m => m.Discount, o => o.Label("Discount")).Entry(); }
+    @{ Html.InputField(plan, m => m.Fee, o => o.Label("Fee")).Entry(); }
 </div>
 
 <p>Saved: <span id="saved"></span></p>

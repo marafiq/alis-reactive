@@ -17,6 +17,7 @@ public sealed class Admission
     public List<string> Tags { get; set; } = new();
 
     public Contact NextOfKin { get; set; } = new();
+    public decimal Deposit { get; set; }
 }
 
 public enum CareLevel
@@ -80,7 +81,7 @@ public sealed class AdmissionRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
+/// <summary>The care level is a value the enum declares.</summary>
 public sealed class CareLevelRules : ReactiveValidator<Admission>
 {
     public CareLevelRules()
@@ -89,6 +90,16 @@ public sealed class CareLevelRules : ReactiveValidator<Admission>
     }
 }
 
+/// <summary>The deposit has at most five digits, two of them decimals, every trailing zero counted.</summary>
+public sealed class DepositRules : ReactiveValidator<Admission>
+{
+    public DepositRules()
+    {
+        RuleFor(x => x.Deposit).PrecisionScale(5, 2, ignoreTrailingZeros: false);
+    }
+}
+
+/// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
 public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
 {
     public UnreadableAdmissionRules()

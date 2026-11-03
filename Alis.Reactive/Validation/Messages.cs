@@ -67,9 +67,9 @@ namespace Alis.Reactive.Validation
         // {Name} or {Name:format}.
         private static readonly Regex Placeholder = new Regex(@"\{([^{}:]+)(?::([^{}]+))?\}", RegexOptions.CultureInvariant);
 
-        // A sentence naming what only the checked value knows ({PropertyValue}, {TotalLength}).
+        // A sentence naming what only the checked value knows ({PropertyValue}, {TotalLength}, {Digits}, {ActualScale}).
         private static readonly Regex ValueSentence =
-            new Regex(@"\s*[^.]*\{(PropertyValue|TotalLength)(:[^{}]+)?\}[^.]*\.", RegexOptions.CultureInvariant);
+            new Regex(@"\s*[^.]*\{(PropertyValue|TotalLength|Digits|ActualScale)(:[^{}]+)?\}[^.]*\.", RegexOptions.CultureInvariant);
 
         private readonly Dictionary<string, object?> _values = new Dictionary<string, object?>(StringComparer.Ordinal);
 
@@ -120,6 +120,7 @@ namespace Alis.Reactive.Validation
         internal const string ExclusiveBetween = "'{PropertyName}' must be between {From} and {To} (exclusive). You entered {PropertyValue}.";
         internal const string Predicate = "The specified condition was not met for '{PropertyName}'.";
         internal const string InEnum = "'{PropertyName}' is not a known value.";
+        internal const string PrecisionScale = "'{PropertyName}' must not be more than {ExpectedPrecision} digits in total, with allowance for {ExpectedScale} decimals. {Digits} digits and {ActualScale} decimals were found.";
     }
 
     /// <summary>How a field is named in a message: <c>AdmissionDate</c> reads "Admission Date".</summary>

@@ -241,6 +241,22 @@ namespace Alis.Reactive
             where TProperty : struct, IComparable<TProperty>, IComparable =>
             Add(rule, new BetweenCheck<T, TProperty?>(from, to, inclusive: false));
 
+        // ---- Decimals ------------------------------------------------------------------------------
+
+        /// <summary>
+        /// At most <paramref name="precision"/> digits, <paramref name="scale"/> of them decimals, counted as
+        /// FluentValidation counts them; the trailing zeros of the decimals count unless
+        /// <paramref name="ignoreTrailingZeros"/>. The browser makes the check as a pattern over the number the page
+        /// binds, which carries no trailing zero either way; the server alone decides when the digits would not print
+        /// in place (more than 21 before the point or 6 after).
+        /// </summary>
+        public static IRuleBuilderOptions<T, decimal> PrecisionScale<T>(this IRuleBuilder<T, decimal> rule, int precision, int scale, bool ignoreTrailingZeros) =>
+            Add(rule, new PrecisionScaleCheck<T, decimal>(precision, scale, ignoreTrailingZeros));
+
+        /// <summary>At most <paramref name="precision"/> digits, <paramref name="scale"/> of them decimals, or nothing.</summary>
+        public static IRuleBuilderOptions<T, decimal?> PrecisionScale<T>(this IRuleBuilder<T, decimal?> rule, int precision, int scale, bool ignoreTrailingZeros) =>
+            Add(rule, new PrecisionScaleCheck<T, decimal?>(precision, scale, ignoreTrailingZeros));
+
         // ---- Enums ---------------------------------------------------------------------------------
 
         /// <summary>

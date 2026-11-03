@@ -380,6 +380,80 @@ namespace Alis.Reactive.Validation
 
     /// <summary>A C# predicate: the server's alone.</summary>
     /// <summary>
+    /// A decimal of at most <c>precision</c> digits, <c>scale</c> of them decimals, counted as FluentValidation counts
+    /// them: the mantissa's digits, with the trailing zeros of the decimals dropped when asked. The page binds the
+    /// value under the number shape, which carries no trailing zero, and the server receives that number; so the
+    /// browser's pattern is the server's count either way. The server alone decides when the digits would not print
+    /// in place (more than 21 before the point or 6 after, where JavaScript prints an exponent).
+    /// </summary>
+    internal sealed class PrecisionScaleCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
+    {
+        private const int IntegerDigitsPrinted = 21;
+        private const int DecimalsPrinted = 6;
+        private readonly int _precision;
+        private readonly int _scale;
+        private readonly bool _ignoreTrailingZeros;
+
+        internal PrecisionScaleCheck(int precision, int scale, bool ignoreTrailingZeros)
+        {
+            if (scale < 0) throw new ArgumentOutOfRangeException(nameof(scale), $"A scale counts decimals and cannot be negative; this one is {scale}.");
+            if (precision < 0) throw new ArgumentOutOfRangeException(nameof(precision), $"A precision counts digits and cannot be negative; this one is {precision}.");
+            if (precision < scale) throw new ArgumentOutOfRangeException(nameof(scale), $"PrecisionScale({precision}, {scale}) has more decimals than digits: the scale is at most the precision.");
+            _precision = precision;
+            _scale = scale;
+            _ignoreTrailingZeros = ignoreTrailingZeros;
+        }
+
+        internal override string Template => Templates.PrecisionScale;
+
+        internal override bool Passes(T instance, TValue value, MessageArguments arguments)
+        {
+            if (value == null) return true;
+            var (scale, digits) = Count((decimal)(object)value);
+            var integerDigits = digits - scale;
+            if (scale <= _scale && integerDigits <= _precision - _scale) return true;
+            // The digits as if the value were padded to the expected decimals, so that 123 under (3, 2) reads as 5 digits.
+            var printedScale = Math.Max(scale, _scale);
+            arguments.With("Digits", Math.Max(integerDigits, 1) + printedScale).With("ActualScale", printedScale);
+            return false;
+        }
+
+        internal override void NameRenderArguments(MessageArguments arguments) =>
+            arguments.With("ExpectedPrecision", _precision).With("ExpectedScale", _scale);
+
+        public IEnumerable<BrowserRule> ForBrowser(string message)
+        {
+            var integerDigits = _precision - _scale;
+            if (integerDigits > IntegerDigitsPrinted || _scale > DecimalsPrinted) return Array.Empty<BrowserRule>();
+            var integerPart = integerDigits == 0 ? "0" : "(?:0|[1-9]\\d{0," + (integerDigits - 1) + "})";
+            var decimals = _scale == 0 ? "" : "(?:\\.\\d{1," + _scale + "})?";
+            return new[] { BrowserRule.Matches("^-?" + integerPart + decimals + "$", "", message) };
+        }
+
+        private (int Scale, int Digits) Count(decimal value)
+        {
+            var bits = decimal.GetBits(value);
+            var scale = (bits[3] >> 16) & 0x7F;
+            var mantissa = new decimal(bits[0], bits[1], bits[2], false, 0);
+            if (_ignoreTrailingZeros)
+            {
+                while (scale > 0 && mantissa % 10 == 0)
+                {
+                    mantissa /= 10;
+                    scale--;
+                }
+            }
+            var digits = 0;
+            while (mantissa >= 1)
+            {
+                digits++;
+                mantissa /= 10;
+            }
+            return (scale, digits);
+        }
+    }
+
+    /// <summary>
     /// A value the enum declares, as the server binds one: a name, in any case, or the number of one. A
     /// <c>[Flags]</c> enum takes any combination of its values, which the server alone checks.
     /// </summary>

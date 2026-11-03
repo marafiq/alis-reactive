@@ -868,6 +868,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 | comparison with a literal | ordered: null passes; equality: no null skip | ordered: `v == null` or `v op literal`; equality: `v op literal` |
 | comparison with another member | the member is read by its path from the model | the peer is read by that path; ordered: `v == null` or (peer present and `v op peer`); equality: `v op peer` |
 | `InclusiveBetween`, `ExclusiveBetween` | null passes; within the bounds; bounds written upper first are refused where the validator is built | `v == null` or within the bounds |
+| `PrecisionScale` | null passes; the mantissa's digits and decimals as FluentValidation counts them, the trailing zeros of the decimals dropped when ignored | `v == null` or `matches(v, pattern, )` over the number's text, which carries no trailing zero (the number shape binds it, 2.1) and so counts as the server counts either way; none, server-only, when the digits would not print in place (more than 21 before the point or 6 after) |
 | `IsInEnum` | null passes; a declared value, or for a `[Flags]` enum a combination of them | `v == null` or `matches(v, pattern, "i")`, the pattern naming every declared name and number with the whitespace the server's binding ignores; a `[Flags]` enum: none, server-only |
 | `SetValidator`, `ChildRules`, `RuleForEach(..).SetValidator`, `Include` | the child's rules, paths prefixed | the child's browser rules, prefixed, under the enclosing conditions |
 | `Must`, `MustAsync` | the predicate | none: server-only |

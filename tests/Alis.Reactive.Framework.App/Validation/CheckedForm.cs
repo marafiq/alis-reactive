@@ -80,6 +80,10 @@ public sealed class CheckedForm
     public Contact Contact { get; set; } = new();
     public MealMenu Menu { get; set; } = MealMenu.Regular;
     public Diets Diets { get; set; } = Diets.None;
+    public decimal Price { get; set; } = 1.5m;
+    public decimal Rate { get; set; } = 0.5m;
+    public decimal Discount { get; set; } = 1.5m;
+    public decimal Fee { get; set; } = 1.5m;
 }
 
 /// <summary>What a guest does not eat: any combination, which only the server can tell from a number.</summary>
@@ -146,5 +150,9 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
         RuleFor(x => x.Contact).SetValidator(new ContactRules());
         RuleFor(x => x.Menu).IsInEnum().WithMessage("Pick a menu on the list.");
         RuleFor(x => x.Diets).IsInEnum().WithMessage("Diets on the list only.");
+        RuleFor(x => x.Price).PrecisionScale(5, 2, ignoreTrailingZeros: true).WithMessage("Up to five digits, two of them decimals.");
+        RuleFor(x => x.Rate).PrecisionScale(2, 2, ignoreTrailingZeros: true).WithMessage("Decimals only, two at most.");
+        RuleFor(x => x.Discount).PrecisionScale(4, 2, ignoreTrailingZeros: false);
+        RuleFor(x => x.Fee).PrecisionScale(4, 2, ignoreTrailingZeros: false).ServerOnly();
     }
 }

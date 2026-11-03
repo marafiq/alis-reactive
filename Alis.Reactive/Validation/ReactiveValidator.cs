@@ -51,8 +51,8 @@ namespace Alis.Reactive
     /// The browser runs <c>NotNull</c>, <c>NotEmpty</c>, <c>Empty</c>, <c>MinimumLength</c>,
     /// <c>MaximumLength</c>, <c>Length</c>, <c>EmailAddress</c>, <c>Url</c>, <c>CreditCard</c>,
     /// <c>Matches</c> (a pattern JavaScript reads the same way), the comparisons with a value or another
-    /// member, <c>InclusiveBetween</c>, <c>ExclusiveBetween</c> and <c>IsInEnum</c> (a <c>[Flags]</c> enum stays on
-    /// the server); <c>SetValidator</c>, <c>ChildRules</c>,
+    /// member, <c>InclusiveBetween</c>, <c>ExclusiveBetween</c>, <c>IsInEnum</c> (a <c>[Flags]</c> enum stays on the
+    /// server) and <c>PrecisionScale</c> (the server alone past 21 digits before the point or 6 after); <c>SetValidator</c>, <c>ChildRules</c>,
     /// <c>RuleForEach</c> with a child validator and <c>Include</c> bring the child's rules along.
     /// </para>
     /// <para>
