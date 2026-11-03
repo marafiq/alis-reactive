@@ -37,19 +37,6 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 
     private Task Save() => Page.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
 
-    private async Task ExpectHeld(string field, string message)
-    {
-        await Expect(Field(field).GetByText(message)).ToBeVisibleAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
-    }
-
-    private async Task ExpectSaved(string field, string message)
-    {
-        await Expect(Saved).ToHaveTextAsync("saved");
-        await Expect(Field(field).GetByText(message)).ToBeHiddenAsync();
-    }
-
     [TestCase("ForTwo", "Guests", "2", "3", "Needed for exactly two guests.", TestName = "equal_holds_at_the_value")]
     [TestCase("NotForTwo", "Guests", "3", "2", "Needed for other than two guests.", TestName = "not_equal_holds_away_from_the_value")]
     [TestCase("ForMore", "Guests", "3", "2", "Needed for more than two guests.", TestName = "greater_than_holds_above_the_value")]
@@ -88,11 +75,14 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 
         await Write(driver, holds);
         await Save();
-        await ExpectHeld(field, message);
+        await Expect(Field(field).GetByText(message)).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write(driver, other);
         await Save();
-        await ExpectSaved(field, message);
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field(field).GetByText(message)).ToBeHiddenAsync();
     }
 
     [Test]
@@ -128,11 +118,14 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 
         await Write("Overnight", "true");
         await Save();
-        await ExpectHeld("Companion name", "Name the companion.");
+        await Expect(Field("Companion name").GetByText("Name the companion.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Overnight", "false");
         await Save();
-        await ExpectSaved("Companion name", "Name the companion.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Companion name").GetByText("Name the companion.")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -144,16 +137,20 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
         await Write("Overnight", "true");
         await Write("Companion stay", "overnight");
         await Save();
-        await ExpectHeld("Companion room", "Give the companion's room for the night.");
+        await Expect(Field("Companion room").GetByText("Give the companion's room for the night.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Companion stay", "day");
         await Save();
-        await ExpectSaved("Companion room", "Give the companion's room for the night.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Companion room").GetByText("Give the companion's room for the night.")).ToBeHiddenAsync();
 
         await Write("Companion stay", "overnight");
         await Write("Overnight", "false");
         await Save();
-        await ExpectSaved("Companion room", "Give the companion's room for the night.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Companion room").GetByText("Give the companion's room for the night.")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -166,11 +163,14 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 
         await Write("Companion kind", "carer");
         await Save();
-        await ExpectHeld("Companion phone", "Give the night carer's phone.");
+        await Expect(Field("Companion phone").GetByText("Give the night carer's phone.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Companion kind", "family");
         await Save();
-        await ExpectSaved("Companion phone", "Give the night carer's phone.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Companion phone").GetByText("Give the night carer's phone.")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -182,11 +182,14 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 
         await Write("Companion kind", "nurse");
         await Save();
-        await ExpectHeld("Companion badge", "Give the companion's badge.");
+        await Expect(Field("Companion badge").GetByText("Give the companion's badge.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Companion kind", "family");
         await Save();
-        await ExpectSaved("Companion badge", "Give the companion's badge.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Companion badge").GetByText("Give the companion's badge.")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -198,11 +201,14 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 
         await Write("Companion kind", "carer");
         await Save();
-        await ExpectHeld("Companion pass", "Give a pass to a companion who is not family.");
+        await Expect(Field("Companion pass").GetByText("Give a pass to a companion who is not family.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Companion kind", "family");
         await Save();
-        await ExpectSaved("Companion pass", "Give a pass to a companion who is not family.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Companion pass").GetByText("Give a pass to a companion who is not family.")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -214,11 +220,14 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
         await Write("Guests", "3");
         await Write("Overnight", "true");
         await Save();
-        await ExpectHeld("ManyByNight", "Needed for many guests overnight.");
+        await Expect(Field("ManyByNight").GetByText("Needed for many guests overnight.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Overnight", "false");
         await Save();
-        await ExpectSaved("ManyByNight", "Needed for many guests overnight.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("ManyByNight").GetByText("Needed for many guests overnight.")).ToBeHiddenAsync();
     }
 
     [Test]
@@ -230,10 +239,13 @@ public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
         await Write("Guests", "1");
         await Write("Overnight", "true");
         await Save();
-        await ExpectHeld("ManyOrByNight", "Needed for many guests or overnight.");
+        await Expect(Field("ManyOrByNight").GetByText("Needed for many guests or overnight.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Overnight", "false");
         await Save();
-        await ExpectSaved("ManyOrByNight", "Needed for many guests or overnight.");
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("ManyOrByNight").GetByText("Needed for many guests or overnight.")).ToBeHiddenAsync();
     }
 }

@@ -28,12 +28,6 @@ public sealed class WhenARequestFails : AppPageTest
 
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();
 
-    private async Task PutTheLedgerAway()
-    {
-        await Click("Put the ledger away");
-        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
-    }
-
     [Test]
     public async Task a_request_that_cannot_be_built_runs_its_finally_and_stops_the_steps_after_it()
     {
@@ -41,7 +35,8 @@ public sealed class WhenARequestFails : AppPageTest
         await Click("Send the ledger's title");
         await Expect(Line("title-answer")).ToHaveTextAsync("ledger titled Night ledger");
         await Expect(Line("title-after")).ToHaveTextAsync("1");
-        await PutTheLedgerAway();
+        await Click("Put the ledger away");
+        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
 
         await Click("Send the ledger's title");
 
@@ -59,7 +54,8 @@ public sealed class WhenARequestFails : AppPageTest
         await Click("Write the answer into the ledger");
         await Expect(Line("answer-written")).ToHaveTextAsync("1");
         await Expect(Line("answer-after")).ToHaveTextAsync("1");
-        await PutTheLedgerAway();
+        await Click("Put the ledger away");
+        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
 
         await Click("Write the answer into the ledger");
 
@@ -76,7 +72,8 @@ public sealed class WhenARequestFails : AppPageTest
         await Open("/Requests/Outage");
         await Click("Send the title and save the keeper");
         await Expect(Line("save-after")).ToHaveTextAsync("1");
-        await PutTheLedgerAway();
+        await Click("Put the ledger away");
+        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
 
         await Click("Send the title and save the keeper");
 
@@ -111,7 +108,8 @@ public sealed class WhenARequestFails : AppPageTest
         await Click("Ask the ledger and the desk at once");
         await Expect(Line("both-settled")).ToHaveTextAsync("1");
         await Expect(Line("both-ledger")).ToHaveTextAsync("1");
-        await PutTheLedgerAway();
+        await Click("Put the ledger away");
+        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
 
         await Click("Ask the ledger and the desk at once");
 
@@ -127,7 +125,8 @@ public sealed class WhenARequestFails : AppPageTest
         await Click("Write two answers at once");
         await Expect(Line("pair-settled")).ToHaveTextAsync("1");
         await Expect(Line("pair-ledger")).ToHaveTextAsync("1");
-        await PutTheLedgerAway();
+        await Click("Put the ledger away");
+        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
 
         await Click("Write two answers at once");
 

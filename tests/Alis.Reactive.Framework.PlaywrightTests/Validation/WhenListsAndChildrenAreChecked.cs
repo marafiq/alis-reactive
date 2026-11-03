@@ -32,17 +32,6 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
 
     private Task Save() => Page.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
 
-    private async Task ExpectNothingSent()
-    {
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
-    }
-
-    private void ExpectOneSent(string because)
-    {
-        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), because);
-    }
-
     [TestCase("", "Give each tag.", TestName = "the_first_check_on_each_item_is_made_in_the_browser")]
     [TestCase("eastern", "Five letters a tag.", TestName = "the_second_check_on_each_item_is_made_in_the_browser")]
     public async Task each_check_on_an_items_rule_is_made(string refused, string message)
@@ -52,7 +41,8 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
         await Write("Second tag", refused);
         await Save();
         await Expect(Field("Second tag").GetByText(message)).ToBeVisibleAsync();
-        await ExpectNothingSent();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Second tag", "west");
         await Save();
@@ -70,7 +60,7 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
         await Expect(Field("Second room").GetByText("East wing rooms only.")).ToBeVisibleAsync();
         await Expect(Field("First room").GetByText("East wing rooms only.")).ToBeHiddenAsync();
         await Expect(Summary).ToBeHiddenAsync();
-        ExpectOneSent("the browser does not make the room's check, so the request goes");
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make the room's check, so the request goes");
     }
 
     [Test]
@@ -83,7 +73,7 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
 
         await Expect(Field("Phone to call").GetByText("Give a phone to call.")).ToBeVisibleAsync();
         await Expect(Summary).ToBeHiddenAsync();
-        ExpectOneSent("the condition around the caller's rules is the server's, so the request goes");
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the condition around the caller's rules is the server's, so the request goes");
     }
 
     [Test]
@@ -96,7 +86,7 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
 
         await Expect(Field("Extension").GetByText("Give each extension.")).ToBeVisibleAsync();
         await Expect(Summary).ToBeHiddenAsync();
-        ExpectOneSent("the condition around the caller's rules is the server's, so even its list's check goes to the server");
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the condition around the caller's rules is the server's, so even its list's check goes to the server");
     }
 
     [Test]
@@ -109,7 +99,7 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
 
         await Expect(Field("First visitor").GetByText("Name each visitor.")).ToBeVisibleAsync();
         await Expect(Summary).ToBeHiddenAsync();
-        ExpectOneSent("the condition around each visitor's rules is the server's, so the request goes");
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the condition around each visitor's rules is the server's, so the request goes");
     }
 
     [Test]
@@ -122,6 +112,6 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
 
         await Expect(Field("Note").GetByText("Ten characters a note.")).ToBeVisibleAsync();
         await Expect(Summary).ToBeHiddenAsync();
-        ExpectOneSent("the condition around the included rules is the server's, so the request goes");
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the condition around the included rules is the server's, so the request goes");
     }
 }

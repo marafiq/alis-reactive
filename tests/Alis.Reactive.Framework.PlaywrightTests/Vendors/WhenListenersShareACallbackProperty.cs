@@ -13,23 +13,12 @@ public sealed class WhenListenersShareACallbackProperty : AppPageTest
 
     private ILocator Ring => Page.Locator("#bell").GetByRole(AriaRole.Button, new() { Name = "Ring the bell", Exact = true });
 
-    private async Task Listen(string wing)
-    {
-        await Button($"Listen from the {wing} wing").ClickAsync();
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = $"The {wing} wing is listening" })).ToBeVisibleAsync();
-    }
-
-    private async Task StopListening(string wing)
-    {
-        await Button($"Stop the {wing} wing listening").ClickAsync();
-        await Expect(Page.Locator($"#{wing}-slot")).ToBeEmptyAsync();
-    }
-
     [Test]
     public async Task a_handler_assigned_later_runs_after_the_handlers_assigned_before_it()
     {
         await Open("/Vendors/SharedCallback");
-        await Listen("north");
+        await Button("Listen from the north wing").ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "The north wing is listening" })).ToBeVisibleAsync();
 
         await Ring.ClickAsync();
 
@@ -41,11 +30,13 @@ public sealed class WhenListenersShareACallbackProperty : AppPageTest
     public async Task a_slots_handler_stops_when_its_slot_unloads_and_the_handlers_before_it_keep_running()
     {
         await Open("/Vendors/SharedCallback");
-        await Listen("north");
+        await Button("Listen from the north wing").ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "The north wing is listening" })).ToBeVisibleAsync();
         await Ring.ClickAsync();
         await Expect(Page.Locator("#north-heard")).ToHaveTextAsync("1");
 
-        await StopListening("north");
+        await Button("Stop the north wing listening").ClickAsync();
+        await Expect(Page.Locator("#north-slot")).ToBeEmptyAsync();
         await Ring.ClickAsync();
 
         await Expect(Page.Locator("#page-heard")).ToHaveTextAsync("2");
@@ -58,12 +49,15 @@ public sealed class WhenListenersShareACallbackProperty : AppPageTest
     public async Task a_handler_released_before_one_assigned_after_it_leaves_that_one_listening()
     {
         await Open("/Vendors/SharedCallback");
-        await Listen("north");
-        await Listen("south");
+        await Button("Listen from the north wing").ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "The north wing is listening" })).ToBeVisibleAsync();
+        await Button("Listen from the south wing").ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "The south wing is listening" })).ToBeVisibleAsync();
         await Ring.ClickAsync();
         await Expect(Page.Locator("#south-heard")).ToHaveTextAsync("1");
 
-        await StopListening("north");
+        await Button("Stop the north wing listening").ClickAsync();
+        await Expect(Page.Locator("#north-slot")).ToBeEmptyAsync();
         await Ring.ClickAsync();
 
         await Expect(Page.Locator("#page-heard")).ToHaveTextAsync("2");

@@ -17,13 +17,6 @@ public sealed class WhenASlotStartsWithServerRenderedContent : AppPageTest
 
     private Task RingTheBell() => Page.Locator("#move-in-bell").GetByRole(AriaRole.Button, new() { Name = "Ring the bell", Exact = true }).ClickAsync();
 
-    private async Task GoOnToTheRoomStep()
-    {
-        await Page.GetByLabel("Resident", new() { Exact = true }).FillAsync("Ann");
-        await Button("Next").ClickAsync();
-        await Expect(Steps.GetByRole(AriaRole.Heading, new() { Name = "The room" })).ToBeVisibleAsync();
-    }
-
     [Test]
     public async Task a_step_rendered_with_the_page_starts_after_the_page_as_a_step_loaded_later_does()
     {
@@ -47,7 +40,9 @@ public sealed class WhenASlotStartsWithServerRenderedContent : AppPageTest
         await RingTheBell();
         await Expect(Page.Locator("#resident-step-heard")).ToHaveTextAsync("1");
 
-        await GoOnToTheRoomStep();
+        await Page.GetByLabel("Resident", new() { Exact = true }).FillAsync("Ann");
+        await Button("Next").ClickAsync();
+        await Expect(Steps.GetByRole(AriaRole.Heading, new() { Name = "The room" })).ToBeVisibleAsync();
         await RingTheBell();
 
         await Expect(Page.Locator("#page-heard")).ToHaveTextAsync("2");
@@ -61,7 +56,9 @@ public sealed class WhenASlotStartsWithServerRenderedContent : AppPageTest
         await Button("Save for later").ClickAsync();
         await Expect(Steps.GetByText("Name the resident.")).ToBeVisibleAsync();
 
-        await GoOnToTheRoomStep();
+        await Page.GetByLabel("Resident", new() { Exact = true }).FillAsync("Ann");
+        await Button("Next").ClickAsync();
+        await Expect(Steps.GetByRole(AriaRole.Heading, new() { Name = "The room" })).ToBeVisibleAsync();
         await Button("Save for later").ClickAsync();
 
         await Expect(Page.Locator("#saved")).ToHaveTextAsync("the move-in taken by Dana is saved for later");

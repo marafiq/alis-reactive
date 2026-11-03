@@ -15,14 +15,6 @@ public sealed class WhenAPageUsesAComponentsData : AppPageTest
 
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();
 
-    private async Task FillThreeCards()
-    {
-        await Click("Fill Cy's card");
-        await Click("Fill Ada's card");
-        await Click("Fill Ben's card");
-        await Expect(Slate.GetByText("Cards: Cy · Ada · Ben", new() { Exact = true })).ToBeVisibleAsync();
-    }
-
     [Test]
     public async Task a_member_of_a_data_value_the_component_holds_is_read()
     {
@@ -39,7 +31,10 @@ public sealed class WhenAPageUsesAComponentsData : AppPageTest
     public async Task one_field_of_each_item_of_a_list_of_data_is_read()
     {
         await Open("/Members/Data");
-        await FillThreeCards();
+        await Click("Fill Cy's card");
+        await Click("Fill Ada's card");
+        await Click("Fill Ben's card");
+        await Expect(Slate.GetByText("Cards: Cy · Ada · Ben", new() { Exact = true })).ToBeVisibleAsync();
 
         await Click("Summarize the cards");
 
@@ -71,7 +66,10 @@ public sealed class WhenAPageUsesAComponentsData : AppPageTest
     public async Task a_field_named_by_a_member_of_the_pages_class_is_the_field_written()
     {
         await Open("/Members/Data");
-        await FillThreeCards();
+        await Click("Fill Cy's card");
+        await Click("Fill Ada's card");
+        await Click("Fill Ben's card");
+        await Expect(Slate.GetByText("Cards: Cy · Ada · Ben", new() { Exact = true })).ToBeVisibleAsync();
 
         await Click("Rename the first card Bea");
 
@@ -82,7 +80,10 @@ public sealed class WhenAPageUsesAComponentsData : AppPageTest
     public async Task a_field_passed_alone_names_what_the_component_orders_by()
     {
         await Open("/Members/Data");
-        await FillThreeCards();
+        await Click("Fill Cy's card");
+        await Click("Fill Ada's card");
+        await Click("Fill Ben's card");
+        await Expect(Slate.GetByText("Cards: Cy · Ada · Ben", new() { Exact = true })).ToBeVisibleAsync();
 
         await Click("Sort the cards by name");
         await Expect(Slate.GetByText("Cards: Ada · Ben · Cy", new() { Exact = true })).ToBeVisibleAsync();

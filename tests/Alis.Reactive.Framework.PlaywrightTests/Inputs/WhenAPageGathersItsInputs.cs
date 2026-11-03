@@ -14,11 +14,6 @@ public sealed class WhenAPageGathersItsInputs : AppPageTest
 
     // Nothing reached the endpoint: once no request is in flight, the line the endpoint's answer fills is
     // still empty. Checked before the network settles, an empty line would pass while a request is on its way.
-    private async Task ExpectNothingPosted()
-    {
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        await Expect(Bound).ToHaveTextAsync("");
-    }
 
     private async Task Fill(string name, string age, string weight, string admitted, string arrives)
     {
@@ -61,7 +56,8 @@ public sealed class WhenAPageGathersItsInputs : AppPageTest
 
         await Expect(Page.GetByText("Name the resident.")).ToBeVisibleAsync();
         await Expect(Page.GetByText("Give an age from 18 to 120.")).ToBeHiddenAsync();
-        await ExpectNothingPosted();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Bound).ToHaveTextAsync("");
     }
 
     [Test]
@@ -72,7 +68,8 @@ public sealed class WhenAPageGathersItsInputs : AppPageTest
 
         await Admit.ClickAsync();
         await Expect(Page.GetByText("Give an age from 18 to 120.")).ToBeVisibleAsync();
-        await ExpectNothingPosted();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Bound).ToHaveTextAsync("");
 
         await Page.GetByLabel("Age").FillAsync("41");
         await Admit.ClickAsync();
@@ -90,7 +87,8 @@ public sealed class WhenAPageGathersItsInputs : AppPageTest
         await Page.GetByLabel("Name").FillAsync("Ada");
 
         await Expect(Page.GetByText("Name the resident.")).ToBeHiddenAsync();
-        await ExpectNothingPosted();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Bound).ToHaveTextAsync("");
     }
 
     [Test]
@@ -105,6 +103,7 @@ public sealed class WhenAPageGathersItsInputs : AppPageTest
         await Page.GetByLabel("Age").PressAsync("Tab");
 
         await Expect(Page.GetByText("Give an age from 18 to 120.")).ToBeVisibleAsync();
-        await ExpectNothingPosted();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Bound).ToHaveTextAsync("");
     }
 }

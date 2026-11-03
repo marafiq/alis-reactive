@@ -31,12 +31,6 @@ public sealed class WhenAPartialOfThePagesModelIsConditionalOrLoadedLater : AppP
 
     private ILocator AdmissionSummary => Page.Locator("#admission-messages [data-reactive-validation-summary]");
 
-    private async Task ChooseARoom()
-    {
-        await Button("Choose a room").ClickAsync();
-        await Expect(Input("Room")).ToBeVisibleAsync();
-    }
-
     [Test]
     public async Task while_no_partial_renders_the_member_the_pages_rule_holds_the_save_in_the_summary()
     {
@@ -79,7 +73,8 @@ public sealed class WhenAPartialOfThePagesModelIsConditionalOrLoadedLater : AppP
     public async Task a_partial_loaded_later_and_left_empty_shows_the_pages_message_beside_its_field()
     {
         await Open("/Partials/Admission");
-        await ChooseARoom();
+        await Button("Choose a room").ClickAsync();
+        await Expect(Input("Room")).ToBeVisibleAsync();
 
         await Button("Admit").ClickAsync();
 
@@ -93,7 +88,8 @@ public sealed class WhenAPartialOfThePagesModelIsConditionalOrLoadedLater : AppP
     {
         await Open("/Partials/Admission");
         await Input("Resident").FillAsync("Ann");
-        await ChooseARoom();
+        await Button("Choose a room").ClickAsync();
+        await Expect(Input("Room")).ToBeVisibleAsync();
         await Input("Room").FillAsync("12");
 
         await Button("Admit").ClickAsync();
@@ -106,7 +102,8 @@ public sealed class WhenAPartialOfThePagesModelIsConditionalOrLoadedLater : AppP
     {
         await Open("/Partials/Admission");
         await Input("Resident").FillAsync("Ann");
-        await ChooseARoom();
+        await Button("Choose a room").ClickAsync();
+        await Expect(Input("Room")).ToBeVisibleAsync();
         await Input("Room").FillAsync("12");
         await Button("Clear the room").ClickAsync();
         await Expect(Input("Room")).ToHaveCountAsync(0);
@@ -122,7 +119,8 @@ public sealed class WhenAPartialOfThePagesModelIsConditionalOrLoadedLater : AppP
     public async Task the_servers_message_for_the_member_lands_beside_the_loaded_field()
     {
         await Open("/Partials/Admission");
-        await ChooseARoom();
+        await Button("Choose a room").ClickAsync();
+        await Expect(Input("Room")).ToBeVisibleAsync();
         await Input("Room").FillAsync("13");
 
         await Button("Admit").ClickAsync();

@@ -34,12 +34,6 @@ public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
 
     private Task Click(string button) => Page.GetByRole(AriaRole.Button, new() { Name = button, Exact = true }).ClickAsync();
 
-    private async Task ExpectNothingSent()
-    {
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the sheet");
-    }
-
     [Test]
     public async Task the_pages_rule_checks_each_row_the_list_partial_rendered()
     {
@@ -48,7 +42,8 @@ public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
         await Input("Contact 2").FillAsync("");
         await Click("Save the contacts");
         await Expect(Field("Contact 2").GetByText("Name each contact.")).ToBeVisibleAsync();
-        await ExpectNothingSent();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the sheet");
 
         await Input("Contact 2").FillAsync("Di");
         await Click("Save the contacts");
@@ -64,7 +59,8 @@ public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
 
         await Click("Save the contacts");
         await Expect(Field("Contact 3").GetByText("Name each contact.")).ToBeVisibleAsync();
-        await ExpectNothingSent();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the sheet");
 
         await Input("Contact 3").FillAsync("Di");
         await Click("Save the contacts");
@@ -111,7 +107,8 @@ public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
 
         await Expect(Field("Contact 2's phone").GetByText("Give the guardian a phone the desk can call.")).ToBeVisibleAsync();
         await Expect(Field("Contact 1's phone").GetByText("Give the guardian a phone the desk can call.")).ToBeHiddenAsync();
-        await ExpectNothingSent();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the sheet");
     }
 
     [Test]
@@ -123,7 +120,8 @@ public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
         await Input("Wing").FillAsync("Memory care");
         await Click("Save the contacts");
         await Expect(Field("Contact 1's phone").GetByText("The memory care wing calls every contact: give each a phone.")).ToBeVisibleAsync();
-        await ExpectNothingSent();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the sheet");
 
         await Input("Wing").FillAsync("Garden");
         await Click("Save the contacts");

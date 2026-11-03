@@ -59,12 +59,6 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
 
     // The browser held the request: once the network settles, nothing reached the endpoint. An empty result
     // alone would pass when the server refused what the browser should have held.
-    private async Task ExpectTheBrowserHeldIt()
-    {
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        lock (_bookings) Assert.That(_bookings, Is.Empty, "a request reached the booking endpoint");
-        await Expect(Booked).ToHaveTextAsync("");
-    }
 
     [Test]
     public async Task each_rule_the_browser_checks_shows_its_own_message_beside_its_own_field()
@@ -79,7 +73,9 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
         await Expect(Field("Email").GetByText("Give an email we can write to.")).ToBeVisibleAsync();
         await Expect(Field("Guests").GetByText("Bring one to four guests.")).ToBeVisibleAsync();
         await Expect(Field("Notes").GetByText("Keep the note to 20 characters.")).ToBeVisibleAsync();
-        await ExpectTheBrowserHeldIt();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_bookings) Assert.That(_bookings, Is.Empty, "a request reached the booking endpoint");
+        await Expect(Booked).ToHaveTextAsync("");
     }
 
     [Test]
@@ -114,7 +110,9 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
         await Book();
 
         await Expect(Field("Company").GetByText("Name the contractor's company.")).ToBeVisibleAsync();
-        await ExpectTheBrowserHeldIt();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_bookings) Assert.That(_bookings, Is.Empty, "a request reached the booking endpoint");
+        await Expect(Booked).ToHaveTextAsync("");
     }
 
     [Test]
@@ -125,7 +123,9 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
 
         await Book();
         await Expect(Field("Email again").GetByText("Write the same email twice.")).ToBeVisibleAsync();
-        await ExpectTheBrowserHeldIt();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_bookings) Assert.That(_bookings, Is.Empty, "a request reached the booking endpoint");
+        await Expect(Booked).ToHaveTextAsync("");
 
         await Page.GetByLabel("Email again").FillAsync("ada@home.test");
         await Book();

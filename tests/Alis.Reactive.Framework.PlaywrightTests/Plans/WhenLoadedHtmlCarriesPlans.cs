@@ -12,17 +12,12 @@ public sealed class WhenLoadedHtmlCarriesPlans : AppPageTest
 
     private ILocator Slot => Page.Locator("#notice-slot");
 
-    private async Task PinTheNotice()
-    {
-        await Button("Pin the notice").ClickAsync();
-        await Expect(Slot.GetByRole(AriaRole.Heading, new() { Name = "Visiting hours change on Sunday" })).ToBeVisibleAsync();
-    }
-
     [Test]
     public async Task every_plan_in_loaded_html_runs()
     {
         await Open("/Plans/Noticeboard");
-        await PinTheNotice();
+        await Button("Pin the notice").ClickAsync();
+        await Expect(Slot.GetByRole(AriaRole.Heading, new() { Name = "Visiting hours change on Sunday" })).ToBeVisibleAsync();
 
         await Button("Mark the notice read").ClickAsync();
         await Button("Share the notice").ClickAsync();
@@ -35,7 +30,8 @@ public sealed class WhenLoadedHtmlCarriesPlans : AppPageTest
     public async Task loaded_html_whose_plan_is_not_json_is_refused_and_the_slot_keeps_what_it_showed()
     {
         await Open("/Plans/Noticeboard");
-        await PinTheNotice();
+        await Button("Pin the notice").ClickAsync();
+        await Expect(Slot.GetByRole(AriaRole.Heading, new() { Name = "Visiting hours change on Sunday" })).ToBeVisibleAsync();
         await Expect(Page.Locator("#pinned")).ToHaveTextAsync("the notice");
 
         await Button("Pin the torn notice").ClickAsync();

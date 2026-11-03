@@ -27,24 +27,21 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
 
     private Task Ward(string ward) => Page.GetByLabel("Ward").FillAsync(ward);
 
-    private async Task ExpectDecided(string line, string text)
-    {
-        await Decide();
-        await Expect(Line(line)).ToHaveTextAsync(text);
-    }
-
     [Test]
     public async Task a_group_after_an_and_chain_is_one_more_term()
     {
         await Open("/Conditions/Groups");
         await Raise("pain", 2); await Raise("risk", 2);
-        await ExpectDecided("watch", "no watch");
+        await Decide();
+        await Expect(Line("watch")).ToHaveTextAsync("no watch");
 
         await Raise("risk", 3);
-        await ExpectDecided("watch", "watch");
+        await Decide();
+        await Expect(Line("watch")).ToHaveTextAsync("watch");
 
         await Lower("pain");
-        await ExpectDecided("watch", "no watch");
+        await Decide();
+        await Expect(Line("watch")).ToHaveTextAsync("no watch");
     }
 
     [Test]
@@ -53,13 +50,16 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
         await Open("/Conditions/Groups");
         await Ward("South");
         await Raise("pain", 3); await Raise("risk", 2);
-        await ExpectDecided("check-in", "no check-in");
+        await Decide();
+        await Expect(Line("check-in")).ToHaveTextAsync("no check-in");
 
         await Raise("risk");
-        await ExpectDecided("check-in", "check in");
+        await Decide();
+        await Expect(Line("check-in")).ToHaveTextAsync("check in");
 
         await Lower("pain", 3); await Lower("risk", 3); await Ward("Isolation");
-        await ExpectDecided("check-in", "check in");
+        await Decide();
+        await Expect(Line("check-in")).ToHaveTextAsync("check in");
     }
 
     [Test]
@@ -67,16 +67,20 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
     {
         await Open("/Conditions/Groups");
         await Ward("South"); await Raise("pain", 3);
-        await ExpectDecided("ease", "no ease");
+        await Decide();
+        await Expect(Line("ease")).ToHaveTextAsync("no ease");
 
         await Ward("North");
-        await ExpectDecided("ease", "ease");
+        await Decide();
+        await Expect(Line("ease")).ToHaveTextAsync("ease");
 
         await Ward("South"); await Raise("risk", 3);
-        await ExpectDecided("ease", "ease");
+        await Decide();
+        await Expect(Line("ease")).ToHaveTextAsync("ease");
 
         await Lower("pain");
-        await ExpectDecided("ease", "no ease");
+        await Decide();
+        await Expect(Line("ease")).ToHaveTextAsync("no ease");
     }
 
     [Test]
@@ -84,16 +88,20 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
     {
         await Open("/Conditions/Groups");
         await Ward("South"); await Raise("risk", 4);
-        await ExpectDecided("alert", "no alert");
+        await Decide();
+        await Expect(Line("alert")).ToHaveTextAsync("no alert");
 
         await Ward("North");
-        await ExpectDecided("alert", "alert");
+        await Decide();
+        await Expect(Line("alert")).ToHaveTextAsync("alert");
 
         await Lower("risk");
-        await ExpectDecided("alert", "no alert");
+        await Decide();
+        await Expect(Line("alert")).ToHaveTextAsync("no alert");
 
         await Ward("South"); await Raise("pain", 5);
-        await ExpectDecided("alert", "alert");
+        await Decide();
+        await Expect(Line("alert")).ToHaveTextAsync("alert");
     }
 
     [Test]
@@ -101,10 +109,12 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
     {
         await Open("/Conditions/Groups");
         await Ward("South"); await Raise("pain", 3);
-        await ExpectDecided("calm", "calm");
+        await Decide();
+        await Expect(Line("calm")).ToHaveTextAsync("calm");
 
         await Raise("pain");
-        await ExpectDecided("calm", "not calm");
+        await Decide();
+        await Expect(Line("calm")).ToHaveTextAsync("not calm");
     }
 
     [Test]
@@ -112,13 +122,16 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
     {
         await Open("/Conditions/Groups");
         await Ward("South"); await Raise("pain", 2); await Raise("risk", 2);
-        await ExpectDecided("steady", "steady");
+        await Decide();
+        await Expect(Line("steady")).ToHaveTextAsync("steady");
 
         await Raise("pain", 3);
-        await ExpectDecided("steady", "not steady");
+        await Decide();
+        await Expect(Line("steady")).ToHaveTextAsync("not steady");
 
         await Lower("pain", 3); await Lower("risk");
-        await ExpectDecided("steady", "not steady");
+        await Decide();
+        await Expect(Line("steady")).ToHaveTextAsync("not steady");
     }
 
     [Test]
@@ -126,13 +139,16 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
     {
         await Open("/Conditions/Groups");
         await Ward("East"); await Raise("pain", 2); await Raise("risk", 2);
-        await ExpectDecided("round", "no round");
+        await Decide();
+        await Expect(Line("round")).ToHaveTextAsync("no round");
 
         await Ward("North");
-        await ExpectDecided("round", "round");
+        await Decide();
+        await Expect(Line("round")).ToHaveTextAsync("round");
 
         await Ward("South");
-        await ExpectDecided("round", "round");
+        await Decide();
+        await Expect(Line("round")).ToHaveTextAsync("round");
     }
 
     [Test]
@@ -140,13 +156,16 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
     {
         await Open("/Conditions/Groups");
         await Ward("South");
-        await ExpectDecided("flag", "no flag");
+        await Decide();
+        await Expect(Line("flag")).ToHaveTextAsync("no flag");
 
         await Ward("Isolation");
-        await ExpectDecided("flag", "flag");
+        await Decide();
+        await Expect(Line("flag")).ToHaveTextAsync("flag");
 
         await Ward("South"); await Raise("risk", 5);
-        await ExpectDecided("flag", "flag");
+        await Decide();
+        await Expect(Line("flag")).ToHaveTextAsync("flag");
     }
 
     [Test]
@@ -154,12 +173,15 @@ public sealed class WhenConditionsAreGrouped : AppPageTest
     {
         await Open("/Conditions/Groups");
         await Ward("Isolation");
-        await ExpectDecided("visit", "no visit");
+        await Decide();
+        await Expect(Line("visit")).ToHaveTextAsync("no visit");
 
         await Raise("pain");
-        await ExpectDecided("visit", "visit");
+        await Decide();
+        await Expect(Line("visit")).ToHaveTextAsync("visit");
 
         await Ward("South");
-        await ExpectDecided("visit", "no visit");
+        await Decide();
+        await Expect(Line("visit")).ToHaveTextAsync("no visit");
     }
 }

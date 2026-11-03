@@ -28,17 +28,12 @@ public sealed class WhenAMembersTemplateIsLoadedIntoASlot : AppPageTest
 
     private ILocator KinField => Page.Locator("#kin-card > div").Filter(new() { Has = Input("Next of kin") });
 
-    private async Task AddTheNextOfKin()
-    {
-        await Button("Add the next of kin").ClickAsync();
-        await Expect(Input("Next of kin")).ToBeVisibleAsync();
-    }
-
     [Test]
     public async Task the_pages_rule_on_the_member_shows_its_message_beside_the_loaded_templates_field()
     {
         await Open("/Partials/Reception");
-        await AddTheNextOfKin();
+        await Button("Add the next of kin").ClickAsync();
+        await Expect(Input("Next of kin")).ToBeVisibleAsync();
 
         await Button("Save the visit").ClickAsync();
 
@@ -52,7 +47,8 @@ public sealed class WhenAMembersTemplateIsLoadedIntoASlot : AppPageTest
     {
         await Open("/Partials/Reception");
         await Input("Visitor").FillAsync("Ada");
-        await AddTheNextOfKin();
+        await Button("Add the next of kin").ClickAsync();
+        await Expect(Input("Next of kin")).ToBeVisibleAsync();
         await Input("Next of kin").FillAsync("Bo");
 
         await Button("Save the visit").ClickAsync();

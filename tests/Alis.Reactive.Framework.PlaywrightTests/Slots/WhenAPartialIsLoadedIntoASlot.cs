@@ -29,17 +29,12 @@ public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
         };
     }
 
-    private async Task OpenTheCard()
-    {
-        await Button("Open the card").ClickAsync();
-        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
-    }
-
     [Test]
     public async Task a_component_in_loaded_html_is_built_before_its_handlers_listen()
     {
         await Open("/Slots/Desk");
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
 
         await Card.GetByRole(AriaRole.Button, new() { Name = "Add row" }).ClickAsync();
 
@@ -51,7 +46,8 @@ public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
     public async Task an_input_in_a_partial_binds_under_the_member_the_partial_was_rendered_for()
     {
         await Open("/Slots/Desk");
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
 
         await Page.GetByLabel("Next of kin").FillAsync("Tom");
         await Button("Save the next of kin").ClickAsync();
@@ -63,7 +59,8 @@ public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
     public async Task a_partials_rule_checks_its_input_where_the_input_binds_under_the_prefix()
     {
         await Open("/Slots/Desk");
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
 
         await Button("Save the next of kin").ClickAsync();
         await Expect(KinField.GetByText("Name the next of kin.")).ToBeVisibleAsync();
@@ -80,7 +77,8 @@ public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
     public async Task the_servers_answer_for_a_partial_under_a_prefix_lands_beside_its_field()
     {
         await Open("/Slots/Desk");
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
 
         await Page.GetByLabel("Next of kin", new() { Exact = true }).FillAsync("Nobody");
         await Button("Save the next of kin").ClickAsync();
@@ -94,7 +92,8 @@ public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
     public async Task a_partials_handler_hears_events_until_its_slot_is_unloaded()
     {
         await Open("/Slots/Desk");
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
 
         await Button("Ring the bell").ClickAsync();
         await Expect(Page.Locator("#page-heard")).ToHaveTextAsync("1");
@@ -112,14 +111,16 @@ public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
     public async Task an_unloaded_slot_lets_go_of_what_it_held_and_loads_fresh_again()
     {
         await Open("/Slots/Desk");
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
         await Card.GetByRole(AriaRole.Button, new() { Name = "Add row" }).ClickAsync();
         await Expect(Card.GetByRole(AriaRole.Listitem)).ToHaveCountAsync(3);
 
         await Button("Close the card").ClickAsync();
         await Expect(Card).ToBeEmptyAsync();
 
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
         await Expect(Card.GetByRole(AriaRole.Listitem)).ToHaveTextAsync(["Monday", "Tuesday"]);
     }
 
@@ -127,7 +128,8 @@ public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
     public async Task a_step_naming_an_element_not_on_the_page_fails_only_its_own_pipeline()
     {
         await Open("/Slots/Desk");
-        await OpenTheCard();
+        await Button("Open the card").ClickAsync();
+        await Expect(Card.GetByRole(AriaRole.Heading, new() { Name = "Next of kin" })).ToBeVisibleAsync();
         await Button("Ring the bell").ClickAsync();
         await Button("Write into the card").ClickAsync();
         await Expect(Page.Locator("#card-status")).ToHaveTextAsync("from the page");

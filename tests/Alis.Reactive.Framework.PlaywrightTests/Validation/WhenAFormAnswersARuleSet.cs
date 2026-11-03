@@ -30,20 +30,15 @@ public sealed class WhenAFormAnswersARuleSet : AppPageTest
 
     private Task Write(string label, string text) => Page.GetByLabel(label, new() { Exact = true }).FillAsync(text);
 
-    private async Task Held(ILocator message)
-    {
-        await Expect(message).ToBeVisibleAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
-    }
-
     [Test]
     public async Task a_form_that_names_a_set_is_held_by_that_sets_rule_and_saved_once_it_holds()
     {
         await Open("/Validation/Discharge?stage=Draft");
         await Write("Summary", "");
         await Save();
-        await Held(Field("Summary").GetByText("Write the summary before saving a draft."));
+        await Expect(Field("Summary").GetByText("Write the summary before saving a draft.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Summary", "Home.");
         await Save();
@@ -67,7 +62,9 @@ public sealed class WhenAFormAnswersARuleSet : AppPageTest
         await Open("/Validation/Discharge?stage=SignOff");
         await Write("Summary", "Short");
         await Save();
-        await Held(Field("Summary").GetByText("A signed-off summary says more."));
+        await Expect(Field("Summary").GetByText("A signed-off summary says more.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
     }
 
     [Test]
@@ -91,7 +88,9 @@ public sealed class WhenAFormAnswersARuleSet : AppPageTest
         await Open("/Validation/Discharge?stage=" + stage);
         await Write("Resident", "");
         await Save();
-        await Held(Field("Resident").GetByText("Name the resident."));
+        await Expect(Field("Resident").GetByText("Name the resident.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
     }
 
     [Test]
@@ -100,7 +99,9 @@ public sealed class WhenAFormAnswersARuleSet : AppPageTest
         await Open("/Validation/Discharge");
         await Write("Ward", "");
         await Save();
-        await Held(Field("Ward").GetByText("Name the ward."));
+        await Expect(Field("Ward").GetByText("Name the ward.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Ward", "East");
         await Write("Summary", "");
@@ -123,7 +124,9 @@ public sealed class WhenAFormAnswersARuleSet : AppPageTest
         await Open("/Validation/Discharge?stage=SignOff");
         await Write("Carrier", "");
         await Save();
-        await Held(Field("Carrier").GetByText("Name who takes the resident home."));
+        await Expect(Field("Carrier").GetByText("Name who takes the resident home.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Open("/Validation/Discharge?stage=Draft");
         await Write("Carrier", "");
@@ -137,7 +140,9 @@ public sealed class WhenAFormAnswersARuleSet : AppPageTest
         await Open("/Validation/Discharge?stage=Draft");
         await Write("Medication", "");
         await Save();
-        await Held(Field("Medication").GetByText("List the medication to hand back."));
+        await Expect(Field("Medication").GetByText("List the medication to hand back.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Open("/Validation/Discharge?stage=SignOff");
         await Write("Medication", "");
