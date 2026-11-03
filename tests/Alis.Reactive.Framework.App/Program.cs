@@ -25,7 +25,8 @@ var app = builder.Build();
 
 // The components' bundle built from the current source; a page without it would prove nothing, so the app
 // refuses to start. The runtime bundle and the core's stylesheet come with the AlisReactive project reference
-// the way an app gets them from the package, at ~/_content/AlisReactive/.
+// the way an app gets them from the package, at ~/_content/AlisReactive/, and the design system's compiled
+// default with its own, at ~/_content/AlisReactive.DesignSystem/.
 RequireBuilt(Path.Combine(app.Environment.ContentRootPath, "wwwroot", "js", "framework-components.js"));
 
 app.UseStaticFiles();

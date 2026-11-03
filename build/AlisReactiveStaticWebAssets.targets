@@ -6,7 +6,7 @@
     A project imports this file and names each asset as an AlisReactiveStaticWebAsset item, the file
     and the RelativePath it is served at:
 
-      <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\design-system.dev.css" RelativePath="css/design-system.css" />
+      <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js" RelativePath="js/alis-reactive.js" />
 
     Where the files land:
       net10.0  An ASP.NET Core app that references the package (or the project) serves each asset at
@@ -16,8 +16,9 @@
                (AlisReactiveNetFrameworkContent.targets) copies the same staticwebassets/ files into the
                web project at Content\{PackageId}\{RelativePath} after every build.
 
-    Most assets are bundles npm builds into Alis.Reactive.Assets/dist (AlisAssetsDist in
-    Directory.Build.props); the rest are stylesheets shipped as written. Each asset keeps its own folder
+    npm builds the runtime bundle into Alis.Reactive.Assets/dist (AlisAssetsDist in
+    Directory.Build.props) and the design system's compiled default into Alis.Reactive.DesignSystem/dist;
+    every other asset is a stylesheet shipped as written. Each asset keeps its own folder
     as its content root, so an app running in Development serves the file from where it is and a
     watcher's rebuild shows on the next request. The SDK's own discovery cannot do that for these
     files: it roots every asset at the project's wwwroot folder.
