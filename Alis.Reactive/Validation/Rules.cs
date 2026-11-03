@@ -31,7 +31,6 @@ namespace Alis.Reactive.Validation
             _unreadable = unreadable;
         }
 
-        /// <summary>The rule <paramref name="rule"/> passes: what the rules under <c>DependentRules</c> run under.</summary>
         // A condition that waits is the server's alone: it has no browser form, and the rules under it make
         // the validator one that waits, as MustAsync does.
         private RuleCondition(Func<T, RuleSetSelection, CancellationToken, Task<bool>> waits)
@@ -53,6 +52,7 @@ namespace Alis.Reactive.Validation
             return new RuleCondition<T>((instance, _, cancellation) => predicate(instance, cancellation));
         }
 
+        /// <summary>The rule <paramref name="rule"/> passes: what the rules under <c>DependentRules</c> run under.</summary>
         internal static RuleCondition<T> Passing<TValue>(Rule<T, TValue> rule) =>
             new RuleCondition<T>(rule.PassesOn, rule.BrowserPassing, null);
 
