@@ -39,7 +39,7 @@ After build, confirm each package's `build\net48\{PackageId}.targets` copied its
 - [ ] `Content\AlisReactive\js\alis-reactive.js`
 - [ ] `Content\AlisReactive.Native\css\native.css`
 - [ ] `Content\AlisReactive.Fusion\css\fusion.css`
-- [ ] `Content\AlisReactive.DesignSystem\css\design-system.css` and `design-system-fusion.css`
+- [ ] `Content\AlisReactive.DesignSystem\css\design-system.css` and `theme.css`
 
 (net10 consumers get no copies: the same files are static web assets served at
 `~/_content/{PackageId}/...`.) The copies are build output and are not added to the project; include

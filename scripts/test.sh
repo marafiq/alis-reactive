@@ -11,7 +11,7 @@ Usage:
 
 Runs the ordered verification gate:
   1. npm run typecheck, then the committed plan contract (plan.ts, plan.schema.json) must match what it regenerated
-  2. npm run build:all
+  2. npm run build:packages
   3. npm test
   4. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
   5. dotnet build
@@ -196,8 +196,8 @@ if ! git ls-files --error-unmatch -- "${contract_files[@]}" >/dev/null 2>&1 || !
   exit 1
 fi
 
-gate "building browser assets"
-npm run build:all
+gate "building the packages' browser assets"
+npm run build:packages
 
 gate "running vitest"
 npm test

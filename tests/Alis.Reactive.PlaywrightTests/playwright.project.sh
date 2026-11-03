@@ -55,17 +55,9 @@ playwright_shard_filter() {
 playwright_check_assets() {
   check_asset_output_is_fresh \
     "design-system CSS" \
-    "Alis.Reactive.Assets/dist/css/design-system.dev.css" \
-    Alis.Reactive.Assets/design-system \
-    Alis.Reactive.Assets/vite.design-system.config.ts \
-    Alis.Reactive.Assets/package.json
-
-  check_asset_output_is_fresh \
-    "design-system Fusion CSS" \
-    "Alis.Reactive.Assets/dist/css/design-system-fusion.dev.css" \
-    Alis.Reactive.Assets/design-system \
-    Alis.Reactive.Assets/vite.design-system.config.ts \
-    Alis.Reactive.Assets/package.json
+    "Alis.Reactive.DesignSystem/dist/css/design-system.css" \
+    Alis.Reactive.DesignSystem/css \
+    Alis.Reactive.DesignSystem/package.json
 
   check_asset_output_is_fresh \
     "sandbox Syncfusion copy" \
@@ -91,8 +83,6 @@ playwright_check_assets() {
     "sandbox CSS" \
     "Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css" \
     Alis.Reactive.SandboxApp/Styles \
-    Alis.Reactive.SandboxApp/build-css.mjs \
-    Alis.Reactive.SandboxApp/vite.config.ts \
     Alis.Reactive.SandboxApp/package.json
 }
 

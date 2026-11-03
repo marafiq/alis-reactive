@@ -1,0 +1,85 @@
+/* The brand on Syncfusion components: the Tailwind3 theme's tokens, redeclared on .alis-root with the
+   design system's values. The theme declares them on :root, so a declaration on the root element wins
+   by inheritance whatever the link order. fusion-tokens.md lists the tokens and their value formats. */
+.alis-root {
+  --color-sf-primary: var(--color-primary);
+  --color-sf-primary-text-color: #fff;
+  --color-sf-primary-light: var(--color-primary-light);
+  --color-sf-primary-lighter: #F5E4E7;
+  --color-sf-primary-dark: var(--color-primary-dark);
+  --color-sf-primary-darker: #3D1420;
+
+  --color-sf-primary-bg-color: var(--color-primary);
+  --color-sf-primary-bg-color-hover: var(--color-primary-dark);
+  --color-sf-primary-bg-color-pressed: #3D1420;
+  --color-sf-primary-bg-color-focus: var(--color-primary-dark);
+  --color-sf-primary-bg-color-disabled: #d8b5bc;
+  --color-sf-primary-border-color: var(--color-primary);
+  --color-sf-primary-border-color-hover: var(--color-primary-dark);
+  --color-sf-primary-border-color-pressed: #3D1420;
+  --color-sf-primary-text: #fff;
+
+  --color-sf-success: #15803d;
+  --color-sf-success-light: #dcfce7;
+  --color-sf-success-lighter: #f0fdf4;
+  --color-sf-success-dark: #166534;
+  --color-sf-info: #0e7490;
+  --color-sf-info-light: #cffafe;
+  --color-sf-info-lighter: #ecfeff;
+  --color-sf-info-dark: #155e75;
+  --color-sf-warning: #c2410c;
+  --color-sf-warning-light: #ffedd5;
+  --color-sf-warning-lighter: #fff7fd;
+  --color-sf-warning-dark: #9a3412;
+  --color-sf-danger: #dc2626;
+  --color-sf-danger-light: #fee2e2;
+  --color-sf-danger-lighter: #fef2f2;
+  --color-sf-danger-dark: #b91c1c;
+
+  --color-sf-content-bg-color: rgba(255, 255, 255);
+  --color-sf-content-bg-color-alt1: #f9fafb;
+  --color-sf-content-bg-color-alt2: #f3f4f6;
+  --color-sf-content-bg-color-alt3: #e5e7eb;
+  --color-sf-content-bg-color-alt4: #9ca3af;
+  --color-sf-content-bg-color-alt5: #6b7280;
+  --color-sf-content-bg-color-hover: #f9fafb;
+  --color-sf-content-bg-color-pressed: #f3f4f6;
+  --color-sf-content-bg-color-focus: #f9fafb;
+  --color-sf-content-bg-color-selected: #e5e7eb;
+  --color-sf-content-bg-color-disabled: #ffffff;
+
+  --color-sf-content-text-color: #111827;
+  --color-sf-content-text-color-alt1: #374151;
+  --color-sf-content-text-color-alt2: #4b5563;
+  --color-sf-content-text-color-alt3: #6b7280;
+  --color-sf-content-text-color-alt4: #9ca3af;
+  --color-sf-content-text-color-hover: #111827;
+  --color-sf-content-text-color-pressed: #111827;
+  --color-sf-content-text-color-focus: #111827;
+  --color-sf-content-text-color-selected: #111827;
+  --color-sf-content-text-color-disabled: #9ca3af;
+  --color-sf-placeholder-text-color: #6b7280;
+
+  --color-sf-border-light: #e5e7eb;
+  --color-sf-border: #d1d5db;
+  --color-sf-border-dark: #9ca3af;
+  --color-sf-border-hover: #d1d5db;
+  --color-sf-border-pressed: #9ca3af;
+  --color-sf-border-focus: #d1d5db;
+  --color-sf-border-selected: #9ca3af;
+  --color-sf-border-dragged: #e5e7eb;
+  --color-sf-border-disabled: #e5e7eb;
+  --color-sf-border-warning: #c2410c;
+  --color-sf-border-error: #dc2626;
+  --color-sf-border-success: #15803d;
+
+  --color-sf-text-input-bg-color: #ffffff;
+  --color-sf-flyout-bg-color: #ffffff;
+  --color-sf-flyout-border: #e5e7eb;
+  --color-sf-overlay-bg-color: rgba(107, 114, 128, .75);
+
+  --e-font-name: var(--font-display);
+  --e-radius: 1rem;
+  --e-border: 1rem;
+  --font-sf: var(--font-display);
+}

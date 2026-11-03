@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.Build.NoTargets/3.7.0">
 
   <!--
-    This project compiles nothing. It exists so the framework browser assets -
-    the TypeScript runtime, the framework's own components and the design-system
-    CSS - are a first-class, navigable node in the solution instead of a loose folder.
+    This project compiles nothing. It exists so the framework's browser code - the
+    TypeScript runtime and the framework's own components - is a first-class,
+    navigable node in the solution instead of a loose folder.
 
-    The bundles are built by esbuild/vite via npm (see CLAUDE.md "Build & Run").
+    The bundle is built by esbuild via npm (see CLAUDE.md "Build & Run").
     MSBuild never touches these files - they are <None> items so Rider shows the
     full tree and new files appear automatically with no .sln or .csproj edits.
   -->
@@ -20,10 +20,8 @@
     <None Include="runtime/**/*" />
     <None Include="components/**/*" />
     <None Include="bundle.ts" />
-    <None Include="design-system/**/*" />
     <None Include="*.json" />
     <None Include="*.mjs" />
-    <None Include="*.config.ts" />
     <None Include="*.md" />
   </ItemGroup>
 

@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Imported into every project that references AlisReactive.DesignSystem (NuGet: build\ and
+    buildTransitive\; the sandbox: an <Import> of this file). Before each build it copies the theme,
+    css/theme.css, into the project, so the project's own Tailwind stylesheet can `@import` it:
+
+      @import "tailwindcss";
+      @import "./alis-reactive.theme.css";
+
+    The copy is build output: keep it out of source control. AlisReactiveTheme names where it lands
+    (default: Styles\alis-reactive.theme.css under the project); `none` turns the copy off. On .NET
+    Framework the same file lands at Content\AlisReactive.DesignSystem\css\theme.css with the
+    package's other browser assets (build\net48\AlisReactive.DesignSystem.targets), and this file is
+    not imported.
+  -->
+
+  <PropertyGroup>
+    <AlisReactiveTheme Condition="'$(AlisReactiveTheme)' == ''">$(MSBuildProjectDirectory)\Styles\alis-reactive.theme.css</AlisReactiveTheme>
+    <_AlisReactiveThemeSource Condition="Exists('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css')">$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css</_AlisReactiveThemeSource>
+    <_AlisReactiveThemeSource Condition="'$(_AlisReactiveThemeSource)' == ''">$(MSBuildThisFileDirectory)..\css\theme.css</_AlisReactiveThemeSource>
+  </PropertyGroup>
+
+  <Target Name="CopyAlisReactiveTheme" BeforeTargets="BeforeBuild" Condition="'$(AlisReactiveTheme)' != 'none'">
+    <Copy SourceFiles="$(_AlisReactiveThemeSource)" DestinationFiles="$(AlisReactiveTheme)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

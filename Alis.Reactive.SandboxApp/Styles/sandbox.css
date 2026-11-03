@@ -1,51 +1,21 @@
-/* Sandbox-only tailwind utilities.
-   Scans sandbox Views/Areas/Controllers/Models for utility classes used in
-   sandbox markup but not emitted by framework C#. Loaded alongside the
-   framework-shipped design-system.css — not a replacement for it. */
-
+/* The sandbox's stylesheet: Tailwind's utilities for its own views, resolved against the design
+   system's theme. AlisReactive.DesignSystem copies the theme to ./alis-reactive.theme.css on every
+   build (its .targets, imported by the csproj); the copy is build output. */
 @import "tailwindcss" source(none);
 @plugin "@tailwindcss/forms";
+@import "./alis-reactive.theme.css";
 
-/* Brand tokens — single source of truth, shared with the framework. */
-@import "../../Alis.Reactive.Assets/design-system/brand.css";
-
-/* Theme tokens live in the framework design-system.css; redeclare the
-   ones tailwind needs to resolve utility classes compiled here. */
-@theme {
-  --color-primary: var(--alis-brand-primary);
-  --color-primary-light: var(--alis-brand-primary-light);
-  --color-primary-dark: var(--alis-brand-primary-dark);
-  --color-accent: var(--alis-brand-accent);
-  --color-accent-light: var(--alis-brand-accent-light);
-  --color-accent-dark: var(--alis-brand-accent-dark);
-
-  --color-surface: #F8FAFC;
-  --color-surface-alt: #F1F5F9;
-  --color-surface-elevated: #FFFFFF;
-
-  --color-border: #E2E8F0;
-  --color-border-strong: #CBD5E1;
-
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94A3B8;
-
-  --color-success: #059669;
-  --color-success-light: #D1FAE5;
-  --color-warning: #D97706;
-  --color-warning-light: #FEF3C7;
-  --color-error: #DC2626;
-  --color-error-light: #FEE2E2;
-  --color-info: #2563EB;
-  --color-info-light: #DBEAFE;
-
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
-}
-
-/* Sandbox-only scan sources. */
 @source "../Views/**/*.cshtml";
 @source "../Areas/**/*.cshtml";
 @source "../Areas/**/*.cs";
 @source "../Controllers/**/*.cs";
 @source "../Models/**/*.cs";
+
+/* The mark a saved in-place editor carries: _DobQuickEditCard adds alis-editor-saved on success and
+   removes it when editing begins; Syncfusion keeps the wrapper's classes across its edit cycle. */
+.alis-editor-saved .e-editable-value::after {
+  content: " ✓";
+  color: var(--color-success);
+  font-weight: 700;
+  padding-left: 4px;
+}

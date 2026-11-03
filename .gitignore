@@ -23,6 +23,8 @@ TestResults/
 # (served as static web assets and packed into the NuGets), the sandbox's own bundles, and the
 # sandbox's copy of the Syncfusion files it links (copy-vendor.mjs).
 Alis.Reactive.Assets/dist/
+Alis.Reactive.DesignSystem/dist/
+Alis.Reactive.SandboxApp/Styles/alis-reactive.theme.css
 Alis.Reactive.SandboxApp/wwwroot/vendor/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js

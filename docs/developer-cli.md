@@ -56,7 +56,7 @@ For live UI work, run the relevant watcher plus the sandbox:
 | UI change | Watch command | Also run |
 |-----------|---------------|----------|
 | Framework runtime TypeScript | `npm run watch:runtime` | `dotnet watch --project Alis.Reactive.SandboxApp` |
-| Framework design-system CSS | `npm run watch:design-system` | `dotnet watch --project Alis.Reactive.SandboxApp` |
+| The design system's compiled default | `npm run watch:design-system` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only plugin JS | `npm run watch:sandbox-plugins` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only CSS | `npm run watch:sandbox-css` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Core, Native, tag helper or Fusion CSS | none (shipped as written) | `dotnet watch --project Alis.Reactive.SandboxApp` |
@@ -70,7 +70,8 @@ Asset ownership:
 | Asset | Source | Output | Ships to consumers |
 |-------|--------|--------|--------------------|
 | Runtime JS | `Alis.Reactive.Assets/runtime/` | `Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js` | yes, `AlisReactive`: `_content/AlisReactive/js/alis-reactive.js` |
-| Design-system CSS | `Alis.Reactive.Assets/design-system/` | `Alis.Reactive.Assets/dist/css/design-system.dev.css`, `design-system-fusion.dev.css` | yes, `AlisReactive.DesignSystem`: `css/design-system.css`, `css/design-system-fusion.css` |
+| The theme | `Alis.Reactive.DesignSystem/css/theme.css` | none, shipped as written; copied into each consumer by the package's `.targets` | yes, `AlisReactive.DesignSystem`: `css/theme.css` |
+| The design system's compiled default | `Alis.Reactive.DesignSystem/css/` | `Alis.Reactive.DesignSystem/dist/css/design-system.css` | yes, `AlisReactive.DesignSystem`: `css/design-system.css` |
 | Fusion CSS | `Alis.Reactive.Fusion/css/fusion.css` | none, shipped as written | yes, `AlisReactive.Fusion`: `css/fusion.css` |
 | Syncfusion theme and script | `@syncfusion/ej2` (the sandbox's dependency) | `Alis.Reactive.SandboxApp/wwwroot/vendor/syncfusion/` | no: each app brings its own |
 | Core CSS | `Alis.Reactive/css/alis-reactive.css` | none, shipped as written | yes, `AlisReactive`: `css/alis-reactive.css` |
@@ -96,7 +97,7 @@ then run the full `scripts/test.sh` before push or release work.
 Use `scripts/test.sh` before push. It runs the gates in this order:
 
 ```text
-npm run typecheck -> npm run build:all -> npm test -> consistency checks -> dotnet build -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
+npm run typecheck -> npm run build:packages -> npm test -> consistency checks -> dotnet build (which builds the apps' own assets) -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
 ```
 
 `scripts/test.sh --parallel` runs the same gate with the Playwright leg split into every project's CI

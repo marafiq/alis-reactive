@@ -88,7 +88,7 @@ editing:
 
 ```bash
 npm run watch:runtime                            # framework runtime TS
-npm run watch:design-system                      # framework design-system CSS
+npm run watch:design-system                      # the design system's compiled default
 npm run watch:sandbox-plugins                    # sandbox-only plugin JS
 npm run watch:sandbox-css                        # sandbox-only CSS
 dotnet watch --project Alis.Reactive.SandboxApp  # Razor + C# hot reload
@@ -106,8 +106,10 @@ The full command reference lives in **[docs/developer-cli.md](docs/developer-cli
 
 ## How the bundles ship
 
-`npm run build:all` builds the browser bundles into `Alis.Reactive.Assets/dist/` (gitignored).
-Each package ships its own files the way a Razor class library does: as static web assets.
+`npm run build:packages` builds the runtime bundle into `Alis.Reactive.Assets/dist/` and the design
+system's compiled default into `Alis.Reactive.DesignSystem/dist/` (both gitignored); `npm run build:all`
+also builds the apps' own assets, which `dotnet build` does for them. Each package ships its own files
+the way a Razor class library does: as static web assets.
 
 | Consumer | How it gets the files |
 |----------|-----------------------|
@@ -119,10 +121,10 @@ Each package ships its own files the way a Razor class library does: as static w
 
 ## Browser assets: what each package ships and where it lands
 
-Components ship the styling their own markup needs. The look (color, type, the brand) is the
-design system's: an app references `AlisReactive.DesignSystem`, or another design system that sets
-the same tokens (`--color-border`, `--color-accent`, `--font-display`, ...), and the components
-follow it. Without one, their stylesheets fall back to neutral colors and the page's font.
+The core and the components ship the styling their own markup needs, plain and complete. The look
+(color, type, the brand) is the design system's: an app references `AlisReactive.DesignSystem`, or
+sets the same tokens itself (`--color-border`, `--color-accent`, `--font-display`, ...), and the
+components follow it. Without one, their stylesheets fall back to neutral colors and the page's font.
 
 | Package | File | net10.0 URL | net48 file in the web project |
 |---------|------|-------------|-------------------------------|
@@ -131,17 +133,16 @@ follow it. Without one, their stylesheets fall back to neutral colors and the pa
 | `AlisReactive.Native` | drawer, loader, check list, radio group | `~/_content/AlisReactive.Native/css/native.css` | `Content\AlisReactive.Native\css\native.css` |
 | `AlisReactive.NativeTagHelpers` | `<native-*>` layout tag helpers | `~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css` | (net10.0 only) |
 | `AlisReactive.Fusion` | grid dialog form, the refused-input mark on Syncfusion wrappers | `~/_content/AlisReactive.Fusion/css/fusion.css` | `Content\AlisReactive.Fusion\css\fusion.css` |
-| `AlisReactive.DesignSystem` | tokens, page base, field and validation look | `~/_content/AlisReactive.DesignSystem/css/design-system.css` | `Content\AlisReactive.DesignSystem\css\design-system.css` |
-| `AlisReactive.DesignSystem` | the brand on Syncfusion components | `~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css` | `Content\AlisReactive.DesignSystem\css\design-system-fusion.css` |
+| `AlisReactive.DesignSystem` | the theme: one `@theme` block of tokens, for an app's own Tailwind build | `~/_content/AlisReactive.DesignSystem/css/theme.css` | `Content\AlisReactive.DesignSystem\css\theme.css` |
+| `AlisReactive.DesignSystem` | the compiled default: the tokens, the page base, the field, validation and Syncfusion look, under `.alis-root` | `~/_content/AlisReactive.DesignSystem/css/design-system.css` | `Content\AlisReactive.DesignSystem\css\design-system.css` |
 
 With Fusion, the Syncfusion theme and `ej2.min.js` are the app's: no framework package ships them. Take
 `@syncfusion/ej2` at the version Fusion pins (`node scripts/pin-syncfusion.mjs --check` prints it) and copy
 its `tailwind3.css` and `dist/ej2.min.js` into your `wwwroot`, as the sandbox's `copy-vendor.mjs` does, or
 link Syncfusion's CDN at that version.
 
-Link them in this order: the core's, the design system, the component stylesheets, the Syncfusion theme,
-Fusion's, then the design system's Fusion layer (its values must follow the Syncfusion theme's), then your
-own CSS.
+Link the framework's stylesheets before your own; among them the order is free, and the Syncfusion
+theme goes anywhere among them.
 
 ```html
 <link rel="stylesheet" href="~/_content/AlisReactive/css/alis-reactive.css" asp-append-version="true"/>
@@ -150,7 +151,7 @@ own CSS.
 <link rel="stylesheet" href="~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/vendor/syncfusion/tailwind3.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.Fusion/css/fusion.css" asp-append-version="true"/>
-<link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
 ...
 <script src="~/vendor/syncfusion/ej2.min.js" asp-append-version="true"></script>
 @Html.EJS().ScriptManager()
@@ -167,40 +168,41 @@ them with System.Web.Optimization or add the package version to the URL to bust 
 
 ## For UI developers — the design system
 
-Bringing the design system into a consuming app is three steps; you do **not** need to
-touch the framework internals.
+The design system is two stylesheets and no code. `css/theme.css` is one `@theme static` block of
+tokens (`--color-primary`, `--color-surface`, `--font-display`, ...): the brand. `css/design-system.css`
+is compiled from it: the tokens on `:root`, the page base, the look of the core's field and validation
+markup, and the brand on Syncfusion components, all scoped to `.alis-root`.
 
-1. **Reference the package.** Add a reference to `AlisReactive.DesignSystem` next to the
-   component packages you use. The component packages do not bring it: it is the app's choice.
+1. **Reference the package** beside the component packages you use; they do not bring it.
 
-2. **Link the stylesheets and mark the root** in `_Layout.cshtml`, in the order shown above, and
-   put the **`alis-root`** class on the element wrapping your content; the design system's page
-   styles are scoped to it so they never leak into the rest of the host app. (The Inter web font is
-   the design default; see the sandbox `_Layout` for the `preconnect`/`font` links.)
+2. **Link the compiled default and mark the root.** The `<link>` above, and `class="alis-root"` on
+   `<body>`: the page styles never leak outside it, and Syncfusion popups append to `body`, so the
+   root must hold them. An app with no CSS build stops here; it re-brands with `:root { --color-primary: ... }`
+   in a stylesheet linked after the design system's.
 
    ```html
-   <body class="alis-root h-full">
+   <body class="alis-root">
    ```
 
-3. **Build class strings from C#, not by hand.** `Alis.Reactive.DesignSystem` exposes
-   small static layout helpers that return the design system's utility classes for the current
-   tokens, so spacing, elevation, and color stay consistent without memorizing utility names.
-   Each takes typed token enums:
+3. **With your own Tailwind build, import the theme.** On every `dotnet build` the package copies
+   `theme.css` to `Styles/alis-reactive.theme.css` in your project (`<AlisReactiveTheme>` names another
+   path; `none` turns the copy off); keep the copy out of source control. Your stylesheet imports it
+   after Tailwind, so your utilities (`bg-primary`, `text-text-muted`, `border-border`) resolve to the
+   tokens the components read, and a later `@theme` block re-brands:
 
-   | Helper (in `DesignSystem/Layout`) | Returns classes for | Example tokens |
-   |---|---|---|
-   | `CardCss`, `ContainerCss`, `DividerCss` | cards, page containers, dividers | `CardElevation`, `CardPadding`, `CardDivider` |
-   | `GridCss`, `HStackCss`, `VStackCss` | grid + flex stacks | `GridCols`, `JustifyContent`, `AlignItems`, `SpacingScale` |
-   | `HeadingCss`, `TextCss`, `KvCss` | headings, body text, key/value rows | `HeadingLevel`, `TextSize`, `TextColor`, `AccentColor` |
-
-   ```razor
-   <div class="@CardCss.CardClasses(CardElevation.Low)">
-     <div class="@CardCss.BodyClasses(CardPadding.Standard)">…</div>
-   </div>
+   ```css
+   @import "tailwindcss";
+   @import "./alis-reactive.theme.css";
+   @theme { --color-primary: #0f766e; }
    ```
 
-   The `<native-*>` tag helpers do not use these: they write their own class names, styled by
-   `native-tag-helpers.css`, and take their own enums (`Alis.Reactive.NativeTagHelpers.*`).
+   Build with Tailwind's CLI (`npx @tailwindcss/cli -i Styles/app.css -o wwwroot/css/app.css --minify`)
+   after the first `dotnet build`, and link the output last. The sandbox does exactly this.
+
+The cascade: every framework stylesheet opens with `@layer theme, base, alis, components, utilities;`
+and keeps its looks in `alis`, so Tailwind's Preflight sits below them and your utilities above; a state
+mark (`alis-has-error`) stays unlayered and wins over a utility. Linking the framework's stylesheets
+before your own is what fixes that order.
 
 ## Repo Layout
 
@@ -211,18 +213,18 @@ Alis.Reactive.Fusion/             C# Syncfusion-component library
 Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
 Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
 Alis.Reactive.DesignSystem/       C# design-system tokens + layout class helpers; ships the design-system CSS
-Alis.Reactive.Assets/             Framework browser assets — npm workspace (runtime, components, CSS)
+Alis.Reactive.Assets/             The runtime and the framework's own components — npm workspace (TypeScript)
 Alis.Reactive.SandboxApp/         Dev harness + live component demos
 examples/resident-intake/         Source-referenced consumer example
 tests/                            Test projects (NUnit + vitest + Playwright)
 ```
 
-`Alis.Reactive.Assets/` is the single home for all framework browser assets — an
-npm workspace holding the runtime TypeScript, the design-system CSS, the Syncfusion
-CSS, and the stylesheets the component packages ship as written. esbuild and vite
-build the bundles into `dist/`; the C# packages ship those files as static web assets
-(`build/AlisReactiveStaticWebAssets.targets`) but never build them. A `NoTargets`
-`.csproj` makes the workspace visible in the solution and compiles nothing.
+`Alis.Reactive.Assets/` is the npm workspace of the runtime TypeScript and the framework's own
+component code; esbuild builds the bundle into its `dist/`. Each package ships its stylesheets as
+written from its own `css/` folder, and the design system builds its compiled default with Tailwind's
+CLI in a workspace of its own (`Alis.Reactive.DesignSystem/package.json`). The C# packages ship those
+files as static web assets (`build/AlisReactiveStaticWebAssets.targets`) but never build them. A
+`NoTargets` `.csproj` makes the Assets workspace visible in the solution and compiles nothing.
 
 ## License
 

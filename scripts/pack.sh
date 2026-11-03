@@ -12,7 +12,7 @@ Example:
 
 Builds delivery artifacts in order:
   1. install npm dependencies if node_modules is missing
-  2. build all browser assets
+  2. build the packages' browser assets
   3. run dotnet build --configuration Release
   4. pack the five shipped NuGet packages into ./nupkgs
 
@@ -45,8 +45,8 @@ OUTPUT_DIR="nupkgs"
 echo "[pack] ensuring npm dependencies"
 [ -d node_modules ] || npm ci
 
-echo "[pack] building browser assets"
-npm run build:all
+echo "[pack] building the packages' browser assets"
+npm run build:packages
 
 echo "[pack] compiling Release projects"
 dotnet build --configuration Release
@@ -54,8 +54,8 @@ dotnet build --configuration Release
 PACKAGES=(
   Alis.Reactive                 # core plan model, builders, serialization, runtime JS bundle
   Alis.Reactive.Native          # native HTML components
-  Alis.Reactive.Fusion          # Syncfusion EJ2 integration + syncfusion CSS bundle
-  Alis.Reactive.DesignSystem    # design-system tokens + layout helpers + CSS bundle
+  Alis.Reactive.Fusion          # Syncfusion EJ2 integration
+  Alis.Reactive.DesignSystem    # the theme and the compiled default stylesheet
   Alis.Reactive.NativeTagHelpers # ASP.NET Core tag helpers (net10.0 only)
 )
 

@@ -2,7 +2,7 @@
 
 Reference for customizing Syncfusion EJ2 components via CSS variables.
 Complements `fusion.css` in this folder: the design system's overrides of the Syncfusion Tailwind3
-theme that `AlisReactive.Fusion` ships (`../fusion/fusion.entry.css`).
+theme an app links beside `AlisReactive.Fusion`.
 
 ## Source of truth
 

@@ -3,29 +3,23 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Framework browser assets — the TypeScript runtime and the design-system CSS. Built by esbuild/vite; shipped by the C# NuGet packages as static web assets.",
+  "description": "The framework's runtime and its own components, TypeScript built by esbuild into dist/scripts; the AlisReactive NuGet ships the bundle as a static web asset.",
   "scripts": {
-    "build": "npm run build:runtime && npm run build:design-system",
+    "build": "npm run build:runtime",
     "generate:plan-types": "dotnet run --project ../tools/PlanContractGenerator/PlanContractGenerator.csproj --property:BuildReactiveBrowserAssets=false -- runtime/types/plan.ts",
     "build:runtime": "npm run generate:plan-types && node esbuild.config.mjs",
-    "build:design-system": "vite build --config vite.design-system.config.ts",
     "watch:runtime": "node esbuild.config.mjs --watch",
-    "watch:design-system": "vite build --config vite.design-system.config.ts --watch",
     "typecheck": "npm run generate:plan-types && tsc --project tsconfig.json --noEmit && tsc --project tsconfig.tests.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "22.20.4",
     "esbuild": "^0.28.2",
     "jsdom": "^27.4.0",
-    "tailwindcss": "^4.2.1",
-    "vite": "^8.3.1",
     "vitest": "^3.2.7"
   },
   "dependencies": {
-    "@microsoft/signalr": "^10.0.11",
-    "@tailwindcss/forms": "^0.5.11"
+    "@microsoft/signalr": "^10.0.11"
   }
 }

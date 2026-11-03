@@ -32,8 +32,8 @@ jobs:
       - name: Install npm deps
         run: npm ci
 
-      - name: Build browser assets (generates runtime/types/plan.ts + bundles)
-        run: npm run build:all
+      - name: Build the packages' browser assets (generates runtime/types/plan.ts + bundles)
+        run: npm run build:packages
 
       - name: Build full solution in Release (net48 compiled against real .NET Framework 4.8)
         run: dotnet build Alis.Reactive.slnx -c Release
@@ -86,8 +86,8 @@ jobs:
       - name: Install npm deps
         run: npm ci
 
-      - name: Build browser assets
-        run: npm run build:all
+      - name: Build the packages' browser assets
+        run: npm run build:packages
 
       - name: Pack this run's packages (local feed for the MVC5 consumer)
         shell: bash
@@ -106,6 +106,7 @@ jobs:
           if (-not (Test-Path "$dir/AlisReactive/css/alis-reactive.css")) { throw "core CSS did not land in Content\AlisReactive\css" }
           if (-not (Test-Path "$dir/AlisReactive.Native/css/native.css")) { throw "Native CSS did not land in Content\AlisReactive.Native\css" }
           if (-not (Test-Path "$dir/AlisReactive.DesignSystem/css/design-system.css")) { throw "design-system CSS did not land in Content\AlisReactive.DesignSystem\css" }
+          if (-not (Test-Path "$dir/AlisReactive.DesignSystem/css/theme.css")) { throw "the theme did not land in Content\AlisReactive.DesignSystem\css" }
 
       - name: Generate web.config binding redirects from the built bin assemblies
         shell: pwsh

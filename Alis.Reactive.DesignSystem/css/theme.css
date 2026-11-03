@@ -1,0 +1,39 @@
+/* The Alis.Reactive theme: the tokens every framework stylesheet reads and every Tailwind utility of
+   an app resolves to. Shipped as written at ~/_content/AlisReactive.DesignSystem/css/theme.css and
+   copied into a consumer's project by the package's .targets, for `@import` into its own Tailwind
+   build; `static`, so every token is emitted on :root whether a utility uses it or not. Re-brand in a
+   later `@theme` block (with a build) or on `:root` (without one). */
+@theme static {
+  --color-primary: #7A2E3B;
+  --color-primary-light: #9B4A57;
+  --color-primary-dark: #5E1F2C;
+  --color-accent: #D4A053;
+  --color-accent-light: #E0B975;
+  --color-accent-dark: #B8873C;
+
+  --color-surface: #F8FAFC;
+  --color-surface-alt: #F1F5F9;
+  --color-surface-elevated: #FFFFFF;
+
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
+
+  --color-success: #059669;
+  --color-success-light: #D1FAE5;
+  --color-warning: #D97706;
+  --color-warning-light: #FEF3C7;
+  --color-error: #DC2626;
+  --color-error-light: #FEE2E2;
+  --color-info: #2563EB;
+  --color-info-light: #DBEAFE;
+
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+
+  --font-display: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}

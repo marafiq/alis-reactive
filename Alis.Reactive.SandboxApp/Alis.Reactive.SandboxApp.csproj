@@ -18,6 +18,8 @@
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
     </ItemGroup>
 
+    <!-- The theme the design system copies into Styles\ before each build, as its NuGet does for an app. -->
+    <Import Project="..\Alis.Reactive.DesignSystem\build\AlisReactive.DesignSystem.targets" />
     <Import Project="..\build\AlisReactiveBrowserAssets.targets" />
 
 </Project>

@@ -31,18 +31,19 @@
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
-  <!-- The stylesheets npm builds into Alis.Reactive.Assets/dist (vite.design-system.config.ts):
-         css/design-system.css         the color and font tokens the component stylesheets read,
-                                       the page base, and the look of the core's field and
-                                       validation markup
-         css/design-system-fusion.css  its look for Syncfusion components; link it after
-                                       AlisReactive.Fusion's css/fusion.css
+  <!-- Two stylesheets:
+         css/theme.css          the theme, shipped as written: one @theme block of tokens an app imports
+                                into its own Tailwind build; build\AlisReactive.DesignSystem.targets
+                                copies it into every referencing project
+         css/design-system.css  the compiled default for an app with no build, built by this package's
+                                npm workspace (package.json) into dist\css
        Served at ~/_content/AlisReactive.DesignSystem/{path} (net10) and copied to
        Content\AlisReactive.DesignSystem\{path} (net48). Where and how:
        build\AlisReactiveStaticWebAssets.targets. -->
   <ItemGroup>
-    <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\design-system.dev.css" RelativePath="css/design-system.css" />
-    <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\design-system-fusion.dev.css" RelativePath="css/design-system-fusion.css" />
+    <AlisReactiveStaticWebAsset Include="css\theme.css" RelativePath="css/theme.css" />
+    <AlisReactiveStaticWebAsset Include="dist\css\design-system.css" RelativePath="css/design-system.css" />
+    <None Include="build\AlisReactive.DesignSystem.targets" Pack="true" PackagePath="build\AlisReactive.DesignSystem.targets;buildTransitive\AlisReactive.DesignSystem.targets" Visible="false" />
   </ItemGroup>
 
   <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />

@@ -45,6 +45,7 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         await Expect(Input(m => m.Name)).ToHaveClassAsync(new Regex("alis-has-error"));
         await Expect(Input(m => m.Email)).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(Input(m => m.Name)).ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         await Expect(Result).ToHaveTextAsync("");
@@ -64,6 +65,8 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' must have a minimum length of 2.");
+        await Expect(Input(m => m.Name)).ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
+        await Expect(Input(m => m.Email)).Not.ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
         await Expect(SummaryDiv).ToBeHiddenAsync();
         await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();

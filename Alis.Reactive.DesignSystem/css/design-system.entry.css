@@ -1,0 +1,12 @@
+/* The compiled default, for an app with no CSS build of its own: the theme's tokens, the page base, the
+   look of the core's field and validation markup, and the brand on Syncfusion components, all under
+   .alis-root. Built by Tailwind's CLI into dist/css/design-system.css, which the package ships at
+   ~/_content/AlisReactive.DesignSystem/css/design-system.css. It imports no Tailwind base and emits no
+   utilities: a host page keeps its own reset, and an app with a build imports theme.css instead. */
+@layer theme, base, alis, components, utilities;
+
+@import "./theme.css" layer(theme);
+@import "./base.css";
+@import "./field.css";
+@import "./validation.css";
+@import "./fusion.css";

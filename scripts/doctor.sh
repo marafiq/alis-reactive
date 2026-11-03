@@ -116,8 +116,7 @@ else
 fi
 
 check_output "runtime bundle" "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js" "scripts/build.sh"
-check_output "design-system CSS" "Alis.Reactive.Assets/dist/css/design-system.dev.css" "scripts/build.sh"
-check_output "design-system Fusion CSS" "Alis.Reactive.Assets/dist/css/design-system-fusion.dev.css" "scripts/build.sh"
+check_output "design-system CSS" "Alis.Reactive.DesignSystem/dist/css/design-system.css" "scripts/build.sh"
 check_output "sandbox Syncfusion copy" "Alis.Reactive.SandboxApp/wwwroot/vendor/syncfusion/ej2.min.js" "scripts/build.sh"
 check_output "sandbox plugin bundle" "Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js" "scripts/build.sh"
 check_output "sandbox CSS" "Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css" "scripts/build.sh"
