@@ -47,7 +47,7 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
 
     // Ctrl-click adds a resident to those already picked.
     private async Task Pick(string resident) =>
-        await Reviews.Cell(resident, ResidentColumn).ClickAsync(new() { Modifiers = new[] { KeyboardModifier.Control } });
+        await Reviews.Cell(resident, ResidentColumn).ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
 
     [Test]
     public async Task the_first_page_lists_six_residents_and_counts_its_one_high_risk_resident()

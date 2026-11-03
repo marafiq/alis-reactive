@@ -47,7 +47,7 @@ public class WhenUsingFusionGridSelection : PlaywrightTestBase
     // Ctrl-click adds a resident to the residents already seated, or takes a seated one off.
     private async Task CtrlClick(string resident) =>
         await Row(resident).Locator($"td[aria-colindex='{ResidentColumn}']")
-            .ClickAsync(new() { Modifiers = new[] { KeyboardModifier.Control } });
+            .ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
 
     [Test]
     public async Task the_sign_up_sheet_lists_the_residents_in_the_order_they_signed_up()
