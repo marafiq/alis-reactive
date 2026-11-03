@@ -31,10 +31,10 @@
     "watch:framework-css": "npm run watch:css -w tests/Alis.Reactive.Framework.App"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
-    "eslint": "^9.39.4",
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.4",
     "source-map-js": "1.2.1",
-    "typescript": "^5.8.0",
-    "typescript-eslint": "^8.70.1"
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.70.1"
   }
 }
