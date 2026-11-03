@@ -66,7 +66,7 @@ export function plan(
   handlers: Handler[],
   planId = "Test.Plan",
 ): PlanDocument {
-  return { version: 5, planId, vendors, objects, handlers };
+  return { version: 6, planId, vendors, objects, handlers };
 }
 
 /** A handler; its block reads the payload as `e`. */

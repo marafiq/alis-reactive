@@ -72,7 +72,7 @@ namespace Alis.Reactive
                 return;
             }
 
-            var fieldMarkup = new InputFieldBuilder(Writer, BindingPath, ElementId);
+            var fieldMarkup = new InputFieldBuilder(Writer, BindingPath, ElementId, Plan.ClassNames);
             if (Options.LabelText != null) fieldMarkup.Label(Options.LabelText);
             if (Options.IsRequired) fieldMarkup.Required();
             using (fieldMarkup.Begin()) { writeContent(); }

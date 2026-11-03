@@ -45,9 +45,10 @@ That is the whole document. The grammar names no feature.
 - **Inputs and forms are plugin data.**
   - The inputs of a view are `alis.model` data, contributed to the page's one table of inputs
     (`plugin("alis.model", "")`, 6.3): `{ inputs: { id: { name, body, value, shape,
-    committed, list } } }`: the MVC binding name, the JSON body path, the value as an expression of
-    the located object, the shape it reads as, the event that commits a value (M4), and whether the
-    input binds a list (H2, H4).
+    committed, invalidClass, list } } }`: the MVC binding name, the JSON body path, the value as an
+    expression of the located object, the shape it reads as, the event that commits a value (M4), the
+    class the input's element carries while a form refuses it (M9), and whether the input binds a
+    list (H2, H4).
   - A form's fields are `alis.form` data: `{ summary, fields: [{ name,
     tests: [{ check: fn(v, i), when: fn(i), message }] }] }`. `summary` is the id of the form's
     summary, `{formId}_validation_summary` (F6), the same whichever plan writes the form. A field is one
@@ -627,6 +628,10 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   `Alis.Reactive/Components/ComponentInput.cs`). When the plan that renders the
   input starts, the model subscribes it and re-raises it on the input's element as the bubbling DOM
   event `alis:commit`, once per element and for as long as the owner lives.
+- **M9 Mark.** Each input carries `invalidClass`, the one class its element carries while a form
+  refuses it: the name the app chose at startup (`services.AddReactiveClassNames`), `alis-has-error`
+  when it chose none. The form adds it when it shows a message beside the input (F6) and removes it
+  when it clears that message (F4, F7, F8); a stylesheet that marks a refused input reads this class.
 - **M8 Names.** A binding-name pattern names the mounted inputs whose binding name it spells, each
   `[*]` standing for an index: `Contacts[*].Name` names `Contacts[0].Name` and `Contacts[12].Name`,
   `Tags[*]` each tag, and a name with no `[*]` the one member. The form lists the inputs a field's name
@@ -663,7 +668,8 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   or a pattern passes. The first failing test's message goes to the summary, under the field's name.
   An item field with no item on the page checks nothing: the server sees no missing item.
 - **F6 Display.** A message goes inline into `{id}_error` when that slot is renderable: it has a
-  parent, and no ancestor has `hidden` or `display: none`. Then the field gets `alis-has-error`.
+  parent, and no ancestor has `hidden` or `display: none`. Then the input's element gets its
+  `invalidClass` (M9).
   Otherwise the message goes to the form's summary, `{formId}_validation_summary`, the element the
   data of the plan that asks names (1.1), one entry per key, replaced and never duplicated; each form
   has its own, so one form's messages never clear another's. The server renders the summary, once per

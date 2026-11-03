@@ -7,7 +7,7 @@
       "type": "object",
       "properties": {
         "version": {
-          "const": 5
+          "const": 6
         },
         "planId": {
           "type": "string"
@@ -743,6 +743,9 @@
         "committed": {
           "type": "string"
         },
+        "invalidClass": {
+          "type": "string"
+        },
         "list": {
           "type": "boolean"
         }
@@ -753,6 +756,7 @@
         "value",
         "shape",
         "committed",
+        "invalidClass",
         "list"
       ],
       "additionalProperties": false

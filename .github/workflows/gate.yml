@@ -73,6 +73,7 @@ jobs:
           - components
           - validation
           - conditions-and-rest
+          - class-names
     env:
       # Without a registered license, EJ2 overlays a trial modal that intercepts every interaction:
       # the actual cause of the historical red legs (fixed in 2d5f9562).

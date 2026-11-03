@@ -23,7 +23,7 @@ namespace Alis.Reactive.Grammar
             Handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
         }
 
-        public int Version => 5;
+        public int Version => 6;
 
         public string PlanId { get; }
         public IReadOnlyDictionary<string, Vendor> Vendors { get; }
@@ -175,20 +175,22 @@ namespace Alis.Reactive.Grammar
     }
 
     /// <summary>
-    /// An input bound to the model: its MVC name, its JSON body path, how its value reads, and the event its
-    /// component raises when a value is committed.
+    /// An input bound to the model: its MVC name, its JSON body path, how its value reads, the event its
+    /// component raises when a value is committed, and the class its element carries while a form refuses it.
     /// </summary>
     internal sealed class InputBinding
     {
-        internal InputBinding(string name, IReadOnlyList<BodyStep> body, Expr value, Shape shape, string committed)
+        internal InputBinding(string name, IReadOnlyList<BodyStep> body, Expr value, Shape shape, string committed, string invalidClass)
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentException("Binding name required.", nameof(name));
             if (string.IsNullOrEmpty(committed)) throw new ArgumentException("Commit event required.", nameof(committed));
+            if (string.IsNullOrEmpty(invalidClass)) throw new ArgumentException("Invalid class required.", nameof(invalidClass));
             Name = name;
             Body = body ?? throw new ArgumentNullException(nameof(body));
             Value = value ?? throw new ArgumentNullException(nameof(value));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
             Committed = committed;
+            InvalidClass = invalidClass;
             List = shape.DescribesArray;
         }
 
@@ -202,6 +204,9 @@ namespace Alis.Reactive.Grammar
 
         /// <summary>The component's event that commits a value; the model re-raises it as <c>alis:commit</c>.</summary>
         public string Committed { get; }
+
+        /// <summary>The class the input's element carries while a form refuses it (grammar.md M9): the app's choice.</summary>
+        public string InvalidClass { get; }
 
         /// <summary>Whether the input binds a list, so a request repeats its key per item and sends nothing when it is missing.</summary>
         public bool List { get; }

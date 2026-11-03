@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "planId": "Alis.Reactive.PlanTests.Support.Admission",
   "vendors": {
     "native": {
@@ -55,6 +55,7 @@
               "kind": "number"
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": false
           }
         }

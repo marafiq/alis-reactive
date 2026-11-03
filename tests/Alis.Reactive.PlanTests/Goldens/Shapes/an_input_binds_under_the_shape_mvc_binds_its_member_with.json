@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "planId": "Alis.Reactive.PlanTests.Support.Vitals",
   "vendors": {
     "native": {
@@ -71,6 +71,7 @@
               }
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": false
           },
           "Alis_Reactive_PlanTests_Support_Vitals__MeasuredOn": {
@@ -98,6 +99,7 @@
               "kind": "date"
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": false
           },
           "Alis_Reactive_PlanTests_Support_Vitals__RecordedAt": {
@@ -125,6 +127,7 @@
               "kind": "instant"
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": false
           },
           "Alis_Reactive_PlanTests_Support_Vitals__Notes": {
@@ -158,6 +161,7 @@
               }
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": true
           }
         }

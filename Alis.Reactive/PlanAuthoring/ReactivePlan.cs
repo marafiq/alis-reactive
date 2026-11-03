@@ -28,12 +28,16 @@ namespace Alis.Reactive
         internal ReactivePlan(IServiceProvider? services, string fieldPrefix, string view)
         {
             _services = services;
-            _context = new PlanBuildContext(PlanId.ForModel(typeof(TModel)).Value, _renderedInputs, fieldPrefix, view);
+            ClassNames = ResolveClassNames(services);
+            _context = new PlanBuildContext(PlanId.ForModel(typeof(TModel)).Value, _renderedInputs, fieldPrefix, view, ClassNames);
         }
 
         /// <summary>The forms this plan validates or shows the server's errors on, by container id.</summary>
         internal IReadOnlyList<string> Forms => _context.Forms;
         internal PlanBuildContext Context => _context;
+
+        /// <summary>The class names the fields of this plan render with: the app's choice, else the framework's.</summary>
+        internal ReactiveClassNames ClassNames { get; }
 
         /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
         /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>
@@ -137,6 +141,22 @@ namespace Alis.Reactive
                     _context.Check(validation.Form, CheckedField.Bind(validation.Form, fields, _context.FieldPrefix).ToList());
                 }
             }
+        }
+
+        // The names the app registered with AddReactiveClassNames, else the framework's own: an app that chose none
+        // renders the names the core's stylesheet styles, which is the promise and not a gap.
+        private static ReactiveClassNames ResolveClassNames(IServiceProvider? services)
+        {
+            var names = services?.GetService(typeof(ReactiveClassNames)) as ReactiveClassNames;
+
+#if NET48
+            // MVC5's DependencyResolver, bridged over the app's container at startup. Its default resolver creates
+            // only types with a public parameterless constructor, and ReactiveClassNames has none, so an app that
+            // registered nothing gets null here and the framework's names below.
+            names ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(ReactiveClassNames)) as ReactiveClassNames;
+#endif
+
+            return names ?? new ReactiveClassNames();
         }
 
         private static IBrowserRuleSource RequireBrowserRuleSource(

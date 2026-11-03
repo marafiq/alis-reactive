@@ -19,7 +19,8 @@ not be swapped.
 
 - No component package references the design system. The core and each component package ship the
   styling their own markup needs, under class names they own (`alis-field`, `alis-has-error`,
-  `alis-drawer`, `alis-check-list`, `alis-card`, `alis-hstack`, `alis-grid-dialog-form`, ...), plain
+  `alis-drawer`, `alis-check-list`, `alis-card`, `alis-hstack`, `alis-grid-dialog-form`, ...; the
+  core's five are the app's to rename at startup, `services.AddReactiveClassNames`), plain
   and complete: the core's `alis-reactive.css` is token-free, the components' read the design
   system's tokens (`--color-*`, `--font-display`) with neutral fallbacks. Fusion ships only the
   styling of its own markup; the Syncfusion theme and script are the app's, at the version Fusion

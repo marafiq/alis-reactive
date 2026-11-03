@@ -299,6 +299,18 @@ Alis.Reactive.ReactiveArray<TElement>.Sum(System.Linq.Expressions.Expression<Sys
 Alis.Reactive.ReactiveArray<TElement>.Sum(System.Linq.Expressions.Expression<System.Func<TElement, double>!>! selector) -> Alis.Reactive.ReactiveValue<double>!
 Alis.Reactive.ReactiveArray<TElement>.Sum(System.Linq.Expressions.Expression<System.Func<TElement, int>!>! selector) -> Alis.Reactive.ReactiveValue<int>!
 Alis.Reactive.ReactiveArray<TElement>.Where(System.Linq.Expressions.Expression<System.Func<TElement, bool>!>! predicate) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.ReactiveClassNames
+Alis.Reactive.ReactiveClassNames.Field.get -> string!
+Alis.Reactive.ReactiveClassNames.Field.set -> void
+Alis.Reactive.ReactiveClassNames.FieldLabel.get -> string!
+Alis.Reactive.ReactiveClassNames.FieldLabel.set -> void
+Alis.Reactive.ReactiveClassNames.FieldMessage.get -> string!
+Alis.Reactive.ReactiveClassNames.FieldMessage.set -> void
+Alis.Reactive.ReactiveClassNames.FieldRequired.get -> string!
+Alis.Reactive.ReactiveClassNames.FieldRequired.set -> void
+Alis.Reactive.ReactiveClassNames.InvalidInput.get -> string!
+Alis.Reactive.ReactiveClassNames.InvalidInput.set -> void
+Alis.Reactive.ReactiveClassNamesServiceCollectionExtensions
 Alis.Reactive.ReactiveFluentValidationBuilder
 Alis.Reactive.ReactiveFluentValidationBuilder.Add<TValidator>() -> Alis.Reactive.ReactiveFluentValidationBuilder!
 Alis.Reactive.ReactiveFluentValidationBuilder.AddFromAssembly(System.Reflection.Assembly! assembly) -> Alis.Reactive.ReactiveFluentValidationBuilder!
@@ -500,6 +512,7 @@ static Alis.Reactive.PlanExtensions.FormSummary(this Microsoft.AspNetCore.Mvc.Re
 static Alis.Reactive.PlanExtensions.ReactivePlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html) -> Alis.Reactive.ReactivePlan<TModel!>!
 static Alis.Reactive.PlanExtensions.RenderPlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, Alis.Reactive.ReactivePlan<TModel!>! plan) -> Microsoft.AspNetCore.Html.IHtmlContent!
 static Alis.Reactive.PropertyExtensions.Set<TValue>(this Alis.Reactive.Property<TValue?>! property, Alis.Reactive.TypedSource<TValue>! source) -> void
+static Alis.Reactive.ReactiveClassNamesServiceCollectionExtensions.AddReactiveClassNames(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.ReactiveClassNames!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.ReactiveFluentValidationServiceCollectionExtensions.AddReactiveFluentValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.ReactiveFluentValidationBuilder!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RequestExtensions.Delete<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
 static Alis.Reactive.RequestExtensions.Get<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!

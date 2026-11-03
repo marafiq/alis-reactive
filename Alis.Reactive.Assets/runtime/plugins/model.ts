@@ -21,6 +21,8 @@
 // M7 `ids`: the element id of each mounted input inside a container, keyed by binding name, so the form
 //    places a server message beside the input that binds the name the server reports, and clears every
 //    message inside it, whichever plan rendered the input.
+// M9 Each input carries `invalidClass`, the class its element carries while a form refuses it: the app's
+//    choice, read by the form when it shows a message beside the input and when it clears it.
 // M8 Names. A binding-name pattern names the mounted inputs whose binding name it spells, each `[*]` standing
 //    for an index: Contacts[*].Name names Contacts[0].Name and Contacts[12].Name, Tags[*] each tag. `namedInputs`
 //    lists every one on the page, with the index each `[*]` stood for, whichever plan rendered it (the form's
@@ -100,6 +102,13 @@ const pageModel: PageModel = {
     return input === undefined ? undefined : bindInput(input);
   },
 };
+
+/** The class the mounted input's element carries while a form refuses it (M9). */
+export function invalidClassOf(id: string): string {
+  // The form reaches an input through the page's table (F4, F7, F8) and finds its element before it marks
+  // it, so the id is a mounted input's.
+  return mountedInput(id)!.binding.invalidClass;
+}
 
 /** Whether the element is a mounted input of the page's table: the element the DOM finds by its id (M6). */
 export function isMountedInput(element: HTMLElement): boolean {

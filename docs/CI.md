@@ -34,8 +34,9 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
   a single 80-minute job that reruns from scratch on any hiccup is the wrong shape for it.
 - **The example's proof is short.** `scripts/example.sh --smoke` (pack five packages, `npm ci`,
   `dotnet build -c Release`, start, drive, stop) ran in 25 s on 2026-11-03 with warm npm, NuGet and
-  Playwright caches; the `example` job pays the browser install and a cold pack on top, so its
-  timeout is 20 minutes.
+  Playwright caches; the `example` job pays the browser install and a cold pack on top: 3 minutes on
+  run [41614396936](https://github.com/marafiq/alis-reactive/actions/runs/41614396936) (2026-11-03,
+  `d0a86a74d`), so its timeout is 20 minutes.
 - **Toolchain.** .NET SDK `10.0.101` or a newer 10.0 feature band (`global.json` sets
   `rollForward: latestFeature`, so a runner that already has a newer 10.0 SDK uses it: CI builds
   with 10.0.4xx while this repo's machines build with 10.0.101); Node 22 in CI;
@@ -46,7 +47,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
-| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x9; `example` | the one gate definition | never |
+| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x10; `example` | the one gate definition | never |
 | `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, five packages | nuget.org + GitHub Release |
@@ -109,6 +110,7 @@ minutes for `components-and-validation` (589 tests), which ran out on run 407117
 | `components` | `Components.*` except Fusion (Native, AppLevel, Brought) | 286 | 1633 s | 2097 s |
 | `validation` | `Validation` | 303 | 1681 s | 2274 s |
 | `conditions-and-rest` | everything not in the others (`Conditions`, `Plugins`, future namespaces) | 265 | 1220 s | 1838 s |
+| `class-names` | the class-names project, whole (`tests/Alis.Reactive.ClassNames.PlaywrightTests`, added 2026-11-03) | 3 | - | - |
 
 The test counts are the `--list` output at the commit that introduced this partition: sum 2592 = the
 discovered set of both projects, union identical to the full list, zero duplicates.

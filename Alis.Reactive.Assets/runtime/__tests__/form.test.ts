@@ -42,7 +42,7 @@ function required(message: string, when = e.lit(true)): FormField["tests"][numbe
 }
 
 function textInput(id: string, name: string): ModelPluginData["inputs"][string] {
-  return { name, body: [name], value: e.as(e.get(e.obj(id), ["value"]), s.string), shape: s.string, committed: "change", list: false };
+  return { name, body: [name], value: e.as(e.get(e.obj(id), ["value"]), s.string), shape: s.string, committed: "change", invalidClass: "alis-has-error", list: false };
 }
 
 function render(html: string): void {
@@ -220,7 +220,7 @@ describe("live", () => {
     };
     const model: ModelPluginData = {
       kind: "model",
-      inputs: { Rating: { name: "Rating", body: ["Rating"], value: e.as(e.get(e.obj("Rating"), ["value"]), s.number), shape: s.number, committed: "valueChanged", list: false } },
+      inputs: { Rating: { name: "Rating", body: ["Rating"], value: e.as(e.get(e.obj("Rating"), ["value"]), s.number), shape: s.number, committed: "valueChanged", invalidClass: "alis-has-error", list: false } },
     };
     const form: FormPluginData = { kind: "form", summary: "admission_validation_summary", fields: [scored] };
     startOwner(Owner.page(), [plan({

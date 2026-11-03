@@ -3,7 +3,7 @@
 // Do not edit by hand. Run `npm run generate:plan-types -w Alis.Reactive.Assets`.
 
 export interface PlanDocument {
-  version: 5;
+  version: 6;
   planId: string;
   vendors: Record<string, Vendor>;
   objects: Record<string, ObjectLocator>;
@@ -247,6 +247,7 @@ export interface InputBinding {
   value: Expr;
   shape: Shape;
   committed: string;
+  invalidClass: string;
   list: boolean;
 }
 

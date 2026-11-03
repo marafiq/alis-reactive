@@ -205,6 +205,25 @@ and keeps its looks in `alis`, so Tailwind's Preflight sits below them and your 
 mark (`alis-has-error`) stays unlayered and wins over a utility. Linking the framework's stylesheets
 before your own is what fixes that order.
 
+**Your own class names.** An input field renders with five class names: the wrapper (`alis-field`), its
+label, the required marker, the message slot and the mark a refused input carries (`alis-has-error`).
+An app with a stylesheet of its own, Bootstrap's say, chooses them once at startup, and every page
+renders with them; a name left unset keeps its default:
+
+```csharp
+builder.Services.AddReactiveClassNames(names =>
+{
+    names.Field = "mb-3";
+    names.FieldLabel = "form-label";
+    names.FieldRequired = "text-danger";
+    names.FieldMessage = "invalid-feedback";
+    names.InvalidInput = "is-invalid";
+});
+```
+
+The framework's stylesheets style the defaults; an app that renames styles its own.
+`tests/Alis.Reactive.ClassNames.App` is such an app, with no framework stylesheet linked.
+
 ## Repo Layout
 
 ```

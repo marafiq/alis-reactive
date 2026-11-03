@@ -22,6 +22,8 @@ namespace Alis.Reactive.PlanModel.Document
 
         private readonly string _planId;
         private readonly RenderedInputs _inputs;
+        // The class names the plan's fields render with; each input's binding tells the form the one a refused input carries (M9).
+        private readonly ReactiveClassNames _classNames;
         private readonly List<DeclaredObject> _declared = new List<DeclaredObject>();
         private readonly Dictionary<string, DeclaredObject> _declaredById = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
         private readonly List<(Func<PlanObjects, string> On, IReadOnlyList<string> Path, string Event, Block Body)> _handlers =
@@ -42,12 +44,13 @@ namespace Alis.Reactive.PlanModel.Document
         // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
 
-        internal PlanBuildContext(string planId, RenderedInputs inputs, string fieldPrefix, string view)
+        internal PlanBuildContext(string planId, RenderedInputs inputs, string fieldPrefix, string view, ReactiveClassNames classNames)
         {
             _planId = planId ?? throw new ArgumentNullException(nameof(planId));
             _inputs = inputs ?? throw new ArgumentNullException(nameof(inputs));
             FieldPrefix = fieldPrefix ?? throw new ArgumentNullException(nameof(fieldPrefix));
             View = view ?? throw new ArgumentNullException(nameof(view));
+            _classNames = classNames ?? throw new ArgumentNullException(nameof(classNames));
         }
 
         /// <summary>The MVC field prefix the plan's view renders under; empty for a page's own view.</summary>
@@ -280,7 +283,7 @@ namespace Alis.Reactive.PlanModel.Document
         }
 
         // Each input this plan rendered: its MVC name, its JSON body path, its value read in the model's
-        // type and the event its component commits a value with.
+        // type, the event its component commits a value with and the class it carries while refused.
         private IReadOnlyDictionary<string, InputBinding> ModelInputs(PlanObjects objects)
         {
             var inputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
@@ -291,7 +294,8 @@ namespace Alis.Reactive.PlanModel.Document
                 var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.ValuePath.Text, rendered.Shape);
                 inputs.Add(
                     declared.Id,
-                    new InputBinding(rendered.BindingPath, BodyOf(rendered.Binding.Path), value, rendered.Shape, rendered.CommittedBy.Value));
+                    new InputBinding(
+                        rendered.BindingPath, BodyOf(rendered.Binding.Path), value, rendered.Shape, rendered.CommittedBy.Value, _classNames.InvalidInput));
             }
 
             return inputs;

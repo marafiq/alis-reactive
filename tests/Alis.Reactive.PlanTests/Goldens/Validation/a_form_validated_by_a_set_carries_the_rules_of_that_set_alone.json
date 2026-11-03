@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "planId": "Alis.Reactive.PlanTests.Support.Admission",
   "vendors": {
     "native": {
@@ -65,6 +65,7 @@
               "kind": "string"
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": false
           },
           "Alis_Reactive_PlanTests_Support_Admission__Age": {
@@ -92,6 +93,7 @@
               "kind": "number"
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": false
           },
           "Alis_Reactive_PlanTests_Support_Admission__Deposit": {
@@ -119,6 +121,7 @@
               "kind": "number"
             },
             "committed": "change",
+            "invalidClass": "alis-has-error",
             "list": false
           }
         }
