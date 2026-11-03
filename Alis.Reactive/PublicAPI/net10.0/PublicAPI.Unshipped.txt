@@ -1,0 +1,549 @@
+#nullable enable
+abstract Alis.Reactive.Component.Vendor.get -> Alis.Reactive.ComponentVendor!
+Alis.Reactive.AllGuard<TModel>
+Alis.Reactive.AllGuard<TModel>.And(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.AllGuard<TModel!>!
+Alis.Reactive.AllGuard<TModel>.And<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.AllGuard<TModel!>!>!
+Alis.Reactive.AllGuard<TModel>.Then(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.BranchBuilder<TModel!>!
+Alis.Reactive.AnyGuard<TModel>
+Alis.Reactive.AnyGuard<TModel>.Or(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.AnyGuard<TModel!>!
+Alis.Reactive.AnyGuard<TModel>.Or<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.AnyGuard<TModel!>!>!
+Alis.Reactive.AnyGuard<TModel>.Then(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.BranchBuilder<TModel!>!
+Alis.Reactive.AppEvent
+Alis.Reactive.AppEvent.Name.get -> string!
+Alis.Reactive.AppEvent<TPayload>
+Alis.Reactive.AppEvent<TPayload>.Name.get -> string!
+Alis.Reactive.Arg
+Alis.Reactive.Arg<T>
+Alis.Reactive.AtLeastOneRule
+Alis.Reactive.BranchBuilder<TModel>
+Alis.Reactive.BranchBuilder<TModel>.Else(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> void
+Alis.Reactive.BranchBuilder<TModel>.ElseIf<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GuardBuilder<TModel!>!>!
+Alis.Reactive.BrowserField
+Alis.Reactive.BrowserField.FieldName.get -> string!
+Alis.Reactive.BrowserField.Rules.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserRule!>!
+Alis.Reactive.BrowserFile
+Alis.Reactive.BrowserFile.BrowserFile() -> void
+Alis.Reactive.BrowserFile.LastModified.get -> long
+Alis.Reactive.BrowserFile.LastModified.set -> void
+Alis.Reactive.BrowserFile.Name.get -> string!
+Alis.Reactive.BrowserFile.Name.set -> void
+Alis.Reactive.BrowserFile.Size.get -> long
+Alis.Reactive.BrowserFile.Size.set -> void
+Alis.Reactive.BrowserFile.Type.get -> string!
+Alis.Reactive.BrowserFile.Type.set -> void
+Alis.Reactive.BrowserRule
+Alis.Reactive.BrowserRule.IsUnconditional.get -> bool
+Alis.Reactive.BrowserRule.Message.get -> string!
+Alis.Reactive.BrowserRule.When(Alis.Reactive.Condition! condition) -> Alis.Reactive.BrowserRule!
+Alis.Reactive.BrowserRuleSet
+Alis.Reactive.BrowserRuleSet.Add(System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserField!>! fields, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.Add(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.BrowserRule! rule) -> void
+Alis.Reactive.BrowserRuleSet.Add(System.Linq.Expressions.LambdaExpression! owner, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserField!>! fields, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.AddItemRules(System.Linq.Expressions.LambdaExpression! collection, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserRule!>! rules, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.AddItems(System.Linq.Expressions.LambdaExpression! collection, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserField!>! itemFields, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.BrowserRuleSet() -> void
+Alis.Reactive.BrowserRuleSet.Declare(System.Linq.Expressions.LambdaExpression! member) -> void
+Alis.Reactive.BrowserRuleSet.DeclareItems(System.Linq.Expressions.LambdaExpression! collection) -> void
+Alis.Reactive.BrowserRuleSet.Fields.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
+Alis.Reactive.ChildElement
+Alis.Reactive.ChildElement.GetAttribute(string! name) -> string?
+Alis.Reactive.ChildElement.HasAttribute(string! name) -> bool
+Alis.Reactive.Comparison
+Alis.Reactive.ComparisonRule
+Alis.Reactive.ComparisonRule.Comparison.get -> Alis.Reactive.Comparison!
+Alis.Reactive.Component
+Alis.Reactive.Component.Component() -> void
+Alis.Reactive.ComponentInput
+Alis.Reactive.ComponentVendor
+Alis.Reactive.ComponentVendor.Name.get -> string!
+Alis.Reactive.Condition
+Alis.Reactive.ConditionExtensions
+Alis.Reactive.ConditionOperators
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.Eq(Alis.Reactive.TypedSource<TProp>! right) -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.Eq(TProp operand) -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.Falsy() -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.In(params TProp[]! values) -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.IsEmpty() -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.IsNull() -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.NotEmpty() -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.NotEq(Alis.Reactive.TypedSource<TProp>! right) -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.NotEq(TProp operand) -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.NotIn(params TProp[]! values) -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.NotNull() -> TNext!
+Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>.Truthy() -> TNext!
+Alis.Reactive.ConditionStart<TModel>
+Alis.Reactive.ConditionStart<TModel>.Confirm(string! message) -> Alis.Reactive.GroupGuard<TModel!>!
+Alis.Reactive.ConditionStart<TModel>.Not(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.GroupGuard<TModel!>!
+Alis.Reactive.ConditionStart<TModel>.When<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GroupGuard<TModel!>!>!
+Alis.Reactive.CreditCardRule
+Alis.Reactive.Data<TData>
+Alis.Reactive.Data<TData>.Get<TResult>(System.Linq.Expressions.Expression<System.Func<TData, TResult>!>! path) -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.DefaultMemberRule
+Alis.Reactive.DefaultMemberRule.DefaultMember.get -> string!
+Alis.Reactive.DispatchPayloadBuilder<TPayload, TModel>
+Alis.Reactive.DispatchPayloadBuilder<TPayload, TModel>.Set<TProp, TSource>(System.Linq.Expressions.Expression<System.Func<TPayload!, TProp>!>! field, Alis.Reactive.TypedSource<TSource>! source) -> Alis.Reactive.DispatchPayloadBuilder<TPayload!, TModel!>!
+Alis.Reactive.DispatchPayloadBuilder<TPayload, TModel>.Set<TProp>(System.Linq.Expressions.Expression<System.Func<TPayload!, TProp>!>! field, TProp value) -> Alis.Reactive.DispatchPayloadBuilder<TPayload!, TModel!>!
+Alis.Reactive.ElementClassList
+Alis.Reactive.ElementClassList.Add(Alis.Reactive.Arg<string!>! name) -> void
+Alis.Reactive.ElementClassList.Items.get -> Alis.Reactive.ReactiveArray<string!>!
+Alis.Reactive.ElementClassList.Remove(Alis.Reactive.Arg<string!>! name) -> void
+Alis.Reactive.ElementClassList.Toggle(Alis.Reactive.Arg<string!>! name) -> void
+Alis.Reactive.ElementContent
+Alis.Reactive.ElementContent.Set(string! value) -> void
+Alis.Reactive.ElementContent.Set<TValue>(Alis.Reactive.TypedSource<TValue>! source) -> void
+Alis.Reactive.EmptyRule
+Alis.Reactive.Event
+Alis.Reactive.Event<TArgs>
+Alis.Reactive.Event<TArgs>.Name.get -> string!
+Alis.Reactive.Field
+Alis.Reactive.Field.Name.get -> string!
+Alis.Reactive.Field<TValue>
+Alis.Reactive.FixedComparisonRule
+Alis.Reactive.FixedComparisonRule.Number.get -> decimal?
+Alis.Reactive.GatherBuilder<TRequest, TModel>
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Form() -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Form(params System.Linq.Expressions.Expression<System.Func<TModel!, object?>!>![]! fields) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Form(string! formId) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Header(string! name, string! value) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Header<TValue>(string! name, Alis.Reactive.TypedSource<TValue>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TItem, TSource>(System.Linq.Expressions.Expression<System.Func<TRequest!, System.Collections.Generic.IEnumerable<TItem>!>!>! member, Alis.Reactive.TypedSource<TSource>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TValue, TSource>(System.Linq.Expressions.Expression<System.Func<TRequest!, TValue>!>! member, Alis.Reactive.TypedSource<TSource>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest!, TValue>!>! member, TValue value) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest!, TValue?>!>! member, Alis.Reactive.TypedSource<TValue>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GroupAll<TModel>
+Alis.Reactive.GroupAll<TModel>.And(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.GroupAll<TModel!>!
+Alis.Reactive.GroupAll<TModel>.And<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GroupAll<TModel!>!>!
+Alis.Reactive.GroupAny<TModel>
+Alis.Reactive.GroupAny<TModel>.Or(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.GroupAny<TModel!>!
+Alis.Reactive.GroupAny<TModel>.Or<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GroupAny<TModel!>!>!
+Alis.Reactive.GroupGuard<TModel>
+Alis.Reactive.GroupGuard<TModel>.And(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.GroupAll<TModel!>!
+Alis.Reactive.GroupGuard<TModel>.And<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GroupAll<TModel!>!>!
+Alis.Reactive.GroupGuard<TModel>.Not() -> Alis.Reactive.GroupGuard<TModel!>!
+Alis.Reactive.GroupGuard<TModel>.Or(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.GroupAny<TModel!>!
+Alis.Reactive.GroupGuard<TModel>.Or<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GroupAny<TModel!>!>!
+Alis.Reactive.Guard<TModel>
+Alis.Reactive.GuardBuilder<TModel>
+Alis.Reactive.GuardBuilder<TModel>.And(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.AllGuard<TModel!>!
+Alis.Reactive.GuardBuilder<TModel>.And<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.AllGuard<TModel!>!>!
+Alis.Reactive.GuardBuilder<TModel>.Not() -> Alis.Reactive.GuardBuilder<TModel!>!
+Alis.Reactive.GuardBuilder<TModel>.Or(System.Func<Alis.Reactive.ConditionStart<TModel!>!, Alis.Reactive.Guard<TModel!>!>! group) -> Alis.Reactive.AnyGuard<TModel!>!
+Alis.Reactive.GuardBuilder<TModel>.Or<TProp>(Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.AnyGuard<TModel!>!>!
+Alis.Reactive.GuardBuilder<TModel>.Then(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.BranchBuilder<TModel!>!
+Alis.Reactive.HtmlElement
+Alis.Reactive.HtmlElement.Children.get -> Alis.Reactive.ReactiveArray<Alis.Reactive.ChildElement!>!
+Alis.Reactive.HtmlElement.ClassList.get -> Alis.Reactive.ElementClassList!
+Alis.Reactive.HtmlElement.Hide() -> void
+Alis.Reactive.HtmlElement.Html.get -> Alis.Reactive.ElementContent!
+Alis.Reactive.HtmlElement.Show() -> void
+Alis.Reactive.HtmlElement.Text.get -> Alis.Reactive.ElementContent!
+Alis.Reactive.HtmlExtensions
+Alis.Reactive.HttpRequestBuilder<TModel>
+Alis.Reactive.HttpRequestBuilder<TModel>.AsFormData() -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.AsJson() -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.Finally(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.Gather(System.Action<Alis.Reactive.GatherBuilder<TModel!, TModel!>!>! gather) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.Gather<TRequest>(System.Action<Alis.Reactive.GatherBuilder<TRequest!, TModel!>!>! gather) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.Response(System.Action<Alis.Reactive.ResponseBuilder<TModel!>!>! response) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.Validate<TValidationSource>(string! formId) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.WhileLoading(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.IAppLevelComponent
+Alis.Reactive.IAppLevelComponent.DefaultId.get -> string!
+Alis.Reactive.IBrowserRuleSource
+Alis.Reactive.IBrowserRuleSource.GetBrowserRules<TValidator>() -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
+Alis.Reactive.IComponent
+Alis.Reactive.IComponent.Vendor.get -> Alis.Reactive.ComponentVendor!
+Alis.Reactive.IConditionBuilder
+Alis.Reactive.IConditionBuilder.Otherwise(System.Action! rules) -> void
+Alis.Reactive.IdGenerator
+Alis.Reactive.IInputComponent
+Alis.Reactive.IInputComponent.Input.get -> Alis.Reactive.ComponentInput!
+Alis.Reactive.InlineValidator<T>
+Alis.Reactive.InlineValidator<T>.InlineValidator() -> void
+Alis.Reactive.InputBoundField<TModel, TProp>
+Alis.Reactive.InputBoundField<TModel, TProp>.Render<TComponent>(Microsoft.AspNetCore.Html.IHtmlContent! content) -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
+Alis.Reactive.InputBoundField<TModel, TProp>.Render<TComponent>(System.Action<System.IO.TextWriter!>! write) -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
+Alis.Reactive.InputBoundFieldBase<THelper, TModel, TProp>
+Alis.Reactive.InputBoundFieldBase<THelper, TModel, TProp>.BindingPath.get -> string!
+Alis.Reactive.InputBoundFieldBase<THelper, TModel, TProp>.ElementId.get -> string!
+Alis.Reactive.InputBoundFieldBase<THelper, TModel, TProp>.Expression.get -> System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>!
+Alis.Reactive.InputBoundFieldBase<THelper, TModel, TProp>.Helper.get -> THelper
+Alis.Reactive.InputBoundFieldBase<THelper, TModel, TProp>.Options.get -> Alis.Reactive.InputFieldOptions!
+Alis.Reactive.InputBoundFieldBase<THelper, TModel, TProp>.Plan.get -> Alis.Reactive.ReactivePlan<TModel!>!
+Alis.Reactive.InputFieldExtensions
+Alis.Reactive.InputFieldOptions
+Alis.Reactive.InputFieldOptions.Hidden() -> Alis.Reactive.InputFieldOptions!
+Alis.Reactive.InputFieldOptions.InputFieldOptions() -> void
+Alis.Reactive.InputFieldOptions.Label(string! label) -> Alis.Reactive.InputFieldOptions!
+Alis.Reactive.InputFieldOptions.Required() -> Alis.Reactive.InputFieldOptions!
+Alis.Reactive.IRuleBuilder<T, TProperty>
+Alis.Reactive.IRuleBuilder<T, TProperty>.SetValidator(Alis.Reactive.IValidator<TProperty>! validator) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.ServerOnly() -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.When(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WithMessage(string! message) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WithMessage(System.Func<T, string!>! message) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IValidator<T>
+Alis.Reactive.IValidator<T>.Validate(T instance) -> Alis.Reactive.ValidationResult!
+Alis.Reactive.IValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!
+Alis.Reactive.JsObject
+Alis.Reactive.JsObject.Event(string? name = null, string! declaredBy = "") -> Alis.Reactive.Event!
+Alis.Reactive.JsObject.Event<TArgs>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Event<TArgs!>!
+Alis.Reactive.JsObject.JsObject() -> void
+Alis.Reactive.JsObject.Method(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, Alis.Reactive.Arg! third, Alis.Reactive.Arg! fourth, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.Method(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, Alis.Reactive.Arg! third, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.Method(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.Method(Alis.Reactive.Arg! first, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.Method(string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.Method<TResult>(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, Alis.Reactive.Arg! third, string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.JsObject.Method<TResult>(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.JsObject.Method<TResult>(Alis.Reactive.Arg! first, string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.JsObject.Method<TResult>(string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.JsObject.MethodAsync(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.MethodAsync(Alis.Reactive.Arg! first, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.MethodAsync(string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.JsObject.MethodAsync<TResult>(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.JsObject.MethodAsync<TResult>(Alis.Reactive.Arg! first, string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.JsObject.MethodAsync<TResult>(string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.JsObject.Object<TObject>(Alis.Reactive.Arg! first, Alis.Reactive.Arg! second, string? name = null, string! declaredBy = "") -> TObject!
+Alis.Reactive.JsObject.Object<TObject>(Alis.Reactive.Arg! first, string? name = null, string! declaredBy = "") -> TObject!
+Alis.Reactive.JsObject.Object<TObject>(string? name = null, string! declaredBy = "") -> TObject!
+Alis.Reactive.JsObject.Objects<TItem>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Objects<TItem!>!
+Alis.Reactive.JsObject.Property<TValue>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Property<TValue>!
+Alis.Reactive.JsObject.ReadOnly<TValue>(string? name = null, string! declaredBy = "") -> Alis.Reactive.ReadOnly<TValue>!
+Alis.Reactive.JsObject.WriteOnly<TValue>(string? name = null, string! declaredBy = "") -> Alis.Reactive.WriteOnly<TValue>!
+Alis.Reactive.ListPropertyExtensions
+Alis.Reactive.MaxLengthRule
+Alis.Reactive.MaxLengthRule.Length.get -> int
+Alis.Reactive.MemberComparisonRule
+Alis.Reactive.MinLengthRule
+Alis.Reactive.MinLengthRule.Length.get -> int
+Alis.Reactive.NoItemsRule
+Alis.Reactive.NoPayload
+Alis.Reactive.NoPayload.NoPayload() -> void
+Alis.Reactive.NotDefaultMemberRule
+Alis.Reactive.NotDefaultMemberRule.DefaultMember.get -> string!
+Alis.Reactive.NotEmptyRule
+Alis.Reactive.NotNullRule
+Alis.Reactive.Objects<TItem>
+Alis.Reactive.Objects<TItem>.At(int index) -> TItem!
+Alis.Reactive.Objects<TItem>.Count.get -> Alis.Reactive.ReadOnly<int>!
+Alis.Reactive.Objects<TItem>.Each<TField>(System.Func<TItem!, Alis.Reactive.ReadOnly<TField>!>! property) -> Alis.Reactive.ReadOnly<System.Collections.Generic.IReadOnlyList<TField>!>!
+Alis.Reactive.ParallelBuilder<TModel>
+Alis.Reactive.ParallelBuilder<TModel>.OnAllSettled(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.ParallelBuilder<TModel!>!
+Alis.Reactive.PatternRule
+Alis.Reactive.PatternRule.Flags.get -> string!
+Alis.Reactive.PatternRule.Pattern.get -> string!
+Alis.Reactive.PipelineBuilder<TModel>
+Alis.Reactive.PipelineBuilder<TModel>.Bound<TProp>(System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>! member) -> Alis.Reactive.TypedSource<TProp>!
+Alis.Reactive.PipelineBuilder<TModel>.Component<TComponent, TOtherModel>(System.Linq.Expressions.Expression<System.Func<TOtherModel!, object?>!>! expr) -> TComponent!
+Alis.Reactive.PipelineBuilder<TModel>.Component<TComponent>() -> TComponent!
+Alis.Reactive.PipelineBuilder<TModel>.Component<TComponent>(string! refId) -> TComponent!
+Alis.Reactive.PipelineBuilder<TModel>.Component<TComponent>(System.Linq.Expressions.Expression<System.Func<TModel!, object?>!>! expr) -> TComponent!
+Alis.Reactive.PipelineBuilder<TModel>.Dispatch(Alis.Reactive.AppEvent! appEvent) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PipelineBuilder<TModel>.Dispatch<TPayload>(Alis.Reactive.AppEvent<TPayload!>! appEvent) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PipelineBuilder<TModel>.Dispatch<TPayload>(Alis.Reactive.AppEvent<TPayload!>! appEvent, System.Action<Alis.Reactive.DispatchPayloadBuilder<TPayload!, TModel!>!>! configure) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PipelineBuilder<TModel>.Dispatch<TPayload>(Alis.Reactive.AppEvent<TPayload!>! appEvent, TPayload! payload) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PipelineBuilder<TModel>.Element(string! elementId) -> Alis.Reactive.HtmlElement!
+Alis.Reactive.PipelineBuilder<TModel>.From<TElement>(Alis.Reactive.TypedSource<System.Collections.Generic.IEnumerable<TElement>!>! source) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.PipelineBuilder<TModel>.From<TElement>(Alis.Reactive.TypedSource<System.Collections.Generic.IReadOnlyList<TElement>!>! source) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.PipelineBuilder<TModel>.From<TElement>(Alis.Reactive.TypedSource<System.Collections.Generic.List<TElement>!>! source) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.PipelineBuilder<TModel>.From<TElement>(Alis.Reactive.TypedSource<TElement[]!>! source) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.PipelineBuilder<TModel>.Hub<THub>(Alis.Reactive.SignalRSource<THub!>! hub) -> THub!
+Alis.Reactive.PipelineBuilder<TModel>.Into(string! elementId) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PipelineBuilder<TModel>.Stream<TStream>(Alis.Reactive.ServerPushSource<TStream!>! stream) -> TStream!
+Alis.Reactive.PipelineBuilder<TModel>.Unload(string! elementId) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PipelineBuilder<TModel>.Url<TQuery>() -> Alis.Reactive.UrlQuery<TQuery!>!
+Alis.Reactive.PipelineBuilder<TModel>.ValidationErrors(string! formId) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PlanExtensions
+Alis.Reactive.Plugin
+Alis.Reactive.Plugin.Name.get -> string!
+Alis.Reactive.Plugin.Plugin(string! name) -> void
+Alis.Reactive.Property<TValue>
+Alis.Reactive.Property<TValue>.Set(TValue value) -> void
+Alis.Reactive.Property<TValue>.Set<TSource>(Alis.Reactive.TypedSource<TSource>! source) -> void
+Alis.Reactive.PropertyExtensions
+Alis.Reactive.RangeRule
+Alis.Reactive.RangeRule.Inclusive.get -> bool
+Alis.Reactive.RangeRule.NumericBounds.get -> (decimal From, decimal To)?
+Alis.Reactive.ReactiveArray<TElement>
+Alis.Reactive.ReactiveArray<TElement>.All(System.Linq.Expressions.Expression<System.Func<TElement, bool>!>! predicate) -> Alis.Reactive.ReactiveValue<bool>!
+Alis.Reactive.ReactiveArray<TElement>.Any() -> Alis.Reactive.ReactiveValue<bool>!
+Alis.Reactive.ReactiveArray<TElement>.Any(System.Linq.Expressions.Expression<System.Func<TElement, bool>!>! predicate) -> Alis.Reactive.ReactiveValue<bool>!
+Alis.Reactive.ReactiveArray<TElement>.Count() -> Alis.Reactive.ReactiveValue<int>!
+Alis.Reactive.ReactiveArray<TElement>.Count(System.Linq.Expressions.Expression<System.Func<TElement, bool>!>! predicate) -> Alis.Reactive.ReactiveValue<int>!
+Alis.Reactive.ReactiveArray<TElement>.Find(System.Linq.Expressions.Expression<System.Func<TElement, bool>!>! predicate) -> Alis.Reactive.ReactiveValue<TElement>!
+Alis.Reactive.ReactiveArray<TElement>.Find<TField>(System.Linq.Expressions.Expression<System.Func<TElement, bool>!>! predicate, System.Linq.Expressions.Expression<System.Func<TElement, TField>!>! selector) -> Alis.Reactive.ReactiveValue<TField>!
+Alis.Reactive.ReactiveArray<TElement>.OrderBy<TKey>(System.Linq.Expressions.Expression<System.Func<TElement, TKey>!>! key) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.ReactiveArray<TElement>.OrderByDescending<TKey>(System.Linq.Expressions.Expression<System.Func<TElement, TKey>!>! key) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.ReactiveArray<TElement>.Select<TResult>(System.Linq.Expressions.Expression<System.Func<TElement, TResult>!>! selector) -> Alis.Reactive.ReactiveArray<TResult>!
+Alis.Reactive.ReactiveArray<TElement>.Sum(System.Linq.Expressions.Expression<System.Func<TElement, decimal>!>! selector) -> Alis.Reactive.ReactiveValue<decimal>!
+Alis.Reactive.ReactiveArray<TElement>.Sum(System.Linq.Expressions.Expression<System.Func<TElement, double>!>! selector) -> Alis.Reactive.ReactiveValue<double>!
+Alis.Reactive.ReactiveArray<TElement>.Sum(System.Linq.Expressions.Expression<System.Func<TElement, int>!>! selector) -> Alis.Reactive.ReactiveValue<int>!
+Alis.Reactive.ReactiveArray<TElement>.Where(System.Linq.Expressions.Expression<System.Func<TElement, bool>!>! predicate) -> Alis.Reactive.ReactiveArray<TElement>!
+Alis.Reactive.ReactiveFluentValidationBuilder
+Alis.Reactive.ReactiveFluentValidationBuilder.Add<TValidator>() -> Alis.Reactive.ReactiveFluentValidationBuilder!
+Alis.Reactive.ReactiveFluentValidationBuilder.AddFromAssembly(System.Reflection.Assembly! assembly) -> Alis.Reactive.ReactiveFluentValidationBuilder!
+Alis.Reactive.ReactiveFluentValidationBuilder.AddFromAssemblyContaining<TMarker>() -> Alis.Reactive.ReactiveFluentValidationBuilder!
+Alis.Reactive.ReactiveFluentValidationServiceCollectionExtensions
+Alis.Reactive.ReactivePlan<TModel>
+Alis.Reactive.ReactivePlan<TModel>.BrowserRules<TValidator>() -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
+Alis.Reactive.ReactivePlan<TModel>.RegisterPlugin<TPlugin>() -> TPlugin!
+Alis.Reactive.ReactivePlan<TModel>.Render<TComponent>(string! elementId, Microsoft.AspNetCore.Html.IHtmlContent! markup) -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
+Alis.Reactive.ReactiveValidator
+Alis.Reactive.ReactiveValidator<T>
+Alis.Reactive.ReactiveValidator<T>.Include(Alis.Reactive.IValidator<T>! rules) -> void
+Alis.Reactive.ReactiveValidator<T>.ReactiveValidator() -> void
+Alis.Reactive.ReactiveValidator<T>.RuleFor<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilder<T, TProperty>!
+Alis.Reactive.ReactiveValidator<T>.RuleForEach<TElement>(System.Linq.Expressions.Expression<System.Func<T, System.Collections.Generic.IEnumerable<TElement>!>!>! collection) -> Alis.Reactive.IRuleBuilder<T, TElement>!
+Alis.Reactive.ReactiveValidator<T>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
+Alis.Reactive.ReactiveValidator<T>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
+Alis.Reactive.ReactiveValidator<T>.Validate(T instance) -> Alis.Reactive.ValidationResult!
+Alis.Reactive.ReactiveValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!
+Alis.Reactive.ReactiveValidator<T>.When(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
+Alis.Reactive.ReactiveValidator<T>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
+Alis.Reactive.ReactiveValue<TValue>
+Alis.Reactive.ReadOnly<TValue>
+Alis.Reactive.ReadOnly<TValue>.Get<TResult>(System.Linq.Expressions.Expression<System.Func<TValue, TResult>!>! path) -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.RenderedComponent<TComponent, TModel>
+Alis.Reactive.RenderedComponent<TComponent, TModel>.Reactive(System.Func<TComponent, Alis.Reactive.Event!>! eventSelector, System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
+Alis.Reactive.RenderedComponent<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent, Alis.Reactive.Event<TArgs!>!>! eventSelector, System.Action<TArgs!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
+Alis.Reactive.RenderedComponent<TComponent, TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void
+Alis.Reactive.RequestExtensions
+Alis.Reactive.RequestStart<TModel>
+Alis.Reactive.RequestStart<TModel>.Delete(string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.RequestStart<TModel>.Get(string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.RequestStart<TModel>.Post(string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.RequestStart<TModel>.Put(string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>
+Alis.Reactive.ResponseBuilder<TModel>.Chained(System.Func<Alis.Reactive.RequestStart<TModel!>!, Alis.Reactive.HttpRequestBuilder<TModel!>!>! request) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>.Chained<TResponse>(System.Func<Alis.Reactive.Data<TResponse!>!, Alis.Reactive.RequestStart<TModel!>!, Alis.Reactive.HttpRequestBuilder<TModel!>!>! request) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>.OnError(int statusCode, System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>.OnError(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>.OnError<TError>(int statusCode, System.Action<Alis.Reactive.Data<TError!>!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>.OnError<TError>(System.Action<Alis.Reactive.Data<TError!>!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>.OnSuccess(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.ResponseBuilder<TModel>.OnSuccess<TResponse>(System.Action<Alis.Reactive.Data<TResponse!>!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.ResponseBuilder<TModel!>!
+Alis.Reactive.RuleBuilderExtensions
+Alis.Reactive.ServerPushSource<TStream>
+Alis.Reactive.ServerPushStream
+Alis.Reactive.ServerPushStream.Close() -> void
+Alis.Reactive.ServerPushStream.ReadyState.get -> Alis.Reactive.ReadOnly<int>!
+Alis.Reactive.ServerPushStream.ServerPushStream() -> void
+Alis.Reactive.SignalRConnectionState
+Alis.Reactive.SignalRConnectionState.Connected = 2 -> Alis.Reactive.SignalRConnectionState
+Alis.Reactive.SignalRConnectionState.Connecting = 1 -> Alis.Reactive.SignalRConnectionState
+Alis.Reactive.SignalRConnectionState.Disconnected = 0 -> Alis.Reactive.SignalRConnectionState
+Alis.Reactive.SignalRConnectionState.Disconnecting = 3 -> Alis.Reactive.SignalRConnectionState
+Alis.Reactive.SignalRConnectionState.Reconnecting = 4 -> Alis.Reactive.SignalRConnectionState
+Alis.Reactive.SignalRHub
+Alis.Reactive.SignalRHub.Close.get -> Alis.Reactive.Event!
+Alis.Reactive.SignalRHub.ConnectionId.get -> Alis.Reactive.ReadOnly<string?>!
+Alis.Reactive.SignalRHub.Invoke(Alis.Reactive.Arg! argument, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.SignalRHub.Invoke(string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.SignalRHub.Invoke<TResult>(Alis.Reactive.Arg! argument, string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.SignalRHub.Invoke<TResult>(string? name = null, string! declaredBy = "") -> Alis.Reactive.TypedSource<TResult>!
+Alis.Reactive.SignalRHub.Reconnected.get -> Alis.Reactive.Event<Alis.Reactive.SignalRReconnectedArgs!>!
+Alis.Reactive.SignalRHub.Reconnecting.get -> Alis.Reactive.Event!
+Alis.Reactive.SignalRHub.Send(Alis.Reactive.Arg! argument, string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.SignalRHub.Send(string? name = null, string! declaredBy = "") -> void
+Alis.Reactive.SignalRHub.SignalRHub() -> void
+Alis.Reactive.SignalRHub.State.get -> Alis.Reactive.ReadOnly<Alis.Reactive.SignalRConnectionState>!
+Alis.Reactive.SignalRReconnectedArgs
+Alis.Reactive.SignalRReconnectedArgs.ConnectionId.get -> Alis.Reactive.ReadOnly<string!>!
+Alis.Reactive.SignalRReconnectedArgs.SignalRReconnectedArgs() -> void
+Alis.Reactive.SignalRSource<THub>
+Alis.Reactive.TextTest
+Alis.Reactive.TriggerBuilder<TModel>
+Alis.Reactive.TriggerBuilder<TModel>.CustomEvent(Alis.Reactive.AppEvent! appEvent, System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TriggerBuilder<TModel>.CustomEvent<TPayload>(Alis.Reactive.AppEvent<TPayload!>! appEvent, System.Action<Alis.Reactive.Data<TPayload!>!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TriggerBuilder<TModel>.CustomEvent<TPayload>(Alis.Reactive.AppEvent<TPayload!>! appEvent, System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TriggerBuilder<TModel>.DomReady(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TriggerBuilder<TModel>.ServerPush<TStream, TArgs>(Alis.Reactive.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Event<TArgs!>!>! eventSelector, System.Action<TArgs!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TriggerBuilder<TModel>.ServerPush<TStream>(Alis.Reactive.ServerPushSource<TStream!>! stream, System.Func<TStream!, Alis.Reactive.Event!>! eventSelector, System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TriggerBuilder<TModel>.SignalR<THub, TArgs>(Alis.Reactive.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Event<TArgs!>!>! eventSelector, System.Action<TArgs!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TriggerBuilder<TModel>.SignalR<THub>(Alis.Reactive.SignalRSource<THub!>! hub, System.Func<THub!, Alis.Reactive.Event!>! eventSelector, System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
+Alis.Reactive.TypedDslExemptionAttribute
+Alis.Reactive.TypedDslExemptionAttribute.Reason.get -> string!
+Alis.Reactive.TypedDslExemptionAttribute.TypedDslExemptionAttribute(string! reason) -> void
+Alis.Reactive.TypedSource<TProp>
+Alis.Reactive.TypedSource<TProp>.TypedSource() -> void
+Alis.Reactive.UrlQuery<TQuery>
+Alis.Reactive.UrlQuery<TQuery>.Get<TValue>(System.Linq.Expressions.Expression<System.Func<TQuery!, TValue>!>! member) -> Alis.Reactive.TypedSource<TValue>!
+Alis.Reactive.ValidationFailure
+Alis.Reactive.ValidationFailure.ErrorMessage.get -> string!
+Alis.Reactive.ValidationFailure.PropertyName.get -> string!
+Alis.Reactive.ValidationResult
+Alis.Reactive.ValidationResult.Errors.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValidationFailure!>!
+Alis.Reactive.ValidationResult.ErrorsByField.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string![]!>!
+Alis.Reactive.ValidationResult.IsValid.get -> bool
+Alis.Reactive.ValueTest
+Alis.Reactive.VendorEventPayload
+Alis.Reactive.VendorEventPayload.Argument = 0 -> Alis.Reactive.VendorEventPayload
+Alis.Reactive.VendorEventPayload.Element = 1 -> Alis.Reactive.VendorEventPayload
+Alis.Reactive.WriteOnly<TValue>
+Alis.Reactive.WriteOnly<TValue>.Set(TValue value) -> void
+Alis.Reactive.WriteOnly<TValue>.Set<TSource>(Alis.Reactive.TypedSource<TSource>! source) -> void
+const Alis.Reactive.ServerPushStream.Closed = 2 -> int
+const Alis.Reactive.ServerPushStream.Connecting = 0 -> int
+const Alis.Reactive.ServerPushStream.Open = 1 -> int
+override Alis.Reactive.AppEvent.ToString() -> string!
+override Alis.Reactive.AppEvent<TPayload>.ToString() -> string!
+override Alis.Reactive.Comparison.ToString() -> string!
+override Alis.Reactive.ComponentVendor.ToString() -> string!
+override Alis.Reactive.Field.ToString() -> string!
+override Alis.Reactive.TextTest.ToString() -> string!
+override Alis.Reactive.ValidationFailure.ToString() -> string!
+override Alis.Reactive.ValueTest.ToString() -> string!
+static Alis.Reactive.AppEvent.Declare(string? name = null, string! declaredBy = "") -> Alis.Reactive.AppEvent!
+static Alis.Reactive.AppEvent.Declare<TPayload>(string? name = null, string! declaredBy = "") -> Alis.Reactive.AppEvent<TPayload!>!
+static Alis.Reactive.Arg.implicit operator Alis.Reactive.Arg!(Alis.Reactive.Field! field) -> Alis.Reactive.Arg!
+static Alis.Reactive.Arg<T>.implicit operator Alis.Reactive.Arg<T>!(T value) -> Alis.Reactive.Arg<T>!
+static Alis.Reactive.BrowserRule.Between<TValue>(TValue from, TValue to, bool inclusive, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Compare<TValue>(Alis.Reactive.Comparison! comparison, TValue value, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.CompareWith(Alis.Reactive.Comparison! comparison, System.Linq.Expressions.LambdaExpression! peer, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.CreditCard(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Email(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Empty(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Matches(string! pattern, string! flags, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.MaxLength(int length, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.MinLength(int length, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.NotEmpty(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.NotNull(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Url(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.Comparison.Equal.get -> Alis.Reactive.Comparison!
+static Alis.Reactive.Comparison.GreaterThan.get -> Alis.Reactive.Comparison!
+static Alis.Reactive.Comparison.GreaterThanOrEqual.get -> Alis.Reactive.Comparison!
+static Alis.Reactive.Comparison.LessThan.get -> Alis.Reactive.Comparison!
+static Alis.Reactive.Comparison.LessThanOrEqual.get -> Alis.Reactive.Comparison!
+static Alis.Reactive.Comparison.NotEqual.get -> Alis.Reactive.Comparison!
+static Alis.Reactive.ComponentInput.Of<TValue, TArgs>(Alis.Reactive.ReadOnly<TValue>! value, Alis.Reactive.Event<TArgs!>! committedBy) -> Alis.Reactive.ComponentInput!
+static Alis.Reactive.ComponentVendor.Define(string! name, string! objectPath, string! subscribe, string! unsubscribe, Alis.Reactive.VendorEventPayload payload) -> Alis.Reactive.ComponentVendor!
+static Alis.Reactive.ComponentVendor.DefineCallbackProperties(string! name, string! objectPath, Alis.Reactive.VendorEventPayload payload) -> Alis.Reactive.ComponentVendor!
+static Alis.Reactive.ComponentVendor.Native.get -> Alis.Reactive.ComponentVendor!
+static Alis.Reactive.Condition.All(params Alis.Reactive.Condition![]! terms) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Always.get -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Any(params Alis.Reactive.Condition![]! terms) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Compare(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.Comparison! comparison, System.Linq.Expressions.Expression! value) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Holds(System.Linq.Expressions.LambdaExpression! collection, System.Linq.Expressions.Expression! item) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.In(System.Linq.Expressions.LambdaExpression! member, System.Linq.Expressions.Expression! values) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Is(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.ValueTest! test) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Not(Alis.Reactive.Condition! term) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Text(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.TextTest! test, string! text) -> Alis.Reactive.Condition!
+static Alis.Reactive.ConditionExtensions.Confirm<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! message) -> Alis.Reactive.GuardBuilder<TModel!>!
+static Alis.Reactive.ConditionExtensions.When<TModel, TProp>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GuardBuilder<TModel!>!>!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.IEnumerable<TItem>!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.IReadOnlyList<TItem>!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.List<TItem>!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TItem[]!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.Between<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, TValue low, TValue high) -> TNext!
+static Alis.Reactive.ConditionOperators.Between<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, TValue low, TValue high) -> TNext!
+static Alis.Reactive.ConditionOperators.Contains<TModel, TText, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TText, TNext!>! source, string! substring) -> TNext!
+static Alis.Reactive.ConditionOperators.EndsWith<TModel, TText, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TText, TNext!>! source, string! suffix) -> TNext!
+static Alis.Reactive.ConditionOperators.Gt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, Alis.Reactive.TypedSource<TValue>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Gt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Gt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, Alis.Reactive.TypedSource<TValue?>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Gt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Gte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, Alis.Reactive.TypedSource<TValue>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Gte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Gte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, Alis.Reactive.TypedSource<TValue?>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Gte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Lt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, Alis.Reactive.TypedSource<TValue>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Lt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Lt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, Alis.Reactive.TypedSource<TValue?>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Lt<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Lte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, Alis.Reactive.TypedSource<TValue>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Lte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Lte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, Alis.Reactive.TypedSource<TValue?>! right) -> TNext!
+static Alis.Reactive.ConditionOperators.Lte<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue?, TNext!>! source, TValue operand) -> TNext!
+static Alis.Reactive.ConditionOperators.Matches<TModel, TText, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TText, TNext!>! source, string! pattern) -> TNext!
+static Alis.Reactive.ConditionOperators.MinLength<TModel, TText, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TText, TNext!>! source, int length) -> TNext!
+static Alis.Reactive.ConditionOperators.StartsWith<TModel, TText, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TText, TNext!>! source, string! prefix) -> TNext!
+static Alis.Reactive.Field.Of<TRow, TValue>(System.Linq.Expressions.Expression<System.Func<TRow, TValue>!>! member) -> Alis.Reactive.Field<TValue>!
+static Alis.Reactive.HtmlExtensions.On<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, Alis.Reactive.ReactivePlan<TModel!>! plan, System.Action<Alis.Reactive.TriggerBuilder<TModel!>!>! trigger) -> void
+static Alis.Reactive.HtmlExtensions.Raises(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, Alis.Reactive.AppEvent! appEvent) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.HtmlExtensions.Raises<TPayload>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, Alis.Reactive.AppEvent<TPayload!>! appEvent) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.HtmlExtensions.Raises<TPayload>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, Alis.Reactive.AppEvent<TPayload!>! appEvent, TPayload! payload) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.IdGenerator.For<TModel, TProp>(System.Linq.Expressions.Expression<System.Func<TModel, TProp>!>! expression) -> string!
+static Alis.Reactive.IdGenerator.For<TModel>(System.Linq.Expressions.Expression<System.Func<TModel, object?>!>! expression) -> string!
+static Alis.Reactive.InputFieldExtensions.InputField<TModel, TProp>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, Alis.Reactive.ReactivePlan<TModel!>! plan, System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>! expression) -> Alis.Reactive.InputBoundField<TModel!, TProp>!
+static Alis.Reactive.InputFieldExtensions.InputField<TModel, TProp>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, Alis.Reactive.ReactivePlan<TModel!>! plan, System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>! expression, System.Action<Alis.Reactive.InputFieldOptions!>! configure) -> Alis.Reactive.InputBoundField<TModel!, TProp>!
+static Alis.Reactive.JsObject.Fixed<TValue>(TValue value) -> Alis.Reactive.Arg!
+static Alis.Reactive.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.TypedSource<TSource>! value) -> Alis.Reactive.Arg!
+static Alis.Reactive.ListPropertyExtensions.Each<TItem, TField>(this Alis.Reactive.ReadOnly<System.Collections.Generic.IReadOnlyList<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, TField>!>! field) -> Alis.Reactive.ReadOnly<System.Collections.Generic.IReadOnlyList<TField>!>!
+static Alis.Reactive.PlanExtensions.FormSummary(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, string! formId, string? cssClass = null) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.PlanExtensions.ReactivePlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html) -> Alis.Reactive.ReactivePlan<TModel!>!
+static Alis.Reactive.PlanExtensions.RenderPlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, Alis.Reactive.ReactivePlan<TModel!>! plan) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.PropertyExtensions.Set<TValue>(this Alis.Reactive.Property<TValue?>! property, Alis.Reactive.TypedSource<TValue>! source) -> void
+static Alis.Reactive.ReactiveFluentValidationServiceCollectionExtensions.AddReactiveFluentValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.ReactiveFluentValidationBuilder!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RequestExtensions.Delete<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+static Alis.Reactive.RequestExtensions.Get<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+static Alis.Reactive.RequestExtensions.Parallel<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, System.Func<Alis.Reactive.RequestStart<TModel!>!, Alis.Reactive.HttpRequestBuilder<TModel!>!>! first, params System.Func<Alis.Reactive.RequestStart<TModel!>!, Alis.Reactive.HttpRequestBuilder<TModel!>!>![]! more) -> Alis.Reactive.ParallelBuilder<TModel!>!
+static Alis.Reactive.RequestExtensions.Post<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+static Alis.Reactive.RequestExtensions.Put<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! url) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+static Alis.Reactive.RuleBuilderExtensions.ChildRules<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Action<Alis.Reactive.InlineValidator<TProperty>!>! rules) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.CreditCard<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.EmailAddress<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.Empty<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.Equal<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.Equal<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.ExclusiveBetween<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty from, TProperty to) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.ExclusiveBetween<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty from, TProperty to) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty from, TProperty to) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty from, TProperty to) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.Length<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, int length) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.Length<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, int minimum, int maximum) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.Matches<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, string! pattern) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.Matches<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, string! pattern, System.Text.RegularExpressions.RegexOptions options) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.Matches<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, System.Text.RegularExpressions.Regex! regex) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.MaximumLength<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, int maximum) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.MinimumLength<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, int minimum) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.RuleBuilderExtensions.Must<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Func<T, TProperty, bool>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.Must<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, bool>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.MustAsync<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Func<T, TProperty, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.MustAsync<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.NotEmpty<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.NotEqual<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.NotEqual<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.NotNull<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.RuleBuilderExtensions.Url<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.ServerPushStream.At<TStream>(string! url) -> Alis.Reactive.ServerPushSource<TStream!>!
+static Alis.Reactive.SignalRHub.At<THub>(string! url) -> Alis.Reactive.SignalRSource<THub!>!
+static Alis.Reactive.TextTest.Contains.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.TextTest.EndsWith.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.TextTest.Matches.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.TextTest.StartsWith.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.ValueTest.Falsy.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.IsEmpty.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.IsNull.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.NotEmpty.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.NotNull.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.Truthy.get -> Alis.Reactive.ValueTest!

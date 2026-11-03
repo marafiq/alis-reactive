@@ -41,6 +41,10 @@
       <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
       <!-- The package's slice rows, bottom row first; ALIS010-ALIS013 lock ADR-0004 against them in every build. -->
       <AdditionalFiles Include="SliceTree.txt" />
+      <!-- The public surface per target: a public symbol is a line in PublicAPI.Unshipped.txt, or the build fails (RS0016, RS0017). -->
+      <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
+      <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+      <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
 
     <!-- The styling Fusion's markup needs: the Syncfusion Tailwind3 theme at the version the

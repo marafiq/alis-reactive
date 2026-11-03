@@ -143,6 +143,10 @@ Identical to a release candidate with a stable version: `git tag -a v1.0.0 -m "A
 "$(git rev-parse origin/main)" && git push origin v1.0.0`. The GitHub Release is created without
 the pre-release flag and becomes "Latest"; nuget.org lists `1.0.0` as the stable version.
 
+The release commit moves every line of each package's `PublicAPI/<tfm>/PublicAPI.Unshipped.txt` into
+the `PublicAPI.Shipped.txt` beside it: what shipped is the shipped file, and the next change to the
+surface starts the unshipped file again.
+
 ## Hotfix through `release/X.Y`
 
 Only after `vX.Y.0` exists, and only when `main` already carries work that must not ship yet.

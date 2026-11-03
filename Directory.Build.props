@@ -13,6 +13,11 @@
     <Copyright>Copyright (c) Alis Solutions 2026</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <LangVersion>14.0</LangVersion>
+    <!-- The public surface of a shipped package is the text in its PublicAPI files; drift is a build error, not a warning. -->
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0024;RS0025;RS0048</WarningsAsErrors>
+    <!-- RS0026 (several overloads with optional parameters) is the DSL's design: an optional name: on every arity
+         so a developer types less; the declared surface text is the record a new overload is reviewed against. -->
+    <NoWarn>$(NoWarn);RS0026</NoWarn>
     <!-- XML documentation warnings are suppressed solution-wide so
          GenerateDocumentationFile still emits XML docs without flooding normal builds. -->
     <NoWarn>$(NoWarn);CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1591;CS1711;CS1712</NoWarn>

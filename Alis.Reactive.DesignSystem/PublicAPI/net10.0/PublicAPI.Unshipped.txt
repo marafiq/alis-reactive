@@ -1,0 +1,132 @@
+#nullable enable
+Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AccentColor.Error = 4 -> Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AccentColor.Info = 5 -> Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AccentColor.Muted = 6 -> Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AccentColor.Primary = 0 -> Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AccentColor.Secondary = 1 -> Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AccentColor.Success = 2 -> Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AccentColor.Warning = 3 -> Alis.Reactive.DesignSystem.AccentColor
+Alis.Reactive.DesignSystem.AlignItems
+Alis.Reactive.DesignSystem.AlignItems.Baseline = 4 -> Alis.Reactive.DesignSystem.AlignItems
+Alis.Reactive.DesignSystem.AlignItems.Center = 1 -> Alis.Reactive.DesignSystem.AlignItems
+Alis.Reactive.DesignSystem.AlignItems.End = 2 -> Alis.Reactive.DesignSystem.AlignItems
+Alis.Reactive.DesignSystem.AlignItems.Start = 0 -> Alis.Reactive.DesignSystem.AlignItems
+Alis.Reactive.DesignSystem.AlignItems.Stretch = 3 -> Alis.Reactive.DesignSystem.AlignItems
+Alis.Reactive.DesignSystem.CardCss
+Alis.Reactive.DesignSystem.CardDivider
+Alis.Reactive.DesignSystem.CardDivider.Both = 3 -> Alis.Reactive.DesignSystem.CardDivider
+Alis.Reactive.DesignSystem.CardDivider.Footer = 2 -> Alis.Reactive.DesignSystem.CardDivider
+Alis.Reactive.DesignSystem.CardDivider.Header = 1 -> Alis.Reactive.DesignSystem.CardDivider
+Alis.Reactive.DesignSystem.CardDivider.None = 0 -> Alis.Reactive.DesignSystem.CardDivider
+Alis.Reactive.DesignSystem.CardElevation
+Alis.Reactive.DesignSystem.CardElevation.Flat = 0 -> Alis.Reactive.DesignSystem.CardElevation
+Alis.Reactive.DesignSystem.CardElevation.High = 3 -> Alis.Reactive.DesignSystem.CardElevation
+Alis.Reactive.DesignSystem.CardElevation.Low = 1 -> Alis.Reactive.DesignSystem.CardElevation
+Alis.Reactive.DesignSystem.CardElevation.Medium = 2 -> Alis.Reactive.DesignSystem.CardElevation
+Alis.Reactive.DesignSystem.CardPadding
+Alis.Reactive.DesignSystem.CardPadding.Compact = 1 -> Alis.Reactive.DesignSystem.CardPadding
+Alis.Reactive.DesignSystem.CardPadding.None = 0 -> Alis.Reactive.DesignSystem.CardPadding
+Alis.Reactive.DesignSystem.CardPadding.Standard = 2 -> Alis.Reactive.DesignSystem.CardPadding
+Alis.Reactive.DesignSystem.ContainerCss
+Alis.Reactive.DesignSystem.CssUtils
+Alis.Reactive.DesignSystem.DividerCss
+Alis.Reactive.DesignSystem.ElementSpacing
+Alis.Reactive.DesignSystem.ElementSpacing.Base = 3 -> Alis.Reactive.DesignSystem.ElementSpacing
+Alis.Reactive.DesignSystem.ElementSpacing.Lg = 5 -> Alis.Reactive.DesignSystem.ElementSpacing
+Alis.Reactive.DesignSystem.ElementSpacing.Md = 4 -> Alis.Reactive.DesignSystem.ElementSpacing
+Alis.Reactive.DesignSystem.ElementSpacing.None = 0 -> Alis.Reactive.DesignSystem.ElementSpacing
+Alis.Reactive.DesignSystem.ElementSpacing.Sm = 2 -> Alis.Reactive.DesignSystem.ElementSpacing
+Alis.Reactive.DesignSystem.ElementSpacing.Xs = 1 -> Alis.Reactive.DesignSystem.ElementSpacing
+Alis.Reactive.DesignSystem.GridCols
+Alis.Reactive.DesignSystem.GridCols.C1 = 1 -> Alis.Reactive.DesignSystem.GridCols
+Alis.Reactive.DesignSystem.GridCols.C2 = 2 -> Alis.Reactive.DesignSystem.GridCols
+Alis.Reactive.DesignSystem.GridCols.C3 = 3 -> Alis.Reactive.DesignSystem.GridCols
+Alis.Reactive.DesignSystem.GridCols.C4 = 4 -> Alis.Reactive.DesignSystem.GridCols
+Alis.Reactive.DesignSystem.GridCols.C5 = 5 -> Alis.Reactive.DesignSystem.GridCols
+Alis.Reactive.DesignSystem.GridCols.C6 = 6 -> Alis.Reactive.DesignSystem.GridCols
+Alis.Reactive.DesignSystem.GridCss
+Alis.Reactive.DesignSystem.HeadingCss
+Alis.Reactive.DesignSystem.HeadingLevel
+Alis.Reactive.DesignSystem.HeadingLevel.H1 = 1 -> Alis.Reactive.DesignSystem.HeadingLevel
+Alis.Reactive.DesignSystem.HeadingLevel.H2 = 2 -> Alis.Reactive.DesignSystem.HeadingLevel
+Alis.Reactive.DesignSystem.HeadingLevel.H3 = 3 -> Alis.Reactive.DesignSystem.HeadingLevel
+Alis.Reactive.DesignSystem.HeadingLevel.H4 = 4 -> Alis.Reactive.DesignSystem.HeadingLevel
+Alis.Reactive.DesignSystem.HeadingLevel.H5 = 5 -> Alis.Reactive.DesignSystem.HeadingLevel
+Alis.Reactive.DesignSystem.HeadingLevel.H6 = 6 -> Alis.Reactive.DesignSystem.HeadingLevel
+Alis.Reactive.DesignSystem.HStackCss
+Alis.Reactive.DesignSystem.JustifyContent
+Alis.Reactive.DesignSystem.JustifyContent.Around = 4 -> Alis.Reactive.DesignSystem.JustifyContent
+Alis.Reactive.DesignSystem.JustifyContent.Between = 3 -> Alis.Reactive.DesignSystem.JustifyContent
+Alis.Reactive.DesignSystem.JustifyContent.Center = 1 -> Alis.Reactive.DesignSystem.JustifyContent
+Alis.Reactive.DesignSystem.JustifyContent.End = 2 -> Alis.Reactive.DesignSystem.JustifyContent
+Alis.Reactive.DesignSystem.JustifyContent.Evenly = 5 -> Alis.Reactive.DesignSystem.JustifyContent
+Alis.Reactive.DesignSystem.JustifyContent.Start = 0 -> Alis.Reactive.DesignSystem.JustifyContent
+Alis.Reactive.DesignSystem.KvCss
+Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Base = 3 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Lg = 5 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Max = 8 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Md = 4 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.None = 0 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Sm = 2 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Xl = 6 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Xs = 1 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.SpacingScale.Xxl = 7 -> Alis.Reactive.DesignSystem.SpacingScale
+Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Accent = 4 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Error = 7 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Inherit = 8 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Inverse = 3 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Muted = 2 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Primary = 0 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Secondary = 1 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Success = 5 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextColor.Warning = 6 -> Alis.Reactive.DesignSystem.TextColor
+Alis.Reactive.DesignSystem.TextCss
+Alis.Reactive.DesignSystem.TextSize
+Alis.Reactive.DesignSystem.TextSize.Base = 2 -> Alis.Reactive.DesignSystem.TextSize
+Alis.Reactive.DesignSystem.TextSize.Lg = 3 -> Alis.Reactive.DesignSystem.TextSize
+Alis.Reactive.DesignSystem.TextSize.Sm = 1 -> Alis.Reactive.DesignSystem.TextSize
+Alis.Reactive.DesignSystem.TextSize.Xl = 4 -> Alis.Reactive.DesignSystem.TextSize
+Alis.Reactive.DesignSystem.TextSize.Xs = 0 -> Alis.Reactive.DesignSystem.TextSize
+Alis.Reactive.DesignSystem.TokenMap
+Alis.Reactive.DesignSystem.VStackCss
+static Alis.Reactive.DesignSystem.CardCss.AccentInnerClasses(Alis.Reactive.DesignSystem.AccentColor accent) -> string!
+static Alis.Reactive.DesignSystem.CardCss.BodyClasses(Alis.Reactive.DesignSystem.CardPadding padding = Alis.Reactive.DesignSystem.CardPadding.Standard) -> string!
+static Alis.Reactive.DesignSystem.CardCss.CardClasses(Alis.Reactive.DesignSystem.CardElevation elevation = Alis.Reactive.DesignSystem.CardElevation.Low) -> string!
+static Alis.Reactive.DesignSystem.CardCss.FooterClasses(Alis.Reactive.DesignSystem.CardDivider divider) -> string!
+static Alis.Reactive.DesignSystem.CardCss.HeaderClasses(Alis.Reactive.DesignSystem.CardDivider divider) -> string!
+static Alis.Reactive.DesignSystem.ContainerCss.Classes(string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.CssUtils.MergeClasses(string! generated, string? cssClass) -> string!
+static Alis.Reactive.DesignSystem.DividerCss.DashedClasses(string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.DividerCss.LabeledLineInnerClasses() -> string!
+static Alis.Reactive.DesignSystem.DividerCss.LabeledLineOuterClasses() -> string!
+static Alis.Reactive.DesignSystem.DividerCss.LabeledTextClasses() -> string!
+static Alis.Reactive.DesignSystem.DividerCss.LabeledTextWrapperClasses() -> string!
+static Alis.Reactive.DesignSystem.DividerCss.LabeledWrapperClasses(string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.DividerCss.PlainClasses(string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.GridCss.Classes(Alis.Reactive.DesignSystem.GridCols cols, Alis.Reactive.DesignSystem.SpacingScale gap = Alis.Reactive.DesignSystem.SpacingScale.Md, string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.GridCss.ResponsiveClasses(Alis.Reactive.DesignSystem.GridCols cols, Alis.Reactive.DesignSystem.SpacingScale gap = Alis.Reactive.DesignSystem.SpacingScale.Md, string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.HeadingCss.Classes(Alis.Reactive.DesignSystem.HeadingLevel level, Alis.Reactive.DesignSystem.ElementSpacing spacing = Alis.Reactive.DesignSystem.ElementSpacing.Sm, string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.HeadingCss.OverlineClasses(string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.HStackCss.Classes(Alis.Reactive.DesignSystem.SpacingScale gap, Alis.Reactive.DesignSystem.AlignItems align = Alis.Reactive.DesignSystem.AlignItems.Center, Alis.Reactive.DesignSystem.JustifyContent justify = Alis.Reactive.DesignSystem.JustifyContent.Start, bool wrap = false, string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.KvCss.InlineDdClasses() -> string!
+static Alis.Reactive.DesignSystem.KvCss.InlineDtClasses() -> string!
+static Alis.Reactive.DesignSystem.KvCss.InlineWrapperClasses(string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.KvCss.StackedDdClasses() -> string!
+static Alis.Reactive.DesignSystem.KvCss.StackedDtClasses() -> string!
+static Alis.Reactive.DesignSystem.KvCss.StackedWrapperClasses(string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.TextCss.Classes(Alis.Reactive.DesignSystem.TextSize size, Alis.Reactive.DesignSystem.TextColor color = Alis.Reactive.DesignSystem.TextColor.Primary, bool bold = false, Alis.Reactive.DesignSystem.ElementSpacing spacing = Alis.Reactive.DesignSystem.ElementSpacing.Base, string? cssClass = null) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Accent(Alis.Reactive.DesignSystem.AccentColor accent) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Color(Alis.Reactive.DesignSystem.TextColor color) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Cols(Alis.Reactive.DesignSystem.GridCols cols) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Gap(Alis.Reactive.DesignSystem.SpacingScale scale) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.GapX(Alis.Reactive.DesignSystem.SpacingScale scale) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.GapY(Alis.Reactive.DesignSystem.SpacingScale scale) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Items(Alis.Reactive.DesignSystem.AlignItems align) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Justify(Alis.Reactive.DesignSystem.JustifyContent justify) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Py(Alis.Reactive.DesignSystem.SpacingScale scale) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Size(Alis.Reactive.DesignSystem.TextSize size) -> string!
+static Alis.Reactive.DesignSystem.TokenMap.Spacing(Alis.Reactive.DesignSystem.ElementSpacing spacing) -> string!
+static Alis.Reactive.DesignSystem.VStackCss.Classes(Alis.Reactive.DesignSystem.SpacingScale gap, bool divideY = false, string? cssClass = null) -> string!

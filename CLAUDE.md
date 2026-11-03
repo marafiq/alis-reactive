@@ -112,6 +112,9 @@ Everything else stays sync.
   deliberate exception carries `[TypedDslExemption("why")]`.
 - Plan model classes are sealed with `internal` constructors and `internal set`. Developers author
   through builders (`Html.On`, `Html.InputField`, `p.Get`, `p.When`).
+- The public surface of a shipped package is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`
+  (`PublicAPI.Shipped.txt` once released). A public symbol missing from it or a line without a symbol
+  fails the build (RS0016, RS0017); a change to the surface is a reviewed diff of that file.
 - Component slices are self-contained. Duplication between slices beats a shared base class.
 - Root cause, not patch. After two failed attempts, stop and research. Leave touched files cleaner:
   delete dead code and helpers that map to no DSL behavior.
