@@ -111,10 +111,10 @@ function operate(expr: OpExpr, scope: Scope): unknown {
     case "truthy":   return ops.truthy(at(0));
     case "empty":    return ops.empty(at(0));
     case "matches":  return ops.matches(at(0), at(1), at(2));
-    case "toNumber": return ops.toNumber(at(0));
-    case "toDate":   return ops.toDate(at(0));
-    case "toBoolean":return ops.toBoolean(at(0));
-    case "toText":   return ops.toText(at(0));
+    case "toNumber": return shaped(at(0), { kind: "number" });
+    case "toDate":   return shaped(at(0), { kind: "date" });
+    case "toBoolean":return shaped(at(0), { kind: "boolean" });
+    case "toText":   return shaped(at(0), { kind: "string" });
     case "toArray":  return ops.toArray(at(0));
     case "finite":   return ops.finite(at(0));
     case "order":    return ops.order(at(0), at(1));

@@ -1,8 +1,3 @@
-// A value changes type in exactly two places, and only by its declared shape: where it is read
-// (a get or call result) and where it is written (a set value, a call argument). These are the
-// conversions (grammar.md section 2.1). A missing value passes through, except into a nullable
-// shape; a value that cannot be converted is kept as it is.
-
 import type { Shape } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { toJavaScriptString } from "../shared/javascript-string";

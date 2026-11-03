@@ -3,7 +3,7 @@
 // ordering against a missing value, NaN or a different kind is false, as C#'s lifted operators are.
 // The lazy operators (and, or, cond, coalesce) are evaluated in evaluate.ts.
 
-import { asBoolean, asDate, asNumber, asText, isMissing } from "./shape";
+import { asNumber, asText, isMissing } from "./shape";
 import { toJavaScriptString } from "../shared/javascript-string";
 
 export function equal(left: unknown, right: unknown): boolean {
@@ -91,26 +91,6 @@ export function matches(value: unknown, pattern: unknown, flags: unknown): boole
   const text = asText(value);
   if (text === undefined) return false;
   return new RegExp(pattern as string, flags as string).test(text);
-}
-
-export function toNumber(value: unknown): unknown {
-  if (isMissing(value)) return value;
-  return asNumber(value) ?? value;
-}
-
-export function toDate(value: unknown): unknown {
-  if (isMissing(value)) return value;
-  return asDate(value) ?? value;
-}
-
-export function toBoolean(value: unknown): unknown {
-  if (isMissing(value)) return value;
-  return asBoolean(value) ?? value;
-}
-
-export function toText(value: unknown): unknown {
-  if (isMissing(value)) return value;
-  return asText(value) ?? value;
 }
 
 /**
