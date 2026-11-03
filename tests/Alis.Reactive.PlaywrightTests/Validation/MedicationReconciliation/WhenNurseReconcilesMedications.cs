@@ -69,21 +69,6 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await AdministrationChecks.Tick("Identity checked");
     }
 
-    private async Task AssertRefusedOnTheLine(Expression<Func<MedicationReconciliationModel, object?>> member, string message)
-    {
-        await ClickWhenStable(SaveReconciliation);
-        await Expect(ErrorFor(member)).ToHaveTextAsync(message);
-        await Expect(ReconciliationStatus).ToHaveTextAsync("Not saved yet.");
-        Assert.That(_savesSent, Is.Empty, "The page refused the line, so nothing was sent.");
-    }
-
-    private async Task AssertSaved(int savesSoFar)
-    {
-        await ClickWhenStable(SaveReconciliation);
-        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
-        Assert.That(_savesSent, Has.Count.EqualTo(savesSoFar), "The page let the reconciliation through, and the server accepted it.");
-    }
-
     [Test]
     public async Task every_medication_needs_its_name_and_naming_one_clears_only_its_own_line()
     {
@@ -110,11 +95,16 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await CompleteTheReconciliation();
         await Write(m => m.Medications[0].DoseMg, "0");
 
-        await AssertRefusedOnTheLine(m => m.Medications[0].DoseMg, "The dose is above 0 mg.");
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ErrorFor(m => m.Medications[0].DoseMg)).ToHaveTextAsync("The dose is above 0 mg.");
+        await Expect(ReconciliationStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the line, so nothing was sent.");
         await Expect(ErrorFor(m => m.Medications[1].DoseMg)).ToHaveTextAsync("");
 
         await Write(m => m.Medications[0].DoseMg, "1");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the reconciliation through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -125,11 +115,16 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await CompleteTheReconciliation();
         await Write(m => m.Medications[1].Hours, "8am");
 
-        await AssertRefusedOnTheLine(m => m.Medications[1].Hours, "Enter the hours given, like 8,20.");
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ErrorFor(m => m.Medications[1].Hours)).ToHaveTextAsync("Enter the hours given, like 8,20.");
+        await Expect(ReconciliationStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the line, so nothing was sent.");
         await Expect(ErrorFor(m => m.Medications[0].Hours)).ToHaveTextAsync("");
 
         await Write(m => m.Medications[1].Hours, "8,20");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the reconciliation through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -141,15 +136,22 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await CompleteTheReconciliation();
         await Field(m => m.Medications[0].Controlled).CheckAsync();
 
-        await AssertRefusedOnTheLine(m => m.Medications[0].CountVerifiedBy, "A second nurse verifies a controlled substance count: name them.");
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ErrorFor(m => m.Medications[0].CountVerifiedBy)).ToHaveTextAsync("A second nurse verifies a controlled substance count: name them.");
+        await Expect(ReconciliationStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the line, so nothing was sent.");
         await Expect(ErrorFor(m => m.Medications[1].CountVerifiedBy)).ToHaveTextAsync("");
 
         await Field(m => m.Medications[0].Controlled).UncheckAsync();
-        await AssertSaved(1);
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the reconciliation through, and the server accepted it.");
 
         await Field(m => m.Medications[0].Controlled).CheckAsync();
         await Write(m => m.Medications[0].CountVerifiedBy, "Dana Ortiz");
-        await AssertSaved(2);
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(2), "The page let the reconciliation through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -160,11 +162,16 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await CompleteTheReconciliation();
         await Write(m => m.Medications[1].Prescriber.Npi, "123456789");
 
-        await AssertRefusedOnTheLine(m => m.Medications[1].Prescriber.Npi, "A prescriber's NPI is ten digits.");
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ErrorFor(m => m.Medications[1].Prescriber.Npi)).ToHaveTextAsync("A prescriber's NPI is ten digits.");
+        await Expect(ReconciliationStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the line, so nothing was sent.");
         await Expect(ErrorFor(m => m.Medications[0].Prescriber.Npi)).ToHaveTextAsync("");
 
         await Write(m => m.Medications[1].Prescriber.Npi, "1234567890");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the reconciliation through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -176,10 +183,15 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await Write(m => m.Medications[0].Name, "Lisinopril");
         await Write(m => m.Medications[1].Name, "Metformin");
 
-        await AssertRefusedOnTheLine(m => m.AdministrationChecks, "Tick at least one administration check.");
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ErrorFor(m => m.AdministrationChecks)).ToHaveTextAsync("Tick at least one administration check.");
+        await Expect(ReconciliationStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the line, so nothing was sent.");
 
         await AdministrationChecks.Tick("Dose double-checked");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the reconciliation through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -217,7 +229,10 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await HasAllergies.Check();
         await Write(m => m.Allergies[1], "Penicillin");
 
-        await AssertRefusedOnTheLine(m => m.Allergies[0], "Name the allergy or clear the line.");
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ErrorFor(m => m.Allergies[0])).ToHaveTextAsync("Name the allergy or clear the line.");
+        await Expect(ReconciliationStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the line, so nothing was sent.");
         await Expect(ErrorFor(m => m.Allergies[1])).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
@@ -228,7 +243,9 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await NavigateAndBoot();
         await CompleteTheReconciliation();
 
-        await AssertSaved(1);
+        await ClickWhenStable(SaveReconciliation);
+        await Expect(ReconciliationStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the reconciliation through, and the server accepted it.");
         await Expect(ErrorFor(m => m.Allergies[0])).ToHaveTextAsync("");
         await Expect(ValidationSummary).ToBeHiddenAsync();
         AssertNoConsoleErrors();

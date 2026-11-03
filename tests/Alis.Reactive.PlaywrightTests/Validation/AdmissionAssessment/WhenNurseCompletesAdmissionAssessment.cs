@@ -82,29 +82,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await FellInLastYear.Choose("No");
     }
 
-    // The chart refuses the assessment as it is, in its own words beside the field; then the page
-    // refuses the same value before anything is sent.
-    private async Task AssertRefusedByTheChartAndThePage(Expression<Func<AdmissionAssessmentModel, object?>> field, string message)
-    {
-        var printsBefore = _printsSent.Count;
-        await ClickWhenStable(PrintForChart);
-        await Expect(_plan.ErrorFor(field)).ToHaveTextAsync(message);
-        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
-        Assert.That(_printsSent, Has.Count.EqualTo(printsBefore + 1), "Print sends the assessment as it is; the server decides.");
-
-        await ClickWhenStable(SaveAssessment);
-        await Expect(_plan.ErrorFor(field)).ToHaveTextAsync(message);
-        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
-        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
-    }
-
-    private async Task AssertSaved(int savesSoFar, string confirmation = Saved)
-    {
-        await ClickWhenStable(SaveAssessment);
-        await Expect(AssessmentStatus).ToHaveTextAsync(confirmation);
-        Assert.That(_savesSent, Has.Count.EqualTo(savesSoFar), "The page let the value through, and the server accepted it.");
-    }
-
     // ── text ──────────────────────────────────────────────────────────────────
 
     [Test]
@@ -114,10 +91,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.ResidentName, "");
 
-        await AssertRefusedByTheChartAndThePage(m => m.ResidentName, "Enter the resident's name.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Enter the resident's name.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("Enter the resident's name.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.ResidentName, "Helen Park");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -128,10 +115,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.ResidentName, "H");
 
-        await AssertRefusedByTheChartAndThePage(m => m.ResidentName, "The resident's name is 2 to 40 characters.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("The resident's name is 2 to 40 characters.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("The resident's name is 2 to 40 characters.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.ResidentName, "Al");
-        await AssertSaved(1, "Assessment saved for Al.");
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync("Assessment saved for Al.");
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -143,10 +140,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.ResidentName, fortyLetters + "H");
 
-        await AssertRefusedByTheChartAndThePage(m => m.ResidentName, "The resident's name is 2 to 40 characters.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("The resident's name is 2 to 40 characters.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("The resident's name is 2 to 40 characters.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.ResidentName, fortyLetters);
-        await AssertSaved(1, $"Assessment saved for {fortyLetters}.");
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync($"Assessment saved for {fortyLetters}.");
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -157,10 +164,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.PreferredName, "Le");
 
-        await AssertRefusedByTheChartAndThePage(m => m.PreferredName, "A preferred name is at least 3 characters.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.PreferredName)).ToHaveTextAsync("A preferred name is at least 3 characters.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.PreferredName)).ToHaveTextAsync("A preferred name is at least 3 characters.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.PreferredName, "Len");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -171,10 +188,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.WristbandLabel, "PARK, HELEN M");
 
-        await AssertRefusedByTheChartAndThePage(m => m.WristbandLabel, "A wristband label is at most 12 characters.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.WristbandLabel)).ToHaveTextAsync("A wristband label is at most 12 characters.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.WristbandLabel)).ToHaveTextAsync("A wristband label is at most 12 characters.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.WristbandLabel, "PARK, HELEN ");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -184,13 +211,31 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await NavigateAndBoot();
         await CompleteTheAssessment();
         await Write(m => m.RoomCode, "MA-21");
-        await AssertRefusedByTheChartAndThePage(m => m.RoomCode, "Enter the room as wing and number, like MA-214.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.RoomCode)).ToHaveTextAsync("Enter the room as wing and number, like MA-214.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.RoomCode)).ToHaveTextAsync("Enter the room as wing and number, like MA-214.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.RoomCode, "MA-2145");
-        await AssertRefusedByTheChartAndThePage(m => m.RoomCode, "Enter the room as wing and number, like MA-214.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.RoomCode)).ToHaveTextAsync("Enter the room as wing and number, like MA-214.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(2), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.RoomCode)).ToHaveTextAsync("Enter the room as wing and number, like MA-214.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.RoomCode, "MA-214");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -200,13 +245,31 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await NavigateAndBoot();
         await CompleteTheAssessment();
         await Write(m => m.FamilyEmail, "ana@");
-        await AssertRefusedByTheChartAndThePage(m => m.FamilyEmail, "Enter the family email as name@domain.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.FamilyEmail)).ToHaveTextAsync("Enter the family email as name@domain.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.FamilyEmail)).ToHaveTextAsync("Enter the family email as name@domain.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.FamilyEmail, "@park.example");
-        await AssertRefusedByTheChartAndThePage(m => m.FamilyEmail, "Enter the family email as name@domain.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.FamilyEmail)).ToHaveTextAsync("Enter the family email as name@domain.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(2), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.FamilyEmail)).ToHaveTextAsync("Enter the family email as name@domain.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.FamilyEmail, "ana@park.example");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -217,7 +280,15 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.FamilyEmail, "ana@park@example");
 
-        await AssertRefusedByTheChartAndThePage(m => m.FamilyEmail, "Enter the family email as name@domain.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.FamilyEmail)).ToHaveTextAsync("Enter the family email as name@domain.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.FamilyEmail)).ToHaveTextAsync("Enter the family email as name@domain.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -228,10 +299,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.PortalLink, "ftp://family.example/hale");
 
-        await AssertRefusedByTheChartAndThePage(m => m.PortalLink, "The family portal link must be a web address.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.PortalLink)).ToHaveTextAsync("The family portal link must be a web address.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.PortalLink)).ToHaveTextAsync("The family portal link must be a web address.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.PortalLink, "https://family.example/hale");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -273,10 +354,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.ConsentWord, "agree");
 
-        await AssertRefusedByTheChartAndThePage(m => m.ConsentWord, "Type AGREE to confirm the resident's consent.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.ConsentWord)).ToHaveTextAsync("Type AGREE to confirm the resident's consent.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.ConsentWord)).ToHaveTextAsync("Type AGREE to confirm the resident's consent.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.ConsentWord, "AGREE");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -288,13 +379,31 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await NavigateAndBoot();
         await CompleteTheAssessment();
         await Write(m => m.SignaturesCollected, "1");
-        await AssertRefusedByTheChartAndThePage(m => m.SignaturesCollected, "Two signatures are collected: the resident's and a witness's.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.SignaturesCollected)).ToHaveTextAsync("Two signatures are collected: the resident's and a witness's.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.SignaturesCollected)).ToHaveTextAsync("Two signatures are collected: the resident's and a witness's.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.SignaturesCollected, "3");
-        await AssertRefusedByTheChartAndThePage(m => m.SignaturesCollected, "Two signatures are collected: the resident's and a witness's.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.SignaturesCollected)).ToHaveTextAsync("Two signatures are collected: the resident's and a witness's.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(2), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.SignaturesCollected)).ToHaveTextAsync("Two signatures are collected: the resident's and a witness's.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.SignaturesCollected, "2");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -305,10 +414,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.Age, "54");
 
-        await AssertRefusedByTheChartAndThePage(m => m.Age, "Residents are 55 or older.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.Age)).ToHaveTextAsync("Residents are 55 or older.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.Age)).ToHaveTextAsync("Residents are 55 or older.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.Age, "55");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -319,10 +438,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.Age, "120");
 
-        await AssertRefusedByTheChartAndThePage(m => m.Age, "Check the age: 120 or more cannot be right.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.Age)).ToHaveTextAsync("Check the age: 120 or more cannot be right.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.Age)).ToHaveTextAsync("Check the age: 120 or more cannot be right.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.Age, "119");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -333,10 +462,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.WeightKg, "20");
 
-        await AssertRefusedByTheChartAndThePage(m => m.WeightKg, "Weight is recorded in kilograms, above 20.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.WeightKg)).ToHaveTextAsync("Weight is recorded in kilograms, above 20.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.WeightKg)).ToHaveTextAsync("Weight is recorded in kilograms, above 20.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.WeightKg, "21");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -347,10 +486,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.WeightKg, "251");
 
-        await AssertRefusedByTheChartAndThePage(m => m.WeightKg, "Weight is recorded in kilograms, up to 250.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.WeightKg)).ToHaveTextAsync("Weight is recorded in kilograms, up to 250.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.WeightKg)).ToHaveTextAsync("Weight is recorded in kilograms, up to 250.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.WeightKg, "250");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -360,15 +509,35 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await NavigateAndBoot();
         await CompleteTheAssessment();
         await Write(m => m.PainScore, "-1");
-        await AssertRefusedByTheChartAndThePage(m => m.PainScore, "Pain is scored 0 to 10.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.PainScore)).ToHaveTextAsync("Pain is scored 0 to 10.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.PainScore)).ToHaveTextAsync("Pain is scored 0 to 10.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.PainScore, "11");
-        await AssertRefusedByTheChartAndThePage(m => m.PainScore, "Pain is scored 0 to 10.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.PainScore)).ToHaveTextAsync("Pain is scored 0 to 10.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(2), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.PainScore)).ToHaveTextAsync("Pain is scored 0 to 10.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.PainScore, "0");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         await Write(m => m.PainScore, "10");
-        await AssertSaved(2);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(2), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -381,10 +550,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.MoveInDate, "");
 
-        await AssertRefusedByTheChartAndThePage(m => m.MoveInDate, "Enter the move-in day.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.MoveInDate)).ToHaveTextAsync("Enter the move-in day.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.MoveInDate)).ToHaveTextAsync("Enter the move-in day.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.MoveInDate, "2025-03-01");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -395,10 +574,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.MoveInDate, "2023-12-31");
 
-        await AssertRefusedByTheChartAndThePage(m => m.MoveInDate, "Move-in days start at January 1, 2024.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.MoveInDate)).ToHaveTextAsync("Move-in days start at January 1, 2024.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.MoveInDate)).ToHaveTextAsync("Move-in days start at January 1, 2024.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.MoveInDate, "2024-01-01");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -409,15 +598,35 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await NavigateAndBoot();
         await CompleteTheAssessment();
         await Write(m => m.AssessmentDate, "2023-12-31");
-        await AssertRefusedByTheChartAndThePage(m => m.AssessmentDate, Outside);
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.AssessmentDate)).ToHaveTextAsync(Outside);
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.AssessmentDate)).ToHaveTextAsync(Outside);
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.AssessmentDate, "2027-01-01");
-        await AssertRefusedByTheChartAndThePage(m => m.AssessmentDate, Outside);
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.AssessmentDate)).ToHaveTextAsync(Outside);
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(2), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.AssessmentDate)).ToHaveTextAsync(Outside);
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.AssessmentDate, "2024-01-01");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         await Write(m => m.AssessmentDate, "2026-12-31");
-        await AssertSaved(2);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(2), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -429,10 +638,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await Write(m => m.AssessmentDate, "2025-03-01");
         await Write(m => m.NextReviewDate, "2025-03-01");
 
-        await AssertRefusedByTheChartAndThePage(m => m.NextReviewDate, "The next review comes after the assessment day.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.NextReviewDate)).ToHaveTextAsync("The next review comes after the assessment day.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.NextReviewDate)).ToHaveTextAsync("The next review comes after the assessment day.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.NextReviewDate, "2025-03-02");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -444,10 +663,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.NextReviewDate, "2025-03-02");
 
-        await AssertRefusedByTheChartAndThePage(m => m.NextReviewDate, "The next review comes after the assessment day.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.NextReviewDate)).ToHaveTextAsync("The next review comes after the assessment day.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.NextReviewDate)).ToHaveTextAsync("The next review comes after the assessment day.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.AssessmentDate, "2025-03-01");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -459,10 +688,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await Write(m => m.AssessmentDate, "2025-03-01");
         await Write(m => m.NextReviewDate, "2028-01-01");
 
-        await AssertRefusedByTheChartAndThePage(m => m.NextReviewDate, "Reviews are planned up to December 31, 2027.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.NextReviewDate)).ToHaveTextAsync("Reviews are planned up to December 31, 2027.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.NextReviewDate)).ToHaveTextAsync("Reviews are planned up to December 31, 2027.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await Write(m => m.NextReviewDate, "2027-12-31");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -475,10 +714,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await CareLevel.Input.SelectOptionAsync(new SelectOptionValue { Value = "" });
 
-        await AssertRefusedByTheChartAndThePage(m => m.CareLevel, "Choose a care level.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.CareLevel)).ToHaveTextAsync("Choose a care level.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.CareLevel)).ToHaveTextAsync("Choose a care level.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await CareLevel.Select("Memory care");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -489,10 +738,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await MobilityAid.Select("Not assessed");
 
-        await AssertRefusedByTheChartAndThePage(m => m.MobilityAid, "Assess the mobility aid.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.MobilityAid)).ToHaveTextAsync("Assess the mobility aid.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.MobilityAid)).ToHaveTextAsync("Assess the mobility aid.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await MobilityAid.Select("Cane");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -502,10 +761,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await NavigateAndBoot();
         await CompleteTheAssessmentLeavingTheFallQuestion();
 
-        await AssertRefusedByTheChartAndThePage(m => m.FellInLastYear, "Answer whether the resident fell in the last year.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.FellInLastYear)).ToHaveTextAsync("Answer whether the resident fell in the last year.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.FellInLastYear)).ToHaveTextAsync("Answer whether the resident fell in the last year.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await FellInLastYear.Choose("Yes");
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -516,10 +785,20 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await ConsentOnFile.Input.UncheckAsync();
 
-        await AssertRefusedByTheChartAndThePage(m => m.ConsentOnFile, "Confirm the signed consent is on file.");
+        await ClickWhenStable(PrintForChart);
+        await Expect(_plan.ErrorFor(m => m.ConsentOnFile)).ToHaveTextAsync("Confirm the signed consent is on file.");
+        await Expect(PrintStatus).ToHaveTextAsync(ChartRefused);
+        Assert.That(_printsSent, Has.Count.EqualTo(1), "Print sends the assessment as it is; the server decides.");
+
+        await ClickWhenStable(SaveAssessment);
+        await Expect(_plan.ErrorFor(m => m.ConsentOnFile)).ToHaveTextAsync("Confirm the signed consent is on file.");
+        await Expect(AssessmentStatus).ToHaveTextAsync("Not saved yet.");
+        Assert.That(_savesSent, Is.Empty, "The page refused the value, so nothing was sent.");
 
         await ConsentOnFile.Check();
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
@@ -577,7 +856,9 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await PhotoConsent.Input.UncheckAsync();
 
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         await Expect(_plan.ErrorFor(m => m.PhotoConsent)).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
@@ -605,7 +886,9 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessment();
         await Write(m => m.FallsLastYear, "0");
 
-        await AssertSaved(1);
+        await ClickWhenStable(SaveAssessment);
+        await Expect(AssessmentStatus).ToHaveTextAsync(Saved);
+        Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         await Expect(_plan.ErrorFor(m => m.FallsLastYear)).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }

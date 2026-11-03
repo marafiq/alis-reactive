@@ -38,12 +38,6 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
         _plan = await PagePlan<NumericConditionModel>.FromPage(Page);
     }
 
-    private async Task EnterHeartRate(string bpm, string expectedZone)
-    {
-        await HeartRate.FillAndBlur(bpm);
-        await Expect(Zone).ToHaveTextAsync(expectedZone, new() { Timeout = 5000 });
-    }
-
     private async Task CheckHeartRateAgainstTheLimit(string bpm)
     {
         await HeartRate.FillAndBlur(bpm);
@@ -56,7 +50,8 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
         await NavigateAndBoot();
         await Expect(TachycardiaWarning).ToBeHiddenAsync();
 
-        await EnterHeartRate("101", "High");
+        await HeartRate.FillAndBlur("101");
+        await Expect(Zone).ToHaveTextAsync("High", new() { Timeout = 5000 });
 
         await Expect(TachycardiaWarning).ToBeVisibleAsync();
         await Expect(TachycardiaWarning).ToHaveTextAsync("Tachycardia detected");
@@ -69,7 +64,8 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await EnterHeartRate("100", "High");
+        await HeartRate.FillAndBlur("100");
+        await Expect(Zone).ToHaveTextAsync("High", new() { Timeout = 5000 });
 
         await Expect(TachycardiaWarning).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -79,10 +75,12 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
     public async Task the_tachycardia_warning_clears_when_the_heart_rate_comes_down()
     {
         await NavigateAndBoot();
-        await EnterHeartRate("150", "Critical");
+        await HeartRate.FillAndBlur("150");
+        await Expect(Zone).ToHaveTextAsync("Critical", new() { Timeout = 5000 });
         await Expect(TachycardiaWarning).ToBeVisibleAsync();
 
-        await EnterHeartRate("80", "Normal");
+        await HeartRate.FillAndBlur("80");
+        await Expect(Zone).ToHaveTextAsync("Normal", new() { Timeout = 5000 });
 
         await Expect(TachycardiaWarning).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -94,9 +92,12 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await EnterHeartRate("130", "Critical");
-        await EnterHeartRate("119", "High");
-        await EnterHeartRate("120", "Critical");
+        await HeartRate.FillAndBlur("130");
+        await Expect(Zone).ToHaveTextAsync("Critical", new() { Timeout = 5000 });
+        await HeartRate.FillAndBlur("119");
+        await Expect(Zone).ToHaveTextAsync("High", new() { Timeout = 5000 });
+        await HeartRate.FillAndBlur("120");
+        await Expect(Zone).ToHaveTextAsync("Critical", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -105,8 +106,10 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await EnterHeartRate("99", "Normal");
-        await EnterHeartRate("100", "High");
+        await HeartRate.FillAndBlur("99");
+        await Expect(Zone).ToHaveTextAsync("Normal", new() { Timeout = 5000 });
+        await HeartRate.FillAndBlur("100");
+        await Expect(Zone).ToHaveTextAsync("High", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 
@@ -115,8 +118,10 @@ public class WhenNumericConditionEvaluates : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        await EnterHeartRate("59", "Low");
-        await EnterHeartRate("60", "Normal");
+        await HeartRate.FillAndBlur("59");
+        await Expect(Zone).ToHaveTextAsync("Low", new() { Timeout = 5000 });
+        await HeartRate.FillAndBlur("60");
+        await Expect(Zone).ToHaveTextAsync("Normal", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 

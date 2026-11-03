@@ -23,7 +23,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
 
     private PagePlan<DischargePlanModel> _plan = null!;
     private ConcurrentQueue<string> _plansSent = null!;
-    private string _planStatusSoFar = null!;
 
     private ILocator SavePlan => Page.Locator("#save-discharge-plan-btn");
     private ILocator PlanStatus => Page.Locator("#discharge-plan-status");
@@ -38,7 +37,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
     private async Task BeginThePlan()
     {
         _plansSent = new ConcurrentQueue<string>();
-        _planStatusSoFar = "No plan saved yet.";
         Page.Request += (_, request) =>
         {
             if (request.Url.EndsWith("/Sandbox/Validation/DischargePlanning/Save")) _plansSent.Enqueue(request.Url);
@@ -54,33 +52,21 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
     private async Task Write(Expression<Func<DischargePlanModel, object?>> field, string text) =>
         await _plan.TextBox(field).FillAndBlur(text);
 
-    private async Task AssertAskedFor(Expression<Func<DischargePlanModel, object?>> field, string message)
-    {
-        var sentBefore = _plansSent.Count;
-        await ClickWhenStable(SavePlan);
-        await Expect(_plan.ErrorFor(field)).ToHaveTextAsync(message);
-        await Expect(PlanStatus).ToHaveTextAsync(_planStatusSoFar);
-        Assert.That(_plansSent, Has.Count.EqualTo(sentBefore), "The page asked for the answer, so nothing was sent.");
-    }
-
-    private async Task AssertSaved(int plansSoFar)
-    {
-        await ClickWhenStable(SavePlan);
-        await Expect(PlanStatus).ToHaveTextAsync(Saved);
-        Assert.That(_plansSent, Has.Count.EqualTo(plansSoFar), "The page let the plan through, and the server accepted it.");
-        _planStatusSoFar = Saved;
-    }
-
     [Test]
     public async Task a_resident_going_home_needs_a_home_address()
     {
         await BeginThePlan();
         await GoingHome.Check();
 
-        await AssertAskedFor(m => m.HomeAddress, "Enter the home address the resident goes to.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.HomeAddress)).ToHaveTextAsync("Enter the home address the resident goes to.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.HomeAddress, "12 Elm Street, Riverside");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -90,10 +76,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await BeginThePlan();
         await Write(m => m.HomeAddress, "12 Elm Street, Riverside");
 
-        await AssertAskedFor(m => m.HomeAddress, "Only a resident going home has a home address to record.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.HomeAddress)).ToHaveTextAsync("Only a resident going home has a home address to record.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await GoingHome.Check();
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -105,11 +96,16 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Write(m => m.HomeAddress, "12 Elm Street, Riverside");
         await LivesAlone.Check();
 
-        await AssertAskedFor(m => m.DailyCheckInBy, "Name who checks in daily on a resident living alone.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.DailyCheckInBy)).ToHaveTextAsync("Name who checks in daily on a resident living alone.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         // Going home, but not alone: one of the two answers is enough to drop the rule.
         await LivesAlone.Input.UncheckAsync();
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -121,12 +117,17 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Write(m => m.HomeAddress, "12 Elm Street, Riverside");
         await HasPets.Check();
 
-        await AssertAskedFor(m => m.PetCarePlan, "Say who cares for the pets.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.PetCarePlan)).ToHaveTextAsync("Say who cares for the pets.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         // The pets stay ticked; the resident no longer goes home, so the inner condition counts for nothing.
         await GoingHome.Input.UncheckAsync();
         await Write(m => m.HomeAddress, "");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -135,16 +136,26 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
     {
         await BeginThePlan();
         await Write(m => m.FollowUpClinic, "Riverside Clinic");
-        await AssertAskedFor(m => m.FollowUpClinic, "A clinic is named only when a follow-up is due.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.FollowUpClinic)).ToHaveTextAsync("A clinic is named only when a follow-up is due.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.FollowUpDays, "14");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
 
         await Write(m => m.FollowUpClinic, "");
-        await AssertAskedFor(m => m.FollowUpClinic, "Name the clinic for the follow-up.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.FollowUpClinic)).ToHaveTextAsync("Name the clinic for the follow-up.");
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.FollowUpClinic, "Riverside Clinic");
-        await AssertSaved(2);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(2), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -155,10 +166,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Write(m => m.FollowUpDays, "14");
         await Write(m => m.FollowUpClinic, "VA Portland");
 
-        await AssertAskedFor(m => m.VaCaseNumber, "A VA clinic needs the veteran's case number.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.VaCaseNumber)).ToHaveTextAsync("A VA clinic needs the veteran's case number.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.FollowUpClinic, "Riverside Clinic");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -167,16 +183,26 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
     {
         await BeginThePlan();
         await Write(m => m.CaregiverPhone, "555-0100");
-        await AssertAskedFor(m => m.CaregiverPhone, "A caregiver phone needs a caregiver.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.CaregiverPhone)).ToHaveTextAsync("A caregiver phone needs a caregiver.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.PrimaryCaregiver, "Ana Park");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
 
         await Write(m => m.CaregiverPhone, "");
-        await AssertAskedFor(m => m.CaregiverPhone, "Enter the caregiver's phone.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.CaregiverPhone)).ToHaveTextAsync("Enter the caregiver's phone.");
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.CaregiverPhone, "555-0100");
-        await AssertSaved(2);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(2), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -188,17 +214,24 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Write(m => m.TransferSummary, "Stable, walks with a walker");
         await Write(m => m.ReceivingNurse, "Dana Ortiz");
 
-        await AssertAskedFor(m => m.BedConfirmation, "Enter the bed confirmation from the nursing facility.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.BedConfirmation)).ToHaveTextAsync("Enter the bed confirmation from the nursing facility.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.BedConfirmation, "SNF-4471");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
 
         // Another destination asks for none of it.
         await Destination.Select("Hospital");
         await Write(m => m.BedConfirmation, "");
         await Write(m => m.TransferSummary, "");
         await Write(m => m.ReceivingNurse, "");
-        await AssertSaved(2);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(2), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -210,11 +243,16 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Destination.Select("Hospice");
         await Write(m => m.TransferSummary, "Comfort care, family at the bedside");
 
-        await AssertAskedFor(m => m.ReceivingNurse, "Name the nurse receiving the resident.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.ReceivingNurse)).ToHaveTextAsync("Name the nurse receiving the resident.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Destination.Select("Hospital");
         await Write(m => m.TransferSummary, "");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -226,10 +264,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Destination.Select("Hospice");
         await Write(m => m.ReceivingNurse, "Dana Ortiz");
 
-        await AssertAskedFor(m => m.TransferSummary, "A transfer needs the nursing summary.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.TransferSummary)).ToHaveTextAsync("A transfer needs the nursing summary.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Destination.Select("Hospital");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -240,10 +283,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Destination.Select("Hospital");
         await Write(m => m.HomeHealthAgency, "Visiting Nurses");
 
-        await AssertAskedFor(m => m.HomeHealthAgency, "Only a resident going home has a home health agency.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.HomeHealthAgency)).ToHaveTextAsync("Only a resident going home has a home health agency.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Destination.Select("Home");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -252,16 +300,26 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
     {
         await BeginThePlan();
         await Write(m => m.TransportCompany, "MedRide");
-        await AssertAskedFor(m => m.TransportCompany, "No transport is booked for a resident the family drives.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.TransportCompany)).ToHaveTextAsync("No transport is booked for a resident the family drives.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await NeedsTransport.Check();
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
 
         await Write(m => m.TransportCompany, "");
-        await AssertAskedFor(m => m.TransportCompany, "Name the transport company.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.TransportCompany)).ToHaveTextAsync("Name the transport company.");
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.TransportCompany, "MedRide");
-        await AssertSaved(2);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(2), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -271,10 +329,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await BeginThePlan();
         await Write(m => m.StairsAtHome, "1");
 
-        await AssertAskedFor(m => m.StairPlan, "Say how the resident manages the stairs.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.StairPlan)).ToHaveTextAsync("Say how the resident manages the stairs.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.StairsAtHome, "0");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -283,18 +346,28 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
     {
         await BeginThePlan();
         await Write(m => m.FallsLast90Days, "2");
-        await AssertAskedFor(m => m.HomeSafetyVisit, "Book a home safety visit and enter its date.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.HomeSafetyVisit)).ToHaveTextAsync("Book a home safety visit and enter its date.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.FallsLast90Days, "1");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
 
         // Either reason is enough: three flights of stairs ask for the visit too.
         await Write(m => m.StairsAtHome, "3");
         await Write(m => m.StairPlan, "Rail on both sides, one step at a time");
-        await AssertAskedFor(m => m.HomeSafetyVisit, "Book a home safety visit and enter its date.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.HomeSafetyVisit)).ToHaveTextAsync("Book a home safety visit and enter its date.");
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.HomeSafetyVisit, "2026-04-01");
-        await AssertSaved(2);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(2), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -304,10 +377,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await BeginThePlan();
         await Write(m => m.Medications, "warfarin 5 mg daily");
 
-        await AssertAskedFor(m => m.InrCheckDate, "Warfarin needs the date of the next INR check.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.InrCheckDate)).ToHaveTextAsync("Warfarin needs the date of the next INR check.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.Medications, "lisinopril 10 mg daily");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -318,10 +396,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await BeginThePlan();
         await Write(m => m.Medications, LongList);
 
-        await AssertAskedFor(m => m.Medications, "A list this long needs a pharmacist's review: tick it.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.Medications)).ToHaveTextAsync("A list this long needs a pharmacist's review: tick it.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await PharmacistReviewed.Check();
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -331,10 +414,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await BeginThePlan();
         await Write(m => m.DiagnosisCode, "F03");
 
-        await AssertAskedFor(m => m.MemorySupportPlan, "A dementia diagnosis needs a memory support plan.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.MemorySupportPlan)).ToHaveTextAsync("A dementia diagnosis needs a memory support plan.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.DiagnosisCode, "I10");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -344,10 +432,15 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await BeginThePlan();
         await Write(m => m.RoomCode, "MA-214-ISO");
 
-        await AssertAskedFor(m => m.IsolationClearedBy, "Name who cleared the resident from isolation.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.IsolationClearedBy)).ToHaveTextAsync("Name who cleared the resident from isolation.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Write(m => m.RoomCode, "MA-214");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
@@ -357,11 +450,16 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await BeginThePlan();
         await Equipment.Tick("Oxygen");
 
-        await AssertAskedFor(m => m.OxygenVendor, "Name the oxygen vendor.");
+        await ClickWhenStable(SavePlan);
+        await Expect(_plan.ErrorFor(m => m.OxygenVendor)).ToHaveTextAsync("Name the oxygen vendor.");
+        await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
+        Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
         await Equipment.Clear("Oxygen");
         await Equipment.Tick("Walker");
-        await AssertSaved(1);
+        await ClickWhenStable(SavePlan);
+        await Expect(PlanStatus).ToHaveTextAsync(Saved);
+        Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
         AssertNoConsoleErrors();
     }
 
