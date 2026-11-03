@@ -36,6 +36,14 @@ namespace Alis.Reactive
         IRuleBuilderOptions<T, TProperty> WithMessage(Func<T, string> message);
 
         /// <summary>
+        /// The name the rule's messages say for the member, in place of the one its spelling gives
+        /// (<c>AdmissionDate</c> reads "Admission Date"): every check of the rule, in the browser and on the
+        /// server. Errors stay under the member's path.
+        /// </summary>
+        /// <param name="displayName">The name people read.</param>
+        IRuleBuilderOptions<T, TProperty> WithName(string displayName);
+
+        /// <summary>
         /// Runs the checks written so far only when the condition holds. A condition that tests model members
         /// against fixed values runs in the browser too; one the browser cannot read is refused when a page
         /// describes the rules: declare it with <see cref="WhenOnServer"/>.

@@ -95,4 +95,18 @@ public class WhenAValidatorDescribesItsRules
         Assert.That(patterns, Is.EqualTo(new[] { @"^-?(?:0|[1-9]\d{0,2})(?:\.\d{1,2})?$" }));
         Golden.Matches(rendered, "Validation", nameof(a_digit_count_is_the_pattern_of_the_number_the_page_binds_which_carries_no_trailing_zero));
     }
+
+    [Test]
+    public void a_rule_given_a_name_says_it_in_place_of_the_members_spelling_and_stays_under_the_members_path()
+    {
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<NamedDepositRules>());
+        html.TextInput(plan, m => m.Deposit);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<NamedDepositRules>("admission")));
+
+        var rendered = html.Rendered(plan);
+
+        var field = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Deposit")!;
+        Assert.That(field["tests"]!.AsArray().Single()!["message"]!.GetValue<string>(), Is.EqualTo("'Deposit held' must not be more than 5 digits in total, with allowance for 2 decimals."));
+        Golden.Matches(rendered, "Validation", nameof(a_rule_given_a_name_says_it_in_place_of_the_members_spelling_and_stays_under_the_members_path));
+    }
 }

@@ -71,8 +71,8 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     [TestCase("Price", "12.345", "0.05", "Up to five digits, two of them decimals.", TestName = "a_digit_count_refuses_a_third_decimal_and_takes_two")]
     [TestCase("Rate", "1.34", "0.34", "Decimals only, two at most.", TestName = "a_digit_count_of_decimals_alone_refuses_a_digit_before_the_point_and_takes_none")]
     [TestCase("Rate", "1", "0", "Decimals only, two at most.", TestName = "a_digit_count_of_decimals_alone_refuses_a_whole_number_and_takes_zero")]
-    [TestCase("Discount", "156.3", "12.34", "'Discount' must not be more than 4 digits in total, with allowance for 2 decimals.", TestName = "a_digit_counts_default_message_reaches_the_browser_without_the_digits_it_found")]
-    [TestCase("Discount", "1.2345", "1.230", "'Discount' must not be more than 4 digits in total, with allowance for 2 decimals.", TestName = "a_trailing_zero_never_reaches_the_server_through_the_form_so_a_count_of_them_takes_it")]
+    [TestCase("Discount", "156.3", "12.34", "'Markdown' must not be more than 4 digits in total, with allowance for 2 decimals.", TestName = "a_digit_counts_default_message_reaches_the_browser_without_the_digits_it_found")]
+    [TestCase("Discount", "1.2345", "1.230", "'Markdown' must not be more than 4 digits in total, with allowance for 2 decimals.", TestName = "a_trailing_zero_never_reaches_the_server_through_the_form_so_a_count_of_them_takes_it")]
     public async Task a_check_refuses_what_its_rule_refuses_and_takes_what_it_takes(string field, string refused, string taken, string message)
     {
         await Open("/Validation/Checks");
@@ -122,7 +122,7 @@ public sealed class WhenEachCheckIsMade : AppPageTest
         await Expect(Field("Diets").GetByText("Diets on the list only.")).ToBeHiddenAsync();
     }
 
-    private const string FourDigitsTwoDecimals = "'Fee' must not be more than 4 digits in total, with allowance for 2 decimals.";
+    private const string FourDigitsTwoDecimals = "'Service fee' must not be more than 4 digits in total, with allowance for 2 decimals.";
 
     [TestCase("123.456778", "9 digits and 6 decimals were found.")]
     [TestCase("12.3414", "6 digits and 4 decimals were found.")]
@@ -151,6 +151,18 @@ public sealed class WhenEachCheckIsMade : AppPageTest
         await Page.GetByLabel("Fee", new() { Exact = true }).FillAsync(taken);
         await Save();
         await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
+    public async Task a_rule_given_a_name_says_it_beside_the_member_in_place_of_the_members_spelling()
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Discount", new() { Exact = true }).FillAsync("156.3");
+        await Save();
+        await Expect(Field("Discount").GetByText("'Markdown' must not be more than 4 digits in total, with allowance for 2 decimals.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(Field("Discount").GetByText("'Discount'")).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
     }
 
     [Test]

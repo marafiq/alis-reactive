@@ -187,6 +187,7 @@ Alis.Reactive.IRuleBuilderOptions<T, TProperty>.When(System.Linq.Expressions.Exp
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WithMessage(string! message) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WithMessage(System.Func<T, string!>! message) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WithName(string! displayName) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IValidator<T>
 Alis.Reactive.IValidator<T>.Validate(T instance) -> Alis.Reactive.ValidationResult!
 Alis.Reactive.IValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!

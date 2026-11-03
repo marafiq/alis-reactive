@@ -152,8 +152,8 @@ namespace Alis.Reactive.Validation
         /// <summary>The member's path, as model binding names it and as errors are reported.</summary>
         protected string FieldPath { get; }
 
-        /// <summary>The member as a message names it: <c>AdmissionDate</c> reads "Admission Date".</summary>
-        protected string FieldDisplayName { get; }
+        /// <summary>The member as a message names it: <c>AdmissionDate</c> reads "Admission Date", or the name <c>WithName</c> gives.</summary>
+        protected string FieldDisplayName { get; private set; }
 
         public bool IsAsync => Parts.Any(part => part.IsAsync);
 
@@ -198,6 +198,13 @@ namespace Alis.Reactive.Validation
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
             LastCheck(nameof(WithMessage)).Message = Message<T>.FromModel(message);
+            return this;
+        }
+
+        public IRuleBuilderOptions<T, TValue> WithName(string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(displayName)) throw new ArgumentException("A name people read has text.", nameof(displayName));
+            FieldDisplayName = displayName;
             return this;
         }
 

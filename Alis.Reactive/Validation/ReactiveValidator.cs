@@ -53,7 +53,8 @@ namespace Alis.Reactive
     /// <c>Matches</c> (a pattern JavaScript reads the same way), the comparisons with a value or another
     /// member, <c>InclusiveBetween</c>, <c>ExclusiveBetween</c>, <c>IsInEnum</c> (a <c>[Flags]</c> enum stays on the
     /// server) and <c>PrecisionScale</c> (the server alone past 21 digits before the point or 6 after); <c>SetValidator</c>, <c>ChildRules</c>,
-    /// <c>RuleForEach</c> with a child validator and <c>Include</c> bring the child's rules along.
+    /// <c>RuleForEach</c> with a child validator and <c>Include</c> bring the child's rules along. <c>WithName</c>
+    /// gives the name a rule's messages say for the member, on both sides; errors stay under the member's path.
     /// </para>
     /// <para>
     /// Some rules only the server can check, and they stay there by what they are: <c>Must</c> and

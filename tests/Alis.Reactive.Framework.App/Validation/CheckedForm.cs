@@ -152,7 +152,7 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
         RuleFor(x => x.Diets).IsInEnum().WithMessage("Diets on the list only.");
         RuleFor(x => x.Price).PrecisionScale(5, 2, ignoreTrailingZeros: true).WithMessage("Up to five digits, two of them decimals.");
         RuleFor(x => x.Rate).PrecisionScale(2, 2, ignoreTrailingZeros: true).WithMessage("Decimals only, two at most.");
-        RuleFor(x => x.Discount).PrecisionScale(4, 2, ignoreTrailingZeros: false);
-        RuleFor(x => x.Fee).PrecisionScale(4, 2, ignoreTrailingZeros: false).ServerOnly();
+        RuleFor(x => x.Discount).PrecisionScale(4, 2, ignoreTrailingZeros: false).WithName("Markdown");
+        RuleFor(x => x.Fee).PrecisionScale(4, 2, ignoreTrailingZeros: false).WithName("Service fee").ServerOnly();
     }
 }

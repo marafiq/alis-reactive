@@ -99,6 +99,15 @@ public sealed class DepositRules : ReactiveValidator<Admission>
     }
 }
 
+/// <summary>The deposit's rule with the name its messages say given, not spelled from the member.</summary>
+public sealed class NamedDepositRules : ReactiveValidator<Admission>
+{
+    public NamedDepositRules()
+    {
+        RuleFor(x => x.Deposit).PrecisionScale(5, 2, ignoreTrailingZeros: false).WithName("Deposit held");
+    }
+}
+
 /// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
 public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
 {
