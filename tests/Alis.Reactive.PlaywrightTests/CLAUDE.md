@@ -42,7 +42,3 @@ Always through `scripts/playwright.sh` (use `--filter` to focus). It rejects
 stale browser assets — rebuild runtime assets after any TS change. Raw
 `dotnet test` on this project is unsupported. Never kill the sandbox by process
 name; a parallel suite may own a sibling instance — kill by port.
-
-Why this file exists: the forensic record shows weeks spent on Playwright
-infrastructure that caught one bug, and suites that passed while the feature
-lied. Behavior-first, defect-unsatisfiable assertions are the correction.

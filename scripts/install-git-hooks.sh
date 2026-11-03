@@ -22,11 +22,6 @@ if [ ! -d "$hooks" ]; then
 fi
 mkdir -p "$hooks"
 
-# The previous guard pinned one "active working branch" through git config. That
-# concept is retired (docs/BRANCHING.md, cutover): drop the setting so nothing
-# keeps reading it.
-git config --unset alis.activeBranch 2>/dev/null || true
-
 cat > "$hooks/pre-commit" <<'HOOK'
 #!/bin/sh
 # Protected-branch guard — installed by scripts/install-git-hooks.sh (do not

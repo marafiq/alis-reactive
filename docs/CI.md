@@ -6,7 +6,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 ## Facts this design rests on
 
 - **The local full gate is the release-grade browser proof.** `scripts/test.sh` runs typecheck,
-  assets, vitest, the consistency checks, `dotnet build`, the non-Playwright dotnet tests, and the
+  lint, assets, vitest, the consistency checks, `dotnet build`, the non-Playwright dotnet tests, and the
   whole Playwright suite. `scripts/test.sh --parallel` runs the Playwright leg as the CI
   shards side by side (each with its own app): about 12 minutes on a 12-core Mac
   (2026-11-03). CI runs the same scripts; it never defines a second gate.
@@ -50,10 +50,10 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
 | `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x10; `example` | the one gate definition | never |
-| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)`, `gate / example` | PR merge (required: `gate / test`) | never |
+| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)`, `gate / example` | PR merge ("Gating") | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, five packages | nuget.org + GitHub Release |
-| `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
+| `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge ("Gating") | never |
 
 ## One gate definition
 
@@ -214,7 +214,9 @@ until proven otherwise. The convention:
 ### Gating
 
 - **Pull requests.** The browser shards run on every PR and are visible on it, but they are **not**
-  required to merge; `gate / test` and the two net48 jobs are. Reason: on a choppy runner a
+  required to merge; `gate / test`, `Build + pack net48 on real .NET Framework 4.8 (Windows)` and
+  `net48 runtime boots under IIS Express (Playwright screenshot proof)` are (`docs/BRANCHING.md`,
+  "Protection", applies them). Reason: on a choppy runner a
   required check that flakes trains people to click "re-run" without reading, and the merge gate
   should be the deterministic proof plus a human reading the shard results. The local full gate
   (`scripts/test.sh`) remains the rule before merge (`docs/developer-cli.md`, "Test Rules").
@@ -298,14 +300,6 @@ until proven otherwise. The convention:
   proof (for test-framework majors: `scripts/playwright.sh --shard <s> --list` still sums to the full
   suite).
 
-## Required checks for `main` (after the cutover)
-
-Required: `gate / test`, `Build + pack net48 on real .NET Framework 4.8 (Windows)`,
-`net48 runtime boots under IIS Express (Playwright screenshot proof)`. Not required:
-`gate / playwright (...)`. The exact `gh api` command and the ruleset JSON are in
-`docs/BRANCHING.md` ("Protection"); the owner applies it once the first post-cutover PR has shown
-the check names.
-
 ## Changing CI: the checklist
 
 1. Read the workflow you are changing and this page. If the change is a new step in the gate, it
@@ -321,14 +315,5 @@ the check names.
 5. Every new job has `timeout-minutes` and the narrowest `permissions`.
 6. Lint locally: `actionlint` on `.github/workflows/*.yml`; `bash -n` on scripts.
 7. Prove by behavior: a workflow change is done when a real run shows the new step doing what it
-   claims (CLAUDE.md, definition of done); YAML that parses is not evidence.
+   claims (CLAUDE.md, "Playwright is the proof"); YAML that parses is not evidence.
 8. Update the "Facts" section when a number you relied on changes.
-
-## Open decisions (owner)
-
-- `verify-net48.yml`'s pack job still packs `1.0.0-rc.1` for its artifact; rename it to a fixture
-  version in a separate PR so CI logs stop reading like a release. The IIS job packs
-  `0.0.0-ci.{run}.{attempt}`: the NuGet cache brought back an earlier run's rc.1 package, and NuGet
-  never re-extracts a version it already holds.
-- Committed `packages.lock.json` files for locked NuGet restores (see "Caching").
-- A `.nvmrc` (`22`) so local Node matches CI (the dev box runs 24).

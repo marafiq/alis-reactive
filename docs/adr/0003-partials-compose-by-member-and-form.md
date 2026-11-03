@@ -18,7 +18,7 @@ That broke the composition an MVC developer writes most (a mapped matrix of 86 c
 covered by a browser test, 24 broken by reading the code):
 
 - An editor template (a partial of a member's type under a prefix) rendered `KinCard__NextOfKin_Name`
-  while the page's validator looked for `DeskPage__NextOfKin_Name` (`Validation/FormChecks.cs:166-171`),
+  while the page's validator looked for `DeskPage__NextOfKin_Name` (`Validation/FormChecks.cs` at `2ed37935e`),
   so the page's rule failed on a typed value and held the save. The page's `g.Form()` omitted the
   template's inputs and its server errors missed them.
 - Repeated cards of one model shared a plan id and merged into one save; a partial typed to a base class
@@ -92,8 +92,7 @@ Around them:
 - Every view that sent `Form()` without validating names its form; every `ResolvePlan` and `ElementPlan`
   view starts `ReactivePlan`; the id of every nested member changes (tests that derive ids through
   `IdGenerator` follow).
-- grammar.md 3.5, 6.3 and 6.4 are rewritten, and a developer guide to partial composition is written from
-  the proven pages.
+- grammar.md 3.5, 6.3 and 6.4 say how a page, its partials and its slots compose.
 - Each rule is proven by framework Playwright tests that fail first, in `Partials/`, `Forms/`, `Slots/`
   and `Rendering/`, plus the verify-net48 smoke page.
 
@@ -103,4 +102,4 @@ Around them:
   belongs to the slot; the per-request record and its refusals.
 - Wave 2: forms send and show what they hold (rule 2, rule 3's model table, the summary).
 - Wave 3: one plan call, the deletions and migrations, item rules over every mounted row, the slot-write
-  refusal, dynamic rows, the spec and the guide, net48.
+  refusal, dynamic rows, the spec, net48.

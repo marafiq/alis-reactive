@@ -401,9 +401,12 @@ A failing handler is logged and stops no other handler.
 5. **Unloading a slot** runs its owner's disposers, and the page's owner's stay. A block that is
    already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:84-90`
    disposes the owner and nothing else).
-6. **Mount events.** The app hears `alis:unmount` and `alis:mount` on the document, with
-   `detail.root`, around every change of content. This is the public contract with app bundles
-   that construct and destroy their own widgets.
+6. **Mount events.** The runtime raises `alis:mount` on the document when HTML is in the document
+   and about to be wired (the page at boot, every slot's new content), and `alis:unmount` when wired
+   HTML is about to be removed; each carries `detail.root` and fires synchronously, so a widget an
+   `alis:mount` listener constructs exists when the runtime locates it
+   (`Alis.Reactive.Assets/runtime/plans/mount-events.ts`). This is the public contract with app
+   bundles that construct and destroy their own widgets; 6.5 S1 gives the order inside a slot.
 
 ## 4. Static checks: what makes a malformed sentence impossible
 
@@ -833,7 +836,9 @@ carries that set's browser rules alone and its endpoint validates by the same se
 none is named; the set reaches a child validator through a rule in the set and an `Include` in no set; a set the
 validator does not declare, and a form under two sets, are refused where the page renders), written as
 FluentValidation users write them. The FluentValidation
-package is not used. Each check is one term of the vocabulary and defines both halves where both
+package is not used. Two of its forms have no counterpart by design: `OverridePropertyName`, because a
+rule is written on the member it checks (ALIS009 refuses a member named by a string), and validator
+factories, because validators register through dependency injection (`AddReactiveFluentValidation`). Each check is one term of the vocabulary and defines both halves where both
 exist: what the server decides, and, for a term the browser decides the same way, the `BrowserRule`
 the plan carries. The rules are data, like the `rules` schema of Syncfusion's React form, but they
 are typed C#, bound to inputs by component ID, and conditional. The browser gets the rules of the
@@ -934,37 +939,21 @@ It reads the rules by their classes, not the plan.
 
 ## 8. Where the code is
 
-**C#** (`Alis.Reactive`), one slice per folder, each using only the slices below it (ADR-0004; analyzer
-ALIS010 reads the rows from `Alis.Reactive/SliceTree.txt` and fails the build at a reference that points up
-or sideways). Every public type is in the namespace `Alis.Reactive`; an internal type's namespace is its folder.
-- `Grammar`: one sealed class per production in 1.1 and 1.2, with internal constructors, invariants
+**C#** (`Alis.Reactive`): one slice per folder, layered bottom up as `Alis.Reactive/SliceTree.txt` lists
+them (ADR-0004 records the decision; analyzer ALIS010 fails the build at a reference that points up or
+sideways). Every public type is in the namespace `Alis.Reactive`; an internal type's namespace is its folder.
+Where this grammar is written:
+- `Grammar`: one sealed class per production of 1.1 and 1.2, with internal constructors, invariants
   checked in the constructor, one-to-one serialization and its discriminator. This is the plan contract;
-  the generator (`tools/PlanContractGenerator`) reads these classes. `WireTerms`: the plan's terms
-  (ids, names, paths).
-- `Members`: how C# members reach the wire: expression paths, JSON member names, C# type names, enum
-  members, `Field`, the CLR type to shape mapping (`ClrShape`) and the browser's order rule.
-- `Vendors`: `ComponentVendor` and the typed-DSL exemption. `Inputs`: what the framework dictates for
-  an input before any component renders it (`IdGenerator`, `HtmlFieldPrefix`, `InputIdentity`,
-  `RenderedInput`, `FieldReference`) and the class names a field renders with (`ReactiveClassNames`,
-  `AddReactiveClassNames`).
-- `PlanModel`: the one model that writes the grammar, bottom up: `Writing` (the scope that binds
-  responses and method results, the declared objects), `Values`, `Conditions` (one model for a
-  validator's conditions over members and a reaction's over values), `Reactions` (the steps) beside
-  `Validation` (browser fields and rules, form checks and summaries, the form writer), `Requests` (the
-  request step, its gather model, routes and the parallel step), `Document` (`PlanBuildContext.Write`
-  writes the plan once at render).
-- `Components`: the object contract every declaration is written with (`JsObject`, `Component`,
-  `Property<T>`, `ReadOnly<T>`, `WriteOnly<T>`, `Objects<T>`, `Arg<T>`, `Event<TArgs>`, `ComponentInput`),
-  its typed sources, `Plugin` and `BrowserFile`.
-- `PlanAuthoring`: the fluent API. `Events` and `Arrays` (with the lambda compiler
-  `ElementExpressionCompiler.cs` through the one member table (2.3), and the array value nodes), `Elements`,
-  `Pipelines` (`PipelineBuilder`, `TriggerBuilder`), then `Conditions` and `Requests`, which extend the
-  pipeline (`ConditionExtensions`, `RequestExtensions`); `ReactivePlan` and `RenderedComponent` at the top.
-- `InputField`, then `Razor`: the one MVC boundary (`Html.ReactivePlan`, `Html.On`, `Html.InputField`,
-  `Html.RenderPlan`, the rendered page's record).
-- `Validation`: the projection of section 7 and its typed model (`ReactiveValidator<T>`).
-- `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: vendors, declarations, render helpers, Confirm,
-  Toast, Drawer, Loader, and the grid's column rules.
+  `tools/PlanContractGenerator` reads these classes into `runtime/types/plan.ts` and `plan.schema.json`.
+- `PlanModel`: the one model that writes the grammar (section 5); `PlanModel/Document`
+  (`PlanBuildContext.Write`) writes the plan once at render.
+- `PlanAuthoring`: the fluent API; `InputField` and `Razor`, the one MVC boundary (`Html.ReactivePlan`,
+  `Html.On`, `Html.InputField`, `Html.RenderPlan`).
+- `Components` and `Vendors`: the object contract every declaration is written with (6.9).
+- `Validation`: the projection of section 7 (`ReactiveValidator<T>`).
+- `Alis.Reactive.Fusion`, `Alis.Reactive.Native`: declarations and render helpers, each package a tree
+  of its own slices (its `SliceTree.txt`).
 
 **TypeScript** (`Alis.Reactive.Assets`)
 - `runtime/grammar`: `evaluate` (the ten expressions), `execute` (the six statements, await),

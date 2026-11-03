@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Alis.Reactive.ArchitectureTests;
 
 /// <summary>
-/// Isolation clause 3 made mechanical (memory/bdd-principles.md, Nested
+/// Isolation clause 3 made mechanical (.claude/memory/bdd-principles.md, Nested
 /// Vertical Slices): a journey's data is unreachable from other journeys and
 /// other worlds. A static store in the sandbox is process-global — every
 /// browser world sees the same instance, so parallel tests collide.

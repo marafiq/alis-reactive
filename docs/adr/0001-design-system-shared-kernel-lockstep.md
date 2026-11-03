@@ -65,5 +65,6 @@ thin-package distributed monolith.
 ## References
 
 - `Directory.Build.props` — single `VersionPrefix`.
-- `Alis.Reactive.DesignSystem/` — tokens (`TokenMap`, `CssUtils`) and layout `*Css` helpers.
-- `Alis.Reactive.NativeTagHelpers/*.csproj` — DesignSystem consumer with no core reference.
+- `Alis.Reactive.DesignSystem/` — the theme and the compiled default (ADR-0002). The tokens (`TokenMap`,
+  `CssUtils`), the layout `*Css` helpers and the `NativeTagHelpers` reference this record was written
+  against were removed in `24fc08036`.

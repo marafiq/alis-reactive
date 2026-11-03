@@ -11,9 +11,9 @@ components. The plan a page renders is specified in [`grammar.md`](grammar.md).
 
 1. **The app owns the widget, the framework owns the plan.** The app installs, bundles,
    constructs and destroys its widgets. The framework renders the element with its id and name,
-   locates the object on it, and runs the plan against it. The runtime raises `alis:mount` before
-   it wires a piece of HTML and `alis:unmount` before it removes one, so the app constructs and
-   destroys at the right moment, including inside partials.
+   locates the object on it, and runs the plan against it. The runtime raises `alis:mount` and
+   `alis:unmount` around every piece of HTML it wires or removes (`docs/design/grammar.md` 3.5), so
+   the app constructs and destroys at the right moment, including inside partials.
 
 2. **A component is declared once, by its own API.** One class names the object's members as C#
    members: `public Property<decimal> Min => Property<decimal>();`, `public void Increment() => Method();`,
@@ -95,8 +95,8 @@ sandbox's call bell (`BroughtComponents/CallBell/CallBell.cs`) is one, and the C
 partial shows its listeners leaving with the partial.
 
 The app constructs and destroys the widget as it would anyway, in listeners for `alis:mount` and
-`alis:unmount` (`Alis.Reactive.SandboxApp/Scripts/sandbox-components.ts`); the framework raises them
-for the page at boot and for every injected partial.
+`alis:unmount` (`Alis.Reactive.SandboxApp/Scripts/sandbox-components.ts`), whose contract is
+`docs/design/grammar.md` 3.5.
 
 **Step 2: declare each member under its JavaScript name, as the kind of member it is.** Every word
 is a noun for the member kind: `Property`, `ReadOnly`, `WriteOnly`, `Object`, `Objects`, `Method`,

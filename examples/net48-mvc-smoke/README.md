@@ -21,12 +21,12 @@ A real .NET Framework 4.8 consumer hits the same issues. Each is captured here w
 | 3 | **`WebApplication.targets` / `VSToolsPath`.** A classic web app imports `$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets`; on a bare build agent `$(VSToolsPath)` defaults wrong (`MSB4226`). | Set `VisualStudioVersion` + `VSToolsPath` in the `.csproj`. |
 | 4 | **Native components are Html helpers, not Tag Helpers.** `<native-*>` Tag Helpers live in the net10-only `AlisReactive.NativeTagHelpers` package and do not exist under System.Web MVC 5. | Use `Html.InputField(plan, m => m.X).NativeTextBox(...)` / `.NativeCheckBox(...)` (`Views/Home/Index.cshtml`). |
 | 5 | **Razor parses `@` inside HTML comments.** `<!-- ... @Html.RenderPlan ... -->` is compiled as code (`CS1502`). | Use Razor comments `@* ... *@` instead. |
-| 6 | **Client validation** on net48 resolves `ReactiveValidator<T>` through MVC5's `DependencyResolver` — a real consumer registers it in `Global.asax` `Application_Start`. | **Not exercised by this native-only smoke** (no validator is registered here); tracked in `docs/net48-windows-verification.md`. |
+| 6 | **Client validation** on net48 resolves `ReactiveValidator<T>` through MVC5's `DependencyResolver` — a real consumer registers it in `Global.asax` `Application_Start`. | **Not exercised by this native-only smoke** (no validator is registered here); the hand test in `docs/net48-windows-verification.md` covers it. |
 
 ## What it proves
 
 CI proves on every run: the build, each package's files landing in `Content\{PackageId}\` with nothing
 git lists, each link's content hash against the bytes served, and the runtime booting under IIS Express
-with a reactive interaction (the `net48-runtime-iis` screenshot). The remaining net48 surfaces a fuller fixture should add are in
-`docs/net48-windows-verification.md` (Syncfusion `.Render()`, the validation bridge, Native HtmlHelper
-markup specifics).
+with a reactive interaction (the `net48-runtime-iis` screenshot). What it does not prove (Syncfusion on
+MVC 5, the validation bridge, Native markup, `packages.config` redirects) is the hand test in
+`docs/net48-windows-verification.md`.

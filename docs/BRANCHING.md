@@ -3,7 +3,7 @@
 One long-lived branch, short-lived everything else, releases by tag. The release runbook is
 `docs/RELEASING.md`; the CI that gates every branch is `docs/CI.md`.
 
-## The model (after the cutover below)
+## The model
 
 | Ref | Purpose | Rules |
 |-----|---------|-------|
@@ -31,42 +31,22 @@ protected deployment environments with required reviewers
 a local "no commit on the trunk" hook
 ([pre-commit-hooks `no-commit-to-branch`](https://github.com/pre-commit/pre-commit-hooks#no-commit-to-branch)).
 
-## Why the state on 2026-09-26 confused
-
-Facts, read from git and the GitHub API on that date:
-
-- Two trunks. `main` (`f4083947`) was 56 commits behind `tiny-safe-but-important-refactorings`
-  (`0a1dca3e`), whose PR #136 into `main` had been open since 2026-06-06. `CLAUDE.md` declared the
-  feature branch the "active working branch", and `scripts/install-git-hooks.sh` refused commits
-  anywhere else, so the feature branch became the de facto trunk.
-- A branch per release candidate: `release/1.0.0-preview1` and `release/1.0.0-rc1` (both at
-  `01c4b672`, already in `main`) and `release/1.0.0-rc3` (at `0a1dca3e`, created the same day as tag
-  `v1.0.0-rc.3` at the same commit). Two names for one commit invite drift, and neither is what the
-  publish workflow reads (it reads the tag).
-- `v1.0.0-rc.3` was cut from the feature branch, so it was not reachable from `main` until the
-  fast-forward at 09:55Z that same day (cutover step 1 below); `v1.0.0-rc.2` is a lightweight tag
-  (no tagger, date or message).
-- 28 remote branches fully merged into `main`, and eight open pull requests (#124, #126 to #131)
-  whose heads are already in `main`; #122 is an abandoned redesign draft with three commits nowhere
-  else.
-- No branch protection, no rulesets (`gh api repos/marafiq/alis-reactive/rulesets` -> `[]`), and
-  the `nuget-release` environment had no reviewer and no deployment policy.
-
 ## Local guard
 
 `sh scripts/install-git-hooks.sh` installs a `pre-commit` hook that refuses a direct commit on
-`main` or `release/*` and points at this page. It replaces the old guard, which pinned one working
-branch through `git config alis.activeBranch` (the installer removes that setting). Override once,
+`main` or `release/*` and points at this page. Override once,
 deliberately: `ALIS_ALLOW_PROTECTED=1 git commit ...`. The server-side ruleset below is the real
 enforcement; the hook only fails faster.
 
-## Protection (the owner applies this; the PR that added this page changed no settings)
+## Protection (the owner applies it)
 
 All commands are read from the GitHub REST docs
 ([rulesets](https://docs.github.com/en/rest/repos/rules),
 [environments](https://docs.github.com/en/rest/deployments/environments),
 [deployment branch policies](https://docs.github.com/en/rest/deployments/branch-policies)).
-Apply them after cutover step 1, when `main` carries the new workflows.
+Read what is applied with `gh api repos/marafiq/alis-reactive/rulesets` and
+`gh api repos/marafiq/alis-reactive/environments/nuget-release`: until both show the rules below,
+`main` takes direct pushes, tags can move, and a pushed `v*` tag publishes without an approval.
 
 ### Ruleset: `main` moves by pull request with green required checks
 
@@ -105,8 +85,8 @@ gh api -X POST repos/marafiq/alis-reactive/rulesets --input /tmp/main-ruleset.js
 `required_approving_review_count` is 0 because a single maintainer cannot approve their own PR;
 the status checks are the gate. `strict_required_status_checks_policy: true` requires the PR
 branch to be current with `main` before merging (the norm; set `false` to trade that safety for
-fewer re-runs). Check names are the job names GitHub shows on a PR; confirm them on the first PR
-after cutover with `gh pr checks <n>` before applying.
+fewer re-runs). Check names are the job names GitHub shows on a PR; confirm them with
+`gh pr checks <n>` before applying.
 
 ### Ruleset: release tags are immutable
 
@@ -152,68 +132,4 @@ step. The tag policy means the environment (and its secret-bearing job) can only
 
 ```bash
 gh repo edit marafiq/alis-reactive --delete-branch-on-merge   # merged PR branches disappear by themselves
-```
-
-## Cutover (ordered; exact commands; run them, in this order, once)
-
-Steps 1 and 2 were done on 2026-09-26 (see below); the local full gate (`scripts/test.sh`) was
-green on `0a1dca3e` (1232/1232) before step 1. Run the remaining steps in order, once.
-
-```bash
-# 1. DONE 2026-09-26 09:55Z. main had no commits of its own, so it was fast-forwarded to the
-#    release line's tip instead of merged:  git push origin 0a1dca3e:refs/heads/main
-#    GitHub marked PR #136 merged; `git describe --tags --abbrev=0 main` prints v1.0.0-rc.3.
-
-# 2. DONE 2026-09-26. Verify any time:
-git fetch origin --tags
-git rev-list --count origin/main..origin/tiny-safe-but-important-refactorings   # 0
-git merge-base --is-ancestor v1.0.0-rc.3 origin/main && echo "rc.3 is on main"
-
-# 3. Retire the old working-branch guard in every clone (installer removes alis.activeBranch and
-#    installs the protected-branch guard).
-rm -f "$(git rev-parse --git-path hooks)/pre-commit"
-sh scripts/install-git-hooks.sh
-
-# 4. Delete the per-RC / preview release branches: the tags already identify those commits.
-for b in release/1.0.0-preview1 release/1.0.0-rc1 release/1.0.0-rc3; do
-  git merge-base --is-ancestor "origin/$b" origin/main && echo "$b is contained in main"
-done
-git push origin --delete release/1.0.0-preview1 release/1.0.0-rc1 release/1.0.0-rc3
-
-# 5. Close the stale pull requests whose heads are already in main (verified 2026-09-26).
-for pr in 124 126 127 128 129 130 131; do
-  gh pr close "$pr" --comment "Closing: every commit of this branch is already in main (merged through #136 / the release line). Branch model: docs/BRANCHING.md."
-done
-#    #122 (abandoned redesign, three commits not in main): close as abandoned; its branch
-#    codex/schema-capability-design keeps the commits.
-gh pr close 122 --comment "Closing as abandoned; the redesign commits stay on codex/schema-capability-design."
-
-# 6. Delete remote branches that are fully merged into main (dry run first, then delete).
-git for-each-ref --format='%(refname:short)' --merged origin/main refs/remotes/origin \
-  | grep -v -E '^origin/(main|HEAD|tiny-safe-but-important-refactorings)$' | sed 's#^origin/##'
-git for-each-ref --format='%(refname:short)' --merged origin/main refs/remotes/origin \
-  | grep -v -E '^origin/(main|HEAD|tiny-safe-but-important-refactorings)$' | sed 's#^origin/##' \
-  | xargs -n 20 git push origin --delete
-
-# 7. Retire the old release line itself (its content is in main; v1.0.0-rc.3 preserves the commit).
-git merge-base --is-ancestor origin/tiny-safe-but-important-refactorings origin/main && \
-  git push origin --delete tiny-safe-but-important-refactorings
-
-# 8. Apply the protection above (rulesets, environment, repository setting).
-
-# 9. DONE in this page's PR: CLAUDE.md's top block names main as the trunk and release line.
-
-# 10. Cut the next release candidate from main per docs/RELEASING.md.
-git tag -a v1.0.0-rc.4 -m "AlisReactive 1.0.0-rc.4" "$(git rev-parse origin/main)" && git push origin v1.0.0-rc.4
-```
-
-Tag only `main`'s tip: the `verify-tag` gate rejects a tag whose commit is not on `main` (or a
-`release/*` hotfix line), so a mis-placed tag fails in seconds and publishes nothing.
-
-## After the cutover: the one-screen answer
-
-```bash
-git describe --tags --abbrev=0 main      # the current release line, by tag
-git tag --points-at origin/main          # empty means main has unreleased commits
-gh release list                          # what shipped
 ```

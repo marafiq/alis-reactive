@@ -10,8 +10,7 @@ type: reference
 
 The public surface of a shipped package is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`
 (root CLAUDE.md): a public symbol added, removed or changed without that text fails the build (RS0016,
-RS0017), so every surface change is a diff a reviewer reads. One shared-surface rename once cascaded
-across 170+ files.
+RS0017), so every surface change is a diff a reviewer reads.
 
 - Before any change: grep all call sites, read every affected file, present evidence.
 - Making an internal member public widens the surface: it needs the same reason and review as any
@@ -78,9 +77,6 @@ Search for: `[component name] [framework] playwright [specific behavior]`.
 Chrome MCP tools behave differently from Playwright — do not trust MCP for SF component
 debugging. Run Playwright diagnostic tests instead of manual browser clicking for SF components.
 
-This saved 2 days of debugging on SF DropDownList Playwright interactions. The ArrowDown
-behavior was documented online and findable in 5 minutes.
-
 ## Never Read Secrets
 
 Never run `dotnet user-secrets list` or any command that reads/displays secret values.
@@ -106,22 +102,6 @@ what it is. The principles that hold:
 - Industry standard: clear on input, re-validate on blur and on the input's commit event.
 - Submit, blur and commit use the same rule evaluation (`runtime/plugins/form/form.ts`, `listenToInputs`).
 - Typing clears the message in the capture phase, before the component hears the keystroke, so a commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks after the clear and its message stays.
-
-## Validation Session Mistake Patterns
-
-These patterns are forbidden. Each was learned the hard way.
-
-1. **Surface tests disguised as BDD.** Tests that assert true/false on functions are not BDD. Every Playwright test must be a full user journey: fill form, submit, see errors, fix, resubmit, success. Verify in the actual browser before committing.
-
-2. **Changing core behavior without understanding existing design.** Before changing behavior, trace the full lifecycle in existing code. Understand WHY the current behavior exists. The code may already handle the case through a different mechanism.
-
-3. **Patch-fix cycle instead of root cause analysis.** When something breaks, STOP. Read the code path end-to-end. Identify the exact line. Fix THAT line. Run ALL tests and verify in browser BEFORE committing. Ten patches is ten mistakes.
-
-4. **Never testing in the actual browser.** After any validation or UI change, open the browser. Fill the form. Click submit. See with your own eyes. Playwright tests only test what they are written to test.
-
-5. **Claiming "all tests pass" while the browser is broken.** Passing tests are necessary but not sufficient. Done means: tests pass AND browser works AND user confirms. Test count means nothing — test quality catches bugs.
-
-6. **Ignoring user feedback and continuing to patch.** When told to stop patching, ACTUALLY STOP. Step back, read the code, think, then make ONE correct change.
 
 ## Code Hygiene — Worked Examples
 

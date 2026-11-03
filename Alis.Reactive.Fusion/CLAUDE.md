@@ -59,8 +59,7 @@ The method in full: `docs/design/bring-your-own-component.md`.
 - Zero changes in `Alis.Reactive.Assets/runtime/`. If a runtime change seems needed, the plan is
   missing information; make the C# slice carry it.
 - New typed surface (members, events, builder methods) stays inside the slice. Changing anything
-  shared risks every slice, so trace downstream use first. Why: one shared-surface change once
-  cascaded across 170+ files.
+  shared risks every slice, so trace downstream use first.
 - Member and event payload names come from the EJ2 source, not from memory or vendor docs alone. A
   payload property like `cancel` is behavior to prove, not a string to copy.
 - Input IDs derive from the model expression; every other ID is the developer's explicit choice.

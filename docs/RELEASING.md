@@ -4,19 +4,13 @@ Releases follow [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)
 entirely by **annotated git tags whose commit is on `main`**. The tag is the single source of truth
 for the published version: nothing is bumped in code, no branch is created per release candidate,
 and merging to `main` never publishes. The publish workflow is
-`.github/workflows/nuget-publish.yml`; the branch model and the one-time cutover are in
-`docs/BRANCHING.md`; the CI that gates every release is described in `docs/CI.md`.
-
-> **Cutover status.** `main` became the release line on 2026-09-26 09:55Z: it was fast-forwarded to
-> `0a1dca3e`, the commit `v1.0.0-rc.3` was cut from, so that tag is reachable from `main` and this
-> page applies verbatim. The remaining one-time steps (retire the per-RC branches, apply the
-> protection) are in `docs/BRANCHING.md`. The publish workflow rejects a tag whose commit is not on
-> `main` (or on a `release/*` branch): such a tag fails in seconds and publishes nothing.
+`.github/workflows/nuget-publish.yml`; the branch model and the repository's protection are in
+`docs/BRANCHING.md`; what each workflow runs and gates is in `docs/CI.md`.
 
 ## Where is the release candidate? (one screen)
 
-A release is identified by its **tag**, never by a branch. There is no `release/1.0.0-rc.N`
-branch; the answer to "which commit is the RC?" is always a tag lookup:
+A release is identified by its **tag**, never by a branch: no branch names a release candidate, and
+the answer to "which commit is the RC?" is always a tag lookup:
 
 ```bash
 git fetch origin --tags --prune --prune-tags
@@ -172,15 +166,9 @@ git push origin v1.0.1
 git switch -c fix/forward-port-1.0.1 origin/main && git cherry-pick <fix-sha> && gh pr create --base main --fill
 ```
 
-## What each workflow does and gates on
+## What the publish workflow checks
 
-| Workflow | Runs on | Gates | Publishes? |
-|----------|---------|-------|------------|
-| `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, lint, assets, vitest, consistency checks, dotnet build, dotnet tests) a `gate / playwright (<shard>)` job per shard, and `gate / example` | never |
-| `verify-net48.yml` | pushes and pull requests to `main` and `release/*` | net48 build + pack on real .NET Framework 4.8 (Windows); IIS Express boot proof of the net48 sample app | never (packs a local fixture feed) |
-| `nightly.yml` | 03:30 UTC Monday to Friday on `main`; manual | the full gate; opens or updates a `ci-nightly-failure` issue when red | never |
-| `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |
-
+Every workflow, what triggers it and what it gates is in `docs/CI.md` ("What each workflow is for").
 `nuget-publish.yml`'s `pack-and-publish` job asserts that exactly the five expected packages exist at
 the tagged version before pushing, pushes with `--skip-duplicate` (re-runs are idempotent), then
 creates or updates the GitHub Release with the packages attached and notes generated per
@@ -217,12 +205,12 @@ for id in AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.Desi
   dotnet nuget delete "$id" 1.0.0-rc.4 --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --non-interactive
 done
 
-# Mark the GitHub Release accordingly; never delete or move the tag (the tag ruleset blocks it anyway).
+# Mark the GitHub Release accordingly; never delete or move the tag (`docs/BRANCHING.md`'s tag ruleset blocks both).
 gh release edit v1.0.0-rc.4 --prerelease --notes "Unlisted from nuget.org on <date>: <reason>. Use 1.0.0-rc.5 or later."
 ```
 
 Then fix forward: the next tag (`v1.0.0-rc.5`) is the remedy. Re-tagging a used version is
-impossible by design (nuget.org rejects a re-push of an existing version, and the tag is immutable).
+impossible by design: nuget.org rejects a re-push of an existing version.
 Reference: [`dotnet nuget delete`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-delete).
 
 ## Rules

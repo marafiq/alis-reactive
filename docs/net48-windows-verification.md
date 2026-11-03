@@ -1,79 +1,36 @@
-# net48 Runtime Verification — Windows
+# net48 hand test on Windows
 
-**Status: AUTOMATED in CI.** The classic ASP.NET MVC 5 / .NET Framework 4.8 runtime proof now runs on
-`windows-latest` in `.github/workflows/verify-net48.yml` (`net48-runtime-iis` job): it builds
-`examples/net48-mvc-smoke`, hosts it under **IIS Express**, drives it with **Playwright**, and uploads
-a screenshot. See `examples/net48-mvc-smoke/README.md` for the known net48 consumer gotchas this
-surfaced and how each is fixed (asset landing, System.Text.Json 10 binding redirects,
-`WebApplication.targets`/`VSToolsPath`, Native Html-helpers vs Tag Helpers, Razor `@` in comments).
-Mono/macOS is **not** a faithful .NET Framework host and must not be used to claim this done — that is
-why it runs on a real Windows runner.
-
-The manual checklist below remains the reference for the surfaces the automated smoke does not yet
-cover (Syncfusion `.Render()`, the validation bridge).
-
-This checklist covers the five net48 runtime items the release candidates surfaced. Run it on Windows
-with Visual Studio (or MSBuild + IIS Express) and .NET Framework 4.8 installed.
+CI's `verify-net48` proves on every run what `examples/net48-mvc-smoke/README.md` lists: the build and
+pack on .NET Framework 4.8, each package's files landing in `Content\{PackageId}\`, their versioned
+links, and the runtime booting under IIS Express with one reactive interaction. That fixture is
+native-only and registers no validator. This checklist covers the rest, by hand, on Windows with
+.NET Framework 4.8 and Visual Studio (or MSBuild and IIS Express). A macOS run is not a .NET Framework
+host and proves none of it.
 
 ## Setup
 
-1. `git clone` the repo on Windows, check out the release tag/branch.
-2. Build the packages locally so you have an `rc.1` feed:
-   ```bash
-   npm ci && npm run build:all
-   scripts/pack.sh 1.0.0-rc.1      # produces ./nupkgs/*.1.0.0-rc.1.nupkg
-   ```
-3. Create a **classic ASP.NET MVC 5 Web Application** (.NET Framework 4.8, `packages.config` — *not*
-   an SDK-style project). In Visual Studio: New Project → "ASP.NET Web Application (.NET Framework)"
-   → MVC.
-4. Add `./nupkgs` as a local NuGet source and install (these pull the `net48` lib + MVC5 deps):
-   ```
-   AlisReactive, AlisReactive.DesignSystem, AlisReactive.Fusion, AlisReactive.Native,
-   ```
+1. Clone the repository on Windows and check out the commit to test.
+2. Pack the packages: `npm ci`, `npm run build:all`, `scripts/pack.sh <version>` (writes `./nupkgs`).
+3. Create a classic ASP.NET MVC 5 web application (.NET Framework 4.8, `packages.config`): in Visual
+   Studio, "ASP.NET Web Application (.NET Framework)", then MVC.
+4. Add `./nupkgs` as a local NuGet source and install `AlisReactive`, `AlisReactive.Native`,
+   `AlisReactive.Fusion` and `AlisReactive.DesignSystem` at `<version>`.
 
-## The five checks
+## The checks
 
-### 1. Asset landing (Task 3a — cross-platform-ish, confirm on Windows)
-After build, confirm each package's `build\net48\{PackageId}.targets` copied its browser assets into
-`Content\{PackageId}\`:
-- [ ] `Content\AlisReactive\js\alis-reactive.js`
-- [ ] `Content\AlisReactive\css\alis-reactive.css`
-- [ ] `Content\AlisReactive.Native\css\native.css`
-- [ ] `Content\AlisReactive.Fusion\css\fusion.css`
-- [ ] `Content\AlisReactive.DesignSystem\css\design-system.css` and `theme.css`
+1. **Fusion's files land.** After a build, `Content\AlisReactive.Fusion\css\fusion.css` is there beside
+   the files the smoke already proves (README, "Browser assets", lists every file).
+2. **Syncfusion renders on net48.** The net48 package depends on `Syncfusion.EJ2.MVC5`, not
+   `Syncfusion.EJ2.AspNet.Core`. A view with a Fusion component (a `FusionDropDownList`) renders with no
+   exception, and the component opens and shows its options in the browser.
+3. **Validation through MVC 5's `DependencyResolver`.** Register a `ReactiveValidator<T>` in
+   `Global.asax` `Application_Start`, submit invalid data, and see the browser's messages, then the
+   server's for a rule only the server checks.
+4. **Native markup.** A rendered `Html.InputField(...).NativeTextBox(...)` carries the `id` and `name`
+   the plan names, and a reactive interaction on it (a live clear, a conditional show) works.
+5. **Binding redirects under `packages.config`.** The app runs with no `FileLoadException` for
+   `System.Text.Json` or its dependencies; if NuGet's `Add-BindingRedirect` was needed, compare the
+   redirects with the smoke's `Web.config` (README of the smoke, gotcha 2).
 
-(net10 consumers get no copies: the same files are static web assets served at
-`~/_content/{PackageId}/...`.) The copies are build output and are not added to the project; include
-`Content\AlisReactive*\` as `Content` in the classic Web Application Project so publish deploys it,
-and record any further step needed (feeds the install docs).
-
-### 2. Syncfusion `.Render()` executes on net48
-The net48 package depends on `Syncfusion.EJ2.MVC5` (a *different* assembly than net10's
-`Syncfusion.EJ2.AspNet.Core`). Render a view with a Fusion component (e.g. `FusionDropDownList`):
-- [ ] The `Html.EJS()....Render()` chain produces markup with no runtime exception.
-- [ ] The component initializes in the browser (dropdown opens, options show).
-
-### 3. Client validation via the MVC5 `DependencyResolver` bridge
-`ReactiveValidator<T>` metadata resolution on net48 goes through MVC5's
-`DependencyResolver.SetResolver` bridge (no test/sandbox covers this today):
-- [ ] Register the validator in `Global.asax`/DI per the install docs.
-- [ ] Submit invalid data; confirm client-side validation errors render from the recorded metadata.
-
-### 4. Native input HTML markup on net48
-Native inputs on net48 are emitted by MVC5 `HtmlHelper.TextBoxFor`-family helpers (different markup
-than net10 Tag Helpers — name/value encoding, `data-val-*` attributes):
-- [ ] Inspect a rendered `Html.InputField(...).NativeTextBox(...)` — confirm the element `id`/`name`
-      match what the runtime expects (plan IDs resolve via `getElementById`).
-- [ ] Confirm a reactive interaction (e.g. live-clear, conditional show) works against that markup.
-
-### 5. `System.Text.Json` 10.x binding redirects
-STJ 10 on .NET Framework 4.8 commonly needs assembly binding redirects in `web.config`; classic
-`packages.config` apps do not always add them automatically:
-- [ ] App runs without a `FileLoadException`/binding error on `System.Text.Json` (or its deps).
-- [ ] If a redirect is required, capture the exact `web.config` `<bindingRedirect>` and add it to the
-      net48 install docs.
-
-## Sign-off
-A release's net48 sign-off is all five boxes checked by hand in a browser on Windows; CI's
-`net48-runtime-iis` job proves the boot and one interaction, not the rest. Do not report this done
-from a macOS run.
+A release's net48 sign-off is these five checks done by hand in a browser on Windows, together with
+a green `verify-net48` run on the same commit.

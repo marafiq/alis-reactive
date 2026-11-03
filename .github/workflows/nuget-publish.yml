@@ -14,7 +14,7 @@ name: Publish NuGet packages
 #   pack-and-publish  five packages at the tagged version -> nuget.org -> GitHub Release
 #                     (runs in the `nuget-release` environment; add a required reviewer there for
 #                      a manual approval click before anything is pushed)
-# Runbook: docs/RELEASING.md. Branch model and cutover: docs/BRANCHING.md.
+# Runbook: docs/RELEASING.md. Branch model and protection: docs/BRANCHING.md.
 on:
   push:
     tags: ['v*']
