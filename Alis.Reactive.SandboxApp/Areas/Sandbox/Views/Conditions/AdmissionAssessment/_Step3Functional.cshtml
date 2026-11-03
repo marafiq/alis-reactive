@@ -18,14 +18,14 @@
     </p>
 
     <!-- Shared Active Plan fields populated by earlier steps and nested partials. -->
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
     <!-- Hidden NumericTextBox keeps Age typed as decimal for the compound .Gte(80m) condition. -->
     <div hidden>
         @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
             .FusionNumericTextBox(b => b.Min(0).Max(120).Step(1)); }
     </div>
-    @Html.HiddenFieldFor(plan, m => m.ResidentName)
-    @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
+    @Html.NativeHiddenField(plan, m => m.ResidentName)
+    @Html.NativeHiddenField(plan, m => m.MonitoringLevel)
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.FallHistory, o => o.Label("Fall History"))

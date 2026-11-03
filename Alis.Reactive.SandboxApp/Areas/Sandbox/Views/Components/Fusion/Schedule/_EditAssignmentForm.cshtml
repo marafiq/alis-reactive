@@ -13,7 +13,7 @@
     <p class="text-sm text-text-secondary">Assignment #@Model.AssignmentId</p>
 
     <form id="assignment-form" class="space-y-3">
-    @Html.HiddenFieldFor(plan, m => m.AssignmentId)
+    @Html.NativeHiddenField(plan, m => m.AssignmentId)
 
     <native-vstack gap="Sm">
         @{ Html.InputField(plan, m => m.StaffId, o => o.Required().Label("Staff Member"))

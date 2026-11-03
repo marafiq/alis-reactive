@@ -15,7 +15,7 @@
     <native-heading level="H2">Intake</native-heading>
     <native-text color="Secondary">Who is moving in, and how.</native-text>
 
-    @Html.HiddenFieldFor(plan, m => m.AdmissionId)
+    @Html.NativeHiddenField(plan, m => m.AdmissionId)
 
     <native-grid cols="C3" gap="Base" class="mt-4">
         @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident name"))

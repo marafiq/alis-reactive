@@ -25,10 +25,10 @@
     </native-vstack>
 
     <form id="new-assignment-form" class="space-y-3">
-        @Html.HiddenFieldFor(plan, m => m.StartTime)
-        @Html.HiddenFieldFor(plan, m => m.EndTime)
-        @Html.HiddenFieldFor(plan, m => m.ShiftId)
-        @Html.HiddenFieldFor(plan, m => m.FacilityId)
+        @Html.NativeHiddenField(plan, m => m.StartTime)
+        @Html.NativeHiddenField(plan, m => m.EndTime)
+        @Html.NativeHiddenField(plan, m => m.ShiftId)
+        @Html.NativeHiddenField(plan, m => m.FacilityId)
 
         <native-vstack gap="Sm">
             @{ Html.InputField(plan, m => m.StaffId, o => o.Required().Label("Staff Member"))

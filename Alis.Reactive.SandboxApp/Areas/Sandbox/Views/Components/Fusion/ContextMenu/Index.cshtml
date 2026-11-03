@@ -151,7 +151,7 @@
         <native-vstack gap="Sm">
             @{ Html.InputField(plan, m => m.ShiftHandover, o => o.Label("Shift handover in progress"))
                 .NativeCheckBox(b => b.CssClass("rounded border-border")); }
-            @Html.HiddenFieldFor(plan, m => m.PendingMove)
+            @Html.NativeHiddenField(plan, m => m.PendingMove)
             <p id="board-status" role="status" class="text-sm font-medium">No changes on the board yet.</p>
             <p id="handover-note" hidden class="text-sm text-amber-700">
                 <span id="handover-held"></span> actions for <span id="handover-resident"></span> wait until the handover ends.

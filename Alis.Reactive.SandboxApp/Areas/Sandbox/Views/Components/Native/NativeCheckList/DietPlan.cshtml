@@ -15,7 +15,7 @@
     <native-card><native-card-body>
         <native-vstack gap="Base">
             <div id="diet-plan-form">
-            @Html.HiddenFieldFor(plan, m => m.ResidentId)
+            @Html.NativeHiddenField(plan, m => m.ResidentId)
             @{ Html.InputField(plan, m => m.DietaryRestrictions, o => o.Label("Dietary Restrictions"))
                 .NativeCheckList(b => b.Items(restrictionOptions)); }
             </div>

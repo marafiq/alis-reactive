@@ -14,8 +14,8 @@
 
     <native-card><native-card-body>
         <form id="care-level-form" class="mb-4">
-            @Html.HiddenFieldFor(plan, m => m.ResidentId)
-            @Html.HiddenFieldFor(plan, m => m.RequiresPhysicianSignOff)
+            @Html.NativeHiddenField(plan, m => m.ResidentId)
+            @Html.NativeHiddenField(plan, m => m.RequiresPhysicianSignOff)
             @{ Html.InputField(plan, m => m.RequestedCareLevel, o => o.Label("New Care Level"))
                 .NativeDropDown(b => b.Items(careLevels).Placeholder("-- Select care level --")); }
         </form>

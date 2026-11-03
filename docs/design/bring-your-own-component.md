@@ -379,7 +379,7 @@ built the same way.
 **Rendering.** An input renders through its field, `field.Render<T>(markup)` (or a `TextWriter`
 callback, as `FusionRichTextEditor` does); a hidden one through `o.Hidden()`
 (`Alis.Reactive/InputField/InputFieldOptions.cs`), which drops the label and message wrapper; pages
-write it `@Html.HiddenFieldFor(plan, m => m.Wing)` (`Components/Native/NativeHiddenField/Index.cshtml`).
+write it `@Html.NativeHiddenField(plan, m => m.Wing)` (`Components/Native/NativeHiddenField/Index.cshtml`).
 Anything else renders against the plan with the id the developer chose,
 `plan.Render<T>(elementId, markup)`. Each returns the handle `.Reactive` hangs off.
 

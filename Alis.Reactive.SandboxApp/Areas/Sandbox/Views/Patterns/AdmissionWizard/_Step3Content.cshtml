@@ -17,8 +17,8 @@
         Functional assessment for @Model.ResidentName (age @Model.Age).
     </p>
 
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
-    @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.MonitoringLevel)
     <div hidden>
         @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
             .FusionNumericTextBox(b => b.Min(0).Max(120).Step(1)); }

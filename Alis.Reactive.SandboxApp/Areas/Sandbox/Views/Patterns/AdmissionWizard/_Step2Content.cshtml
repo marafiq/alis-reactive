@@ -19,10 +19,10 @@
         Diagnosis: <strong>@Model.PrimaryDiagnosis</strong> — resident @Model.ResidentName
     </p>
 
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
-    @Html.HiddenFieldFor(plan, m => m.PrimaryDiagnosis)
-    @Html.HiddenFieldFor(plan, m => m.ResidentName)
-    @Html.HiddenFieldFor(plan, m => m.CareUnit)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.PrimaryDiagnosis)
+    @Html.NativeHiddenField(plan, m => m.ResidentName)
+    @Html.NativeHiddenField(plan, m => m.CareUnit)
 
     @if (showCognitive)
     {

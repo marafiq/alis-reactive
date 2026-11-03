@@ -14,7 +14,7 @@
     <native-heading level="H2">Review</native-heading>
     <native-text color="Secondary">The admission as saved. The coordinator who signs it off submits it.</native-text>
 
-    @Html.HiddenFieldFor(plan, m => m.AdmissionId)
+    @Html.NativeHiddenField(plan, m => m.AdmissionId)
 
     <dl class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <div class="rounded-md border border-border/60 p-4">

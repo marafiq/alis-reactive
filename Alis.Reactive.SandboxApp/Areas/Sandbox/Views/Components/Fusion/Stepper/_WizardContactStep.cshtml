@@ -14,7 +14,7 @@
     <native-heading level="H2">Responsible party</native-heading>
     <native-text color="Secondary">The family member Maple Grove calls first.</native-text>
 
-    @Html.HiddenFieldFor(plan, m => m.AdmissionId)
+    @Html.NativeHiddenField(plan, m => m.AdmissionId)
 
     <native-grid cols="C3" gap="Base" class="mt-4">
         @{ Html.InputField(plan, m => m.ResponsibleParty, o => o.Required().Label("Responsible party"))

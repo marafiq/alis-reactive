@@ -13,10 +13,10 @@
     </p>
 
     <!-- Shared Active Plan summary fields populated by earlier steps. -->
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
-    @Html.HiddenFieldFor(plan, m => m.RiskTier)
-    @Html.HiddenFieldFor(plan, m => m.CareUnit)
-    @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.RiskTier)
+    @Html.NativeHiddenField(plan, m => m.CareUnit)
+    @Html.NativeHiddenField(plan, m => m.MonitoringLevel)
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Required().Label("Emergency Contact"))

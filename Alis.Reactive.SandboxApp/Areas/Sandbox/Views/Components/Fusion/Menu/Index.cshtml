@@ -128,7 +128,7 @@
                 section.Element("section-overview").Show();
             });
     }))
-    @Html.HiddenFieldFor(plan, m => m.CurrentPage)
+    @Html.NativeHiddenField(plan, m => m.CurrentPage)
 
     <native-card><native-card-body>
         <div id="@Content" class="transition-opacity">

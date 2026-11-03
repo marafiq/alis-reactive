@@ -77,7 +77,7 @@
             <section id="handoff-note" hidden class="mt-3">
                 <h3 id="handoff-note-resident" class="text-sm font-semibold"></h3>
                 <p id="handoff-note-text" class="mt-1 text-sm"></p>
-                @Html.HiddenFieldFor(plan, m => m.HandoffResident)
+                @Html.NativeHiddenField(plan, m => m.HandoffResident)
                 <native-hstack gap="Sm" class="mt-3">
                     @(Html.NativeButton("handed-off-btn", "Handed off")
                         .CssClass(Button)

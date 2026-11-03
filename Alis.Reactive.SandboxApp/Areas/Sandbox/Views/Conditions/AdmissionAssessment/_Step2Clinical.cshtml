@@ -14,10 +14,10 @@
     </p>
 
     <!-- Shared Active Plan fields populated by Step 1 and nested clinical partials. -->
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
-    @Html.HiddenFieldFor(plan, m => m.PrimaryDiagnosis)
-    @Html.HiddenFieldFor(plan, m => m.ResidentName)
-    @Html.HiddenFieldFor(plan, m => m.CareUnit)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.PrimaryDiagnosis)
+    @Html.NativeHiddenField(plan, m => m.ResidentName)
+    @Html.NativeHiddenField(plan, m => m.CareUnit)
 
     <!-- Step 1 diagnosis conditions target these IDs across step plans. -->
     <div id="cognitive-section" hidden>

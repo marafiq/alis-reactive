@@ -17,7 +17,7 @@
     <native-heading level="H2">Care plan for @Model.ResidentName</native-heading>
     <native-text color="Secondary">The care the resident moves in with.</native-text>
 
-    @Html.HiddenFieldFor(plan, m => m.AdmissionId)
+    @Html.NativeHiddenField(plan, m => m.AdmissionId)
 
     <native-grid cols="C3" gap="Base" class="mt-4">
         @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care level"))

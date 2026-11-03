@@ -13,7 +13,7 @@ namespace Alis.Reactive.Native
     /// The native HTML <c>&lt;input type="hidden"&gt;</c>, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Render it with <c>Html.HiddenFieldFor(plan, m =&gt; m.ScreeningId)</c>; reach it with
+    /// Render it with <c>Html.NativeHiddenField(plan, m =&gt; m.ScreeningId)</c>; reach it with
     /// <c>p.Component&lt;NativeHiddenField&gt;(m =&gt; m.ScreeningId)</c> and use its members directly, for
     /// example to keep the id a response returns:
     /// <code>
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Native
         /// <param name="plan">Reactive Plan that receives the hidden-field registration.</param>
         /// <param name="expression">Model property expression used for MVC binding and component registration.</param>
         /// <returns>The rendered hidden field, ready for <c>.Reactive(...)</c>.</returns>
-        public static RenderedComponent<NativeHiddenField, TModel> HiddenFieldFor<TModel, TProp>(
+        public static RenderedComponent<NativeHiddenField, TModel> NativeHiddenField<TModel, TProp>(
 #if NET48
             this HtmlHelper<TModel> html,
 #else

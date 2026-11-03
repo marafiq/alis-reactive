@@ -16,7 +16,7 @@
 <native-card><native-card-body id="step1-form">
     <native-heading level="H2">Step 1: Demographics</native-heading>
 
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.ResidentName, o => o.Required().Label("Resident Name"))

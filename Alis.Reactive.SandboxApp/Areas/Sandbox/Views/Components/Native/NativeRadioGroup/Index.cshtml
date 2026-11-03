@@ -33,7 +33,7 @@
     <native-grid cols="C2" gap="Lg">
         <native-card><native-card-body id="@FormId">
             <native-vstack gap="Lg">
-                @Html.HiddenFieldFor(plan, m => m.ResidentId)
+                @Html.NativeHiddenField(plan, m => m.ResidentId)
 
                 @{ Html.InputField(plan, m => m.CareLevel, o => o.Required().Label("Care level"))
                     .NativeRadioGroup(b => b

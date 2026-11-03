@@ -21,9 +21,9 @@
 
     <native-card><native-card-body>
         <form id="@FormId" class="flex flex-col gap-4">
-            @Html.HiddenFieldFor(plan, m => m.Wing)
-            @Html.HiddenFieldFor(plan, m => m.RoundStartedAt)
-            @{ Html.HiddenFieldFor(plan, m => m.ResidentId)
+            @Html.NativeHiddenField(plan, m => m.Wing)
+            @Html.NativeHiddenField(plan, m => m.RoundStartedAt)
+            @{ Html.NativeHiddenField(plan, m => m.ResidentId)
                 .Reactive(evt => evt.Change, (args, p) =>
                     p.Get(Url.SandboxRoute("NightCare", "NativeHiddenField"))
                      .Gather<NightCareQuery>(g => g.Set(x => x.ResidentId, args.Value))
