@@ -150,12 +150,14 @@ namespace Alis.Reactive
 
         /// <summary>
         /// Sends the named inputs, each by its binding name, as MVC binds it, wherever on the page they are
-        /// rendered: under the view's field prefix when the view is a partial rendered for a member of the page's
-        /// model.
+        /// rendered and whichever view rendered them: under the view's field prefix when the view is a partial
+        /// rendered for a member of the page's model.
         /// </summary>
         /// <remarks>
-        /// A request other than the view model must have a member for each binding name, prefix included, of a
-        /// type the input's value binds to; the view is refused when it renders otherwise.
+        /// Each is read as <c>p.Bound</c> reads it: of two inputs that bind one name, the one that joined the page
+        /// last, the one a form holding both sends; nothing when no input on the page binds it. A request other than
+        /// the view model must have a member for each binding name, prefix included, of a type the input's value binds
+        /// to; the view is refused when it renders otherwise.
         /// </remarks>
         /// <param name="fields">The view model members whose inputs are sent, for example <c>m =&gt; m.Name, m =&gt; m.Address.City</c>.</param>
         public GatherBuilder<TRequest, TModel> Form(params Expression<Func<TModel, object?>>[] fields)
@@ -169,8 +171,7 @@ namespace Alis.Reactive
                 var fieldType = ExpressionPathHelper.ToPropertyType(field);
                 if (typeof(TRequest) != typeof(TModel))
                     RequestMembers.Require(typeof(TRequest), binding, fieldType);
-                var inputId = IdGenerator.ForMember(ExpressionPathHelper.ToDeclarer(field), binding.Value);
-                _draft.Add(binding, ValueExpression.ReadBound(inputId, ClrShape.Of(fieldType)));
+                _draft.Add(binding, ValueExpression.ReadBound(binding.Value, ClrShape.Of(fieldType)));
             }
 
             return this;

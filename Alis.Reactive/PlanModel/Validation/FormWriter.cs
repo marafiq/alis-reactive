@@ -37,9 +37,9 @@ namespace Alis.Reactive.PlanModel.Validation
         }
 
         private FnExpr When(BrowserRule rule, FormFieldValues values) =>
-            G.Fn(rule.Condition.Bound(values).Write(_scope), FormInputRead.Indexes);
+            G.Fn(rule.Condition.Bound(values).Write(_scope), FormFieldValues.Indexes);
 
         private FnExpr Check(BrowserRule rule, CheckedField field) =>
-            G.Fn(rule.Check(G.Ref(Value), field.Shape, field.Values, _scope), Value, FormInputRead.Indexes);
+            G.Fn(rule.Check(G.Ref(Value), field.Shape, field.Values, _scope), Value, FormFieldValues.Indexes);
     }
 }

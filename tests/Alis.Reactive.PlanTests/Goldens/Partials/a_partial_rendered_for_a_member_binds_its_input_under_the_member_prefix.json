@@ -136,12 +136,16 @@
                                     "id": "$model"
                                   },
                                   "path": [
-                                    "boundValueOf"
+                                    "valueOf"
                                   ],
                                   "args": [
                                     {
                                       "kind": "lit",
-                                      "value": "Alis_Reactive_PlanTests_Support_Contact__NextOfKin_Name"
+                                      "value": "NextOfKin.Name"
+                                    },
+                                    {
+                                      "kind": "list",
+                                      "items": []
                                     }
                                   ]
                                 }

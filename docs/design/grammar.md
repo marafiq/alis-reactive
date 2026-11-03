@@ -204,9 +204,9 @@ exactly whatever the zone of the browser or the server.
 
 **Binding reads.** Where the server binds a value, the browser reads it the way MVC binds it.
 - **Where:** the `alis.model` values a request body carries (`fill`, `fields`, so
-  `Form()` and `Form(formId)` send them; `Form(m => m.X)` reads one input with `model.boundValueOf(id)`),
-  every input a validation rule reads: its field, a peer, and each member its condition reads, by
-  binding name (M8), and `p.Bound(m => m.X)`, which reads as `Form(m => m.X)` does.
+  `Form()` and `Form(formId)` send them), and every read by binding name (M8): `Form(m => m.X)`,
+  `p.Bound(m => m.X)`, and every input a validation rule reads: its field, a peer, and each member its
+  condition reads.
 - **What:** text that is empty or only whitespace is `null`, as MVC's `ConvertEmptyStringToNull`
   makes it, under every shape: text, a nullable of any shape (a `Guid?`, a `TimeSpan?`, a `char?`),
   and `any` (a `char`, a `Uri`). A non-nullable number, boolean or date left empty is its type's
@@ -580,7 +580,7 @@ no key (H2) and no entry (H4).
   - A `File` cannot be sent in a GET; it is a boundary error.
 - **H3 JSON.** `values` is the body, each value as the plan built it; the plugin converts no text.
   - The inputs a request sends (`Form()` through `model.fill`, `Form(m => m.X)` through
-    `model.boundValueOf`) are binding reads (2.1), so an input left blank or holding only spaces is
+    `model.valueOf`) are binding reads (2.1), so an input left blank or holding only spaces is
     already `null`, as MVC's form binding makes it.
   - Every other value (a literal, a component's or a plugin's member, a payload, a method's result) is
     converted to its member's shape (2.1) and sent as it is, `""` included: MVC's JSON binding keeps
@@ -614,10 +614,6 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   a list.
 - **M3 `fill(record)`.** Writes the values of M1 into `record` at their body paths and returns it.
   A node already on the path keeps its other members; it is copied before it is written.
-- **M5 `boundValueOf(id)`.** On the page's table (`plugin("alis.model", "")`): the value of the
-  mounted input with that id, whichever plan rendered it, as a binding read (2.1), for a gathered
-  `Form(m => ..)` field and `p.Bound(m => ..)`; missing when no input with that id is on the page, as
-  the server sees a member no input posts.
 - **M6 One element per id.** The server refuses an element id rendered twice in one request
   (`Alis.Reactive/Razor/RenderedPage.cs`). Two requests can still bring one twice, as two slots that
   each load one partial do. The table keeps both entries; every read goes through the element the
@@ -639,14 +635,20 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
 - **M8 Names.** A binding-name pattern names the mounted inputs whose binding name it spells, each
   `[*]` standing for an index: `Contacts[*].Name` names `Contacts[0].Name` and `Contacts[12].Name`,
   `Tags[*]` each tag, and a name with no `[*]` the one member. The form lists the inputs a field's name
-  names on the page, with the index each `[*]` stood for (F1). `valueOf(name, indexes)` on
-  `plugin("alis.model", containerId)` reads, as a binding read (2.1), the input that binds the name at
-  those indexes, the first `[*]` taking the first index: the one inside the container, else the one
-  elsewhere on the page (a member the request sends beside the form, `Form(m => ..)`), the one
-  contributed last of several; missing when none is on the page, as the server sees a member no input
-  posts. A form's tests read every member through it: the member's name is the same whichever view
-  renders its input, so the page's rule reads the input a partial, an editor template or a slot's
-  content renders, and an item's rule reads the members of its own item.
+  names on the page, with the index each `[*]` stood for (F1). `valueOf(name, indexes)` is the one read
+  of an input's value: as a binding read (2.1), the input that binds the name at those indexes, the
+  first `[*]` taking the first index, the one inside the container, else the one elsewhere on the page;
+  of several, the one contributed last, which is the one M2 and M3 send; missing when none is on the
+  page, as the server sees a member no input posts.
+  - On `plugin("alis.model", containerId)` a form's tests read every member through it, at the indexes
+    of the item they check: the input inside the form first, as its `Form()` sends it, else a member the
+    request sends beside the form.
+  - On the page's table, `plugin("alis.model", "")`, whose container is the page, `p.Bound(m => ..)` and
+    a `Form(m => ..)` field read through it, at no index (`[]`).
+
+  The member's name is the same whichever view renders its input, so the page's rule, its bound read
+  and its named send reach the input a partial of any model, an editor template or a slot's content
+  renders for the member, and an item's rule reads the members of its own item.
 
 ### 6.4 `form` (`plugin("alis.form", containerId)`)
 

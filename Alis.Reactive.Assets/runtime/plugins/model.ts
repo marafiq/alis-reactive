@@ -11,9 +11,6 @@
 // M4 Each input's `committed` event is re-raised on its element as alis:commit, once per element and
 //    for as long as its owner lives. The plan that renders an input contributes it, so the widget
 //    exists by then.
-// M5 `boundValueOf(id)` on the page's table (`plugin("alis.model", "")`): the value of the mounted input
-//    with that id, whichever plan rendered it, as a binding read, for a bound read or a named gather;
-//    missing when none is on the page.
 // M6 An id names one element. Two live entries for one id (two slots that each loaded one partial, which
 //    no single request can render) both read the element the DOM finds by that id, the first in document
 //    order; each owner's release removes only its own entry, so the other slot's input is read once the
@@ -26,10 +23,11 @@
 // M8 Names. A binding-name pattern names the mounted inputs whose binding name it spells, each `[*]` standing
 //    for an index: Contacts[*].Name names Contacts[0].Name and Contacts[12].Name, Tags[*] each tag. `namedInputs`
 //    lists every one on the page, with the index each `[*]` stood for, whichever plan rendered it (the form's
-//    fields, F1). `valueOf(pattern, indexes)` on a container reads, as a binding read, the input that binds the
-//    pattern at those indexes, the first `[*]` the first index: the one inside the container, else the one
-//    elsewhere on the page (a member the request sends beside the form), the one contributed last of several;
-//    missing when none is on the page, as the server sees a member no input posts.
+//    fields, F1). `valueOf(pattern, indexes)` is the one read of an input's value: as a binding read, the input
+//    that binds the pattern at those indexes, the first `[*]` the first index, the one inside the container, else
+//    the one elsewhere on the page, the one contributed last of several; missing when none is on the page, as the
+//    server sees a member no input posts. A form's tests read on the form's container; a bound read and a named
+//    send read on the page's table, whose container is the page.
 
 import type { BodyStep, InputBinding, ModelPluginData } from "../types/index";
 import type { Contribution, Plugin } from "../objects/plugins";
@@ -51,16 +49,15 @@ interface ModelInput {
   readonly objects: PlanObjects;
 }
 
-export interface PageModel {
-  boundValueOf(id: string): unknown;
+export interface BoundValues {
+  valueOf(pattern: string, indexes: readonly number[]): unknown;
 }
 
-export interface ContainedInputs {
+export interface ContainedInputs extends BoundValues {
   fill(record: Record<string, unknown>): Record<string, unknown>;
   readonly fields: Record<string, unknown>;
   readonly arrays: string[];
   readonly ids: Record<string, string>;
-  valueOf(pattern: string, indexes: readonly number[]): unknown;
 }
 
 export interface NamedInput {
@@ -86,13 +83,6 @@ function mountedInput(id: string): ModelInput | undefined {
   const input = inputsById.get(id)?.[0];
   return input !== undefined && input.objects.element(id) !== null ? input : undefined;
 }
-
-const pageModel: PageModel = {
-  boundValueOf(id: string) {
-    const input = mountedInput(id);
-    return input === undefined ? undefined : bindInput(input);
-  },
-};
 
 export function invalidClassOf(id: string): string {
   // The form reaches an input through the page's table (F4, F7, F8) and finds its element before it marks
@@ -127,6 +117,17 @@ function escapedForPattern(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function boundValueIn(holder: Node, pattern: string, indexes: readonly number[]): unknown {
+  const at = namedInputs(pattern).filter(input => input.indexes.every((index, position) => index === indexes[position]));
+  const held = at.filter(input => holder.contains(input.element));
+  const read = held.length > 0 ? held[held.length - 1] : at[at.length - 1];
+  return read?.value;
+}
+
+const pageModel: BoundValues = {
+  valueOf: (pattern, indexes) => boundValueIn(document, pattern, indexes),
+};
+
 export function containedInputs(containerId: string): ContainedInputs {
   const container = (): HTMLElement => {
     const element = document.getElementById(containerId);
@@ -143,13 +144,7 @@ export function containedInputs(containerId: string): ContainedInputs {
     return held;
   };
   return {
-    valueOf(pattern: string, indexes: readonly number[]) {
-      const holder = container();
-      const at = namedInputs(pattern).filter(input => input.indexes.every((index, position) => index === indexes[position]));
-      const held = at.filter(input => holder.contains(input.element));
-      const read = held.length > 0 ? held[held.length - 1] : at[at.length - 1];
-      return read?.value;
-    },
+    valueOf: (pattern, indexes) => boundValueIn(container(), pattern, indexes),
     fill(record: Record<string, unknown>) {
       for (const input of inside()) assignAt(record, input.binding.body, bindInput(input));
       return record;

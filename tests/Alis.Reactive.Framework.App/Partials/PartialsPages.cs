@@ -194,6 +194,69 @@ public sealed class EscortLine
     public string? Shift { get; set; }
 }
 
+/// <summary>
+/// The concierge's record of a visit: the page renders the visitor, and the next of kin's name is rendered by the
+/// community's person line, a partial of a model of its own (PersonName) rendered under the member's prefix, so its
+/// input binds as NextOfKin.Name though no class of the page's model declares it.
+/// </summary>
+public sealed class ConciergePage
+{
+    public string? Visitor { get; set; }
+
+    public KinCard NextOfKin { get; set; } = new();
+}
+
+/// <summary>A person's name, as the community's person line (PersonLine) renders it for whichever member holds one.</summary>
+public sealed class PersonName
+{
+    public string? Name { get; set; }
+}
+
+/// <summary>The concierge's rules, which check the next of kin by the next of kin's own.</summary>
+public sealed class ConciergeRules : ReactiveValidator<ConciergePage>
+{
+    public ConciergeRules()
+    {
+        RuleFor(x => x.NextOfKin).SetValidator(new KinRules());
+    }
+}
+
+/// <summary>What a desk notes of a next of kin, whichever page sends it.</summary>
+public sealed class KinNote
+{
+    public KinCard NextOfKin { get; set; } = new();
+}
+
+/// <summary>
+/// A desk midway through moving from the next of kin's own card to the community's person line: for now the page
+/// renders both, so two inputs bind NextOfKin.Name.
+/// </summary>
+public sealed class ChangeoverPage
+{
+    public KinCard NextOfKin { get; set; } = new();
+}
+
+/// <summary>
+/// A visit and a sitting booked on one page, each in a form of its own: the visit's next of kin through the next
+/// of kin's own card, the sitting's through the community's person line, both binding NextOfKin.Name.
+/// </summary>
+public sealed class BookingsPage
+{
+    public string? Visitor { get; set; }
+
+    public KinCard NextOfKin { get; set; } = new();
+}
+
+/// <summary>The visit's rules: a visitor who brings a next of kin is named.</summary>
+public sealed class BookingRules : ReactiveValidator<BookingsPage>
+{
+    public BookingRules()
+    {
+        RuleFor(x => x.Visitor).NotEmpty().WithMessage("Name the visitor who brings the next of kin.")
+            .When(x => !string.IsNullOrEmpty(x.NextOfKin.Name));
+    }
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class PartialsEcho
 {

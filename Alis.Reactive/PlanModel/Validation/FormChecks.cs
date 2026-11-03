@@ -84,40 +84,13 @@ namespace Alis.Reactive.PlanModel.Validation
             _fieldPrefix = fieldPrefix;
         }
 
-        internal override ValueExpression Value(FieldReference field) => new FormInputRead(_formId, NameOf(field), field.Shape);
+        internal const string Indexes = "i";
+
+        internal override ValueExpression Value(FieldReference field) => ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
 
         internal CheckedField Check(BrowserField field) =>
             new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);
 
         private string NameOf(FieldReference field) => HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
-    }
-
-    /// <summary>
-    /// A member a form's test reads, by its binding name, as MVC binds it: the form's own input, else the page's
-    /// (grammar.md M8). An item's name, <c>Lines[*].Qty</c>, is read at the indexes of the item the test checks,
-    /// which the form hands each test as <see cref="Indexes"/>.
-    /// </summary>
-    internal sealed class FormInputRead : ValueExpression
-    {
-        /// <summary>The parameter a test's check and condition take the indexes of the item it checks by.</summary>
-        internal const string Indexes = "i";
-
-        private readonly string _formId;
-        private readonly string _name;
-        private readonly Shape _shape;
-
-        internal FormInputRead(string formId, string name, Shape shape)
-        {
-            _formId = formId;
-            _name = name;
-            _shape = shape;
-        }
-
-        internal override Shape OutputShape => _shape;
-
-        // The model hands the value back as MVC binds it, already in the input's shape: the plan converts it no
-        // second time.
-        internal override Expr Write(Scope scope) =>
-            G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "valueOf" }, new Expr[] { G.Lit(_name), G.Ref(Indexes) }, Shape.Any);
     }
 }

@@ -1,7 +1,7 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
 /// <summary>
-/// <c>p.Bound(m =&gt; m.Member)</c> reads a member of the page's model as MVC binds it (ADR-0003, grammar.md M5):
+/// <c>p.Bound(m =&gt; m.Member)</c> reads a member of the page's model as MVC binds it (ADR-0003, grammar.md M8):
 /// the input a partial renders for it, whichever plan rendered it, and missing while no input renders the member,
 /// where a component read would fail at the DOM boundary.
 /// </summary>

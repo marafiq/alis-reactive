@@ -132,8 +132,19 @@ namespace Alis.Reactive.PlanModel.Values
         /// <summary>A query string key, as MVC binds it: a scalar from its first value, an array from all of them.</summary>
         internal static ValueExpression ReadUrl(string key, Shape shape) => new UrlRead(key, shape);
 
-        /// <summary>An input's value as MVC binds it, through the model every plan of the composition joins.</summary>
-        internal static ValueExpression ReadBound(string inputId, Shape shape) => new BoundRead(inputId, shape);
+        /// <summary>
+        /// A member as MVC binds it, by its binding name: the input on the page that binds it, whichever view rendered
+        /// it; missing when none is on the page (grammar.md M8).
+        /// </summary>
+        internal static ValueExpression ReadBound(string name, Shape shape) =>
+            new BoundRead(name, shape, BoundRead.Page, G.List(Array.Empty<Expr>()));
+
+        /// <summary>
+        /// A member a form's test reads by its binding name: the input inside the form that binds it, else the one on
+        /// the page, at the indexes of the item the test checks, which the test takes as <paramref name="itemIndexes"/>.
+        /// </summary>
+        internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes) =>
+            new BoundRead(name, shape, formId, G.Ref(itemIndexes));
 
         /// <summary>A record of named fields, written in the order given; a name appears once.</summary>
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
@@ -300,21 +311,30 @@ namespace Alis.Reactive.PlanModel.Values
 
     internal sealed class BoundRead : ValueExpression
     {
-        private readonly string _inputId;
-        private readonly Shape _shape;
+        internal const string Page = "";
 
-        internal BoundRead(string inputId, Shape shape)
+        private readonly string _name;
+        private readonly Shape _shape;
+        private readonly string _containerId;
+        private readonly Expr _indexes;
+
+        internal BoundRead(string name, Shape shape, string containerId, Expr indexes)
         {
-            _inputId = inputId ?? throw new ArgumentNullException(nameof(inputId));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            _containerId = containerId ?? throw new ArgumentNullException(nameof(containerId));
+            _indexes = indexes ?? throw new ArgumentNullException(nameof(indexes));
         }
 
         internal override Shape OutputShape => _shape;
 
-        // The model hands the value back as MVC binds it, already in the input's shape (grammar.md M5): the
-        // plan converts it no second time.
-        internal override Expr Write(Scope scope) =>
-            G.Call(G.Obj(scope.Objects.Model()), new[] { "boundValueOf" }, new Expr[] { G.Lit(_inputId) }, Shape.Any);
+        // The model hands the value back as MVC binds it, already in the input's shape: the plan converts it no
+        // second time.
+        internal override Expr Write(Scope scope)
+        {
+            var inputs = _containerId == Page ? scope.Objects.Model() : scope.Objects.Inputs(_containerId);
+            return G.Call(G.Obj(inputs), new[] { "valueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any);
+        }
     }
 
     internal sealed class RecordExpression : ValueExpression

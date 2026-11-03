@@ -1,0 +1,43 @@
+@using Alis.Reactive.Framework.App.Partials
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model ChangeoverPage
+@{
+    ViewData["Title"] = "The desk's changeover";
+    var plan = Html.ReactivePlan<ChangeoverPage>();
+
+    var kin = new ViewDataDictionary(ViewData) { { "Label", "Next of kin's name" } };
+    kin.TemplateInfo.HtmlFieldPrefix = nameof(ChangeoverPage.NextOfKin);
+}
+<h1>The desk's changeover</h1>
+
+@* Midway through the changeover the desk renders the next of kin twice: through the next of kin's own card and
+   through the community's person line. Both inputs bind NextOfKin.Name. *@
+<form id="changeover-form">
+    <fieldset>
+        <legend>The next of kin's card</legend>
+        @Html.EditorFor(m => m.NextOfKin)
+    </fieldset>
+    <fieldset>
+        <legend>The community's person line</legend>
+        @await Html.PartialAsync("PersonLine", new PersonName(), kin)
+    </fieldset>
+</form>
+
+<p>The next of kin as the desk would bind it: <span id="kin-bound"></span></p>
+<p>The desk's notes: <span id="kin-noted"></span></p>
+<p>The desk's endpoint bound: <span id="changeover-saved"></span></p>
+
+@(plan.Button("read-kin", "Read the next of kin")
+    .Reactive(button => button.Click, p => p.When(p.Bound(m => m.NextOfKin.Name)).IsNull()
+        .Then(none => none.Element("kin-bound").Text.Set("no next of kin"))
+        .Else(some => some.Element("kin-bound").Text.Set(p.Bound(m => m.NextOfKin.Name)))))
+@(plan.Button("note-kin", "Note the next of kin")
+    .Reactive(button => button.Click, p => p.Post("/Partials/NoteKin")
+        .Gather<KinNote>(g => g.Form(m => m.NextOfKin.Name))
+        .Response(r => r.OnSuccess<PartialsEcho>((echo, s) => s.Element("kin-noted").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("save-changeover", "Save the next of kin")
+    .Reactive(button => button.Click, p => p.Post("/Partials/NoteKin")
+        .Gather<KinNote>(g => g.Form("changeover-form"))
+        .Response(r => r.OnSuccess<PartialsEcho>((echo, s) => s.Element("changeover-saved").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)
