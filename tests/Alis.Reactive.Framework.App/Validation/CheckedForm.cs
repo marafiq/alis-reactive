@@ -103,12 +103,13 @@ public sealed class Contact
     public string? Phone { get; set; } = "555-0101";
 }
 
-/// <summary>A child validator whose one rule only the server makes.</summary>
+/// <summary>A child validator whose rule only the server makes, answering with its first failing check alone.</summary>
 public sealed class ContactRules : ReactiveValidator<Contact>
 {
     public ContactRules()
     {
-        RuleFor(x => x.Phone).Matches("^555-").ServerOnly().WithMessage("Use a 555 number.");
+        RuleLevelCascadeMode = CascadeMode.Stop;
+        RuleFor(x => x.Phone).Matches("^555-").WithMessage("Use a 555 number.").MaximumLength(8).WithMessage("Eight characters at most.").ServerOnly();
     }
 }
 
@@ -144,7 +145,7 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
         RuleFor(x => x.Purpose).NotEmpty().WithMessage("Give a purpose.");
         RuleFor(x => x.Guests).NotEmpty().WithMessage("At least one guest.");
         RuleFor(x => x.Leaving).GreaterThanOrEqualTo(x => x.Arriving).WithMessage("Leave on or after arriving.");
-        RuleFor(x => x.Badge).Matches("^A-").ServerOnly().WithMessage("Badges start with A-.");
+        RuleFor(x => x.Badge).Matches("^A-").WithMessage("Badges start with A-.").MaximumLength(4).WithMessage("Four characters at most.").ServerOnly();
         RuleFor(x => x.Visiting).NotEmpty().WithMessage("Give the visiting day.");
         RuleFor(x => x.Called).NotEmpty().WithMessage("Give the time of the call.");
         RuleFor(x => x.Contact).SetValidator(new ContactRules());
@@ -153,6 +154,6 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
         RuleFor(x => x.Price).PrecisionScale(5, 2, ignoreTrailingZeros: true).WithMessage("Up to five digits, two of them decimals.");
         RuleFor(x => x.Rate).PrecisionScale(2, 2, ignoreTrailingZeros: true).WithMessage("Decimals only, two at most.");
         RuleFor(x => x.Discount).PrecisionScale(4, 2, ignoreTrailingZeros: false).WithName("Markdown");
-        RuleFor(x => x.Fee).PrecisionScale(4, 2, ignoreTrailingZeros: false).WithName("Service fee").ServerOnly();
+        RuleFor(x => x.Fee).Cascade(CascadeMode.Stop).PrecisionScale(4, 2, ignoreTrailingZeros: false).WithName("Service fee").LessThan(1000m).ServerOnly();
     }
 }

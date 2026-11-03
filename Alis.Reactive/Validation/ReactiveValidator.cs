@@ -55,6 +55,9 @@ namespace Alis.Reactive
     /// server) and <c>PrecisionScale</c> (the server alone past 21 digits before the point or 6 after); <c>SetValidator</c>, <c>ChildRules</c>,
     /// <c>RuleForEach</c> with a child validator and <c>Include</c> bring the child's rules along. <c>WithName</c>
     /// gives the name a rule's messages say for the member, on both sides; errors stay under the member's path.
+    /// The browser shows one message per input, the first failing check's; the server answers with every
+    /// failing check of a rule, or with the first alone under <c>Cascade(CascadeMode.Stop)</c> or the validator's
+    /// <c>RuleLevelCascadeMode</c>.
     /// </para>
     /// <para>
     /// Some rules only the server can check, and they stay there by what they are: <c>Must</c> and
@@ -96,13 +99,21 @@ namespace Alis.Reactive
             Justification = "An app derives from the typed validator; the untyped base stays closed and exposes no protected member.")]
         protected ReactiveValidator() { }
 
+        /// <summary>
+        /// What the server does after a check of a rule fails, for every rule of this validator that sets no
+        /// <c>Cascade</c> of its own: <see cref="CascadeMode.Continue"/>, FluentValidation's default, answers with
+        /// every failing check; <see cref="CascadeMode.Stop"/> answers with the first alone, as the browser shows
+        /// one message per input. Read when the rules run, so it may be set anywhere in the constructor.
+        /// </summary>
+        protected CascadeMode RuleLevelCascadeMode { get; set; } = CascadeMode.Continue;
+
         /// <summary>Starts the rules of one member: <c>RuleFor(x =&gt; x.Address.City).NotEmpty()</c>.</summary>
         /// <param name="member">The member, as a path from the model.</param>
         /// <typeparam name="TProperty">The member's type.</typeparam>
         public IRuleBuilder<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty>> member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-            return Declared(new MemberRule<T, TProperty>(member, _scope));
+            return Declared(new MemberRule<T, TProperty>(member, _scope, () => RuleLevelCascadeMode));
         }
 
         /// <summary>
@@ -114,7 +125,7 @@ namespace Alis.Reactive
         public IRuleBuilder<T, TElement> RuleForEach<TElement>(Expression<Func<T, IEnumerable<TElement>>> collection)
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
-            return Declared(new CollectionRule<T, TElement>(collection, _scope));
+            return Declared(new CollectionRule<T, TElement>(collection, _scope, () => RuleLevelCascadeMode));
         }
 
         /// <summary>Runs another validator's rules for the same model, as if written here.</summary>

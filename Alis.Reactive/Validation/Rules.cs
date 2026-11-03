@@ -132,9 +132,13 @@ namespace Alis.Reactive.Validation
     /// <summary>The checks and child validators written after one <c>RuleFor</c> or <c>RuleForEach</c>.</summary>
     internal abstract class Rule<T, TValue> : IRule<T>, IRuleBuilderOptions<T, TValue>, IRuleTarget<T, TValue>
     {
+        private readonly Func<CascadeMode> _validatorCascade;
+        private CascadeMode? _cascade;
+
         // A rule names a member: its errors are reported under the member's path, and the page binds it.
-        protected Rule(ModelMember<T> member, Conditions<T> scope)
+        protected Rule(ModelMember<T> member, Conditions<T> scope, Func<CascadeMode> validatorCascade)
         {
+            _validatorCascade = validatorCascade;
             FieldPath = member.Path ?? throw new ArgumentException(
                 $"A rule names a member of the model, like x => x.Address.City; {member.Written} computes a value. " +
                 "Write the rule on the member it reads, with Must for what C# decides.");
@@ -156,6 +160,9 @@ namespace Alis.Reactive.Validation
         protected string FieldDisplayName { get; private set; }
 
         public bool IsAsync => Parts.Any(part => part.IsAsync);
+
+        /// <summary>Whether the server answers with the rule's first failing check alone: the rule's own mode, else the validator's.</summary>
+        protected bool StopsAtFirstFailure => (_cascade ?? _validatorCascade()) == CascadeMode.Stop;
 
         public abstract Task Validate(T instance, string prefix, ValidationRun run);
 
@@ -184,6 +191,12 @@ namespace Alis.Reactive.Validation
         {
             if (validator == null) throw new ArgumentNullException(nameof(validator));
             Parts.Add(new ChildPart<T, TValue>(validator));
+            return this;
+        }
+
+        public IRuleBuilder<T, TValue> Cascade(CascadeMode mode)
+        {
+            _cascade = mode;
             return this;
         }
 
@@ -234,8 +247,8 @@ namespace Alis.Reactive.Validation
     /// <summary><c>RuleFor(x =&gt; x.Member)</c>: the checks of one member.</summary>
     internal sealed class MemberRule<T, TValue> : Rule<T, TValue>
     {
-        internal MemberRule(Expression<Func<T, TValue>> member, Conditions<T> scope)
-            : base(ModelMember<T>.Of(member), scope)
+        internal MemberRule(Expression<Func<T, TValue>> member, Conditions<T> scope, Func<CascadeMode> validatorCascade)
+            : base(ModelMember<T>.Of(member), scope, validatorCascade)
         {
         }
 
@@ -244,7 +257,11 @@ namespace Alis.Reactive.Validation
             if (!Scope.Hold(instance)) return;
             var value = (TValue)Member.ValueIn(instance)!;
             foreach (var part in Parts)
+            {
+                var failures = run.Failures.Count;
                 await part.Validate(instance, value, prefix + FieldPath, FieldDisplayName, run).ConfigureAwait(false);
+                if (StopsAtFirstFailure && run.Failures.Count > failures) return;
+            }
         }
 
         // A check on the member reports under the member's name, so the member is declared whether or not
@@ -264,8 +281,8 @@ namespace Alis.Reactive.Validation
     /// <summary><c>RuleForEach(x =&gt; x.Items)</c>: the checks of every item of a list, named <c>Items[0]</c>, <c>Items[1]</c>.</summary>
     internal sealed class CollectionRule<T, TElement> : Rule<T, TElement>
     {
-        internal CollectionRule(Expression<Func<T, IEnumerable<TElement>>> collection, Conditions<T> scope)
-            : base(ModelMember<T>.Of(collection), scope)
+        internal CollectionRule(Expression<Func<T, IEnumerable<TElement>>> collection, Conditions<T> scope, Func<CascadeMode> validatorCascade)
+            : base(ModelMember<T>.Of(collection), scope, validatorCascade)
         {
         }
 
@@ -279,7 +296,11 @@ namespace Alis.Reactive.Validation
             {
                 var path = prefix + FieldPath + "[" + index++ + "]";
                 foreach (var part in Parts)
+                {
+                    var failures = run.Failures.Count;
                     await part.Validate(instance, item, path, FieldDisplayName, run).ConfigureAwait(false);
+                    if (StopsAtFirstFailure && run.Failures.Count > failures) break;
+                }
             }
         }
 

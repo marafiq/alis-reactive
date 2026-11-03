@@ -17,6 +17,25 @@ namespace Alis.Reactive
         /// <summary>Validates the member's value with its own validator; its errors are named under the member.</summary>
         /// <param name="validator">The validator of the member's type.</param>
         IRuleBuilderOptions<T, TProperty> SetValidator(IValidator<TProperty> validator);
+
+        /// <summary>
+        /// What the server does after a check of this rule fails: <see cref="CascadeMode.Continue"/> runs the rest
+        /// and answers with every failing check, <see cref="CascadeMode.Stop"/> answers with the first alone, as
+        /// the browser shows one message per input. It overrides the validator's
+        /// <c>RuleLevelCascadeMode</c> for this rule.
+        /// </summary>
+        /// <param name="mode">The mode.</param>
+        IRuleBuilder<T, TProperty> Cascade(CascadeMode mode);
+    }
+
+    /// <summary>What the server does after a check of a rule fails.</summary>
+    public enum CascadeMode
+    {
+        /// <summary>Runs the rule's remaining checks and answers with every failing one, FluentValidation's default.</summary>
+        Continue,
+
+        /// <summary>Answers with the first failing check alone, as the browser shows one message per input.</summary>
+        Stop,
     }
 
     /// <summary>A member's rules after a check: the check's message, its conditions, and where it runs.</summary>

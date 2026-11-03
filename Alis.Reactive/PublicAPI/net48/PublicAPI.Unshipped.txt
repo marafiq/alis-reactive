@@ -54,6 +54,9 @@ Alis.Reactive.ComparisonRule.Comparison.get -> Alis.Reactive.Comparison!
 Alis.Reactive.Component
 Alis.Reactive.Component.Component() -> void
 Alis.Reactive.ComponentInput
+Alis.Reactive.CascadeMode
+Alis.Reactive.CascadeMode.Continue = 0 -> Alis.Reactive.CascadeMode
+Alis.Reactive.CascadeMode.Stop = 1 -> Alis.Reactive.CascadeMode
 Alis.Reactive.ComponentVendor
 Alis.Reactive.ComponentVendor.Name.get -> string!
 Alis.Reactive.Condition
@@ -178,6 +181,7 @@ Alis.Reactive.InputFieldOptions.InputFieldOptions() -> void
 Alis.Reactive.InputFieldOptions.Label(string! label) -> Alis.Reactive.InputFieldOptions!
 Alis.Reactive.InputFieldOptions.Required() -> Alis.Reactive.InputFieldOptions!
 Alis.Reactive.IRuleBuilder<T, TProperty>
+Alis.Reactive.IRuleBuilder<T, TProperty>.Cascade(Alis.Reactive.CascadeMode mode) -> Alis.Reactive.IRuleBuilder<T, TProperty>!
 Alis.Reactive.IRuleBuilder<T, TProperty>.SetValidator(Alis.Reactive.IValidator<TProperty>! validator) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.ServerOnly() -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
@@ -299,6 +303,8 @@ Alis.Reactive.ReactiveValidator
 Alis.Reactive.ReactiveValidator<T>
 Alis.Reactive.ReactiveValidator<T>.Include(Alis.Reactive.IValidator<T>! rules) -> void
 Alis.Reactive.ReactiveValidator<T>.ReactiveValidator() -> void
+Alis.Reactive.ReactiveValidator<T>.RuleLevelCascadeMode.get -> Alis.Reactive.CascadeMode
+Alis.Reactive.ReactiveValidator<T>.RuleLevelCascadeMode.set -> void
 Alis.Reactive.ReactiveValidator<T>.RuleFor<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilder<T, TProperty>!
 Alis.Reactive.ReactiveValidator<T>.RuleForEach<TElement>(System.Linq.Expressions.Expression<System.Func<T, System.Collections.Generic.IEnumerable<TElement>!>!>! collection) -> Alis.Reactive.IRuleBuilder<T, TElement>!
 Alis.Reactive.ReactiveValidator<T>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!

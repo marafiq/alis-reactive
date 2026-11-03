@@ -199,6 +199,38 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     }
 
     [Test]
+    public async Task a_rule_that_continues_after_a_failing_check_answers_with_every_failing_check_one_after_another()
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Badge", new() { Exact = true }).FillAsync("B-1700");
+        await Save();
+        await Expect(Field("Badge").GetByText("Badges start with A-. Four characters at most.", new() { Exact = true })).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make these checks, so the request goes");
+    }
+
+    [Test]
+    public async Task a_rule_that_stops_at_a_failing_check_answers_with_that_check_alone()
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Fee", new() { Exact = true }).FillAsync("1234.5");
+        await Save();
+        await Expect(Field("Fee").GetByText(FourDigitsTwoDecimals + " 6 digits and 2 decimals were found.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(Field("Fee").GetByText("less than")).ToBeHiddenAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make these checks, so the request goes");
+    }
+
+    [Test]
+    public async Task a_validator_that_stops_its_rules_at_a_failing_check_answers_with_that_check_alone()
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Phone", new() { Exact = true }).FillAsync("556-01010");
+        await Save();
+        await Expect(Field("Phone").GetByText("Use a 555 number.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(Field("Phone").GetByText("Eight characters")).ToBeHiddenAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make these checks, so the request goes");
+    }
+
+    [Test]
     public async Task a_child_validators_rule_the_server_alone_makes_comes_back_beside_its_field()
     {
         await Open("/Validation/Checks");
