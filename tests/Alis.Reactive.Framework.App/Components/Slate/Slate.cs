@@ -192,7 +192,5 @@ public sealed class SlateRow : JsObject
 {
     public ReadOnly<string> Label => ReadOnly<string>();
 
-    public ReadOnly<bool> Marked => ReadOnly<bool>();
-
     public void Mark() => Method();
 }
