@@ -13,8 +13,10 @@
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
-    <!-- Syncfusion is pinned exactly on both target frameworks; an app's @syncfusion/ej2 must match
-         (scripts/pin-syncfusion.mjs). -->
+    <!-- Syncfusion is pinned exactly, the one exception to the floors every other dependency takes:
+         the framework supports one Syncfusion release at a time, with no second version path, and its
+         C# builders and an app's @syncfusion/ej2 script must be that same release
+         (scripts/pin-syncfusion.mjs moves both). -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="[33.1.47]" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
