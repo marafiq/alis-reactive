@@ -108,6 +108,16 @@ public sealed class NamedDepositRules : ReactiveValidator<Admission>
     }
 }
 
+/// <summary>The age is checked only while the name passes its own check.</summary>
+public sealed class DependentAdmissionRules : ReactiveValidator<Admission>
+{
+    public DependentAdmissionRules()
+    {
+        RuleFor(x => x.Name).NotEmpty().DependentRules(() =>
+            RuleFor(x => x.Age).GreaterThan(0).WithMessage("Give the resident's age."));
+    }
+}
+
 /// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
 public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
 {

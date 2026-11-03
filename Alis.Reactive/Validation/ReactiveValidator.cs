@@ -57,7 +57,9 @@ namespace Alis.Reactive
     /// gives the name a rule's messages say for the member, on both sides; errors stay under the member's path.
     /// The browser shows one message per input, the first failing check's; the server answers with every
     /// failing check of a rule, or with the first alone under <c>Cascade(CascadeMode.Stop)</c> or the validator's
-    /// <c>RuleLevelCascadeMode</c>.
+    /// <c>RuleLevelCascadeMode</c>. <c>DependentRules</c> after a rule's checks declares rules that apply only while
+    /// that rule passes; the browser skips them while the rule fails when every check of it has a browser form,
+    /// otherwise they are the server's.
     /// </para>
     /// <para>
     /// Some rules only the server can check, and they stay there by what they are: <c>Must</c> and
@@ -90,7 +92,7 @@ namespace Alis.Reactive
     /// </code>
     /// </example>
     /// <typeparam name="T">The model it validates.</typeparam>
-    public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
+    public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>, IRuleHost<T>
     {
         private readonly List<IRule<T>> _rules = new List<IRule<T>>();
         private Conditions<T> _scope = Conditions<T>.None;
@@ -113,7 +115,7 @@ namespace Alis.Reactive
         public IRuleBuilder<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty>> member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-            return Declared(new MemberRule<T, TProperty>(member, _scope, () => RuleLevelCascadeMode));
+            return Declared(new MemberRule<T, TProperty>(member, _scope, this));
         }
 
         /// <summary>
@@ -125,7 +127,7 @@ namespace Alis.Reactive
         public IRuleBuilder<T, TElement> RuleForEach<TElement>(Expression<Func<T, IEnumerable<TElement>>> collection)
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
-            return Declared(new CollectionRule<T, TElement>(collection, _scope, () => RuleLevelCascadeMode));
+            return Declared(new CollectionRule<T, TElement>(collection, _scope, this));
         }
 
         /// <summary>Runs another validator's rules for the same model, as if written here.</summary>
@@ -208,6 +210,10 @@ namespace Alis.Reactive
             _rules.Add(rule);
             return rule;
         }
+
+        CascadeMode IRuleHost<T>.RuleLevelCascadeMode => RuleLevelCascadeMode;
+
+        void IRuleHost<T>.DeclareUnder(RuleCondition<T> condition, Action rules) => DeclareUnder(_scope.And(condition), rules);
 
         private IConditionBuilder Branch(RuleCondition<T> condition, Action rules)
         {

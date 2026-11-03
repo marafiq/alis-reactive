@@ -73,6 +73,8 @@ public sealed class CheckedForm
 
     public string? Badge { get; set; } = "A-17";
 
+    public string? Escort { get; set; } = "Grace";
+
     public DateTime Visiting { get; set; } = new(2026, 10, 5);
 
     public DateTimeOffset Called { get; set; } = new(2026, 10, 5, 9, 0, 0, TimeSpan.Zero);
@@ -142,10 +144,11 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
         RuleFor(x => x.Stars).InclusiveBetween(1, 5).WithMessage("One to five stars.");
         RuleFor(x => x.Repeat).Equal(x => x.Original).WithMessage("Repeat the original.");
         RuleFor(x => x.Fresh).NotEqual(x => x.Former).WithMessage("Not the former one.");
-        RuleFor(x => x.Purpose).NotEmpty().WithMessage("Give a purpose.");
-        RuleFor(x => x.Guests).NotEmpty().WithMessage("At least one guest.");
+        RuleFor(x => x.Purpose).NotEmpty().WithMessage("Give a purpose.").DependentRules(() =>
+            RuleFor(x => x.Guests).NotEmpty().WithMessage("At least one guest."));
         RuleFor(x => x.Leaving).GreaterThanOrEqualTo(x => x.Arriving).WithMessage("Leave on or after arriving.");
-        RuleFor(x => x.Badge).Matches("^A-").WithMessage("Badges start with A-.").MaximumLength(4).WithMessage("Four characters at most.").ServerOnly();
+        RuleFor(x => x.Badge).Matches("^A-").WithMessage("Badges start with A-.").MaximumLength(4).WithMessage("Four characters at most.").ServerOnly().DependentRules(() =>
+            RuleFor(x => x.Escort).NotEmpty().WithMessage("A badge holder names an escort."));
         RuleFor(x => x.Visiting).NotEmpty().WithMessage("Give the visiting day.");
         RuleFor(x => x.Called).NotEmpty().WithMessage("Give the time of the call.");
         RuleFor(x => x.Contact).SetValidator(new ContactRules());

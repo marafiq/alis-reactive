@@ -184,6 +184,7 @@ Alis.Reactive.IRuleBuilder<T, TProperty>
 Alis.Reactive.IRuleBuilder<T, TProperty>.Cascade(Alis.Reactive.CascadeMode mode) -> Alis.Reactive.IRuleBuilder<T, TProperty>!
 Alis.Reactive.IRuleBuilder<T, TProperty>.SetValidator(Alis.Reactive.IValidator<TProperty>! validator) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>
+Alis.Reactive.IRuleBuilderOptions<T, TProperty>.DependentRules(System.Action! rules) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.ServerOnly() -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!

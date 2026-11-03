@@ -199,6 +199,51 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     }
 
     [Test]
+    public async Task a_dependent_rule_waits_in_the_browser_while_the_rule_before_it_fails_and_applies_once_it_passes()
+    {
+        await Open("/Validation/Checks");
+        var purposeWanted = Field("Purpose").GetByText("Give a purpose.");
+        var guestWanted = Field("Guests").GetByText("At least one guest.");
+
+        await Page.GetByLabel("Purpose", new() { Exact = true }).FillAsync("   ");
+        await Page.GetByLabel("Guests", new() { Exact = true }).FillAsync("0");
+        await Save();
+        await Expect(purposeWanted).ToBeVisibleAsync();
+        await Expect(guestWanted).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Page.GetByLabel("Purpose", new() { Exact = true }).FillAsync("Tour");
+        await Save();
+        await Expect(guestWanted).ToBeVisibleAsync();
+        await Expect(purposeWanted).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Page.GetByLabel("Guests", new() { Exact = true }).FillAsync("1");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
+    public async Task a_dependent_rule_of_a_rule_the_server_alone_makes_is_the_servers_and_waits_while_that_rule_fails()
+    {
+        await Open("/Validation/Checks");
+        var escortWanted = Field("Escort").GetByText("A badge holder names an escort.");
+
+        await Page.GetByLabel("Escort", new() { Exact = true }).FillAsync("");
+        await Save();
+        await Expect(escortWanted).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make the badge's check, so neither the escort's; the request goes");
+
+        await Page.GetByLabel("Badge", new() { Exact = true }).FillAsync("B-17");
+        await Save();
+        await Expect(Field("Badge").GetByText("Badges start with A-.")).ToBeVisibleAsync();
+        await Expect(escortWanted).ToBeHiddenAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST", "POST" }));
+    }
+
+    [Test]
     public async Task a_rule_that_continues_after_a_failing_check_answers_with_every_failing_check_one_after_another()
     {
         await Open("/Validation/Checks");
