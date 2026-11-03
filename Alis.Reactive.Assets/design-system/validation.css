@@ -16,6 +16,10 @@
   line-height: 1.4;
 }
 
+.alis-root .alis-field__message[hidden] {
+  display: none;
+}
+
 /* Validation summary box */
 .alis-root [data-reactive-validation-summary] {
   background-color: var(--color-error-light, #FEE2E2);

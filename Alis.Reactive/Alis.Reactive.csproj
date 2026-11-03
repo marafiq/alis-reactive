@@ -30,12 +30,13 @@
         <Reference Include="System.Web" />
     </ItemGroup>
 
-    <!-- The runtime script npm builds into Alis.Reactive.Assets/dist, served at
-         ~/_content/AlisReactive/js/alis-reactive.js (net10) and copied to
-         Content\AlisReactive\js\alis-reactive.js (net48). Where and how:
+    <!-- The runtime script npm builds into Alis.Reactive.Assets/dist, and the stylesheet for what the
+         core writes, shipped as written. Served at ~/_content/AlisReactive/{RelativePath} (net10) and
+         copied to Content\AlisReactive\{RelativePath} (net48). Where and how:
          build\AlisReactiveStaticWebAssets.targets. -->
     <ItemGroup>
         <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js" RelativePath="js/alis-reactive.js" />
+        <AlisReactiveStaticWebAsset Include="css\alis-reactive.css" RelativePath="css/alis-reactive.css" />
     </ItemGroup>
 
     <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />

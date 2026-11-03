@@ -15,7 +15,7 @@ public abstract class AppPageTest : PageTest
 {
     private const int DefaultTimeoutMs = 60000;
     private const string BootedMarker = "html[data-alis-booted='true']";
-    private const string RuntimeBundle = "/scripts/alis-reactive.dev.js";
+    private const string RuntimeBundle = "/_content/AlisReactive/js/alis-reactive.js";
     private static readonly string? CoverageDir = Environment.GetEnvironmentVariable("ALIS_JS_COVERAGE_DIR");
     private readonly List<string> _console = new();
     private readonly object _consoleLock = new();

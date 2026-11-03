@@ -128,16 +128,18 @@ follow it. Without one, their stylesheets fall back to neutral colors and the pa
 | Package | File | net10.0 URL | net48 file in the web project |
 |---------|------|-------------|-------------------------------|
 | `AlisReactive` | runtime script | `~/_content/AlisReactive/js/alis-reactive.js` | `Content\AlisReactive\js\alis-reactive.js` |
+| `AlisReactive` | the field wrapper, its message, the form summary and the refused-input mark, plain | `~/_content/AlisReactive/css/alis-reactive.css` | `Content\AlisReactive\css\alis-reactive.css` |
 | `AlisReactive.Native` | drawer, loader, check list, radio group | `~/_content/AlisReactive.Native/css/native.css` | `Content\AlisReactive.Native\css\native.css` |
 | `AlisReactive.NativeTagHelpers` | `<native-*>` layout tag helpers | `~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css` | (net10.0 only) |
 | `AlisReactive.Fusion` | Syncfusion Tailwind3 theme, grid dialog form | `~/_content/AlisReactive.Fusion/css/fusion.css` | `Content\AlisReactive.Fusion\css\fusion.css` |
 | `AlisReactive.DesignSystem` | tokens, page base, field and validation look | `~/_content/AlisReactive.DesignSystem/css/design-system.css` | `Content\AlisReactive.DesignSystem\css\design-system.css` |
 | `AlisReactive.DesignSystem` | the brand on Syncfusion components | `~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css` | `Content\AlisReactive.DesignSystem\css\design-system-fusion.css` |
 
-Link them in this order: the design system, the component stylesheets, Fusion's, then the design
-system's Fusion layer (its values must follow the Syncfusion theme's), then your own CSS.
+Link them in this order: the core's, the design system, the component stylesheets, Fusion's, then the
+design system's Fusion layer (its values must follow the Syncfusion theme's), then your own CSS.
 
 ```html
+<link rel="stylesheet" href="~/_content/AlisReactive/css/alis-reactive.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.Native/css/native.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css" asp-append-version="true"/>

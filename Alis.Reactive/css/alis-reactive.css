@@ -1,0 +1,41 @@
+/* What the core writes, plain and complete without a design system: the field wrapper, the form
+   summary, the mark the runtime puts on a refused input, and the live-connection retry container.
+   The layer order is the framework's cascade contract: looks sit in `alis`, below an app's own
+   utilities; a state mark stays unlayered, above them. A design system restyles these rules by
+   specificity in the same layer. */
+@layer theme, base, alis, components, utilities;
+
+@layer alis {
+  .alis-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .alis-field__required,
+  .alis-field__message,
+  [data-reactive-validation-summary] {
+    color: #b91c1c;
+  }
+
+  /* The message keeps its line, shown or hidden: a message that appears when a field is left must not
+     move the page under a click that is already on its way to the next control. */
+  .alis-field__message {
+    display: block;
+    min-height: 1.25em;
+    font-size: 0.875em;
+  }
+
+  .alis-field__message[hidden] {
+    visibility: hidden;
+  }
+
+  #alis-realtime-connection-retry-container {
+    cursor: pointer;
+  }
+}
+
+.alis-has-error {
+  border-color: #b91c1c;
+  outline-color: #b91c1c;
+}

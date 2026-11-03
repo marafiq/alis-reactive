@@ -1,7 +1,6 @@
 using Alis.Reactive;
 using Alis.Reactive.Framework.App.Realtime;
 using Alis.Reactive.Framework.App.Validation;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,14 +23,11 @@ builder.Services.AddSingleton<LineExchange>();
 
 var app = builder.Build();
 
-// The runtime bundle built from the current source, at the URL an app serves it from, and the
-// components' bundle; a page without either would prove nothing, so the app refuses to start.
-var root = app.Environment.ContentRootPath;
-var runtimeDir = Path.GetFullPath(Path.Combine(root, "..", "..", "Alis.Reactive.Assets", "dist", "scripts"));
-RequireBuilt(Path.Combine(runtimeDir, "alis-reactive.dev.js"));
-RequireBuilt(Path.Combine(root, "wwwroot", "js", "framework-components.js"));
+// The components' bundle built from the current source; a page without it would prove nothing, so the app
+// refuses to start. The runtime bundle and the core's stylesheet come with the AlisReactive project reference
+// the way an app gets them from the package, at ~/_content/AlisReactive/.
+RequireBuilt(Path.Combine(app.Environment.ContentRootPath, "wwwroot", "js", "framework-components.js"));
 
-app.UseStaticFiles(new StaticFileOptions { FileProvider = new PhysicalFileProvider(runtimeDir), RequestPath = "/scripts" });
 app.UseStaticFiles();
 app.UseRouting();
 app.MapControllers();

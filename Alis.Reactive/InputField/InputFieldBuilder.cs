@@ -11,7 +11,7 @@ namespace Alis.Reactive.InputField
     /// Pure BCL so MVC5 and ASP.NET Core wrappers emit the same label,
     /// content slot, and validation message markup. The classes name the parts
     /// (<c>alis-field</c>, <c>alis-field__label</c>, <c>alis-field__required</c>,
-    /// <c>alis-field__message</c>); the app's design system styles them.
+    /// <c>alis-field__message</c>); the core's stylesheet styles them plain, and a design system restyles them.
     /// </remarks>
     internal class InputFieldBuilder
     {

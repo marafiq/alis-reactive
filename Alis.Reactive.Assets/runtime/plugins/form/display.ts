@@ -1,5 +1,6 @@
 // Validation messages live in generated HTML: an inline slot {id}_error beside each field and one
-// summary per form, which the server renders. These helpers reach them by ID only.
+// summary per form, which the server renders. These helpers reach them by ID only. The `hidden`
+// attribute is a slot's one state; what a hidden slot looks like is the stylesheet's.
 
 const ERR_CLASS = "alis-has-error";
 
@@ -11,7 +12,6 @@ export function showInline(componentDomId: string, message: string): void {
   if (errorSpan) {
     errorSpan.textContent = message;
     errorSpan.removeAttribute("hidden");
-    errorSpan.style.display = "";
     delete errorSpan.dataset.alisFromServer;
   }
 }
@@ -34,7 +34,6 @@ export function clearInline(componentDomId: string): void {
     delete errorSpan.dataset.alisFromServer;
     errorSpan.textContent = "";
     errorSpan.setAttribute("hidden", "");
-    errorSpan.style.display = "none";
   }
   const componentElement = document.getElementById(componentDomId);
   if (componentElement) componentElement.classList.remove(ERR_CLASS);
