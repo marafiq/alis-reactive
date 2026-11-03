@@ -7,8 +7,9 @@
 
     ASP.NET MVC 5 has no static web assets, so after every build this copies the package's
     staticwebassets\ folder, the same files an ASP.NET Core app serves at ~/_content/{PackageId}/,
-    into the web project at Content\{PackageId}\. Link them from a view with
-    Url.Content("~/Content/{PackageId}/{path}"), for example ~/Content/AlisReactive/js/alis-reactive.js.
+    into the web project at Content\{PackageId}\. Link them from a view with the core's
+    Url.AppendVersion("~/Content/{PackageId}/{path}"), which adds the file's content hash, for example
+    Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js").
 
     The copied files are build output and each folder says so itself: the target writes a .gitignore
     into Content\{PackageId}\ that ignores everything there, only when it changes, so git never lists

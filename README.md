@@ -1,6 +1,23 @@
 # Alis.Reactive
 
-Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce Reactive Plan JSON executed by the runtime. Zero JavaScript in views.
+Reactive pages for ASP.NET MVC, written in your views as fluent, typed C#. The C# says what a page
+does (react to an event, send a request, check a form on both sides, load a partial, show a branch);
+the framework renders it as a plan that its browser runtime runs. Views carry no JavaScript.
+
+It is for teams building server-rendered MVC applications, on ASP.NET Core MVC (.NET 10) or ASP.NET
+MVC 5 (.NET Framework 4.8), who want dynamic pages without hand-written scripts, and who want to bring
+any JavaScript component (Syncfusion, native inputs, their own) through one typed declaration.
+
+**Start here.**
+
+- **Using the packages:** reference them and register them ([In your application](#in-your-application));
+  `examples/resident-intake` is a complete app built only from the packed packages.
+- **Working on the framework:** `scripts/doctor.sh`, `scripts/build.sh`, `scripts/run.sh`, then open
+  http://localhost:5220 ([Getting started](#getting-started)).
+
+**Look next:** [the map of this repository](#the-repository), `docs/design/grammar.md` (what a plan
+means), `docs/design/bring-your-own-component.md` (bring a component), `docs/developer-cli.md` (every
+command), and `CLAUDE.md` (the rules every contributor and coding agent follows).
 
 ## Packages
 
@@ -36,73 +53,19 @@ browser in camel case, so `Fields<TItem>(...)` finds each item's members, and th
 assigns `JsonConvert.DefaultSettings`; it keeps the rest of those settings. Without it, a plain
 camel-case resolver renames the pinned names and the toast falls back to the top left.
 
-## Getting Started
+## Getting started
 
-Prerequisites: **.NET SDK 10.0.x** and **Node.js 22+**.
-
-A fresh clone has no installed dependencies and no built bundles. Run these from
-the repo root:
+Prerequisites: the .NET SDK `global.json` names (10.0.x) and Node.js 22 or newer. A fresh clone has no
+installed dependencies and no built bundles; from the repository root:
 
 ```bash
-scripts/doctor.sh
-scripts/build.sh
-scripts/run.sh
+scripts/doctor.sh   # read-only check of tools and build outputs
+scripts/build.sh    # npm dependencies, browser bundles, dotnet build
+scripts/run.sh      # the sandbox at http://localhost:5220
 ```
 
-Open **http://localhost:5220** — the sandbox home page is the index of component demos.
-
-`scripts/build.sh` installs npm dependencies if needed, builds the browser
-bundles, and runs `dotnet build`. `scripts/run.sh` rebuilds bundles before
-starting the sandbox so it does not serve stale browser assets.
-
-### CLI Commands
-
-`docs/developer-cli.md` is the canonical command guide. The root wrappers keep
-build, test, Playwright, and packaging order explicit:
-
-| Script | What it does |
-|--------|--------------|
-| `scripts/doctor.sh` | read-only CLI preflight: tools, script executability, restore/build-output hints, git status |
-| `scripts/build.sh` | JS deps (if missing) → framework bundles → both-TFM C# build |
-| `scripts/run.sh` | bundles → start the sandbox at `http://localhost:5220` |
-| `scripts/test.sh` | full gate: contract drift typecheck -> lint -> browser asset build -> vitest -> both-TFM build -> non-Playwright dotnet tests -> observable Playwright (`--no-e2e` skips the browser leg) |
-| `scripts/playwright.sh` | observable Playwright runner with filter support, live logs, TRX, diagnostics, active-test progress markers, stale `--no-build` detection, and stale browser asset detection |
-| `scripts/pack.sh <version>` | delivery: bundles → Release build → pack the five library NuGets to `./nupkgs` (local; releases are cut by tag, see [docs/RELEASING.md](docs/RELEASING.md)) |
-
-Every wrapper supports `--help`. See **[docs/developer-cli.md](docs/developer-cli.md)**
-for filtered Playwright examples, first-time browser install, packaging, and the
-command to run for each change type.
-
-## Developing
-
-For UI work, use the sandbox as the visual workbench. Build once, then start the
-sandbox:
-
-```bash
-scripts/build.sh
-scripts/run.sh
-```
-
-For a live edit/refresh loop, run the watcher that owns the asset you are
-editing:
-
-```bash
-npm run watch:runtime                            # framework runtime TS
-npm run watch:design-system                      # the design system's compiled default
-npm run watch:sandbox-plugins                    # sandbox-only plugin JS
-npm run watch:sandbox-css                        # sandbox-only CSS
-dotnet watch --project Alis.Reactive.SandboxApp  # Razor + C# hot reload
-```
-
-Refresh the browser after TS/CSS watcher output changes. Razor and C# changes
-flow through `dotnet watch`. UI proof usually starts with a narrow browser test,
-for example:
-
-```bash
-scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion"
-```
-
-The full command reference lives in **[docs/developer-cli.md](docs/developer-cli.md)**.
+The sandbox's home page is the index of its pages. Every command, the watchers for live edits, and the
+narrowest proof for each kind of change are in [docs/developer-cli.md](docs/developer-cli.md).
 
 ## How the bundles ship
 
@@ -232,27 +195,30 @@ builder.Services.AddReactiveClassNames(names =>
 The framework's stylesheets style the defaults; an app that renames styles its own.
 `tests/Alis.Reactive.ClassNames.App` is such an app, with no framework stylesheet linked.
 
-## Repo Layout
+## The repository
 
-```
-Alis.Reactive/                    C# core library (packed as AlisReactive NuGet)
-Alis.Reactive.Native/             C# native-component library
-Alis.Reactive.Fusion/             C# Syncfusion-component library
-Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
-Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
-Alis.Reactive.DesignSystem/       The theme and the compiled default stylesheet, no C#; its own npm workspace
-Alis.Reactive.Assets/             The runtime and the framework's own components — npm workspace (TypeScript)
-Alis.Reactive.SandboxApp/         Dev harness + live component demos
-examples/resident-intake/         Consumer of the packed packages, built and driven by scripts/example.sh
-tests/                            Test projects (NUnit + vitest + Playwright)
-```
-
-`Alis.Reactive.Assets/` is the npm workspace of the runtime TypeScript and the framework's own
-component code; esbuild builds the bundle into its `dist/`. Each package ships its stylesheets as
-written from its own `css/` folder, and the design system builds its compiled default with Tailwind's
-CLI in a workspace of its own (`Alis.Reactive.DesignSystem/package.json`). The C# packages ship those
-files as static web assets (`build/AlisReactiveStaticWebAssets.targets`) but never build them. A
-`NoTargets` `.csproj` makes the Assets workspace visible in the solution and compiles nothing.
+| Entry | What it is |
+|-------|------------|
+| `Alis.Reactive/` | The core package (`AlisReactive`): the plan model, the fluent builders, the Razor helpers, and validation in FluentValidation's grammar |
+| `Alis.Reactive.Analyzers/` | The Roslyn analyzers (ALIS001 to ALIS013) that ship inside `AlisReactive` and check views and declarations at build time |
+| `Alis.Reactive.Native/` | The native-component package: HTML inputs, buttons and action links, the drawer and the loader |
+| `Alis.Reactive.Fusion/` | The Syncfusion package: one slice per EJ2 component, plus the app-wide Confirm and Toast |
+| `Alis.Reactive.NativeTagHelpers/` | ASP.NET Core tag helpers for native components (net10 only) |
+| `Alis.Reactive.DesignSystem/` | The design system: a Tailwind theme and its compiled default stylesheet, built in its own npm workspace, no C# |
+| `Alis.Reactive.Assets/` | The TypeScript runtime and the framework's own component code, an npm workspace that esbuild bundles into `AlisReactive` (its `.csproj` compiles nothing; it shows the workspace in the solution) |
+| `Alis.Reactive.SandboxApp/` | The development workbench: one page per primitive or component, driven by the Playwright tests |
+| `examples/` | `resident-intake`, an app built only from the packed packages; `net48-mvc-smoke`, the MVC 5 app CI runs under IIS Express |
+| `tests/` | The test projects (Playwright, NUnit, analyzers, architecture) and the apps they drive |
+| `tools/` | `PlanContractGenerator`, which writes the runtime's `plan.ts` and `plan.schema.json` from the C# grammar |
+| `scripts/` | The command-line wrappers: doctor, build, run, test, Playwright, pack, example ([docs/developer-cli.md](docs/developer-cli.md)) |
+| `build/` | MSBuild targets: the two the packages ship (static web assets, the net48 `Content` copy) and the one the repo's apps use to build their browser assets |
+| `docs/` | The grammar, the component guide, the ADRs, and how CI, branching and releasing work |
+| `.github/` | CI workflows, Dependabot, release notes and the pull-request template |
+| `.claude/`, `CLAUDE.md`, `AGENTS.md` | The rules, principles and hooks every contributor and coding agent follows (`AGENTS.md` links to `CLAUDE.md`) |
+| `Alis.Reactive.slnx` | The solution: every project except the two examples |
+| `Directory.Build.props`, `global.json` | Shared build settings (version, language, package metadata, public-surface checks) and the pinned .NET SDK |
+| `package.json`, `package-lock.json`, `eslint.config.js` | The npm workspaces (runtime, design system, sandbox, framework app), their lock, and the lint rules |
+| `.gitignore` | Build output and local files git never lists |
 
 ## License
 
