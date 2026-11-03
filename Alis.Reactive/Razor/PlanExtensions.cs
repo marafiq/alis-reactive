@@ -71,6 +71,7 @@ namespace Alis.Reactive
         /// view's body or in a section the layout renders: Razor never renders a partial's own <c>@section</c>.
         /// </remarks>
         /// <typeparam name="TModel">View model used to author typed expression paths.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan whose generated JSON should be embedded.</param>
         /// <returns>HTML content containing the plan JSON consumed by the runtime.</returns>
 #if NET48

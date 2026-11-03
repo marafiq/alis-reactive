@@ -47,7 +47,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
-    /// <summary>Renders a <see cref="FusionDatePicker"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionDatePicker"/> for a model-bound field.</summary>
     public static class FusionDatePickerHtmlExtensions
     {
         /// <summary>Renders a FusionDatePicker with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>

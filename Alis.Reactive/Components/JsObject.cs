@@ -75,14 +75,14 @@ namespace Alis.Reactive
 
         /// <summary>Declares a property the page reads.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
-        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}()"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}(string, string)"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new ReadOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
         /// <summary>Declares a property the page reads and writes.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
-        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}()"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
+        /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}(string, string)"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected Property<TValue> Property<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new Property<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
@@ -287,7 +287,7 @@ namespace Alis.Reactive
         /// Declares an event whose listener receives a payload, declared as its own class:
         /// <c>public Event&lt;FusionGridRowSelectedArgs&gt; RowSelected =&gt; Event&lt;FusionGridRowSelectedArgs&gt;();</c>.
         /// A page handles it with <c>.Reactive(evt =&gt; evt.RowSelected, (args, p) =&gt; ..)</c>. An event
-        /// declared on an object the component holds (<see cref="Object{TObject}()"/> on a property) is
+        /// declared on an object the component holds (<see cref="Object{TObject}(string, string)"/> on a property) is
         /// subscribed on that object.
         /// </summary>
         /// <typeparam name="TArgs">The declaration of the payload.</typeparam>

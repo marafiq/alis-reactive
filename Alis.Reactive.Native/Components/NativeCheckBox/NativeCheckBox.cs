@@ -37,7 +37,7 @@ namespace Alis.Reactive.Native
         public ReadOnly<bool?> Checked => ReadOnly<bool?>();
     }
 
-    /// <summary>Renders a <see cref="NativeCheckBox"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Native.NativeCheckBox"/> for a model-bound field.</summary>
     public static class NativeCheckBoxHtmlExtensions
     {
         /// <summary>Renders a NativeCheckBox with its defaults; see the overload that takes <c>build</c>.</summary>

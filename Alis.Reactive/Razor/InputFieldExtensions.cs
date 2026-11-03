@@ -29,6 +29,7 @@ namespace Alis.Reactive
         /// </remarks>
         /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan that owns this field registration.</param>
         /// <param name="expression">Model property to bind the field to.</param>
         /// <returns>Bound field ready to receive a component extension.</returns>
@@ -49,6 +50,7 @@ namespace Alis.Reactive
         /// </summary>
         /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
         /// <typeparam name="TProp">Model property type the field is bound to.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
         /// <param name="plan">Reactive Plan that owns this field registration.</param>
         /// <param name="expression">Model property to bind the field to.</param>
         /// <param name="configure">Configures label text and required marker.</param>

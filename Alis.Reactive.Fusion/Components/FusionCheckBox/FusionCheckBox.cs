@@ -53,7 +53,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<bool> Checked => ReadOnly<bool>();
     }
 
-    /// <summary>Renders a <see cref="FusionCheckBox"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionCheckBox"/> for a model-bound field.</summary>
     public static class FusionCheckBoxHtmlExtensions
     {
         /// <summary>Renders a FusionCheckBox with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>

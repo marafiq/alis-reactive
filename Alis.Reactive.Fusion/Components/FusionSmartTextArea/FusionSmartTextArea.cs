@@ -72,7 +72,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<string> InsertedText => ReadOnly<string>();
     }
 
-    /// <summary>Renders a <see cref="FusionSmartTextArea"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionSmartTextArea"/> for a model-bound field.</summary>
     public static class FusionSmartTextAreaHtmlExtensions
     {
         /// <summary>Renders a FusionSmartTextArea with its defaults; see the overload that takes the configuration.</summary>

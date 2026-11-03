@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
-    /// <summary>Renders a <see cref="FusionRating"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionRating"/> for a model-bound field.</summary>
     public static class FusionRatingHtmlExtensions
     {
         /// <summary>Renders a FusionRating with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>

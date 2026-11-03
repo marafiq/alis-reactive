@@ -18,9 +18,6 @@
     <!-- RS0026 (several overloads with optional parameters) is the DSL's design: an optional name: on every arity
          so a developer types less; the declared surface text is the record a new overload is reviewed against. -->
     <NoWarn>$(NoWarn);RS0026</NoWarn>
-    <!-- XML documentation warnings are suppressed solution-wide so
-         GenerateDocumentationFile still emits XML docs without flooding normal builds. -->
-    <NoWarn>$(NoWarn);CS0419;CS1570;CS1571;CS1572;CS1573;CS1574;CS1580;CS1581;CS1584;CS1587;CS1591;CS1711;CS1712</NoWarn>
     <!-- The handoff point between the npm runtime build and the core package: esbuild writes the
          runtime bundle into Alis.Reactive.Assets/dist/, and AlisReactive lists it from here as a
          static web asset (build/AlisReactiveStaticWebAssets.targets). -->

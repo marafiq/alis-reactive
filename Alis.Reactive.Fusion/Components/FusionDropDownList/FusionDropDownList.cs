@@ -86,7 +86,7 @@ namespace Alis.Reactive.Fusion
     {
     }
 
-    /// <summary>Renders a <see cref="FusionDropDownList"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionDropDownList"/> for a model-bound field.</summary>
     public static class FusionDropDownListHtmlExtensions
     {
         /// <summary>Maps display text and selected value fields using typed item expressions.</summary>

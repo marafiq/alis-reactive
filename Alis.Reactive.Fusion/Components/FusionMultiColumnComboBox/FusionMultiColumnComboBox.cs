@@ -60,7 +60,7 @@ namespace Alis.Reactive.Fusion
     }
 
     /// <summary>
-    /// Adds typed field mapping and rendering helpers for <see cref="FusionMultiColumnComboBox"/>.
+    /// Adds typed field mapping and rendering helpers for <see cref="Alis.Reactive.Fusion.FusionMultiColumnComboBox"/>.
     /// </summary>
     public static class FusionMultiColumnComboBoxHtmlExtensions
     {

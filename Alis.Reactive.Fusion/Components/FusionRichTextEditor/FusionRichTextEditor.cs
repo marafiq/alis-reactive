@@ -43,7 +43,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
-    /// <summary>Renders a <see cref="FusionRichTextEditor"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionRichTextEditor"/> for a model-bound field.</summary>
     public static class FusionRichTextEditorHtmlExtensions
     {
         /// <summary>Renders a FusionRichTextEditor with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>

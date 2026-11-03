@@ -35,7 +35,7 @@ namespace Alis.Reactive.Native
         public ReadOnly<string[]> Value => ReadOnly<string[]>();
     }
 
-    /// <summary>Renders a <see cref="NativeCheckList"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Native.NativeCheckList"/> for a model-bound field.</summary>
     public static class NativeCheckListHtmlExtensions
     {
         /// <summary>Renders a NativeCheckList with its defaults; see the overload that takes <c>build</c>.</summary>

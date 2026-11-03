@@ -129,6 +129,7 @@ namespace Alis.Reactive
         private Conditions<T> _scope = Conditions<T>.None;
         private RuleSets _sets = RuleSets.None;
 
+        /// <summary>Starts a validator with no rules; the derived class's constructor declares them.</summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("ApiDesign", "RS0022:Constructor make protected",
             Justification = "An app derives from the typed validator; the untyped base stays closed and exposes no protected member.")]
         protected ReactiveValidator() { }

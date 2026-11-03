@@ -75,7 +75,7 @@ namespace Alis.Reactive.Fusion
             Method(Pass<IEnumerable<object>, TItems>(items));
     }
 
-    /// <summary>Renders a <see cref="FusionMultiSelect"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionMultiSelect"/> for a model-bound field.</summary>
     public static class FusionMultiSelectHtmlExtensions
     {
         /// <summary>Maps display text and selected value fields using typed item expressions.</summary>

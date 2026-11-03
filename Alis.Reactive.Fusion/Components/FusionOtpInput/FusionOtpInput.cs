@@ -99,7 +99,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
     }
 
-    /// <summary>Renders a <see cref="FusionOtpInput"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionOtpInput"/> for a model-bound field.</summary>
     public static class FusionOtpInputHtmlExtensions
     {
         /// <summary>Renders a FusionOtpInput with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>

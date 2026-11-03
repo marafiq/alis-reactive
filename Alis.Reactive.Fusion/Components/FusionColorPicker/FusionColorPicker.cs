@@ -44,7 +44,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<string> Value => ReadOnly<string>();
     }
 
-    /// <summary>Renders a <see cref="FusionColorPicker"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionColorPicker"/> for a model-bound field.</summary>
     public static class FusionColorPickerHtmlExtensions
     {
         /// <summary>Renders a FusionColorPicker with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>

@@ -15,8 +15,7 @@ namespace Alis.Reactive.Fusion
     /// <remarks>
     /// Render it with <c>Html.FusionTooltip(plan, "care-tip", b =&gt; ...)</c>, reach it with
     /// <c>var careTip = p.Component&lt;FusionTooltip&gt;("care-tip");</c> and use its members directly:
-    /// <c>careTip.Open();</c>. Its open and close events are <see cref="Opened"/> and <see cref="Closed"/>,
-    /// because <see cref="Open"/> and <see cref="Close"/> are its methods.
+    /// <c>careTip.Open();</c>.
     /// </remarks>
     public sealed class FusionTooltip : FusionComponent
     {

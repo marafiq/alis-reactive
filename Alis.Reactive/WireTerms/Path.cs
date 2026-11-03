@@ -46,7 +46,7 @@ namespace Alis.Reactive.WireTerms
 
     /// <summary>
     /// The one path model: from an object or a value, step by step, to a member. Every module builds a path
-    /// from typed steps; the plan reads it as <see cref="Text"/>, a request body as <see cref="Body"/>.
+    /// from typed steps; the plan reads it as <see cref="Text"/>.
     /// </summary>
     internal sealed class Path
     {

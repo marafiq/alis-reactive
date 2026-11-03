@@ -89,7 +89,7 @@ namespace Alis.Reactive.Fusion
         public ReadOnly<string> Value => ReadOnly<string>();
     }
 
-    /// <summary>Renders a <see cref="FusionTextBox"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionTextBox"/> for a model-bound field.</summary>
     public static class FusionTextBoxHtmlExtensions
     {
         /// <summary>Renders a FusionTextBox with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>

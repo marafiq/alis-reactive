@@ -92,7 +92,7 @@ namespace Alis.Reactive
         /// <param name="member">The collection member.</param>
         /// <param name="source">A value whose items are <typeparamref name="TItem"/>.</param>
         public GatherBuilder<TRequest, TModel> Set<TItem, TSource>(
-            Expression<Func<TRequest, IEnumerable<TItem>>> member,
+            Expression<Func<TRequest, IEnumerable<TItem>?>> member,
             TypedSource<TSource> source)
             where TSource : IEnumerable<TItem>
         {

@@ -90,11 +90,11 @@
         <native-text color="Secondary">Click a detail to correct it. Each correction is saved on its own.</native-text>
 
         <native-vstack gap="Base" class="mt-4">
-            @Html.Partial(Partials + "_DobQuickEditCard.cshtml", new DateOfBirthCorrection { ResidentId = residentId, Value = new DateTime(1942, 6, 14) })
-            @Html.Partial(Partials + "_CareLevelQuickEditCard.cshtml", new CareLevelCorrection { ResidentId = residentId, Value = "Assisted Living" })
-            @Html.Partial(Partials + "_MonthlyRateQuickEditCard.cshtml", new MonthlyRateCorrection { ResidentId = residentId, Value = 4500m })
-            @Html.Partial(Partials + "_LastHospitalStayQuickEditCard.cshtml", new LastHospitalStayCorrection { ResidentId = residentId, Value = new DateTime(2025, 11, 3, 14, 15, 0) })
-            @Html.Partial(Partials + "_MedicalRecordNumberQuickEditCard.cshtml", new MedicalRecordNumberCorrection { ResidentId = residentId, Value = "EVA1942" })
+            @await Html.PartialAsync(Partials + "_DobQuickEditCard.cshtml", new DateOfBirthCorrection { ResidentId = residentId, Value = new DateTime(1942, 6, 14) })
+            @await Html.PartialAsync(Partials + "_CareLevelQuickEditCard.cshtml", new CareLevelCorrection { ResidentId = residentId, Value = "Assisted Living" })
+            @await Html.PartialAsync(Partials + "_MonthlyRateQuickEditCard.cshtml", new MonthlyRateCorrection { ResidentId = residentId, Value = 4500m })
+            @await Html.PartialAsync(Partials + "_LastHospitalStayQuickEditCard.cshtml", new LastHospitalStayCorrection { ResidentId = residentId, Value = new DateTime(2025, 11, 3, 14, 15, 0) })
+            @await Html.PartialAsync(Partials + "_MedicalRecordNumberQuickEditCard.cshtml", new MedicalRecordNumberCorrection { ResidentId = residentId, Value = "EVA1942" })
         </native-vstack>
     </section>
 </native-vstack>

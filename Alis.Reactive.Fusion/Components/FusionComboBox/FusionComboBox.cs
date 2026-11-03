@@ -84,7 +84,7 @@ namespace Alis.Reactive.Fusion
     {
     }
 
-    /// <summary>Renders a <see cref="FusionComboBox"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionComboBox"/> for a model-bound field.</summary>
     public static class FusionComboBoxHtmlExtensions
     {
         /// <summary>Maps display text and selected value fields using typed item expressions.</summary>

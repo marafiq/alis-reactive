@@ -36,7 +36,7 @@ namespace Alis.Reactive.Native
         public ReadOnly<string> Value => ReadOnly<string>();
     }
 
-    /// <summary>Renders a <see cref="NativeRadioGroup"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Native.NativeRadioGroup"/> for a model-bound field.</summary>
     public static class NativeRadioGroupHtmlExtensions
     {
         /// <summary>Renders a NativeRadioGroup with its defaults; see the overload that takes <c>build</c>.</summary>

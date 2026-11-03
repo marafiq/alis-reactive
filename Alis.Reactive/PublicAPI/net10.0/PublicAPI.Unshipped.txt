@@ -114,7 +114,7 @@ Alis.Reactive.GatherBuilder<TRequest, TModel>.Form(params System.Linq.Expression
 Alis.Reactive.GatherBuilder<TRequest, TModel>.Form(string! formId) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
 Alis.Reactive.GatherBuilder<TRequest, TModel>.Header(string! name, string! value) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
 Alis.Reactive.GatherBuilder<TRequest, TModel>.Header<TValue>(string! name, Alis.Reactive.TypedSource<TValue>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
-Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TItem, TSource>(System.Linq.Expressions.Expression<System.Func<TRequest!, System.Collections.Generic.IEnumerable<TItem>!>!>! member, Alis.Reactive.TypedSource<TSource>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
+Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TItem, TSource>(System.Linq.Expressions.Expression<System.Func<TRequest!, System.Collections.Generic.IEnumerable<TItem>?>!>! member, Alis.Reactive.TypedSource<TSource>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
 Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TValue, TSource>(System.Linq.Expressions.Expression<System.Func<TRequest!, TValue>!>! member, Alis.Reactive.TypedSource<TSource>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
 Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest!, TValue>!>! member, TValue value) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!
 Alis.Reactive.GatherBuilder<TRequest, TModel>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest!, TValue?>!>! member, Alis.Reactive.TypedSource<TValue>! source) -> Alis.Reactive.GatherBuilder<TRequest!, TModel!>!

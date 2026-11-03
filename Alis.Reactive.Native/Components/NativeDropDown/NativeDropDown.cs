@@ -37,7 +37,7 @@ namespace Alis.Reactive.Native
         public ReadOnly<string> Value => ReadOnly<string>();
     }
 
-    /// <summary>Renders a <see cref="NativeDropDown"/> for a model-bound field.</summary>
+    /// <summary>Renders a <see cref="Alis.Reactive.Native.NativeDropDown"/> for a model-bound field.</summary>
     public static class NativeDropDownHtmlExtensions
     {
         /// <summary>Renders a NativeDropDown with its defaults; see the overload that takes <c>build</c>.</summary>

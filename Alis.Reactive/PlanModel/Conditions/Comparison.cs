@@ -45,6 +45,7 @@ namespace Alis.Reactive
             : this == LessThan ? order < 0
             : order <= 0;
 
+        /// <inheritdoc/>
         public override string ToString() => Name;
     }
 
@@ -76,6 +77,7 @@ namespace Alis.Reactive
 
         internal string Name { get; }
 
+        /// <inheritdoc/>
         public override string ToString() => Name;
     }
 
@@ -107,6 +109,7 @@ namespace Alis.Reactive
 
         internal bool IsPattern => Method.Length == 0;
 
+        /// <inheritdoc/>
         public override string ToString() => Name;
     }
 }
