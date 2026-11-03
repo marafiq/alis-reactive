@@ -8,11 +8,11 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 - **The local full gate is the release-grade browser proof.** `scripts/test.sh` runs typecheck,
   assets, vitest, the consistency checks, `dotnet build`, the non-Playwright dotnet tests, and the
   whole Playwright suite. `scripts/test.sh --parallel` runs the Playwright leg as the CI
-  shards side by side (each with its own sandbox): about 20 minutes instead of about 60 on a
-  12-core machine. CI runs the same scripts; it never defines a second gate.
-- **CI Playwright is single-worker.** `tests/Alis.Reactive.PlaywrightTests/GlobalUsings.cs:4-5`
+  shards side by side (each with its own app): about 12 minutes on a 12-core Mac
+  (2026-11-03). CI runs the same scripts; it never defines a second gate.
+- **CI Playwright is single-worker.** Each Playwright project's `GlobalUsings.cs`
   declares `[assembly: Parallelizable(ParallelScope.Fixtures)]` and
-  `[assembly: LevelOfParallelism(1)]`; one Kestrel sandbox per test assembly run
+  `[assembly: LevelOfParallelism(1)]`; one Kestrel app per test assembly run
   (`tests/Alis.Reactive.Playwright.TestHost/AppServer.cs` on a free port, started by the
   `[SetUpFixture]` each test project declares over it). Playwright's own CI guide
   recommends one worker on CI "to prioritize stability and reproducibility"
@@ -23,8 +23,9 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
   from 18:50:07 to 20:09:29 = 79.4 min, 1232 tests, all passed; the 1209 tests with
   `[playwright:end]` markers sum to 4697 s of test time. The deterministic job takes about 2 min
   (run 36232653109, job `test`: 1m59s).
-- **Traces and screenshots already exist on failure.** `PlaywrightTestBase.cs:61` starts a
-  Playwright trace for every test; `TearDown` (`PlaywrightTestBase.cs:109-132`) saves
+- **Traces and screenshots already exist on failure.** `AppPageTest`
+  (`tests/Alis.Reactive.Playwright.TestHost/AppPageTest.cs`) starts a Playwright trace for every
+  test; its `[TearDown]` `KeepFailureEvidence` saves
   `TestResults/playwright-traces/<test>.zip` and `<test>.png` only when the test failed and attaches
   both to the TRX. `scripts/playwright.sh` writes a log, a TRX and a VSTest `--diag` file per run
   and prints `[playwright:start]` / `[playwright:end]` markers with elapsed time.
@@ -40,15 +41,16 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 - **Toolchain.** .NET SDK `10.0.101` or a newer 10.0 feature band (`global.json` sets
   `rollForward: latestFeature`, so a runner that already has a newer 10.0 SDK uses it: CI builds
   with 10.0.4xx while this repo's machines build with 10.0.101); Node 22 in CI;
-  `Microsoft.Playwright.NUnit` 1.63.0, `NUnit` 4.6.1, `NUnit3TestAdapter` 5.2.0
-  (`tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj`).
+  `Microsoft.Playwright.NUnit` 1.63.0 and `NUnit` 4.6.1
+  (`tests/Alis.Reactive.Playwright.TestHost/Alis.Reactive.Playwright.TestHost.csproj`),
+  `NUnit3TestAdapter` 5.2.0 in each test project.
 
 ## What each workflow is for, and what gates what
 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
 | `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x10; `example` | the one gate definition | never |
-| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
+| `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)`, `gate / example` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, five packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
@@ -150,7 +152,7 @@ the start of the failure the re-run hid (`scripts/trx-failed-tests.mjs <trx> fla
 The annotation shows on the pull request's checks, so a green job can't hide a re-run, and the
 flake can be root-caused from the check: a green job uploads no failure artifacts. The
 `if: failure()` artifact upload carries logs, TRX, diagnostics, and the
-traces and screenshots `PlaywrightTestBase` saved for the failed tests. This is the
+traces and screenshots `AppPageTest` saved for the failed tests. This is the
 Playwright-recommended shape (retry in CI, keep the trace of the failure:
 [playwright.dev/docs/test-retries](https://playwright.dev/docs/test-retries)) implemented at the
 runner level, because NUnit's `[Retry]` only retries assertion failures unless every exception type
@@ -165,7 +167,7 @@ The retry lives in the wrapper so it is the same locally and in CI.
 Every job declares `timeout-minutes` (GitHub's default is 360 minutes,
 [workflow syntax](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idtimeout-minutes)):
 `verify-tag` 10, `test` 30, each `playwright` shard 60 (3x the expected time, room for one re-run
-pass on a slow runner), `example` 20, `pack-and-publish` 45, net48 jobs 30 and 40, docs 20 and 10, the nightly
+pass on a slow runner), `example` 20, `pack-and-publish` 45, net48 jobs 30 and 40, the nightly
 reporter 10. A hung shard now costs an hour, not six. Inside the run, `scripts/playwright.sh` keeps
 `--blame-hang --blame-hang-timeout 10m` per test.
 
@@ -181,7 +183,7 @@ to the same summary. When the last attempt is still red, the wrapper also prints
 (`scripts/trx-failed-tests.mjs <trx> annotations`), so the pull request's checks, and the
 check-run annotations API, name the failures without opening the log or the artifact. The
 annotation, like the flaky warning, also carries the page console the failed test wrote to its
-output (`PlaywrightTestBase` writes it on failure): its error lines, then its last thirty lines.
+output (`AppPageTest` writes it on failure): its error lines, then its last thirty lines.
 Every shard also prints one `::notice` naming each fixture and how many of its tests passed on
 the first attempt (`scripts/trx-failed-tests.mjs <trx> summary`), so a green shard's check-run
 annotations say what it proved.
@@ -198,7 +200,7 @@ until proven otherwise. The convention:
    test. Widening a timeout is not a fix (CLAUDE.md, Rules: root cause, not patch).
 2. If it cannot be fixed within the PR, quarantine it: add `[Category("Quarantine")]`
    ([NUnit Category](https://docs.nunit.org/articles/nunit/writing-tests/attributes/category.html)),
-   add the shard exclusion `&TestCategory!=Quarantine` to every `playwright_shard_filter` case and a sixth,
+   add the shard exclusion `&TestCategory!=Quarantine` to every `playwright_shard_filter` case and a
    non-blocking `quarantine` shard with `TestCategory=Quarantine`, and add the row below. The PR that
    quarantines must show the shard's test count dropping by exactly the quarantined tests.
 3. Quarantine expires after **14 days**: fix and remove the category, or delete the test with the
@@ -240,10 +242,10 @@ until proven otherwise. The convention:
   only what they need (`checks: write` for the shard summary, `contents: write` for the GitHub
   Release, `issues: write` for the nightly reporter)
   ([security hardening](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions)).
-- **Pinning policy.** GitHub-owned `actions/*` stay on major tags (`@v4`), the accepted trade-off
+- **Pinning policy.** GitHub-owned `actions/*` stay on major tags (`actions/checkout@v7`), the accepted trade-off
   for first-party actions; every third-party action is pinned to a full commit SHA with the version
   in a trailing comment (`dorny/test-reporter@a43b3a5f... # v3.0.0`,
-  `microsoft/setup-msbuild@6fb02220... # v2`). Dependabot keeps both current.
+  `microsoft/setup-msbuild@30375c66... # v3.0.0`). Dependabot keeps both current.
 - **Concurrency.** `ci.yml` and `verify-net48.yml` group by pull request and cancel a superseded
   PR run (`cancel-in-progress: ${{ github.event_name == 'pull_request' }}`); pushes to `main` /
   `release/*` never cancel, and `nuget-publish.yml` serializes releases with
@@ -272,8 +274,8 @@ until proven otherwise. The convention:
 
 - **Syncfusion is upgraded with one command.** `node scripts/pin-syncfusion.mjs <version>` moves the
   pins together: NuGet `Syncfusion.EJ2.AspNet.Core` and `Syncfusion.EJ2.MVC5` in Fusion, and npm
-  `@syncfusion/ej2` in each app of this repository that brings Syncfusion to the browser (the sandbox),
-  re-resolving that app's lock; then `npm ci` and `scripts/test.sh --parallel`. No framework package
+  `@syncfusion/ej2` in each app of this repository that brings Syncfusion to the browser (the sandbox
+  and `examples/resident-intake`), re-resolving each app's lock; then `npm ci` and `scripts/test.sh --parallel`. No framework package
   ships Syncfusion's browser files; nothing imports a control package, so none is pinned.
   `scripts/test.sh` runs `--check` in every gate, so a half-done bump fails instead of drifting. A new Syncfusion major also
   needs a license key valid for it in user-secrets and in both the Actions and Dependabot secret stores:

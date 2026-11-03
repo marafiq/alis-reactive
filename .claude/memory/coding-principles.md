@@ -6,16 +6,19 @@ type: reference
 
 # Coding Principles
 
-## API Surface Is Frozen
+## The Public Surface Is Reviewed
 
-The public API surface does not change without explicit user approval and full downstream
-analysis. A single parameter rename cascaded across 170+ files in 6 commits.
+The public surface of a shipped package is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`
+(root CLAUDE.md): a public symbol added, removed or changed without that text fails the build (RS0016,
+RS0017), so every surface change is a diff a reviewer reads. One shared-surface rename once cascaded
+across 170+ files.
 
-- No hook blocks API surface edits — review manually.
 - Before any change: grep all call sites, read every affected file, present evidence.
-- `internal` to `public` is strictly forbidden. Internal members protect the surface deliberately.
+- Making an internal member public widens the surface: it needs the same reason and review as any
+  other surface change.
 - Fusion HtmlExtension methods use the `Fusion` prefix (e.g., `.FusionDropDownList()`).
-- Event args properties: `{ get; private set; }` for Fusion, "Gets" voice in XML docs.
+- An event payload is a class deriving `JsObject`: `ReadOnly<T>` for what it carries, `Property<T>` for
+  what the vendor reads back (`Alis.Reactive.Fusion/CLAUDE.md`). "Gets" voice in XML docs.
 - No "Syncfusion" prefix in XML docs — use framework class names (e.g., "FusionAutoComplete").
 
 Callback parameter naming convention (locked):
@@ -27,8 +30,7 @@ Callback parameter naming convention (locked):
 | `Action<TriggerBuilder>` | `trigger` |
 | `Action<GatherBuilder>` | `gather` |
 | `Action<ResponseBuilder>` | `response` |
-| `Action<HttpRequestBuilder>` | `request` |
-| `Func<ConditionStart<TModel>, Condition<TModel>>` | `group` |
+| `Func<ConditionStart<TModel>, Guard<TModel>>` | `group` |
 
 ## Fail-Fast, Not Fallback
 
@@ -102,7 +104,7 @@ what it is. The principles that hold:
 
 ### Live Re-Validation
 - Industry standard: clear on input, re-validate on blur and on the input's commit event.
-- Submit, blur and commit use the same rule evaluation (`runtime/plugins/form/form.ts`, `wireLive`).
+- Submit, blur and commit use the same rule evaluation (`runtime/plugins/form/form.ts`, `listenToInputs`).
 - Typing clears the message in the capture phase, before the component hears the keystroke, so a commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks after the clear and its message stays.
 
 ## Validation Session Mistake Patterns

@@ -82,14 +82,9 @@ Each of these means a test proves less than its name claims. The number is the r
 - A sleep, a retry, or an order between tests (8).
 - A name that describes the code instead of the promise (1).
 
-## Where the framework's tests stand (2026-10-27, HEAD f02b08971)
+## Which tests meet these rules
 
-Measured against these rules; each later unit reports these counts again.
-
-| Tests | Count | Breaks |
-|---|---|---|
-| `tests/Alis.Reactive.PlanTests` | 49 | 2: all 49 arrange through internals (`Support/Page.cs`). 4 and 7: 18 assert a recorded plan. |
-| `Alis.Reactive.Assets/runtime/__tests__` | 96 | 3: all run in jsdom; 21 sites use a stub, spy or fake. |
-| Playwright framework suites (CoreBehaviors, Plugins, HttpPipeline, Validation, Conditions, Patterns) | 844 | 3: 28 of their 108 pages render Fusion components. |
-
-Until a test meets the rules it is feedback while coding, not proof of the framework.
+`tests/Alis.Reactive.Framework.PlaywrightTests` is written to them. `tests/Alis.Reactive.PlanTests`
+arrange through the public surface but assert recorded plans (4 and 7), and the runtime's vitest
+suites run in jsdom with stubs (3). Until a test meets the rules it is feedback while coding, not
+proof of the framework.

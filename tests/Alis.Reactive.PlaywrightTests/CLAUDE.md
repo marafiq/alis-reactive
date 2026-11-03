@@ -1,7 +1,7 @@
 # Playwright Behavior Tests
 
-Root CLAUDE.md is authoritative. Read `memory/bdd-principles.md` before writing or
-modifying any test here. Fixtures are C# — `modern-csharp` standards apply to
+Root CLAUDE.md is authoritative. Read `.claude/memory/bdd-principles.md` before writing or
+modifying any test here. Fixtures are C#: `.claude/memory/coding-principles.md` applies to
 them like any production code.
 
 ## What a test is
@@ -11,7 +11,7 @@ boots it, a real gesture happens, the browser visibly changes. Isolated (fresh
 navigation, no ordering, no shared state), vertical (no mocking), behavior-named
 (one sentence the user role would say). A suite derives from one senior-living
 journey and owns its nested slice — model, view, fixture
-(`memory/bdd-principles.md` → Nested Vertical Slices).
+(`.claude/memory/bdd-principles.md` → Nested Vertical Slices).
 
 ## Non-negotiables
 

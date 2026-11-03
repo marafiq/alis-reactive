@@ -83,7 +83,7 @@ gh run list --branch main --limit 6          # CI (gate) and verify-net48 green 
 git tag -a v1.0.0-rc.4 -m "AlisReactive 1.0.0-rc.4" "$(git rev-parse origin/main)"
 git push origin v1.0.0-rc.4
 
-# 2. Watch the publish run: verify-tag -> gate (test + every browser shard) -> pack-and-publish.
+# 2. Watch the publish run: verify-tag -> gate (test, every browser shard, the example) -> pack-and-publish.
 gh run watch "$(gh run list --workflow=nuget-publish.yml --limit 1 --json databaseId -q '.[0].databaseId')"
 ```
 
@@ -130,8 +130,9 @@ git tag -a vprobe -m "probe" origin/main && scripts/verify-release-tag.sh vprobe
 git tag -d vprobe
 ```
 
-Probe tags are local and deleted right after; never push one. Real tags today: `v1.0.0-rc.2` exits
-`4` (it is lightweight); `v1.0.0-rc.1` and `v1.0.0-rc.3` exit `0` with `reachable_from=main`. Until
+Probe tags are local and deleted right after; never push one. Real tags on 2026-11-03: `v1.0.0-rc.2`
+exits `4` (it is lightweight); `v1.0.0-rc.1`, `v1.0.0-rc.3` and `v1.0.0-rc.4` to `v1.0.0-rc.6` exit `0`
+with `reachable_from=main`. Until
 the per-RC branch `release/1.0.0-rc3` is deleted (`docs/BRANCHING.md`, step 4) it also vouches for
 the rc.3 commit, because the guard accepts `release/*` for hotfix lines; after that step only `main`
 and true hotfix lines can vouch for a tag. Proof run on 2026-09-26: rc.3 `0`, a local lightweight
@@ -175,7 +176,7 @@ git switch -c fix/forward-port-1.0.1 origin/main && git cherry-pick <fix-sha> &&
 
 | Workflow | Runs on | Gates | Publishes? |
 |----------|---------|-------|------------|
-| `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, assets, vitest, consistency checks, dotnet build, dotnet tests) and five `gate / playwright (<shard>)` jobs | never |
+| `ci.yml` | every pull request; pushes to `main` and `release/*` (path-filtered) | `gate / test` (typecheck, assets, vitest, consistency checks, dotnet build, dotnet tests) a `gate / playwright (<shard>)` job per shard, and `gate / example` | never |
 | `verify-net48.yml` | pushes and pull requests to `main` and `release/*` | net48 build + pack on real .NET Framework 4.8 (Windows); IIS Express boot proof of the net48 sample app | never (packs a local fixture feed) |
 | `nightly.yml` | 03:30 UTC Monday to Friday on `main`; manual | the full gate; opens or updates a `ci-nightly-failure` issue when red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |
@@ -188,12 +189,12 @@ creates or updates the GitHub Release with the packages attached and notes gener
 ## Verify a release
 
 ```bash
-gh run view <run-id>                           # verify-tag, gate / test, all gate / playwright (...), pack-and-publish green
+gh run view <run-id>                           # verify-tag, gate / test, all gate / playwright (...), gate / example, pack-and-publish green
 gh release view v1.0.0-rc.4                    # five .nupkg assets, pre-release flag, generated notes
 
 # nuget.org's flat container lists every version of a package id (lower-case id; indexing lags a few minutes):
 curl -s https://api.nuget.org/v3-flatcontainer/alisreactive/index.json | jq -r '.versions[-3:][]'
-for id in alisreactive alisreactive.native alisreactive.fusion alisreactive.fluentvalidator alisreactive.designsystem alisreactive.nativetaghelpers; do
+for id in alisreactive alisreactive.native alisreactive.fusion alisreactive.designsystem alisreactive.nativetaghelpers; do
   printf '%-34s ' "$id"; curl -s "https://api.nuget.org/v3-flatcontainer/$id/index.json" | jq -r '.versions | index("1.0.0-rc.4") != null'
 done
 ```

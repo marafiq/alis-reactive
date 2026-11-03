@@ -3,7 +3,7 @@
 Root CLAUDE.md is authoritative. These tests prove the framework itself, and they follow
 `.claude/memory/framework-test-principles.md`, not the component rules in `bdd-principles.md`.
 
-- The app is `tests/Alis.Reactive.Framework.App`: the core and the validator package, and the components
+- The app is `tests/Alis.Reactive.Framework.App`: the core (validation included), and the components
   of `docs/design/framework-test-components.md`, brought the way any app brings one. No component
   library, no test doubles, no log-line assertions. It consumes the design system as an app does (the
   compiled default linked, the theme in its own Tailwind build, `alis-root` on `body`); `/Validation/Notice`
@@ -13,8 +13,9 @@ Root CLAUDE.md is authoritative. These tests prove the framework itself, and the
 - Each capability row of `docs/design/framework-test-components.md` is proven by a test here; the test
   names the row in its fixture's summary.
 - Run through `scripts/playwright.sh --project framework`.
-- What these tests run of the framework: `scripts/framework-coverage.sh` (npm run coverage:framework). It
+- What these tests run of the framework: `scripts/framework-coverage.sh` (npm run coverage:framework)
   records the runtime's block coverage per page and instruments the core's assemblies with
   dotnet-coverage, then writes `tests/TestResults/framework-coverage/<stamp>/report.md`: the share of
-  `runtime/**` and of the core's C# the tests ran, and every line they did not. A line not run is a
-  missing test, or code the framework does not need.
+  `runtime/**` and of the core's C# the tests ran, and every line they did not. It is feedback while
+  coding, like typecheck, never a gate or a proof (root CLAUDE.md): a line it reports not run points at
+  a missing test or at code the framework does not need, and a Playwright test settles which.

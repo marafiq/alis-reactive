@@ -108,8 +108,9 @@ The full command reference lives in **[docs/developer-cli.md](docs/developer-cli
 
 `npm run build:packages` builds the runtime bundle into `Alis.Reactive.Assets/dist/` and the design
 system's compiled default into `Alis.Reactive.DesignSystem/dist/` (both gitignored); `npm run build:all`
-also builds the apps' own assets, which `dotnet build` does for them. Each package ships its own files
-the way a Razor class library does: as static web assets.
+also builds the sandbox's own assets. Every app builds its own in its `dotnet build`, after the design
+system copies the theme in: the sandbox, the framework test app and the example. Each package ships
+its own files the way a Razor class library does: as static web assets.
 
 | Consumer | How it gets the files |
 |----------|-----------------------|

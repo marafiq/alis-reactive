@@ -61,10 +61,10 @@ with `off(name, fn)`, and hands a listener the event's payload.
 
 | The object has | Members |
 |----------------|---------|
-| properties read and written | `value` (the target), `mode`, `schedule.night`, `zones[i].target` |
+| properties read and written | `value` (the target), `mode`, `fan`, `schedule.night`, `zones[i].target` |
 | properties read | `current`, `locked`, `schedule.active`, `zones[i].name` |
 | a property written only | `pin`, a setter without a getter |
-| methods that return nothing | `increase()`, `hold(minutes)`, `setRange(min, max)`, `setQuietHours(hours)`, `applyPlan(plan)`, `schedule.apply()`, `zones[i].boost()` |
+| methods that return nothing | `increase()`, `decrease()`, `hold(minutes)`, `setRange(min, max)`, `setQuietHours(hours)`, `applyPlan(plan)`, `schedule.apply()`, `zones[i].boost()` |
 | methods that return a value | `isComfortable()`, `distanceTo(target)`, `estimate(target, mode)`, `describe(plan)`, `schedule.nextChange()`, `zones[i].isBoosted()` |
 | a method that returns an object | `reading()`: `value`, `unit`, `label()` |
 | an event without a payload | `unlocked` |
@@ -109,6 +109,7 @@ is said by the C# member being a property or a method
 ```csharp
     public Property<int> Value => Property<int>();                                // read and written
     public Property<ThermostatMode> Mode => Property<ThermostatMode>();           // an enum, by its JavaScript text
+    public Property<ThermostatFan> Fan => Property<ThermostatFan>();
     public ReadOnly<int> Current => ReadOnly<int>();                              // read
     public ReadOnly<bool> Locked => ReadOnly<bool>();
     public WriteOnly<string> Pin => WriteOnly<string>();                          // written only: a read does not compile
@@ -116,6 +117,7 @@ is said by the C# member being a property or a method
     public Objects<ThermostatZone> Zones => Objects<ThermostatZone>();            // a list of objects with members of their own
 
     public void Increase() => Method();                                           // no argument
+    public void Decrease() => Method();
     public void Hold(Arg<decimal> minutes) => Method(minutes);                    // one
     public void SetRange(Arg<int> min, Arg<int> max) => Method(min, max);         // several
     public void SetQuietHours(Arg<IReadOnlyList<string>> hours) => Method(hours); // a list
@@ -192,32 +194,33 @@ line when no line does; a `MethodAsync<T>` result makes that first line wait for
 asked again by a line outside the branch arm or request part where it was first read (grammar.md 3.1).
 
 **Step 3: render it, then use it as the object.** The render helper writes the component's own
-markup with the id and name the framework derives from the model, and hands the markup back:
+markup with the id the framework derives from the model, and hands the markup back:
 
 ```csharp
 public static RenderedComponent<Thermostat, TModel> Thermostat<TModel>(
-    this InputBoundField<TModel, int> field, int currentTemperature, string pin, bool locked)
+    this InputBoundField<TModel, int> field, int currentTemperature, string pin, bool locked,
+    IEnumerable<string> zones)
     where TModel : class
 {
     var html = new StringBuilder()
         .Append("<div class=\"thermostat\" id=\"").Append(Encode(field.ElementId))
-        .Append("\" data-name=\"").Append(Encode(field.BindingPath))
         .Append("\" data-target=\"").Append(Target(field))
         .Append("\" data-current=\"").Append(currentTemperature)
         .Append("\" data-pin=\"").Append(Encode(pin))
         .Append("\" data-locked=\"").Append(locked ? "true" : "false")
+        .Append("\" data-zones=\"").Append(Encode(string.Join(",", zones)))
         .Append("\"></div>");
     return field.Render<Thermostat>(new HtmlString(html.ToString()));
 }
 ```
 
 Anything that is not a form value renders against the plan with the id the developer chose,
-`plan.Render<T>(elementId, markup)`. Every view then has the object
-(`Components/Brought/Thermostat/Index.cshtml`):
+`plan.Render<T>(elementId, markup)`. Every view then has the object (adapted from
+`Components/Brought/Thermostat/Index.cshtml`, which says the comfort in a helper of its own):
 
 ```csharp
 Html.InputField(plan, m => m.Target, o => o.Required().Label("Target temperature"))
-    .Thermostat(currentTemperature: 68, pin: "1234", locked: true)
+    .Thermostat(currentTemperature: 68, pin: "1234", locked: true, zones: new[] { "Bedroom", "Bath" })
     .Reactive(evt => evt.TargetChanging, (args, p) =>
         // The wing's range is the limit: a target outside it is capped at the nearest allowed degree.
         p.When(args.Requested).NotEq(args.Clamp())
@@ -443,8 +446,9 @@ unchanged.
 Confirm, FileUpload, SmartTextArea, SmartPasteButton and Mention's element bridge. Their helpers
 render data attributes, never an inline `<script>`. The architecture test
 (`Alis.Reactive.Assets/runtime/__tests__/architecture.test.ts`) fails if either side imports the
-other. The brought components the sandbox carries, Tom Select, and a visit planner, a thermostat and
-a call bell it wrote itself (`Alis.Reactive.SandboxApp/BroughtComponents/`), prove the method with no
+other. The brought components the sandbox carries, Tom Select, and a visit planner, a thermostat, a
+call bell, an intake sheet, a medication list and a whiteboard it wrote itself
+(`Alis.Reactive.SandboxApp/BroughtComponents/`), prove the method with no
 runtime change of their own: the thermostat has every kind of member once, and `WhenSettingRoomComfort`
 drives each through the page; the call bell takes its listeners as properties, which its vendor entry
 says and the one driver follows, and `WhenAnsweringACallBell` drives them.
@@ -458,11 +462,6 @@ What the method does not yet do. Each is a known gap, not a hidden one.
   element from their init script, so a render-time check cannot tell a forgotten id from a vendor's.
 - A declaration is not generic over the app's row type (`FusionGrid<TRow>`); row-typed members are
   generic methods with `Field` arguments.
-- The validation grammar covers what the sandbox uses. Rule sets, cascade modes, dependent rules,
-  custom validators, enum membership and precision checks are not built; an app that needs one
-  adds it as a check.
-- Four declared members have no journey yet: Dialog `RefreshPosition`, Kanban `CancelEdit`,
-  Schedule `CloseEditor` and `NativeHiddenField.Change`.
 
 ## Decisions
 

@@ -22,14 +22,14 @@ Run from the repo root (npm-workspace passthroughs) or from this folder.
 | Command | Does |
 |---------|------|
 | `npm run build:packages` | build the runtime bundle and the design system's compiled default |
-| `npm run build:all` | the packages' assets and the apps' own (the sandbox, the framework test app); the sandbox's stylesheet imports the theme that `dotnet build` copies into it, so build once first |
+| `npm run build:all` | the packages' assets and the sandbox's own; the sandbox's stylesheet imports the theme that `dotnet build` copies into it, so build once first. The framework test app builds its own in its `dotnet build` (`npm run build:framework-app` by hand) |
 | `npm run watch:runtime` | rebuild the runtime JS on every `.ts` change |
 | `npm run watch:design-system` | rebuild the design system's compiled default on every change |
-| `npm run typecheck` | `tsc --noEmit` over `runtime/` |
+| `npm run typecheck` | regenerates `runtime/types/plan.ts` from the grammar, then `tsc --noEmit` over the runtime and its tests; from the root it also typechecks the sandbox's and the framework test app's TypeScript |
 | `npm test` | vitest |
 
-`esbuild.config.mjs` pins esbuild's working directory to the repo root so output is identical
-regardless of where the command is invoked.
+`esbuild.config.mjs` names its entry and its output relative to this folder: run it through npm
+(`npm run build -w Alis.Reactive.Assets`, as the root scripts do), which runs it here.
 
 ## You do not edit the `.csproj`
 

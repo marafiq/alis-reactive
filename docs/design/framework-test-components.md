@@ -44,6 +44,7 @@ when that slice lands, so no member exists without the test that proves it. The 
 | `FilePicker` | as `Slate`, the object under `filePicker`, declared an input (`IInputComponent`) | A file input holding the files the person chose as the browser's own `File` objects (`BrowserFile`), committed when they choose, and listing them as the browser does (`Listed`, the input's own `FileList`): what a page reads of a file, and the file a form-data request sends (the Requests slice). |
 | `Stamp` | none: no plan reaches it; the script its render helper writes after its element builds it, as a vendor's render helper writes the script that builds its widget | A line of text its own script writes: the script a slot runs when it loads HTML (the Slots slice). |
 | `Choice<TEnum>` | as `Slate`, the object under `choice`, declared an input committed by its own `changed` event; its render helper writes its markup to the field's writer | A select of an enum's members by name, with a blank option for a member that may hold none: an enum member gathered, checked, compared and set (the Inputs slice). |
+| `Banner` | as `Slate`, the object under `banner`; an app-level component (`IAppLevelComponent`) at the fixed id `app-banner`, so a page reaches it with `p.Component<Banner>()` | The app's one banner: a message it shows and the flashes it counts (the Elements slice). |
 
 ## The capabilities
 

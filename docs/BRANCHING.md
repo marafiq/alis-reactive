@@ -70,8 +70,8 @@ Apply them after cutover step 1, when `main` carries the new workflows.
 
 ### Ruleset: `main` moves by pull request with green required checks
 
-Required checks are the deterministic legs plus the net48 proof. The five `gate / playwright (...)`
-jobs run on every PR and are visible, but are **not** required (`docs/CI.md`, "Gating").
+Required checks are the deterministic legs plus the net48 proof. The `gate / playwright (...)` jobs
+and `gate / example` run on every PR and are visible, but are **not** required (`docs/CI.md`, "Gating").
 
 ```bash
 cat > /tmp/main-ruleset.json <<'JSON'

@@ -30,8 +30,8 @@ pwsh tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 in
 | Build everything | `scripts/build.sh` | Installs npm deps if needed, builds all JS/CSS bundles, then runs `dotnet build`. |
 | Run sandbox | `scripts/run.sh` | Builds assets first, then starts `http://localhost:5220`. Stop with `Ctrl+C`. |
 | Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> consistency checks -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright. |
-| Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the CI shards side by side, each with its own sandbox. About 20 minutes instead of about 60. |
-| Upgrade Syncfusion | `node scripts/pin-syncfusion.mjs <version>` then `npm ci` | Moves the npm and NuGet pins together and locks every control package at the version the umbrella shipped with; `--check` verifies (runs in every gate). |
+| Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the CI shards side by side, each with its own app. About 12 minutes on a 12-core Mac. |
+| Upgrade Syncfusion | `node scripts/pin-syncfusion.mjs <version>` then `npm ci` | Moves the NuGet pins and the `@syncfusion/ej2` pin of the sandbox and `examples/resident-intake` together, re-resolving each app's lock; `--check` verifies (runs in every gate). |
 | Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright. |
 | Full Playwright | `scripts/playwright.sh` | Use this instead of raw `dotnet test` for browser tests. |
 | Filtered Playwright | `scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"` | Supports any VSTest filter. |
@@ -80,7 +80,7 @@ Asset ownership:
 | Core CSS | `Alis.Reactive/css/alis-reactive.css` | none, shipped as written | yes, `AlisReactive`: `css/alis-reactive.css` |
 | Native CSS | `Alis.Reactive.Native/css/native.css` | none, shipped as written | yes, `AlisReactive.Native`: `css/native.css` |
 | Native tag helper CSS | `Alis.Reactive.NativeTagHelpers/css/native-tag-helpers.css` | none, shipped as written | yes, `AlisReactive.NativeTagHelpers`: `css/native-tag-helpers.css` |
-| Sandbox plugin JS | `Alis.Reactive.SandboxApp/Scripts/` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` | no |
+| Sandbox plugin and component JS | `Alis.Reactive.SandboxApp/Scripts/` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js`, `sandbox-components.js` and `sandbox-components.css` | no |
 | Sandbox CSS | `Alis.Reactive.SandboxApp/Styles/` | `Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css` | no |
 | Framework test app components and CSS | `tests/Alis.Reactive.Framework.App/Components/`, `Styles/` | `tests/Alis.Reactive.Framework.App/wwwroot/js/`, `wwwroot/css/framework.css`, built by the app's own `dotnet build` | no |
 

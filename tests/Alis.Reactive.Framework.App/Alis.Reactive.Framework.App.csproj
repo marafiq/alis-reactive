@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <!-- The app the framework is proven on: the core and the validator package only, so no component
-         library can compile into a framework page. Its components are brought the way any app brings
+    <!-- The app the framework is proven on: the core (validation included) and the design system, so no
+         component library can compile into a framework page. Its components are brought the way any app brings
          one (docs/design/framework-test-components.md). It consumes the design system as an app does:
          the compiled default linked, the theme in its own Tailwind build. Its TypeScript and CSS are
          built by its own npm build before each dotnet build (below), after the theme is copied in; the

@@ -32,7 +32,7 @@ recorded plans, or run in jsdom with stubs), so they are feedback while coding, 
 ```bash
 scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"  # focused proof
 scripts/test.sh             # full gate: typecheck, assets, vitest, checks, dotnet build, Playwright
-scripts/test.sh --parallel  # Playwright as the CI shards side by side (~20 min)
+scripts/test.sh --parallel  # Playwright as the CI shards side by side (~12 min)
 scripts/test.sh --no-e2e    # everything except the browser leg
 ```
 

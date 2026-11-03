@@ -1,6 +1,6 @@
 # ADR-0004: The core is an inverted dependency tree of concept slices
 
-**Status:** accepted; implemented (U1 74fcb65f6, U2 e66dc0ae3, U3 d2cbb0138, U4 0ecfbaf8c)
+**Status:** accepted; implemented (U1 74fcb65f6, U2 e66dc0ae3, U3 d2cbb0138, U4 0ecfbaf8c, U5 a70890e83, U6 43fda6f60, 59f545f47, cfcc3a5c1 and 1edb34cd4); the lock became the analyzer ALIS010-ALIS013 in feaa9d057, 90c166df9 and 7ec0973dd
 **Date:** 2026-10-29
 **Domain:** structure | encapsulation | public namespaces
 
@@ -28,7 +28,7 @@ reaches no cycle at all, and the one a new engineer reads as obviously right.
 | 0 | `Grammar` (wire nodes, `G`, the serializer and its discriminator), `WireTerms` (plan terms and `Path`) |
 | 1 | `Members` (C# member reading: `Expressions`, `ExpressionPathHelper`, `JsonMemberName`, `CSharpTypeName`, `EnumMember`, `Field`, and `ClrShape`, the CLR-type to shape mapping taken out of `Shape`) |
 | 2 | `Vendors` (`ComponentVendor`, `VendorEventPayload`, `TypedDslExemptionAttribute`) |
-| 3 | `Inputs` (`IdGenerator`, `HtmlFieldPrefix`, `InputIdentity`, `RenderedInput(s)`, `FieldReference`, `MemberInputs`) |
+| 3 | `Inputs` (`IdGenerator`, `HtmlFieldPrefix`, `InputIdentity`, `RenderedInput(s)`, `FieldReference`, `ReactiveClassNames`) |
 | 4 | `PlanModel/Writing` |
 | 5 | `PlanModel/Values` |
 | 6 | `PlanModel/Conditions` |
@@ -82,7 +82,7 @@ an additional file in its csproj; the file's directory is the package root. The 
 every reference that points up the table or sideways in a row, at the reference; every file whose namespace
 breaks the rule above, at the namespace; every public class that nothing in the package derives from and that is
 not sealed, at the class; and every folder with no row, every entry that names no folder, every type declared in
-two slices and every shipped package without a table. `tests/Alis.Reactive.AnalyzerTests/SliceTreeTests.cs` proves
+two slices and every shipped package with C# and no table (the design system ships no C#). `tests/Alis.Reactive.AnalyzerTests/SliceTreeTests.cs` proves
 each rule fires and stays silent. The IL test that preceded it (Mono.Cecil over both targets) is retired: what the
 compiler's model reads that IL did not (a const read, a nameof) is a real source dependency, and what IL read that
 the model does not (the members the compiler binds by pattern: foreach, await, using, deconstruction) lives on a

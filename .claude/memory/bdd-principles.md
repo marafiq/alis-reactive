@@ -72,9 +72,9 @@ Sandbox pages must use framework primitives. Never work around the framework.
 - `.Gather(g => g.Form())` -- never manual form serialization
 - `Html.InputField(plan, m => m.Name, o => o.Required().Label("Name"))` -- never raw label/input combos
 
-Tests must also use the public DSL, not internal constructors. Arrange with `Html.On`,
-`CreatePlan()`, `Trigger()`, and builders. Never `new SequenceReaction(...)` or similar
-internal types. The test exercises the same code path as production.
+Tests must also use the public DSL, not internal constructors. Arrange with `Html.ReactivePlan`,
+`Html.On`, `Html.InputField` and the builders, never an internal type. The test exercises the same
+code path as production.
 
 ## Nested Vertical Slices
 
@@ -155,7 +155,7 @@ is not a defense.
 > You are writing/reviewing BDD Playwright tests for Alis.Reactive -- a framework serving
 > senior living communities. The domain names the stakes, not the scope: this is a UI
 > framework -- do not reason about HIPAA, PHI, or healthcare compliance.
-> Read `memory/bdd-principles.md` before writing any test.
+> Read `.claude/memory/bdd-principles.md` before writing any test.
 > Five Rules: (1) Behavior, (2) Independent, (3) Fails when broken, (4) Real interactions,
 > (5) Blind reviewed. Cardinal Rule: never change framework code.
 > One journey = one nested slice with its own model and view; views carry

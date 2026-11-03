@@ -41,7 +41,9 @@ That is the whole document. The grammar names no feature.
   container ID, a stream's URL. The framework's features use the same extension point an app does.
 - **Plugin data.** `data` is JSON the plugin defines, and it may contain expressions. Each plan
   contributes its data under its owner, and the plugin joins the contributions per key. The C#
-  declaration of each plugin states its data type, so the generated contract types it too.
+  declaration of each plugin states its data type, so the generated contract types it too. Every
+  `data` names its `kind`; a plan that names a plugin's object without contributing to it writes
+  `{ kind: "none" }`.
 - **Inputs and forms are plugin data.**
   - The inputs of a view are `alis.model` data, contributed to the page's one table of inputs
     (`plugin("alis.model", "")`, 6.3): `{ inputs: { id: { name, body, value, shape,
@@ -62,7 +64,7 @@ That is the whole document. The grammar names no feature.
     its name names (F1). `i` is the indexes of the item a test checks (`[]` for a member), which every
     member the test reads by an item's name takes (M8). An input does not name its form; membership is decided by containment (6.4),
     because a partial cannot know which form will contain it.
-- **A hub is plugin data.** `alis.hub` data is `{}`: it carries nothing, and every plan that names a
+- **A hub is plugin data.** `alis.hub` data is `{ kind: "hub" }`: it carries nothing else, and every plan that names a
   hub writes it, so the plan holds the hub's connection under its owner (B1).
 - **No owner field.** The owner of a plan is whoever discovered it: the page at boot, or a slot when
   it loads.
@@ -412,12 +414,11 @@ A failing handler is logged and stops no other handler.
 | Ordering applies only to comparable types; text operators apply only to text | C# type: generic constraints |
 | A condition or an array lambda (a comparison, an `OrderBy` key) never orders a `TimeSpan`: it reaches the browser as its text, and `"1.02:00:00"` sorts before `"23:00:00"` | render |
 | An event's payload type matches the callback | C# type |
-| A member call that returns a value is not discarded | analyzer: a discarded `Value<T>` is an error |
 | Every handle is used inside an active block, within its binding's scope | builder at render, naming the handle |
 | Every step is written inside a callback being built, not after its callback returned | builder, at the step |
 | An element holds one component: an id is named with one vendor in a plan | builder, naming the id and both vendors |
 | A plugin is registered once in a plan | builder, naming the plugin and the view |
-| A lambda uses only members the compiler maps | analyzer at compile time; render as a backstop |
+| A lambda uses only members the compiler maps | render (`ElementExpressionCompiler`, naming the expression) |
 | Every route placeholder is filled from the request | render |
 | A request that sends `Form()`, the inputs of the form it validates, validates a form; otherwise it names its element with `Form(formId)` | render |
 | A regular expression is in JavaScript's dialect | render |
@@ -476,7 +477,7 @@ if (form.validate()) {                            // .Validate<V>(container); ou
     else if (res.status === 409) { …OnError(409)… }
     else { …untyped OnError… }                    // also reached by status 0
   } finally { …Finally… }                         // emitted only when Finally exists; reads no res
-  if (res.ok) { …Chained<TResponse>((res, next) => …)… }   // PlanAuthoring/Requests/ResponseBuilder.cs:135
+  if (res.ok) { …Chained<TResponse>((res, next) => …)… }   // PlanAuthoring/Requests/ResponseBuilder.cs:136
 }
 ```
 
@@ -572,7 +573,7 @@ no key (H2) and no entry (H4).
   - An array becomes repeated keys.
   - A missing scalar is sent empty (`name=`).
   - A missing array sends no key, because `name=` binds as a collection holding one null
-    (`Alis.Reactive.Assets/runtime/plugins/http.ts:112-128`).
+    (`Alis.Reactive.Assets/runtime/plugins/http.ts:114-130`).
   - A `File` cannot be sent in a GET; it is a boundary error.
 - **H3 JSON.** `values` is the body, each value as the plan built it; the plugin converts no text.
   - The inputs a request sends (`Form()` through `model.fill`, `Form(m => m.X)` through
@@ -587,7 +588,7 @@ no key (H2) and no entry (H4).
   - Arrays repeat the key.
   - A `File` is appended with its name, and a date is its local text.
   - A missing scalar is sent empty.
-  - A missing array sends no entry (`Alis.Reactive.Assets/runtime/plugins/http.ts:136-153`).
+  - A missing array sends no entry (`Alis.Reactive.Assets/runtime/plugins/http.ts:138-155`).
 - **H5 Headers.** A header whose value is missing is omitted.
 - **H6 Body.** The body is read by Content-Type: JSON is parsed, text and HTML stay text, and an
   empty or other body is missing.
@@ -778,7 +779,8 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   - C1: `ask(message)` is async and resolves true on OK, and false on Cancel, close or Escape.
   - C2: Asks queue first in, first out.
   - C3: Escape inside the dialog never reaches the document.
-  - C4: A missing dialog is a boundary error that names `FusionConfirmDialog`.
+  - C4: A page that renders no dialog provides no `alis.confirm` (its own code may); the dialog's
+    element present without its Syncfusion Dialog is a boundary error that names the element.
 - **Loader** (Native):
   - L1: `show()` shows the loader inside the element its `target` property names, positioned over
     it, or over the viewport when `target` is empty; a `timeout` above 0 starts the auto-hide
@@ -789,7 +791,7 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   - W1: Closing announces `alis:unmount` on its content element and empties it, so what a plan
     loaded into it is released with it (6.5 S4).
 - **Toast** (Fusion): its declared members, and no obligation beyond them.
-- **Native CheckList and RadioGroup:** the native plugin defines `value` and `isInteracted` on the
+- **Native CheckList and RadioGroup:** the framework's component code defines `value` on the
   element (`Alis.Reactive.Assets/components/native/check-list.ts`, `radio-group.ts`), replacing the
   inline view scripts.
 
@@ -895,7 +897,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 
 - **Custom checks** are extension methods that compose the vocabulary, so they run in both places:
   `WristbandCode()` is `Matches(@"^WB-\d{6}$").WithMessage(..)`
-  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/MoveInReview/MoveInReviewValidator.cs:107-108`).
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/MoveInReview/MoveInReviewValidator.cs:106-107`).
 - **Empty values** follow model binding: `v` and `model` are binding reads (2.1). A non-nullable
   number reads an empty input as 0, a nullable one as `null`, and text that is empty or only
   whitespace as `null`. So `MinimumLength`, `Matches` and `EmailAddress` pass on an empty optional
@@ -943,7 +945,8 @@ or sideways). Every public type is in the namespace `Alis.Reactive`; an internal
   members, `Field`, the CLR type to shape mapping (`ClrShape`) and the browser's order rule.
 - `Vendors`: `ComponentVendor` and the typed-DSL exemption. `Inputs`: what the framework dictates for
   an input before any component renders it (`IdGenerator`, `HtmlFieldPrefix`, `InputIdentity`,
-  `RenderedInput`, `FieldReference`).
+  `RenderedInput`, `FieldReference`) and the class names a field renders with (`ReactiveClassNames`,
+  `AddReactiveClassNames`).
 - `PlanModel`: the one model that writes the grammar, bottom up: `Writing` (the scope that binds
   responses and method results, the declared objects), `Values`, `Conditions` (one model for a
   validator's conditions over members and a reaction's over values), `Reactions` (the steps) beside

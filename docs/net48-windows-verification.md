@@ -1,10 +1,10 @@
-# net48 Runtime Verification — Windows (RC1)
+# net48 Runtime Verification — Windows
 
 **Status: AUTOMATED in CI.** The classic ASP.NET MVC 5 / .NET Framework 4.8 runtime proof now runs on
 `windows-latest` in `.github/workflows/verify-net48.yml` (`net48-runtime-iis` job): it builds
 `examples/net48-mvc-smoke`, hosts it under **IIS Express**, drives it with **Playwright**, and uploads
 a screenshot. See `examples/net48-mvc-smoke/README.md` for the known net48 consumer gotchas this
-surfaced and how each is fixed (asset landing, System.Text.Json 9 binding redirects,
+surfaced and how each is fixed (asset landing, System.Text.Json 10 binding redirects,
 `WebApplication.targets`/`VSToolsPath`, Native Html-helpers vs Tag Helpers, Razor `@` in comments).
 Mono/macOS is **not** a faithful .NET Framework host and must not be used to claim this done — that is
 why it runs on a real Windows runner.
@@ -12,8 +12,8 @@ why it runs on a real Windows runner.
 The manual checklist below remains the reference for the surfaces the automated smoke does not yet
 cover (Syncfusion `.Render()`, the validation bridge).
 
-This checklist closes the five net48 runtime items the RC1 audit surfaced. Run it on Windows with
-Visual Studio (or MSBuild + IIS Express) and .NET Framework 4.8 installed.
+This checklist covers the five net48 runtime items the release candidates surfaced. Run it on Windows
+with Visual Studio (or MSBuild + IIS Express) and .NET Framework 4.8 installed.
 
 ## Setup
 
@@ -37,6 +37,7 @@ Visual Studio (or MSBuild + IIS Express) and .NET Framework 4.8 installed.
 After build, confirm each package's `build\net48\{PackageId}.targets` copied its browser assets into
 `Content\{PackageId}\`:
 - [ ] `Content\AlisReactive\js\alis-reactive.js`
+- [ ] `Content\AlisReactive\css\alis-reactive.css`
 - [ ] `Content\AlisReactive.Native\css\native.css`
 - [ ] `Content\AlisReactive.Fusion\css\fusion.css`
 - [ ] `Content\AlisReactive.DesignSystem\css\design-system.css` and `theme.css`
@@ -65,14 +66,14 @@ than net10 Tag Helpers — name/value encoding, `data-val-*` attributes):
       match what the runtime expects (plan IDs resolve via `getElementById`).
 - [ ] Confirm a reactive interaction (e.g. live-clear, conditional show) works against that markup.
 
-### 5. `System.Text.Json` 9.x binding redirects
-STJ 9 on .NET Framework 4.8 commonly needs assembly binding redirects in `web.config`; classic
+### 5. `System.Text.Json` 10.x binding redirects
+STJ 10 on .NET Framework 4.8 commonly needs assembly binding redirects in `web.config`; classic
 `packages.config` apps do not always add them automatically:
 - [ ] App runs without a `FileLoadException`/binding error on `System.Text.Json` (or its deps).
 - [ ] If a redirect is required, capture the exact `web.config` `<bindingRedirect>` and add it to the
       net48 install docs.
 
 ## Sign-off
-RC1 net48 sign-off requires all five boxes checked in a browser on Windows, OR an explicit, recorded
-decision to ship RC1 with net48 runtime marked "build/pack verified, runtime boot pending" and the
-gap disclosed in the release notes. Do not report this done from a macOS run.
+A release's net48 sign-off is all five boxes checked by hand in a browser on Windows; CI's
+`net48-runtime-iis` job proves the boot and one interaction, not the rest. Do not report this done
+from a macOS run.
