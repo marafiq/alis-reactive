@@ -1338,7 +1338,6 @@ Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.Link<THref, TText>(System.Lin
 Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.Link<THref, TText>(System.Linq.Expressions.Expression<System.Func<TModel, THref>!>! hrefProperty, System.Linq.Expressions.Expression<System.Func<TModel, TText>!>! textProperty, string! css) -> Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>!
 Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.Raw(string! html) -> Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>!
 Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.Render() -> string!
-Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.ShowIf(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! condition, System.Action<Alis.Reactive.Fusion.FusionConditionalBuilder<TModel>!>! content) -> Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>!
 Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.Span(string! text) -> Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>!
 Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.Span(string! text, string! css) -> Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>!
 Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>.Span<TProperty>(System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! property) -> Alis.Reactive.Fusion.FusionTemplateBuilder<TModel>!

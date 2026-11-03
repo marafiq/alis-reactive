@@ -360,16 +360,6 @@ namespace Alis.Reactive.Fusion
         }
 
         /// <summary>
-        /// Adds conditional content when the typed condition is true.
-        /// </summary>
-        /// <param name="condition">Typed template condition.</param>
-        /// <param name="content">Configures content emitted when the condition is true.</param>
-        public FusionTemplateBuilder<TModel> ShowIf(Expression<Func<TModel, bool>> condition, Action<FusionConditionalBuilder<TModel>> content)
-        {
-            return When(condition, content);
-        }
-
-        /// <summary>
         /// Adds raw HTML to the template output.
         /// </summary>
         /// <param name="html">Raw HTML.</param>
