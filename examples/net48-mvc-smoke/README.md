@@ -17,26 +17,16 @@ A real .NET Framework 4.8 consumer hits the same issues. Each is captured here w
 | # | Problem | Fix (see file) |
 |---|---------|----------------|
 | 1 | **Asset delivery.** MVC 5 has no static web assets: each package's `build\net48\{PackageId}.targets` copies its files into `Content\{PackageId}\` on build (`Content\AlisReactive\js\alis-reactive.js`, `Content\AlisReactive\css\alis-reactive.css`, `Content\AlisReactive.Native\css\native.css`, `Content\AlisReactive.DesignSystem\css\design-system.css` and `theme.css`; this fixture is **native-only**, so it does not pull the Fusion CSS). There is no `asp-append-version` Tag Helper on net48. | Reference the copied files by versioned URLs: `@Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js")` (`Views/Shared/_Layout.cshtml`) adds the file's content hash, as `asp-append-version` does on .NET, and the CI smoke checks each link's hash against the served bytes; and include the `Content\AlisReactive*` folders as Content so publish deploys them. |
-| 2 | **Binding redirects.** `System.Text.Json` 10 and its transitive chain (`System.Text.Encodings.Web`, `System.IO.Pipelines`, `System.Buffers`, `System.Memory`, `System.Runtime.CompilerServices.Unsafe`, `System.Numerics.Vectors`, `System.Threading.Tasks.Extensions`, `Microsoft.Bcl.AsyncInterfaces`) need assembly binding redirects on .NET Framework, or you get `FileLoadException: ... manifest definition does not match the assembly reference`. Classic `packages.config` apps do **not** auto-add them. | `Web.config` `<runtime><assemblyBinding>`. A real consumer runs NuGet's `Add-BindingRedirect` or adds them by hand; this fixture's CI **auto-generates** them from the actual `bin\` assembly versions, so they are always exact; the committed `Web.config` holds the set that run generated for these packages, so a local build of the same packages starts as it is. |
+| 2 | **Binding redirects.** `System.Text.Json` 10 and its transitive chain (`System.Text.Encodings.Web`, `System.IO.Pipelines`, `System.Buffers`, `System.Memory`, `System.Runtime.CompilerServices.Unsafe`, `System.Numerics.Vectors`, `System.Threading.Tasks.Extensions`, `Microsoft.Bcl.AsyncInterfaces`) need assembly binding redirects on .NET Framework, or you get `FileLoadException: ... manifest definition does not match the assembly reference`. Classic `packages.config` apps do **not** auto-add them. | `Web.config` `<runtime><assemblyBinding>`. A real consumer runs NuGet's `Add-BindingRedirect` or adds them by hand; this fixture's CI **auto-generates** them from the actual `bin\` assembly versions, so they are always exact. |
 | 3 | **`WebApplication.targets` / `VSToolsPath`.** A classic web app imports `$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets`; on a bare build agent `$(VSToolsPath)` defaults wrong (`MSB4226`). | Set `VisualStudioVersion` + `VSToolsPath` in the `.csproj`. |
 | 4 | **Native components are Html helpers, not Tag Helpers.** `<native-*>` Tag Helpers live in the net10-only `AlisReactive.NativeTagHelpers` package and do not exist under System.Web MVC 5. | Use `Html.InputField(plan, m => m.X).NativeTextBox(...)` / `.NativeCheckBox(...)` (`Views/Home/Index.cshtml`). |
 | 5 | **Razor parses `@` inside HTML comments.** `<!-- ... @Html.RenderPlan ... -->` is compiled as code (`CS1502`). | Use Razor comments `@* ... *@` instead. |
 | 6 | **Client validation** on net48 resolves `ReactiveValidator<T>` through MVC5's `DependencyResolver` — a real consumer registers it in `Global.asax` `Application_Start`. | **Not exercised by this native-only smoke** (no validator is registered here); tracked in `docs/net48-windows-verification.md`. |
 
-## Run it locally on Windows
-
-```powershell
-npm ci                                    # pack.sh builds the packages' browser assets
-$v = "0.0.0-local.$(Get-Date -Format yyyyMMddHHmmss)"   # a new version each time: NuGet keeps the first package of a version
-bash scripts/pack.sh $v                   # builds the local feed in ./nupkgs
-msbuild examples/net48-mvc-smoke/Net48MvcSmoke.csproj /p:Configuration=Release /p:AlisReactiveVersion=$v /restore /t:Build
-& "$env:ProgramFiles\IIS Express\iisexpress.exe" /path:(Resolve-Path examples/net48-mvc-smoke) /port:5000
-# browse http://localhost:5000/ , tick the checkbox, the green proof box appears
-```
-
 ## What it proves
 
-Asset landing (#1) and build are green in CI today. The full browser boot + reactive interaction is
-the `net48-runtime-iis` screenshot. The remaining net48 surfaces a fuller fixture should add are in
+CI proves on every run: the build, each package's files landing in `Content\{PackageId}\` with nothing
+git lists, each link's content hash against the bytes served, and the runtime booting under IIS Express
+with a reactive interaction (the `net48-runtime-iis` screenshot). The remaining net48 surfaces a fuller fixture should add are in
 `docs/net48-windows-verification.md` (Syncfusion `.Render()`, the validation bridge, Native HtmlHelper
 markup specifics).
