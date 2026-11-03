@@ -11,12 +11,11 @@ packages only *ship* the bundles built here.
 | `runtime/`, `components/` | TypeScript runtime and the framework's own component code | `dist/scripts/alis-reactive.dev.js` | `AlisReactive`: `js/alis-reactive.js` |
 | `design-system/` | Design-system CSS: tokens, page base, field and validation look; `fusion.css`, its look for Syncfusion | `dist/css/design-system.dev.css`, `dist/css/design-system-fusion.dev.css` | `AlisReactive.DesignSystem`: `css/design-system.css`, `css/design-system-fusion.css` |
 | `fusion/` | The Syncfusion Tailwind3 theme and the grid dialog form | `dist/css/syncfusion.dev.css` | `AlisReactive.Fusion`: `css/fusion.css` |
-| `native/` | Drawer, loader, check list, radio group | none: shipped as written | `AlisReactive.Native`: `css/native.css` |
-| `native-tag-helpers/` | The `<native-*>` layout tag helpers | none: shipped as written | `AlisReactive.NativeTagHelpers`: `css/native-tag-helpers.css` |
 
-The component stylesheets (`native/`, `native-tag-helpers/`, `fusion/grid-dialog-form.css`) style
-the class names their package writes and read the design system's tokens (`--color-*`,
-`--font-display`) with neutral fallbacks; no component stylesheet imports the design system.
+A stylesheet shipped as written lives in its package (`Alis.Reactive/css/`, `Alis.Reactive.Native/css/`,
+`Alis.Reactive.NativeTagHelpers/css/`), not here. Each styles the class names its package writes and
+reads the design system's tokens (`--color-*`, `--font-display`) with neutral fallbacks; none imports
+the design system.
 
 The matching **C#** lives in sibling projects: design-system token/layout helpers in
 `Alis.Reactive.DesignSystem/`, components in `Alis.Reactive.Native/`, `Alis.Reactive.Fusion/` and

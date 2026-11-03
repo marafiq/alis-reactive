@@ -58,6 +58,20 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The accent and border colors are the design system's; the group's own stylesheet reads them.
+    [Test]
+    public async Task the_chosen_meal_plan_is_outlined_in_the_accent_color_and_the_others_are_not()
+    {
+        await NavigateAndBoot();
+        await Expect(MealPlan.Box("Vegetarian")).ToHaveCSSAsync("border-color", "rgb(226, 232, 240)");
+
+        await MealPlan.Choose("Vegetarian");
+
+        await Expect(MealPlan.Box("Vegetarian")).ToHaveCSSAsync("border-color", "rgb(212, 160, 83)");
+        await Expect(MealPlan.Box("Standard")).ToHaveCSSAsync("border-color", "rgb(226, 232, 240)");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task choosing_a_care_level_puts_it_on_the_move_in_summary()
     {

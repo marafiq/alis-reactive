@@ -37,13 +37,12 @@
     </ItemGroup>
 
     <!-- The stylesheet Native's own markup needs (drawer, loader, check list, radio group), shipped
-         as written from Alis.Reactive.Assets/native: served at
-         ~/_content/AlisReactive.Native/css/native.css (net10) and copied to
+         as written: served at ~/_content/AlisReactive.Native/css/native.css (net10) and copied to
          Content\AlisReactive.Native\css\native.css (net48). Where and how:
          build\AlisReactiveStaticWebAssets.targets. The look comes from whatever design system the
          app links. -->
     <ItemGroup>
-        <AlisReactiveStaticWebAsset Include="..\Alis.Reactive.Assets\native\native.css" RelativePath="css/native.css" />
+        <AlisReactiveStaticWebAsset Include="css\native.css" RelativePath="css/native.css" />
     </ItemGroup>
 
     <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />

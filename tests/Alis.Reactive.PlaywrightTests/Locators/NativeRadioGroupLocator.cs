@@ -26,6 +26,9 @@ public sealed class NativeRadioGroupLocator
     /// <summary>The radio of the option whose text is exactly <paramref name="optionText"/>.</summary>
     public ILocator Option(string optionText) => Label(optionText).Locator("input[type=radio]");
 
+    /// <summary>The bordered box of the option whose text is exactly <paramref name="optionText"/>.</summary>
+    public ILocator Box(string optionText) => Label(optionText).Locator("> div");
+
     /// <summary>Clicks the option whose text is exactly <paramref name="optionText"/>.</summary>
     public async Task Choose(string optionText) => await Label(optionText).ClickAsync();
 }

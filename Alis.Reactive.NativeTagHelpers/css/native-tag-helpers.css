@@ -1,11 +1,14 @@
-/* AlisReactive.NativeTagHelpers: the styling the layout tag helpers' markup needs, shipped with the
-   package as written (~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css).
-   Colors and type read the design system's tokens (--color-*, --font-display) when an app links
-   one; without one, text inherits the page's and surfaces fall back to neutral values.
+/* AlisReactive.NativeTagHelpers: the styling the layout tag helpers' markup needs, shipped as
+   written (~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css). Colors and type
+   read the design system's tokens (--color-*, --font-display) when an app links one; without one,
+   text inherits the page's and surfaces fall back to neutral values.
 
-   The rules set only what a tag helper attribute controls, so classes the page writes on the tag
-   (class="mt-4 flex-wrap") keep working for everything else. */
+   The rules set only what a tag helper attribute controls, and sit in the framework's `alis` layer,
+   so classes the page writes on the tag (class="mt-4 flex-wrap") win. */
 
+@layer theme, base, alis, components, utilities;
+
+@layer alis {
 /* native-container */
 .alis-container {
   max-width: 80rem;
@@ -100,8 +103,8 @@
 
 /* native-heading */
 .alis-heading {
-  font-family: var(--font-display);
-  color: var(--color-text-primary);
+  font-family: var(--font-display, inherit);
+  color: var(--color-text-primary, inherit);
 }
 
 .alis-heading--h1 {
@@ -162,11 +165,11 @@
 .alis-text--lg { font-size: 1.125rem; line-height: calc(1.75 / 1.125); }
 .alis-text--xl { font-size: 1.25rem; line-height: calc(1.75 / 1.25); }
 
-.alis-text--primary { color: var(--color-text-primary); }
+.alis-text--primary { color: var(--color-text-primary, inherit); }
 .alis-text--secondary { color: var(--color-text-secondary, #475569); }
 .alis-text--muted { color: var(--color-text-muted, #94a3b8); }
 .alis-text--inverse { color: #fff; }
-.alis-text--accent { color: var(--color-accent); }
+.alis-text--accent { color: var(--color-accent, currentColor); }
 .alis-text--success { color: var(--color-success, #059669); }
 .alis-text--warning { color: var(--color-warning, #d97706); }
 .alis-text--error { color: var(--color-error, #dc2626); }
@@ -188,7 +191,7 @@
 .alis-kv__value {
   font-size: 0.875rem;
   line-height: calc(1.25 / 0.875);
-  color: var(--color-text-primary);
+  color: var(--color-text-primary, inherit);
 }
 
 .alis-kv--stacked > .alis-kv__label {
@@ -288,3 +291,4 @@
 
 .alis-card__body--compact { padding: 1rem 1.25rem; }
 .alis-card__body--standard { padding: 1.5rem; }
+}
