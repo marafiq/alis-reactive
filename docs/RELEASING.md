@@ -178,7 +178,7 @@ git switch -c fix/forward-port-1.0.1 origin/main && git cherry-pick <fix-sha> &&
 | `nightly.yml` | 03:30 UTC Monday to Friday on `main`; manual | the full gate; opens or updates a `ci-nightly-failure` issue when red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs exercise the gates only | `verify-tag` (annotated, SemVer, reachable from `main`/`release/*`) -> `gate` (test + all shards, **blocking**) -> `pack-and-publish` in the `nuget-release` environment | **only on a tag** |
 
-`nuget-publish.yml`'s `pack-and-publish` job asserts that exactly the six expected packages exist at
+`nuget-publish.yml`'s `pack-and-publish` job asserts that exactly the five expected packages exist at
 the tagged version before pushing, pushes with `--skip-duplicate` (re-runs are idempotent), then
 creates or updates the GitHub Release with the packages attached and notes generated per
 `.github/release.yml`.
@@ -187,7 +187,7 @@ creates or updates the GitHub Release with the packages attached and notes gener
 
 ```bash
 gh run view <run-id>                           # verify-tag, gate / test, all gate / playwright (...), pack-and-publish green
-gh release view v1.0.0-rc.4                    # six .nupkg assets, pre-release flag, generated notes
+gh release view v1.0.0-rc.4                    # five .nupkg assets, pre-release flag, generated notes
 
 # nuget.org's flat container lists every version of a package id (lower-case id; indexing lags a few minutes):
 curl -s https://api.nuget.org/v3-flatcontainer/alisreactive/index.json | jq -r '.versions[-3:][]'
@@ -209,7 +209,7 @@ it **unlists** them: hidden from search and from the package page, still restora
 version so nobody's build breaks.
 
 ```bash
-# Unlist every one of the six package ids at the bad version (dotnet nuget delete unlists on nuget.org).
+# Unlist every one of the five package ids at the bad version (dotnet nuget delete unlists on nuget.org).
 for id in AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.DesignSystem AlisReactive.NativeTagHelpers; do
   dotnet nuget delete "$id" 1.0.0-rc.4 --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --non-interactive
 done
@@ -249,7 +249,7 @@ Reference: [`dotnet nuget delete`](https://learn.microsoft.com/en-us/dotnet/core
 | Deterministic suite red on the tagged commit | `gate / test` red; `pack-and-publish` never starts |
 | A browser shard red | Failed tests are re-run once inside the shard; still red = the release stops; re-run failed jobs after fixing or quarantining (`docs/CI.md`) |
 | Re-run the same tag, or re-push it | `--skip-duplicate` skips published versions; the GitHub Release is updated, not duplicated |
-| Pack regression (missing/extra package, wrong version) | The six-package assertion fails **before** anything is pushed |
+| Pack regression (missing/extra package, wrong version) | The five-package assertion fails **before** anything is pushed |
 | Two releases triggered at once | Serialized by the `nuget-release` concurrency group; an in-flight publish is never cancelled |
 | `NUGET_API_KEY` not configured | Fails immediately with a clear message, before packing |
 | Partial publish (network drop mid-push) | Re-run the workflow: published packages are skipped, the rest are pushed |

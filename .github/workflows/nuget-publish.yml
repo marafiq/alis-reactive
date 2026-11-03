@@ -11,7 +11,7 @@ name: Publish NuGet packages
 #   verify-tag  annotated tag, SemVer version, commit reachable from main or release/*  (seconds)
 #   gate        the shared gate (gate.yml): deterministic suite + every browser shard — BLOCKING
 #               (a red shard stops the release; re-run the failed jobs, publishing is idempotent)
-#   pack-and-publish  six packages at the tagged version -> nuget.org -> GitHub Release
+#   pack-and-publish  five packages at the tagged version -> nuget.org -> GitHub Release
 #                     (runs in the `nuget-release` environment; add a required reviewer there for
 #                      a manual approval click before anything is pushed)
 # Runbook: docs/RELEASING.md. Branch model and cutover: docs/BRANCHING.md.
@@ -124,7 +124,7 @@ jobs:
           fi
 
       - name: Pack NuGet packages
-        # pack.sh runs npm ci + npm run build:all itself, then packs all six at -p:Version.
+        # pack.sh runs npm ci + npm run build:all itself, then packs all five at -p:Version.
         run: scripts/pack.sh "${PACKAGE_VERSION}"
 
       - name: Verify the five packages were produced at the tagged version

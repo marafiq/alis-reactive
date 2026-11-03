@@ -45,7 +45,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 | `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5 | the one gate definition | never |
 | `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
-| `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, six packages | nuget.org + GitHub Release |
+| `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, five packages | nuget.org + GitHub Release |
 | `verify-net48.yml` | pushes and PRs to `main` / `release/*`; manual | net48 build+pack on Windows; IIS Express boot proof | PR merge (both required) | never |
 
 ## One gate definition

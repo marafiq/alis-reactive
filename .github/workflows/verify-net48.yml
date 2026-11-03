@@ -52,7 +52,7 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: Pack six NuGets on Windows
+      - name: Pack five NuGets on Windows
         shell: bash
         run: scripts/pack.sh 1.0.0-rc.1
 

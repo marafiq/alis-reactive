@@ -955,7 +955,7 @@ or sideways). Every public type is in the namespace `Alis.Reactive`; an internal
   Toast, Drawer, Loader, and the grid's column rules.
 
 **TypeScript** (`Alis.Reactive.Assets`)
-- `runtime/grammar`: `evaluate` (the nine expressions), `execute` (the six statements, await),
+- `runtime/grammar`: `evaluate` (the ten expressions), `execute` (the six statements, await),
   `operators`, `paths`, `shape` and `environment`. It imports nothing below.
 - `runtime/objects`: the two locators (`plan-objects`), the vendor driver, the plugins registered by name,
   and owners.
