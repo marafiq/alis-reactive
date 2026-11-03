@@ -55,8 +55,11 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         await CareTeam.Item(name).ClickAsync();
     }
 
+    // The nurse brings the hand-off card into view before typing: EJ2 closes the list when the page scrolls,
+    // and a click on a button below the fold would scroll it between opening the list and reading it.
     private async Task FindDayNurses(string word)
     {
+        await Find.ScrollIntoViewIfNeededAsync();
         await DayNurse.ClickAsync();
         await DayNurse.PressSequentiallyAsync(word, new() { Delay = 30 });
         await Find.ClickAsync();
