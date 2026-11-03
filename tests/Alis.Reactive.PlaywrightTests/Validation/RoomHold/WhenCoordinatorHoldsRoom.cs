@@ -156,6 +156,25 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The room is chosen by a button that writes the hidden field; no one types in it. The field's own
+    // change is what takes the summary's ask away, before any hold is placed.
+    [Test]
+    public async Task choosing_a_room_takes_the_summarys_ask_for_one_away_before_a_hold_is_placed()
+    {
+        await NavigateAndBoot();
+        await WriteProspectName("Jane Smith");
+        await HoldTermsAgreed.Check();
+        await ClickWhenStable(PlaceHold);
+        await Expect(ValidationSummary).ToHaveTextAsync("Choose a room to hold.");
+
+        await ClickWhenStable(ChooseMaple216);
+
+        await Expect(ValidationSummary).ToBeHiddenAsync();
+        await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
+        Assert.That(_holdsSent, Is.Empty, "Choosing a room places no hold.");
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task a_missing_name_is_asked_for_beside_the_field_not_in_the_summary()
     {
