@@ -371,7 +371,6 @@ Alis.Reactive.TypedDslExemptionAttribute
 Alis.Reactive.TypedDslExemptionAttribute.Reason.get -> string!
 Alis.Reactive.TypedDslExemptionAttribute.TypedDslExemptionAttribute(string! reason) -> void
 Alis.Reactive.TypedSource<TProp>
-Alis.Reactive.TypedSource<TProp>.TypedSource() -> void
 Alis.Reactive.UrlQuery<TQuery>
 Alis.Reactive.UrlQuery<TQuery>.Get<TValue>(System.Linq.Expressions.Expression<System.Func<TQuery!, TValue>!>! member) -> Alis.Reactive.TypedSource<TValue>!
 Alis.Reactive.ValidationFailure

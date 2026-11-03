@@ -90,6 +90,10 @@ namespace Alis.Reactive
         private readonly List<IRule<T>> _rules = new List<IRule<T>>();
         private Conditions<T> _scope = Conditions<T>.None;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("ApiDesign", "RS0022:Constructor make protected",
+            Justification = "An app derives from the typed validator; the untyped base stays closed and exposes no protected member.")]
+        protected ReactiveValidator() { }
+
         /// <summary>Starts the rules of one member: <c>RuleFor(x =&gt; x.Address.City).NotEmpty()</c>.</summary>
         /// <param name="member">The member, as a path from the model.</param>
         /// <typeparam name="TProperty">The member's type.</typeparam>

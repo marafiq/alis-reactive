@@ -8,5 +8,6 @@ namespace Alis.Reactive
     /// <typeparam name="TProp">The value's type.</typeparam>
     public abstract class TypedSource<TProp> : Arg<TProp>
     {
+        private protected TypedSource() { }
     }
 }

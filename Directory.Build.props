@@ -14,7 +14,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <LangVersion>14.0</LangVersion>
     <!-- The public surface of a shipped package is the text in its PublicAPI files; drift is a build error, not a warning. -->
-    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0024;RS0025;RS0048</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0022;RS0024;RS0025;RS0048</WarningsAsErrors>
     <!-- RS0026 (several overloads with optional parameters) is the DSL's design: an optional name: on every arity
          so a developer types less; the declared surface text is the record a new overload is reviewed against. -->
     <NoWarn>$(NoWarn);RS0026</NoWarn>
