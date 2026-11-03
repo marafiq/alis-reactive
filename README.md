@@ -163,12 +163,16 @@ theme goes anywhere among them.
 The app serves them with `app.UseStaticFiles()`, as the sandbox does. Running from build
 output outside Development needs `builder.WebHost.UseStaticWebAssets()`; a published app does not.
 
-On net48, link the copied files with `Url.Content("~/Content/AlisReactive/js/alis-reactive.js")`.
+Link every framework file with `asp-append-version="true"`, as above: the URL carries the file's content
+hash, so the first page after a package upgrade fetches the new files and no browser runs a cached
+runtime against a newer plan.
+
+On net48, link the copied files with `Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js")`, the
+core's equivalent of `asp-append-version` for MVC 5: the same URL with the same content hash.
 They are build output, and each `Content\{PackageId}\` folder carries a `.gitignore` the package
 writes, so git never lists them; include the folders as `Content` in the web project so publish
 deploys them. A copy an app committed before stays tracked, since an ignore never untracks a file:
-`git rm -r --cached` it once. MVC 5 has no `asp-append-version`; bundle
-them with System.Web.Optimization or add the package version to the URL to bust caches on upgrade.
+`git rm -r --cached` it once.
 
 ## For UI developers — the design system
 

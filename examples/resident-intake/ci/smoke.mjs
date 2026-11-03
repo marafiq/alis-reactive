@@ -2,6 +2,7 @@
 // (non-zero exit) when the page does not look or behave as the packages promise: the accent on the
 // Submit button and its white label before any gesture, an empty intake refused in the browser with the
 // field marked and nothing posted, and a complete intake saved with its confirmation number.
+import { createHash } from "node:crypto";
 import { chromium, expect } from "@playwright/test";
 
 const url = process.env.SMOKE_URL || "http://localhost:5300/";
@@ -55,6 +56,19 @@ async function typeAndLeave(text, value) {
 try {
   await page.goto(url);
   await expect(page.locator("#intake-form")).toBeVisible({ timeout: 15000 });
+
+  // The framework's files are linked by URLs versioned with the hash of the bytes the server sends
+  // (asp-append-version), so a package upgrade changes the URL a browser cached.
+  for (const [selector, attribute] of [
+    ['script[src*="/_content/AlisReactive/js/alis-reactive.js"]', "src"],
+    ['link[href*="/_content/AlisReactive.DesignSystem/css/design-system.css"]', "href"],
+  ]) {
+    const linked = await page.locator(selector).getAttribute(attribute);
+    if (!linked) throw new Error(`${selector} is not on the page.`);
+    const served = await (await page.request.get(new URL(linked, url).toString())).body();
+    const version = createHash("sha256").update(served).digest("base64url");
+    if (!linked.endsWith(`?v=${version}`)) throw new Error(`${linked} is not versioned by its content (expected ?v=${version}).`);
+  }
 
   // The look the packages promise, before any gesture: the theme's accent behind a white label.
   const submit = page.locator("#submit-intake");

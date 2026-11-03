@@ -407,6 +407,7 @@ Alis.Reactive.TypedDslExemptionAttribute.TypedDslExemptionAttribute(string! reas
 Alis.Reactive.TypedSource<TProp>
 Alis.Reactive.UrlQuery<TQuery>
 Alis.Reactive.UrlQuery<TQuery>.Get<TValue>(System.Linq.Expressions.Expression<System.Func<TQuery!, TValue>!>! member) -> Alis.Reactive.TypedSource<TValue>!
+Alis.Reactive.UrlVersionExtensions
 Alis.Reactive.ValidationFailure
 Alis.Reactive.ValidationFailure.ErrorMessage.get -> string!
 Alis.Reactive.ValidationFailure.PropertyName.get -> string!
@@ -581,6 +582,7 @@ static Alis.Reactive.TextTest.Contains.get -> Alis.Reactive.TextTest!
 static Alis.Reactive.TextTest.EndsWith.get -> Alis.Reactive.TextTest!
 static Alis.Reactive.TextTest.Matches.get -> Alis.Reactive.TextTest!
 static Alis.Reactive.TextTest.StartsWith.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.UrlVersionExtensions.AppendVersion(this System.Web.Mvc.UrlHelper! url, string! contentPath) -> string!
 static Alis.Reactive.ValueTest.Falsy.get -> Alis.Reactive.ValueTest!
 static Alis.Reactive.ValueTest.IsEmpty.get -> Alis.Reactive.ValueTest!
 static Alis.Reactive.ValueTest.IsNull.get -> Alis.Reactive.ValueTest!

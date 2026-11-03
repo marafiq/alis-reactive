@@ -1,5 +1,6 @@
 // Proves the classic MVC5 .NET Framework 4.8 app boots the AlisReactive runtime in a real browser
 // and executes a reactive interaction. Fails (non-zero exit) if the reactive behavior does not occur.
+import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
 
 const url = process.env.SMOKE_URL || 'http://localhost:5000/';
@@ -12,6 +13,21 @@ page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text(
 page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
 
 await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+
+// 0. Every framework file is linked by a URL versioned with the hash of the bytes the server sends
+// (Url.AppendVersion), so a package upgrade changes the URL a browser cached.
+for (const [selector, attribute] of [
+  ['script[src*="/Content/AlisReactive/js/alis-reactive.js"]', 'src'],
+  ['link[href*="/Content/AlisReactive/css/alis-reactive.css"]', 'href'],
+  ['link[href*="/Content/AlisReactive.DesignSystem/css/design-system.css"]', 'href'],
+  ['link[href*="/Content/AlisReactive.Native/css/native.css"]', 'href'],
+]) {
+  const linked = await page.locator(selector).getAttribute(attribute);
+  if (!linked) throw new Error(`${selector} is not on the page.`);
+  const served = await (await page.request.get(new URL(linked, url).toString())).body();
+  const version = createHash('sha256').update(served).digest('base64url');
+  if (!linked.endsWith(`?v=${version}`)) throw new Error(`${linked} is not versioned by its content (expected ?v=${version}).`);
+}
 
 // 1. The page rendered the plan and the runtime asset loaded.
 const planScript = page.locator('script[type="application/json"][data-reactive-plan]');
