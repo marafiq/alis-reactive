@@ -1,6 +1,5 @@
 # Classic MSBuild + NuGet build outputs for this fixture — never commit them.
 bin/
 obj/
-packages/
 *.user
 *.suo

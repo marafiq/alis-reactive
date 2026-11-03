@@ -47,7 +47,7 @@ jobs:
 
       - uses: ./.github/actions/setup-toolchain
 
-      - name: Deterministic gate (typecheck, assets, vitest, dotnet build, dotnet tests)
+      - name: Deterministic gate (typecheck, lint, assets, vitest, dotnet build, dotnet tests)
         run: CONFIGURATION=${{ inputs.configuration }} scripts/test.sh --no-e2e
 
   playwright:

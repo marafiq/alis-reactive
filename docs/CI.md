@@ -326,7 +326,6 @@ the check names.
 
 ## Open decisions (owner)
 
-- `npm run lint` as a blocking step in `gate / test` (lint was clean on 2026-06-09).
 - `verify-net48.yml`'s pack job still packs `1.0.0-rc.1` for its artifact; rename it to a fixture
   version in a separate PR so CI logs stop reading like a release. The IIS job packs
   `0.0.0-ci.{run}.{attempt}`: the NuGet cache brought back an earlier run's rc.1 package, and NuGet

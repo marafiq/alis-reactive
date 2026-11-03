@@ -1,6 +1,6 @@
 # Verifies the multi-target libraries compile and pack on REAL .NET Framework 4.8
 # (Windows), not just against the cross-platform reference assemblies used on macOS/Linux.
-# This is the RC1 net48 gate the macOS dev box cannot provide.
+# It is the net48 proof the macOS dev box cannot provide.
 name: verify-net48
 
 on:

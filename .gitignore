@@ -1,8 +1,6 @@
 bin/
 obj/
 nupkgs/
-test-results/
-/packages/
 riderModule.iml
 /_ReSharper.Caches/
 .idea/
@@ -16,7 +14,6 @@ node_modules/
 # SonarQube scanner output
 .sonarqube/
 .DS_Store
-tests/Alis.Reactive.PlaywrightTests/TestResults/
 TestResults/
 
 # Browser assets `npm run build:all` builds: the framework bundles in Alis.Reactive.Assets/dist/

@@ -158,12 +158,12 @@ export class MedicationList {
   }
 
   private line(facts: LineFacts): Line {
-    const list = this;
+    const render = (): void => this.render();
     return {
       ...facts,
       reconcile(): void {
         this.reconciled = true;
-        list.render();
+        render();
       },
       isDue(): boolean {
         return this.scheduledAt.getHours() <= DUE_HOUR;

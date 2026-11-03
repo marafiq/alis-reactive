@@ -29,7 +29,7 @@ pwsh tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 in
 | Check CLI environment | `scripts/doctor.sh` | Read-only. Reports missing tools, missing bundles, missing test DLL, and dirty git state. |
 | Build everything | `scripts/build.sh` | Installs npm deps if needed, builds all JS/CSS bundles, then runs `dotnet build`. |
 | Run sandbox | `scripts/run.sh` | Builds assets first, then starts `http://localhost:5220`. Stop with `Ctrl+C`. |
-| Full verification gate | `scripts/test.sh` | Typecheck -> assets -> vitest -> consistency checks -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright. |
+| Full verification gate | `scripts/test.sh` | Typecheck -> lint -> assets -> vitest -> consistency checks -> `dotnet build` -> non-Playwright dotnet tests -> observable Playwright. |
 | Full gate, parallel browser leg | `scripts/test.sh --parallel` | Same gate; Playwright runs as the CI shards side by side, each with its own app. About 12 minutes on a 12-core Mac. |
 | Upgrade Syncfusion | `node scripts/pin-syncfusion.mjs <version>` then `npm ci` | Moves the NuGet pins and the `@syncfusion/ej2` pin of the sandbox and `examples/resident-intake` together, re-resolving each app's lock; `--check` verifies (runs in every gate). |
 | Non-browser gate | `scripts/test.sh --no-e2e` | Same as full gate without Playwright. |
@@ -101,7 +101,7 @@ then run the full `scripts/test.sh` before push or release work.
 Use `scripts/test.sh` before push. It runs the gates in this order:
 
 ```text
-npm run typecheck -> npm run build:packages -> npm test -> consistency checks -> dotnet build (which builds the apps' own assets) -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
+npm run typecheck -> npm run lint -> npm run build:packages -> npm test -> consistency checks -> dotnet build (which builds the apps' own assets) -> non-Playwright dotnet tests -> scripts/playwright.sh --no-build
 ```
 
 `scripts/test.sh --parallel` runs the same gate with the Playwright leg split into every project's CI

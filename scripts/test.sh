@@ -11,18 +11,18 @@ Usage:
 
 Runs the ordered verification gate:
   1. npm run typecheck, then the committed plan contract (plan.ts, plan.schema.json) must match what it regenerated
-  2. npm run build:packages
-  3. npm test
-  4. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
-  5. dotnet build
-  6. non-Playwright dotnet test projects, if any
-  7. scripts/playwright.sh --no-build, every Playwright project (or every CI shard at once with --parallel)
+  2. npm run lint
+  3. npm run build:packages
+  4. npm test
+  5. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
+  6. dotnet build
+  7. non-Playwright dotnet test projects, if any
+  8. scripts/playwright.sh --no-build, every Playwright project (or every CI shard at once with --parallel)
 
 Options:
   --parallel  Run the Playwright leg as every project's CI shards (scripts/playwright.sh
-              --list-shards), side by side, each with its own app. About 20
-              minutes instead of about 60.
-  --no-e2e    Skip the Playwright browser leg after typecheck, assets, vitest,
+              --list-shards), side by side, each with its own app.
+  --no-e2e    Skip the Playwright browser leg after typecheck, lint, assets, vitest,
               consistency checks, dotnet build, and non-Playwright dotnet tests have passed.
   -h, --help  Show this help.
 
@@ -195,6 +195,9 @@ if ! git ls-files --error-unmatch -- "${contract_files[@]}" >/dev/null 2>&1 || !
   git --no-pager status --short -- "${contract_files[@]}" >&2
   exit 1
 fi
+
+gate "linting TypeScript"
+npm run lint
 
 gate "building the packages' browser assets"
 npm run build:packages
