@@ -1,0 +1,7 @@
+/* The example's stylesheet: Tailwind's utilities for its views, resolved against the design system's
+   theme. AlisReactive.DesignSystem copies the theme to ./alis-reactive.theme.css before every build;
+   the copy is build output, not source. */
+@import "tailwindcss" source(none);
+@import "./alis-reactive.theme.css";
+
+@source "../Views/**/*.cshtml";

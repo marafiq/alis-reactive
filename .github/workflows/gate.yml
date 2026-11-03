@@ -6,7 +6,9 @@ name: gate
 # (.github/actions/setup-toolchain), the shard partition (each Playwright project's
 # playwright.project.sh, run through scripts/playwright.sh --shard) and the timeouts. Locally the same
 # gate is `scripts/test.sh` (`--parallel` runs the same shards). In CI it is split into one
-# deterministic job and one job per browser shard (about 20 minutes instead of about 80).
+# deterministic job and one job per browser shard (about 20 minutes instead of about 80), plus the
+# `example` job: the packages packed and consumed by examples/resident-intake, driven in a browser
+# (`scripts/example.sh --smoke`).
 # Design rationale, the evidence behind the numbers, and the change checklist: docs/CI.md.
 on:
   workflow_call:
@@ -119,4 +121,37 @@ jobs:
             tests/*/TestResults/observable/flaky-*.txt
             tests/*/bin/TestResults/playwright-traces/*
           retention-days: 14
+          if-no-files-found: warn
+
+  example:
+    name: example
+    if: ${{ inputs.playwright }}
+    runs-on: ubuntu-latest
+    # Observed locally with warm caches: 25 s from pack to PASS; the runner adds the browser install
+    # and a cold pack and restore (docs/CI.md, "Facts").
+    timeout-minutes: 20
+    env:
+      # Without a registered license, EJ2 overlays a trial dialog that intercepts every interaction.
+      Syncfusion__LicenseKey: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
+      # A version no earlier run packed: the NuGet cache restores ~/.nuget/packages, and NuGet never
+      # re-extracts a version it already holds.
+      EXAMPLE_VERSION: 0.0.0-ci.${{ github.run_id }}.${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/setup-toolchain
+
+      - name: Install the smoke's browser and its OS dependencies
+        run: cd examples/resident-intake/ci && npm ci && npx playwright install --with-deps chromium
+
+      - name: Pack this run's packages, build the example against them, run it and drive it
+        run: scripts/example.sh --smoke "$EXAMPLE_VERSION"
+
+      - name: Upload the smoke's screenshot
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: example-smoke
+          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
+          path: examples/resident-intake/ci/smoke.png
           if-no-files-found: warn

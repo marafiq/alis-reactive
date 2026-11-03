@@ -38,3 +38,10 @@ Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 examples/net48-mvc-smoke/Content/AlisReactive*/
 # The framework test app's components bundle, built by npm run build:all.
 tests/Alis.Reactive.Framework.App/wwwroot/js/
+# The example builds as an app outside this repository would (scripts/example.sh): the theme the
+# design system copies into it, its stylesheet, its Syncfusion copy and the smoke's output.
+examples/resident-intake/Styles/alis-reactive.theme.css
+examples/resident-intake/wwwroot/css/app.css
+examples/resident-intake/wwwroot/vendor/
+examples/resident-intake/ci/app.log
+examples/resident-intake/ci/smoke.png

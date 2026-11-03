@@ -32,6 +32,10 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
   was red (the unlicensed EJ2 trial modal, fixed in `2d5f9562`); since then ten consecutive legs
   were green (2026-06-10 to 2026-07-11) plus the `v1.0.0-rc.2` publish leg. Green is the norm, but
   a single 80-minute job that reruns from scratch on any hiccup is the wrong shape for it.
+- **The example's proof is short.** `scripts/example.sh --smoke` (pack five packages, `npm ci`,
+  `dotnet build -c Release`, start, drive, stop) ran in 25 s on 2026-11-03 with warm npm, NuGet and
+  Playwright caches; the `example` job pays the browser install and a cold pack on top, so its
+  timeout is 20 minutes.
 - **Toolchain.** .NET SDK `10.0.101` or a newer 10.0 feature band (`global.json` sets
   `rollForward: latestFeature`, so a runner that already has a newer 10.0 SDK uses it: CI builds
   with 10.0.4xx while this repo's machines build with 10.0.101); Node 22 in CI;
@@ -42,7 +46,7 @@ Why the workflows look the way they do, in one place, so nobody has to reinvent 
 
 | Workflow | Trigger | Jobs | Gates | Publishes |
 |----------|---------|------|-------|-----------|
-| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x5 | the one gate definition | never |
+| `gate.yml` (reusable, `workflow_call`) | called by the three below | `test`; `playwright (<shard>)` x9; `example` | the one gate definition | never |
 | `ci.yml` | every pull request; pushes to `main` / `release/*` (path-filtered); manual | `gate` -> `gate / test`, `gate / playwright (...)` | PR merge (required: `gate / test`) | never |
 | `nightly.yml` | 03:30 UTC Mon-Fri on `main`; manual | `gate`; `report-failure` | the watched browser signal: opens/updates issue `ci-nightly-failure` on red | never |
 | `nuget-publish.yml` | push of a `v*` tag; manual runs gate only | `verify-tag` -> `gate` -> `pack-and-publish` | the release: tag shape, both suites, five packages | nuget.org + GitHub Release |
@@ -61,9 +65,15 @@ uses the same action, so a toolchain bump is one edit. Every job still runs the 
 (`scripts/test.sh --no-e2e`, `scripts/build.sh`, `scripts/playwright.sh`), so local and CI stay
 one entry point.
 
-Check names on a pull request are `gate / test` and `gate / playwright (<shard>)` (GitHub names a
-reusable workflow's jobs `<caller job> / <called job>`); confirm with `gh pr checks <n>` before
-wiring required checks.
+Check names on a pull request are `gate / test`, `gate / playwright (<shard>)` and `gate / example`
+(GitHub names a reusable workflow's jobs `<caller job> / <called job>`); confirm with `gh pr checks <n>`
+before wiring required checks.
+
+`gate / example` is the consumer's proof: it packs this run's packages under a run-unique version
+(`0.0.0-ci.<run_id>.<attempt>`; NuGet never re-extracts a version its cache already holds), builds
+`examples/resident-intake` against them as an app outside the repository would (`PackageReference`,
+its own npm install, Tailwind over the shipped theme), starts it and drives it with
+`examples/resident-intake/ci/smoke.mjs`, Playwright for node. Locally: `scripts/example.sh --smoke`.
 
 ## Playwright on GitHub-hosted runners: designed for choppiness
 
@@ -153,7 +163,7 @@ The retry lives in the wrapper so it is the same locally and in CI.
 Every job declares `timeout-minutes` (GitHub's default is 360 minutes,
 [workflow syntax](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#jobsjob_idtimeout-minutes)):
 `verify-tag` 10, `test` 30, each `playwright` shard 60 (3x the expected time, room for one re-run
-pass on a slow runner), `pack-and-publish` 45, net48 jobs 30 and 40, docs 20 and 10, the nightly
+pass on a slow runner), `example` 20, `pack-and-publish` 45, net48 jobs 30 and 40, docs 20 and 10, the nightly
 reporter 10. A hung shard now costs an hour, not six. Inside the run, `scripts/playwright.sh` keeps
 `--blame-hang --blame-hang-timeout 10m` per test.
 

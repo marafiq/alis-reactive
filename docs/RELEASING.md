@@ -145,7 +145,9 @@ the pre-release flag and becomes "Latest"; nuget.org lists `1.0.0` as the stable
 
 The release commit moves every line of each package's `PublicAPI/<tfm>/PublicAPI.Unshipped.txt` into
 the `PublicAPI.Shipped.txt` beside it: what shipped is the shipped file, and the next change to the
-surface starts the unshipped file again.
+surface starts the unshipped file again. It also sets the default `AlisReactiveVersion` of
+`examples/resident-intake` and `examples/net48-mvc-smoke` to the version being released, so a clone
+builds both against nuget.org when no version is passed.
 
 ## Hotfix through `release/X.Y`
 

@@ -113,7 +113,8 @@ the way a Razor class library does: as static web assets.
 
 | Consumer | How it gets the files |
 |----------|-----------------------|
-| **Sandbox** and `examples/resident-intake` | Project references. In Development the app serves each file at `~/_content/{PackageId}/...` from where npm wrote it, so a watcher's rebuild shows on the next request |
+| **Sandbox** | Project references. In Development the app serves each file at `~/_content/{PackageId}/...` from where npm wrote it, so a watcher's rebuild shows on the next request |
+| `examples/resident-intake` | Package references from `./nupkgs`, as an app outside this repository: `scripts/example.sh` packs, builds it against that version and runs it; `--smoke` drives it in a browser, as the gate's `example` job does |
 | **ASP.NET Core app (net10.0)** | Package references. The same `~/_content/{PackageId}/...` paths; publish copies the files under `wwwroot/_content/` |
 | **ASP.NET MVC 5 app (net48)** | Package references. Each package's `build\net48\{PackageId}.targets` copies its files into the web project at `Content\{PackageId}\` after every build |
 
@@ -215,7 +216,7 @@ Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
 Alis.Reactive.DesignSystem/       The theme and the compiled default stylesheet, no C#; its own npm workspace
 Alis.Reactive.Assets/             The runtime and the framework's own components — npm workspace (TypeScript)
 Alis.Reactive.SandboxApp/         Dev harness + live component demos
-examples/resident-intake/         Source-referenced consumer example
+examples/resident-intake/         Consumer of the packed packages, built and driven by scripts/example.sh
 tests/                            Test projects (NUnit + vitest + Playwright)
 ```
 

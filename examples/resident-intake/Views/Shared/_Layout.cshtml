@@ -4,28 +4,26 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] — Resident Intake</title>
+    <link rel="stylesheet" href="~/_content/AlisReactive/css/alis-reactive.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.Native/css/native.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/vendor/syncfusion/tailwind3.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.Fusion/css/fusion.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css" asp-append-version="true"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true"/>
 </head>
 <body class="alis-root h-full">
 <div class="min-h-full flex flex-col">
-    <div class="h-1 bg-gradient-to-r from-[#7A2E3B] via-[#9B4A57] to-[#D4A053]"></div>
+    <div class="h-1 bg-linear-to-r from-primary via-primary-light to-accent"></div>
 
     <header class="border-b border-border bg-white">
         <native-container>
             <div class="flex items-center h-16 gap-4">
-                <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7A2E3B] to-[#9B4A57]
+                <span class="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-primary-light
                              flex items-center justify-center">
                     <span class="text-white font-bold text-sm">A</span>
                 </span>
-                <span class="text-lg font-bold tracking-tight text-[#7A2E3B]">
+                <span class="text-lg font-bold tracking-tight text-primary">
                     Resident Intake
                 </span>
                 <span class="text-sm text-text-muted ml-auto">Powered by Alis.Reactive</span>
@@ -46,7 +44,7 @@
     </footer>
 </div>
 
-<script src="https://cdn.syncfusion.com/ej2/33.1.47/dist/ej2.min.js"></script>
+<script src="~/vendor/syncfusion/ej2.min.js" asp-append-version="true"></script>
 @Html.FusionToast()
 @Html.EJS().ScriptManager()
 @Html.FusionConfirmDialog()

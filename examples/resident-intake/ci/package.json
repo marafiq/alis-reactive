@@ -1,0 +1,9 @@
+{
+  "name": "resident-intake-smoke",
+  "private": true,
+  "type": "module",
+  "description": "Playwright driver that proves the resident-intake example, built against the packed packages, looks and behaves as they promise in a real browser (scripts/example.sh --smoke).",
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

@@ -9,8 +9,8 @@
 // minimum). No framework package ships Syncfusion's browser files: each app that renders Fusion
 // components depends on the npm umbrella `@syncfusion/ej2` at the same version and copies
 // dist/ej2.min.js and tailwind3.css into its wwwroot (its copy-vendor.mjs). The apps in this
-// repository are listed below with the lock that resolves each; nothing imports a control package,
-// so none is pinned.
+// repository (the sandbox, the resident-intake example) are listed below with the lock that resolves
+// each; nothing imports a control package, so none is pinned.
 
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -22,6 +22,7 @@ const NUGET_IDS = ["Syncfusion.EJ2.AspNet.Core", "Syncfusion.EJ2.MVC5"];
 const UMBRELLA = "@syncfusion/ej2";
 const APPS = [
   { manifest: "Alis.Reactive.SandboxApp/package.json", lock: "package-lock.json" },
+  { manifest: "examples/resident-intake/package.json", lock: "examples/resident-intake/package-lock.json" },
 ];
 
 function readJson(path) {

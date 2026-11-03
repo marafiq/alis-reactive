@@ -1,0 +1,16 @@
+{
+  "name": "resident-intake",
+  "private": true,
+  "type": "module",
+  "description": "The example's own browser assets: its stylesheet, Tailwind over the theme AlisReactive.DesignSystem copies into Styles/, and its copy of the Syncfusion files it links.",
+  "scripts": {
+    "build": "node copy-vendor.mjs && tailwindcss -i Styles/app.css -o wwwroot/css/app.css --minify"
+  },
+  "dependencies": {
+    "@syncfusion/ej2": "33.1.47"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}
