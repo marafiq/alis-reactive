@@ -1,34 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <!-- The Razor SDK makes this a Razor class library, so its stylesheets ship as static web assets.
-       There are no Razor files to compile. -->
+  <!-- Stylesheets only: the theme an app imports into its own Tailwind build, and the compiled default
+       for an app with none. The Razor SDK ships them as static web assets; there is no C# and no Razor,
+       so the package carries no assembly. Both target frameworks stay so the net48 copy targets ship. -->
 
   <PropertyGroup>
     <TargetFrameworks>net48;net10.0</TargetFrameworks>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <RootNamespace>Alis.Reactive.DesignSystem</RootNamespace>
-    <AssemblyName>Alis.Reactive.DesignSystem</AssemblyName>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>AlisReactive.DesignSystem</PackageId>
     <IsPackable>true</IsPackable>
-    <PackageDescription>Design system for Alis.Reactive — brand tokens, layout class helpers, and the stylesheets that give the framework's markup and components their look. An app references it to choose this look; the component packages do not depend on it.</PackageDescription>
-    <PackageTags>reactive;design-system;css;tokens</PackageTags>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <PackageDescription>The look an app chooses for Alis.Reactive: a Tailwind v4 theme to import into its own build, and the compiled default for an app with none. No component package depends on it.</PackageDescription>
+    <PackageTags>reactive;design-system;css;tailwind</PackageTags>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-    <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <!-- The package's slice rows, bottom row first; ALIS010-ALIS013 lock ADR-0004 against them in every build. -->
-    <AdditionalFiles Include="SliceTree.txt" />
-    <!-- The public surface per target: a public symbol is a line in PublicAPI.Unshipped.txt, or the build fails (RS0016, RS0017). -->
-    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
-    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
-    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
   <!-- Two stylesheets:

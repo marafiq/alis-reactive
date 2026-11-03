@@ -438,13 +438,13 @@ public class SliceTreeTests
 
     [Test]
     public Task a_shipped_package_without_a_table_is_reported() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, table: null, "ALIS013",
-            Disagree("'Alis.Reactive.DesignSystem' ships without a SliceTree.txt"),
-            ("Tokens/Color.cs",
+        Fixture.ReportsInPackage<SliceTreeAnalyzer>(Fusion, table: null, "ALIS013",
+            Disagree("'Alis.Reactive.Fusion' ships without a SliceTree.txt"),
+            ("Templates/Form.cs",
                 """
-                namespace Alis.Reactive.DesignSystem.Tokens;
+                namespace Alis.Reactive.Fusion.Templates;
 
-                internal static class Color
+                internal static class Form
                 {
                 }
                 """));

@@ -20,7 +20,6 @@ namespace Alis.Reactive.Analyzers
                 "Alis.Reactive",
                 "Alis.Reactive.Fusion",
                 "Alis.Reactive.Native",
-                "Alis.Reactive.DesignSystem",
                 "Alis.Reactive.NativeTagHelpers");
 
         /// <summary>

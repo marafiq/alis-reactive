@@ -45,8 +45,7 @@ jobs:
           for proj in \
             Alis.Reactive/Alis.Reactive.csproj \
             Alis.Reactive.Native/Alis.Reactive.Native.csproj \
-            Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj \
-            Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj ; do
+            Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj ; do
             echo "::group::net48 build $proj"
             dotnet build "$proj" -c Release -f net48
             echo "::endgroup::"

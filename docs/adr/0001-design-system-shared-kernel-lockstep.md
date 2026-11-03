@@ -1,6 +1,6 @@
 # ADR-0001: DesignSystem is a lockstep-versioned shared kernel
 
-**Status:** accepted; its dependency direction is superseded by ADR-0002 (lockstep versioning stands)
+**Status:** accepted; its dependency direction is superseded by ADR-0002, and the C# it describes (tokens, layout class helpers) was removed on 2026-11-03: the package is two stylesheets. Lockstep versioning stands.
 **Date:** 2026-06-08
 **Domain:** components | process
 

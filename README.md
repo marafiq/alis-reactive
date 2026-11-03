@@ -9,7 +9,7 @@ Plan-driven reactive framework for ASP.NET MVC. C# fluent builders produce React
 | `Alis.Reactive` | Core plan model, builders, serialization, and validation rules in FluentValidation's grammar (server and browser) |
 | `Alis.Reactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
 | `Alis.Reactive.Fusion` | Syncfusion EJ2 component integration |
-| `Alis.Reactive.DesignSystem` | The look an app chooses: tokens, stylesheets, and C# layout class helpers. No component package depends on it |
+| `Alis.Reactive.DesignSystem` | The look an app chooses: a Tailwind theme to import into its own build, and the compiled default for an app with none. No component package depends on it |
 | `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
 `Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, and `Alis.Reactive.DesignSystem`
@@ -212,7 +212,7 @@ Alis.Reactive.Native/             C# native-component library
 Alis.Reactive.Fusion/             C# Syncfusion-component library
 Alis.Reactive.NativeTagHelpers/   C# tag helpers (net10 only)
 Alis.Reactive.Analyzers/          Roslyn analyzers (shipped inside AlisReactive)
-Alis.Reactive.DesignSystem/       C# design-system tokens + layout class helpers; ships the design-system CSS
+Alis.Reactive.DesignSystem/       The theme and the compiled default stylesheet, no C#; its own npm workspace
 Alis.Reactive.Assets/             The runtime and the framework's own components — npm workspace (TypeScript)
 Alis.Reactive.SandboxApp/         Dev harness + live component demos
 examples/resident-intake/         Source-referenced consumer example
