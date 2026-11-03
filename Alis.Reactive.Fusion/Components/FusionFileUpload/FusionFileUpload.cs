@@ -18,7 +18,6 @@ namespace Alis.Reactive.Fusion
         /// <summary>The selected files, as the browser's <c>File</c> objects a form-data request sends.</summary>
         public ReadOnly<IReadOnlyList<BrowserFile>> Files => FilesData.Each(file => file.RawFile!);
 
-        // The uploader lists its files as items that each carry the browser's file.
         private ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
 
         /// <summary>Raised when the user selects files, before the uploader adds them; set <c>Cancel</c> to refuse them.</summary>

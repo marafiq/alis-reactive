@@ -39,7 +39,6 @@ namespace Alis.Reactive.Components
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Method name required.", nameof(name));
 
-            // An empty path calls the object itself: a plugin that is a function.
             Name = name;
             Path = path;
             ArgumentShapes = argumentShapes ?? throw new ArgumentNullException(nameof(argumentShapes));

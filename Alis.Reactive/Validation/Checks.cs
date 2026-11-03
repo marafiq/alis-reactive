@@ -163,7 +163,6 @@ namespace Alis.Reactive.Validation
     /// <summary>Whether JavaScript reads a .NET pattern the same way, and its flags there.</summary>
     internal static class JavaScriptPattern
     {
-        // Options with no JavaScript flag.
         private const RegexOptions NoJavaScriptForm = RegexOptions.IgnorePatternWhitespace | RegexOptions.RightToLeft;
 
         // Syntax .NET reads one way and JavaScript another, or not at all: \A \Z \z \G anchors, inline
@@ -312,7 +311,6 @@ namespace Alis.Reactive.Validation
 
             internal override object? RenderName => _value;
 
-            // A null literal has no browser form: compare with null by NotNull or Empty.
             internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message) =>
                 _value == null ? Array.Empty<BrowserRule>() : new[] { BrowserRule.Compare(comparison, _value, message) };
         }
@@ -332,7 +330,6 @@ namespace Alis.Reactive.Validation
 
             internal override object? RenderName => DisplayName;
 
-            // A member the page can bind is a path from the model; a computed value is the server's.
             internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message) =>
                 _member.Path == null
                     ? Array.Empty<BrowserRule>()

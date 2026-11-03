@@ -35,8 +35,6 @@ namespace Alis.Reactive
         /// <summary>Whether the rule always applies, rather than only when a condition holds.</summary>
         public bool IsUnconditional => Condition.IsAlways;
 
-        // ── the rules ────────────────────────────────────────────────────────────
-
         /// <summary>A value is entered: not blank, and not the type's default. A list has at least one item.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule NotEmpty(string message) => new NotEmptyRule(message, Condition.Always);
@@ -124,8 +122,6 @@ namespace Alis.Reactive
         /// <param name="condition">The condition.</param>
         public BrowserRule When(Condition condition) => Under(condition ?? throw new ArgumentNullException(nameof(condition)));
 
-        // ── what the form writes ─────────────────────────────────────────────────
-
         internal Condition Condition { get; private set; }
 
         /// <summary>The other members the rule reads, besides the one it is on.</summary>
@@ -156,8 +152,6 @@ namespace Alis.Reactive
             rule.Condition = condition;
             return rule;
         }
-
-        // ── how a check reads a value ────────────────────────────────────────────
 
         // One @, with something on each side: what EmailAddress() accepts.
         private const string EmailPattern = "^[^@]+@[^@]+$";
@@ -209,7 +203,6 @@ namespace Alis.Reactive
             return orderedShape is NumberShape or BooleanShape or DateShape or InstantShape;
         }
 
-        // A value as the number a comparison under an ordered shape (IsOrdered) orders it by.
         private protected static Expr Comparable(Expr value, Shape shape)
         {
             if (shape.TryGetNullableInnerShape(out var inner)) return Nullable(value, inner, Comparable);

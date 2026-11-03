@@ -64,10 +64,8 @@ namespace Alis.Reactive.Validation
     /// <summary>The values a message template names, by placeholder.</summary>
     internal sealed class MessageArguments
     {
-        // {Name} or {Name:format}.
         private static readonly Regex Placeholder = new Regex(@"\{([^{}:]+)(?::([^{}]+))?\}", RegexOptions.CultureInvariant);
 
-        // A sentence naming what only the checked value knows ({PropertyValue}, {TotalLength}, {Digits}, {ActualScale}).
         private static readonly Regex ValueSentence =
             new Regex(@"\s*[^.]*\{(PropertyValue|TotalLength|Digits|ActualScale)(:[^{}]+)?\}[^.]*\.", RegexOptions.CultureInvariant);
 

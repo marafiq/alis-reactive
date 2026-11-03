@@ -59,7 +59,6 @@ namespace Alis.Reactive.PlanModel.Requests
             sentence.AddRange(WhileLoading.Write(scope));
             var cleanup = Finally.Write(scope);
 
-            // A gathered value that returns a promise settles just before the request is sent.
             var exchange = scope.WithHoisted(() => new[]
             {
                 G.Let(response, G.Call(G.Obj(scope.Objects.Http()), "send", SendArgument(method, input, scope)), awaits: true),
@@ -84,8 +83,6 @@ namespace Alis.Reactive.PlanModel.Requests
         }
 
         internal static Expr Ok(string response) => G.Get(G.Ref(response), new[] { "ok" }, Shape.Any);
-
-        // ── the request alis.http sends ──────────────────────────────────────────
 
         private Expr SendArgument(string method, GatheredInput input, Scope scope)
         {
@@ -121,11 +118,9 @@ namespace Alis.Reactive.PlanModel.Requests
         private static Expr Named(IReadOnlyList<(string Name, ValueExpression Value)> members, Scope scope) =>
             G.Record(members.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
 
-        // A query string or form data is flat, keyed by MVC binding name.
         private static List<RecordField> FlatValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope) =>
             payload.Select(member => new RecordField(member.Name.Value, member.Value.Write(scope))).ToList();
 
-        // A JSON body nests each value at its body path; an index segment (Lines[0]) makes an array.
         private static ValueExpression Nested(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload)
         {
             var draft = new RecordDraft();
@@ -192,7 +187,6 @@ namespace Alis.Reactive.PlanModel.Requests
             return new[] { G.If(RequestStep.Ok(response), success, error) };
         }
 
-        // An exact status runs its route; any other status runs the catch-all route.
         private static IReadOnlyList<Statement> Route(
             IReadOnlyList<(int Status, Block Route)> statuses, Block? catchAll, string response, Scope routeScope)
         {
@@ -205,8 +199,6 @@ namespace Alis.Reactive.PlanModel.Requests
         }
     }
 
-    // The form a request validates before it is sent, the validator the request names, and the browser rules
-    // read from it.
     internal sealed class FormValidation
     {
         internal FormValidation(

@@ -46,7 +46,6 @@ namespace Alis.Reactive.Native
         private string _cssClass = "alis-check-list";
         private string _optionCssClass = "alis-check-list__option";
 
-        // Internal because the factory also registers this input component in the Reactive Plan.
 #if NET48
         internal NativeCheckListBuilder(
             HtmlHelper<TModel> html,

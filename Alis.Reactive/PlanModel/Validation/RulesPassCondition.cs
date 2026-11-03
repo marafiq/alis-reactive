@@ -52,7 +52,6 @@ namespace Alis.Reactive.PlanModel.Validation
             return G.And(_rules.Select(rule => Passes(rule, value, scope)).ToList());
         }
 
-        // The rule passes, or does not apply: !when || check(value).
         private Expr Passes(BrowserRule rule, Expr value, Scope scope)
         {
             var check = rule.Check(value, _field.Shape, _values!, scope);

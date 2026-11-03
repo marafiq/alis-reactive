@@ -23,7 +23,6 @@ namespace Alis.Reactive.PlanAuthoring.Requests
                 $"the endpoint binds, is {CSharpTypeName.Of(member)}. Give the request member the input's type.");
         }
 
-        // The member's type, or null when the path reaches an open member (object, a dictionary) that takes any name.
         private static Type? MemberType(Type request, BindingPath binding)
         {
             var current = request;
@@ -49,8 +48,6 @@ namespace Alis.Reactive.PlanAuthoring.Requests
             return current;
         }
 
-        // The same type, a nullable form of it, a base type, or a collection of the same items. A value that
-        // may be missing (int?) does not bind to a member that may not (int).
         private static bool Binds(Type input, Type member)
         {
             var missingIntoRequired = Nullable.GetUnderlyingType(input) != null && Nullable.GetUnderlyingType(member) == null;
@@ -67,7 +64,6 @@ namespace Alis.Reactive.PlanAuthoring.Requests
         private static bool IsCollection(Type type) =>
             type != typeof(string) && (type.IsArray || SequenceOf(type) != null);
 
-        // A member typed as object or a dictionary takes any name below it.
         private static bool IsOpen(Type type) =>
             type == typeof(object) || DictionaryValueType(type) != null;
 

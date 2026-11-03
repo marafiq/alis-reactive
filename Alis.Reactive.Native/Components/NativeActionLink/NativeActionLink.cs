@@ -109,7 +109,6 @@ namespace Alis.Reactive.Native
             var link = new NativeActionLinkBuilder<TModel>(html, plan, id, linkText, url);
             var sent = new LinkRequestCount();
 
-            // A modified or non-main click, or one the page already handled, stays the browser's.
             plan.Render<NativeActionLink>(id, link).Reactive(evt => evt.Click, (click, p) =>
                 p.When(click.Button).Eq(0)
                     .And(click.DefaultPrevented).Falsy()

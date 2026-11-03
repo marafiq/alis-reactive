@@ -41,11 +41,9 @@ namespace Alis.Reactive
 
         private readonly InputIdentity _identity;
 
-        // The plan learns which component holds the input's value and which event commits it.
         internal void AddRenderedInput(IInputComponent component) =>
             Plan.AddRenderedInput(component.RenderedAs(_identity));
 
-        // Internal because Html.InputField decides the input's identity, which validation and gather read.
         internal InputBoundFieldBase(
             THelper helper,
             BoundInputField<TModel, TProp> field,

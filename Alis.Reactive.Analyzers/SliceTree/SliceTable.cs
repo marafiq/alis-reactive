@@ -58,7 +58,6 @@ namespace Alis.Reactive.Analyzers.SliceTree
 
         public static string Display(string folder) => folder.Length == 0 ? "." : folder;
 
-        // A row is a non-blank line; its entries are its whitespace-separated words, each with its span in the file.
         private static IEnumerable<Entry> Entries(SourceText text)
         {
             var row = 0;

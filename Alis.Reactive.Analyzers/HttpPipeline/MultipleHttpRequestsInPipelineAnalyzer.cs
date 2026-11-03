@@ -103,7 +103,6 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
                     && memberAccess.Expression is IdentifierNameSyntax identifier
                     && identifier.Identifier.Text == parameterName)
                 {
-                    // Get, Post, Put and Delete extend the pipeline from RequestExtensions.
                     var symbol = semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol;
                     return symbol is IMethodSymbol methodSymbol
                         && SymbolEqualityComparer.Default.Equals(

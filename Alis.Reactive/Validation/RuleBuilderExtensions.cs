@@ -16,8 +16,6 @@ namespace Alis.Reactive
         // FluentValidation's limit on one pattern match, so a pattern cannot hold the server.
         private static readonly TimeSpan PatternTimeout = TimeSpan.FromSeconds(2);
 
-        // ---- Presence ------------------------------------------------------------------------------
-
         /// <summary>Requires a value: anything but null. In the browser, a filled input.</summary>
         public static IRuleBuilderOptions<T, TProperty> NotNull<T, TProperty>(this IRuleBuilder<T, TProperty> rule) =>
             Add(rule, new NotNullCheck<T, TProperty>());
@@ -29,8 +27,6 @@ namespace Alis.Reactive
         /// <summary>Requires null, blank text, an empty list or the type's default.</summary>
         public static IRuleBuilderOptions<T, TProperty> Empty<T, TProperty>(this IRuleBuilder<T, TProperty> rule) =>
             Add(rule, new EmptyCheck<T, TProperty>());
-
-        // ---- Text ----------------------------------------------------------------------------------
 
         /// <summary>Text of at least <paramref name="minimum"/> characters. Null text passes.</summary>
         public static IRuleBuilderOptions<T, string?> MinimumLength<T>(this IRuleBuilder<T, string?> rule, int minimum) =>
@@ -80,8 +76,6 @@ namespace Alis.Reactive
         /// <summary>Digits, with dashes and spaces between them, whose Luhn checksum holds. Null text passes.</summary>
         public static IRuleBuilderOptions<T, string?> CreditCard<T>(this IRuleBuilder<T, string?> rule) =>
             Add(rule, new CreditCardCheck<T>());
-
-        // ---- Equality ------------------------------------------------------------------------------
 
         /// <summary>The value equals <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> Equal<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value) =>
@@ -241,8 +235,6 @@ namespace Alis.Reactive
             where TProperty : struct, IComparable<TProperty>, IComparable =>
             Add(rule, new BetweenCheck<T, TProperty?>(from, to, inclusive: false));
 
-        // ---- Decimals ------------------------------------------------------------------------------
-
         /// <summary>
         /// At most <paramref name="precision"/> digits, <paramref name="scale"/> of them decimals, counted as
         /// FluentValidation counts them; the trailing zeros of the decimals count unless
@@ -257,8 +249,6 @@ namespace Alis.Reactive
         public static IRuleBuilderOptions<T, decimal?> PrecisionScale<T>(this IRuleBuilder<T, decimal?> rule, int precision, int scale, bool ignoreTrailingZeros) =>
             Add(rule, new PrecisionScaleCheck<T, decimal?>(precision, scale, ignoreTrailingZeros));
 
-        // ---- Enums ---------------------------------------------------------------------------------
-
         /// <summary>
         /// A value the enum declares, as the server binds one: a name in any case, or the number of one. A
         /// <c>[Flags]</c> enum takes any combination of its values; that the server alone checks.
@@ -271,8 +261,6 @@ namespace Alis.Reactive
         public static IRuleBuilderOptions<T, TEnum?> IsInEnum<T, TEnum>(this IRuleBuilder<T, TEnum?> rule)
             where TEnum : struct, Enum =>
             Add(rule, new InEnumCheck<T, TEnum?>(typeof(TEnum)));
-
-        // ---- The server's alone ----------------------------------------------------------------------
 
         /// <summary>A C# test of the value. Only the server runs C#, so only the server checks it.</summary>
         public static IRuleBuilderOptions<T, TProperty> Must<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Func<TProperty, bool> predicate)
@@ -313,8 +301,6 @@ namespace Alis.Reactive
             return RuleTarget.Of(rule).Add(new CustomPart<T, TProperty>(check, waits: true));
         }
 
-        // ---- Nested objects --------------------------------------------------------------------------
-
         /// <summary>Rules for the members of a nested object, written in place; the browser runs those it can.</summary>
         /// <example><c>RuleFor(x =&gt; x.Pharmacy).ChildRules(pharmacy =&gt; pharmacy.RuleFor(x =&gt; x.Phone).NotEmpty());</c></example>
         public static IRuleBuilderOptions<T, TProperty> ChildRules<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Action<InlineValidator<TProperty>> rules)
@@ -340,7 +326,6 @@ namespace Alis.Reactive
             return Add(rule, new CompareCheck<T, TValue>(comparison, Operand<T, TValue>.Member(ModelMember<T>.Of(member))));
         }
 
-        // An order needs something to compare with.
         private static TValue Required<TValue>(TValue value) =>
             value ?? throw new ArgumentNullException(nameof(value), "Compare with a value, not null; NotNull or Empty test for null.");
 

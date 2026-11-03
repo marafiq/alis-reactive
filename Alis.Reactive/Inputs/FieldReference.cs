@@ -23,8 +23,6 @@ namespace Alis.Reactive.Inputs
 
         internal Shape Shape { get; }
 
-        // x => x.Address.City is "Address.City", typed string. Anything but a chain of members from the model's
-        // parameter names no member.
         internal static FieldReference Of(LambdaExpression member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));

@@ -7,7 +7,6 @@ namespace Alis.Reactive.PlanAuthoring.Conditions
 {
     internal static class ConditionComposition
     {
-        // a && b && c is one all-of node; a nested any-of stays a node of its own.
         internal static Condition All(Condition existing, Condition incoming)
         {
             var terms = new List<Condition>();
@@ -44,8 +43,6 @@ namespace Alis.Reactive.PlanAuthoring.Conditions
         }
     }
 
-    // Where Then puts its branch: in the callback the condition was started in, where Then is written, or
-    // as the next arm of the branch an ElseIf continues.
     internal abstract class ConditionContinuation<TModel> where TModel : class
     {
         internal static ConditionContinuation<TModel> InCallback(PlanBuildContext context) =>

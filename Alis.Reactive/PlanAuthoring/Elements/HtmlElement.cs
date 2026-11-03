@@ -62,7 +62,6 @@ namespace Alis.Reactive
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value) =>
             _context.AddStep(new SetStep(Target.Element(_id), property.Path.TargetText, property.Shape, value));
 
-        // The element's text or HTML: the page's record refuses it on a slot some plan of the page loads into.
         internal void SetContent(ComponentProperty<string> property, string content, ValueExpression value)
         {
             _context.SetsContentOf(_id, content);

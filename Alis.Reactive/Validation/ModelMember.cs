@@ -45,8 +45,6 @@ namespace Alis.Reactive.Validation
         /// <summary>The expression as written: <c>x =&gt; x.Address.City</c>.</summary>
         internal string Written { get; }
 
-        // A member read through a null (x => x.Pharmacy.Phone with no pharmacy) is a rule written without a
-        // guard; the error names the rule's expression.
         internal object? ValueIn(T instance)
         {
             try
@@ -77,7 +75,6 @@ namespace Alis.Reactive.Validation
             return instance => compiled(instance);
         }
 
-        // x.A.B is "A.B"; anything but a chain of members from the model parameter has no path.
         private static string? PathOf(Expression body, ParameterExpression model)
         {
             var names = new List<string>();

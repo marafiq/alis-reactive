@@ -27,8 +27,6 @@ namespace Alis.Reactive
         /// <summary>No condition: it always holds, and a rule under it always applies.</summary>
         public static Condition Always { get; } = new TrueCondition();
 
-        // ── over the members of a validator's model ──────────────────────────────
-
         /// <summary>Tests the member's value alone.</summary>
         /// <param name="member">The member, as a path from the model: <c>x =&gt; x.IsVeteran</c>.</param>
         /// <param name="test">The test.</param>
@@ -99,8 +97,6 @@ namespace Alis.Reactive
         /// <summary>The term does not hold.</summary>
         /// <param name="term">The term.</param>
         public static Condition Not(Condition term) => new NotCondition(term ?? throw new ArgumentNullException(nameof(term)));
-
-        // ── over the values a plan reads ─────────────────────────────────────────
 
         internal static Condition Unary(ValueTest test, ValueExpression left, Shape shape) =>
             new UnaryCondition(test, left, shape);
@@ -215,7 +211,6 @@ namespace Alis.Reactive
 
         private protected Expr Left(Scope scope) => G.As(Raw(scope), Shape);
 
-        // A comparison that reads a promise: its awaited reads settle, then the `if` runs.
         internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
             IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
     }
@@ -229,7 +224,6 @@ namespace Alis.Reactive
             _test = test ?? throw new ArgumentNullException(nameof(test));
         }
 
-        // Null and empty test the value unconverted; truthiness tests it in the condition's shape.
         internal override Expr Write(Scope scope)
         {
             var raw = Raw(scope);
@@ -398,8 +392,6 @@ namespace Alis.Reactive
         internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
             IsSynchronous ? base.Guard(then, otherwise, scope) : AllOf(0, then, otherwise, scope);
 
-        // Consecutive synchronous terms share one `if`; a term that waits guards the rest, which are a block
-        // of their own inside that `if`.
         private IReadOnlyList<Statement> AllOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
         {
             if (start >= Terms.Count) return then;

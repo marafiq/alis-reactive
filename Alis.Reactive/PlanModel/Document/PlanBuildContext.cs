@@ -36,12 +36,9 @@ namespace Alis.Reactive.PlanModel.Document
         // validated form's fields are bound when the plan renders (Check).
         private readonly Dictionary<string, IReadOnlyList<CheckedField>> _forms =
             new Dictionary<string, IReadOnlyList<CheckedField>>(StringComparer.Ordinal);
-        // The elements this plan loads into or unloads, and the elements whose text or HTML its steps set, with which
-        // of the two the first such step sets: the page's record refuses a step that writes over a slot.
         private readonly HashSet<string> _slots = new HashSet<string>(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _contentSetById = new Dictionary<string, string>(StringComparer.Ordinal);
 
-        // The callbacks being built, innermost last: a step lands in the innermost one.
         private readonly Stack<Block> _blocks = new Stack<Block>();
 
         internal PlanBuildContext(string planId, RenderedInputs inputs, string fieldPrefix, string view, ReactiveClassNames classNames)
@@ -61,8 +58,6 @@ namespace Alis.Reactive.PlanModel.Document
 
         /// <summary>Whether the plan has rendered: from then on it takes no input and no behavior, and renders no more.</summary>
         internal bool Rendered { get; private set; }
-
-        // ── rendering ────────────────────────────────────────────────────────────
 
         /// <summary>The plan renders, once.</summary>
         internal void Seal()
@@ -91,8 +86,6 @@ namespace Alis.Reactive.PlanModel.Document
                 "Razor runs a @section after the view's body: render the plan in a section the layout renders after the " +
                 $"others, such as @section Scripts {{ @Html.RenderPlan(plan) }}, or write {what} in the body.");
         }
-
-        // ── callbacks ────────────────────────────────────────────────────────────
 
         /// <summary>Builds a callback: every step written while it runs lands in the returned block.</summary>
         internal Block Build(Action callback)
@@ -130,8 +123,6 @@ namespace Alis.Reactive.PlanModel.Document
         /// <summary>Runs <paramref name="body"/> each time an object the plan names raises <paramref name="eventName"/>.</summary>
         internal void On(Func<PlanObjects, string> on, IReadOnlyList<string> path, string eventName, Block body) =>
             _handlers.Add((on, path, eventName, body));
-
-        // ── objects ──────────────────────────────────────────────────────────────
 
         /// <summary>An element the view rendered with this id, found by the browser itself unless a component claims it.</summary>
         internal void DeclareElement(string elementId)
@@ -189,8 +180,6 @@ namespace Alis.Reactive.PlanModel.Document
             _declaredById.Add(declared.Id, declared);
         }
 
-        // ── validation ───────────────────────────────────────────────────────────
-
         /// <summary>
         /// A request that checks its form first; the form's rules are bound when the plan is written. A request
         /// validated again keeps its place with the new validation. A form is validated by one validator, so a
@@ -245,8 +234,6 @@ namespace Alis.Reactive.PlanModel.Document
             _forms[formId] = fields;
         }
 
-        // ── writing ──────────────────────────────────────────────────────────────
-
         /// <summary>
         /// Writes the plan: every element by id and vendor, the inputs <c>alis.model</c> binds, each form's
         /// fields and their checks as <c>alis.form</c> data, then each handler.
@@ -282,8 +269,6 @@ namespace Alis.Reactive.PlanModel.Document
                 DeclareComponent(input.Value.ComponentId, input.Value.ComponentVendor);
         }
 
-        // Each input this plan rendered: its MVC name, its JSON body path, its value read in the model's
-        // type, the event its component commits a value with and the class it carries while refused.
         private IReadOnlyDictionary<string, InputBinding> ModelInputs(PlanObjects objects)
         {
             var inputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
@@ -301,8 +286,6 @@ namespace Alis.Reactive.PlanModel.Document
             return inputs;
         }
 
-        // The JSON body path an input binds under: a name makes an object, a position makes an array. An input is
-        // one member, so its path never reads each item of a list.
         private static IReadOnlyList<BodyStep> BodyOf(Path path) => path.Segments
             .Select(segment => segment.IsEachItem
                 ? throw new InvalidOperationException($"'{path}' reads each item of a list; a body names members and positions.")

@@ -9,11 +9,6 @@ using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.Members
 {
-    // The one walk of a member chain. A chain from a lambda's parameter is read once into steps, a
-    // member by name, a list item by position or a dictionary entry by key, and written in the three
-    // forms the framework uses: a JSON path (camel-cased names, read in the browser), a body path (the
-    // members' own names, sent to the server) and an MVC binding name (text, the boundary MVC reads).
-    // Its last member names the class that declares it, which scopes the id of the member's input.
     internal static class ExpressionPathHelper
     {
         /// <summary>The JSON path a member chain reads in the browser: a response, a payload, an item.</summary>
@@ -93,7 +88,6 @@ namespace Alis.Reactive.Members
             return Expressions.TypeOf(expression.Body);
         }
 
-        // A gathered model member: its MVC binding name, and its body path read from the member's types.
         internal static BindingPath ToMemberBindingPath(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
@@ -153,7 +147,6 @@ namespace Alis.Reactive.Members
                 $"Select a member by its path, like m => m.Address.City or m => m.Items[0].Sku; '{Expressions.StripConvert(expr)}' is not one.");
         }
 
-        // The steps from the parameter the chain starts at; false when the expression is not such a chain.
         private static bool TrySteps(Expression expr, out List<AccessStep> steps, out ParameterExpression? parameter)
         {
             expr = Expressions.StripConvert(expr);
@@ -184,7 +177,6 @@ namespace Alis.Reactive.Members
             return false;
         }
 
-        // A dictionary indexer takes a key, not a position, so its entries are named in a JSON body.
         private static bool IsDictionary(Type collectionType) =>
             typeof(System.Collections.IDictionary).IsAssignableFrom(collectionType)
             || new[] { collectionType }.Concat(collectionType.GetInterfaces()).Any(IsGenericDictionaryContract);
@@ -228,7 +220,6 @@ namespace Alis.Reactive.Members
         private static int EvaluateIndex(Expression expression) =>
             Convert.ToInt32(Expressions.Evaluate(expression), CultureInfo.InvariantCulture);
 
-        // One step of a member chain: a member by name, a list item by position, or a dictionary entry by key.
         private readonly struct AccessStep
         {
             private readonly string _kind;
@@ -259,7 +250,6 @@ namespace Alis.Reactive.Members
 
             internal int Position { get; }
 
-            // The member read, on the owner it is read on: what names the class that declares it.
             internal MemberExpression? Access { get; }
         }
     }

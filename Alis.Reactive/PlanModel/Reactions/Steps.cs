@@ -179,7 +179,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             _form = form ?? throw new ArgumentNullException(nameof(form));
         }
 
-        // The errors are the response's body: the step belongs inside an error route of a request.
         internal override void WriteTo(List<Statement> block, Scope scope)
         {
             var form = G.Obj(scope.Objects.Form(_form));
@@ -217,7 +216,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             _hasElse = true;
         }
 
-        // A branch is one statement: a method result its conditions read is bound before it.
         internal override void WriteTo(List<Statement> block, Scope scope) =>
             block.AddRange(scope.WithHoisted(() => Arms(0, scope)));
 

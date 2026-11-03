@@ -88,7 +88,6 @@ namespace Alis.Reactive
                 .Where(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IValidator<>));
     }
 
-    // The validators one AddReactiveFluentValidation call registered.
     internal sealed class ReactiveValidatorTypes
     {
         internal ReactiveValidatorTypes(IReadOnlyList<Type> types)
@@ -99,7 +98,6 @@ namespace Alis.Reactive
         internal IReadOnlyList<Type> Types { get; }
     }
 
-    // The browser rules of the validator this request resolves, read when the page renders.
     internal sealed class ReactiveValidatorRuleSource : IBrowserRuleSource
     {
         private readonly IServiceProvider _services;

@@ -100,9 +100,6 @@ namespace Alis.Reactive
                 html.ViewContext.Writer);
         }
 
-        // MVC names the input under the prefix the view renders under now, and the plan sends and checks it under the
-        // prefix the view rendered under when the plan started: they are one prefix, or the input posts under a name
-        // its plan does not know.
         private static void RefuseAPrefixTheViewTookAfterThePlanStarted(string prefix, PlanBuildContext plan, string bindingName)
         {
             if (prefix == plan.FieldPrefix) return;

@@ -48,8 +48,6 @@ namespace Alis.Reactive.PlanModel.Validation
             return bound;
         }
 
-        // Each checked member, then each item field of a collection at the item name standing for every item: Lines[*].Qty
-        // for the item field Qty of Lines, and Lines[*].Deliveries[*].Code for an item's own collection.
         private static IEnumerable<BrowserField> Checked(IEnumerable<BrowserField> fields)
         {
             foreach (var field in fields)
@@ -62,7 +60,6 @@ namespace Alis.Reactive.PlanModel.Validation
             }
         }
 
-        // Several rules on one collection each name its items: an item's field carries the checks of all of them.
         private static void Join(List<CheckedField> bound, CheckedField field)
         {
             var index = bound.FindIndex(existing => existing.Name == field.Name);

@@ -42,7 +42,6 @@ namespace Alis.Reactive.Native
         private bool _enabled = true;
         private string? _cssClass;
 
-        // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeDropDownBuilder(
 #if NET48
             HtmlHelper<TModel> html,

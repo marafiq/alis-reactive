@@ -76,7 +76,6 @@ namespace Alis.Reactive.PlanModel.Requests
         /// <summary>The element with this id.</summary>
         internal static SentForm Named(string formId) => new SentForm(formId);
 
-        // A form is an element, so Form() names the one the request checks; a request that checks none names none.
         internal string ContainerFor(string method, string url, FormValidation? validation) =>
             _formId ?? validation?.Form ?? throw new InvalidOperationException(
                 $"The {method} request to '{url}' sends Form(), the inputs of the form it validates, but it validates no form. " +

@@ -137,7 +137,6 @@ namespace Alis.Reactive.Native
             writer.Write(encoder.Encode(_text));
             writer.Write("</a>");
 
-            // The link's own plan, rendered beside it.
 #if NET48
             writer.Write(_html.RenderPlan(_plan).ToHtmlString());
 #else

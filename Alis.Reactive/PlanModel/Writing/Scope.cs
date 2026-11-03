@@ -151,7 +151,6 @@ namespace Alis.Reactive.PlanModel.Writing
     {
         private int _names;
 
-        // The method results a let has bound anywhere in the plan being written.
         private readonly HashSet<object> _written = new HashSet<object>();
 
         // The statements hoisted before the statement being written, such as the let that binds a method's

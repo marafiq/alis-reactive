@@ -3,8 +3,6 @@ using System.Linq;
 
 namespace Alis.Reactive.Members
 {
-    // A type as C# writes it, so a message names Int32?, List<IFormFile> and Choice<CareLevel> rather than
-    // Nullable`1, List`1 and Choice`1.
     internal static class CSharpTypeName
     {
         internal static string Of(Type type)

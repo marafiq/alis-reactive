@@ -69,7 +69,6 @@ namespace Alis.Reactive.Fusion.Templates
 
             while (current != null)
             {
-                // Template data carries the same camel-case JSON names the runtime reads.
                 parts.Insert(0, JsonNamingPolicy.CamelCase.ConvertName(current.Member.Name));
                 current = current.Expression as MemberExpression;
             }

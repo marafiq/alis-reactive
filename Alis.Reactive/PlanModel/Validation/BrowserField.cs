@@ -70,16 +70,12 @@ namespace Alis.Reactive
         internal BrowserField WithoutRules() =>
             new BrowserField(Reference, Array.Empty<BrowserRule>(), ItemFields.Select(field => field.WithoutRules()), IsChecked, _ownerCondition);
 
-        // A collection item field under the name that stands for every item (Lines[*]): its own conditions
-        // take the item's name, its owner's condition does not.
         internal BrowserField UnderItem(string itemName) =>
             PrefixedBy(itemName, _ownerCondition);
 
-        // An item field whose owner declared it under a condition (When around RuleForEach).
         internal BrowserField ScopedBy(Condition condition) =>
             new BrowserField(Reference, Rules, ItemFields, IsChecked, Condition.Combine(condition, _ownerCondition));
 
-        // An item field whose collection's owner moves under prefix: its owner condition moves with it.
         private BrowserField OwnedUnder(string prefix, Condition condition) =>
             new BrowserField(Reference, Rules, ItemFields, IsChecked, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
     }

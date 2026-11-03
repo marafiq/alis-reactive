@@ -78,8 +78,6 @@ namespace Alis.Reactive.Grammar
             _ => Kind,
         };
 
-        // ── equality ─────────────────────────────────────────────────────────────
-
         /// <summary>Determines whether two <see cref="Shape"/> instances represent the same type contract.</summary>
         /// <param name="other">Shape to compare.</param>
         /// <returns><see langword="true"/> if the shapes are structurally equal.</returns>

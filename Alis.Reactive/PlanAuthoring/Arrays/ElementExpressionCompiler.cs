@@ -62,7 +62,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
 
         private const string Tests = "String.Contains, String.StartsWith, String.EndsWith, String.IsNullOrEmpty, Enumerable.Contains and Regex.IsMatch";
 
-        // A method of the table, or one its type marks with its JavaScript name.
         private static string? PureMethodName(MethodInfo method) =>
             PureMethods.TryGetValue(method, out var name) ? name : method.GetCustomAttribute<PureMethodAttribute>()?.JavaScriptName;
 
@@ -223,8 +222,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             return ValueExpression.LiteralFor(member, ClrShape.Of(memberType));
         }
 
-        // A side of a comparison with a date's DayOfWeek, as the number C# compares: the day an item's date falls
-        // on, or a fixed DayOfWeek as its number.
         private static ValueExpression DayNumber(Expression operand, ParameterExpression element)
         {
             if (IsDayOfWeek(operand)) return DateCall(CompileValue(((MemberExpression)operand).Expression!, element), "getDay");
@@ -238,8 +235,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         {
             var node = Unconverted(expression);
 
-            // Parameter-free: a constant or captured value, evaluated once and written as every literal is
-            // (an enum by its JSON name, a date as text).
             if (!Expressions.Reads(node, element))
             {
                 var value = Expressions.Evaluate(node);
@@ -299,9 +294,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             return ExpressionPathHelper.TryJsonPath(node, element, out path);
         }
 
-        // A member of a value .NET defines: a nullable's Value is the value itself and its HasValue a test that
-        // it is not missing; the value members are their JavaScript forms; a date's DayOfWeek is read only in a
-        // comparison; any other is refused by name.
         private static bool TryMember(MemberExpression member, ParameterExpression element, out ValueExpression read)
         {
             read = null!;
@@ -342,8 +334,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 "Project the value on the server. Got: " + member);
         }
 
-        // A method called on an item's value (x => x.Room.Trim().ToUpper()), each of the pure table written as its
-        // JavaScript equivalent on the value before it; or a test, as the boolean it gives.
         private static ValueExpression CompileCall(MethodCallExpression call, ParameterExpression element)
         {
             if (call.Object != null && PureMethodName(call.Method) is string methodName)
@@ -384,8 +374,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             return node;
         }
 
-        // Whether a numeric cast can give C# a different number: to a whole number from a fraction, or to a whole
-        // number that cannot hold every value of the one cast.
         private static bool Narrows(Type from, Type to)
         {
             var source = Nullable.GetUnderlyingType(from) ?? from;
@@ -419,7 +407,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 or ExpressionType.GreaterThan or ExpressionType.GreaterThanOrEqual
                 or ExpressionType.LessThan or ExpressionType.LessThanOrEqual;
 
-        // A call on a date an item holds: getFullYear(), getDay() and the rest, each a number.
         private static ValueExpression DateCall(ValueExpression date, string method) =>
             ValueExpression.Call(Target.Returned(date), new[] { method }, Array.Empty<ValueExpression>(), Array.Empty<Shape>(), Shape.Number);
 
@@ -453,8 +440,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             return false;
         }
 
-        // The text a text test compares with, or the pattern it matches: a constant or a captured value, evaluated
-        // once here and written as a literal.
         private static string FixedText(Expression expression, ParameterExpression element)
         {
             var argument = Unconverted(expression);

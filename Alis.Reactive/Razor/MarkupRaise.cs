@@ -15,7 +15,6 @@ namespace Alis.Reactive.Razor
     /// </summary>
     internal static class MarkupRaise
     {
-        // A member's value as the text JSON gives it, an enum by its member's name, as a condition compares it.
         private static readonly JsonSerializerOptions ValueText = new JsonSerializerOptions
         {
             Converters = { new JsonStringEnumConverter() },
@@ -23,7 +22,6 @@ namespace Alis.Reactive.Razor
 
         internal static string Of(string eventName) => $"data-alis-raise=\"{WebUtility.HtmlEncode(eventName)}\"";
 
-        // A member left null carries no attribute, so the listener reads it as missing.
         internal static string Of<TPayload>(string eventName, TPayload payload)
         {
             var attributes = new StringBuilder(Of(eventName));

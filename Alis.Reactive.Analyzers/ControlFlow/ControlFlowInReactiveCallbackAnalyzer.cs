@@ -11,9 +11,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ControlFlowInReactiveCallbackAnalyzer : DiagnosticAnalyzer
     {
-        // What a callback does at render time: it calls the DSL, declares variables, and declares one
-        // entry per item of render-time data in a loop or through a local function. A condition is not
-        // decided here; it is p.When(...).Then(...).Else(...), and the plan carries it.
         private static readonly ImmutableHashSet<SyntaxKind> AllowedStatementKinds =
             ImmutableHashSet.Create(
                 SyntaxKind.Block,

@@ -143,7 +143,6 @@ namespace Alis.Reactive
             return this;
         }
 
-        // A declared event of a stream or a hub: its payload is live inside the callback, as a component's is.
         private TriggerBuilder<TModel> On<TArgs>(Func<PlanObjects, string> on, Event<TArgs> declaredEvent, Action<TArgs, PipelineBuilder<TModel>> pipeline)
             where TArgs : JsObject
         {

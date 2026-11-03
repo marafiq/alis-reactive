@@ -40,7 +40,6 @@ namespace Alis.Reactive.Native
         private string? _cssClass;
         private string? _placeholder;
 
-        // Internal because the factory also registers this input component in the Reactive Plan.
 #if NET48
         internal NativeTextBoxBuilder(
             HtmlHelper<TModel> html,

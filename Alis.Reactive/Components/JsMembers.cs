@@ -215,7 +215,6 @@ namespace Alis.Reactive
             return new DeclaredArg(field, ClrShape.OfValue(field));
         }
 
-        // A literal, or a value read when the step runs, in the shape the declaration gives it.
         private protected static ValueExpression ExpressionOf(object? value, Shape shape) =>
             value is Arg source ? source.Expression : ValueExpression.LiteralFor(value, shape);
 

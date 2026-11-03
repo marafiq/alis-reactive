@@ -18,7 +18,6 @@ namespace Alis.Reactive
 
         internal TArgs Args { get; }
 
-        // The path from the component's object to the object that raises the event: empty for the component.
         internal IReadOnlyList<string> ObjectPath { get; }
 
         internal Event(string jsEvent, TArgs args, IReadOnlyList<string> objectPath)

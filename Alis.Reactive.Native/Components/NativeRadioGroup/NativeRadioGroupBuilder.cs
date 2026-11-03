@@ -43,7 +43,6 @@ namespace Alis.Reactive.Native
         private string _cssClass = "alis-radio-group";
         private string _optionCssClass = "alis-radio-group__option";
 
-        // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeRadioGroupBuilder(
 #if NET48
             HtmlHelper<TModel> html,

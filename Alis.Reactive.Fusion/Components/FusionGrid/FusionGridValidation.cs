@@ -81,7 +81,6 @@ namespace Alis.Reactive.Fusion
             return rules.Count == 0 ? null : rules;
         }
 
-        // The validator keys a field by its property path, the C# member names joined by dots.
         private static string PropertyPathOf<TField>(Expression<Func<TRow, TField>> field)
         {
             var names = new List<string>();

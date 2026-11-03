@@ -58,7 +58,6 @@ namespace Alis.Reactive.Validation
         /// <summary>Whether a rule in these sets answers this selection: a rule in no set answers no selection, a rule in a set the one that names it.</summary>
         internal bool Selects(RuleSets sets) => _ruleSet == null ? !sets.Any : sets.Contains(_ruleSet);
 
-        // A validator written another way than ReactiveValidator is asked through IValidator<T>, by the overload the selection needs.
         internal ValidationResult Validate<TModel>(IValidator<TModel> validator, TModel instance) =>
             _ruleSet == null ? validator.Validate(instance) : validator.Validate(instance, _ruleSet);
 

@@ -61,8 +61,6 @@ namespace Alis.Reactive
 
     internal static class DeclaredName
     {
-        // The declaring member's name camel-cased, as every member of the object model is named, or the
-        // name given where JavaScript names it otherwise.
         internal static string Of(string? name, string declaredBy)
         {
             if (name != null) return Required(name);

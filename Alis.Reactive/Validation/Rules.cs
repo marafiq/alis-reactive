@@ -195,7 +195,6 @@ namespace Alis.Reactive.Validation
         private readonly IRuleHost<T> _host;
         private CascadeMode? _cascade;
 
-        // A rule names a member: its errors are reported under the member's path, and the page binds it.
         protected Rule(ModelMember<T> member, Conditions<T> scope, RuleSets sets, IRuleHost<T> host)
         {
             _host = host;
@@ -236,8 +235,6 @@ namespace Alis.Reactive.Validation
 
         public abstract void DescribeFor(BrowserRuleSet browser, RuleSetSelection selection);
 
-        // The browser's condition for one check: the rule's enclosing blocks and the check's own conditions,
-        // or false when one of them is the server's alone.
         protected bool TryBrowserCondition(RulePart<T, TValue> part, out Condition condition)
         {
             condition = Condition.Always;
@@ -542,15 +539,12 @@ namespace Alis.Reactive.Validation
             if (!passes) run.Fail(prefix + fieldPath, Message.For(instance, arguments));
         }
 
-        // A check reaches the browser when the vocabulary has its term and its message is known before any
-        // model exists.
         internal override void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when, RuleSetSelection selection)
         {
             foreach (var rule in BrowserRules(displayName))
                 browser.Add(member.Expression, rule.When(when));
         }
 
-        // The same check on each item of a collection member.
         internal void DescribeForItems(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when)
         {
             var rules = BrowserRules(displayName).ToList();
@@ -602,7 +596,6 @@ namespace Alis.Reactive.Validation
             if (TryItemFields(selection, out var fields)) browser.Add(member.Expression, fields.Select(field => field.WithoutRules()), Condition.Always);
         }
 
-        // A validator the app wrote another way than ReactiveValidator gives the browser nothing.
         internal bool TryItemFields(RuleSetSelection selection, out IReadOnlyList<BrowserField> fields)
         {
             fields = _child is ReactiveValidator rules ? rules.BrowserRules(selection) : Array.Empty<BrowserField>();
@@ -612,7 +605,6 @@ namespace Alis.Reactive.Validation
 
     internal static class Validators
     {
-        // A validator of the framework runs its rules into this run; another reports its failures, named under prefix.
         internal static async Task Run<TModel>(IValidator<TModel> validator, TModel instance, string prefix, ValidationRun run)
         {
             if (validator is ReactiveValidator<TModel> rules)

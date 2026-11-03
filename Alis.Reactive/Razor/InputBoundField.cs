@@ -29,7 +29,6 @@ namespace Alis.Reactive
 #endif
         where TModel : class
     {
-        // Internal because Html.InputField decides the input's identity, which validation and gather read.
         internal InputBoundField(
 #if NET48
             HtmlHelper<TModel> html,
@@ -42,7 +41,6 @@ namespace Alis.Reactive
         {
         }
 
-        // A render helper renders through Render<TComponent>, which tells the plan which component holds the value.
 #if NET48
         internal void Render(IHtmlString content)
         {

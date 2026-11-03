@@ -80,7 +80,6 @@ namespace Alis.Reactive.Members
         private static bool IsNullComparer(Expression comparer) =>
             StripConvert(comparer) is ConstantExpression constant && constant.Value == null;
 
-        // The array or collection under an implicit conversion to a span.
         private static Expression WithoutSpanConversion(Expression expression)
         {
             if (expression is MethodCallExpression conversion && conversion.Method.Name == "op_Implicit" && conversion.Arguments.Count == 1)

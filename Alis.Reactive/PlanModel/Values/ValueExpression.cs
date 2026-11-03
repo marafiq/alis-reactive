@@ -33,8 +33,6 @@ namespace Alis.Reactive.PlanModel.Values
         /// <summary>The value as a comparison reads it: converted to the shape; a literal is written in it.</summary>
         internal virtual Expr WriteAs(Shape shape, Scope scope) => G.As(Write(scope), shape);
 
-        // ── literals ─────────────────────────────────────────────────────────────
-
         internal static ValueExpression Literal(bool value) => new LiteralExpression(Scalar.Of(value), Shape.Boolean);
 
         internal static ValueExpression Literal(string value) => new LiteralExpression(Scalar.Of(value), Shape.String);
@@ -112,8 +110,6 @@ namespace Alis.Reactive.PlanModel.Values
             return declared == null ? memberName : declared.Name;
         }
 
-        // ── reads ────────────────────────────────────────────────────────────────
-
         /// <summary>A property of an object, or a path into data; with no path, the object or data itself.</summary>
         internal static ValueExpression Get(Target target, IReadOnlyList<string> path, Shape shape) =>
             new GetExpression(target, path, shape);
@@ -138,8 +134,6 @@ namespace Alis.Reactive.PlanModel.Values
 
         /// <summary>An input's value as MVC binds it, through the model every plan of the composition joins.</summary>
         internal static ValueExpression ReadBound(string inputId, Shape shape) => new BoundRead(inputId, shape);
-
-        // ── records and lists ────────────────────────────────────────────────────
 
         /// <summary>A record of named fields, written in the order given; a name appears once.</summary>
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
@@ -206,8 +200,6 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
-        // Data a callback received is shown as the server or the event sent it; an object's member, the URL
-        // and a method read keep their type, which decides how they are read.
         internal override ValueExpression AsArrived() =>
             _target.IsData ? new GetExpression(_target, _path, Shape.Any) : this;
 

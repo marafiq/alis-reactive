@@ -62,7 +62,6 @@ namespace Alis.Reactive.PlanModel.Values
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(scope.Objects.Element(_id)), G.NoPath);
         }
 
-        // An object a registered plugin makes: a plugin by its name, a stream or a hub by its URL.
         private sealed class PluginTarget : Target
         {
             private readonly Func<PlanObjects, string> _object;

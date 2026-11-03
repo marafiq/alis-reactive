@@ -20,7 +20,6 @@ namespace Alis.Reactive.Components
             ClrShape.Of(type, candidate =>
                 IsDataClass(candidate) && enclosingRecords.Add(candidate) ? RecordOf(candidate, enclosingRecords) : Shape.Any);
 
-        // A declaration is a live JavaScript object, not data.
         private static bool IsDataClass(Type type) => ClrShape.IsDataClass(type) && !typeof(JsObject).IsAssignableFrom(type);
 
         private static Shape RecordOf(Type type, HashSet<Type> enclosingRecords)

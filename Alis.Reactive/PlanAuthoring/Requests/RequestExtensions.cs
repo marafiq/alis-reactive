@@ -55,7 +55,6 @@ namespace Alis.Reactive
             return builder;
         }
 
-        // A request is placed where it is written and configured until the plan is written.
         private static RequestStart<TModel> Request<TModel>(PipelineBuilder<TModel> pipeline) where TModel : class
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));

@@ -46,7 +46,6 @@ namespace Alis.Reactive.Components
                 method.Name,
                 method.Awaits);
 
-        // The line a method with a result is written on: it runs there when no earlier statement read the result.
         internal void RunsAtThisLine(ValueExpression result) => Context.AddStep(new MethodResultStep(result));
 
     }

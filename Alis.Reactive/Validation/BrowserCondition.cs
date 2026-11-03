@@ -67,8 +67,6 @@ namespace Alis.Reactive.Validation
                 return left == null || right == null ? null : join(left, right);
             }
 
-            // !x.Flag reads as falsy, !string.IsNullOrEmpty(x.Name) as not empty, and !set.Contains(x.Code)
-            // as not in; any other negation keeps its operand's form.
             private Condition? Negate(Expression operand)
             {
                 if (IsField(operand))
@@ -131,10 +129,8 @@ namespace Alis.Reactive.Validation
             private Condition In(Expression member, Expression values) =>
                 Condition.In(Lambda(member), values);
 
-            // The member as a path from the model: x.Score.Value reads x.Score, whose browser value is the number or nothing.
             private LambdaExpression Lambda(Expression member) => Expression.Lambda(ModelMember(member), _model);
 
-            // x.Name.Contains("a"), x.Name.StartsWith("a"), x.Name.EndsWith("a"), Regex.IsMatch(x.Name, "a").
             private bool TryText(MethodCallExpression call, out Expression field, out TextTest test, out string operand)
             {
                 field = null!;
@@ -168,7 +164,6 @@ namespace Alis.Reactive.Validation
                 return true;
             }
 
-            // values.Contains(x.Code): the field is one of a fixed set of values.
             private bool TryMembership(MethodCallExpression call, out Expression field, out Expression values)
             {
                 field = null!;
@@ -181,7 +176,6 @@ namespace Alis.Reactive.Validation
                 return true;
             }
 
-            // x.Tags.Contains("fall-risk"): a collection field holds a fixed item.
             private bool TryCollectionContains(
                 MethodCallExpression call,
                 out Expression collection,
@@ -215,7 +209,6 @@ namespace Alis.Reactive.Validation
                 return current == _model;
             }
 
-            // x.Score.HasValue: the nullable member has a value.
             private bool IsHasValue(Expression expression, out Expression nullable)
             {
                 nullable = null!;
@@ -238,7 +231,6 @@ namespace Alis.Reactive.Validation
                     : current;
             }
 
-            // An expression that reads nothing of the model: a constant, or a captured variable.
             private bool IsFixed(Expression expression) => !Expressions.Reads(expression, _model);
 
             private static ExpressionType Mirrored(ExpressionType op) => op switch

@@ -36,11 +36,9 @@ namespace Alis.Reactive.PlanModel.Validation
             return new FormField(field.Name, tests);
         }
 
-        // Whether the rule applies to the item at the indexes the form hands it.
         private FnExpr When(BrowserRule rule, FormFieldValues values) =>
             G.Fn(rule.Condition.Bound(values).Write(_scope), FormInputRead.Indexes);
 
-        // The rule's verdict on the field's value, as the server's rule decides it.
         private FnExpr Check(BrowserRule rule, CheckedField field) =>
             G.Fn(rule.Check(G.Ref(Value), field.Shape, field.Values, _scope), Value, FormInputRead.Indexes);
     }

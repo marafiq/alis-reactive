@@ -265,7 +265,6 @@ namespace Alis.Reactive
 
         private protected abstract bool ComparesWithMember { get; }
 
-        // Equality has a browser form under every shape; order only under a shape the browser orders as the server does.
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = this;
@@ -277,8 +276,6 @@ namespace Alis.Reactive
 
         private Expr Same(Expr value, Expr target) => G.Eq(Canonical(value, Shape), Canonical(target, Shape));
 
-        // The value and its target as numbers under the shape; a pair that cannot be compared (a peer
-        // with nothing bound) fails.
         private Expr Ordered(Expr value, Expr target, Operator op, Scope scope)
         {
             var a = scope.Fresh("a");
@@ -305,7 +302,6 @@ namespace Alis.Reactive
 
         private protected override bool ComparesWithMember => false;
 
-        // The fixed value as every literal is written: a date as its text, an enum by its JSON name.
         private protected override Expr Target(FormFieldValues values, Scope scope) =>
             ValueExpression.LiteralFor(_value, Shape).Write(scope);
     }
@@ -354,7 +350,6 @@ namespace Alis.Reactive
         public (decimal From, decimal To)? NumericBounds =>
             AsNumber(_from) is decimal from && AsNumber(_to) is decimal to ? (from, to) : null;
 
-        // A range of text stays with the server, which orders text by its culture.
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = this;

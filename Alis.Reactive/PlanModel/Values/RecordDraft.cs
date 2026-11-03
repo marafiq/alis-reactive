@@ -41,7 +41,6 @@ namespace Alis.Reactive.PlanModel.Values
                 return ValueExpression.List(items, Shape.ArrayOf(Shape.Any));
             }
 
-            // A record with both names and positions names its positions by their digits.
             var fields = _order.Select(name => (name, _fields[name].ToValueExpression()))
                 .Concat(_items.Select(item => (item.Key.ToString(CultureInfo.InvariantCulture), item.Value.ToValueExpression())))
                 .ToList();

@@ -23,8 +23,6 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
                          "The condition will not be included in the plan.",
             helpLinkUri: null);
 
-        // The DSL's chains that are not yet in the plan: a source chosen without an operator, and a
-        // condition built without .Then(), whether a guard or the all-guard and any-guard .And and .Or build.
         private static readonly ImmutableArray<string> IncompleteChainTypes = ImmutableArray.Create(
             "Alis.Reactive.ConditionSourceBuilder`3",
             "Alis.Reactive.GuardBuilder`1",

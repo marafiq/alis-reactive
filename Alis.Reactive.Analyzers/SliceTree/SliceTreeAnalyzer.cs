@@ -63,7 +63,6 @@ namespace Alis.Reactive.Analyzers.SliceTree
             isEnabledByDefault: true,
             description: "ADR-0004: each shipped package carries a SliceTree.txt whose rows name every folder once, and every entry names a folder.");
 
-        // The same rule when a shipped package has no table at all: reported once the compilation ends.
         private static readonly DiagnosticDescriptor MissingTable = new DiagnosticDescriptor(
             TableId,
             title: "The slice table and the package agree",
@@ -307,8 +306,6 @@ namespace Alis.Reactive.Analyzers.SliceTree
                 }
             }
 
-            // The edge check: the slice of the file the reference is written in against the slice of the file
-            // that declares what it refers to. Same slice, another assembly or a file outside the table: no edge.
             public void Check(Action<Diagnostic> report, string fromPath, Location at, ISymbol definition)
             {
                 if (!sliceOfPath.TryGetValue(fromPath, out var from)) return;
@@ -420,8 +417,6 @@ namespace Alis.Reactive.Analyzers.SliceTree
             };
         }
 
-        // One place a reference is written: the file it is in and where to report. Each symbol it names is checked
-        // once; the types a member's signature names are walked down to every named type, generic arguments included.
         private sealed class Site
         {
             private readonly Run run;

@@ -31,7 +31,6 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             description: "The shipped packages and every component declaration expose typed DSL only. A bare object or System.Type, an untyped Arg on a public member, or a member-naming string in an exposed signature lets JS-style untyped access creep into views.",
             helpLinkUri: null);
 
-        // A string parameter with one of these names names a member, not a value.
         private static readonly ImmutableHashSet<string> MemberNamingParameters =
             ImmutableHashSet.Create(
                 StringComparer.Ordinal,
@@ -87,7 +86,6 @@ namespace Alis.Reactive.Analyzers.TypedDsl
                 Report(context, property, property.Locations, Describe(property.Type));
         }
 
-        // Public or protected, through every containing type.
         private static bool IsExposed(ISymbol symbol)
         {
             for (ISymbol current = symbol; current != null && !(current is INamespaceSymbol); current = current.ContainingSymbol)
@@ -101,8 +99,6 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             return true;
         }
 
-        // The whole surface of a shipped package, and a component's surface wherever it is declared:
-        // a declaration class, and the render helpers that put a component on a page.
         private static bool InScope(ISymbol symbol)
         {
             if (AnalyzerHelpers.ShippedAssemblies.Contains(symbol.ContainingAssembly?.Name ?? ""))
@@ -121,8 +117,6 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             return false;
         }
 
-        // An override or an interface implementation whose shape a base class or interface outside the
-        // shipped packages fixed (Equals(object), a JSON converter's Read, IHtmlContent.WriteTo).
         private static bool InheritsShapeFromOutside(IMethodSymbol method)
         {
             if (method.IsOverride)

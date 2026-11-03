@@ -50,13 +50,9 @@ namespace Alis.Reactive
     {
         private ObjectBinding? _binding;
 
-        // A nested object (Object<T> on a property, or an item of Objects<T>) is reached through the object
-        // that holds it: it shares that object's binding, and its members' JavaScript names start with the
-        // path that holds it.
         private JsObject? _holder;
         private Path _holderPath = Path.None;
 
-        // An object a method returned: reached through the method's result, so it holds no events.
         private bool _returned;
 
         internal ObjectBinding Binding => _binding ?? _holder?.Binding ?? throw new InvalidOperationException(
@@ -70,8 +66,6 @@ namespace Alis.Reactive
             new TObject { _holder = holder, _holderPath = path };
 
         private bool IsReturned => _returned || (_holder?.IsReturned ?? false);
-
-        // ── properties ───────────────────────────────────────────────────────────
 
         /// <summary>Declares a property the page reads.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
@@ -93,8 +87,6 @@ namespace Alis.Reactive
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
         protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new WriteOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
-
-        // ── objects ──────────────────────────────────────────────────────────────
 
         /// <summary>
         /// Declares an object with members of its own, declared as its own class. On a property it is the
@@ -149,8 +141,6 @@ namespace Alis.Reactive
             DeclaresMethod(declaredBy)
                 ? new Objects<TItem>(ReturnedObject<ReturnedList>(name, declaredBy), Path.None)
                 : new Objects<TItem>(this, JavaScriptPath(name, declaredBy));
-
-        // ── methods that return nothing ──────────────────────────────────────────
 
         /// <summary>Declares a method that returns nothing and takes no argument: <c>public void Refresh() =&gt; Method();</c>.</summary>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
@@ -212,8 +202,6 @@ namespace Alis.Reactive
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected void MethodAsync(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Run(name, declaredBy, awaits: true, first, second);
-
-        // ── methods that return a value ──────────────────────────────────────────
 
         /// <summary>
         /// Declares a method that returns a value and takes no argument:
@@ -281,8 +269,6 @@ namespace Alis.Reactive
         protected TypedSource<TResult> MethodAsync<TResult>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
             Result<TResult>(name, declaredBy, awaits: true, first, second);
 
-        // ── events ───────────────────────────────────────────────────────────────
-
         /// <summary>
         /// Declares an event whose listener receives a payload, declared as its own class:
         /// <c>public Event&lt;FusionGridRowSelectedArgs&gt; RowSelected =&gt; Event&lt;FusionGridRowSelectedArgs&gt;();</c>.
@@ -306,8 +292,6 @@ namespace Alis.Reactive
         protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "") =>
             new Event(EventNamed(name, declaredBy), ObjectPath());
 
-        // ── arguments ────────────────────────────────────────────────────────────
-
         /// <summary>
         /// An argument the JavaScript method always takes and the page never chooses:
         /// <c>public void ShowColumn(Field key) =&gt; Method(key, Fixed("field"), name: "showColumns");</c>.
@@ -326,8 +310,6 @@ namespace Alis.Reactive
         /// <param name="value">The value read when the step runs.</param>
         protected static Arg Pass<TDeclared, TSource>(TypedSource<TSource> value) where TSource : TDeclared =>
             Arg.Declared<TDeclared, TSource>(value);
-
-        // ── behind the declarations ──────────────────────────────────────────────
 
         private void Run(string? name, string declaredBy, bool awaits, params Arg[] args) =>
             Binding.Call(MethodNamed(name, declaredBy, awaits, args), Expressions(args));
@@ -358,21 +340,14 @@ namespace Alis.Reactive
             return name == null ? JavaScriptNameOf(declaredBy) : OwnName(name, declaredBy);
         }
 
-        // The path from the component's object to this object: empty for the component itself.
         private IReadOnlyList<string> ObjectPath() => _holderPath.TargetText;
 
-        // The member's path from the object a page holds: the holder's path first for a nested object, then
-        // the declared name, or the C# name camel-cased.
         private Path JavaScriptPath(string? name, string declaredBy)
         {
             if (name == null) return _holderPath.Then(JavaScriptNameOf(declaredBy));
-            // name: "" declares the object itself: a plugin that is a function.
             return name.Length == 0 ? _holderPath : _holderPath.Then(OwnName(name, declaredBy));
         }
 
-        // A declared name is one JavaScript name. A member of an object the component holds is declared on
-        // that object (Object<T>()), and a field of each item of a list is read with Each(..): one way to
-        // reach either, which the compiler checks.
         private string OwnName(string name, string declaredBy)
         {
             var reachesIntoAnObject = name.IndexOf('.') >= 0 || name.IndexOf('[') >= 0;
@@ -403,7 +378,6 @@ namespace Alis.Reactive
         private static IReadOnlyList<ValueExpression> Expressions(Arg[] args) =>
             args.Select(arg => arg.Expression).ToList();
 
-        // A member is named by its C# name, camel-cased, unless the declaration names it.
         private static string JavaScriptNameOf(string declaredBy)
         {
             if (string.IsNullOrEmpty(declaredBy))
@@ -412,7 +386,6 @@ namespace Alis.Reactive
             return JsonMemberName.Of(declaredBy);
         }
 
-        // A method's result: the value a line reads, bound once in the callback that uses it.
         private sealed class MethodResult<TResult> : TypedSource<TResult>
         {
             internal MethodResult(JsObject owner, ComponentMethod method, IReadOnlyList<ValueExpression> args)
@@ -423,7 +396,6 @@ namespace Alis.Reactive
             internal override ValueExpression Expression { get; }
         }
 
-        // The object a method returned a list in: its items are reached through the result.
         private sealed class ReturnedList : JsObject
         {
         }

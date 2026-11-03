@@ -43,7 +43,6 @@ namespace Alis.Reactive
             // over its DI container in Application_Start. See ReactivePlan.RequireBrowserRuleSource.
             new ReactivePlan<TModel>(services: null, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
-        // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
         private static string FieldPrefixOf<TModel>(HtmlHelper<TModel> html) =>
             html.ViewData.TemplateInfo.HtmlFieldPrefix;
 #else
@@ -51,7 +50,6 @@ namespace Alis.Reactive
             where TModel : class =>
             new ReactivePlan<TModel>(html.ViewContext.HttpContext.RequestServices, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
-        // The MVC field prefix the view renders under: a partial rendered for a member of the page's model.
         private static string FieldPrefixOf<TModel>(IHtmlHelper<TModel> html) =>
             html.ViewData.TemplateInfo.HtmlFieldPrefix;
 #endif
@@ -120,8 +118,6 @@ namespace Alis.Reactive
             return FormSummaries.Markup(formId, cssClass);
         }
 
-        // The plan's script, then the summary of each of its forms the page holds none of yet, where the messages
-        // no field of the form can show go (a hidden field's, an unloaded partial's, a member no input renders).
         private static string PlanMarkup<TModel>(ReactivePlan<TModel> plan, RenderedPage page) where TModel : class
         {
             var json = plan.Serialize();

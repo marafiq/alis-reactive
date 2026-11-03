@@ -64,8 +64,6 @@ namespace Alis.Reactive
             return Scope(declarer) + "__" + ExpressionPathHelper.ToMvcElementId(mvcName);
         }
 
-        // The class's namespace and its name as C# writes it, after the classes it is nested in:
-        // Alis.Reactive.Models.Ward+Room is Alis_Reactive_Models_Ward_Room.
         private static string Scope(Type declarer)
         {
             var name = new StringBuilder(CSharpTypeName.Of(declarer));

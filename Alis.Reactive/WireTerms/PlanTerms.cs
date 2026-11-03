@@ -5,7 +5,6 @@ namespace Alis.Reactive.WireTerms
 {
     internal abstract class PlanString
     {
-        // The term names what the developer gave ("Plugin name"), so a refusal says which name is missing.
         protected PlanString(string value, string term)
         {
             if (string.IsNullOrWhiteSpace(value))
