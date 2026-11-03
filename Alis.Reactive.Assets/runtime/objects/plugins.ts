@@ -9,7 +9,6 @@ import type { Owner } from "./owner";
 import type { PlanObjects } from "./plan-objects";
 import { canHaveMembers } from "../grammar/paths";
 
-/** What a plugin receives with a plan's data contribution. */
 export interface Contribution {
   readonly key: string;
   readonly data: PluginData;
@@ -19,11 +18,8 @@ export interface Contribution {
 }
 
 export interface Plugin {
-  /** The object for a key, with the data the plan that names it wrote for it: the singleton when the key is empty. */
   object(key: string, data: PluginData): unknown;
-  /** A plan's data under its owner; the plugin joins contributions per key and registers disposers on the owner. */
   contribute?(contribution: Contribution): void;
-  /** Subscribes a handler to one of the key's events, under its owner. */
   subscribe?(key: string, event: string, listener: Listener, owner: Owner): void;
 }
 
@@ -40,7 +36,6 @@ export function pluginNamed(name: string): Plugin {
   return plugin;
 }
 
-/** An app's plugin: one object or function the bundle provides under a name, with no keys and no data. */
 export function pluginOf(name: string, instance: unknown): Plugin {
   if (!canHaveMembers(instance)) throw new Error(`[alis] plugin "${name}" must be an object or function`);
   return { object: () => instance };

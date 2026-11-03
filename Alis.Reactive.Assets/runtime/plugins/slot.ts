@@ -52,11 +52,6 @@ function load(id: string, html: unknown): void {
   log.info("partial-slot.load", { slotId: id, plans: plans.length });
 }
 
-/**
- * A new owner for what the slot holds, released by the slot's next load or unload, or when anything
- * removes the content around it. Only an owner has anything to release, so the first one starts the
- * listening.
- */
 export function slotOwner(id: string): Owner {
   listenForUnmounts();
   const owner = Owner.slot(id);
@@ -70,8 +65,6 @@ function unload(id: string): void {
   target.innerHTML = "";
 }
 
-// Wired HTML about to go: the owners of the slots inside it go first, innermost first, then the owner
-// of the slot it is, when it is one.
 function releaseWithin(root: HTMLElement): void {
   const inside = [...owners.keys()].filter(id => {
     const element = document.getElementById(id);

@@ -37,7 +37,6 @@ export class Owner {
   }
 
   dispose(): void {
-    // A disposer that throws stops no other; the owner ends either way.
     for (const disposer of this.disposers.splice(0).reverse()) {
       try {
         disposer();

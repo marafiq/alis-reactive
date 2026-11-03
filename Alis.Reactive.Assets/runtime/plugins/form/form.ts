@@ -44,7 +44,6 @@ const log = logger("validation");
 interface Entry {
   readonly field: FormField;
   readonly objects: PlanObjects;
-  /** The id of the form's summary, from the data the field came with. */
   readonly summary: string;
 }
 
@@ -65,8 +64,6 @@ function entriesOf(containerId: string): Entry[] {
   return entries;
 }
 
-// ── summary ────────────────────────────────────────────────────────────────
-
 function addSummaryError(summary: HTMLElement | null, key: string, message: string): void {
   if (summary === null) return;
   removeSummaryEntry(summary, key);
@@ -86,8 +83,6 @@ function clearAndHide(summary: HTMLElement | null): void {
   hideSummaryDiv(summary);
 }
 
-// ── evaluation ─────────────────────────────────────────────────────────────
-
 function evaluateWhen(entry: Entry, test: FormTest, indexes: readonly number[]): boolean {
   const when = evaluate(test.when, rootScope(entry.objects)) as (indexes: readonly number[]) => unknown;
   return !!when(indexes);
@@ -98,7 +93,6 @@ function checkPasses(entry: Entry, test: FormTest, value: unknown, indexes: read
   return !!check(value, indexes);
 }
 
-// A name with an index in it, Lines[*].Qty, stands for every item of a collection; any other names one member.
 function namesItems(field: FormField): boolean {
   return field.name.includes("[*]");
 }
@@ -118,8 +112,6 @@ function evaluateField(entry: Entry, container: HTMLElement, summary: HTMLElemen
   return valid;
 }
 
-// The field's tests at one input it names: the first that fails puts its message beside the input, or in the
-// summary when the input's message slot cannot render.
 function evaluateInput(entry: Entry, input: NamedInput, summary: HTMLElement | null): boolean {
   const inlineHidden = !canRenderInline(input.id);
   const value = input.value;
@@ -139,9 +131,6 @@ function evaluateInput(entry: Entry, input: NamedInput, summary: HTMLElement | n
   return true;
 }
 
-// A member the page does not render posts no value, so its active tests run against nothing, as the
-// server's run against a missing member: a required test fails, a length or a pattern passes. A
-// failure has no message slot on the page and goes to the summary.
 function unmountedField(entry: Entry, summary: HTMLElement | null): boolean {
   const { field } = entry;
   log.trace("validation-field.unmounted", { field: field.name });
@@ -163,7 +152,6 @@ function validate(containerId: string, summaryId: string): boolean {
     return false;
   }
 
-  // A section of the form saved on its own may have shown a message the form's own tests do not make.
   const summary = document.getElementById(summaryId);
   clearInlineMessages(containedInputs(containerId).ids);
   clearAndHide(summary);
@@ -181,8 +169,6 @@ interface Holder {
   readonly checks: readonly { readonly entry: Entry; readonly input: NamedInput }[];
 }
 
-// Every validated container that holds the input's element, with each of its fields that names the input. An
-// input can sit in more than one: a section saved on its own, inside the whole form.
 function holdersOf(element: HTMLElement): Holder[] {
   const holders: Holder[] = [];
   for (const [containerId, entries] of formsByContainer) {
@@ -196,7 +182,6 @@ function holdersOf(element: HTMLElement): Holder[] {
   return holders;
 }
 
-// Leaving an input rechecks it against every container that holds it; the first failing test shows.
 function revalidate(element: HTMLElement): void {
   const holders = holdersOf(element);
   clearInline(element.id);
@@ -240,14 +225,10 @@ function showErrors(containerId: string, summaryId: string, problem: unknown): v
   log.debug("server-errors.shown", { id: containerId });
 }
 
-// Every inline message the form may show: each mounted input's inside it (M7), whichever plan rendered it.
 function clearInlineMessages(inputs: Record<string, string>): void {
   for (const id of Object.values(inputs)) clearInline(id);
 }
 
-// ── live ───────────────────────────────────────────────────────────────────
-
-// The mounted input whose element is the target, or holds it: a component's own input inside its element.
 function inputAround(target: EventTarget | null): HTMLElement | null {
   for (let node = target instanceof HTMLElement ? target : null; node !== null; node = node.parentElement) {
     if (isMountedInput(node)) return node;

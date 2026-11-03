@@ -74,13 +74,10 @@ function wireMarkupRaise(): void {
     if (!(target instanceof Element)) return;
     const source = target.closest<HTMLElement>(`[${RAISE_ATTRIBUTE}]`);
     if (!source) return;
-    // The selector matched the attribute.
     raise(source.getAttribute(RAISE_ATTRIBUTE)!, markupDetail(source));
   }, true);
 }
 
-// The markup's payload, member by member: what a view's markup and a vendor template's button carry
-// alike, a value as the text written for it.
 function markupDetail(source: HTMLElement): Record<string, string> {
   const detail: Record<string, string> = {};
   for (const [key, text] of Object.entries(source.dataset)) {

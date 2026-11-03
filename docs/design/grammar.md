@@ -399,7 +399,7 @@ A failing handler is logged and stops no other handler.
    mark of a booted page, readable by whoever arrives later (`Alis.Reactive.Assets/runtime/root.ts`).
    The Playwright tests wait on it.
 5. **Unloading a slot** runs its owner's disposers, and the page's owner's stay. A block that is
-   already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:84-90`
+   already running finishes; nothing aborts it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:77-83`
    disposes the owner and nothing else).
 6. **Mount events.** The runtime raises `alis:mount` on the document when HTML is in the document
    and about to be wired (the page at boot, every slot's new content), and `alis:unmount` when wired
@@ -768,7 +768,7 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
   owner holding it is disposed.
 - **B2 Start.** A start tries four times: at once, at once again, then 2 and 10 seconds after the try
   before; as soon as the fourth try fails it shows the retry indicator (R3)
-  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:34-56`). A click on the indicator starts the same way,
+  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:34-54`). A click on the indicator starts the same way,
   and offers again only if all four tries fail.
 - **B3 Messages.** Client methods are events, matched without regard to case. The payload is the
   method's single argument.

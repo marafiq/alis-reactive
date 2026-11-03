@@ -1,8 +1,3 @@
-// Native drawer markup is a layout singleton rendered by @Html.NativeDrawer(). When it mounts, this
-// gives the element the members the C# NativeDrawer declares, so the DSL calls them like any
-// component's: open(), close() and the size property. It also wires the close button, the Escape key
-// and the reset after the close transition, through the drawer's well-known DOM IDs.
-
 import { announceUnmount, onMount } from "../hooks";
 
 const SIZES = ["sm", "md", "lg"] as const;
@@ -23,7 +18,6 @@ function close(container: HTMLElement): void {
   container.classList.remove(VISIBLE);
 }
 
-// The applied size, or "" when none is: the panel then has the stylesheet's default width.
 function appliedSize(container: HTMLElement): DrawerSize | "" {
   return SIZES.find(size => container.classList.contains(sizeClass(size))) ?? "";
 }

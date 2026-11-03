@@ -11,14 +11,12 @@ export type Listener = (payload: unknown) => void;
 
 type VendorListener = (first: unknown) => void;
 
-/** The vendor's object on the element, or a boundary error when the widget is not constructed. */
 export function vendorObject(element: HTMLElement, vendorName: string, vendor: Vendor): unknown {
   const root = read(element, vendor.objectPath, "optional", `#${element.id}`);
   if (!isMissing(root)) return root;
   throw new Error(`[alis] #${element.id} has no ${vendorName} object yet (${vendor.objectPath.join(".")})`);
 }
 
-/** Subscribes the way the vendor's data says and returns the unsubscribe. */
 export function subscribeVendor(
   root: unknown,
   vendorName: string,
@@ -48,7 +46,6 @@ function subscribeByMethod(
   };
 }
 
-/** A listener assigned to a callback property; it remembers what the property held and whether it is gone. */
 interface AssignedListener {
   (this: unknown, ...args: unknown[]): void;
   previous: unknown;

@@ -52,34 +52,25 @@ interface ModelInput {
 }
 
 export interface PageModel {
-  /** The value of the mounted input with this element id, as MVC binds it; missing when none is on the page. */
   boundValueOf(id: string): unknown;
 }
 
 export interface ContainedInputs {
-  /** Writes every mounted input inside the container into the record at its JSON body path; returns the record. */
   fill(record: Record<string, unknown>): Record<string, unknown>;
   readonly fields: Record<string, unknown>;
   readonly arrays: string[];
-  /** The element id of every mounted input inside the container, keyed by MVC binding name (M7). */
   readonly ids: Record<string, string>;
-  /** The value, as MVC binds it, of the input that binds the pattern at these indexes: inside the container, else on the page (M8). */
   valueOf(pattern: string, indexes: readonly number[]): unknown;
 }
 
-/** A mounted input a binding-name pattern names (M8). */
 export interface NamedInput {
   readonly id: string;
   readonly element: HTMLElement;
-  /** Its binding name, the pattern's `[*]` filled in. */
   readonly name: string;
-  /** What each `[*]` of the pattern stood for, left to right. */
   readonly indexes: readonly number[];
-  /** Its value as MVC binds it, read when asked. */
   readonly value: unknown;
 }
 
-// Every live entry for an id, in the order contributed (M6).
 const inputsById = new Map<string, ModelInput[]>();
 
 function currentValue(input: ModelInput): unknown {
@@ -103,20 +94,17 @@ const pageModel: PageModel = {
   },
 };
 
-/** The class the mounted input's element carries while a form refuses it (M9). */
 export function invalidClassOf(id: string): string {
   // The form reaches an input through the page's table (F4, F7, F8) and finds its element before it marks
   // it, so the id is a mounted input's.
   return mountedInput(id)!.binding.invalidClass;
 }
 
-/** Whether the element is a mounted input of the page's table: the element the DOM finds by its id (M6). */
 export function isMountedInput(element: HTMLElement): boolean {
   if (element.id === "") return false;
   return mountedInput(element.id)?.objects.element(element.id) === element;
 }
 
-/** Every mounted input on the page whose binding name the pattern names, whichever plan rendered it (M8). */
 export function namedInputs(pattern: string): NamedInput[] {
   const names = new RegExp(`^${pattern.split("[*]").map(escapedForPattern).join("\\[(\\d+)\\]")}$`);
   const named: NamedInput[] = [];
@@ -216,7 +204,6 @@ function leave(input: ModelInput): void {
 }
 
 export const modelPlugin: Plugin = {
-  // The page's table is the singleton; any other key is the container whose inputs a request sends.
   object: key => (key === "" ? pageModel : containedInputs(key)),
   // The plan gives alis.model no data but its own: the inputs it rendered.
   contribute({ data, owner, objects }: Contribution) {

@@ -7,7 +7,6 @@ export function isMissing(value: unknown): value is null | undefined {
   return value === null || value === undefined;
 }
 
-/** Converts a value read or written under a shape. Missing values pass through. */
 export function shaped(value: unknown, shape: Shape): unknown {
   if (isMissing(value)) return shape.kind === "nullable" ? null : value;
   return convert(value, shape);
@@ -73,7 +72,6 @@ export function asNumber(value: unknown): number | undefined {
   return undefined;
 }
 
-/** Boolean shape: text is false only for "", "false" in any case and "0"; numbers for 0 and NaN. */
 export function asBoolean(value: unknown): boolean | undefined {
   if (typeof value === "boolean") return value;
   if (typeof value === "string") return !(value === "" || value.toLowerCase() === "false" || value === "0");
@@ -83,10 +81,6 @@ export function asBoolean(value: unknown): boolean | undefined {
   return undefined;
 }
 
-/**
- * Text shape: numbers and booleans as text, an instant as its UTC instant, other dates as local
- * calendar text, arrays as JavaScript's own text.
- */
 export function asText(value: unknown): string | undefined {
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return `${value}`;
@@ -97,7 +91,6 @@ export function asText(value: unknown): string | undefined {
   return undefined;
 }
 
-/** Date shape: a Date; a number as a time; "YYYY-MM-DD" as local midnight; other text as Date parses it. */
 export function asDate(value: unknown): Date | undefined {
   if (value instanceof Date) return Number.isFinite(value.getTime()) ? value : undefined;
   if (typeof value === "number") return Number.isFinite(value) ? new Date(value) : undefined;
@@ -120,7 +113,6 @@ export class Instant extends Date {
   }
 }
 
-/** Instant shape: what the date shape reads, as an Instant. */
 export function asInstant(value: unknown): Instant | undefined {
   if (value instanceof Instant) return value;
   const date = asDate(value);

@@ -81,7 +81,6 @@ function keepEscapeInConfirm(event: KeyboardEvent): void {
 
 let ask: ((message: string) => Promise<boolean>) | undefined;
 
-// App-level singleton rendered by @Html.FusionConfirmDialog() in the layout; fixed id.
 onMount(`#${dialogId}`, dialogHostElement => {
   const hostWindow = window as unknown as SyncfusionWindow;
   const dialog = new hostWindow.ej.popups.Dialog({

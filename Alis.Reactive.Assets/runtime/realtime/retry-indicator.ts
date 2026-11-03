@@ -1,11 +1,3 @@
-// One developer-owned layout element is the retry indicator for every live
-// connection: <div id="alis-realtime-connection-retry-container" hidden>...</div>.
-// Marker children are the only registry — one per dropped connection, each
-// carrying its retry action. The indicator is visible while any marker exists.
-// One click takes every marker and retries its connection; a connection whose
-// retry fails adds its marker again. Without the element the behavior is not
-// invoked at all — that is a loud boundary error, never a fallback.
-
 import { logger } from "../diagnostics/trace";
 
 const log = logger("retry-indicator");

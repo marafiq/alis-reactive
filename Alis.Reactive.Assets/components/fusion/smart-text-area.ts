@@ -1,7 +1,3 @@
-// FusionSmartTextArea: the textarea rendered with data-alis-smart-text-area becomes a Syncfusion
-// SmartTextArea with the options that attribute carries. A suggestion endpoint becomes the handler
-// that posts the request settings to it and reads the suggestion back as text.
-
 import { onMount } from "../hooks";
 
 interface SmartTextAreaOptions {

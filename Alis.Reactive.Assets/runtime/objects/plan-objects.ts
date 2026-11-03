@@ -27,7 +27,6 @@ export class PlanObjects implements Objects {
     return document.getElementById((this.locator(id) as ElementObjectLocator).id);
   }
 
-  /** Subscribes on the object, or on the object at `path` under it: a nested object's own event. */
   subscribe(id: string, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const locator = this.locator(id);
     switch (locator.kind) {

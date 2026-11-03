@@ -1,7 +1,3 @@
-// FusionSmartPasteButton: the button rendered with data-alis-smart-paste-button becomes a Syncfusion
-// SmartPasteButton with the options that attribute carries. An assist endpoint becomes the handler
-// that posts the request settings to it and reads the answer back as text.
-
 import { onMount } from "../hooks";
 
 interface SmartPasteButtonOptions {

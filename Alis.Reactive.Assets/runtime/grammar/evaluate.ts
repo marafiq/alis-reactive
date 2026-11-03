@@ -10,7 +10,6 @@ import { call, read, type PathMode } from "./paths";
 import { isMissing, shaped } from "./shape";
 import * as ops from "./operators";
 
-/** Resolves the located objects of the plan being run. */
 export interface Objects {
   object(id: string): unknown;
 }
@@ -24,7 +23,6 @@ export function childScope(scope: Scope): Scope {
   return { env: scope.env.child(), objects: scope.objects };
 }
 
-/** The scope a plugin evaluates a plan's own expressions in: nothing bound, the plan's objects. */
 export function rootScope(objects: Objects): Scope {
   return { env: Environment.root(), objects };
 }
@@ -45,7 +43,6 @@ export function evaluate(expr: Expr, scope: Scope): unknown {
   }
 }
 
-/** A path rooted at a located object is checked; every other path is optional (grammar.md 1.3). */
 export function modeOf(target: Expr): PathMode {
   return target.kind === "obj" ? "checked" : "optional";
 }
@@ -54,7 +51,6 @@ export function labelOf(target: Expr): string {
   return target.kind === "obj" ? `#${target.id}` : target.kind === "ref" ? target.name : `(${target.kind})`;
 }
 
-/** A statement's expression: a call at its top may return a promise for the statement to settle. */
 export function evaluateStatement(expr: Expr, scope: Scope): unknown {
   return expr.kind === "call" ? evaluateCall(expr, scope, true) : evaluate(expr, scope);
 }
@@ -123,7 +119,6 @@ function operate(expr: OpExpr, scope: Scope): unknown {
   }
 }
 
-// The first operand that is not missing, evaluated left to right; the last one otherwise.
 function coalesce(count: number, at: (index: number) => unknown): unknown {
   for (let index = 0; index < count - 1; index++) {
     const value = at(index);

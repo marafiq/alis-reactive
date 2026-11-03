@@ -1,6 +1,3 @@
-// The runtime's console log. Errors and warnings always show; the page raises the level with
-// data-alis-trace on <html> (info, debug or trace), the one knob, read once at boot.
-
 export type TraceLevel = "off" | "error" | "warn" | "info" | "debug" | "trace";
 
 const LEVELS: Record<TraceLevel, number> = {
@@ -13,7 +10,6 @@ export function setLevel(level: TraceLevel): void {
   active = LEVELS[level];
 }
 
-/** The level the page asks for, from `data-alis-trace` on its root element; the default when it names none. */
 export function levelOf(root: HTMLElement): TraceLevel {
   const named = root.dataset["alisTrace"];
   if (named === undefined) return "warn";

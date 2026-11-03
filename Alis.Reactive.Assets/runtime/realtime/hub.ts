@@ -31,7 +31,6 @@ interface Managed {
 }
 
 const hubs = new Map<string, Managed>();
-// The wait before each try after the first.
 const retryDelays = [0, 2000, 10000] as const;
 const tries = retryDelays.length + 1;
 
@@ -45,7 +44,6 @@ async function startWithRetry(managed: Managed, url: string): Promise<void> {
     } catch (error) {
       log.warn("start.retry", { hubUrl: url, attempt, error: toJavaScriptString(error) });
     }
-    // Released meanwhile: a start never outlives its holders, so it tries no more and offers nothing.
     if (managed.stopping) return;
     if (attempt === tries) break;
     await new Promise(resolve => setTimeout(resolve, retryDelays[attempt - 1]));
@@ -168,8 +166,6 @@ export const hubPlugin: Plugin = {
       return;
     }
 
-    // A method the page declares without a payload is called with no argument; one declared with a
-    // payload, with one object.
     const onMethod = (...args: unknown[]): void => {
       log.debug("method.received", { hubUrl: url, method: event });
       const payload = args[0];

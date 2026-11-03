@@ -51,7 +51,6 @@ function perform(expr: Expr, awaits: boolean, scope: Scope): Completion {
   result.catch(error => log.error("call.rejected", { error: toJavaScriptString(error) }));
 }
 
-// A trace names a located object by its id, the way the view named it.
 function traceName(target: Expr): string {
   return target.kind === "obj" ? target.id : labelOf(target);
 }
@@ -69,8 +68,6 @@ function branch(statement: Extract<Statement, { kind: "if" }>, scope: Scope): Co
   return executeBlock(statement.else, childScope(scope));
 }
 
-// Every block starts; the statement completes when all have settled. A failure is logged and does
-// not stop the others (Promise.allSettled).
 function all(blocks: readonly (readonly Statement[])[], scope: Scope): Completion {
   const pending: Promise<void>[] = [];
   for (const block of blocks) {

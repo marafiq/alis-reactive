@@ -10,7 +10,6 @@ import { isMissing } from "./shape";
 
 const EACH_ITEM = "[]";
 
-/** A value that can hold members: an object or a function. */
 type Holder = Record<string | number, unknown>;
 
 export function canHaveMembers(value: unknown): value is Holder {

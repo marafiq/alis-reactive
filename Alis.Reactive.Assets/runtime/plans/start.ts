@@ -16,7 +16,6 @@ import { toJavaScriptString } from "../shared/javascript-string";
 
 const log = logger("plans");
 
-/** An owner and the plans that start under it. */
 export interface OwnedPlans {
   readonly owner: Owner;
   readonly plans: readonly PlanDocument[];
@@ -64,7 +63,6 @@ function subscribeHandlers(objects: PlanObjects, owner: Owner): void {
 // A handler's block reads its payload by this name (grammar.md 1.1).
 const PAYLOAD = "e";
 
-/** Runs one handler. A failing handler is logged and stops no other handler (grammar.md 3.4). */
 export function runHandler(handler: Handler, payload: unknown, objects: PlanObjects): void {
   const env = Environment.root();
   env.bind(PAYLOAD, payload);

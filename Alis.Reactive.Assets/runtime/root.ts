@@ -1,8 +1,3 @@
-// The runtime's entry. It registers the framework's own plugins, takes the plugins queued in
-// window.__alisPlugins (the app's, and the framework's own components'), announces the page's HTML
-// with alis:mount so every component is constructed, then starts the plan scripts on the page under
-// their owners (grammar.md 3.5) and marks the page booted.
-
 import type { PlanDocument } from "./types/index";
 import { pluginOf, registerPlugin } from "./objects/plugins";
 import { Owner } from "./objects/owner";

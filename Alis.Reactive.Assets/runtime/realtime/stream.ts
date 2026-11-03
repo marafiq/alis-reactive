@@ -81,7 +81,6 @@ function release(url: string, managed: Managed, subscription: Subscription): voi
 
 export const streamPlugin: Plugin = {
   object: url => ({
-    // A URL no handler listens to has no source: it reads as closed.
     get readyState() {
       return streams.get(url)?.source.readyState ?? EventSource.CLOSED;
     },

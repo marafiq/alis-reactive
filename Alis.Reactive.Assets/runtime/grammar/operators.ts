@@ -26,7 +26,6 @@ function ordered(value: unknown): Ordered {
   return { kind: "none" };
 }
 
-/** The sign of left - right, or undefined when the pair cannot be ordered. */
 export function compare(left: unknown, right: unknown): number | undefined {
   const a = ordered(left);
   const b = ordered(right);
@@ -57,7 +56,6 @@ export function greaterThanOrEqual(left: unknown, right: unknown): boolean {
   return sign !== undefined && sign >= 0;
 }
 
-/** C# arithmetic over numbers. An operand that is missing or not a number gives missing. */
 export function arithmetic(op: "add" | "sub" | "mul" | "mod", left: unknown, right: unknown): unknown {
   const a = asNumber(left);
   const b = asNumber(right);
@@ -75,17 +73,14 @@ export function negate(value: unknown): unknown {
   return number === undefined ? null : -number;
 }
 
-/** JavaScript's truthiness, applied after conversion: Truthy() and Falsy(). */
 export function truthy(value: unknown): boolean {
   return !!value;
 }
 
-/** Empty in a condition: "", missing, or an empty array. Nothing is trimmed. */
 export function empty(value: unknown): boolean {
   return value === "" || isMissing(value) || (Array.isArray(value) && value.length === 0);
 }
 
-/** False when the value is missing; otherwise a fresh RegExp test on its text. */
 export function matches(value: unknown, pattern: unknown, flags: unknown): boolean {
   if (isMissing(value)) return false;
   const text = asText(value);
@@ -93,10 +88,6 @@ export function matches(value: unknown, pattern: unknown, flags: unknown): boole
   return new RegExp(pattern as string, flags as string).test(text);
 }
 
-/**
- * The target of a LINQ method: missing is [], text or a number is [value], an iterable (a
- * DOMTokenList, an HTMLCollection) is its items. Anything else is a boundary error.
- */
 export function toArray(value: unknown): unknown[] {
   if (Array.isArray(value)) return value;
   if (isMissing(value)) return [];
@@ -106,7 +97,6 @@ export function toArray(value: unknown): unknown[] {
   throw new Error(`[alis] an array method needs an array, got ${describe(value)}`);
 }
 
-/** The fields of every record, left to right, in one record: the gathered values with the model's. */
 export function merge(records: readonly unknown[]): Record<string, unknown> {
   return Object.assign({}, ...(records as object[]));
 }
@@ -117,10 +107,6 @@ export function finite(value: unknown): number {
   return Number.isFinite(number) ? number : 0;
 }
 
-/**
- * OrderBy's comparator: two numbers (or dates) by their difference with non-finite values last;
- * everything else by its text in code-unit order.
- */
 export function order(left: unknown, right: unknown): number {
   const a = sortKey(left);
   const b = sortKey(right);

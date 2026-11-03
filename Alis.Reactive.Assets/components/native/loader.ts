@@ -1,8 +1,3 @@
-// Native loader markup is a layout singleton rendered by @Html.NativeLoader(). When it mounts, this
-// gives the element the members the C# NativeLoader declares: show(), hide(), and the target and
-// timeout of the next show, kept in data-target and data-timeout. A class observer then positions the
-// loader over its target, runs the timeout, and puts it back on the page when it hides.
-
 import { onMount } from "../hooks";
 
 const VISIBLE = "alis-loader--visible";
@@ -17,8 +12,6 @@ function hide(loader: HTMLElement): void {
   loader.setAttribute("aria-hidden", "true");
 }
 
-// The auto-hide of the Show in progress. A Hide cancels it and a later Show restarts it, so a
-// timeout never outlives the Hide of the request that set it.
 let pendingAutoHide: ReturnType<typeof setTimeout> | undefined;
 
 // A targeted loader lives inside the element it covers. When that element leaves the page (a drawer
@@ -74,7 +67,6 @@ onMount("#alis-loader", loader => {
     show: () => show(loader),
     hide: () => hide(loader),
   });
-  // No target covers the viewport; a timeout of 0 never hides on its own.
   Object.defineProperties(loader, {
     target: {
       get: () => loader.dataset.target ?? "",
