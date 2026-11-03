@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Validation;
@@ -53,5 +54,25 @@ public class WhenAValidatorDescribesItsRules
         var names = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Select(field => field!["name"]!.GetValue<string>());
         Assert.That(names, Is.EqualTo(new[] { "Name", "Age" }), "each member a rule is written on, once");
         Golden.Matches(rendered, "Validation", nameof(two_requests_that_validate_one_form_describe_it_once));
+    }
+
+    [Test]
+    public void an_enum_check_is_the_pattern_of_every_value_the_server_binds_with_its_default_message()
+    {
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<CareLevelRules>());
+        html.TextInput(plan, m => m.Level);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<CareLevelRules>("admission")));
+
+        var rendered = html.Rendered(plan);
+
+        var field = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray().Single(each => each!["name"]!.GetValue<string>() == "Level")!;
+        var test = field["tests"]!.AsArray().Single()!;
+        Assert.That(test["message"]!.GetValue<string>(), Is.EqualTo("'Level' is not a known value."));
+        var patterns = test["check"]!.Nodes().OfType<JsonObject>()
+            .Select(node => node["value"] as JsonValue)
+            .Select(value => value != null && value.TryGetValue<string>(out var text) ? text : null)
+            .Where(text => text != null && text.StartsWith("^", StringComparison.Ordinal));
+        Assert.That(patterns, Is.EqualTo(new[] { @"^\s*(?:Independent|Assisted|Memory|0|1|2)\s*$" }));
+        Golden.Matches(rendered, "Validation", nameof(an_enum_check_is_the_pattern_of_every_value_the_server_binds_with_its_default_message));
     }
 }

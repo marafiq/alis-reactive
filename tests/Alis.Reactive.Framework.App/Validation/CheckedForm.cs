@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.Framework.App.Validation;
@@ -77,6 +78,19 @@ public sealed class CheckedForm
     public DateTimeOffset Called { get; set; } = new(2026, 10, 5, 9, 0, 0, TimeSpan.Zero);
 
     public Contact Contact { get; set; } = new();
+    public MealMenu Menu { get; set; } = MealMenu.Regular;
+    public Diets Diets { get; set; } = Diets.None;
+}
+
+/// <summary>What a guest does not eat: any combination, which only the server can tell from a number.</summary>
+[Flags]
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum Diets
+{
+    None = 0,
+    Vegetarian = 1,
+    GlutenFree = 2,
+    DairyFree = 4,
 }
 
 /// <summary>The contact the form holds, checked by its own validator.</summary>
@@ -130,5 +144,7 @@ public sealed class CheckRules : ReactiveValidator<CheckedForm>
         RuleFor(x => x.Visiting).NotEmpty().WithMessage("Give the visiting day.");
         RuleFor(x => x.Called).NotEmpty().WithMessage("Give the time of the call.");
         RuleFor(x => x.Contact).SetValidator(new ContactRules());
+        RuleFor(x => x.Menu).IsInEnum().WithMessage("Pick a menu on the list.");
+        RuleFor(x => x.Diets).IsInEnum().WithMessage("Diets on the list only.");
     }
 }

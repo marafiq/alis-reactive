@@ -241,6 +241,21 @@ namespace Alis.Reactive
             where TProperty : struct, IComparable<TProperty>, IComparable =>
             Add(rule, new BetweenCheck<T, TProperty?>(from, to, inclusive: false));
 
+        // ---- Enums ---------------------------------------------------------------------------------
+
+        /// <summary>
+        /// A value the enum declares, as the server binds one: a name in any case, or the number of one. A
+        /// <c>[Flags]</c> enum takes any combination of its values; that the server alone checks.
+        /// </summary>
+        public static IRuleBuilderOptions<T, TEnum> IsInEnum<T, TEnum>(this IRuleBuilder<T, TEnum> rule)
+            where TEnum : struct, Enum =>
+            Add(rule, new InEnumCheck<T, TEnum>(typeof(TEnum)));
+
+        /// <summary>A value the enum declares, or nothing.</summary>
+        public static IRuleBuilderOptions<T, TEnum?> IsInEnum<T, TEnum>(this IRuleBuilder<T, TEnum?> rule)
+            where TEnum : struct, Enum =>
+            Add(rule, new InEnumCheck<T, TEnum?>(typeof(TEnum)));
+
         // ---- The server's alone ----------------------------------------------------------------------
 
         /// <summary>A C# test of the value. Only the server runs C#, so only the server checks it.</summary>

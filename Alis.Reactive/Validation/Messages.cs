@@ -119,6 +119,7 @@ namespace Alis.Reactive.Validation
         internal const string InclusiveBetween = "'{PropertyName}' must be between {From} and {To}. You entered {PropertyValue}.";
         internal const string ExclusiveBetween = "'{PropertyName}' must be between {From} and {To} (exclusive). You entered {PropertyValue}.";
         internal const string Predicate = "The specified condition was not met for '{PropertyName}'.";
+        internal const string InEnum = "'{PropertyName}' is not a known value.";
     }
 
     /// <summary>How a field is named in a message: <c>AdmissionDate</c> reads "Admission Date".</summary>

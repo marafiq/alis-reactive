@@ -65,6 +65,8 @@ public sealed class WhenEachCheckIsMade : AppPageTest
     [TestCase("Card", "5555555555554445", "5555555555554444", "Give a card number.", TestName = "a_card_check_takes_a_number_whose_doubled_digits_pass_nine")]
     [TestCase("Floor", "ten", "9", "A floor below ten.", TestName = "an_ordered_number_check_refuses_text_that_is_no_number")]
     [TestCase("Later", "soon", "2026-10-03", "Later comes after earlier.", TestName = "an_ordered_date_check_refuses_text_that_is_no_date")]
+    [TestCase("Menu", "7", "Pureed", "Pick a menu on the list.", TestName = "an_enum_check_refuses_a_number_that_names_no_value_and_takes_a_name")]
+    [TestCase("Menu", "Vegan", "lowsodium", "Pick a menu on the list.", TestName = "an_enum_check_refuses_an_unknown_name_and_takes_a_name_in_any_case")]
     public async Task a_check_refuses_what_its_rule_refuses_and_takes_what_it_takes(string field, string refused, string taken, string message)
     {
         await Open("/Validation/Checks");
@@ -98,6 +100,20 @@ public sealed class WhenEachCheckIsMade : AppPageTest
         await Save();
         await Expect(Saved).ToHaveTextAsync("saved");
         await Expect(reasonWanted).ToBeHiddenAsync();
+    }
+
+    [Test]
+    public async Task a_flags_enum_is_the_servers_to_check_which_refuses_a_number_outside_its_values_and_takes_a_combination()
+    {
+        await Open("/Validation/Checks");
+        await Page.GetByLabel("Diets", new() { Exact = true }).FillAsync("9");
+        await Save();
+        await Expect(Field("Diets").GetByText("Diets on the list only.")).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser cannot tell a combination from a number, so the request goes");
+        await Page.GetByLabel("Diets", new() { Exact = true }).FillAsync("Vegetarian, GlutenFree");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Diets").GetByText("Diets on the list only.")).ToBeHiddenAsync();
     }
 
     [Test]

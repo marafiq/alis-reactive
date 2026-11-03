@@ -81,6 +81,14 @@ public sealed class AdmissionRules : ReactiveValidator<Admission>
 }
 
 /// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
+public sealed class CareLevelRules : ReactiveValidator<Admission>
+{
+    public CareLevelRules()
+    {
+        RuleFor(x => x.Level).IsInEnum();
+    }
+}
+
 public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
 {
     public UnreadableAdmissionRules()

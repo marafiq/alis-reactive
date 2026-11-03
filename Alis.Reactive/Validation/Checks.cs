@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Validation
 {
@@ -377,6 +379,50 @@ namespace Alis.Reactive.Validation
     }
 
     /// <summary>A C# predicate: the server's alone.</summary>
+    /// <summary>
+    /// A value the enum declares, as the server binds one: a name, in any case, or the number of one. A
+    /// <c>[Flags]</c> enum takes any combination of its values, which the server alone checks.
+    /// </summary>
+    internal sealed class InEnumCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
+    {
+        private readonly Type _enumType;
+        private readonly bool _flags;
+        private readonly ulong _mask;
+
+        internal InEnumCheck(Type enumType)
+        {
+            _enumType = enumType;
+            _flags = enumType.IsDefined(typeof(FlagsAttribute), inherit: false);
+            foreach (var value in Enum.GetValues(enumType))
+                _mask |= Bits(value);
+        }
+
+        internal override string Template => Templates.InEnum;
+
+        internal override bool Passes(T instance, TValue value, MessageArguments arguments) =>
+            value == null || (_flags ? (Bits(value) & ~_mask) == 0 : Enum.IsDefined(_enumType, value));
+
+        // Each name and each number the server binds, with the whitespace Enum.Parse ignores around them.
+        public IEnumerable<BrowserRule> ForBrowser(string message)
+        {
+            if (_flags) return Array.Empty<BrowserRule>();
+            var names = Enum.GetNames(_enumType).Select(Regex.Escape);
+            var numbers = Enum.GetValues(_enumType).Cast<object>().Select(Number).Distinct();
+            var pattern = "^\\s*(?:" + string.Join("|", names.Concat(numbers)) + ")\\s*$";
+            return new[] { BrowserRule.Matches(pattern, "i", message) };
+        }
+
+        private ulong Bits(object value) =>
+            Enum.GetUnderlyingType(_enumType) == typeof(ulong)
+                ? Convert.ToUInt64(value, CultureInfo.InvariantCulture)
+                : unchecked((ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture));
+
+        private string Number(object value) =>
+            Enum.GetUnderlyingType(_enumType) == typeof(ulong)
+                ? Convert.ToUInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture)
+                : Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+    }
+
     internal sealed class PredicateCheck<T, TValue> : Check<T, TValue>
     {
         private readonly Func<T, TValue, bool> _predicate;

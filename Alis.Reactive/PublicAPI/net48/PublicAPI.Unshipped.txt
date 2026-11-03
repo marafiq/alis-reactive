@@ -506,6 +506,8 @@ static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(th
 static Alis.Reactive.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
 static Alis.Reactive.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, TProperty from, TProperty to) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 static Alis.Reactive.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty?>! rule, TProperty from, TProperty to) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.RuleBuilderExtensions.IsInEnum<T, TEnum>(this Alis.Reactive.IRuleBuilder<T, TEnum>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, TEnum>!
+static Alis.Reactive.RuleBuilderExtensions.IsInEnum<T, TEnum>(this Alis.Reactive.IRuleBuilder<T, TEnum?>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, TEnum?>!
 static Alis.Reactive.RuleBuilderExtensions.Length<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, int length) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
 static Alis.Reactive.RuleBuilderExtensions.Length<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule, int minimum, int maximum) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
 static Alis.Reactive.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
