@@ -20,7 +20,7 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
 
     private SemaphoreSlim _markReadReleased = null!;
 
-    private ILocator MarkRead(string resident) => Page.GetByTestId($"mark-read-{resident}");
+    private ILocator MarkRead(string resident) => Page.Locator($"#mark-read-{resident}");
     private ILocator HandoverStatus => Page.Locator("#handover-status");
     private ILocator Loader => Page.Locator("#alis-loader");
 

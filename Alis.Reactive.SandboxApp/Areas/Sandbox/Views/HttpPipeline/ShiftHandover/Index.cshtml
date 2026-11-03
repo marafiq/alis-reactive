@@ -35,8 +35,7 @@
                             .OnError<HandoverNoteRead>(400, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message)))
                             .OnError<HandoverNoteRead>(409, (json, e) => e.Element("handover-status").Text.Set(json.Get(x => x.Message))))
                         .Finally(f => f.Component<NativeLoader>().Hide()))
-                        .CssClass("text-sm font-medium text-accent hover:text-accent/80")
-                        .Attr("data-testid", $"mark-read-{note.Key}"))
+                        .CssClass("text-sm font-medium text-accent hover:text-accent/80"))
                 </div>
             }
             <p id="handover-status" class="text-sm text-text-muted">No note marked read yet.</p>
