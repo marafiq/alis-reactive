@@ -230,6 +230,28 @@ namespace Alis.Reactive
         public IConditionBuilder UnlessOnServer(Expression<Func<T, bool>> predicate, Action rules) =>
             Branch(RuleCondition<T>.OnServer(predicate).Negated(), rules);
 
+        /// <summary>
+        /// Applies the rules only when <paramref name="predicate"/> holds, asked while the rules run and waited
+        /// for: a bed book, a registry, a service. A condition that waits is the server's alone, and a
+        /// validator holding one is validated with <see cref="ValidateAsync(T, CancellationToken)"/>, as one
+        /// with <c>MustAsync</c> is.
+        /// </summary>
+        /// <param name="predicate">The condition over the model, answered later.</param>
+        /// <param name="rules">Declares the rules.</param>
+        /// <returns>Its <c>Otherwise</c> declares the rules for when the condition does not hold.</returns>
+        public IConditionBuilder WhenAsync(Func<T, CancellationToken, Task<bool>> predicate, Action rules) =>
+            Branch(RuleCondition<T>.OnServerAsync(predicate), rules);
+
+        /// <summary>
+        /// Applies the rules only when <paramref name="predicate"/> does not hold, asked while the rules run
+        /// and waited for; the server's alone, as <see cref="WhenAsync"/>.
+        /// </summary>
+        /// <param name="predicate">The condition over the model, answered later.</param>
+        /// <param name="rules">Declares the rules.</param>
+        /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
+        public IConditionBuilder UnlessAsync(Func<T, CancellationToken, Task<bool>> predicate, Action rules) =>
+            Branch(RuleCondition<T>.OnServerAsync(predicate).Negated(), rules);
+
         /// <inheritdoc />
         public ValidationResult Validate(T instance) => Validate(instance, RuleSetSelection.Default);
 
@@ -248,7 +270,7 @@ namespace Alis.Reactive
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
             if (IsAsync(selection))
-                throw new InvalidOperationException($"{CSharpTypeName.Of(GetType())} has a rule that waits (MustAsync); validate with ValidateAsync.");
+                throw new InvalidOperationException($"{CSharpTypeName.Of(GetType())} has a rule that waits (MustAsync, CustomAsync or WhenAsync); validate with ValidateAsync.");
 
             var run = new ValidationRun(synchronous: true, CancellationToken.None, selection);
             RunRules(instance, "", run).GetAwaiter().GetResult();

@@ -842,7 +842,7 @@ A rule reaches the browser unless something in it only the server can do. No lis
 - `Matches` with an option JavaScript lacks or syntax it reads differently (`\A`, `\z`, `\G`,
   inline `(?i)`, atomic and comment groups, `\p{..}`, class subtraction).
 - A condition declared `WhenOnServer` or `UnlessOnServer`: one the server alone decides (a method call,
-  a service, a query over a collection).
+  a service, a query over a collection); and one that waits, `WhenAsync` or `UnlessAsync`.
 - A rule on a computed value (`x => x.Name.Trim()`), which has no input.
 - `.ServerOnly()`, which keeps the checks written before it on the server, for a member the page has
   no input for.
@@ -855,7 +855,10 @@ A rule reaches the browser unless something in it only the server can do. No lis
   comparisons of members with fixed values, `string.IsNullOrEmpty`, `Contains`, `StartsWith`,
   `EndsWith`, `Regex.IsMatch`, membership in a fixed set, joined by `&&`, `||` and `!`.
   `WhenOnServer(predicate, rules)`, `UnlessOnServer(...)`, `.WhenOnServer(predicate)` and
-  `.UnlessOnServer(predicate)` declare a condition the server alone decides.
+  `.UnlessOnServer(predicate)` declare a condition the server alone decides. `WhenAsync(predicate, rules)`
+  and `UnlessAsync(...)` take a predicate that waits (`Func<T, CancellationToken, Task<bool>>`): the
+  condition is the server's, and a validator holding one is validated with `ValidateAsync`, as one with
+  `MustAsync` is.
 - A condition after a rule's checks applies to every check written before it, as in
   FluentValidation.
 - Blocks nest: a check's browser condition is the AND of its blocks' conditions and its own.

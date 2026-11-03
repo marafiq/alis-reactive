@@ -52,6 +52,6 @@ public sealed class WhenAValidatorIsRegistered : AppPageTest
         await Click("Save without waiting for the rule that waits");
 
         await Expect(Page.Locator("#saved")).ToHaveTextAsync(
-            "WaitingGuestRules has a rule that waits (MustAsync); validate with ValidateAsync.");
+            "WaitingGuestRules has a rule that waits (MustAsync, CustomAsync or WhenAsync); validate with ValidateAsync.");
     }
 }

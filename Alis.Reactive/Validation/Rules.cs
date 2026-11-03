@@ -19,6 +19,7 @@ namespace Alis.Reactive.Validation
         private readonly Func<T, RuleSetSelection, bool> _holds;
         private readonly Func<Condition?> _browser;
         private readonly string? _unreadable;
+        private readonly Func<T, RuleSetSelection, CancellationToken, Task<bool>>? _waits;
 
         // The browser's form is read where a page describes the rules, so that a validator the server alone
         // runs is built whatever its conditions. The server's test takes the selection the validation runs
@@ -31,10 +32,29 @@ namespace Alis.Reactive.Validation
         }
 
         /// <summary>The rule <paramref name="rule"/> passes: what the rules under <c>DependentRules</c> run under.</summary>
+        // A condition that waits is the server's alone: it has no browser form, and the rules under it make
+        // the validator one that waits, as MustAsync does.
+        private RuleCondition(Func<T, RuleSetSelection, CancellationToken, Task<bool>> waits)
+        {
+            _holds = (_, _) => throw new InvalidOperationException("A condition that waits is asked through HoldsAsync.");
+            _browser = () => null;
+            _unreadable = null;
+            _waits = waits;
+        }
+
+        internal bool Waits => _waits != null;
+
+        internal Task<bool> HoldsAsync(T instance, RuleSetSelection selection, CancellationToken cancellation) =>
+            _waits != null ? _waits(instance, selection, cancellation) : Task.FromResult(_holds(instance, selection));
+
+        internal static RuleCondition<T> OnServerAsync(Func<T, CancellationToken, Task<bool>> predicate)
+        {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+            return new RuleCondition<T>((instance, _, cancellation) => predicate(instance, cancellation));
+        }
+
         internal static RuleCondition<T> Passing<TValue>(Rule<T, TValue> rule) =>
             new RuleCondition<T>(rule.PassesOn, rule.BrowserPassing, null);
-
-        internal bool Holds(T instance, RuleSetSelection selection) => _holds(instance, selection);
 
         internal static RuleCondition<T> When(Expression<Func<T, bool>> predicate)
         {
@@ -58,7 +78,9 @@ namespace Alis.Reactive.Validation
         internal static RuleCondition<T> ServerOnly { get; } = new RuleCondition<T>((_, _) => true, () => null, null);
 
         internal RuleCondition<T> Negated() =>
-            new RuleCondition<T>((instance, selection) => !_holds(instance, selection), () => _browser() is Condition browser ? Condition.Not(browser) : null, _unreadable);
+            _waits is { } waits
+                ? new RuleCondition<T>(async (instance, selection, cancellation) => !await waits(instance, selection, cancellation).ConfigureAwait(false))
+                : new RuleCondition<T>((instance, selection) => !_holds(instance, selection), () => _browser() is Condition browser ? Condition.Not(browser) : null, _unreadable);
 
         /// <summary>
         /// The browser's form, or false when the server alone decides. A condition the browser cannot read that
@@ -90,7 +112,14 @@ namespace Alis.Reactive.Validation
 
         internal Conditions<T> And(RuleCondition<T> condition) => new Conditions<T>(_all.Concat(new[] { condition }).ToArray());
 
-        internal bool Hold(T instance, RuleSetSelection selection) => _all.All(condition => condition.Holds(instance, selection));
+        internal bool Waits => _all.Any(condition => condition.Waits);
+
+        internal async Task<bool> HoldAsync(T instance, ValidationRun run)
+        {
+            foreach (var condition in _all)
+                if (!await condition.HoldsAsync(instance, run.Selection, run.Cancellation).ConfigureAwait(false)) return false;
+            return true;
+        }
 
         /// <summary>The browser's form of all of them, or false when one is the server's alone.</summary>
         internal bool TryForBrowser(out Condition condition)
@@ -140,7 +169,7 @@ namespace Alis.Reactive.Validation
         /// <summary>Whether the selection reaches this rule.</summary>
         bool RunsUnder(RuleSetSelection selection);
 
-        /// <summary>Whether a check the selection reaches waits (MustAsync), child validators included.</summary>
+        /// <summary>Whether a check the selection reaches waits (MustAsync, CustomAsync or a condition declared WhenAsync), child validators included.</summary>
         bool IsAsync(RuleSetSelection selection);
 
         /// <summary>The sets a selection can reach through this rule without this validator naming them: those of a validator an Include in no set holds.</summary>
@@ -196,7 +225,7 @@ namespace Alis.Reactive.Validation
 
         public bool RunsUnder(RuleSetSelection selection) => selection.Selects(Sets);
 
-        public bool IsAsync(RuleSetSelection selection) => Parts.Any(part => part.IsAsync(selection));
+        public bool IsAsync(RuleSetSelection selection) => Scope.Waits || Parts.Any(part => part.IsAsync(selection));
 
         public IEnumerable<string> ReachableRuleSets => Enumerable.Empty<string>();
 
@@ -251,7 +280,7 @@ namespace Alis.Reactive.Validation
             var waits = Sets.Any ? Sets.Names.Any(name => IsAsync(RuleSetSelection.Of(name))) : IsAsync(RuleSetSelection.Default);
             if (waits)
                 throw new InvalidOperationException(
-                    $"DependentRules follows a rule on '{FieldPath}' that waits (MustAsync), and a condition does not wait: " +
+                    $"DependentRules follows a rule on '{FieldPath}' that waits (MustAsync, CustomAsync or WhenAsync), and a condition does not wait: " +
                     "write the dependent rules under WhenOnServer with the same test.");
             _host.DeclareUnder(RuleCondition<T>.Passing(this), rules);
             return this;
@@ -341,7 +370,7 @@ namespace Alis.Reactive.Validation
 
         public override async Task Validate(T instance, string prefix, ValidationRun run)
         {
-            if (!Scope.Hold(instance, run.Selection)) return;
+            if (!await Scope.HoldAsync(instance, run).ConfigureAwait(false)) return;
             var value = (TValue)Member.ValueIn(instance)!;
             foreach (var part in Parts)
             {
@@ -375,7 +404,7 @@ namespace Alis.Reactive.Validation
 
         public override async Task Validate(T instance, string prefix, ValidationRun run)
         {
-            if (!Scope.Hold(instance, run.Selection)) return;
+            if (!await Scope.HoldAsync(instance, run).ConfigureAwait(false)) return;
             if (!(Member.ValueIn(instance) is IEnumerable<TElement> items)) return;
 
             var index = 0;
@@ -430,14 +459,14 @@ namespace Alis.Reactive.Validation
         // FluentValidation runs it; an Include in a set runs under that set alone.
         public bool RunsUnder(RuleSetSelection selection) => selection.Selects(_sets) || (selection.IsNamed && !_sets.Any);
 
-        public bool IsAsync(RuleSetSelection selection) => _included is ReactiveValidator rules && rules.IsAsync(selection);
+        public bool IsAsync(RuleSetSelection selection) => _scope.Waits || (_included is ReactiveValidator rules && rules.IsAsync(selection));
 
         public IEnumerable<string> ReachableRuleSets =>
             _included is ReactiveValidator rules && !_sets.Any ? rules.DeclaredRuleSets : Enumerable.Empty<string>();
 
         public async Task Validate(T instance, string prefix, ValidationRun run)
         {
-            if (!_scope.Hold(instance, run.Selection)) return;
+            if (!await _scope.HoldAsync(instance, run).ConfigureAwait(false)) return;
             await Validators.Run(_included, instance, prefix, run).ConfigureAwait(false);
         }
 
@@ -478,7 +507,7 @@ namespace Alis.Reactive.Validation
 
         internal override async Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run)
         {
-            if (!Conditions.Hold(instance, run.Selection)) return;
+            if (!await Conditions.HoldAsync(instance, run).ConfigureAwait(false)) return;
             var arguments = new MessageArguments(displayName).With("PropertyValue", value);
             await _check(value, new CustomContext<T>(instance, run, prefix, fieldPath, arguments), run.Cancellation).ConfigureAwait(false);
         }
@@ -504,7 +533,7 @@ namespace Alis.Reactive.Validation
 
         internal override async Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run)
         {
-            if (!Conditions.Hold(instance, run.Selection)) return;
+            if (!await Conditions.HoldAsync(instance, run).ConfigureAwait(false)) return;
             var arguments = new MessageArguments(displayName).With("PropertyValue", value);
             _check.NameRenderArguments(arguments);
             var passes = run.Synchronous
@@ -558,7 +587,7 @@ namespace Alis.Reactive.Validation
         // A missing value has no members to validate; NotNull says it is missing.
         internal override async Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run)
         {
-            if (!Conditions.Hold(instance, run.Selection) || value == null) return;
+            if (!await Conditions.HoldAsync(instance, run).ConfigureAwait(false) || value == null) return;
             await Validators.Run(_child, value, prefix + fieldPath + ".", run).ConfigureAwait(false);
         }
 

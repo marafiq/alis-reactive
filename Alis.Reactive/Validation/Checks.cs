@@ -526,7 +526,7 @@ namespace Alis.Reactive.Validation
         internal override bool IsAsync => true;
 
         internal override bool Passes(T instance, TValue value, MessageArguments arguments) =>
-            throw new InvalidOperationException("A rule that waits (MustAsync) runs only in ValidateAsync.");
+            throw new InvalidOperationException("A rule that waits (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync.");
 
         internal override Task<bool> PassesAsync(T instance, TValue value, MessageArguments arguments, CancellationToken cancellation) =>
             _predicate(instance, value, cancellation);

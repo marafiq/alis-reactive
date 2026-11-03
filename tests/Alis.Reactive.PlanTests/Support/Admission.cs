@@ -170,6 +170,17 @@ public sealed class MessageAfterChildRules : ReactiveValidator<Admission>
     }
 }
 
+/// <summary>A rule under a condition that waits: the server's alone.</summary>
+public sealed class WaitingAdmissionRules : ReactiveValidator<Admission>
+{
+    public WaitingAdmissionRules()
+    {
+        RuleFor(x => x.Age).GreaterThan(0).WithMessage("Give the age.");
+        WhenAsync((admission, cancellation) => Task.FromResult(admission.Age > 90), () =>
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name the resident."));
+    }
+}
+
 /// <summary>A rule on a value computed from a member has no member to report under.</summary>
 public sealed class ComputedMemberRules : ReactiveValidator<Admission>
 {

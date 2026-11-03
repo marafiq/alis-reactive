@@ -160,4 +160,22 @@ public class WhenAValidatorDescribesItsRules
         Assert.That(fields[1]!["tests"]!.AsArray(), Has.Count.EqualTo(1));
         Golden.Matches(rendered, "Validation", nameof(a_form_validated_by_a_set_carries_the_rules_of_that_set_alone));
     }
+
+    [Test]
+    public void a_rule_under_a_condition_that_waits_is_the_servers()
+    {
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<WaitingAdmissionRules>());
+        html.TextInput(plan, m => m.Name);
+        html.TextInput(plan, m => m.Age);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<WaitingAdmissionRules>("admission")));
+
+        var rendered = html.Rendered(plan);
+
+        var fields = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray();
+        var name = fields.Single(each => each!["name"]!.GetValue<string>() == "Name");
+        Assert.That(name!["tests"]!.AsArray(), Is.Empty, "the name's rule waits on the server's condition");
+        var age = fields.Single(each => each!["name"]!.GetValue<string>() == "Age");
+        Assert.That(age!["tests"]!.AsArray(), Has.Count.EqualTo(1));
+        Golden.Matches(rendered, "Validation", nameof(a_rule_under_a_condition_that_waits_is_the_servers));
+    }
 }

@@ -320,6 +320,8 @@ Alis.Reactive.ReactiveValidator<T>.RuleFor<TProperty>(System.Linq.Expressions.Ex
 Alis.Reactive.ReactiveValidator<T>.RuleForEach<TElement>(System.Linq.Expressions.Expression<System.Func<T, System.Collections.Generic.IEnumerable<TElement>!>!>! collection) -> Alis.Reactive.IRuleBuilder<T, TElement>!
 Alis.Reactive.ReactiveValidator<T>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
 Alis.Reactive.ReactiveValidator<T>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
+Alis.Reactive.ReactiveValidator<T>.UnlessAsync(System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
+Alis.Reactive.ReactiveValidator<T>.WhenAsync(System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
 Alis.Reactive.ReactiveValidator<T>.Validate(T instance) -> Alis.Reactive.ValidationResult!
 Alis.Reactive.ReactiveValidator<T>.Validate(T instance, string! ruleSet) -> Alis.Reactive.ValidationResult!
 Alis.Reactive.ReactiveValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!
