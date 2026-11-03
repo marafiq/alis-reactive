@@ -50,7 +50,7 @@ namespace Alis.Reactive
     }
 
     /// <summary>A test of a value alone: whether it is truthy, missing or empty.</summary>
-    public sealed class ValueTest
+    internal sealed class ValueTest
     {
         private ValueTest(string name)
         {
@@ -58,22 +58,22 @@ namespace Alis.Reactive
         }
 
         /// <summary>The value is truthy: not null, false, zero or empty.</summary>
-        public static ValueTest Truthy { get; } = new ValueTest("truthy");
+        internal static ValueTest Truthy { get; } = new ValueTest("truthy");
 
         /// <summary>The value is falsy.</summary>
-        public static ValueTest Falsy { get; } = new ValueTest("falsy");
+        internal static ValueTest Falsy { get; } = new ValueTest("falsy");
 
         /// <summary>Nothing is bound.</summary>
-        public static ValueTest IsNull { get; } = new ValueTest("is-null");
+        internal static ValueTest IsNull { get; } = new ValueTest("is-null");
 
         /// <summary>A value is bound.</summary>
-        public static ValueTest NotNull { get; } = new ValueTest("not-null");
+        internal static ValueTest NotNull { get; } = new ValueTest("not-null");
 
         /// <summary>The value is null, empty text or an empty list.</summary>
-        public static ValueTest IsEmpty { get; } = new ValueTest("is-empty");
+        internal static ValueTest IsEmpty { get; } = new ValueTest("is-empty");
 
         /// <summary>The value is not empty.</summary>
-        public static ValueTest NotEmpty { get; } = new ValueTest("not-empty");
+        internal static ValueTest NotEmpty { get; } = new ValueTest("not-empty");
 
         internal string Name { get; }
 
@@ -82,7 +82,7 @@ namespace Alis.Reactive
     }
 
     /// <summary>A test of text against text: a substring, a prefix, a suffix, or a pattern.</summary>
-    public sealed class TextTest
+    internal sealed class TextTest
     {
         private TextTest(string name, string method)
         {
@@ -91,16 +91,16 @@ namespace Alis.Reactive
         }
 
         /// <summary>The text contains the other.</summary>
-        public static TextTest Contains { get; } = new TextTest("contains", "includes");
+        internal static TextTest Contains { get; } = new TextTest("contains", "includes");
 
         /// <summary>The text starts with the other.</summary>
-        public static TextTest StartsWith { get; } = new TextTest("starts-with", "startsWith");
+        internal static TextTest StartsWith { get; } = new TextTest("starts-with", "startsWith");
 
         /// <summary>The text ends with the other.</summary>
-        public static TextTest EndsWith { get; } = new TextTest("ends-with", "endsWith");
+        internal static TextTest EndsWith { get; } = new TextTest("ends-with", "endsWith");
 
         /// <summary>The text matches the other as a regular expression.</summary>
-        public static TextTest Matches { get; } = new TextTest("matches", "");
+        internal static TextTest Matches { get; } = new TextTest("matches", "");
 
         internal string Name { get; }
 

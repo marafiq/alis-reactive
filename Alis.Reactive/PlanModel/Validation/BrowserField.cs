@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive
 {
@@ -76,7 +77,7 @@ namespace Alis.Reactive
     /// return rules.Fields;
     /// </code>
     /// </example>
-    public sealed class BrowserRuleSet
+    internal sealed class BrowserRuleSet
     {
         private readonly Dictionary<string, Entry> _fields = new Dictionary<string, Entry>(StringComparer.Ordinal);
         private readonly List<Entry> _order = new List<Entry>();
@@ -84,7 +85,7 @@ namespace Alis.Reactive
         /// <summary>Adds a rule on a member.</summary>
         /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
         /// <param name="rule">The rule, under the condition it is declared under.</param>
-        public void Add(LambdaExpression member, BrowserRule rule)
+        internal void Add(LambdaExpression member, BrowserRule rule)
         {
             if (rule == null) throw new ArgumentNullException(nameof(rule));
             var reference = FieldReference.Of(member);
@@ -98,7 +99,7 @@ namespace Alis.Reactive
         /// <param name="collection">The collection member, as a path from the validator's model.</param>
         /// <param name="rules">The rules each item is checked by.</param>
         /// <param name="when">The condition the collection's rule is declared under.</param>
-        public void AddItemRules(LambdaExpression collection, IEnumerable<BrowserRule> rules, Condition when)
+        internal void AddItemRules(LambdaExpression collection, IEnumerable<BrowserRule> rules, Condition when)
         {
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             if (when == null) throw new ArgumentNullException(nameof(when));
@@ -116,7 +117,7 @@ namespace Alis.Reactive
         /// <param name="collection">The collection member, as a path from the validator's model.</param>
         /// <param name="itemFields">The item's members and rules, by their paths in the item.</param>
         /// <param name="when">The condition the collection's rule is declared under.</param>
-        public void AddItems(LambdaExpression collection, IEnumerable<BrowserField> itemFields, Condition when)
+        internal void AddItems(LambdaExpression collection, IEnumerable<BrowserField> itemFields, Condition when)
         {
             if (itemFields == null) throw new ArgumentNullException(nameof(itemFields));
             if (when == null) throw new ArgumentNullException(nameof(when));
@@ -129,13 +130,13 @@ namespace Alis.Reactive
         /// <summary>Adds a validator's members in place: a validator included whole.</summary>
         /// <param name="fields">The included validator's members and rules.</param>
         /// <param name="when">The condition the inclusion is declared under.</param>
-        public void Add(IEnumerable<BrowserField> fields, Condition when) => AddUnder("", fields, when);
+        internal void Add(IEnumerable<BrowserField> fields, Condition when) => AddUnder("", fields, when);
 
         /// <summary>Adds a child validator's members under the member that holds them.</summary>
         /// <param name="owner">The member that holds them, as a path from the validator's model.</param>
         /// <param name="fields">The child validator's members and rules.</param>
         /// <param name="when">The condition the child's rule is declared under.</param>
-        public void Add(LambdaExpression owner, IEnumerable<BrowserField> fields, Condition when) =>
+        internal void Add(LambdaExpression owner, IEnumerable<BrowserField> fields, Condition when) =>
             AddUnder(FieldReference.Of(owner).Path, fields, when);
 
         private void AddUnder(string prefix, IEnumerable<BrowserField> fields, Condition when)
@@ -154,7 +155,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Every member the validator names, with its rules, where it first named it.</summary>
-        public IReadOnlyList<BrowserField> Fields =>
+        internal IReadOnlyList<BrowserField> Fields =>
             _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields)).ToArray();
 
         private void AddRule(FieldReference field, BrowserRule rule)

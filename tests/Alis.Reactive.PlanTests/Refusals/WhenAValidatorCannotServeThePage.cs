@@ -15,7 +15,7 @@ public class WhenAValidatorCannotServeThePage
 
         var refused = Assert.Throws<InvalidOperationException>(() => html.Rendered(plan));
 
-        Assert.That(refused!.Message, Does.Contain("no IBrowserRuleSource is registered"));
+        Assert.That(refused!.Message, Does.Contain("no validators are registered"));
         Assert.That(refused.Message, Does.Contain("AddReactiveFluentValidation"));
     }
 

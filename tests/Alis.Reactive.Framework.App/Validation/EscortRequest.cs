@@ -203,3 +203,11 @@ public sealed class UnreadableEscortRules : ReactiveValidator<EscortRequest>
         RuleFor(x => x.ForMore).NotEmpty().When(x => x.Wing != null && x.Wing.Length > 3).WithMessage("Needed for a long wing name.");
     }
 }
+
+/// <summary>The condition with no browser form an escort request's rules sit under.</summary>
+public enum EscortUnreadable
+{
+    LengthOfText,
+    OrderAgainstNothing,
+    TextEquals,
+}

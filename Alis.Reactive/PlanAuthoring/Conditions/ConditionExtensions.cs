@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.PlanAuthoring.Conditions;
+using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive
 {

@@ -179,15 +179,14 @@ namespace Alis.Reactive
 #if NET48
             throw new InvalidOperationException(
                 $"{requiredBy} specifies validation source '{validatorName}', " +
-                "but no IBrowserRuleSource could be resolved. " +
+                "but no validators could be resolved. " +
                 "Register the validators with AddReactiveFluentValidation(...) and bridge it to " +
                 "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
 #else
             throw new InvalidOperationException(
                 $"{requiredBy} specifies validation source '{validatorName}', " +
-                "but no IBrowserRuleSource is registered in DI. " +
-                "Register the validators with services.AddReactiveFluentValidation(...), " +
-                "or register your own IBrowserRuleSource.");
+                "but no validators are registered in DI. " +
+                "Register them with services.AddReactiveFluentValidation(...).");
 #endif
         }
     }
