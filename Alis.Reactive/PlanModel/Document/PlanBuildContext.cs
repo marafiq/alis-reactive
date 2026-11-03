@@ -197,12 +197,16 @@ namespace Alis.Reactive.PlanModel.Document
         {
             foreach (var (other, otherValidation) in _validatedRequests)
             {
-                if (other == request || otherValidation.Form != validation.Form || otherValidation.Validator == validation.Validator)
-                    continue;
-                throw new InvalidOperationException(
-                    $"Form '{validation.Form}' is validated by {CSharpTypeName.Of(otherValidation.Validator)} and by " +
-                    $"{CSharpTypeName.Of(validation.Validator)}, but a form takes one validator. Give each validator a " +
-                    "form of its own, or write one validator whose rules differ by When conditions.");
+                if (other == request || otherValidation.Form != validation.Form) continue;
+                if (otherValidation.Validator != validation.Validator)
+                    throw new InvalidOperationException(
+                        $"Form '{validation.Form}' is validated by {CSharpTypeName.Of(otherValidation.Validator)} and by " +
+                        $"{CSharpTypeName.Of(validation.Validator)}, but a form takes one validator. Give each validator a " +
+                        "form of its own, or write one validator whose rules differ by When conditions.");
+                if (otherValidation.RuleSet != validation.RuleSet)
+                    throw new InvalidOperationException(
+                        $"Form '{validation.Form}' is validated by {CSharpTypeName.Of(validation.Validator)} under {otherValidation.DescribedRuleSet} " +
+                        $"and under {validation.DescribedRuleSet}, but a form takes one validator and one rule set. Give each a form of its own.");
             }
 
             var index = _validatedRequests.FindIndex(validated => validated.Request == request);

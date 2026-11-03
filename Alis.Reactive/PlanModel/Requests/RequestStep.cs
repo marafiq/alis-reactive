@@ -212,11 +212,13 @@ namespace Alis.Reactive.PlanModel.Requests
         internal FormValidation(
             Func<IBrowserRuleSource, IReadOnlyList<BrowserField>> rules,
             Type validator,
-            string form)
+            string form,
+            string? ruleSet)
         {
             Rules = rules ?? throw new ArgumentNullException(nameof(rules));
             Validator = validator ?? throw new ArgumentNullException(nameof(validator));
             Form = form ?? throw new ArgumentNullException(nameof(form));
+            RuleSet = ruleSet;
         }
 
         internal Func<IBrowserRuleSource, IReadOnlyList<BrowserField>> Rules { get; }
@@ -224,5 +226,12 @@ namespace Alis.Reactive.PlanModel.Requests
         internal Type Validator { get; }
 
         internal string Form { get; }
+
+        // null: the rules in no set, what Validate(instance) runs; a blank name is refused before this, so no
+        // text stands for the absence.
+        internal string? RuleSet { get; }
+
+        /// <summary>The set as a refusal names it.</summary>
+        internal string DescribedRuleSet => RuleSet == null ? "no rule set" : $"rule set '{RuleSet}'";
     }
 }

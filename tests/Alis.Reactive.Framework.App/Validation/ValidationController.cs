@@ -254,4 +254,47 @@ public sealed class ValidationController : Controller
     [HttpPost("/Validation/Book/Failures")]
     public IActionResult BookFailures([FromBody] VisitBooking booking, [FromServices] VisitRules rules) =>
         Json(new Booked { Summary = string.Join("; ", rules.Validate(booking).Errors) });
+
+    public IActionResult Discharge(string? stage)
+    {
+        ViewData["Stage"] = stage;
+        return View(new DischargeSummary());
+    }
+
+    public IActionResult DischargeRefused() => View(new DischargeSummary());
+
+    /// <summary>Checks the rules in no stage, and saves.</summary>
+    [HttpPost("/Validation/Discharge")]
+    public IActionResult SaveDischarge([FromBody] DischargeSummary summary, [FromServices] DischargeRules rules)
+    {
+        var result = rules.Validate(summary);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"saved for {summary.Resident}" });
+    }
+
+    /// <summary>Checks the rules of one stage, the set the page named, and saves.</summary>
+    [HttpPost("/Validation/Discharge/{stage}")]
+    public IActionResult SaveDischargeStage(string stage, [FromBody] DischargeSummary summary, [FromServices] DischargeRules rules)
+    {
+        var result = rules.Validate(summary, stage);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"{stage} saved for {summary.Resident}" });
+    }
+
+    /// <summary>Validates under a stage the rules do not declare, and says what the validator said of it.</summary>
+    [HttpPost("/Validation/DischargeUndeclared")]
+    public IActionResult SaveDischargeUndeclared([FromBody] DischargeSummary summary, [FromServices] DischargeRules rules)
+    {
+        try
+        {
+            rules.Validate(summary, "Drafts");
+            return Json(new Booked { Summary = "saved" });
+        }
+        catch (InvalidOperationException refused)
+        {
+            return Json(new Booked { Summary = refused.Message });
+        }
+    }
 }

@@ -15,13 +15,24 @@ namespace Alis.Reactive
     {
         /// <summary>Checks every rule against the model.</summary>
         /// <param name="instance">The model.</param>
-        /// <exception cref="InvalidOperationException">A rule waits (<c>MustAsync</c>): use <see cref="ValidateAsync"/>.</exception>
+        /// <exception cref="InvalidOperationException">A rule waits (<c>MustAsync</c>): use <see cref="ValidateAsync(T, CancellationToken)"/>.</exception>
         ValidationResult Validate(T instance);
+
+        /// <summary>Checks the rules of one set against the model; a set the validator does not declare is refused, naming those it declares.</summary>
+        /// <param name="instance">The model.</param>
+        /// <param name="ruleSet">The set, as <c>RuleSet</c> named it.</param>
+        ValidationResult Validate(T instance, string ruleSet);
 
         /// <summary>Checks every rule against the model, waiting for the rules that ask a database or a service.</summary>
         /// <param name="instance">The model.</param>
         /// <param name="cancellation">Stops the rules that wait.</param>
         Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = default);
+
+        /// <summary>Checks the rules of one set against the model, waiting where a rule waits; a set the validator does not declare is refused.</summary>
+        /// <param name="instance">The model.</param>
+        /// <param name="ruleSet">The set, as <c>RuleSet</c> named it.</param>
+        /// <param name="cancellation">Cancels the wait.</param>
+        Task<ValidationResult> ValidateAsync(T instance, string ruleSet, CancellationToken cancellation = default);
     }
 
     /// <summary>
@@ -35,11 +46,29 @@ namespace Alis.Reactive
         {
         }
 
-        /// <summary>Whether a rule waits for a database or a service.</summary>
-        internal abstract bool IsAsync { get; }
+        /// <summary>Whether a rule the selection reaches waits for a database or a service.</summary>
+        internal abstract bool IsAsync(RuleSetSelection selection);
 
-        /// <summary>The rules the browser runs, with those of the child validators the rules hold.</summary>
-        internal abstract IReadOnlyList<BrowserField> BrowserRules();
+        /// <summary>The rules the browser runs under the selection, with those of the child validators the rules hold.</summary>
+        internal abstract IReadOnlyList<BrowserField> BrowserRules(RuleSetSelection selection);
+
+        /// <summary>The sets a selection can name: those declared here, and those of a validator an <c>Include</c> in no set holds.</summary>
+        internal abstract IEnumerable<string> DeclaredRuleSets { get; }
+
+        /// <summary>
+        /// The selection a name asks for; a name no reachable validator declares is refused, naming the declared
+        /// sets. The one refusal, for <c>Validate</c>, <c>ValidateAsync</c> and the page's rule source.
+        /// </summary>
+        internal RuleSetSelection Select(string ruleSet)
+        {
+            if (string.IsNullOrWhiteSpace(ruleSet)) throw new ArgumentException("A rule set has a name people read.", nameof(ruleSet));
+            var declared = DeclaredRuleSets.ToList();
+            if (declared.Contains(ruleSet, StringComparer.Ordinal)) return RuleSetSelection.Of(ruleSet);
+            var validator = CSharpTypeName.Of(GetType());
+            throw new InvalidOperationException(declared.Count == 0
+                ? $"{validator} declares no rule set, and '{ruleSet}' was asked for. Write the rules it holds under RuleSet(\"{ruleSet}\", () => ..)."
+                : $"{validator} declares no rule set '{ruleSet}'. It declares: {string.Join(", ", declared)}.");
+        }
     }
 
     /// <summary>
@@ -59,7 +88,8 @@ namespace Alis.Reactive
     /// failing check of a rule, or with the first alone under <c>Cascade(CascadeMode.Stop)</c> or the validator's
     /// <c>RuleLevelCascadeMode</c>. <c>DependentRules</c> after a rule's checks declares rules that apply only while
     /// that rule passes; the browser skips them while the rule fails when every check of it has a browser form,
-    /// otherwise they are the server's.
+    /// otherwise they are the server's. <c>RuleSet("Issue", () => ..)</c> groups rules a form or a <c>Validate</c>
+    /// call names to run alone; the rules in no set run when none is named.
     /// </para>
     /// <para>
     /// Some rules only the server can check, and they stay there by what they are: <c>Must</c>, <c>MustAsync</c>,
@@ -95,7 +125,9 @@ namespace Alis.Reactive
     public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>, IRuleHost<T>
     {
         private readonly List<IRule<T>> _rules = new List<IRule<T>>();
+        private readonly List<string> _declaredSets = new List<string>();
         private Conditions<T> _scope = Conditions<T>.None;
+        private RuleSets _sets = RuleSets.None;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("ApiDesign", "RS0022:Constructor make protected",
             Justification = "An app derives from the typed validator; the untyped base stays closed and exposes no protected member.")]
@@ -115,7 +147,7 @@ namespace Alis.Reactive
         public IRuleBuilder<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty>> member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-            return Declared(new MemberRule<T, TProperty>(member, _scope, this));
+            return Declared(new MemberRule<T, TProperty>(member, _scope, _sets, this));
         }
 
         /// <summary>
@@ -127,12 +159,44 @@ namespace Alis.Reactive
         public IRuleBuilder<T, TElement> RuleForEach<TElement>(Expression<Func<T, IEnumerable<TElement>>> collection)
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
-            return Declared(new CollectionRule<T, TElement>(collection, _scope, this));
+            return Declared(new CollectionRule<T, TElement>(collection, _scope, _sets, this));
         }
 
         /// <summary>Runs another validator's rules for the same model, as if written here.</summary>
         /// <param name="rules">The validator.</param>
-        public void Include(IValidator<T> rules) => _rules.Add(new IncludeRule<T>(rules, _scope));
+        public void Include(IValidator<T> rules) => _rules.Add(new IncludeRule<T>(rules, _scope, _sets));
+
+        /// <summary>
+        /// Declares the rules inside <paramref name="rules"/> as members of the named sets: <c>RuleSet("Issue", ..)</c>,
+        /// or <c>RuleSet("Issue, Renew", ..)</c> for a rule in both. <c>Validate(instance, "Issue")</c> and a request's
+        /// <c>Validate&lt;TRules&gt;(formId, "Issue")</c> run the rules in that set alone; <c>Validate(instance)</c> and
+        /// <c>Validate&lt;TRules&gt;(formId)</c> run the rules in no set. The set reaches a child validator through a rule
+        /// of this set that holds it (<c>SetValidator</c>, <c>ChildRules</c>), and an <c>Include</c> written in no set,
+        /// and then runs the child's rules of the same name. Names match as written. A <c>RuleSet</c> inside a
+        /// <c>RuleSet</c> is refused.
+        /// </summary>
+        /// <param name="ruleSet">The set's name, or several separated by commas.</param>
+        /// <param name="rules">Declares the rules.</param>
+        public void RuleSet(string ruleSet, Action rules)
+        {
+            if (rules == null) throw new ArgumentNullException(nameof(rules));
+            var sets = RuleSets.Named(ruleSet);
+            if (_sets.Any)
+                throw new InvalidOperationException(
+                    $"RuleSet '{sets}' is written inside RuleSet '{_sets}'; a set holds rules, not sets. " +
+                    $"A rule in both is written once, under RuleSet(\"{_sets}, {sets}\", () => ..).");
+            foreach (var name in sets.Names)
+                if (!_declaredSets.Contains(name, StringComparer.Ordinal)) _declaredSets.Add(name);
+            _sets = sets;
+            try
+            {
+                rules();
+            }
+            finally
+            {
+                _sets = RuleSets.None;
+            }
+        }
 
         /// <summary>Applies the rules <paramref name="rules"/> declares only when <paramref name="predicate"/> holds.</summary>
         /// <param name="predicate">The condition over the model.</param>
@@ -167,42 +231,58 @@ namespace Alis.Reactive
             Branch(RuleCondition<T>.OnServer(predicate).Negated(), rules);
 
         /// <inheritdoc />
-        public ValidationResult Validate(T instance)
+        public ValidationResult Validate(T instance) => Validate(instance, RuleSetSelection.Default);
+
+        /// <inheritdoc />
+        public ValidationResult Validate(T instance, string ruleSet) => Validate(instance, Select(ruleSet));
+
+        /// <inheritdoc />
+        public Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = default) =>
+            ValidateAsync(instance, RuleSetSelection.Default, cancellation);
+
+        /// <inheritdoc />
+        public Task<ValidationResult> ValidateAsync(T instance, string ruleSet, CancellationToken cancellation = default) =>
+            ValidateAsync(instance, Select(ruleSet), cancellation);
+
+        private ValidationResult Validate(T instance, RuleSetSelection selection)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
-            if (IsAsync)
+            if (IsAsync(selection))
                 throw new InvalidOperationException($"{CSharpTypeName.Of(GetType())} has a rule that waits (MustAsync); validate with ValidateAsync.");
 
-            var run = new ValidationRun(synchronous: true, CancellationToken.None);
+            var run = new ValidationRun(synchronous: true, CancellationToken.None, selection);
             RunRules(instance, "", run).GetAwaiter().GetResult();
             return new ValidationResult(run.Failures.ToArray());
         }
 
-        /// <inheritdoc />
-        public async Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = default)
+        private async Task<ValidationResult> ValidateAsync(T instance, RuleSetSelection selection, CancellationToken cancellation)
         {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
 
-            var run = new ValidationRun(synchronous: false, cancellation);
+            var run = new ValidationRun(synchronous: false, cancellation, selection);
             await RunRules(instance, "", run).ConfigureAwait(false);
             return new ValidationResult(run.Failures.ToArray());
         }
 
-        internal override bool IsAsync => _rules.Any(rule => rule.IsAsync);
+        internal override bool IsAsync(RuleSetSelection selection) => _rules.Any(rule => rule.RunsUnder(selection) && rule.IsAsync(selection));
 
-        internal override IReadOnlyList<BrowserField> BrowserRules()
+        internal override IEnumerable<string> DeclaredRuleSets =>
+            _declaredSets.Concat(_rules.SelectMany(rule => rule.ReachableRuleSets)).Distinct(StringComparer.Ordinal);
+
+        internal override IReadOnlyList<BrowserField> BrowserRules(RuleSetSelection selection)
         {
             var browser = new BrowserRuleSet();
             foreach (var rule in _rules)
-                rule.DescribeFor(browser);
+                if (rule.RunsUnder(selection)) rule.DescribeFor(browser, selection);
             return browser.Fields;
         }
 
-        // A synchronous run completes without waiting: no check it holds waits.
+        // A synchronous run completes without waiting: no check it holds waits. The run's selection decides
+        // which rules it reaches, here and in every validator a rule holds.
         internal async Task RunRules(T instance, string prefix, ValidationRun run)
         {
             foreach (var rule in _rules)
-                await rule.Validate(instance, prefix, run).ConfigureAwait(false);
+                if (rule.RunsUnder(run.Selection)) await rule.Validate(instance, prefix, run).ConfigureAwait(false);
         }
 
         private TRule Declared<TRule>(TRule rule) where TRule : IRule<T>

@@ -141,4 +141,23 @@ public class WhenAValidatorDescribesItsRules
         Assert.That(field["tests"]!.AsArray(), Is.Empty);
         Golden.Matches(rendered, "Validation", nameof(a_custom_check_declares_its_member_to_the_page_and_leaves_it_no_test));
     }
+
+    [Test]
+    public void a_form_validated_by_a_set_carries_the_rules_of_that_set_alone()
+    {
+        var (html, plan) = Page.Of<Admission>(Registered.Validator<StagedAdmissionRules>());
+        html.TextInput(plan, m => m.Name);
+        html.TextInput(plan, m => m.Age);
+        html.TextInput(plan, m => m.Deposit);
+        html.On(plan, t => t.DomReady(p => p.Post("/admit").Gather(g => g.Form()).Validate<StagedAdmissionRules>("admission", "Admit")));
+
+        var rendered = html.Rendered(plan);
+
+        var fields = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray();
+        Assert.That(fields.Select(each => each!["name"]!.GetValue<string>()), Is.EqualTo(new[] { "Name", "Age" }), "the deposit's rule is in another set");
+        var name = fields[0]!["tests"]!.AsArray();
+        Assert.That(name.Select(test => test!["message"]!.GetValue<string>()), Is.EqualTo(new[] { "Name the resident." }), "the name's length is in no set");
+        Assert.That(fields[1]!["tests"]!.AsArray(), Has.Count.EqualTo(1));
+        Golden.Matches(rendered, "Validation", nameof(a_form_validated_by_a_set_carries_the_rules_of_that_set_alone));
+    }
 }

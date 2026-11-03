@@ -13,5 +13,11 @@ namespace Alis.Reactive
         /// <typeparam name="TValidator">The validator's type.</typeparam>
         /// <returns>Each member the validator names, with its rules.</returns>
         IReadOnlyList<BrowserField> GetBrowserRules<TValidator>() where TValidator : class;
+
+        /// <summary>The browser rules the validator declares in one set, as <c>Validate&lt;TValidator&gt;(formId, ruleSet)</c> reads them.</summary>
+        /// <typeparam name="TValidator">The validator's type.</typeparam>
+        /// <param name="ruleSet">The set, as the validator's <c>RuleSet</c> named it; a set it does not declare is refused.</param>
+        /// <returns>Each member the set names, with its rules.</returns>
+        IReadOnlyList<BrowserField> GetBrowserRules<TValidator>(string ruleSet) where TValidator : class;
     }
 }

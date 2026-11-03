@@ -820,7 +820,11 @@ errors stay under the member's path) and `Cascade` (the browser shows one messag
 failing check's; the server answers with every failing check of a rule, or with the first alone under
 `Cascade(CascadeMode.Stop)` or the validator's `RuleLevelCascadeMode`) and `DependentRules` (rules that
 apply only while the rule before them passes: the browser skips them while it fails, when every check of
-it has a browser form, else they are the server's), written as FluentValidation users write them. The FluentValidation
+it has a browser form, else they are the server's) and `RuleSet` (a form validated by a set, `Validate<TRules>(formId, "Issue")`,
+carries that set's browser rules alone and its endpoint validates by the same set; the rules in no set run when
+none is named; the set reaches a child validator through a rule in the set and an `Include` in no set; a set the
+validator does not declare, and a form under two sets, are refused where the page renders), written as
+FluentValidation users write them. The FluentValidation
 package is not used. Each check is one term of the vocabulary and defines both halves where both
 exist: what the server decides, and, for a term the browser decides the same way, the `BrowserRule`
 the plan carries. The rules are data, like the `rules` schema of Syncfusion's React form, but they

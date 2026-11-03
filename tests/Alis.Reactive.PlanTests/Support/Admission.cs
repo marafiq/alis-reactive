@@ -130,6 +130,18 @@ public sealed class CustomAdmissionRules : ReactiveValidator<Admission>
     }
 }
 
+/// <summary>An admission's rules by stage: an enquiry asks less than an admission, and the name's length is asked of neither.</summary>
+public sealed class StagedAdmissionRules : ReactiveValidator<Admission>
+{
+    public StagedAdmissionRules()
+    {
+        RuleFor(x => x.Name).MaximumLength(40);
+        RuleSet("Enquire, Admit", () => RuleFor(x => x.Name).NotEmpty().WithMessage("Name the resident."));
+        RuleSet("Admit", () => RuleFor(x => x.Age).GreaterThan(0).WithMessage("Give the resident's age."));
+        RuleSet("Enquire", () => RuleFor(x => x.Deposit).GreaterThan(0m));
+    }
+}
+
 /// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
 public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
 {

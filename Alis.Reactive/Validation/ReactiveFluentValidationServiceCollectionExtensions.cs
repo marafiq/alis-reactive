@@ -111,13 +111,22 @@ namespace Alis.Reactive
             _validators = new HashSet<Type>(registered.SelectMany(types => types.Types));
         }
 
-        public IReadOnlyList<BrowserField> GetBrowserRules<TValidator>() where TValidator : class
+        public IReadOnlyList<BrowserField> GetBrowserRules<TValidator>() where TValidator : class =>
+            Resolve<TValidator>().BrowserRules(RuleSetSelection.Default);
+
+        public IReadOnlyList<BrowserField> GetBrowserRules<TValidator>(string ruleSet) where TValidator : class
+        {
+            var validator = Resolve<TValidator>();
+            return validator.BrowserRules(validator.Select(ruleSet));
+        }
+
+        private ReactiveValidator Resolve<TValidator>() where TValidator : class
         {
             if (!_validators.Contains(typeof(TValidator)))
                 throw new InvalidOperationException(
                     $"No validator '{typeof(TValidator).FullName}' is registered for the page's browser rules. " +
                     "Register it with services.AddReactiveFluentValidation(validation => validation.Add<TValidator>()).");
-            return ((ReactiveValidator)(object)_services.GetRequiredService<TValidator>()).BrowserRules();
+            return (ReactiveValidator)(object)_services.GetRequiredService<TValidator>();
         }
     }
 }

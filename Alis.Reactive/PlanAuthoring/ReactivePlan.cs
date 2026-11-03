@@ -96,6 +96,14 @@ namespace Alis.Reactive
             RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>();
 
+        /// <summary>The browser rules <typeparamref name="TValidator"/> declares in one set (<c>RuleSet("Issue", ..)</c>).</summary>
+        /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
+        /// <param name="ruleSet">The set, as the validator's <c>RuleSet</c> named it; a set it does not declare is refused.</param>
+        /// <returns>Each field the set names, with the rules the browser can evaluate.</returns>
+        public IReadOnlyList<BrowserField> BrowserRules<TValidator>(string ruleSet) where TValidator : class =>
+            RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
+                .GetBrowserRules<TValidator>(ruleSet);
+
         // The plan as its script carries it, once, after everything written to it: the rendered inputs join it, each
         // validated form is bound to its validator's rules from the services the plan started with, and the grammar is
         // serialized. Html.RenderPlan is the one caller, so a plan always renders with the page's record.

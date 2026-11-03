@@ -87,25 +87,18 @@ a missing secret, mention the possibility without reading the secret store.
 
 ## Validation Design
 
-### Schema Principles
-- `shape` on ValidationRule is derived from the comparison operand's CLR type during rule extraction (via `Shape.FromClrType()`). Non-comparison rules (required, email, regex) carry `Shape.None`; component shape comes from `Shape.FromClrType(typeof(TProp))` at registration time.
-- `field` on ValidationRule for cross-property comparisons uses the same deterministic ID system as everything else: TModel, prop expression, known type, predictable ID.
-- Schema must be deterministic — no fallbacks, no silent drops. Every validation rule either reaches the browser or is server-only by what it is (a C# predicate, a message built from the model, a condition with no browser form, `.ServerOnly()`).
-- `Empty()` and `Null()` are extractable. PrecisionScale, IsInEnum, IsEnumName are server-only.
+The reference is `docs/design/grammar.md` section 7: the validator grammar (`ReactiveValidator<T>`, FluentValidation's
+syntax), what each check decides on the server and the browser form the plan carries, and what stays on the server by
+what it is. The principles that hold:
 
-### Cross-Property Comparisons
-- Same `min`/`max`/`gt`/`lt` rule types — `constraint` for fixed value, `field` for cross-property. Mutually exclusive.
-- Cross-property reads use the same mechanism: binding path, enriched fieldId, resolveRoot, walk(readExpr). No scanning, no new concepts.
-
-### Date Handling
-- `shape: "date"` uses `toDate()` from `runtime/grammar/operators.ts` — handles Date objects (SF), ISO strings, date-only strings with timezone safety.
-- DateTime constraints serialize as `"yyyy-MM-dd"` (C# format string) when time is midnight — parsed as local midnight, timezone-safe.
-- Facility timezone is the application's responsibility.
-
-### Validator Scope
-- Validator scope = form scope. Always. List the fields a view renders before creating the validator.
-- Nested properties require `SetValidator()`. Direct chain (`RuleFor(x => x.Address.Street)`) extracts a rule but the field path won't correlate with components at runtime because the component-to-field mapping relies on the prefix built during `SetValidator` traversal.
-- Verify the extracted field list in the plan JSON.
+- Every rule either reaches the browser or is the server's by what it is (a C# predicate or custom check, a message
+  built from the model, a condition with no browser form, `.ServerOnly()`). No fallbacks, no silent drops: a condition
+  the browser cannot read and that is not declared the server's is refused where the page describes the rules.
+- A form is validated by one validator and one rule set; the plan carries that set's rules already filtered, and the
+  endpoint validates by the same set.
+- Errors are reported under the member's path, as model binding names it; `WithName` changes only the name a message
+  says. A nested object's rules come through `SetValidator`, `ChildRules` or `Include`, prefixed by the member's path.
+- A date reaches the browser as the text MVC binds (`yyyy-MM-dd` at midnight); the facility's timezone is the app's.
 
 ### Live Re-Validation
 - Industry standard: clear on input, re-validate on blur and on the input's commit event.

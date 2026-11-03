@@ -154,11 +154,13 @@ Alis.Reactive.HttpRequestBuilder<TModel>.Gather(System.Action<Alis.Reactive.Gath
 Alis.Reactive.HttpRequestBuilder<TModel>.Gather<TRequest>(System.Action<Alis.Reactive.GatherBuilder<TRequest!, TModel!>!>! gather) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
 Alis.Reactive.HttpRequestBuilder<TModel>.Response(System.Action<Alis.Reactive.ResponseBuilder<TModel!>!>! response) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
 Alis.Reactive.HttpRequestBuilder<TModel>.Validate<TValidationSource>(string! formId) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
+Alis.Reactive.HttpRequestBuilder<TModel>.Validate<TValidationSource>(string! formId, string! ruleSet) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
 Alis.Reactive.HttpRequestBuilder<TModel>.WhileLoading(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
 Alis.Reactive.IAppLevelComponent
 Alis.Reactive.IAppLevelComponent.DefaultId.get -> string!
 Alis.Reactive.IBrowserRuleSource
 Alis.Reactive.IBrowserRuleSource.GetBrowserRules<TValidator>() -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
+Alis.Reactive.IBrowserRuleSource.GetBrowserRules<TValidator>(string! ruleSet) -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
 Alis.Reactive.IComponent
 Alis.Reactive.IComponent.Vendor.get -> Alis.Reactive.ComponentVendor!
 Alis.Reactive.IConditionBuilder
@@ -199,7 +201,9 @@ Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WithMessage(System.Func<T, strin
 Alis.Reactive.IRuleBuilderOptions<T, TProperty>.WithName(string! displayName) -> Alis.Reactive.IRuleBuilderOptions<T, TProperty>!
 Alis.Reactive.IValidator<T>
 Alis.Reactive.IValidator<T>.Validate(T instance) -> Alis.Reactive.ValidationResult!
+Alis.Reactive.IValidator<T>.Validate(T instance, string! ruleSet) -> Alis.Reactive.ValidationResult!
 Alis.Reactive.IValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!
+Alis.Reactive.IValidator<T>.ValidateAsync(T instance, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!
 Alis.Reactive.JsObject
 Alis.Reactive.JsObject.Event(string? name = null, string! declaredBy = "") -> Alis.Reactive.Event!
 Alis.Reactive.JsObject.Event<TArgs>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Event<TArgs!>!
@@ -302,6 +306,7 @@ Alis.Reactive.ReactiveFluentValidationBuilder.AddFromAssemblyContaining<TMarker>
 Alis.Reactive.ReactiveFluentValidationServiceCollectionExtensions
 Alis.Reactive.ReactivePlan<TModel>
 Alis.Reactive.ReactivePlan<TModel>.BrowserRules<TValidator>() -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
+Alis.Reactive.ReactivePlan<TModel>.BrowserRules<TValidator>(string! ruleSet) -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
 Alis.Reactive.ReactivePlan<TModel>.RegisterPlugin<TPlugin>() -> TPlugin!
 Alis.Reactive.ReactivePlan<TModel>.Render<TComponent>(string! elementId, Microsoft.AspNetCore.Html.IHtmlContent! markup) -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
 Alis.Reactive.ReactiveValidator
@@ -310,12 +315,15 @@ Alis.Reactive.ReactiveValidator<T>.Include(Alis.Reactive.IValidator<T>! rules) -
 Alis.Reactive.ReactiveValidator<T>.ReactiveValidator() -> void
 Alis.Reactive.ReactiveValidator<T>.RuleLevelCascadeMode.get -> Alis.Reactive.CascadeMode
 Alis.Reactive.ReactiveValidator<T>.RuleLevelCascadeMode.set -> void
+Alis.Reactive.ReactiveValidator<T>.RuleSet(string! ruleSet, System.Action! rules) -> void
 Alis.Reactive.ReactiveValidator<T>.RuleFor<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.IRuleBuilder<T, TProperty>!
 Alis.Reactive.ReactiveValidator<T>.RuleForEach<TElement>(System.Linq.Expressions.Expression<System.Func<T, System.Collections.Generic.IEnumerable<TElement>!>!>! collection) -> Alis.Reactive.IRuleBuilder<T, TElement>!
 Alis.Reactive.ReactiveValidator<T>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
 Alis.Reactive.ReactiveValidator<T>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
 Alis.Reactive.ReactiveValidator<T>.Validate(T instance) -> Alis.Reactive.ValidationResult!
+Alis.Reactive.ReactiveValidator<T>.Validate(T instance, string! ruleSet) -> Alis.Reactive.ValidationResult!
 Alis.Reactive.ReactiveValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!
+Alis.Reactive.ReactiveValidator<T>.ValidateAsync(T instance, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.ValidationResult!>!
 Alis.Reactive.ReactiveValidator<T>.When(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
 Alis.Reactive.ReactiveValidator<T>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.IConditionBuilder!
 Alis.Reactive.ReactiveValue<TValue>

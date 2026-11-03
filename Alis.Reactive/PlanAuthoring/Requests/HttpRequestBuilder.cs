@@ -92,10 +92,28 @@ namespace Alis.Reactive
         /// <typeparam name="TValidationSource">Source type whose metadata declares the client validation rules.</typeparam>
         /// <param name="formId">DOM element ID of the form container for error display.</param>
         public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId)
+            where TValidationSource : class =>
+            Validate(formId, new FormValidation(source => source.GetBrowserRules<TValidationSource>(), typeof(TValidationSource), formId, ruleSet: null));
+
+        /// <summary>
+        /// Runs client validation for the form before sending the request, by the rules of one set of the validator
+        /// (<c>RuleSet("Issue", ..)</c>); the endpoint validates by the same set, <c>rules.Validate(model, "Issue")</c>.
+        /// A form takes one validator and one set: a request that names another pair for the same form is refused
+        /// where the page renders. A set the validator does not declare is refused there too, naming the declared sets.
+        /// </summary>
+        /// <typeparam name="TValidationSource">Source type whose metadata declares the client validation rules.</typeparam>
+        /// <param name="formId">DOM element ID of the form container for error display.</param>
+        /// <param name="ruleSet">The set, as the validator's <c>RuleSet</c> named it.</param>
+        public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId, string ruleSet)
             where TValidationSource : class
         {
+            if (string.IsNullOrWhiteSpace(ruleSet)) throw new ArgumentException("A rule set has a name people read.", nameof(ruleSet));
+            return Validate(formId, new FormValidation(source => source.GetBrowserRules<TValidationSource>(ruleSet), typeof(TValidationSource), formId, ruleSet));
+        }
+
+        private HttpRequestBuilder<TModel> Validate(string formId, FormValidation validation)
+        {
             if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
-            var validation = new FormValidation(source => source.GetBrowserRules<TValidationSource>(), typeof(TValidationSource), formId);
             Step.Validation = validation;
             _context.ValidateBefore(Step, validation);
             return this;
