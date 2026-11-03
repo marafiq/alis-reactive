@@ -21,6 +21,9 @@ public sealed class DatePickerLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
+    /// <summary>The input group around the input, the bordered box a user sees.</summary>
+    public ILocator Wrapper => Input.Locator("..");
+
     public ILocator CalendarIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-date-icon");
 
     public ILocator Popup => _page.Locator($"#{_componentId}_options");

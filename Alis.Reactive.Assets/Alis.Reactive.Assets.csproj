@@ -2,9 +2,8 @@
 
   <!--
     This project compiles nothing. It exists so the framework browser assets -
-    the TypeScript runtime, the framework's own components, the design-system CSS
-    and the Syncfusion CSS - are a first-class, navigable node in the solution
-    instead of a loose folder.
+    the TypeScript runtime, the framework's own components and the design-system
+    CSS - are a first-class, navigable node in the solution instead of a loose folder.
 
     The bundles are built by esbuild/vite via npm (see CLAUDE.md "Build & Run").
     MSBuild never touches these files - they are <None> items so Rider shows the
@@ -22,7 +21,6 @@
     <None Include="components/**/*" />
     <None Include="bundle.ts" />
     <None Include="design-system/**/*" />
-    <None Include="fusion/**/*" />
     <None Include="*.json" />
     <None Include="*.mjs" />
     <None Include="*.config.ts" />

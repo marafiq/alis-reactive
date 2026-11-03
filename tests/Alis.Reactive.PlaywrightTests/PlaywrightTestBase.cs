@@ -2,8 +2,8 @@ namespace Alis.Reactive.PlaywrightTests;
 
 /// <summary>
 /// A page test against the sandbox: the shared page lifecycle (<see cref="AppPageTest"/>) plus what the
-/// sandbox's pages need, the Syncfusion runtime served from node_modules with its animations off and the
-/// layout's web fonts left out, and the sandbox suites' own helpers over the page's console.
+/// sandbox's pages need, Syncfusion's animations off and the layout's web fonts left out, and the sandbox
+/// suites' own helpers over the page's console.
 /// </summary>
 public abstract class PlaywrightTestBase : AppPageTest
 {
@@ -50,7 +50,6 @@ public abstract class PlaywrightTestBase : AppPageTest
         };
 
         await RouteExternalFontsToLocalFallback();
-        await RouteLocalSyncfusionRuntime();
         await DisableSyncfusionScriptAnimations();
     }
 
@@ -77,20 +76,6 @@ public abstract class PlaywrightTestBase : AppPageTest
             "window.addEventListener('DOMContentLoaded', () => {" +
             " window.ej?.base?.setGlobalAnimation?.(window.ej.base.GlobalAnimationMode.Disable);" +
             " });");
-    }
-
-    private async Task RouteLocalSyncfusionRuntime()
-    {
-        var syncfusionRuntimePath = FindRequiredFile(
-            Path.Combine("node_modules", "@syncfusion", "ej2", "dist", "ej2.min.js"));
-
-        await Context.RouteAsync("**/vendor/syncfusion/dist/ej2.min.js", async route =>
-            await route.FulfillAsync(new()
-            {
-                Status = 200,
-                ContentType = "application/javascript",
-                Path = syncfusionRuntimePath
-            }));
     }
 
     protected async Task NavigateTo(string path)
@@ -308,20 +293,5 @@ public abstract class PlaywrightTestBase : AppPageTest
         foreach (var message in messages)
             TestContext.Out.WriteLine(message);
         TestContext.Out.WriteLine("=== End Console Output ===");
-    }
-
-    private static string FindRequiredFile(string relativePath)
-    {
-        var dir = TestContext.CurrentContext.TestDirectory;
-        while (dir != null)
-        {
-            var candidate = Path.Combine(dir, relativePath);
-            if (File.Exists(candidate))
-                return candidate;
-
-            dir = Path.GetDirectoryName(dir);
-        }
-
-        throw new FileNotFoundException($"Required test asset '{relativePath}' was not found.");
     }
 }

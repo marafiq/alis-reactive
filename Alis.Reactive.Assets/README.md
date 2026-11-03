@@ -10,10 +10,11 @@ packages only *ship* the bundles built here.
 |--------|------|------------------|---------------------------------------------------|
 | `runtime/`, `components/` | TypeScript runtime and the framework's own component code | `dist/scripts/alis-reactive.dev.js` | `AlisReactive`: `js/alis-reactive.js` |
 | `design-system/` | Design-system CSS: tokens, page base, field and validation look; `fusion.css`, its look for Syncfusion | `dist/css/design-system.dev.css`, `dist/css/design-system-fusion.dev.css` | `AlisReactive.DesignSystem`: `css/design-system.css`, `css/design-system-fusion.css` |
-| `fusion/` | The Syncfusion Tailwind3 theme and the grid dialog form | `dist/css/syncfusion.dev.css` | `AlisReactive.Fusion`: `css/fusion.css` |
 
 A stylesheet shipped as written lives in its package (`Alis.Reactive/css/`, `Alis.Reactive.Native/css/`,
-`Alis.Reactive.NativeTagHelpers/css/`), not here. Each styles the class names its package writes and
+`Alis.Reactive.NativeTagHelpers/css/`, `Alis.Reactive.Fusion/css/`), not here. The Syncfusion theme and
+script are an app's own (the sandbox's `copy-vendor.mjs`); no package ships them. Each styles the class
+names its package writes and
 reads the design system's tokens (`--color-*`, `--font-display`) with neutral fallbacks; none imports
 the design system.
 
@@ -32,12 +33,11 @@ Run from the repo root (npm-workspace passthroughs) or from this folder.
 | `npm run build:all` | build every bundle (this workspace + the sandbox) |
 | `npm run watch:runtime` | rebuild the runtime JS on every `.ts` change |
 | `npm run watch:design-system` | rebuild both design-system stylesheets on every change |
-| `npm run watch:fusion` | rebuild the Fusion (Syncfusion) CSS |
 | `npm run typecheck` | `tsc --noEmit` over `runtime/` |
 | `npm test` | vitest |
 
-Build configs live here: `esbuild.config.mjs` (runtime),
-`vite.design-system.config.ts`, `vite.fusion.config.ts`. Each pins vite/esbuild's
+Build configs live here: `esbuild.config.mjs` (runtime) and
+`vite.design-system.config.ts`. Each pins vite/esbuild's
 working directory to the repo root so output is identical regardless of where the
 command is invoked.
 

@@ -31,6 +31,8 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await Expect(ErrorFor(m => m.AdmissionDate)).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
         await Expect(ErrorFor(m => m.DischargeDate)).ToHaveTextAsync("Discharge date is required.", new() { Timeout = 2000 });
+        await Expect(DatePicker(m => m.AdmissionDate).Wrapper).ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
+        await Expect(DatePicker(m => m.CarePlanReviewDate).Wrapper).Not.ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
         await Expect(Result).ToHaveTextAsync("Click to validate");
 
         AssertNoConsoleErrors();
@@ -56,6 +58,7 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await DatePicker(m => m.AdmissionDate).FillAndBlur("01/01/2020");
         await Expect(ErrorFor(m => m.AdmissionDate)).ToBeHiddenAsync(new() { Timeout = 2000 });
+        await Expect(DatePicker(m => m.AdmissionDate).Wrapper).Not.ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
 
         AssertNoConsoleErrors();
     }

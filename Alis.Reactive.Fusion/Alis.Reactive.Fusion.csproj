@@ -13,7 +13,8 @@
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
-    <!-- Syncfusion must match the npm browser assets exactly on both target frameworks. -->
+    <!-- Syncfusion is pinned exactly on both target frameworks; an app's @syncfusion/ej2 must match
+         (scripts/pin-syncfusion.mjs). -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="[33.1.47]" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -47,15 +48,13 @@
       <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
 
-    <!-- The styling Fusion's markup needs: the Syncfusion Tailwind3 theme at the version the
-         Syncfusion packages above are pinned to, and the grid dialog form's own CSS. npm builds it
-         into Alis.Reactive.Assets/dist (vite.fusion.config.ts, Alis.Reactive.Assets/fusion); it is
-         served at ~/_content/AlisReactive.Fusion/css/fusion.css (net10) and copied to
-         Content\AlisReactive.Fusion\css\fusion.css (net48). Where and how:
-         build\AlisReactiveStaticWebAssets.targets. The brand comes from whatever design system the
-         app links after it. -->
+    <!-- The styling Fusion's own markup needs (the grid dialog form, the refused-input mark on a
+         Syncfusion wrapper), shipped as written: served at ~/_content/AlisReactive.Fusion/css/fusion.css
+         (net10) and copied to Content\AlisReactive.Fusion\css\fusion.css (net48). Where and how:
+         build\AlisReactiveStaticWebAssets.targets. The Syncfusion theme and script are the app's, at
+         the version the Syncfusion packages above pin. -->
     <ItemGroup>
-        <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\css\syncfusion.dev.css" RelativePath="css/fusion.css" />
+        <AlisReactiveStaticWebAsset Include="css\fusion.css" RelativePath="css/fusion.css" />
     </ItemGroup>
 
     <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />

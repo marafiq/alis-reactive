@@ -68,11 +68,10 @@ playwright_check_assets() {
     Alis.Reactive.Assets/package.json
 
   check_asset_output_is_fresh \
-    "Syncfusion CSS" \
-    "Alis.Reactive.Assets/dist/css/syncfusion.dev.css" \
-    Alis.Reactive.Assets/fusion \
-    Alis.Reactive.Assets/vite.fusion.config.ts \
-    Alis.Reactive.Assets/package.json
+    "sandbox Syncfusion copy" \
+    "Alis.Reactive.SandboxApp/wwwroot/vendor/syncfusion/ej2.min.js" \
+    Alis.Reactive.SandboxApp/copy-vendor.mjs \
+    Alis.Reactive.SandboxApp/package.json
 
   check_asset_output_is_fresh \
     "sandbox plugin bundle" \

@@ -204,8 +204,7 @@ npm test
 
 gate "consistency checks"
 check_ci_shard_matrix
-# npm and NuGet must carry the same Syncfusion version, and every control package must be locked at
-# the version the @syncfusion/ej2 umbrella was published with (scripts/pin-syncfusion.mjs explains why).
+# NuGet and each app's npm dependency must carry the same Syncfusion version (scripts/pin-syncfusion.mjs).
 node scripts/pin-syncfusion.mjs --check
 
 gate "compiling C# projects ($configuration)"

@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Sandbox app — its own browser assets (plugins JS, sandbox CSS). Not shipped.",
+  "description": "Sandbox app — its own browser assets (plugins JS, sandbox CSS) and its copy of the Syncfusion files it links. Not shipped.",
   "scripts": {
-    "build": "npm run build:plugins && npm run build:css",
+    "build": "npm run build:vendor && npm run build:plugins && npm run build:css",
+    "build:vendor": "node copy-vendor.mjs",
     "build:plugins": "node esbuild.config.mjs",
     "build:css": "node build-css.mjs",
     "watch:plugins": "node esbuild.config.mjs --watch",
@@ -21,6 +22,7 @@
     "vitest": "^3.2.7"
   },
   "dependencies": {
+    "@syncfusion/ej2": "33.1.47",
     "tom-select": "2.6.2"
   }
 }

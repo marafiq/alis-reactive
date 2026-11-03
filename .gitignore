@@ -19,13 +19,11 @@ node_modules/
 tests/Alis.Reactive.PlaywrightTests/TestResults/
 TestResults/
 
-# Built JS/CSS bundles — produced by `npm run build:all`.
-# All three framework bundles (runtime JS, design-system CSS, Syncfusion CSS)
-# build into Alis.Reactive.Assets/dist/. They are served to the sandbox via a
-# CompositeFileProvider in SandboxApp/Program.cs and packed into their
-# respective NuGets — never copied into sandbox wwwroot. Sandbox-only bundles
-# live in SandboxApp/wwwroot/.
+# Browser assets `npm run build:all` builds: the framework bundles in Alis.Reactive.Assets/dist/
+# (served as static web assets and packed into the NuGets), the sandbox's own bundles, and the
+# sandbox's copy of the Syncfusion files it links (copy-vendor.mjs).
 Alis.Reactive.Assets/dist/
+Alis.Reactive.SandboxApp/wwwroot/vendor/
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.css

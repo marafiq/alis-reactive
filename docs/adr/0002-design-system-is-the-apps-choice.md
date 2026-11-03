@@ -20,8 +20,9 @@ not be swapped.
 - No component package references the design system. Each ships the styling its own markup needs,
   under class names it owns (`alis-drawer`, `alis-check-list`, `alis-card`, `alis-hstack`,
   `alis-grid-dialog-form`, ...), and reads the design system's tokens (`--color-*`,
-  `--font-display`) with neutral fallbacks. Fusion ships the Syncfusion Tailwind3 theme with its
-  own defaults; the brand on it is the design system's `design-system-fusion.css`.
+  `--font-display`) with neutral fallbacks. Fusion ships only the styling of its own markup; the
+  Syncfusion theme and script are the app's, at the version Fusion pins. The brand on Syncfusion
+  components is the design system's.
 - The core's field markup names its parts (`alis-field`, `alis-field__label`,
   `alis-field__required`, `alis-field__message`); the design system styles them.
 - The design system depends on nothing. It emits every token on `:root` (`@theme static`) because

@@ -1,7 +1,6 @@
 using Alis.Reactive;
 using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Hubs;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,22 +39,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Playwright boot must not depend on CDN availability. Syncfusion's ASP.NET
-// helpers require global `ej/ejs` before the Reactive runtime boots.
-var syncfusionPackageDir = Path.GetFullPath(
-    Path.Combine(app.Environment.ContentRootPath, "..", "node_modules", "@syncfusion", "ej2"));
-if (!Directory.Exists(syncfusionPackageDir))
-{
-    throw new InvalidOperationException(
-        $"Syncfusion browser assets not found at '{syncfusionPackageDir}'. " +
-        "Run 'npm install' from the repo root before starting the sandbox.");
-}
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(syncfusionPackageDir),
-    RequestPath = "/vendor/syncfusion"
-});
 
 app.UseStaticFiles();
 app.UseRouting();

@@ -4,9 +4,11 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] — Alis.Reactive Sandbox</title>
+    <link rel="stylesheet" href="~/_content/AlisReactive/css/alis-reactive.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.Native/css/native.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/vendor/syncfusion/tailwind3.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.Fusion/css/fusion.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/sandbox.css" asp-append-version="true"/>
@@ -57,7 +59,7 @@
     </footer>
 </div>
 
-<script src="~/vendor/syncfusion/dist/ej2.min.js"></script>
+<script src="~/vendor/syncfusion/ej2.min.js" asp-append-version="true"></script>
 @Html.FusionToast()
 @Html.EJS().ScriptManager()
 @await RenderSectionAsync("Scripts", required: false)

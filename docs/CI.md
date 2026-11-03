@@ -259,13 +259,11 @@ until proven otherwise. The convention:
 ## Dependency updates
 
 - **Syncfusion is upgraded with one command.** `node scripts/pin-syncfusion.mjs <version>` moves the
-  three pins together (npm `@syncfusion/ej2`, NuGet `Syncfusion.EJ2.AspNet.Core` and `Syncfusion.EJ2.MVC5`),
-  pins every control package to the exact version the umbrella was published with (root `overrides`),
-  and re-resolves only the Syncfusion part of `package-lock.json`; then `npm ci` and
-  `scripts/test.sh --parallel`. It exists because npm resolves the umbrella's `~` ranges to the newest
-  patch, and ignores new `overrides` for packages an existing lock already resolved (seen in the
-  32.2.8 -> 33.1.47 upgrade: 22 control packages stayed on the skipped 33.1.49). `scripts/test.sh` runs
-  `--check` in every gate, so a half-done bump fails instead of drifting. A new Syncfusion major also
+  pins together: NuGet `Syncfusion.EJ2.AspNet.Core` and `Syncfusion.EJ2.MVC5` in Fusion, and npm
+  `@syncfusion/ej2` in each app of this repository that brings Syncfusion to the browser (the sandbox),
+  re-resolving that app's lock; then `npm ci` and `scripts/test.sh --parallel`. No framework package
+  ships Syncfusion's browser files; nothing imports a control package, so none is pinned.
+  `scripts/test.sh` runs `--check` in every gate, so a half-done bump fails instead of drifting. A new Syncfusion major also
   needs a license key valid for it in user-secrets and in both the Actions and Dependabot secret stores:
   a sandbox page carries `window.syncfusion={isLicValidated:true}` when the key is accepted.
 - **What Dependabot proposes.** One grouped PR per ecosystem per month: minor and patch for npm and

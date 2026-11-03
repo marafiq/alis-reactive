@@ -89,7 +89,6 @@ editing:
 ```bash
 npm run watch:runtime                            # framework runtime TS
 npm run watch:design-system                      # framework design-system CSS
-npm run watch:fusion                             # framework Fusion CSS
 npm run watch:sandbox-plugins                    # sandbox-only plugin JS
 npm run watch:sandbox-css                        # sandbox-only CSS
 dotnet watch --project Alis.Reactive.SandboxApp  # Razor + C# hot reload
@@ -131,21 +130,30 @@ follow it. Without one, their stylesheets fall back to neutral colors and the pa
 | `AlisReactive` | the field wrapper, its message, the form summary and the refused-input mark, plain | `~/_content/AlisReactive/css/alis-reactive.css` | `Content\AlisReactive\css\alis-reactive.css` |
 | `AlisReactive.Native` | drawer, loader, check list, radio group | `~/_content/AlisReactive.Native/css/native.css` | `Content\AlisReactive.Native\css\native.css` |
 | `AlisReactive.NativeTagHelpers` | `<native-*>` layout tag helpers | `~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css` | (net10.0 only) |
-| `AlisReactive.Fusion` | Syncfusion Tailwind3 theme, grid dialog form | `~/_content/AlisReactive.Fusion/css/fusion.css` | `Content\AlisReactive.Fusion\css\fusion.css` |
+| `AlisReactive.Fusion` | grid dialog form, the refused-input mark on Syncfusion wrappers | `~/_content/AlisReactive.Fusion/css/fusion.css` | `Content\AlisReactive.Fusion\css\fusion.css` |
 | `AlisReactive.DesignSystem` | tokens, page base, field and validation look | `~/_content/AlisReactive.DesignSystem/css/design-system.css` | `Content\AlisReactive.DesignSystem\css\design-system.css` |
 | `AlisReactive.DesignSystem` | the brand on Syncfusion components | `~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css` | `Content\AlisReactive.DesignSystem\css\design-system-fusion.css` |
 
-Link them in this order: the core's, the design system, the component stylesheets, Fusion's, then the
-design system's Fusion layer (its values must follow the Syncfusion theme's), then your own CSS.
+With Fusion, the Syncfusion theme and `ej2.min.js` are the app's: no framework package ships them. Take
+`@syncfusion/ej2` at the version Fusion pins (`node scripts/pin-syncfusion.mjs --check` prints it) and copy
+its `tailwind3.css` and `dist/ej2.min.js` into your `wwwroot`, as the sandbox's `copy-vendor.mjs` does, or
+link Syncfusion's CDN at that version.
+
+Link them in this order: the core's, the design system, the component stylesheets, the Syncfusion theme,
+Fusion's, then the design system's Fusion layer (its values must follow the Syncfusion theme's), then your
+own CSS.
 
 ```html
 <link rel="stylesheet" href="~/_content/AlisReactive/css/alis-reactive.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.Native/css/native.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css" asp-append-version="true"/>
+<link rel="stylesheet" href="~/vendor/syncfusion/tailwind3.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.Fusion/css/fusion.css" asp-append-version="true"/>
 <link rel="stylesheet" href="~/_content/AlisReactive.DesignSystem/css/design-system-fusion.css" asp-append-version="true"/>
 ...
+<script src="~/vendor/syncfusion/ej2.min.js" asp-append-version="true"></script>
+@Html.EJS().ScriptManager()
 <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
 ```
 
