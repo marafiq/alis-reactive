@@ -16,8 +16,10 @@ namespace Alis.Reactive.PlaywrightTests.Components.Brought.IntakeSheet;
 /// receipt reads back what reached it by each. A fact carried in the wrong kind reads "?" in the letter
 /// and binds wrong at the desk, so the receipt and the letter name the kind each fact arrived in.
 /// The link names the resident, the wing, the room and the party: a link that names no wing stops the
-/// notice before it is raised. Not exercised: the desk's address when the waiting list has not answered
-/// (a route value with nothing to fill it), which the HTTP pipeline's own journeys prove.
+/// notice before it is raised. The preview asks the sheet for its summary and its waiting-list number
+/// while the coordinator may still be typing: an entry in progress is kept. Not exercised: the desk's
+/// address when the waiting list has not answered (a route value with nothing to fill it), which the
+/// HTTP pipeline's own journeys prove.
 /// </remarks>
 [TestFixture]
 public class WhenNotifyingTheWingOfAMoveIn : PlaywrightTestBase
@@ -179,6 +181,22 @@ public class WhenNotifyingTheWingOfAMoveIn : PlaywrightTestBase
         await Preview.ClickAsync();
         await Expect(Line("preview-latex")).ToHaveTextAsync("Latex-free gloves at the desk.");
         await Expect(Line("preview-allergies")).ToHaveTextAsync("Penicillin,Latex");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task an_allergy_typed_while_the_notice_is_previewed_is_kept()
+    {
+        await OpenTheNotice();
+
+        await Preview.ClickAsync();
+        await Field("Allergies").FillAsync("Penicillin, Latex");
+        await Expect(Line("letter-allergies")).ToHaveTextAsync("Allergies: Penicillin (from the intake sheet).");
+        await Expect(Field("Allergies")).ToHaveValueAsync("Penicillin, Latex");
+
+        await Field("Allergies").BlurAsync();
+        await Preview.ClickAsync();
+        await Expect(Line("preview-latex")).ToHaveTextAsync("Latex-free gloves at the desk.");
         AssertNoConsoleErrors();
     }
 

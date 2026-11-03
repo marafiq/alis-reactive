@@ -110,7 +110,7 @@ export class IntakeSheet {
 
   set name(value: string) {
     this.facts.name = value;
-    this.refresh();
+    this.show("name");
   }
 
   get age(): number {
@@ -119,7 +119,7 @@ export class IntakeSheet {
 
   set age(value: number) {
     this.facts.age = value;
-    this.refresh();
+    this.show("age");
   }
 
   get moveInDate(): Date {
@@ -128,7 +128,7 @@ export class IntakeSheet {
 
   set moveInDate(value: Date) {
     this.facts.moveInDate = value;
-    this.refresh();
+    this.show("moveInDate");
   }
 
   get veteran(): boolean {
@@ -137,7 +137,7 @@ export class IntakeSheet {
 
   set veteran(value: boolean) {
     this.facts.veteran = value;
-    this.refresh();
+    this.show("veteran");
   }
 
   get careLevel(): CareLevel {
@@ -146,7 +146,7 @@ export class IntakeSheet {
 
   set careLevel(value: CareLevel) {
     this.facts.careLevel = value;
-    this.refresh();
+    this.show("careLevel");
   }
 
   get monthlyRate(): number {
@@ -155,7 +155,7 @@ export class IntakeSheet {
 
   set monthlyRate(value: number) {
     this.facts.monthlyRate = value;
-    this.refresh();
+    this.show("monthlyRate");
   }
 
   get roomPreference(): string | null {
@@ -164,7 +164,7 @@ export class IntakeSheet {
 
   set roomPreference(value: string | null) {
     this.facts.roomPreference = value;
-    this.refresh();
+    this.show("roomPreference");
   }
 
   get petCount(): number | null {
@@ -173,7 +173,7 @@ export class IntakeSheet {
 
   set petCount(value: number | null) {
     this.facts.petCount = value;
-    this.refresh();
+    this.show("petCount");
   }
 
   get priorStayEnded(): Date | null {
@@ -182,7 +182,7 @@ export class IntakeSheet {
 
   set priorStayEnded(value: Date | null) {
     this.facts.priorStayEnded = value;
-    this.refresh();
+    this.show("priorStayEnded");
   }
 
   get fluShot(): boolean | null {
@@ -191,7 +191,7 @@ export class IntakeSheet {
 
   set fluShot(value: boolean | null) {
     this.facts.fluShot = value;
-    this.refresh();
+    this.show("fluShot");
   }
 
   get diet(): Diet | null {
@@ -200,7 +200,7 @@ export class IntakeSheet {
 
   set diet(value: Diet | null) {
     this.facts.diet = value;
-    this.refresh();
+    this.show("diet");
   }
 
   /** The family contact: an object with members of its own. */
@@ -214,7 +214,7 @@ export class IntakeSheet {
 
   set allergies(value: string[]) {
     this.facts.allergies = [...value];
-    this.refresh();
+    this.show("allergies");
   }
 
   /** The applicant's number on the waiting list, or null while the list has not answered. */
@@ -224,7 +224,7 @@ export class IntakeSheet {
 
   set waitlist(value: number | null) {
     this.waitlistNumber = value;
-    this.refresh();
+    this.show("waitlist");
   }
 
   /** Replaces every fact at once, as a waiting-list record arrives. */
@@ -241,7 +241,7 @@ export class IntakeSheet {
   /** The applicant in one line; the sheet counts each summary it writes. */
   summary(): string {
     this.summaries += 1;
-    this.refresh();
+    this.count();
     const { name, age, careLevel, moveInDate } = this.facts;
     return `${name}, ${age}, ${careLevel}, moving in ${dateText(moveInDate)}`;
   }
@@ -258,7 +258,7 @@ export class IntakeSheet {
   /** Asks the waiting list, which answers a moment later; the sheet counts each time it is asked. */
   waitlistPosition(): Promise<number | null> {
     this.waitlistChecks += 1;
-    this.refresh();
+    this.count();
     const position = this.waitlistNumber;
     return new Promise(resolve => setTimeout(() => resolve(position), 120));
   }
@@ -290,7 +290,7 @@ export class IntakeSheet {
     const field = control.dataset.field;
     if (field === undefined) return;
     this.take(field, control);
-    this.refresh();
+    this.show(field);
     this.emit("changed", {
       field,
       applicant: { ...this.facts, contact: { ...this.facts.contact }, allergies: [...this.facts.allergies] },
@@ -323,7 +323,9 @@ export class IntakeSheet {
     for (const listener of [...(this.listeners.get(name) ?? [])]) listener(payload);
   }
 
-  // The controls are built once; a refresh writes the facts into them, so an edit never loses focus.
+  // The controls are built once. A fact the page writes lands in its own control, and a question the
+  // page asks (the summary, the waiting list) moves only its counter, so an entry the coordinator is
+  // still typing is kept.
   private build(): void {
     const fields = element("div", "is-fields");
     fields.append(
@@ -360,22 +362,32 @@ export class IntakeSheet {
   }
 
   private refresh(): void {
+    for (const field of this.controls.keys()) this.show(field);
+    this.count();
+  }
+
+  private show(field: string): void {
     const facts = this.facts;
-    this.write("name", facts.name);
-    this.write("age", String(facts.age));
-    this.write("moveInDate", dateText(facts.moveInDate));
-    this.tick("veteran", facts.veteran);
-    this.write("careLevel", facts.careLevel);
-    this.write("monthlyRate", facts.monthlyRate.toFixed(2));
-    this.write("roomPreference", facts.roomPreference ?? "");
-    this.write("petCount", facts.petCount === null ? "" : String(facts.petCount));
-    this.write("priorStayEnded", dateText(facts.priorStayEnded));
-    this.write("fluShot", facts.fluShot === null ? "" : facts.fluShot ? "yes" : "no");
-    this.write("diet", facts.diet ?? "");
-    this.write("contactPhone", facts.contact.phone);
-    this.write("contactRelation", facts.contact.relation);
-    this.write("allergies", facts.allergies.join(", "));
-    this.write("waitlist", this.waitlistNumber === null ? "" : String(this.waitlistNumber));
+    switch (field) {
+      case "name": this.write(field, facts.name); break;
+      case "age": this.write(field, String(facts.age)); break;
+      case "moveInDate": this.write(field, dateText(facts.moveInDate)); break;
+      case "veteran": this.tick(field, facts.veteran); break;
+      case "careLevel": this.write(field, facts.careLevel); break;
+      case "monthlyRate": this.write(field, facts.monthlyRate.toFixed(2)); break;
+      case "roomPreference": this.write(field, facts.roomPreference ?? ""); break;
+      case "petCount": this.write(field, facts.petCount === null ? "" : String(facts.petCount)); break;
+      case "priorStayEnded": this.write(field, dateText(facts.priorStayEnded)); break;
+      case "fluShot": this.write(field, facts.fluShot === null ? "" : facts.fluShot ? "yes" : "no"); break;
+      case "diet": this.write(field, facts.diet ?? ""); break;
+      case "contactPhone": this.write(field, facts.contact.phone); break;
+      case "contactRelation": this.write(field, facts.contact.relation); break;
+      case "allergies": this.write(field, facts.allergies.join(", ")); break;
+      case "waitlist": this.write(field, this.waitlistNumber === null ? "" : String(this.waitlistNumber)); break;
+    }
+  }
+
+  private count(): void {
     this.summariesLine.textContent = `Summaries written: ${this.summaries}`;
     this.waitlistChecksLine.textContent = `Waitlist checks: ${this.waitlistChecks}`;
   }
