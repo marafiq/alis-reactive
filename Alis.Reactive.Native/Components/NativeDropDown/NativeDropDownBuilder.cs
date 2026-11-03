@@ -36,7 +36,6 @@ namespace Alis.Reactive.Native
 #endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
 
         private IEnumerable<SelectListItem>? _items;
         private string? _placeholder;
@@ -51,13 +50,11 @@ namespace Alis.Reactive.Native
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            string elementId,
-            string bindingPath)
+            string elementId)
         {
             _html = html;
             _expression = expression;
             _elementId = elementId;
-            _bindingPath = bindingPath;
         }
 
         /// <summary>

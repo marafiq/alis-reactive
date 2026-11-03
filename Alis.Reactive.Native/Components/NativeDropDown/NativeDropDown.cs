@@ -62,7 +62,7 @@ namespace Alis.Reactive.Native
             Action<NativeDropDownBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            var builder = new NativeDropDownBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
+            var builder = new NativeDropDownBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId);
             build(builder);
             return field.Render<global::Alis.Reactive.Native.NativeDropDown>(builder);
         }

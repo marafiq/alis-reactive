@@ -127,9 +127,8 @@ namespace Alis.Reactive.PlanModel.Values
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
-            Shape shape,
-            string member) =>
-            new CallExpression(target, path, args, argShapes, shape, member);
+            Shape shape) =>
+            new CallExpression(target, path, args, argShapes, shape);
 
         internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits) =>
             new MethodResultExpression(call, member, awaits);
@@ -227,22 +226,19 @@ namespace Alis.Reactive.PlanModel.Values
         private readonly IReadOnlyList<ValueExpression> _args;
         private readonly IReadOnlyList<Shape> _argShapes;
         private readonly Shape _shape;
-        private readonly string _member;
 
         internal CallExpression(
             Target target,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
-            Shape shape,
-            string member)
+            Shape shape)
         {
             _target = target ?? throw new ArgumentNullException(nameof(target));
             _path = path ?? throw new ArgumentNullException(nameof(path));
             _args = args ?? throw new ArgumentNullException(nameof(args));
             _argShapes = argShapes ?? throw new ArgumentNullException(nameof(argShapes));
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-            _member = member ?? throw new ArgumentNullException(nameof(member));
         }
 
         internal override Shape OutputShape => _shape;

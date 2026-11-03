@@ -24,9 +24,6 @@ public class WhenAdmissionWizardFlowsAcrossServerLoadedSteps : PlaywrightTestBas
     private DropDownListLocator DropDown<TModel>(Expression<Func<TModel, object?>> expr) where TModel : class
         => new(Page, IdFor(expr));
 
-    private ILocator SwitchWrapper<TModel>(Expression<Func<TModel, object?>> expr) where TModel : class
-        => Page.Locator($"#step-container .e-switch-wrapper:has(#{IdFor(expr)})");
-
     private ILocator ErrorFor(string formId, string fieldName)
         => Page.Locator($"#step-container #{formId} span[data-valmsg-for='{fieldName}']");
 

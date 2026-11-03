@@ -32,7 +32,6 @@ public class WhenTheAideHostsAFamilyVisit : PlaywrightTestBase
     private ILocator Summary => Page.Locator("[data-reactive-validation-summary]");
     private ILocator VisitorError => Page.Locator("span[data-valmsg-for='Visitor']");
 
-    private ILocator RoomNote => Page.Locator($"#{IdGenerator.For<RoomEveningModel>(m => m.RoomNote)}");
     private ILocator Visitor => Page.Locator($"#{IdGenerator.For<RoomEveningModel>(m => m.Visitor)}");
     private ILocator Relationship => Page.Locator($"#{IdGenerator.For<RoomEveningModel>(m => m.Relationship)}");
     private ILocator Bell => Page.Locator("#room-bell");

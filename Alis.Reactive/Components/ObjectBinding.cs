@@ -42,7 +42,7 @@ namespace Alis.Reactive.Components
 
         internal ValueExpression Invoke(ComponentMethod method, IReadOnlyList<ValueExpression> args, Shape returns) =>
             ValueExpression.MethodResult(
-                ValueExpression.Call(Locate(), method.Path.TargetText, args, method.ArgumentShapes, returns, method.Name),
+                ValueExpression.Call(Locate(), method.Path.TargetText, args, method.ArgumentShapes, returns),
                 method.Name,
                 method.Awaits);
 

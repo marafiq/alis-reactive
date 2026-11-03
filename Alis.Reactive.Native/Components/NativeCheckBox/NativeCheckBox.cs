@@ -60,7 +60,7 @@ namespace Alis.Reactive.Native
             Action<NativeCheckBoxBuilder<TModel, bool>> build)
             where TModel : class
         {
-            var builder = new NativeCheckBoxBuilder<TModel, bool>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
+            var builder = new NativeCheckBoxBuilder<TModel, bool>(field.Helper, field.Expression, field.ElementId);
             build(builder);
             return field.Render<global::Alis.Reactive.Native.NativeCheckBox>(builder);
         }

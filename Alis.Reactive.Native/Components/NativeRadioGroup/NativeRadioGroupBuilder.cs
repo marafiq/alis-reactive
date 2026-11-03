@@ -39,7 +39,6 @@ namespace Alis.Reactive.Native
 #endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
         private readonly List<RadioButtonItem> _options = new List<RadioButtonItem>();
         private string _cssClass = "alis-radio-group";
         private string _optionCssClass = "alis-radio-group__option";
@@ -52,13 +51,11 @@ namespace Alis.Reactive.Native
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            string elementId,
-            string bindingPath)
+            string elementId)
         {
             _html = html;
             _expression = expression;
             _elementId = elementId;
-            _bindingPath = bindingPath;
         }
 
         /// <summary>

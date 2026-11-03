@@ -154,7 +154,7 @@ internal static class Sweep
         using var _ = plan;
         var result = Schema.Evaluate(plan.RootElement, new EvaluationOptions { OutputFormat = OutputFormat.List });
         if (result.IsValid) return null;
-        return string.Join("\n", result.Details
+        return string.Join("\n", result.Details!
             .Where(detail => detail.Errors != null)
             .Select(detail => $"    {detail.InstanceLocation}: {string.Join("; ", detail.Errors!.Select(error => error.Key + ": " + error.Value))}"));
     }

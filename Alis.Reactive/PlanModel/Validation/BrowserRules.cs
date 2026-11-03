@@ -173,12 +173,9 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class PatternRule : BrowserRule
     {
-        private readonly string _name;
-
-        internal PatternRule(string name, string pattern, string flags, string message, Condition condition)
+        internal PatternRule(string pattern, string flags, string message, Condition condition)
             : base(message, condition)
         {
-            _name = name;
             Pattern = pattern;
             Flags = flags;
         }

@@ -26,7 +26,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 
         // Each wing keeps its own desk: the holds are asked of the desk the X-Wing header names.
         [HttpGet("FrontDesk/Holds/{residentId}")]
-        public IActionResult FrontDeskHolds(string residentId)
+        public IActionResult FrontDeskHolds()
         {
             var family = Request.Headers["X-Family"].ToString();
             if (string.IsNullOrEmpty(family)) return BadRequest(new DeskMessage { Message = "Name the family." });

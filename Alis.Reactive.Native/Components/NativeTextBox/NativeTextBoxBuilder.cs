@@ -35,7 +35,6 @@ namespace Alis.Reactive.Native
 #endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
 
         private string _type = "text";
         private string? _cssClass;
@@ -46,20 +45,17 @@ namespace Alis.Reactive.Native
         internal NativeTextBoxBuilder(
             HtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            string elementId,
-            string bindingPath)
+            string elementId)
 #else
         internal NativeTextBoxBuilder(
             IHtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            string elementId,
-            string bindingPath)
+            string elementId)
 #endif
         {
             _html = html;
             _expression = expression;
             _elementId = elementId;
-            _bindingPath = bindingPath;
         }
 
         /// <summary>

@@ -37,7 +37,6 @@ namespace Alis.Reactive.Native.Components.NativeHiddenField
 #endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
 
         internal NativeHiddenFieldBuilder(
 #if NET48
@@ -46,13 +45,11 @@ namespace Alis.Reactive.Native.Components.NativeHiddenField
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            string elementId,
-            string bindingPath)
+            string elementId)
         {
             _html = html;
             _expression = expression;
             _elementId = elementId;
-            _bindingPath = bindingPath;
         }
 
 #if NET48

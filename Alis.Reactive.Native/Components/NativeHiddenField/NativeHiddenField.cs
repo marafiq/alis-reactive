@@ -75,7 +75,7 @@ namespace Alis.Reactive.Native
         {
             var field = html.InputField(plan, expression, o => o.Hidden());
             return field.Render<NativeHiddenField>(
-                new NativeHiddenFieldBuilder<TModel, TProp>(html, expression, field.ElementId, field.BindingPath));
+                new NativeHiddenFieldBuilder<TModel, TProp>(html, expression, field.ElementId));
         }
     }
 }

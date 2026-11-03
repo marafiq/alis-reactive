@@ -61,7 +61,7 @@ namespace Alis.Reactive.Native
             Action<NativeRadioGroupBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            var builder = new NativeRadioGroupBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
+            var builder = new NativeRadioGroupBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId);
             build(builder);
             return field.Render<global::Alis.Reactive.Native.NativeRadioGroup>(builder);
         }

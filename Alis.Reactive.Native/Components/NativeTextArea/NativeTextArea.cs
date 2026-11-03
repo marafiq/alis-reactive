@@ -61,7 +61,7 @@ namespace Alis.Reactive.Native
             Action<NativeTextAreaBuilder<TModel, TProp>> build)
             where TModel : class
         {
-            var builder = new NativeTextAreaBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId, field.BindingPath);
+            var builder = new NativeTextAreaBuilder<TModel, TProp>(field.Helper, field.Expression, field.ElementId);
             build(builder);
             return field.Render<global::Alis.Reactive.Native.NativeTextArea>(builder);
         }

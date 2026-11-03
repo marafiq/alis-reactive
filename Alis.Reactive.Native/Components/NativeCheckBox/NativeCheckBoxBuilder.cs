@@ -38,7 +38,6 @@ namespace Alis.Reactive.Native
 #endif
         private readonly Expression<Func<TModel, bool>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
 
         private string? _cssClass;
 
@@ -50,13 +49,11 @@ namespace Alis.Reactive.Native
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, bool>> expression,
-            string elementId,
-            string bindingPath)
+            string elementId)
         {
             _html = html;
             _expression = expression;
             _elementId = elementId;
-            _bindingPath = bindingPath;
         }
 
         /// <summary>

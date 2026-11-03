@@ -61,14 +61,14 @@ namespace Alis.Reactive
 
         /// <summary>An email address, as <c>EmailAddress()</c> reads one: one @, neither first nor last.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static BrowserRule Email(string message) => new PatternRule("email", EmailPattern, "", message, Condition.Always);
+        public static BrowserRule Email(string message) => new PatternRule(EmailPattern, "", message, Condition.Always);
 
         /// <summary>
         /// An <c>http</c> or <c>https</c> URL, its scheme in any case, as the server's absolute URL reads it.
         /// The browser checks the scheme; the server also checks the rest.
         /// </summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static BrowserRule Url(string message) => new PatternRule("url", UrlPattern, "", message, Condition.Always);
+        public static BrowserRule Url(string message) => new PatternRule(UrlPattern, "", message, Condition.Always);
 
         /// <summary>A card number that passes the Luhn check.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
@@ -81,7 +81,7 @@ namespace Alis.Reactive
         public static BrowserRule Matches(string pattern, string flags, string message)
         {
             if (string.IsNullOrEmpty(pattern)) throw new ArgumentException("A browser pattern needs its text.", nameof(pattern));
-            return new PatternRule("regex", pattern, flags ?? "", message, Condition.Always);
+            return new PatternRule(pattern, flags ?? "", message, Condition.Always);
         }
 
         /// <summary>The value compares with a fixed value: <c>GreaterThanOrEqual</c> is a minimum, <c>LessThanOrEqual</c> a maximum.</summary>
