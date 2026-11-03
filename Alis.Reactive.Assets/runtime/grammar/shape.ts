@@ -45,7 +45,10 @@ export function bound(value: unknown, shape: Shape): unknown {
     case "boolean": return nothingBound ? false : converted;
     case "date":    return nothingBound ? earliestDate() : converted;
     case "instant": return nothingBound ? new Instant(EARLIEST_INSTANT) : converted;
-    default:        return converted;
+    case "array":
+    case "object":
+    case "nullable": return converted;
+    default:        return assertNever(shape, "shape");
   }
 }
 
