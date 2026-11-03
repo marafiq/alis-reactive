@@ -24,9 +24,7 @@ public sealed class PagePlan<TModel> where TModel : class
 
     public static async Task<PagePlan<TModel>> FromPage(IPage page)
     {
-        var json = await page.EvalOnSelectorAsync<string>(
-            "[data-reactive-plan]",
-            "el => el.textContent");
+        var json = (await page.Locator("[data-reactive-plan]").First.TextContentAsync())!;
 
         using var doc = JsonDocument.Parse(json);
         var components = new Dictionary<string, BoundComponent>(StringComparer.OrdinalIgnoreCase);

@@ -7,12 +7,8 @@ namespace Alis.Reactive.PlaywrightTests;
 /// </summary>
 public abstract class PlaywrightTestBase : AppPageTest
 {
-    private const int BootPollIntervalMs = 50;
     private const int ReactiveBootTimeoutMs = 60000;
-    private const int NavigationTimeoutBootRecoveryMs = 1000;
-    private const string ReactiveBootedTrace = "[alis:boot] booted";
     private const string ReactiveBootedMarkerSelector = "html[data-alis-booted='true']";
-    private const string ReactiveBootedPagePredicate = "() => document.documentElement.dataset.alisBooted === 'true'";
     private static readonly string[] IgnoredNavigationErrors =
     [
         "ERR_NETWORK_CHANGED",
@@ -22,6 +18,7 @@ public abstract class PlaywrightTestBase : AppPageTest
 
     private readonly List<string> _consoleMessages = new();
     private readonly List<string> _consoleErrors = new();
+    private readonly List<(string Containing, TaskCompletionSource Arrived)> _traceWaiters = new();
     private readonly object _consoleLock = new();
 
     /// <summary>The page's console so far, copied under the lock the console handler writes under.</summary>
@@ -35,9 +32,15 @@ public abstract class PlaywrightTestBase : AppPageTest
         {
             lock (_consoleLock)
             {
-                _consoleMessages.Add($"[{msg.Type}] {msg.Text}");
+                var line = $"[{msg.Type}] {msg.Text}";
+                _consoleMessages.Add(line);
                 if (msg.Type == "error")
                     _consoleErrors.Add(msg.Text);
+                foreach (var waiter in _traceWaiters.Where(waiter => line.Contains(waiter.Containing)).ToList())
+                {
+                    waiter.Arrived.TrySetResult();
+                    _traceWaiters.Remove(waiter);
+                }
             }
         };
         Page.PageError += (_, error) =>
@@ -78,25 +81,8 @@ public abstract class PlaywrightTestBase : AppPageTest
             " });");
     }
 
-    protected async Task NavigateTo(string path)
-    {
-        try
-        {
-            await Page.GotoAsync($"{BaseUrl}{path}", new()
-            {
-                WaitUntil = WaitUntilState.DOMContentLoaded,
-                Timeout = 60000
-            });
-        }
-        catch (TimeoutException)
-        {
-            if (!await PageReachedReactiveBootAfterNavigationTimeout())
-                throw;
-
-            TestContext.Out.WriteLine(
-                "Navigation timed out after reactive boot was observed; continuing with reactive boot as readiness.");
-        }
-    }
+    protected async Task NavigateTo(string path) =>
+        await Page.GotoAsync($"{BaseUrl}{path}", new() { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 60000 });
 
     protected async Task NavigateToAndWaitForBoot(
         string path,
@@ -138,21 +124,25 @@ public abstract class PlaywrightTestBase : AppPageTest
             return;
         }
 
-        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
-        while (true)
+        var waiter = (Containing: containing, Arrived: new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously));
+        lock (_consoleLock)
         {
-            if (ConsoleContains(containing))
+            if (_consoleMessages.Any(m => m.Contains(containing)))
                 return;
-
-            if (DateTime.UtcNow >= deadline)
-                break;
-
-            await Task.Delay(100);
+            _traceWaiters.Add(waiter);
         }
 
-        var messages = SnapshotConsoleMessages();
-        Assert.Fail($"Timed out waiting for console message containing '{containing}'. " +
-                     $"Got {messages.Count} messages: [{string.Join(", ", messages.Take(10))}]");
+        try
+        {
+            await waiter.Arrived.Task.WaitAsync(TimeSpan.FromMilliseconds(timeoutMs));
+        }
+        catch (TimeoutException)
+        {
+            lock (_consoleLock) _traceWaiters.Remove(waiter);
+            var messages = SnapshotConsoleMessages();
+            Assert.Fail($"Timed out waiting for console message containing '{containing}'. " +
+                         $"Got {messages.Count} messages: [{string.Join(", ", messages.Take(10))}]");
+        }
     }
 
     protected void AssertTraceContains(string scope, string text)
@@ -163,31 +153,8 @@ public abstract class PlaywrightTestBase : AppPageTest
                                      $"Messages: [{string.Join(", ", messages.Take(10))}]");
     }
 
-    protected async Task ClickWhenStable(ILocator locator, int timeoutMs = 60000)
-    {
-        await Expect(locator).ToBeVisibleAsync(new() { Timeout = timeoutMs });
-        await Expect(locator).ToBeEnabledAsync(new() { Timeout = timeoutMs });
-
-        try
-        {
-            await locator.ClickAsync(new() { Timeout = timeoutMs });
-        }
-        catch (TimeoutException ex)
-        {
-            TestContext.Out.WriteLine(
-                $"ClickWhenStable retrying after timeout for locator '{locator}': {ex.Message}");
-            await Page.WaitForTimeoutAsync(250);
-            await locator.ClickAsync(new() { Timeout = timeoutMs });
-        }
-    }
-
-    private bool ConsoleContains(string containing)
-    {
-        lock (_consoleLock)
-        {
-            return _consoleMessages.Any(m => m.Contains(containing));
-        }
-    }
+    protected async Task ClickWhenStable(ILocator locator, int timeoutMs = 60000) =>
+        await locator.ClickAsync(new() { Timeout = timeoutMs });
 
     private List<string> SnapshotConsoleMessages()
     {
@@ -216,82 +183,14 @@ public abstract class PlaywrightTestBase : AppPageTest
         {
             _consoleMessages.Clear();
             _consoleErrors.Clear();
+            _traceWaiters.Clear();
         }
     }
 
-    private async Task WaitForReactiveBoot(int timeoutMs)
-    {
-        var bootTimeoutMs = Math.Max(timeoutMs, ReactiveBootTimeoutMs);
-        if (ConsoleContains(ReactiveBootedTrace))
-            return;
-
-        if (await PageReportsReactiveBoot(bootTimeoutMs))
-            return;
-
-        if (ConsoleContains(ReactiveBootedTrace) || await PageHasReactiveBootMarker())
-            return;
-
-        WriteConsoleMessages(
-            "=== Page Console Output While Waiting For Boot ===",
-            SnapshotConsoleMessages());
-        throw new TimeoutException($"Timed out waiting {bootTimeoutMs}ms for reactive boot.");
-    }
-
-    private async Task<bool> PageReportsReactiveBoot(int timeoutMs)
-    {
-        try
+    private async Task WaitForReactiveBoot(int timeoutMs) =>
+        await Page.Locator(ReactiveBootedMarkerSelector).WaitForAsync(new()
         {
-            await Page.WaitForFunctionAsync(
-                ReactiveBootedPagePredicate,
-                null,
-                new() { Timeout = timeoutMs, PollingInterval = BootPollIntervalMs });
-            return true;
-        }
-        catch (TimeoutException)
-        {
-            return false;
-        }
-        catch (PlaywrightException ex) when (PageExecutionContextChangedWhileWaiting(ex))
-        {
-            return false;
-        }
-    }
-
-    private async Task<bool> PageReachedReactiveBootAfterNavigationTimeout()
-    {
-        if (ConsoleContains(ReactiveBootedTrace))
-            return true;
-
-        if (await PageHasReactiveBootMarker())
-            return true;
-
-        return await PageReportsReactiveBoot(NavigationTimeoutBootRecoveryMs);
-    }
-
-    private static bool PageExecutionContextChangedWhileWaiting(PlaywrightException ex) =>
-        ex.Message.Contains("Execution context was destroyed", StringComparison.OrdinalIgnoreCase)
-        || ex.Message.Contains("Target page, context or browser has been closed", StringComparison.OrdinalIgnoreCase);
-
-    private async Task<bool> PageHasReactiveBootMarker()
-    {
-        try
-        {
-            return await Page.Locator(ReactiveBootedMarkerSelector).CountAsync() > 0;
-        }
-        catch (PlaywrightException)
-        {
-            return false;
-        }
-    }
-
-    private static void WriteConsoleMessages(string header, IReadOnlyCollection<string> messages)
-    {
-        if (messages.Count == 0)
-            return;
-
-        TestContext.Out.WriteLine(header);
-        foreach (var message in messages)
-            TestContext.Out.WriteLine(message);
-        TestContext.Out.WriteLine("=== End Console Output ===");
-    }
+            State = WaitForSelectorState.Attached,
+            Timeout = Math.Max(timeoutMs, ReactiveBootTimeoutMs),
+        });
 }

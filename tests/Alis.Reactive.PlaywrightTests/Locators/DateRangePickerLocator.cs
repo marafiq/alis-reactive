@@ -95,8 +95,6 @@ public sealed class DateRangePickerLocator
                 .ClickWhenStableAsync(_page);
         }
 
-        await ApplyButton.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
-        await _page.WaitForTimeoutAsync(150);
         await ApplyButton.ClickAsync(new() { Timeout = 5000 });
     }
 
@@ -126,18 +124,6 @@ public sealed class DateRangePickerLocator
         }
     }
 
-    private static async Task WaitForTitleChange(ILocator title, string previousText, int timeoutMs = 5000)
-    {
-        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
-        while (DateTime.UtcNow < deadline)
-        {
-            var currentText = (await title.TextContentAsync())?.Trim();
-            if (!string.Equals(currentText, previousText, StringComparison.Ordinal))
-                return;
-
-            await Task.Delay(50);
-        }
-
-        throw new TimeoutException($"Calendar title did not change from '{previousText}' within {timeoutMs}ms.");
-    }
+    private static async Task WaitForTitleChange(ILocator title, string previousText, int timeoutMs = 5000) =>
+        await Assertions.Expect(title).Not.ToHaveTextAsync(previousText, new() { Timeout = timeoutMs });
 }
