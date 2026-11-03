@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] · Alis.Reactive framework</title>
+    @* The core's stylesheet alone, no design system and no reset: the page that proves a refusal is complete without one. *@
+    <link rel="stylesheet" href="/_content/AlisReactive/css/alis-reactive.css" />
+</head>
+<body>
+    @RenderBody()
+    @* Components first, so their alis:mount listeners exist before the runtime boots the page. *@
+    <script src="/js/framework-components.js"></script>
+    <script src="/_content/AlisReactive/js/alis-reactive.js"></script>
+</body>
+</html>

@@ -80,7 +80,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">Hand off to</native-heading>
         <p class="text-sm text-text-secondary mb-3">Type part of a day nurse's name and find them on the day shift.</p>
-        <native-hstack gap="Sm" align="End" class="flex-wrap">
+        <native-hstack gap="Sm" class="flex-wrap">
             @{ Html.InputField(plan, m => m.NextNurse, o => o.Label("Day nurse"))
                 .NativeTextBox(b => b.CssClass("rounded-md border border-border px-3 py-1.5 text-sm")); }
 

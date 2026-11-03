@@ -45,7 +45,7 @@
     </div>
 
     <native-card><native-card-body>
-        <native-hstack gap="Base" align="End" class="mb-4 flex-wrap">
+        <native-hstack gap="Base" class="mb-4 flex-wrap">
             @{ Html.InputField(plan, m => m.Month, o => o.Label("Census month"))
                 .NativeDropDown(b => b.Items(months).CssClass(InputCss))
                 .Reactive(evt => evt.Change, (args, p) => ShowCensus(p, args.Value)); }

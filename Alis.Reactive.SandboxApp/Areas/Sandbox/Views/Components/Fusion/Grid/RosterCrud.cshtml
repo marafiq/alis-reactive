@@ -70,7 +70,7 @@
                 new GridColumn { Field = columns.Field(r => r.MovedIn), HeaderText = "Moved in", Width = "140" }
             })))
 
-        <native-hstack gap="Sm" align="End" class="mt-4 flex-wrap">
+        <native-hstack gap="Sm" class="mt-4 flex-wrap">
             @{ Html.InputField(plan, m => m.NewSuite, o => o.Label("New suite for the resident picked above"))
                 .NativeTextBox(b => b.Placeholder("118").CssClass(InputCss)); }
             @(Html.NativeButton("move-to-suite", "Move to suite")
@@ -96,7 +96,7 @@
 
     <native-card><native-card-body>
         <native-heading level="H2">Admit a resident</native-heading>
-        <native-hstack gap="Sm" align="End" class="mt-2 flex-wrap">
+        <native-hstack gap="Sm" class="mt-2 flex-wrap">
             @{ Html.InputField(plan, m => m.AdmitName, o => o.Label("Resident's name"))
                 .NativeTextBox(b => b.Placeholder("Full name").CssClass(InputCss)); }
             @{ Html.InputField(plan, m => m.AdmitSuite, o => o.Label("Suite"))

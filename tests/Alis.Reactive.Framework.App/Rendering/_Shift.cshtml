@@ -3,8 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"] · Alis.Reactive framework</title>
+    <link rel="stylesheet" href="/_content/AlisReactive/css/alis-reactive.css" />
+    <link rel="stylesheet" href="/_content/AlisReactive.DesignSystem/css/design-system.css" />
+    <link rel="stylesheet" href="/css/framework.css" />
 </head>
-<body>
+<body class="alis-root">
     <main>@RenderBody()</main>
     @* The layout renders a view's sections after its body: the aside first, the scripts last. *@
     <aside aria-label="For the next shift">@await RenderSectionAsync("Aside", required: false)</aside>

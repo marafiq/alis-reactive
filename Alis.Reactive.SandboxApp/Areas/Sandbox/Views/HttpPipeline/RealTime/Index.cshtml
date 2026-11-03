@@ -222,7 +222,7 @@
             </native-grid>
             <p id="resident-board-note" class="text-sm text-text-secondary">Live resident updates appear here.</p>
             <native-divider />
-            <native-hstack gap="Sm" align="End">
+            <native-hstack gap="Sm">
                 @{ Html.InputField(plan, m => m.AcknowledgedBy, o => o.Label("Acknowledged by"))
                     .NativeTextBox(b => b
                         .CssClass("rounded-md border border-border px-3 py-1.5 text-sm")

@@ -96,7 +96,7 @@
     <native-card><native-card-body>
         <native-heading level="H2">Clinical review</native-heading>
         <native-text color="Secondary">Pick the resident the review team saw on the board, then record what they decided.</native-text>
-        <native-hstack gap="Base" align="End" class="mt-3 flex-wrap">
+        <native-hstack gap="Base" class="mt-3 flex-wrap">
             @{ Html.InputField(plan, m => m.ReviewRisk, o => o.Label("Fall risk"))
                 .FusionDropDownList(b => b
                     .DataSource(Model.RiskLevels)

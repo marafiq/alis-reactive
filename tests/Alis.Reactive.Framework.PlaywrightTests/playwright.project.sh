@@ -1,6 +1,6 @@
 # The framework's Playwright project, as scripts/playwright.sh reads it: one shard, the whole project,
-# its components' bundle (one esbuild run writes it with the Plugins pages' second bundles), and the app it
-# is written against.
+# its components' bundle (one esbuild run writes it with the Plugins pages' second bundles), its
+# stylesheet (Tailwind over the shipped theme), and the app it is written against.
 # shellcheck shell=bash
 
 playwright_project=framework
@@ -24,8 +24,15 @@ playwright_check_assets() {
     tests/Alis.Reactive.Framework.App/esbuild.config.mjs \
     tests/Alis.Reactive.Framework.App/tsconfig.json \
     tests/Alis.Reactive.Framework.App/package.json
+
+  check_asset_output_is_fresh \
+    "framework app CSS" \
+    "tests/Alis.Reactive.Framework.App/wwwroot/css/framework.css" \
+    tests/Alis.Reactive.Framework.App/Styles \
+    tests/Alis.Reactive.Framework.App/package.json \
+    Alis.Reactive.DesignSystem/css/theme.css
 }
 
 playwright_sources() {
-  printf '%s\n' tests/Alis.Reactive.Framework.App
+  printf '%s\n' Alis.Reactive.DesignSystem tests/Alis.Reactive.Framework.App
 }

@@ -39,7 +39,7 @@ app.Run();
 static void RequireBuilt(string bundle)
 {
     if (!File.Exists(bundle))
-        throw new InvalidOperationException($"'{bundle}' is not built. Run 'npm run build:all' from the repository root.");
+        throw new InvalidOperationException($"'{bundle}' is not built. Build the app: dotnet build tests/Alis.Reactive.Framework.App.");
 }
 
 // The framework's Playwright project starts the app by its entry point (AppServer).

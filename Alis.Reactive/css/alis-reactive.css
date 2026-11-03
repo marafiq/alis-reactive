@@ -6,10 +6,20 @@
 @layer theme, base, alis, components, utilities;
 
 @layer alis {
+  /* A field keeps the room for its message, shown or hidden: a message that appears when a field is
+     left must not move the page under a click already on its way to the next control. The wrapper
+     reserves the message's line and the gap before it; a shown message takes that room. The slot
+     itself hides by the `hidden` attribute alone, whatever reset the page runs (Tailwind's Preflight
+     makes `[hidden]` display: none with !important, which no later layer can undo). */
   .alis-field {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .alis-field:has(> .alis-field__message:not([hidden])) {
+    padding-bottom: 0;
   }
 
   .alis-field__required,
@@ -18,16 +28,9 @@
     color: #b91c1c;
   }
 
-  /* The message keeps its line, shown or hidden: a message that appears when a field is left must not
-     move the page under a click that is already on its way to the next control. */
   .alis-field__message {
-    display: block;
-    min-height: 1.25em;
-    font-size: 0.875em;
-  }
-
-  .alis-field__message[hidden] {
-    visibility: hidden;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
 
   #alis-realtime-connection-retry-container {

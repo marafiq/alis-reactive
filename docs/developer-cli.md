@@ -61,6 +61,7 @@ For live UI work, run the relevant watcher plus the sandbox:
 | The design system's compiled default | `npm run watch:design-system` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only plugin JS | `npm run watch:sandbox-plugins` | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Sandbox-only CSS | `npm run watch:sandbox-css` | `dotnet watch --project Alis.Reactive.SandboxApp` |
+| Framework test app components or CSS | `npm run watch:framework-app`, `npm run watch:framework-css` | `dotnet watch --project tests/Alis.Reactive.Framework.App` |
 | Core, Native, tag helper or Fusion CSS | none (shipped as written) | `dotnet watch --project Alis.Reactive.SandboxApp` |
 | Razor or C# view/demo changes | none | `dotnet watch --project Alis.Reactive.SandboxApp` |
 
@@ -81,6 +82,7 @@ Asset ownership:
 | Native tag helper CSS | `Alis.Reactive.NativeTagHelpers/css/native-tag-helpers.css` | none, shipped as written | yes, `AlisReactive.NativeTagHelpers`: `css/native-tag-helpers.css` |
 | Sandbox plugin JS | `Alis.Reactive.SandboxApp/Scripts/` | `Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js` | no |
 | Sandbox CSS | `Alis.Reactive.SandboxApp/Styles/` | `Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css` | no |
+| Framework test app components and CSS | `tests/Alis.Reactive.Framework.App/Components/`, `Styles/` | `tests/Alis.Reactive.Framework.App/wwwroot/js/`, `wwwroot/css/framework.css`, built by the app's own `dotnet build` | no |
 
 UI proof commands:
 

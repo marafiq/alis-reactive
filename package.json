@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "build:packages": "npm run build -w Alis.Reactive.Assets && npm run build -w Alis.Reactive.DesignSystem",
-    "build:apps": "npm run build -w Alis.Reactive.SandboxApp && npm run build -w tests/Alis.Reactive.Framework.App",
+    "build:apps": "npm run build -w Alis.Reactive.SandboxApp",
     "build:all": "npm run build:packages && npm run build:apps",
     "generate:plan-types": "npm run generate:plan-types -w Alis.Reactive.Assets",
     "build:runtime": "npm run build:runtime -w Alis.Reactive.Assets",
@@ -27,7 +27,8 @@
     "lint:fix": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ tests/Alis.Reactive.Framework.App/Components/ --fix",
     "test": "npm run test -w Alis.Reactive.Assets && npm run test -w Alis.Reactive.SandboxApp",
     "test:watch": "npm run test:watch -w Alis.Reactive.Assets",
-    "coverage:framework": "bash scripts/framework-coverage.sh"
+    "coverage:framework": "bash scripts/framework-coverage.sh",
+    "watch:framework-css": "npm run watch:css -w tests/Alis.Reactive.Framework.App"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

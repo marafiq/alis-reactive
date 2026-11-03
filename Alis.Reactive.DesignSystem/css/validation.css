@@ -1,17 +1,10 @@
 /* The look of a refusal: the field's message, the form's summary, and the mark on the refused input. */
 @layer alis {
-  /* The message slot collapses while hidden, so a field takes no room for a message it does not show;
-     the core's own stylesheet keeps the line instead, so a message never moves the page. */
+  /* One line of 1rem: the room field.css reserves for it while it is hidden. */
   .alis-root .alis-field__message {
-    display: block;
     font-size: 0.75rem;
+    line-height: 1rem;
     color: var(--color-error);
-    margin-top: 0.25rem;
-    line-height: 1.4;
-  }
-
-  .alis-root .alis-field__message[hidden] {
-    display: none;
   }
 
   .alis-root [data-reactive-validation-summary] {

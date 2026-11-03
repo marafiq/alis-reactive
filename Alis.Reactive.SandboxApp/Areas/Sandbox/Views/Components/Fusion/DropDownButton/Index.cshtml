@@ -26,7 +26,7 @@
     <native-text color="Secondary">End of the evening shift. Choose your wing, then print what the night shift needs.</native-text>
 
     <native-card><native-card-body>
-        <native-hstack gap="Base" align="End" class="flex-wrap">
+        <native-hstack gap="Base" class="flex-wrap">
             @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing"))
                 .NativeDropDown(b => b.Items(wings).Placeholder("-- Choose a wing --").CssClass(Field))
                 .Reactive(evt => evt.Change, (args, p) =>

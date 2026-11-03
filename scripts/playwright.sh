@@ -111,7 +111,7 @@ check_asset_output_is_fresh() {
 
   if [ ! -f "$output" ]; then
     echo "[playwright:runner] ERROR: $label output '$output' does not exist." >&2
-    echo "[playwright:runner] Run npm run build:all before Playwright." >&2
+    echo "[playwright:runner] Run scripts/build.sh before Playwright." >&2
     exit 3
   fi
 
@@ -129,7 +129,7 @@ check_asset_output_is_fresh() {
     echo "[playwright:runner] ERROR: $label output is stale." >&2
     echo "[playwright:runner] Sources newer than '$output':" >&2
     printf '%s\n' "$changed" >&2
-    echo "[playwright:runner] Run npm run build:all before Playwright." >&2
+    echo "[playwright:runner] Run scripts/build.sh before Playwright." >&2
     exit 3
   fi
 }
@@ -247,7 +247,7 @@ Options:
                         times (default 0). A test that then passes is reported as flaky:
                         [playwright:flaky] lines and TestResults/observable/flaky-<stamp>.txt.
   --no-build            Skip the project build and run the existing binaries.
-                        Use after npm run build:all + dotnet build.
+                        Use after scripts/build.sh.
                         Fails if C# or Razor sources are newer than the test DLL.
   --configuration <cfg> Build/test configuration. Defaults to Debug.
   --hang-timeout <dur>  Per-test blame-hang timeout. Defaults to 10m.

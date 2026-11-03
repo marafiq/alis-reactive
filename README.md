@@ -198,7 +198,8 @@ markup, and the brand on Syncfusion components, all scoped to `.alis-root`.
    ```
 
    Build with Tailwind's CLI (`npx @tailwindcss/cli -i Styles/app.css -o wwwroot/css/app.css --minify`)
-   after the first `dotnet build`, and link the output last. The sandbox does exactly this.
+   after the first `dotnet build`, and link the output last. The sandbox, the framework test app and
+   `examples/resident-intake` do exactly this.
 
 The cascade: every framework stylesheet opens with `@layer theme, base, alis, components, utilities;`
 and keeps its looks in `alis`, so Tailwind's Preflight sits below them and your utilities above; a state

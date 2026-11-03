@@ -1,6 +1,7 @@
 @using Alis.Reactive.Framework.App.Validation
 @model Notice
 @{
+    Layout = "_CoreOnly";
     ViewData["Title"] = "A notice";
     var plan = Html.ReactivePlan<Notice>();
 }

@@ -120,6 +120,7 @@ check_output "design-system CSS" "Alis.Reactive.DesignSystem/dist/css/design-sys
 check_output "sandbox Syncfusion copy" "Alis.Reactive.SandboxApp/wwwroot/vendor/syncfusion/ej2.min.js" "scripts/build.sh"
 check_output "sandbox plugin bundle" "Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js" "scripts/build.sh"
 check_output "sandbox CSS" "Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css" "scripts/build.sh"
+check_output "framework app CSS" "tests/Alis.Reactive.Framework.App/wwwroot/css/framework.css" "scripts/build.sh"
 for descriptor in tests/*/playwright.project.sh; do
   project_name="$(basename "$(dirname "$descriptor")")"
   check_output "Playwright test DLL ($project_name)" "tests/$project_name/bin/Debug/net10.0/$project_name.dll" "dotnet build"

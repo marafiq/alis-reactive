@@ -36,8 +36,11 @@ Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 # (build/AlisReactiveNetFrameworkContent.targets). The package is the source of
 # truth; tracked copies only produce phantom diffs.
 examples/net48-mvc-smoke/Content/AlisReactive*/
-# The framework test app's components bundle, built by npm run build:all.
+# The framework test app's components bundle and stylesheet, built by its own npm build before each
+# dotnet build, and the theme the design system copies into it.
 tests/Alis.Reactive.Framework.App/wwwroot/js/
+tests/Alis.Reactive.Framework.App/wwwroot/css/
+tests/Alis.Reactive.Framework.App/Styles/alis-reactive.theme.css
 # The example builds as an app outside this repository would (scripts/example.sh): the theme the
 # design system copies into it, its stylesheet, its Syncfusion copy and the smoke's output.
 examples/resident-intake/Styles/alis-reactive.theme.css
