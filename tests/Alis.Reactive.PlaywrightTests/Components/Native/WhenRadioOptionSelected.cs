@@ -200,6 +200,19 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The group's focus lands on its first radio when none is chosen, where the Tab key would land.
+    [Test]
+    public async Task the_referrals_care_level_puts_the_coordinator_on_the_room_type()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(UseReferralCareLevel);
+
+        await Expect(CareLevel.Option("Memory Care")).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await Expect(RoomType.Option("Shared room")).ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
+
     [Test]
     public async Task the_referrals_memory_care_books_an_assessment_before_move_in_day()
     {

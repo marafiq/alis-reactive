@@ -17,6 +17,9 @@ namespace Alis.Reactive.Native
         /// </summary>
         public Property<string[]> Value => Property<string[]>();
 
+        /// <summary>Moves focus to the first box.</summary>
+        public void Focus() => Method();
+
         /// <summary>Raised when the user checks or clears a box.</summary>
         public Event<NativeCheckListChangeArgs> Change =>
             Event<NativeCheckListChangeArgs>();

@@ -22,6 +22,13 @@ onMount("[data-alis-radio-group]", element => {
     configurable: true,
   });
 
+  // The hidden input takes no focus: focusing the group puts the user on the chosen radio, else the
+  // first, where the Tab key would land.
+  Object.defineProperty(group, "focus", {
+    value: (): void => (radios.find(radio => radio.checked) ?? radios[0])?.focus(),
+    configurable: true,
+  });
+
   group.parentElement!.addEventListener("change", event => {
     const radio = event.target as HTMLInputElement;
     if (radio.type !== "radio") return;

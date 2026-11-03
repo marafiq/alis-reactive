@@ -18,6 +18,9 @@ namespace Alis.Reactive.Native
         /// </summary>
         public Property<string> Value => Property<string>();
 
+        /// <summary>Moves focus to the chosen radio, or to the first when none is chosen.</summary>
+        public void Focus() => Method();
+
         /// <summary>Raised when the user chooses an option.</summary>
         public Event<NativeRadioGroupChangeArgs> Change =>
             Event<NativeRadioGroupChangeArgs>();

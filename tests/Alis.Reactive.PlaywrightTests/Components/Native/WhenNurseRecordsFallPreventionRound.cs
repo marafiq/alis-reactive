@@ -199,6 +199,19 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
+    // The list's focus lands on its first box, where the Tab key would land, so the nurse can add tonight's.
+    [Test]
+    public async Task repeating_last_night_puts_the_nurse_on_the_first_precaution()
+    {
+        await NavigateAndBoot();
+
+        await ClickWhenStable(SameAsLastNight);
+
+        await Expect(Precautions.Box(BedAlarm)).ToBeCheckedAsync(new() { Timeout = 10000 });
+        await Expect(Precautions.Box(LowBed)).ToBeFocusedAsync();
+        AssertNoConsoleErrors();
+    }
+
     // What is sent is what the boxes show: last night's precautions and the one the nurse adds tonight.
     [Test]
     public async Task recording_after_repeating_last_night_sends_last_nights_precautions_with_tonights_addition()

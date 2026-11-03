@@ -51,6 +51,7 @@
                              var careLevel = s.Component<NativeRadioGroup>(m => m.CareLevel);
                              careLevel.Value.Set(referral.Get(x => x.CareLevel));
                              CareLevelChosen(s, careLevel.Value);
+                             s.Component<NativeRadioGroup>(m => m.RoomType).Focus();
                          }))))
                 <p id="assessment-notice" class="text-sm text-text-secondary">Choose a care level to see what happens before move-in.</p>
 

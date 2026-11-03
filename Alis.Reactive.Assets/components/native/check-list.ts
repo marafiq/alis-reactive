@@ -23,6 +23,10 @@ onMount("[data-alis-check-list]", list => {
   });
   post();
 
+  // The container takes no focus of its own: focusing the list puts the user on its first box, where
+  // the Tab key would land.
+  Object.defineProperty(list, "focus", { value: (): void => boxes[0]?.focus(), configurable: true });
+
   list.addEventListener("change", event => {
     if ((event.target as HTMLInputElement).type === "checkbox") post();
   });

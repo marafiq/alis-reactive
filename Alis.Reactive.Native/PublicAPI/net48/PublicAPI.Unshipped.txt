@@ -65,6 +65,7 @@ Alis.Reactive.Native.NativeCheckBoxChangeArgs.NativeCheckBoxChangeArgs() -> void
 Alis.Reactive.Native.NativeCheckBoxHtmlExtensions
 Alis.Reactive.Native.NativeCheckList
 Alis.Reactive.Native.NativeCheckList.Change.get -> Alis.Reactive.Event<Alis.Reactive.Native.NativeCheckListChangeArgs!>!
+Alis.Reactive.Native.NativeCheckList.Focus() -> void
 Alis.Reactive.Native.NativeCheckList.NativeCheckList() -> void
 Alis.Reactive.Native.NativeCheckList.Value.get -> Alis.Reactive.Property<string![]!>!
 Alis.Reactive.Native.NativeCheckListBuilder<TModel, TProp>
@@ -123,6 +124,7 @@ Alis.Reactive.Native.NativeLoader.Timeout.get -> Alis.Reactive.Property<int>!
 Alis.Reactive.Native.NativeLoaderHtmlExtensions
 Alis.Reactive.Native.NativeRadioGroup
 Alis.Reactive.Native.NativeRadioGroup.Change.get -> Alis.Reactive.Event<Alis.Reactive.Native.NativeRadioGroupChangeArgs!>!
+Alis.Reactive.Native.NativeRadioGroup.Focus() -> void
 Alis.Reactive.Native.NativeRadioGroup.NativeRadioGroup() -> void
 Alis.Reactive.Native.NativeRadioGroup.Value.get -> Alis.Reactive.Property<string!>!
 Alis.Reactive.Native.NativeRadioGroupBuilder<TModel, TProp>

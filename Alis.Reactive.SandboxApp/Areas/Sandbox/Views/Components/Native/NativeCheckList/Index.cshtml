@@ -56,7 +56,11 @@
                 .Reactive(plan, evt => evt.Click, (args, p) =>
                     p.Get(Url.SandboxRoute("LastNightRound", "NativeCheckList"))
                      .Response(r => r.OnSuccess<LastNightPrecautions>((lastNight, s) =>
-                        s.Component<NativeCheckList>(m => m.Precautions).Value.Set(lastNight.Get(x => x.Precautions))))))
+                     {
+                         var precautions = s.Component<NativeCheckList>(m => m.Precautions);
+                         precautions.Value.Set(lastNight.Get(x => x.Precautions));
+                         precautions.Focus();
+                     }))))
 
             @{ Html.InputField(plan, m => m.CheckedBy, o => o.Required().Label("Checked by"))
                 .NativeTextBox(b => b.Placeholder("Your initials")); }
