@@ -315,6 +315,17 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
+    public IActionResult DayTrip() => View(new DayTrip());
+
+    [HttpPost("/Validation/DayTrip")]
+    public IActionResult SaveDayTrip([FromBody] DayTrip trip, [FromServices] DayTripRules rules)
+    {
+        var result = rules.Validate(trip);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     public IActionResult RoomMove() => View(new RoomMove());
 
     [HttpPost("/Validation/RoomMove")]
