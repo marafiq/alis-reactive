@@ -22,14 +22,14 @@ contributor and coding agent follows).
 
 | Package | Description |
 |---------|-------------|
-| `Alis.Reactive` | Core plan model, builders, serialization, and validation rules in FluentValidation's grammar (server and browser) |
-| `Alis.Reactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
-| `Alis.Reactive.Fusion` | Syncfusion EJ2 component integration |
-| `Alis.Reactive.DesignSystem` | The look an app chooses: a Tailwind theme to import into its own build, and the compiled default for an app with none. No component package depends on it |
-| `Alis.Reactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
+| `AlisReactive` | Core plan model, builders, serialization, and validation rules in FluentValidation's grammar (server and browser) |
+| `AlisReactive.Native` | Native HTML components (TextBox, CheckBox, DropDown, Button, etc.) |
+| `AlisReactive.Fusion` | Syncfusion EJ2 component integration |
+| `AlisReactive.DesignSystem` | The look an app chooses: a Tailwind theme to import into its own build, and the compiled default for an app with none. No component package depends on it |
+| `AlisReactive.NativeTagHelpers` | ASP.NET Core Tag Helpers for native components |
 
-`Alis.Reactive`, `Alis.Reactive.Native`, `Alis.Reactive.Fusion`, and `Alis.Reactive.DesignSystem`
-multi-target **`net48` and `net10.0`** — the *same* DSL on both runtimes (bridged by `#if` shims, never a divergent API). Only `Alis.Reactive.NativeTagHelpers` is
+`AlisReactive`, `AlisReactive.Native`, `AlisReactive.Fusion`, and `AlisReactive.DesignSystem`
+multi-target **`net48` and `net10.0`** — the *same* DSL on both runtimes (bridged by `#if` shims, never a divergent API). Only `AlisReactive.NativeTagHelpers` is
 **`net10.0`-only** (ASP.NET Core Tag Helpers).
 
 ### In your application
@@ -38,6 +38,7 @@ Register the packages you use in `Program.cs` (MVC 5 on net48: in `Global.asax` 
 startup). `examples/resident-intake/Program.cs` is the worked example.
 
 ```csharp
+using Alis.Reactive;
 using Alis.Reactive.Fusion;
 
 builder.Services.AddControllersWithViews();
@@ -198,7 +199,7 @@ The framework's stylesheets style the defaults; an app that renames styles its o
 | Entry | What it is |
 |-------|------------|
 | `Alis.Reactive/` | The core package (`AlisReactive`): the plan model, the fluent builders, the Razor helpers, and validation in FluentValidation's grammar |
-| `Alis.Reactive.Analyzers/` | The Roslyn analyzers (ALIS001 to ALIS013) that ship inside `AlisReactive` and check views and declarations at build time |
+| `Alis.Reactive.Analyzers/` | The Roslyn analyzers (ALIS001, ALIS003 to ALIS005, ALIS007 to ALIS013) that ship inside `AlisReactive` and check views and declarations at build time |
 | `Alis.Reactive.Native/` | The native-component package: HTML inputs, buttons and action links, the drawer and the loader |
 | `Alis.Reactive.Fusion/` | The Syncfusion package: one slice per EJ2 component, plus the app-wide Confirm and Toast |
 | `Alis.Reactive.NativeTagHelpers/` | ASP.NET Core tag helpers for native components (net10 only) |
