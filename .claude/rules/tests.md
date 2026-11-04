@@ -40,7 +40,10 @@ shipped components and the sandbox journeys and adds the Component and journey t
    something when the promise holds.
 6. **Both sides of every promise.** The case where the behavior happens and the case where it must not: the
    condition holds and fails; the rule refuses and accepts; the request is sent and is held back. A suite that
-   proves only the happy path passes while the feature lies.
+   proves only the happy path passes while the feature lies. A test written from a decision cannot find that
+   decision's error: when a test pins a choice (a payload member the component does not pass reads as nothing),
+   the other steps the same code decides (a write or a call through that path) are promises too, each with its
+   own test.
 7. **No tautology.** Expected values are literals read from the promise, never computed by the code under
    test, copied from its output, or accepted as a recorded snapshot. A test never asserts what it typed or
    set itself, or what the compiler already guarantees. `ToHaveTextAsync` when the text is known, not
