@@ -360,6 +360,24 @@ namespace Alis.Reactive.Validation
         {
         }
 
+        internal override Condition? BrowserPassing()
+        {
+            var collection = FieldReference.Of(Member.Expression);
+            var item = FieldReference.ItemOf(collection);
+            var rules = new List<BrowserRule>();
+            foreach (var part in Parts)
+            {
+                if (!(part is CheckPart<T, TElement> check) || !TryBrowserCondition(part, out var when) || !check.TryBrowserRules(FieldDisplayName, out var own))
+                    return null;
+                foreach (var rule in own)
+                {
+                    if (!rule.TryFor(item, out var resolved)) return null;
+                    rules.Add(resolved.When(when));
+                }
+            }
+            return new ItemsPassCondition(collection, rules);
+        }
+
         public override async Task Validate(T instance, string prefix, ValidationRun run)
         {
             if (!await Scope.HoldAsync(instance, run).ConfigureAwait(false)) return;

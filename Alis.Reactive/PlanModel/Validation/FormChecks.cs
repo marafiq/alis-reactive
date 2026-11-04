@@ -73,6 +73,8 @@ namespace Alis.Reactive.PlanModel.Validation
 
         internal override ValueExpression Value(FieldReference field) => ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
 
+        internal ValueExpression ItemIndexes(FieldReference item) => ValueExpression.ReadBoundItemIndexes(NameOf(item), _formId, Indexes);
+
         internal CheckedField Check(BrowserField field)
             => new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);
 

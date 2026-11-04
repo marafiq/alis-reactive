@@ -125,6 +125,9 @@ namespace Alis.Reactive.PlanModel.Values
         internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes)
             => new BoundRead(name, shape, formId, G.Ref(itemIndexes));
 
+        internal static ValueExpression ReadBoundItemIndexes(string itemName, string formId, string ownerIndexes)
+            => new BoundItemIndexesRead(itemName, formId, G.Ref(ownerIndexes));
+
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
@@ -305,6 +308,25 @@ namespace Alis.Reactive.PlanModel.Values
                 : new[] { G.Lit(_name), _indexes };
             return G.Call(G.Obj(scope.Objects.Model()), new[] { "valueOf" }, args, Shape.Any);
         }
+    }
+
+    internal sealed class BoundItemIndexesRead : ValueExpression
+    {
+        private readonly string _itemName;
+        private readonly string _formId;
+        private readonly Expr _ownerIndexes;
+
+        internal BoundItemIndexesRead(string itemName, string formId, Expr ownerIndexes)
+        {
+            _itemName = itemName ?? throw new ArgumentNullException(nameof(itemName));
+            _formId = formId ?? throw new ArgumentNullException(nameof(formId));
+            _ownerIndexes = ownerIndexes ?? throw new ArgumentNullException(nameof(ownerIndexes));
+        }
+
+        internal override Shape OutputShape => Shape.Any;
+
+        internal override Expr Write(Scope scope)
+            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "indexesOf" }, new[] { G.Lit(_itemName), _ownerIndexes }, Shape.Any);
     }
 
     internal sealed class RecordExpression : ValueExpression

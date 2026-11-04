@@ -20,6 +20,7 @@ interface ModelInput {
 
 export interface BoundValues {
   valueOf(pattern: string, indexes: readonly number[], inputId?: string): unknown;
+  indexesOf(itemPattern: string, ownerIndexes: readonly number[]): (readonly number[])[];
 }
 
 export interface ContainedInputs extends BoundValues {
@@ -96,8 +97,18 @@ function boundValueIn(holder: Node, pattern: string, indexes: readonly number[],
   return read?.value;
 }
 
+function itemIndexesIn(holder: Node, itemPattern: string, ownerIndexes: readonly number[]): (readonly number[])[] {
+  const items = new Map<string, readonly number[]>();
+  for (const input of namedInputs(itemPattern)) {
+    const ownedHere = ownerIndexes.every((index, position) => input.indexes[position] === index);
+    if (ownedHere && holder.contains(input.element)) items.set(input.indexes.join(","), input.indexes);
+  }
+  return [...items.values()];
+}
+
 const pageModel: BoundValues = {
   valueOf: (pattern, indexes, inputId) => boundValueIn(document, pattern, indexes, inputId),
+  indexesOf: (itemPattern, ownerIndexes) => itemIndexesIn(document, itemPattern, ownerIndexes),
 };
 
 export function containedInputs(containerId: string): ContainedInputs {
@@ -117,6 +128,7 @@ export function containedInputs(containerId: string): ContainedInputs {
   };
   return {
     valueOf: (pattern, indexes) => boundValueIn(container(), pattern, indexes),
+    indexesOf: (itemPattern, ownerIndexes) => itemIndexesIn(container(), itemPattern, ownerIndexes),
     fill(record: Record<string, unknown>) {
       for (const input of inside()) assignAt(record, input.binding.body, bindInput(input));
       return record;

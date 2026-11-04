@@ -63,9 +63,9 @@ namespace Alis.Reactive
         IRuleBuilderOptions<T, TProperty> WithName(string displayName);
 
         /// <summary>
-        /// Rules that apply only while every check of this rule passes, or does not apply, written inside as
-        /// under <c>When</c>. The browser skips them while this rule fails, when every check of it has a browser
-        /// form; otherwise they are the server's. A rule that waits (<c>MustAsync</c>) takes none.
+        /// Rules that apply only while every check of this rule passes, on every item of a list, or does not apply,
+        /// written inside as under <c>When</c>. The browser skips them while this rule fails, when every check of it
+        /// has a browser form; otherwise they are the server's. A rule that waits (<c>MustAsync</c>) takes none.
         /// </summary>
         /// <param name="rules">Declares the dependent rules.</param>
         IRuleBuilderOptions<T, TProperty> DependentRules(Action rules);

@@ -115,6 +115,71 @@ public sealed class WhenRulesDependOnTheRuleBeforeThem : AppPageTest
     }
 
     [Test]
+    public async Task a_dependent_rule_after_a_lists_browser_checks_is_decided_in_the_browser_and_waits_while_any_item_fails()
+    {
+        await Open("/Validation/DayTrip");
+        var coachWanted = Field("Coach").GetByText("Name the coach.", new() { Exact = true });
+
+        await Write("Coach", "");
+        await Write("Second seat", "");
+        await Save();
+        await Expect(Field("Second seat").GetByText("Give each seat.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(coachWanted).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Write("Second seat", "1C");
+        await Save();
+        await Expect(coachWanted).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "every seat passes, so the browser asks for the coach and holds the request");
+
+        await Write("Coach", "Red");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
+    public async Task a_dependent_rule_after_a_lists_browser_checks_applies_in_the_browser_when_the_form_holds_no_item()
+    {
+        await Open("/Validation/DayTrip?seats=false");
+
+        await Write("Coach", "");
+        await Save();
+        await Expect(Field("Coach").GetByText("Name the coach.", new() { Exact = true })).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "no item fails, so the browser asks for the coach and holds the request");
+
+        await Write("Coach", "Red");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
+    public async Task a_dependent_rule_after_a_list_inside_each_item_waits_in_the_browser_only_on_its_own_items_list()
+    {
+        await Open("/Validation/DayTrip");
+        var firstPorterWanted = Field("First guest's porter").GetByText("Name each guest's porter.", new() { Exact = true });
+        var secondPorterWanted = Field("Second guest's porter").GetByText("Name each guest's porter.", new() { Exact = true });
+
+        await Write("First guest's bag", "");
+        await Write("First guest's porter", "");
+        await Write("Second guest's porter", "");
+        await Save();
+        await Expect(Field("First guest's bag").GetByText("Tag each bag.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(secondPorterWanted).ToBeVisibleAsync();
+        await Expect(firstPorterWanted).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Write("First guest's bag", "Green case");
+        await Write("First guest's porter", "Lu");
+        await Write("Second guest's porter", "Mo");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
     public async Task a_dependent_rule_after_a_lists_rule_is_the_servers_and_waits_while_any_item_fails()
     {
         await Open("/Validation/DayTrip");

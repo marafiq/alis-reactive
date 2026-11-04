@@ -4,8 +4,8 @@ public sealed class DayTrip
 {
     public List<TripGuest> Guests { get; set; } = new()
     {
-        new TripGuest { Name = "Ada", Relation = "Daughter" },
-        new TripGuest { Name = "Bea", Relation = "Friend" },
+        new TripGuest { Name = "Ada", Relation = "Daughter", Bags = new() { "Red case" }, Porter = "Jo" },
+        new TripGuest { Name = "Bea", Relation = "Friend", Bags = new() { "Blue case" }, Porter = "Kim" },
     };
 
     public List<TripCompanion> Companions { get; set; } = new()
@@ -27,6 +27,10 @@ public sealed class DayTrip
     public List<string?> Stops { get; set; } = new() { "Pier", "Park" };
 
     public string? ReturnBy { get; set; } = "16:00";
+
+    public List<string?> Seats { get; set; } = new() { "1A", "1B" };
+
+    public string? Coach { get; set; } = "Blue";
 }
 
 public sealed class TripGuest
@@ -34,6 +38,10 @@ public sealed class TripGuest
     public string? Name { get; set; }
 
     public string? Relation { get; set; }
+
+    public List<string?> Bags { get; set; } = new();
+
+    public string? Porter { get; set; }
 }
 
 public sealed class TripCompanion
@@ -63,6 +71,9 @@ public sealed class DayTripRules : ReactiveValidator<DayTrip>
         RuleForEach(x => x.Guests).ChildRules(guest =>
             guest.RuleFor(x => x.Name).NotEmpty().WithMessage("Name each guest.").DependentRules(() =>
                 guest.RuleFor(x => x.Relation).NotEmpty().WithMessage("Say how each guest is related.")));
+        RuleForEach(x => x.Guests).ChildRules(guest =>
+            guest.RuleForEach(x => x.Bags).NotEmpty().WithMessage("Tag each bag.").DependentRules(() =>
+                guest.RuleFor(x => x.Porter).NotEmpty().WithMessage("Name each guest's porter.")));
         RuleForEach(x => x.Companions).ChildRules(companion =>
             companion.RuleFor(x => x.Badge).Must(badge => badge != null && badge.StartsWith("V-")).WithMessage("Visitor badges start with V-.").DependentRules(() =>
                 companion.RuleFor(x => x.Phone).NotEmpty().WithMessage("Give each badge holder's phone.")));
@@ -73,5 +84,7 @@ public sealed class DayTripRules : ReactiveValidator<DayTrip>
             RuleFor(x => x.Courier).NotEmpty().WithMessage("Name the courier."));
         RuleForEach(x => x.Stops).Must(stop => stop is "Pier" or "Park" or "Museum").WithMessage("Pick a stop on the route.").DependentRules(() =>
             RuleFor(x => x.ReturnBy).NotEmpty().WithMessage("Say when the trip returns."));
+        RuleForEach(x => x.Seats).NotEmpty().WithMessage("Give each seat.").DependentRules(() =>
+            RuleFor(x => x.Coach).NotEmpty().WithMessage("Name the coach."));
     }
 }

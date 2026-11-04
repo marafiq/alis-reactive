@@ -315,7 +315,11 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    public IActionResult DayTrip() => View(new DayTrip());
+    public IActionResult DayTrip(bool seats = true)
+    {
+        ViewData["Seats"] = seats;
+        return View(new DayTrip());
+    }
 
     [HttpPost("/Validation/DayTrip")]
     public IActionResult SaveDayTrip([FromBody] DayTrip trip, [FromServices] DayTripRules rules)
