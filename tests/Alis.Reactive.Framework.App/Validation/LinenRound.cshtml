@@ -11,6 +11,9 @@
     @{ Html.InputField(plan, m => m.Rooms[1], o => o.Label("Second room")).Entry(); }
     @{ Html.InputField(plan, m => m.Carts[0], o => o.Label("First cart")).Entry(); }
     @{ Html.InputField(plan, m => m.Carts[1], o => o.Label("Second cart")).Entry(); }
+    @{ Html.InputField(plan, m => m.Bins[0], o => o.Label("First bin")).Entry(); }
+    @{ Html.InputField(plan, m => m.Bins[1], o => o.Label("Second bin")).Entry(); }
+    @{ Html.InputField(plan, m => m.Porter, o => o.Label("Porter")).Entry(); }
 </div>
 
 <p>Saved: <span id="saved"></span></p>

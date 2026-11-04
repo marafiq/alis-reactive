@@ -54,4 +54,35 @@ public sealed class WhenAListIsCheckedItemByItem : AppPageTest
         await Save();
         await Expect(Saved).ToHaveTextAsync("saved");
     }
+
+    [Test]
+    public async Task a_custom_check_on_each_item_answers_beside_the_item_it_refuses_with_the_lists_name_and_the_items_value()
+    {
+        await Open("/Validation/LinenRound");
+
+        await Write("Second bin", "B-13");
+        await Save();
+        await Expect(Field("Second bin").GetByText("'Bins' B-13 is out of service.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(Field("First bin").GetByText("is out of service.")).ToBeHiddenAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make a custom check, so the request goes");
+
+        await Write("Second bin", "B-3");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
+    public async Task a_custom_check_on_an_item_puts_a_failure_under_another_member_beside_that_members_input()
+    {
+        await Open("/Validation/LinenRound");
+
+        await Write("Second bin", "B-99");
+        await Save();
+        await Expect(Field("Porter").GetByText("Bin B-99 goes to the porter; name one.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(Field("Second bin").GetByText("goes to the porter")).ToBeHiddenAsync();
+
+        await Write("Porter", "Ed");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
 }
