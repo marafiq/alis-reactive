@@ -298,12 +298,16 @@ namespace Alis.Reactive
             return RuleTarget.Of(rule).Add(new CustomPart<T, TProperty>(check, waits: true));
         }
 
-        /// <summary>Rules for the members of a nested object, written in place; the browser runs those it can.</summary>
+        /// <summary>
+        /// Rules for the members of a nested object, written in place; the browser runs those it can. An inline rule
+        /// written in no set belongs to the sets of the rule that holds it.
+        /// </summary>
         /// <example><c>RuleFor(x =&gt; x.Pharmacy).ChildRules(pharmacy =&gt; pharmacy.RuleFor(x =&gt; x.Phone).NotEmpty());</c></example>
         public static IRuleBuilderOptions<T, TProperty> ChildRules<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Action<InlineValidator<TProperty>> rules)
         {
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             var child = new InlineValidator<TProperty>();
+            child.TakeHolderSets(RuleTarget.Of(rule).Sets);
             rules(child);
             return rule.SetValidator(child);
         }

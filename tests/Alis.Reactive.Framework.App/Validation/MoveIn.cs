@@ -7,6 +7,13 @@ public sealed class MoveInPacket
     public List<string?> Keys { get; set; } = new() { "K-1", "K-2" };
 
     public string? Insurer { get; set; } = "Mutual";
+
+    public MoveInPharmacy Pharmacy { get; set; } = new();
+}
+
+public sealed class MoveInPharmacy
+{
+    public string? Phone { get; set; } = "555-0101";
 }
 
 public sealed class MoveInRules : ReactiveValidator<MoveInPacket>
@@ -18,6 +25,9 @@ public sealed class MoveInRules : ReactiveValidator<MoveInPacket>
         {
             RuleForEach(x => x.Keys).NotEmpty().WithMessage("Log each key handed over.");
             Include(new MoveInBillingRules());
+            RuleFor(x => x.Pharmacy).ChildRules(pharmacy => pharmacy.RuleFor(x => x.Phone)
+                .NotEmpty().WithMessage("Give the pharmacy's phone.")
+                .Must(phone => phone != null && phone.StartsWith("555-")).WithMessage("Use a 555 number."));
         });
     }
 }

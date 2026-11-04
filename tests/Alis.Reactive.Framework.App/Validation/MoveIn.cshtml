@@ -13,6 +13,7 @@
     @{ Html.InputField(plan, m => m.Keys[0], o => o.Label("First key")).Entry(); }
     @{ Html.InputField(plan, m => m.Keys[1], o => o.Label("Second key")).Entry(); }
     @{ Html.InputField(plan, m => m.Insurer, o => o.Label("Insurer")).Entry(); }
+    @{ Html.InputField(plan, m => m.Pharmacy.Phone, o => o.Label("Pharmacy phone")).Entry(); }
 </div>
 
 <p>Saved: <span id="saved"></span></p>

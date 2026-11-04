@@ -121,6 +121,7 @@ namespace Alis.Reactive
         private readonly List<string> _declaredSets = new List<string>();
         private Conditions<T> _scope = Conditions<T>.None;
         private RuleSets _sets = RuleSets.None;
+        private RuleSets _holderSets = RuleSets.None;
 
         /// <summary>Starts a validator with no rules; the derived class's constructor declares them.</summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("ApiDesign", "RS0022:Constructor make protected",
@@ -141,7 +142,7 @@ namespace Alis.Reactive
         public IRuleBuilder<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty>> member)
         {
             if (member == null) throw new ArgumentNullException(nameof(member));
-            return Declared(new MemberRule<T, TProperty>(member, _scope, _sets, this));
+            return Declared(new MemberRule<T, TProperty>(member, _scope, SetsOfANewRule, this));
         }
 
         /// <summary>
@@ -153,21 +154,21 @@ namespace Alis.Reactive
         public IRuleBuilder<T, TElement> RuleForEach<TElement>(Expression<Func<T, IEnumerable<TElement>>> collection)
         {
             if (collection == null) throw new ArgumentNullException(nameof(collection));
-            return Declared(new CollectionRule<T, TElement>(collection, _scope, _sets, this));
+            return Declared(new CollectionRule<T, TElement>(collection, _scope, SetsOfANewRule, this));
         }
 
         /// <summary>Runs another validator's rules for the same model, as if written here.</summary>
         /// <param name="rules">The validator.</param>
-        public void Include(IValidator<T> rules) => _rules.Add(new IncludeRule<T>(rules, _scope, _sets));
+        public void Include(IValidator<T> rules) => _rules.Add(new IncludeRule<T>(rules, _scope, SetsOfANewRule));
 
         /// <summary>
         /// Declares the rules inside <paramref name="rules"/> as members of the named sets: <c>RuleSet("Issue", ..)</c>,
         /// or <c>RuleSet("Issue, Renew", ..)</c> for a rule in both. <c>Validate(instance, "Issue")</c> and a request's
         /// <c>Validate&lt;TRules&gt;(formId, "Issue")</c> run the rules in that set alone; <c>Validate(instance)</c> and
-        /// <c>Validate&lt;TRules&gt;(formId)</c> run the rules in no set. The set reaches a child validator through a rule
-        /// of this set that holds it (<c>SetValidator</c>, <c>ChildRules</c>), and an <c>Include</c> written in no set,
-        /// and then runs the child's rules of the same name. Names match as written. A <c>RuleSet</c> inside a
-        /// <c>RuleSet</c> is refused.
+        /// <c>Validate&lt;TRules&gt;(formId)</c> run the rules in no set. <c>ChildRules</c> on a rule of this set gives the
+        /// inline rules written in no set this set too. <c>SetValidator</c> on a rule of this set, and an <c>Include</c>
+        /// in this set or in none, run the child validator's rules of the same name alone. Names match as written. A
+        /// <c>RuleSet</c> inside a <c>RuleSet</c> is refused.
         /// </summary>
         /// <param name="ruleSet">The set's name, or several separated by commas.</param>
         /// <param name="rules">Declares the rules.</param>
@@ -301,6 +302,10 @@ namespace Alis.Reactive
             foreach (var rule in _rules)
                 if (rule.RunsUnder(run.Selection)) await rule.Validate(instance, prefix, run).ConfigureAwait(false);
         }
+
+        internal void TakeHolderSets(RuleSets sets) => _holderSets = sets;
+
+        private RuleSets SetsOfANewRule => _sets.Any ? _sets : _holderSets;
 
         private TRule Declared<TRule>(TRule rule) where TRule : IRule<T>
         {

@@ -114,6 +114,8 @@ namespace Alis.Reactive
         IRuleBuilderOptions<T, TValue> Add(Check<T, TValue> check);
 
         IRuleBuilderOptions<T, TValue> Add(RulePart<T, TValue> part);
+
+        RuleSets Sets { get; }
     }
 
     internal static class RuleTarget

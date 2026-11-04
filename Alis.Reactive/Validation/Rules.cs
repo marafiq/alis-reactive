@@ -188,6 +188,8 @@ namespace Alis.Reactive.Validation
 
         protected RuleSets Sets { get; }
 
+        RuleSets IRuleTarget<T, TValue>.Sets => Sets;
+
         protected List<RulePart<T, TValue>> Parts { get; } = new List<RulePart<T, TValue>>();
 
         protected string FieldPath { get; }
