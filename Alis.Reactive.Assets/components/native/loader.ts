@@ -14,9 +14,6 @@ function hide(loader: HTMLElement): void {
 
 let pendingAutoHide: ReturnType<typeof setTimeout> | undefined;
 
-// A targeted loader lives inside the element it covers. When that element leaves the page (a drawer
-// closes, a partial is replaced), the loader goes back to the page hidden: it is an app-level object
-// and must stay mounted for the next Show or Hide.
 let targetRemovalWatch: MutationObserver | undefined;
 
 function watchTargetRemoval(loader: HTMLElement): void {

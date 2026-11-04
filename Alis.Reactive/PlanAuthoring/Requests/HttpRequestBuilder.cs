@@ -23,7 +23,6 @@ namespace Alis.Reactive
             Step = step ?? throw new ArgumentNullException(nameof(step));
         }
 
-        /// <summary>The request this builder configures, written where the request was started.</summary>
         internal RequestStep Step { get; }
 
         /// <summary>Builds the request from the view model's own members, for an endpoint that binds the view model.</summary>

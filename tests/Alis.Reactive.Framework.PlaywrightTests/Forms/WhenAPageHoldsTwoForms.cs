@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Forms;
 
-/// <summary>
-/// The summary of a form is the form's own, <c>{formId}_validation_summary</c>, rendered by the server (ADR-0003,
-/// grammar.md F6): two forms on one page, each checked by the server alone, each show the message no field of
-/// theirs shows in their own summary, and showing one form's answer leaves the other's in place.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageHoldsTwoForms : AppPageTest
 {

@@ -1,6 +1,3 @@
-# Verifies the multi-target libraries compile and pack on REAL .NET Framework 4.8
-# (Windows), not just against the cross-platform reference assemblies used on macOS/Linux.
-# It is the net48 proof the macOS dev box cannot provide.
 name: verify-net48
 
 on:
@@ -8,13 +5,11 @@ on:
   push:
     branches: [main, 'release/*']
   pull_request:
-    branches: [main, 'release/*']   # a hotfix PR into release/X.Y gets the same net48 proof as main
+    branches: [main, 'release/*']
 
-# Least privilege: these jobs only read the repository.
 permissions:
   contents: read
 
-# A new push to a pull request supersedes its running net48 jobs; pushes to main / release/* never cancel.
 concurrency:
   group: net48-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -23,7 +18,7 @@ jobs:
   net48-windows:
     name: Build + pack net48 on real .NET Framework 4.8 (Windows)
     runs-on: windows-latest
-    timeout-minutes: 30   # observed: about 3 minutes
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
 
@@ -62,17 +57,15 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: nupkgs-net48-windows
-          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
+          overwrite: true
           path: nupkgs/*.nupkg
           if-no-files-found: error
 
   net48-runtime-iis:
     name: net48 runtime boots under IIS Express (Playwright screenshot proof)
     runs-on: windows-latest
-    timeout-minutes: 40   # observed: about 4 minutes
+    timeout-minutes: 40
     env:
-      # A version no earlier run packed. The NuGet cache restores ~/.nuget/packages, and NuGet never
-      # re-extracts a version it already holds, so a reused version builds against a stale package.
       SMOKE_VERSION: 0.0.0-ci.${{ github.run_id }}.${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v7
@@ -106,15 +99,11 @@ jobs:
           if (-not (Test-Path "$dir/AlisReactive.Native/css/native.css")) { throw "Native CSS did not land in Content\AlisReactive.Native\css" }
           if (-not (Test-Path "$dir/AlisReactive.DesignSystem/css/design-system.css")) { throw "design-system CSS did not land in Content\AlisReactive.DesignSystem\css" }
           if (-not (Test-Path "$dir/AlisReactive.DesignSystem/css/theme.css")) { throw "the theme did not land in Content\AlisReactive.DesignSystem\css" }
-          # Each package marks its folder ignored; the build leaves nothing git lists (Web.config is rewritten later).
           $listed = git status --porcelain -- examples/net48-mvc-smoke
           if ($listed) { $listed; throw "the packages' delivery left files git lists in the smoke app" }
 
       - name: Generate web.config binding redirects from the built bin assemblies
         shell: pwsh
-        # Classic net48 web apps do not auto-add binding redirects for PackageReference transitives
-        # (the System.Text.Json 9 dependency chain). Rather than hand-guess versions, derive an exact
-        # redirect for every strong-named assembly actually in bin\ and rewrite web.config's <runtime>.
         run: |
           $bin = "examples/net48-mvc-smoke/bin"
           $cfgPath = (Resolve-Path "examples/net48-mvc-smoke/Web.config").Path
@@ -166,8 +155,6 @@ jobs:
             $ready = $false; $resp = $null
             for ($i = 0; $i -lt 40; $i++) {
               try {
-                # -SkipHttpErrorCheck: a 500 startup error still means the server is UP — we want to
-                # SEE that body, not retry forever as if the port were dead.
                 $resp = Invoke-WebRequest "http://localhost:5000/" -UseBasicParsing -TimeoutSec 4 -SkipHttpErrorCheck
                 if ($resp.StatusCode -ge 200) { $ready = $true; break }
               } catch { Start-Sleep -Seconds 2 }
@@ -194,6 +181,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: net48-runtime-screenshot
-          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
+          overwrite: true
           path: examples/net48-mvc-smoke/net48-smoke.png
           if-no-files-found: warn

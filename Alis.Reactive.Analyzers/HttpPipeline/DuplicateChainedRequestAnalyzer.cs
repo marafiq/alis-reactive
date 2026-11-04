@@ -6,10 +6,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Alis.Reactive.Analyzers.HttpPipeline
 {
-    /// <summary>
-    /// Reports a second <c>.Chained()</c> call in one fluent chain on a response, which has one follow-up
-    /// request: the request builder refuses the second when the view renders, and this reports it as the view compiles.
-    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateChainedRequestAnalyzer : DiagnosticAnalyzer
     {

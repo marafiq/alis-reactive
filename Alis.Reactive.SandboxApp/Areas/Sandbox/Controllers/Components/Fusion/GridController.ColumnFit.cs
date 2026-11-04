@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The evening med pass sheet: the medication aide works down tonight's doses on the med cart's tablet and
-    /// widens the columns to read a long name in full. Every page starts from tonight's doses on file.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("ColumnFit"), ActionName("ColumnFit")]

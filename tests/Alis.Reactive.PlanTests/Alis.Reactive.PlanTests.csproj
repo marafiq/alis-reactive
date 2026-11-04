@@ -20,14 +20,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- The plans are authored against the core alone: a page's elements are declared here, on the
-             core's own native vendor, and no consumer package is referenced. -->
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <ProjectReference Include="../../Alis.Reactive/Alis.Reactive.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <!-- The goldens travel with the tests: each is the plan a test wrote the last time it was reviewed. -->
         <None Include="Goldens/**/*.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 

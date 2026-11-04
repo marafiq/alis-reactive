@@ -20,8 +20,6 @@ namespace Alis.Reactive.PlanModel.Requests
                 url ?? throw new ArgumentNullException(nameof(url)),
                 ReadPlaceholders(url));
 
-        // A top-level request member fills the placeholder of its name, matched as MVC matches route
-        // values: ignoring case. The placeholder keeps the URL's own spelling.
         internal string? PlaceholderFor(BindingPath member)
         {
             var isTopLevel = member.Value.IndexOfAny(new[] { '.', '[' }) < 0;

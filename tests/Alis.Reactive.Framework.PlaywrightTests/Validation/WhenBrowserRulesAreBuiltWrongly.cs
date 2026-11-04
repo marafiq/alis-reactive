@@ -1,15 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// Browser rules a validation integration builds by hand (<c>BrowserRuleSet</c>, <c>BrowserRule</c>) wrongly,
-/// refused where the page that describes them renders, with the message the developer reads: a rule named for
-/// a call on a member rather than a member, the items of a member that holds no list, and a range whose bounds
-/// are two kinds of value.
-/// </summary>
 [TestFixture]
 public sealed class WhenBrowserRulesAreBuiltWrongly : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string mistake) => await Page.GotoAsync($"{BaseUrl}/Validation/RuleSetRefused?mistake={mistake}");
 
     private ILocator Message(string text) => Page.GetByText(text).First;

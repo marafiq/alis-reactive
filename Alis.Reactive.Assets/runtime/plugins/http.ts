@@ -1,19 +1,3 @@
-// alis.http (grammar.md 6.2). `send(request)` resolves to { status, ok, body }. The C# request builder
-// decides everything else at render: which values fill the route, which go to the query or body, the
-// body format, and the order of validation, WhileLoading, routes, Finally and Chained around this call.
-// H1 Each {name} is filled from route[name] with encodeURIComponent; a missing route value throws
-//    before anything is sent.
-// H2 GET: values become the query string. An array becomes repeated keys, a missing scalar is sent
-//    empty, a missing array sends no key, and a File is a boundary error.
-// H3 JSON: values is the body, each value as the plan built it: an input read as MVC binds it (a blank
-//    one is already null), anything else as it is, "" included; a date is its local calendar text, an
-//    instant its UTC instant; an empty record sends no body.
-// H4 Form data: one entry per key; arrays repeat the key, a File is appended with its name, a date is
-//    its local calendar text, a missing scalar is sent empty and a missing array sends no entry.
-// H5 A header whose value is missing is omitted.
-// H6 The body is read by Content-Type: JSON parsed, text and HTML kept as text, anything else missing.
-// H7 Status 0 means no usable response: the network failed, or a JSON body could not be parsed.
-
 import type { Plugin } from "../objects/plugins";
 import { asText, isMissing } from "../grammar/shape";
 import { logger } from "../diagnostics/trace";
@@ -28,7 +12,6 @@ export interface HttpRequest {
   readonly url: string;
   readonly route: Record<string, unknown>;
   readonly values: Record<string, unknown>;
-  /** The names in `values` that hold arrays, so a missing one sends no entry (H2, H4). */
   readonly arrays: readonly string[];
   readonly headers: Record<string, unknown>;
   readonly format: "json" | "form-data";
@@ -129,8 +112,6 @@ function queryPairs(values: Record<string, unknown>, arrays: readonly string[]):
   return pairs;
 }
 
-// A component whose value is files declares where they are (the uploader: filesData[].rawFile), so
-// what reaches the request is the browser's File objects.
 function fileOf(value: unknown): File | undefined {
   return value instanceof File ? value : undefined;
 }
@@ -167,10 +148,6 @@ function wireText(value: unknown, name: string): string {
   return text;
 }
 
-// A date is sent as asText writes it (an instant as its UTC instant, any other date as its local
-// calendar text); the holder still has the Date, which toJSON has already turned into a UTC instant
-// by the time it reaches here. A file has no JSON form. Text goes as the plan built it (H3): a blank
-// input was read as MVC binds it, and "" a request sets stays "", as MVC's JSON binding keeps it.
 function jsonValue(this: unknown, key: string, value: unknown): unknown {
   if (fileOf(value) !== undefined) throw new Error("[alis] File objects require form-data body format");
   const held = (this as Record<string, unknown>)[key];

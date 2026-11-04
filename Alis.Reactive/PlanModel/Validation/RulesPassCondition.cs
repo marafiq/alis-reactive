@@ -9,11 +9,6 @@ using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive.PlanModel.Validation
 {
-    /// <summary>
-    /// The condition of a rule written under <c>DependentRules</c>: every browser rule of the rule it depends on
-    /// passes over that member's value, or does not apply. It is bound to the form's inputs where the form is
-    /// written, like a member test.
-    /// </summary>
     internal sealed class RulesPassCondition : Condition
     {
         private readonly FieldReference _field;

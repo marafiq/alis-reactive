@@ -4,15 +4,12 @@ using Alis.Reactive.Framework.App.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// A slice is one folder: its controller, its pages and their models. A controller named for its
-// folder finds its views there.
 builder.Services.AddControllersWithViews().AddRazorOptions(razor =>
 {
     razor.ViewLocationFormats.Clear();
     razor.ViewLocationFormats.Add("/{1}/{0}.cshtml");
     razor.ViewLocationFormats.Add("/Shared/{0}.cshtml");
 });
-// Scanning finds every validator but a generic one, which the app registers for each model it checks.
 builder.Services.AddReactiveFluentValidation(validation => validation
     .AddFromAssemblyContaining<Program>()
     .Add<GuestNameRules<RegisteredGuest>>()
@@ -23,10 +20,6 @@ builder.Services.AddSingleton<LineExchange>();
 
 var app = builder.Build();
 
-// The components' bundle built from the current source; a page without it would prove nothing, so the app
-// refuses to start. The runtime bundle and the core's stylesheet come with the AlisReactive project reference
-// the way an app gets them from the package, at ~/_content/AlisReactive/, and the design system's compiled
-// default with its own, at ~/_content/AlisReactive.DesignSystem/.
 RequireBuilt(Path.Combine(app.Environment.ContentRootPath, "wwwroot", "js", "framework-components.js"));
 
 app.UseStaticFiles();
@@ -43,5 +36,4 @@ static void RequireBuilt(string bundle)
         throw new InvalidOperationException($"'{bundle}' is not built. Build the app: dotnet build tests/Alis.Reactive.Framework.App.");
 }
 
-// The framework's Playwright project starts the app by its entry point (AppServer).
 public partial class Program;

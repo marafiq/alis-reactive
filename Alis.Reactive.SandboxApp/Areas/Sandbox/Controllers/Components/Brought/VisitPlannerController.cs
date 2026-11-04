@@ -13,7 +13,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
     {
         private const string ViewBase = "~/Areas/Sandbox/Views/Components/Brought/VisitPlanner/";
 
-        // Seed data: each request builds its own response, so no browser world shares an object.
         private static readonly ResidentSeed[] Residents =
         [
             new ResidentSeed("margaret", "Margaret Hale", "Garden wing", 3,
@@ -74,7 +73,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         [HttpGet("NoCompanion")]
         public IActionResult NoCompanion() => PartialView(ViewBase + "_NoCompanion.cshtml");
 
-        // The front desk holds a companion's time as soon as it is booked.
         [HttpPost("CompanionHold")]
         public IActionResult CompanionHold([FromBody] CompanionVisitPlanModel? plan) =>
             Ok(new CompanionHoldResponse { Held = string.Join(", ", plan?.VisitSlots ?? new List<string>()) });

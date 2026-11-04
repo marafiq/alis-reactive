@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline;
 
-/// <summary>
-/// The family portal for Walter Cho, room 118: his daughter, Grace Cho, is his emergency contact. The
-/// resident and the contact are named differently, so a read of the wrong level of the answer shows the
-/// wrong name.
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/HttpPipeline/FamilyCall")]
 public class FamilyCallController : Controller

@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Alis.Reactive.WireTerms
 {
-    /// <summary>One step of a path: a member by name, an item by position, or each item of a list.</summary>
     internal sealed class PathSegment
     {
         private readonly string _text;
@@ -35,19 +34,13 @@ namespace Alis.Reactive.WireTerms
 
         internal bool IsIndex => Kind == "index";
 
-        /// <summary>The position an index step names.</summary>
         internal int Index => IsIndex
             ? _index
             : throw new InvalidOperationException($"'{_text}' names a member, not a position.");
 
-        /// <summary>The step as the plan carries it: the member's name, the position's digits, or <c>[]</c> for each item.</summary>
         internal string ToPathText() => _text;
     }
 
-    /// <summary>
-    /// The one path model: from an object or a value, step by step, to a member. Every module builds a path
-    /// from typed steps; the plan reads it as <see cref="Text"/>.
-    /// </summary>
     internal sealed class Path
     {
         internal static readonly Path None = new Path(Array.Empty<PathSegment>());
@@ -73,7 +66,6 @@ namespace Alis.Reactive.WireTerms
             return new Path(list);
         }
 
-        /// <summary>The path to each item of the list this path reads.</summary>
         internal Path Each()
         {
             var list = new List<PathSegment>(Segments) { PathSegment.EachItem };
@@ -89,20 +81,12 @@ namespace Alis.Reactive.WireTerms
 
         internal bool ReadsEachItem => Segments.Any(segment => segment.IsEachItem);
 
-        /// <summary>The path as the plan carries it: one text per step; <c>[]</c> reads each item of a list.</summary>
         internal IReadOnlyList<string> Text => Segments.Select(segment => segment.ToPathText()).ToList();
 
-        /// <summary>The path of a member that is written, called or listened to: the items of a list as a whole are none of those.</summary>
         internal IReadOnlyList<string> TargetText => ReadsEachItem
             ? throw new InvalidOperationException($"'{this}' reads each item of a list; it can be read, not written, called or subscribed to.")
             : Text;
 
-        /// <summary>
-        /// Reads a path from text, at the boundaries that hand the framework text: an MVC field prefix
-        /// (<c>NextOfKin</c>, <c>Members[1].Address</c>) and a vendor's object path (<c>slate</c>,
-        /// <c>ej2_instances.0</c>). A step of digits, or digits in brackets as MVC names a list item, is a
-        /// position; any other step is a member. Everywhere else a path is built from typed steps.
-        /// </summary>
         internal static Path Parse(string text)
         {
             if (string.IsNullOrEmpty(text)) return None;

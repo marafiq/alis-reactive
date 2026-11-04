@@ -37,7 +37,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionFileUploadFilesChangedArgs> FilesChanged =>
             Event<FusionFileUploadFilesChangedArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Files, committedBy: FilesChanged);
     }
 
@@ -109,7 +108,6 @@ namespace Alis.Reactive.Fusion
                 .HtmlAttributes(new Dictionary<string, object>
                 {
                     ["name"] = setup.BindingPath,
-                    // The framework's uploader code finds the uploader by it and raises FilesChanged.
                     ["data-alis-file-upload"] = ""
                 });
             build(builder);

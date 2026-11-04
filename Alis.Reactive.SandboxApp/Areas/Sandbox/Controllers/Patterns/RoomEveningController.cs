@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns
 {
-    /// <summary>
-    /// Room 12's evening: a visit card loaded into the log, an escort card loaded into the visit card, and
-    /// the quiet-night card that replaces the visit. URL: /Sandbox/Patterns/RoomEvening.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Patterns/RoomEvening")]
     public class RoomEveningController : Controller
@@ -16,15 +12,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns
         [HttpGet("")]
         public IActionResult Index() => View(ViewBase + "Index.cshtml", new RoomEveningModel());
 
-        // The family visit card: the visitor's inputs, the sign-in rule, and a slot for the escort card.
         [HttpGet("FamilyVisit")]
         public IActionResult FamilyVisit() => PartialView(ViewBase + "_FamilyVisit.cshtml", new RoomEveningModel());
 
-        // The quiet-night card that replaces the visit: no plan of its own.
         [HttpGet("QuietNight")]
         public IActionResult QuietNight() => PartialView(ViewBase + "_QuietNight.cshtml");
 
-        // The escort card, loaded into the visit card's own slot.
         [HttpGet("EscortCard")]
         public IActionResult EscortCard() => PartialView(ViewBase + "_EscortCard.cshtml", new RoomEveningModel());
 

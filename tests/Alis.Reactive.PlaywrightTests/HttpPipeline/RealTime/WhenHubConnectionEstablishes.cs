@@ -63,8 +63,6 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The server counts this page's live connections to the resident hub when the status is pushed:
-    // the panel's trigger rides the page's connection instead of opening a second one.
     [Test]
     public async Task the_resident_panel_shares_the_pages_live_connection()
     {
@@ -79,8 +77,6 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Closing the panel unloads its slot, and with it the panel's live update handler; the page's own
-    // handler, called on the same message first, shows the push arrived.
     [Test]
     public async Task a_closed_resident_panel_takes_no_more_live_updates()
     {

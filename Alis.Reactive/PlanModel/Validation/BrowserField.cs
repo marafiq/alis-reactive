@@ -12,8 +12,6 @@ namespace Alis.Reactive
     /// </summary>
     public sealed class BrowserField
     {
-        // For a collection item field: the condition declared around its RuleForEach, relative to the
-        // collection's owner. Relocating the owner prefixes it; the item's name (Lines[*]) never does.
         private readonly Condition _ownerCondition;
 
         internal BrowserField(

@@ -3,10 +3,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>
-/// One field per check the validator offers, each starting at a value its rule takes and away from the rule's
-/// bound, so a check made wrongly at its bound refuses only its own field.
-/// </summary>
 public sealed class CheckedForm
 {
     public int? Count { get; set; } = 1;
@@ -88,7 +84,6 @@ public sealed class CheckedForm
     public decimal Fee { get; set; } = 1.5m;
 }
 
-/// <summary>What a guest does not eat: any combination, which only the server can tell from a number.</summary>
 [Flags]
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Diets
@@ -99,13 +94,11 @@ public enum Diets
     DairyFree = 4,
 }
 
-/// <summary>The contact the form holds, checked by its own validator.</summary>
 public sealed class Contact
 {
     public string? Phone { get; set; } = "555-0101";
 }
 
-/// <summary>A child validator whose rule only the server makes, answering with its first failing check alone.</summary>
 public sealed class ContactRules : ReactiveValidator<Contact>
 {
     public ContactRules()
@@ -115,7 +108,6 @@ public sealed class ContactRules : ReactiveValidator<Contact>
     }
 }
 
-/// <summary>Every check the validator offers, once each, written once and checked on both sides.</summary>
 public sealed class CheckRules : ReactiveValidator<CheckedForm>
 {
     public CheckRules()

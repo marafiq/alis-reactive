@@ -1,7 +1,3 @@
-// The day picker: a few days, one of which the user may pick, holding none until they do. It knows
-// nothing of Alis.Reactive; DayPicker.cs declares its members by these names. Asked whether the picked
-// day is free, it answers a moment later and shows the check on its own line.
-
 type Listener = (payload: unknown) => void;
 
 interface DayPickerHost extends HTMLElement {
@@ -13,7 +9,6 @@ function dayText(day: Date): string {
   return `${day.getFullYear()}-${two(day.getMonth() + 1)}-${two(day.getDate())}`;
 }
 
-// A "YYYY-MM-DD" day as the person picks it: local midnight.
 function dayOf(text: string): Date {
   const [year, month, date] = text.split("-").map(Number);
   return new Date(year ?? 0, (month ?? 1) - 1, date ?? 1);
@@ -47,7 +42,6 @@ export class DayPicker {
     this.show();
   }
 
-  /** The day picked, or null. */
   get day(): Date | null {
     return this.picked;
   }
@@ -57,7 +51,6 @@ export class DayPicker {
     this.show();
   }
 
-  /** Whether the picked day is free; it shows that it is checking at once, and the answer when it has it. */
   async isFree(): Promise<boolean> {
     const day = this.picked;
     this.checkLine.textContent = day === null ? "Checking, with no day picked" : `Checking ${dayText(day)}`;

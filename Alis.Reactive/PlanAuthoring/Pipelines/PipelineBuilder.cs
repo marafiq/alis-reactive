@@ -32,10 +32,6 @@ namespace Alis.Reactive
             Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        /// <summary>
-        /// Builds a callback's steps. A step lands in the callback being built, whichever pipeline variable
-        /// or handle wrote it: a handle declared in a trigger and used inside OnSuccess writes into OnSuccess.
-        /// </summary>
         internal static Block Build(PlanBuildContext context, Action<PipelineBuilder<TModel>> reactions)
         {
             if (reactions == null) throw new ArgumentNullException(nameof(reactions));

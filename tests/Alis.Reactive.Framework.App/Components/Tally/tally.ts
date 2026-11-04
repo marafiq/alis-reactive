@@ -1,6 +1,3 @@
-// The tally: a page-wide counter with a mark to count towards. It knows nothing of Alis.Reactive; it
-// queues itself as a plugin named "tally" for the runtime to register at boot.
-
 interface PendingPlugin {
   readonly name: string;
   readonly instance: object;

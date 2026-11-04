@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 {
-    // The visit board: a desk's stream hears the times other desks' families take, and how many desks
-    // watch the week, in the same browser session only.
     public partial class VisitPlannerController
     {
         private readonly VisitBoardStreams _board;
@@ -17,7 +15,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         [HttpGet("Board")]
         public IActionResult Board()
         {
-            // The session cookie is issued once the session holds a value; the board's stream needs it.
             HttpContext.Session.SetString("visit-board", "open");
             return View(ViewBase + "VisitBoard.cshtml", new VisitBoardModel());
         }
@@ -45,8 +42,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             finally { _board.Close(session, stream); }
         }
 
-        // The desk holds the time and says how much of the family's week falls on a weekend: the count of
-        // weekend visits comes in the body, the count of booked visits in the X-Booked header.
         [HttpPost("Board/Take/{slotId}")]
         public async Task<IActionResult> TakeVisit(string slotId, [FromBody] TakeRequest? take)
         {

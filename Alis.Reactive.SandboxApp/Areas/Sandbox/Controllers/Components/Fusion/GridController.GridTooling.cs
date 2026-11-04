@@ -3,17 +3,12 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Next week's shift schedule: the staffing scheduler reads the week a day at a time, jumps to the weekend
-    /// and chooses the columns to show. Every page starts from the schedule on file.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("GridTooling"), ActionName("GridTooling")]
         public IActionResult ShiftSchedulePage() =>
             View("~/Areas/Sandbox/Views/Components/Fusion/Grid/GridTooling.cshtml", new ShiftScheduleViewModel());
 
-        // Monday first, then each day's day, evening and night shift in turn.
         [HttpGet("GridToolingShifts")]
         public IActionResult GridToolingShifts()
         {

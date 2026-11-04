@@ -6,12 +6,10 @@ public class WhenPlanBoots : PlaywrightTestBase
     [Test]
     public async Task home_page_links_to_sandbox_events()
     {
-        // The site root redirects to the hierarchical Sandbox hub, the single top of the tree.
         await NavigateTo("/");
         await Expect(Page).ToHaveTitleAsync("Sandbox — Alis.Reactive Sandbox");
         AssertNoConsoleErrors();
 
-        // Drill down the hierarchy by cards: hub -> Core Behaviors section -> Events demo.
         await Page.GetByRole(AriaRole.Link, new() { Name = "Core Behaviors" }).ClickAsync();
         await Page.WaitForURLAsync("**/Sandbox/CoreBehaviors");
 

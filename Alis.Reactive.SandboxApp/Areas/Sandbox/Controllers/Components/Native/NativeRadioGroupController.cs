@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Move-in preferences: the move-in coordinator records Dorothy Price's care level, room type and meal
-    /// plan before her move-in day, taking the care level from her hospital referral when she wants, and
-    /// the office records them.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeRadioGroup")]
     public class NativeRadioGroupController : Controller

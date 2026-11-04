@@ -113,7 +113,6 @@
         </native-hstack>
 
         <native-hstack gap="Sm" wrap="true" class="mt-3">
-            @* Opens the editor on the first shift no one covers; the page's editor for a shift is its drawer. *@
             @(Html.NativeButton("cover-next-open-shift", "Cover the next open shift")
                 .CssClass(Button)
                 .Reactive(plan, evt => evt.Click, (args, p) =>

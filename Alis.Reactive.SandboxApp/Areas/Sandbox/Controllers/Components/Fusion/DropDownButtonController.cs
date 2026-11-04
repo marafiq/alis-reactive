@@ -13,7 +13,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View("~/Areas/Sandbox/Views/Components/Fusion/DropDownButton/Index.cshtml", new FusionDropDownButtonModel());
         }
 
-        // No incident was logged this shift, so the incident summary has nothing to print.
         [HttpPost("Print")]
         public IActionResult Print([FromBody] ShiftReportRequest request)
         {

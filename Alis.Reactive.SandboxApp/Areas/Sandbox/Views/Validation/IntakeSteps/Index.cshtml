@@ -21,7 +21,6 @@
                 The nurse can review the care needs as soon as the care step is filled in.
             </native-text>
         </native-vstack>
-        @* The care needs are on the page only during the care step; before it there is nothing to check or send. *@
         @(Html.NativeButton("ask-nurse-review-btn", "Ask the nurse to review care needs")
             .CssClass("rounded-md border border-border px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-muted")
             .Reactive(plan, evt => evt.Click, (args, p) =>

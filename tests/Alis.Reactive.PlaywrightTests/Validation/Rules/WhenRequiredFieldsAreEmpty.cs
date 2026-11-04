@@ -36,7 +36,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Seven characters are one short; eight are the minimum.
     [Test]
     public async Task password_minlength_validates_on_blur()
     {
@@ -277,8 +276,6 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The page checks only the server section, so the server, checking the whole model, refuses the
-    // sections the page did not send: their messages have no field on this form and go to the summary.
     [Test]
     public async Task server_rejects_incomplete_data_and_shows_errors()
     {
@@ -367,12 +364,9 @@ public class WhenRequiredFieldsAreEmpty : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Each form on the page has a summary of its own: the messages no field of that form shows.
     private ILocator SummaryOf(string formId) => Page.Locator($"#{formId}_validation_summary");
     private const string PhoneFormat = "Phone must match format 123-456-7890.";
 
-    // A phone typed into the extra fields, which are then hidden, is reported in the page's summary:
-    // its message slot is hidden with them.
     private async Task ReportAPhoneWhileTheExtraFieldsAreHidden()
     {
         await NavigateTo(Path);

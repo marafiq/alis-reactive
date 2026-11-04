@@ -6,7 +6,6 @@ public sealed class NoticesController : Controller
 {
     public IActionResult Index() => View(new Notice());
 
-    /// <summary>Checks the notice with the rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Notices/Save")]
     public IActionResult Save([FromBody] Notice notice, [FromServices] NoticeRules rules)
     {

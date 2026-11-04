@@ -75,7 +75,6 @@
 
     <section>
         <h2 class="text-sm font-semibold mb-2">2. FormData POST — the same fields (gathers by name)</h2>
-        @* An element id names one element, so the fields render once, above, and this request sends them as form data. *@
         @(Html.NativeButton("form-submit-btn", "Submit FormData")
             .CssClass("px-4 py-2 bg-blue-600 text-white rounded text-sm")
             .Reactive(plan, evt => evt.Click, (args, p) =>

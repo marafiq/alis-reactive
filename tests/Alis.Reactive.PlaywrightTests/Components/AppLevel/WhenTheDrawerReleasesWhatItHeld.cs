@@ -2,10 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
-/// <summary>
-/// As the night nurse, I want notes loaded into the drawer to hear the desk only while they are in the
-/// drawer, so that closing it, or unloading its content, leaves nothing behind that fails later.
-/// </summary>
 [TestFixture]
 public class WhenTheDrawerReleasesWhatItHeld : PlaywrightTestBase
 {

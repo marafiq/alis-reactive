@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
-/// <summary>
-/// An entry's text sent in a form post as the type of the member it binds (P4, I1), as the endpoint that binds
-/// it says: a day or a moment left empty as the value its type defaults to, a day with a time as that local time
-/// to the millisecond, and text that is no day or no number as it was typed, for the server to refuse
-/// (grammar.md 2.1: a value that cannot be converted is kept as it is); and the text of a list member's entry
-/// as a list, empty when the entry is.
-/// </summary>
 [TestFixture]
 public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 {

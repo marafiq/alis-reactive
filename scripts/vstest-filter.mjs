@@ -1,13 +1,4 @@
 #!/usr/bin/env node
-// Applies a VSTest test-case filter expression to fully qualified test names read from stdin and
-// prints the matching names. `dotnet test --list-tests` lists every discovered test and ignores
-// `--filter`, so scripts/playwright.sh --list applies the shard's (or --filter's) expression here,
-// with the grammar of https://learn.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests:
-//   <property><operator><value>, joined by | (or) and & (and), with parentheses; & binds tighter.
-//   Operators: = != ~ !~    Properties: FullyQualifiedName, Name    Values match case-insensitively.
-//   Escapes in values: \| \& \( \) \= \! \~ \\
-//
-//   node scripts/vstest-filter.mjs '<expression>' < names.txt
 import { readFileSync } from "node:fs";
 
 const expression = process.argv[2];

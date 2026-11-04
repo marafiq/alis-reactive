@@ -14,11 +14,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         [HttpGet("")]
         public IActionResult Index() => View(ViewBase + "Index.cshtml", new RoomComfortModel());
 
-        // The Garden wing keeps rooms between 64 and 72°F and sets 66°F for the night.
         [HttpGet("Policy")]
         public IActionResult Policy() => Ok(new ComfortPolicy { Min = 64, Max = 72, Night = 66 });
 
-        // The wing's plan for the night: each request builds its own, so no browser world shares an object.
         [HttpGet("NightPlan")]
         public IActionResult NightPlan() => Ok(new ComfortPlan
         {

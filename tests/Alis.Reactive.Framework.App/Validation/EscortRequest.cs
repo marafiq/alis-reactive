@@ -2,12 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>
-/// An escort request: what the desk is told (guests, wing, floor, overnight, the visit's purpose) and one
-/// field per form a rule's condition can take, each needed only while its condition holds. Each field starts
-/// filled, so a field is refused only when a test empties it. A condition that reads a member of text or of a
-/// nullable tests the member first, as the server's C# must; the browser reads both tests.
-/// </summary>
 public sealed class EscortRequest
 {
     public int Guests { get; set; } = 1;
@@ -88,11 +82,9 @@ public sealed class EscortRequest
 
     public string? GuestOfNote { get; set; } = "yes";
 
-    /// <summary>Who comes with the visitor: checked by its own validator, while the visit is overnight.</summary>
     public EscortCompanion Companion { get; set; } = new();
 }
 
-/// <summary>A companion of the visitor: what kind, how long they stay, and a field per rule its validator writes under a condition.</summary>
 public sealed class EscortCompanion
 {
     public string? Kind { get; set; }
@@ -110,7 +102,6 @@ public sealed class EscortCompanion
     public string? Pass { get; set; } = "yes";
 }
 
-/// <summary>A companion's rules: one always, the others each under a condition of its own over the companion's members.</summary>
 public sealed class EscortCompanionRules : ReactiveValidator<EscortCompanion>
 {
     public EscortCompanionRules()
@@ -123,13 +114,11 @@ public sealed class EscortCompanionRules : ReactiveValidator<EscortCompanion>
     }
 }
 
-/// <summary>The visit the escort is for.</summary>
 public sealed class EscortVisit
 {
     public string? Purpose { get; set; }
 }
 
-/// <summary>Each field is needed while its condition holds; every condition has a browser form.</summary>
 public sealed class EscortRules : ReactiveValidator<EscortRequest>
 {
     private static readonly string[] KnownWings = { "East", "West" };
@@ -175,7 +164,6 @@ public sealed class EscortRules : ReactiveValidator<EscortRequest>
     }
 }
 
-/// <summary>A rule under an ordering against nothing, which no value passes and the browser has no form of.</summary>
 public sealed class NothingOrderedEscortRules : ReactiveValidator<EscortRequest>
 {
     private static readonly int? NoGuestLimit = null;
@@ -186,7 +174,6 @@ public sealed class NothingOrderedEscortRules : ReactiveValidator<EscortRequest>
     }
 }
 
-/// <summary>A rule under a text method the browser has no form of (Equals), and not declared the server's.</summary>
 public sealed class TextEqualsEscortRules : ReactiveValidator<EscortRequest>
 {
     public TextEqualsEscortRules()
@@ -195,7 +182,6 @@ public sealed class TextEqualsEscortRules : ReactiveValidator<EscortRequest>
     }
 }
 
-/// <summary>A rule under a condition the browser cannot read (a member of text, its length) and not declared the server's.</summary>
 public sealed class UnreadableEscortRules : ReactiveValidator<EscortRequest>
 {
     public UnreadableEscortRules()

@@ -1,15 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Members;
 
-/// <summary>
-/// A member a declaration declares wrongly, or a field a page names wrongly, refused when the page renders with
-/// the message the developer reads: an event on an object a method returns, an object declared for a member the
-/// declaration does not have, a method declared for no member, and a field that selects no member of the row,
-/// a call on a member, or a list position before the first.
-/// </summary>
 [TestFixture]
 public sealed class WhenAMemberIsDeclaredOrNamedWrongly : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string mistake) => await Page.GotoAsync($"{BaseUrl}/Members/Refused?mistake={mistake}");
 
     private ILocator Message(string text) => Page.GetByText(text).First;

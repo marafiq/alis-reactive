@@ -1,14 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
-/// <summary>
-/// An input bound to a member of an enum, rendered by a choice that writes its markup to the field's writer
-/// (I5): the member chosen is posted by its name and bound as that member; a required enum refuses the member
-/// its default binds as, an enum with no member numbered 0 takes any of its members, and one that may hold
-/// none refuses only none; a rule under a condition on the member applies while the input holds that member,
-/// or one of a set of them; picking a member re-checks the input by the choice's own event; the choice the
-/// field renders runs the pipelines its events are given; and a pipeline compares the member a choice holds
-/// and sets a member into it.
-/// </summary>
 [TestFixture]
 public sealed class WhenAnInputHoldsAnEnumMember : AppPageTest
 {

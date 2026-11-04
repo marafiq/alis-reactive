@@ -25,9 +25,7 @@ public class ResidentIntakeModel
     public decimal? DepositAmount { get; set; }
 }
 
-/// <summary>The document events the intake page raises and hears.</summary>
 public static class IntakeEvents
 {
-    /// <summary>Raised once the intake is saved; the page then loads its summary.</summary>
     public static readonly AppEvent IntakeSaved = AppEvent.Declare();
 }

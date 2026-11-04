@@ -47,13 +47,6 @@ namespace Alis.Reactive
         public static string For<TModel, TProp>(Expression<Func<TModel, TProp>> expression) =>
             ForMember(ExpressionPathHelper.ToDeclarer(expression), ExpressionPathHelper.ToMemberName(expression.Body));
 
-        /// <summary>
-        /// The one rule every input id follows, wherever it is derived: the rendered input, a validator's member,
-        /// a component read by its member and a named gather. Dots and brackets in the name become underscores,
-        /// matching the <c>Html.IdFor</c> convention.
-        /// </summary>
-        /// <param name="declarer">The class that declares the bound member (<see cref="ExpressionPathHelper.ToDeclarer"/>).</param>
-        /// <param name="mvcName">The member's full MVC name, the view's field prefix included: <c>NextOfKin.Name</c>.</param>
         internal static string ForMember(Type declarer, string mvcName)
         {
             if (declarer.IsInterface)

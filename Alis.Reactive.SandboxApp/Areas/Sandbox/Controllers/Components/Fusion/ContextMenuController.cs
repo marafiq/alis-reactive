@@ -3,15 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The Maple wing room board. Every page starts from the residents and open rooms below; a move answers
-    /// with the board as it would be after the move and keeps nothing, so each page owns its own board.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/ContextMenu")]
     public class ContextMenuController : Controller
     {
-        // Maple 218 looks open on the board, but the front desk holds it for tonight's admission.
         private const string HeldRoom = "maple-218";
 
         private static readonly IReadOnlyList<BoardResident> Residents =
@@ -24,7 +19,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "Sundowns after 5 PM; quiet music helps. Finger foods. Sister Marisol visits Wednesdays.")
         ];
 
-        // The rooms open on the wing tonight, by the code a room item's id ends with.
         private static readonly IReadOnlyList<(string Code, string Name)> OpenRooms =
         [
             ("maple-216", "Maple 216"),
@@ -73,7 +67,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // A room item's id is the resident's key, "-room-", then the room's code: "arthur-room-maple-216".
         private static string RoomCode(string? itemId)
         {
             const string Marker = "-room-";

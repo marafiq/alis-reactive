@@ -1,9 +1,5 @@
-// The slate: a board that holds a title, a note, a header and rows, and shows them. It knows nothing
-// of Alis.Reactive; Slate.cs declares its members by these names.
-
 type Listener = (payload: unknown) => void;
 
-/** Listeners by event name, as the slate and its header both keep them. */
 class Listeners {
   private readonly named = new Map<string, Set<Listener>>();
 
@@ -30,7 +26,6 @@ interface SlateHost extends HTMLElement {
   slate?: Slate;
 }
 
-/** The header above the title: an object the slate holds. */
 export class Header {
   readonly listeners = new Listeners();
   private captionText = "";
@@ -60,7 +55,6 @@ export class Header {
   }
 }
 
-/** What a changing listener receives; the slate reads cancel, reason and requested back once the listeners ran. */
 export interface Changing {
   requested: string;
   readonly current: string;
@@ -69,7 +63,6 @@ export interface Changing {
   clamp(): void;
 }
 
-/** One row of the slate. */
 export class Row {
   private isMarked = false;
 
@@ -90,7 +83,6 @@ export interface Card {
   due: Date;
 }
 
-// The slate orders cards by a field's value: a date by its time, anything else as it compares.
 function order(a: unknown, b: unknown): number {
   const left = a instanceof Date ? a.getTime() : a;
   const right = b instanceof Date ? b.getTime() : b;
@@ -172,17 +164,14 @@ export class Slate {
     this.show();
   }
 
-  /** How many rows the slate holds. */
   get count(): number {
     return this.rows.length;
   }
 
-  /** The rows' labels, in order. */
   get labels(): string[] {
     return this.rows.map(row => row.label);
   }
 
-  /** A note shown under the title. Written only: the slate keeps no getter for it. */
   set note(text: string) {
     this.noteText = text;
     this.show();
@@ -197,47 +186,39 @@ export class Slate {
     this.show();
   }
 
-  /** The row at a position. */
   rowAt(index: number): Row {
     const row = this.rows[index];
     if (row === undefined) throw new RangeError(`The slate has no row ${index}.`);
     return row;
   }
 
-  /** The row at a position counted from the first row, or from the last. */
   rowFrom(index: number, fromLast: boolean): Row {
     return this.rowAt(fromLast === true ? this.rows.length - 1 - index : index);
   }
 
-  /** The rows marked so far. */
   markedRows(): Row[] {
     return this.rows.filter(row => row.marked);
   }
 
-  /** The labels of a run of rows, from a position, joined by commas. */
   labelsFrom(start: number, count: number): string {
     return this.labels.slice(start, start + count).join(", ");
   }
 
-  /** The labels of a run of rows, from a position, joined by the separator given. */
   labelsJoined(start: number, count: number, separator: string): string {
     return this.labels.slice(start, start + count).join(separator);
   }
 
-  /** Shows the labels as the summary line. */
   summarize(labels: readonly string[]): void {
     this.summaryText = labels.join(" · ");
     this.show();
   }
 
-  /** Takes every row off the slate. */
   clear(): void {
     this.rows.splice(0, this.rows.length);
     this.show();
     this.listeners.emit("cleared");
   }
 
-  /** A placed line of four values; the number joins the total. Each must arrive as its own type. */
   place(text: string, number: number, flag: boolean, day: Date): void {
     this.runningTotal += number;
     this.placedDay = day;
@@ -246,7 +227,6 @@ export class Slate {
     this.show();
   }
 
-  /** A card: whose it is and the day it is due, by name and weekday. */
   fill(card: Card): void {
     this.placedText = `${card.name} due ${weekdays[card.due.getDay()]} ${dayText(card.due)}`;
     this.latestCard = { name: card.name, due: card.due };
@@ -254,27 +234,22 @@ export class Slate {
     this.show();
   }
 
-  /** When the slate was started, as a timestamp. */
   get startedAt(): number {
     return this.startedAtMs;
   }
 
-  /** The day of the line placed last, or null before any. */
   get placedOn(): Date | null {
     return this.placedDay;
   }
 
-  /** The flag of the line placed last. */
   get placedFlag(): boolean {
     return this.placedWithFlag;
   }
 
-  /** The card filled last, as data. */
   get lastCard(): Card | null {
     return this.latestCard;
   }
 
-  /** Every card filled, as data. */
   get cards(): readonly Card[] {
     return this.cardList;
   }
@@ -288,7 +263,6 @@ export class Slate {
     this.show();
   }
 
-  /** Writes one field of a card. */
   setCard(index: number, field: string, value: unknown): void {
     const card = this.cardList[index];
     if (card === undefined) throw new RangeError(`The slate has no card ${index}.`);
@@ -296,13 +270,11 @@ export class Slate {
     this.show();
   }
 
-  /** Orders the cards by a field. */
   sortCards(field: string): void {
     this.cardList.sort((a, b) => order((a as unknown as Record<string, unknown>)[field], (b as unknown as Record<string, unknown>)[field]));
     this.show();
   }
 
-  /** Adds a row, saying who asked for it. */
   addRowBy(label: string, by: string): void {
     this.rows.push(new Row(`${label} (by ${by})`, () => this.show()));
     this.show();
@@ -370,8 +342,6 @@ export class Slate {
     this.listeners.emit("rowAdded", { label, count: this.rows.length });
   };
 
-  // Asks its listeners before it takes a new title: a listener may cancel with a reason, or clamp
-  // the requested title; the slate reads the payload once they have all run.
   private retitle(requested: string): void {
     const change: Changing = {
       requested,

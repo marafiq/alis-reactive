@@ -13,8 +13,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         [HttpGet("")]
         public IActionResult Index() => View(ViewBase + "Index.cshtml", new MedicationListModel());
 
-        // Maple Grove Pharmacy delivered four of the five lines: no lidocaine patch, and its warfarin label
-        // carries a trailing space. The empty delivery is what the pharmacy sends when nothing was ordered.
         [HttpGet("Delivery")]
         public IActionResult Delivery([FromQuery] string pharmacy)
         {

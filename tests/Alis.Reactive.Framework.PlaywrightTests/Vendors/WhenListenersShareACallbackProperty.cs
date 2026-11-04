@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Vendors;
 
-/// <summary>
-/// Handlers of several owners assigned to one callback property (V2): the page's bell heard by the page and by
-/// the wings loaded into two slots. Each handler runs after those assigned before it; a wing's handler stops
-/// when its slot unloads while the page's and the bell's own keep running; and a wing released before one
-/// assigned after it leaves that one listening.
-/// </summary>
 [TestFixture]
 public sealed class WhenListenersShareACallbackProperty : AppPageTest
 {

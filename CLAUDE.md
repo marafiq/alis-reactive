@@ -114,10 +114,11 @@ Everything else stays sync.
 - Never lose typed nature or a feature. Nothing is removed, made internal or loosened to a string
   because nothing calls it: coverage is never complete, so a member with no caller is unproven, not
   dead. Prove it with a sandbox page and a Playwright test.
-- Comments are exceptional. Make the code say it: a name, an extracted function, a guard at the
-  boundary. Keep a comment only for what code cannot show (a vendor or protocol quirk, a spec
-  citation). A comment a change makes false or redundant is deleted, not reworded. XML docs on the
-  public surface are the developer's IntelliSense and follow `.claude/rules/docs.md`.
+- No comments: code is the truth. Name the thing what it is, extract a function, guard the
+  boundary. The one exception is an XML doc on the public surface of a shipped package (what its
+  PublicAPI text lists): the developer's IntelliSense, written rarely and to `.claude/rules/docs.md`.
+  A shebang, `#nullable` and the version Dependabot reads beside a pinned action are directives, not
+  comments. `WhenCodeIsWritten` fails on any other comment, in every language the repo holds.
 - Raise a gap, never invent. When a view, component or test needs a door the DSL or the vendor's
   public API lacks, name the gap with its use case; never invent a member, a syntax or a runtime
   behavior so a test passes. A member's real shape comes from the installed package or the vendor's

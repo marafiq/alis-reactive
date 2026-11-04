@@ -1,7 +1,5 @@
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
 {
-    // Included nested validators must emit Address.* paths for conditions and peer references.
     public class NestedBugAddressValidator : ReactiveValidator<NestedBugAddress>
     {
         public NestedBugAddressValidator()
@@ -35,7 +33,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
         }
     }
 
-    // Parent and child conditions must compose instead of letting the child rule fire alone.
     public class ParentChildBugValidator : ReactiveValidator<ParentChildModel>
     {
         public ParentChildBugValidator()
@@ -56,7 +53,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.NestedBugs
         }
     }
 
-    // Rules included inside When must inherit the outer condition.
     public class IncludeBugValidator : ReactiveValidator<IncludeModel>
     {
         public IncludeBugValidator()

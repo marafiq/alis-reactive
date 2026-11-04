@@ -4,13 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// The wing's desk, which books escorts for family visits. Helen Park (Maple wing, two visits a week)
-    /// and Arthur Bell (Cedar wing, one) each have a week of times; the desk the X-Desk header names
-    /// answers with its own escort, Dana at the east desk and Malik at the west, and a request that names
-    /// no desk is refused. Every answer repeats what the desk received, so a value lost between the page
-    /// and the desk shows up on the page.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/VisitEscort")]
     public class VisitEscortController : Controller
@@ -72,7 +65,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         public IActionResult Seating([FromQuery] PartyQuery query) =>
             Ok(new EscortMessage($"The family room seats {query.Party.Visitors} visitors and {Named(query.Companions.FirstOrDefault()?.Name)}."));
 
-        // Built per call: a static collection in the sandbox is shared by every browser world.
         private static List<VisitSlot> Times(params string[] ids) =>
             ids.Select(id => new VisitSlot { Id = id, Label = Label(id), Day = DayOf(id) }).ToList();
 

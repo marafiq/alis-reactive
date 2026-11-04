@@ -7,7 +7,6 @@ using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive.PlanModel.Requests
 {
-    /// <summary>Requests that start together; the steps after them run once every one has settled.</summary>
     internal sealed class ParallelStep : Step
     {
         private readonly List<RequestStep> _requests = new List<RequestStep>();

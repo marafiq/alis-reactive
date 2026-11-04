@@ -4,29 +4,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Maple Grove's work-order system behind the facilities lead's maintenance board: it holds the work
-    /// orders, makes or refuses each change the board sends, and answers questions about one work order.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Kanban")]
     public class KanbanController : Controller
     {
-        // Each browser keeps its own work orders in its session, seeded on first read, so one test's
-        // changes are never another's.
         private const string BoardKey = "maintenanceBoard";
         private const string NextNumberKey = "maintenanceNextWorkOrderNumber";
         private const string FrontDeskCallTakenKey = "maintenanceFrontDeskCallTaken";
         private const string BrakeCableArrivedKey = "maintenanceBrakeCableArrived";
         private const int FirstNewWorkOrderNumber = 110;
 
-        // Walter Finch's wheelchair waits on a brake cable that is back-ordered until Friday.
         private const int WheelchairWorkOrder = 101;
 
-        // Ana Ruiz is updating the call light work order at her desk.
         private const int HeldWorkOrder = 102;
 
-        // The family in Birch 106 withdrew the faucet request this morning; the board does not know yet.
         private const int WithdrawnWorkOrder = 105;
 
         [HttpGet("")]
@@ -70,7 +61,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 : new WorkOrderHold());
         }
 
-        // The number is reserved now; the work order is filed when the board adds it.
         [HttpPost("Draft")]
         public IActionResult Draft()
         {
@@ -86,7 +76,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // The front desk took one urgent call this shift; it reaches the board when the lead asks for it.
         [HttpGet("FrontDeskCall")]
         public IActionResult FrontDeskCall()
         {
@@ -110,7 +99,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // The brake cable is in: the wheelchair's work order is ready to go back in progress.
         [HttpPost("PartArrived")]
         public IActionResult PartArrived()
         {
@@ -175,7 +163,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 });
             }
 
-            // Work that has just been finished waits for the resident's sign-off.
             var moved = existing.Status != changed.Status;
             var finishedNow = moved && changed.Status == WorkOrderStatus.Done;
             var updated = changed with
@@ -184,8 +171,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 SignedOff = !finishedNow && existing.SignedOff,
                 FinishedToday = finishedNow || existing.FinishedToday
             };
-            // Done lists work in the order it was finished; the board does not draw earlier finished work, so a
-            // place the board gives there would not count it.
             var place = finishedNow ? null : change.Index ?? (moved ? null : (int?)existing.Queue);
             board = PlaceInLine(board, updated, place);
             SaveBoard(board);
@@ -219,15 +204,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Starting the wheelchair repair before the brake cable arrives parks it in the Blocked column.
         private bool WaitsForItsPart(WorkOrder existing, WorkOrder changed) =>
             existing.Number == WheelchairWorkOrder
             && existing.Status == WorkOrderStatus.Open
             && changed.Status == WorkOrderStatus.InProgress
             && HttpContext.Session.GetString(BrakeCableArrivedKey) == null;
 
-        // Puts the work order at its place in its column's line in its wing, the end when no place is given,
-        // and numbers that line from 0.
         private static List<WorkOrder> PlaceInLine(List<WorkOrder> board, WorkOrder workOrder, int? place)
         {
             var others = board.Where(other => other.Number != workOrder.Number).ToList();
@@ -277,7 +259,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return next;
         }
 
-        // Maple has nothing in progress, so a work order dropped there is first in line.
         private static List<WorkOrder> SeededBoard() =>
         [
             Seed(101, WorkOrderStatus.Open, 0, "Wheelchair brakes slipping", "Maple 118", MaintenanceWing.Maple, WorkOrderPriority.Routine, "Dev Patel"),

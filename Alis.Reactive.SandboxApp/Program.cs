@@ -4,29 +4,22 @@ using Alis.Reactive.SandboxApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Optional Syncfusion license comes from configuration or user secrets.
 var sfLicense = builder.Configuration["Syncfusion:LicenseKey"];
 if (!string.IsNullOrEmpty(sfLicense))
     Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(sfLicense);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
-// Per-session state keeps sandbox grid edits isolated across separate app/test sessions.
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options => options.IdleTimeout = TimeSpan.FromHours(2));
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.AddFromAssemblyContaining<Program>());
 builder.Services.AddReactiveFusion();
-// The reservations office registers its own validators, as a module from its own assembly would; the
-// registrations merge with the app's, and its hold-book rule runs on the server alone.
 builder.Services.AddReactiveFluentValidation(validation =>
     validation.Add<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ReservationsOfficeValidator>());
-// Maple Grove's rate policy: the rate sheet's validator takes it from DI, for the page and the server alike.
 builder.Services.AddSingleton(new Alis.Reactive.SandboxApp.Areas.Sandbox.Models.RateSheetPolicy("Maple Grove", 15000m));
-// The visit board's streams, keyed by session so browser worlds never hear each other.
 builder.Services.AddSingleton<Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought.VisitBoardStreams>();
 
-// Disable demo broadcasts in Playwright so realtime tests control their own events.
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ALIS_NO_BROADCAST")))
     builder.Services.AddHostedService<RealTimeBroadcastService>();
 
@@ -45,8 +38,6 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
-// A broken outage drill refuses the resident hub's negotiate, as an unreachable server would, so the
-// page's automatic reconnect runs its schedule instead of being accepted and then closed by the hub.
 app.Use(async (context, next) =>
 {
     if (ResidentStatusHub.RefusesNegotiate(context.Request))
@@ -71,5 +62,4 @@ app.MapControllerRoute(
 
 app.Run();
 
-// The test projects start the sandbox by its entry point (AppServer).
 public partial class Program;

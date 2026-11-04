@@ -5,22 +5,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ResidentRegister;
 
-/// <summary>
-/// As the Maple wing front-desk coordinator, I want to find residents, move a resident to another room,
-/// remove duplicate records and prepare the fire-drill roster from one register, so that the drill counts
-/// every resident once, in the room they live in.
-/// </summary>
-/// <remarks>
-/// The register holds five records for three residents: Helen Park (1042), Arthur Bell (1043) and Rosa
-/// Diaz (1044, the newest resident) each hold a care plan; 1047 (Helen Park) and 1048 (Arthur Bell) are
-/// duplicates entered by mistake. The server never removes a record that holds a care plan, and moves a
-/// resident only into a room no other resident lives in. A removal or a move reloads the list of records
-/// from the server. The roster link always names the Maple wing, which the server always accepts, so it
-/// has no error route. A modified click on a link (a new tab) stays the browser's and is not exercised
-/// here: a record's address answers only the removal. The page's inputs are found by the framework's id
-/// rule rather than PagePlan: each record's link carries a plan of its own, rendered before the page's,
-/// and PagePlan reads the first plan on the page.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorKeepsResidentRegister : PlaywrightTestBase
 {
@@ -57,8 +41,6 @@ public class WhenCoordinatorKeepsResidentRegister : PlaywrightTestBase
 
     private async Task OpenRegister() => await NavigateToAndWaitForBoot(Path);
 
-    // The request is held at the browser until the test releases it, then sent on unchanged, so what the
-    // page shows before the answer arrives can be seen.
     private async Task HoldUntilReleased(string url)
     {
         _released = new SemaphoreSlim(0);
@@ -238,7 +220,6 @@ public class WhenCoordinatorKeepsResidentRegister : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(Refused);
     }
 
-    // The list is reloaded from the server after a removal, with each record's link in it again.
     [Test]
     public async Task after_the_list_reloads_the_next_duplicate_can_be_removed()
     {

@@ -46,19 +46,12 @@ namespace Alis.Reactive
         {
         }
 
-        /// <summary>Whether a rule the selection reaches waits for a database or a service.</summary>
         internal abstract bool IsAsync(RuleSetSelection selection);
 
-        /// <summary>The rules the browser runs under the selection, with those of the child validators the rules hold.</summary>
         internal abstract IReadOnlyList<BrowserField> BrowserRules(RuleSetSelection selection);
 
-        /// <summary>The sets a selection can name: those declared here, and those of a validator an <c>Include</c> in no set holds.</summary>
         internal abstract IEnumerable<string> DeclaredRuleSets { get; }
 
-        /// <summary>
-        /// The selection a name asks for; a name no reachable validator declares is refused, naming the declared
-        /// sets. The one refusal, for <c>Validate</c>, <c>ValidateAsync</c> and the page's rule source.
-        /// </summary>
         internal RuleSetSelection Select(string ruleSet)
         {
             if (string.IsNullOrWhiteSpace(ruleSet)) throw new ArgumentException("A rule set has a name people read.", nameof(ruleSet));
@@ -300,8 +293,6 @@ namespace Alis.Reactive
             return browser.Fields;
         }
 
-        // A synchronous run completes without waiting: no check it holds waits. The run's selection decides
-        // which rules it reaches, here and in every validator a rule holds.
         internal async Task RunRules(T instance, string prefix, ValidationRun run)
         {
             foreach (var rule in _rules)

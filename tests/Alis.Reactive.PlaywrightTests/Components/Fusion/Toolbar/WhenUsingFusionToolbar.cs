@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Toolbar;
 
-// Journey: a resident manages their account from a command bar. They can request
-// maintenance or message their care team (which records the started action), and
-// pay their balance (which locks the bar, posts the clicked command, and shows the
-// server's confirmation). "Done" unlocks the bar again.
 [TestFixture]
 public class WhenUsingFusionToolbar : PlaywrightTestBase
 {
@@ -21,8 +17,6 @@ public class WhenUsingFusionToolbar : PlaywrightTestBase
         await Expect(CommandBar.Command("pay-balance")).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // RENDERS — the FusionToolbar builder renders the account command bar with the
-    // resident's three actions visible.
     [Test]
     public async Task the_account_command_bar_opens_with_the_residents_actions()
     {
@@ -36,8 +30,6 @@ public class WhenUsingFusionToolbar : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // INTERACTS — clicking a command fires Clicked through the .Reactive wiring; the
-    // FusionToolbarClickedArgs.Item.Text payload names the started action in the status banner.
     [Test]
     public async Task requesting_maintenance_shows_which_action_the_resident_started()
     {
@@ -50,9 +42,6 @@ public class WhenUsingFusionToolbar : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The same Clicked pipeline routes a different command to the same status banner with
-    // its own text — proving the typed Item.Text carries each clicked item's own label,
-    // not a constant.
     [Test]
     public async Task messaging_the_care_team_shows_that_action_started()
     {
@@ -65,10 +54,6 @@ public class WhenUsingFusionToolbar : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Item.Id ROUTES the workflow — the Clicked pipeline branches on args.Item.Id Eq
-    // "pay-balance". Paying takes the payment branch (server confirmation panel), not the
-    // status branch. If Item.Id stopped carrying, this click would fall to the Else branch
-    // and the confirmation would never appear.
     [Test]
     public async Task paying_the_balance_runs_the_payment_workflow_and_shows_the_server_confirmation()
     {
@@ -83,8 +68,6 @@ public class WhenUsingFusionToolbar : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Disable — paying locks the whole command bar (the root gains Syncfusion's e-disabled
-    // state); "Done" calls Disable(false) and the lock is gone.
     [Test]
     public async Task paying_locks_the_command_bar_and_done_unlocks_it()
     {
@@ -101,11 +84,6 @@ public class WhenUsingFusionToolbar : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // GATHERS — the framework gather pipeline carries the clicked item's typed payload
-    // (Item.Id, Item.Text, Item.Disabled) into the POST body under their declared keys.
-    // A trusted toolbar click only ever lands on an enabled item, so Item.Disabled's
-    // reachable value is false; its fails-when-broken proof is the POST body (P025).
-    // (Framework gather test: asserts request.PostData.)
     [Test]
     public async Task paying_posts_the_clicked_command_payload_to_the_server()
     {

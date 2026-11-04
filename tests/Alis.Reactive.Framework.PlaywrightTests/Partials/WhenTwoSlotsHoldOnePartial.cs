@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// Two slots each load the same template in a request of their own, so the server cannot refuse the second copy
-/// and the page holds its input twice under one id. An id names one element (grammar.md M6): each slot's unload
-/// releases exactly the input it loaded, so the copy the other slot holds is still the one the page reads.
-/// </summary>
 [TestFixture]
 public sealed class WhenTwoSlotsHoldOnePartial : AppPageTest
 {

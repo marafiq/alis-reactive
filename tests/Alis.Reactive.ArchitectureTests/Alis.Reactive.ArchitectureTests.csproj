@@ -17,7 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!-- The two apps whose pages are swept in process: every GET action, every plan it renders. -->
         <ProjectReference Include="../../Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
         <ProjectReference Include="../Alis.Reactive.Framework.App/Alis.Reactive.Framework.App.csproj" />
     </ItemGroup>

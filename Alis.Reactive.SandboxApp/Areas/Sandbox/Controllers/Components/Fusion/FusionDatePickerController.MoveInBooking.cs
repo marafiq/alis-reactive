@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>Move-in booking: the server confirms the days it booked, written out in full.</summary>
     public partial class FusionDatePickerController
     {
         [HttpGet("MoveInBooking")]

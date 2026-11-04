@@ -2,19 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.VisitPlanner;
 
-/// <summary>
-/// As a front desk coordinator, I want the visit board to show at once when a family at another desk
-/// takes a time, so that I never promise a family a time someone else already holds.
-/// </summary>
-/// <remarks>
-/// Each desk opens the board for the family it serves (?resident=margaret&amp;family=...). Desks in
-/// one browser session are one community: a time taken at one desk is pushed to the others, and to
-/// no other session; every desk is also told how many desks watch the week, on the same stream under
-/// its own event name. The board also reads the week back off the visit planner: the wing's board
-/// code and desk code (through the slugify plugin), the quiet, first weekend and first afternoon times
-/// (arrays over the planner's slots), the weekend visits booked (an array over its change payload) and
-/// what is left (its remaining function). Its activity list and spoken status line are plugins.
-/// </remarks>
 [TestFixture]
 public class WhenWatchingTheVisitBoard : PlaywrightTestBase
 {
@@ -52,7 +39,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         await Expect(Planner.Times).ToHaveCountAsync(6);
     }
 
-    // The Okafor family's desk, open in the same session as this test's page.
     private async Task<PlannerField> OpenTheOkaforDesk() => PlannerOn(await OpenTheOkaforDeskPage());
 
     private async Task<IPage> OpenTheOkaforDeskPage()
@@ -78,8 +64,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Find(label => label.EndsWith("PM")) over the slots' labels: the first label, "Mon 10:00 AM", is a
-    // morning time, so a Find that ignored its predicate would name it instead of Tuesday's.
     [Test]
     public async Task the_board_names_the_first_afternoon_time_of_the_week()
     {
@@ -89,7 +73,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The slugify plugin's result is written to a component's property: the desk code box, not text.
     [Test]
     public async Task the_desk_code_is_filled_in_from_the_wings_name()
     {
@@ -99,8 +82,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The visitLog plugin's command records a fixed line, and its Entries member is read back into the
-    // count; neither has any other way onto the page.
     [Test]
     public async Task opening_the_board_records_it_in_the_activity_list()
     {
@@ -133,9 +114,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The take sends two array results: the weekend count in the request body and the booked count in the
-    // X-Booked header, and the desk answers with both. Sat, then Sun, then Mon: 1 of 1, 2 of 2, 2 of 3.
-    // An array result that did not reach the request would leave the desk saying 0.
     [Test]
     public async Task each_hold_says_how_many_of_the_familys_booked_visits_fall_on_a_weekend()
     {
@@ -152,8 +130,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The greeter note reads a group: the planner's IsBooked("sat-11") method, the slugify plugin over the
-    // wing, and the family named in the URL. Releasing Saturday makes the group's first term false.
     [Test]
     public async Task the_weekend_greeter_is_asked_for_a_named_garden_wing_family_holding_saturday_eleven()
     {
@@ -172,8 +148,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A desk whose link names no family: the group's URL term is empty, so Saturday at the Garden wing
-    // asks for no greeter. The weekend count, written by the same handler, proves the handler ran.
     [Test]
     public async Task a_desk_whose_link_names_no_family_asks_for_no_greeter()
     {
@@ -205,8 +179,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The log's dispatch carries fixed values (false, 0) and a plugin result (the slug of the wing); a time
-    // this family never booked is not one it lost.
     [Test]
     public async Task the_log_names_the_desk_and_that_this_family_lost_nothing_when_another_family_takes_an_open_time()
     {
@@ -222,8 +194,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The take is recorded with the visitLog plugin's command given the pushed message, its Entries are
-    // read back, and the announce plugin (a function itself, called for its effect) reads the message out.
     [Test]
     public async Task a_time_another_desk_takes_is_recorded_in_the_activity_list_and_read_out()
     {
@@ -241,8 +211,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Each push runs the trigger again with its own payload: a second take replaces the first message and
-    // marks a second time taken.
     [Test]
     public async Task every_time_another_desk_takes_shows_here_in_turn()
     {
@@ -262,9 +230,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Both triggers on the board read one URL; the server counts each open stream as a desk. One
-    // EventSource per page makes two desks; one per trigger would make four, and the Okafor desk, whose
-    // streams open after the Hales' two, would never read two.
     [Test]
     public async Task the_board_says_how_many_desks_are_watching_the_week()
     {
@@ -278,9 +243,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The stream sends two event types. The desks message must not run the SlotTaken pipeline (it would
-    // write the alert, record a line and tell the log), and a slot-taken message must not run the desks
-    // trigger (it would blank the count).
     [Test]
     public async Task a_desk_joining_leaves_the_taken_time_alert_alone_and_a_taken_time_leaves_the_desk_count()
     {
@@ -319,7 +281,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The log's dispatch from the branch that released the time carries true and 1, written into the plan.
     [Test]
     public async Task the_log_says_this_family_lost_a_booked_time_when_another_desk_takes_it()
     {
@@ -361,7 +322,6 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         internal ILocator Time(string label) =>
             _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
 
-        // A filter's inner locator is matched inside each item, so it starts from the page, not the root.
         internal ILocator TakenUnder(string label) =>
             _root.Locator("li.vp-item")
                 .Filter(new() { Has = _root.Page.GetByRole(AriaRole.Button, new() { Name = label, Exact = true }) })

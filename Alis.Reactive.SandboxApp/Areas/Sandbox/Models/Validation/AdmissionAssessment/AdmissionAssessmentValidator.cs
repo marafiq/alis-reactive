@@ -1,10 +1,5 @@
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// The assessment's rules, written once. The page runs every one of them; the server runs the same
-    /// ones on what the page sends, whether it checked first or not.
-    /// </summary>
     public class AdmissionAssessmentValidator : ReactiveValidator<AdmissionAssessmentModel>
     {
         public static readonly DateTime FirstMoveInDay = new DateTime(2024, 1, 1);
@@ -49,8 +44,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.FellInLastYear).NotNull().WithMessage("Answer whether the resident fell in the last year.");
             RuleFor(x => x.ConsentOnFile).Equal(true).WithMessage("Confirm the signed consent is on file.");
 
-            // NotNull on a yes/no box and on a count: the server reads an unticked box as no and an
-            // empty count as zero, and both are values.
             RuleFor(x => x.PhotoConsent).NotNull().WithMessage("Say whether the resident consents to photos.");
             RuleFor(x => x.FallsLastYear).NotNull().WithMessage("Record the number of falls in the last year.");
         }

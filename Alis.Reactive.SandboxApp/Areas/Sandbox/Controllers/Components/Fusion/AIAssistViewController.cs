@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>Margaret Hale's care-plan assistant: the care team's records answer each question.</summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/AIAssistView")]
     public class AIAssistViewController : Controller
@@ -36,7 +35,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 });
         }
 
-        // The answer comes from the care team's records; it ends by naming the common questions not asked.
         [HttpPost("Answer")]
         public IActionResult Answer([FromBody] AssistantQuestion question)
         {
@@ -44,7 +42,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new AssistantAnswer { Answer = FromCareRecords(prompt) + OtherQuestions(prompt, question.Suggestions) });
         }
 
-        // The assistant stops preparing the answer; the coordinator counts questions from one.
         [HttpPost("StopAnswer")]
         public IActionResult StopAnswer([FromBody] StoppedAnswer stopped)
         {
@@ -79,7 +76,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return $"The care team has no notes on “{HtmlEncoder.Default.Encode(prompt)}” yet.";
         }
 
-        // "You can also ask “A”, “B” or “C”." The answer is shown as HTML, so the questions are encoded.
         private static string OtherQuestions(string prompt, IEnumerable<string> suggestions)
         {
             var others = suggestions

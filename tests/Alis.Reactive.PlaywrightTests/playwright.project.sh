@@ -1,14 +1,5 @@
-# The sandbox's Playwright project, as scripts/playwright.sh reads it: its name, its CI shards, the
-# browser bundles the sandbox serves, and the sources its test binaries are built from beside the core.
-# shellcheck shell=bash
-
 playwright_project=sandbox
 
-# The CI shard partition (docs/CI.md, "Sharding"). VSTest filters have no wildcards, so Fusion
-# component namespaces are split by their first letter: `~.Components.Fusion.A` is a contains
-# match on the namespace segment, and every letter is listed so a new component always lands in
-# exactly one shard. The last shard is the complement of the others, so a new top-level namespace
-# can never fall outside every shard.
 playwright_shards="fusion-a-f fusion-grid fusion-h-r fusion-s-z http-core-and-patterns components validation conditions-and-rest"
 
 fusion_letters() {
@@ -25,7 +16,6 @@ playwright_shard_filter() {
       printf '(%s)' "$(fusion_letters A B C D E F)"
       ;;
     fusion-grid)
-      # G holds Grid alone, the largest component suite.
       printf '(%s)' "$(fusion_letters G)"
       ;;
     fusion-h-r)

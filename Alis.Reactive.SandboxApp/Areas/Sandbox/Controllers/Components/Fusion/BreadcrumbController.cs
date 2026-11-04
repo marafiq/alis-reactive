@@ -5,11 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Care-record navigation journey: a coordinator steps up the breadcrumb trail to
-    /// open a higher section of a resident's record. Open resolves the section summary
-    /// from the clicked crumb's url and the record code from the clicked crumb's id.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/CareRecordBreadcrumb")]
     public class BreadcrumbController : Controller

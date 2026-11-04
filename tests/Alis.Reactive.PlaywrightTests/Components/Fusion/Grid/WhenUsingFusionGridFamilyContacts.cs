@@ -1,21 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As a front-desk coordinator, I want the family contacts grid to refuse a contact I type wrong as I
-/// leave the cell, in the words the server would use, so that the directory never holds a family the
-/// desk cannot reach, and never refuses one the server accepts.
-/// </summary>
-/// <remarks>
-/// The cells check the rules <c>FamilyContactValidator</c> gives the browser; the server checks every
-/// rule again when the changes are saved. Helen Park's contact is the first row, Arthur Bell's the second.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridFamilyContacts : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/FamilyContacts";
     private const string GridId = "family-contacts-grid";
 
-    // The grid numbers its columns from 1.
     private const int ContactColumn = 3;
     private const int PhoneColumn = 4;
     private const int EmailColumn = 5;
@@ -35,8 +25,6 @@ public class WhenUsingFusionGridFamilyContacts : PlaywrightTestBase
         await Expect(Page.Locator($"#{GridId} .e-row").First).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // Opens Helen Park's cell and types over what is there. The grid shows a cell's editor holding its
-    // value a moment after the double-click (a number's "3.00" becomes "3"); a fill before then is lost.
     private async Task EditHelensCell(int column, string field, string current, string value)
     {
         await Cells(column).First.DblClickAsync();
@@ -45,7 +33,6 @@ public class WhenUsingFusionGridFamilyContacts : PlaywrightTestBase
         await Editor(field).FillAsync(value);
     }
 
-    // Moving on to Arthur Bell's cell in the same column checks the cell being left.
     private async Task MoveToArthursCell(int column) => await Cells(column).Nth(1).DblClickAsync();
 
     [Test]
@@ -112,7 +99,6 @@ public class WhenUsingFusionGridFamilyContacts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The server accepts any address with one @ and something on each side, so the cell does too.
     [Test]
     public async Task an_email_with_an_apostrophe_is_saved_as_the_server_accepts_it()
     {
@@ -139,7 +125,6 @@ public class WhenUsingFusionGridFamilyContacts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A phone keyboard capitalizes the first letter; the server reads the address the same either way.
     [Test]
     public async Task a_portal_link_typed_with_a_capital_h_is_saved()
     {

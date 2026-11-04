@@ -4,25 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEdi
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InPlaceEditor;
 
-/// <summary>
-/// As a care coordinator, I want to keep Eleanor Vance's resident profile current by correcting each detail where
-/// it is shown, with the server checking every correction and a cancelled one leaving her record as it was, so that
-/// her door sign, her care and her bill all work from the right facts.
-/// </summary>
-/// <remarks>
-/// The profile (name, admission date, preferred name) is saved together; an open preferred-name edit stays open
-/// when the coordinator clicks elsewhere, and Save profile commits it. The face sheet's details are each saved on
-/// their own: date of birth, care level (assisted living, $4,500 a month), monthly rate, last hospital stay and
-/// medical record number. The monthly rate follows the care level unless a custom rate is set, and billing must
-/// accept a custom rate (assisted living runs $3,800 to $5,500) before its editor closes. The page renders a plan
-/// for each face-sheet row before the profile's, so inputs are found by the ids the framework derives from the model.
-/// Not exercised: <c>Name</c> on the event payloads, which EJ2 fills with the event's own name ("beginEdit",
-/// "submitClick"; ej2-base observer.js:91-93), not the field's; <c>BeginEdit</c>'s <c>CancelFocus</c>, which EJ2 always
-/// raises false (inplace-editor.js:232); <c>Mode</c> on <c>BeginEdit</c> and <c>EndEdit</c>, the editor's fixed render
-/// mode ("Inline" for every editor here; inplace-editor.js:232, 918); <c>EndEdit</c>'s <c>Cancel</c>, as no rule here
-/// keeps an editor open when it is closed; <c>ActionSuccess</c>'s <c>Data</c>, empty when the editor has no url of its
-/// own (inplace-editor.js:709-711).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 {
@@ -53,7 +34,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
     private ILocator RecordNumberStatus => Page.Locator("#card-mrn-status");
     private ILocator RecordNumberInput => RecordNumber.Root.Locator("input.e-maskedtextbox").First;
 
-    // Every save the page sends the server, by its address: .../UpdateProfile, .../UpdateDateOfBirth and the rest.
     private ConcurrentQueue<string> _savesSent = null!;
 
     private int SavesSentTo(string action) => _savesSent.Count(url => url.EndsWith($"{Path}/{action}"));
@@ -77,9 +57,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         await MonthlyRate.Input.PressAsync("Enter");
     }
 
-    // The coordinator enters the number in one go, as a paste does: the mask has a placeholder, so it moves
-    // the caret to its first blank in a timeout after focus (mask-base.js:350-369), and keys typed one by one
-    // right after the editor opens can land before or after that move (two CI runs lost the number this way).
     private async Task TypeTheRecordNumber(string recordNumber)
     {
         await RecordNumber.Open();
@@ -101,7 +78,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 
         await ClickWhenStable(ClearPreferredName);
 
-        // The editor shows "Empty" only when its value is cleared: a write that did nothing keeps "Ellie".
         await Expect(PreferredName.ShownValue).ToHaveTextAsync("Empty", new() { Timeout = 5000 });
         await ClickWhenStable(SaveProfile);
         await Expect(ProfileStatus).ToHaveTextAsync("Saved Eleanor Vance's profile. She has no preferred name.", new() { Timeout = 10000 });
@@ -135,7 +111,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Enter keeps the name for the profile without saving it: the one save sent is Save profile's.
     [Test]
     public async Task saving_the_profile_after_pressing_enter_takes_the_reminder_away()
     {
@@ -179,7 +154,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 
         await PreferredName.Input.PressAsync("Enter");
 
-        // The field is checked as soon as the edit is committed, before anything is saved.
         await Expect(ErrorFor(preferredNameId)).ToHaveTextAsync(PreferredNameTooLong, new() { Timeout = 5000 });
         await ClickWhenStable(SaveProfile);
         await Expect(ErrorFor(preferredNameId)).ToHaveTextAsync(PreferredNameTooLong);
@@ -199,12 +173,10 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         await ClickWhenStable(SaveProfile);
         await Expect(ErrorFor(admissionDateId)).ToHaveTextAsync("The admission date cannot be after today.", new() { Timeout = 5000 });
 
-        // Today is the boundary: "not after today" accepts it.
         await AdmissionDate.SelectDate(today.Year, today.Month, today.Day);
         await ClickWhenStable(SaveProfile);
         await Expect(ProfileStatus).ToHaveTextAsync("Saved Eleanor Vance's profile. Preferred name: Ellie.", new() { Timeout = 10000 });
         await Expect(ErrorFor(admissionDateId)).ToBeHiddenAsync();
-        // The refused date was never sent: the one save is today's.
         Assert.That(SavesSentTo("UpdateProfile"), Is.EqualTo(1));
         AssertNoConsoleErrors();
     }
@@ -246,7 +218,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
 
         await DateOfBirth.Input.PressAsync("Enter");
 
-        // Today is the boundary: a date of birth must be before it.
         await Expect(ErrorFor(IdGenerator.For<DateOfBirthCorrection>(m => m.Value)))
             .ToHaveTextAsync("A date of birth must be before today.", new() { Timeout = 5000 });
         Assert.That(SavesSentTo("UpdateDateOfBirth"), Is.Zero);
@@ -316,7 +287,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
     {
         await OpenTheProfile();
 
-        // The click must do nothing: a rate set by the care level does not open.
         await MonthlyRate.ValueArea.ClickAsync(new() { Force = true });
         await Expect(MonthlyRate.ActionButtons).ToHaveCountAsync(0);
 
@@ -389,7 +359,6 @@ public class WhenUsingFusionInPlaceEditor : PlaywrightTestBase
         await LastHospitalStay.Input.PressAsync("Enter");
 
         await Expect(LastHospitalStayStatus).ToHaveTextAsync("Last hospital stay saved: March 2, 2024 at 9:30 AM.", new() { Timeout = 10000 });
-        // The future stay was never sent: the one save is the earlier stay's.
         Assert.That(SavesSentTo("UpdateLastHospitalStay"), Is.EqualTo(1));
         AssertNoConsoleErrors();
     }

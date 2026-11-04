@@ -5,22 +5,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.HospitalTransfer;
 
-/// <summary>
-/// As a nurse, I want sending a resident to the hospital to tell the transfer desk everything on the form
-/// and to tell the family where the resident is going, so that the hospital expects the resident and the
-/// family hears it from us first.
-/// </summary>
-/// <remarks>
-/// The whole form goes to the transfer desk as one JSON body: the resident, the reason, how they travel,
-/// the hospital and the ward asked for, and two escort lines. The page asks for the resident and the
-/// reason before anything is sent. The desk answers by resident: Helen Park (1042) is accepted, with the
-/// ward she is received on and what to pack; Arthur Bell (1043) is already at the hospital; Walter Cho
-/// (1045) was discharged this morning; Frank Moore (1046) needs the ambulance dispatcher, who is offline;
-/// Rosa Diaz (1044) makes the desk fail with no answer at all. Mercy General has no bed tonight, which
-/// only the desk knows, so that refusal shows beside the hospital field. The loader covers the page while
-/// the desk is asked and lifts once it has answered, however it answered; only then is the family told,
-/// from the hospital's own answer.
-/// </remarks>
 [TestFixture]
 public class WhenNurseSendsResidentToHospital : PlaywrightTestBase
 {
@@ -62,8 +46,6 @@ public class WhenNurseSendsResidentToHospital : PlaywrightTestBase
         _plan = await PagePlan<HospitalTransferModel>.FromPage(Page);
     }
 
-    // The request is held at the browser until the test releases it, then sent on unchanged, so what the
-    // page shows before the answer arrives can be seen.
     private async Task<SemaphoreSlim> HoldUntilReleased(string url)
     {
         var released = new SemaphoreSlim(0);
@@ -288,8 +270,6 @@ public class WhenNurseSendsResidentToHospital : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 
-    // The notice carries the transfer's number and the hospital's whole answer, both read from that
-    // answer; the family desk composes its message from what it received.
     [Test]
     public async Task the_family_is_told_where_the_resident_is_going_from_the_hospitals_answer()
     {
@@ -320,8 +300,6 @@ public class WhenNurseSendsResidentToHospital : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Helen Park's notice reaches the family desk after any notice Arthur Bell's refusal could have sent,
-    // so once her family line shows its answer, the only notice sent is hers.
     [Test]
     public async Task a_refused_transfer_tells_the_family_nothing()
     {

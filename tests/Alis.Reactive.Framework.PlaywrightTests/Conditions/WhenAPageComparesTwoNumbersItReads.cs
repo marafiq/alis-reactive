@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// A number compared with another value read when the condition runs: the pain score against a comfort
-/// goal the nurse moves on a second meter. Both start at 3; the goal is moved between comparisons, so each
-/// answer is the goal as it stands when the condition runs.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageComparesTwoNumbersItReads : AppPageTest
 {

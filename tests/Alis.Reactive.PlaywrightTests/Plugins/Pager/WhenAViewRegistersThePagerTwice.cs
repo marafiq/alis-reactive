@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Plugins.Pager;
 
-/// <summary>
-/// As the developer of the wing pager page, I want a view that registers the pager twice refused as it
-/// renders, by the plugin's name, so that the mistake never reaches a nurse's browser.
-/// </summary>
 [TestFixture]
 public class WhenAViewRegistersThePagerTwice : PlaywrightTestBase
 {

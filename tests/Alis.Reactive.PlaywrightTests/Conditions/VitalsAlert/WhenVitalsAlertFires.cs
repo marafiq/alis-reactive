@@ -2,18 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.VitalsAlert;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.VitalsAlert;
 
-/// <summary>
-/// As a nurse on the evening round, I want the heart rate I check to alert the responder its tier calls
-/// for, the rapid response team at 180 bpm or more and the charge nurse from 140, so that a dangerous
-/// reading is acted on at once and a normal one disturbs no one.
-/// </summary>
-/// <remarks>
-/// Walter Cho's heart rate reads 72 bpm until the nurse enters another; a cleared field is no reading, and
-/// the page asks for one. Each responder answers with what it was told, naming the heart rate the alert
-/// carried, so a reading sent to the wrong responder, or sent without its heart rate, shows a different
-/// answer. Each tier is checked on its edge: exactly at it and one below it. Everything the page renders is
-/// exercised.
-/// </remarks>
 [TestFixture]
 public class WhenVitalsAlertFires : PlaywrightTestBase
 {
@@ -53,7 +41,6 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // 179 is the highest reading below the critical tier: the charge nurse, not rapid response.
     [Test]
     public async Task a_heart_rate_of_179_alerts_the_charge_nurse()
     {
@@ -108,7 +95,6 @@ public class WhenVitalsAlertFires : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A cleared field is no reading: the nurse is asked for one, not told that no one needs alerting.
     [Test]
     public async Task checking_a_cleared_heart_rate_asks_for_the_reading()
     {

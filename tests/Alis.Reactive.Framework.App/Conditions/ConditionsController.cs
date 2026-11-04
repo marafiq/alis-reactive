@@ -2,11 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Conditions;
 
-/// <summary>
-/// Conditions: comparisons over numbers, text, days and lists, composed with and, or and not; When,
-/// ElseIf and Else in authored order; terms that wait for a method or for the user; and the branches a
-/// page is refused for.
-/// </summary>
 public sealed class ConditionsController : Controller
 {
     public IActionResult Levels() => View(new LevelsPage());

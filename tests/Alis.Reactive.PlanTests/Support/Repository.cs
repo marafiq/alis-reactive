@@ -1,6 +1,5 @@
 namespace Alis.Reactive.PlanTests.Support;
 
-/// <summary>The repository the tests run in: the folder holding Alis.Reactive.slnx.</summary>
 internal static class Repository
 {
     internal static readonly string Root = Find(AppContext.BaseDirectory);

@@ -3,32 +3,11 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Stepper;
 
-/// <summary>
-/// As an admissions coordinator, I want to take a new resident's admission one step at a time, each step
-/// checked and saved by the server before the next one opens, and to go back to any step I passed and find
-/// it as I saved it, so that no admission reaches the care team half written or refused.
-/// </summary>
-/// <remarks>
-/// The steps are Intake, Care, Contacts and Review; the server sends each one when the stepper opens it.
-/// Continue saves the step through the server and moves the stepper on; Back moves it back; a click on the
-/// stepper opens only a step the coordinator already passed. The server refuses what only it can know: a
-/// resident who already lives at Maple Grove, a care level with no open bed, the resident named as their
-/// own responsible party, a coordinator outside the admissions team.
-/// Each step's fields are located by <c>IdGenerator</c>, not <c>PagePlan</c>: a step's plan leaves the markup
-/// when the step loads, so the only plan on the page is the wizard's, which holds none of the steps' fields.
-/// The wizard moves with <c>NextStep</c> and <c>PreviousStep</c>, not by writing <c>ActiveStep</c>: Syncfusion
-/// reports a written active step to <c>stepChanging</c> with the new step as both the previous and the active
-/// one, the same as a click on the open step, which the gate refuses. <c>ActiveStep</c>, <c>Reset</c>,
-/// <c>StepClick</c> and <c>StepChanged</c>'s <c>PreviousStep</c> and <c>IsInteracted</c> are proven by
-/// <see cref="WhenUsingFusionStepper"/>; <c>RefreshProgressbar</c> is not exercised: it redraws the bar after
-/// the stepper's container changes size, which this page never does.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionStepper/Wizard";
 
-    // Chromium logs an answer of 400 as a failed request; the server's refusals answer 400.
     private const string RefusedRequest = "the server responded with a status of 400";
 
     private FusionStepperLocator Steps => new(Page, "admission-steps");
@@ -62,7 +41,6 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
 
     private FusionTextBoxLocator Coordinator => new(Page, IdGenerator.For<AdmissionReview>(m => m.AdmissionCoordinator));
 
-    // The message beside a field, in the step that holds it.
     private ILocator MessageFor<TStep>(Expression<Func<TStep, object?>> field) where TStep : class =>
         Page.Locator($"#{IdGenerator.For(field)}_error");
 
@@ -93,7 +71,6 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
         await Email.FillAndBlur("mina.patel@example.com");
     }
 
-    // Amina Patel, 82, for a memory care evaluation.
     private async Task SaveTheIntake()
     {
         await FillIntake("Amina Patel", "82", "Memory Care Evaluation");
@@ -101,7 +78,6 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
         await Expect(CareForm).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // Memory Care for Alzheimer's, fall risk 7, with its memory assessment.
     private async Task SaveTheCarePlan()
     {
         await FillCare("Memory Care", "Alzheimer's", "7");
@@ -110,7 +86,6 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
         await Expect(ContactsForm).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // Mina Patel, her daughter.
     private async Task SaveTheResponsibleParty()
     {
         await FillContacts("Mina Patel");
@@ -138,8 +113,6 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The browser says what is missing without asking the server: a refusal from the server would log a
-    // failed request.
     [Test]
     public async Task continuing_with_nothing_entered_says_what_the_intake_needs()
     {

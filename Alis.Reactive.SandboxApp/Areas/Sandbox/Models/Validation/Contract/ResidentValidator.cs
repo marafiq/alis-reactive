@@ -1,4 +1,3 @@
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class ResidentValidator : ReactiveValidator<ResidentModel>
@@ -47,7 +46,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    // ServerPartial omits rules for fields that page does not render.
     public class ServerPartialValidator : ReactiveValidator<ResidentModel>
     {
         public ServerPartialValidator()
@@ -84,7 +82,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    // AjaxPartial keeps address validation wired across Active Plan partial enrichment.
     public class AjaxPartialValidator : ReactiveValidator<ResidentModel>
     {
         public AjaxPartialValidator()
@@ -100,7 +97,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .NotEmpty().WithMessage("'Confirm Email' is required.")
                 .Equal(x => x.Email).WithMessage("'Confirm Email' must match 'Email'.");
 
-            // Custom Address reports summary errors until the partial loads address fields, then inline errors.
             When(x => x.AddressType == "Custom Address", () =>
             {
                 RuleFor(x => x.Address).SetValidator(new ResidentAddressValidator());

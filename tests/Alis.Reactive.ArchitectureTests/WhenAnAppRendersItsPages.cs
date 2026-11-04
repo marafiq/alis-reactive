@@ -11,20 +11,12 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
 
-/// <summary>
-/// Every plan an app's pages carry conforms to plan.schema.json, the schema generated from the grammar. The
-/// pages come from the app's own action table, never from a list: every GET action is requested in process,
-/// a route parameter filled from its constraint, and the links and the plan URLs each answer carries are
-/// followed. A plan the schema refuses fails by page. A page that refuses to render (both apps hold pages
-/// that author a mistake on purpose, each proven by its own Playwright test) carries no plan to check.
-/// </summary>
 [TestFixture]
 public class WhenAnAppRendersItsPages
 {
     [Test]
     public async Task every_sandbox_get_action_answers_and_every_plan_it_renders_conforms()
     {
-        // The sandbox's demo broadcasts are for a person watching; the sweep reads pages.
         Environment.SetEnvironmentVariable("ALIS_NO_BROADCAST", "1");
         await using var app = new WebApplicationFactory<Alis.Reactive.SandboxApp.Hubs.NotificationHub>();
 
@@ -40,21 +32,16 @@ public class WhenAnAppRendersItsPages
     }
 }
 
-/// <summary>Requests every page an app serves and holds each plan on it to the schema.</summary>
 internal static class Sweep
 {
     private static readonly JsonSchema Schema =
         JsonSchema.FromFile(Path.Combine(Repository.Root, "Alis.Reactive.Assets", "runtime", "types", "plan.schema.json"));
 
-    // The plan script exactly as Html.RenderPlan writes it; the JSON inside escapes '<', so it never closes the
-    // script. A script written by hand carries a value on the attribute and is not the framework's plan.
     private static readonly Regex PlanScript = new("<script type=\"application/json\" data-reactive-plan>(.*?)</script>", RegexOptions.Singleline);
 
-    // A same-origin link, and a request URL a plan carries that has no placeholder left to fill.
     private static readonly Regex Link = new("href=\"(/[^\"]*)\"");
     private static readonly Regex PlanUrl = new("\"name\":\"url\",\"value\":\\{\"kind\":\"lit\",\"value\":\"(/[^\"{]*)\"\\}");
 
-    // A route template's parameters: {id}, {id:int}, {id?}, {*path}.
     private static readonly Regex Placeholder = new(@"\{\*?(\w+)(?::([^}?]*))?\??\}");
 
     internal static async Task Run<TApp>(WebApplicationFactory<TApp> app, string name) where TApp : class
@@ -77,7 +64,6 @@ internal static class Sweep
             var started = System.Diagnostics.Stopwatch.StartNew();
             try
             {
-                // Headers first: a stream (server-sent events) never ends, and no plan lives outside HTML.
                 using var response = await client.GetAsync(path, HttpCompletionOption.ResponseHeadersRead);
                 if ((int)response.StatusCode >= 500) refused.Add($"{origin} ({(int)response.StatusCode})");
                 if (response.Content.Headers.ContentType?.MediaType != "text/html") continue;
@@ -109,7 +95,6 @@ internal static class Sweep
         Assert.That(plans, Is.GreaterThan(0), $"{name} rendered no plan on {visited.Count} pages; the sweep read nothing.");
     }
 
-    // Every GET action of the app at the path its route gives it; a parameter is filled by its constraint.
     private static IEnumerable<(string Action, string Path)> ActionPaths(IServiceProvider services)
     {
         var links = services.GetRequiredService<LinkGenerator>();
@@ -136,7 +121,6 @@ internal static class Sweep
         return methods.Count == 0 || methods.Contains("GET", StringComparer.OrdinalIgnoreCase);
     }
 
-    // A value that satisfies the constraint, so the route resolves; what the action answers for it is its own.
     private static string Sample(string constraint) => constraint switch
     {
         var c when c.Contains("int") || c.Contains("long") => "1",

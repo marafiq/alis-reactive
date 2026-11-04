@@ -1,14 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A page places a form's summary with <c>Html.FormSummary(formId)</c>: the message no field of the form shows
-/// comes back where the page placed it, and the plan renders no second summary after its script; a page that
-/// places one form's summary twice is refused where it renders, naming where the summary first rendered.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPagePlacesAFormsSummary : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     [Test]

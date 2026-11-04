@@ -35,7 +35,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionMultiSelectChangeArgs> Change =>
             Event<FusionMultiSelectChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>

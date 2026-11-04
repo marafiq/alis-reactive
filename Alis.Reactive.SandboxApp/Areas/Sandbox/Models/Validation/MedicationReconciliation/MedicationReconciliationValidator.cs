@@ -1,7 +1,5 @@
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>The rules every controlled substance line adds: a second nurse verified the count.</summary>
     public class ControlledSubstanceRules : ReactiveValidator<MedicationLine>
     {
         public ControlledSubstanceRules()
@@ -18,7 +16,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.DoseMg).GreaterThan(0).WithMessage("The dose is above 0 mg.");
             RuleFor(x => x.Hours).Matches(@"^\d{1,2}(,\d{1,2})*$").WithMessage("Enter the hours given, like 8,20.");
 
-            // Rules shared by every controlled substance, included only on a controlled line.
             When(x => x.Controlled, () => Include(new ControlledSubstanceRules()));
 
             RuleFor(x => x.Prescriber).ChildRules(prescriber =>
@@ -33,8 +30,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             RuleFor(x => x.ResidentName).NotEmpty().WithMessage("Enter the resident's name.");
             RuleForEach(x => x.Medications).SetValidator(new MedicationLineValidator());
 
-            // Checks on each allergy line itself, when the resident has allergies: named, which the browser
-            // checks too, and listed by the pharmacy, which only the server knows.
             When(x => x.HasAllergies, () =>
                 RuleForEach(x => x.Allergies)
                     .NotEmpty().WithMessage("Name the allergy or clear the line.")

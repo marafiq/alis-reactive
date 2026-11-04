@@ -3,28 +3,11 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the charge nurse on the South wing, I want the updates the pharmacy and the therapy team send, and what
-/// the clinical review team decides for a resident, to show on that resident's row of the wing's board as soon
-/// as the server answers, with the changed row picked out, so that the aides read a current board all shift.
-/// </summary>
-/// <remarks>
-/// The board: Dorothy Hale S-101 (Independent, Low, 2 tasks), Grace Bennett S-104 (Assisted Living, Moderate,
-/// 3), Harold Brooks S-107, Irene Morgan S-110 (Skilled Nursing, Low, 3), Leo Simmons S-112 (Assisted Living,
-/// Low, 2, next review 2026-06-09) and Katherine Ortiz S-115 (Memory Care, High, 4). Each resident's cell shows
-/// the suite and care level under the name, and the fall risk is a badge, red when High. The pharmacy added two
-/// tasks for Irene Morgan and therapy raised Grace Bennett's fall risk to High; applying either changes that one
-/// cell by the resident's key (SetCellValue: a number, then a text the badge draws) and picks the row out by
-/// its key (GetRowIndexByPrimaryKey). A clinical review replaces the picked resident's row with the one the
-/// server answers (SetRowData); a review books the next one three months on.
-/// Every grid member the page uses is exercised.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridOperations : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Operations";
 
-    // The grid numbers its columns from 1; the hidden ID is the first.
     private const int ResidentColumn = 2;
     private const int FallRiskColumn = 3;
     private const int OpenTasksColumn = 4;

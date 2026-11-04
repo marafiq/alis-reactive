@@ -1,10 +1,6 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// What the office needs before move-in day: a care level, a room type and a meal plan. Only the office
-    /// refuses a suite on the memory care floor, which has none.
-    /// </summary>
     public sealed class MoveInPreferencesValidator : ReactiveValidator<NativeRadioGroupModel>
     {
         public MoveInPreferencesValidator()

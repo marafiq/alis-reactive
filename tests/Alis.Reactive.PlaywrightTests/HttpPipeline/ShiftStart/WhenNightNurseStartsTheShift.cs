@@ -3,20 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftStart;
 
-/// <summary>
-/// As the night nurse starting my shift, I want to check the floor's partners side by side, open the
-/// wing's handover sheet, order the night snacks and sign the board, so that the shift starts with
-/// everything I need to know and nothing waiting on anything else.
-/// </summary>
-/// <remarks>
-/// The pharmacy, the lab and the kitchen are asked through the community's gateway at once, each check
-/// carrying its own X-Partner header; the pharmacy answers, the lab has nothing pending and says so with
-/// a 404, the kitchen answers, and the status line waits for all three. The handover sheet of the chosen
-/// wing is loaded into the page as the server renders it: Maple's is written, Cedar's is not. The kitchen
-/// takes its orders as a form post of the snack and the count, never the floor note; its crackers line
-/// runs on the old system, whose answer the page cannot read. The board is signed for the chosen wing
-/// with no answer to read, and an order still with the kitchen does not hold it up.
-/// </remarks>
 [TestFixture]
 public class WhenNightNurseStartsTheShift : PlaywrightTestBase
 {
@@ -57,8 +43,6 @@ public class WhenNightNurseStartsTheShift : PlaywrightTestBase
         _plan = await PagePlan<ShiftStartModel>.FromPage(Page);
     }
 
-    // The gateway address is the same for every partner; the check for one partner is told apart by its
-    // X-Partner header, held at the browser until the test releases it, then sent on unchanged.
     private async Task<SemaphoreSlim> HoldPartnerUntilReleased(string partner)
     {
         var released = new SemaphoreSlim(0);
@@ -199,8 +183,6 @@ public class WhenNightNurseStartsTheShift : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
-    // The order is a form post of the two named fields: the kitchen reads them as a form, and the floor
-    // note typed beside them never leaves the floor.
     [Test]
     public async Task ordering_snacks_sends_the_kitchen_only_the_snack_and_the_count_as_a_form()
     {
@@ -229,7 +211,6 @@ public class WhenNightNurseStartsTheShift : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
-    // The crackers line answers with JSON the page cannot read: that is no answer, and the page says so.
     [Test]
     public async Task a_kitchen_answer_the_page_cannot_read_is_reported_as_no_answer()
     {
@@ -266,8 +247,6 @@ public class WhenNightNurseStartsTheShift : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
-    // Two requests on one page keep their own loading lines and their own answers: the board is signed
-    // while the kitchen still has the order, and each line ends with its own answer.
     [Test]
     public async Task an_order_still_with_the_kitchen_does_not_hold_up_signing_the_board()
     {

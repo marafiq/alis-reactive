@@ -1,14 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 
-/// <summary>
-/// A hub the server drops, hangs up on or refuses. The server welcomes every call it takes and numbers it, so
-/// the call number says which connection the page holds. A dropped connection runs its Reconnecting pipeline,
-/// comes back under a new id the server knows the page by and runs its Reconnected pipeline; a connection the
-/// server closes for good runs its Close pipeline and the page offers to retry it; a click takes the offer and
-/// calls the hub again, a retry the hub answers leaves no offer and a retry refused on every try is offered
-/// again; a start the server refuses is tried again, a start refused on every try ends in the offer, and a click
-/// on that offer calls the hub again; and a page with no offer still hears the close.
-/// </summary>
 [TestFixture]
 public sealed class WhenTheServerDropsAHub : AppPageTest
 {
@@ -18,13 +9,8 @@ public sealed class WhenTheServerDropsAHub : AppPageTest
 
     private ILocator RetryOffer => Page.GetByText("The connection dropped.");
 
-    // The page's clock is the test's, installed before the page opens, so the waits between a start's tries
-    // pass when the test moves it on rather than in real seconds.
     private Task TakeThePagesClock() => Page.Clock.InstallAsync();
 
-    // A start tries at once and at once again, then waits 2 and 10 seconds before its third and fourth tries, and
-    // offers to retry as soon as the fourth is refused. The server counts each try it refuses, and page time moves
-    // past a wait only once the try before it was refused.
     private async Task PassTheWaitsOfAStartTheServerRefuses()
     {
         await Page.GetByText("The server refused 2 calls to the line.", new() { Exact = true }).WaitForAsync();

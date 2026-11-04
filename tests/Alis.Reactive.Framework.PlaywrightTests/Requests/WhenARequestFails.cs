@@ -1,13 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>
-/// A request that fails, and what runs around it: a request that cannot be built or whose answer cannot be
-/// handled still runs its Finally, waits for a Finally that waits, and stops the steps after it; a route value
-/// that is missing sends nothing (H1); a branch of a parallel pair that fails stops neither the other branch
-/// nor what runs once both settle; a dropped connection and an answer whose JSON cannot be read run the
-/// route for any error (H7); and an answer is read by its media type (H6). Each pipeline counts its attempt
-/// on the page's tally, so a line shows the attempt at which its step last ran.
-/// </summary>
 [TestFixture]
 public sealed class WhenARequestFails : AppPageTest
 {

@@ -15,7 +15,6 @@ public sealed class FusionTextBoxLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>Generated input wrapper where append icons render.</summary>
     public ILocator Wrapper => _page.Locator($"#{_componentId}").Locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' e-input-group ')][1]");
 
     public async Task Fill(string value)
@@ -30,7 +29,6 @@ public sealed class FusionTextBoxLocator
 
     public async Task Blur() => await Input.BlurAsync();
 
-    /// <summary>Fill text and then blur to trigger Syncfusion's change event.</summary>
     public async Task FillAndBlur(string value)
     {
         await Fill(value);

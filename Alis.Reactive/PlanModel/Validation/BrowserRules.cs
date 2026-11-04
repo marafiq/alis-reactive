@@ -76,8 +76,6 @@ namespace Alis.Reactive
         {
         }
 
-        // The value is the list as the field's shape reads it: an array, or the list the input keeps when it is
-        // no array (a file input's FileList), each counting its items; a missing one has none.
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0));
     }
@@ -113,8 +111,6 @@ namespace Alis.Reactive
         {
         }
 
-        // The list as AtLeastOneRule reads it, an array or the input's own list (a FileList), with no items
-        // counted; a missing one has none, as the server's Empty passes null.
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0)));
     }
@@ -201,8 +197,6 @@ namespace Alis.Reactive
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
             G.Or(Absent(value), CardNumber(value, scope));
 
-        // The server's card check: dashes and spaces dropped, every other character a digit, and
-        // the Luhn sum a multiple of ten.
         private static Expr CardNumber(Expr v, Scope scope)
         {
             var digits = scope.Fresh("d");
@@ -250,11 +244,8 @@ namespace Alis.Reactive
         /// <summary>How the value compares with the target.</summary>
         public Comparison Comparison { get; }
 
-        /// <summary>The shape both sides are converted to.</summary>
         internal Shape Shape { get; }
 
-        // Equality has no skip for nothing bound, as the server's Equal and NotEqual; an ordering passes
-        // on nothing bound, as the server's comparisons do.
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
         {
             var target = Target(values, scope);
@@ -271,7 +262,6 @@ namespace Alis.Reactive
             return Comparison.IsEquality || IsOrdered(Shape);
         }
 
-        /// <summary>The target as the check reads it when it runs.</summary>
         private protected abstract Expr Target(FormFieldValues values, Scope scope);
 
         private Expr Same(Expr value, Expr target) => G.Eq(Canonical(value, Shape), Canonical(target, Shape));
@@ -356,8 +346,6 @@ namespace Alis.Reactive
             return IsOrdered(_shape);
         }
 
-        // The value and both bounds as numbers under the bounds' shape; nothing bound passes, as the
-        // server's range check does.
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
         {
             var a = scope.Fresh("a");

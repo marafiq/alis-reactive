@@ -1,7 +1,3 @@
-// The six statements (grammar.md 3.2). A block runs synchronously until its first awaited statement
-// and continues when that settles; a block with no awaited statement never returns a promise, so a
-// payload write before the first await lands before the vendor reads it.
-
 import type { Expr, SetStatement, Statement } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { logger } from "../diagnostics/trace";
@@ -86,9 +82,6 @@ function all(blocks: readonly (readonly Statement[])[], scope: Scope): Completio
   });
 }
 
-// The body awaits: a try holds a request's send (grammar.md 5.1). It runs in the enclosing block's
-// scope, so its top-level bindings stay visible after the try: code after a try runs only when the
-// body completed (grammar.md 3.1).
 function attempt(body: readonly Statement[], cleanup: readonly Statement[], scope: Scope): Completion {
   let completion: Promise<void>;
   try {

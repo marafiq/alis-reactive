@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 
-/// <summary>
-/// The plans a slot finds in the HTML it loads: every plan script in it runs, and HTML whose plan script is
-/// not JSON the framework wrote is refused before the slot lets go of what it shows, so only that load's
-/// pipeline stops and the page goes on.
-/// </summary>
 [TestFixture]
 public sealed class WhenLoadedHtmlCarriesPlans : AppPageTest
 {

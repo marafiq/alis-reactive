@@ -1,6 +1,3 @@
-// The entry: a text input that tells its listeners when the user leaves it after a change. It knows
-// nothing of Alis.Reactive. The input element holds it as `entry`.
-
 type Listener = (payload: unknown) => void;
 
 interface EntryHost extends HTMLInputElement {

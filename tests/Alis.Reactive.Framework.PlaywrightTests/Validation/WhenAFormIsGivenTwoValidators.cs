@@ -1,15 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A form one request validates by one validator and another request by a different one, refused where the
-/// page renders with the message the developer reads: the form and both validators as C# spells them, and
-/// the two ways to write it. Validators are told apart by type, so one generic validator for two models is
-/// two validators.
-/// </summary>
 [TestFixture]
 public sealed class WhenAFormIsGivenTwoValidators : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string mistake) => await Page.GotoAsync($"{BaseUrl}/Validation/HandoverRefused?mistake={mistake}");
 
     private ILocator Message(string text) => Page.GetByText(text).First;

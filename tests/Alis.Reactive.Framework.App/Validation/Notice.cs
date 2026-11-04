@@ -1,7 +1,6 @@
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>A notice whose fields are checked with the messages the validator words itself, or builds.</summary>
 public sealed class Notice
 {
     public int? Rooms { get; set; } = 1;
@@ -81,7 +80,6 @@ public sealed class NoticeContact
     public string? Phone { get; set; } = "555-0101";
 }
 
-/// <summary>Each check with the message the validator words for it, and the messages only the server can give.</summary>
 public sealed class NoticeRules : ReactiveValidator<Notice>
 {
     public NoticeRules()

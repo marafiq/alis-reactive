@@ -1,6 +1,3 @@
-/* The example's stylesheet: Tailwind's utilities for its views, resolved against the design system's
-   theme. AlisReactive.DesignSystem copies the theme into ./AlisReactive.DesignSystem/ before every
-   build, a folder that ignores itself. */
 @import "tailwindcss" source(none);
 @import "./AlisReactive.DesignSystem/theme.css";
 

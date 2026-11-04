@@ -3,12 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
-/// <summary>
-/// Riverside Pharmacy reviews new medication orders for Maple Grove's second floor. Helen Park takes
-/// warfarin, Arthur Bell lisinopril and Walter Cho digoxin; Rosa Diaz is allergic to penicillin. The
-/// pharmacy refuses an allergy (409) and a controlled substance without a signed prescription (422).
-/// Walter Cho's physician's pager is down, so a page about him fails (503).
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Conditions/PharmacyReview")]
 public class PharmacyReviewController : Controller
@@ -74,7 +68,6 @@ public class PharmacyReviewController : Controller
 
     private static string Normalized(string? medication) => (medication ?? "").Trim().ToLowerInvariant();
 
-    // No static lookup table: a static collection in the sandbox is shared by every browser world.
     private static string? ResidentName(string resident) => resident switch
     {
         "helen" => "Helen Park",

@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 
-/// <summary>
-/// A server-sent event stream the server closes for good: it ends the stream and answers the browser's next
-/// call with 204, which a browser does not retry. The server welcomes every call it takes and numbers it. The
-/// page offers to retry the stream, a click on the offer opens it again with the page's handlers still
-/// listening, and the offer goes once it is open; and an event whose data is not JSON runs no pipeline.
-/// </summary>
 [TestFixture]
 public sealed class WhenTheServerClosesAStream : AppPageTest
 {

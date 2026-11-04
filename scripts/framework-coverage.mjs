@@ -1,13 +1,3 @@
-// What the framework's own tests run of the framework: the runtime (runtime/**, through the bundle's
-// source map) and the core's C# (Alis.Reactive, from Cobertura).
-//
-// usage: node scripts/framework-coverage.mjs <js coverage dir> <cobertura file> <report.md>
-//
-// A runtime segment counts as run when any test ran it: V8's block coverage gives each range a count,
-// an inner range overriding the one around it. A C# line counts as run when its hits are above zero.
-// The framework's own component code (components/**) is a consumer and is not counted. Neither is
-// runtime/shared/assert-never.ts: it runs only for a node a switch's union has no case for, which the
-// generated contract makes a type error, so no page can run it.
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { SourceMapConsumer } from "source-map-js";
@@ -19,7 +9,6 @@ if (!jsDir || !cobertura || !reportPath) {
 }
 const repo = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 
-// ── runtime ──────────────────────────────────────────────────────────────────────────────────
 const bundlePath = path.join(repo, "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js");
 const bundle = readFileSync(bundlePath, "utf8");
 const map = new SourceMapConsumer(JSON.parse(readFileSync(bundlePath + ".map", "utf8")));
@@ -29,8 +18,6 @@ const files = readdirSync(jsDir).filter(name => name.endsWith(".json"));
 for (const name of files) {
   const scripts = JSON.parse(readFileSync(path.join(jsDir, name), "utf8"));
   for (const functions of scripts) {
-    // A function reported without block detail (V8 gives none for a page opened a second time in one test)
-    // says only that it was entered, not which of its blocks ran: it counts as not run, never as all run.
     const ranges = functions.flatMap(fn => fn.isBlockCoverage ? fn.ranges : fn.ranges.map(range => ({ ...range, count: 0 })))
       .sort((a, b) => a.startOffset - b.startOffset || b.endOffset - a.endOffset);
     const counts = new Int32Array(bundle.length).fill(-1);
@@ -63,7 +50,6 @@ for (let i = 0; i < mappings.length; i++) {
   runtime.set(source, file);
 }
 
-// ── C# ───────────────────────────────────────────────────────────────────────────────────────
 const xml = readFileSync(cobertura, "utf8");
 const csharp = new Map();
 for (const klass of xml.matchAll(/<class [^>]*filename="([^"]+)"[^>]*>([\s\S]*?)<\/class>/g)) {
@@ -77,7 +63,6 @@ for (const klass of xml.matchAll(/<class [^>]*filename="([^"]+)"[^>]*>([\s\S]*?)
   csharp.set(relative, file);
 }
 
-// ── report ───────────────────────────────────────────────────────────────────────────────────
 const percent = (part, whole) => (whole === 0 ? 100 : (100 * part) / whole).toFixed(1);
 const ranges = numbers => {
   const sorted = [...numbers].sort((a, b) => a - b);
@@ -101,7 +86,6 @@ const csRows = [...csharp].sort(([a], [b]) => a.localeCompare(b)).map(([file, f]
 const csTotal = csRows.reduce((sum, r) => sum + r.total, 0);
 const csRunTotal = csRows.reduce((sum, r) => sum + r.run, 0);
 
-// A run that recorded nothing measured nothing: no share is written for it.
 if (files.length === 0 || csTotal === 0) {
   console.error(
     `[coverage] nothing was measured: ${files.length} page tests recorded runtime coverage and the ` +

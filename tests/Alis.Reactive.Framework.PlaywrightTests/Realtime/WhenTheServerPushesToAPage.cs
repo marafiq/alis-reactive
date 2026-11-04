@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 
-/// <summary>
-/// A page the server pushes to: server-sent events run their pipelines with their data, every time, and an
-/// event with no data too; a stream the page closes reads as closed; and a SignalR hub the page sends to,
-/// invokes and hears, each call answered on its own connection: a method named otherwise than its member, an
-/// invoke whose next step waits for the server, an answer read, the connection id the server knows the page
-/// by, and a client method called with anything but one object, which runs nothing.
-/// </summary>
 [TestFixture]
 public sealed class WhenTheServerPushesToAPage : AppPageTest
 {
@@ -101,8 +94,6 @@ public sealed class WhenTheServerPushesToAPage : AppPageTest
         await Expect(Line("board")).ToHaveTextAsync("cleared");
     }
 
-    // The server tells the page it is tidying before it completes the call; the step after the call writes
-    // "tidied" over it only if it waited for the server.
     [Test]
     public async Task a_hub_method_the_page_invokes_holds_the_next_step_until_the_server_completes_it()
     {
@@ -147,8 +138,6 @@ public sealed class WhenTheServerPushesToAPage : AppPageTest
         await Expect(Line("found")).ToHaveTextAsync("found");
     }
 
-    // The server calls StatusChanged with a bare word, then BoardCleared: once the board reads cleared, the
-    // bare call has arrived.
     [Test]
     public async Task a_client_method_the_server_calls_with_anything_but_one_object_runs_no_pipeline()
     {

@@ -2,8 +2,6 @@ using Alis.Reactive.Fusion;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor
 {
-    // Each face-sheet row is corrected in place and saved on its own: its own model, validator and plan.
-
     public class DateOfBirthCorrection
     {
         public string? ResidentId { get; set; }
@@ -36,7 +34,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlac
         }
     }
 
-    /// <summary>A care level the community offers, by name, with the monthly rate it carries.</summary>
     public sealed class CareLevelChoice
     {
         public string Name { get; set; } = "";
@@ -58,11 +55,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlac
 
         public decimal Value { get; set; }
 
-        /// <summary>A rate other than the one her care level carries.</summary>
         public bool CustomRate { get; set; }
     }
 
-    // The page checks the rate's range; only billing knows the band her care level allows.
     public class MonthlyRateCorrectionValidator : ReactiveValidator<MonthlyRateCorrection>
     {
         public MonthlyRateCorrectionValidator()
@@ -76,7 +71,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlac
         }
     }
 
-    /// <summary>The editor's own commit data, sent as it raised it: the field's name and the new value.</summary>
     public sealed class MonthlyRateChange
     {
         public string? ResidentId { get; set; }
@@ -84,7 +78,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlac
         public FusionInPlaceEditorSubmission? Change { get; set; }
     }
 
-    /// <summary>What billing answers when it accepts a rate: the rate as it keeps it.</summary>
     public sealed class MonthlyRateSaved
     {
         public string Rate { get; set; } = "";
@@ -126,13 +119,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlac
         }
     }
 
-    /// <summary>What a face-sheet row answers when its correction is saved.</summary>
     public sealed class CorrectionSaved
     {
         public string Message { get; set; } = "";
     }
 
-    /// <summary>Why the record refused a correction it could not take.</summary>
     public sealed class CorrectionRefused
     {
         public string Message { get; set; } = "";

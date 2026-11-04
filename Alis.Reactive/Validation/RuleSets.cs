@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>The sets a rule is declared in: none, or the names one <c>RuleSet("Issue, Renew")</c> lists.</summary>
     internal sealed class RuleSets
     {
         private static readonly char[] Separators = { ',', ';' };
@@ -18,7 +17,6 @@ namespace Alis.Reactive.Validation
 
         internal static RuleSets None { get; } = new RuleSets(Array.Empty<string>());
 
-        /// <summary>The names one <c>RuleSet</c> declares: split on ',' or ';' as FluentValidation reads them, trimmed; a blank piece is refused.</summary>
         internal static RuleSets Named(string ruleSet)
         {
             if (ruleSet == null) throw new ArgumentNullException(nameof(ruleSet));
@@ -37,11 +35,8 @@ namespace Alis.Reactive.Validation
         public override string ToString() => string.Join(", ", Names);
     }
 
-    /// <summary>Which rules one validation runs: those in no set (<c>Validate(instance)</c>), or those in one named set.</summary>
     internal sealed class RuleSetSelection
     {
-        // null: no set is selected. A blank name is refused as a set's name (RuleSets.Named, ReactiveValidator.Select),
-        // so no text could stand for the absence without becoming a sentinel.
         private readonly string? _ruleSet;
 
         private RuleSetSelection(string? ruleSet)
@@ -55,7 +50,6 @@ namespace Alis.Reactive.Validation
 
         internal bool IsNamed => _ruleSet != null;
 
-        /// <summary>Whether a rule in these sets answers this selection: a rule in no set answers no selection, a rule in a set the one that names it.</summary>
         internal bool Selects(RuleSets sets) => _ruleSet == null ? !sets.Any : sets.Contains(_ruleSet);
 
         internal ValidationResult Validate<TModel>(IValidator<TModel> validator, TModel instance) =>

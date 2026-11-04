@@ -91,7 +91,6 @@ namespace Alis.Reactive
             args.BindTo(new EventPayloadBinding(context));
             var body = PipelineBuilder<TModel>.Build(context, p => pipeline(args, p));
 
-            // The component joins the plan after the elements its own callback names.
             context.DeclareComponent(_componentId, Declaration.Vendor);
             context.On(objects => objects.Element(_componentId), declaredEvent.ObjectPath, declaredEvent.Name, body);
             return this;

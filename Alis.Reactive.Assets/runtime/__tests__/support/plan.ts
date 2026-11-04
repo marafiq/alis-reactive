@@ -1,5 +1,3 @@
-// Small builders for plans in tests. They write the same JSON the C# grammar emits.
-
 import type {
   Expr, FnExpr, Handler, ObjectLocator, Operator, PlanDocument, Shape, Statement, Vendor,
 } from "../../types/index";
@@ -49,7 +47,6 @@ export const vendors: Record<string, Vendor> = {
     payload: "element",
   },
   fake: { objectPath: ["widget"], listen: { kind: "method", subscribe: "on", unsubscribe: "off" }, payload: "argument" },
-  // The same fake widget, listened to by assignment: its events are callback properties (`widget.onPressed = fn`).
   assigned: { objectPath: ["widget"], listen: { kind: "assignment" }, payload: "argument" },
 };
 
@@ -69,12 +66,10 @@ export function plan(
   return { version: 6, planId, vendors, objects, handlers };
 }
 
-/** A handler; its block reads the payload as `e`. */
 export function on(object: string, event: string, ...statements: Statement[]): Handler {
   return { on: object, path: [], event, do: statements };
 }
 
-/** An element whose vendor object is a tiny event emitter under `widget`, like a Syncfusion instance. */
 export function fakeWidget(id: string, members: Record<string, unknown> = {}): HTMLElement & { widget: FakeWidget } {
   const el = document.createElement("div") as unknown as HTMLElement & { widget: FakeWidget };
   el.id = id;
@@ -104,7 +99,6 @@ export class FakeWidget {
     for (const listener of this.listeners.get(event) ?? []) listener(arg);
   }
 
-  /** Calls the function assigned to a callback property, the way a widget calls its `onPressed`. */
   invoke(callback: string, arg: unknown): void {
     const assigned = this[callback];
     if (typeof assigned === "function") assigned.call(this, arg);

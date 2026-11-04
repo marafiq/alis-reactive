@@ -6,7 +6,6 @@
 }
 <h1>The front desk's log</h1>
 
-@* Each entry is logged by a form of its own; the server alone checks each. *@
 <form id="visit-form" aria-label="A visit">
     @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
 </form>

@@ -24,7 +24,6 @@ namespace Alis.Reactive
         private readonly PlanBuildContext _context;
         private readonly IServiceProvider? _services;
 
-        // The plan id names the plan in traces only: the model's type, which many plans of a page may share.
         internal ReactivePlan(IServiceProvider? services, string fieldPrefix, string view)
         {
             _services = services;
@@ -32,11 +31,9 @@ namespace Alis.Reactive
             _context = new PlanBuildContext(PlanId.ForModel(typeof(TModel)).Value, _renderedInputs, fieldPrefix, view, ClassNames);
         }
 
-        /// <summary>The forms this plan validates or shows the server's errors on, by container id.</summary>
         internal IReadOnlyList<string> Forms => _context.Forms;
         internal PlanBuildContext Context => _context;
 
-        /// <summary>The class names the fields of this plan render with: the app's choice, else the framework's.</summary>
         internal ReactiveClassNames ClassNames { get; }
 
         /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
@@ -108,9 +105,6 @@ namespace Alis.Reactive
             RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>(ruleSet);
 
-        // The plan as its script carries it, once, after everything written to it: the rendered inputs join it, each
-        // validated form is bound to its validator's rules from the services the plan started with, and the grammar is
-        // serialized. Html.RenderPlan is the one caller, so a plan always renders with the page's record.
         internal string Serialize()
         {
             _context.Seal();
@@ -118,9 +112,6 @@ namespace Alis.Reactive
             return GrammarSerializer.Serialize(_context.Write());
         }
 
-        // Every rendered input joins the plan, then each validated form is bound to its one validator's rules:
-        // every request that validates a form names the same validator, so the form is bound once. A form only the
-        // server checks has no fields: its messages land beside the mounted inputs inside it (grammar.md F8).
         private void ResolveAll()
         {
             _context.DeclareRenderedInputs();
@@ -143,16 +134,11 @@ namespace Alis.Reactive
             }
         }
 
-        // The names the app registered with AddReactiveClassNames, else the framework's own: an app that chose none
-        // renders the names the core's stylesheet styles, which is the promise and not a gap.
         private static ReactiveClassNames ResolveClassNames(IServiceProvider? services)
         {
             var names = services?.GetService(typeof(ReactiveClassNames)) as ReactiveClassNames;
 
 #if NET48
-            // MVC5's DependencyResolver, bridged over the app's container at startup. Its default resolver creates
-            // only types with a public parameterless constructor, and ReactiveClassNames has none, so an app that
-            // registered nothing gets null here and the framework's names below.
             names ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(ReactiveClassNames)) as ReactiveClassNames;
 #endif
 
@@ -164,12 +150,9 @@ namespace Alis.Reactive
             string validatorName,
             string requiredBy)
         {
-            // ASP.NET Core flows the source through the per-request IServiceProvider.
             var source = services?.GetService(typeof(IBrowserRuleSource)) as IBrowserRuleSource;
 
 #if NET48
-            // net48 / System.Web has no per-request IServiceProvider. MVC5's idiomatic
-            // service locator is DependencyResolver, bridged at startup via SetResolver.
             source ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(IBrowserRuleSource))
                 as IBrowserRuleSource;
 #endif

@@ -1,6 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-// DomReady dispatch payloads must flow into typed CustomEvent paths and rendered text.
 [TestFixture]
 public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
 {
@@ -72,8 +71,6 @@ public class WhenPayloadFlowsBetweenEvents : PlaywrightTestBase
     [Test]
     public async Task all_properties_resolved_shows_success_status()
     {
-        // Status Text.Set reaction runs after every source binding. If any Text.Set throws on a bad path,
-        // the sequence aborts before this element turns green.
         await NavigateTo(PayloadPath);
         await WaitForTraceMessage("booted", 5000);
 

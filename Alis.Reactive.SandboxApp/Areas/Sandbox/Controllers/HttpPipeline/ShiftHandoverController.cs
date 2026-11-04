@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Shift handover: a handover note is marked read by a shift, which the page names in the X-Shift
-    /// header. The server refuses a note marked read by no shift, and Arthur Lee's note, which the day shift
-    /// already marked read.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/ShiftHandover")]
     public class ShiftHandoverController : Controller
@@ -16,7 +11,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         public IActionResult Index() =>
             View("~/Areas/Sandbox/Views/HttpPipeline/ShiftHandover/Index.cshtml", new ShiftHandoverPageModel());
 
-        // The link's own address, opened in a tab of its own (a Ctrl or Cmd click): the note, not a change.
         [HttpGet("MarkRead/{resident}")]
         public IActionResult OpenNote(string resident) =>
             ResidentName(resident) is { } name
@@ -35,7 +29,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return Ok(new HandoverNoteRead($"{name}'s handover note is marked read by the {shift.ToLowerInvariant()} shift."));
         }
 
-        // No static lookup table: a static collection in the sandbox is shared by every browser world.
         private static string? ResidentName(string resident) => resident switch
         {
             "helen" => "Helen Park",

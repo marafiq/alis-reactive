@@ -3,9 +3,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Uses popup gestures because typed text does not always update Syncfusion <c>ej2.value</c>.
-/// </summary>
 public sealed class DatePickerLocator
 {
     private const int MaxMonthNavigationAttempts = 24;
@@ -21,14 +18,12 @@ public sealed class DatePickerLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    /// <summary>The input group around the input, the bordered box a user sees.</summary>
     public ILocator Wrapper => Input.Locator("..");
 
     public ILocator CalendarIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-date-icon");
 
     public ILocator Popup => _page.Locator($"#{_componentId}_options");
 
-    /// <summary>Types with real keystrokes because Syncfusion does not parse every FillAsync value.</summary>
     public async Task Fill(string dateText)
     {
         await Input.ClickWhenStableAsync(_page);
@@ -53,7 +48,6 @@ public sealed class DatePickerLocator
         await Blur();
     }
 
-    /// <summary>Selects a date through the popup so Syncfusion updates <c>ej2.value</c>.</summary>
     public async Task SelectDate(int year, int month, int day)
     {
         await CalendarIcon.ClickWhenStableAsync(_page);

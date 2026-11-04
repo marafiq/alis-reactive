@@ -2,21 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.OtpInput;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.OtpInput;
 
-/// <summary>
-/// As a front-desk receptionist, I want to check each visitor in by the 4-digit code we texted them, fix a
-/// digit I typed wrong, and give a code to a visitor who did not book, so that nobody goes past the desk
-/// without being matched to a visit.
-/// </summary>
-/// <remarks>
-/// Today's one booked code is 4821: Daniel O'Brien visiting Margaret Hale in Maple 214. A walk-in code is
-/// 7305. A code the desk types is checked once its four digits are in; a code the page writes is not, and
-/// neither is it hinted at as a correction. Showing a code moves focus into the fields (EJ2 focuses them
-/// whenever its value changes), so the walk-in code is applied at once with DataBind and the fields are then
-/// let go of; without DataBind the code lands on EJ2's next tick, after FocusOut, and leaves the last field
-/// focused.
-/// Not exercised: the field's form input (<c>IInputComponent.Input</c>, which Form() gathers and validation
-/// reads); this page sends the code by reading Value, as the page before it did.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionOtpInput : PlaywrightTestBase
 {
@@ -39,14 +24,12 @@ public class WhenUsingFusionOtpInput : PlaywrightTestBase
         await Expect(VisitCode.Field(3)).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // A code no visit matches, typed and answered.
     private async Task TypeARefusedCode()
     {
         await VisitCode.TypeCode("4812");
         await Expect(Status).ToHaveTextAsync("No visit today matches 4812.", new() { Timeout = 5000 });
     }
 
-    // The receptionist clicks elsewhere on the page.
     private async Task ClickAwayFromTheCode() => await Status.ClickAsync();
 
     [Test]
@@ -105,7 +88,6 @@ public class WhenUsingFusionOtpInput : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The last field keeps focus after its digit is typed; only the page lets go of it.
     [Test]
     public async Task the_code_fields_let_go_once_a_booked_code_is_typed()
     {
@@ -205,7 +187,6 @@ public class WhenUsingFusionOtpInput : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Once the fourth digit shows, the code has been applied and the page has let go of the fields.
     [Test]
     public async Task a_walk_in_code_is_shown_and_the_code_fields_let_go_of_it()
     {

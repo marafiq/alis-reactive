@@ -5,12 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Respite-stay booking: the coordinator picks a community, enters the daily rate and,
-    /// when known, the expected number of nights and whether the community drives the resident
-    /// in. The confirmation repeats what the server received, so a blank field that reached the
-    /// server as zero or "no" shows up on the page.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/RespiteBooking")]
     public class RespiteBookingController : Controller
@@ -41,7 +35,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (!result.IsValid)
                 return FieldErrors(result.ErrorsByField);
 
-            // The validator requires the community and the daily rate.
             var communityId = booking.CommunityId!.Value;
             var dailyRate = booking.DailyRate!.Value;
             if (!Communities.TryGetValue(communityId, out var community))

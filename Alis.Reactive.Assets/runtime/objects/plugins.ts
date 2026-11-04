@@ -1,8 +1,3 @@
-// Plugins (grammar.md 1.1): a plugin registered by name makes the objects `plugin(name, key, data)`
-// locates. The runtime registers alis.document, alis.http, alis.model, alis.form, alis.slot,
-// alis.stream and alis.hub; an app's plugins, and the framework's own components' (alis.confirm),
-// arrive through window.__alisPlugins. The interpreter imports no plugin.
-
 import type { PlanDocument, PluginData } from "../types/index";
 import type { Listener } from "./vendor-driver";
 import type { Owner } from "./owner";

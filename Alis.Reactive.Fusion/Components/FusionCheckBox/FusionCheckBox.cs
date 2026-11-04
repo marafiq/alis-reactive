@@ -41,7 +41,6 @@ namespace Alis.Reactive.Fusion
         /// <summary>Raised when the box is checked or cleared.</summary>
         public Event<FusionCheckBoxChangeArgs> Change => Event<FusionCheckBoxChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);
     }
 

@@ -2,7 +2,6 @@ using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Refusals;
 
-/// <summary>A request that could not reach its endpoint as written is refused where the view renders.</summary>
 [TestFixture]
 public class WhenARequestCannotBeSent
 {

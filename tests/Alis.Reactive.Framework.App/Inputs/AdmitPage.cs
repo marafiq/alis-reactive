@@ -1,7 +1,6 @@
 
 namespace Alis.Reactive.Framework.App.Inputs;
 
-/// <summary>An admission: a member of each type an entry's text converts to.</summary>
 public sealed class AdmitPage
 {
     public string? Name { get; set; }
@@ -15,13 +14,11 @@ public sealed class AdmitPage
     public DateTimeOffset Arrives { get; set; }
 }
 
-/// <summary>What the endpoint bound, in its own words.</summary>
 public sealed class AdmitEcho
 {
     public string Summary { get; set; } = "";
 }
 
-/// <summary>The rules every admission is checked by, written once: the browser checks what it can.</summary>
 public sealed class AdmitRules : ReactiveValidator<AdmitPage>
 {
     public AdmitRules()

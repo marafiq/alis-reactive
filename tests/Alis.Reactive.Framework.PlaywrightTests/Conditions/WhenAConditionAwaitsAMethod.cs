@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// A condition whose term is a method's awaited result (M4, M5 in a condition): the result settles before
-/// the condition reads it, and the method is asked only when its term is reached: after the arms before
-/// it failed, after the terms before an And held, after the terms before an Or failed. The picker shows
-/// each check it is asked for, so a check that was not asked leaves "Availability not checked". Of its
-/// days, 2026-10-27 is free and 2026-10-28 is booked; the pain starts at 2.
-/// </summary>
 [TestFixture]
 public sealed class WhenAConditionAwaitsAMethod : AppPageTest
 {

@@ -1,5 +1,3 @@
-// The server, as a test stands in for it: every request is kept, and each path answered as the test says.
-
 import { vi } from "vitest";
 
 export interface Sent {
@@ -14,7 +12,6 @@ export interface Answer {
   readonly status?: number;
 }
 
-/** Answers each path with what the test says, anything else with an empty 200, and keeps what was sent. */
 export function server(answers: Record<string, Answer> = {}): Sent[] {
   const sent: Sent[] = [];
   vi.stubGlobal("fetch", vi.fn(async (url: string, init: RequestInit = {}) => {

@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// A day that may be missing compared with another such day read when the condition runs: the day a
-/// resident leaves against the day they arrive. The leaving day stays 2026-10-28; the arriving day moves.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageComparesTwoDaysItReads : AppPageTest
 {

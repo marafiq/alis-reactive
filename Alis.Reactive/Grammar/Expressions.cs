@@ -4,17 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Grammar
 {
-    /// <summary>
-    /// An expression of the plan's grammar (grammar.md 1.2). Ten productions; the runtime evaluates
-    /// each synchronously. Nodes are immutable and may be shared, so a step can write a block twice.
-    /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<Expr>))]
     internal abstract class Expr
     {
         private protected Expr() { }
     }
 
-    /// <summary><c>lit(scalar)</c>: text, a number, a boolean or null, written in the plan as it is.</summary>
     internal sealed class LitExpr : Expr
     {
         internal LitExpr(Scalar value)
@@ -26,7 +21,6 @@ namespace Alis.Reactive.Grammar
         public Scalar Value { get; }
     }
 
-    /// <summary><c>obj(id)</c>: an object the plan locates (grammar.md 1.1).</summary>
     internal sealed class ObjExpr : Expr
     {
         internal ObjExpr(string id)
@@ -39,7 +33,6 @@ namespace Alis.Reactive.Grammar
         public string Id { get; }
     }
 
-    /// <summary><c>ref(name)</c>: a binding made by a handler, a <c>let</c> or a lambda.</summary>
     internal sealed class RefExpr : Expr
     {
         internal RefExpr(string name)
@@ -52,7 +45,6 @@ namespace Alis.Reactive.Grammar
         public string Name { get; }
     }
 
-    /// <summary><c>get(expr, path)</c>: a member read.</summary>
     internal sealed class GetExpr : Expr
     {
         internal GetExpr(Expr target, IReadOnlyList<string> path)
@@ -66,10 +58,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<string> Path { get; }
     }
 
-    /// <summary>
-    /// <c>as(expr, shape)</c>: the value converted to a shape (grammar.md 2.1), the one place a value
-    /// changes type. A shape that converts nothing is never written.
-    /// </summary>
     internal sealed class AsExpr : Expr
     {
         internal AsExpr(Expr expr, Shape shape)
@@ -84,7 +72,6 @@ namespace Alis.Reactive.Grammar
         public Shape Shape { get; }
     }
 
-    /// <summary><c>call(expr, path, args)</c>: a member call. An empty path calls the target itself.</summary>
     internal sealed class CallExpr : Expr
     {
         internal CallExpr(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args)
@@ -100,7 +87,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<Expr> Args { get; }
     }
 
-    /// <summary><c>fn(params, body)</c>: a lambda.</summary>
     internal sealed class FnExpr : Expr
     {
         internal FnExpr(IReadOnlyList<string> parameters, Expr body)
@@ -114,7 +100,6 @@ namespace Alis.Reactive.Grammar
         public Expr Body { get; }
     }
 
-    /// <summary><c>record(field*)</c>: JSON-shaped data built from named fields, in order.</summary>
     internal sealed class RecordExpr : Expr
     {
         internal RecordExpr(IReadOnlyList<RecordField> fields)
@@ -126,7 +111,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<RecordField> Fields { get; }
     }
 
-    /// <summary>A field of a record.</summary>
     internal sealed class RecordField
     {
         internal RecordField(string name, Expr value)
@@ -140,7 +124,6 @@ namespace Alis.Reactive.Grammar
         public Expr Value { get; }
     }
 
-    /// <summary><c>list(items)</c>: an array built from expressions.</summary>
     internal sealed class ListExpr : Expr
     {
         internal ListExpr(IReadOnlyList<Expr> items)
@@ -152,7 +135,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<Expr> Items { get; }
     }
 
-    /// <summary><c>op(operator, args)</c>: an operator of the closed table (grammar.md 2.2).</summary>
     internal sealed class OpExpr : Expr
     {
         internal OpExpr(Operator op, IReadOnlyList<Expr> args)

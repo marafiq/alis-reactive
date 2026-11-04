@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Night room checks on Maple wing: the server stamps the start of the round, names the resident in
-    /// each room with their night care, and records each check with the wing, the round and the resident
-    /// the page sends.
-    /// </summary>
     public partial class NativeHiddenFieldController
     {
         private const string RoundStartTime = "02:00";

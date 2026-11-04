@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 
-/// <summary>
-/// An array read from each source a page can give <c>p.From(..)</c>, and the arrays an element offers: a list
-/// a response carries, a response that is an array, a sequence a response member holds, a list a response
-/// does not hold, a component's list, a list a method returns, an element's children (read by an attribute's
-/// value and by whether they have one) and its classes. The
-/// residents endpoint answers Cyd Marsh, Ada Hartley, Ben Hart and Dot Ashton, in that order.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageReadsAnArrayFromASource : AppPageTest
 {

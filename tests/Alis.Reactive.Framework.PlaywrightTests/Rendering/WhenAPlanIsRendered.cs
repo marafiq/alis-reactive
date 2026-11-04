@@ -1,16 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Rendering;
 
-/// <summary>
-/// A plan renders once, after everything its view writes to it. A layout renders a view's sections after its body,
-/// so a plan rendered in the layout's last section takes what an earlier section wrote; an input or behavior written
-/// after the plan rendered and a plan rendered twice are refused when the page renders, each naming the view and the
-/// fix. A partial's plan rendered in its body, or by a helper when the helper's markup is written, runs beside the
-/// page's.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPlanIsRendered : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     [Test]

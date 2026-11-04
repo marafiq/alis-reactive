@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Triggers;
 
-/// <summary>
-/// What starts a page's pipelines: the page being ready, once (D1), read with the URL it was opened with (D3),
-/// and the app's own events, raised synchronously (D2) with the payload a page composes, or by a click on
-/// markup that carries the event's name and its payload (D4).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageStartsItsPipelines : AppPageTest
 {

@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The evening task count: the charge nurse records each resident's open tasks and missed doses on the
-    /// Maple wing and saves the count at handoff. Every page starts from the counts on file; the server
-    /// describes a count against them and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("BatchCellEdit"), ActionName("BatchCellEdit")]
@@ -36,7 +31,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // The task board has one count the sheet does not: Henry Liu's open tasks went up during the shift.
         [HttpPost("TaskCountTaskBoard")]
         public IActionResult TaskCountTaskBoard()
         {
@@ -50,7 +44,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // "Amina Patel, open tasks 2 → 4" for each resident whose counts differ from the counts on file.
         private static List<string> TaskCountChangeWords(IEnumerable<TaskCountRow> changed)
         {
             var onFile = TaskCountOnFile().ToDictionary(resident => resident.Room);

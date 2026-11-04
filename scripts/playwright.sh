@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-# Observable Playwright/NUnit runner.
-#
-# Use this instead of raw `dotnet test` for browser tests. The wrapper makes both
-# filtered and full runs observable by printing the active filter, teeing live
-# output to a log, writing TRX/diagnostic artifacts, and enabling blame-hang.
-# Browser assets are built before dotnet test, never during the VSTest phase.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -18,12 +12,6 @@ print_filter=0
 list_only=0
 retry_failed=0
 no_build=0
-
-# ── projects ─────────────────────────────────────────────────────────────────────────────────────
-# Every Playwright project describes itself in tests/<Project>/playwright.project.sh: its name
-# (playwright_project), its CI shards (playwright_shards, with playwright_shard_filter), the browser
-# bundles its app serves (playwright_check_assets) and the sources its binaries are built from beside
-# the core (playwright_sources). The runner names no project: the paths follow from the folder.
 
 descriptors() {
   local found=0 descriptor
@@ -42,7 +30,6 @@ load_project() {
   unset -f playwright_shard_filter playwright_check_assets playwright_sources
   playwright_project=""
   playwright_shards=""
-  # shellcheck source=/dev/null
   source "$1"
   project_dir="$(dirname "$1")"
   local name
@@ -56,7 +43,6 @@ load_project() {
   fi
 }
 
-# The descriptor of the project named $1, or of the project that owns shard $2.
 descriptor_named() {
   local descriptor
   while IFS= read -r descriptor; do
@@ -87,8 +73,6 @@ list_projects() {
   done < <(descriptors)
 }
 
-# Every project's shards, in descriptor order; a name two projects declare is refused, since a shard
-# names one CI job.
 list_shards() {
   local descriptor names=""
   while IFS= read -r descriptor; do
@@ -134,7 +118,6 @@ check_asset_output_is_fresh() {
   fi
 }
 
-# Every app serves the runtime bundle; the project's own bundles come from its descriptor.
 check_browser_assets_are_fresh() {
   check_asset_output_is_fresh \
     "runtime bundle" \
@@ -149,10 +132,6 @@ check_browser_assets_are_fresh() {
   playwright_check_assets
 }
 
-# Each source project is fresh when its sources are older than its own assembly in the test output: a
-# build refreshes that copy whenever it rebuilds the project, while the test assembly itself is rebuilt
-# only when its own sources or a referenced public surface change (a view edit rebuilds the app alone).
-# A project with no assembly there (the analyzers) is compared against the test assembly.
 check_no_build_is_fresh() {
   if [ ! -f "$assembly" ]; then
     echo "[playwright:runner] ERROR: --no-build requested, but '$assembly' does not exist." >&2
@@ -160,7 +139,6 @@ check_no_build_is_fresh() {
     exit 3
   fi
 
-  # build/ holds the targets that decide what each package serves, so a change there is a change to the core.
   local sources=(
     Alis.Reactive
     Alis.Reactive.Analyzers
@@ -199,9 +177,6 @@ check_no_build_is_fresh() {
   fi
 }
 
-# Builds the filter that re-runs exactly the tests listed (one FQN per line). A parametrised test
-# carries its arguments after "(", which VSTest cannot match exactly, so it falls back to a
-# contains match on the method — re-running every row of that method.
 retry_filter_for() {
   local expr="" fqn
   while IFS= read -r fqn; do
@@ -309,7 +284,6 @@ case "$retry_failed" in
     ;;
 esac
 
-# The projects this run covers: the one a shard belongs to, the one --project names, or all of them.
 projects_to_run=()
 if [ -n "$shard" ]; then
   if [ -n "$filter" ] || [ -n "$selected" ]; then
@@ -325,7 +299,6 @@ else
   done < <(descriptors)
 fi
 
-# The filter for the loaded project: its shard's, or the one given.
 project_filter() {
   if [ -n "$shard" ]; then
     playwright_shard_filter "$shard"
@@ -343,8 +316,6 @@ if [ "$print_filter" -eq 1 ]; then
   exit 0
 fi
 
-# Listing needs the test assembly but no browser assets and no app, so it builds without the npm
-# step and skips the asset freshness checks.
 list_project() {
   local resolved discovered
   resolved="$(project_filter)"
@@ -354,10 +325,6 @@ list_project() {
   else
     check_no_build_is_fresh
   fi
-  # The NUnit adapter's default display name is the bare method name; FullName makes each line a
-  # fully qualified, unique test name. dotnet test --list-tests lists every discovered test and
-  # ignores --filter, so the shard or --filter expression is applied afterwards with the same
-  # grammar (scripts/vstest-filter.mjs).
   local list_cmd=(
     dotnet test "$project"
     -c "$configuration"
@@ -385,8 +352,6 @@ fi
 
 attempt_trx=""
 
-# One dotnet test invocation. $1 suffixes the artifact names ("" for the first attempt, then
-# "-retry1", "-retry2", ...), $2 is the VSTest filter. Returns dotnet test's exit code.
 run_attempt() {
   local suffix="$1"
   local attempt_filter="$2"
@@ -435,16 +400,10 @@ run_attempt() {
   return "$status"
 }
 
-# Runs the loaded project: checks its bundles, builds it (or checks it is fresh), runs the filter,
-# re-runs what failed up to --retry-failed times, and reports flaky and failing tests. Returns the
-# last attempt's exit code.
 run_project() {
   local project_filter_expr status
   project_filter_expr="$(project_filter)"
   mkdir -p "$results_dir"
-  # The stamp names this run's log, TRX and diagnostics. scripts/test.sh --parallel hands one stamp
-  # to all its shards (ALIS_PLAYWRIGHT_RUN_STAMP) so their files read as one run; each shard appends
-  # its name after a dot, so concurrent shards never share a file name.
   stamp="${ALIS_PLAYWRIGHT_RUN_STAMP:-$(date +%Y%m%d-%H%M%S)}"
   if [ -n "$shard" ]; then
     stamp="$stamp.$shard"
@@ -459,8 +418,6 @@ run_project() {
 
   check_browser_assets_are_fresh
 
-  # run_project is called as an if condition, where bash suspends set -e: a failed build must stop the
-  # project explicitly, or the tests would run on the previous binaries.
   if [ "$no_build" -eq 0 ]; then
     echo "[playwright:runner] building test project"
     if ! dotnet build "$project" -c "$configuration"; then
@@ -475,15 +432,10 @@ run_project() {
 
   if run_attempt "" "$project_filter_expr"; then status=0; else status=$?; fi
 
-  # On GitHub Actions a notice names each fixture and how many of its tests passed on the first
-  # attempt, so a green shard's check says what it proved.
   if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
     node scripts/trx-failed-tests.mjs "$attempt_trx" summary
   fi
 
-  # Re-run only what failed, up to --retry-failed times. Every attempt keeps its own log, TRX and
-  # diagnostics; the final exit code is the last attempt's. Tests that fail and then pass are the
-  # flaky list — visible in the output, in flaky-<stamp>.txt, and in the GitHub job summary.
   local retries_done=0 failed_trx failed_tests failed_count fqn flaky_path
   local flaky=()
   local flaky_annotations=""
@@ -519,16 +471,11 @@ run_project() {
         echo "Two red runs in a row is a regression or a quarantine candidate: docs/CI.md, \"Flaky tests\"."
       } >> "$GITHUB_STEP_SUMMARY"
     fi
-    # The job stays green, and nobody opens the summary of a green job: a warning annotation puts each
-    # flaky test on the pull request's checks with the start of the failure the re-run hid, so a
-    # re-run never turns a failure into silence, and the flake can be root-caused from the check.
     if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
       printf '%s' "$flaky_annotations" | sed '/^$/d'
     fi
   fi
 
-  # A red run names each test that still fails, with the start of its message, as an error
-  # annotation on the pull request's checks: the failure is readable without opening the log.
   if [ "$status" -ne 0 ] && [ "${GITHUB_ACTIONS:-}" = "true" ]; then
     node scripts/trx-failed-tests.mjs "$attempt_trx" annotations
   fi
@@ -536,8 +483,6 @@ run_project() {
   return "$status"
 }
 
-# Each selected project runs, every one even after a red one; the exit code is the first red
-# project's.
 overall=0
 for descriptor in "${projects_to_run[@]}"; do
   load_project "$descriptor"

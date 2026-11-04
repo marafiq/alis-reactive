@@ -3,13 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Shift start. The community's gateway forwards a check to the partner its X-Partner header names:
-    /// the pharmacy answers, the lab has nothing pending and says so with a 404, the kitchen answers. The
-    /// Maple wing's handover sheet is written; Cedar's is not. The kitchen takes its orders as form posts
-    /// and answers in its own words; its crackers line runs on the old system, whose answer the page
-    /// cannot read. The board is signed for a wing with no answer to read.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/ShiftStart")]
     public class ShiftStartController : Controller

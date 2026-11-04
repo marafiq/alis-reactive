@@ -46,8 +46,6 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Each hub has a connection of its own: while this page's resident hub connection is down
-    // (aborted, and its reconnects refused), the notification hub still delivers.
     [Test]
     public async Task notifications_keep_arriving_while_the_resident_hub_is_down()
     {
@@ -56,7 +54,6 @@ public class WhenResidentStatusUpdatesLive : PlaywrightTestBase
         await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/notifications\"}", 10000);
         await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/resident-status", 10000);
 
-        // Once the server has answered Break, it has dropped this page's resident hub connection.
         await Page.RunAndWaitForResponseAsync(
             async () => await ClickWhenStable(Page.Locator("#btn-break-hub")),
             "**/RealTime/BreakResidentHub");

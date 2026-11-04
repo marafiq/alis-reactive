@@ -1,15 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the front desk, I want to pick care levels as chips and list only the residents in them, and to be
-/// told when Memory Care residents are listed, so that I send their visitors through the secured wing's desk.
-/// </summary>
-/// <remarks>
-/// The roster holds seven residents: three in Memory Care (Ada, Cy, Gus), two Assisted (Bo, Fay), one in
-/// Skilled Nursing (Di) and one Independent (Ed). Applying the filters announces the chips the chip list
-/// says are selected; the page counts them, tests their values for Memory Care and sends their texts to the
-/// server, which answers with the residents in those care levels.
-/// </remarks>
 [TestFixture]
 public class WhenFilteringWithChips : PlaywrightTestBase
 {
@@ -72,8 +62,6 @@ public class WhenFilteringWithChips : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The note follows the chips applied last: an Assisted-only list holds no Memory Care resident, and a
-    // test that ignored the chip's value would keep the note.
     [Test]
     public async Task an_assisted_only_list_drops_the_secured_wing_note()
     {

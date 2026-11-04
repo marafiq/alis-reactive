@@ -1,6 +1,3 @@
-/* The brand on Syncfusion components: the Tailwind3 theme's tokens, redeclared on .alis-root with the
-   design system's values. The theme declares them on :root, so a declaration on the root element wins
-   by inheritance whatever the link order. fusion-tokens.md lists the tokens and their value formats. */
 .alis-root {
   --color-sf-primary: var(--color-primary);
   --color-sf-primary-text-color: #fff;

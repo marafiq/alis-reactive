@@ -6,10 +6,6 @@ using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanModel.Requests
 {
-    // The members a gather sets, by binding name, its headers, and the form whose inputs it sends. Where a member
-    // goes is decided when the request is written, because only then is the URL known: MVC's route-value rule sends
-    // a member named like a {placeholder} to the path, and every other member to the query or body. Which form
-    // Form() sends is decided then too, because only then is the form the request validates known.
     internal sealed class GatherInputDraft
     {
         private readonly List<(BindingPath Member, ValueExpression Value)> _members = new List<(BindingPath, ValueExpression)>();
@@ -60,7 +56,6 @@ namespace Alis.Reactive.PlanModel.Requests
         }
     }
 
-    /// <summary>The element whose inputs a gather's <c>Form</c> sends: the form its request validates, or an element it names.</summary>
     internal sealed class SentForm
     {
         private readonly string? _formId;
@@ -70,10 +65,8 @@ namespace Alis.Reactive.PlanModel.Requests
             _formId = formId;
         }
 
-        /// <summary>The form the request validates.</summary>
         internal static SentForm Validated { get; } = new SentForm(null);
 
-        /// <summary>The element with this id.</summary>
         internal static SentForm Named(string formId) => new SentForm(formId);
 
         internal string ContainerFor(string method, string url, FormValidation? validation) =>
@@ -82,7 +75,6 @@ namespace Alis.Reactive.PlanModel.Requests
                 "Name the element whose inputs it sends, Form(\"formId\"), or validate that form first, Validate<TValidator>(\"formId\").");
     }
 
-    /// <summary>A gather resolved against its URL: body or query members, route values, headers and the form whose inputs it sends.</summary>
     internal sealed class GatheredInput
     {
         internal GatheredInput(
@@ -103,7 +95,6 @@ namespace Alis.Reactive.PlanModel.Requests
 
         internal IReadOnlyList<(string Name, ValueExpression Value)> Headers { get; }
 
-        /// <summary>The id of the element whose mounted inputs are sent; null when the gather sends no form.</summary>
         internal string? Form { get; }
 
         internal bool IsEmpty => Payload.Count == 0 && Route.Count == 0 && Headers.Count == 0 && Form == null;

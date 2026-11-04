@@ -105,9 +105,6 @@ public class WhenManagingTodoItems : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The layout's toast host asks Syncfusion for the bottom-right corner. A global Newtonsoft
-    // naming policy that renames Syncfusion's pinned "X"/"Y" drops that request and the toast
-    // falls back to the top left, over the page header.
     [Test]
     public async Task save_confirmation_appears_in_the_bottom_right_corner()
     {

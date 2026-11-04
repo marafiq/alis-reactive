@@ -1,16 +1,3 @@
-// alis.document (grammar.md 6.1).
-// D1 `ready` is an event of the owner being started: a ready handler runs when its own owner starts,
-//    after every handler of that owner has subscribed, and never again.
-// D2 `raise(name, detail)` is synchronous: a non-bubbling CustomEvent carrying the detail the plan
-//    gives it. A listener's payload is the detail, or the event itself when the detail is missing.
-// D3 `query` is the query string read the way MVC binds [FromQuery]: keys match case-insensitively
-//    and a scalar member reads the first value; `queryAll` gives an array member every value. An
-//    absent key reads as missing.
-// D4 A click on an element carrying data-alis-raise, or inside one, raises the event the nearest names,
-//    with a record of that element's data-alis-detail- attributes: each is one payload member, named as
-//    the DOM's dataset names it (data-alis-detail-resident-id is residentId) and holding its text, which
-//    the listener's typed read converts by the member's type.
-
 import type { Plugin } from "../objects/plugins";
 import { logger } from "../diagnostics/trace";
 import { isMissing } from "../grammar/shape";
@@ -19,7 +6,6 @@ const executeLog = logger("execute");
 const triggerLog = logger("trigger");
 
 const RAISE_ATTRIBUTE = "data-alis-raise";
-// The dataset key of every data-alis-detail- attribute starts with it.
 const DETAIL_KEY = "alisDetail";
 
 export interface DocumentObject {
@@ -35,7 +21,6 @@ export function raise(name: string, detail: unknown): void {
 
 function queryRecord<T>(pick: (values: string[]) => T | undefined): Record<string, T> {
   const params = new URLSearchParams(window.location.search);
-  // A plan reads the record only by a member's binding name (UrlRead), never by a symbol.
   return new Proxy({} as Record<string, T>, {
     get(_target, key: string) {
       const values = valuesFor(params, key);
@@ -65,7 +50,6 @@ const documentObject: DocumentObject = {
 
 let markupRaiseWired = false;
 
-// Captured at the document, so a vendor that stops a click inside its own template cannot swallow it.
 function wireMarkupRaise(): void {
   if (markupRaiseWired) return;
   markupRaiseWired = true;

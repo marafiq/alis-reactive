@@ -25,7 +25,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionInputMaskChangeArgs> Change =>
             Event<FusionInputMaskChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

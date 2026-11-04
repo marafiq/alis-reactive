@@ -68,9 +68,6 @@ echo "[example] installing the example's npm dependencies"
 echo "[example] building the example against AlisReactive $version"
 dotnet build "$example" --configuration Release -p:AlisReactiveVersion="$version"
 
-# Development serves the packages' static web assets (~/_content/...) from the restored packages; the
-# example runs from its folder so that is its content root. The shell becomes the app, so the app's
-# pid is the one started (and the one stopped after the smoke).
 start_app() {
   cd "$example"
   ASPNETCORE_ENVIRONMENT=Development ASPNETCORE_URLS="$url" exec dotnet bin/Release/net10.0/ResidentIntake.dll
@@ -82,7 +79,6 @@ if [ "$smoke" -eq 0 ]; then
 fi
 
 echo "[example] installing the smoke's Playwright and browser"
-# The browser install leaves other versions in the cache alone (it prunes them by default).
 (cd "$example/ci" && npm ci --no-audit --no-fund && PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium)
 
 log="$example/ci/app.log"

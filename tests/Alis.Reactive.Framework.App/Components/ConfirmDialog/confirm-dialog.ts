@@ -1,8 +1,3 @@
-// The app's own confirmation dialog: the question a page's p.Confirm(..) asks, with a Yes and a No.
-// It knows nothing of Alis.Reactive beyond the plugin name a page's confirmation is asked through,
-// alis.confirm, which an app without the Fusion dialog gives from its own code. It queues itself on
-// window.__alisPlugins for the runtime to register at boot.
-
 interface PendingPlugin {
   readonly name: string;
   readonly instance: object;
@@ -35,7 +30,6 @@ function dialogAnswering(message: string, answer: (agreed: boolean) => void): HT
 }
 
 export const confirmDialog = {
-  /** Shows the question and settles with the answer: true for Yes, false for No. Questions wait their turn. */
   ask(message: string): Promise<boolean> {
     const answered = asked.then(() => new Promise<boolean>(answer => {
       document.body.append(dialogAnswering(message, answer));

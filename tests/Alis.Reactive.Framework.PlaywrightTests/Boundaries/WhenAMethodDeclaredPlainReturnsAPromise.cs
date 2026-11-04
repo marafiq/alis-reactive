@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Boundaries;
 
-/// <summary>
-/// A member declared sync whose JavaScript returns a promise, read where the plan reads a value (grammar.md
-/// 3.3, 3.4): the read fails at the object, so the step before it ran, the steps after it do not, and the
-/// page goes on. A promise is never written as a value. The slate's look-up answers a moment later; the
-/// page's declaration of it says it answers at once.
-/// </summary>
 [TestFixture]
 public sealed class WhenAMethodDeclaredPlainReturnsAPromise : AppPageTest
 {

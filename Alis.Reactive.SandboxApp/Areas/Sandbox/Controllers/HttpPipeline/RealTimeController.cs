@@ -44,7 +44,6 @@ public class RealTimeController : Controller
     public IActionResult ResidentPanelClosed() =>
         PartialView("~/Areas/Sandbox/Views/HttpPipeline/RealTime/_ResidentPanelClosed.cshtml");
 
-    // The status names how many live connections the pushing page holds to this hub.
     [HttpPost("PushResidentStatus")]
     public async Task<IActionResult> PushResidentStatus([FromBody] ResidentStatusPayload payload, [FromQuery] string? drill)
     {
@@ -59,8 +58,6 @@ public class RealTimeController : Controller
         var drillWorld = DrillWorldFor(drill);
         if (drillWorld.Broken)
         {
-            // EventSource retries forever on 5xx but fails PERMANENTLY on 404 — permanent
-            // failure is the state the runtime's retry indicator responds to.
             Response.StatusCode = 404;
             return;
         }
@@ -80,8 +77,6 @@ public class RealTimeController : Controller
         drillWorld.Outboxes[streamKey] = outbox;
         try
         {
-            // retry: 300 keeps the browser's reconnect delay short so outage drills observe
-            // the permanent failure quickly instead of waiting on the ~3s browser default.
             await Response.WriteAsync($"retry: 300\nevent: {new FacilityAlertStream().Alert.Name}\ndata: {alert}\n\n", lifetime.Token);
             await Response.Body.FlushAsync(lifetime.Token);
             await foreach (var message in outbox.Reader.ReadAllAsync(lifetime.Token))
@@ -98,7 +93,6 @@ public class RealTimeController : Controller
         }
     }
 
-    // The all-clear carries no payload the page reads; its data line is still JSON.
     [HttpPost("SoundAllClear")]
     public IActionResult SoundAllClear([FromBody] OutageDrillRequest payload)
     {
@@ -107,9 +101,6 @@ public class RealTimeController : Controller
         return Ok();
     }
 
-    // Outage drill state is scoped per page load: the view embeds a fresh drill id in the
-    // SSE URL and both drill buttons, so every page (and every test) breaks only its own
-    // stream world. Nothing is process-global — a reload is always a fresh, healthy drill.
     private sealed class FacilityDrillWorld
     {
         public volatile bool Broken;
@@ -119,8 +110,6 @@ public class RealTimeController : Controller
 
     private static readonly ConcurrentDictionary<string, FacilityDrillWorld> DrillWorlds = new();
 
-    // A request without a drill id (stale page, direct curl) gets its own shared world
-    // instead of a 500 — the empty-key world behaves exactly like any other drill.
     private static FacilityDrillWorld DrillWorldFor(string? drillId) =>
         DrillWorlds.GetOrAdd(drillId ?? "", _ => new FacilityDrillWorld());
 

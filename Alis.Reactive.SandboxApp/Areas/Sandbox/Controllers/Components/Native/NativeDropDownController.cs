@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Van booking: the front desk books the community van for a resident's trip. The van is out at
-    /// 10:00 AM (the dialysis run), so a booking then is offered the next free time.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeDropDown")]
     public class NativeDropDownController : Controller

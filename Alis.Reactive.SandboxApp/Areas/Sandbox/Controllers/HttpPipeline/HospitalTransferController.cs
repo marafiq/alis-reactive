@@ -3,14 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Hospital transfer. The transfer desk answers by resident: Helen Park (1042) is accepted; Arthur
-    /// Bell (1043) is already at the hospital; Rosa Diaz (1044) makes the desk fail with no answer; Walter
-    /// Cho (1045) was discharged this morning; Frank Moore (1046) needs the ambulance dispatcher, who is
-    /// offline. Mercy General has no bed tonight, which only the desk knows, so a transfer there is refused
-    /// beside the hospital field. Once a transfer is accepted, the family desk tells the family where the
-    /// resident is going, from the hospital's answer as the page forwards it.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/HospitalTransfer")]
     public class HospitalTransferController : Controller
@@ -27,7 +19,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         {
             if (transfer == null) return BadRequest();
 
-            // The same validator the page runs; its Must on the hospital runs here alone.
             var result = new HospitalTransferValidator().Validate(transfer);
             if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
@@ -54,8 +45,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 $"ward {transfer.Receiving.Ward} (transfer {notice.TransferId ?? "unnumbered"})."));
         }
 
-        // The desk's answer repeats everything it received, so a value lost between the page and the desk
-        // shows up on the page.
         private static TransferAccepted Accepted(string residentId, string resident, HospitalTransferModel transfer)
         {
             var hospital = string.IsNullOrWhiteSpace(transfer.Destination?.Hospital)
@@ -78,7 +67,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 $"{resident} to {hospital}{ward}: {travel}, {escorted}. Reason: {transfer.Reason?.Trim()}");
         }
 
-        // No static lookup table: a static collection in the sandbox is shared by every browser world.
         private static string FamilyOf(string resident) => resident switch
         {
             "Helen Park" => "Grace Park",

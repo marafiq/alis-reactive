@@ -14,17 +14,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Native.Components.NativeHiddenField
 {
-    /// <summary>
-    /// Renders a native HTML <c>&lt;input type="hidden"&gt;</c> bound to a model property.
-    /// </summary>
-    /// <remarks>
-    /// Uses the Reactive Plan-owned render target for element ID and MVC binding name.
-    /// No label or validation slot is rendered. The input carries <c>data-alis-hidden-field</c>, so the
-    /// framework's hidden-field code (constructed on <c>alis:mount</c>) raises <c>change</c> when its value
-    /// is written with a new value.
-    /// </remarks>
-    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">Model value type rendered through the hidden input.</typeparam>
     internal sealed class NativeHiddenFieldBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
@@ -53,7 +42,6 @@ namespace Alis.Reactive.Native.Components.NativeHiddenField
         }
 
 #if NET48
-        /// <inheritdoc />
         public string ToHtmlString()
         {
             var sw = new StringWriter();
@@ -62,7 +50,6 @@ namespace Alis.Reactive.Native.Components.NativeHiddenField
         }
 #endif
 
-        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             var hiddenInputAttributes = new Dictionary<string, object>

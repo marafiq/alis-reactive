@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 {
-    /// <summary>
-    /// Care plan review: refreshing the census answers at once, while saving the care plan takes
-    /// the server a moment, so the page's loader must stay up until the save answers.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Loader")]
     public class LoaderController : Controller

@@ -7,7 +7,6 @@ namespace Alis.Reactive.Framework.App.Components;
 
 public static class SlateHtml
 {
-    /// <summary>A slate with its title and first rows; slate.ts builds its markup when the page mounts.</summary>
     public static RenderedComponent<Slate, TModel> Slate<TModel>(
         this ReactivePlan<TModel> plan,
         string id,
@@ -23,7 +22,6 @@ public static class SlateHtml
         return plan.Render<Slate>(id, new HtmlString(markup.ToString()));
     }
 
-    /// <summary>A slate started at a moment, which the slate keeps as a timestamp; otherwise as <see cref="Slate{TModel}(ReactivePlan{TModel}, string, string, string[])"/>.</summary>
     public static RenderedComponent<Slate, TModel> Slate<TModel>(
         this ReactivePlan<TModel> plan,
         string id,

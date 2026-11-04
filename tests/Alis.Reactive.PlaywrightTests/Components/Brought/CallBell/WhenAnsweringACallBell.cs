@@ -1,15 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.CallBell;
 
-/// <summary>
-/// As the night nurse, I want a resident's call bell heard at the desk while someone is on duty and
-/// answered from the page, so that no call goes unnoticed and the bell itself says when no one is listening.
-/// </summary>
-/// <remarks>
-/// The call bell is a widget the sandbox wrote itself (Scripts/call-bell.ts) that takes each listener as a
-/// property, the way a chart takes options.onClick (BroughtComponents/CallBell). The desk's card is an
-/// injected partial whose plan listens to the page's bell with two handlers of one callback; ending
-/// coverage unloads the card, and the bell must be left as it was before the desk came on duty.
-/// </remarks>
 [TestFixture]
 public class WhenAnsweringACallBell : PlaywrightTestBase
 {

@@ -1,15 +1,3 @@
-// The visit planner: a week of family visit times for one resident. The sandbox writes it the way an
-// app writes its own widget, with no knowledge of Alis.Reactive. Its object lives on its host element
-// as `visitPlanner`; BroughtComponents/VisitPlanner/VisitPlanner.cs declares it to the framework.
-//
-//   properties  value (booked slot ids), capacity, wing, readOnly, slots, labels.empty, count (read only)
-//   functions   remaining(), isBooked(id), firstOpen(), firstBooked(), summary() (a promise)
-//   methods     select(id), release(id), clear(), book(id, visitors, note), focus(), prepareSummary() (a promise),
-//               markTaken(id, family) (another family holds the time; it cannot be booked here)
-//   events      weekChanged, full (its payload can waitlist the time), beforeBook (cancelable),
-//               slotsLoaded, through on(name, fn) / off(name, fn). Its commit event is weekChanged,
-//               not "change": a form learns it from the declaration, not from a convention.
-
 import "./visit-planner.css";
 
 export interface VisitSlot {
@@ -44,7 +32,6 @@ export class VisitPlanner {
   private emptyText = "No visit times yet.";
   private prepared = "";
 
-  /** Texts the planner shows; `labels.empty` is what it says before any slot is offered. */
   readonly labels: { empty: string };
 
   constructor(host: VisitPlannerHost) {
@@ -68,7 +55,6 @@ export class VisitPlanner {
     return [...this.booked];
   }
 
-  /** Replaces the booked times without raising weekChanged, as a form field's value would. */
   set value(ids: string[]) {
     this.booked = this.inOfferedOrder(ids ?? []);
     this.render();
@@ -105,7 +91,6 @@ export class VisitPlanner {
     return this.offered.map(slot => ({ ...slot }));
   }
 
-  /** Offers a new week of times; a booking whose time is no longer offered is dropped. */
   set slots(slots: VisitSlot[]) {
     this.offered = (slots ?? []).map(slot => ({ id: slot.id, label: slot.label, day: slot.day, quiet: Boolean(slot.quiet) }));
     this.booked = this.inOfferedOrder(this.booked);
@@ -125,20 +110,14 @@ export class VisitPlanner {
     return id !== null && this.booked.includes(id);
   }
 
-  /** The first offered time that is neither booked nor in quiet hours; "" when there is none. */
   firstOpen(): string {
     return this.offered.find(slot => !slot.quiet && !this.booked.includes(slot.id))?.id ?? "";
   }
 
-  /** The earliest booked time; "" when none is booked. */
   firstBooked(): string {
     return this.booked[0] ?? "";
   }
 
-  /**
-   * Books a time. beforeBook listeners may cancel it; a full week raises full instead. A booking
-   * raises weekChanged.
-   */
   select(id: string): void {
     const slot = this.offered.find(candidate => candidate.id === id);
     if (slot === undefined || this.booked.includes(id) || this.takenBy.has(id)) return;
@@ -179,21 +158,18 @@ export class VisitPlanner {
     this.emitChange(null, null);
   }
 
-  /** Records who is coming to a booked time; the planner shows it under the time. */
   book(id: string, visitors: number, note: string): void {
     if (!this.booked.includes(id)) return;
     this.notes.set(id, { visitors, note: note ?? "" });
     this.render();
   }
 
-  /** Marks a time another family holds: it shows who, and it cannot be booked here. */
   markTaken(id: string, family: string): void {
     if (!this.offered.some(slot => slot.id === id)) return;
     this.takenBy.set(id, family ?? "");
     this.render();
   }
 
-  /** Prepares the summary the family receives from the booked times; settles when it is ready. */
   prepareSummary(): Promise<void> {
     return later(300).then(() => {
       const times = this.offered.filter(slot => this.booked.includes(slot.id)).map(slot => slot.label);
@@ -201,7 +177,6 @@ export class VisitPlanner {
     });
   }
 
-  /** The prepared summary as it stood when asked for; "" until one is prepared. */
   summary(): Promise<string> {
     const text = this.prepared;
     return later(100).then(() => text);

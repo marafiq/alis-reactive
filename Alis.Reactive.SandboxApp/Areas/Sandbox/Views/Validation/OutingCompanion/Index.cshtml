@@ -23,7 +23,6 @@
                     .NativeTextBox(b => b.Placeholder("Where the outing goes").CssClass(Field)); }
             </native-grid>
 
-            @* The companion is a partial loaded into this slot and replaced when removed. *@
             <div id="companion-slot">
                 @await Html.PartialAsync("~/Areas/Sandbox/Views/Validation/OutingCompanion/_NoCompanion.cshtml")
             </div>

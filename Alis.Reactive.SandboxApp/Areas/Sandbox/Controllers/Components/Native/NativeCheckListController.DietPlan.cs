@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Diet plan: the kitchen's dietary restrictions for one resident, opened with the restrictions
-    /// on file and saved back as the nurse leaves them.
-    /// </summary>
     public partial class NativeCheckListController
     {
         private const int HaroldJenningsId = 3051;

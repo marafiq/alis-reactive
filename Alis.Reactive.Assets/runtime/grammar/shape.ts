@@ -27,13 +27,6 @@ function convert(value: unknown, shape: Shape): unknown {
   }
 }
 
-/**
- * A value as MVC binds it into the model the server validates (grammar.md 2.1, binding reads): text
- * that is empty or only whitespace is null, as ConvertEmptyStringToNull makes it, under any shape
- * that holds text (a char or a link is any); a non-nullable number, boolean or date left empty is its
- * type's default (0, false, 0001-01-01), the value the property keeps when binding has nothing to
- * bind. A nullable shape already reads blank as null.
- */
 export function bound(value: unknown, shape: Shape): unknown {
   const converted = shaped(value, shape);
   const nothingBound = isMissing(converted) || isBlankText(converted);
@@ -51,7 +44,6 @@ export function bound(value: unknown, shape: Shape): unknown {
   }
 }
 
-// DateTime.MinValue: 0001-01-01 at midnight, local for a date, UTC for an instant.
 const EARLIEST_INSTANT = -62_135_596_800_000;
 
 function earliestDate(): Date {
@@ -60,7 +52,6 @@ function earliestDate(): Date {
   return date;
 }
 
-/** Number shape: finite numbers; booleans as 1 or 0; text through Number (blank text is 0); dates as their time. */
 export function asNumber(value: unknown): number | undefined {
   if (typeof value === "number") return Number.isFinite(value) ? value : undefined;
   if (typeof value === "boolean") return value ? 1 : 0;
@@ -103,10 +94,6 @@ export function asDate(value: unknown): Date | undefined {
   return Number.isFinite(parsed.getTime()) ? parsed : undefined;
 }
 
-/**
- * A moment in time, read under the instant shape (a DateTimeOffset): a Date whose text is the exact
- * instant in UTC, so the server binds the same moment whatever the zone of the browser or the server.
- */
 export class Instant extends Date {
   override toJSON(): string {
     return this.toISOString();
@@ -119,10 +106,6 @@ export function asInstant(value: unknown): Instant | undefined {
   return date === undefined ? undefined : new Instant(date.getTime());
 }
 
-// A date as the person picked it, with no offset, the way an HTML form posts one: "YYYY-MM-DD" at
-// local midnight, else "YYYY-MM-DDTHH:mm:ss" with milliseconds when it has them. As a UTC instant a
-// day picked east of UTC would read as the day before, and a DateOnly member could not bind it.
-// asDate reads both forms back as the same local date.
 function localDateText(date: Date): string {
   const day = `${`${date.getFullYear()}`.padStart(4, "0")}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`;
   const isMidnight =
@@ -138,7 +121,6 @@ function twoDigits(value: number): string {
   return `${value}`.padStart(2, "0");
 }
 
-// setFullYear, because the Date constructor reads years below 100 as 19xx.
 function localMidnight(year: number, month: number, day: number): Date | undefined {
   const date = new Date(2000, 0, 1);
   date.setFullYear(year, month - 1, day);
@@ -155,8 +137,6 @@ function asArrayOf(value: unknown, item: Shape): unknown {
   return [shaped(value, item)];
 }
 
-// An object's declared members convert by their shapes; its other members stay as they arrived. When no
-// member changes, the object itself passes, so a library that keeps it by reference still has it.
 function asObjectOf(value: unknown, shape: Extract<Shape, { kind: "object" }>): unknown {
   if (!isRecord(value) || value instanceof Date) return value;
 
@@ -172,15 +152,11 @@ function asObjectOf(value: unknown, shape: Extract<Shape, { kind: "object" }>): 
   return converted ?? record;
 }
 
-// A nullable shape is a CLR Nullable<T>, and T is never text: MVC binds blank text into none of them
-// (a number, a Guid, a time, a char), only as null, so the browser reads it as null too.
 function asNullable(value: unknown, inner: Shape): unknown {
   if (isBlankText(value)) return null;
   return convert(value, inner);
 }
 
-// Whitespace as .NET's char.IsWhiteSpace defines it (string.IsNullOrWhiteSpace, which MVC binding
-// and FluentValidation use); JavaScript's trim differs on U+FEFF and U+0085.
 const dotNetWhitespaceOnly = /^[\t\n\v\f\r \u0085\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]*$/;
 
 export function isBlankText(value: unknown): value is string {

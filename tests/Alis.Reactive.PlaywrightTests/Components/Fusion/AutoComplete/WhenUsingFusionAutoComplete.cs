@@ -2,25 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.AutoComple
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AutoComplete;
 
-/// <summary>
-/// As a charge nurse on the evening shift, I want to find the physician to page by typing part of a name,
-/// with the list filtered by the hospital's physician directory, and see how that physician is reached, so
-/// that Margaret Hale's change of condition reaches the right physician and nobody else.
-/// </summary>
-/// <remarks>
-/// The directory holds Dr. Anita Patel (Geriatrics, 555-0142, her attending), Dr. Lena Patterson (Internal
-/// Medicine), Dr. James Okafor (Cardiology, 555-0148), Dr. Maria Reyes (Hospital Medicine) and Dr. Wen Lim
-/// (Psychiatry), who are on call tonight, and Dr. Elena Novak. Her care team, Dr. Patel and Dr. Okafor, is
-/// what the field holds before the directory answers; the directory answers a search after 1.5 seconds,
-/// and the page says it is searching meanwhile. A physician chosen by name is to be confirmed with the
-/// answering service, and the keyboard goes away so the callback shows; one the page fills in is not. Once
-/// the page is sent, the physician it went to cannot be changed until the nurse pages someone else.
-/// Not exercised: writing Text, which a page never needs: it changes the physician by value; Text is read.
-/// Enabled is written here (the page locks and opens the field); it is not read. The Fields overload with
-/// a group member is not used: no physician list here is grouped (the MultiSelect diet order groups
-/// allergies by kind). Change's e, item and itemData fields are not declared; IsInteracted is EJ2's reading
-/// of e.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionAutoComplete : PlaywrightTestBase
 {
@@ -42,7 +23,6 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
     private ILocator PageSomeoneElse => Page.Locator("#page-again-btn");
     private ILocator PageStatus => Page.Locator("#page-status");
 
-    // The cross the field shows while it holds a physician and has the cursor.
     private ILocator ClearButton => Physician.Input.Locator("xpath=..").Locator(".e-clear-icon");
 
     private async Task NavigateAndBoot()
@@ -52,7 +32,6 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         await Expect(Physician.Input).ToBeEditableAsync(new() { Timeout = 5000 });
     }
 
-    // Key by key, as the field searches on each key.
     private async Task TypeInPhysician(string text)
     {
         await ClickWhenStable(Physician.Input);
@@ -86,8 +65,6 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Her care team has Dr. Okafor, but the list waits for the directory's answer rather than offering him
-    // from the care team; the status still says searching after the list is seen empty.
     [Test]
     public async Task while_the_directory_is_searched_her_care_team_is_not_offered_for_what_was_typed()
     {
@@ -131,7 +108,6 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Choosing from the list leaves the cursor in the field; only the page moves it out.
     [Test]
     public async Task a_physician_chosen_by_name_is_to_be_confirmed_and_the_keyboard_goes_away()
     {
@@ -159,7 +135,6 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The last search offered only Dr. Okafor; her attending still replaces him, and needs no confirming.
     [Test]
     public async Task paging_her_attending_replaces_a_physician_chosen_by_name()
     {
@@ -177,7 +152,6 @@ public class WhenUsingFusionAutoComplete : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The on-call list does not hold her attending; paging her brings her care team back first.
     [Test]
     public async Task paging_her_attending_after_opening_the_on_call_list_fills_in_dr_patel()
     {

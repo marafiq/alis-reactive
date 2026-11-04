@@ -3,17 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.RoomEvening;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.RoomEvening;
 
-/// <summary>
-/// As the evening aide, I want a family visit to open as a card in room 12's evening log, with its own
-/// inputs, rule and buttons, hearing the room's bell and opening an escort card of its own, and I want
-/// ending the visit to take all of that away while the room's bell, buttons and log keep working, so that
-/// the log never carries a visitor who has left.
-/// </summary>
-/// <remarks>
-/// The visit card is a partial injected into the log's slot. Its inputs join the log's form, its rule joins
-/// the form's checks, its plan joins the room's bell by id, and its own slot takes the escort card. The
-/// quiet-night card that replaces it carries no plan, so loading it only unloads the visit.
-/// </remarks>
 [TestFixture]
 public class WhenTheAideHostsAFamilyVisit : PlaywrightTestBase
 {
@@ -24,7 +13,6 @@ public class WhenTheAideHostsAFamilyVisit : PlaywrightTestBase
     private ILocator VisitStatus => Page.Locator("#visit-status");
     private ILocator VisitBellLine => Page.Locator("#visit-bell-line");
     private ILocator VisitBellCount => Page.Locator("#visit-bell-count");
-    // The escort card sits in the visit card's own slot, inside the visit slot.
     private ILocator EscortStatus => VisitSlot.Locator("#escort-slot #escort-status");
     private ILocator ShiftStatus => Page.Locator("#shift-status");
     private ILocator AnsweredLine => Page.Locator("#answered-line");
@@ -207,7 +195,6 @@ public class WhenTheAideHostsAFamilyVisit : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The escort card sits in the visit card's own slot: ending the visit takes it along, listeners included.
     [Test]
     public async Task ending_the_visit_takes_the_escort_card_and_its_listeners_with_it()
     {
@@ -237,8 +224,6 @@ public class WhenTheAideHostsAFamilyVisit : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // With no escort card on the page, the page's first line has nowhere to write: it fails, reports the
-    // missing card, and the line after it never runs.
     [Test]
     public async Task paging_the_escort_before_a_card_is_open_changes_nothing_and_reports_the_missing_card()
     {
@@ -251,8 +236,6 @@ public class WhenTheAideHostsAFamilyVisit : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(MissingEscortCard);
     }
 
-    // Between the two visits the bell rings unheard; the reopened card hears the next call, with the
-    // bell's own count of two, and the old card's listener is gone.
     [Test]
     public async Task reopening_the_visit_after_ending_it_brings_a_fresh_card_that_hears_the_bell_again()
     {

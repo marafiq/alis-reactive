@@ -39,8 +39,6 @@ function declareMembers(container: HTMLElement): void {
   });
 }
 
-// The content a plan loaded into the drawer goes with the close: announced first, so what it brought
-// (its components, rules and behavior) is released before the HTML is emptied.
 function resetAfterClose(container: HTMLElement): void {
   container.setAttribute("aria-hidden", "true");
   container.classList.remove(...SIZES.map(sizeClass));

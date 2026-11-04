@@ -8,7 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     [Route("Sandbox/Components/Rating")]
     public class RatingController : Controller
     {
-        // The October ratings the other 23 Maple Grove residents have sent.
         private static readonly IReadOnlyList<double> OtherResidentsOctoberScores =
             [5, 4, 4, 5, 3, 4, 5, 4, 4, 5, 3, 4, 5, 4, 4, 5, 4, 3, 5, 4, 4, 5, 2];
 
@@ -21,7 +20,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Records the rating and answers with October's average across the community.
         [HttpPost("Send")]
         public IActionResult Send([FromBody] SurveyResponse response)
         {

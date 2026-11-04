@@ -46,8 +46,6 @@ namespace Alis.Reactive.WireTerms
 
         public Path Path => _path;
 
-        // A model member's field: the MVC name text, and the body path read from the member's types.
-        // Equality stays the name alone: one MVC name is one field.
         internal static BindingPath ForMember(string mvcName, Path bodyPath) => new BindingPath(mvcName, bodyPath);
     }
 

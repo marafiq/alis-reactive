@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Members;
 
-/// <summary>
-/// What a declaration names, written into a page as text: a field reads as the name the component's
-/// JavaScript gives it, and a vendor as its name.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageWritesWhatADeclarationNames : AppPageTest
 {

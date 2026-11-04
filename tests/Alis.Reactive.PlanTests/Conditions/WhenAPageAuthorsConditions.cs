@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.PlanTests.Conditions;
 
-/// <summary>A condition guards a branch; arms run in authored order and the first match wins.</summary>
 [TestFixture]
 public class WhenAPageAuthorsConditions
 {

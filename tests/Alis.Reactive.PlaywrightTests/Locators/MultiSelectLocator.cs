@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Selects through the popup and blurs because Syncfusion MultiSelect raises <c>change</c> on blur.
-/// </summary>
 public sealed class MultiSelectLocator
 {
     private readonly IPage _page;
@@ -16,10 +13,8 @@ public sealed class MultiSelectLocator
         _componentId = componentId;
     }
 
-    /// <summary>Inner wrapper; clicking the outer input group can miss Syncfusion's handler.</summary>
     public ILocator Wrapper => _page.Locator($"#{_componentId}").Locator("xpath=ancestor::div[contains(@class,'e-multi-select-wrapper')]");
 
-    /// <summary>Popup uses the property-name suffix, for example <c>DietaryRestrictions_popup</c>.</summary>
     public ILocator Popup => _page.Locator($"#{_componentId.Split("__").Last()}_popup");
 
     public ILocator PopupItems => Popup.Locator(".e-list-item");
@@ -33,7 +28,6 @@ public sealed class MultiSelectLocator
         await Popup.WaitForAsync(new() { State = WaitForSelectorState.Visible, Timeout = 5000 });
     }
 
-    /// <summary>Selects one item and blurs so Syncfusion raises <c>change</c>.</summary>
     public async Task SelectItem(string itemText)
     {
         await Open();
@@ -42,7 +36,6 @@ public sealed class MultiSelectLocator
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
     }
 
-    /// <summary>Selects multiple items, reopening after each Box-mode popup close, then blurs.</summary>
     public async Task SelectItems(params string[] itemTexts)
     {
         foreach (var text in itemTexts)
@@ -54,7 +47,6 @@ public sealed class MultiSelectLocator
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
     }
 
-    /// <summary>Removes a chosen item with its chip's close icon, then blurs.</summary>
     public async Task RemoveItem(string itemText)
     {
         await Wrapper.Locator(".e-chips").Filter(new() { HasText = itemText }).Locator(".e-chips-close").ClickAsync();

@@ -1,15 +1,3 @@
-// alis.slot (grammar.md 6.5), keyed by the container element's id, which is looked up at every call so
-// a slot can sit inside content that appears after boot.
-// S1 load(html), in order: take the plan scripts out of the HTML; raise alis:unmount on the old
-//    content, which releases the owners of the slots inside it, innermost first, and the slot's own;
-//    replace it; re-create the inserted <script> nodes in document order so vendor scripts run; raise
-//    alis:mount; start a new owner with the plans found. HTML with no plan only unloads.
-// S2 unload() raises alis:unmount on the content, releasing the same owners, and empties the slot.
-// S3 Wired HTML that anything else removes (a drawer closing on content a plan loaded into it) is
-//    announced the same way, alis:unmount on its root, and the owners inside it are released alike.
-// Content the server rendered inside a slot's container starts under the slot's owner at boot
-// (slotOwner, grammar.md 3.5), so the slot's first load or unload releases it like loaded content.
-
 import type { Plugin } from "../objects/plugins";
 import { Owner } from "../objects/owner";
 import { discoverPlans } from "../plans/discover";
@@ -88,8 +76,6 @@ function listenForUnmounts(): void {
   document.addEventListener(UNMOUNT_EVENT, event => releaseWithin((event as CustomEvent<MountEventDetail>).detail.root));
 }
 
-// Scripts inserted through innerHTML do not run. Re-creating each one in document order runs it the
-// way the browser runs a parsed page, for any vendor's initialization script.
 function runInsertedScripts(root: HTMLElement): void {
   for (const original of Array.from(root.querySelectorAll("script"))) {
     const replacement = document.createElement("script");

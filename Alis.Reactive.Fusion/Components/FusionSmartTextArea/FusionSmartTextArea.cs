@@ -30,7 +30,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionSmartTextAreaChangeArgs> Change =>
             Event<FusionSmartTextAreaChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised before a suggestion is inserted.</summary>
@@ -138,8 +137,6 @@ namespace Alis.Reactive.Fusion
             return writer.ToString();
         }
 
-        // The options the framework's smart-text-area code (constructed on alis:mount, like an app's
-        // widget) hands to Syncfusion; a suggestion endpoint becomes the handler that asks it.
         private static string ConstructionOptions(FusionSmartTextAreaOptions options)
         {
             var payload = new

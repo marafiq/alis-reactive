@@ -11,13 +11,6 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Alis.Reactive.Analyzers.SliceTree
 {
-    /// <summary>
-    /// ADR-0004 in every build of a package that carries a <c>SliceTree.txt</c>: a package is an inverted tree of
-    /// concept slices, one per folder, each using only the slices in rows below it (ALIS010); a file that declares a
-    /// public type has the package namespace and any other file's namespace is its folder (ALIS011); a public class
-    /// that nothing in the package derives from is sealed (ALIS012); the table and the package's folders agree
-    /// (ALIS013). The package root is the table's directory. A shipped package without a table is ALIS013 too.
-    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class SliceTreeAnalyzer : DiagnosticAnalyzer
     {
@@ -133,8 +126,6 @@ namespace Alis.Reactive.Analyzers.SliceTree
             return slash < 0 ? "" : normalized.Substring(0, slash + 1);
         }
 
-        // The folder of a file under the root, "" for a root file; null for a file elsewhere (a generated tree, a
-        // linked file) or under bin/ and obj/.
         private static string? FolderOf(string root, string filePath)
         {
             var path = filePath.Replace('\\', '/');
@@ -145,8 +136,6 @@ namespace Alis.Reactive.Analyzers.SliceTree
             return slash < 0 ? "" : relative.Substring(0, slash);
         }
 
-        // One compilation's immutable facts: the table, each file's folder and slice, and the base types of the
-        // package, read once on first use. Every action reads them and reports; nothing is written after construction.
         private sealed class Run
         {
             private readonly Compilation compilation;

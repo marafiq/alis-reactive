@@ -4,12 +4,6 @@ using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.Components
 {
-    /// <summary>
-    /// A member of an object, read when the step runs: the object is located then, and the member is the
-    /// path into it. An empty path reads the object itself, such as a response body that is the array a
-    /// grid binds.
-    /// </summary>
-    /// <typeparam name="TProp">The C# type of the member.</typeparam>
     internal sealed class MemberRead<TProp> : TypedSource<TProp>
     {
         private readonly Func<Target> _locate;

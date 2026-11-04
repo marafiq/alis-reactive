@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 
-/// <summary>
-/// One retry offer for every connection the server closed for good, a hub and a stream on one page: one click
-/// takes the offer and retries each of them, and a connection whose retry fails is offered again while the
-/// others come back. The server numbers the calls it takes on each. The board is closed first, so the offer it
-/// shows proves the board closed before the line is hung up.
-/// </summary>
 [TestFixture]
 public sealed class WhenSeveralConnectionsDrop : AppPageTest
 {

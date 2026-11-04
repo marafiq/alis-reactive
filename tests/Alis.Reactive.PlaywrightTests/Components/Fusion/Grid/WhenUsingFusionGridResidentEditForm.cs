@@ -1,21 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the admissions coordinator, I want to correct a resident's care level, primary nurse and next care
-/// review in their record, and admit the next referral by completing their admission form, so that each
-/// resident's record says who cares for them and when they are reviewed, from the day they move in.
-/// </summary>
-/// <remarks>
-/// The residents, by name: Amina Patel, Grace Bennett, Henry Liu (Assisted Living, Elena Ruiz, next review
-/// October 16), Ruth Carter and Walter Grant. The nurses on staff are Nora Ellis and Malik Stone (days), Elena
-/// Ruiz (evenings) and Owen Park (nights); the nurse's editor lists each with their shift and saves the name.
-/// Waiting to move in, the next first: Rosa Diaz (moving in Monday, October 19, Moderate risk, 2 open tasks,
-/// first review October 26), Oscar Flynn and Vera Lindqvist. A first care review falls within two weeks of
-/// moving in. The server keeps nothing: every page starts from the records on file.
-/// Not exercised:
-/// ActionComplete's Name, Type, Action, PreviousData, RowIndex, SelectedRow and Cancel: the page sends the
-/// saved row, told apart by RequestType; WhenUsingFusionGridEditing reads Action and PreviousData.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridResidentEditForm : PlaywrightTestBase
 {
@@ -23,7 +7,6 @@ public class WhenUsingFusionGridResidentEditForm : PlaywrightTestBase
     private const string ResidentsId = "desk-residents";
     private const string ReferralsId = "desk-referrals";
 
-    // The grids number their columns from 1, counting the hidden ID column.
     private const int ResidentColumn = 2;
     private const int CareLevelColumn = 4;
     private const int NurseColumn = 5;
@@ -54,7 +37,6 @@ public class WhenUsingFusionGridResidentEditForm : PlaywrightTestBase
         await Expect(Referrals.Rows).ToHaveCountAsync(3, new() { Timeout = 10000 });
     }
 
-    // A click on Henry's name selects his row; Correct Record opens the selected row's editors.
     private async Task CorrectHenrysRecord()
     {
         await Residents.Cell("Henry Liu", ResidentColumn).ClickAsync();
@@ -82,7 +64,6 @@ public class WhenUsingFusionGridResidentEditForm : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Lists that opened on their first option would change Henry's care level and nurse when left untouched.
     [Test]
     public async Task correcting_a_record_opens_its_editors_on_what_the_record_holds()
     {
@@ -133,7 +114,6 @@ public class WhenUsingFusionGridResidentEditForm : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Rosa Diaz moves in first, so the form opens on her referral; her risk list opens on her moderate risk.
     [Test]
     public async Task admitting_the_next_referral_opens_the_admission_form_on_that_referral()
     {
@@ -151,7 +131,6 @@ public class WhenUsingFusionGridResidentEditForm : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The coordinator writes Rosa's full name as it is on her residency agreement.
     [Test]
     public async Task an_admission_completed_on_the_form_admits_the_resident()
     {

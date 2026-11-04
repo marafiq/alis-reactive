@@ -4,17 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Grammar
 {
-    /// <summary>
-    /// A statement of the plan's grammar (grammar.md 1.2). Six productions. Only <c>do</c> and
-    /// <c>let</c> await, and only when their call is to an async member.
-    /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<Statement>))]
     internal abstract class Statement
     {
         private protected Statement() { }
     }
 
-    /// <summary><c>set(target, path, value)</c>: writes a member; the value is converted where it is read (<c>as</c>).</summary>
     internal sealed class SetStatement : Statement
     {
         internal SetStatement(Expr target, IReadOnlyList<string> path, Expr value)
@@ -31,7 +26,6 @@ namespace Alis.Reactive.Grammar
         public Expr Value { get; }
     }
 
-    /// <summary><c>do(expr, await)</c>: evaluates an expression for its effect.</summary>
     internal sealed class DoStatement : Statement
     {
         internal DoStatement(Expr expr, bool awaits)
@@ -45,7 +39,6 @@ namespace Alis.Reactive.Grammar
         public bool Await { get; }
     }
 
-    /// <summary><c>let(name, expr, await)</c>: binds a value for the rest of the block.</summary>
     internal sealed class LetStatement : Statement
     {
         internal LetStatement(string name, Expr expr, bool awaits)
@@ -62,7 +55,6 @@ namespace Alis.Reactive.Grammar
         public bool Await { get; }
     }
 
-    /// <summary><c>if(arms, else)</c>: runs the first arm whose condition is truthy, else the else block.</summary>
     internal sealed class IfStatement : Statement
     {
         internal IfStatement(IReadOnlyList<Arm> arms, IReadOnlyList<Statement> otherwise)
@@ -77,7 +69,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<Statement> Else { get; }
     }
 
-    /// <summary>An arm of an <c>if</c>: a condition and the block it guards.</summary>
     internal sealed class Arm
     {
         internal Arm(Expr when, IReadOnlyList<Statement> then)
@@ -90,7 +81,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<Statement> Then { get; }
     }
 
-    /// <summary><c>all(blocks)</c>: starts every block, then waits until all have settled.</summary>
     internal sealed class AllStatement : Statement
     {
         internal AllStatement(IReadOnlyList<IReadOnlyList<Statement>> blocks)
@@ -102,7 +92,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<IReadOnlyList<Statement>> Blocks { get; }
     }
 
-    /// <summary><c>try(body, finally)</c>: runs the finally block on every exit from the body.</summary>
     internal sealed class TryStatement : Statement
     {
         internal TryStatement(IReadOnlyList<Statement> body, IReadOnlyList<Statement> cleanup)

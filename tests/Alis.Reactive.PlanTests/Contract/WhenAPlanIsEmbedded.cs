@@ -4,11 +4,6 @@ using Json.Schema;
 
 namespace Alis.Reactive.PlanTests.Contract;
 
-/// <summary>
-/// Every plan a page carries conforms to the schema the generator writes from the grammar
-/// (Alis.Reactive.Assets/runtime/types/plan.schema.json). The goldens are the plans the tests wrote, so each
-/// one on disk is checked, whichever test wrote it.
-/// </summary>
 [TestFixture]
 public class WhenAPlanIsEmbedded
 {
@@ -30,7 +25,6 @@ public class WhenAPlanIsEmbedded
             .Select(path => Path.GetRelativePath(Golden.Root, path))
             .OrderBy(path => path, StringComparer.Ordinal);
 
-    // Details are absent only under the flag output format; the evaluation asks for the list.
     private static string Errors(EvaluationResults result) =>
         string.Join("\n", (result.Details ?? [])
             .Where(detail => detail.Errors != null)

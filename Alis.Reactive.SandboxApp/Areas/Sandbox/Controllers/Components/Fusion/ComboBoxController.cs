@@ -3,15 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The Maple wing's 08:00 medication pass: the page that picks the resident, the chart it shows, and the
-    /// record of the medications given.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/FusionComboBox")]
     public sealed class ComboBoxController : Controller
     {
-        // The round, in the order the nurse walks it, with each resident's chart.
         private static readonly IReadOnlyList<ChartedResident> Round =
         [
             new("R-1031", "Bell, Arthur", "Maple 202", "No known allergies"),

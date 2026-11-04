@@ -4,11 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Validation.PetPolicy;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.PetPolicy;
 
-/// <summary>
-/// As the developer of the pet policy page, I want a condition only the server can read declared so and
-/// kept with the server, and the same condition refused as the page renders when it is not declared, so
-/// that no rule changes sides in silence.
-/// </summary>
 [TestFixture]
 public class WhenThePetPolicyIsDecidedByTheServer : PlaywrightTestBase
 {

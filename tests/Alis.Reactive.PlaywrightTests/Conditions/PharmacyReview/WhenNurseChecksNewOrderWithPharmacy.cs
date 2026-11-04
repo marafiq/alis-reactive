@@ -3,23 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.PharmacyReview;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.PharmacyReview;
 
-/// <summary>
-/// As a charge nurse taking a physician's new medication order, I want the pharmacy's review to tell me
-/// whether to give the medication, hold it or stop it, and to page the physician only for a major
-/// interaction, so that no resident is given what the pharmacy flagged and no physician is paged for a
-/// safe order.
-/// </summary>
-/// <remarks>
-/// Riverside Pharmacy answers by resident and medication: Helen Park takes warfarin (aspirin is a major
-/// interaction, 7 of 10; furosemide is clear), Arthur Bell takes lisinopril (potassium chloride is a
-/// moderate interaction, 6 of 10; enalapril a duplicate, 8 of 10), Walter Cho takes digoxin
-/// (clarithromycin is a major interaction, 9 of 10, and his physician's pager is down), Rosa Diaz is
-/// allergic to penicillin (amoxicillin is refused, 409), and oxycodone is refused for anyone without a
-/// signed prescription (422). Choosing a resident shows what the pharmacy has on file for them, and typing
-/// a medication looks it up in the formulary, by generic or brand name. The MAR line is written after the
-/// pharmacy's answer and any physician page have finished, so once it shows its answer every other line is
-/// final; the tests read it first. Everything the page renders is exercised.
-/// </remarks>
 [TestFixture]
 public class WhenNurseChecksNewOrderWithPharmacy : PlaywrightTestBase
 {
@@ -62,7 +45,6 @@ public class WhenNurseChecksNewOrderWithPharmacy : PlaywrightTestBase
         await ClickWhenStable(CheckWithPharmacy);
     }
 
-    // Holds every request to the given address until the returned semaphore is released.
     private async Task<SemaphoreSlim> HoldRequests(string glob)
     {
         var released = new SemaphoreSlim(0);
@@ -90,7 +72,6 @@ public class WhenNurseChecksNewOrderWithPharmacy : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Six of ten is below a major interaction: the page decision needs both the interaction and its severity.
     [Test]
     public async Task a_moderate_interaction_holds_the_order_without_paging_the_physician()
     {
@@ -106,7 +87,6 @@ public class WhenNurseChecksNewOrderWithPharmacy : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Eight of ten, but a duplicate is not an interaction: no page.
     [Test]
     public async Task a_duplicate_therapy_holds_the_order_without_paging_the_physician()
     {
@@ -325,7 +305,6 @@ public class WhenNurseChecksNewOrderWithPharmacy : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Soma has four letters, the shortest name the page treats as a whole medication name.
     [Test]
     public async Task a_name_the_formulary_lacks_is_ordered_specially_and_shows_no_earlier_medication()
     {

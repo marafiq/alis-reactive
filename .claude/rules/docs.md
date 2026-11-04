@@ -13,7 +13,7 @@ Write from the developer's perspective. The developer reads docs to understand w
 
 - No "runtime" in dev-facing docs. Say "execute in the browser" not "the runtime merges/discovers/executes".
 - No internal type names in user docs: "descriptors", "entries", "CallReaction", "SetReaction", "SequenceReaction". Use "intent", "fluent builders", "reactions". Reserve internals for contributor docs.
-- No implementation details in summary/remarks: script tags, data attributes, hidden divs, THelper closure, HtmlEncoder belong in code comments, not XML docs.
+- No implementation details in summary/remarks: script tags, data attributes, hidden divs, THelper closure, HtmlEncoder stay out of XML docs.
 - "C# Fluent Builders" not "C# Modules" or "C# DSL". Framework users write fluent C# to express intent.
 - "boot" not "auto-boot". Do not leak implementation module names.
 - Avoid jargon; prefer the concrete ASP.NET terms developers already know: "view" and "partial view", not "parent/child". Say "owning view" if you must distinguish.
@@ -41,14 +41,16 @@ Cascade examples use real Gather pattern (`Alis.Reactive.SandboxApp/Areas/Sandbo
 
 ## XML docs
 
+An XML doc sits only on the public surface of a shipped package. Every word in a `<summary>`, `<remarks>`
+or `<param>` earns its place: concise, accurate, and written for the developer reading IntelliSense.
+
 1. `<summary>` = dev language always. `<remarks>` = can go deeper but frame as "what this means for you".
-2. Code comments (`//`) inside method bodies CAN speak internal language -- they target maintainers.
-3. Anti-patterns in remarks where relevant: "Omitting either call produces no reactive behavior."
-4. Do not document `this` param on single-param extensions. When other params exist, include `html` minimally to avoid CS1573.
-5. Code comments must be truthful. Research actual behavior before writing.
-6. No em-dashes in XML docs. Rider grammar linter flags them as redundant punctuation. Use colons or restructure.
-7. "Gets" voice for a property; framework class names, never a "Syncfusion" prefix (e.g., "FusionAutoComplete").
-8. A doc agent's brief names `.claude/rules/docs.md` first, before any setup.
+2. Anti-patterns in remarks where relevant: "Omitting either call produces no reactive behavior."
+3. Do not document `this` param on single-param extensions. When other params exist, include `html` minimally to avoid CS1573.
+4. An XML doc is true of the member it sits on: read the behavior before writing it.
+5. No em-dashes in XML docs. Rider grammar linter flags them as redundant punctuation. Use colons or restructure.
+6. "Gets" voice for a property; framework class names, never a "Syncfusion" prefix (e.g., "FusionAutoComplete").
+7. A doc agent's brief names `.claude/rules/docs.md` first, before any setup.
 
 ## Rule files
 

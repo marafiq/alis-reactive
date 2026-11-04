@@ -120,7 +120,6 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // With no address chosen the address rules do not apply, so the corrected form is saved.
     [Test]
     public async Task confirm_email_mismatch_shows_inline_error()
     {
@@ -191,8 +190,6 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Choosing the facility address unloads the address slot: its inputs leave the page with it, and Form()
-    // sends only the inputs on the page.
     [Test]
     public async Task address_fields_cleared_by_choosing_the_facility_address_are_not_saved()
     {
@@ -215,8 +212,6 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The address and the emergency contact are partials of the page's own plan, loaded into two slots;
-    // the inputs of both are the form's, and Submit sends them together.
     [Test]
     public async Task an_emergency_contact_loaded_beside_the_address_is_saved_with_it()
     {
@@ -239,7 +234,6 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Reloading the address replaces only the address slot: the emergency contact's inputs stay the form's.
     [Test]
     public async Task reloading_the_address_keeps_the_emergency_contact_loaded_beside_it()
     {

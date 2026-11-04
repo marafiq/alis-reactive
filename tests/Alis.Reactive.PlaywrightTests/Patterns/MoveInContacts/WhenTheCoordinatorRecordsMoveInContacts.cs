@@ -2,17 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInContacts;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.MoveInContacts;
 
-/// <summary>
-/// As the admissions coordinator, I want every contact I type on the move-in packet to reach the server
-/// under its own name, whether it is the resident's nested name, an emergency contact in the list or the
-/// next of kin on a card of its own, so that the packet the business office reads is the one I filled.
-/// </summary>
-/// <remarks>
-/// Each input's id is derived from the model member, so a test reaches it as the framework names it, and
-/// its label points at it. The list's rows are one partial rendered per item; the next of kin is a card
-/// of another model rendered under a field prefix, with a save of its own. The alternate page renders that
-/// card twice, under two prefixes, which the audit found collides on ids.
-/// </remarks>
 [TestFixture]
 public class WhenTheCoordinatorRecordsMoveInContacts : PlaywrightTestBase
 {
@@ -104,7 +93,6 @@ public class WhenTheCoordinatorRecordsMoveInContacts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Each row's Call button carries a plan of its own and names the contact in its own row.
     [Test]
     public async Task calling_a_contact_from_its_row_names_that_contact_alone()
     {
@@ -133,8 +121,6 @@ public class WhenTheCoordinatorRecordsMoveInContacts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The alternate page renders the contact card twice, under two prefixes. The server binds the alternate
-    // contact apart from the next of kin, by the names the alternate card's inputs carry.
     [Test]
     public async Task an_alternate_contact_is_saved_apart_from_the_next_of_kin()
     {
@@ -165,8 +151,6 @@ public class WhenTheCoordinatorRecordsMoveInContacts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The card's own rules resolve its inputs under its prefix: a blank name on the alternate card is refused on
-    // that card, before anything is sent, while the next of kin card beside it stays silent.
     [Test]
     public async Task a_blank_alternate_name_is_refused_on_its_own_card_before_it_is_sent()
     {

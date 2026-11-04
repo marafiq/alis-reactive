@@ -5,10 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Realtime;
 
-/// <summary>
-/// Server-sent news for one page's world, and the pushes that send it (capabilities of realtime); and the
-/// ward's line and board, which the server drops, ends, closes for good and takes back.
-/// </summary>
 public sealed class RealtimeController(LineExchange exchange) : Controller
 {
     private static readonly RoundStream Stream = new();
@@ -18,7 +14,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
 
     public IActionResult Round() => View(new RoundPage());
 
-    /// <summary>The line page; the server refuses its first calls to the line when asked to.</summary>
     public IActionResult Line([FromQuery] int refusals = 0, [FromQuery] bool offersRetry = true)
     {
         var page = new LinePage(offersRetry);
@@ -26,7 +21,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         return View(page);
     }
 
-    /// <summary>The ward page; the server refuses its first calls to the line when asked to.</summary>
     public IActionResult Ward([FromQuery] bool pageListens = false, [FromQuery] int refusals = 0)
     {
         var page = new WardPage(pageListens);
@@ -44,7 +38,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
 
     public IActionResult EventNamedByNoMember() => View();
 
-    /// <summary>The world's stream: its first news on connecting, then each push as it comes.</summary>
     [HttpGet("/Realtime/News")]
     public async Task News([FromQuery] string world, CancellationToken stopped)
     {
@@ -58,7 +51,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         }
         catch (OperationCanceledException)
         {
-            // The page closed the stream, or left.
         }
     }
 
@@ -80,7 +72,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         return Ok();
     }
 
-    /// <summary>The ward's board: a welcome on each call it takes, then each push, until the page leaves or the server ends it.</summary>
     [HttpGet("/Realtime/Board")]
     public async Task WardBoard([FromQuery] string world, CancellationToken stopped)
     {
@@ -95,7 +86,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         Response.ContentType = "text/event-stream";
         try
         {
-            // A browser calls a stream that ended again after the retry the stream names, in milliseconds.
             await Response.WriteAsync("retry: 100\n\n", call.Ended);
             await Write(Board.Welcome.Name, new { call = call.Number }, call.Ended);
             call.Answer();
@@ -104,7 +94,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         }
         catch (OperationCanceledException)
         {
-            // The page left, or the server ended the stream.
         }
     }
 
@@ -136,7 +125,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         return Ok();
     }
 
-    /// <summary>A bulletin, its data JSON or garbled, and then the all clear.</summary>
     [HttpPost("/Realtime/Board/Bulletin")]
     public IActionResult PushBulletin([FromQuery] string world, [FromQuery] bool garbled)
     {
@@ -146,7 +134,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         return Ok();
     }
 
-    /// <summary>How many of the page's line and board connections the server holds open, and how many calls to the line it refused, now and as they change.</summary>
     [HttpGet("/Realtime/Switchboard")]
     public async Task Lines([FromQuery] string world, CancellationToken stopped)
     {
@@ -160,7 +147,6 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         }
         catch (OperationCanceledException)
         {
-            // The page left.
         }
         finally
         {

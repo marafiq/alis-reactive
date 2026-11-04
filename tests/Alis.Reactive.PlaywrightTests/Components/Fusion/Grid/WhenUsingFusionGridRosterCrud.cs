@@ -2,31 +2,12 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the Cedar wing front desk, I want the roster to take on each admission, suite move and move-out the
-/// server accepts, in suite order and on the right resident's row, and to stay as it was when the server
-/// refuses, so that the roster the staff read always matches who lives in which suite.
-/// </summary>
-/// <remarks>
-/// The roster on file, in suite order: Agnes Whitfield 101, Bernard Okafor 104, Clara Jensen 108, Dennis Moreau
-/// 112, Eleanor Price 116 and Frank Delgado 120. Dennis Moreau and Frank Delgado move out today; Frank's final
-/// invoice is still open, so the server refuses his move-out. A suite move applies to the resident picked in
-/// the roster. The server answers each change; the roster adds the admitted resident at the row the server
-/// names (AddRecordAt), replaces the moved resident's row (UpdateRow at GetRowIndexByPrimaryKey), and selects
-/// the departed resident's row by key and deletes it (SelectRow, DeleteRecord).
-/// UpdateRow replaces the record whose primary key the new row carries (ej2-data JsonAdaptor.update); the
-/// index only has to name a row on the roster, so a wrong index that still names a row would go unseen here.
-/// Not exercised: AddRecord without an index, as every admission here names the row it takes
-/// (WhenUsingFusionGridResidentAdmissionAudit.moving_zara_in_adds_her_to_the_roster_and_names_the_change adds
-/// at the top).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridRosterCrud : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/RosterCrud";
     private const string RosterId = "cedar-roster";
 
-    // The grid numbers its columns from 1; the hidden ID is the first.
     private const int ResidentColumn = 2;
     private const int SuiteColumn = 3;
 
@@ -74,7 +55,6 @@ public class WhenUsingFusionGridRosterCrud : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Suite 110 falls between Clara Jensen's 108 and Dennis Moreau's 112.
     [Test]
     public async Task an_admitted_resident_joins_the_roster_in_suite_order()
     {

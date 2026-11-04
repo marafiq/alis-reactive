@@ -3,35 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the director of nursing, I want to narrow the care census by risk or care level, correct a resident's
-/// care in the grid, reassign, flag or discharge the residents I tick, admit a resident and work the high-risk
-/// watch list, so that every resident's risk, nurse and open care tasks are right on the board the care team
-/// works from.
-/// </summary>
-/// <remarks>
-/// The census holds 24 residents, ten to a page by name: Abigail Moore (Low risk, Nora Ellis, 1 open task)
-/// first and Esther Cole last on page one, 62 open care tasks in all. Four residents are at critical risk,
-/// seven in Memory Care, and five at high risk make the watch list, Amina Patel (Malik Stone, 6 open tasks)
-/// first. Beatrice Lane's review, October 15, is the soonest; eight residents are at low risk, Esther Cole among
-/// them. The chips choose one risk and one care level. Every request that answers with the board's rows reads the
-/// text of the chip each list has chosen: a chip, a sort, a page, a watch-list refresh, and each save,
-/// reassignment, flag, discharge and admission. A chip clicked again lets its choice go. The server answers every
-/// change with the first page of the residents the chips chose and a sentence that says what it did; a flag or
-/// discharge from the watch list reloads both the list and the census. The census lives in the browser's session,
-/// so every test starts from the census as filed.
-/// Not exercised:
-/// DataStateChange's Name, RequiresCounts, Group, Where, Search and Action: the board pages and sorts on the
-/// server; WhenUsingFusionGridCensus and WhenUsingFusionGridDirectory read the rest.
-/// The chip lists' SelectedChipIndex and SelectedChipValue, and the selected chip's Index and Data: the board asks
-/// for its residents by the chosen chip's text. The chips' click payload: the board reads the chips themselves;
-/// WhenUsingFusionChipList reads its Text and Selected.
-/// The care level and risk cell editors and the review day's date editor: the nurse's editor proves the
-/// typed select editor here; WhenUsingFusionGridResidentEditForm and WhenUsingFusionGridInlineEdit prove a
-/// select and a date editor saved.
-/// The page renders the discharge link's own plan before its own, so the admit form's fields are found by the
-/// ids their model members give them, not through PagePlan.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridCareOps : PlaywrightTestBase
 {
@@ -44,14 +15,12 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     private const string LowRiskResidents = "8 residents at Low risk: 6 open care tasks.";
     private const string SkilledNursingResidents = "6 Skilled Nursing residents: 24 open care tasks.";
 
-    // The grid numbers its columns from 1, the tick box first.
     private const int RiskColumn = 6;
     private const int NurseColumn = 7;
     private const int OpenTasksColumn = 8;
 
     private FusionGridLocator Board => new(Page, GridId);
     private ILocator Summary => Page.Locator("#careops-summary");
-    // The tick box the director sees; the grid hides the checkbox input itself behind it.
     private ILocator Tick(string resident) => Board.Row(resident).Locator(".e-checkbox-wrapper .e-frame");
     private ILocator NurseEditor => Page.Locator($"#{GridId} select[name='primaryNurse']");
     private ILocator OpenTasksEditor => Page.Locator($"#{GridId}openTasks");
@@ -80,7 +49,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     private ILocator ErrorFor(System.Linq.Expressions.Expression<Func<CareOpsViewModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}_error");
 
-    // Every discharge the page asks the server for, from the board or the watch list.
     private ConcurrentQueue<string> _dischargesSent = null!;
 
     private async Task NavigateAndBoot()
@@ -96,8 +64,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await Expect(WatchList).ToHaveCountAsync(5, new() { Timeout = 10000 });
     }
 
-    // Opens a resident's open-tasks cell and types over the count. The grid focuses its numeric editor a moment
-    // after showing it and rewrites "6.00" to "6"; a fill before then lands after the number.
     private async Task EditOpenTasks(string resident, string current, string value)
     {
         await Board.Cell(resident, OpenTasksColumn).DblClickAsync();
@@ -105,7 +71,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         await OpenTasksEditor.FillAsync(value);
     }
 
-    // Clicks a chip and waits for the board to answer with the residents the chips now choose.
     private async Task Choose(FusionChipListLocator chips, string chip, string board)
     {
         await ClickWhenStable(chips.Chip(chip));
@@ -159,7 +124,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Harold Chen is the one Memory Care resident at critical risk.
     [Test]
     public async Task the_critical_chip_keeps_to_the_memory_care_residents_already_chosen()
     {
@@ -251,8 +215,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Sorting asks the server for the board again, and the chosen chip goes with it: by open tasks, Mara Thompson's
-    // three come first and Harold Chen's six last.
     [Test]
     public async Task sorting_the_critical_residents_keeps_to_critical_risk()
     {
@@ -269,7 +231,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // By open tasks, Yara Ahmed's one comes first and Harold Chen's six last among the Memory Care residents.
     [Test]
     public async Task sorting_the_memory_care_residents_keeps_to_memory_care()
     {
@@ -285,7 +246,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A list that opened on its first nurse would reassign the resident when the cell is left untouched.
     [Test]
     public async Task the_nurse_editor_opens_on_the_residents_own_nurse()
     {
@@ -298,8 +258,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The nurse's editor is still open when Save Care Changes is clicked: the page saves the open cell into the
-    // pending changes before it sends them.
     [Test]
     public async Task a_nurse_chosen_in_the_cell_is_saved_while_the_cell_is_still_open()
     {
@@ -315,7 +273,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The cell checks the range ResidentCareItemValidator gives the browser as it is left.
     [Test]
     public async Task more_than_seven_open_tasks_are_refused_in_the_cell()
     {
@@ -328,8 +285,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Only a critical-risk resident must keep an open task. A grid column's rule holds for every row, so that rule
-    // is not the cell's: Amina Patel, at high risk, can be left with none.
     [Test]
     public async Task a_resident_who_is_not_critical_can_be_left_with_no_open_tasks()
     {
@@ -344,7 +299,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Amina Patel, Bilal Khan and Priya Shah are the Memory Care residents at high risk.
     [Test]
     public async Task saved_care_changes_come_back_on_the_board_the_chips_chose()
     {
@@ -362,7 +316,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The cell lets the edit through; the server checks the critical-risk rule and keeps the census as filed.
     [Test]
     public async Task a_critical_resident_left_with_no_open_tasks_is_refused_when_the_changes_are_saved()
     {
@@ -392,7 +345,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Beatrice Lane, Clara Hoffman and Mara Thompson are the Skilled Nursing residents at critical risk.
     [Test]
     public async Task a_reassigned_resident_comes_back_on_the_board_the_chips_chose()
     {
@@ -434,7 +386,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Esther Cole, Leo Simmons and Ruth Carter are the Assisted Living residents at low risk.
     [Test]
     public async Task a_resident_flagged_critical_leaves_a_board_kept_to_low_risk()
     {
@@ -485,7 +436,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The low-risk chip asks the server again after the answer: a discharge sent on Cancel would come first.
     [Test]
     public async Task cancelling_the_discharge_keeps_the_ticked_resident_on_the_census()
     {
@@ -503,8 +453,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The flag raises one refresh event, and the page has two listeners for it: one reloads the watch list,
-    // the other the census.
     [Test]
     public async Task a_watched_resident_flagged_critical_leaves_the_watch_list_and_shows_critical_on_the_board()
     {
@@ -533,7 +481,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Flagging Amina Patel reloads the watch list after the answer: a discharge sent on Cancel would come first.
     [Test]
     public async Task cancelling_a_watched_residents_discharge_keeps_them_on_the_watch_list()
     {
@@ -569,7 +516,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Agnes Whitlock files second by name, so she shows on the board's first page.
     [Test]
     public async Task an_admitted_resident_joins_the_census_with_the_night_float_team()
     {
@@ -592,7 +538,6 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Agnes Whitlock files first by name among the Memory Care residents at high risk.
     [Test]
     public async Task an_admitted_resident_joins_the_board_the_chips_chose()
     {

@@ -11,7 +11,6 @@
 
     <p>The name read back: <span id="name-read-back"></span></p>
 
-    @* The line reads its own member as MVC binds it: the name under the line's prefix. *@
     @(plan.Button("read-name-back", "Read the name back")
         .Reactive(button => button.Click, p => p.When(p.Bound(m => m.Name)).IsNull()
             .Then(none => none.Element("name-read-back").Text.Set("no name"))

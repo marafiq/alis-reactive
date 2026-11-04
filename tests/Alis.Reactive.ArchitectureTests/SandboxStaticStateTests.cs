@@ -5,23 +5,11 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
 
-/// <summary>
-/// Isolation clause 3 made mechanical (.claude/rules/tests.md, Nested
-/// vertical slices): a journey's data is unreachable from other journeys and
-/// other worlds. A static store in the sandbox is process-global — every
-/// browser world sees the same instance, so parallel tests collide.
-/// Readonly seed lists are fine; stores are not.
-/// </summary>
 [TestFixture]
 public class SandboxStaticStateTests
 {
-    // The only registry of exceptions: keyed stores whose key already isolates
-    // (per flow id or per world). New statics get a per-world mechanism (the Grid
-    // Billing session store is the exemplar), not an allowlist entry.
     private static readonly string[] Allowlist =
     [
-        // -- Keyed per drill world: each drill world reads its own key, so worlds
-        //    do not collide. Migrate to session stores as touched.
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.RealTimeController.DrillWorlds",
         "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.DrillConnections",
         "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.BrokenDrills",
@@ -56,8 +44,6 @@ public class SandboxStaticStateTests
             + string.Join("\n", stale));
     }
 
-    // Every static field of every type the sandbox declares (its controllers, models, hubs and brought
-    // components alike), and the field behind each static auto-property, named as the property.
     private static IEnumerable<(FieldInfo Field, string FullName)> SandboxStaticFields()
     {
         var assembly = Assembly.Load("Alis.Reactive.SandboxApp");
@@ -83,14 +69,11 @@ public class SandboxStaticStateTests
         }
     }
 
-    // "<Shifts>k__BackingField" is the field behind the auto-property Shifts.
     private static string? AutoPropertyName(FieldInfo field) =>
         field.Name.StartsWith('<') && field.Name.EndsWith(">k__BackingField", StringComparison.Ordinal)
             ? field.Name[1..field.Name.IndexOf('>')]
             : null;
 
-    // Keyed lookups are stores: their content mutates per key across worlds,
-    // readonly or not.
     private static bool IsStoreShaped(Type type) =>
         typeof(IDictionary).IsAssignableFrom(type)
         || type.Namespace == "System.Collections.Concurrent"

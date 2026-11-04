@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The activities office's outing planner: where the bus can go and what each destination suits, whom
-    /// the trip's tags invite, who rides with the lift, and the post to the activities calendar.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/ChipList")]
     public sealed class ChipListController : Controller
@@ -27,7 +23,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new("history-museum", "History Museum", ["history", "art"], DayOfWeek.Tuesday)
         ];
 
-        // Who enjoys what, as the residents told the activities office.
         private static readonly IReadOnlyList<Enthusiast> Residents =
         [
             new("Ava Stone", ["gardening", "walking"]),
@@ -93,7 +88,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static Place? FindDestination(string? id) =>
             Places.FirstOrDefault(destination => destination.Id == id);
 
-        // "a", "a and b", "a, b and c".
         private static string Sentence(IEnumerable<string> items)
         {
             var list = items.ToArray();

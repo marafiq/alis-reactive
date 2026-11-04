@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Events;
 
-/// <summary>
-/// The events a component raises, heard by a page's pipelines: without a payload (E1), with payload members
-/// read (E2), written back before the component reads them (E3), and called (E4), and a nested object's
-/// event (E5). Every event here is the slate's own: raised by its buttons or by what a method made it do.
-/// </summary>
 [TestFixture]
 public sealed class WhenAComponentRaisesEvents : AppPageTest
 {

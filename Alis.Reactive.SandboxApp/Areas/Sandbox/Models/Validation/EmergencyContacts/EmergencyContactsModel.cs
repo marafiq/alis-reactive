@@ -1,6 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>A resident's intake: whether they have emergency contacts, and each contact's details.</summary>
     public class EmergencyContactsModel
     {
         public string? ResidentName { get; set; }
@@ -14,6 +13,5 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? Phone { get; set; }
     }
 
-    /// <summary>The intake confirmation the server returns once the contacts are saved.</summary>
     public sealed record EmergencyContactsConfirmation(string Confirmation);
 }

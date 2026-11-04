@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.BedAssignment;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 
-/// <summary>
-/// Bed assignment: the wings come with the page; the rooms of a wing with an open bed, and the open beds of
-/// a room, come from the server as the coordinator chooses; the assignment is confirmed by the server.
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Patterns/BedAssignment")]
 public class BedAssignmentController : Controller
@@ -15,7 +11,6 @@ public class BedAssignmentController : Controller
 
     private static readonly BedWing[] Wings = [new("maple", "Maple"), new("oak", "Oak"), new("cedar", "Cedar")];
 
-    // Wing, room, and the room's open beds by their letters.
     private static readonly (string Wing, string Room, string[] Beds)[] OpenRooms =
     [
         ("maple", "112", ["A", "B"]),
@@ -30,7 +25,6 @@ public class BedAssignmentController : Controller
     public IActionResult Index() =>
         View("~/Areas/Sandbox/Views/Patterns/BedAssignment/Index.cshtml", new BedAssignmentModel { Wings = Wings });
 
-    // "Oak has 3 rooms with an open bed."
     [HttpGet("Rooms")]
     public IActionResult Rooms([FromQuery] WingRoomsQuery query)
     {
@@ -42,7 +36,6 @@ public class BedAssignmentController : Controller
         return Ok(new WingRooms(rooms, summary));
     }
 
-    // "Room 207 has 2 open beds."
     [HttpGet("Beds")]
     public IActionResult Beds([FromQuery] RoomBedsQuery query)
     {
@@ -53,7 +46,6 @@ public class BedAssignmentController : Controller
         return Ok(new RoomBeds(beds, summary));
     }
 
-    // "Margaret Thompson is assigned bed 207-B in room 207, Oak wing."
     [HttpPost("Assign")]
     public IActionResult Assign([FromBody] BedAssignmentModel? assignment)
     {
@@ -72,7 +64,6 @@ public class BedAssignmentController : Controller
     private static IEnumerable<string> BedsOf(string? wing, string? room) =>
         OpenRooms.Where(open => open.Wing == wing && open.Room == room).SelectMany(open => open.Beds.Select(letter => $"{open.Room}-{letter}"));
 
-    // Bed A of each room is by the window, bed B by the door.
     private static string BedName(string code) =>
         code.EndsWith("-A", StringComparison.Ordinal) ? $"Bed {code}, by the window" : $"Bed {code}, by the door";
 

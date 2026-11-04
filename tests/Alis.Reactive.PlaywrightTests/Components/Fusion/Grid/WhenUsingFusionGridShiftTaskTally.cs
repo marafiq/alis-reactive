@@ -1,32 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the evening charge nurse on Maple wing, I want to update each resident's open tasks and PRN doses at shift
-/// change in one tally, have a count no shift could carry refused as I leave the cell, and have the tally wait
-/// for the night supervisor when it leaves a resident with ten or more open tasks, so that the night nurse
-/// starts from an accurate tally that a supervisor has seen when it is heavy.
-/// </summary>
-/// <remarks>
-/// The tally starts from Amina Patel (2 open tasks, 0 PRN doses), Grace Bennett (3, 1), Henry Liu (6, 0) and
-/// Irene Morgan (4, 2). Start tally opens Amina's open tasks; Review tally lists the pending changes, the cell
-/// still open included; Send to the night shift sends them once nothing holds the tally. The eMAR sync brings
-/// in the open tasks the evening medication pass left Grace with.
-/// Not exercised:
-/// CloseEdit, which would discard the tally: the page offers no discard; the Maple wing roster
-/// (WhenUsingFusionGridEditing) proves CloseEdit.
-/// ActionComplete after a sent tally: the roster pages read ActionComplete; this page reads what the server sent.
-/// CellSave's and BeforeBatchSave's Cancel as a value read: the page writes it, and EJ2 reads it back
-/// (batch-edit.js:340, 991).
-/// The pending changes' AddedRecords and DeletedRecords: the tally adds and removes no residents, so both
-/// arrive empty (batch-edit.js:347-372).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridShiftTaskTally : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/ShiftTaskTally";
     private const string TallyId = "shift-tally-grid";
 
-    // The tally numbers its columns from 1.
     private const int OpenTasksColumn = 4;
     private const int PrnDosesColumn = 5;
 
@@ -51,7 +30,6 @@ public class WhenUsingFusionGridShiftTaskTally : PlaywrightTestBase
         await Expect(Rows).ToHaveCountAsync(4, new() { Timeout = 10000 });
     }
 
-    // Starts the tally and writes over Amina Patel's open tasks, leaving her cell open.
     private async Task CountAminasOpenTasks(string count)
     {
         await ClickWhenStable(StartTally);
@@ -152,7 +130,6 @@ public class WhenUsingFusionGridShiftTaskTally : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The tally stays pending: a review after the hold still lists the count.
     [Test]
     public async Task a_tally_leaving_a_resident_ten_or_more_tasks_waits_for_the_night_supervisor()
     {

@@ -31,9 +31,6 @@ public sealed class NumericTextBoxLocator
 
     public async Task Blur() => await Input.PressAsync("Tab");
 
-    /// <summary>
-    /// Fills a value and blurs because Syncfusion commits change events on focus loss.
-    /// </summary>
     public async Task FillAndBlur(string value)
     {
         await Fill(value);

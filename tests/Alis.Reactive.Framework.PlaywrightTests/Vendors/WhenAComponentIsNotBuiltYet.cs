@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Vendors;
 
-/// <summary>
-/// A component whose element is on the page but whose object its script has not built: the handler of its
-/// event fails to listen and stops no other handler from listening, an input of one cannot announce its commits
-/// and stops no handler from listening (M4), and a step that reaches it fails only its own pipeline (the step
-/// before it ran, the step after it did not, and the next gesture works).
-/// </summary>
 [TestFixture]
 public sealed class WhenAComponentIsNotBuiltYet : AppPageTest
 {

@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Syncfusion AutoComplete uses <c>#{componentId}</c> input and <c>#{componentId}_popup</c> popup IDs.
-/// </summary>
 public sealed class AutoCompleteLocator
 {
     private readonly IPage _page;
@@ -24,9 +21,6 @@ public sealed class AutoCompleteLocator
 
     public ILocator PopupItem(string text) => PopupItems.GetByText(text, new() { Exact = true });
 
-    /// <summary>
-    /// Uses sequential key presses because Syncfusion filtering ignores FillAsync.
-    /// </summary>
     public async Task Type(string text, int delayMs = 50)
     {
         await Input.ClickWhenStableAsync(_page);

@@ -1,26 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the resident services coordinator, I want the roster to come from the resident record and to bring today's
-/// changes in the record onto it (an arrival, a new care level, an approved suite move), and to look at another
-/// wing's roster, so that the roster the staff read always matches the record.
-/// </summary>
-/// <remarks>
-/// The roster opens on Cedar wing as the record lists it, by suite: Amina Patel (101), Henry Liu (104), Grace
-/// Bennett (108), Walter Grant (112) and Edith Hale (115). Today Rosa Diaz moves into suite 106, Henry Liu's care
-/// level becomes Skilled Nursing after his hospital stay, and Grace Bennett's move to suite 118 is approved. Each
-/// change comes from the server, which answers from the record; Birch wing lists Jonah Reed, Priya Shah, Ruth Carter
-/// and Samuel Diaz.
-/// UpdateRow's index only finds the row on screen: EJ2 saves the row by its primary key (normal-edit.js:250-269,
-/// data.js:485), so the index is proven by the row changing at all, not by which row changes.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridServerRoster : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/ServerRoster";
     private const string RosterId = "record-roster";
 
-    // The roster numbers its columns from 1.
     private const int SuiteColumn = 3;
     private const int CareLevelColumn = 4;
 

@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The night nurse's shift handoff note for Margaret Hale: her care team, who the note can notify, and the
-    /// nurses on the day shift, who she can be handed to.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Mention")]
     public class MentionController : Controller

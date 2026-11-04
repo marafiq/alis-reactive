@@ -1,17 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As the charge aide running a fire drill, I want one button that starts and ends the drill and says
-/// which it will do, and a missing resident to put the call to the charge nurse one key press away, so
-/// that the wing is cleared in order and no resident is left behind.
-/// </summary>
-/// <remarks>
-/// The drill button reads its own text to know whether the drill is under way and rewrites it
-/// (<c>TextContent</c> read and written, on its <c>Click</c>). Reporting a missing resident raises the
-/// page's resident-missing event; the alert it opens moves the cursor to the call button (<c>Focus</c>), so
-/// Enter calls the charge nurse, and the call button confirms the call in its own text. The click payload
-/// carries no data, so there is nothing of it to show.
-/// </remarks>
 [TestFixture]
 public class WhenChargeAideRunsFireDrill : PlaywrightTestBase
 {

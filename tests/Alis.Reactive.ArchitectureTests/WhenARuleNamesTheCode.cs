@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Text;
 using System.Text.Json;
@@ -11,19 +10,10 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
 
-/// <summary>
-/// The rules Claude reads (every CLAUDE.md and the files under .claude/rules and .claude/agents) name the code they
-/// describe: paths and their sections, names the code uses, text the code writes, members quoted from a declaration,
-/// the options a script reads. A refactor that moves or renames any of them fails here with the rule file, its line
-/// and what it cites, so a rule never outlives the code it describes. The code is what git tracks, C# read through
-/// Roslyn and TypeScript and JavaScript through the repo's TypeScript compiler, comments and docs left out; a worktree
-/// under the root is another checkout and never answers for it.
-/// </summary>
 [TestFixture]
 public class WhenARuleNamesTheCode
 {
     private const string ThisFile = "tests/Alis.Reactive.ArchitectureTests/" + nameof(WhenARuleNamesTheCode) + ".cs";
-    private const string ScriptReader = "tests/Alis.Reactive.ArchitectureTests/read-scripts.mjs";
 
     private static readonly string[] Branches = ["origin/main", "feature/", "feature/<name>", "fix/", "chore/"];
     private static readonly string[] OutsideWhatGitTracks = [".worktrees/<name>", "tests/TestResults/framework-coverage/<stamp>/report.md"];
@@ -188,7 +178,6 @@ public class WhenARuleNamesTheCode
         var unparsed = new List<string>();
         var source = new StringBuilder();
 
-        var scripts = new List<string>();
         foreach (var file in Repository.TrackedFiles.Where(file => file != ThisFile))
         {
             foreach (var segment in file.Split('/'))
@@ -199,11 +188,7 @@ public class WhenARuleNamesTheCode
 
             var extension = Path.GetExtension(file);
             if (!SourceExtensions.Contains(extension) || Path.GetFileName(file) == "package-lock.json") continue;
-            if (extension is ".ts" or ".mjs" or ".js")
-            {
-                scripts.Add(file);
-                continue;
-            }
+            if (extension is ".ts" or ".mjs" or ".js") continue;
 
             var text = File.ReadAllText(Path.Combine(Repository.Root, file));
             if (extension != ".cs")
@@ -239,9 +224,8 @@ public class WhenARuleNamesTheCode
             throw new InvalidOperationException("The guard reads the code through Roslyn and could not parse it, so a name in it would go unseen:\n"
                                                 + string.Join("\n", unparsed));
 
-        using var read = ReadScripts(scripts);
-        foreach (var identifier in read.RootElement.GetProperty("identifiers").EnumerateArray()) names.Add(identifier.GetString()!);
-        foreach (var code in read.RootElement.GetProperty("code").EnumerateArray()) source.Append(code.GetString()).Append('\0');
+        names.UnionWith(Scripts.Tracked.Identifiers);
+        foreach (var code in Scripts.Tracked.Code) source.Append(code).Append('\0');
         return new CodeIndex(names, members, source.ToString());
     }
 
@@ -262,27 +246,6 @@ public class WhenARuleNamesTheCode
             foreach (var piece in trivia.Where(piece => piece.IsKind(SyntaxKind.WhitespaceTrivia) || piece.IsKind(SyntaxKind.EndOfLineTrivia)))
                 code.Append(piece.ToFullString());
         }
-    }
-
-    private static JsonDocument ReadScripts(IEnumerable<string> files)
-    {
-        var start = new ProcessStartInfo("node", [Path.Combine(Repository.Root, ScriptReader)])
-        {
-            WorkingDirectory = Repository.Root,
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-        };
-        using var node = Process.Start(start) ?? throw new InvalidOperationException("node could not be started to read " + ScriptReader);
-        var output = node.StandardOutput.ReadToEndAsync();
-        var errors = node.StandardError.ReadToEndAsync();
-        node.StandardInput.Write(string.Join('\n', files.Select(file => Path.Combine(Repository.Root, file))));
-        node.StandardInput.Close();
-        node.WaitForExit();
-        if (node.ExitCode != 0)
-            throw new InvalidOperationException($"{ScriptReader} exited with {node.ExitCode}, so no TypeScript or JavaScript name was read: {errors.Result}");
-        return JsonDocument.Parse(output.Result);
     }
 
     private static HashSet<string> ReadNpmScripts()

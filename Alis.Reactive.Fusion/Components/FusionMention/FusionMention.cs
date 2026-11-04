@@ -115,9 +115,6 @@ namespace Alis.Reactive.Fusion
             });
         }
 
-        // A Mention with a target turns its own element into the suggestion popup and renames it when the
-        // popup first opens, so the component's element is a hidden span: the framework's mention code
-        // (run on alis:mount, like an app's widget code) gives it the Mention's instance.
         private static string RenderBridge(string elementId, string hostId)
         {
             return "<span id=\"" + HtmlEncoder.Default.Encode(elementId) + "\" hidden data-alis-mention=\""

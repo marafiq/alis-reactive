@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Room holds: the coordinator holds a room for a prospective resident. The server refuses a room
-    /// another family already holds; that refusal belongs to no field the coordinator typed in. The
-    /// reservations office also refuses a prospect who already holds a room.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/RoomHold")]
     public class RoomHoldController : Controller
@@ -30,8 +25,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         {
             if (hold == null) return BadRequest();
 
-            // The availability rule asks the hold book asynchronously, so the server validates asynchronously;
-            // the reservations office's rules are its own validator's, which only the server runs.
             var rules = new InlineValidator<RoomHoldModel>();
             rules.Include(_holdRules);
             rules.Include(_reservationsOffice);

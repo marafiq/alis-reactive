@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Visitor sign-in: the front desk finds a returning visitor by phone, signs each visitor in by name
-    /// and the resident they visit, and is then ready for the next visitor.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeTextBox")]
     public class NativeTextBoxController : Controller

@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace Alis.Reactive.Grammar
 {
-    /// <summary>Short constructors for grammar nodes, so a step, a value or a condition reads like the sentence it writes.</summary>
     internal static class G
     {
         internal static readonly IReadOnlyList<string> NoPath = Array.Empty<string>();
@@ -12,7 +11,6 @@ namespace Alis.Reactive.Grammar
 
         internal static LitExpr Lit(object? value) => new LitExpr(Scalar.Of(value));
 
-        /// <summary>A literal read in a shape: converted when it is read, unless it is already a value of that shape.</summary>
         internal static Expr Lit(Scalar value, Shape shape) => AlreadyIn(value, shape) ? new LitExpr(value) : As(new LitExpr(value), shape);
 
         internal static LitExpr Null => new LitExpr(Scalar.Null);
@@ -22,16 +20,10 @@ namespace Alis.Reactive.Grammar
         internal static ObjExpr Obj(string id) => new ObjExpr(id);
         internal static RefExpr Ref(string name) => new RefExpr(name);
 
-        /// <summary>A member read, converted to the member's shape.</summary>
         internal static Expr Get(Expr target, IReadOnlyList<string> path, Shape shape) => As(new GetExpr(target, path), shape);
 
         internal static Expr Get(Expr target, params string[] path) => new GetExpr(target, path);
 
-        /// <summary>
-        /// The value converted to a shape, written once: a shape that converts nothing adds nothing, a value
-        /// already converted to the shape is not converted again, and a list read as a list of anything
-        /// converts once, under the list shape it is then written as.
-        /// </summary>
         internal static Expr As(Expr value, Shape shape)
         {
             if (IsUnconverted(shape)) return value;
@@ -44,7 +36,6 @@ namespace Alis.Reactive.Grammar
             return new AsExpr(value, shape);
         }
 
-        /// <summary>A call whose arguments convert to their declared shapes, one per argument, and whose result converts to a shape.</summary>
         internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, IReadOnlyList<Shape> argShapes, Shape shape)
         {
             if (argShapes.Count != args.Count)
@@ -52,13 +43,11 @@ namespace Alis.Reactive.Grammar
             return As(new CallExpr(target, path, args.Select((arg, index) => As(arg, argShapes[index])).ToList()), shape);
         }
 
-        /// <summary>A call whose arguments pass as they are (a lambda, a literal, a record the plan wrote) and whose result converts to a shape.</summary>
         internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, Shape shape) =>
             As(new CallExpr(target, path, args), shape);
 
         internal static Expr Call(Expr target, string member, params Expr[] args) => new CallExpr(target, new[] { member }, args);
 
-        /// <summary>Applies a lambda to arguments: binds each value once, as a <c>let</c> inside an expression.</summary>
         internal static Expr Apply(FnExpr fn, params Expr[] args) => new CallExpr(fn, NoPath, args);
 
         internal static FnExpr Fn(Expr body, params string[] parameters) => new FnExpr(parameters, body);
@@ -83,7 +72,6 @@ namespace Alis.Reactive.Grammar
 
         internal static Expr List(IEnumerable<Expr> items) => new ListExpr(items.ToList());
 
-        /// <summary>Writes a member, with the value converted to the member's shape.</summary>
         internal static Statement Set(Expr target, IReadOnlyList<string> path, Shape shape, Expr value) =>
             new SetStatement(target, path, As(value, shape));
 
@@ -103,8 +91,6 @@ namespace Alis.Reactive.Grammar
 
         internal static bool IsUnconverted(Shape shape) => shape is AnyShape;
 
-        // A value the conversion would hand back as it is: a missing value, or text, a boolean or a number
-        // under its own scalar shape, nullable or not (grammar.md 2.1).
         private static bool AlreadyIn(Scalar scalar, Shape shape)
         {
             var value = scalar.Value;

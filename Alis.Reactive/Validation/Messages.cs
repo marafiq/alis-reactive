@@ -6,22 +6,14 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>
-    /// A rule's message: a template with placeholders (<c>{PropertyName}</c>, <c>{MaxLength}</c>), or text the
-    /// server builds from the model. The server fills every placeholder; the browser fills those known when
-    /// the page renders and drops a sentence that names the value being checked. A message with nothing
-    /// else to say is the server's, like one built from the model.
-    /// </summary>
     internal abstract class Message<T>
     {
         internal static Message<T> Template(string template) => new TemplateMessage(template);
 
         internal static Message<T> FromModel(Func<T, string> build) => new ModelMessage(build);
 
-        /// <summary>The message the server sends for this instance.</summary>
         internal abstract string For(T instance, MessageArguments arguments);
 
-        /// <summary>The browser's text, or false when only the model can say it.</summary>
         internal abstract bool TryForBrowser(MessageArguments renderArguments, out string text);
 
         private sealed class TemplateMessage : Message<T>
@@ -61,7 +53,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>The values a message template names, by placeholder.</summary>
     internal sealed class MessageArguments
     {
         private static readonly Regex Placeholder = new Regex(@"\{([^{}:]+)(?::([^{}]+))?\}", RegexOptions.CultureInvariant);
@@ -94,7 +85,6 @@ namespace Alis.Reactive.Validation
         internal static string WithoutValueSentences(string template) => ValueSentence.Replace(template, "");
     }
 
-    /// <summary>The default messages, worded as FluentValidation words them in English.</summary>
     internal static class Templates
     {
         internal const string NotNull = "'{PropertyName}' must not be empty.";
@@ -121,7 +111,6 @@ namespace Alis.Reactive.Validation
         internal const string PrecisionScale = "'{PropertyName}' must not be more than {ExpectedPrecision} digits in total, with allowance for {ExpectedScale} decimals. {Digits} digits and {ActualScale} decimals were found.";
     }
 
-    /// <summary>How a field is named in a message: <c>AdmissionDate</c> reads "Admission Date".</summary>
     internal static class DisplayName
     {
         internal static string Of(string memberPath)

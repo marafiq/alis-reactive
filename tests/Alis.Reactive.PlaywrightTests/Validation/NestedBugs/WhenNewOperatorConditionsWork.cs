@@ -15,7 +15,6 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     private ILocator ErrorFor(string field) =>
         Page.Locator($"#op-form span[data-valmsg-for='{field}']");
 
-    // An adult with a job title: every other condition is off, so a "skips" test can end in a save.
     private async Task EnterAnEmployedAdult()
     {
         await Input(m => m.Age).FillAsync(AdultAgeOutsideLessThanRule);
@@ -67,8 +66,6 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // An int left empty binds as 0 on the server, where "Age < 18" then holds; the browser reads the
-    // age the same way, so it asks for the guardian before the form is sent.
     [Test]
     public async Task an_age_left_empty_counts_as_a_minor_as_the_server_binds_it()
     {

@@ -3,21 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.VisitPlanner;
 
-/// <summary>
-/// As the front desk coordinator, I want every visit time I book for a family to be held in the desk
-/// system, and every time I unbook to be released, so that the desk and the planner never disagree.
-/// </summary>
-/// <remarks>
-/// The page is opened from a link that names the resident and the family, and may name how many
-/// visitors are coming and how many the family's visitor pass allows. Everything the desk is told
-/// comes from the visit planner (a widget the sandbox wrote itself), from that link, or from the
-/// desk's own earlier answer: the slot from the planner's event, the wing from its property, the
-/// visit count from its count, the earliest visit from its function, and the wing whose desk holds
-/// the family's times from the week the desk answered first. The desk answers by the time asked for:
-/// Monday 10:00 is held, Tuesday 3:00 is held until the family confirms, Saturday 11:00 was taken by
-/// another family, and on Sunday the desk does not answer. The Hale family already holds Wednesday
-/// 2:00 at the Garden wing desk.
-/// </remarks>
 [TestFixture]
 public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
 {
@@ -46,7 +31,6 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
     private ILocator LoaderOverDesk => Page.Locator("#desk-card #alis-loader");
     private NumericTextBoxLocator Visitors => _plan.NumericTextBox(m => m.Visitors);
 
-    // The drawer drops this class the moment it starts closing, so whether it is open is read from it.
     private static readonly Regex DrawerOpen = new("alis-drawer--visible");
     private static readonly Regex SuccessTone = new(@"\be-toast-success\b");
     private static readonly Regex DangerTone = new(@"\be-toast-danger\b");
@@ -83,7 +67,6 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The holds are asked of the desk of the wing the week answered with, read from that answer.
     [Test]
     public async Task the_familys_holds_are_asked_of_the_desk_of_the_wing_the_week_names()
     {
@@ -123,8 +106,6 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The family's holds are asked for only after the week has arrived; the desk stops saying it is
-    // asking as soon as the week is there, without waiting for the holds.
     [Test]
     public async Task the_desk_stops_saying_it_is_asking_once_the_week_arrives_while_the_holds_still_load()
     {
@@ -302,7 +283,6 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The release names the family in its body, beside the resident in its path.
     [Test]
     public async Task releasing_every_hold_tells_the_desk_which_family_let_them_go()
     {
@@ -347,7 +327,6 @@ public class WhenHoldingVisitsAtTheFrontDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The badge and the card are asked for side by side; the drawer waits for both, with the desk covered.
     [Test]
     public async Task the_arrival_card_waits_for_the_badge_with_the_desk_covered()
     {

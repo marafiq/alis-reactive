@@ -4,30 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Kanban;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Kanban;
 
-/// <summary>
-/// As Maple Grove's facilities lead, I want a maintenance board where I move work orders from Open to In
-/// Progress to Done, take the front desk's urgent calls, edit a work order in its card dialog and file
-/// finished work away, with each change shown only once the work-order system has it, so that the
-/// technicians and the front desk work from the same board I do.
-/// </summary>
-/// <remarks>
-/// The board has a row for each wing (Maple, Birch) and a column for each status; each column is a line the
-/// work-order system keeps in order. The board sends every change to the work-order system and does not draw
-/// it until the system answers: a change it accepts arrives with the system's work orders, a change it refuses
-/// leaves the board as it was. The board's own rules refuse finishing unassigned work, putting urgent work below
-/// other work in progress, moving or editing finished work, deleting a work order from its dialog, saving a work
-/// order without its room, and filing away finished work the resident has not signed off. Starting the wheelchair
-/// repair before its brake cable arrives opens a folded Waiting on parts column.
-/// Not exercised: <c>EndEdit</c>, because EJ2 only copies the change into its own card list in a later
-/// microtask and raises <c>dataStateChange</c> (data.js:133-151), which the declaration does not carry, so the
-/// board looks the same until it binds the system's answer, which replaces that list. <c>DataBind</c>, because
-/// the Kanban starts binding new cards asynchronously whether or not it runs (kanban.js:206-212, data.js:186-192,
-/// ej2-data manager.js:334-338), so nothing in the same pipeline can tell. <c>DataBinding</c>'s <c>Count</c>,
-/// because EJ2 fills it only for a board bound to a result-and-count object or a query that asks for a count
-/// (data.js:99-103, manager.js:404-413), and <c>Cards</c> holds a list. <c>QueryCellInfo</c>'s <c>Cancel</c>,
-/// because a header cell or a row EJ2 does not draw leaves the board's cells out of line with its columns
-/// (layout-render.js:142-146, 225-234, 328-337).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionKanban : PlaywrightTestBase
 {
@@ -60,7 +36,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
     private ILocator DialogInput<TValue>(Expression<Func<WorkOrder, TValue>> member) =>
         Board.DialogField(Field.Of(member).Name);
 
-    // The whole board fits in the window, so a card is dragged without scrolling.
     public override BrowserNewContextOptions ContextOptions()
     {
         var options = base.ContextOptions() ?? new BrowserNewContextOptions();
@@ -75,7 +50,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await Expect(Board.Card("Wheelchair brakes slipping")).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // The work-order system's answer to the next change is held until the returned release is called.
     private async Task<Func<Task>> HoldTheAnswer(string url)
     {
         var released = new SemaphoreSlim(0);
@@ -97,8 +71,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await Expect(Board.Dialog).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // Maple has nothing in progress, so the wheelchair repair goes there; the board then binds the work-order
-    // system's answer, with the repair in the Blocked column.
     private async Task StartTheWheelchairRepair()
     {
         await Board.DragCard(Board.Card("Wheelchair brakes slipping"), Cell(WorkOrderStatus.InProgress, MaintenanceWing.Maple));
@@ -221,7 +193,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
         await Expect(Saving).ToBeHiddenAsync();
         await Expect(Cell(WorkOrderStatus.Open, MaintenanceWing.Birch)).ToContainTextAsync("Faucet drips in the kitchenette");
         await Expect(Cell(WorkOrderStatus.InProgress, MaintenanceWing.Birch)).Not.ToContainTextAsync("Faucet drips in the kitchenette");
-        // The browser logs the refused change's 409; nothing else may fail.
         AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
 
@@ -342,7 +313,6 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
 
         await Expect(Status).ToHaveTextAsync("No new calls from the front desk.", new() { Timeout = 5000 });
         await Expect(Board.Card("Toilet running nonstop")).ToHaveCountAsync(1);
-        // The browser logs the empty answer's 404; nothing else may fail.
         AssertNoConsoleErrorsExcept("the server responded with a status of 404");
     }
 

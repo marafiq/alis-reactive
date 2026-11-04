@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
-/// <summary>
-/// Walter Cho's care level review. He lives in assisted living on the basic support protocol and goes out
-/// without an escort until the coordinator changes it.
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Conditions/CareLevelCascade")]
 public class CareLevelCascadeController : Controller

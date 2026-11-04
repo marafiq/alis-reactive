@@ -2,23 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.MultiColum
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.MultiColumnComboBox;
 
-/// <summary>
-/// As a staffing coordinator, I want to pick the nurse who covers an open shift from a list showing each
-/// nurse's home wing, usual shift and certifications, so that every shift goes to a nurse who said yes, has
-/// the hours left and holds the certification the wing needs.
-/// </summary>
-/// <remarks>
-/// The open shifts are tonight's Willow night shift (nobody has volunteered), tomorrow's Maple day shift
-/// (Jordan Ellis volunteered by text) and Saturday's Cedar evening shift (Ana Lima already covers it). Willow
-/// is the memory care wing and takes only a nurse certified in dementia care. Choosing a shift opens the nurse
-/// list at once while the staffing line says how the shift stands. The staff are Sam Ortiz, Grace Kim, Ana
-/// Lima, Jordan Ellis and Marcus Bell (40 hours worked already); the CareBridge agency sends Kim Tran and
-/// Leah Novak when agency nurses are included.
-/// Not exercised: the render helper without a build step (a nurse list with no nurses covers no shift) and
-/// the Fields overload without a group (this list groups its nurses by employer). Change's IsInteracted
-/// cannot be told apart from the payload's <c>event</c> field, which EJ2 fills from the same browser event
-/// (multi-column-combo-box.js:1168-1178).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 {
@@ -48,7 +31,6 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
 
     private async Task ChooseShift(string shift) => await _plan.NativeDropDown(m => m.OpenShift).Select(shift);
 
-    // Nobody has volunteered for tonight's Willow shift, so the nurse list stays open to choose from.
     private async Task ChooseWillowTonight()
     {
         await ChooseShift(WillowTonight);
@@ -69,7 +51,6 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A nurse the page fills in leaves the list open; only the page closes it.
     [Test]
     public async Task a_nurse_who_volunteered_by_text_is_filled_in_and_the_list_closes()
     {
@@ -178,7 +159,6 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Erasing the name and pressing Enter empties the field; the list holds no row for empty text.
     [Test]
     public async Task erasing_the_nurse_takes_down_the_call_to_confirm_and_her_hours()
     {
@@ -268,7 +248,6 @@ public class WhenUsingFusionMultiColumnComboBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Picking a row keeps the cursor in the nurse list, so the message clears on the pick itself.
     [Test]
     public async Task picking_the_missing_nurse_clears_her_message_without_assigning_again()
     {

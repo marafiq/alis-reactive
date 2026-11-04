@@ -27,7 +27,6 @@ public sealed class NativeTextBoxLocator
 
     public async Task Blur() => await Input.BlurAsync();
 
-    /// <summary>Fills text and blurs so native change handlers run.</summary>
     public async Task FillAndBlur(string text)
     {
         await Fill(text);

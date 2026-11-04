@@ -1,10 +1,6 @@
-// Owners, handlers, the document's ready and raise, and slots (grammar.md 3.5, 6.1, 6.5).
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { e, element, fakeWidget, on, plan, plugin, s, st } from "./support/plan";
 
-// Each test runs a fresh runtime: the plugin registry and the slots start empty, with no reset hook
-// shipped in the runtime for it.
 let Owner: (typeof import("../objects/owner"))["Owner"];
 let startOwner: (typeof import("../plans/start"))["startOwner"];
 let slotPlugin: (typeof import("../plugins/slot"))["slotPlugin"];

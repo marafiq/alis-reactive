@@ -41,7 +41,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionDropDownTreeChangeArgs> Change =>
             Event<FusionDropDownTreeChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Wing census: the director's morning stand-up reads each wing's census from this morning's records
-    /// and ticks the programs running today. URL: /Sandbox/Components/ArrayOps.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/ArrayOps")]
     public class ArrayOpsController : Controller
@@ -15,12 +11,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
         public IActionResult Index() =>
             View("~/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml", new WingCensusModel());
 
-        /// <summary>
-        /// Maple wing. Each count has a resident on its line: Margaret Hale's Morse score is 45, Rose
-        /// Delgado's 24, Evelyn Hart is 90 and her review is in 7 days. Walter Brooks, in hospital, has the
-        /// wing's highest fall risk and the soonest review, and the first resident in residence on the
-        /// list, Harold Kim, has neither.
-        /// </summary>
         [HttpGet("Maple")]
         public IActionResult MapleWing() => Ok(new WingCensusResponse
         {
@@ -38,7 +28,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             },
         });
 
-        /// <summary>Birch wing: nobody in hospital this morning; George Webb is 90.</summary>
         [HttpGet("Birch")]
         public IActionResult BirchWing() => Ok(new WingCensusResponse
         {

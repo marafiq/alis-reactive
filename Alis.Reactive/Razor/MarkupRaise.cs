@@ -8,11 +8,6 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Razor
 {
-    /// <summary>
-    /// The attributes that make an element raise a declared event when it is clicked (grammar.md 6.1, D4):
-    /// <c>data-alis-raise</c> names the event, and each member of the payload is one <c>data-alis-detail-</c>
-    /// attribute holding the member's value as text, which the listener's typed read converts by the member's type.
-    /// </summary>
     internal static class MarkupRaise
     {
         private static readonly JsonSerializerOptions ValueText = new JsonSerializerOptions
@@ -48,8 +43,6 @@ namespace Alis.Reactive.Razor
         private static string TextOf(JsonElement value) =>
             value.ValueKind == JsonValueKind.String ? value.GetString()! : value.GetRawText();
 
-        // The attribute the DOM's dataset names alisDetail followed by the member's name with its first letter
-        // capitalized: each capital is a dash and the small letter, so residentId is data-alis-detail-resident-id.
         private static string DatasetAttribute(string member)
         {
             var key = "alisDetail" + char.ToUpperInvariant(member[0]) + member.Substring(1);

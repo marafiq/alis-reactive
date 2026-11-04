@@ -2,22 +2,16 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Framework.App.Inputs;
 
-/// <summary>A resident's care: members of enums, chosen from their members, and what each one decides.</summary>
 public sealed class CarePage
 {
-    /// <summary>The level of care now; its default member, Independent, is no answer.</summary>
     public CareLevel Level { get; set; }
 
-    /// <summary>The level of care before this one, or none yet; Independent is an answer here.</summary>
     public CareLevel? PreviousLevel { get; set; }
 
-    /// <summary>The shift the care starts on; it has no member numbered 0.</summary>
     public Shift Shift { get; set; } = Shift.Night;
 
-    /// <summary>The lifting equipment, needed for nursing care.</summary>
     public string? Equipment { get; set; }
 
-    /// <summary>The keyworker, needed for nursing or memory care.</summary>
     public string? Keyworker { get; set; }
 }
 
@@ -37,13 +31,11 @@ public enum Shift
     Night = 2,
 }
 
-/// <summary>What the endpoint bound, in its own words.</summary>
 public sealed class CareEcho
 {
     public string Summary { get; set; } = "";
 }
 
-/// <summary>The rules the care is checked by, written once: the browser checks what it can.</summary>
 public sealed class CareRules : ReactiveValidator<CarePage>
 {
     public CareRules()

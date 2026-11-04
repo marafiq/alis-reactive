@@ -28,7 +28,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionRatingValueChangedArgs> ValueChanged =>
             Event<FusionRatingValueChangedArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);
     }
 

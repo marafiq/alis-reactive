@@ -3,22 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.CheckList;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As a night nurse, I want the fall-prevention round to open with the resident's fall risk factors on
-/// file, to call for hourly checks while a recent fall is ticked, to repeat last night's precautions in
-/// one step, and to refuse a round without the precautions she needs, so that no resident at risk of
-/// falling is left unprotected tonight.
-/// </summary>
-/// <remarks>
-/// Edith Morales's round opens with "Fell in the last 30 days" and "Takes a sedative at night" on file.
-/// The hourly-checks banner reads the risk factor list when the round opens (its <c>Value</c>) and as the
-/// nurse ticks it (its <c>Change</c>, whose <c>Value</c> carries every box ticked). Unticking the last
-/// precaution asks for one at once: the list's change is its commit, which checks it again. "Same
-/// precautions as last night" writes the server's answer to the precaution list's <c>Value</c>: the
-/// boxes show exactly last night's, and a box the nurse ticks after it adds to them in what is sent.
-/// Only the server knows that a recent fall needs the bed alarm on. Not exercised: the CSV input the
-/// list keeps for a form posted without the plan, which no page posts.
-/// </remarks>
 [TestFixture]
 public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
 {
@@ -39,7 +23,6 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
     private ILocator SameAsLastNight => Page.Locator("#same-as-last-night-btn");
     private ILocator Status => Page.Locator("#fall-round-status");
 
-    // Every round the page sends the server to record.
     private ConcurrentQueue<string> _roundsSent = null!;
 
     private async Task NavigateAndBoot()
@@ -91,7 +74,6 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The list's change carries every box ticked, not only the one just clicked.
     [Test]
     public async Task ticking_another_risk_factor_keeps_the_hourly_checks()
     {
@@ -118,7 +100,6 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Recording the round afterwards is the server's later answer: a round sent on the tick would come first.
     [Test]
     public async Task ticking_a_precaution_clears_the_request_without_recording_again()
     {
@@ -182,7 +163,6 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A precaution ticked before is cleared: the list shows last night's and nothing else.
     [Test]
     public async Task same_precautions_as_last_night_ticks_exactly_last_nights()
     {
@@ -199,7 +179,6 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The list's focus lands on its first box, where the Tab key would land, so the nurse can add tonight's.
     [Test]
     public async Task repeating_last_night_puts_the_nurse_on_the_first_precaution()
     {
@@ -212,7 +191,6 @@ public class WhenNurseRecordsFallPreventionRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // What is sent is what the boxes show: last night's precautions and the one the nurse adds tonight.
     [Test]
     public async Task recording_after_repeating_last_night_sends_last_nights_precautions_with_tonights_addition()
     {

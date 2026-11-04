@@ -73,10 +73,6 @@ namespace Alis.Reactive
         {
             BrowserOrder.Require(typeof(TKey));
 
-            // Sort keys must coerce to comparable scalars. Non-scalar keys (object/collection)
-            // serializes as Shape.Any, and the runtime would fall back to lexicographic
-            // String(value) order, where every object becomes "[object Object]".
-            // Reject it where it is authored rather than emit a silently wrong runtime sort.
             var keyShape = ClrShape.Of(typeof(TKey));
             var keyIsSortableScalar = keyShape is StringShape or NumberShape or BooleanShape or DateShape or InstantShape or NullableShape;
             if (!keyIsSortableScalar)

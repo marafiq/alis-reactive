@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Boundaries;
 
-/// <summary>
-/// The runtime boots a page however the page loads it (runtime/root.ts): from a deferred script, which runs
-/// once the document is parsed, and with no bundle of components or plugins beside it. Each page writes its
-/// own HTML; the layout's way, a plain script at the end of the body after the components' bundle, is every
-/// other page of the app.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageLoadsTheRuntimeItsOwnWay : AppPageTest
 {

@@ -8,7 +8,6 @@
 
 <form id="fluids-chart">
     @{ Html.InputField(plan, m => m.Reading.Millilitres, o => o.Label("Millilitres")).Entry(); }
-    @* The initials are rendered with no label of their own; the page labels them by the id the framework gives them. *@
     @{ Html.InputField(plan, m => m.Initials).Entry(); }
     <label for="Alis_Reactive_Framework_App_Partials_ChartEntry_FluidsReading___Initials">Initials, by the id written out</label>
 </form>

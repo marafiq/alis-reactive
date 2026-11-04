@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// When, ElseIf and Else: the first arm whose condition holds runs, in authored order, the Else only when
-/// no arm holds, and a branch without an Else runs nothing when its condition fails while the steps after
-/// it run. The care plan's arms are pain of 4 or more, then pain of 2 or more, then no action; its alarm
-/// is raised at 5. The pain starts at 0.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageBranches : AppPageTest
 {

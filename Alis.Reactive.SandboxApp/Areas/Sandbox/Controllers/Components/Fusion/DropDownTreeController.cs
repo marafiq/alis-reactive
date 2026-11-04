@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Maple Grove's room assignment for the week's move-ins: the residents moving in, the building plan,
-    /// the room a deposit holds, the hold the plan's choice makes, and the move-in it books.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/FusionDropDownTree")]
     public sealed class DropDownTreeController : Controller
@@ -87,7 +83,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static Arrival? FindArrival(string? residentId) =>
             Arrivals.FirstOrDefault(arrival => arrival.Id == residentId);
 
-        // The building plan holds one node at a time; its value is that node's id.
         private static BuildingPlanNode? FindNode(string[]? value) =>
             Plan.FirstOrDefault(node => node.Value == value?.FirstOrDefault());
 

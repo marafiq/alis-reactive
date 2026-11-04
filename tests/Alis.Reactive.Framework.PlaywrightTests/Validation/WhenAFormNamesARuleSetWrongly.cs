@@ -1,10 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>A page that names a set the validator does not declare, or two sets for one form, is refused where it renders.</summary>
 [TestFixture]
 public sealed class WhenAFormNamesARuleSetWrongly : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     private ILocator Message(string text) => Page.GetByText(text).First;

@@ -5,11 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 {
-    // The front desk's system, answering by the time asked for: Monday 10:00 is held, Tuesday 3:00 is
-    // held until the family confirms, Saturday 11:00 was taken by another family, and on Sunday the
-    // desk does not answer. The Hale family already holds Wednesday 2:00 at the desk of the resident's
-    // wing. An arrival prints the family's badge and gives the visit's arrival card: weekday visits
-    // meet in the garden lounge, weekend visits in the sun room.
     public partial class VisitPlannerController
     {
         [HttpGet("FrontDesk")]
@@ -24,7 +19,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
                 : Ok(resident.Week());
         }
 
-        // Each wing keeps its own desk: the holds are asked of the desk the X-Wing header names.
         [HttpGet("FrontDesk/Holds/{residentId}")]
         public IActionResult FrontDeskHolds()
         {

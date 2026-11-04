@@ -1,7 +1,3 @@
-// A vendor is data in the plan: where the object lives on the rendered element, how its objects take a
-// listener (a pair of methods, or assignment to the property the event names), and what a listener
-// receives (grammar.md 6.9). This driver follows that data, so the runtime holds no code for any vendor.
-
 import type { MethodVendorListening, Vendor } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { call, read, write } from "../grammar/paths";
@@ -52,7 +48,6 @@ interface AssignedListener {
   disposed: boolean;
 }
 
-// Assigning adds a listener as `on` would: the function the property already holds runs first and keeps running, so a widget's own callback and an earlier handler both stay; disposing puts back what the property held.
 function assignListener(root: unknown, vendorName: string, event: string, vendorListener: VendorListener): () => void {
   const label = `${vendorName} ${event}`;
   const previous = read(root, [event], "checked", label);
@@ -65,8 +60,6 @@ function assignListener(root: unknown, vendorName: string, event: string, vendor
   write(root, [event], assigned, "checked", label);
   return () => {
     assigned.disposed = true;
-    // A listener assigned later holds this one as its previous and stays in place; it puts the property
-    // back when it goes, skipping every listener that went before it, so a disposed handler never returns.
     if (read(root, [event], "checked", label) === assigned) write(root, [event], live(assigned.previous), "checked", label);
   };
 }
@@ -81,8 +74,6 @@ function isAssignedListener(value: unknown): value is AssignedListener {
   return typeof value === "function" && "disposed" in value && "previous" in value;
 }
 
-// A member read off a payload is an optional path (grammar.md 1.3), so a listener argument the vendor
-// did not pass reads as missing members; nothing stands in for it.
 function payloadOf(vendor: Vendor, first: unknown): unknown {
   switch (vendor.payload) {
     case "argument": return first;
@@ -91,11 +82,8 @@ function payloadOf(vendor: Vendor, first: unknown): unknown {
   }
 }
 
-// A native input's handler reads the element, which stays valid after an await; a custom event
-// carries its detail, or is the payload itself when it has none, as the document's events are.
 function elementPayload(first: unknown): unknown {
   if (first instanceof CustomEvent) return isMissing(first.detail) ? first : first.detail;
-  // A vendor that hands the listener an event it did not dispatch has no current target.
   if (first instanceof Event) return first.currentTarget ?? first;
   return first;
 }

@@ -2,21 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.HiddenFiel
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As a night nurse, I want each room check I record to carry the wing, the start of the round and the
-/// resident in the room, without my typing them, and to see the night care of the resident I am about to
-/// check, so that the morning report shows who was checked on which round and nobody's care is missed.
-/// </summary>
-/// <remarks>
-/// The page keeps three hidden fields: the wing the server writes when the page opens, the start time the
-/// server answers when the round starts, and the resident the server names for the room chosen (each a
-/// <c>Value</c> write from a response). Starting the round again reads the start time back (a <c>Value</c>
-/// read). Every check is sent with all three, and the server's answer is built from them. Writing the
-/// resident raises the hidden field's <c>Change</c>: its reaction asks for the night care of the resident
-/// its <c>Value</c> names, and, as the field's commit, it checks the field's rule again, so the summary's
-/// "no resident" message clears as soon as the server names one. Not exercised: a write of the value the
-/// field already holds, which raises nothing; no step on the page writes the same resident twice.
-/// </remarks>
 [TestFixture]
 public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
 {
@@ -95,7 +80,6 @@ public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The resident the server names for the room brings their night care; another room, another resident's.
     [Test]
     public async Task the_night_care_shown_is_that_of_the_resident_in_the_room_chosen()
     {
@@ -112,9 +96,6 @@ public class WhenNurseRecordsNightRoomChecks : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The resident travels in a hidden field with no message slot, so its message is in the summary. The
-    // server naming the resident clears it at once, before the check is recorded again: the resident's night
-    // care, which arrives after the summary clears, has come, and no check has gone to the server.
     [Test]
     public async Task choosing_the_room_clears_the_missing_resident_from_the_summary_at_once()
     {

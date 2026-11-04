@@ -2,25 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.DropDownLi
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownList;
 
-/// <summary>
-/// As an admissions coordinator, I want to choose the care level a new resident needs and then a wing that
-/// offers it, with the wing list following the care level, so that no resident is placed in a wing that
-/// cannot give her the care she needs.
-/// </summary>
-/// <remarks>
-/// Eleanor Whitfield moves in on Monday. Independent Living is offered in Birch (room open) and Aspen;
-/// Assisted Living in Maple and Cedar (Main building, Cedar has the open room) and Laurel (Garden house);
-/// Memory Care in Willow and Juniper (Garden house), neither with a room open, and Juniper's waitlist is full
-/// until spring, which only admissions knows. The St. Mary's referral recommends Memory Care. A care level with
-/// an open room fills in that wing; one without moves the cursor to the wing list and opens it. Entering the
-/// wing list opens it once a care level has filled it. The page asks for the wings by a URL that already
-/// holds a query, Maple Grove's (<c>?community=maple-grove</c>), and the care level joins it there; the
-/// server finds no wing list without both, so every test that shows a wing list proves the join.
-/// Not exercised: the render helper without a build step (a list rendered with nothing to choose is no
-/// placement). The Focus and Blur payloads carry nothing to read. Change's IsInteracted cannot be told apart
-/// from the payload's <c>e</c> and <c>event</c> fields, which EJ2 fills from the same browser event
-/// (drop-down-list.js:1859-1869).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionDropDownList : PlaywrightTestBase
 {
@@ -47,7 +28,6 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         await Expect(CareLevel.DropDownButton).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // Assisted Living has a room open in Cedar, which the page fills in.
     private async Task ChooseAssistedLiving()
     {
         await CareLevel.Choose("Assisted Living");
@@ -128,7 +108,6 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // With no care level the wing list has nothing in it, so entering it opens nothing.
     [Test]
     public async Task leaving_the_care_level_without_choosing_one_says_to_choose_it_first()
     {
@@ -143,8 +122,6 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Choosing from the list keeps the cursor in the care level, so its Blur does not run; the choice itself
-    // takes the reminder down.
     [Test]
     public async Task choosing_a_care_level_takes_down_the_reminder_to_choose_one()
     {
@@ -159,7 +136,6 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The clear button empties the care level and leaves its list open; only the page closes it.
     [Test]
     public async Task clearing_the_care_level_closes_its_list_and_takes_the_wing_with_it()
     {
@@ -176,7 +152,6 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The clear button empties the wing and leaves its list open and focused; only the page closes it.
     [Test]
     public async Task clearing_the_wing_closes_its_list_and_leaves_the_field()
     {
@@ -251,7 +226,6 @@ public class WhenUsingFusionDropDownList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The page cannot know a waitlist is full; admissions refuses the placement and says why.
     [Test]
     public async Task admitting_to_a_wing_whose_waitlist_is_full_is_refused()
     {

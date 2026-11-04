@@ -1,6 +1,5 @@
 namespace Alis.Reactive.Framework.App.Requests;
 
-/// <summary>The page that sends every kind of request.</summary>
 public sealed class RequestsPage;
 
 public sealed class ResidentQuery
@@ -23,7 +22,6 @@ public sealed class NoteRequest
     public decimal Amount { get; set; }
 }
 
-/// <summary>An estimate the desk may not have yet.</summary>
 public sealed class EstimateRequest
 {
     public decimal? Estimate { get; set; }
@@ -51,13 +49,11 @@ public sealed class SlowQuery
     public string Name { get; set; } = "";
 }
 
-/// <summary>What an endpoint received, in its own words.</summary>
 public sealed class Echo
 {
     public string Summary { get; set; } = "";
 }
 
-/// <summary>Why an endpoint refused.</summary>
 public sealed class Refusal
 {
     public string Reason { get; set; } = "";

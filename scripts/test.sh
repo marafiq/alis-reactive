@@ -36,8 +36,6 @@ USAGE
 configuration="${CONFIGURATION:-Debug}"
 run_e2e=1
 
-# Under GitHub Actions a failing step names itself as an error annotation on the pull request's
-# checks, so a red gate says which step failed without the log (docs/CI.md, "Results").
 gate_step="starting"
 gate() {
   gate_step="$1"
@@ -99,7 +97,6 @@ run_dotnet_tests() {
     rm -f "$results_dir/$trx_name"
     if ! dotnet test "$project" --configuration "$configuration" --no-build \
       --logger "trx;LogFileName=$trx_name" --results-directory "$results_dir"; then
-      # Each failing test is its own annotation, with the start of its message.
       if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
         node scripts/trx-failed-tests.mjs "$results_dir/$trx_name" annotations
       fi
@@ -108,9 +105,6 @@ run_dotnet_tests() {
   done
 }
 
-# CI runs exactly the shards listed in gate.yml's matrix; each project's playwright.project.sh declares
-# its own. A shard declared there but not in the matrix would never run in CI and nothing would fail,
-# so the two lists must match.
 check_ci_shard_matrix() {
   local script_shards ci_shards
   script_shards="$(scripts/playwright.sh --list-shards | sort)"
@@ -125,9 +119,6 @@ check_ci_shard_matrix() {
   echo "[test]   CI shard matrix matches scripts/playwright.sh ($(printf '%s\n' "$script_shards" | wc -l | tr -d ' ') shards)"
 }
 
-# An interrupt (Ctrl-C) or termination stops every running shard with its dotnet test, sandbox and
-# browser. Each shard runs in its own process group (set -m), so one signal to the group reaches all
-# of them; without this they would keep running for twenty minutes after test.sh exited.
 shard_pids=()
 stop_shards() {
   local pid
@@ -140,9 +131,6 @@ stop_shards() {
   exit 130
 }
 
-# Every project's CI shards side by side. Each scripts/playwright.sh run starts its own app on a free
-# port. All shards share one run stamp (each adds its shard name to its file names), and every
-# shard's console output lands in one directory.
 run_parallel_playwright() {
   local run_stamp run_dir shard status=0 code
   local shards=()
@@ -161,7 +149,7 @@ run_parallel_playwright() {
       scripts/playwright.sh --no-build --shard "$shard" > "$run_dir/$shard.log" 2>&1 &
     shard_pids+=("$!")
     echo "[test] shard $shard started: tail -f $run_dir/$shard.log"
-    sleep 1   # spreads the app and browser start-ups
+    sleep 1
   done
 
   for i in "${!shards[@]}"; do
@@ -185,9 +173,6 @@ gate "ensuring npm dependencies"
 gate "checking generated TS contract and TypeScript"
 npm run typecheck
 
-# typecheck regenerated plan.ts and plan.schema.json from the grammar. A copy that differs from the index was
-# not regenerated after the grammar moved, or was regenerated and not staged: the contract is committed as the
-# generator writes it, never by hand.
 gate "checking the committed plan contract matches the generator"
 contract_files=(Alis.Reactive.Assets/runtime/types/plan.ts Alis.Reactive.Assets/runtime/types/plan.schema.json)
 if ! git ls-files --error-unmatch -- "${contract_files[@]}" >/dev/null 2>&1 || ! git diff --quiet -- "${contract_files[@]}"; then
@@ -207,7 +192,6 @@ npm test
 
 gate "consistency checks"
 check_ci_shard_matrix
-# NuGet and each app's npm dependency must carry the same Syncfusion version (scripts/pin-syncfusion.mjs).
 node scripts/pin-syncfusion.mjs --check
 
 gate "compiling C# projects ($configuration)"

@@ -4,16 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The resident directory: the evening supervisor finds residents by name, wing, care level, risk or
-    /// nurse and opens their card. The grid asks for every page, sort, filter, search and grouping it shows;
-    /// each answer is worked out from the community's 48 residents, and nothing is kept between requests.
-    /// </summary>
-    /// <remarks>
-    /// The directory reads the grid's request strictly, as a server should: a filter join, a comparison, a
-    /// column or a sort direction it does not know is refused with 400, and a search reads only the fields
-    /// the grid names.
-    /// </remarks>
     public partial class GridController
     {
         private const int DirectoryPageSize = 8;
@@ -55,7 +45,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // The row after the selected one; -1, a row no grid has, when nobody is selected.
         [HttpPost("DirectoryNextOnRounds")]
         public IActionResult DirectoryNextOnRounds([FromBody] DirectoryNextRequest request) =>
             Ok(new DirectoryNextResident
@@ -89,7 +78,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var total = matching.Count;
             var results = new DirectoryResults { Count = total, Change = DirectoryChange(query, total) };
 
-            // A grouped directory shows every matching resident; the grid draws the groups from them.
             if (query.Group.Count > 0)
             {
                 results.Result = matching;
@@ -185,7 +173,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             };
         }
 
-        // A search reads only the fields the grid names: a search that names none finds nobody.
         private static IEnumerable<DirectoryEntry> DirectorySearched(IEnumerable<DirectoryEntry> residents, List<FusionGridSearchDescriptor> search) =>
             search.Where(s => s.Key.Length > 0).Aggregate(
                 residents,
@@ -208,7 +195,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             };
         }
 
-        // Each sort the grid names, in order, then surname; a risk sorts by how high it is.
         private static IEnumerable<DirectoryEntry> DirectorySorted(IEnumerable<DirectoryEntry> residents, List<FusionGridSortColumn> sorted)
         {
             var bySurname = DirectoryColumnOf(Field.Of((DirectoryResident r) => r.ResidentName).Name).SortKey;
@@ -290,7 +276,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             int OpenTasks,
             string PrimaryNurse);
 
-        /// <summary>A column the grid can sort, filter, search or group by: its words, its text and its sort key.</summary>
         private sealed record DirectoryColumn(
             string Field,
             string Label,
@@ -313,7 +298,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new(Field.Of((DirectoryResident r) => r.PrimaryNurse).Name, "primary nurse", r => r.PrimaryNurse, r => r.PrimaryNurse, false)
         };
 
-        // Surname order. Care level follows the row, a wing holds four rows in turn, risk follows pairs of rows.
         private static readonly DirectoryEntry[] DirectoryOnFile = new[]
         {
             "Abbott, Margaret", "Ahmed, Yara", "Álvarez, José", "Bennett, Grace", "Brooks, Harold", "Carter, Ruth",

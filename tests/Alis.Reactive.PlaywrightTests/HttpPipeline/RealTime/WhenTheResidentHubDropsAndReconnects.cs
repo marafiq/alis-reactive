@@ -2,13 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-// Story: As a charge nurse watching the resident board, I want the board to say whether its live
-// link is up, being restored, or back, so that I know whether what I see is current.
-//
-// The link line reads the hub's own state and connection id: with each status that lands, when the
-// connection drops (Reconnecting) and when it is back (Reconnected, under the new id the event
-// carries). The drill drops this page's transport and refuses its negotiates until Restore, so the
-// client's automatic reconnect is what brings the link back.
 [TestFixture]
 public class WhenTheResidentHubDropsAndReconnects : PlaywrightTestBase
 {
@@ -53,7 +46,6 @@ public class WhenTheResidentHubDropsAndReconnects : PlaywrightTestBase
 
         await ClickWhenStable(RestoreHubButton);
 
-        // The client's next automatic attempt (2 s, then 10 s after the drop) is the one that succeeds.
         await Expect(HubState).ToHaveTextAsync("Connected", new() { Timeout = 45000 });
         await Expect(BoardNote).ToHaveTextAsync("Live updates resumed.");
         await Expect(ConnectionId).ToHaveTextAsync(AConnectionId);

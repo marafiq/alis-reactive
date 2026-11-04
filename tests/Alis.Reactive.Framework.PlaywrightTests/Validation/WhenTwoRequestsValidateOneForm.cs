@@ -1,15 +1,10 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// One form two requests send, both validated by the form's one validator: each request is held by the
-/// validator's rules, its message beside its own field and nothing sent, and goes once they hold.
-/// </summary>
 [TestFixture]
 public sealed class WhenTwoRequestsValidateOneForm : AppPageTest
 {
     private readonly List<string> _saves = new();
 
-    // Every request that reached either endpoint, as the network carried it.
     [SetUp]
     public void WatchTheHandoverEndpoints()
     {

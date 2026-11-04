@@ -51,15 +51,10 @@ function start(): void {
   log.info("booting", { plans: planIds });
   startOwners(ownersAtBoot(discovered));
 
-  // The one mark of a booted page: state on the root element, readable by whoever arrives later.
   document.documentElement.dataset["alisBooted"] = "true";
   log.info("booted", { plans: planIds });
 }
 
-// A plan whose script sits inside an element some plan loads into (an alis.slot a plan names) starts
-// under the owner of the innermost such element, so the slot's first load or unload releases it as it
-// releases loaded content. Every other plan is the page's. The owners start as loads would have started
-// them: the page's first, then each slot's, an outer slot's before the slot inside it.
 function ownersAtBoot(discovered: readonly DiscoveredPlan[]): OwnedPlans[] {
   const slotIds = new Set(discovered.flatMap(({ plan }) => slotsNamedBy(plan)));
   const pagePlans: PlanDocument[] = [];
@@ -93,7 +88,6 @@ function innermostSlot(script: HTMLElement, slotIds: ReadonlySet<string>): HTMLE
   return null;
 }
 
-// An element comes before the elements inside it.
 function inDocumentOrder(one: HTMLElement, other: HTMLElement): number {
   return one.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
 }

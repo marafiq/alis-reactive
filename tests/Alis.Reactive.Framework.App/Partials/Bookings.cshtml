@@ -10,9 +10,6 @@
 }
 <h1>Bookings</h1>
 
-@* Each form holds an input that binds NextOfKin.Name: the visit's through the next of kin's own card, the
-   sitting's through the community's person line. The visit's rule reads the next of kin its own form holds, as
-   its save sends it. *@
 <form id="visit-form" aria-label="The visit">
     @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
     @Html.EditorFor(m => m.NextOfKin)

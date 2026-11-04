@@ -1,14 +1,8 @@
 name: Nightly browser gate
 
-# The watched browser signal for main. Pull requests run the browser shards too, but that check is
-# not required to merge (docs/CI.md, "Gating"): GitHub-hosted runners are slow and occasionally
-# flaky, and a required check that flakes teaches people to ignore red. This scheduled run of the
-# full gate on main's tip is the run whose failure opens (or updates) an issue.
-# GitHub runs scheduled workflows on the default branch only, may delay them under load, and
-# disables them after 60 days without repository activity.
 on:
   schedule:
-    - cron: '30 3 * * 1-5'   # 03:30 UTC, Monday to Friday
+    - cron: '30 3 * * 1-5'
   workflow_dispatch:
 
 permissions:

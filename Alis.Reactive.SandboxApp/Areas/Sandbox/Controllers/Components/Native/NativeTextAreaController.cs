@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Shift handover: the evening charge nurse writes the handover for the night nurse, flags any
-    /// incident, and sends it.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeTextArea")]
     public class NativeTextAreaController : Controller

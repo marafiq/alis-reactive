@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Garden outing: four residents, three of whom use a mobility aid; nobody uses a mobility scooter. No
-    /// aid chosen means every resident. The bus has two boarding-help spaces and books only aids it knows.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/OutingRoster")]
     public class OutingRosterController : Controller

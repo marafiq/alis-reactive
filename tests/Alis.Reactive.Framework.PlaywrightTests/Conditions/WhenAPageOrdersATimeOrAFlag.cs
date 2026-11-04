@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// An ordering of values the grammar orders by their kind (grammar.md 2.2): a time of day the address gives,
-/// which the plan reads as its text, ordered as C# orders the times; and a method's flag, ordered false before
-/// true as C# orders a bool.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageOrdersATimeOrAFlag : AppPageTest
 {

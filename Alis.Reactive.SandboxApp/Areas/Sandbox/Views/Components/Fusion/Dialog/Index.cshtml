@@ -30,8 +30,6 @@
         </native-vstack>
     </native-card-body></native-card>
 
-    @* The review asks for an explicit choice: Escape, the close icon and a click outside do not
-       dismiss it; "Not yet" does. The coordinator can drag it aside by its title to read the page. *@
     @(Html.FusionDialog(plan, "discharge-dialog", b =>
     {
         b.Header("Confirm discharge");

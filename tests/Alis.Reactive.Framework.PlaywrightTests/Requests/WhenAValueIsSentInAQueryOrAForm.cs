@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>
-/// What a request carries, as the endpoint that receives it says: a list in a query as one key per item, a
-/// value the address leaves out as an empty key and a list it leaves out as no key (H2), the same in form data
-/// (H4), empty text the request sets in a JSON body as empty text, and a list's blank items as their text (H3),
-/// and a query member whose items have no text form stopping its own request.
-/// </summary>
 [TestFixture]
 public sealed class WhenAValueIsSentInAQueryOrAForm : AppPageTest
 {

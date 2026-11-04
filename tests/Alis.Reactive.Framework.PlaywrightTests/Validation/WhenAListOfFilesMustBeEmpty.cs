@@ -1,16 +1,10 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// <c>Empty</c> on a list of files, decided in the browser as the server decides it: a report with no photo
-/// chosen is filed, one with a photo is held beside the photos, and the server's own rules return a report
-/// with a photo with the same message.
-/// </summary>
 [TestFixture]
 public sealed class WhenAListOfFilesMustBeEmpty : AppPageTest
 {
     private readonly List<string> _filings = new();
 
-    // Every report that reached the filing endpoint, as the network carried it.
     [SetUp]
     public void WatchTheFilingEndpoint()
     {

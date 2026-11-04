@@ -2,30 +2,12 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the evening charge nurse on the Maple wing, I want to record each resident's open tasks and missed doses
-/// in one sheet, bring in the counts the task board already has, and save the whole count at handoff, so that
-/// the night shift starts from counts that are right, and no resident goes into the night with eight open tasks
-/// before the supervisor hears about it.
-/// </summary>
-/// <remarks>
-/// The sheet lists eight residents by room; Amina Patel (room 201, 2 open tasks) is the first row and Henry Liu
-/// (room 202, 3 open tasks, 1 missed dose) the second. A count is typed into its cell and kept when the nurse
-/// moves on; the page notes the last change until the count is saved, refuses an open-task count over 20, and
-/// holds the save while any resident would have 8 open tasks or more.
-/// Not exercised:
-/// CellSave's and BeforeBatchSave's Cancel read back: the page writes Cancel to refuse a count or hold the
-/// save and never needs to read it; the write is the same JavaScript member.
-/// The batch changes' AddedRecords and DeletedRecords: a count adds and removes no resident, so they are
-/// always empty here.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBatchCellEdit : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/BatchCellEdit";
     private const string GridId = "task-count-grid";
 
-    // The grid numbers a row's cells from 0.
     private const int ResidentCell = 1;
     private const int OpenTasksCell = 2;
     private const int MissedDosesCell = 3;
@@ -47,8 +29,6 @@ public class WhenUsingFusionGridBatchCellEdit : PlaywrightTestBase
         await Expect(Cell(Amina, ResidentCell)).ToHaveTextAsync("Amina Patel", new() { Timeout = 10000 });
     }
 
-    // Opens a count and types over it. The grid shows the editor holding the count a moment after the
-    // double-click; a fill before then is lost.
     private async Task TypeCount(int row, int cell, string field, string current, string value)
     {
         await Cell(row, cell).DblClickAsync();
@@ -57,7 +37,6 @@ public class WhenUsingFusionGridBatchCellEdit : PlaywrightTestBase
         await Editor(field).FillAsync(value);
     }
 
-    // Moving on to the resident's name keeps the count being typed.
     private async Task MoveOn(int row) => await ClickWhenStable(Cell(row, ResidentCell));
 
     [Test]
@@ -158,7 +137,6 @@ public class WhenUsingFusionGridBatchCellEdit : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Amina's change comes first in the sheet; the save is held for Henry all the same.
     [Test]
     public async Task eight_open_tasks_for_any_resident_hold_the_save_until_the_supervisor_is_paged()
     {

@@ -10,8 +10,6 @@ namespace Alis.Reactive.Fusion
     /// </summary>
     public static class ReactiveFusionServiceCollectionExtensions
     {
-        // Camel cases every name that is not pinned, dictionary keys included, and keeps the names
-        // pinned with [JsonProperty]. One shared instance, so Newtonsoft's contract cache is reused.
         private static readonly IContractResolver FusionNaming = new DefaultContractResolver
         {
             NamingStrategy = new CamelCaseNamingStrategy
@@ -58,8 +56,6 @@ namespace Alis.Reactive.Fusion
 
         private static void UseFusionNamingForNewtonsoftDefaults()
         {
-            // Newtonsoft leaves DefaultSettings null until an app assigns it; null means its plain
-            // defaults, which is what a new JsonSerializerSettings carries.
             var appSettings = JsonConvert.DefaultSettings ?? (() => new JsonSerializerSettings());
             var alreadyUsesFusionNaming = appSettings().ContractResolver == FusionNaming;
             if (alreadyUsesFusionNaming) return;

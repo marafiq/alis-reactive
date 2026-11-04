@@ -10,7 +10,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("")]
         public IActionResult Index()
         {
-            // The resident's plan carries over from last month: 7 meals/week, 2 wellness checks/week.
             return View("~/Areas/Sandbox/Views/Components/Fusion/NumericTextBox/Index.cshtml", new NumericTextBoxModel
             {
                 MealsPerWeek = 7,

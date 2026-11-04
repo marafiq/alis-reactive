@@ -3,23 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DatePicker;
 
-/// <summary>
-/// As an admissions coordinator, I want to book the day a new resident moves in while her room is held for
-/// her and the admissions office is open, with her first care-plan review proposed from that day, so that she
-/// moves in on a day the community is ready for her and the care team reviews her plan on time.
-/// </summary>
-/// <remarks>
-/// Dorothy Klein moves into Maple 118, ready from Monday, November 2 and held for her through Monday,
-/// November 30. The page and the server check the hold; only the server checks the weekday. A day the page
-/// refuses is never sent: the server would refuse it too, with a 400 the console reports and the tests refuse.
-/// A day refused as it is picked shows its message before Book is pressed, so that test counts the bookings.
-/// Each admission day picked asks the server for the first care-plan review, which it proposes two weeks
-/// later; a day inside the hold is then settled and the field lets the keyboard go. The browser runs in
-/// America/Los_Angeles, west of UTC: a day sent, answered or shown as a UTC instant would read as the day
-/// before. Change's IsInteracted is read on the first review, the date both the server and the coordinator
-/// fill in.
-/// Not exercised: the render helper without a build step, since every date on the page shows a placeholder.
-/// </remarks>
 [TestFixture]
 public class WhenDateSelected : PlaywrightTestBase
 {
@@ -36,10 +19,8 @@ public class WhenDateSelected : PlaywrightTestBase
 
     private ConcurrentQueue<string> _bookingsSent = null!;
 
-    // West of UTC: a day read or written as a UTC instant would show and book as the day before.
     public override BrowserNewContextOptions ContextOptions()
     {
-        // The NUnit base returns null when no options are configured; a zone needs an options object.
         var options = base.ContextOptions() ?? new BrowserNewContextOptions();
         options.TimezoneId = "America/Los_Angeles";
         return options;
@@ -97,7 +78,6 @@ public class WhenDateSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Typing keeps the cursor in the field, and Enter does not move it; only the page lets it go.
     [Test]
     public async Task an_admission_day_typed_inside_the_hold_is_settled_and_the_keyboard_goes_away()
     {
@@ -111,8 +91,6 @@ public class WhenDateSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The message comes as the day is picked, while the cursor is still in the field: the field is checked
-    // when the date picker commits its day, not when the coordinator leaves it or books.
     [Test]
     public async Task a_day_before_the_room_is_ready_is_refused_as_it_is_picked_and_the_cursor_stays_to_correct_it()
     {
@@ -126,8 +104,6 @@ public class WhenDateSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The message is on screen as soon as the day is picked, so the refused day is shown never to leave the
-    // page by the booking that follows: the last day held is the only booking the server receives.
     [Test]
     public async Task a_day_after_the_hold_ends_is_not_booked()
     {
@@ -161,8 +137,6 @@ public class WhenDateSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Saturday, November 7 is inside the hold, so only the server refuses it. Booking moves the cursor to the
-    // button; the refusal brings it back to the admission day.
     [Test]
     public async Task a_weekend_admission_is_refused_by_the_admissions_office_and_the_cursor_returns_to_the_day()
     {

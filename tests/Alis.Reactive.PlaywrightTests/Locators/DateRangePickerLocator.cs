@@ -3,12 +3,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Uses popup gestures because typed text does not always update Syncfusion range values.
-/// </summary>
-/// <remarks>
-/// DateRangePicker uses <c>#{id}_popup</c>, unlike DatePicker and DateTimePicker.
-/// </remarks>
 public sealed class DateRangePickerLocator
 {
     private const int MaxMonthNavigationAttempts = 24;
@@ -26,7 +20,6 @@ public sealed class DateRangePickerLocator
 
     public ILocator RangeIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-range-icon");
 
-    /// <summary>Range popup; DateRangePicker uses <c>#{id}_popup</c>, not <c>#{id}_options</c>.</summary>
     public ILocator RangePopup => _page.Locator($"#{_componentId}_popup");
 
     public ILocator LeftCalendar => RangePopup.Locator(".e-left-container .e-calendar");
@@ -59,7 +52,6 @@ public sealed class DateRangePickerLocator
         await Blur();
     }
 
-    /// <summary>Selects the start and end dates through Syncfusion calendars, then applies the range.</summary>
     public async Task SelectRange(int startYear, int startMonth, int startDay,
         int endYear, int endMonth, int endDay)
     {

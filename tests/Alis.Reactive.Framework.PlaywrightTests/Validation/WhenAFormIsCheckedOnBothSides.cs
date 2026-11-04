@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A form whose rules are written once: the browser checks the rules it can, each message beside its own
-/// field; a rule under a condition applies only while the condition holds; a rule comparing two members
-/// checks them against each other; a rule only the server decides comes back from the server to its field,
-/// and one for a member the page has no input for comes back to the summary.
-/// </summary>
 [TestFixture]
 public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
 {
@@ -13,7 +7,6 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
 
     private ILocator Booked => Page.Locator("#booked");
 
-    // Every request that reached the booking endpoint, as the network carried it.
     [SetUp]
     public void WatchTheBookingEndpoint()
     {
@@ -25,8 +18,6 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
         };
     }
 
-    // The field's own wrapper: its label, its input and its message slot, and nothing of another field. The
-    // label is matched whole, with the mark a required field carries, so "Email" is not "Email again".
     private ILocator Field(string label) =>
         Page.Locator("#visit-form > div").Filter(new()
         {
@@ -56,9 +47,6 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
     }
 
     private Task Book() => Page.GetByRole(AriaRole.Button, new() { Name = "Book the visit", Exact = true }).ClickAsync();
-
-    // The browser held the request: once the network settles, nothing reached the endpoint. An empty result
-    // alone would pass when the server refused what the browser should have held.
 
     [Test]
     public async Task each_rule_the_browser_checks_shows_its_own_message_beside_its_own_field()

@@ -1,11 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <!-- The app the framework is proven on: the core (validation included) and the design system, so no
-         component library can compile into a framework page. Its components are brought the way any app brings
-         one (docs/design/framework-test-components.md). It consumes the design system as an app does:
-         the compiled default linked, the theme in its own Tailwind build. Its TypeScript and CSS are
-         built by its own npm build before each dotnet build (below), after the theme is copied in; the
-         app refuses to start without the bundle, and scripts/playwright.sh refuses a stale one. -->
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -16,15 +10,11 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj" />
-        <!-- The look this app chose; the core does not bring one. -->
         <ProjectReference Include="..\..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
     </ItemGroup>
 
-    <!-- The theme the design system copies into Styles\ before each build, as its NuGet does for an app. -->
     <Import Project="..\..\Alis.Reactive.DesignSystem\build\AlisReactive.DesignSystem.targets" />
 
-    <!-- The app's own browser assets, as an app builds them: the components bundle and the stylesheet. Skipped
-         while the outputs are newer than every input, and at VSTest time (BuildReactiveBrowserAssets=false). -->
     <ItemGroup>
         <BrowserAssetInput Include="Components\**\*.*;components.ts;Plugins\Bundles\**\*.*;esbuild.config.mjs;tsconfig.json;package.json;Styles\**\*.*" />
         <BrowserAssetOutput Include="wwwroot\js\framework-components.js;wwwroot\css\framework.css" />
@@ -33,8 +23,6 @@
     <Target Name="BuildBrowserAssets" BeforeTargets="Build" Condition="'$(BuildReactiveBrowserAssets)' != 'false'"
             Inputs="@(BrowserAssetInput)" Outputs="@(BrowserAssetOutput)">
         <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\.." Command="npm run build -w tests/Alis.Reactive.Framework.App" />
-        <!-- Tailwind leaves an output it would write unchanged as it was; stamping the outputs keeps the next
-             build incremental and the runner's freshness check true. -->
         <Touch Files="@(BrowserAssetOutput)" />
     </Target>
 

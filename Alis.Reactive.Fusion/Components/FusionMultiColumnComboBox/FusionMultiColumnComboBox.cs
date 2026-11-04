@@ -45,7 +45,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionMultiColumnComboBoxChangeArgs> Change =>
             Event<FusionMultiColumnComboBoxChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

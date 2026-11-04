@@ -1,14 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Vendors;
 
-/// <summary>
-/// A vendor a page declares wrongly, refused when the page renders with the message the developer reads: a
-/// name that does not start with a letter, an object path with an empty step, two different vendors given one
-/// name on one plan, and one element named as the components of two vendors.
-/// </summary>
 [TestFixture]
 public sealed class WhenAVendorIsDeclaredWrongly : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string mistake) => await Page.GotoAsync($"{BaseUrl}/Vendors/Refused?mistake={mistake}");
 
     private ILocator Message(string text) => Page.GetByText(text).First;

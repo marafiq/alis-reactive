@@ -109,7 +109,6 @@ namespace Alis.Reactive
         void Otherwise(Action rules);
     }
 
-    /// <summary>The rule a check is added to: what the grammar's extension methods write into.</summary>
     internal interface IRuleTarget<T, TValue>
     {
         IRuleBuilderOptions<T, TValue> Add(Check<T, TValue> check);

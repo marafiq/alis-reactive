@@ -15,13 +15,12 @@ export default tseslint.config(
 
   eslint.configs.recommended,
 
-  // TypeScript: recommended (type-aware off for now — keep it fast)
   ...tseslint.configs.recommended,
 
   {
     files: ["Alis.Reactive.Assets/runtime/**/*.ts", "Alis.Reactive.Assets/components/**/*.ts", "Alis.Reactive.Assets/bundle.ts"],
     ignores: [
-      "Alis.Reactive.Assets/runtime/__tests__/**", // test files relaxed below
+      "Alis.Reactive.Assets/runtime/__tests__/**",
     ],
     rules: {
       "no-fallthrough": "error",

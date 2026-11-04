@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plugins;
 
-/// <summary>
-/// The plugins the runtime refuses. A step reaching a plugin no script on the page registered fails only its
-/// own pipeline (the step before ran, the step after did not, and the next gesture works). A second bundle
-/// of the app that registers a name already taken, or registers as a plugin something that holds no members,
-/// is refused as the page starts, and the page does not start.
-/// </summary>
 [TestFixture]
 public sealed class WhenThePageMeetsAPluginItCannotUse : AppPageTest
 {
@@ -25,8 +19,6 @@ public sealed class WhenThePageMeetsAPluginItCannotUse : AppPageTest
         await Expect(Page.Locator("#added")).ToBeEmptyAsync();
     }
 
-    // The runtime starts the page when its HTML has loaded, before the load event the navigation waits for,
-    // so a page that has not started by then never will.
     [Test]
     public async Task a_plugin_name_a_second_bundle_registers_again_stops_the_page_from_starting()
     {

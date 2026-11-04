@@ -1,18 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 
-/// <summary>
-/// A lambda the array operations cannot run in the browser is refused where the page renders, with a message
-/// that names the mistake, instead of a plan that would compute something else: a record as an order's key, a
-/// method with no pure JavaScript form, a computed projection, a text test against the item or against a
-/// character, a comparison that never reads the item, a cast to a flag, a member of a value the member table of
-/// grammar.md 2.3 does not name, a day of the week read as a value, a cast that drops a fraction, a cast to a
-/// narrower number, and a length of time ordered by a comparison or as an order's key: it reaches the browser as
-/// its text, which does not order as the length does.
-/// </summary>
 [TestFixture]
 public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
 {
-    // The page as a developer meets it: the request answers with the message it was refused with.
     private async Task Render(string mistake) =>
         await Page.GotoAsync($"{BaseUrl}/Arrays/Refused?mistake={mistake}");
 

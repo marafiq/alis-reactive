@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Family contacts: the front desk edits each resident's family contact in the grid and saves the
-    /// edits together. Every page starts from the contacts on file; a save answers with the contacts as
-    /// edited and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("FamilyContacts")]

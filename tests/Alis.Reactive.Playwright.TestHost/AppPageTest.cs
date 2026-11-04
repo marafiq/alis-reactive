@@ -5,12 +5,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.Playwright.TestHost;
 
-/// <summary>
-/// One browser page per test against the app the test assembly runs (<see cref="AppServer"/>): the page is
-/// opened the way a user opens it, and when a test fails its trace, a screenshot and the page's console are
-/// kept beside the test output. The console is evidence for the reader of a failure, never something a test
-/// asserts on.
-/// </summary>
 public abstract class AppPageTest : PageTest
 {
     private const int DefaultTimeoutMs = 60000;
@@ -22,11 +16,8 @@ public abstract class AppPageTest : PageTest
     private Stopwatch? _stopwatch;
     private ICDPSession? _coverage;
 
-    /// <summary>The address of the app the test assembly runs.</summary>
     protected string BaseUrl => AppServer.BaseUrl;
 
-    /// <summary>Opens a page of the app and waits until the runtime has booted it, as a user first meets it.</summary>
-    /// <param name="path">The page's path, for example <c>/Members/Properties</c>.</param>
     protected async Task Open(string path)
     {
         await Page.GotoAsync(BaseUrl + path, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
@@ -53,8 +44,6 @@ public abstract class AppPageTest : PageTest
             Sources = false,
         });
 
-        // With ALIS_JS_COVERAGE_DIR set, the page records which code of the runtime bundle it runs
-        // (scripts/framework-coverage.mjs reads it); without it, nothing is recorded.
         if (CoverageDir is not null)
         {
             _coverage = await Context.NewCDPSessionAsync(Page);
@@ -84,7 +73,6 @@ public abstract class AppPageTest : PageTest
             TestContext.AddTestAttachment(tracePath!, "Playwright trace");
             TestContext.AddTestAttachment(screenshotPath!, "Screenshot on failure");
 
-            // scripts/trx-failed-tests.mjs reads the failure's console between these two lines.
             var console = ConsoleSnapshot();
             if (console.Count > 0)
             {

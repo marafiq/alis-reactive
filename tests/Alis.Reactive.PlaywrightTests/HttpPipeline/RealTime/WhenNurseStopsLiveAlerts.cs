@@ -1,11 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-// Story: As a nurse leaving the floor, I want to stop the live facility alerts on my screen, so that
-// the panel stops changing behind me and nothing tries to reconnect it.
-//
-// Stop Alerts closes the stream from the page (the stream's own close method) and says "Stopped"
-// only once the stream reads as closed (its ready state). A deliberate close is not a drop: the
-// reconnect banner stays hidden.
 [TestFixture]
 public class WhenNurseStopsLiveAlerts : PlaywrightTestBase
 {
@@ -32,8 +26,6 @@ public class WhenNurseStopsLiveAlerts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The all-clear is written to the drill's stream after the page closed it; a notification pushed
-    // afterwards over the hub lands, by which time an all-clear that still arrived would have shown.
     [Test]
     public async Task an_all_clear_sounded_after_alerts_are_stopped_never_reaches_the_panel()
     {

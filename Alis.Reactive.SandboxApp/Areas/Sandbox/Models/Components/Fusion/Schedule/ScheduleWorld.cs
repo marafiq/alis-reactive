@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// One browser's schedule: each facility week it opens starts from the seed
-    /// (<see cref="FakeScheduleData.GenerateWeek"/>) and keeps the browser's changes in its session, so a
-    /// staff change one browser makes is never seen by another.
-    /// </summary>
     public sealed class ScheduleWorld
     {
         private const string WeekKeyPrefix = "schedule-week:";
@@ -20,10 +15,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             _session = session;
         }
 
-        /// <summary>
-        /// The facility's shifts and in-services that start in the range, across every week it touches, and
-        /// how many of its shifts still need someone.
-        /// </summary>
         public ScheduleDataResponse GetAssignments(Facility facility, DateTime rangeStart, DateTime rangeEnd)
         {
             var assignments = new List<ShiftAssignment>();
@@ -42,21 +33,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             };
         }
 
-        /// <summary>The shift with this id, in any week this browser opened.</summary>
         public ShiftAssignment? FindAssignment(int assignmentId) =>
             OpenedWeeks().SelectMany(week => week.Assignments).FirstOrDefault(a => a.Id == assignmentId);
 
-        /// <summary>Puts the staff member on the shift; null when either is unknown.</summary>
         public ShiftAssignment? AssignStaff(int assignmentId, int staffId)
         {
             var staff = FakeScheduleData.Staff.FirstOrDefault(s => s.Id == staffId);
             return staff == null ? null : Change(assignmentId, assignment => FakeScheduleData.Assign(assignment, staff));
         }
 
-        /// <summary>Takes the shift off the schedule and returns it; null when the shift is unknown.</summary>
         public ShiftAssignment? CancelAssignment(int assignmentId) => TakeOff(assignmentId);
 
-        /// <summary>Adds a staffed shift to the facility's week; null when the staff member is unknown.</summary>
         public ShiftAssignment? CreateAssignment(string facilityId, DateTime startTime, DateTime endTime, int shiftId, int staffId)
         {
             var staff = FakeScheduleData.Staff.FirstOrDefault(s => s.Id == staffId);
@@ -71,10 +58,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             return assignment;
         }
 
-        /// <summary>
-        /// Whether the coordinator may change the in-service the schedule opened: refused while someone else has it
-        /// open. Null when this browser's schedule has no such in-service.
-        /// </summary>
         public (bool Refused, InServiceAnswer Answer)? ClaimInService(int inServiceId)
         {
             var inService = FindInService(inServiceId);
@@ -88,11 +71,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             return (refused, new InServiceAnswer { Note = note });
         }
 
-        /// <summary>
-        /// Saves the title and description the coordinator gave an in-service. Its hour stays the one after the AM
-        /// shift, whatever the editor showed, and the answer says so. Null when this browser's schedule has no such
-        /// in-service.
-        /// </summary>
         public InServiceAnswer? SaveInService(int inServiceId, string subject, string description)
         {
             if (FindInService(inServiceId) == null) return null;
@@ -111,7 +89,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             };
         }
 
-        /// <summary>Takes an in-service off the schedule; null when this browser's schedule has no such in-service.</summary>
         public InServiceAnswer? RemoveInService(int inServiceId)
         {
             if (FindInService(inServiceId) == null) return null;

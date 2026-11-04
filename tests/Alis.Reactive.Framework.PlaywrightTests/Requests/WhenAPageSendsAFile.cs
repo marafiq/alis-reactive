@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>
-/// A file the person chose, as the browser hands it to a page (<c>BrowserFile</c>): what the page reads of it,
-/// posted for an endpoint to check, and the file itself, which a form-data request sends, from an array or from
-/// the browser's own file list (H4, I10); a query or a JSON body has no form for a file, so a request that would
-/// carry one stops before it is sent (H2, H3).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageSendsAFile : AppPageTest
 {
@@ -17,7 +11,6 @@ public sealed class WhenAPageSendsAFile : AppPageTest
 
     private ILocator Button(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true });
 
-    // The care plan as the person's computer keeps it: a text file of its own, last changed when it was.
     private static string CarePlanFile()
     {
         var folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "alis-care-plan-" + Guid.NewGuid().ToString("N")));

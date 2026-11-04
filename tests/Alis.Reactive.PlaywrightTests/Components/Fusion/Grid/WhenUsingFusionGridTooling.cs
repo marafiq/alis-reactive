@@ -1,25 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the staffing scheduler, I want next week's schedule a day at a time, a way straight to the weekend, and
-/// a choice of the columns I read, so that I find the open weekend shifts before anyone else books the week.
-/// </summary>
-/// <remarks>
-/// The schedule holds the week of October 19, three shifts a day (day, evening, night), one day to a page,
-/// Monday first. Saturday's evening shift has no aide and its night shift no nurse. The grid's own toolbar
-/// carries Weekend and Choose columns; the pager moves a day at a time.
-/// Not exercised:
-/// ToolbarClick's Item Text, Cancel and Name: the page tells its two items apart by Id; Cancel stops only the
-/// grid's built-in items (Print, Edit, ColumnChooser and the like, toolbar.js:504-549), and this toolbar has
-/// none; Name is the event's own name (ej2-base observer.js:92).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridTooling : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/GridTooling";
     private const string GridId = "shift-schedule";
 
-    // The grid numbers a row's cells from 0, counting the hidden ID column.
     private const int DayCell = 1;
     private const int ShiftCell = 2;
     private const int NurseCell = 3;

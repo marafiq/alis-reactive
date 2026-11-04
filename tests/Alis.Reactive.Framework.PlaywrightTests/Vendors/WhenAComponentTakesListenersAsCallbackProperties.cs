@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Vendors;
 
-/// <summary>
-/// A component that takes listeners by assignment to a callback property (V2): the page's pipeline is
-/// assigned beside the component's own callback, and both run.
-/// </summary>
 [TestFixture]
 public sealed class WhenAComponentTakesListenersAsCallbackProperties : AppPageTest
 {

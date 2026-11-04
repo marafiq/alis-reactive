@@ -3,16 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Margaret Hale's change-of-condition page: the physician directory the nurse searches, how each
-    /// physician is reached, who is on call tonight, and the page that goes out.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/AutoComplete")]
     public sealed class AutoCompleteController : Controller
     {
-        // The directory answers after a moment, as the hospital's directory service does; the page says it is
-        // searching while it waits.
         private static readonly TimeSpan DirectoryLookup = TimeSpan.FromMilliseconds(1500);
 
         private static readonly IReadOnlyList<DirectoryEntry> Physicians =

@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Elements;
 
-/// <summary>
-/// The page's own elements shown and hidden and their classes taken off and toggled; the app's one-per-page
-/// component reached by the id its declaration names; a component rendered for another model's member read
-/// by that member; a typed event raised with no payload heard, its payload's members reading nothing; and the
-/// dispatches a page is refused for where it renders.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageUsesItsElements : AppPageTest
 {

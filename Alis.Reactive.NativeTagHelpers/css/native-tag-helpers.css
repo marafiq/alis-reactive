@@ -1,22 +1,12 @@
-/* AlisReactive.NativeTagHelpers: the styling the layout tag helpers' markup needs, shipped as
-   written (~/_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css). Colors and type
-   read the design system's tokens (--color-*, --font-display) when an app links one; without one,
-   text inherits the page's and surfaces fall back to neutral values.
-
-   The rules set only what a tag helper attribute controls, and sit in the framework's `alis` layer,
-   so classes the page writes on the tag (class="mt-4 flex-wrap") win. */
-
 @layer theme, base, alis, components, utilities;
 
 @layer alis {
-/* native-container */
 .alis-container {
   max-width: 80rem;
   margin-inline: auto;
   padding-inline: 1rem;
 }
 
-/* native-vstack, native-hstack, native-grid */
 .alis-vstack {
   display: flex;
   flex-direction: column;
@@ -57,7 +47,6 @@
 .alis-grid--cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .alis-grid--cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 
-/* Responsive: one column on a phone; up to two from 40rem; three or more from 64rem. */
 .alis-grid--responsive-1,
 .alis-grid--responsive-2,
 .alis-grid--responsive-3,
@@ -94,14 +83,12 @@
 .alis-gap-xxl { gap: 3rem; }
 .alis-gap-max { gap: 4rem; }
 
-/* native-heading, native-text: space below */
 .alis-space-xs { margin-bottom: 0.25rem; }
 .alis-space-sm { margin-bottom: 0.5rem; }
 .alis-space-base { margin-bottom: 0.75rem; }
 .alis-space-md { margin-bottom: 1rem; }
 .alis-space-lg { margin-bottom: 1.5rem; }
 
-/* native-heading */
 .alis-heading {
   font-family: var(--font-display, inherit);
   color: var(--color-text-primary, inherit);
@@ -158,7 +145,6 @@
   color: var(--color-text-muted, #94a3b8);
 }
 
-/* native-text */
 .alis-text--xs { font-size: 0.75rem; line-height: calc(1 / 0.75); }
 .alis-text--sm { font-size: 0.875rem; line-height: calc(1.25 / 0.875); }
 .alis-text--base { font-size: 1rem; line-height: 1.5; }
@@ -177,7 +163,6 @@
 
 .alis-text--bold { font-weight: 600; }
 
-/* native-kv */
 .alis-kv__label,
 .alis-kv__value {
   margin: 0;
@@ -216,7 +201,6 @@
   line-height: calc(1.25 / 0.875);
 }
 
-/* native-divider */
 .alis-divider {
   height: 0;
   margin: 1rem 0;
@@ -260,7 +244,6 @@
   background-color: var(--color-surface, #fff);
 }
 
-/* native-card */
 .alis-card {
   background-color: var(--color-surface-elevated, #fff);
   border: 1px solid var(--color-border, #e2e8f0);

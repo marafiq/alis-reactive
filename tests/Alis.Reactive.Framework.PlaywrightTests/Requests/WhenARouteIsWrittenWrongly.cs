@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>
-/// A request's URL template, route values, headers and query reads are checked where the page renders: a
-/// placeholder no member fills, a brace closed but never opened or opened but never closed, a placeholder
-/// named outside [a-zA-Z0-9_], a placeholder filled with a list, a record sent as a header, and a record or
-/// the whole query read from the URL are each refused with a message that names the mistake.
-/// </summary>
 [TestFixture]
 public sealed class WhenARouteIsWrittenWrongly : AppPageTest
 {

@@ -1,16 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>
-/// The gathers a page is refused for when it renders, with the message the developer reads: a named input the
-/// request has no member for, at its root or in a class it holds; a named input whose value the request member
-/// cannot bind, a number into text, a value that may be empty into one that may not, or a list into text, each
-/// type named as C# writes it; a named input of a partial sent to a request without the partial's prefix; a named
-/// form that names no input; a member set twice; a header with no value; and form data sent with nothing gathered.
-/// </summary>
 [TestFixture]
 public sealed class WhenAGatherIsWrittenWrongly : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     private ILocator Message(string text) => Page.GetByText(text).First;

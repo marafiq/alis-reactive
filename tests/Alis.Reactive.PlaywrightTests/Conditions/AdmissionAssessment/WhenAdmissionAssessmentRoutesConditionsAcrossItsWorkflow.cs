@@ -3,22 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessme
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.AdmissionAssessment;
 
-/// <summary>
-/// As an admissions nurse screening a new resident, I want each answer I give to set the resident's risk,
-/// open the clinical questions their diagnosis calls for and send the alerts their answers call for, so that
-/// the care team receives every alert the screening raises, about the right resident, and none it does not.
-/// </summary>
-/// <remarks>
-/// Age sets the risk tier: high from 85, standard from 65, low under it. The diagnosis opens one clinical
-/// section: Alzheimer's or Parkinson's the cognitive assessment, heart disease the cardiac one, diabetes
-/// the diabetes one. Each alert service answers with what the page sent it (the resident's name, the
-/// reading, the answer), so an alert sent with a field missing reads differently. Each threshold is checked
-/// on its edge. The fields are located by <c>IdGenerator</c>, not <c>PagePlan</c>: every step and every
-/// clinical section renders a plan of its own, and <c>PagePlan</c> reads only the first.
-/// Not exercised: the pacemaker and insulin switches (each shows its details, the same switch-to-section
-/// condition the veteran and wandering switches prove), the polypharmacy warning, the blood-thinner
-/// monitoring level, and the Back buttons, which only show and hide steps.
-/// </remarks>
 [TestFixture]
 public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : PlaywrightTestBase
 {
@@ -114,9 +98,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await Expect(Page.Locator("#pain-section")).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // Step 1: demographics
-
-    // 85 is high risk and 84 is not: a Gt in place of the Gte would call 85 standard.
     [Test]
     public async Task an_age_of_85_or_more_puts_the_resident_in_the_high_risk_tier()
     {
@@ -159,8 +140,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // The directory answers with the physicians whose name holds what was typed: one, of six. A search that
-    // reached the directory without the typed text would offer all six.
     [Test]
     public async Task typing_part_of_a_physicians_name_offers_only_the_physicians_who_match()
     {
@@ -174,8 +153,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await Expect(physician.Input).ToHaveValueAsync("Dr. Emily Park");
         AssertNoConsoleErrors();
     }
-
-    // Step 2: clinical sections
 
     [Test]
     public async Task alzheimers_opens_the_cognitive_assessment_and_no_other_clinical_section()
@@ -213,14 +190,11 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
 
         await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "");
 
-        // A blank score is no score: the page's own Else branch, not the Memory Care branch, now applies.
         await Expect(CognitiveStatus).ToHaveTextAsync("Mild/Normal — Standard");
         await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Standard Assisted Living");
         AssertNoConsoleErrors();
     }
 
-    // The ladder is Lt(15) for Memory Care, then Lt(25) for memory support, else standard. At 15 an
-    // Lte(15) would still say Memory Care; at 25 an Lte(25) would still say memory support.
     [Test]
     public async Task a_moderate_cognitive_score_routes_the_resident_to_assisted_living_with_memory_support()
     {
@@ -236,7 +210,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         await Expect(CognitiveStatus).ToHaveTextAsync("Mild/Normal — Standard", new() { Timeout = 5000 });
         await Expect(Input<Step2ClinicalModel>(m => m.CareUnit)).ToHaveValueAsync("Standard Assisted Living");
 
-        // 24 is the highest moderate score: each step above changes what the status says.
         await FillAndBlur<Step2ClinicalModel>(m => m.CognitiveScore, "24");
         await Expect(CognitiveStatus)
             .ToHaveTextAsync("Moderate Impairment — Assisted Living + Memory", new() { Timeout = 5000 });
@@ -244,7 +217,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // The alert names the resident entered in step 1 and how often they wander.
     [Test]
     public async Task a_resident_who_wanders_frequently_raises_an_elopement_alert_naming_them()
     {
@@ -289,7 +261,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // A Gte in place of the Gt would refer a systolic of exactly 140.
     [Test]
     public async Task a_systolic_pressure_of_140_needs_no_cardiology_referral()
     {
@@ -333,10 +304,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // Step 3: functional assessment
-
-    // Continuous monitoring needs both a fall risk of 7 or more AND an age (from step 1) of 80 or more.
-    // A score of 5 at age 88 fails the first term: an And that read only the age arm would say Continuous.
     [Test]
     public async Task a_high_fall_risk_resident_aged_eighty_or_more_needs_continuous_monitoring()
     {
@@ -356,8 +323,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // The age arm reads a second component: at 74 a high fall risk alone does not call for continuous
-    // monitoring. A dropped And arm, or Or semantics, would say Continuous.
     [Test]
     public async Task a_high_fall_risk_resident_under_eighty_keeps_standard_monitoring()
     {
@@ -390,7 +355,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // A walker calls for an escort but not for an accessible room: the room request is for wheelchairs only.
     [Test]
     public async Task a_walker_user_needs_an_escort_but_no_room_change()
     {
@@ -452,7 +416,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // A Gte in place of the Gt would alert at 7.
     [Test]
     public async Task pain_of_7_clears_the_pain_alert()
     {
@@ -489,10 +452,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // Step 4: review and submit
-
-    // The page refuses the screening before it is sent, so nothing says it is being submitted, and the same
-    // button submits it once the contact is added.
     [Test]
     public async Task a_screening_refused_for_its_missing_contact_is_not_shown_as_submitting_and_submits_once_the_contact_is_added()
     {
@@ -515,7 +474,6 @@ public class WhenAdmissionAssessmentRoutesConditionsAcrossItsWorkflow : Playwrig
         AssertNoConsoleErrors();
     }
 
-    // The server takes its time over a screening; the page says it is submitting until the answer comes back.
     [Test]
     public async Task a_screening_shows_it_is_submitting_until_the_server_completes_the_assessment()
     {

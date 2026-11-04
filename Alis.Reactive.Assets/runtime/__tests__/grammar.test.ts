@@ -1,5 +1,3 @@
-// The grammar's meaning (grammar.md sections 1-3): the browser computes what the developer's C# would.
-
 import { afterEach, describe, expect, it } from "vitest";
 import { Environment } from "../grammar/environment";
 import { evaluate, type Scope, type Objects } from "../grammar/evaluate";
@@ -54,7 +52,6 @@ describe("values convert at the boundary, by shape", () => {
     expect(value(e.as(e.lit(undefined), s.string))).toBeUndefined();
   });
 
-  // A server's class handed to a method: its date members become Dates, the rest stays as it arrived.
   it("passes a record argument with its date members as Dates and every other member kept", () => {
     const shift = { id: 7, subject: "Jane Blonde (CNA)", startTime: "2026-10-13T16:00:00", guid: "kept" };
     let received: Record<string, unknown> | undefined;

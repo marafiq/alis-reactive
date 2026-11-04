@@ -53,7 +53,6 @@
                 </native-hstack>
             </div>
 
-            @* EJ2 moves a column into the other's place: risk into the resident's, then back into the next review's. *@
             @{ Html.InputField(plan, m => m.LeadWithRisk, o => o.Label("Lead with risk"))
                 .NativeCheckBox(b => b.CssClass("rounded border-border"))
                 .Reactive(evt => evt.Change, (args, p) =>

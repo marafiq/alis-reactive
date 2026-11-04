@@ -8,10 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Wing { get; set; } = "";
     }
 
-    /// <summary>
-    /// Server-side grid response. Syncfusion Grid custom binding expects {result, count}.
-    /// Set as dataSource directly: ej2.dataSource = {result: [...], count: N}.
-    /// </summary>
     public class ResidentGridResponse
     {
         public List<ResidentGridItem> Result { get; set; } = new();
@@ -39,7 +35,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? OpenTasks { get; set; }
     }
 
-    /// <summary>The page <c>POST Grid/Data</c> binds: what a DataManager's URL adaptor asks for.</summary>
     public class GridDataRequest
     {
         public int Skip { get; set; }

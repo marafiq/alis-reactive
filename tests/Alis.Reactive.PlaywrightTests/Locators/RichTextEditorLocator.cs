@@ -13,10 +13,8 @@ public sealed class RichTextEditorLocator
         _componentId = componentId;
     }
 
-    /// <summary>Outer <c>.e-richtexteditor</c> wrapper, parent of the hidden textarea.</summary>
     public ILocator Container => _page.Locator($"#{_componentId}").Locator("xpath=..");
 
-    /// <summary>Contenteditable editing area inside the wrapper.</summary>
     public ILocator Editor => Container.Locator("[contenteditable='true']");
 
     public async Task Focus() => await Editor.ClickWhenStableAsync(_page);
@@ -37,7 +35,6 @@ public sealed class RichTextEditorLocator
 
     public async Task Blur() => await _page.Keyboard.PressAsync("Tab");
 
-    /// <summary>Fills text and blurs so Syncfusion raises <c>change</c>.</summary>
     public async Task FillAndBlur(string text)
     {
         await Fill(text);

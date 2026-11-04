@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns
 {
-    /// <summary>
-    /// The move-in packet's contacts: nested and listed inputs saved as JSON and as a form, and a next of
-    /// kin card under a field prefix. URL: /Sandbox/Patterns/MoveInContacts.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Patterns/MoveInContacts")]
     public class MoveInContactsController : Controller
@@ -16,7 +12,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns
         [HttpGet("")]
         public IActionResult Index() => View(ViewBase + "Index.cshtml", new MoveInContactsModel());
 
-        // The next of kin card beside an alternate contact: the same card, rendered twice under two prefixes.
         [HttpGet("Alternate")]
         public IActionResult Alternate() => View(ViewBase + "Alternate.cshtml", new MoveInContactsModel());
 
@@ -34,7 +29,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns
                 ? BadRequest()
                 : Ok(new ContactsSaved($"Next of kin: {Describe(packet.NextOfKin)}; alternate: {Describe(packet.Alternate)}."));
 
-        // What the server bound: the resident by name, then each contact it received, in order.
         private static string DescribePacket(MoveInContactsModel packet)
         {
             var contacts = packet.Contacts.Count == 0

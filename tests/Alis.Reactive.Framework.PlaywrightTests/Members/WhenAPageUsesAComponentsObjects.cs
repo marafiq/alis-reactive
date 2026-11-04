@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Members;
 
-/// <summary>
-/// The objects a component holds and returns, reached by a page's pipelines: a nested object's members
-/// (O1), an object a method returns (O2), a list of objects (O3), and a list a method returns (O4).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageUsesAComponentsObjects : AppPageTest
 {

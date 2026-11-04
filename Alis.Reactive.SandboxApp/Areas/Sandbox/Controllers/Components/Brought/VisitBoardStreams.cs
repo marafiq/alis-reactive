@@ -7,10 +7,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
 {
-    /// <summary>
-    /// The visit board's open streams, keyed by browser session: desks in one session (one community,
-    /// one browser world) hear each other, and no other session does.
-    /// </summary>
     public sealed class VisitBoardStreams
     {
         private static readonly JsonSerializerOptions Web = new JsonSerializerOptions(JsonSerializerDefaults.Web);
@@ -19,7 +15,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         private readonly ConcurrentDictionary<string, ConcurrentDictionary<Channel<BoardPush>, string>> _bySession =
             new ConcurrentDictionary<string, ConcurrentDictionary<Channel<BoardPush>, string>>();
 
-        /// <summary>Opens a desk's stream and tells every desk in the session how many now watch the week.</summary>
         internal Channel<BoardPush> Open(string session, string family)
         {
             var channel = Channel.CreateUnbounded<BoardPush>();
@@ -29,14 +24,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             return channel;
         }
 
-        /// <summary>Closes a desk's stream and tells the desks still open how many now watch.</summary>
         internal void Close(string session, Channel<BoardPush> channel)
         {
             if (!_bySession.TryGetValue(session, out var streams)) return;
             if (streams.TryRemove(channel, out _)) TellHowManyWatch(streams);
         }
 
-        /// <summary>Tells every desk in the session that serves another family that a time was taken.</summary>
         internal void TellOtherDesks(string session, string family, SlotTaken taken)
         {
             if (!_bySession.TryGetValue(session, out var streams)) return;
@@ -45,7 +38,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
                 stream.Writer.TryWrite(push);
         }
 
-        // Each open stream is one desk: a page that opened two streams for one URL would count twice.
         private static void TellHowManyWatch(ConcurrentDictionary<Channel<BoardPush>, string> streams)
         {
             var open = streams.Keys.ToList();
@@ -60,6 +52,5 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         }
     }
 
-    /// <summary>One server-sent event for a desk: its name and its JSON data.</summary>
     internal sealed record BoardPush(string Event, string Data);
 }

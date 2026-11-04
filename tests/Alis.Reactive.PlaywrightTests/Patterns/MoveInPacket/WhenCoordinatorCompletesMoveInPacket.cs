@@ -4,27 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInPacket;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.MoveInPacket;
 
-/// <summary>
-/// As an admissions coordinator, I want everything I enter in a new resident's move-in packet, whatever
-/// kind of field holds it, to reach her record when I save the packet and the business office when I send
-/// it, so that nobody re-types or misses what I recorded.
-/// </summary>
-/// <remarks>
-/// The packet opens on Margaret Thompson, record RES-1042, from the referral; the record number is carried
-/// in a hidden field. Saving posts the packet as JSON; the business office's intake takes it as a form post.
-/// Each side answers with what it received, one sentence for each part of the packet: the resident (hidden
-/// field, text box, masked phone, radio group, select), her care (check box, check list, multi-select, text
-/// area, rich text editor), her schedule (date, time, date and time, date range) and her billing (drop-down
-/// list, multi-column combo box, autocomplete, numeric field, switch). The server builds each sentence from
-/// the values it bound, mapping codes to names, so a value the page failed to send, sent under another name
-/// or in a shape the server cannot bind reads differently, and a packet the server cannot bind at all is not
-/// confirmed. Each test fills one part and reads that part's sentence; the parts it leaves empty are sent
-/// empty. Every value a test reads back differs from the value the field opens with, except the record
-/// number and the name, which come from the referral. Saving or sending without the resident's name sends
-/// nothing: the request count shows it, because the server refuses such a packet as well. The count is read
-/// once the name is given back and the packet saved or sent, so a request the refused click had sent would
-/// have been counted by then.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
 {
@@ -169,7 +148,6 @@ public class WhenCoordinatorCompletesMoveInPacket : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // What is sent is what the packet holds when it is sent, not when the page opened or was last saved.
     [Test]
     public async Task saving_again_after_changing_the_care_level_records_the_new_one()
     {

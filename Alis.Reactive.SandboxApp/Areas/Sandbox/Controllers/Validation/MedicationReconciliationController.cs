@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Medication reconciliation: Save takes a reconciliation the page checked first; Print the MAR takes
-    /// it as it is and runs the same validator.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/MedicationReconciliation")]
     public class MedicationReconciliationController : Controller

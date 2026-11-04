@@ -2,7 +2,6 @@ using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Refusals;
 
-/// <summary>A developer's mistake is refused where the view renders, naming what to change; nothing reaches the browser.</summary>
 [TestFixture]
 public class WhenAPageCannotRender
 {

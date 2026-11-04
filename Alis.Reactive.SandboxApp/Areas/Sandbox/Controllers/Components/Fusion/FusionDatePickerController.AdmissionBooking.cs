@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Admission booking (the Index page): the server proposes the first care-plan review two weeks after
-    /// the admission day, and books the days the coordinator settles on, written out in full.
-    /// </summary>
     public partial class FusionDatePickerController
     {
         [HttpGet("CarePlanReview")]

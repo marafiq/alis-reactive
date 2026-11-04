@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Resident roster: the front desk's roster loads once and is sorted by name in the browser; narrowing
-    /// it to the active residents reads the rows already on screen, with no second request.
-    /// URL: /Sandbox/Components/ArrayGrid.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/ArrayGrid")]
     public class ArrayGridController : Controller
@@ -20,7 +15,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ArrayGridModel());
         }
 
-        /// <summary>The roster, in no particular order: the page sorts it.</summary>
         [HttpGet("Residents")]
         public IActionResult Residents()
         {

@@ -1,14 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>
-/// A request that names the inputs it sends (<c>g.Form(m =&gt; m.A, m =&gt; m.B)</c>), each reaching an endpoint that
-/// says what it bound: only the inputs named, each by its binding name and read as MVC binds it (blank text as
-/// nothing, a number left empty as zero), into a request
-/// member of a type the input's value binds to (the same type, one that may be empty, a base type, another
-/// collection of the same items), matched ignoring case, through a list item or into a member that takes any
-/// name; and in a partial rendered for a member of the page's model, under that member's prefix, or for an entry
-/// of a dictionary keyed by a number, posted as form data. An input no longer on the page is sent as nothing (M8).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageSendsNamedInputs : AppPageTest
 {
@@ -18,7 +9,6 @@ public sealed class WhenAPageSendsNamedInputs : AppPageTest
 
     private async Task Type(string label, string text) => await Page.GetByLabel(label, new() { Exact = true }).FillAsync(text);
 
-    // A text file as the person's computer keeps it, chosen with the file picker labelled for it.
     private async Task Choose(string label, string name, string text)
     {
         var folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), "alis-requests-" + Guid.NewGuid().ToString("N")));

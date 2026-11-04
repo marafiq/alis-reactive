@@ -1,17 +1,10 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// Whitespace typed where the server binds no text (a record number, a time of day, a letter, a link) is
-/// nothing bound, read the way MVC binds it: <c>NotEmpty</c> holds the ride in the browser with its message,
-/// and the server, sent the same entry unchecked, returns it with the same message, because the browser sends
-/// what it read.
-/// </summary>
 [TestFixture]
 public sealed class WhenAnEntryHoldsOnlyWhitespace : AppPageTest
 {
     private readonly List<string> _bookings = new();
 
-    // Every ride that reached the booking endpoint, as the network carried it.
     [SetUp]
     public void WatchTheBookingEndpoint()
     {

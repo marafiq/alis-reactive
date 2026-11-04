@@ -86,7 +86,6 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             }
         }
 
-        /// <summary>Checks whether a fluent chain starts with an HTTP call on the pipeline parameter.</summary>
         private static bool StartsHttpChainOnParameter(
             ExpressionSyntax expression,
             string parameterName,

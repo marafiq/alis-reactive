@@ -5,18 +5,10 @@ using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive.PlanModel.Validation
 {
-    /// <summary>
-    /// Writes a validation container's rules as <c>alis.form</c> data: per field the binding name the server
-    /// reports errors under (an item's standing for every item, <c>Lines[*].Qty</c>), and one test per rule. A
-    /// test's check is a lambda of the field's value and the indexes of the item it checks, true when the value
-    /// passes; its condition is a lambda of the indexes. Every input a rule reads is read as MVC binds it, and each
-    /// check is the server rule's own verdict on that value (grammar.md 7.4).
-    /// </summary>
     internal sealed class FormWriter
     {
         private const string Value = "v";
 
-        // A rule's reads wait for no promise: it is checked on every keystroke, where nothing waits.
         private readonly Scope _scope;
 
         internal FormWriter(Scope scope)
@@ -24,7 +16,6 @@ namespace Alis.Reactive.PlanModel.Validation
             _scope = scope;
         }
 
-        /// <summary>The form's data: its summary, the form's own whichever plan renders it, and its fields.</summary>
         internal FormPluginData Form(string formId, IReadOnlyList<CheckedField> fields) =>
             new FormPluginData(FormSummaries.IdOf(formId), fields.Select(Field).ToList());
 

@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// A page edits a member of its model through the member's editor template, a partial of the member's own
-/// model rendered under the member's prefix (ADR-0003 rule 1: an input's id follows its member). The page
-/// reads the template's input by the member, a rule of the page's validator on the member, the browser's or the
-/// server's, checks what the template holds and shows its message beside the template's field, and the page's
-/// save sends the template's input with the form that holds it (rules 2 and 3).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageEditsAMemberThroughItsTemplate : AppPageTest
 {

@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Room transfers: the request and the urgent request run the same validator, asynchronously because
-    /// housekeeping's calendar is asked. Housekeeping's own desk answers in plain text.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/RoomTransfer")]
     public class RoomTransferController : Controller
@@ -24,7 +20,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         public Task<IActionResult> RequestUrgentTransfer([FromBody] RoomTransferModel? transfer) =>
             RequestAsync(transfer, "Urgent transfer");
 
-        /// <summary>Housekeeping's desk: closed on Sunday, and it says so in a note rather than a record.</summary>
         [HttpPost("Housekeeping")]
         public IActionResult Housekeeping([FromBody] RoomTransferModel? transfer)
         {

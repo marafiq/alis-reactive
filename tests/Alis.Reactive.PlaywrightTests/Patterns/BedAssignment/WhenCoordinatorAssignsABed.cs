@@ -2,21 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.BedAssignment;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.BedAssignment;
 
-/// <summary>
-/// As an admissions coordinator, I want the room list to offer only the rooms of the wing I choose that have
-/// an open bed, and the bed list only that room's open beds, so that I can only assign a new resident a bed
-/// that is free in the room and wing I chose.
-/// </summary>
-/// <remarks>
-/// Maple has rooms 112 (beds A and B open) and 118 (bed B); Oak has 204 (bed A), 207 (A and B) and 211 (B);
-/// Cedar has 305 (A and B). Bed A of a room is by the window, bed B by the door. The wing list comes with
-/// the page; the server answers the rooms of the wing chosen, and the open beds of the room chosen in that
-/// wing, so a beds lookup sent without the wing finds none. Choosing another wing replaces the rooms: the
-/// room list clears the room chosen before, which the new list does not hold, and raises its change, and
-/// the page empties the bed list for it. Not exercised: overlapping lookups from a coordinator who changes
-/// the wing before the rooms arrive (the latest answer is not guaranteed to win, and no page here shows
-/// which did).
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorAssignsABed : PlaywrightTestBase
 {
@@ -180,7 +165,6 @@ public class WhenCoordinatorAssignsABed : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
-    // Gather-pipeline check: no answer can show what the rooms lookup left out, so the request itself is read.
     [Test]
     public async Task the_rooms_lookup_sends_only_the_wing_chosen()
     {

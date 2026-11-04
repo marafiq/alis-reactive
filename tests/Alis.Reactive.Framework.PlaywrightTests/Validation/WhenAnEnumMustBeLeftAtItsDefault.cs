@@ -1,16 +1,10 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// <c>Empty</c> on an enum, decided in the browser as the server decides it: the member the enum's default
-/// binds as is empty, so a guest's meal from the regular menu is ordered; any other menu is held beside the
-/// menu, and the server's own rules return it with the same message.
-/// </summary>
 [TestFixture]
 public sealed class WhenAnEnumMustBeLeftAtItsDefault : AppPageTest
 {
     private readonly List<string> _orders = new();
 
-    // Every meal that reached the ordering endpoint, as the network carried it.
     [SetUp]
     public void WatchTheOrderingEndpoint()
     {

@@ -40,7 +40,6 @@
 
     <native-card><native-card-body>
         <div class="mb-4 max-w-xs">
-            @* The grid asks the server again for its page and sort; the census answers for the age in this box. *@
             @{ Html.InputField(plan, m => m.MinAge, o => o.Label("Aged at least"))
                 .FusionNumericTextBox(b => b
                     .Format("n0")

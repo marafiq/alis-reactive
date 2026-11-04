@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As a nurse, I want a resident's diet plan to open with the dietary restrictions on file checked,
-/// so that the kitchen keeps following them after I save, and only the changes I make are applied.
-/// </summary>
 [TestFixture]
 public class WhenNurseUpdatesDietPlan : PlaywrightTestBase
 {

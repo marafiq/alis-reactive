@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// Every check the validator offers, made in the browser the way the server makes it: a value the rule
-/// refuses is held with the rule's message beside its own field and nothing sent, and a value it takes is
-/// saved by the endpoint running the same rules. A rule only the server makes comes back from the server.
-/// </summary>
 [TestFixture]
 public sealed class WhenEachCheckIsMade : AppPageTest
 {
@@ -18,7 +13,6 @@ public sealed class WhenEachCheckIsMade : AppPageTest
         _saves.Clear();
         Page.Request += (_, request) =>
         {
-            // The page itself is a GET of the same path; a save is the POST.
             if (request.Method == "POST" && request.Url.EndsWith("/Validation/Checks", StringComparison.Ordinal))
                 lock (_saves) _saves.Add(request.Method);
         };

@@ -3,22 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ListBox;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ListBox;
 
-/// <summary>
-/// As the activities coordinator, I want to choose who rides the morning bus to Thursday's garden outing, with
-/// everyone else on the afternoon bus, so that the morning bus is not overfilled, the residents in wheelchairs
-/// get the lift, and nobody misses a morning appointment for the trip.
-/// </summary>
-/// <remarks>
-/// Eight residents signed up; the list's selection is the morning bus, which seats six. Walter Dean and Margaret
-/// Hale ride in wheelchairs and the lift is on the morning bus only. Ruth Coleman and Dorothy Kim have
-/// appointments that morning. Last Thursday Arthur Bell, Grace Liu and Samuel Ortiz rode in the morning.
-/// Last week's groups are applied with DataBind before the lift riders are selected: without it the list still
-/// shows the old selection when SelectItems reads the selection back from the list (list-box.js:891-911,
-/// 2225-2246), that read-back cancels the pending write (ej2-base base.js:60-75), and only the lift riders end up
-/// on the morning bus.
-/// Not exercised: SelectItems and EnableItems by text (their third argument false); every call here names the
-/// residents by ID, which is what the page holds.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionListBox : PlaywrightTestBase
 {

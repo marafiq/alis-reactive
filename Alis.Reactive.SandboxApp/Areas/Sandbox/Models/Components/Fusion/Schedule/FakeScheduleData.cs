@@ -1,9 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// The schedule's seed: facilities, shifts, staff, and each facility's generated week. What a
-    /// browser changes lives in its own <see cref="ScheduleWorld"/>.
-    /// </summary>
     public static class FakeScheduleData
     {
         public static readonly List<Facility> Facilities = new()
@@ -32,10 +28,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             new StaffMember { Id = 8, Name = "James Wilson", Role = "LPN", Phone = "555-0108" },
         };
 
-        /// <summary>The staff educator who teaches the in-services.</summary>
         public const string StaffEducator = "Dana Whitfield";
 
-        /// <summary>The facility whose roster is full: every shift of its weeks starts with someone on it.</summary>
         private const string FullyStaffedFacilityId = "oak-ridge";
 
         private static readonly string[][] ResidentGroups = new[]
@@ -49,7 +43,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             new[] { "Roberts, Smith" },
         };
 
-        /// <summary>Puts a staff member on a shift.</summary>
         public static void Assign(ShiftAssignment assignment, StaffMember staff)
         {
             assignment.StaffName = staff.Name;
@@ -61,7 +54,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             assignment.CategoryColor = null;
         }
 
-        /// <summary>A shift a coordinator adds in an open hour, staffed from the start.</summary>
         public static ShiftAssignment NewAssignment(int id, DateTime startTime, DateTime endTime, int shiftId, StaffMember staff) => new()
         {
             Id = id,
@@ -82,9 +74,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         private static string ShiftLabel(int shiftId) =>
             Shifts.FirstOrDefault(s => s.Id == shiftId)?.Text?.Split(' ')[0] ?? "Shift";
 
-        // string.GetHashCode is randomized per process, so seeding from it gave every sandbox start
-        // a different week. A seed built from the facility's characters and the week's date gives
-        // every run, machine, and CI shard the same week.
         private static int StableSeed(string facilityId, DateTime sunday)
         {
             var seed = sunday.Year * 400 + sunday.DayOfYear;
@@ -92,11 +81,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             return seed;
         }
 
-        /// <summary>
-        /// The week a facility starts with, the same on every run, machine and CI shard: three shifts a day,
-        /// some of them open except at Oak Ridge, whose roster is full, and two in-services the AM staff attend
-        /// after their shift, on Tuesday and Thursday. The staff educator has Thursday's open to change it.
-        /// </summary>
         public static List<ShiftAssignment> GenerateWeek(string facilityId, DateTime sunday)
         {
             var seed = StableSeed(facilityId, sunday);
@@ -153,7 +137,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             return assignments;
         }
 
-        // An hour of training for the AM staff, from 2:30 PM, just after their shift ends.
         private static ShiftAssignment InService(int id, string subject, DateTime day, string openBy) => new()
         {
             Id = id,

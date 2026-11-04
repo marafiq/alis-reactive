@@ -4,9 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title — net48 MVC Smoke</title>
-    @* Each package's build\net48 targets copies its files into Content\{PackageId}\ on build;
-       verify-net48.yml asserts they landed. The design system is this app's choice of look. Each link is
-       versioned by the file's content hash, so a package upgrade reaches a browser with a cached copy. *@
     <link rel="stylesheet" href="@Url.AppendVersion("~/Content/AlisReactive/css/alis-reactive.css")" />
     <link rel="stylesheet" href="@Url.AppendVersion("~/Content/AlisReactive.DesignSystem/css/design-system.css")" />
     <link rel="stylesheet" href="@Url.AppendVersion("~/Content/AlisReactive.Native/css/native.css")" />
@@ -15,8 +12,6 @@
     <div style="max-width: 720px; margin: 2rem auto; padding: 0 1rem;">
         @RenderBody()
     </div>
-    @* Runtime JS copied by the AlisReactive package. root.ts auto-discovers the [data-reactive-plan]
-       script element that RenderPlan emits and boots the plan - no inline script needed. *@
     <script src="@Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js")"></script>
 </body>
 </html>

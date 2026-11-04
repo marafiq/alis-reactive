@@ -2,17 +2,12 @@ using System.Diagnostics;
 
 namespace Alis.Reactive.ArchitectureTests;
 
-/// <summary>The repository the tests run in: the folder holding Alis.Reactive.slnx.</summary>
 internal static class Repository
 {
     internal static readonly string Root = Find(AppContext.BaseDirectory);
 
     private static readonly Lazy<IReadOnlyList<string>> Tracked = new(ListTrackedFiles);
 
-    /// <summary>
-    /// The files git tracks that are on disk, by their path from the root with '/' between folders. A worktree under
-    /// the root is another checkout, never the code.
-    /// </summary>
     internal static IReadOnlyList<string> TrackedFiles => Tracked.Value;
 
     private static string Find(string from)

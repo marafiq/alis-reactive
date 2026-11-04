@@ -1,13 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// The conditions a page is refused for when it renders, with the message the developer reads: an ElseIf
-/// after the Else, a second Else, and a negative minimum length.
-/// </summary>
 [TestFixture]
 public sealed class WhenABranchIsWrittenWrongly : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     [Test]

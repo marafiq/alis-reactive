@@ -9,10 +9,8 @@
 </head>
 <body class="alis-root">
     <main>@RenderBody()</main>
-    @* The layout renders a view's sections after its body: the aside first, the scripts last. *@
     <aside aria-label="For the next shift">@await RenderSectionAsync("Aside", required: false)</aside>
     @await RenderSectionAsync("Scripts", required: false)
-    @* Components first, so their alis:mount listeners exist before the runtime boots the page. *@
     <script src="/js/framework-components.js"></script>
     <script src="/_content/AlisReactive/js/alis-reactive.js"></script>
 </body>

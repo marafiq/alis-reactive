@@ -2,15 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.PharmacyConnection;
 
-/// <summary>
-/// As an administrator, I want to send a test order to a partner pharmacy and read its reply, so that
-/// medication orders only go to a pharmacy that is answering.
-/// </summary>
-/// <remarks>
-/// The server relays the pharmacy's answer as its status code and the body of its reply, a member the
-/// response names <c>ResponseBody</c>. Riverside Pharmacy accepts the order; Northgate Pharmacy is down
-/// for maintenance and says so.
-/// </remarks>
 [TestFixture]
 public class WhenAdministratorTestsPharmacyConnection : PlaywrightTestBase
 {

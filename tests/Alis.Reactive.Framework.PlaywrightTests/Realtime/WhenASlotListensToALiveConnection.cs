@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 
-/// <summary>
-/// A bed loaded into the ward's slot listens to the ward's line (a hub) and board (a stream); the page may
-/// listen too. The server reports, live, how many of the page's line and board connections it holds open.
-/// When the slot is unloaded, a connection only it listened to closes, is not offered for retry, reads as
-/// closed and withdraws an offer it had; while the page still listens, the connection stays and only the
-/// slot's handlers stop hearing it.
-/// </summary>
 [TestFixture]
 public sealed class WhenASlotListensToALiveConnection : AppPageTest
 {

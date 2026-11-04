@@ -1,6 +1,3 @@
-/* The sandbox's stylesheet: Tailwind's utilities for its own views, resolved against the design
-   system's theme. AlisReactive.DesignSystem copies the theme into ./AlisReactive.DesignSystem/ on
-   every build (its .targets, imported by the csproj), a folder that ignores itself. */
 @import "tailwindcss" source(none);
 @plugin "@tailwindcss/forms";
 @import "./AlisReactive.DesignSystem/theme.css";
@@ -11,8 +8,6 @@
 @source "../Controllers/**/*.cs";
 @source "../Models/**/*.cs";
 
-/* The mark a saved in-place editor carries: _DobQuickEditCard adds alis-editor-saved on success and
-   removes it when editing begins; Syncfusion keeps the wrapper's classes across its edit cycle. */
 .alis-editor-saved .e-editable-value::after {
   content: " ✓";
   color: var(--color-success);

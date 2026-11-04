@@ -2,7 +2,6 @@ using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Refusals;
 
-/// <summary>A payload is a record of members set once each; what is not that is refused as it is written.</summary>
 [TestFixture]
 public class WhenAPayloadCannotBeComposed
 {

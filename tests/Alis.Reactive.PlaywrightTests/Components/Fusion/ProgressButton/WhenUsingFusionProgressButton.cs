@@ -3,27 +3,11 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ProgressBu
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ProgressButton;
 
-/// <summary>
-/// As a med-pass nurse handing off the evening shift, I want to send the medication pass to the pharmacy from a
-/// button that shows how much of the report has gone, so that I leave the floor knowing the pharmacy has it.
-/// </summary>
-/// <remarks>
-/// The send button stays disabled until the nurse checks off the pass; checking it off readies the button and
-/// puts her on it. Lakeside Pharmacy confirms once the six-second upload finishes; Riverside Pharmacy confirms
-/// the moment it has the report, which ends the upload there and then; County Pharmacy takes the pass by fax,
-/// which has no upload bar. A saved draft that stopped at 60% can be resumed from there or sent again whole.
-/// Content and CssClass are proven by what the button shows once the report is sent; nothing on a send page
-/// reads its own button's words or colour back, so their reads are not exercised (the page reads the button
-/// through Disabled and EnableProgress). Begin always reports 0% after no time, so Percent and CurrentDuration
-/// are told apart on a resumed send's first moment (60% after no time), and Step on Begin. A confirmed send is
-/// told apart from the upload's own end by time: it ends inside three seconds, the upload takes six.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionProgressButton : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionProgressButton";
 
-    // The upload runs six seconds; a pharmacy that confirms on receipt ends it well inside three.
     private const int ConfirmedOnReceiptWithinMs = 3000;
     private const int UploadFinishesWithinMs = 15000;
 

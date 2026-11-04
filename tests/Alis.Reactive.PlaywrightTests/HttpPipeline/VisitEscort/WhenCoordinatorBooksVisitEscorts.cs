@@ -3,21 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.VisitEscort;
 
-/// <summary>
-/// As the memory-care coordinator, I want every visit time I book for a family to have an escort booked
-/// at the wing's desk, and every time I release to let its escort go, so that no family arrives without
-/// someone to walk them in.
-/// </summary>
-/// <remarks>
-/// The page opens from a link that names the resident, the wing and the desk: the week of times comes from
-/// the desk by the resident in the link. The visit planner is a widget the sandbox wrote itself. Each time
-/// booked asks the desk for an escort: the time from the planner's event, the wing from the link, which
-/// visit of the week from the planner's count, and the desk from the link's X-Desk header, which a link
-/// may leave out. Each time released releases its escort with a reason. Sharing the week waits for the
-/// summary the planner prepares and sends it with the visits left; naming the party at the earliest visit
-/// sends the visitors and the note inside the party and the companion as the first companion, as JSON on
-/// the way to the desk and as query keys when asking about the seating.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorBooksVisitEscorts : PlaywrightTestBase
 {
@@ -95,7 +80,6 @@ public class WhenCoordinatorBooksVisitEscorts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The visit count is read when each request is sent, so the second booking asks for the week's second visit.
     [Test]
     public async Task a_second_booking_asks_for_the_weeks_second_visit()
     {
@@ -121,7 +105,6 @@ public class WhenCoordinatorBooksVisitEscorts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A link with no desk sends no X-Desk header at all, and the desk system refuses a request that names none.
     [Test]
     public async Task a_link_naming_no_desk_asks_me_to_book_the_escort_by_phone()
     {
@@ -151,8 +134,6 @@ public class WhenCoordinatorBooksVisitEscorts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The summary is prepared by the planner over a moment and read back as a promise; the request is
-    // sent only once both have settled, with the visits left counted at that moment.
     [Test]
     public async Task sharing_the_week_sends_the_family_the_planners_summary_and_the_visits_left()
     {
@@ -232,7 +213,6 @@ public class WhenCoordinatorBooksVisitEscorts : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The planner's own markup, as the coordinator sees it.
     private sealed class PlannerField
     {
         private readonly ILocator _root;

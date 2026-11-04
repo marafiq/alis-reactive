@@ -2,8 +2,6 @@ using Alis.Reactive;
 
 namespace Alis.Reactive.PlanTests.Support;
 
-// The one page the plans are authored for: a resident's admission, with the members every grammar
-// production needs, a text, a number, a yes or no, a choice and a list.
 public sealed class Admission
 {
     public string? Name { get; set; }
@@ -60,7 +58,6 @@ public static class AdmissionEvents
     public static readonly AppEvent<Admission> Admitted = AppEvent.Declare<Admission>();
 }
 
-/// <summary>What an endpoint binds when it reads the age as text: the form's number does not fit it.</summary>
 public sealed class AdmissionAsText
 {
     public string? Name { get; set; }
@@ -68,20 +65,17 @@ public sealed class AdmissionAsText
     public string? Age { get; set; }
 }
 
-/// <summary>The rules every admission is checked by, written once and run on both sides.</summary>
 public sealed class AdmissionRules : ReactiveValidator<Admission>
 {
     public AdmissionRules()
     {
         RuleFor(x => x.Name).NotEmpty().WithMessage("Name the resident.");
 
-        // Only the server reads the tags through a query: declared so, the rule under it stays there.
         WhenOnServer(x => x.Tags.Any(tag => tag.Length > 3), () =>
             RuleFor(x => x.Age).GreaterThan(0).WithMessage("Give the resident's age."));
     }
 }
 
-/// <summary>The care level is a value the enum declares.</summary>
 public sealed class CareLevelRules : ReactiveValidator<Admission>
 {
     public CareLevelRules()
@@ -90,7 +84,6 @@ public sealed class CareLevelRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>The deposit has at most five digits, two of them decimals, every trailing zero counted.</summary>
 public sealed class DepositRules : ReactiveValidator<Admission>
 {
     public DepositRules()
@@ -99,7 +92,6 @@ public sealed class DepositRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>The deposit's rule with the name its messages say given, not spelled from the member.</summary>
 public sealed class NamedDepositRules : ReactiveValidator<Admission>
 {
     public NamedDepositRules()
@@ -108,7 +100,6 @@ public sealed class NamedDepositRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>The age is checked only while the name passes its own check.</summary>
 public sealed class DependentAdmissionRules : ReactiveValidator<Admission>
 {
     public DependentAdmissionRules()
@@ -118,7 +109,6 @@ public sealed class DependentAdmissionRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>A check written in C# with failures of its own.</summary>
 public sealed class CustomAdmissionRules : ReactiveValidator<Admission>
 {
     public CustomAdmissionRules()
@@ -130,7 +120,6 @@ public sealed class CustomAdmissionRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>An admission's rules by stage: an enquiry asks less than an admission, and the name's length is asked of neither.</summary>
 public sealed class StagedAdmissionRules : ReactiveValidator<Admission>
 {
     public StagedAdmissionRules()
@@ -142,7 +131,6 @@ public sealed class StagedAdmissionRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>The same rules with the query written as a plain When, which the browser cannot read.</summary>
 public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
 {
     public UnreadableAdmissionRules()
@@ -152,7 +140,6 @@ public sealed class UnreadableAdmissionRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>The rules of a next of kin, written once for every validator that holds one.</summary>
 public sealed class ContactRules : ReactiveValidator<Contact>
 {
     public ContactRules()
@@ -161,7 +148,6 @@ public sealed class ContactRules : ReactiveValidator<Contact>
     }
 }
 
-/// <summary>A message after a child validator has no check of its own to name.</summary>
 public sealed class MessageAfterChildRules : ReactiveValidator<Admission>
 {
     public MessageAfterChildRules()
@@ -170,7 +156,6 @@ public sealed class MessageAfterChildRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>A rule under a condition that waits: the server's alone.</summary>
 public sealed class WaitingAdmissionRules : ReactiveValidator<Admission>
 {
     public WaitingAdmissionRules()
@@ -181,7 +166,6 @@ public sealed class WaitingAdmissionRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>A rule on a value computed from a member has no member to report under.</summary>
 public sealed class ComputedMemberRules : ReactiveValidator<Admission>
 {
     public ComputedMemberRules()
@@ -190,7 +174,6 @@ public sealed class ComputedMemberRules : ReactiveValidator<Admission>
     }
 }
 
-/// <summary>The front desk's object on the page: a method that answers after asking the server.</summary>
 public sealed class Desk : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;

@@ -1,14 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Realtime;
 
-/// <summary>
-/// A declared document event reads as the name it is raised under, with or without a payload: its member's
-/// name camel-cased, or the name given. An event declared with a blank name, or by no member, is refused when
-/// the page renders, with the message the developer reads.
-/// </summary>
 [TestFixture]
 public sealed class WhenAnEventIsNamed : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     [Test]

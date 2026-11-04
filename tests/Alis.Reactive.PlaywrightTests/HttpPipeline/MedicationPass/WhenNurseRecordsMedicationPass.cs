@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.MedicationPass;
 
-/// <summary>
-/// As a nurse, I want each dose I tick during the medication pass to be recorded against that
-/// resident, so that the record shows exactly who received their medication.
-/// </summary>
 [TestFixture]
 public class WhenNurseRecordsMedicationPass : PlaywrightTestBase
 {
@@ -34,8 +30,6 @@ public class WhenNurseRecordsMedicationPass : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The refill request runs inside the pass's success route; its own route reads the pass
-    // confirmation by that response's handle, not the refill response it is nested in.
     [Test]
     public async Task the_next_pass_time_shows_once_the_refills_are_ordered()
     {

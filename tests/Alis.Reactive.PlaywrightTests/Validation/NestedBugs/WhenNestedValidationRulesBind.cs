@@ -18,7 +18,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await Input<NestedAddressModel>(m => m.Name).FillAsync("Jane");
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
-        // With no city there is nothing to confirm: the page sends the form and the server saves it.
         await Expect(Page.Locator("#result")).ToHaveTextAsync("Saved");
         await Expect(Page.Locator($"#nested-form span[data-valmsg-for='Address.ConfirmCity']")).ToHaveTextAsync("");
         AssertNoConsoleErrors();
@@ -49,7 +48,6 @@ public class WhenNestedValidationRulesBind : PlaywrightTestBase
         await Input<ParentChildModel>(m => m.Child.ChildFlag).CheckAsync();
         await ClickWhenStable(Page.Locator("#submit-btn"));
 
-        // The child's condition holds, but the parent's does not: nothing is asked for and the form is saved.
         await Expect(Page.Locator("#result")).ToHaveTextAsync("Saved");
         await Expect(Page.Locator($"#parent-child-form span[data-valmsg-for='Child.ChildName']")).ToHaveTextAsync("");
         AssertNoConsoleErrors();

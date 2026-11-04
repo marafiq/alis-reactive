@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Maple Grove's referral intake: today's inbox of referral letters, the save of a referral, and the
-    /// answers an AI service would give Syncfusion's smart components. The sandbox reaches no AI service, so
-    /// <see cref="Paste"/> reads the letter's labelled lines and <see cref="Suggest"/> completes two openings.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/SmartComponents")]
     public class SmartComponentsController : Controller
@@ -21,7 +16,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new() { Id = "ref-3102", Summary = "Riverside Medical Group: Arthur Bell" }
         ];
 
-        // Each inbox referral's letter, by the referral's ID.
         private static readonly IReadOnlyDictionary<string, string> Letters = new Dictionary<string, string>
         {
             ["ref-3101"] = "St. Mary's Hospital, Discharge Planning\n"
@@ -38,7 +32,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static readonly IReadOnlyList<string> CareLevels = ["Independent Living", "Assisted Living", "Memory Care"];
 
-        // The letter's label for each field of the referral form, by the field's name.
         private static readonly IReadOnlyDictionary<string, string> LetterLabels = new Dictionary<string, string>
         {
             ["ResidentName"] = "Patient",
@@ -47,7 +40,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             ["Reason"] = "Reason for referral"
         };
 
-        // What the stand-in suggests after a note's last word.
         private static readonly IReadOnlyDictionary<string, string> Completions = new Dictionary<string, string>
         {
             ["family"] = " tour scheduled for Thursday",
@@ -80,7 +72,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Smart Paste asks for each form field by name; the answer gives each a value from the letter.
         [HttpPost("Paste")]
         public IActionResult Paste([FromBody] SmartAssistRequest request)
         {
@@ -90,7 +81,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Content(string.Join("\n", lines), "text/plain");
         }
 
-        // The smart text area asks what the coordinator will type at the cursor (^^^).
         [HttpPost("Suggest")]
         public IActionResult Suggest([FromBody] SmartAssistRequest request)
         {
@@ -104,7 +94,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static string Instructions(SmartAssistRequest request) =>
             request.Messages.FirstOrDefault(message => message.Role == "system")?.Content ?? string.Empty;
 
-        // The last user message, after its USER_DATA: or USER_TEXT: label.
         private static string UserText(SmartAssistRequest request)
         {
             var content = request.Messages.LastOrDefault(message => message.Role == "user")?.Content ?? string.Empty;

@@ -24,8 +24,6 @@ namespace Alis.Reactive
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
-            // Transient: the browser's rules are read from the validator the request resolves, so a
-            // scoped dependency, DateTime.Today or a captured setting is the one this request's server sees.
             services.TryAddTransient<IBrowserRuleSource, ReactiveValidatorRuleSource>();
 
             var builder = new ReactiveFluentValidationBuilder(services);

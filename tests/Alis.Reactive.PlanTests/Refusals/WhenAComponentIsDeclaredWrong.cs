@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.PlanTests.Refusals;
 
-/// <summary>A brought component is a declaration of its members on a vendor; a declaration the framework cannot follow is refused naming the rule.</summary>
 [TestFixture]
 public class WhenAComponentIsDeclaredWrong
 {

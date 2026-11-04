@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-// PreToolUse gate for Bash: Playwright runs only through scripts/playwright.sh.
-// Decides by the test TARGET, not by words in the command: `dotnet test` / `dotnet vstest` must
-// name a non-Playwright test project. The solution, a bare `dotnet test` (which resolves to the
-// solution or the project in the current directory), and the Playwright project are redirected.
 const OPTIONS_WITH_VALUE = new Set([
   "--filter", "--configuration", "-c", "--framework", "-f", "--logger", "-l", "--settings", "-s",
   "--output", "-o", "--results-directory", "--diag", "-d", "--verbosity", "-v", "--runtime", "-r",

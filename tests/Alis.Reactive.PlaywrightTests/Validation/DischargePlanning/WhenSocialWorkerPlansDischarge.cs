@@ -4,17 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.DischargePlanning;
 
-/// <summary>
-/// As a social worker, I want the discharge plan to ask only for what the answers around it call for,
-/// and to stop asking when those answers change, so that the plan I save is complete for the resident
-/// it describes.
-/// </summary>
-/// <remarks>
-/// Every form a condition can take gates one rule on this plan. Each test turns a condition on with
-/// a real answer, sees the rule asked for before anything is sent, then turns the condition off or
-/// satisfies the rule and sees the server save the plan. The server runs the same validator, so a
-/// condition the page decided wrongly would come back as a refusal.
-/// </remarks>
 [TestFixture]
 public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
 {
@@ -47,8 +36,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Write(m => m.ResidentName, "Helen Park");
     }
 
-    // Leaving the field itself lets its message settle, and leaves no other field to settle under the
-    // next click.
     private async Task Write(Expression<Func<DischargePlanModel, object?>> field, string text) =>
         await _plan.TextBox(field).FillAndBlur(text);
 
@@ -101,7 +88,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
         Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
-        // Going home, but not alone: one of the two answers is enough to drop the rule.
         await LivesAlone.Input.UncheckAsync();
         await ClickWhenStable(SavePlan);
         await Expect(PlanStatus).ToHaveTextAsync(Saved);
@@ -122,7 +108,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Expect(PlanStatus).ToHaveTextAsync("No plan saved yet.");
         Assert.That(_plansSent, Has.Count.EqualTo(0), "The page asked for the answer, so nothing was sent.");
 
-        // The pets stay ticked; the resident no longer goes home, so the inner condition counts for nothing.
         await GoingHome.Input.UncheckAsync();
         await Write(m => m.HomeAddress, "");
         await ClickWhenStable(SavePlan);
@@ -224,7 +209,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Expect(PlanStatus).ToHaveTextAsync(Saved);
         Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
 
-        // Another destination asks for none of it.
         await Destination.Select("Hospital");
         await Write(m => m.BedConfirmation, "");
         await Write(m => m.TransferSummary, "");
@@ -235,7 +219,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The transfer destinations are a list the condition holds.
     [Test]
     public async Task a_transfer_to_hospice_or_skilled_nursing_needs_the_receiving_nurse_and_a_hospital_does_not()
     {
@@ -256,7 +239,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The same destinations as an array: the server asks for the summary, and so should the page.
     [Test]
     public async Task a_transfer_to_hospice_or_skilled_nursing_needs_the_nursing_summary_and_a_hospital_does_not()
     {
@@ -356,7 +338,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Expect(PlanStatus).ToHaveTextAsync(Saved);
         Assert.That(_plansSent, Has.Count.EqualTo(1), "The page let the plan through, and the server accepted it.");
 
-        // Either reason is enough: three flights of stairs ask for the visit too.
         await Write(m => m.StairsAtHome, "3");
         await Write(m => m.StairPlan, "Rail on both sides, one step at a time");
         await ClickWhenStable(SavePlan);
@@ -463,7 +444,6 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The answer that gated the rule changes; leaving the field it gated rechecks it under the new answer.
     [Test]
     public async Task a_home_address_message_clears_when_the_resident_is_no_longer_going_home_and_the_field_is_left()
     {

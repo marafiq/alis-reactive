@@ -2,16 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A rule written under a condition applies only while the condition holds, in the browser as on the server,
-/// for every form a condition the browser can read takes: the six comparisons with the member on either
-/// side, a value the validator fixes, null, empty text, the three text tests and a pattern, a fixed array and
-/// list, a nullable's value, a flag, a negation, a nested member, a list member holding an item, and the
-/// conditions joined by and and or. A child validator's rules apply only while the condition written on the
-/// child holds, and each condition of its own reads the child's inputs.
-/// Each field starts filled; a test empties it, sets what the condition reads so that it holds, and the
-/// browser refuses with nothing sent; then it sets it so that it does not, and the request is saved.
-/// </summary>
 [TestFixture]
 public sealed class WhenARuleIsWrittenUnderACondition : AppPageTest
 {

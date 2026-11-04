@@ -13,8 +13,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             return View("~/Areas/Sandbox/Views/Validation/SpecializedRules/Index.cshtml", new NewRuleTypesModel());
         }
 
-        // The server runs the same validator on what the form sent: a value the browser accepts is one
-        // the server accepts.
         [HttpPost("ValidateClient")]
         public IActionResult ValidateClient([FromBody] NewRuleTypesModel? model)
         {

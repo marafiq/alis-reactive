@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A condition that waits (WhenAsync) is the server's: the rules under it reach no input, the form sends,
-/// and the server answers under the condition. A validator holding one is validated with ValidateAsync;
-/// asked without waiting, it refuses and says so.
-/// </summary>
 [TestFixture]
 public sealed class WhenAConditionWaits : AppPageTest
 {

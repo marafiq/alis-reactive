@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// Rules on a list's items, on a child the form holds, and rules included whole: each check on an item is
-/// made, and the server's answer for an item, for a child's member or for an included rule lands beside the
-/// field it is about, even where the check or the condition around it is the server's alone.
-/// </summary>
 [TestFixture]
 public sealed class WhenListsAndChildrenAreChecked : AppPageTest
 {

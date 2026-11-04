@@ -1,9 +1,3 @@
-// An owner is the page or a slot (grammar.md 3.5). It holds disposers for what was done on its behalf
-// (handler subscriptions, plugin data contributions, connection subscriptions) and knows nothing about
-// what they are. Starting an owner runs the work waiting for its start: the document's `ready`. An
-// owner starts once, after its plans have subscribed and contributed (plans/start.ts), and is
-// disposed at most once, when its slot is released (plugins/slot.ts).
-
 import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
 
@@ -32,7 +26,6 @@ export class Owner {
   }
 
   start(): void {
-    // A hook runs a ready handler, which logs its own failure and stops no other (plans/start.ts runHandler).
     for (const hook of this.startHooks.splice(0)) hook();
   }
 

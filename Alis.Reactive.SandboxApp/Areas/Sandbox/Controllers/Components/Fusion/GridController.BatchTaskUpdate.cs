@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The day task board: the Birch wing day nurse keeps each resident's open tasks current and hands the board to the
-    /// evening shift. Every page starts from the counts on record; a handover answers with the board as saved and what
-    /// changed against the record, and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("BatchTaskUpdate"), ActionName("BatchTaskUpdate")]

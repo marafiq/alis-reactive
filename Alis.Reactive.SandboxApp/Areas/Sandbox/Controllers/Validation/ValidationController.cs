@@ -64,7 +64,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             var dbSection = model.Db;
             if (dbSection != null)
             {
-                // The section's own rules name its fields from the section; the page names them under Db.
                 var sectionResult = new BasicSectionValidator().Validate(dbSection);
                 if (!sectionResult.IsValid)
                 {

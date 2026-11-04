@@ -1,22 +1,5 @@
 <Project>
 
-  <!--
-    Imported into every .NET project that references AlisReactive.DesignSystem (NuGet: build\ and
-    buildTransitive\; the sandbox and the framework test app: an <Import> of this file). Before each build
-    it copies the theme, css/theme.css, into a folder the package owns, Styles\AlisReactive.DesignSystem\
-    under the project, so the project's own Tailwind stylesheet can `@import` it:
-
-      @import "tailwindcss";
-      @import "./AlisReactive.DesignSystem/theme.css";
-
-    The folder is build output and says so itself: the package writes a .gitignore into it that ignores
-    everything there, so git never lists the copy and the project configures nothing. Both files are
-    written only when they change. AlisReactiveThemeFolder names another folder (the package owns it and
-    writes its .gitignore); `none` turns the copy off. On .NET Framework the theme lands at
-    Content\AlisReactive.DesignSystem\css\theme.css with the package's other browser assets
-    (build\net48\AlisReactive.DesignSystem.targets), and this file is not imported.
-  -->
-
   <PropertyGroup>
     <AlisReactiveThemeFolder Condition="'$(AlisReactiveThemeFolder)' == ''">$(MSBuildProjectDirectory)\Styles\AlisReactive.DesignSystem\</AlisReactiveThemeFolder>
     <_AlisReactiveThemeSource Condition="Exists('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css')">$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css</_AlisReactiveThemeSource>

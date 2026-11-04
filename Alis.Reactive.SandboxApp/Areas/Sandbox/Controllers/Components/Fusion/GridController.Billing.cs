@@ -6,12 +6,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Month-end billing: the business office pages, sorts and filters the month's charges on the server,
-    /// corrects rates in the grid, raises the rates of the residents it picks, marks them billed, opens a
-    /// new resident's charges and emails the families their statements. The charges live in the browser
-    /// session (seeded on first visit), so each browser keeps its own month while its changes persist.
-    /// </summary>
     public partial class GridController
     {
         private const string BillingSessionKey = "billingCensus";
@@ -90,7 +84,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Only a charge still pending goes out on this month's bill; a billed or paid one is already out.
         [HttpPost("BillingMarkBilled")]
         public IActionResult BillingMarkBilled([FromBody] BillingBulkRequest request)
         {
@@ -113,7 +106,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // A resident has one set of charges a month; a second is refused as the dialog's own field error.
         [HttpPost("BillingAddCharge")]
         public IActionResult BillingAddCharge([FromBody] ResidentBillingViewModel request)
         {
@@ -128,7 +120,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                     [nameof(ResidentBillingViewModel.NewResidentName)] = [$"{name} already has charges this month."]
                 });
 
-            // New residents move in to the North wing's move-in suites.
             var row = new ResidentBillingItem
             {
                 ResidentId = census.Max(r => r.ResidentId) + 1,
@@ -149,7 +140,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Every family on the board who owes this month gets a statement; a paid-up family gets none.
         [HttpPost("BillingEmailStatements")]
         public IActionResult BillingEmailStatements([FromBody] BillingStatementsRequest request)
         {
@@ -190,7 +180,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 .Where(r => string.IsNullOrWhiteSpace(wing) || r.Wing.Equals(wing, StringComparison.OrdinalIgnoreCase))
                 .Where(r => string.IsNullOrWhiteSpace(status) || r.BillingStatus.Equals(status, StringComparison.OrdinalIgnoreCase));
 
-        // The grid's sort, column by column; a board with no sort lists residents by name.
         private static IEnumerable<ResidentBillingItem> SortBilling(
             IEnumerable<ResidentBillingItem> source, List<FusionGridSortColumn>? sorted)
         {
@@ -221,7 +210,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             _ => r.ResidentName
         };
 
-        // "36 residents: $151,975 outstanding.", or with the board's filters in brackets.
         private static string BillingBoardSummary(List<ResidentBillingItem> rows, string? careLevel, string? wing, string? status)
         {
             var filters = new[] { careLevel, string.IsNullOrWhiteSpace(wing) ? null : $"{wing} wing", status }
@@ -237,7 +225,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static string BillingDollars(decimal amount) => "$" + amount.ToString("N0", CultureInfo.InvariantCulture);
 
-        // The month's charges, by name: care levels in turn, a third each pending, billed and paid.
         private static List<ResidentBillingItem> BillingChargesOnFile()
         {
             var names = new[]

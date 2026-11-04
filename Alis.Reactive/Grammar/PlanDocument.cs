@@ -4,10 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Grammar
 {
-    /// <summary>
-    /// The plan a view renders (grammar.md 1.1): the vendors its components come from, the objects it
-    /// locates, and the handlers it subscribes. The document names no feature.
-    /// </summary>
     internal sealed class PlanDocument
     {
         internal PlanDocument(
@@ -31,7 +27,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<Handler> Handlers { get; }
     }
 
-    /// <summary>Where a vendor's objects live on an element, how they take a listener, and what a listener receives.</summary>
     internal sealed class Vendor
     {
         internal Vendor(IReadOnlyList<string> objectPath, VendorListening listen, VendorEventPayload payload)
@@ -51,11 +46,6 @@ namespace Alis.Reactive.Grammar
             && Payload == other.Payload;
     }
 
-    /// <summary>
-    /// How a vendor's objects take a listener (grammar.md 1.1): through a pair of methods, or by
-    /// assignment to the property the event names. These two are the whole set; the method pair
-    /// carries its names and the assignment has nothing to carry, so a vendor cannot name half of each.
-    /// </summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<VendorListening>))]
     internal abstract class VendorListening
     {
@@ -64,7 +54,6 @@ namespace Alis.Reactive.Grammar
         internal abstract bool SameAs(VendorListening other);
     }
 
-    /// <summary><c>method(subscribe, unsubscribe)</c>: <c>object.on(event, fn)</c> adds a listener and <c>object.off(event, fn)</c> removes it.</summary>
     internal sealed class MethodVendorListening : VendorListening
     {
         internal MethodVendorListening(string subscribe, string unsubscribe)
@@ -83,10 +72,6 @@ namespace Alis.Reactive.Grammar
             other is MethodVendorListening method && method.Subscribe == Subscribe && method.Unsubscribe == Unsubscribe;
     }
 
-    /// <summary>
-    /// <c>assignment</c>: <c>object.onEvent = fn</c> adds the listener after the function the property
-    /// already holds, and what the property held is put back when the handler's owner unloads.
-    /// </summary>
     internal sealed class AssignmentVendorListening : VendorListening
     {
         internal AssignmentVendorListening() { }
@@ -96,14 +81,12 @@ namespace Alis.Reactive.Grammar
         internal override bool SameAs(VendorListening other) => other is AssignmentVendorListening;
     }
 
-    /// <summary>How the runtime finds an object: on an element, or made by a registered plugin.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<ObjectLocator>))]
     internal abstract class ObjectLocator
     {
         private protected ObjectLocator() { }
     }
 
-    /// <summary><c>element(id, vendor)</c>: the vendor's object on the element with this id.</summary>
     internal sealed class ElementObjectLocator : ObjectLocator
     {
         internal ElementObjectLocator(string id, string vendor)
@@ -119,7 +102,6 @@ namespace Alis.Reactive.Grammar
         public string Vendor { get; }
     }
 
-    /// <summary><c>plugin(name, key, data)</c>: an object of the plugin a bundle registered under the name.</summary>
     internal sealed class PluginObjectLocator : ObjectLocator
     {
         internal PluginObjectLocator(string name, string key, PluginData data)
@@ -136,7 +118,6 @@ namespace Alis.Reactive.Grammar
         public PluginData Data { get; }
     }
 
-    /// <summary>What a plan contributes to a plugin, under its owner.</summary>
     [JsonConverter(typeof(PlanNodeDiscriminator<PluginData>))]
     internal abstract class PluginData
     {
@@ -145,16 +126,11 @@ namespace Alis.Reactive.Grammar
         internal static PluginData None { get; } = new NonePluginData();
     }
 
-    /// <summary>A plugin object that takes no data from the plan.</summary>
     internal sealed class NonePluginData : PluginData
     {
         public string Kind => "none";
     }
 
-    /// <summary>
-    /// <c>alis.hub</c> data: it carries nothing but itself. A plan that names a hub contributes it, so the plan
-    /// holds the hub's connection for as long as its owner lives (grammar.md 6.7, B1).
-    /// </summary>
     internal sealed class HubPluginData : PluginData
     {
         internal HubPluginData() { }
@@ -162,7 +138,6 @@ namespace Alis.Reactive.Grammar
         public string Kind => "hub";
     }
 
-    /// <summary><c>alis.model</c> data: the inputs this plan rendered, by element id (grammar.md 6.3).</summary>
     internal sealed class ModelPluginData : PluginData
     {
         internal ModelPluginData(IReadOnlyDictionary<string, InputBinding> inputs)
@@ -174,10 +149,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyDictionary<string, InputBinding> Inputs { get; }
     }
 
-    /// <summary>
-    /// An input bound to the model: its MVC name, its JSON body path, how its value reads, the event its
-    /// component raises when a value is committed, and the class its element carries while a form refuses it.
-    /// </summary>
     internal sealed class InputBinding
     {
         internal InputBinding(string name, IReadOnlyList<BodyStep> body, Expr value, Shape shape, string committed, string invalidClass)
@@ -196,23 +167,18 @@ namespace Alis.Reactive.Grammar
 
         public string Name { get; }
 
-        /// <summary>The JSON body path the input binds under: a name makes an object, a position makes an array.</summary>
         public IReadOnlyList<BodyStep> Body { get; }
 
         public Expr Value { get; }
         public Shape Shape { get; }
 
-        /// <summary>The component's event that commits a value; the model re-raises it as <c>alis:commit</c>.</summary>
         public string Committed { get; }
 
-        /// <summary>The class the input's element carries while a form refuses it (grammar.md M9): the app's choice.</summary>
         public string InvalidClass { get; }
 
-        /// <summary>Whether the input binds a list, so a request repeats its key per item and sends nothing when it is missing.</summary>
         public bool List { get; }
     }
 
-    /// <summary><c>alis.form</c> data: the fields a validation container checks (grammar.md 6.4).</summary>
     internal sealed class FormPluginData : PluginData
     {
         internal FormPluginData(string summary, IReadOnlyList<FormField> fields)
@@ -223,17 +189,11 @@ namespace Alis.Reactive.Grammar
 
         public string Kind => "form";
 
-        /// <summary>The element id of the form's validation summary, <c>{formId}_validation_summary</c>, which the server renders.</summary>
         public string Summary { get; }
 
         public IReadOnlyList<FormField> Fields { get; }
     }
 
-    /// <summary>
-    /// A field of a form: the binding name the server reports errors under, and its tests. An item's name stands
-    /// for every item, each <c>[*]</c> for an index (<c>Lines[*].Qty</c>): the form checks each mounted input the
-    /// name names (grammar.md F1).
-    /// </summary>
     internal sealed class FormField
     {
         internal FormField(string name, IReadOnlyList<FormTest> tests)
@@ -247,10 +207,6 @@ namespace Alis.Reactive.Grammar
         public IReadOnlyList<FormTest> Tests { get; }
     }
 
-    /// <summary>
-    /// A test of a field: the check its value must pass while the condition holds, each a lambda of the indexes
-    /// of the item it checks (<c>check(v, i)</c>, <c>when(i)</c>), and the message shown when it fails.
-    /// </summary>
     internal sealed class FormTest
     {
         internal FormTest(FnExpr check, FnExpr when, string message)
@@ -265,13 +221,8 @@ namespace Alis.Reactive.Grammar
         public string Message { get; }
     }
 
-    /// <summary>
-    /// <c>on(object, path, event) { do }</c>: a handler of an event of the object, or of the object it holds at
-    /// <c>path</c>. The payload is bound as <c>e</c> (<see cref="Payload"/>) for the handler's block.
-    /// </summary>
     internal sealed class Handler
     {
-        /// <summary>The name a handler's block reads its payload by.</summary>
         internal const string Payload = "e";
 
         internal Handler(string on, IReadOnlyList<string> path, string eventName, IReadOnlyList<Statement> body)

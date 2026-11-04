@@ -7,7 +7,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     [Route("Sandbox/Components/OtpInput")]
     public class OtpInputController : Controller
     {
-        // Today's one booked visit, and the code the desk gives a visitor who did not book.
         private const string BookedCode = "4821";
         private const string WalkInCode = "7305";
 

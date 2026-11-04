@@ -1,8 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <!-- An app that chooses the class names its fields render with (Program.cs) and styles them in a
-         stylesheet of its own, with no framework stylesheet linked: the core and Native's text box and
-         button, nothing built by npm. The class-names Playwright project runs against it. -->
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>

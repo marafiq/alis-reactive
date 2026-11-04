@@ -32,7 +32,6 @@ values propagate silently. A fallback is a rare, deliberate, justified exception
 - No string matching on type names (`GetType().Name.Contains(...)`) — create proper interfaces.
 - No reflection hacks — use compile-time type safety.
 - No "backward compat" shims — if the contract changes, update all consumers.
-- No `// TODO` or `// FIXME` — fix it now or don't write it.
 - If a third-party library lacks the interface you need, write your own.
 - If it feels like a workaround, it IS a workaround — find the clean solution.
 

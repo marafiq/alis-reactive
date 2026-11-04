@@ -2,11 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.RealTime;
 
-// Story: As a nurse on the resident board, I want to acknowledge the status shown under my name, so
-// that the board records who saw it and on how many screens.
-//
-// Acknowledge is a method of the hub the page declares: the name typed travels to the server as the
-// call's argument, and the receipt the server answers is what the note shows.
 [TestFixture]
 public class WhenNurseAcknowledgesAStatus : PlaywrightTestBase
 {

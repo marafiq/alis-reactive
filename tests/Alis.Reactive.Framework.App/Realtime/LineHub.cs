@@ -2,12 +2,6 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Alis.Reactive.Framework.App.Realtime;
 
-/// <summary>
-/// The ward's line, one per page by the world in its URL. It welcomes each call it takes and drops or hangs
-/// up on the page when asked. A drop cuts the connection under the hub, so the page calls again; a hang-up
-/// closes it (<c>Context.Abort()</c> sends a close that allows no reconnect), and the gate in front of the hub
-/// refuses the page's calls until the server answers again.
-/// </summary>
 public sealed class LineHub(LineExchange exchange) : Hub
 {
     private static readonly WardLine Line = new();
@@ -43,11 +37,6 @@ public sealed class LineHub(LineExchange exchange) : Hub
 
 public static class LineHubRoutes
 {
-    /// <summary>
-    /// Maps the line's hub behind a gate: while a page's world refuses calls (its first calls, or every call
-    /// while hung up), the server answers the page's call before the hub's handshake with 503, and counts the
-    /// refusal once it is sent.
-    /// </summary>
     public static void MapLineHub(this WebApplication app, string pattern)
     {
         app.Use(async (context, next) =>

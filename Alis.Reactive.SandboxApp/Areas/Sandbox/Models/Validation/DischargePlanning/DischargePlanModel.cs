@@ -2,10 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// The social worker's discharge plan. What the plan must say depends on the answers around it:
-    /// where the resident goes, who is there, what they take and what they need.
-    /// </summary>
     public class DischargePlanModel
     {
         public string? ResidentName { get; set; }
@@ -13,12 +9,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? HomeAddress { get; set; }
         public bool LivesAlone { get; set; }
 
-        /// <summary>Who checks in daily on a resident going home alone.</summary>
         public string? DailyCheckInBy { get; set; }
         public bool HasPets { get; set; }
         public string? PetCarePlan { get; set; }
 
-        /// <summary>Days until the follow-up visit; blank when no follow-up is due.</summary>
         public int? FollowUpDays { get; set; }
         public string? FollowUpClinic { get; set; }
         public string? VaCaseNumber { get; set; }
@@ -55,6 +49,5 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         Hospital,
     }
 
-    /// <summary>What the server says once the plan is saved.</summary>
     public sealed record DischargePlanConfirmation(string Confirmation);
 }

@@ -1,7 +1,3 @@
-// Every component of the framework test app. Each constructs itself on alis:mount and releases itself
-// on alis:unmount, as any app's widgets do; the meter is a custom element, the tally a plugin, the
-// confirmation dialog the app's own answer to a page's p.Confirm(..), and the stamp is built by the script
-// its render helper writes after it.
 import "./Components/Slate/slate";
 import "./Components/Bell/bell";
 import "./Components/Meter/meter";

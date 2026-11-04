@@ -41,8 +41,6 @@
         WorkingDirectory="$(AlisReactiveRepositoryRoot)"
         Command="npm run build:all"
         EnvironmentVariables="MSBUILDDISABLENODEREUSE=1" />
-    <!-- Tailwind leaves an output it would write unchanged as it was, so its time can stay older than an
-         input that changed nothing in it; stamping every output keeps the next build incremental. -->
     <Touch Files="@(ReactiveBrowserAssetOutput)" />
   </Target>
 

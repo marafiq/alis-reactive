@@ -1,17 +1,4 @@
 #!/usr/bin/env node
-// Pins Syncfusion EJ2 to one version across NuGet and npm, and proves the pins agree.
-//
-//   node scripts/pin-syncfusion.mjs <version>   set every pin to <version> (needs network)
-//   node scripts/pin-syncfusion.mjs --check     verify the pins agree (offline; scripts/test.sh runs it)
-//
-// The framework supports exactly one Syncfusion version: Alis.Reactive.Fusion.csproj pins
-// `Syncfusion.EJ2.AspNet.Core` and `Syncfusion.EJ2.MVC5` as [version] (exact; a bare version is only a
-// minimum). No framework package ships Syncfusion's browser files: each app that renders Fusion
-// components depends on the npm umbrella `@syncfusion/ej2` at the same version and copies
-// dist/ej2.min.js and tailwind3.css into its wwwroot (its copy-vendor.mjs). The apps in this
-// repository (the sandbox, the resident-intake example) are listed below with the lock that resolves
-// each; nothing imports a control package, so none is pinned.
-
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";

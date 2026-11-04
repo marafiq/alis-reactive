@@ -2,32 +2,12 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the resident services coordinator, I want to correct, admit and move out residents on the Maple wing
-/// roster, and have the roster refuse a move into memory care that only the transfer team books, so that the
-/// roster the nurses work from matches who lives on the wing.
-/// </summary>
-/// <remarks>
-/// The roster is Amina Patel, Grace Bennett, Henry Liu, Irene Morgan (already approved for memory care and
-/// moving to Willow wing), Jonah Reed and Katherine Ortiz. Henry and Irene are due for review today; choosing
-/// one opens their row for editing. The handoff correction applies a resident's risk and open tasks from the
-/// night nurse's note to their row.
-/// Not exercised:
-/// Refresh: UpdateRow redraws the roster itself (normal-edit.js:269-280), so a Refresh after it would break
-/// unseen; WhenUsingFusionGridBilling's refresh test fails when Refresh breaks.
-/// ActionBegin's and ActionComplete's Name and Type: EJ2 sets both to the event's own name (observer.js:92;
-/// normal-edit.js:299, 421), the same on every save, so they carry nothing a page could show; the page tells a
-/// save from a cancel by RequestType.
-/// SelectedRow: an inline save reports -1, as the roster clears its selection when a row opens for editing
-/// (normal-edit.js:227-229, 300), and an added row reports 0 (normal-edit.js:651).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridEditing : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Editing";
     private const string RosterId = "maple-roster";
 
-    // The roster numbers its columns from 1.
     private const int ResidentColumn = 2;
     private const int CareLevelColumn = 3;
     private const int SuiteColumn = 4;
@@ -66,7 +46,6 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
         await Expect(Rows).ToHaveCountAsync(6, new() { Timeout = 10000 });
     }
 
-    // Opens Henry Liu's row from today's review list.
     private async Task ReviewHenrysRow()
     {
         await ClickWhenStable(ReviewHenry);
@@ -153,7 +132,6 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Irene's move to memory care is already booked, so correcting her row is no move into memory care.
     [Test]
     public async Task a_resident_already_in_memory_care_can_still_be_corrected()
     {
@@ -226,7 +204,6 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Once a correction has been tried, a field checks itself again as the coordinator leaves it.
     [Test]
     public async Task a_name_too_short_to_find_a_resident_is_refused_as_the_coordinator_leaves_the_field()
     {
@@ -254,7 +231,6 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Rosa Diaz is on the waiting list, not on the wing; only the server knows who lives here.
     [Test]
     public async Task a_correction_for_someone_not_on_the_wing_is_refused_by_the_server()
     {

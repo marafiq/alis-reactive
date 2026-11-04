@@ -5,10 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Care level change request: the server decides per resident whether a physician must sign
-    /// off, renders that decision into a hidden field, and confirms what the submitted form said.
-    /// </summary>
     public partial class NativeHiddenFieldController
     {
         private static readonly IReadOnlyDictionary<int, bool> PhysicianSignOffByResident = new Dictionary<int, bool>

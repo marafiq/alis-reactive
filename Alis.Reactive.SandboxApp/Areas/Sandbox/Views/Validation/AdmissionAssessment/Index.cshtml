@@ -94,7 +94,6 @@
                         })
                         .OnError(400, e => e.ValidationErrors("assessment-form")));
                 }))
-            @* The chart takes the assessment as it is: the server alone decides, with the same rules. *@
             @(Html.NativeButton("print-assessment-btn", "Print for the chart")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>

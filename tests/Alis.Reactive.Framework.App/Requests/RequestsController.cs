@@ -3,22 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Requests;
 
-/// <summary>
-/// The endpoints a page's requests reach, each binding its request as any endpoint does and saying, in its
-/// own words, what it received (capabilities of the HTTP pipeline, and M4 in a request): members set, inputs
-/// named, a file a person chose, and the pages a gather is refused for.
-/// </summary>
 public sealed class RequestsController : Controller
 {
     public IActionResult Desk() => View(new RequestsPage());
 
     public IActionResult Booking() => View(new BookingPage());
 
-    /// <summary>Refuses the booking as a conflict, with its reason in the body.</summary>
     [HttpPost("/Requests/Bookings/Taken")]
     public IActionResult BookTaken() => Conflict(new BookingProblem { Reason = "room 2 is taken" });
 
-    /// <summary>Refuses the booking as forbidden, with its reason in the body.</summary>
     [HttpPost("/Requests/Bookings/Closed")]
     public IActionResult BookClosed() => StatusCode(403, new BookingProblem { Reason = "the east wing is closed" });
 
@@ -47,7 +40,6 @@ public sealed class RequestsController : Controller
     [HttpGet("/Requests/Totals/{total}")]
     public IActionResult Total(decimal total) => Said($"total {Number(total)} in the path");
 
-    /// <summary>Refuses with the status asked for: 409 says why, in a body of its own.</summary>
     [HttpGet("/Requests/Refuse")]
     public IActionResult Refuse([FromQuery] int status) =>
         status == 409 ? StatusCode(409, new Refusal { Reason = "The room is taken" }) : StatusCode(status);
@@ -58,7 +50,6 @@ public sealed class RequestsController : Controller
     [HttpGet("/Requests/Second")]
     public IActionResult Second([FromQuery] string from) => Said($"second, after {from}");
 
-    /// <summary>Answers after the delay asked for, with the name it was given.</summary>
     [HttpGet("/Requests/Slow")]
     public async Task<IActionResult> Slow([FromQuery] int delay, [FromQuery] string name)
     {
@@ -83,7 +74,6 @@ public sealed class RequestsController : Controller
     [HttpGet("/Requests/Limits/{limit}")]
     public IActionResult Limit(int limit) => Said($"limit {limit}");
 
-    /// <summary>Drops the connection before it answers, as a server that fails mid-request does.</summary>
     [HttpGet("/Requests/Dropped")]
     public IActionResult Dropped()
     {
@@ -91,7 +81,6 @@ public sealed class RequestsController : Controller
         return new EmptyResult();
     }
 
-    /// <summary>Says it answers JSON, then sends JSON that stops part way.</summary>
     [HttpGet("/Requests/Garbled")]
     public IActionResult Garbled() => Content("{\"summary\": \"the night", "application/json");
 
@@ -103,12 +92,10 @@ public sealed class RequestsController : Controller
 
     public IActionResult Census() => View(new CensusPage());
 
-    /// <summary>Says the query it was sent, as the address reads, and the wing and wings it bound from it.</summary>
     [HttpGet("/Requests/Census/Asked")]
     public IActionResult CensusAsked([FromQuery] CensusQuery query) =>
         Said($"query {QueryText()}, bound wing {query.Wing ?? "none"} and wings {Listed(query.Wings)}");
 
-    /// <summary>Says each field the form post carried, by name and value.</summary>
     [HttpPost("/Requests/Census/Posted")]
     public IActionResult CensusPosted() =>
         Said("fields " + string.Join(", ", Request.Form.Select(field => $"{field.Key}='{field.Value}'")));
@@ -155,7 +142,6 @@ public sealed class RequestsController : Controller
     [HttpPost("/Requests/Extras")]
     public IActionResult Extras([FromBody] GuideExtras extras) => Said($"guide {extras.Guide?.ToString() ?? "none"}");
 
-    /// <summary>The escort card rendered for the visit's Escort member, its save gathering the request asked for.</summary>
     public IActionResult Escort(EscortGather gather)
     {
         ViewData["Gather"] = gather;
@@ -169,7 +155,6 @@ public sealed class RequestsController : Controller
 
     public IActionResult CarePlan() => View(new CarePlanPage());
 
-    /// <summary>Binds what the page read of the chosen file, as any endpoint binds a JSON body.</summary>
     [HttpPost("/Requests/CarePlans/Check")]
     public IActionResult CheckCarePlan([FromBody] CarePlanCheck check) => check.CarePlan is { } file
         ? Said($"{file.Name}, {file.Size} bytes, {file.Type}, changed " +
@@ -196,7 +181,6 @@ public sealed class RequestsController : Controller
     [HttpPost("/Requests/Consents")]
     public async Task<IActionResult> SendConsents([FromForm] ConsentFiles files) => Said(await Received(files.Consents));
 
-    // Each file as the server reads it: its name, its length, its media type and its text.
     private static async Task<string> Received(IEnumerable<IFormFile>? files)
     {
         var received = new List<string>();

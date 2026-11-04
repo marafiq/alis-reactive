@@ -12,17 +12,10 @@ using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanModel.Document
 {
-    /// <summary>
-    /// The plan a view is building: the elements it names, the handlers its triggers start, the forms
-    /// its requests validate or show the server's errors on, and the callback a step lands in.
-    /// <see cref="Write"/> writes the grammar the runtime runs.
-    /// </summary>
     internal sealed class PlanBuildContext
     {
-
         private readonly string _planId;
         private readonly RenderedInputs _inputs;
-        // The class names the plan's fields render with; each input's binding tells the form the one a refused input carries (M9).
         private readonly ReactiveClassNames _classNames;
         private readonly List<DeclaredObject> _declared = new List<DeclaredObject>();
         private readonly Dictionary<string, DeclaredObject> _declaredById = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
@@ -31,9 +24,6 @@ namespace Alis.Reactive.PlanModel.Document
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
         private readonly List<(RequestStep Request, FormValidation Validation)> _validatedRequests =
             new List<(RequestStep, FormValidation)>();
-        // The forms of this plan by container id, with the fields each checks. A form an error route shows the
-        // server's errors on joins when the route is written, with no fields until a request validates it; a
-        // validated form's fields are bound when the plan renders (Check).
         private readonly Dictionary<string, IReadOnlyList<CheckedField>> _forms =
             new Dictionary<string, IReadOnlyList<CheckedField>>(StringComparer.Ordinal);
         private readonly HashSet<string> _slots = new HashSet<string>(StringComparer.Ordinal);
@@ -50,16 +40,12 @@ namespace Alis.Reactive.PlanModel.Document
             _classNames = classNames ?? throw new ArgumentNullException(nameof(classNames));
         }
 
-        /// <summary>The MVC field prefix the plan's view renders under; empty for a page's own view.</summary>
         internal string FieldPrefix { get; }
 
-        /// <summary>The path of the view that started the plan, which what the plan refuses names.</summary>
         internal string View { get; }
 
-        /// <summary>Whether the plan has rendered: from then on it takes no input and no behavior, and renders no more.</summary>
         internal bool Rendered { get; private set; }
 
-        /// <summary>The plan renders, once.</summary>
         internal void Seal()
         {
             if (Rendered)
@@ -69,15 +55,12 @@ namespace Alis.Reactive.PlanModel.Document
             Rendered = true;
         }
 
-        /// <summary>An input the view rendered joins the plan, while the plan has not rendered.</summary>
         internal void AddInput(RenderedInput input)
         {
             RefuseOnceRendered($"Input '{input.BindingPath}'", "the input");
             _inputs.Add(input);
         }
 
-        // Razor runs a view's sections after its body, when the layout renders them: what a section writes to a plan
-        // the body rendered never reaches the page.
         private void RefuseOnceRendered(string written, string what)
         {
             if (!Rendered) return;
@@ -87,7 +70,6 @@ namespace Alis.Reactive.PlanModel.Document
                 $"others, such as @section Scripts {{ @Html.RenderPlan(plan) }}, or write {what} in the body.");
         }
 
-        /// <summary>Builds a callback: every step written while it runs lands in the returned block.</summary>
         internal Block Build(Action callback)
         {
             RefuseOnceRendered("Behavior", "the behavior");
@@ -105,7 +87,6 @@ namespace Alis.Reactive.PlanModel.Document
             return block;
         }
 
-        /// <summary>The callback being built, where a step written now lands.</summary>
         internal Block ActiveBlock
         {
             get
@@ -120,18 +101,15 @@ namespace Alis.Reactive.PlanModel.Document
 
         internal void AddStep(Step step) => ActiveBlock.Add(step);
 
-        /// <summary>Runs <paramref name="body"/> each time an object the plan names raises <paramref name="eventName"/>.</summary>
         internal void On(Func<PlanObjects, string> on, IReadOnlyList<string> path, string eventName, Block body) =>
             _handlers.Add((on, path, eventName, body));
 
-        /// <summary>An element the view rendered with this id, found by the browser itself unless a component claims it.</summary>
         internal void DeclareElement(string elementId)
         {
             if (string.IsNullOrWhiteSpace(elementId)) throw new ArgumentException("Element ID required.", nameof(elementId));
             if (!_declaredById.ContainsKey(elementId)) Add(new DeclaredObject(elementId, ComponentVendor.Native));
         }
 
-        /// <summary>A component on the element with this id, from one vendor for the whole plan.</summary>
         internal void DeclareComponent(string componentId, ComponentVendor vendor)
         {
             if (string.IsNullOrWhiteSpace(componentId)) throw new ArgumentException("Component ID required.", nameof(componentId));
@@ -147,23 +125,19 @@ namespace Alis.Reactive.PlanModel.Document
             Add(new DeclaredObject(componentId, vendor));
         }
 
-        /// <summary>A slot this plan loads into or unloads (<c>Into</c>, <c>Unload</c>).</summary>
         internal void LoadsOrUnloads(string slotId)
         {
             DeclareElement(slotId);
             _slots.Add(slotId);
         }
 
-        /// <summary>A step sets the text or the HTML of the element with this id.</summary>
         internal void SetsContentOf(string elementId, string content)
         {
             if (!_contentSetById.ContainsKey(elementId)) _contentSetById.Add(elementId, content);
         }
 
-        /// <summary>The slots this plan loads into or unloads.</summary>
         internal IReadOnlyCollection<string> Slots => _slots;
 
-        /// <summary>The elements whose text or HTML a step of this plan sets, with which of the two.</summary>
         internal IReadOnlyDictionary<string, string> ContentSetById => _contentSetById;
 
         internal void RegisterPlugin(string name)
@@ -180,11 +154,6 @@ namespace Alis.Reactive.PlanModel.Document
             _declaredById.Add(declared.Id, declared);
         }
 
-        /// <summary>
-        /// A request that checks its form first; the form's rules are bound when the plan is written. A request
-        /// validated again keeps its place with the new validation. A form is validated by one validator, so a
-        /// request that names another for a form another request validates is refused.
-        /// </summary>
         internal void ValidateBefore(RequestStep request, FormValidation validation)
         {
             foreach (var (other, otherValidation) in _validatedRequests)
@@ -208,18 +177,12 @@ namespace Alis.Reactive.PlanModel.Document
 
         internal IReadOnlyList<(RequestStep Request, FormValidation Validation)> ValidatedRequests => _validatedRequests;
 
-        /// <summary>
-        /// A form an error route shows the server's errors on is a form of the plan, as a validated form is: the
-        /// plan writes its summary, and its fields when a request validates it. Each message is placed beside the
-        /// mounted input inside the form that binds the name the server reports it under.
-        /// </summary>
         internal void ShowErrorsOn(string formId)
         {
             DeclareElement(formId);
             if (!_forms.ContainsKey(formId)) _forms.Add(formId, Array.Empty<CheckedField>());
         }
 
-        /// <summary>The forms of this plan: each a request validates, and each an error route shows the server's errors on.</summary>
         internal IReadOnlyList<string> Forms =>
             _validatedRequests
                 .Select(validated => validated.Validation.Form)
@@ -227,17 +190,12 @@ namespace Alis.Reactive.PlanModel.Document
                 .Distinct(StringComparer.Ordinal)
                 .ToList();
 
-        /// <summary>The fields a validated form checks, with its one validator's rules, bound when the plan renders.</summary>
         internal void Check(string formId, IReadOnlyList<CheckedField> fields)
         {
             DeclareElement(formId);
             _forms[formId] = fields;
         }
 
-        /// <summary>
-        /// Writes the plan: every element by id and vendor, the inputs <c>alis.model</c> binds, each form's
-        /// fields and their checks as <c>alis.form</c> data, then each handler.
-        /// </summary>
         internal PlanDocument Write()
         {
             var objects = new PlanObjects(_declared);
@@ -262,7 +220,6 @@ namespace Alis.Reactive.PlanModel.Document
             return new PlanDocument(_planId, objects.Vendors(), objects.Snapshot(), handlers);
         }
 
-        /// <summary>Every input the view rendered is an element of the plan, after the elements its steps name.</summary>
         internal void DeclareRenderedInputs()
         {
             foreach (var input in _inputs.Entries)
@@ -291,6 +248,5 @@ namespace Alis.Reactive.PlanModel.Document
                 ? throw new InvalidOperationException($"'{path}' reads each item of a list; a body names members and positions.")
                 : segment.IsIndex ? BodyStep.At(segment.Index) : BodyStep.Member(segment.ToPathText()))
             .ToList();
-
     }
 }

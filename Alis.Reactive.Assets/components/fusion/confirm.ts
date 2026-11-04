@@ -1,12 +1,3 @@
-// alis.confirm: the app-level confirmation the core's p.Confirm(..) asks (grammar.md 6.8). The Fusion
-// package implements it with a Syncfusion Dialog rendered by @Html.FusionConfirmDialog(), made when
-// the dialog's element mounts; the plan locates it as a plugin.
-// C1 ask(message) resolves true on OK, false on Cancel, close or Escape.
-// C2 Asks queue first in, first out.
-// C3 Escape inside the dialog never reaches the document.
-// C4 It answers only on a page that renders the dialog. A page without it may give alis.confirm from
-//    its own code, and the core asks that one; a page with neither has no alis.confirm to ask.
-
 import { onMount, providePlugin, whenParsed } from "../hooks";
 
 const dialogId = "alisConfirmDialog";
@@ -73,8 +64,6 @@ function showConfirmDialog(
   });
 }
 
-// The confirm is modal: an Escape pressed in it is its own and never reaches the page beneath, where
-// an open drawer would close on it too. The dialog still closes on it, unless another popup is open.
 function keepEscapeInConfirm(event: KeyboardEvent): void {
   if (event.key === "Escape") event.stopPropagation();
 }

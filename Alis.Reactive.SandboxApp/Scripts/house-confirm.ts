@@ -1,8 +1,3 @@
-// The community's own confirmation, which a page renders in place of the framework's Syncfusion one:
-// a <dialog id="house-confirm"> whose form closes it with the button pressed. It answers the plan's
-// p.Confirm(..) under the name the core asks, alis.confirm. A page renders one confirm or the other;
-// with both, the runtime refuses the second alis.confirm when it boots.
-
 export {};
 
 interface PendingHostPlugin {
@@ -16,8 +11,6 @@ interface PluginQueueWindow extends Window {
 
 const yes = "yes";
 
-// The runtime takes plugins when the document is parsed; this script runs before it, so it looks for
-// the dialog then too.
 function whenParsed(act: () => void): void {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", act, { once: true });
   else act();

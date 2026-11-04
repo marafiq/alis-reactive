@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// Comparisons composed: an And chain holds only when every term does, an Or chain when any does, Not
-/// negates its comparison, a group after And or Or is one term whose own Or or And binds first, and Not
-/// over a group holds when the group does not. Pain and fall risk start at 0; the ward starts empty.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageComposesConditions : AppPageTest
 {

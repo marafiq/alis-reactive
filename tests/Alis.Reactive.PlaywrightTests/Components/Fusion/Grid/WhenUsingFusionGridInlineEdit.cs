@@ -1,28 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As a Birch wing nurse, I want to move a resident's next care-plan review in the review list and have the
-/// care team's calendar confirm the new day, so that every review lands on a day the care team meets.
-/// </summary>
-/// <remarks>
-/// The list is Amina Patel (due Thursday, October 15), Henry Liu (due Friday, October 16), Grace Bennett,
-/// Walter Grant and Rosa Diaz. The reviews due this week open from the buttons above the list; Save sends
-/// the moved review to the calendar, which books a weekday and refuses a weekend, and a refused review goes
-/// back to the day on file.
-/// Not exercised:
-/// ActionComplete's Name, Type, Action, PreviousData, RowIndex, SelectedRow and Cancel: the page sends the
-/// saved row, told apart by RequestType. Name and Type are the event's own name (ej2-base observer.js:92,
-/// normal-edit.js:76); Cancel acts only in ActionBegin; WhenUsingFusionGridEditing reads Action and
-/// PreviousData and cancels an ActionBegin.
-/// A review saved with its day cleared is refused as a weekend is; a nurse clears the day only by mistake.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridInlineEdit : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/InlineEdit";
     private const string GridId = "care-plan-reviews";
 
-    // The grid numbers its columns from 1, counting the hidden ID column.
     private const int NextReviewColumn = 5;
 
     private ILocator Rows => Page.Locator($"#{GridId} .e-row");
@@ -59,7 +42,6 @@ public class WhenUsingFusionGridInlineEdit : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Henry is the second row: his button finds his row by his resident number, selects it and opens it.
     [Test]
     public async Task choosing_a_review_due_this_week_opens_that_residents_review_day()
     {

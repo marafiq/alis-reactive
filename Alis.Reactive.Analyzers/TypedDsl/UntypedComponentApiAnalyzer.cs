@@ -7,15 +7,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Alis.Reactive.Analyzers.TypedDsl
 {
-    /// <summary>
-    /// The public API is typed. On the whole exposed surface of the shipped packages, and on every
-    /// component declaration and render helper wherever it is written, a public or protected member
-    /// takes and returns typed values: no <c>object</c>, no <c>System.Type</c>, no untyped <c>Arg</c> on a
-    /// public member, and no string that names a member, field, event, method or path. Strings stay for
-    /// what is text: a message, a label, a URL, an element id the developer chose, a header name, a CSS
-    /// class, and a JavaScript name at the vendor or plugin boundary, which <c>name:</c> carries.
-    /// A deliberate exception names its reason with <c>[TypedDslExemption]</c>.
-    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class UntypedComponentApiAnalyzer : DiagnosticAnalyzer
     {
@@ -154,9 +145,6 @@ namespace Alis.Reactive.Analyzers.TypedDsl
         private static bool IsNamed(ITypeSymbol type, string definitionName) =>
             type is INamedTypeSymbol named && named.OriginalDefinition.ToDisplayString() == definitionName;
 
-        // object, System.Type, and any array or generic type built over them: the values that let
-        // anything through. Expression<Func<T, object?>> selectors are not flagged: the parameter type
-        // is Expression<>, whose type argument is a delegate, not a value.
         private static bool IsUntypedValue(ITypeSymbol type)
         {
             if (type.SpecialType == SpecialType.System_Object)

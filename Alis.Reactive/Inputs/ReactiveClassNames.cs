@@ -29,9 +29,6 @@ namespace Alis.Reactive
         private string _fieldMessage = "alis-field__message";
         private string _invalidInput = "alis-has-error";
 
-        // An app configures the names through AddReactiveClassNames alone. On MVC5 the default DependencyResolver
-        // creates any concrete type with a public parameterless constructor, so an internal one is what keeps an
-        // app that registered nothing on the framework's names (ReactivePlan.ResolveClassNames).
         internal ReactiveClassNames()
         {
         }

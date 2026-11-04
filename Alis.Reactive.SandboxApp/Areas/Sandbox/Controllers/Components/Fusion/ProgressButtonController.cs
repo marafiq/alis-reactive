@@ -11,8 +11,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult Index() =>
             View("~/Areas/Sandbox/Views/Components/Fusion/ProgressButton/Index.cshtml", new FusionProgressButtonModel());
 
-        // Riverside's system confirms the moment it has the report; Lakeside confirms once the upload
-        // finishes; County takes the pass by fax.
         [HttpPost("Send")]
         public IActionResult Send([FromBody] MedicationPassSendRequest request) => request.Pharmacy switch
         {

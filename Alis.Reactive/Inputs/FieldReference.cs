@@ -7,7 +7,6 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Inputs
 {
-    /// <summary>A member of the validator's model: its path and the shape of its value.</summary>
     internal sealed class FieldReference
     {
         private FieldReference(string path, Type type, Shape shape)
@@ -33,10 +32,6 @@ namespace Alis.Reactive.Inputs
             return new FieldReference(name, body.Type, ClrShape.Of(body.Type));
         }
 
-        /// <summary>
-        /// The item of a collection member itself, with no path of its own: the member's element, whose input
-        /// (<c>Tags[0]</c>) binds the collection's member.
-        /// </summary>
         internal static FieldReference ItemOf(FieldReference collection)
         {
             var itemType = ItemTypeOf(collection.Type)

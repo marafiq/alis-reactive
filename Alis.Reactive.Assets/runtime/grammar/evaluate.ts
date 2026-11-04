@@ -1,8 +1,3 @@
-// The one evaluator. Expressions are synchronous (grammar.md 3.3): only statements await, so a value
-// is computed here without ever waiting. Only the call at the top of a `do` or `let` may return a
-// promise, which that statement settles or lets run; the result is shaped when it arrives. A promise
-// anywhere else is a member the plan reads as sync, so the call fails at the object (3.4).
-
 import type { CallExpr, Expr, OpExpr, RecordExpr } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { Environment } from "./environment";

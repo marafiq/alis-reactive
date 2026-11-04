@@ -3,7 +3,6 @@ using System.IO;
 
 namespace Alis.Reactive.ContractGeneration
 {
-    /// <summary>Writes runtime/types/plan.ts and, beside it, plan.schema.json from the C# grammar (<see cref="GrammarContract"/>).</summary>
     internal static class Program
     {
         private static int Main(string[] args)

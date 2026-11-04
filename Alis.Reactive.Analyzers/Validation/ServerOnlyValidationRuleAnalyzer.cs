@@ -7,10 +7,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Alis.Reactive.Analyzers.Validation
 {
-    /// <summary>
-    /// Reports the <c>ReactiveValidator&lt;T&gt;</c> checks only the server can run: C# predicates, which
-    /// the page's plan cannot carry.
-    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class ServerOnlyValidationRuleAnalyzer : DiagnosticAnalyzer
     {

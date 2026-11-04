@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.PlanTests.Partials;
 
-/// <summary>A partial's inputs bind under its prefix; a slot loads a response and unloads what it brought.</summary>
 [TestFixture]
 public class WhenAPartialComposes
 {

@@ -109,7 +109,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The page did check the form: the reason for no contact is asked for, and nothing about the emails.
     [Test]
     public async Task confirm_email_passes_when_matches_email()
     {
@@ -212,8 +211,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Fusion NumericTextBox validates inline with regular validation errors.
-
     [Test]
     public async Task memory_care_with_fusion_numeric_validates_and_succeeds()
     {
@@ -225,13 +222,11 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Input(m => m.PhysicianName).FillAsync("Dr. Smith");
         await Input(m => m.ReasonForNoContact).FillAsync("No relatives");
 
-        // Leave the Fusion NumericTextBox empty so submit exercises inline validation.
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).ToHaveTextAsync("'Memory Assessment' is required for Memory Care.");
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Tab commits the Syncfusion value before the next submit.
         var scoreInput = Input(m => m.MemoryAssessmentScore);
         await scoreInput.ClickAsync();
         await scoreInput.FillAsync("85");
@@ -311,7 +306,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // With a contact named and reachable, nothing else is asked for: the admission is saved.
     [Test]
     public async Task reason_for_no_contact_not_required_when_has_emergency_contact_checked()
     {
@@ -465,8 +459,6 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The email rule asks for one @ with something on each side, not a dot after it;
-    // the browser asks the same, and the server saves the admission.
     [Test]
     public async Task an_email_with_no_dot_after_the_at_is_accepted_as_the_server_accepts_it()
     {

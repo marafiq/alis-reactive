@@ -1,10 +1,6 @@
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>
-/// Numbers bounded every way a comparison is written: by a value or by another member, the checked member and
-/// the other one each nullable or not. Base and MaybeBase are 5; every field starts inside its bound.
-/// </summary>
 public sealed class BoundsForm
 {
     public int Base { get; set; } = 5;
@@ -50,7 +46,6 @@ public sealed class BoundsForm
     public int? MaybeInsideTen { get; set; } = 5;
 }
 
-/// <summary>One rule per comparison overload a page has not used elsewhere.</summary>
 public sealed class BoundsRules : ReactiveValidator<BoundsForm>
 {
     public BoundsRules()
@@ -77,7 +72,6 @@ public sealed class BoundsRules : ReactiveValidator<BoundsForm>
     }
 }
 
-/// <summary>A range written with its bounds the wrong way round.</summary>
 public sealed class BackwardsRangeRules : ReactiveValidator<BoundsForm>
 {
     public BackwardsRangeRules()

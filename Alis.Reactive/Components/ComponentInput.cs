@@ -29,7 +29,6 @@ namespace Alis.Reactive
             CommittedBy = committedBy;
         }
 
-        /// <summary>The path from the component's object to its value; the model reads the value in the model's type.</summary>
         internal Path ValuePath { get; }
 
         internal EventName CommittedBy { get; }
@@ -48,7 +47,6 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>What a plan carries for an input a component renders under an identity.</summary>
     internal static class InputComponentExtensions
     {
         internal static RenderedInput RenderedAs(this IInputComponent component, InputIdentity identity)

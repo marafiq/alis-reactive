@@ -1,6 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-// Dispatch chain under test: dom-ready -> "test" -> "testReceived" -> "final".
 [TestFixture]
 public class WhenEventsChainAcrossListeners : PlaywrightTestBase
 {
@@ -60,7 +59,6 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
     [Test]
     public async Task dom_updates_preserve_class_coherence()
     {
-        // Text assertions do not expose stale classes; this catches remove/add drift.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -78,8 +76,6 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
     [Test]
     public async Task dispatches_occur_in_chronological_order_in_trace()
     {
-        // If boot executes dom-ready before wiring listeners, the chain may partially fire
-        // or fire out of order.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 

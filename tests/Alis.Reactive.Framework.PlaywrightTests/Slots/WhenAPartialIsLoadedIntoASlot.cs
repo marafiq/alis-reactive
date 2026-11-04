@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Slots;
 
-/// <summary>
-/// A partial of its own model loaded into a slot and unloaded from it: a component in the loaded HTML is
-/// built before its handlers listen (L1), an input in it binds under the partial's prefix (I4), its rules
-/// check that input where it binds and the server's answer for it lands beside it, its handlers hear events
-/// until the slot is unloaded (E6), an unloaded slot lets go of what it held and loads fresh again (L2), and
-/// a step naming an element that is not on the page fails only its own pipeline (B1).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPartialIsLoadedIntoASlot : AppPageTest
 {

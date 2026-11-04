@@ -5,12 +5,6 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Alis.Reactive.Analyzers.SliceTree
 {
-    /// <summary>
-    /// A package's slice table as its <c>SliceTree.txt</c> holds it: one row per line, bottom row first, entries
-    /// separated by whitespace. An entry is a folder, <c>X/*</c> (each subfolder of <c>X</c> is a slice of its own),
-    /// <c>*</c> (each top folder is a slice) or <c>.</c> (the root files). Expanded against the folders the
-    /// compilation has, it gives each folder its slice and row and names where the table and the folders disagree.
-    /// </summary>
     internal sealed class SliceTable
     {
         private SliceTable(ImmutableDictionary<string, Slice> sliceOfFolder, ImmutableArray<Problem> problems)
@@ -19,10 +13,8 @@ namespace Alis.Reactive.Analyzers.SliceTree
             Problems = problems;
         }
 
-        /// <summary>Each folder that a row names, with its slice; a folder the table does not name is absent.</summary>
         public ImmutableDictionary<string, Slice> SliceOfFolder { get; }
 
-        /// <summary>Where the table and the package disagree, each at the entry that says so.</summary>
         public ImmutableArray<Problem> Problems { get; }
 
         public static SliceTable Build(SourceText text, IReadOnlyCollection<string> folders)
@@ -112,14 +104,12 @@ namespace Alis.Reactive.Analyzers.SliceTree
         }
     }
 
-    /// <summary>A slice by name and the row it sits in; the bottom row is 0.</summary>
     internal sealed class Slice(string name, int row)
     {
         public string Name { get; } = name;
         public int Row { get; } = row;
     }
 
-    /// <summary>A disagreement between the table and the package, at the entry in the table that says so.</summary>
     internal sealed class Problem(string message, TextSpan span)
     {
         public string Message { get; } = message;

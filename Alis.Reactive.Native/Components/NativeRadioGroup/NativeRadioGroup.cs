@@ -25,7 +25,6 @@ namespace Alis.Reactive.Native
         public Event<NativeRadioGroupChangeArgs> Change =>
             Event<NativeRadioGroupChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

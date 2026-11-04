@@ -29,7 +29,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ZipCode { get; set; }
     }
 
-    /// <summary>The document events the Resident page raises and hears.</summary>
     public static class ResidentEvents
     {
         public static readonly AppEvent ZipcodeValidated = AppEvent.Declare();

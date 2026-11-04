@@ -7,10 +7,6 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.PlanAuthoring.Requests
 {
-    // A form input is sent by its binding name, under the view's field prefix. When the endpoint binds a class
-    // other than the view model, that name must be a member of the class too, of a type the input's value binds
-    // to, or the server drops or refuses the value. MVC matches member names ignoring case; a position steps
-    // into the collection's item type.
     internal static class RequestMembers
     {
         internal static void Require(Type request, BindingPath binding, Type inputType)
@@ -76,7 +72,6 @@ namespace Alis.Reactive.PlanAuthoring.Requests
             return SequenceOf(collection)?.GetGenericArguments()[0] ?? typeof(object);
         }
 
-        // The IEnumerable<T> a type is or implements: an interface does not list itself among its interfaces.
         private static Type? SequenceOf(Type type) =>
             new[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(candidate =>
                 candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>));

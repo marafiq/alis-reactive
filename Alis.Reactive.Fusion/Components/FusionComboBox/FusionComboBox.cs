@@ -51,7 +51,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionComboBoxChangeArgs> Change =>
             Event<FusionComboBoxChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>

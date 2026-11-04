@@ -11,7 +11,6 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Generated IDs must be valid CSS selectors; dotted MVC names would become class selectors.
         var nameField = Page.Locator("#json-form input[name='Name']");
         await Expect(nameField).ToBeAttachedAsync(new() { Timeout = 5000 });
         var id = await nameField.GetAttributeAsync("id");
@@ -55,7 +54,6 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-
     [Test]
     public async Task json_post_round_trips_exact_field_values_to_server()
     {
@@ -79,7 +77,6 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
         await Expect(result).ToContainTextAsync("Status=inactive", new() { Timeout = 5000 });
         await Expect(result).ToContainTextAsync("City=Denver", new() { Timeout = 5000 });
 
-        // Amount and PostalCode remain model defaults; this test mutates only plain form fields.
         await Expect(result).ToContainTextAsync("Amount=42.5", new() { Timeout = 5000 });
         await Expect(result).ToContainTextAsync("Zip=98101", new() { Timeout = 5000 });
 
@@ -89,7 +86,6 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
     [Test]
     public async Task form_data_post_round_trips_exact_field_values_to_server()
     {
-        // The fields render once, in #json-form; the form data request sends them by name.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -106,12 +102,10 @@ public class WhenIdsPreventCollisions : PlaywrightTestBase
         await Expect(result).ToContainTextAsync("Name=FormUser", new() { Timeout = 5000 });
         await Expect(result).ToContainTextAsync("Status=pending", new() { Timeout = 5000 });
 
-        // Amount remains the model default; this test mutates only plain form fields.
         await Expect(result).ToContainTextAsync("Amount=42.5", new() { Timeout = 5000 });
 
         AssertNoConsoleErrors();
     }
-
 
     [Test]
     public async Task json_post_result_displays_with_success_styling()

@@ -1,21 +1,3 @@
-// A room thermostat: a widget the sandbox wrote itself, with no knowledge of Alis.Reactive. Its object
-// lives on its host element as `thermostat`; BroughtComponents/Thermostat/Thermostat.cs declares it to
-// the framework. It has every kind of member a JavaScript object can have:
-//
-//   properties  value (the target; read and written), mode and fan (read and written), current (read only),
-//               locked (read only), pin (written only), schedule (an object: night read and written,
-//               active read only), zones (a list of objects: name read only, target read and written)
-//   methods     increase(), decrease(), hold(minutes), setRange(min, max), setQuietHours(hours),
-//               applyPlan(plan), schedule.apply(), zones[i].boost()
-//   functions   isComfortable(), distanceTo(target), estimate(target, mode), describe(plan),
-//               reading() (an object with value, unit and label()), schedule.nextChange(),
-//               zones[i].isBoosted()
-//   events      unlocked (no payload); targetChanging (a payload the page reads, writes and calls:
-//               requested, previous, cancel, reason, clamp(), accept()); targetChanged (value, previous);
-//               schedule.applied (target), raised by the schedule object itself.
-//               Listeners are added with on(name, fn) and removed with off(name, fn), on the thermostat
-//               and on its schedule alike.
-
 import "./thermostat.css";
 
 export type ThermostatMode = "heat" | "cool" | "off";
@@ -33,7 +15,6 @@ export interface ComfortPlan {
   readonly nights: readonly NightSetting[];
 }
 
-/** What a targetChanging listener receives; cancel and reason are read back once the listeners ran. */
 export interface TargetChange {
   readonly requested: number;
   readonly previous: number;
@@ -51,7 +32,6 @@ export interface Reading {
 
 type Listener = (payload: unknown) => void;
 
-/** Listeners by event name, the way the thermostat and its schedule both keep them. */
 class Listeners {
   private readonly named = new Map<string, Set<Listener>>();
 
@@ -77,7 +57,6 @@ class Listeners {
   }
 }
 
-/** The night schedule: an object of its own, with its own event. */
 export class Schedule {
   private readonly listeners = new Listeners();
   private nightTarget = 0;
@@ -98,7 +77,6 @@ export class Schedule {
     return this.applied;
   }
 
-  /** Makes the night setting the target through the thermostat's own change; raises applied when it took. */
   apply(): void {
     if (this.nightTarget === 0) return;
     this.applied = true;
@@ -119,7 +97,6 @@ export class Schedule {
   }
 }
 
-/** One zone of the room: an item of the thermostat's zones, with members of its own. */
 export class Zone {
   private boosted = false;
 
@@ -134,7 +111,6 @@ export class Zone {
     this.thermostat.refresh();
   }
 
-  /** Warms this zone two degrees above its target for a while. */
   boost(): void {
     this.boosted = true;
     this.zoneTarget += 2;
@@ -171,10 +147,8 @@ export class Thermostat {
   private status = "";
   private quietHours: string[] = [];
 
-  /** The night schedule: an object with members and an event of its own. */
   readonly schedule: Schedule;
 
-  /** The room's zones: a list of objects with members of their own. */
   readonly zones: Zone[];
 
   constructor(host: ThermostatHost) {
@@ -197,7 +171,6 @@ export class Thermostat {
     return this.target;
   }
 
-  /** Replaces the target without raising an event, as a form field's value would. */
   set value(target: number) {
     this.target = target;
     this.render();
@@ -221,17 +194,14 @@ export class Thermostat {
     this.render();
   }
 
-  /** The room's measured temperature. */
   get current(): number {
     return this.room;
   }
 
-  /** Whether the thermostat's own buttons are locked. */
   get locked(): boolean {
     return this.lockedValue;
   }
 
-  /** Written only: the right code unlocks the thermostat and raises unlocked; a wrong one is reported. */
   set pin(code: string) {
     if (code !== this.pinCode) {
       this.status = "Wrong PIN";
@@ -252,7 +222,6 @@ export class Thermostat {
     this.change(this.target - 1);
   }
 
-  /** Keeps the target for a while; the thermostat shows how long. */
   hold(minutes: number): void {
     this.status = `Held for ${minutes} min`;
     this.render();
@@ -264,13 +233,11 @@ export class Thermostat {
     this.render();
   }
 
-  /** The hours the thermostat keeps the fan quiet, from the first to the last. */
   setQuietHours(hours: string[]): void {
     this.quietHours = [...hours];
     this.render();
   }
 
-  /** Applies a plan: its target and mode now, its first night setting for the night. */
   applyPlan(plan: ComfortPlan): void {
     const previous = this.target;
     this.modeValue = plan.mode;
@@ -289,7 +256,6 @@ export class Thermostat {
     return Math.abs(target - this.room);
   }
 
-  /** Minutes a mode takes to bring the room to a target. */
   estimate(target: number, mode: ThermostatMode): number {
     return Math.abs(target - this.room) * MINUTES_PER_DEGREE[mode];
   }
@@ -299,7 +265,6 @@ export class Thermostat {
     return `${plan.mode} to ${plan.target}°${this.unit}, ${nights}`;
   }
 
-  /** The room's reading as an object of its own. */
   reading(): Reading {
     const value = this.room;
     const unit = this.unit;
@@ -321,7 +286,6 @@ export class Thermostat {
     delete this.host.thermostat;
   }
 
-  /** Changes the target: targetChanging listeners may refuse it; a change raises targetChanged. */
   change(requested: number): void {
     const previous = this.target;
     let accepted = false;
@@ -348,7 +312,6 @@ export class Thermostat {
     this.listeners.emit("targetChanged", { value: this.target, previous });
   }
 
-  /** Shows the state again after a member of the schedule or a zone changed it. */
   refresh(): void {
     this.render();
   }

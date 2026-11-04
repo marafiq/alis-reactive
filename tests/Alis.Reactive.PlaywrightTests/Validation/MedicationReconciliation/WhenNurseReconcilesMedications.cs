@@ -4,15 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.MedicationReconciliation;
 
-/// <summary>
-/// As a nurse reconciling a resident's medications, I want each line checked by its own rules, a
-/// controlled substance by the extra ones, and the allergy lines by theirs, so that a mistake is named
-/// on the line that holds it before the reconciliation is saved.
-/// </summary>
-/// <remarks>
-/// Save checks the page first and sends nothing it can refuse. Print the MAR sends the reconciliation
-/// as it is, and the server, running the same validator, says what it refuses.
-/// </remarks>
 [TestFixture]
 public class WhenNurseReconcilesMedications : PlaywrightTestBase
 {
@@ -33,7 +24,6 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
     private NativeCheckListLocator AdministrationChecks =>
         new(Page, IdGenerator.For<MedicationReconciliationModel, List<string>>(m => m.AdministrationChecks));
 
-    // IdGenerator is the framework's own id rule: it resolves the indexed lines, which PagePlan cannot.
     private ILocator Field(Expression<Func<MedicationReconciliationModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}");
 
@@ -60,7 +50,6 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         await Page.Keyboard.PressAsync("Tab");
     }
 
-    // The resident, both medications named, and one administration check: what a complete reconciliation needs.
     private async Task CompleteTheReconciliation()
     {
         await Write(m => m.ResidentName, "Helen Park");
@@ -128,7 +117,6 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The controlled substance rules are a validator of their own, included on a line only while it is controlled.
     [Test]
     public async Task a_controlled_substance_needs_its_count_verified_and_an_uncontrolled_one_does_not()
     {
@@ -195,8 +183,6 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A check on the allergy line that only the pharmacy can make: the server runs it, and its answer
-    // lands on the line it names, since the page knows the line.
     [Test]
     public async Task an_allergen_the_pharmacy_does_not_list_is_refused_by_the_mar_printer()
     {

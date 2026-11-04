@@ -6,12 +6,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
 
-/// <summary>
-/// The hooks .claude/settings.json runs before a tool are the rules a session cannot talk its way past: the generated
-/// plan contract is never hand-edited, and Playwright runs only through scripts/playwright.sh. Each hook decides by a
-/// path or a project name, so a refactor that moves the contract or renames a test project would switch it off without
-/// a word. Here each hook runs as Claude Code runs it, on the files and projects the repo holds now.
-/// </summary>
 [TestFixture]
 public class WhenClaudeRunsAHook
 {

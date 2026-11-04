@@ -3,10 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>
-/// ALIS009: the whole exposed surface of a shipped package, and a component declaration wherever it is
-/// written, is typed. A deliberate exception names its reason with [TypedDslExemption].
-/// </summary>
 [TestFixture]
 public class UntypedComponentApiTests
 {
@@ -95,7 +91,6 @@ public class UntypedComponentApiTests
             }
             """);
 
-    // A render helper in a shipped package, with the member given.
     private static string Shipped(string member) => $$"""
         using System;
         using Alis.Reactive;

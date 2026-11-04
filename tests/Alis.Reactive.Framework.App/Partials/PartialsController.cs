@@ -2,12 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Partials;
 
-/// <summary>A page and its partials composing by the member an input binds: an editor template, a partial of a base class, a generic model.</summary>
 public sealed class PartialsController : Controller
 {
     public IActionResult Desk() => View(new DeskPage());
 
-    /// <summary>Binds the desk as any endpoint does and checks it by the desk's rules; then says whom it bound.</summary>
     [HttpPost]
     public IActionResult SaveDesk([FromBody] DeskPage desk, [FromServices] DeskRules rules)
     {
@@ -17,7 +15,6 @@ public sealed class PartialsController : Controller
         return Said($"visitor {desk.Visitor ?? "none"}, next of kin {desk.NextOfKin.Name ?? "none"}");
     }
 
-    /// <summary>Checks the next of kin against the resident's file, so a message names the member as the desk binds it (NextOfKin.Name).</summary>
     [HttpPost]
     public IActionResult CheckKin([FromBody] DeskPage desk, [FromServices] KinOnFileRules rules)
     {
@@ -27,16 +24,10 @@ public sealed class PartialsController : Controller
         return Said($"next of kin {desk.NextOfKin.Name} is on file");
     }
 
-    /// <summary>The reception: the desk's record, whose next of kin is loaded into the page when the visitor names one.</summary>
     public IActionResult Reception() => View(new DeskPage());
 
-    /// <summary>The reception with two slots that each load the next of kin's template, so the page holds its input twice.</summary>
     public IActionResult DoubleBooked() => View(new DeskPage());
 
-    /// <summary>
-    /// The next of kin's editor template, loaded into the reception's slot: rendered for the desk's NextOfKin member,
-    /// as EditorFor renders it, so its input binds as NextOfKin.Name.
-    /// </summary>
     public IActionResult NextOfKin()
     {
         ViewData.TemplateInfo.HtmlFieldPrefix = nameof(DeskPage.NextOfKin);
@@ -45,10 +36,8 @@ public sealed class PartialsController : Controller
 
     public IActionResult Admission(bool showsRoom = false) => View(new AdmissionPage { ShowsRoom = showsRoom });
 
-    /// <summary>The room's line, loaded into the admission's slot: a partial of the admission's own model.</summary>
     public IActionResult RoomLine() => PartialView("RoomLine", new AdmissionPage());
 
-    /// <summary>Binds the admission as any endpoint does, checks it by the admission's rules, and says where the resident goes.</summary>
     [HttpPost]
     public IActionResult Admit([FromBody] AdmissionPage admission, [FromServices] AdmissionRules rules)
     {
@@ -60,7 +49,6 @@ public sealed class PartialsController : Controller
 
     public IActionResult Lobby() => View(new LobbyPage());
 
-    /// <summary>Binds the lobby's record as any endpoint does, checks it by the sign-in rules, and says whom it signed in.</summary>
     [HttpPost]
     public IActionResult SignIn([FromBody] LobbyPage lobby, [FromServices] LobbyRules rules)
     {
@@ -72,7 +60,6 @@ public sealed class PartialsController : Controller
 
     public IActionResult Fluids() => View(new ChartEntry<FluidsReading>());
 
-    /// <summary>Binds the chart entry as any endpoint does and says what was charted, and by whom.</summary>
     [HttpPost]
     public IActionResult ChartFluids([FromBody] ChartEntry<FluidsReading> entry) => Said(
         $"{entry.Reading.Millilitres?.ToString() ?? "no"} ml, initials {entry.Initials ?? "none"}");
@@ -81,7 +68,6 @@ public sealed class PartialsController : Controller
 
     public IActionResult Sitting() => View(new SittingPage());
 
-    /// <summary>Checks the next of kin against the resident's file, by the member's binding name; the browser checks nothing.</summary>
     [HttpPost]
     public IActionResult BookSitting([FromBody] SittingPage sitting) => sitting.NextOfKin.Name is "Bo" or "Cy"
         ? Said($"{sitting.Visitor ?? "no one"} sits with the resident beside {sitting.NextOfKin.Name}")
@@ -89,7 +75,6 @@ public sealed class PartialsController : Controller
 
     public IActionResult Handover() => View(new HandoverPage());
 
-    /// <summary>Refuses every handover whose keyholder's relationship is not given, by the member's binding name.</summary>
     [HttpPost]
     public IActionResult HandOver([FromBody] HandoverPage handover) => handover.Keyholder.Relationship is null
         ? BadRequest(new { errors = new Dictionary<string, string[]> { ["Keyholder.Relationship"] = ["Say how the keyholder is related."] } })
@@ -97,7 +82,6 @@ public sealed class PartialsController : Controller
 
     public IActionResult Escort() => View(new EscortPage());
 
-    /// <summary>Refuses the escort a line sends: which shift they cover is the server's to ask for, by the member's binding name.</summary>
     [HttpPost]
     public IActionResult CheckEscort([FromBody] EscortPage escort)
     {
@@ -107,7 +91,6 @@ public sealed class PartialsController : Controller
 
     public IActionResult Concierge() => View(new ConciergePage());
 
-    /// <summary>Binds the concierge's visit as any endpoint does and checks it by the concierge's rules; then says whom it bound.</summary>
     [HttpPost]
     public IActionResult SaveConcierge([FromBody] ConciergePage visit, [FromServices] ConciergeRules rules)
     {
@@ -117,7 +100,6 @@ public sealed class PartialsController : Controller
         return Said($"visitor {visit.Visitor ?? "none"}, next of kin {visit.NextOfKin.Name ?? "none"}");
     }
 
-    /// <summary>Notes the next of kin a desk sends, by the member's binding name, and says whom it bound.</summary>
     [HttpPost]
     public IActionResult NoteKin([FromBody] KinNote note) => Said($"next of kin {note.NextOfKin.Name ?? "none"}");
 
@@ -125,17 +107,14 @@ public sealed class PartialsController : Controller
 
     public IActionResult Corrections() => View(new CorrectionsPage());
 
-    /// <summary>Binds a room correction as any endpoint does and says which room it bound.</summary>
     [HttpPost]
     public IActionResult CorrectRoom([FromBody] RoomCorrection correction) => Said($"room {correction.Value ?? "none"}");
 
-    /// <summary>Binds a phone correction as any endpoint does and says which phone it bound.</summary>
     [HttpPost]
     public IActionResult CorrectPhone([FromBody] PhoneCorrection correction) => Said($"phone {correction.Value ?? "none"}");
 
     public IActionResult Bookings() => View(new BookingsPage());
 
-    /// <summary>Binds the visit as any endpoint does, checks it by the visit's rules, and says whom it booked.</summary>
     [HttpPost]
     public IActionResult BookVisit([FromBody] BookingsPage booking, [FromServices] BookingRules rules)
     {

@@ -1,24 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the evening nurse on East wing, I want what I record for a resident (a task done, a fall) and what
-/// their chart now says to show on that resident's row of the rounds board as soon as the server answers,
-/// so that the board I walk the wing with is right without reloading it.
-/// </summary>
-/// <remarks>
-/// The board: Martha Collins E-201 (Low, 2 tasks), Joseph Rivera E-203 (Moderate, 3), Ruth Adler E-205
-/// (Moderate, 1), Victor Nguyen E-207 (Low, 0) and Lillian Brooks E-209 (High, 4). The nurse picks a resident
-/// on the board; the server answers with that resident's key, and the page changes that row by key: one cell
-/// (SetCellValue, a number for open tasks and a text for fall risk) or the whole row (SetRowData). Ruth
-/// Adler's chart changed this afternoon (moved to E-214, High fall risk, 3 open tasks); nobody else's did.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridKeyedUpdate : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/KeyedUpdate";
     private const string BoardId = "evening-rounds";
 
-    // The grid numbers its columns from 1; the hidden ID is the first.
     private const int ResidentColumn = 2;
     private const int RoomColumn = 3;
     private const int FallRiskColumn = 4;

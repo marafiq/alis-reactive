@@ -4,17 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.RoomTransfer;
 
-/// <summary>
-/// As a coordinator requesting a room transfer, I want the page to refuse what it can see is wrong and
-/// the server to tell me, in the page, what only it knows, so that a request that goes through is one
-/// housekeeping can act on.
-/// </summary>
-/// <remarks>
-/// The rules that stay on the server stay by what they are: C# that asks the room book, a lookup that
-/// waits, a message written from the model, a rule kept there on purpose, a condition only C# can
-/// evaluate. Each is proven by the request being sent once and the server's answer appearing beside
-/// the field it is about, whether or not the field has a rule the page runs.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
 {
@@ -59,7 +48,6 @@ public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
         await Page.Keyboard.PressAsync("Tab");
     }
 
-    // Helen Park, from MA-214 to the free room next door, on a Tuesday.
     private async Task DescribeTheTransfer(string toRoom = "MA-216", string day = Tuesday)
     {
         await Write(m => m.ResidentName, "Helen Park");
@@ -142,7 +130,6 @@ public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
-    // The reason's length is a rule the page could run, kept on the server on purpose.
     [Test]
     public async Task a_reason_over_a_hundred_characters_is_sent_and_the_server_asks_to_shorten_it()
     {
@@ -220,7 +207,6 @@ public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Housekeeping's desk answers with a note, not a record of field errors: nothing is placed on the form.
     [Test]
     public async Task a_refusal_from_housekeeping_shows_no_field_messages()
     {

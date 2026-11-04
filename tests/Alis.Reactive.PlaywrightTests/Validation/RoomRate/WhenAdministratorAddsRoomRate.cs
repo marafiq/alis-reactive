@@ -3,17 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.RoomRate;
 
-/// <summary>
-/// As a community administrator, I want a room name of only spaces, a blank or $0 monthly rate, and an
-/// undecided community fee to be asked for before the room is sent, so that I correct them on the page
-/// instead of waiting for the server to refuse them; a $0 community fee is taken as a waived fee.
-/// </summary>
-/// <remarks>
-/// Each test fills the field it is about first and a valid field last: leaving an invalid field shows
-/// its message, which moves the Add Room button, so the click must not be what leaves it. An "asks for"
-/// test then corrects the field and adds the room: exactly one add request proves the first Add Room
-/// sent nothing, whenever a send would have happened.
-/// </remarks>
 [TestFixture]
 public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
 {
@@ -166,8 +155,6 @@ public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
         AssertTheRoomWasSentOnce();
     }
 
-    // Maple Grove's rate policy is a service the app registers; the validator takes it from DI, and the
-    // page's rule comes from that same validator, so the cap and its wording are the policy's.
     [Test]
     public async Task a_monthly_rate_over_the_communitys_cap_is_asked_for_in_the_rate_policys_words()
     {
@@ -201,7 +188,6 @@ public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("The community fee must be less than the monthly rate.");
         await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
 
-        // A fee equal to the monthly rate is not less than it either: leaving the fee asks again.
         await CommunityFee.Fill("4200");
         await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("");
         await RoomName.Fill("Maple 214");
@@ -216,8 +202,6 @@ public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
         AssertTheRoomWasSentOnce();
     }
 
-    // Suites are priced by size: a room whose name ends in "Suite" needs its square footage; the
-    // other tests add "Maple 214" without one.
     [Test]
     public async Task a_suite_needs_its_square_footage()
     {

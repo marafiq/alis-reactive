@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Members;
 
-/// <summary>
-/// A component's member read as the type its declaration names when the component keeps another kind of value
-/// (P9, grammar.md 2.1): a number read as a flag is false only at zero, a list as a flag is true once it holds
-/// an item, a day as a flag is true and nothing is not, a flag read as a number counts one or none, and a
-/// timestamp read as a day arrives as a day where a method takes one.
-/// </summary>
 [TestFixture]
 public sealed class WhenAComponentKeepsAnotherKindOfValue : AppPageTest
 {

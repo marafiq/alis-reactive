@@ -44,7 +44,6 @@
                         })
                         .OnError(400, e => e.ValidationErrors("transfer-form")));
                 }))
-            @* The urgent request checks the same form with the same rules before it goes to the server. *@
             @(Html.NativeButton("request-urgent-btn", "Request urgent transfer")
                 .CssClass("rounded-md bg-danger px-4 py-2 text-sm font-medium text-white hover:bg-danger/90")
                 .Reactive(plan, evt => evt.Click, (args, p) =>
@@ -58,7 +57,6 @@
                         })
                         .OnError(400, e => e.ValidationErrors("transfer-form")));
                 }))
-            @* Housekeeping's desk answers in a note, not a record of field errors. *@
             @(Html.NativeButton("ask-housekeeping-btn", "Ask housekeeping")
                 .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                 .Reactive(plan, evt => evt.Click, (args, p) =>

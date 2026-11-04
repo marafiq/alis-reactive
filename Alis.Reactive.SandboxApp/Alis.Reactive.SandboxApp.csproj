@@ -9,7 +9,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <!-- The look this app chose; the component packages do not bring one. -->
         <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
@@ -17,7 +16,6 @@
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
     </ItemGroup>
 
-    <!-- The theme the design system copies into Styles\ before each build, as its NuGet does for an app. -->
     <Import Project="..\Alis.Reactive.DesignSystem\build\AlisReactive.DesignSystem.targets" />
     <Import Project="..\build\AlisReactiveBrowserAssets.targets" />
 

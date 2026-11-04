@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Cardiology follow-up: the clinic says whether Dr. Osei is in at the time picked, and books the time
-    /// the nurse settles on, written out in full.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/DateTimePicker")]
     public class DateTimePickerController : Controller

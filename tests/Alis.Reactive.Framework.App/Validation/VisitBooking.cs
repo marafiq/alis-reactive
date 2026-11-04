@@ -1,7 +1,6 @@
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>A visit booked at the front desk.</summary>
 public sealed class VisitBooking
 {
     public string? Visitor { get; set; }
@@ -20,7 +19,6 @@ public sealed class VisitBooking
 
     public string? Notes { get; set; }
 
-    /// <summary>The visiting slot, set by the page and not an input: only the server checks it.</summary>
     public string? Slot { get; set; }
 }
 
@@ -29,7 +27,6 @@ public sealed class Booked
     public string Summary { get; set; } = "";
 }
 
-/// <summary>The rules every visit is checked by, written once: the browser checks what it can, the server all.</summary>
 public sealed class VisitRules : ReactiveValidator<VisitBooking>
 {
     public VisitRules()

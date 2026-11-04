@@ -3,12 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// ChipFilter sandbox — multi-select chips drive the array DSL and a server-side grid filter.
-    /// Chip selection is broadcast as a custom event whose payload carries the selected chip
-    /// objects; the array DSL counts/guards them by member, and their texts gather into a POST that
-    /// filters the resident grid. URL: /Sandbox/Components/ChipFilter.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/ChipFilter")]
     public class ChipFilterController : Controller
@@ -32,11 +26,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ChipFilterModel());
         }
 
-        /// <summary>Loads the unfiltered resident roster on page boot.</summary>
         [HttpGet("Residents")]
         public IActionResult Residents() => Ok(new CareResidentResponse { Residents = All });
 
-        /// <summary>Filters the roster by the selected care levels (the chip texts).</summary>
         [HttpPost("Filter")]
         public IActionResult Filter([FromBody] CareFilterRequest? request)
         {

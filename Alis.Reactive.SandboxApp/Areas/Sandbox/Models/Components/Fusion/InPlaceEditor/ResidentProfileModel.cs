@@ -1,17 +1,14 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlaceEditor
 {
-    /// <summary>Eleanor Vance's profile, saved together with Save profile.</summary>
     public class ResidentProfileModel
     {
         public string? Name { get; set; }
 
         public DateTime? AdmissionDate { get; set; }
 
-        /// <summary>The name on her door sign and the one staff call her by.</summary>
         public string? PreferredName { get; set; }
 
-        /// <summary>A profile under care review keeps its preferred name.</summary>
         public bool ProfileLocked { get; set; }
     }
 
@@ -30,7 +27,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InPlac
         }
     }
 
-    /// <summary>What the profile answers when it is saved.</summary>
     public sealed class ProfileSaved
     {
         public string Message { get; set; } = "";

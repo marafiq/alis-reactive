@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>Respite stay: the server prices the days picked and reserves the stay.</summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/DateRangePicker")]
     public class DateRangePickerController : Controller
@@ -15,7 +14,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return View("~/Areas/Sandbox/Views/Components/Fusion/DateRangePicker/Index.cshtml", new DateRangePickerModel());
         }
 
-        /// <summary>Prices the stay: the nights between the day Eleanor arrives and the day she leaves.</summary>
         [HttpGet("Quote")]
         public IActionResult Quote([FromQuery] RespiteStayDates stay)
         {
@@ -24,7 +22,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new RespiteQuote($"{Day(arrives)} to {Day(leaves)}: {Priced(arrives, leaves)}."));
         }
 
-        /// <summary>Reserves the respite stay for the days picked.</summary>
         [HttpPost("Reserve")]
         public IActionResult Reserve([FromBody] RespiteStayDates? stay)
         {

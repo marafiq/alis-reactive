@@ -42,7 +42,6 @@ function emit(level: number, tag: string, msg: string, details?: unknown): void 
                       : level <= LEVELS.warn  ? console.warn
                       : level <= LEVELS.info  ? console.info
                       : console.log;
-  // Emit searchable JSON text and the live object DevTools can expand.
   if (details !== undefined) {
     consoleMethod(`${tag} ${msg} ${safeStringify(details)}`, details);
     return;
@@ -55,7 +54,6 @@ function safeStringify(details: unknown): string {
   try {
     return JSON.stringify(details);
   } catch {
-    // Circular references and BigInt values still get a text marker.
     return "[unserializable]";
   }
 }

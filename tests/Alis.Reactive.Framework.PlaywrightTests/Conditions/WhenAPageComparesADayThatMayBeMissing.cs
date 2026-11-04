@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// A day that may be missing (a <c>DateTime?</c> the picker holds, nothing until a day is picked), tested
-/// for null and compared with a fixed day, the open day 2026-10-27: as a calendar day, ordered by its
-/// time, in a range, and, when missing, unequal to any day and neither before nor after one. The page
-/// tests the day each time the picker changes.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageComparesADayThatMayBeMissing : AppPageTest
 {

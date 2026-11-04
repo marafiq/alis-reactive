@@ -1,16 +1,6 @@
-/* What the core writes, plain and complete without a design system: the field wrapper, the form
-   summary, the mark the runtime puts on a refused input, and the live-connection retry container.
-   The layer order is the framework's cascade contract: looks sit in `alis`, below an app's own
-   utilities; a state mark stays unlayered, above them. A design system restyles these rules by
-   specificity in the same layer. */
 @layer theme, base, alis, components, utilities;
 
 @layer alis {
-  /* A field keeps the room for its message, shown or hidden: a message that appears when a field is
-     left must not move the page under a click already on its way to the next control. The wrapper
-     reserves the message's line and the gap before it; a shown message takes that room. The slot
-     itself hides by the `hidden` attribute alone, whatever reset the page runs (Tailwind's Preflight
-     makes `[hidden]` display: none with !important, which no later layer can undo). */
   .alis-field {
     display: flex;
     flex-direction: column;

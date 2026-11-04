@@ -63,10 +63,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new ResidentGridEditingModel());
         }
 
-        /// <summary>
-        /// The remote adaptor roster's data endpoint: the page the grid's DataManager asks for, as
-        /// <c>{result, count}</c>.
-        /// </summary>
         [HttpPost("Data")]
         public IActionResult Data([FromBody] GridDataRequest? request)
         {

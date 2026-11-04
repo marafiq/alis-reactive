@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
-/// <summary>
-/// One partial rendered for each item of a list member, under the field prefix MVC gives a list item
-/// (<c>Members[0]</c>, <c>Members[1]</c>): a rendering's inputs reach the endpoint at the item's position in
-/// the list a JSON body sends, as the endpoint binds it.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPartialIsRenderedForAListItem : AppPageTest
 {

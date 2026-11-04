@@ -3,7 +3,6 @@ using Alis.Reactive.Fusion;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// The Syncfusion license comes from configuration or user secrets; without one EJ2 shows a trial dialog.
 var sfLicense = builder.Configuration["Syncfusion:LicenseKey"];
 if (!string.IsNullOrEmpty(sfLicense))
     Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(sfLicense);

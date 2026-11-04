@@ -2,13 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>A meal ordered for a visiting guest, from the kitchen's menus. Regular, the first, is the enum's default.</summary>
 public sealed class GuestMealOrder
 {
     public MealMenu Menu { get; set; } = MealMenu.Regular;
 }
 
-/// <summary>The kitchen's menus, sent by name; a resident's diet decides the others.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum MealMenu
 {
@@ -17,7 +15,6 @@ public enum MealMenu
     Pureed,
 }
 
-/// <summary>The rules a guest's meal is ordered by: guests eat from the regular menu, the enum's default.</summary>
 public sealed class GuestMealRules : ReactiveValidator<GuestMealOrder>
 {
     public GuestMealRules()

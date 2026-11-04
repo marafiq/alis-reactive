@@ -11,26 +11,18 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.PlanModel.Values
 {
-    /// <summary>
-    /// One value the plan reads: a literal, a member of an object (a component, a plugin, an element,
-    /// data a callback was handed), the URL, an input as MVC binds it, a record, a list or an array
-    /// operation. Each writes the grammar expression that reads it, in the scope it is used in.
-    /// </summary>
     internal abstract class ValueExpression
     {
         private protected ValueExpression() { }
 
         internal abstract Shape OutputShape { get; }
 
-        /// <summary>The value as it arrived, unconverted, for text shown as the server or the event sent it.</summary>
         internal virtual ValueExpression AsArrived() => this;
 
-        /// <summary>Whether reading it waits for a promise, so a condition over it is asked in its own <c>if</c>.</summary>
         internal virtual bool ReadsAwaited => false;
 
         internal abstract Expr Write(Scope scope);
 
-        /// <summary>The value as a comparison reads it: converted to the shape; a literal is written in it.</summary>
         internal virtual Expr WriteAs(Shape shape, Scope scope) => G.As(Write(scope), shape);
 
         internal static ValueExpression Literal(bool value) => new LiteralExpression(Scalar.Of(value), Shape.Boolean);
@@ -45,12 +37,6 @@ namespace Alis.Reactive.PlanModel.Values
 
         private static ValueExpression LiteralRaw(object value, Shape shape) => new LiteralExpression(Scalar.Of(value), shape);
 
-        /// <summary>
-        /// A value fixed when the view renders, written as the plan carries it (grammar.md 1.2): text, a number, a
-        /// boolean and null as a literal; a date, a Guid, a time or a char as the text JSON gives it; an enum by its
-        /// JSON name; a data class as a record of its members by their JSON names; a dictionary as a record of its
-        /// keys; a collection as a list. A member's value is read under the member's shape.
-        /// </summary>
         internal static ValueExpression LiteralFor(object? value, Shape shape) => LiteralFor(value, shape, depth: 0);
 
         private static ValueExpression LiteralFor(object? value, Shape shape, int depth)
@@ -84,7 +70,6 @@ namespace Alis.Reactive.PlanModel.Values
                 "a number, a boolean, a date, a Guid, a time, an enum, a data class, a dictionary or a collection of those.");
         }
 
-        // The text JSON gives a value MVC binds from text: a DateTimeOffset, a Guid, a TimeSpan, a DateOnly, a TimeOnly, a char.
         private static string JsonTextOf(object value) =>
             JsonSerializer.SerializeToElement(value, value.GetType()).GetString()
             ?? throw new InvalidOperationException($"A {CSharpTypeName.Of(value.GetType())} is not written as text.");
@@ -98,8 +83,6 @@ namespace Alis.Reactive.PlanModel.Values
         private static object? Property(object entry, string name) =>
             entry.GetType().GetProperty(name)!.GetValue(entry);
 
-        // An option is its member name ("Descending"), unless the enum names the JavaScript text the
-        // way System.Text.Json does: [JsonStringEnumMemberName("notequal")] NotEqual.
         private static string JavaScriptTextOf(Enum option)
         {
             var memberName = option.ToString();
@@ -110,14 +93,12 @@ namespace Alis.Reactive.PlanModel.Values
             return declared == null ? memberName : declared.Name;
         }
 
-        /// <summary>A property of an object, or a path into data; with no path, the object or data itself.</summary>
         internal static ValueExpression Get(Target target, IReadOnlyList<string> path, Shape shape) =>
             new GetExpression(target, path, shape);
 
         internal static ValueExpression Get(Target target, Shape shape) =>
             new GetExpression(target, G.NoPath, shape);
 
-        /// <summary>What a method of an object returns.</summary>
         internal static CallExpression Call(
             Target target,
             IReadOnlyList<string> path,
@@ -129,25 +110,14 @@ namespace Alis.Reactive.PlanModel.Values
         internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits) =>
             new MethodResultExpression(call, member, awaits);
 
-        /// <summary>A query string key, as MVC binds it: a scalar from its first value, an array from all of them.</summary>
         internal static ValueExpression ReadUrl(string key, Shape shape) => new UrlRead(key, shape);
 
-        /// <summary>
-        /// A member as MVC binds it, by its binding name: the input the plan rendered for it or, when it rendered none,
-        /// the input on the page that binds it, whichever view rendered it; missing when none is on the page
-        /// (grammar.md M8).
-        /// </summary>
         internal static ValueExpression ReadBound(string name, Shape shape) =>
             new BoundRead(name, shape, BoundRead.Page, G.List(Array.Empty<Expr>()));
 
-        /// <summary>
-        /// A member a form's test reads by its binding name: the input inside the form that binds it, else the one on
-        /// the page, at the indexes of the item the test checks, which the test takes as <paramref name="itemIndexes"/>.
-        /// </summary>
         internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes) =>
             new BoundRead(name, shape, formId, G.Ref(itemIndexes));
 
-        /// <summary>A record of named fields, written in the order given; a name appears once.</summary>
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
@@ -171,9 +141,6 @@ namespace Alis.Reactive.PlanModel.Values
             return new ListExpression(items.ToList(), shape);
         }
 
-        // ── operators and tests, per item of an array lambda, which never waits ──
-
-        /// <summary>An operator of grammar.md 2.2 over values (<c>??</c>, <c>?:</c>, a date's month counted from 1), its result read in a shape.</summary>
         internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands) =>
             new OperationExpression(op, operands, shape);
     }
@@ -251,7 +218,6 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Expr Write(Scope scope) => WriteCall(scope, _shape);
 
-        /// <summary>The call with its result as it arrives: what a <c>let</c> binds, converted where the name is read.</summary>
         internal Expr WriteUnconverted(Scope scope) => WriteCall(scope, Shape.Any);
 
         private Expr WriteCall(Scope scope, Shape shape)
@@ -262,11 +228,6 @@ namespace Alis.Reactive.PlanModel.Values
         }
     }
 
-    /// <summary>
-    /// What a method returned: bound once per block, by a <c>let</c> hoisted before the statement that
-    /// first reads it, and read by name after, converted to the method's shape where it is read. A promise
-    /// is awaited by that <c>let</c> (grammar.md 3.1).
-    /// </summary>
     internal sealed class MethodResultExpression : ValueExpression
     {
         private readonly CallExpression _call;
@@ -301,13 +262,11 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
-        // MVC binds a scalar from a key's first value and an array from all of them.
         internal override Expr Write(Scope scope)
         {
             var values = _shape.DescribesArray ? "queryAll" : "query";
             return G.Get(G.Get(G.Obj(scope.Objects.Document()), new[] { values }, Shape.Any), new[] { _key }, _shape);
         }
-
     }
 
     internal sealed class BoundRead : ValueExpression
@@ -329,8 +288,6 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
-        // The model hands the value back as MVC binds it, already in the input's shape: the plan converts it no
-        // second time.
         internal override Expr Write(Scope scope)
         {
             if (_containerId != Page)

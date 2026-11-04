@@ -2,7 +2,6 @@ using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Requests;
 
-/// <summary>A request is one send of alis.http: its route, query or body gathered from the page, its routes on the answer.</summary>
 [TestFixture]
 public class WhenAPageAuthorsRequests
 {

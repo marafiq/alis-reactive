@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A comparison reads its value under the member's shape, the same in the browser as on the server: a
-/// number, a flag, a date, an instant and text compared for equality and for order, and a number compared with
-/// another member. Each refuses in the browser with nothing sent and takes what the server takes. Text the
-/// server orders by its culture, which the browser cannot match, so an order of text is the server's alone.
-/// </summary>
 [TestFixture]
 public sealed class WhenValuesAreComparedUnderTheirShape : AppPageTest
 {

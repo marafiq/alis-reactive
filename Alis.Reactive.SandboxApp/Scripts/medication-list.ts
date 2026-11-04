@@ -1,16 +1,3 @@
-// A resident's medication list: a widget the sandbox wrote itself, with no knowledge of Alis.Reactive.
-// Its object lives on its host element as `medicationList`; BroughtComponents/MedicationList/
-// MedicationList.cs declares it to the framework. It holds a list of objects, each with members of
-// its own, the way a chart holds its series:
-//
-//   properties  lines (the list: each line has name, units, dailyCost, hoursApart, route, scheduledAt
-//               (a Date), controlled and reconciled, and its own reconcile() and isDue()), count,
-//               deliveries (a list the page records: pharmacy, deliveredAt, lines)
-//   methods     add(name, units, route), remove(name), clear(), reconcileAll()
-//   events      changed, with the line that changed and the list as it now stands; raised once for
-//               each edit made on the list.
-//               Listeners are added with on(name, fn) and removed with off(name, fn).
-
 import "./medication-list.css";
 
 export type Route = "oral" | "injection" | "topical";
@@ -26,7 +13,6 @@ export interface LineFacts {
   reconciled: boolean;
 }
 
-/** One line of the list: its facts and its own members. */
 export interface Line extends LineFacts {
   reconcile(): void;
   isDue(): boolean;
@@ -38,7 +24,6 @@ export interface Delivery {
   lines: string[];
 }
 
-/** What a changed listener receives. */
 export interface ListChange {
   readonly changed: string;
   readonly items: LineFacts[];
@@ -61,7 +46,6 @@ const ROUTES: ReadonlyArray<[Route, string]> = [
   ["topical", "Topical"],
 ];
 
-// A dose is due at 08:00 on the list's day; the list reads its lines against that hour.
 const DUE_HOUR = 8;
 
 export class MedicationList {
@@ -79,7 +63,6 @@ export class MedicationList {
     this.render();
   }
 
-  /** The list: each line an object with members of its own. */
   get lines(): Line[] {
     return this.items;
   }
@@ -88,7 +71,6 @@ export class MedicationList {
     return this.items.length;
   }
 
-  /** The deliveries the page recorded against the list. */
   get deliveries(): Delivery[] {
     return this.recorded;
   }

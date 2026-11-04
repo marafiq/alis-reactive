@@ -10,33 +10,22 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>
-    /// One term of the rule vocabulary: what the server decides about a value, and the message it says when
-    /// the value fails. A term the browser runs too also implements <see cref="IBrowserCheck"/>, which gives
-    /// the plan's form of the same decision; a term without it (a C# predicate, a database lookup) is the
-    /// server's alone.
-    /// </summary>
     internal abstract class Check<T, TValue>
     {
-        /// <summary>The default message.</summary>
         internal abstract string Template { get; }
 
-        /// <summary>Whether the value passes; on a failure, the arguments its message names.</summary>
         internal abstract bool Passes(T instance, TValue value, MessageArguments arguments);
 
-        /// <summary>Whether the term waits for something (a database, a service).</summary>
         internal virtual bool IsAsync => false;
 
         internal virtual Task<bool> PassesAsync(T instance, TValue value, MessageArguments arguments, CancellationToken cancellation) =>
             Task.FromResult(Passes(instance, value, arguments));
 
-        /// <summary>The arguments a message can name before any value exists, when the page renders.</summary>
         internal virtual void NameRenderArguments(MessageArguments arguments)
         {
         }
     }
 
-    /// <summary>A term the browser runs as well: the plan's form of the decision the server makes.</summary>
     internal interface IBrowserCheck
     {
         IEnumerable<BrowserRule> ForBrowser(string message);
@@ -51,7 +40,6 @@ namespace Alis.Reactive.Validation
         public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.NotNull(message) };
     }
 
-    /// <summary>Not null, not blank text, not an empty list, and not the type's default.</summary>
     internal sealed class NotEmptyCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
         internal override string Template => Templates.NotEmpty;
@@ -90,7 +78,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>Text no shorter than a minimum and no longer than a maximum (-1: none). Null text passes.</summary>
     internal sealed class LengthCheck<T> : Check<T, string?>, IBrowserCheck
     {
         private readonly int _min;
@@ -124,7 +111,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>Text the pattern matches. Null text passes.</summary>
     internal class PatternCheck<T> : Check<T, string?>
     {
         private readonly Regex _pattern;
@@ -139,10 +125,6 @@ namespace Alis.Reactive.Validation
         internal override bool Passes(T instance, string? value, MessageArguments arguments) =>
             value == null || _pattern.IsMatch(value);
 
-        /// <summary>
-        /// The term for a pattern: one the browser reads as .NET does goes there too; one with .NET-only
-        /// syntax or options (\z, inline options, atomic groups, RightToLeft) is the server's.
-        /// </summary>
         internal static PatternCheck<T> For(Regex pattern) =>
             JavaScriptPattern.Reads(pattern) ? new BrowserPatternCheck(pattern) : new PatternCheck<T>(pattern);
 
@@ -160,15 +142,10 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>Whether JavaScript reads a .NET pattern the same way, and its flags there.</summary>
     internal static class JavaScriptPattern
     {
         private const RegexOptions NoJavaScriptForm = RegexOptions.IgnorePatternWhitespace | RegexOptions.RightToLeft;
 
-        // Syntax .NET reads one way and JavaScript another, or not at all: \A \Z \z \G anchors, inline
-        // options (?i), (?I) and (?i:...), atomic (?>...) and comment (?#...) groups, (?'name') groups,
-        // balancing groups (?<open-close>...), conditionals (?(x)...), Unicode classes \p{..} (literal
-        // "p" without JavaScript's u flag) and class subtraction [a-z-[aeiou]].
         private static readonly Regex DotNetOnlySyntax = new Regex(
             @"\\[AZzG]|\(\?[imnsxIMNSX-]+[:)]|\(\?>|\(\?#|\(\?'|\(\?<\w*-\w+>|\(\?\(|\\[pP]\{|\[[^\]]*-\[",
             RegexOptions.CultureInvariant);
@@ -182,7 +159,6 @@ namespace Alis.Reactive.Validation
             + (pattern.Options.HasFlag(RegexOptions.Singleline) ? "s" : "");
     }
 
-    /// <summary>Exactly one @, neither first nor last. Null text passes.</summary>
     internal sealed class EmailCheck<T> : Check<T, string?>, IBrowserCheck
     {
         internal override string Template => Templates.Email;
@@ -197,7 +173,6 @@ namespace Alis.Reactive.Validation
         public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.Email(message) };
     }
 
-    /// <summary>Digits, with dashes and spaces between them, whose Luhn checksum holds. Null text passes.</summary>
     internal sealed class CreditCardCheck<T> : Check<T, string?>, IBrowserCheck
     {
         internal override string Template => Templates.CreditCard;
@@ -221,7 +196,6 @@ namespace Alis.Reactive.Validation
         public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.CreditCard(message) };
     }
 
-    /// <summary>An absolute http or https address. Null or empty text passes.</summary>
     internal sealed class UrlCheck<T> : Check<T, string?>, IBrowserCheck
     {
         internal override string Template => Templates.Url;
@@ -236,10 +210,6 @@ namespace Alis.Reactive.Validation
         public IEnumerable<BrowserRule> ForBrowser(string message) => new[] { BrowserRule.Url(message) };
     }
 
-    /// <summary>
-    /// The value compared with a literal or with another member of the model. An ordered comparison passes
-    /// a null value and fails a missing other member; equality compares whatever both hold.
-    /// </summary>
     internal sealed class CompareCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
         private readonly Comparison _comparison;
@@ -271,17 +241,12 @@ namespace Alis.Reactive.Validation
             return _comparison.Orders(Comparer.Default.Compare(value, other));
         }
 
-        // The browser names the other member, whose value it has not read yet, or the literal.
         internal override void NameRenderArguments(MessageArguments arguments) =>
             arguments.With("ComparisonValue", _operand.RenderName).With("ComparisonProperty", _operand.DisplayName);
 
         public IEnumerable<BrowserRule> ForBrowser(string message) => _operand.ForBrowser(_comparison, message);
     }
 
-    /// <summary>
-    /// What a comparison compares the value with: a fixed value of the member's type, or another member
-    /// of the model.
-    /// </summary>
     internal abstract class Operand<T, TValue>
     {
         internal static Operand<T, TValue> Literal(TValue value) => new LiteralOperand(value);
@@ -337,7 +302,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>A value within two bounds, both included or both excluded. A null value passes.</summary>
     internal sealed class BetweenCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
         private readonly TValue _from;
@@ -375,14 +339,6 @@ namespace Alis.Reactive.Validation
             new[] { BrowserRule.Between(_from, _to, _inclusive, message) };
     }
 
-    /// <summary>A C# predicate: the server's alone.</summary>
-    /// <summary>
-    /// A decimal of at most <c>precision</c> digits, <c>scale</c> of them decimals, counted as FluentValidation counts
-    /// them: the mantissa's digits, with the trailing zeros of the decimals dropped when asked. The page binds the
-    /// value under the number shape, which carries no trailing zero, and the server receives that number; so the
-    /// browser's pattern is the server's count either way. The server alone decides when the digits would not print
-    /// in place (more than 21 before the point or 6 after, where JavaScript prints an exponent).
-    /// </summary>
     internal sealed class PrecisionScaleCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
         private const int IntegerDigitsPrinted = 21;
@@ -409,7 +365,6 @@ namespace Alis.Reactive.Validation
             var (scale, digits) = Count((decimal)(object)value);
             var integerDigits = digits - scale;
             if (scale <= _scale && integerDigits <= _precision - _scale) return true;
-            // The digits as if the value were padded to the expected decimals, so that 123 under (3, 2) reads as 5 digits.
             var printedScale = Math.Max(scale, _scale);
             arguments.With("Digits", Math.Max(integerDigits, 1) + printedScale).With("ActualScale", printedScale);
             return false;
@@ -450,10 +405,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>
-    /// A value the enum declares, as the server binds one: a name, in any case, or the number of one. A
-    /// <c>[Flags]</c> enum takes any combination of its values, which the server alone checks.
-    /// </summary>
     internal sealed class InEnumCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
     {
         private readonly Type _enumType;
@@ -473,7 +424,6 @@ namespace Alis.Reactive.Validation
         internal override bool Passes(T instance, TValue value, MessageArguments arguments) =>
             value == null || (_flags ? (Bits(value) & ~_mask) == 0 : Enum.IsDefined(_enumType, value));
 
-        // Each name and each number the server binds, with the whitespace Enum.Parse ignores around them.
         public IEnumerable<BrowserRule> ForBrowser(string message)
         {
             if (_flags) return Array.Empty<BrowserRule>();
@@ -508,7 +458,6 @@ namespace Alis.Reactive.Validation
         internal override bool Passes(T instance, TValue value, MessageArguments arguments) => _predicate(instance, value);
     }
 
-    /// <summary>A predicate that waits (a database lookup, a service call): the server's alone.</summary>
     internal sealed class AsyncPredicateCheck<T, TValue> : Check<T, TValue>
     {
         private readonly Func<T, TValue, CancellationToken, Task<bool>> _predicate;

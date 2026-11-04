@@ -1,15 +1,3 @@
-// A room whiteboard: a widget the sandbox wrote itself, with no knowledge of Alis.Reactive. Its object
-// lives on its host element as `whiteboard`; BroughtComponents/Whiteboard/Whiteboard.cs declares it to
-// the framework. It is the board on a resident's wall that the nurse keeps up to date:
-//
-//   properties  nurse and goal (read and written), nextCheckMinutes (read and written, null when no
-//               check is scheduled), notes and lastRefresh (read only)
-//   methods     page(who), highlight(row, effect), addNote(number, text), wipe()
-//   functions   nextNoteNumber() (each call draws the next number), refresh() (a promise that settles
-//               after a moment and then records the refresh), loadMotto() (a promise of the wing's motto)
-//   events      noteAdded (number, text); wiped (no payload).
-//               Listeners are added with on(name, fn) and removed with off(name, fn).
-
 import "./whiteboard.css";
 
 export interface NoteAdded {
@@ -69,7 +57,6 @@ export class Whiteboard {
     this.render();
   }
 
-  /** Minutes until the next check; null when no check is scheduled. */
   get nextCheckMinutes(): number | null {
     return this.nextCheck;
   }
@@ -79,50 +66,42 @@ export class Whiteboard {
     this.render();
   }
 
-  /** How many notes are on the board. */
   get notes(): number {
     return this.noteLines.length;
   }
 
-  /** What the last refresh recorded; empty until a refresh has settled. */
   get lastRefresh(): string {
     return this.refreshes === 0 ? "" : `Refreshed ${this.refreshes}`;
   }
 
-  /** Pages someone from the board. */
   page(who: string): void {
     this.status = `Paged ${who}`;
     this.render();
   }
 
-  /** Marks a row with an effect, shown as the row's style; "plain" when the caller names none. */
   highlight(row: string, effect = "plain"): void {
     if (!isRow(row)) throw new Error(`whiteboard has no row "${row}"`);
     this.effects.set(row, effect);
     this.render();
   }
 
-  /** Draws the next note number. */
   nextNoteNumber(): number {
     this.drawn += 1;
     return this.drawn;
   }
 
-  /** Adds a numbered note and tells whoever listens. */
   addNote(number: number, text: string): void {
     this.noteLines.push(`${number}. ${text}`);
     this.render();
     this.emit("noteAdded", { number, text } satisfies NoteAdded);
   }
 
-  /** Clears the notes and tells whoever listens; the listener receives nothing. */
   wipe(): void {
     this.noteLines.length = 0;
     this.render();
     this.emit("wiped", undefined);
   }
 
-  /** Settles after a moment, then records the refresh. */
   refresh(): Promise<void> {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -133,7 +112,6 @@ export class Whiteboard {
     });
   }
 
-  /** The wing's motto, after a moment. */
   loadMotto(): Promise<string> {
     return new Promise(resolve => {
       setTimeout(() => resolve("Kindness first"), SETTLE_MS);

@@ -7,8 +7,6 @@
 <h1>Moving in</h1>
 <p>Progress: <span id="move-in-progress"></span></p>
 
-@* The page starts before the step rendered inside it, as before a step loaded later: each step then
-   names itself in the progress line, and hears who takes the move-in. *@
 @{ Html.On(plan, t => t.DomReady(p =>
 {
     p.Element("move-in-progress").Text.Set("started");
@@ -26,7 +24,6 @@
 
 <form id="move-in">
     @{ Html.InputField(plan, m => m.Coordinator, o => o.Label("Taken by")).Entry(); }
-    @* The first step is rendered with the page, inside the container every step loads into. *@
     <div id="move-in-step">
         @await Html.PartialAsync("/Slots/MoveInResident.cshtml", new MoveInResident())
     </div>

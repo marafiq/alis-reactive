@@ -4,16 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.MoveInReview;
 
-/// <summary>
-/// As a move-in coordinator, I want the review form to tell me what is missing as I work, under the
-/// same rules the server applies, so that a review I save is one the community accepts.
-/// </summary>
-/// <remarks>
-/// The rules are written once, in FluentValidation's grammar. The page checks every rule it can; a
-/// rule whose condition only the server can decide (a returning resident's previous room) is answered
-/// by the server, beside the field it is about. The page sends every field it renders and, beside
-/// the pharmacy phone, the pharmacy network the community contracts.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 {
@@ -40,7 +30,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         _plan = await PagePlan<MoveInReviewModel>.FromPage(Page);
     }
 
-    // Leaving the field lets its message settle, so the next click lands where it aims.
     private async Task Write(Expression<Func<MoveInReviewModel, object?>> field, string text)
     {
         await _plan.TextBox(field).Fill(text);
@@ -91,7 +80,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // The server refuses the name twice, too long and not letters only, and the page shows both reasons.
         await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync(
             $"{NameWithDigits} is longer than the 30 characters a wristband prints. " +
             "A wristband prints letters only: remove the digits from the name.");
@@ -185,7 +173,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // Seven is the top of the moderate band, 5 to 7 inclusive.
         await Expect(_plan.ErrorFor(m => m.ReassessmentPlan)).ToHaveTextAsync("A moderate fall risk needs a reassessment plan.");
         Assert.That(_reviewsSent, Is.Empty);
         await Write(m => m.FallRiskScore, "8");
@@ -197,7 +184,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The length check is written after the moderate-risk condition, so it holds at every score.
     [Test]
     public async Task a_reassessment_plan_is_kept_short_whatever_the_fall_risk()
     {
@@ -228,7 +214,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // A condition on the plan's length has no browser form, so only the server asks, beside the reviewer.
         await Expect(_plan.ErrorFor(m => m.TherapistReviewer)).ToHaveTextAsync("A mobility plan this long needs a therapist to review it.");
         await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(ReviewStatus).ToHaveTextAsync("Not saved yet.");
@@ -271,7 +256,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // Either need is enough; a resident with neither is saved without an assistant in every other test.
         await Expect(_plan.ErrorFor(m => m.EvacuationAssist)).ToHaveTextAsync("Name who helps the resident out in an evacuation.");
         Assert.That(_reviewsSent, Is.Empty);
         await Write(m => m.EvacuationAssist, "Night shift aide");
@@ -339,7 +323,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A phone keyboard capitalizes the first letter; the server reads the address the same either way.
     [Test]
     public async Task a_family_portal_link_typed_with_a_capital_h_is_accepted()
     {
@@ -442,7 +425,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // The rule applies unless the phone is empty; the phone is given, so the pharmacy is asked for.
         await Expect(_plan.ErrorFor(m => m.Pharmacy.Name)).ToHaveTextAsync("Name the pharmacy for this phone number.");
         Assert.That(_reviewsSent, Is.Empty);
         await Write(m => m.Pharmacy.Name, "Riverside Pharmacy");
@@ -452,7 +434,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The delivery date is on the pharmacy; the move-in day it is compared with is on the review.
     [Test]
     public async Task the_pharmacys_first_delivery_cannot_come_before_the_move_in_day()
     {
@@ -499,7 +480,6 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
 
         await ClickWhenStable(SaveReview);
 
-        // The field has no rule the page runs, so only the server answers, beside the field.
         await Expect(_plan.ErrorFor(m => m.ForwardingZip)).ToHaveTextAsync("Enter the forwarding ZIP as five digits.");
         await Expect(ValidationSummary).ToBeHiddenAsync();
         Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The pattern ends in .NET's \\z, so the server checks it.");

@@ -1,6 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>An error route that takes any status reads the error body by its type, whatever status refused it.</summary>
 [TestFixture]
 public sealed class WhenARequestIsRefusedWithAReason : AppPageTest
 {

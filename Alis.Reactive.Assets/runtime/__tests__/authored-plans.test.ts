@@ -1,12 +1,7 @@
-// The plans the C# builders wrote (tests/Alis.Reactive.PlanTests, the goldens), run by this runtime
-// against the plain DOM they name: the framework's own proof that a page authored in C# behaves,
-// with no component library and no browser between the two.
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { authored, mount, type } from "./support/authored";
 import { server } from "./support/network";
 
-// Each test runs a fresh runtime, as every suite here does.
 let Owner: (typeof import("../objects/owner"))["Owner"];
 let startOwner: (typeof import("../plans/start"))["startOwner"];
 
@@ -120,7 +115,6 @@ describe("requests", () => {
     expect(sent[0]).toMatchObject({ method: "GET", url: "/residents/1042?Wing=Garden" });
   });
 
-  // The view lays the form out: the inputs inside the element the request's Form(formId) names.
   function formHolding(formId: string, inputs: HTMLElement[]): void {
     const form = document.createElement("form");
     form.id = formId;
@@ -155,8 +149,6 @@ describe("requests", () => {
 });
 
 describe("validation", () => {
-  // The view lays the form out: the input inside the container the plan validates, an error slot
-  // beside it, and the form's summary.
   function layOut(elements: Record<string, HTMLElement>): { error: HTMLElement } {
     const container = elements["admission"]!;
     const name = input(elements, "Name");
@@ -195,7 +187,6 @@ describe("validation", () => {
 });
 
 describe("partials", () => {
-  // The card the server answers with: a partial rendered for the next of kin, its input filled, its plan beside it.
   function card(): string {
     const partial = authored("Partials", "a_partial_rendered_for_a_member_binds_its_input_under_the_member_prefix");
     const inputId = Object.keys(partial.objects).find(id => id.endsWith("__NextOfKin_Name"))!;

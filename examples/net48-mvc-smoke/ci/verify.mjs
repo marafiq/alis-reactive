@@ -1,5 +1,3 @@
-// Proves the classic MVC5 .NET Framework 4.8 app boots the AlisReactive runtime in a real browser
-// and executes a reactive interaction. Fails (non-zero exit) if the reactive behavior does not occur.
 import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
 
@@ -14,8 +12,6 @@ page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
 
 await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
 
-// 0. Every framework file is linked by a URL versioned with the hash of the bytes the server sends
-// (Url.AppendVersion), so a package upgrade changes the URL a browser cached.
 for (const [selector, attribute] of [
   ['script[src*="/Content/AlisReactive/js/alis-reactive.js"]', 'src'],
   ['link[href*="/Content/AlisReactive/css/alis-reactive.css"]', 'href'],
@@ -29,11 +25,9 @@ for (const [selector, attribute] of [
   if (!linked.endsWith(`?v=${version}`)) throw new Error(`${linked} is not versioned by its content (expected ?v=${version}).`);
 }
 
-// 1. The page rendered the plan and the runtime asset loaded.
 const planScript = page.locator('script[type="application/json"][data-reactive-plan]');
 if ((await planScript.count()) === 0) throw new Error('No [data-reactive-plan] script — RenderPlan did not emit the plan.');
 
-// 2. The proof block starts hidden, becomes visible only when the runtime executes the reaction.
 const proof = page.locator('#reactive-proof');
 if (await proof.isVisible()) throw new Error('#reactive-proof is visible before interaction — initial hidden state wrong.');
 

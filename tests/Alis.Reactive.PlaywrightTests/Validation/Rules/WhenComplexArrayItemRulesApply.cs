@@ -3,15 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 
-/// <summary>
-/// As a pharmacy coordinator entering an order, I want each line of the order, and each delivery of a
-/// line, checked by its own rules, so that a mistake on one line is named on that line and a line
-/// without the option is never asked for its details.
-/// </summary>
-/// <remarks>
-/// The page's "Validate Lines" sends the lines to an endpoint that accepts anything, so every message
-/// below is the browser's.
-/// </remarks>
 [TestFixture]
 public sealed class WhenComplexArrayItemRulesApply : PlaywrightTestBase
 {

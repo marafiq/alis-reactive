@@ -1,13 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Subscriptions;
 
-/// <summary>
-/// Markup that raises an app's event when it is clicked (grammar.md 6.1, D4), written with Html.Raises: an event
-/// that carries nothing is raised; without its payload the listener reads each member as missing; each member the
-/// markup carries reaches the listener as its type, a text as its text, a number as a number and an enum as its
-/// member; a click inside the markup is the markup's; and a payload that holds a record is refused as the view
-/// renders. A whole payload the markup carries reaching the listener is proven by
-/// Triggers/WhenAPageStartsItsPipelines.
-/// </summary>
 [TestFixture]
 public sealed class WhenMarkupRaisesAnEvent : AppPageTest
 {
@@ -45,7 +37,6 @@ public sealed class WhenMarkupRaisesAnEvent : AppPageTest
         await Expect(Announcement).ToHaveTextAsync("a delivery");
     }
 
-    // Twelve is more than nine as a number; as text it is not, and text is ordered against no number.
     [Test]
     public async Task a_number_member_the_markup_carries_reaches_the_listener_as_a_number()
     {
@@ -76,7 +67,6 @@ public sealed class WhenMarkupRaisesAnEvent : AppPageTest
         await Expect(Announcement).ToHaveTextAsync("a visitor");
     }
 
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     [Test]
     public async Task markup_raising_a_payload_that_holds_a_record_is_refused_naming_the_fix()
     {

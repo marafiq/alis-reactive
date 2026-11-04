@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
-/// <summary>
-/// One partial of its own model rendered for two members of the page's model, under two field prefixes (I9):
-/// each rendering sends its inputs under its own member and checks its own inputs, a rule for each item of a
-/// list checks the item a rendering renders under its member, a step that names one of the partial's inputs by
-/// its member reaches the input its own rendering rendered, and a plain form post sends each input under the
-/// binding path its field gave it.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPartialIsRenderedForTwoMembers : AppPageTest
 {

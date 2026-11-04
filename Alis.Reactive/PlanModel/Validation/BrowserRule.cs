@@ -124,28 +124,19 @@ namespace Alis.Reactive
 
         internal Condition Condition { get; private set; }
 
-        /// <summary>The other members the rule reads, besides the one it is on.</summary>
         internal virtual IEnumerable<FieldReference> Fields => Array.Empty<FieldReference>();
 
-        /// <summary>The rule as the member makes it; false when the member leaves the rule to the server.</summary>
         internal virtual bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = this;
             return true;
         }
 
-        /// <summary>The rule relocated under <paramref name="prefix"/>, declared under <paramref name="outer"/> as well.</summary>
         internal virtual BrowserRule PrefixedBy(string prefix, Condition outer) =>
             Under(Condition.Combine(outer, Condition.PrefixedBy(prefix)));
 
-        /// <summary>
-        /// True when <paramref name="value"/>, the field's value as MVC binds it, passes: the server rule's own
-        /// verdict on that value (grammar.md 7.4).
-        /// </summary>
         internal abstract Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope);
 
-        // The same rule under another condition. A rule holds only its message, its condition and immutable
-        // operands, so a shallow copy with the condition swapped is that rule.
         private protected BrowserRule Under(Condition condition)
         {
             var rule = (BrowserRule)MemberwiseClone();
@@ -153,26 +144,18 @@ namespace Alis.Reactive
             return rule;
         }
 
-        // One @, with something on each side: what EmailAddress() accepts.
         private const string EmailPattern = "^[^@]+@[^@]+$";
 
-        // The scheme the server's absolute URL lower-cases, written without a flag so that a component
-        // testing a pattern with no flags tests the same one; an authority with no whitespace, which an
-        // absolute URI never holds. The server checks the rest.
         private const string UrlPattern = "^[Hh][Tt][Tt][Pp][Ss]?://[^\\s/?#]+[^\\s]*$";
 
-        // 0001-01-02T00:00:00Z: a date before it is DateTime.MinValue, in whatever zone it was read.
         private const long DayAfterEarliestDate = -62135510400000;
 
-        // A bound value the server's null checks skip: nothing bound (blank text binds as null).
         private protected static Expr Absent(Expr v) => G.Eq(v, G.Null);
 
         private protected static Expr Matches(Expr v, string pattern) => G.Op(Operator.Matches, v, G.Lit(pattern), G.Lit(""));
 
         private protected static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.Any);
 
-        // What NotEmpty rejects, as far as the field's shape tells: nothing entered (the binding read already
-        // reads text of only whitespace as nothing), and the type's default: false, 0, or 0001-01-01 for a date.
         private protected static Expr BlankOrDefault(Expr v, Shape fieldShape)
         {
             var terms = new List<Expr> { NothingEntered(v) };
@@ -182,21 +165,13 @@ namespace Alis.Reactive
             return G.Or(terms);
         }
 
-        // Nothing was entered: a missing value, one whose text is "" (an empty list included), or one
-        // with no text form. A pattern with one character of anything fails on exactly those. The binding
-        // read has already made text of only whitespace missing (grammar.md 2.1).
         private protected static Expr NothingEntered(Expr v) => G.Not(Matches(v, "[\\s\\S]"));
 
-        // The member an enum's default binds as (its member with value 0): what the server's NotEmpty refuses and
-        // its Empty takes. A nullable enum's default is null, which binds as blank, so its member with value 0 is
-        // an answer like any other.
         private protected static string? DefaultMemberOf(Type memberType) =>
             memberType.IsEnum ? EnumMember.Default(memberType)?.ToString() : null;
 
         private protected static Expr IsNumber(Expr value) => G.Eq(G.Op(Operator.Finite, value), value);
 
-        // The shapes the browser orders as the server does: numbers, flags and dates. The server orders text by
-        // its culture, which the browser cannot match, so an order of text stays with the server.
         private protected static bool IsOrdered(Shape shape)
         {
             var orderedShape = shape.TryGetNullableInnerShape(out var inner) ? inner : shape;
@@ -221,8 +196,6 @@ namespace Alis.Reactive
             }
         }
 
-        // A value as equality under the shape reads it, with no skip for nothing bound, as the server's
-        // Equal and NotEqual: converted the way the shape converts a missing value too.
         private protected static Expr Canonical(Expr value, Shape shape)
         {
             if (shape.TryGetNullableInnerShape(out var inner)) return Nullable(value, inner, Canonical);
@@ -243,8 +216,6 @@ namespace Alis.Reactive
             }
         }
 
-        // A nullable as MVC binds it: a missing value stays missing (the binding read makes blank text one);
-        // anything else converts under the inner shape.
         private static Expr Nullable(Expr value, Shape inner, Func<Expr, Shape, Expr> convert) =>
             G.Op(Operator.Cond, G.Eq(value, G.Null), G.Null, convert(value, inner));
 

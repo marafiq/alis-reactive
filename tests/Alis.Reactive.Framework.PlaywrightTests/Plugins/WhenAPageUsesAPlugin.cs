@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plugins;
 
-/// <summary>
-/// A plugin the app registers by name, with no element (G1): its methods change what its properties read,
-/// a property is written, and a method's result decides a branch.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageUsesAPlugin : AppPageTest
 {

@@ -2,22 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionDecision
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.AdmissionDecision;
 
-/// <summary>
-/// As the admissions director, I want an applicant's stay decided from the rules as they combine, by the
-/// first reason that fits, and only after the waiting list or I have answered where an answer is needed,
-/// so that no stay is decided on half the facts or on a question nobody asked.
-/// </summary>
-/// <remarks>
-/// Margaret Hale's facts sit on an intake sheet the sandbox wrote itself (BroughtComponents/IntakeSheet):
-/// 62, a veteran, assisted living, second on the waiting list. The page combines them with the director's
-/// approval and the bed offered: chains of and and or, a group inside each, a negated group, a group two
-/// deep, and a ladder whose first three reasons all fit a 95-year-old with approval. The waiting list
-/// answers a moment after it is asked and the sheet counts each time it is asked, so the count shows
-/// when a term that waits was reached and when an earlier term settled the matter without it: inside an
-/// or, inside a negated group and as a reason after the first. The director is asked the same three
-/// ways through the page's confirmation, and may decline. The letter asks the sheet for its summary and
-/// the list for its answer once each, though it shows both twice.
-/// </remarks>
 [TestFixture]
 public class WhenDecidingARespiteStay : PlaywrightTestBase
 {
@@ -65,8 +49,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
     private async Task Answer(string button) =>
         await ClickWhenStable(ConfirmDialog.GetByRole(AriaRole.Button, new() { Name = button }));
 
-    // ── how the rules combine ───────────────────────────────────────────────
-
     [Test]
     public async Task of_age_with_a_bed_outside_memory_care_is_approved_and_without_a_bed_or_in_memory_care_is_not()
     {
@@ -104,7 +86,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A group inside an and: veteran, and (90 or over, or memory care).
     [Test]
     public async Task a_veteran_of_ninety_or_in_memory_care_has_priority_needs_and_a_civilian_does_not()
     {
@@ -128,7 +109,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A group inside an or: approved, or (of age and a bed).
     [Test]
     public async Task approval_or_an_applicant_of_age_with_a_bed_clears_the_admission()
     {
@@ -151,7 +131,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A negated group: a bed, and not (memory care and the Garden bed).
     [Test]
     public async Task a_garden_bed_suits_every_level_but_memory_care_and_a_maple_bed_suits_memory_care()
     {
@@ -175,7 +154,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A group two deep: of age, and (approved, or (a bed and a place in the top three)).
     [Test]
     public async Task placement_needs_eligibility_and_either_approval_or_a_bed_with_a_place_near_the_top_of_the_list()
     {
@@ -202,7 +180,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Not on one comparison inside a group: a Garden bed, and not memory care.
     [Test]
     public async Task a_garden_bed_is_for_a_resident_outside_memory_care()
     {
@@ -222,8 +199,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         await Expect(Line("decision-garden")).ToHaveTextAsync("Not a Garden bed, or needs the secured wing.");
         AssertNoConsoleErrors();
     }
-
-    // ── the first reason that fits ──────────────────────────────────────────
 
     [Test]
     public async Task the_first_reason_that_fits_decides_ninety_and_over_before_approval_before_eligibility()
@@ -248,8 +223,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         await Expect(Line("decision-reason")).ToHaveTextAsync("Under age.");
         AssertNoConsoleErrors();
     }
-
-    // ── the waiting list: a term that waits ─────────────────────────────────
 
     [Test]
     public async Task an_approved_applicant_is_admitted_without_asking_the_waiting_list()
@@ -334,7 +307,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The list has not answered: no number is not in the top three.
     [Test]
     public async Task with_no_answer_from_the_list_the_decision_waits()
     {
@@ -347,8 +319,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         await Expect(WaitlistChecks).ToHaveTextAsync("Waitlist checks: 1");
         AssertNoConsoleErrors();
     }
-
-    // ── asking the director ─────────────────────────────────────────────────
 
     [Test]
     public async Task without_approval_the_director_is_asked_and_yes_admits()
@@ -391,7 +361,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Declining the question makes the negated group hold: the bed is Margaret's.
     [Test]
     public async Task declining_to_hold_the_bed_for_someone_else_assigns_it_to_margaret()
     {
@@ -485,8 +454,6 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         await Expect(ConfirmDialog).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
-
-    // ── the letter: asked once, shown twice ─────────────────────────────────
 
     [Test]
     public async Task the_summary_is_written_once_though_the_letter_shows_it_twice()

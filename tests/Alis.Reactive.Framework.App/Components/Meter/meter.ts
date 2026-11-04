@@ -1,6 +1,3 @@
-// The meter: a custom element with a level and a maximum, stepped by its own buttons. It knows nothing
-// of Alis.Reactive. The element is the object; a change is a DOM event whose detail says what changed.
-
 class Meter extends HTMLElement {
   private value = 0;
   private readonly levelLine = document.createElement("span");
@@ -40,7 +37,6 @@ class Meter extends HTMLElement {
     this.value = Math.min(this.max, Math.max(0, previous + delta));
     this.show();
     this.dispatchEvent(new CustomEvent("levelChanged", { detail: { level: this.value, previous } }));
-    // As an input does, it then says it changed, with nothing more: a listener reads the meter itself.
     this.dispatchEvent(new Event("change"));
   }
 

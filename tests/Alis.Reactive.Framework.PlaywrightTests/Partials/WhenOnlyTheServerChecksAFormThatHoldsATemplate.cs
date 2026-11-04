@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// A form no request validates, whose error route shows the server's errors on it (<c>e.ValidationErrors(form)</c>),
-/// holds a member's editor template, a partial with a plan of its own (ADR-0003 rule 2, grammar.md F8): the
-/// server's message for the member lands beside the input the template rendered, which the form holds, and typing
-/// into that input clears it (F7).
-/// </summary>
 [TestFixture]
 public sealed class WhenOnlyTheServerChecksAFormThatHoldsATemplate : AppPageTest
 {

@@ -4,21 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.ResidentAdmission;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.Workflows;
 
-/// <summary>
-/// As an admissions coordinator, I want the admission form to tell me what is missing before anything is
-/// sent, address the admission notice to the physician I choose, and confirm the admission in the
-/// server's words, so that every resident I admit is admitted with a physician who will see them.
-/// </summary>
-/// <remarks>
-/// The physician search lists "Dr. Alan Smith" and matches and sends the name the notice is addressed to,
-/// "Alan Smith, MD". Dr. Wei Chen's panel is full this month: only the server knows it and refuses him.
-/// The server's confirmation names the resident, the care level, the physician, the rate and whether the
-/// resident moves in today, so a value the form failed to send reads differently. The notes are sent with
-/// the admission but the confirmation does not repeat them. The rate and the switch have no reaction on
-/// this page; they are read only as the server answers them. Their Change payloads are proven on their
-/// own journeys: Components.Fusion.NumericTextBox.WhenNumericValueEntered and
-/// Components.Fusion.Switch.WhenSwitchToggles.
-/// </remarks>
 [TestFixture]
 public class WhenAdmittingNewResident : PlaywrightTestBase
 {
@@ -52,8 +37,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         _plan = await PagePlan<AdmitResidentModel>.FromPage(Page);
     }
 
-    // The request is held at the browser until the test releases it, then sent on unchanged, so what the
-    // page shows before the answer arrives can be seen.
     private async Task HoldUntilReleased(string url)
     {
         _released = new SemaphoreSlim(0);
@@ -70,7 +53,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         await Physician.SelectItem(physician);
     }
 
-    // The three fields an admission cannot go without.
     private async Task FillTheRequiredFields(string resident, string search, string physician, string rate)
     {
         await _plan.TextBox(m => m.ResidentName).FillAndBlur(resident);
@@ -168,7 +150,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Typing a name clears the message at once, while the coordinator is still in the field.
     [Test]
     public async Task the_name_message_clears_as_soon_as_a_name_is_typed()
     {
@@ -184,7 +165,6 @@ public class WhenAdmittingNewResident : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Typing a rate clears the message at once, while the coordinator is still in the field.
     [Test]
     public async Task the_rate_message_clears_as_soon_as_a_rate_is_typed()
     {

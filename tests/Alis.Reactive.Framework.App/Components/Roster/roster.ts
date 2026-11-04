@@ -1,6 +1,3 @@
-// The roster: the names it is given, one line each, in the order given. It knows nothing of
-// Alis.Reactive; Roster.cs declares its members by these names.
-
 interface RosterHost extends HTMLElement {
   roster?: Roster;
 }
@@ -13,7 +10,6 @@ export class Roster {
     host.roster = this;
   }
 
-  /** Shows the names in place of the lines it showed. */
   show(names: readonly string[]): void {
     this.list.replaceChildren(...names.map(name => {
       const line = document.createElement("li");

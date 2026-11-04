@@ -26,7 +26,6 @@ namespace Alis.Reactive.Native
         public Event<NativeCheckBoxChangeArgs> Change =>
             Event<NativeCheckBoxChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);
     }
 

@@ -4,9 +4,6 @@ using System.Text;
 
 namespace Alis.Reactive.Fusion.Templates
 {
-    /// <summary>
-    /// Internal element rendering shared by root and conditional Syncfusion template builders.
-    /// </summary>
     internal static class TemplateElements
     {
         internal static string Span(string content, TemplateCss css)
@@ -34,22 +31,10 @@ namespace Alis.Reactive.Fusion.Templates
             return $"<a href=\"{href}\"{css.ClassAttribute}>{text}</a>";
         }
 
-        /// <summary>
-        /// Renders a button whose click raises a document event with one payload member bound from the
-        /// row. The template carries no script and no JSON: the runtime raises the event named by
-        /// <c>data-alis-raise</c> with a record of the member the button's <c>data-alis-detail-</c> attribute
-        /// names, holding the text the template engine writes for the row's value. The listener's typed read
-        /// converts that text by the member's type (grammar.md 5.2, 6.1 D4), so a number, a Guid, an enum or
-        /// any text reaches the plan the same way.
-        /// </summary>
         internal static string EventButton(string text, string eventName, string detailAttribute, string valueBinding, TemplateCss css) =>
             $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
             $"{detailAttribute}=\"{valueBinding}\">{text}</button>";
 
-        /// <summary>
-        /// The attribute that carries the payload member a template button fills: a direct member, and one that
-        /// always holds a value, since the template engine writes a missing value as the text <c>null</c>.
-        /// </summary>
         internal static string DetailAttribute<TPayload, TProperty>(string text, Expression<Func<TPayload, TProperty>> member)
         {
             var path = FusionTemplateExpression.ToPropertyPath(member);
@@ -70,9 +55,6 @@ namespace Alis.Reactive.Fusion.Templates
             return DatasetAttribute(path);
         }
 
-        // The attribute the DOM's dataset names alisDetail followed by the member's JSON name with its first letter
-        // capitalized: each capital is a dash and the small letter (residentId is data-alis-detail-resident-id),
-        // as the core writes a view's markup (grammar.md 6.1, D4).
         private static string DatasetAttribute(string member)
         {
             var key = "alisDetail" + char.ToUpperInvariant(member[0]) + member.Substring(1);

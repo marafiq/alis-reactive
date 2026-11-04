@@ -3,12 +3,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Uses popup gestures because typed text does not always update Syncfusion <c>ej2.value</c>.
-/// </summary>
-/// <remarks>
-/// Calendar and time popups both use <c>#{id}_options</c>.
-/// </remarks>
 public sealed class DateTimePickerLocator
 {
     private const int MaxMonthNavigationAttempts = 24;
@@ -28,10 +22,8 @@ public sealed class DateTimePickerLocator
 
     public ILocator ClockIcon => _page.Locator($"#{_componentId}").Locator("..").Locator(".e-time-icon");
 
-    /// <summary>Calendar popup; tag-qualified because Syncfusion reuses <c>#{id}_options</c>.</summary>
     public ILocator CalendarPopup => _page.Locator($"div#{_componentId}_options");
 
-    /// <summary>Time list popup; tag-qualified because Syncfusion reuses <c>#{id}_options</c>.</summary>
     public ILocator TimeListPopup => _page.Locator($"ul#{_componentId}_options");
 
     public async Task Fill(string dateTimeText)
@@ -68,7 +60,6 @@ public sealed class DateTimePickerLocator
         await dayCell.ClickWhenStableAsync(_page);
     }
 
-    /// <summary>Selects a visible 30-minute interval, for example <c>8:00 AM</c>.</summary>
     public async Task SelectTime(string timeText)
     {
         await ClockIcon.ClickWhenStableAsync(_page);
@@ -78,7 +69,6 @@ public sealed class DateTimePickerLocator
         await item.ClickWhenStableAsync(_page);
     }
 
-    /// <summary>Selects date and time through popups, waiting between them to avoid popup collision.</summary>
     public async Task Select(int year, int month, int day, string timeText)
     {
         await SelectDate(year, month, day);

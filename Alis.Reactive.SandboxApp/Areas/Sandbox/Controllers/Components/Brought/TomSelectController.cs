@@ -39,7 +39,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             return Ok(new SuiteAvailabilityResponse { Summary = suite.Availability });
         }
 
-        // The care assessment recommends memory care for this resident.
         [HttpGet("Recommendation")]
         public IActionResult Recommendation() =>
             Ok(new SuiteRecommendationResponse { SuiteType = "memory-care" });

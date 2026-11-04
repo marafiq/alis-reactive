@@ -8,11 +8,6 @@ using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive.PlanModel.Validation
 {
-    /// <summary>
-    /// One member, or the items of a collection, that a form checks: the binding name the server reports it under,
-    /// the type the model binds it in, and the validator's rules on it. An item's name stands for every item,
-    /// <c>Lines[*].Qty</c>, so the form checks each item mounted when it checks, whoever rendered it.
-    /// </summary>
     internal sealed class CheckedField
     {
         internal CheckedField(string name, Shape shape, IReadOnlyList<BrowserRule> rules, FormFieldValues values)
@@ -29,18 +24,11 @@ namespace Alis.Reactive.PlanModel.Validation
 
         internal IReadOnlyList<BrowserRule> Rules { get; }
 
-        /// <summary>Where the rules' conditions and comparisons read the other members.</summary>
         internal FormFieldValues Values { get; }
 
         internal CheckedField With(IReadOnlyList<BrowserRule> rules) =>
             new CheckedField(Name, Shape, Rules.Concat(rules).ToArray(), Values);
 
-        /// <summary>
-        /// The fields a validator's rules check on a form: every member with a rule the browser checks, whether or not
-        /// this plan renders it (a partial or the member's editor template may), and each item field of a collection,
-        /// named for every item. A member only the server checks carries no field: the server's message for it finds
-        /// its input by binding name (grammar.md F8).
-        /// </summary>
         internal static IEnumerable<CheckedField> Bind(string formId, IReadOnlyList<BrowserField> fields, string fieldPrefix)
         {
             var values = new FormFieldValues(formId, fieldPrefix);
@@ -70,11 +58,6 @@ namespace Alis.Reactive.PlanModel.Validation
         }
     }
 
-    /// <summary>
-    /// The members a form's rules read, by the binding name the server reports each under, the view's field prefix
-    /// applied: each is read from the input that binds it, whichever view rendered it (this plan, a partial, a
-    /// member's editor template, a slot's content), as MVC binds it.
-    /// </summary>
     internal sealed class FormFieldValues : FieldValues
     {
         private readonly string _formId;

@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests;
 
-/// <summary>
-/// A page test against the sandbox: the shared page lifecycle (<see cref="AppPageTest"/>) plus what the
-/// sandbox's pages need, Syncfusion's animations off and the layout's web fonts left out, and the sandbox
-/// suites' own helpers over the page's console.
-/// </summary>
 public abstract class PlaywrightTestBase : AppPageTest
 {
     private const int ReactiveBootTimeoutMs = 60000;
@@ -21,7 +16,6 @@ public abstract class PlaywrightTestBase : AppPageTest
     private readonly List<(string Containing, TaskCompletionSource Arrived)> _traceWaiters = new();
     private readonly object _consoleLock = new();
 
-    /// <summary>The page's console so far, copied under the lock the console handler writes under.</summary>
     protected IReadOnlyList<string> ConsoleMessages => SnapshotConsoleMessages();
 
     [SetUp]
@@ -70,9 +64,6 @@ public abstract class PlaywrightTestBase : AppPageTest
             await route.FulfillAsync(new() { Status = 204 }));
     }
 
-    // Playwright's "stable" actionability check fights animated bounding boxes, so tests
-    // disable EJ2 script animations here — at the harness boundary — leaving the sandbox
-    // itself animated and truthful for eyes-first verification.
     private async Task DisableSyncfusionScriptAnimations()
     {
         await Context.AddInitScriptAsync(

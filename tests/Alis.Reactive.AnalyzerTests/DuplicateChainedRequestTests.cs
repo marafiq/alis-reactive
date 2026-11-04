@@ -3,7 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>ALIS007: a response has one follow-up request; a second .Chained() in one fluent chain is reported as the view compiles.</summary>
 [TestFixture]
 public class DuplicateChainedRequestTests
 {
@@ -37,7 +36,6 @@ public class DuplicateChainedRequestTests
                 .Chained(physician => physician.Post("/notify-physician")));
             """));
 
-    // The C# the Razor compiler generates for a view whose DomReady pipeline holds the lines given.
     private static string View(string pipeline) => $$"""
         using System.Threading.Tasks;
         using Alis.Reactive;

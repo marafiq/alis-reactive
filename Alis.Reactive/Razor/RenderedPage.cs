@@ -10,16 +10,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Razor
 {
-    /// <summary>
-    /// What the views of one request rendered, kept in the request's items so that a page, its layout and its
-    /// partials write to one record whichever plan they render for: the element id of each input, with the view that
-    /// rendered it, the summary of each form, and the slots the plans load into with the elements whose text or HTML
-    /// their steps set. An element id names one element, so an input that renders an id a second time is refused
-    /// there, a form's summary renders once, and a step that sets the text or HTML of a slot is refused.
-    /// </summary>
     internal sealed class RenderedPage
     {
-        // The request's items hold the record under a key no app can name.
         private static readonly object Key = new object();
 
         private readonly Dictionary<string, string> _viewByElementId = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -32,7 +24,6 @@ namespace Alis.Reactive.Razor
         {
         }
 
-        /// <summary>The record of the request the view renders in, started by the first view that writes to it.</summary>
         internal static RenderedPage Of(ViewContext view)
         {
             var items = view.HttpContext.Items;
@@ -46,17 +37,13 @@ namespace Alis.Reactive.Razor
             return page;
         }
 
-        /// <summary>The path of the view a helper renders in: the page's in its body and its sections, a partial's in the partial.</summary>
         internal static string ViewPathOf(ViewContext view) =>
 #if NET48
-            // MVC 5 keeps the path on the view it compiled from a file; a view no file compiled has no path, and its
-            // type names it.
             view.View is BuildManagerCompiledView compiled ? compiled.ViewPath : CSharpTypeName.Of(view.View.GetType());
 #else
             view.View.Path;
 #endif
 
-        /// <summary>An input renders its element id: the first time on the page, or it is refused naming both views.</summary>
         internal void Input(string elementId, string bindingName, string viewPath)
         {
             if (_viewByElementId.TryGetValue(elementId, out var firstView))
@@ -69,10 +56,6 @@ namespace Alis.Reactive.Razor
             _viewByElementId.Add(elementId, viewPath);
         }
 
-        /// <summary>
-        /// The summary of a form renders at <paramref name="place"/>: true the first time on the page, false once the
-        /// page holds it.
-        /// </summary>
         internal bool SummaryRenders(string formId, string place)
         {
             if (_summaryPlaceByForm.ContainsKey(formId)) return false;
@@ -80,14 +63,8 @@ namespace Alis.Reactive.Razor
             return true;
         }
 
-        /// <summary>Where the page rendered a form's summary, as a refusal names it.</summary>
         internal string SummaryPlaceOf(string formId) => _summaryPlaceByForm[formId];
 
-        /// <summary>
-        /// A plan renders: the slots it loads into or unloads, and the elements whose text or HTML its steps set, join the
-        /// page's. A step that sets the text or HTML of a slot some plan of the page loads into or unloads is refused,
-        /// whichever of the two plans renders first.
-        /// </summary>
         internal void PlanRenders(PlanBuildContext plan)
         {
             foreach (var slot in plan.Slots)

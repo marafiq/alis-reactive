@@ -1,30 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the Maple wing wellness nurse, I want to open each resident's review form from the care review list and
-/// have a record on hold stay closed with the reason, so that I never change a record the hospital transfer
-/// team holds, and the server knows which record I have open.
-/// </summary>
-/// <remarks>
-/// The list is Amina Patel, Grace Bennett (on hold for a hospital transfer to Mercy General), Henry Liu and
-/// Irene Morgan. The nurse selects a resident and presses Open review; the review form saves with its own Save
-/// and Cancel buttons. Opening a review checks the record out on the server, which names the resident's census
-/// line.
-/// The review form's Risk level list opens on its first choice, Low, not on the resident's risk: the form's
-/// select field carries no value of the row (FusionGridEditTemplates DialogForm), so the nurse chooses the risk
-/// the review sets, and the tests do too.
-/// Not exercised:
-/// BeginEdit's Type: EJ2 sends "edit" on every beginEdit (normal-edit.js:110), so it carries nothing a page
-/// could show.
-/// BeginEdit's Cancel as a value read: the page writes it, and EJ2 reads it back (normal-edit.js:151).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBeginEditNormal : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/BeginEditNormal";
     private const string ReviewListId = "care-review-grid";
 
-    // The list numbers its columns from 1.
     private const int ResidentColumn = 2;
     private const int RiskColumn = 4;
     private const int OpenTasksColumn = 5;
@@ -62,7 +43,6 @@ public class WhenUsingFusionGridBeginEditNormal : PlaywrightTestBase
         await Expect(ReviewForm).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(ReviewField("residentName")).ToHaveValueAsync("Henry Liu");
         await Expect(ReviewField("openTasks")).ToHaveValueAsync("6");
-        // The risk list opens on Henry's moderate risk, so a review saved untouched keeps it.
         await Expect(ReviewField("riskLevel")).ToHaveValueAsync("Moderate");
         AssertNoConsoleErrors();
     }

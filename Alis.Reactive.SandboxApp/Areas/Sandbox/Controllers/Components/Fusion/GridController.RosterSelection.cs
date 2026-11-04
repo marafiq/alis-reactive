@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Garden outing sign-up: the activities director seats residents who asked to go on Thursday's
-    /// botanical garden outing and books the bus. Every page starts from the sign-up sheet; a booking
-    /// answers with whom it booked and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         private const int GardenOutingBusSeats = 4;
@@ -19,7 +14,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new RosterSelectionModel
                 {
                     BusSeats = GardenOutingBusSeats,
-                    // The bus was full when Rosa Diaz asked to go on September's outing.
                     TurnedAwayResidentId = 7105,
                     TurnedAwayResidentName = "Rosa Diaz"
                 });
@@ -50,11 +44,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static string GardenOutingResidents(int count) => count == 1 ? "1 resident" : $"{count} residents";
 
-        // "Helen Park", "Helen Park and Arthur Bell", "Helen Park, Arthur Bell and Walter Kim".
         private static string GardenOutingNames(List<string> names) =>
             names.Count == 1 ? names[0] : $"{string.Join(", ", names.Take(names.Count - 1))} and {names[^1]}";
 
-        // The residents who asked to go, in the order they signed up.
         private static List<GardenOutingSignUp> GardenOutingSignUps() => new()
         {
             new GardenOutingSignUp { ResidentId = 7101, ResidentName = "Helen Park", Wing = "North", Mobility = "Walks", SignedUp = "Mon 9:05" },

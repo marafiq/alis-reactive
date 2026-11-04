@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The morning huddle sheet: the staffing scheduler chooses which columns it carries, in what order, and
-    /// what the wing column is called, before it prints. Every page starts from the same five residents.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("CareStaffColumns"), ActionName("CareStaffColumns")]

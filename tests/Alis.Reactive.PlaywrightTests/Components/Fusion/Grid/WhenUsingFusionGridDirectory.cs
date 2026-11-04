@@ -2,32 +2,12 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the evening nursing supervisor, I want to find any resident in the community directory by name, wing,
-/// care level, risk or nurse, and open their card, so that I can answer a family's call and plan tonight's
-/// rounds without walking to the nurses' station.
-/// </summary>
-/// <remarks>
-/// The directory lists Maple Grove's 48 residents, surname first, eight to a page; the server answers every
-/// page, sort, filter, search and grouping the grid asks for, says how many residents match and what the last
-/// change did, and refuses a request it cannot read. Abbott, Margaret (North wing, Independent) heads page 1;
-/// Brooks, Harold is the first resident on the East wing. Picking a resident opens their card; Next resident
-/// steps down the page, and the card says how it was opened.
-/// Not exercised:
-/// DataStateChange's, RecordClick's and RowSelected's Name: EJ2 writes each event's own name on its payload
-/// (ej2-base observer.js:92); a handler is attached to one event and has nothing to decide by it.
-/// DataStateChange's Action Name, Type and Cancel: Action is the actionBegin payload EJ2 already ran
-/// (actions/data.js:607), so they read actionBegin and false whenever the event comes.
-/// RecordClick's RowIndex: the row a click lands on is the row the click selects, whose index the page reads
-/// from RowSelected (selection.js:292-296, grid.js:2575-2583).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridDirectory : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Directory";
     private const string GridId = "resident-directory-grid";
 
-    // The grid numbers a row's cells from 0.
     private const int ResidentCell = 1;
     private const int CareLevelCell = 3;
     private const int WingCell = 4;
@@ -111,7 +91,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The grid keeps several sorts at once; Highest risk first replaces the name sort instead of adding to it.
     [Test]
     public async Task highest_risk_first_replaces_the_name_sort_with_the_high_risk_residents_on_top()
     {
@@ -171,7 +150,6 @@ public class WhenUsingFusionGridDirectory : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The filter bar compares from the start of the wing, whatever the case typed: "s" is South only.
     [Test]
     public async Task typing_a_lowercase_s_in_the_wing_filter_shows_the_south_wing()
     {

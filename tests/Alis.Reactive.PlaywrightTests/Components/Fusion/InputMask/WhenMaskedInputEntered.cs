@@ -3,20 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.InputMask;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.InputMask;
 
-/// <summary>
-/// As the front desk, I want to enter Margaret Hale's family phone numbers in the shape the desk dials them and
-/// have a number refused until all ten digits are in, so that the community can always reach her family.
-/// </summary>
-/// <remarks>
-/// Both fields mask "(000) 000-0000"; their value is the ten digits alone. The browser checks the rules of
-/// <c>FamilyPhoneNumbersValidator</c> each time a field commits (the mask commits on every key, mask-base.js:734)
-/// and on Save; the server checks them again. Ticking "Daniel is also her emergency contact" copies his number
-/// into the emergency field; a copy raises the field's Change with IsInteracted false (mask-base.js:741-761,
-/// 1083), a key the desk presses raises it with IsInteracted true. The desk reaches a field by its label and
-/// types over what it holds (<see cref="InputMaskLocator.Type"/>): typing from wherever the caret was left
-/// loses every key when Chromium restores it after the mask's last blank on a label click.
-/// A refused Save sends nothing: each refusal test checks no save request left the page.
-/// </remarks>
 [TestFixture]
 public class WhenMaskedInputEntered : PlaywrightTestBase
 {
@@ -66,8 +52,6 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A pasted number reaches the mask as one input event (Fill sends the same), and the mask commits it from
-    // its own input handler (mask-base.js:491-521); the refusal it shows stays on screen.
     [Test]
     public async Task a_number_pasted_without_all_ten_digits_is_refused_at_once()
     {
@@ -96,8 +80,6 @@ public class WhenMaskedInputEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The family phone's message is already on screen as it is typed; the emergency phone's, left empty, comes
-    // only from the Save, so it shows the Save was handled before the requests are counted.
     [Test]
     public async Task saving_with_an_unfinished_family_phone_is_refused()
     {

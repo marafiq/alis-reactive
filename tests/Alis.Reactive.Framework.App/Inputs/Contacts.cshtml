@@ -12,7 +12,6 @@
 }
 <h1>A resident's contacts</h1>
 
-@* A plain form around both cards: the browser posts every input under the name its field gave it. *@
 <form method="post" action="/Inputs/Contacts/Posted">
     @await Html.PartialAsync("ContactCard", Model.Primary, primary)
     @await Html.PartialAsync("ContactCard", Model.Alternate, alternate)

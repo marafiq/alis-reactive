@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.HoldRelease;
 
-// Journey: an admissions coordinator releases a room held for a resident who is moving in. The
-// community asks before a hold is released, in its own confirmation: the page renders a native
-// <dialog> in place of the framework's Syncfusion confirm, and the sandbox's script gives it to the
-// plan as alis.confirm, the object p.Confirm(..) asks.
 [TestFixture]
 public class WhenReleasingARoomHold : PlaywrightTestBase
 {

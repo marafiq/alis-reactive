@@ -9,11 +9,6 @@ using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanModel.Requests
 {
-    /// <summary>
-    /// One HTTP request and what happens around it, written as the sentence the runtime runs: the form
-    /// checks itself, the loading steps run, the request is sent and its response routed, the finally
-    /// steps run, then a chained request follows a success.
-    /// </summary>
     internal sealed class RequestStep : Step
     {
         private readonly string _method;
@@ -45,16 +40,12 @@ namespace Alis.Reactive.PlanModel.Requests
 
         private IReadOnlyList<Statement> Write(Scope around)
         {
-            // A request its form checks first runs inside the check, so what it binds is its own.
             var scope = Validation == null ? around : around.ForBlock();
             var method = _method;
             var input = Gather.Resolve(method, _url, Validation);
             var response = scope.Fresh("res");
             var routeScope = scope.WithResponse(Routes.Handle, response);
 
-            // WhileLoading runs before the request is built, and Finally whether or not it was built, sent or
-            // answered, so neither reads what building and sending it binds: both are written before it. Finally
-            // reads no response of its own request, as C# refuses a finally that reads what its try assigned.
             var sentence = new List<Statement>();
             sentence.AddRange(WhileLoading.Write(scope));
             var cleanup = Finally.Write(scope);
@@ -93,8 +84,6 @@ namespace Alis.Reactive.PlanModel.Requests
             var nested = method != "GET" && format == "json";
             var body = nested ? Nested(input.Payload).Write(scope) : G.Record(FlatValues(input.Payload, scope));
 
-            // Form() writes each mounted input inside its form at its own key: nested, leaf by leaf into the
-            // authored record (fill), so an authored value beside an input survives; flat, merged in by binding name.
             Expr arrays = G.List(input.Payload
                 .Where(member => member.Value.OutputShape.DescribesArray)
                 .Select(member => (Expr)G.Lit(member.Name.Value)));
@@ -130,15 +119,10 @@ namespace Alis.Reactive.PlanModel.Requests
         }
     }
 
-    /// <summary>
-    /// Where a response goes: an exact status runs its route, any other success or error its catch-all,
-    /// and a chained request follows a success.
-    /// </summary>
     internal sealed class ResponseRoutes
     {
         private readonly List<(int Status, Block Route)> _errorStatuses = new List<(int, Block)>();
 
-        // Null until declared: an empty route cannot tell a second OnSuccess from the first.
         private Block? _success;
         private Block? _error;
 
@@ -219,11 +203,8 @@ namespace Alis.Reactive.PlanModel.Requests
 
         internal string Form { get; }
 
-        // null: the rules in no set, what Validate(instance) runs; a blank name is refused before this, so no
-        // text stands for the absence.
         internal string? RuleSet { get; }
 
-        /// <summary>The set as a refusal names it.</summary>
         internal string DescribedRuleSet => RuleSet == null ? "no rule set" : $"rule set '{RuleSet}'";
     }
 }

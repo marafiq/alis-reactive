@@ -4,10 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.ResidentAdmission;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.Workflows
 {
-    /// <summary>
-    /// Admitting a new resident: the server checks the admission with the page's validator, including the
-    /// check only it can make, and confirms it in its own words.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Patterns/BddExperiment")]
     public class BddExperimentController : Controller
@@ -30,10 +26,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.Workflows
             return Ok(new ResidentAdmitted(Confirmation(admission)));
         }
 
-        // "Margaret Thompson is admitted to Assisted Living under Alan Smith, MD at $4,500.00 a month, moving in today."
         private static string Confirmation(AdmitResidentModel admission)
         {
-            // " to Assisted Living", or nothing while no care level is chosen.
             var admittedTo = string.Concat(AdmissionCareLevel.All
                 .Where(level => level.Code == admission.CareLevel)
                 .Select(level => $" to {level.Name}"));

@@ -2,19 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ChipList;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ChipList;
 
-/// <summary>
-/// As the activities coordinator, I want to tag the next outing with the residents' interests, sign up the
-/// residents who asked to go, keep the bus to its four seats with a wait list, and set the days the outing
-/// repeats, so that the residents who would enjoy it are invited and everyone on the bus can board.
-/// </summary>
-/// <remarks>
-/// The tags are Gardening, Music, Art, Walking and History. The Garden Center suits Gardening and Walking and
-/// runs on Thursdays; the Symphony Matinee suits Music and runs on Sundays. Ava Stone, Leah Kim, Nora Gray,
-/// Mateo Reed and Walter Chen are on the bus in that order, so Walter Chen waits for a seat; Nora Gray and
-/// Mateo Reed use the wheelchair lift. Edith Moreau, Harold Price and Ruth Alvarez asked to go.
-/// Not exercised: each selected chip's data <c>Text</c>, as the page reads the selected chips' names from
-/// <c>Texts</c>, which carries the same strings.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionChipList : PlaywrightTestBase
 {

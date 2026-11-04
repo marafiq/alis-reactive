@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>A form whose rules are written once and checked on both sides: the browser what it can, the server all.</summary>
 public sealed class ValidationController : Controller
 {
     public IActionResult Visit() => View(new VisitBooking());
@@ -13,7 +12,6 @@ public sealed class ValidationController : Controller
 
     public IActionResult Escort() => View(new EscortRequest());
 
-    /// <summary>An escort request whose rules sit under a condition the browser cannot read, the one the address names.</summary>
     public IActionResult EscortRefused(EscortUnreadable unreadable = EscortUnreadable.LengthOfText)
     {
         ViewData["Unreadable"] = unreadable;
@@ -28,7 +26,6 @@ public sealed class ValidationController : Controller
 
     public IActionResult Bounds() => View(new BoundsForm());
 
-    /// <summary>The bounds page, checked by a range written with its bounds the wrong way round.</summary>
     public IActionResult BoundsRefused() => View(new BoundsForm());
 
     public IActionResult Sameness() => View(new SamenessForm());
@@ -41,17 +38,14 @@ public sealed class ValidationController : Controller
 
     public IActionResult Outing() => View(new ResidentOuting());
 
-    /// <summary>The outing whose form's summary the page places in the desk's notes, once or, as a defect, twice.</summary>
     public IActionResult OutingNotes(bool placedTwice = false)
     {
         ViewData["PlacedTwice"] = placedTwice;
         return View(new ResidentOuting());
     }
 
-    /// <summary>The outing signed out from a card whose sign-out button carries a plan of its own.</summary>
     public IActionResult OutingCard() => View(new ResidentOuting());
 
-    /// <summary>Signs the resident out, or refuses with every message by the member's binding name.</summary>
     [HttpPost("/Validation/Outing")]
     public IActionResult SignOutForAnOuting([FromBody] ResidentOuting outing)
     {
@@ -65,7 +59,6 @@ public sealed class ValidationController : Controller
             : Json(new Booked { Summary = $"{outing.Resident} signed out with {outing.Companion}" });
     }
 
-    /// <summary>Checks the report by its rules; 400 with every message by field, or filed with the photos it bound.</summary>
     [HttpPost("/Validation/Incident")]
     public IActionResult FileIncident([FromForm] IncidentReport report, [FromServices] IncidentReportRules rules)
     {
@@ -77,7 +70,6 @@ public sealed class ValidationController : Controller
 
     public IActionResult Unphotographed() => View(new UnphotographedReport());
 
-    /// <summary>Checks the report by its rules; 400 with every message by field, or filed with no photos.</summary>
     [HttpPost("/Validation/Unphotographed")]
     public IActionResult FileUnphotographed([FromForm] UnphotographedReport report, [FromServices] UnphotographedReportRules rules)
     {
@@ -89,7 +81,6 @@ public sealed class ValidationController : Controller
 
     public IActionResult Ride() => View(new RideRequest());
 
-    /// <summary>Checks the ride by its rules; 400 with every message by field, or booked.</summary>
     [HttpPost("/Validation/Ride")]
     public IActionResult BookRide([FromBody] RideRequest ride, [FromServices] RideRequestRules rules)
     {
@@ -101,7 +92,6 @@ public sealed class ValidationController : Controller
 
     public IActionResult GuestMeal() => View(new GuestMealOrder());
 
-    /// <summary>Checks the meal by its rules; 400 with every message by field, or ordered from the menu it bound.</summary>
     [HttpPost("/Validation/GuestMeal")]
     public IActionResult OrderGuestMeal([FromBody] GuestMealOrder meal, [FromServices] GuestMealRules rules)
     {
@@ -113,14 +103,12 @@ public sealed class ValidationController : Controller
 
     public IActionResult Handover() => View(new HandoverNote());
 
-    /// <summary>A handover whose one form a second request validates by another validator, the one the address names.</summary>
     public IActionResult HandoverRefused(HandoverMistake mistake)
     {
         ViewData["Mistake"] = mistake;
         return View(new HandoverNote());
     }
 
-    /// <summary>Checks the draft by the handover's rules; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Handover/Draft")]
     public IActionResult SaveHandoverDraft([FromBody] HandoverNote note, [FromServices] HandoverRules rules)
     {
@@ -130,7 +118,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"draft saved for {note.Resident}" });
     }
 
-    /// <summary>Checks the handover by the same rules; 400 with every message by field, or handed over.</summary>
     [HttpPost("/Validation/Handover")]
     public IActionResult HandOver([FromBody] HandoverNote note, [FromServices] HandoverRules rules)
     {
@@ -140,7 +127,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"handed over for {note.Resident}" });
     }
 
-    /// <summary>Checks the guest by the generic rules registered for it; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Guest")]
     public IActionResult SaveGuest([FromBody] RegisteredGuest guest, [FromServices] GuestNameRules<RegisteredGuest> rules)
     {
@@ -150,7 +136,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"saved {guest.Name}" });
     }
 
-    /// <summary>Checks the guest by a rule that reads through a null, and says what the validator said of it.</summary>
     [HttpPost("/Validation/GuestUnguarded")]
     public IActionResult SaveGuestUnguarded([FromBody] RegisteredGuest guest, [FromServices] UnguardedGuestRules rules)
     {
@@ -165,7 +150,6 @@ public sealed class ValidationController : Controller
         }
     }
 
-    /// <summary>Checks the guest by a rule that waits, without waiting for it, and says what the validator said of it.</summary>
     [HttpPost("/Validation/GuestUnwaited")]
     public IActionResult SaveGuestUnwaited([FromBody] RegisteredGuest guest, [FromServices] WaitingGuestRules rules)
     {
@@ -180,7 +164,6 @@ public sealed class ValidationController : Controller
         }
     }
 
-    /// <summary>Checks the comparisons with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Sameness")]
     public IActionResult SaveSameness([FromBody] SamenessForm form, [FromServices] SamenessRules rules)
     {
@@ -190,7 +173,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    /// <summary>Checks the bounds with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Bounds")]
     public IActionResult SaveBounds([FromBody] BoundsForm form, [FromServices] BoundsRules rules)
     {
@@ -200,7 +182,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    /// <summary>Checks the notice with the same rules the page carries, one of which waits; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Notice")]
     public async Task<IActionResult> SaveNotice([FromBody] Notice notice, [FromServices] NoticeRules rules)
     {
@@ -210,7 +191,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    /// <summary>Checks the escort request with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Escort")]
     public IActionResult SaveEscort([FromBody] EscortRequest request, [FromServices] EscortRules rules)
     {
@@ -220,7 +200,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    /// <summary>Checks the household with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Household")]
     public IActionResult SaveHousehold([FromBody] Household household, [FromServices] HouseholdRules rules)
     {
@@ -230,7 +209,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    /// <summary>Checks the form with the same rules the page carries; 400 with every message by field, or saved.</summary>
     [HttpPost("/Validation/Checks")]
     public IActionResult SaveChecks([FromBody] CheckedForm form, [FromServices] CheckRules rules)
     {
@@ -240,7 +218,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    /// <summary>Checks the booking with the same rules the page carries, and answers 400 with every message by field.</summary>
     [HttpPost("/Validation/Book")]
     public IActionResult Book([FromBody] VisitBooking booking, [FromServices] VisitRules rules)
     {
@@ -250,7 +227,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"booked {booking.Visitor} for {booking.Guests} guest(s)" });
     }
 
-    /// <summary>Checks the visit and answers with every failure as a line of text, as a log would write it.</summary>
     [HttpPost("/Validation/Book/Failures")]
     public IActionResult BookFailures([FromBody] VisitBooking booking, [FromServices] VisitRules rules) =>
         Json(new Booked { Summary = string.Join("; ", rules.Validate(booking).Errors) });
@@ -263,7 +239,6 @@ public sealed class ValidationController : Controller
 
     public IActionResult DischargeRefused() => View(new DischargeSummary());
 
-    /// <summary>Checks the rules in no stage, and saves.</summary>
     [HttpPost("/Validation/Discharge")]
     public IActionResult SaveDischarge([FromBody] DischargeSummary summary, [FromServices] DischargeRules rules)
     {
@@ -273,7 +248,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"saved for {summary.Resident}" });
     }
 
-    /// <summary>Checks the rules of one stage, the set the page named, and saves.</summary>
     [HttpPost("/Validation/Discharge/{stage}")]
     public IActionResult SaveDischargeStage(string stage, [FromBody] DischargeSummary summary, [FromServices] DischargeRules rules)
     {
@@ -283,7 +257,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"{stage} saved for {summary.Resident}" });
     }
 
-    /// <summary>Validates under a stage the rules do not declare, and says what the validator said of it.</summary>
     [HttpPost("/Validation/DischargeUndeclared")]
     public IActionResult SaveDischargeUndeclared([FromBody] DischargeSummary summary, [FromServices] DischargeRules rules)
     {
@@ -300,7 +273,6 @@ public sealed class ValidationController : Controller
 
     public IActionResult Transfer() => View(new WardTransfer());
 
-    /// <summary>Asks the rules, the bed book among them, and saves.</summary>
     [HttpPost("/Validation/Transfer")]
     public async Task<IActionResult> SaveTransfer([FromBody] WardTransfer transfer, [FromServices] TransferRules rules, CancellationToken cancellation)
     {
@@ -310,7 +282,6 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"{transfer.Resident} moved to {transfer.Ward}" });
     }
 
-    /// <summary>Validates without waiting, and says what the validator said of it.</summary>
     [HttpPost("/Validation/TransferWithoutWaiting")]
     public IActionResult SaveTransferWithoutWaiting([FromBody] WardTransfer transfer, [FromServices] TransferRules rules)
     {

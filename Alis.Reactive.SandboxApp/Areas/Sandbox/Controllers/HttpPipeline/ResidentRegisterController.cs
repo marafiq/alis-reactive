@@ -4,13 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Resident register for Maple wing: Helen Park (record 1042), Arthur Bell (1043) and Rosa Diaz (1044,
-    /// the newest resident) each hold a care plan; records 1047 (Helen Park) and 1048 (Arthur Bell) are
-    /// duplicates entered by mistake. A record that holds a care plan is never removed. A resident moves
-    /// only into a room no other resident lives in. The records this browser removed and the rooms it
-    /// changed live in its own session, so no other browser sees them.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/ResidentRegister")]
     public class ResidentRegisterController : Controller
@@ -100,7 +93,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 .ToList();
         }
 
-        // Built per call: a static collection in the sandbox is shared by every browser world.
         private static RegisterRecord[] SeedRecords() => new[]
         {
             new RegisterRecord(1042, "Helen Park", "Maple 214", HoldsCarePlan: true),
@@ -119,7 +111,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         private void Save(RegisterChanges changes) =>
             HttpContext.Session.SetString(ChangesKey, JsonSerializer.Serialize(changes));
 
-        /// <summary>What this browser changed on the register: the records it removed and the rooms it moved residents to.</summary>
         private sealed class RegisterChanges
         {
             public List<int> Removed { get; set; } = new();

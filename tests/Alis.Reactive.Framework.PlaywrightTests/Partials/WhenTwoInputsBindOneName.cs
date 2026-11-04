@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// Midway through a changeover the desk renders its next of kin twice, through the next of kin's own card and
-/// through the community's person line, so two inputs of the form bind <c>NextOfKin.Name</c>. The form sends the
-/// one that joined the page last (grammar.md M2), and the page reads the member as that request binds it
-/// (grammar.md M8): <c>p.Bound</c> and a named send take the same input.
-/// </summary>
 [TestFixture]
 public sealed class WhenTwoInputsBindOneName : AppPageTest
 {

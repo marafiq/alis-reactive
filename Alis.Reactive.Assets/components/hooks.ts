@@ -1,9 +1,3 @@
-// The hooks the framework's own components construct through, the same ones an app's components use
-// (docs/design/bring-your-own-component.md). The runtime raises alis:mount when HTML is in the
-// document and about to be wired (the page at boot, a partial when it loads) and alis:unmount before
-// wired HTML is removed; both carry the HTML's root. It takes plugins from window.__alisPlugins when
-// it boots, once the document is parsed. Nothing here imports the runtime.
-
 interface MountEventDetail {
   readonly root: HTMLElement;
 }
@@ -30,10 +24,6 @@ export function announceUnmount(root: HTMLElement): void {
   root.ownerDocument.dispatchEvent(new CustomEvent<MountEventDetail>("alis:unmount", { detail }));
 }
 
-/**
- * Runs once the document is parsed and before the runtime boots: the runtime starts on the same
- * event, and this module is imported before it.
- */
 export function whenParsed(act: () => void): void {
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", act, { once: true });
   else act();

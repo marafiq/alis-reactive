@@ -14,7 +14,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
     private DatePickerLocator DatePicker(Expression<Func<DateValidationModel, object?>> member) => new(Page, IdGenerator.For(member));
 
-    // Typed dates reach any year without paging the calendar; leaving each one lets its message settle.
     private async Task EnterStay(string admission, string discharge)
     {
         await DatePicker(m => m.AdmissionDate).FillAndBlur(admission);
@@ -38,7 +37,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The last day of 2019 is before the earliest admission day; the first day of 2020 is it.
     [Test]
     public async Task admission_date_before_2020_shows_min_error()
     {
@@ -48,7 +46,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await ClickWhenStable(ValidateBtn);
         await Expect(ErrorFor(m => m.AdmissionDate)).ToHaveTextAsync("Admission date is required.", new() { Timeout = 2000 });
 
-        // Typed dates reach 2019 without paging the calendar back from 2026.
         await DatePicker(m => m.AdmissionDate).FillAndBlur("12/31/2019");
 
         await ClickWhenStable(ValidateBtn);
@@ -141,7 +138,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
 
         await ClickWhenStable(ValidateBtn);
 
-        // GreaterThan(December 31, 2024): the day itself is not after it.
         await Expect(ErrorFor(m => m.CarePlanReviewDate)).ToHaveTextAsync("Date the care plan review after December 31, 2024.");
         await Expect(Result).ToHaveTextAsync("Click to validate");
 
@@ -242,7 +238,6 @@ public class WhenDateRulesEnforce : PlaywrightTestBase
         await Expect(ErrorFor(m => m.MoveOutInspectionDate)).ToHaveTextAsync("The move-out inspection happens on the discharge day.");
         await Expect(Result).ToHaveTextAsync("Click to validate");
 
-        // A day after discharge is off the discharge day too.
         await DatePicker(m => m.MoveOutInspectionDate).FillAndBlur("03/31/2025");
         await Expect(ErrorFor(m => m.MoveOutInspectionDate)).ToHaveTextAsync("");
         await DatePicker(m => m.MoveOutInspectionDate).FillAndBlur("04/01/2025");

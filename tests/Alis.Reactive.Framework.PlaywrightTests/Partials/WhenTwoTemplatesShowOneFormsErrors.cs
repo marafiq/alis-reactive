@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// A form's summary renders once per page (ADR-0003, grammar.md F6): two editor templates, each with a plan of its
-/// own that shows the server's answer on the page's form, share the form's one summary, which the first of them
-/// renders, and the second's message lands in it.
-/// </summary>
 [TestFixture]
 public sealed class WhenTwoTemplatesShowOneFormsErrors : AppPageTest
 {

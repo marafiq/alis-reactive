@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Resident charts: Helen Park's and Rosa Diaz's charts carry their medical record numbers; Arthur Bell,
-    /// admitted today, has none yet.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/ResidentChart")]
     public class ResidentChartController : Controller

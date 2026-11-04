@@ -32,7 +32,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionColorPickerChangeArgs> Change =>
             Event<FusionColorPickerChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
@@ -69,9 +68,6 @@ namespace Alis.Reactive.Fusion
             Action<ColorPickerBuilder> build)
             where TModel : class
         {
-            // Pass the attributes to ColorPickerFor rather than chaining HtmlAttributes: the fluent call
-            // does not override the element ID, and the parameter sets it on both the markup and the
-            // script's appendTo target.
             var attributes = new Dictionary<string, object> { ["id"] = field.ElementId, ["name"] = field.BindingPath };
             var builder = field.Helper.EJS().ColorPickerFor(field.Expression, attributes);
             build(builder);

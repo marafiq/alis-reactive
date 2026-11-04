@@ -70,10 +70,6 @@
             <p class="text-sm text-text-secondary"><span id="navigation-mode"></span></p>
         </div>
 
-        @* The Tab content panels switch with no slide animation. EJ2's slide effect finalizes
-           the panel swap on the CSS animationend event; with the animation effect set to None
-           the swap is applied synchronously, so the active panel shows immediately and the
-           previous one hides cleanly. *@
         <div class="w-full">
             @(Html.FusionTab(plan, Workspace, b => b
                 .Items(sections)

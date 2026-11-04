@@ -1,10 +1,3 @@
-// Paths (grammar.md 1.3). A member path rooted at a located object is checked: every segment must
-// exist, so a vendor version without a declared member fails loudly. Every other path is optional,
-// as JavaScript's `?.` is. A write rooted at a located object needs its final member; any other write
-// needs only the holder of its final member, and creates that member when absent (a payload's `cancel`).
-// A read's "[]" segment reads the rest of the path on each item of the list before it, in the same
-// mode: an item of a located object's list is checked like the object.
-
 import { toArray } from "./operators";
 import { isMissing } from "./shape";
 
@@ -66,7 +59,6 @@ export function call(
   const last = path.length - 1;
   const holderValue = read(root, path.slice(0, last), mode, label);
   if (mode === "optional" && isMissing(holderValue)) return undefined;
-  // An optional target may be a primitive: "text".includes(..) is a call on a string.
   const holder = mode === "optional" ? (holderValue as Holder) : requireHolder(holderValue, label, path, last);
   const method = holder[path[last]!];
   if (mode === "optional" && isMissing(method)) return undefined;

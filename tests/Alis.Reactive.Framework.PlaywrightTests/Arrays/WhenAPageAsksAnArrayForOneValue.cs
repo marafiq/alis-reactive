@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 
-/// <summary>
-/// One value asked of an array: <c>Count()</c> and <c>Count(p)</c>, <c>Sum</c> of whole numbers, decimals and
-/// doubles (and of no items), <c>Any()</c>, <c>Any(p)</c> and <c>All(p)</c> deciding a branch, and
-/// <c>Find(p)</c> and <c>Find(p, f)</c> giving the first match or nothing. The residents endpoint answers Cyd
-/// Marsh (81, present, balance 12.50, weight 61.5), Ada Hartley (102, away, 0.25, 70.25), Ben Hart (79,
-/// present, 30, 82) and Dot Ashton (80, away, 7.75, 55.5), in that order.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageAsksAnArrayForOneValue : AppPageTest
 {

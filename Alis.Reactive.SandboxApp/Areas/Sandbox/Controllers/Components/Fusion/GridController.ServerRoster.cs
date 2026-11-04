@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The resident roster as the resident record lists it: resident services brings today's changes from the record
-    /// onto the roster (an arrival, a care level, an approved suite move) and looks at another wing. Every page starts
-    /// from the record; each answer is computed from it and nothing is kept.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("ServerRoster"), ActionName("ServerRoster")]
@@ -21,7 +16,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult RecordRosterWingResidents([FromBody] RecordRosterWingQuery query) =>
             Ok(new RecordRosterWing { Wing = query.Wing, Page = RecordRosterPageOf(query.Wing) });
 
-        // Rosa Diaz moves into suite 106 today; the roster lists Cedar wing by suite, so she takes 106's place.
         [HttpPost("RecordRosterTodaysArrival")]
         public IActionResult RecordRosterTodaysArrival()
         {
@@ -34,7 +28,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Henry Liu came back from the hospital needing skilled nursing; the record has his new care level.
         [HttpPost("RecordRosterCareLevel")]
         public IActionResult RecordRosterCareLevel()
         {
@@ -47,7 +40,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Grace Bennett's move from suite 108 to the larger suite 118 is approved.
         [HttpPost("RecordRosterSuiteMove")]
         public IActionResult RecordRosterSuiteMove()
         {

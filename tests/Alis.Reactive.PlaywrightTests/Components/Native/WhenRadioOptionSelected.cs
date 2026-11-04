@@ -2,21 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As the move-in coordinator, I want to record Dorothy Price's care level, room type and meal plan before
-/// her move-in day, take her care level from her hospital referral, be warned at once about a choice the
-/// community cannot honour, and have the office record what I chose, so that the care team, housekeeping
-/// and the kitchen are ready when she arrives.
-/// </summary>
-/// <remarks>
-/// The memory care floor has no suites: the page warns as soon as the two are chosen together, and only
-/// the office refuses them when the preferences are saved. A radio group raises change when the
-/// coordinator picks an option (HTML, the radio input's input and change events, which the group raises
-/// again on its own element). "Use the referral's care level" writes the server's answer to the care
-/// level group's <c>Value</c>: the referral's option is the one checked, the page reads the group back
-/// for the summary and the assessment notice, and saving sends it. Not exercised: a write of empty text,
-/// which clears every option; no step on this page clears a choice.
-/// </remarks>
 [TestFixture]
 public class WhenRadioOptionSelected : PlaywrightTestBase
 {
@@ -58,7 +43,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The accent and border colors are the design system's; the group's own stylesheet reads them.
     [Test]
     public async Task the_chosen_meal_plan_is_outlined_in_the_accent_color_and_the_others_are_not()
     {
@@ -200,7 +184,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The referral's care level takes the place of the one chosen before; one option stays checked.
     [Test]
     public async Task the_referrals_care_level_is_chosen_in_place_of_the_one_picked_before()
     {
@@ -214,7 +197,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The group's focus lands on its first radio when none is chosen, where the Tab key would land.
     [Test]
     public async Task the_referrals_care_level_puts_the_coordinator_on_the_room_type()
     {
@@ -268,7 +250,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Refused in the browser: preferences sent to the server would answer 400, a console error.
     [Test]
     public async Task saving_with_nothing_chosen_says_what_is_missing()
     {
@@ -283,7 +264,6 @@ public class WhenRadioOptionSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A radio never reaches the group's own element with input or blur; only the group's change rechecks it.
     [Test]
     public async Task choosing_a_room_type_clears_its_refusal_without_saving_again()
     {

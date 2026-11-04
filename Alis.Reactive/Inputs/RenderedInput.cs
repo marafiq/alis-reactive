@@ -6,12 +6,6 @@ using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.Inputs
 {
-    /// <summary>
-    /// An input a page rendered through <c>Html.InputField</c>: its identity, and what its component declares
-    /// as its input, the path of its value and the event that commits it. The plan carries it so that
-    /// validation reads the value where the component holds it and the form re-checks the field on the event
-    /// the component commits with.
-    /// </summary>
     internal sealed class RenderedInput
     {
         private readonly InputIdentity _identity;
@@ -32,16 +26,13 @@ namespace Alis.Reactive.Inputs
 
         internal BindingPath Binding => _identity.Binding;
 
-        /// <summary>The path from the component's object to its value; the model reads the value in the model's type.</summary>
         internal Path ValuePath { get; }
 
-        /// <summary>The event the component raises when the person commits a value; the form re-checks the field on it.</summary>
         internal EventName CommittedBy { get; }
 
         internal Shape Shape => _identity.ValueShape;
     }
 
-    /// <summary>The inputs one plan rendered, by binding path.</summary>
     internal sealed class RenderedInputs
     {
         private readonly Dictionary<string, RenderedInput> _inputs = new Dictionary<string, RenderedInput>(StringComparer.Ordinal);
@@ -49,8 +40,6 @@ namespace Alis.Reactive.Inputs
         internal IReadOnlyList<KeyValuePair<string, RenderedInput>> Entries =>
             new List<KeyValuePair<string, RenderedInput>>(_inputs);
 
-        // A field joins its plan once: the page refuses an element id rendered a second time before the input joins
-        // (RenderedPage), and one plan's binding path names one element id.
         internal void Add(RenderedInput input) => _inputs.Add(input.BindingPath, input);
 
         internal bool TryFindForComponent(ComponentId componentId, [NotNullWhen(true)] out RenderedInput? input)

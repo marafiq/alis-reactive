@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Move-in day: the admissions coordinator moves today's arrivals onto the North wing roster and today's
-    /// departures off it. Every page starts from the same roster; the roster changes only in the browser.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("ResidentAdmissionAudit"), ActionName("ResidentAdmissionAudit")]

@@ -20,12 +20,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new FusionStepperModel());
         }
 
-        /// <summary>A new admission; its steps load one at a time from <see cref="LoadWizardStep"/>.</summary>
         [HttpGet("Wizard")]
         public IActionResult Wizard() =>
             View(ViewBase + "Wizard.cshtml", new AdmissionWizardModel { AdmissionId = Guid.NewGuid().ToString("N") });
 
-        /// <summary>One step of the admission, holding what was last saved for it.</summary>
         [HttpPost("Wizard/LoadStep")]
         public IActionResult LoadWizardStep([FromBody] AdmissionStepRequest request)
         {
@@ -76,7 +74,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var resident = drafts.Load<AdmissionIntake>(contacts.AdmissionId).ResidentName;
             var errors = new Dictionary<string, string[]>(new AdmissionContactsValidator().Validate(contacts).ErrorsByField);
 
-            // The responsible party is someone other than the resident the intake names.
             if (resident is not null && string.Equals(contacts.ResponsibleParty, resident, StringComparison.OrdinalIgnoreCase))
                 errors[nameof(AdmissionContacts.ResponsibleParty)] = [$"{resident} is the resident. Name someone else as the responsible party."];
 

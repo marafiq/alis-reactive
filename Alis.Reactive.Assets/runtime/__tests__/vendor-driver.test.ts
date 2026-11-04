@@ -1,11 +1,6 @@
-// The vendor driver's second way to listen (grammar.md 6.9 E4): a listener assigned to the property the
-// event names. The method style is covered by the handler tests in plans.test.ts.
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { e, element, fakeWidget, on, plan, s, st, vendors } from "./support/plan";
 
-// Each test runs a fresh runtime: the plugin registry and every plugin's state start empty, with no
-// reset hook shipped in the runtime for it.
 let Owner: (typeof import("../objects/owner"))["Owner"];
 let startOwner: (typeof import("../plans/start"))["startOwner"];
 let subscribeVendor: (typeof import("../objects/vendor-driver"))["subscribeVendor"];

@@ -22,7 +22,6 @@
 
     <native-card><native-card-body id="@FormId">
         <native-grid cols="C2" gap="Lg">
-            @* The plan's list opens below it, or over the fields above it when the window has no room below. *@
             <native-vstack gap="Base">
                 @{ Html.InputField(plan, m => m.Resident, o => o.Required().Label("Moving in"))
                     .NativeDropDown(b => b.Items(residents).Placeholder("-- Choose a resident --").CssClass(InputCss))
@@ -87,14 +86,12 @@
                                 .OnError<RoomHoldNote>(400, (note, e) => e.Element("hold-status").Text.Set(note.Get(x => x.Message))));
                     }); }
 
-                @* Every line the plan changes sits below it, so the plan never moves while its list is open. *@
                 <p id="deposit-held" hidden class="text-sm">The deposit holds <span id="deposit-room" class="font-medium"></span>.</p>
                 <p id="no-deposit" hidden class="text-sm text-text-muted">No room is held for this resident yet. Choose one on the building plan.</p>
                 <p id="unknown-room" hidden class="text-sm text-red-700">No room is numbered <span id="unknown-room-number"></span>.</p>
                 <p id="hold-status" class="text-sm font-medium">No room is held yet.</p>
             </native-vstack>
 
-            @* The room number and the commands sit beside the building plan, where its list cannot cover them. *@
             <native-vstack gap="Base">
                 @{ Html.InputField(plan, m => m.RoomNumber, o => o.Label("Room number"))
                     .NativeTextBox(b => b.CssClass(InputCss).Placeholder("Oak 110"))

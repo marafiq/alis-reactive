@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# What the framework's own tests run of the framework. Runs the framework Playwright project with the
-# runtime's block coverage recorded per page (ALIS_JS_COVERAGE_DIR, read by AppPageTest) and the core's
-# assemblies statically instrumented by dotnet-coverage, then writes the report
-# (scripts/framework-coverage.mjs). The test output's assemblies are restored afterwards.
-# Needs dotnet-coverage: dotnet tool install -g dotnet-coverage.
-#
-# usage: scripts/framework-coverage.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

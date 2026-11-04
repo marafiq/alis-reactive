@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Night safety checks on Cedar wing: the charge nurse corrects the two-hourly checks the aides recorded, reviews the
-    /// changes and saves them to the night log. Every page starts from the checks the aides recorded; a save answers with
-    /// the checks as the log now holds them and what was saved, and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("BatchChangeReview"), ActionName("BatchChangeReview")]

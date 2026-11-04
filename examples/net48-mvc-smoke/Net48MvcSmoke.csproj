@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Classic, non-SDK ASP.NET MVC 5 web application targeting .NET Framework 4.8. It is the
-       net48 runtime proof: it consumes the shipped net48 NuGet packages (PackageReference, below)
-       and is hosted under IIS Express in CI (verify-net48.yml) to prove a
-       real .NET Framework consumer boots the runtime in a browser. Intentionally NOT in
-       Alis.Reactive.slnx (dotnet/.slnx does not build classic web apps; CI builds it via msbuild). -->
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -21,14 +16,9 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <MvcBuildViews>false</MvcBuildViews>
-    <!-- Let the build generate assembly binding redirects into web.config so the well-known
-         System.Text.Json 9 transitive-dependency redirects do not have to be hand-maintained. -->
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <LangVersion>latest</LangVersion>
-    <!-- PackageReference (not packages.config) so NuGet resolves transitive deps. The classic
-         packages.config consumer concern (manual transitives + Add-BindingRedirect) is documented
-         separately in docs/net48-windows-verification.md; this fixture proves the runtime works. -->
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -72,11 +62,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <!-- The shipped net48 NuGet packages under test. Each one's buildTransitive\net48 targets copies
-         its browser assets into Content\{PackageId}\ at build (the runtime JS, Native's CSS, the
-         design-system CSS this app chose). AlisReactiveVersion defaults to the rc.1 below. NuGet
-         never re-extracts a version its cache already holds, so CI packs a version of its own per
-         run and passes it as /p:AlisReactiveVersion (verify-net48.yml). -->
     <PackageReference Include="AlisReactive" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.Native" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.DesignSystem" Version="$(AlisReactiveVersion)" />
@@ -84,8 +69,6 @@
   </ItemGroup>
   <PropertyGroup>
     <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">1.0.0-rc.1</AlisReactiveVersion>
-    <!-- Point the WebApplication targets import at the VS2022 web workload (the runner's MSBuild
-         leaves $(VSToolsPath) at a wrong default, causing MSB4226). -->
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>

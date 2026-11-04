@@ -8,7 +8,6 @@
     <p>Details taken by <span id="resident-taken-by"></span></p>
     @{ Html.InputField(plan, m => m.Name, o => o.Label("Resident")).Entry(); }
 
-    @* The needs are rendered with the step, inside a container of the step's own; they start after the step. *@
     <p>Needs: <span id="needs-status"></span></p>
     <div id="resident-needs">
         @await Html.PartialAsync("/Slots/MoveInNeeds.cshtml", new MoveInNeeds())
@@ -16,7 +15,6 @@
     @(plan.Button("no-needs", "No special needs")
         .Reactive(button => button.Click, p => p.Unload("resident-needs")))
 
-    @* The step checks the page's form by its own rules, then loads the next step where it sits. *@
     @(plan.Button("resident-next", "Next")
         .Reactive(button => button.Click, p => p.Post("/Slots/MoveIn/Resident")
             .Gather(g => g.Form())

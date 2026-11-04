@@ -14,8 +14,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         [HttpGet("")]
         public IActionResult Index() => View(ViewBase + "Index.cshtml", new MoveInNoticeModel());
 
-        // The waiting list's record of a resident, for the wing the query names: Margaret Hale is second
-        // on it, Harold Benson fifth.
         [HttpGet("WaitingList/{resident}")]
         public IActionResult WaitingList(string resident, [FromQuery] string wing)
         {
@@ -50,7 +48,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             return Ok(entry);
         }
 
-        // The desk's receipt reads back everything that reached it: the address, each header, and the body.
         [HttpPost("Notice/{wing}/{desk}/{applicant}/{age:int}/{phone}/{days:int}/{position:int}/{relation}")]
         public IActionResult Notice(
             string wing, string desk, string applicant, int age, string phone, int days, int position, string relation,

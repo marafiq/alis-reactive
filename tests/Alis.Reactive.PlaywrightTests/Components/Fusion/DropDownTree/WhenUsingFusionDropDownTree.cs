@@ -2,22 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.DropDownTr
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownTree;
 
-/// <summary>
-/// As a move-in coordinator, I want to give each resident moving in a room, chosen on the building plan by
-/// building, wing and room or typed by its number, with the room their deposit holds filled in for me, so
-/// that every resident has exactly one room held for them before move-in day.
-/// </summary>
-/// <remarks>
-/// Moving in this week: Ruth Alvarez, whose deposit holds Maple 106 (move-in October 21), and Walter Chen,
-/// with no room held. The building plan is Maple House (North wing: Maple 104, Maple 106; South wing:
-/// Maple 121, Maple 123) and Oak House (Memory care wing: Oak 110, Oak 112). Choosing a resident opens the
-/// plan for the coordinator; a room the deposit holds is filled in and the plan closes on it. Every change
-/// of room tells the front office which room is released and which is held, and a room picked on the plan,
-/// not filled in by the page, writes its number in the room number box.
-/// Not exercised: a read of Change's e field could not be told from IsInteracted, which EJ2 sets from it.
-/// The render helper without a build step is not used: a plan rendered with no buildings has no room to
-/// choose.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionDropDownTree : PlaywrightTestBase
 {
@@ -43,14 +27,12 @@ public class WhenUsingFusionDropDownTree : PlaywrightTestBase
         await Expect(BuildingPlan.Input).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // Walter Chen has no room held, so the plan stays open for the coordinator to choose one.
     private async Task ChooseWalterChen()
     {
         await MovingIn.Select("Walter Chen");
         await Expect(NoDeposit).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // Ruth Alvarez's deposit holds Maple 106, which the page fills in and holds for her.
     private async Task ChooseRuthAlvarez()
     {
         await MovingIn.Select("Ruth Alvarez");
@@ -77,8 +59,6 @@ public class WhenUsingFusionDropDownTree : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The page opens the plan when the resident is chosen; filling in the deposit's room does not close it,
-    // only the page does.
     [Test]
     public async Task the_room_a_deposit_holds_is_filled_in_and_the_building_plan_closes_on_it()
     {
@@ -118,7 +98,6 @@ public class WhenUsingFusionDropDownTree : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The hold is posted after the number would have been written, so the box is read once it is settled.
     [Test]
     public async Task the_room_a_deposit_holds_does_not_write_its_number()
     {

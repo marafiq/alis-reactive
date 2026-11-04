@@ -6,18 +6,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.IntakeSteps;
 
-/// <summary>
-/// As an admissions coordinator, I want to take a new resident's intake one step at a time in one
-/// form, so that each step asks only about what it shows and finishing never trips over a step I
-/// already completed.
-/// </summary>
-/// <remarks>
-/// Each step is a partial the server returns into the form. A step checks its fields against the
-/// whole form, so the form must forget a step's rules when the next step replaces it. The care
-/// step's mobility questions arrive once a care level is chosen; until then Finish says what they
-/// still need. The server checks the whole intake with the same rules the steps check. The nurse
-/// review, a page action, checks the care needs only where the care step renders them.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
 {
@@ -32,7 +20,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     private ConcurrentQueue<string> _finishesSent = null!;
     private ConcurrentQueue<string> _nurseReviewsSent = null!;
 
-    // The intake form and the nurse's care needs are two forms, each with a summary of its own.
     private ILocator IntakeSummary => Page.Locator("#intake-form_validation_summary");
     private ILocator VisibleSummaries => Page.Locator("[data-reactive-validation-summary]:visible");
     private ILocator StepHeading => Page.Locator("#intake-step h2");
@@ -46,7 +33,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     private ILocator AskNurseToReview => Page.Locator("#ask-nurse-review-btn");
     private ILocator NurseReviewStatus => Page.Locator("#nurse-review-status");
 
-    // The steps arrive after boot, so their inputs are found by the id the model member gives them.
     private ILocator Input(Expression<Func<IntakeStepsModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}");
 
@@ -76,7 +62,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await Expect(StepHeading).ToHaveTextAsync($"Step 2 of 2: Care needs for {name}", new() { Timeout = 5000 });
     }
 
-    // Choosing a level asks the server for its mobility questions; the aid is answered once they arrive.
     private async Task ChooseCareLevelAndAid(string careLevel, string aid)
     {
         await CareLevel.SelectOptionAsync(careLevel);
@@ -109,7 +94,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
             () => ClickWhenStable(FinishIntake),
             request => request.Method == "POST" && request.Url.Contains("/IntakeSteps/Finish"));
 
-        // The resident step left the page; its answers travel beside the care step's inputs.
         using (var body = JsonDocument.Parse(finish.PostData ?? "{}"))
         {
             Assert.That(body.RootElement.GetProperty("ResidentName").GetString(), Is.EqualTo("Jane Smith"), finish.PostData);
@@ -131,7 +115,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         await ClickWhenStable(FinishIntake);
 
         await Expect(_plan.ErrorFor(m => m.CareLevel)).ToHaveTextAsync("Choose a care level.");
-        // The mobility questions are not on the page yet, so what they need is said in the summary.
         await Expect(IntakeSummary).ToHaveTextAsync(MobilityAidMissing);
         await Expect(IntakeStatus).ToHaveTextAsync("No intake saved yet.");
         Assert.That(_finishesSent, Is.Empty, "A care step without a care level may not be sent.");
@@ -167,8 +150,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The review checks the care needs where the care step renders them. Before that step there is no
-    // such place on the page: nothing is checked, so nothing is asked for, and nothing is sent.
     [Test]
     public async Task asking_the_nurse_to_review_care_needs_before_the_care_step_sends_nothing()
     {
@@ -239,8 +220,6 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
 
         await ClickWhenStable(FinishIntake);
 
-        // The care step does not check the phone in the browser, so the server answers with the
-        // resident step's rule, in the same words, beside the phone the care step renders.
         await Expect(_plan.ErrorFor(m => m.FamilyPhone)).ToHaveTextAsync(FamilyPhoneFormat, new() { Timeout = 5000 });
         await Expect(VisibleSummaries).ToHaveCountAsync(0);
         await Expect(IntakeStatus).ToHaveTextAsync("No intake saved yet.");

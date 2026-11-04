@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Resident records: the records coordinator updates a family's phone number as the family asks. The record
-    /// of a discharged resident is closed and stays as it was on the day they left. Every page starts from the
-    /// records and requests on file; nothing is kept between requests.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("LockedResidentEdit"), ActionName("LockedResidentEdit")]

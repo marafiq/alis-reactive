@@ -1,10 +1,6 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// An admission day falls while Maple 118 is held for Dorothy, and on a weekday: the admissions office
-    /// does not admit at weekends, a check only the server makes.
-    /// </summary>
     public class AdmissionDayValidator : ReactiveValidator<FusionDatePickerModel>
     {
         public AdmissionDayValidator()

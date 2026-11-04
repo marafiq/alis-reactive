@@ -70,8 +70,6 @@ namespace Alis.Reactive.Fusion
         {
             var fieldName = Field.Of(field).Name;
             var name = HtmlEncoder.Default.Encode(fieldName);
-            // value="${field}" binds the editing row's current value through the Syncfusion
-            // template engine — the built-in editor leaves native date inputs unset.
             return "<input type=\"date\" name=\"" + name + "\" value=\"${" + fieldName
                 + "}\" class=\"e-field e-input\" style=\"width:100%\" />";
         }
@@ -120,8 +118,6 @@ namespace Alis.Reactive.Fusion
             return html.ToString();
         }
 
-        // The option the editing row holds opens selected: the Syncfusion template engine fills the
-        // editor from the row, and a list that opened on its first option would save that option.
         internal static string SelectedWhenRowHolds(string fieldName, string value) =>
             "${if(" + fieldName + " === '" + value.Replace("\\", "\\\\").Replace("'", "\\'") + "')} selected${/if}";
     }

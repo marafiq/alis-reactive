@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// Text an entry holds, compared and tested: equal and not equal, contains, starts with, ends with, a
-/// pattern, a minimum length, empty and not empty, and membership of a fixed set.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageTestsText : AppPageTest
 {

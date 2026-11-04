@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Monthly census: the business office reviews a closed month's census and downloads it for the state
-    /// report and the month's billing. September and October are closed; November is still open and cannot
-    /// be reported. Nothing is kept between requests.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("RosterExport"), ActionName("RosterExport")]
@@ -32,7 +27,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             Summary = $"{month}: {residents.Count} residents, {residents.Sum(resident => resident.CensusDays)} census days."
         };
 
-        // Samuel Ortiz moved out on September 14.
         private static List<MonthlyCensusResident> SeptemberCensus() => new()
         {
             new MonthlyCensusResident { ResidentId = 7401, ResidentName = "Dorothy Fleming", Suite = "201", CareLevel = "Assisted Living", CensusDays = 30 },
@@ -43,7 +37,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new MonthlyCensusResident { ResidentId = 7406, ResidentName = "Vera Lindqvist", Suite = "216", CareLevel = "Memory Care", CensusDays = 30 }
         };
 
-        // Theodore Banks moved into Samuel Ortiz's suite on October 12.
         private static List<MonthlyCensusResident> OctoberCensus() => new()
         {
             new MonthlyCensusResident { ResidentId = 7401, ResidentName = "Dorothy Fleming", Suite = "201", CareLevel = "Assisted Living", CensusDays = 31 },

@@ -9,11 +9,6 @@ using Alis.Reactive.PlanModel.Validation;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>
-    /// A rule's <c>When</c> or <c>Unless</c>: the server's test, and the browser's form of it when it has one. A
-    /// condition the browser cannot read is either declared the server's (<c>WhenOnServer</c>) or refused
-    /// where a page describes the rules, so no rule changes sides in silence.
-    /// </summary>
     internal sealed class RuleCondition<T>
     {
         private readonly Func<T, RuleSetSelection, bool> _holds;
@@ -21,9 +16,6 @@ namespace Alis.Reactive.Validation
         private readonly string? _unreadable;
         private readonly Func<T, RuleSetSelection, CancellationToken, Task<bool>>? _waits;
 
-        // The browser's form is read where a page describes the rules, so that a validator the server alone
-        // runs is built whatever its conditions. The server's test takes the selection the validation runs
-        // under, which only a rule's own test reads (DependentRules).
         private RuleCondition(Func<T, RuleSetSelection, bool> holds, Func<Condition?> browser, string? unreadable)
         {
             _holds = holds;
@@ -31,8 +23,6 @@ namespace Alis.Reactive.Validation
             _unreadable = unreadable;
         }
 
-        // A condition that waits is the server's alone: it has no browser form, and the rules under it make
-        // the validator one that waits, as MustAsync does.
         private RuleCondition(Func<T, RuleSetSelection, CancellationToken, Task<bool>> waits)
         {
             _holds = (_, _) => throw new InvalidOperationException("A condition that waits is asked through HoldsAsync.");
@@ -52,7 +42,6 @@ namespace Alis.Reactive.Validation
             return new RuleCondition<T>((instance, _, cancellation) => predicate(instance, cancellation));
         }
 
-        /// <summary>The rule <paramref name="rule"/> passes: what the rules under <c>DependentRules</c> run under.</summary>
         internal static RuleCondition<T> Passing<TValue>(Rule<T, TValue> rule) =>
             new RuleCondition<T>(rule.PassesOn, rule.BrowserPassing, null);
 
@@ -66,7 +55,6 @@ namespace Alis.Reactive.Validation
 
         internal static RuleCondition<T> Unless(Expression<Func<T, bool>> predicate) => When(predicate).Negated();
 
-        /// <summary>A condition the server alone decides, by the developer's word: <c>WhenOnServer</c>, <c>UnlessOnServer</c>.</summary>
         internal static RuleCondition<T> OnServer(Expression<Func<T, bool>> predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
@@ -74,7 +62,6 @@ namespace Alis.Reactive.Validation
             return new RuleCondition<T>((instance, _) => holds(instance), () => null, null);
         }
 
-        /// <summary>Holds always, with no browser form: what <c>.ServerOnly()</c> writes after a rule's checks.</summary>
         internal static RuleCondition<T> ServerOnly { get; } = new RuleCondition<T>((_, _) => true, () => null, null);
 
         internal RuleCondition<T> Negated() =>
@@ -82,10 +69,6 @@ namespace Alis.Reactive.Validation
                 ? new RuleCondition<T>(async (instance, selection, cancellation) => !await waits(instance, selection, cancellation).ConfigureAwait(false))
                 : new RuleCondition<T>((instance, selection) => !_holds(instance, selection), () => _browser() is Condition browser ? Condition.Not(browser) : null, _unreadable);
 
-        /// <summary>
-        /// The browser's form, or false when the server alone decides. A condition the browser cannot read that
-        /// was not declared the server's is refused here, where a page describes the rules.
-        /// </summary>
         internal bool TryForBrowser(out Condition browser)
         {
             if (_unreadable != null)
@@ -98,7 +81,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>Every condition a rule is written under, outermost first.</summary>
     internal sealed class Conditions<T>
     {
         private readonly IReadOnlyList<RuleCondition<T>> _all;
@@ -121,7 +103,6 @@ namespace Alis.Reactive.Validation
             return true;
         }
 
-        /// <summary>The browser's form of all of them, or false when one is the server's alone.</summary>
         internal bool TryForBrowser(out Condition condition)
         {
             condition = Condition.Always;
@@ -139,7 +120,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>One validation of one model: the failures found, and whether it may wait.</summary>
     internal sealed class ValidationRun
     {
         private readonly List<ValidationFailure> _failures = new List<ValidationFailure>();
@@ -151,7 +131,6 @@ namespace Alis.Reactive.Validation
             Selection = selection ?? throw new ArgumentNullException(nameof(selection));
         }
 
-        /// <summary>The rules this validation runs: those in no set, or those in one named set.</summary>
         internal RuleSetSelection Selection { get; }
 
         internal bool Synchronous { get; }
@@ -163,16 +142,12 @@ namespace Alis.Reactive.Validation
         internal void Fail(string propertyName, string message) => _failures.Add(new ValidationFailure(propertyName, message));
     }
 
-    /// <summary>A rule of a validator: it validates a model, and describes what of it the browser runs.</summary>
     internal interface IRule<T>
     {
-        /// <summary>Whether the selection reaches this rule.</summary>
         bool RunsUnder(RuleSetSelection selection);
 
-        /// <summary>Whether a check the selection reaches waits (MustAsync, CustomAsync or a condition declared WhenAsync), child validators included.</summary>
         bool IsAsync(RuleSetSelection selection);
 
-        /// <summary>The sets a selection can reach through this rule without this validator naming them: those of a validator an Include in no set holds.</summary>
         IEnumerable<string> ReachableRuleSets { get; }
 
         Task Validate(T instance, string prefix, ValidationRun run);
@@ -180,16 +155,13 @@ namespace Alis.Reactive.Validation
         void DescribeFor(BrowserRuleSet browser, RuleSetSelection selection);
     }
 
-    /// <summary>The validator as its rules see it: the default they run under, and where dependent rules are declared.</summary>
     internal interface IRuleHost<T>
     {
         CascadeMode RuleLevelCascadeMode { get; }
 
-        /// <summary>Declares the rules <paramref name="rules"/> writes under <paramref name="condition"/>, inside the current blocks.</summary>
         void DeclareUnder(RuleCondition<T> condition, Action rules);
     }
 
-    /// <summary>The checks and child validators written after one <c>RuleFor</c> or <c>RuleForEach</c>.</summary>
     internal abstract class Rule<T, TValue> : IRule<T>, IRuleBuilderOptions<T, TValue>, IRuleTarget<T, TValue>
     {
         private readonly IRuleHost<T> _host;
@@ -211,15 +183,12 @@ namespace Alis.Reactive.Validation
 
         protected Conditions<T> Scope { get; }
 
-        /// <summary>The sets the rule was declared in: none, or the names of the <c>RuleSet</c> it sits in.</summary>
         protected RuleSets Sets { get; }
 
         protected List<RulePart<T, TValue>> Parts { get; } = new List<RulePart<T, TValue>>();
 
-        /// <summary>The member's path, as model binding names it and as errors are reported.</summary>
         protected string FieldPath { get; }
 
-        /// <summary>The member as a message names it: <c>AdmissionDate</c> reads "Admission Date", or the name <c>WithName</c> gives.</summary>
         protected string FieldDisplayName { get; private set; }
 
         public bool RunsUnder(RuleSetSelection selection) => selection.Selects(Sets);
@@ -228,7 +197,6 @@ namespace Alis.Reactive.Validation
 
         public IEnumerable<string> ReachableRuleSets => Enumerable.Empty<string>();
 
-        /// <summary>Whether the server answers with the rule's first failing check alone: the rule's own mode, else the validator's.</summary>
         protected bool StopsAtFirstFailure => (_cascade ?? _host.RuleLevelCascadeMode) == CascadeMode.Stop;
 
         public abstract Task Validate(T instance, string prefix, ValidationRun run);
@@ -283,7 +251,6 @@ namespace Alis.Reactive.Validation
             return this;
         }
 
-        /// <summary>The server's test of <c>DependentRules</c>: the rule, run on its own under the same selection, finds no failure.</summary>
         internal bool PassesOn(T instance, RuleSetSelection selection)
         {
             var run = new ValidationRun(synchronous: true, CancellationToken.None, selection);
@@ -291,10 +258,6 @@ namespace Alis.Reactive.Validation
             return run.Failures.Count == 0;
         }
 
-        /// <summary>
-        /// The browser's form of the same test: every check of the rule has one, under conditions the browser
-        /// reads; or null, and the dependent rules are the server's. A rule over a list has none.
-        /// </summary>
         internal virtual Condition? BrowserPassing() => null;
 
         public IRuleBuilderOptions<T, TValue> WithMessage(string message)
@@ -328,7 +291,6 @@ namespace Alis.Reactive.Validation
 
         public IRuleBuilderOptions<T, TValue> ServerOnly() => Conditioned(RuleCondition<T>.ServerOnly);
 
-        // A condition written after checks applies to every check written before it, as in FluentValidation.
         private IRuleBuilderOptions<T, TValue> Conditioned(RuleCondition<T> condition)
         {
             foreach (var part in Parts)
@@ -345,7 +307,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary><c>RuleFor(x =&gt; x.Member)</c>: the checks of one member.</summary>
     internal sealed class MemberRule<T, TValue> : Rule<T, TValue>
     {
         internal MemberRule(Expression<Func<T, TValue>> member, Conditions<T> scope, RuleSets sets, IRuleHost<T> host)
@@ -384,7 +345,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary><c>RuleForEach(x =&gt; x.Items)</c>: the checks of every item of a list, named <c>Items[0]</c>, <c>Items[1]</c>.</summary>
     internal sealed class CollectionRule<T, TElement> : Rule<T, TElement>
     {
         internal CollectionRule(Expression<Func<T, IEnumerable<TElement>>> collection, Conditions<T> scope, RuleSets sets, IRuleHost<T> host)
@@ -410,7 +370,6 @@ namespace Alis.Reactive.Validation
             }
         }
 
-        // The browser validates an item through the item's own validator, or by the checks written on the
         public override void DescribeFor(BrowserRuleSet browser, RuleSetSelection selection)
         {
             foreach (var part in Parts)
@@ -424,7 +383,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary><c>Include(validator)</c>: another validator's rules for the same model, run where they are written.</summary>
     internal sealed class IncludeRule<T> : IRule<T>
     {
         private readonly IValidator<T> _included;
@@ -438,8 +396,6 @@ namespace Alis.Reactive.Validation
             _sets = sets;
         }
 
-        // An Include in no set runs under any selection, so the included validator's own sets decide, as
-        // FluentValidation runs it; an Include in a set runs under that set alone.
         public bool RunsUnder(RuleSetSelection selection) => selection.Selects(_sets) || (selection.IsNamed && !_sets.Any);
 
         public bool IsAsync(RuleSetSelection selection) => _scope.Waits || (_included is ReactiveValidator rules && rules.IsAsync(selection));
@@ -460,7 +416,6 @@ namespace Alis.Reactive.Validation
         }
     }
 
-    /// <summary>One check or child validator of a rule, with the conditions written after it.</summary>
     internal abstract class RulePart<T, TValue>
     {
         internal Conditions<T> Conditions { get; set; } = Conditions<T>.None;
@@ -472,7 +427,6 @@ namespace Alis.Reactive.Validation
         internal abstract void DescribeFor(BrowserRuleSet browser, ModelMember<T> member, string displayName, Condition when, RuleSetSelection selection);
     }
 
-    /// <summary>A C# check that adds its own failures, under the member or another: the server's alone.</summary>
     internal sealed class CustomPart<T, TValue> : RulePart<T, TValue>
     {
         private readonly Func<TValue, CustomContext<T>, CancellationToken, Task> _check;
@@ -535,7 +489,6 @@ namespace Alis.Reactive.Validation
             if (rules.Count > 0) browser.AddItemRules(member.Expression, rules, when);
         }
 
-        /// <summary>The check's browser rules, when it has any; a check the server alone makes has none.</summary>
         internal bool TryBrowserRules(string displayName, out IReadOnlyList<BrowserRule> rules)
         {
             rules = BrowserRules(displayName).ToList();
@@ -562,7 +515,6 @@ namespace Alis.Reactive.Validation
 
         internal override bool IsAsync(RuleSetSelection selection) => _child is ReactiveValidator rules && rules.IsAsync(selection);
 
-        // A missing value has no members to validate; NotNull says it is missing.
         internal override async Task Validate(T instance, TValue value, string prefix, string fieldPath, string displayName, ValidationRun run)
         {
             if (!await Conditions.HoldAsync(instance, run).ConfigureAwait(false) || value == null) return;

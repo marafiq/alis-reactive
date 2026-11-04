@@ -3,17 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CoreBehaviors.RoomWhiteboard
 
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors.RoomWhiteboard;
 
-/// <summary>
-/// As the evening nurse, I want room 12's whiteboard to show what I put on it, the way I put it, so that
-/// whoever walks in reads the board I meant to leave.
-/// </summary>
-/// <remarks>
-/// The whiteboard is a widget the sandbox wrote itself (Scripts/whiteboard.ts, BroughtComponents/Whiteboard).
-/// Each test is one kind of reaction: a property set from a literal, from an input, and to nothing; a
-/// method called with a literal, with an input, with a field and a fixed argument, with a result drawn once
-/// and used twice, and with a promise waited for; an element's text, HTML, visibility and classes; a payload
-/// composed from a widget, an input, a nullable property and a literal; and a chain run line by line.
-/// </remarks>
 [TestFixture]
 public class WhenTheNurseKeepsTheWhiteboard : PlaywrightTestBase
 {
@@ -142,8 +131,6 @@ public class WhenTheNurseKeepsTheWhiteboard : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The number is drawn once per note: the board, the line beside it and the desk all show the same
-    // number; a second draw for the line would read 2 beside a board that says 1.
     [Test]
     public async Task adding_a_note_numbers_it_once_for_the_board_the_line_beside_it_and_the_desk()
     {
@@ -255,15 +242,12 @@ public class WhenTheNurseKeepsTheWhiteboard : PlaywrightTestBase
 
         await PostBoard.ClickAsync();
 
-        // Read as the nurse sees it: the hidden "next check in" part of the sentence is not shown.
         await Expect(Posted).ToHaveTextAsync(
             "Desk has the board: Nurse Okafor in room 12, no check scheduled, goal \"Rest after lunch\".",
             new() { UseInnerText = true });
         AssertNoConsoleErrors();
     }
 
-    // Each line runs after the one before it: the board names Nurse Patel while she holds it, then
-    // Nurse Okafor once it is set, so a hand-over records both. Lines run together would name one nurse twice.
     [Test]
     public async Task handing_over_records_who_held_the_board_and_who_takes_it()
     {

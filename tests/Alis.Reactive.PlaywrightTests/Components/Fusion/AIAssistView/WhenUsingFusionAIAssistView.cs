@@ -1,17 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.AIAssistView;
 
-/// <summary>
-/// As a care coordinator, I want to ask the community's assistant about a resident's care-plan follow-ups
-/// and read the care team's answer in the conversation, so that I can plan her week without paging through
-/// her chart.
-/// </summary>
-/// <remarks>
-/// The page is Margaret Hale's assistant. The server answers each question from the care team's records and
-/// ends by naming the common questions not asked. The coordinator can stop an answer (the question goes back
-/// in the box and the page says which question stopped), bring the night shift's handoff into the
-/// conversation, send the typed question to the charge nurse instead, and open the notes the care team saved
-/// in place of the conversation. Her chart links here with a question, which is asked on arrival.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionAIAssistView : PlaywrightTestBase
 {
@@ -38,8 +26,6 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
     private ILocator Cleared => Page.Locator("#question-cleared");
     private ILocator Status => Page.Locator("#assistant-status");
 
-    // The whole assistant fits in the window, so an item is in view exactly when the assistant's own
-    // scrolling shows it.
     public override BrowserNewContextOptions ContextOptions()
     {
         var options = base.ContextOptions() ?? new BrowserNewContextOptions();
@@ -185,7 +171,6 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
         await Expect(Assistant.Responses.Nth(1)).ToContainTextAsync(PodiatryAnswer, new() { Timeout = 10000 });
         var firstQuestion = Assistant.Prompts.First;
 
-        // The coordinator scrolls the conversation back up to the first question.
         await Assistant.Responses.Nth(1).HoverAsync();
         await Page.Mouse.WheelAsync(0, -5000);
         await Expect(firstQuestion).ToBeInViewportAsync(new() { Timeout = 5000 });
@@ -241,8 +226,6 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await AskTheFollowUpsFromTheSuggestions();
-        // The care team's answer to the next question is held, so the assistant is still answering when
-        // Stop is clicked.
         var answerReleased = new SemaphoreSlim(0);
         await Page.RouteAsync(AnswerUrl, async route =>
         {
@@ -258,7 +241,6 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
             "Stopped the answer to question 2. Edit it below and send it again.", new() { Timeout = 5000 });
         await Expect(Assistant.PromptBox).ToHaveTextAsync("Is the walker check done?");
 
-        // Let the held answer arrive before the page closes.
         await Page.RunAndWaitForResponseAsync(
             () => { answerReleased.Release(); return Task.CompletedTask; },
             AnswerUrl);
@@ -289,7 +271,6 @@ public class WhenUsingFusionAIAssistView : PlaywrightTestBase
         await ClickWhenStable(AskNurse);
 
         await Expect(Status).ToHaveTextAsync("Type the question for the charge nurse first.", new() { Timeout = 5000 });
-        // The browser logs the refused request's 400; nothing else may fail.
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 }

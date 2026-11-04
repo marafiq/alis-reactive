@@ -3,7 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>ALIS008: a pipeline sends one request; a second top-level request silently replaces the first.</summary>
 [TestFixture]
 public class MultipleHttpRequestsInPipelineTests
 {
@@ -33,7 +32,6 @@ public class MultipleHttpRequestsInPipelineTests
             p.Get("/lab");
             """));
 
-    // The C# the Razor compiler generates for a view whose DomReady pipeline holds the lines given.
     public static string View(string pipeline) => $$"""
         using System.Threading.Tasks;
         using Alis.Reactive;

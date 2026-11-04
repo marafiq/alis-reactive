@@ -1,16 +1,3 @@
-// alis.hub (grammar.md 6.7), keyed by hub URL. It ships the SignalR client in the framework's bundle,
-// so a page with a hub trigger needs no script of its own.
-// B1 One HubConnection per URL, with credentials and automatic reconnect, counted by holders: a plan
-//    that names the hub holds its connection for as long as the plan's owner lives (its data
-//    contribution). The connection stops, a start still trying it makes no further attempt, and its
-//    retry offer is withdrawn, when the last owner holding it is disposed.
-// B2 A start tries four times: at once, at once again, then 2 and 10 seconds after the try before, and
-//    shows the retry indicator as soon as the fourth try fails. A click on the offer takes it and starts
-//    again; the offer comes back only if every try of that start fails.
-// B3 Client methods are events, matched without regard to case; the payload is the single argument.
-// B4 invoke(method, ...args) and send(method, ...args) are async; state and connectionId are
-//    properties; reconnecting, reconnected and close are events.
-
 import * as signalR from "@microsoft/signalr";
 import type { Plugin } from "../objects/plugins";
 import type { Owner } from "../objects/owner";
@@ -53,8 +40,6 @@ async function startWithRetry(managed: Managed, url: string): Promise<void> {
   showRetryIndicator(url, () => retry(managed, url));
 }
 
-// The offer is shown only on a disconnected connection no start is running for, and a click takes it,
-// so a retry never runs beside another start.
 function retry(managed: Managed, url: string): void {
   log.info("retry.manual", { hubUrl: url });
   managed.started = startWithRetry(managed, url);
@@ -122,8 +107,6 @@ function release(url: string, managed: Managed): void {
   removeRetryIndicator(url);
 }
 
-// The connection the owner of a step's plan holds. A block that runs on after that owner is disposed
-// finds none, and fails rather than open a connection nothing would release.
 function held(url: string): Managed {
   const managed = hubs.get(url);
   if (!managed) throw new Error(`[alis] hub "${url}" is held by no owner: the plan that named it was released`);

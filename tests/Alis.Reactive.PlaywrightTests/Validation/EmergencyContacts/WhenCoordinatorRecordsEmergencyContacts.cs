@@ -4,15 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.EmergencyContacts;
 
-/// <summary>
-/// As an admissions coordinator, I want each emergency contact's phone required only when the
-/// resident has emergency contacts, so that I can complete an intake either way.
-/// </summary>
-/// <remarks>
-/// One validator serves the page: Save Intake checks the whole form, Save Contacts checks only the
-/// contacts section. The server also checks each number against the community's directory, which
-/// the browser cannot.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
 {
@@ -23,8 +14,6 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
     private ConcurrentQueue<string> _intakesSent = null!;
     private ConcurrentQueue<string> _contactSavesSent = null!;
 
-    // IdGenerator is the framework's own id rule: it resolves the indexed contact rows, which PagePlan
-    // cannot, and the checkbox, which PagePlan has no native accessor for.
     private ILocator Field(Expression<Func<EmergencyContactsModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}");
 
@@ -72,8 +61,6 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
         await ClickWhenStable(SaveIntake);
 
         await Expect(ErrorFor(m => m.Contacts[0].Phone)).ToHaveTextAsync("Phone is required.");
-        // The server's matching rule would show the same message after a 400, which Chromium logs as
-        // a console error; none here means the browser stopped the save itself.
         AssertNoConsoleErrors();
     }
 
@@ -98,7 +85,6 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
 
         await ClickWhenStable(SaveIntake);
 
-        // The server names the second contact's phone, Contacts[1].Phone, and the page puts the reason there.
         await Expect(ErrorFor(m => m.Contacts[1].Phone)).ToHaveTextAsync(FrontDeskNumber);
         await Expect(ErrorFor(m => m.Contacts[0].Phone)).ToHaveTextAsync("");
         await Expect(IntakeStatus).ToHaveTextAsync("No intake saved yet.");
@@ -111,8 +97,6 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
-    // Save Contacts, under the contacts section, comes before Save Intake, and the section does not hold
-    // the resident's name: leaving the name empty still asks for it, by the whole form's rule.
     [Test]
     public async Task leaving_the_residents_name_empty_asks_for_it_before_anything_is_saved()
     {
@@ -139,7 +123,6 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
 
         await ClickWhenStable(SaveContacts);
 
-        // The resident's name is outside the contacts section, so its rule does not hold the contacts up.
         await Expect(IntakeStatus).ToHaveTextAsync("Emergency contacts saved: 2.");
         await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("");
         Assert.That(_contactSavesSent, Has.Count.EqualTo(1));

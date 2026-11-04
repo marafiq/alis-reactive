@@ -1,7 +1,3 @@
-// The file picker: a file input that holds the files the person chose, as the browser's own File
-// objects, and tells its listeners when the person chooses. It knows nothing of Alis.Reactive. The
-// input element holds it as `filePicker`.
-
 type Listener = (payload: unknown) => void;
 
 interface FilePickerHost extends HTMLInputElement {
@@ -20,7 +16,6 @@ export class FilePicker {
     return Array.from(this.input.files ?? []);
   }
 
-  /** The files as the browser lists them: the input's own FileList. */
   get listed(): FileList | null {
     return this.input.files;
   }

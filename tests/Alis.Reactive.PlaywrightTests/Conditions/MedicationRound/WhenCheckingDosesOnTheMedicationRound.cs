@@ -2,27 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.MedicationRound;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.MedicationRound;
 
-/// <summary>
-/// As a medication aide on the morning round, I want each dose checked against where the resident is,
-/// their pulse and temperature, the physician's order, their allergies and when the last dose was given,
-/// and the pharmacy label scanned before I record it, so that no resident is given a dose that should be held.
-/// </summary>
-/// <remarks>
-/// The round is Maple wing's 08:00 doses on Tuesday 2 June 2026. Check opens a dose: the round raises it
-/// with the dose's facts as the eMAR holds them, and the page reads each fact to say what it means. A dose
-/// is clear to give only when it is due, the pulse is within 60 to 100 (or the physician, called about the
-/// pulse, says give), the resident is on the wing, the order runs past today, and the last dose was 4 or
-/// more hours ago. Each resident's facts sit on the edge of a check: Margaret Hale's pulse is 60, Evelyn
-/// Hart's 100, Walter Brooks's 59 and Robert Miles's 101; Walter's temperature is 100.4, Robert's 100.3,
-/// Evelyn's 100.5, Henry Walsh's 96.0 and Clara Nguyen's 95.9; Rose Delgado's last dose was 239 minutes
-/// ago, Evelyn's and Harold Kim's 240; Henry's order ends today, Agnes Moore's ended yesterday and
-/// Walter's ends tomorrow. Margaret's and Evelyn's doses are clear to give (Evelyn's temperature is for the
-/// charge nurse, not a reason to hold); every other dose is held for one reason, except Agnes's, held for two.
-/// The label, witness and hold-reason fields check what the aide types; Record as given asks before it
-/// records and says what the aide answered. Not exercised: the dose the round raises always carries every
-/// fact, so no check reads a fact the eMAR left out altogether (an order the pharmacy has not sent reads
-/// as none, which Harold Kim's dose covers).
-/// </remarks>
 [TestFixture]
 public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
 {
@@ -82,7 +61,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         await Expect(CheckButtonFor("Margaret Hale")).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // Opens a resident's dose; the panel names the resident once the round has raised it.
     private async Task CheckTheDoseOf(string resident)
     {
         await ClickWhenStable(CheckButtonFor(resident));
@@ -103,7 +81,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Margaret Hale's pulse is 60; Evelyn Hart's is 100 and her last dose was exactly 4 hours ago.
     [Test]
     public async Task a_due_dose_with_nothing_to_hold_it_for_is_clear_to_give()
     {
@@ -130,7 +107,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The range includes both ends: a pulse of exactly 60 or exactly 100 is in it.
     [Test]
     public async Task a_pulse_of_exactly_60_or_exactly_100_is_within_range()
     {
@@ -188,7 +164,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The physician's word stands in for the pulse only; every other check still has to pass.
     [Test]
     public async Task the_physician_saying_give_does_not_clear_a_dose_held_for_another_reason()
     {
@@ -299,7 +274,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Walter Brooks's order ends tomorrow: one day past today is still current.
     [Test]
     public async Task a_signed_order_that_runs_past_today_is_current()
     {
@@ -324,7 +298,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Henry Walsh's order ends today and Agnes Moore's ended yesterday; neither is current on the round.
     [Test]
     public async Task an_order_that_ends_today_or_ended_before_has_ended_and_holds_the_dose()
     {
@@ -339,8 +312,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Robert Miles's order says under the skin, Rose Delgado's verbal order gives no route, and Harold Kim
-    // has no order at all: only an order that says by mouth reads as by mouth.
     [Test]
     public async Task the_route_reads_by_mouth_only_when_the_order_says_so()
     {
@@ -360,7 +331,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Walter Brooks has never had allergies recorded; Evelyn Hart's record is blank.
     [Test]
     public async Task recorded_allergies_are_shown_and_a_blank_or_missing_record_reads_none_on_file()
     {
@@ -441,8 +411,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Ida Bell is away but her dose is routine; Robert Miles's insulin is time-critical but he is on the
-    // wing, and neither has a fever.
     [Test]
     public async Task an_away_resident_with_a_routine_dose_or_a_time_critical_dose_given_on_the_wing_raises_no_alert()
     {
@@ -456,7 +424,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Walter Brooks's temperature is exactly 100.4: not yet a fever.
     [Test]
     public async Task a_temperature_of_exactly_100_4_raises_no_alert()
     {
@@ -530,7 +497,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A lot sticker carries the pharmacy's code after its own: it is not the pharmacy's label.
     [Test]
     public async Task a_sticker_that_only_carries_the_pharmacy_code_is_not_a_pharmacy_label()
     {
@@ -542,7 +508,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A look-alike address holds the community's domain but does not end with it.
     [Test]
     public async Task a_witness_must_sign_in_with_a_maple_grove_address()
     {
@@ -556,7 +521,6 @@ public class WhenCheckingDosesOnTheMedicationRound : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // "Nauseous." is nine characters; "Vomited x2" is ten.
     [Test]
     public async Task a_hold_reason_needs_at_least_ten_characters()
     {

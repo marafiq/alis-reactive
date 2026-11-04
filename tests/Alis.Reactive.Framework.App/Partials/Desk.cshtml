@@ -10,7 +10,6 @@
     @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
     <fieldset id="kin-section">
         <legend>The resident's next of kin</legend>
-        @* The next of kin's own editor template, rendered under the member's prefix: its input binds as NextOfKin.Name. *@
         @Html.EditorFor(m => m.NextOfKin)
     </fieldset>
 </form>

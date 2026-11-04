@@ -1,8 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-    <!-- The Razor SDK makes this a Razor class library, so its stylesheet ships as a static web
-         asset. There are no Razor files to compile. -->
-
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <Nullable>enable</Nullable>
@@ -13,24 +10,14 @@
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
-    <!-- Syncfusion is pinned exactly, the one exception to the floors every other dependency takes:
-         the framework supports one Syncfusion release at a time, with no second version path, and its
-         C# builders and an app's @syncfusion/ej2 script must be that same release
-         (scripts/pin-syncfusion.mjs moves both). -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="[33.1.47]" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <!-- net48 binds to ASP.NET MVC5 (System.Web.Mvc): same Syncfusion EJ2 builder API
-         via the MVC5 package, different ASP.NET host types. Mirrors the net48 group in
-         Alis.Reactive.csproj; PolySharp + ReferenceAssemblies enable C# 14 on net48. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
       <PackageReference Include="Syncfusion.EJ2.MVC5" Version="[33.1.47]" />
       <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
-      <!-- AddReactiveFusion() extends IServiceCollection on both TFMs; net10 gets it from the
-           ASP.NET Core framework reference. Accept the same minimum as AlisReactive
-           and allow newer DI versions. -->
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[9.0.0,)" />
       <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
       <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
@@ -39,22 +26,13 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
-      <!-- Run the typed-DSL analyzer (ALIS009) on this slice's own source so untyped
-           public component API fails the build here, not ships to consumers. -->
       <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-      <!-- The package's slice rows, bottom row first; ALIS010-ALIS013 lock ADR-0004 against them in every build. -->
       <AdditionalFiles Include="SliceTree.txt" />
-      <!-- The public surface per target: a public symbol is a line in PublicAPI.Unshipped.txt, or the build fails (RS0016, RS0017). -->
       <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
       <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
       <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
 
-    <!-- The styling Fusion's own markup needs (the grid dialog form, the refused-input mark on a
-         Syncfusion wrapper), shipped as written: served at ~/_content/AlisReactive.Fusion/css/fusion.css
-         (net10) and copied to Content\AlisReactive.Fusion\css\fusion.css (net48). Where and how:
-         build\AlisReactiveStaticWebAssets.targets. The Syncfusion theme and script are the app's, at
-         the version the Syncfusion packages above pin. -->
     <ItemGroup>
         <AlisReactiveStaticWebAsset Include="css\fusion.css" RelativePath="css/fusion.css" />
     </ItemGroup>

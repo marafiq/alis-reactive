@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Discharge with a family notice. Both notice services are down: the text-message service answers
-    /// 503 with no body, as a service behind a gateway often does, and the email service answers 503
-    /// with its reason. Rosa Diaz's discharge is refused until her physician signs the order.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/DischargeNotice")]
     public class DischargeNoticeController : Controller
@@ -34,7 +29,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                     new FamilyNoticeResult("The email service is down for maintenance."))
                 : StatusCode(StatusCodes.Status503ServiceUnavailable);
 
-        // No static lookup table: a static collection in the sandbox is shared by every browser world.
         private static string? ResidentName(string resident) => resident switch
         {
             "margaret" => "Margaret Hill",

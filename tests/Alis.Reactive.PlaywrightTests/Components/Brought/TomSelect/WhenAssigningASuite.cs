@@ -4,11 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.TomSelect;
 
-// Journey: an admissions coordinator assigns an incoming resident to a suite type. The suite type
-// is a Tom Select dropdown — a component the sandbox installs from npm, constructs on alis:mount
-// and declares in its own assembly (BroughtComponents/TomSelect.cs). Choosing a suite quotes its
-// monthly rate (a Syncfusion field) and what is open; the coordinator can take the recommended
-// suite, clear the choice, reserve the suite, and add a companion's suite from a partial.
 [TestFixture]
 public class WhenAssigningASuite : PlaywrightTestBase
 {
@@ -35,8 +30,6 @@ public class WhenAssigningASuite : PlaywrightTestBase
     private ILocator AddCompanion => Page.Locator("#companion-add");
     private ILocator RemoveCompanion => Page.Locator("#companion-remove");
 
-    // The companion partial renders CompanionSuiteModel.CompanionSuiteType; its ID is the
-    // framework's deterministic ID for that model member.
     private static readonly string CompanionSuiteTypeId = IdGenerator.For<CompanionSuiteModel>(m => m.CompanionSuiteType);
 
     private async Task OpenAssignment()
@@ -58,8 +51,6 @@ public class WhenAssigningASuite : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The field wrapper writes the label and, for a required field, its "*" marker. The label is the
-    // sibling before the field's message slot, so it is found the same way whatever the input renders.
     [Test]
     public async Task the_suite_type_is_marked_required_and_the_monthly_rate_is_not()
     {
@@ -125,7 +116,6 @@ public class WhenAssigningASuite : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Gather proof: the posted body carries the Tom Select value read from the brought component.
     [Test]
     public async Task reserving_a_suite_posts_the_choice_and_prepares_the_move_in_documents()
     {
@@ -139,7 +129,6 @@ public class WhenAssigningASuite : PlaywrightTestBase
 
         using (var body = JsonDocument.Parse(reservation.PostData ?? "{}"))
         {
-            // Form() posts each input under its MVC binding name, the name the model binder reads.
             Assert.That(body.RootElement.TryGetProperty("SuiteType", out var suiteType), Is.True,
                 $"The reservation posted no SuiteType: {reservation.PostData}");
             Assert.That(suiteType.GetString(), Is.EqualTo("companion"));
@@ -165,8 +154,6 @@ public class WhenAssigningASuite : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The companion's dropdown lives in <body>, outside the partial; only alis:unmount destroying
-    // the widget removes it.
     [Test]
     public async Task removing_the_companion_leaves_no_dropdown_behind()
     {
@@ -181,8 +168,6 @@ public class WhenAssigningASuite : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Tom Select names its parts after the select's ID: the combobox is {id}-ts-control and the
-    // listbox is {id}-ts-dropdown.
     private sealed class TomSelectField(IPage page, string selectId)
     {
         public ILocator Control => page.Locator($"#{selectId}-ts-control");

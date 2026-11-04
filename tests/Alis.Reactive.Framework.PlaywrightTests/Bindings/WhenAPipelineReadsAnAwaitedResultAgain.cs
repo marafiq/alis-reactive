@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Bindings;
 
-/// <summary>
-/// An awaited method's result, held in a variable and read in more than one part of a pipeline (grammar.md
-/// 3.1, M5): each read gets the value the method settles with, wherever the plan places it: in a request's
-/// WhileLoading and its Finally, after a checked request, after a chained request, in requests started
-/// together, and after a branch that asked for it. The slate finds Ben as its second row, a moment after
-/// it is asked; the standby slate is not on the page.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPipelineReadsAnAwaitedResultAgain : AppPageTest
 {

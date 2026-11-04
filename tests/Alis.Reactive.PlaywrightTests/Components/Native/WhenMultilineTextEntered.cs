@@ -2,19 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As the evening charge nurse on Maple wing, I want to write the handover for the night nurse, starting
-/// from the community's template, flag any incident for her to read first, and send it, so that the night
-/// shift starts knowing what happened on mine.
-/// </summary>
-/// <remarks>
-/// A text area raises change only when the nurse leaves it; Enter starts a new line (HTML, the textarea
-/// element's change event), so an incident is flagged on leaving the field. The server answers a sent
-/// handover with the number of lines it received. The text box locator reaches a text area by its plan
-/// ID like any input. Not exercised: the text area as a validated input. This page does not validate,
-/// and a text area's committing event, change, comes only with leaving the field, which rechecks a field
-/// on its own, so no gesture could tell a broken commit event apart.
-/// </remarks>
 [TestFixture]
 public class WhenMultilineTextEntered : PlaywrightTestBase
 {
@@ -36,7 +23,6 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
         _plan = await PagePlan<NativeTextAreaModel>.FromPage(Page);
     }
 
-    // Tabbing out of the text area commits what was written.
     private async Task WriteTheIncident(string incident)
     {
         await Incident.Fill(incident);
@@ -54,7 +40,6 @@ public class WhenMultilineTextEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The click leaves the cursor on the button; only the page moves it into the handover.
     [Test]
     public async Task starting_from_the_template_leaves_the_cursor_in_the_handover()
     {

@@ -27,7 +27,6 @@ public sealed class FusionTextAreaLocator
 
     public async Task Blur() => await TextArea.BlurAsync();
 
-    /// <summary>Fill text and then blur to trigger Syncfusion's change event.</summary>
     public async Task FillAndBlur(string value)
     {
         await Fill(value);

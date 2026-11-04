@@ -1,13 +1,3 @@
-// The app constructs and destroys its own widgets; the framework only finds them. These two
-// document events tell the app when to do it:
-//   alis:mount   — HTML is in the document and about to be wired; construct widgets inside detail.root.
-//   alis:unmount — wired HTML is about to be removed; destroy widgets inside detail.root.
-// Both fire synchronously, so a widget constructed in an alis:mount listener exists when the
-// runtime locates it.
-//
-//   alis:commit  — an input committed a value. Raised on the input's element (bubbling) whatever the
-//   component calls its own event (change, valueChanged, selected…), so a form hears one event.
-
 export interface MountEventDetail {
   readonly root: HTMLElement;
 }

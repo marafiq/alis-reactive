@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Members;
 
-/// <summary>
-/// A component's properties, read and written by a page's pipelines: read-only (P1), write-only (P2),
-/// read and written (P3) on a slate.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageUsesAComponentsProperties : AppPageTest
 {

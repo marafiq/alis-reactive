@@ -20,9 +20,6 @@
                 @{ Html.InputField(plan, m => m.HasContacts, o => o.Label("Resident has emergency contacts"))
                     .NativeCheckBox(b => b.CssClass("h-4 w-4 rounded border-border text-accent")); }
             </div>
-            @* The contacts can be saved on their own: Save Contacts, under the section, checks only the
-               fields in it, with the same validator Save Intake uses for the whole form, and sends the
-               section's inputs with the flag the endpoint reads beside them. *@
             <div id="contacts-section" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @for (var i = 0; i < Model.Contacts.Count; i++)
                 {

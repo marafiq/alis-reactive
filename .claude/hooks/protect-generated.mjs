@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// PreToolUse gate for Edit/Write: the generated plan contract (plan.ts and plan.schema.json) is regenerated, never hand-edited.
 let raw = "";
 process.stdin.on("data", (chunk) => (raw += chunk));
 process.stdin.on("end", () => {

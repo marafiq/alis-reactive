@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Resident intake: emergency contacts are recorded only when the resident has them, and then
-    /// every contact needs a phone number.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/EmergencyContacts")]
     public class EmergencyContactsController : Controller
@@ -30,7 +26,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             return Ok(new EmergencyContactsConfirmation(ConfirmationFor(intake)));
         }
 
-        /// <summary>Saves the contacts alone: each contact is checked, the rest of the intake is not.</summary>
         [HttpPost("SaveContacts")]
         public IActionResult SaveContacts([FromBody] EmergencyContactsModel? intake)
         {

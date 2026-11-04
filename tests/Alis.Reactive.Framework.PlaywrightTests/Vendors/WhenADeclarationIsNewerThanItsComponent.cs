@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Vendors;
 
-/// <summary>
-/// A page written against a declaration newer than the component it runs (grammar 1.3). A member path rooted
-/// at the component is checked: a read, a write or a call of a member the component does not have, and a read
-/// through a member that holds nothing, each fail only their own pipeline (the step before ran, the step after
-/// did not, and the next gesture works). A member read off an event's payload is optional: one the component
-/// does not pass reads as nothing, and the pipeline goes on.
-/// </summary>
 [TestFixture]
 public sealed class WhenADeclarationIsNewerThanItsComponent : AppPageTest
 {

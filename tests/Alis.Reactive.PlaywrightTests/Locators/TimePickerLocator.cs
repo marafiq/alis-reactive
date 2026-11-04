@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Uses popup gestures because typed text does not always update Syncfusion <c>ej2.value</c>.
-/// </summary>
 public sealed class TimePickerLocator
 {
     private readonly IPage _page;
@@ -46,12 +43,6 @@ public sealed class TimePickerLocator
         await Blur();
     }
 
-    /// <summary>
-    /// Selects a popup item so Syncfusion updates <c>ej2.value</c>.
-    /// </summary>
-    /// <remarks>
-    /// Assumes the default 30-minute popup interval.
-    /// </remarks>
     public async Task SelectTime(string timeText)
     {
         await ClockIcon.ClickWhenStableAsync(_page);

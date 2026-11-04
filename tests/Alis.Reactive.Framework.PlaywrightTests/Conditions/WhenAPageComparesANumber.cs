@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// A number a component holds, compared with fixed values: each of the six comparisons, a range with both
-/// bounds included, and truthiness. The meter starts at 3; each comparison is asked below, at and above it.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageComparesANumber : AppPageTest
 {

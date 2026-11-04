@@ -2,24 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChar
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.BulletChart;
 
-/// <summary>
-/// As the director of nursing at the weekly staffing huddle, I want each wing's hours against its budget on one
-/// screen, with the week's shifts a click away, so that the huddle finds the wing that ran over and why before
-/// next week's schedule is set.
-/// </summary>
-/// <remarks>
-/// The week of October 5: Maple, Birch, Cedar and Memory Care, in that order on both charts. Birch, second on
-/// each chart, worked 868 of its 840 budgeted nursing hours and used 96 of its 120 agency hours. Pointing at a
-/// nursing bar repeats its hours under the chart and its tooltip says what a click does; pointing at an agency
-/// bar repeats its tooltip card under the chart. The huddle round names the wing after the ones ticked and goes
-/// round to Maple after Memory Care; it wraps with the nursing chart's GetActualIndex.
-/// Not exercised:
-/// GetActualIndex below zero (it wraps to the last place; no count on the page goes below zero).
-/// TooltipRender's Name (the event's own name, "tooltipRender" on every tooltip, tooltip.js:100-102; nothing a
-/// director reads derives from it).
-/// BulletChartMouseClick's X and Y (where in the chart the click landed, bullet-chart.js:876-880, 962; they
-/// place something at the click, and the DSL positions no element, so the page derives nothing from them).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionBulletChart : PlaywrightTestBase
 {

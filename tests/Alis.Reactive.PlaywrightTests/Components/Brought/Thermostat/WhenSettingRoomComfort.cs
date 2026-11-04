@@ -2,17 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.Thermostat;
 
-/// <summary>
-/// As the overnight nurse, I want to set a resident's room comfort before rounds, within the wing's range
-/// and with its night setting, so that the resident sleeps well and the thermostat stays as I left it.
-/// </summary>
-/// <remarks>
-/// The thermostat is a widget the sandbox wrote itself (Scripts/thermostat.ts) and declares in its own
-/// assembly (BroughtComponents/Thermostat). Each test drives one kind of member through the page:
-/// properties read, written and written only; methods with no argument, one, several, a list and an
-/// object; functions, one returning an object; a nested object with members and an event of its own; a
-/// list of objects used one item at a time; and events with and without a payload.
-/// </remarks>
 [TestFixture]
 public class WhenSettingRoomComfort : PlaywrightTestBase
 {
@@ -64,7 +53,6 @@ public class WhenSettingRoomComfort : PlaywrightTestBase
     {
         await NavigateToAndWaitForBoot(Path);
         _plan = await PagePlan<RoomComfortModel>.FromPage(Page);
-        // The wing's policy has arrived when the range shows.
         await Expect(RangeMax).ToHaveTextAsync("72", new() { Timeout = 5000 });
     }
 

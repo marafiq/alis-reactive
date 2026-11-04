@@ -7,7 +7,6 @@
 }
 <h1>An input not built yet</h1>
 
-@* The note's entry element without the class its script builds an entry on, so no entry object is made for it. *@
 @{
     var note = Html.InputField(plan, m => m.Note, o => o.Label("Note"));
     note.Render<Entry>(new HtmlString($"<input id=\"{note.ElementId}\" type=\"text\">"));

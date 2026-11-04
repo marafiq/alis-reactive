@@ -1,7 +1,6 @@
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>Values compared for equality and order under every shape: numbers, flags, dates, instants and text. Rooms is 3.</summary>
 public sealed class SamenessForm
 {
     public int Rooms { get; set; } = 3;
@@ -29,7 +28,6 @@ public sealed class SamenessForm
     public List<string>? FormerWings { get; set; }
 }
 
-/// <summary>One rule per shape a comparison reads its value under.</summary>
 public sealed class SamenessRules : ReactiveValidator<SamenessForm>
 {
     public SamenessRules()

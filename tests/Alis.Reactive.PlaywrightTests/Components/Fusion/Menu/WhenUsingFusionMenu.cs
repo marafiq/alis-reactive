@@ -2,26 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Menu;
 
-/// <summary>
-/// As a med tech starting a shift on the nurses' station tablet, I want the staff navigation to open the page I
-/// choose and get out of the way, to tell me how many pages a section holds, and to keep Billing closed to me
-/// while the business office opens it, so that I reach my work in a tap and never a part of the app my role
-/// does not use.
-/// </summary>
-/// <remarks>
-/// The navigation is a hamburger menu, closed on load and opened by its menu icon or by Open navigation.
-/// Choosing a page shows its title and link, loads what the page says tonight and closes the navigation; until
-/// a page is chosen the navigation stays open. Billing shows with the lock icon to everyone but the business office, and its list stays closed
-/// to them. The page behind the navigation is dimmed while the navigation is open. Jordan Lee, a med tech, is
-/// signed in unless the tablet was switched to Pat Kim of the business office.
-/// Not exercised:
-/// BeforeOpen's Top and Left: a Menu's sections and its hamburger list open with 0 for both
-/// (menu-base.js:970, 1073), so on this page they carry nothing a page could show.
-/// OnOpen's, OnClose's and BeforeClose's Items: each carries the items of the list opening or closing, the list
-/// BeforeOpen's Items carries, which the page reads.
-/// BeforeItemRender for the top list: EJ2 renders it when it creates the menu, before the page boots; the page
-/// reads BeforeItemRender for a section's pages, which render when the section opens.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionMenu : PlaywrightTestBase
 {

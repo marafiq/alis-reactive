@@ -20,7 +20,6 @@ public class EscalationRoutingCareTrackOption
     public string Text { get; set; } = "";
 }
 
-/// <summary>The document events the EscalationRouting page raises and hears.</summary>
 public static class EscalationRoutingEvents
 {
     public static readonly AppEvent ComponentRouteIsolation = AppEvent.Declare();

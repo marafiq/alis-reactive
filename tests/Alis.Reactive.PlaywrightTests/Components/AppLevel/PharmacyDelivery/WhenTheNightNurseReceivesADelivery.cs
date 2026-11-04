@@ -4,17 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.AppLevel.Pharmacy
 
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel.PharmacyDelivery;
 
-/// <summary>
-/// As the night nurse, I want the evening pharmacy delivery handled from one page: the slip opened in the
-/// drawer, my signature noticed, a damaged item returned only once I have said yes, the manifest check
-/// covering its card while the pharmacy answers, and the delivery marked with who received it, so that
-/// nothing about the delivery is left to memory.
-/// </summary>
-/// <remarks>
-/// The drawer, toast, confirm and loader are the page's app-level objects, reached without an id; the slip
-/// is a partial loaded into the drawer; Mark delivered is a link with a plan of its own whose request checks the
-/// page's rule on the receiver's input and sends it, both inside the receipt the request names.
-/// </remarks>
 [TestFixture]
 public class WhenTheNightNurseReceivesADelivery : PlaywrightTestBase
 {
@@ -32,7 +21,6 @@ public class WhenTheNightNurseReceivesADelivery : PlaywrightTestBase
     private ILocator SlipSummary => DrawerContent.Locator("#slip-summary");
     private ILocator SlipWide => Page.Locator("#slip-wide");
     private ILocator SlipStatus => Page.Locator("#slip-status");
-    // The layout's toast host (#alisFusionToast) carries e-toast itself; a notice is an e-toast inside the container.
     private ILocator Notices => Page.Locator(".e-toast-container .e-toast");
     private ILocator Notice => Notices.First;
     private ILocator ConfirmDialog => Page.Locator("#alisConfirmDialog");
@@ -216,8 +204,6 @@ public class WhenTheNightNurseReceivesADelivery : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A Shift click is the browser's: the link's address opens in a window of its own, and the page sends
-    // nothing and marks nothing.
     [Test]
     public async Task a_shift_click_on_mark_delivered_opens_the_slip_in_a_new_window_and_marks_nothing()
     {
@@ -236,8 +222,6 @@ public class WhenTheNightNurseReceivesADelivery : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // An Alt click is the browser's too: Chromium saves the link's address as a file, and the page sends
-    // nothing and marks nothing.
     [Test]
     public async Task an_alt_click_on_mark_delivered_saves_the_slip_and_marks_nothing()
     {

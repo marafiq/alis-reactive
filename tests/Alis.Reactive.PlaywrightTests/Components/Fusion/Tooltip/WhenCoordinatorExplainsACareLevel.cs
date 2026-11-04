@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Tooltip;
 
-/// <summary>
-/// As a care coordinator walking a family through the care levels, I open an explanation of Memory
-/// Care beside the term, close it when the family has it, and can turn explanations off.
-/// </summary>
 [TestFixture]
 public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
 {
@@ -29,7 +25,6 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
 
         await Explain.ClickAsync();
 
-        // Open shows the tooltip; its beforeOpen highlights the term being explained.
         await Expect(Explanation).ToContainTextAsync("24/7 staff, a secure environment", new() { Timeout = 5000 });
         await Expect(MemoryCareTerm).ToHaveClassAsync(Highlighted);
         AssertNoConsoleErrors();
@@ -43,7 +38,6 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
 
         await Explain.ClickAsync();
 
-        // afterOpen offers "Got it" once the explanation is showing.
         await Expect(Explanation).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(GotIt).ToBeVisibleAsync(new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -59,8 +53,6 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
 
         await GotIt.ClickAsync();
 
-        // Close hides the tooltip; beforeClose takes the highlight off the term, and afterClose
-        // withdraws "Got it".
         await Expect(Explanation).ToBeHiddenAsync(new() { Timeout = 5000 });
         await Expect(MemoryCareTerm).Not.ToHaveClassAsync(Highlighted);
         await Expect(GotIt).ToBeHiddenAsync(new() { Timeout = 5000 });
@@ -75,7 +67,6 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
 
         await Explain.ClickAsync();
 
-        // beforeRender cancels the tooltip before it renders and says why.
         await Expect(Page.Locator("#explanations-off")).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Page.Locator("#explanations-off")).ToHaveTextAsync("Explanations are turned off on this screen.");
         await Expect(Explanation).ToHaveCountAsync(0);

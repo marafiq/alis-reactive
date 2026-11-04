@@ -7,8 +7,6 @@
 <section>
     <h2>The @Model.Wing wing is listening</h2>
 
-    @* The page's bell, joined to this plan with no markup of its own: the wing's handler is assigned to the
-       bell's callback property after the page's, for as long as the wing's slot holds it. *@
     @(plan.Render<Bell>("bell", HtmlString.Empty)
         .Reactive(bell => bell.OnRung, (ring, p) =>
         {

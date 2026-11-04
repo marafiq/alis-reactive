@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>Fire drill: Willow wing's monthly drill, started and ended by the charge aide.</summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/NativeButton")]
     public class NativeButtonController : Controller

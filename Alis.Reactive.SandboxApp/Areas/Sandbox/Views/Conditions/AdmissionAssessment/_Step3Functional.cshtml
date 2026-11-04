@@ -17,9 +17,7 @@
         Fall risk, mobility, and medication assessment. High-risk combinations trigger automatic monitoring level changes.
     </p>
 
-    <!-- Shared Active Plan fields populated by earlier steps and nested partials. -->
     @Html.NativeHiddenField(plan, m => m.ScreeningId)
-    <!-- Hidden NumericTextBox keeps Age typed as decimal for the compound .Gte(80m) condition. -->
     <div hidden>
         @{ Html.InputField(plan, m => m.Age, o => o.Label("Age"))
             .FusionNumericTextBox(b => b.Min(0).Max(120).Step(1)); }

@@ -2,18 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.RichTextEd
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.RichTextEditor;
 
-/// <summary>
-/// As the activities director, I want to write the family newsletter's Garden Club paragraph with its
-/// formatting, see it as families will, and save it with its word count, so that the newsletter reads the way
-/// I wrote it.
-/// </summary>
-/// <remarks>
-/// The editor opens empty; last month's paragraph is "The Garden Club potted herbs for the dining room windows."
-/// with "Garden Club" in bold. The preview follows each change the editor commits: when the director leaves it
-/// (IsInteracted true), and every three seconds while she keeps typing in it, at the save interval the page sets
-/// (IsInteracted false, rich-text-editor.js:2933-2941, 3301-3304). The server counts the words of the paragraph
-/// it is sent.
-/// </remarks>
 [TestFixture]
 public class WhenRichTextEdited : PlaywrightTestBase
 {

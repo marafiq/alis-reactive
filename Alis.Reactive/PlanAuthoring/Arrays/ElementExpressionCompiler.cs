@@ -13,20 +13,8 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.PlanAuthoring.Arrays
 {
-    /// <summary>
-    /// Compiles a per-item lambda into the plan's closed algebra, by the member table of grammar.md 2.3. A
-    /// predicate becomes a <see cref="Condition"/> whose leaves read the item, a projection a value. The item's
-    /// own data members are read by their JSON path; a member, method or operator of a value .NET defines is
-    /// written as its JavaScript form in the table; a value that reads nothing of the item is evaluated once, to
-    /// a literal. Anything else is refused when the view renders, by a message that names it, so a plan never
-    /// computes something other than the C# the lambda says.
-    /// </summary>
     internal static class ElementExpressionCompiler
     {
-        // The methods a lambda may call on an item's value, each a C# method with a JavaScript equivalent that is
-        // pure: a per-item call is a value projection, so it must not mutate. The text methods are tabled here; a
-        // framework type marks its own with PureMethodAttribute. The table is read by the method the lambda calls,
-        // so a C# name never misses its JavaScript one in silence.
         private static readonly IReadOnlyDictionary<MethodInfo, string> PureMethods = new Dictionary<MethodInfo, string>
         {
             [MethodOf<string>(text => text.Trim())] = "trim",
@@ -38,9 +26,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             [MethodOf<string>(text => text.ToLowerInvariant())] = "toLowerCase",
         };
 
-        // The members of a value .NET defines that a lambda may read, each as its JavaScript form: a date's parts
-        // are its local parts (JavaScript counts months from 0, C# from 1), a text's length is its own. A
-        // nullable's Value and HasValue, and a date's DayOfWeek in a comparison, are read where they are met.
         private static readonly IReadOnlyDictionary<MemberInfo, Func<ValueExpression, ValueExpression>> ValueMembers =
             new Dictionary<MemberInfo, Func<ValueExpression, ValueExpression>>
             {
@@ -87,10 +72,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             return CompileCondition(predicate.Body, predicate.Parameters[0]);
         }
 
-        /// <summary>
-        /// Compiles a per-item value selector (<c>x =&gt; x.Balance</c>, <c>x =&gt; x</c>,
-        /// <c>x =&gt; x.Nickname ?? x.Name</c>) to a value read against the item.
-        /// </summary>
         internal static ValueExpression CompileProjection(LambdaExpression projection)
         {
             if (projection == null) throw new ArgumentNullException(nameof(projection));
@@ -135,9 +116,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 "or a boolean value. Got a " + CSharpTypeName.Of(body.Type) + ": " + body);
         }
 
-        // A test made by a method: text's Contains, StartsWith and EndsWith with fixed text, string.IsNullOrEmpty,
-        // Regex.IsMatch with a fixed pattern, and Contains over fixed values (Enumerable's, or an array's own,
-        // which C# 14 binds to a span).
         private static bool TryTest(MethodCallExpression call, ParameterExpression element, out Condition test)
         {
             test = Condition.Always;
@@ -180,13 +158,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             var left = Unconverted(binary.Left);
             var right = Unconverted(binary.Right);
 
-            // Runtime coerces BOTH operands to one Shape before comparing (sync-condition
-            // applies condition.shape to each side, then ===), so the comparison Shape must come
-            // from the typed member operand — never positionally from whichever side is written
-            // first. This mirrors ConditionSourceBuilder, which derives its single shape from the
-            // member's declared type, not from a literal. C# already forbids cross-category
-            // comparisons, so this keeps a literal-on-left predicate (e.g. 65 < x.Age) shaped by
-            // the member, not the literal.
             Expression memberOperand;
             if (Expressions.Reads(left, element)) memberOperand = left;
             else if (Expressions.Reads(right, element)) memberOperand = right;
@@ -196,7 +167,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
 
             if (!ComparisonFor(binary.NodeType).IsEquality) BrowserOrder.Require(memberOperand.Type);
 
-            // C# compares a DayOfWeek by its number, and a date's day of the week is getDay(), a number too.
             if (IsDayOfWeek(left) || IsDayOfWeek(right))
                 return Condition.Ordered(ComparisonFor(binary.NodeType), DayNumber(left, element), DayNumber(right, element), Shape.Number);
 
@@ -209,9 +179,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 shape);
         }
 
-        // An operand compared with the member. C# compares an enum as its underlying number, so beside an
-        // enum member a constant or captured value arrives folded to that number; the data holds the member's
-        // JavaScript text, so the operand is the enum member again, written as every literal is.
         private static ValueExpression CompileOperand(Expression operand, ParameterExpression element, Type memberType)
         {
             var enumType = EnumMember.TypeOf(memberType);
@@ -275,8 +242,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 "no form the plan writes. Project the value on the server. Got: " + node);
         }
 
-        // A chain of the item's own data members (x.Keyworker.Name, x.Lines[0].Sku), read by its JSON path. A
-        // member of a value .NET defines is no segment of it: x.Admitted.Year is a part of a date, not "year".
         private static bool TryDataPath(Expression node, ParameterExpression element, out Path path)
         {
             var link = node;
@@ -354,9 +319,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 "changes the item. Got: " + call);
         }
 
-        // The expression under the conversions C# makes that keep a value: a boxing, a widening, a nullable lift, an
-        // enum read as its number. A cast that changes the value is refused: C# drops a fraction or wraps a number
-        // too wide for its type, and a browser's number does neither.
         private static Expression Unconverted(Expression expression)
         {
             var node = expression;

@@ -18,7 +18,6 @@
         <native-vstack gap="Base">
             <native-text>Independent Living · Assisted Living · <span id="memory-care-term" class="rounded px-1 font-medium">Memory Care</span></native-text>
 
-            @* The explanation opens only from the page: Explain shows it beside the term, Got it closes it. *@
             @(Html.FusionTooltip(plan, "care-level-tooltip", b =>
             {
                 b.Content("24/7 staff, a secure environment, and help with every activity of daily living.");
@@ -49,7 +48,6 @@
                     .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                         p.Component<FusionTooltip>("care-level-tooltip").Open()))
-                @* "Got it" is offered only while the explanation is open. *@
                 <div id="explanation-actions" hidden>
                     @(Html.NativeButton("explanation-done", "Got it")
                         .CssClass(ButtonSecondary)

@@ -4,17 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.AdmissionAssessment;
 
-/// <summary>
-/// As an admissions nurse, I want every answer on the assessment checked where the chart draws the
-/// line, as I write it, so that an assessment the page accepts is one the chart accepts.
-/// </summary>
-/// <remarks>
-/// Save checks the page's rules first and sends nothing it can refuse. Print for the chart sends the
-/// assessment as it is, and the server, running the same validator, refuses it in the same words
-/// beside the same field. So a refusal is proven by both deciders, the chart first, so that the
-/// message beside the field is the server's; an accepted boundary value is proven by the save the
-/// server confirms.
-/// </remarks>
 [TestFixture]
 public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
 {
@@ -53,15 +42,12 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         _plan = await PagePlan<AdmissionAssessmentModel>.FromPage(Page);
     }
 
-    // Leaving the field lets its message settle, so the next click lands where it aims.
     private async Task Write(Expression<Func<AdmissionAssessmentModel, object?>> field, string text)
     {
         await _plan.TextBox(field).Fill(text);
         await Page.Keyboard.PressAsync("Tab");
     }
 
-    // Every answer the chart needs, valid. The photo consent is ticked and one fall recorded because
-    // the page asks for them, though the chart takes an unticked box as a no and no falls as zero.
     private async Task CompleteTheAssessmentLeavingTheFallQuestion()
     {
         await Write(m => m.ResidentName, "Helen Park");
@@ -81,8 +67,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await CompleteTheAssessmentLeavingTheFallQuestion();
         await FellInLastYear.Choose("No");
     }
-
-    // ── text ──────────────────────────────────────────────────────────────────
 
     [Test]
     public async Task leaving_the_residents_name_blank_asks_for_it()
@@ -316,7 +300,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
-    // The server reads the whole address; a space in the host is no address.
     [Test]
     public async Task a_portal_link_with_a_space_in_it_is_refused_by_the_chart()
     {
@@ -370,8 +353,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
-
-    // ── numbers ───────────────────────────────────────────────────────────────
 
     [Test]
     public async Task one_signature_or_three_are_refused_and_two_are_saved()
@@ -541,8 +522,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
-    // ── dates ─────────────────────────────────────────────────────────────────
-
     [Test]
     public async Task leaving_the_move_in_day_blank_asks_for_it()
     {
@@ -655,7 +634,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
-    // A review is after the assessment day only when there is one: a missing day fails the comparison.
     [Test]
     public async Task a_next_review_without_an_assessment_day_is_refused()
     {
@@ -704,8 +682,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         Assert.That(_savesSent, Has.Count.EqualTo(1), "The page let the value through, and the server accepted it.");
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
-
-    // ── choices and yes/no answers ────────────────────────────────────────────
 
     [Test]
     public async Task leaving_the_care_level_on_its_placeholder_asks_for_it()
@@ -802,7 +778,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
-    // The residency's default, not set, is the type's default: the chart reads it as no answer.
     [Test]
     public async Task a_residency_left_not_set_is_refused_by_the_chart()
     {
@@ -833,8 +808,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // NotNull on a yes/no box: an unticked box is a no, and a no is an answer. The page's own check
-    // disagrees and says so beside the box as the box is unticked (see the test after this one).
     [Test]
     public async Task an_unticked_photo_consent_box_is_printed_as_a_no()
     {
@@ -863,8 +836,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // NotNull on a count: no falls is zero, and zero is an answer. The page's own check disagrees and
-    // says so beside the count as the field is left (see the test after this one).
     [Test]
     public async Task no_falls_last_year_is_printed_as_zero()
     {
@@ -892,8 +863,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.FallsLastYear)).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
-
-    // ── as the nurse writes ───────────────────────────────────────────────────
 
     [Test]
     public async Task typing_into_the_name_clears_its_message_before_the_field_is_left()
@@ -927,7 +896,6 @@ public class WhenNurseCompletesAdmissionAssessment : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A choice is committed as it is made: the message follows the choice without the field being left.
     [Test]
     public async Task choosing_a_care_level_clears_its_message_at_once_and_unchoosing_it_asks_again()
     {

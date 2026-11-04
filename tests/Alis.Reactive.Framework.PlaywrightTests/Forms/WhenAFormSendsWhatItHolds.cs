@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Forms;
 
-/// <summary>
-/// A form is an element (ADR-0003 rule 2, grammar.md 5.1): <c>Form()</c> sends the mounted inputs inside the form
-/// its request validates, and <c>Form(formId)</c> the inputs inside the element it names, whichever plan rendered
-/// them; an input outside that element is not sent.
-/// </summary>
 [TestFixture]
 public sealed class WhenAFormSendsWhatItHolds : AppPageTest
 {

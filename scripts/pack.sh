@@ -52,11 +52,11 @@ echo "[pack] compiling Release projects"
 dotnet build --configuration Release
 
 PACKAGES=(
-  Alis.Reactive                 # core plan model, builders, serialization, runtime JS bundle
-  Alis.Reactive.Native          # native HTML components
-  Alis.Reactive.Fusion          # Syncfusion EJ2 integration
-  Alis.Reactive.DesignSystem    # the theme and the compiled default stylesheet
-  Alis.Reactive.NativeTagHelpers # ASP.NET Core tag helpers (net10.0 only)
+  Alis.Reactive
+  Alis.Reactive.Native
+  Alis.Reactive.Fusion
+  Alis.Reactive.DesignSystem
+  Alis.Reactive.NativeTagHelpers
 )
 
 mkdir -p "$OUTPUT_DIR"

@@ -43,12 +43,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionInPlaceEditorChangeArgs> Change =>
             Event<FusionInPlaceEditorChangeArgs>();
 
-        /// <inheritdoc />
-        /// <remarks>
-        /// Committed by <see cref="EndEdit"/>, not <see cref="Change"/>: EJ2's save moves focus off the inner
-        /// input, which raises the editor's change, before it stores the new value (inplace-editor.js:1196-1201);
-        /// endEdit follows the store (1203-1204), so the form checks the value the person entered.
-        /// </remarks>
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: EndEdit);
 
         /// <summary>Raised before the value is submitted.</summary>

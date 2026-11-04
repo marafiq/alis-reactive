@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// A card, a member's editor template that starts a plan of its own model, which no other view on the page starts,
-/// carries the save that checks the page's form (ADR-0003, grammar.md F6): the message no field of the form shows
-/// appears in that form's summary, which the server renders for the form.
-/// </summary>
 [TestFixture]
 public sealed class WhenACardChecksThePagesForm : AppPageTest
 {

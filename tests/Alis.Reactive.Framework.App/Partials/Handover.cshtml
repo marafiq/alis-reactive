@@ -8,8 +8,6 @@
 
 <form id="handover-form">
     @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
-    @* The keyholder's line is the editor template of its own model, rendered under the member's prefix; it carries
-       the handover's save, which checks this form. *@
     @Html.EditorFor(m => m.Keyholder)
 </form>
 

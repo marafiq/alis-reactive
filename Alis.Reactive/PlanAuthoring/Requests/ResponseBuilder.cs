@@ -23,7 +23,6 @@ namespace Alis.Reactive
             _context = context;
         }
 
-        /// <summary>The routes this builder configures, written where the request is.</summary>
         internal ResponseRoutes Routes { get; } = new ResponseRoutes();
 
         /// <summary>Adds route for any successful 2xx HTTP response.</summary>

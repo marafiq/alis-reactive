@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.PlanTests.Triggers;
 
-/// <summary>A trigger is a handler of one object's event; its pipeline is the statements the plan runs.</summary>
 [TestFixture]
 public class WhenAPageDeclaresTriggers
 {

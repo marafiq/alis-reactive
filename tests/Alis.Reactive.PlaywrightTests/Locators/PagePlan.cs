@@ -4,13 +4,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Reads the emitted Reactive Plan and provides typed component locators.
-/// </summary>
-/// <remarks>
-/// Test bodies stay at the model-expression and locator level while this helper
-/// handles the plan JSON shape.
-/// </remarks>
 public sealed class PagePlan<TModel> where TModel : class
 {
     private readonly IPage _page;
@@ -31,7 +24,6 @@ public sealed class PagePlan<TModel> where TModel : class
         var elements = new List<BoundComponent>();
         var objects = doc.RootElement.GetProperty("objects");
 
-        // Every element the plan locates, keyed by the member path its generated id ends with.
         foreach (var entry in objects.EnumerateObject())
         {
             var locator = entry.Value;
@@ -45,8 +37,6 @@ public sealed class PagePlan<TModel> where TModel : class
             components[bindingPath] = element;
         }
 
-        // The model's inputs answer to their MVC binding name ("Address.City") before any other element
-        // whose id ends the same way, such as a page element named after the member it shows.
         foreach (var entry in objects.EnumerateObject())
         {
             var locator = entry.Value;
@@ -189,7 +179,6 @@ public sealed class PagePlan<TModel> where TModel : class
     }
 }
 
-/// <summary>Component resolved from the emitted Reactive Plan.</summary>
 public sealed record BoundComponent(
     string ElementId,
     string BindingPath,

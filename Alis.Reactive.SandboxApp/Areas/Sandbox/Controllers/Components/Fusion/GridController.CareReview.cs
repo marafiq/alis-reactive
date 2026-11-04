@@ -3,12 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The East wing's care reviews: the director of nursing goes through the wing's twelve residents six to a
-    /// page, puts the residents she picks on Thursday's care conference agenda, and starts a resident's review
-    /// or asks housekeeping to ready their suite from their row. Every page starts from the same list, and an answer works from what the page sent,
-    /// keeping nothing.
-    /// </summary>
     public partial class GridController
     {
         private const string WingReviewUnderWay = "Under way";
@@ -19,8 +13,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml",
                 new WingReviewViewModel { Wing = "East", Director = "Joan Avery, RN", PageSize = 6 });
 
-        // A waiting resident's bed is missing until one is free, and the page's row button fills its payload from
-        // it: the view is refused as it renders.
         [HttpGet("CareReviewWaitingList")]
         public IActionResult WingReviewWaitingList() =>
             View(
@@ -75,8 +67,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Page one carries one high-risk resident (Katherine Ortiz), page two three (Noah Walsh, Ruth Carter and
-        // Samuel Diaz). Henry Liu's review started last week.
         private static List<WingReviewResident> WingReviewsOnFile() => new()
         {
             new() { ResidentId = 7101, ResidentName = "Amina Patel", Suite = "E-101", RiskLevel = "Low", ReviewDue = "June 2", Review = "Not started" },

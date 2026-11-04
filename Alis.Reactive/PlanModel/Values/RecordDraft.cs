@@ -7,11 +7,6 @@ using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.PlanModel.Values
 {
-    /// <summary>
-    /// A record assembled from values at paths, in the order they were assigned: a name makes a field, an
-    /// index makes a list item, an index skipped a null item. Each path is assigned once; a value under a
-    /// path that holds one, or a path under a value, is a conflict the developer resolves.
-    /// </summary>
     internal sealed class RecordDraft
     {
         private readonly List<string> _order = new List<string>();
@@ -28,7 +23,6 @@ namespace Alis.Reactive.PlanModel.Values
             Assign(path.Segments, 0, value, path.ToString());
         }
 
-        /// <summary>The record, or the list a root of positions alone makes.</summary>
         internal ValueExpression ToValueExpression()
         {
             if (_value != null) return _value;

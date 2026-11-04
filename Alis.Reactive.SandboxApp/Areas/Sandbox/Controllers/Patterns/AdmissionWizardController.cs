@@ -5,19 +5,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.AdmissionWizard;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 
-/// <summary>
-/// Server-side wizard — single page shell, step content loaded via Into().
-///
-/// Flow:
-///   DomReady → POST LoadStep(1) → Into("step-container")
-///   Next     → POST SaveStepX (JSON) → OnSuccess set ScreeningId → Chained POST LoadStep(X+1) → Into()
-///   Previous → POST LoadStep(X-1) → Into()
-///   Submit   → POST Submit (JSON) → validates all drafts server-side
-///
-/// Draft persistence: each step's draft is saved under the screening's id in the browser session, so each
-/// browser keeps its own screenings and no other browser sees them.
-/// Edit scenario: LoadStep reads from draft, model carries saved values, Syncfusion components render them.
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Patterns/AdmissionWizard")]
 public class AdmissionWizardController : Controller
@@ -26,7 +13,6 @@ public class AdmissionWizardController : Controller
 
     private static string NewScreeningId() => $"SCR-{DateTime.UtcNow:yyyyMMddHHmmssffff}";
 
-    // A step this browser has not saved for the screening starts empty.
     private T GetDraft<T>(string id) where T : class, new()
         => TryGetDraft<T>(id, out var draft) ? draft : new T();
 
@@ -250,14 +236,12 @@ public class AdmissionWizardController : Controller
         return result.IsValid;
     }
 
-    // The submit answers to every step's rules: each step's messages join the others' by field.
     private static void CollectErrors(ValidationResult result, Dictionary<string, string[]> errors)
     {
         foreach (var field in result.ErrorsByField)
             errors[field.Key] = errors.TryGetValue(field.Key, out var earlier) ? [.. earlier, .. field.Value] : field.Value;
     }
 
-    // A screening with no id, or a step this browser has not saved for it, has no draft.
     private bool TryGetDraft<TStep>(string screeningId, [NotNullWhen(true)] out TStep? draft) where TStep : class
     {
         var json = string.IsNullOrEmpty(screeningId) ? null : HttpContext.Session.GetString(DraftKey<TStep>(screeningId));

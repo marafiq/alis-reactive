@@ -1,30 +1,3 @@
-// alis.form (grammar.md 6.4), keyed by the validation container's element id. Plans contribute their
-// fields under their owner; each field names what it checks by binding name and carries its own tests, so
-// the form needs nothing but the evaluator and the page's table of inputs.
-// F1 A field names a member, or every item of a collection, by binding name (Lines[*].Qty, alis.model M8).
-//    It applies at each mounted input inside the container that its name names, whichever plan rendered
-//    it, at that moment; an input outside the container is not checked. A missing container fails
-//    validation when the form has tests. A test reads its field's value and every member it names by
-//    binding name, at the indexes of the item it checks (M8).
-// F3 Per input, tests whose `when` is false are skipped and the first failing check decides.
-// F4 validate() checks the tests written for its container: it clears every inline message inside the
-//    container, whichever form showed it (a section saved on its own), and the summary, then evaluates
-//    every field and returns the AND.
-// F5 A member field no input on the page binds posts no value: each active test checks a missing value,
-//    and the first that fails puts its message in the summary. An item field with no item on the page
-//    checks nothing: the server sees no missing item.
-// F6 A message goes inline into {id}_error when that slot can render, else into the form's summary, the
-//    element the form's data names ({formId}_validation_summary), which the server renders.
-// F7 Live, for every mounted input whichever plan rendered it and whenever it mounted: the DOM `input`
-//    event on it, or inside it, clears its message; DOM `blur` and alis:commit (the model re-raises each
-//    input's own commit event as it) revalidate it against every container that holds it. The form hears
-//    them on the document, so an input is live as soon as it is in the page's table and stops with it.
-// F8 showErrors(problem) clears first, then places each server error beside the mounted input inside the
-//    container with that exact binding name, whichever plan rendered it (alis.model M7), else in the
-//    summary; a form only the server checks needs no fields. A body that is not a record is logged and
-//    shows nothing.
-// F9 A slot's load or unload removes exactly its own fields, then clears and hides the form's summary.
-
 import type { FormField, FormPluginData, FormTest, PluginData } from "../../types/index";
 import type { Contribution, Plugin } from "../../objects/plugins";
 import type { PlanObjects } from "../../objects/plan-objects";
@@ -199,7 +172,6 @@ function showErrors(containerId: string, summaryId: string, problem: unknown): v
     return;
   }
 
-  // The mounted inputs inside the form, whichever plan rendered them; a form not on the page fails here (M1).
   const inputs = containedInputs(containerId).ids;
   const summary = document.getElementById(summaryId);
   clearInlineMessages(inputs);
@@ -211,8 +183,6 @@ function showErrors(containerId: string, summaryId: string, problem: unknown): v
     return;
   }
 
-  // Each server message is a sentence (FluentValidation's and MVC's end with a period), so several read
-  // one after another.
   for (const [name, messages] of Object.entries(errors)) {
     const message = Array.isArray(messages) ? messages.join(" ") : asText(messages) ?? "";
     const id = inputs[name];
@@ -243,15 +213,10 @@ function mountedInputAt(target: EventTarget | null): HTMLElement | null {
 function listenToInputs(): void {
   if (inputsListened) return;
   inputsListened = true;
-  // Typing clears the message before the component hears the keystroke (the document's capture runs first),
-  // so a commit the component raises from that same input event (EJ2's MaskedTextBox on a paste) re-checks
-  // the input after the clear and its message stays.
   document.addEventListener("input", event => {
     const input = inputAround(event.target);
     if (input !== null) clearInline(input.id);
   }, true);
-  // Leaving an input the server judged keeps the server's message: no input and no commit came since, so the
-  // value it judged has not changed. Blur does not bubble; the document hears it as it is captured.
   document.addEventListener("blur", event => {
     const input = mountedInputAt(event.target);
     if (input !== null && !showsServerMessage(input.id)) revalidate(input);
@@ -262,8 +227,6 @@ function listenToInputs(): void {
   });
 }
 
-// A plan writes a form's data on every form it validates or shows the server's errors on, so the plan that
-// asks for the form names its summary.
 function summaryOf(data: PluginData): string {
   return (data as FormPluginData).summary;
 }
@@ -273,7 +236,6 @@ export const formPlugin: Plugin = {
     validate: () => validate(containerId, summaryOf(data)),
     showErrors: problem => showErrors(containerId, summaryOf(data), problem),
   }),
-  // The plan gives alis.form no data but a form's: its fields and its summary.
   contribute({ key, data: contributed, owner, objects }: Contribution) {
     const data = contributed as FormPluginData;
     const entries = entriesOf(key);

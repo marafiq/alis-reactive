@@ -1,5 +1,3 @@
-/* The page inside .alis-root: type, surface, and the look of native form controls. Scoped to the root
-   so nothing leaks into the rest of a host app; assumes no reset and no plugin. */
 @layer alis {
   .alis-root {
     background-color: var(--color-surface);

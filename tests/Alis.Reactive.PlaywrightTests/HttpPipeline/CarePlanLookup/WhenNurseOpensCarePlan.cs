@@ -3,16 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.CarePlanLookup;
 
-/// <summary>
-/// As a nurse, I want to open a resident's care plan, so that I can check it before my round, and keep
-/// using the page whatever came of the last attempt.
-/// </summary>
-/// <remarks>
-/// Open fetches the care plan by the chosen resident's number in the URL and covers the page with the
-/// loader while it does; the loader lifts once the request ends. Rosa Diaz, admitted this week, has no
-/// care plan on file. The page does not require a resident before Open: with none chosen the URL cannot be
-/// built, nothing is sent, and the failure is reported to the developer's console.
-/// </remarks>
 [TestFixture]
 public class WhenNurseOpensCarePlan : PlaywrightTestBase
 {
@@ -37,8 +27,6 @@ public class WhenNurseOpensCarePlan : PlaywrightTestBase
         _plan = await PagePlan<CarePlanLookupModel>.FromPage(Page);
     }
 
-    // The request is held at the browser until the test releases it, so the loader can be seen covering
-    // the page before the answer arrives.
     private async Task HoldCarePlanUntilReleased()
     {
         _carePlanReleased = new SemaphoreSlim(0);
@@ -66,9 +54,6 @@ public class WhenNurseOpensCarePlan : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The care alerts arrive as HTML from the clinical record and are written as HTML: the label is a
-    // bold element and the line reads as words. Written as text, the line would show the raw tags and
-    // hold no bold label; not written at all, it would stay empty.
     [Test]
     public async Task a_residents_care_alerts_show_with_each_label_in_bold()
     {

@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 {
-    /// <summary>
-    /// Shift notes: a resident opens in the drawer, where the nurse writes a shift note or
-    /// starts a discharge that must be confirmed first.
-    /// </summary>
     public partial class DrawerController
     {
         private const int MargaretHillId = 2107;

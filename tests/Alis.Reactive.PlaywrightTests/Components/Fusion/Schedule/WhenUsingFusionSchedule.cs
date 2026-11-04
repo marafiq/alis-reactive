@@ -4,48 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 
-/// <summary>
-/// As a staffing coordinator, I keep the week's AM, PM and night shifts covered where the schedule shows them:
-/// I staff, add and cancel shifts in the assignment drawer and the new-assignment dialog, ask the agency for
-/// the open ones, and change or delete an in-service in the schedule's own editor unless someone else has it
-/// open, so that every shift has someone on it, every change is saved on the server, and no change is made
-/// twice at once.
-/// </summary>
-/// <remarks>
-/// <para>
-/// Each test opens a new browser, whose schedule starts from the seeded weeks: shifts staffed or left open the
-/// same way on every run (Oak Ridge's roster is full, so none of its shifts is open), and two in-services a week
-/// for the AM staff, Falls prevention on Tuesday and Safe resident transfers on Thursday, which the staff
-/// educator, Dana Whitfield, has open. The server answers every load with a summary of what it answered for:
-/// the facility, how many shifts need coverage, and the dates.
-/// </para>
-/// <para>
-/// Not exercised. <c>DataBind</c>: Syncfusion applies <c>eventSettings.dataSource</c> on the next tick without
-/// it (ej2-base base.js:147) and reads the events through a promise either way (crud.js:41), so no later step of
-/// the same pipeline sees a difference; the page calls it after each load. <c>Navigating</c>'s
-/// <c>PreviousDate</c>, <c>PreviousView</c>, <c>ViewIndex</c> and <c>Cancel</c>, and <c>EventRendered</c>'s
-/// <c>Type</c>: no step of the journey needs them; the payroll lock stops a move in <c>ActionBegin</c>, which
-/// Syncfusion raises before <c>Navigating</c> (schedule.js:671-676). <c>CellClick</c>'s all-day row: it has no
-/// height while no all-day event is on the week, so <c>IsAllDay</c> is clicked in a month's day.
-/// <c>ActionBegin</c>'s <c>AddedRecords</c>: the page reads no added event; a new shift is saved on the server
-/// before <c>AddEvent</c> shows it, and the editor never opens on an empty hour. Moving an in-service to other
-/// hours in the editor: the server keeps it at the hour after the AM shift and its answer says so; no test
-/// moves one.
-/// </para>
-/// <para>
-/// An in-service saved or deleted in the schedule's editor reaches <c>ActionBegin</c> with its record in
-/// <c>ChangedRecords</c> (crud.js:314-317, from the editor's save, event-window.js:1434 and 1725) or
-/// <c>DeletedRecords</c> (crud.js:655-657, from the delete alert, quick-popups.js:1008-1009). The page cancels
-/// the schedule's own change, posts the record to the server and reloads the week with what it saved. A
-/// shift the drawer saves or cancels passes <c>ActionBegin</c> too (<c>SaveEvent</c>, crud.js:722;
-/// <c>DeleteEvent</c>, crud.js:657), after the server already has it, and is not sent again.
-/// </para>
-/// <para>
-/// The new-assignment dialog's staff list is located by <c>IdGenerator</c>: the dialog's partial plan lands
-/// before the page's own plan in the document, so <c>PagePlan.FromPage</c> would read the partial's plan once it
-/// loads. The page's own inputs are read from its plan at boot.
-/// </para>
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionSchedule : PlaywrightTestBase
 {
@@ -76,11 +34,8 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     private DropDownListLocator NewShiftStaff =>
         new(Page, IdGenerator.For<NewAssignmentModel>(m => m.StaffId));
 
-    // The AM shift runs 6:00 AM to 2:00 PM, so its column is open at 4:00 PM every day.
     private static DateTime OpenHourToday => DateTime.Today.AddHours(16);
 
-    // The whole schedule fits in the window, so a cell is in view exactly when the schedule's own
-    // scrolling shows it.
     public override BrowserNewContextOptions ContextOptions()
     {
         var options = base.ContextOptions() ?? new BrowserNewContextOptions();
@@ -96,15 +51,12 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today), new() { Timeout = 10000 });
     }
 
-    // The server's summary of a week: Sunday to Saturday, three shifts a day.
     private static Regex WeekSummary(string facility, DateTime day)
     {
         var sunday = day.Date.AddDays(-(int)day.DayOfWeek);
         return SummaryOf(facility, 21, sunday, sunday.AddDays(6));
     }
 
-    // The server's summary of a month as the month view shows it: whole weeks, from the Sunday on or before the
-    // first to the Saturday on or after the last.
     private static Regex MonthSummary(string facility, DateTime day)
     {
         var first = new DateTime(day.Year, day.Month, 1);
@@ -114,7 +66,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         return SummaryOf(facility, ((to - from).Days + 1) * 3, from, to);
     }
 
-    // "Maple Grove: 6 of 21 shifts need coverage from October 11 to October 17, 2026."
     private static Regex SummaryOf(string facility, int shifts, DateTime from, DateTime to) =>
         new("^" + Regex.Escape($"{facility}: ") + @"\d+" +
             Regex.Escape($" of {shifts} shifts need coverage from {from.ToString("MMMM d", CultureInfo.InvariantCulture)} " +
@@ -130,7 +81,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await cell.ClickAsync();
     }
 
-    // The list opens from its own button; a click outside the modal dialog would close the dialog.
     private async Task ChooseNewShiftStaff(string staff)
     {
         await NewShiftStaff.Open();
@@ -149,7 +99,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     private ILocator StaffChoice(string staff) =>
         AssignmentForm.GetByRole(AriaRole.Radio, new() { Name = staff, Exact = true });
 
-    // Opens the first open shift's assignment in the drawer and chooses Tom Harding; returns where the shift is.
     private async Task<(DateTime Start, int Group)> ChooseTomForTheFirstOpenShift()
     {
         var openShift = Schedule.Appointments(new Regex("UNASSIGNED")).First;
@@ -165,7 +114,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
     private const string RenamedFallsPreventionTitle = "In-service: Falls prevention and hip protectors";
 
-    // Falls prevention is the AM staff's in-service on this week's Tuesday at 2:30 PM, after their shift.
     private static DateTime FallsPreventionStart => DateTime.Today.AddDays(2 - (int)DateTime.Today.DayOfWeek).AddHours(14.5);
 
     private ILocator FallsPrevention =>
@@ -174,7 +122,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     private ILocator RenamedFallsPrevention =>
         Schedule.Appointment(RenamedFallsPreventionTitle, FallsPreventionStart, groupIndex: 0);
 
-    // The server answers that Falls prevention is the coordinator's to change, and the editor stays open on it.
     private async Task OpenFallsPreventionInTheEditor()
     {
         await Schedule.OpenToChange(FallsPrevention);
@@ -182,7 +129,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
             "The Falls prevention in-service is yours to change until you close it.", new() { Timeout = 10000 });
     }
 
-    // Holds the page's requests to the URL until the test releases them; Asked completes once the page sent one.
     private async Task<(Task Asked, SemaphoreSlim Released)> Hold(string url)
     {
         var asked = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -222,8 +168,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await Facility.Select("Sunrise Gardens");
 
-        // The schedule says it is loading while Sunrise Gardens' shifts are asked for; only the schedule's
-        // dataBound, after they bind, takes that away.
         await Expect(Loading).ToBeVisibleAsync(new() { Timeout = 10000 });
         shiftsReleased.Release();
         await Expect(Summary).ToHaveTextAsync(WeekSummary("Sunrise Gardens", DateTime.Today), new() { Timeout = 10000 });
@@ -253,7 +197,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await Schedule.Next.ClickAsync();
 
-        // The week's grid starts empty: only the navigating handler's request fills it.
         await Expect(Summary).ToHaveTextAsync(WeekSummary("Maple Grove", DateTime.Today.AddDays(7)), new() { Timeout = 10000 });
         await Expect(StaffedShifts.First).ToBeVisibleAsync(new() { Timeout = 10000 });
         AssertNoConsoleErrors();
@@ -284,7 +227,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A PM cell holds one shift a day, so its lower corner is empty in every month.
     [Test]
     public async Task clicking_a_day_of_the_month_asks_for_the_hour_the_shift_starts()
     {
@@ -328,7 +270,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await ClickOpenHourToday();
 
-        // The form loads with the clicked cell's shift, start and end, read from the cellClick payload.
         await Expect(NewAssignmentDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(NewAssignmentDialog).ToContainTextAsync("Shift: AM Shift (6:00 AM - 2:00 PM)", new() { Timeout = 10000 });
         await Expect(NewAssignmentDialog).ToContainTextAsync(
@@ -336,7 +277,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await Expect(NewAssignmentDialog).ToContainTextAsync(
             "End: " + OpenHourToday.AddHours(1).ToString("MMM d, yyyy h:mm tt", CultureInfo.InvariantCulture));
 
-        // The empty cell's own details are cancelled in popupOpen, so only the dialog shows.
         await Expect(Schedule.Details).ToHaveCountAsync(0);
         await Expect(AddShiftHint).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -360,7 +300,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await Expect(Schedule.Appointment("Janet Brooks (CNA)", OpenHourToday, groupIndex: 0)).ToBeVisibleAsync();
         Assert.That(weekLoads, Is.EqualTo(0), "The new shift joins the week the schedule shows; the week is not reloaded.");
 
-        // The shift was saved in this coordinator's schedule, so it is there after a reload.
         await Page.ReloadAsync();
         await WaitForTraceMessage("booted", 10000);
         await Expect(Schedule.Appointment("Janet Brooks (CNA)", OpenHourToday, groupIndex: 0)).ToBeVisibleAsync(new() { Timeout = 10000 });
@@ -387,7 +326,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await ClickOpenHourToday();
         await Expect(NewAssignmentDialog).ToBeVisibleAsync(new() { Timeout = 10000 });
 
-        // The modal overlay sits beside the dialog; a click in its corner is a click outside the dialog.
         await Page.Locator("#new-assignment-dialog + .e-dlg-overlay")
             .ClickAsync(new() { Position = new() { X = 5, Y = 5 } });
 
@@ -423,8 +361,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await Schedule.Open(StaffedShifts.First);
 
-        // The details' template binds the clicked shift: its staff phone in the content, Edit and Reassign in
-        // the footer. None of this exists until the popup renders the shift.
         await Expect(Schedule.Details.GetByText("Reassign", new() { Exact = true })).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Schedule.Details.GetByText(new Regex(@"\d{3}-\d{4}"))).ToBeVisibleAsync();
         AssertNoConsoleErrors();
@@ -452,7 +388,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await Schedule.Details.GetByText("Edit", new() { Exact = true }).ClickAsync();
 
-        // The drawer loads the clicked shift's assignment: its staff member is the one chosen.
         await Expect(Drawer).ToHaveClassAsync(new Regex("alis-drawer--visible"), new() { Timeout = 10000 });
         await Expect(Page.Locator("#alis-drawer-title")).ToHaveTextAsync("Edit Shift Assignment");
         await Expect(StaffChoice(staff)).ToBeCheckedAsync(new() { Timeout = 10000 });
@@ -485,11 +420,9 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await ClickWhenStable(Page.Locator("#btn-save-assignment"));
 
-        // The shift shows Tom where it is, and the week the server answers with has one fewer open shift.
         await Expect(Schedule.Appointment("Tom Harding (LPN)", start, group).First).ToBeVisibleAsync(new() { Timeout = 15000 });
         await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 15000 });
 
-        // It was saved on the server, not only in the schedule.
         await Page.ReloadAsync();
         await WaitForTraceMessage("booted", 10000);
         await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 10000 });
@@ -497,8 +430,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The drawer's save hands the saved shift to the schedule, which raises the same ActionBegin an in-service
-    // saved in the editor raises; the server already has the shift.
     [Test]
     public async Task a_shift_staffed_in_the_drawer_is_not_sent_again_as_an_in_service()
     {
@@ -520,8 +451,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The schedule's editor opens on the first shift no one covers, and the page's PopupOpen hands it to
-    // the drawer: an open shift has no staff member chosen, where an assigned one would.
     [Test]
     public async Task covering_the_next_open_shift_opens_its_assignment_form_with_no_one_chosen()
     {
@@ -538,7 +467,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Oak Ridge's roster is full: the schedule holds no open shift for the editor to open on.
     [Test]
     public async Task covering_the_next_open_shift_of_a_full_roster_says_every_shift_is_covered()
     {
@@ -565,7 +493,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await Schedule.OpenToChange(shift);
 
-        // popupOpen cancels Syncfusion's editor (type "Editor") and loads the shift's assignment instead.
         await Expect(StaffChoice(staff)).ToBeCheckedAsync(new() { Timeout = 10000 });
         await Expect(Schedule.Editor).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -650,7 +577,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         var amShiftStart = Schedule.Cell(DateTime.Today.AddHours(6), groupIndex: 0);
         var nightShiftStart = Schedule.Cell(DateTime.Today.AddHours(22), groupIndex: 2);
 
-        // The schedule opens at the start of the work hours (6 AM), so the night shift comes first.
         await Page.Locator("#schedule-show-night").ClickAsync();
 
         await Expect(nightShiftStart).ToBeInViewportAsync(new() { Timeout = 5000 });
@@ -680,8 +606,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The schedule's own events go to the agency; it counts the open ones among them, which are the ones the
-    // server's summary counts.
     [Test]
     public async Task asking_the_agency_sends_every_open_shift_the_schedule_holds()
     {
@@ -706,7 +630,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await Expect(Schedule.Editor).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Schedule.EditorField("subject")).ToHaveValueAsync("In-service: Falls prevention");
         await Expect(InServiceNote).ToHaveTextAsync("The Falls prevention in-service is yours to change until you close it.", new() { Timeout = 10000 });
-        // The server's answer that it is free leaves the editor open.
         await Expect(Schedule.Editor).ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
@@ -725,8 +648,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The editor is open while the server is asked; nothing the coordinator does closes it. The server's
-    // answer that Dana Whitfield has the in-service open is what closes it.
     [Test]
     public async Task an_in_service_someone_else_is_changing_closes_and_says_who_has_it()
     {
@@ -749,7 +670,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
             "Dana Whitfield is changing the Safe resident transfers in-service right now, so it was closed here. Try again in a few minutes.",
             new() { Timeout = 10000 });
         await Expect(Schedule.Editor).ToBeHiddenAsync(new() { Timeout = 5000 });
-        // Closing the editor hides the note; the refusal shows its note after the close.
         await Expect(InServiceNote).ToBeVisibleAsync();
         AssertNoConsoleErrorsExcept("the server responded with a status of 409");
     }
@@ -763,14 +683,12 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
         await Schedule.EditorSave.ClickAsync();
 
-        // The server says what it saved, and the week it reloads shows the new title.
         await Expect(InServiceNote).ToHaveTextAsync(
             "Saved the Falls prevention and hip protectors in-service, on Tuesday at 2:30 PM after the AM shift.",
             new() { Timeout = 10000 });
         await Expect(RenamedFallsPrevention).ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(FallsPrevention).ToHaveCountAsync(0);
 
-        // It was saved on the server, not only in the schedule.
         await Page.ReloadAsync();
         await WaitForTraceMessage("booted", 10000);
         await Expect(RenamedFallsPrevention).ToBeVisibleAsync(new() { Timeout = 10000 });
@@ -778,9 +696,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The schedule's own save of the change is cancelled. Were it not, the schedule would show the new title before
-    // the server had saved anything, and the reload the page makes after any save the schedule makes would put the
-    // old one back; the week's loads are held, so that unsaved title would stay on screen.
     [Test]
     public async Task a_changed_in_service_shows_its_new_title_only_once_the_server_saved_it()
     {
@@ -818,7 +733,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
             "Took the Falls prevention in-service off Tuesday's schedule.", new() { Timeout = 10000 });
         await Expect(FallsPrevention).ToHaveCountAsync(0, new() { Timeout = 10000 });
 
-        // It was taken off on the server: the week comes back with Thursday's in-service and without Tuesday's.
         await Page.ReloadAsync();
         await WaitForTraceMessage("booted", 10000);
         await Expect(Schedule.Appointments("In-service: Safe resident transfers")).ToBeVisibleAsync(new() { Timeout = 10000 });
@@ -826,7 +740,6 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The schedule's own delete is cancelled: until the server has taken the in-service off, the week keeps it.
     [Test]
     public async Task a_deleted_in_service_stays_on_the_week_until_the_server_took_it_off()
     {

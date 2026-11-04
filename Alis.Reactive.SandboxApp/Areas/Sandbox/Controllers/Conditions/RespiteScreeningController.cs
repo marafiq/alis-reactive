@@ -12,9 +12,6 @@ public class RespiteScreeningController : Controller
     public IActionResult Index() =>
         View("~/Areas/Sandbox/Views/Conditions/RespiteScreening/Index.cshtml", new RespiteScreeningModel());
 
-    // The Garden wing expects Margaret Hale: 62 or over, from its opening day, assisted living at $5,000;
-    // it offers the garden-view room and allows one pet. Its records: a veteran, no previous stay, this
-    // season's flu shot given, a diabetic diet.
     [HttpGet("Policy")]
     public IActionResult Policy() => Ok(new WingPolicy
     {

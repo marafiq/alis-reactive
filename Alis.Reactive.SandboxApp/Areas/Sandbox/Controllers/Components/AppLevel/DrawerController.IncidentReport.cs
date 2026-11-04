@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 {
-    /// <summary>
-    /// Incident reports: the nurse files a report from the drawer. Filing takes a moment, during
-    /// which a loader covers the form; the nurse may close the drawer before it answers.
-    /// </summary>
     public partial class DrawerController
     {
         private static readonly TimeSpan FilingTime = TimeSpan.FromMilliseconds(1200);

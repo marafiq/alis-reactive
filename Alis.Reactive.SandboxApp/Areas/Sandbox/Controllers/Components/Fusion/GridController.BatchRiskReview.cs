@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The morning falls huddle on Aspen wing: the director of nursing raises the fall risk of the residents who fell
-    /// overnight and sends the changed risk levels to care planning. Every page starts from the risk levels on record;
-    /// the server says what care planning will update against them and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("BatchRiskReview"), ActionName("BatchRiskReview")]

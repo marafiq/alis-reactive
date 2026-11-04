@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Maple Grove's nursing coverage for the week of October 19: the open shifts, how each stands with the
-    /// staffing line, the nurses the coordinator can call in with the hours they have worked, and the
-    /// assignment itself.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/MultiColumnComboBox")]
     public sealed class MultiColumnComboBoxController : Controller
@@ -16,7 +11,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private const string Agency = "CareBridge agency";
         private const int WeeklyHours = 40;
 
-        // Willow is the memory care wing: a nurse who covers it is certified in dementia care.
         private static readonly IReadOnlyList<CoverageShift> Shifts =
         [
             new("willow-night", "Tonight 19:00–07:00, Willow (Priya Raman called out)", "the Willow night shift tonight, 19:00–07:00",

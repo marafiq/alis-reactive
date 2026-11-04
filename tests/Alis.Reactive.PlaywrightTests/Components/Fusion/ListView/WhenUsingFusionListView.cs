@@ -3,20 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ListView;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ListView;
 
-/// <summary>
-/// As the day charge nurse on Maple wing, I want to walk the evening nurse through the residents in round order
-/// and tick off what I finish before I leave, so that no resident is missed at the handoff and nothing is left
-/// for the evening shift that I should have done.
-/// </summary>
-/// <remarks>
-/// The round is Arthur Bell, Ruth Coleman, Helen Park, Walter Dean and Grace Liu. Helen Park is at St. Mary's
-/// Hospital, so the round does not open her and skips her when it moves on. Opening a resident the nurse clicks
-/// fetches their note by their place on the round; handing a resident off moves the round on to the next resident
-/// in the building, whose note comes with the handoff's answer, and after Grace Liu the round is complete.
-/// A resident the page selects after a handoff raises Select without IsInteracted or Index (list-view.js:1084-1110,
-/// 1130-1150), which is how the round tells its own move from the nurse's click. Before you leave is a checkbox
-/// list of the day nurse's last tasks; its Select carries the task and whether it is now checked.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionListView : PlaywrightTestBase
 {

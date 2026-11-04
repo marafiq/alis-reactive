@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The family newsletter's Garden Club paragraph: last month's paragraph to start from, and the save that
-    /// counts the words families will read.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/RichTextEditor")]
     public class RichTextEditorController : Controller
@@ -31,7 +27,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new NewsletterParagraphSaved { Message = $"Saved the Garden Club paragraph: {words} {noun}." });
         }
 
-        // The words a family reads: the paragraph's text without its markup.
         private static int WordsIn(string paragraph)
         {
             var text = Regex.Replace(paragraph, "<[^>]+>", " ").Replace("&nbsp;", " ");

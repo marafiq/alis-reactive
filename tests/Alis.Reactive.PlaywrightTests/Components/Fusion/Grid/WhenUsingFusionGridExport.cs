@@ -5,25 +5,12 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the business office manager, I want to download a closed month's census as Excel, CSV or PDF, holding
-/// exactly the residents the census grid shows, so that the state report and the month's billing count the
-/// same residents and days the community does.
-/// </summary>
-/// <remarks>
-/// The page opens on October 2026: Dorothy Fleming, Harold Chen, Lucia Romero, Margaret Hale, Theodore Banks
-/// (moved in October 12, 20 days) and Vera Lindqvist. September has Samuel Ortiz (moved out September 14) in
-/// place of Theodore Banks. November is still open and the server refuses it. Each download is the file the
-/// browser receives: the grid's own default name (Export.xlsx, Export.csv, Export.pdf; the export methods
-/// take no file name) and the rows inside it. The hidden resident ID is not exported.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridExport : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/RosterExport";
     private const string CensusId = "monthly-census";
 
-    // The grid numbers its columns from 1; the hidden ID is the first.
     private const int CensusDaysColumn = 5;
 
     private static readonly string[] OctoberCsv =
@@ -59,7 +46,6 @@ public class WhenUsingFusionGridExport : PlaywrightTestBase
         await Expect(Rows).ToHaveCountAsync(6, new() { Timeout = 10000 });
     }
 
-    // The file the browser saves when the button is clicked.
     private async Task<(string Name, byte[] Content)> Download(ILocator button)
     {
         var download = await Page.RunAndWaitForDownloadAsync(async () => await ClickWhenStable(button));
@@ -67,11 +53,9 @@ public class WhenUsingFusionGridExport : PlaywrightTestBase
         return (download.SuggestedFilename, await File.ReadAllBytesAsync(path));
     }
 
-    // The CSV's lines, after the byte-order mark the grid writes first.
     private static string[] CsvLines(byte[] csv) =>
         Encoding.UTF8.GetString(csv).TrimStart('﻿').Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-    // The workbook's text cells: an .xlsx keeps every text it shows in xl/sharedStrings.xml.
     private static string WorkbookStrings(byte[] xlsx)
     {
         using var workbook = new ZipArchive(new MemoryStream(xlsx));
@@ -79,7 +63,6 @@ public class WhenUsingFusionGridExport : PlaywrightTestBase
         return reader.ReadToEnd();
     }
 
-    // The text the PDF draws: its page streams are deflated, and each text is a literal "(...)".
     private static List<string> PdfTexts(byte[] pdf)
     {
         var raw = Encoding.Latin1.GetString(pdf);
@@ -149,7 +132,6 @@ public class WhenUsingFusionGridExport : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The download is made from what the grid holds, so a month chosen on the page is the month downloaded.
     [Test]
     public async Task choosing_september_downloads_septembers_census()
     {

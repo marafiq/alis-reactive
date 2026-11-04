@@ -5,13 +5,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Care operations: the director of nursing narrows the care census by risk or care level, edits care
-    /// levels, risks, nurses, open tasks and review days in the grid, reassigns, flags or discharges the
-    /// residents ticked on the board, admits a resident, and works the high-risk watch list. Every answer with
-    /// the board's rows keeps to the risk and care level the chips chose. The census lives in the browser
-    /// session (seeded on first visit), so each browser keeps its own board while its changes persist.
-    /// </summary>
     public partial class GridController
     {
         private const string CareSessionKey = "careOpsCensus";
@@ -39,8 +32,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // Every edited row answers to the whole validator, including the rule the grid's cells cannot check;
-        // one refused row keeps the census as it was.
         [HttpPost("CareOpsSave")]
         public IActionResult CareOpsSave([FromBody] CareOpsSaveRequest request)
         {
@@ -118,8 +109,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 : $"Discharged {CareNames(discharged)}.");
         }
 
-        // A new resident is covered by the night float team until the charge nurse assigns a primary nurse,
-        // and has a care review a week after admission.
         [HttpPost("CareOpsAdmit")]
         public IActionResult CareOpsAdmit([FromBody] CareOpsViewModel request)
         {
@@ -144,7 +133,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return CareBoard(census, request.FilterRisk, request.FilterCareLevel, $"Admitted {row.ResidentName} to {row.Wing} wing, {row.CareLevel}, at {row.RiskLevel} risk.");
         }
 
-        // The high-risk watch list: each resident at high risk, by name, with their quick actions.
         [HttpGet("CareOpsActionRows")]
         public IActionResult CareOpsActionRows() =>
             PartialView(
@@ -184,15 +172,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private void SaveCareCensus(List<ResidentCareItem> census) =>
             HttpContext.Session.SetString(CareSessionKey, JsonSerializer.Serialize(census));
 
-        // After a change the board shows the first page of the residents the chips chose, by name, with what the
-        // change did.
         private OkObjectResult CareBoard(List<ResidentCareItem> census, string? filterRisk, string? filterCareLevel, string summary)
         {
             var rows = SortCare(CareChosen(census, CareFilter(filterRisk), CareFilter(filterCareLevel)), null).ToList();
             return Ok(new CareOpsResponse { Result = rows.Take(CarePageSize).ToList(), Count = rows.Count, Summary = summary });
         }
 
-        // The residents at the risk and care level the chips chose; no choice keeps every resident.
         private static IEnumerable<ResidentCareItem> CareChosen(IEnumerable<ResidentCareItem> census, string? risk, string? careLevel) =>
             census
                 .Where(r => risk == null || r.RiskLevel == risk)
@@ -204,17 +189,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return census.Where(r => picked.Contains(r.ResidentId)).OrderBy(r => r.ResidentName, StringComparer.Ordinal).ToList();
         }
 
-        // "Amina Patel", "Amina Patel and Arthur Bell", "Amina Patel, Arthur Bell and Bilal Khan".
         private static string CareNames(List<ResidentCareItem> residents) =>
             residents.Count == 1
                 ? residents[0].ResidentName
                 : $"{string.Join(", ", residents.Take(residents.Count - 1).Select(r => r.ResidentName))} and {residents[^1].ResidentName}";
 
-        // A chip's text, where "All", or no chip, chooses no filter.
         private static string? CareFilter(string? chip) =>
             string.IsNullOrWhiteSpace(chip) || chip == "All" ? null : chip;
 
-        // The grid's sort, column by column; a board with no sort lists residents by name.
         private static IEnumerable<ResidentCareItem> SortCare(
             IEnumerable<ResidentCareItem> source, List<FusionGridSortColumn>? sorted)
         {
@@ -245,8 +227,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             _ => r.ResidentName
         };
 
-        // "24 residents on the census: 62 open care tasks.", "4 residents at Critical risk: …",
-        // "7 Memory Care residents: …".
         private static string CareSummary(List<ResidentCareItem> rows, string? risk, string? careLevel)
         {
             var residents = rows.Count == 1 ? "resident" : "residents";

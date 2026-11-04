@@ -34,7 +34,6 @@ namespace Alis.Reactive.Native
         public Event<NativeHiddenFieldChangeArgs> Change =>
             Event<NativeHiddenFieldChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

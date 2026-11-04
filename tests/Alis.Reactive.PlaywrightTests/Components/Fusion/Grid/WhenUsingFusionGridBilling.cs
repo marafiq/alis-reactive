@@ -2,29 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the business office manager closing October's billing, I want to page, sort and narrow the month's
-/// charges on the server, correct a rate in the grid, raise or bill the residents I pick, open a new resident's
-/// charges and email the families their statements, so that every family is billed what the community charges
-/// and the board always shows what is still outstanding.
-/// </summary>
-/// <remarks>
-/// The board holds 36 residents, twelve to a page by name: Abigail Moore (Independent, $3,200 a month, pending)
-/// first and Grace Bennett last on page one, Priya Shah first on page three. Care levels run in turn, so nine
-/// residents are in Memory Care, and a third each are pending, billed and paid; $147,000 is outstanding. Each
-/// change goes to the server, which answers in a toast, and the grid then asks the server again for the page,
-/// sort and filters it shows (its DataStateChange, on Refresh). The charges live in the browser's session, so
-/// every test starts from the month as filed.
-/// Not exercised:
-/// ToolbarClick's Item Text, Cancel and Name: the board tells its Email statements item apart by Id; Cancel
-/// stops only the grid's built-in items (toolbar.js:504-549), and the board's column chooser item is one the
-/// page leaves to the grid; Name is the event's own name (ej2-base observer.js:92).
-/// DataStateChange's Name, RequiresCounts, Group, Where, Search and Action: the board pages and sorts on the
-/// server and keeps its own filters; WhenUsingFusionGridCensus and WhenUsingFusionGridDirectory read the rest.
-/// The exports, Print, AutoFitColumns and OpenColumnChooser the old board called are proven where a page uses
-/// them: WhenUsingFusionGridExport, WhenUsingFusionGridPrintableRoster, WhenUsingFusionGridColumnFit and
-/// WhenUsingFusionGridTooling.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBilling : PlaywrightTestBase
 {
@@ -32,7 +9,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
     private const string GridId = "billing-grid";
     private const string WholeBoard = "36 residents: $147,000 outstanding.";
 
-    // The grid numbers its columns from 1.
     private const int ResidentColumn = 2;
     private const int MonthlyRateColumn = 5;
     private const int BalanceDueColumn = 7;
@@ -73,7 +49,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         await Expect(Board.Rows).ToHaveCountAsync(12, new() { Timeout = 10000 });
     }
 
-    // A click on a resident's name selects their row; the name's cell is not one the board edits.
     private async Task Select(string resident)
     {
         await ClickWhenStable(Board.Cell(resident, ResidentColumn));
@@ -103,7 +78,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The last page starts 24 residents in, twice the twelve a page shows.
     [Test]
     public async Task the_last_page_shows_the_last_twelve_residents()
     {
@@ -117,7 +91,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Arthur Bell leads the Memory Care residents by name; Frank Delgado and Vera Lindqvist pay its lowest rate.
     [Test]
     public async Task sorting_the_memory_care_residents_by_rate_lists_the_lowest_rate_first_and_keeps_to_memory_care()
     {
@@ -180,7 +153,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Each filter left set would keep the board narrowed: all three are set before they are cleared.
     [Test]
     public async Task clearing_the_filters_brings_back_every_resident()
     {
@@ -200,15 +172,11 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The rate's editor is still open when Save Rate Changes is clicked: the page saves the open cell into the
-    // pending changes before it sends them. The server works out the new balance due, which the grid then shows.
     [Test]
     public async Task a_rate_changed_in_the_grid_is_saved_while_its_cell_is_still_open()
     {
         await NavigateAndBoot();
         await Board.Cell("Beatrice Lane", MonthlyRateColumn).DblClickAsync();
-        // The grid focuses its numeric editor a moment after showing it and rewrites "8,425.00" to "8425";
-        // a fill before then lands after the number.
         await Expect(RateEditor).ToHaveValueAsync("8425", new() { Timeout = 10000 });
         await RateEditor.FillAsync("5000");
 
@@ -261,7 +229,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Arthur Bell has paid for the month; billing him again would ask his family to pay twice.
     [Test]
     public async Task a_resident_who_has_paid_is_not_billed_again()
     {
@@ -293,7 +260,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Agnes Whitlock files second by name, so her new charges show on the board's first page.
     [Test]
     public async Task a_new_residents_charges_open_on_the_board()
     {
@@ -340,7 +306,6 @@ public class WhenUsingFusionGridBilling : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Six of the nine Memory Care families owe this month; the other three have paid.
     [Test]
     public async Task email_statements_reaches_every_family_on_the_board_with_a_balance_due()
     {

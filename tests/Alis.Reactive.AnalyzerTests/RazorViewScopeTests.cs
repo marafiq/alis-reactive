@@ -3,10 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>
-/// The view-only analyzers share one test of what a view is: the path the Razor compiler gives the view's C#.
-/// Proven through ALIS008, the simplest of them.
-/// </summary>
 [TestFixture]
 public class RazorViewScopeTests
 {

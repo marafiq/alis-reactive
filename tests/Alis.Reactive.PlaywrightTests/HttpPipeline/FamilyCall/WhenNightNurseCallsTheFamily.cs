@@ -1,16 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.FamilyCall;
 
-/// <summary>
-/// As a night nurse calling a resident's family after a fall, I want the family portal to tell me who the
-/// emergency contact is and the number to call, so that I reach the right person at once, at any hour.
-/// </summary>
-/// <remarks>
-/// The family portal answers with the resident, and within the resident the emergency contact: Walter Cho,
-/// room 118, whose daughter Grace Cho is reached at (617) 555-0142. The contact's details sit two levels
-/// down in the answer and the resident's one level down, and the two are named differently, so a read of
-/// the wrong level shows the wrong name. The portal has no error answer here: a portal that does not answer
-/// is not part of this journey. Everything the page renders is exercised.
-/// </remarks>
 [TestFixture]
 public class WhenNightNurseCallsTheFamily : PlaywrightTestBase
 {
@@ -26,8 +15,6 @@ public class WhenNightNurseCallsTheFamily : PlaywrightTestBase
     private ILocator Room => Page.Locator("#contact-room");
     private ILocator Phone => Page.Locator("#contact-phone");
 
-    // The request is held at the browser until the test releases it, then sent on unchanged, so what the
-    // page shows before the answer arrives can be seen.
     private async Task<SemaphoreSlim> HoldUntilReleased(string url)
     {
         var released = new SemaphoreSlim(0);

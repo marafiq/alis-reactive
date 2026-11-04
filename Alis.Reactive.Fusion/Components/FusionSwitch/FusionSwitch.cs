@@ -20,7 +20,6 @@ namespace Alis.Reactive.Fusion
         /// <summary>Raised when the switch is turned on or off.</summary>
         public Event<FusionSwitchChangeArgs> Change => Event<FusionSwitchChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);
     }
 

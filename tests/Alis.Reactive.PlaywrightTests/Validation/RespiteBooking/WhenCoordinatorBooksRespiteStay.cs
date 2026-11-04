@@ -2,11 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.RespiteBooking;
 
-/// <summary>
-/// As an admissions coordinator, I want a blank community, rate, length of stay, or transport
-/// answer to mean "not entered" so that a respite stay is never booked at $0 a day, for zero
-/// nights, or without transport nobody decided against.
-/// </summary>
 [TestFixture]
 public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
 {
@@ -117,7 +112,6 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
 
         await ClickWhenStable(BookStay);
 
-        // No nights were entered (ExpectedNights == null), so the stay must say how it ends.
         await Expect(_plan.ErrorFor(m => m.EndOfStayPlan)).ToHaveTextAsync("An open-ended stay needs a plan for how it ends.");
         await Expect(_plan.ErrorFor(m => m.LastDayPickupTime)).ToHaveTextAsync("");
         await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
@@ -141,7 +135,6 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
 
         await ClickWhenStable(BookStay);
 
-        // Nights were entered (ExpectedNights.HasValue), so the last day's pickup is asked for, not an end plan.
         await Expect(_plan.ErrorFor(m => m.LastDayPickupTime)).ToHaveTextAsync("A planned stay needs the pickup time on its last day.");
         await Expect(_plan.ErrorFor(m => m.EndOfStayPlan)).ToHaveTextAsync("");
         await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
@@ -165,8 +158,6 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
 
         await ClickWhenStable(BookStay);
 
-        // Cedar Ridge is not one of the communities with a transport desk; Maple Grove is, and books
-        // with transport undecided in the test above.
         await Expect(_plan.ErrorFor(m => m.NeedsTransport))
             .ToHaveTextAsync("This community has no transport desk: answer whether it drives the resident in.");
         await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");

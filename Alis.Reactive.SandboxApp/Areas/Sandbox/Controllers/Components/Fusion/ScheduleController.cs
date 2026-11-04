@@ -4,10 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The staffing coordinator's shift schedule. Each browser's changes live in its own
-    /// <see cref="ScheduleWorld"/>, so a save is visible on the next GET and to no other browser.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Schedule")]
     public class ScheduleController : Controller
@@ -24,11 +20,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new PointInTimeScheduleModel { SelectedFacilityId = DefaultFacilityId });
         }
 
-        /// <summary>
-        /// The facility's shifts for the dates a view shows around a date, and the server's summary of them.
-        /// The view is in the path (<c>{currentView}</c>), as the page gathers it from the schedule or from
-        /// its navigating event; the date and the facility are in the query.
-        /// </summary>
         [HttpGet("Shifts/{currentView}")]
         public IActionResult Shifts(string currentView, string? selectedFacilityId, DateTime? currentDate)
         {
@@ -40,9 +31,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(World.GetAssignments(facility, rangeStart, rangeEnd));
         }
 
-        /// <summary>
-        /// Asks the staffing agency to cover the open shifts among those the schedule holds.
-        /// </summary>
         [HttpPost("AgencyRequest")]
         public IActionResult AgencyRequest([FromBody] AgencyCoverRequest request)
         {
@@ -53,10 +41,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new AgencyCoverAnswer { Summary = summary });
         }
 
-        /// <summary>
-        /// Answers whether the in-service opened in the schedule's editor is the coordinator's to change:
-        /// 409 while someone else has it open.
-        /// </summary>
         [HttpPost("InServiceClaim")]
         public IActionResult InServiceClaim([FromBody] InServiceClaimRequest request)
         {
@@ -67,10 +51,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return refused ? Conflict(answer) : Ok(answer);
         }
 
-        /// <summary>
-        /// Saves an in-service changed in the schedule's editor, which the page holds back from the schedule until
-        /// the server answers what it saved.
-        /// </summary>
         [HttpPost("SaveInService")]
         public IActionResult SaveInService([FromBody] InServiceChange change)
         {
@@ -78,7 +58,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return answer == null ? NotFound(new { error = "In-service not found." }) : Ok(answer);
         }
 
-        /// <summary>Takes an in-service deleted in the schedule's editor off this browser's schedule.</summary>
         [HttpPost("RemoveInService")]
         public IActionResult RemoveInService([FromBody] InServiceRemoval removal)
         {
@@ -94,7 +73,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "WorkWeek" => WorkWeekRange(anchor),
                 "Month" => MonthRange(anchor),
                 "Agenda" => (anchor.Date, anchor.Date.AddDays(7)),
-                _ => WeekRange(anchor), // "Week" and default
+                _ => WeekRange(anchor),
             };
         }
 
@@ -115,16 +94,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             var firstOfMonth = new DateTime(anchor.Year, anchor.Month, 1);
             var lastOfMonth = firstOfMonth.AddMonths(1).AddDays(-1);
-            // Syncfusion Month view shows full weeks — pad to surrounding Sundays
             var rangeStart = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
             var rangeEnd = lastOfMonth.AddDays(6 - (int)lastOfMonth.DayOfWeek + 1);
             return (rangeStart, rangeEnd);
         }
 
-        /// <summary>
-        /// Assigns staff to a shift slot in this browser's schedule.
-        /// Subsequent data-source loads return the updated assignment.
-        /// </summary>
         [HttpPost("~/api/schedule/assign")]
         public IActionResult AssignStaff([FromBody] AssignStaffRequest request)
         {
@@ -138,7 +112,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(updated);
         }
 
-        /// <summary>Takes a shift off this browser's schedule and returns it.</summary>
         [HttpPost("~/api/schedule/cancel-shift")]
         public IActionResult CancelShift([FromBody] CancelShiftRequest request)
         {
@@ -146,10 +119,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return cancelled == null ? NotFound(new { error = "Assignment not found." }) : Ok(cancelled);
         }
 
-        /// <summary>
-        /// Loads the event-edit partial into the NativeDrawer after a schedule event click.
-        /// Partial has its own Reactive Plan that merges into the page's Active Plan.
-        /// </summary>
         [HttpGet("EditForm")]
         public IActionResult EditForm(int assignmentId)
         {
@@ -169,11 +138,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 model);
         }
 
-        /// <summary>
-        /// Loads the empty-cell assignment partial into the FusionDialog. The cell's shift column (0-based)
-        /// is its shift (1-based). The query names the column for what it is: a query value bound under the
-        /// model's own name (<c>ShiftId</c>) is what MVC's hidden field sends, not the model's value.
-        /// </summary>
         [HttpGet("NewAssignmentForm")]
         public IActionResult NewAssignmentForm([FromQuery] NewAssignmentQuery query)
         {
@@ -189,9 +153,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 model);
         }
 
-        /// <summary>
-        /// Creates a shift assignment from the new-assignment dialog payload.
-        /// </summary>
         [HttpPost("~/api/schedule/create-assignment")]
         public IActionResult CreateAssignment([FromBody] NewAssignmentModel? model)
         {

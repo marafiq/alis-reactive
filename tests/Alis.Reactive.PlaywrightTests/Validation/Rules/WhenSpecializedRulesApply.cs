@@ -4,15 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Rules;
 
-/// <summary>
-/// As a billing administrator, I want each specialized rule checked in the page before anything is
-/// sent, so that a value the community would refuse never leaves the form.
-/// </summary>
-/// <remarks>
-/// The page's server runs the same validator, so a message alone could be the server's. Each refusal
-/// below fills every other field validly first and proves nothing was sent: the browser's own rule
-/// refused it.
-/// </remarks>
 [TestFixture]
 public class WhenSpecializedRulesApply : PlaywrightTestBase
 {
@@ -102,7 +93,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The bounds are excluded; the scores just inside them, 1 and 99, pass in the page and on the server.
     [Test]
     public async Task when_nurse_enters_valid_score_within_range_error_clears()
     {
@@ -139,8 +129,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The rate is a plain decimal: the server binds an empty input as 0, and 0 is not above 0. The
-    // page reads the empty input the same way.
     [Test]
     public async Task a_monthly_rate_left_empty_is_refused_as_the_zero_the_server_binds()
     {
@@ -156,7 +144,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // One is the smallest whole rate above zero: the page lets it through and the server accepts it.
     [Test]
     public async Task when_monthly_rate_is_positive_gt_passes()
     {
@@ -356,7 +343,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await Input(m => m.Website).FillAsync("https://sunnyacres.com");
     }
 
-    // The server binds an empty decimal as 0, which is outside (0, 100); the browser judges the same 0.
     [Test]
     public async Task a_score_left_empty_is_refused_as_the_zero_the_server_binds()
     {
@@ -372,7 +358,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The card rule drops dashes and spaces and refuses any other character that is not a digit.
     [Test]
     public async Task a_card_number_with_a_letter_in_it_is_refused_though_its_digits_check_out()
     {
@@ -388,8 +373,6 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The card rule sets no minimum length: a twelve-digit number that passes the Luhn check is a
-    // card number to the server, so the browser lets it through and the server accepts it.
     [Test]
     public async Task a_twelve_digit_card_number_that_passes_the_check_is_accepted_by_the_server_too()
     {

@@ -32,13 +32,10 @@ namespace Alis.Reactive
 
         internal string Name { get; }
 
-        /// <summary>The grammar operator the comparison writes.</summary>
         internal Operator Operation { get; }
 
-        /// <summary>Equal or not equal, which compare whatever both sides hold; the others order the sides.</summary>
         internal bool IsEquality { get; }
 
-        /// <summary>Whether an ordering holds, given how the value compares with the other: negative, zero or positive.</summary>
         internal bool Orders(int order) =>
             this == GreaterThan ? order > 0
             : this == GreaterThanOrEqual ? order >= 0
@@ -104,7 +101,6 @@ namespace Alis.Reactive
 
         internal string Name { get; }
 
-        /// <summary>The JavaScript string method the test calls; empty for a pattern, which the matches operator tests.</summary>
         internal string Method { get; }
 
         internal bool IsPattern => Method.Length == 0;

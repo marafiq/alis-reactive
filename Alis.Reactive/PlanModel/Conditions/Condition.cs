@@ -121,7 +121,6 @@ namespace Alis.Reactive
 
         internal static Condition Confirm(string message) => new ConfirmCondition(message);
 
-        /// <summary>Both conditions: the outer one, then this one.</summary>
         internal static Condition Combine(Condition outer, Condition inner)
         {
             if (outer.IsAlways) return inner;
@@ -131,13 +130,10 @@ namespace Alis.Reactive
 
         internal virtual bool IsAlways => false;
 
-        /// <summary>The members of the validator's model the condition reads, left to right.</summary>
         internal virtual IEnumerable<FieldReference> Fields => Array.Empty<FieldReference>();
 
-        /// <summary>The condition with every member it reads relocated under <paramref name="prefix"/>.</summary>
         internal virtual Condition PrefixedBy(string prefix) => this;
 
-        /// <summary>The condition over the inputs that hold the members it reads.</summary>
         internal virtual Condition Bound(FieldValues fields) => this;
 
         internal virtual bool IsSynchronous => true;
@@ -155,8 +151,6 @@ namespace Alis.Reactive
             return terms.ToArray();
         }
 
-        // A value the condition fixes, as the member's own type: an enum is its member's name, which is
-        // how MVC binds it; anything else is written as it is.
         private static object? LiteralOf(Type memberType, object? value)
         {
             if (value == null) return null;
@@ -165,10 +159,6 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>
-    /// A test of one member of a validator's model. When the form binds it, the member is read as MVC
-    /// binds it and tested in the shape its input holds, by the condition the test builds for that read.
-    /// </summary>
     internal sealed class MemberTest : Condition
     {
         private readonly FieldReference _field;
@@ -190,7 +180,6 @@ namespace Alis.Reactive
             throw new InvalidOperationException($"The test of '{_field.Path}' is bound to the form's inputs before it is written.");
     }
 
-    /// <summary>A comparison of one value: it reads the value, converts it to the condition's shape, and tests it.</summary>
     internal abstract class ValueCondition : Condition
     {
         private readonly ValueExpression _left;
@@ -236,7 +225,6 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>The value ordered against another of its shape, a literal or a value read when the condition runs.</summary>
     internal sealed class OrderedCondition : ValueCondition
     {
         private readonly Comparison _comparison;
@@ -253,7 +241,6 @@ namespace Alis.Reactive
         internal override Expr Write(Scope scope) => G.Op(_comparison.Operation, Left(scope), _right.WriteAs(Shape, scope));
     }
 
-    /// <summary>The value among a list of values, read once and compared with each, as C#'s Contains does.</summary>
     internal sealed class MembershipCondition : ValueCondition
     {
         private readonly IReadOnlyList<ValueExpression> _items;
@@ -279,7 +266,6 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>The value between a lower and an upper bound, both included.</summary>
     internal sealed class RangeCondition : ValueCondition
     {
         private readonly ValueExpression _low;
@@ -304,7 +290,6 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>A list holding an item: each item converted to the item's shape and compared.</summary>
     internal sealed class ArrayContainsCondition : ValueCondition
     {
         private readonly ValueExpression _item;
@@ -329,7 +314,6 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>The value, as text, holding, starting with, ending with or matching the given text.</summary>
     internal sealed class TextCondition : ValueCondition
     {
         private readonly TextTest _test;
@@ -349,7 +333,6 @@ namespace Alis.Reactive
         }
     }
 
-    /// <summary>The value, as text, at least so many characters long.</summary>
     internal sealed class MinLengthCondition : ValueCondition
     {
         private readonly int _length;
@@ -465,7 +448,6 @@ namespace Alis.Reactive
             IsSynchronous ? base.Guard(then, otherwise, scope) : _term.Guard(otherwise, then, scope);
     }
 
-    /// <summary>A user decision: the confirm asks, and the branches wait for the answer.</summary>
     internal sealed class ConfirmCondition : Condition
     {
         private readonly string _message;

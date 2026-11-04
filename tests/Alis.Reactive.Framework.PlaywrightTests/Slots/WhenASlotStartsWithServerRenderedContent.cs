@@ -1,13 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Slots;
 
-/// <summary>
-/// A partial the server renders with the page inside a container some plan loads into belongs to that slot
-/// (grammar 3.5): the move-in's first step sits in the container its own Next loads the room step into, and
-/// the step's needs sit in a container of the step's own. Each starts after what holds it, as it would were
-/// it loaded there, and hears what the page's ready handler raises; the first load or Unload of the
-/// innermost container it sits in releases its handlers and the rules it checks the page's form by, as it
-/// releases a part the slot loaded.
-/// </summary>
 [TestFixture]
 public sealed class WhenASlotStartsWithServerRenderedContent : AppPageTest
 {

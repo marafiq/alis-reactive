@@ -2,30 +2,12 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the day nurse on Birch wing, I want to keep each resident's open tasks current on the task board as I work
-/// through the wing, mark a resident's tasks all done in one step, and hand the board over to the evening shift, so
-/// that the evening nurse starts from the counts the day actually left.
-/// </summary>
-/// <remarks>
-/// The board loads from the record: Amina Patel (room 101, 2 open tasks) first, then Henry Liu (104, 3), Grace
-/// Bennett (108, 1), Walter Grant (112, 0), Edith Hale (115, 4) and Jonah Reed (118, 2). A count is typed into its
-/// cell; All tasks done sets the chosen resident's count to none; the handover sends the board's changes to the
-/// server, which says what changed against the record and answers with the board as saved.
-/// A button outside the grid takes the focus without saving the cell being typed (the grid saves on focus loss only
-/// when the focus lands on nothing or on another input, grid.js:5907-5919), so the handover keeps that count only
-/// through its own SaveCell.
-/// Not exercised:
-/// The pending changes' AddedRecords and DeletedRecords: the board adds and removes no residents, so both arrive
-/// empty (batch-edit.js:347-372).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBatchEdit : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/BatchTaskUpdate";
     private const string BoardId = "day-task-board";
 
-    // The board numbers its columns from 1.
     private const int ResidentColumn = 2;
     private const int OpenTasksColumn = 4;
 
@@ -48,8 +30,6 @@ public class WhenUsingFusionGridBatchEdit : PlaywrightTestBase
         await Expect(Rows).ToHaveCountAsync(6, new() { Timeout = 10000 });
     }
 
-    // Opens Amina Patel's open tasks and types over them, leaving the cell open. The grid shows the editor holding
-    // the count a moment after the double-click; a fill before then is lost.
     private async Task TypeAminasOpenTasks(string count)
     {
         await Cell("Amina Patel", OpenTasksColumn).DblClickAsync();
@@ -57,7 +37,6 @@ public class WhenUsingFusionGridBatchEdit : PlaywrightTestBase
         await OpenTasksEditor.FillAsync(count);
     }
 
-    // Choosing a resident is clicking their name; the board marks the row as chosen.
     private async Task ChooseResident(string resident)
     {
         await Cell(resident, ResidentColumn).ClickAsync();
@@ -104,7 +83,6 @@ public class WhenUsingFusionGridBatchEdit : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The board the server answers replaces the one on screen, so nothing is left marked as changed.
     [Test]
     public async Task a_handed_over_board_shows_the_saved_counts_with_nothing_left_unsaved()
     {

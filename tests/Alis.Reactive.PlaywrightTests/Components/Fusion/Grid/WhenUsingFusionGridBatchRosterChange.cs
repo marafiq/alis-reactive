@@ -3,27 +3,12 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the Maple wing admissions coordinator, I want to record a suite's move-out and move-in on the roster as one
-/// turnover and have the roster keep it unsaved until housekeeping has turned the suite over, so that the roster never
-/// shows a resident moved into a suite that is not ready for them.
-/// </summary>
-/// <remarks>
-/// The roster loads from the record: Amina Patel (suite 201), Henry Liu (203), Grace Bennett (204), Ruth Carter
-/// (205) and Jonah Reed (207). Ruth moves out of suite 205 this morning and Walter Kim moves in this afternoon.
-/// Recording the move-out takes Ruth's row off the roster; recording the move-in puts Walter at the top, marked as
-/// new. Saving names who moves out and who moves in, holds the turnover while housekeeping has not signed off, and
-/// otherwise sends it to the server, which says what it recorded.
-/// Not exercised:
-/// The pending changes' ChangedRecords: a turnover changes no resident's row, so it arrives empty (batch-edit.js:367-368).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBatchRosterChange : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/BatchRosterChange";
     private const string RosterId = "turnover-roster";
 
-    // The roster numbers its columns from 1.
     private const int SuiteColumn = 3;
 
     private static readonly Regex Changed = new("e-updatedtd");
@@ -111,7 +96,6 @@ public class WhenUsingFusionGridBatchRosterChange : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The held turnover stayed pending: signing off and saving again sends both moves.
     [Test]
     public async Task a_held_turnover_is_saved_in_full_once_housekeeping_signs_off()
     {
@@ -147,7 +131,6 @@ public class WhenUsingFusionGridBatchRosterChange : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A move-out alone names no one moving in.
     [Test]
     public async Task a_move_out_alone_is_saved_without_a_move_in()
     {

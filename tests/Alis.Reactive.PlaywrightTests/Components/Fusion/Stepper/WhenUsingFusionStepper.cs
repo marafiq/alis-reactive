@@ -2,19 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Stepper;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Stepper;
 
-/// <summary>
-/// As a move-in coordinator, I want a checklist that walks me through a resident's move-in in order and
-/// will not let me move the resident in before the room is signed off, so that no resident moves into a
-/// room nobody has inspected.
-/// </summary>
-/// <remarks>
-/// The checklist is Paperwork, Room ready, Moved in. The page says where the checklist is and what to do
-/// there; moving to Moved in waits for the signed room inspection. The admission steps below it are a
-/// stepper that opens its steps in order and marks Intake done (optional) and Review in need of attention.
-/// RefreshProgressbar is not exercised: it redraws the bar after the stepper's container changes size,
-/// which no page here does. StepChanging's PreviousStep and IsInteracted are the fields StepChanged
-/// carries, read here from StepChanged.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionStepper : PlaywrightTestBase
 {
@@ -43,7 +30,6 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
 
     private async Task SignTheRoomInspection() => await _plan.NativeCheckBox(m => m.RoomInspectionSigned).Check();
 
-    // Room ready, with the inspection signed, then on to Moved in.
     private async Task MoveTheResidentIn()
     {
         await ClickWhenStable(Next);
@@ -214,7 +200,6 @@ public class WhenUsingFusionStepper : PlaywrightTestBase
     {
         await NavigateAndBoot();
 
-        // A linear stepper takes the pointer only on the steps beside the open one (EJ2's e-linear rule).
         await AdmissionSteps.StepLabel("Review").HoverAsync();
 
         await Expect(AdmissionSteps.Tooltip).ToBeVisibleAsync(new() { Timeout = 5000 });

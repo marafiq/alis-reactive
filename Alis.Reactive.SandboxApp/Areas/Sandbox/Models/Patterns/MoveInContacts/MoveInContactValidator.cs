@@ -1,7 +1,6 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInContacts
 {
-    /// <summary>A contact card's own rules, checked on the card under whichever prefix it renders.</summary>
     public class MoveInContactValidator : ReactiveValidator<MoveInContact>
     {
         public MoveInContactValidator()

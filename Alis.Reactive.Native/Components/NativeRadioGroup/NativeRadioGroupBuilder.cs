@@ -136,9 +136,6 @@ namespace Alis.Reactive.Native
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
 #if NET48
-            // net48: read the raw model value directly. System.Web.Mvc ValueFor returns an
-            // already-HTML-encoded MvcHtmlString, which would double-encode in the hidden input.
-            // (ModelState-aware re-render after a failed POST is a net10-only nicety.)
             var selectedValue = _html.ViewData.Eval(System.Web.Mvc.ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
 #else
             var selectedValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
@@ -148,9 +145,6 @@ namespace Alis.Reactive.Native
 
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
-            // The hidden input is the component and has no name: the radios post the value. The framework's
-            // radio-group code (constructed on alis:mount) keeps the picked value on it and raises change, and
-            // checks the radio a write to its value names.
             writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" data-alis-radio-group />");
 
             for (int i = 0; i < _options.Count; i++)
@@ -158,7 +152,6 @@ namespace Alis.Reactive.Native
                 var option = _options[i];
                 var radioId = $"{_elementId}_r{i}";
 
-                // Label stays display:block per design system; inner div supplies flex layout.
                 writer.Write("<label>");
                 writer.Write($"<div class=\"{encoder.Encode(_optionCssClass)}\">");
 

@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A page that links the core's stylesheet and no design system. A field's refusal is complete on its own:
-/// the message shows in red beside the field and the input is marked with a red border; a corrected field
-/// loses both.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageLinksOnlyTheCoresStylesheet : AppPageTest
 {

@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Care reviews: the wellness nurse opens each resident's review from the list. Opening a review checks
-    /// the record out to the nurse; the server answers with its word and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("BeginEditNormalRoster")]
@@ -19,7 +15,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (resident == null)
                 return NotFound(new CareReviewCheckedOut { Summary = "That record is not on the care review list." });
 
-            // The census sheet numbers its lines from one.
             return Ok(new CareReviewCheckedOut
             {
                 Summary = $"{resident.ResidentName}'s record is checked out to you for review (census line {checkout!.CensusLine + 1})."

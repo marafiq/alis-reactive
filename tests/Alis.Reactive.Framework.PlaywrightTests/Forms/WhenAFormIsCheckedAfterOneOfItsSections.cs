@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Forms;
 
-/// <summary>
-/// A form checks the tests written for it, and first clears every inline message inside it (ADR-0003 rule 2,
-/// grammar.md F4): a section of the form saved on its own, by rules of its own, shows its message beside its
-/// field, and the whole form's save, whose rules do not ask for that field, clears the message and is sent.
-/// </summary>
 [TestFixture]
 public sealed class WhenAFormIsCheckedAfterOneOfItsSections : AppPageTest
 {

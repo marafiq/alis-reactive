@@ -1,15 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Rendering;
 
-/// <summary>
-/// A plan keeps the field prefix its view rendered under when the plan started, and every input it renders binds
-/// under that prefix. A prefix the view takes before its plan starts is the plan's; one it takes after, as MVC 5 gives
-/// a view whose copied ViewData is given a prefix, is refused when the page renders, naming EditorFor and a fresh
-/// TemplateInfo. On .NET Framework the copy itself is proven by the net48 smoke page.
-/// </summary>
 [TestFixture]
 public sealed class WhenAViewsPrefixChangesAfterItsPlanStarts : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     [Test]

@@ -4,15 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The business office's census by age: Maple Grove's 45 residents, filtered to those at or over an age,
-    /// sorted by any column and paged by the server. Every answer is worked out from the census on file and the
-    /// grid's request; nothing is kept between requests.
-    /// </summary>
-    /// <remarks>
-    /// The census reads the grid's request strictly: a page of no residents, a column or a direction it does
-    /// not know, or a change it does not know is refused with 400.
-    /// </remarks>
     public partial class GridController
     {
         [HttpGet("Census"), ActionName("Census")]
@@ -49,7 +40,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             };
         }
 
-        // Sorted the way the grid asks, then by name, so residents of the same age keep one order.
         private static IEnumerable<AgeCensusResident> AgeCensusSorted(IEnumerable<AgeCensusResident> residents, List<FusionGridSortColumn> sorted)
         {
             var ordered = residents.OrderBy(_ => 0);
@@ -128,8 +118,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             };
         }
 
-        // Ages run 66 to 98: nine residents are 90 or older, 25 are 80 or older. Oscar Flynn, 98, is the
-        // oldest; Ada Lawson and Paul Dunn, 66, the youngest.
         private static List<AgeCensusResident> AgeCensusOnFile()
         {
             string[] names =

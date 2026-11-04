@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// The messages a rule says. A check the browser makes says the validator's own words for it, naming the
-/// member in words and the values the page knows, and leaving out the sentence that names what was entered;
-/// a message of its own fills its placeholders with their formats. The server says the whole of its default
-/// message, a message built from the model, and the messages of predicates, a predicate that waits, and a
-/// rule whose condition only the server decides.
-/// </summary>
 [TestFixture]
 public sealed class WhenARuleSaysItsMessage : AppPageTest
 {

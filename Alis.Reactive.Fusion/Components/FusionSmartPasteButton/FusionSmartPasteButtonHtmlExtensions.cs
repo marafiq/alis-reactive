@@ -69,8 +69,6 @@ namespace Alis.Reactive.Fusion
             return writer.ToString();
         }
 
-        // The options the framework's smart-paste-button code (constructed on alis:mount, like an app's
-        // widget) hands to Syncfusion; an assist endpoint becomes the handler that asks it.
         private static string ConstructionOptions(FusionSmartPasteButtonOptions options)
         {
             var payload = new

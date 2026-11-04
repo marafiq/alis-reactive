@@ -1,8 +1,3 @@
-# The framework's Playwright project, as scripts/playwright.sh reads it: one shard, the whole project,
-# its components' bundle (one esbuild run writes it with the Plugins pages' second bundles), its
-# stylesheet (Tailwind over the shipped theme), and the app it is written against.
-# shellcheck shell=bash
-
 playwright_project=framework
 
 playwright_shards="framework"

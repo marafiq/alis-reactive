@@ -3,24 +3,11 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.VisitPlanner;
 
-/// <summary>
-/// As the life enrichment coordinator, I want to plan a family's visits with a resident for the week,
-/// within the wing's times, the week's allowance and the therapy schedule, so that the front desk
-/// expects every family that comes.
-/// </summary>
-/// <remarks>
-/// The visit planner is a widget the sandbox wrote itself (Scripts/visit-planner.ts) and declares in
-/// its own assembly (BroughtComponents/VisitPlanner). Every behavior here runs through the
-/// framework's generic grammar: properties of every shape, functions, methods with mixed arguments,
-/// events with nested and cancelable payloads, validation, gather and partials.
-/// </remarks>
 [TestFixture]
 public class WhenPlanningFamilyVisits : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/VisitPlanner";
 
-    // The companion panel renders CompanionVisitPlanModel.VisitSlots; its ID is the framework's
-    // deterministic ID for that member.
     private static readonly string CompanionPlannerId = IdGenerator.For<CompanionVisitPlanModel>(m => m.VisitSlots);
 
     private PagePlan<FamilyVisitPlanModel> _plan = null!;
@@ -349,9 +336,6 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // NotEq between two values read when the change happens: the change's count and the planner's
-    // capacity (3 for Margaret). At 3 of 3 they are equal and the note shows; one released, it hides. An
-    // Eq in its place, or a capacity never read, would never show it.
     [Test]
     public async Task every_visit_of_the_week_planned_is_noted_until_one_is_released()
     {
@@ -369,8 +353,6 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Falsy over the lock box: the planner itself would clear a locked week, so only the guard keeps the
-    // visits. An always-true Falsy, or a Checked never read (missing is falsy), would clear them.
     [Test]
     public async Task a_locked_week_is_not_cleared_until_it_is_unlocked()
     {
@@ -426,7 +408,6 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The planner's own markup, as a family coordinator sees it.
     private sealed class PlannerField
     {
         private readonly ILocator _root;
@@ -446,7 +427,6 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
 
         internal ILocator WaitlistUnder(string label) => ItemOf(label).Locator(".vp-waitlist");
 
-        // A filter's inner locator is matched inside each item, so it starts from the page, not the root.
         private ILocator ItemOf(string label) =>
             _root.Locator("li.vp-item")
                 .Filter(new() { Has = _root.Page.GetByRole(AriaRole.Button, new() { Name = label, Exact = true }) });

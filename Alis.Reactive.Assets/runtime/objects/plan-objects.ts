@@ -1,7 +1,3 @@
-// The located objects of one plan: an element through its vendor's data, or a plugin through the
-// plugin registered under its name (grammar.md 1.1). Elements are looked up at every use and never
-// cached, so a slot's content can change underneath a plan (grammar.md E1).
-
 import type { ElementObjectLocator, ObjectLocator, PlanDocument, PluginObjectLocator, Vendor } from "../types/index";
 import type { Objects } from "../grammar/evaluate";
 import { read } from "../grammar/paths";
@@ -22,7 +18,6 @@ export class PlanObjects implements Objects {
     }
   }
 
-  /** The element of an input, or null when it is not on the page. An input is always an element. */
   element(id: string): HTMLElement | null {
     return document.getElementById((this.locator(id) as ElementObjectLocator).id);
   }
@@ -43,7 +38,6 @@ export class PlanObjects implements Objects {
     owner.onDispose(subscribeVendor(target, locator.vendor, vendor, event, listener));
   }
 
-  // The plan declares every object and vendor its handlers and expressions name (the C# object table).
   private locator(id: string): ObjectLocator {
     return this.plan.objects[id] as ObjectLocator;
   }
@@ -59,8 +53,6 @@ export class PlanObjects implements Objects {
   }
 }
 
-// A handler subscribes to the plugin itself, never to an object it holds (the C# refuses one), and only
-// the framework's own plugins raise events: alis.document, alis.stream and alis.hub, each with subscribe.
 function subscribePlugin(locator: PluginObjectLocator, event: string, listener: Listener, owner: Owner): void {
   pluginNamed(locator.name).subscribe!(locator.key, event, listener, owner);
 }

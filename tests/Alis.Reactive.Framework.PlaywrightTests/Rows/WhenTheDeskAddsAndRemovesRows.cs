@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Rows;
 
-/// <summary>
-/// Dynamic rows as ADR-0003 writes them: the list is one partial in a slot, and adding or removing a contact posts
-/// the list and loads the server's rendering of it again, its rows numbered from 0. What the rows hold survives the
-/// round trip, and a removed row leaves no gap in what the sheet sends, as JSON or as a form post.
-/// </summary>
 [TestFixture]
 public sealed class WhenTheDeskAddsAndRemovesRows : AppPageTest
 {

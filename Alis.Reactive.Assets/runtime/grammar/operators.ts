@@ -1,8 +1,3 @@
-// The closed operator table (grammar.md section 2.2). Each operator gives the answer C# gives for
-// the developer's expression over the converted values: a missing value equals only another, and an
-// ordering against a missing value, NaN or a different kind is false, as C#'s lifted operators are.
-// The lazy operators (and, or, cond, coalesce) are evaluated in evaluate.ts.
-
 import { asNumber, asText, isMissing } from "./shape";
 import { toJavaScriptString } from "../shared/javascript-string";
 
@@ -101,7 +96,6 @@ export function merge(records: readonly unknown[]): Record<string, unknown> {
   return Object.assign({}, ...(records as object[]));
 }
 
-/** Sum's per-item value: the number if finite, else 0, so text never concatenates. */
 export function finite(value: unknown): number {
   const number = typeof value === "number" ? value : Number(value);
   return Number.isFinite(number) ? number : 0;
@@ -126,7 +120,6 @@ function sortKey(value: unknown): unknown {
   return value instanceof Date ? value.getTime() : value;
 }
 
-// toArray turns a missing value into [] first, so the value described is never null.
 function describe(value: unknown): string {
   if (typeof value === "object") return (value as object).constructor?.name ?? "object";
   return typeof value;

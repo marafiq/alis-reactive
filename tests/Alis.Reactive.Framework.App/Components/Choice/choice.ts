@@ -1,7 +1,3 @@
-// The choice: a select of named options that tells its listeners when the user picks one. It knows
-// nothing of Alis.Reactive; Choice.cs declares its members by these names. The select element holds
-// it as `choice`.
-
 type Listener = (payload: unknown) => void;
 
 interface ChoiceHost extends HTMLSelectElement {
@@ -16,7 +12,6 @@ export class Choice {
     select.choice = this;
   }
 
-  /** The name of the option chosen; empty for the blank option. */
   get value(): string {
     return this.select.value;
   }

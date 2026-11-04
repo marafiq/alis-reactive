@@ -1,25 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftEmailLink;
 
-/// <summary>
-/// As a nurse, I want the link in the shift email to open the resident's file where the email points,
-/// at my community and for my shift, so that I act on the right resident's doses and notes without
-/// searching for them.
-/// </summary>
-/// <remarks>
-/// The link names the community, the resident, the shift, the section to open, the page of shift notes
-/// and every wing the nurse covers; the page reads each from the link as it opens. The community's API
-/// answers only for the community its X-Community header names: Helen Park (1042) and Arthur Bell
-/// (1043) live at Maple Grove, and Cedar Point has neither. The chart is asked for by the resident in
-/// its path, with the shift in its query, and names the dose due on that shift; the page then asks when
-/// that dose was last given, by the resident the link names and the medication the chart named, both in
-/// the path. Arthur Bell's dose is Carbidopa/Levodopa 25/100 mg: sent unencoded, its slashes would split
-/// the path and the dose would not be found. The shift notes are asked for by shift and page in the
-/// query. The pharmacy and the lab are checked side by side through the community's gateway, which
-/// forwards each check to the partner its X-Partner header names. The "Checking with the pharmacy and
-/// the lab..." line is not asserted: it is replaced once both checks settle, and that the line waits for
-/// both is a behavior of parallel requests that
-/// <c>WhenHoldingVisitsAtTheFrontDesk.the_arrival_card_waits_for_the_badge_with_the_desk_covered</c> proves.
-/// </remarks>
 [TestFixture]
 public class WhenNurseOpensShiftEmailLink : PlaywrightTestBase
 {
@@ -94,8 +74,6 @@ public class WhenNurseOpensShiftEmailLink : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The page reads the wings as MVC binds them from a query string: every value of the key, whatever
-    // case the link spells the key in.
     [Test]
     public async Task a_link_that_names_several_wings_lists_every_wing_however_it_spells_wing()
     {
@@ -124,8 +102,6 @@ public class WhenNurseOpensShiftEmailLink : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The page number is written before the page decides on the hint, so once it shows "1" the hint's
-    // absence is the page's decision.
     [Test]
     public async Task the_first_page_of_notes_does_not_send_me_to_page_one()
     {
@@ -186,8 +162,6 @@ public class WhenNurseOpensShiftEmailLink : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Both checks go to the same gateway address; only each one's X-Partner header tells the gateway
-    // where to forward it, so each line shows its own partner's answer only if each check carried its own.
     [Test]
     public async Task checking_with_the_pharmacy_and_the_lab_shows_each_ones_own_answer()
     {

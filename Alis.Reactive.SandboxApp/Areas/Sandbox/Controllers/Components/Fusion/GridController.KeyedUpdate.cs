@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Evening rounds: the nurse on East wing picks a resident on the board and records a task done or a fall,
-    /// or brings in what the chart says now; each answer names the resident by key. Every page starts from the
-    /// evening's board, and an answer works from the resident the nurse sent, keeping nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("KeyedUpdate"), ActionName("KeyedUpdate")]
@@ -59,8 +54,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (picked == null)
                 return BadRequest(EveningRoundsNobodyPicked());
 
-            // Ruth Adler's room lost its heating this afternoon; she moved to E-214, therapy raised her fall
-            // risk and wound care added orders. Nobody else's chart changed since the board was printed.
             return Ok(picked.ResidentId == 7303
                 ? new EveningRoundsChart
                 {

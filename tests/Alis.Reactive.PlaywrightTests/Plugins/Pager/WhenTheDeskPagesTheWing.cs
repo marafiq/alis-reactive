@@ -2,17 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Plugins.Pager;
 
 namespace Alis.Reactive.PlaywrightTests.Plugins.Pager;
 
-/// <summary>
-/// As the night desk, I want to page the Garden wing's staff through the community's pager system from
-/// the page, so that a page goes out on the right channel, is counted once it has arrived, and reaches
-/// everyone who carries a pager.
-/// </summary>
-/// <remarks>
-/// The pager is JavaScript the page registers by name (Scripts/sandbox-plugins.ts) and declares with every
-/// kind of member a plugin can have: a channel read and written, an access code written only, a promise
-/// waited for before the delivered count is read, a status object with a method of its own, and a list of
-/// pagers used by position and as a whole. Initials is a plugin that is itself a function.
-/// </remarks>
 [TestFixture]
 public class WhenTheDeskPagesTheWing : PlaywrightTestBase
 {
@@ -92,7 +81,6 @@ public class WhenTheDeskPagesTheWing : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The delivered count is read after the send's promise settles: a page is counted once it has arrived.
     [Test]
     public async Task a_page_is_counted_once_it_has_arrived_and_signed_with_the_senders_initials()
     {

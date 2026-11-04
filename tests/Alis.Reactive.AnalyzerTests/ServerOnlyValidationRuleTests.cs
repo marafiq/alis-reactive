@@ -3,7 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>ALIS005: a C# predicate in a ReactiveValidator runs on the server only; the analyzer says so where it is written.</summary>
 [TestFixture]
 public class ServerOnlyValidationRuleTests
 {

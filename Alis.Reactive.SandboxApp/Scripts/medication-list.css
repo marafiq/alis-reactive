@@ -1,4 +1,3 @@
-/* The medication list the sandbox wrote itself (medication-list.ts). */
 .medication-list {
   display: grid;
   gap: 0.5rem;

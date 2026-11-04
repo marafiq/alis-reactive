@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Plans;
 
-/// <summary>
-/// Every plan stands alone under its owner (ADR-0003 rule 3): two cards of one model, on a page with no plan of its
-/// own, each start a plan with <c>ReactivePlan</c>, and each save sends only the input inside its own card, the
-/// element it names (rule 2). A card's plan that validates a form shows the messages no field of it shows; one that
-/// neither validates a form nor shows a form's errors adds no markup for them.
-/// </summary>
 [TestFixture]
 public sealed class WhenEachCardStartsAPlanOfItsOwn : AppPageTest
 {

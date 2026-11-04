@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A form that names a rule set is checked by that set's rules alone, in the browser and on the server, and a
-/// form that names none by the rules in no set. The set reaches a child validator through a rule in the set,
-/// and an included validator written in no set.
-/// </summary>
 [TestFixture]
 public sealed class WhenAFormAnswersARuleSet : AppPageTest
 {

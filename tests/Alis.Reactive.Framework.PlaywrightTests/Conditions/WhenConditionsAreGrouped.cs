@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// Groups at every place a condition takes one: after an And chain and after an Or chain, a group inside a
-/// group after And and after Or, Not over one comparison in a group, and And and Or chains that continue
-/// inside a group with a comparison or another group. Each line names its condition; pain and fall risk
-/// start at 0 and the ward starts empty.
-/// </summary>
 [TestFixture]
 public sealed class WhenConditionsAreGrouped : AppPageTest
 {

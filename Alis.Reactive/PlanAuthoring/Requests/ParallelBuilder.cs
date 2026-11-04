@@ -28,7 +28,6 @@ namespace Alis.Reactive
             request(new RequestStart<TModel>(_context, Step.Add));
         }
 
-        /// <summary>The requests this builder configures, written where <c>Parallel</c> is.</summary>
         internal ParallelStep Step { get; } = new ParallelStep();
 
         /// <summary>

@@ -1,26 +1,5 @@
 <Project>
 
-  <!--
-    Packed into every Alis.Reactive package that ships browser assets and targets net48, as
-    build\net48\{PackageId}.targets (packages.config) and buildTransitive\net48\{PackageId}.targets
-    (PackageReference). NuGet imports it into .NET Framework projects only.
-
-    ASP.NET MVC 5 has no static web assets, so after every build this copies the package's
-    staticwebassets\ folder, the same files an ASP.NET Core app serves at ~/_content/{PackageId}/,
-    into the web project at Content\{PackageId}\. Link them from a view with the core's
-    Url.AppendVersion("~/Content/{PackageId}/{path}"), which adds the file's content hash, for example
-    Url.AppendVersion("~/Content/AlisReactive/js/alis-reactive.js").
-
-    The copied files are build output and each folder says so itself: the target writes a .gitignore
-    into Content\{PackageId}\ that ignores everything there, only when it changes, so git never lists
-    the copies and the project configures nothing. Include the folders as Content in the web project so
-    publish deploys them.
-
-    Every Alis.Reactive package imports this same file under its own name. The item gathers each
-    package's files with that package's destination; the target is defined once per import, the last
-    definition wins, and it copies them all.
-  -->
-
   <ItemGroup>
     <AlisReactivePackageContent Include="$(MSBuildThisFileDirectory)..\..\staticwebassets\**\*">
       <DestinationFolder>$(MSBuildProjectDirectory)\Content\$(MSBuildThisFileName)\</DestinationFolder>

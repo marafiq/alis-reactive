@@ -2,19 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.CareLevelCascade;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.CareLevelCascade;
 
-/// <summary>
-/// As a care coordinator updating a resident's care after a reassessment, I want the care protocol to
-/// follow the care level I choose and the community's escort policy applied when I ask for it, so that a
-/// resident moving into memory care or skilled nursing gets the monitoring and the escort the policy
-/// requires, and one moving out of them keeps neither.
-/// </summary>
-/// <remarks>
-/// Walter Cho starts in assisted living on the basic support protocol, going out without an escort. Memory
-/// care puts him on enhanced monitoring, skilled nursing on the full clinical protocol, any other level
-/// back on basic support. The escort policy reads the care level as it stands when it is applied: memory
-/// care and skilled nursing go out with an escort, every other level without, whatever was switched by
-/// hand. Everything the page renders is exercised.
-/// </remarks>
 [TestFixture]
 public class WhenCareLevelCascades : PlaywrightTestBase
 {
@@ -69,7 +56,6 @@ public class WhenCareLevelCascades : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // He goes out without an escort until the policy is applied: the switch moves only on the button.
     [Test]
     public async Task applying_the_escort_policy_to_a_memory_care_resident_requires_an_escort()
     {

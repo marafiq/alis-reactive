@@ -3,7 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>ALIS003: one component chain wires each event once.</summary>
 [TestFixture]
 public class DuplicateReactiveEventTests
 {
@@ -54,8 +53,6 @@ public class DuplicateReactiveEventTests
                 .Reactive(plan, evt => evt.Click, (click, p) => p.Element("offer-status").Text.Set("Sent."));
             """));
 
-    // The C# the Razor compiler generates for a view that renders the components given; the view brings a
-    // thermostat with two events of its own.
     private static string View(string components) => $$"""
         using System.Threading.Tasks;
         using Alis.Reactive;

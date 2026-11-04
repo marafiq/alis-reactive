@@ -4,15 +4,8 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The admissions desk: the admissions coordinator corrects a resident's care level, primary nurse and next
-    /// care review in the residents' records, and admits the next referral waiting to move in by completing its
-    /// admission form. Every page starts from the records on file; a correction or an admission answers with
-    /// what it did and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
-        // A first care review falls within this many days of moving in.
         private const int AdmissionsFirstReviewWithinDays = 14;
 
         [HttpGet("ResidentEditForm"), ActionName("ResidentEditForm")]
@@ -46,8 +39,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // A first care review falls between the day the resident moves in and two weeks after; a referral
-        // whose form says otherwise stays waiting, as it is on file.
         [HttpPost("ResidentEditFormAdmit")]
         public IActionResult ResidentEditFormAdmit([FromBody] ReferralAdmission admission)
         {
@@ -89,7 +80,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static DateOnly AdmissionsDate(string day) => DateOnly.ParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        // "Tuesday, October 20", as the coordinator reads a day; a record left without one says so.
         private static string AdmissionsDay(string day) =>
             DateOnly.TryParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
                 ? date.ToString("dddd, MMMM d", CultureInfo.InvariantCulture)

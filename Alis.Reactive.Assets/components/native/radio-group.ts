@@ -1,8 +1,3 @@
-// NativeRadioGroup: the hidden input rendered with data-alis-radio-group is the component. It holds the
-// chosen radio's value and raises change when the user picks one, so the group reads and commits as
-// one input. Writing its value checks the radio with that value and no other, none for empty text;
-// a write raises no event, as a script's write to any native input raises none.
-
 import { onMount } from "../hooks";
 
 const inputValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!;
@@ -22,8 +17,6 @@ onMount("[data-alis-radio-group]", element => {
     configurable: true,
   });
 
-  // The hidden input takes no focus: focusing the group puts the user on the chosen radio, else the
-  // first, where the Tab key would land.
   Object.defineProperty(group, "focus", {
     value: (): void => (radios.find(radio => radio.checked) ?? radios[0])?.focus(),
     configurable: true,

@@ -2,22 +2,6 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the night charge nurse on Cedar wing, I want to correct the two-hourly safety checks the aides recorded, see
-/// every change listed before it goes into the night log, reopen any change I got wrong straight from that list, and
-/// then save them together, so that the night log holds only the checks I have looked at.
-/// </summary>
-/// <remarks>
-/// Tonight's checks load as the aides recorded them: Amina Patel (room 301, 3 checks), Henry Liu (304, 2), Grace
-/// Bennett (308, 3), Walter Grant (312, 1) and Edith Hale (315, 3). Review changes lists the changed residents under
-/// Changes to save and keeps every change pending (the review cancels the grid's own save, batch-edit.js:339-342);
-/// choosing one there reopens that resident's checks; Save to the night log sends the pending changes, the one still
-/// being typed included, shows the checks as the log now holds them and empties Changes to save.
-/// Not exercised:
-/// The pending changes' AddedRecords and DeletedRecords: the checks add and remove no residents, so both arrive empty
-/// (batch-edit.js:347-372).
-/// RecordClick's RowIndex, CellIndex and Name: the review reopens a change by the resident's ID, which RowData carries.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBatchChangeReview : PlaywrightTestBase
 {
@@ -25,7 +9,6 @@ public class WhenUsingFusionGridBatchChangeReview : PlaywrightTestBase
     private const string ChecksId = "night-checks-grid";
     private const string ReviewId = "night-checks-review";
 
-    // Both grids number their columns from 1.
     private const int ResidentColumn = 2;
     private const int ChecksColumn = 4;
 
@@ -47,8 +30,6 @@ public class WhenUsingFusionGridBatchChangeReview : PlaywrightTestBase
         await Expect(Rows).ToHaveCountAsync(5, new() { Timeout = 10000 });
     }
 
-    // Opens a resident's checks and types over them, leaving the cell open. The grid shows the editor holding the
-    // count a moment after the double-click; a fill before then is lost.
     private async Task TypeChecks(string resident, string current, string checks)
     {
         await Checks(resident).DblClickAsync();
@@ -56,7 +37,6 @@ public class WhenUsingFusionGridBatchChangeReview : PlaywrightTestBase
         await ChecksEditor.FillAsync(checks);
     }
 
-    // Henry Liu's checks become 4 and Grace Bennett's 2, and the nurse reviews them.
     private async Task CorrectHenryAndGraceThenReview()
     {
         await TypeChecks("Henry Liu", "2", "4");
@@ -65,8 +45,6 @@ public class WhenUsingFusionGridBatchChangeReview : PlaywrightTestBase
         await Expect(ChangesToSave).ToHaveCountAsync(2, new() { Timeout = 10000 });
     }
 
-    // Chooses a resident in Changes to save and clicks into the checks it reopens. The focus stays in the review
-    // list after the choice, so the box shows the count as 2.00 until the nurse clicks into it.
     private async Task ReopenFromTheReview(string resident, string pending)
     {
         await ClickWhenStable(ChangeToSave(resident).Locator($"td[aria-colindex='{ResidentColumn}']"));

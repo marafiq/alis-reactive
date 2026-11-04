@@ -35,7 +35,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionTextAreaChangeArgs> Change =>
             Event<FusionTextAreaChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the textarea receives focus.</summary>

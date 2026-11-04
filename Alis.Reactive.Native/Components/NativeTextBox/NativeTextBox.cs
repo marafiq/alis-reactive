@@ -25,7 +25,6 @@ namespace Alis.Reactive.Native
         public Event<NativeTextBoxChangeArgs> Change =>
             Event<NativeTextBoxChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

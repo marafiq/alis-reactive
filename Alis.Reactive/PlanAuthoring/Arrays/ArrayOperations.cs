@@ -21,11 +21,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         internal override Expr Write(Scope scope) => _condition.Write(scope);
     }
 
-    /// <summary>
-    /// An operation over a list, written as JavaScript's own method with a lambda: the source is read as
-    /// an array, and the lambdas run per item with hoisting off, so a method result read inside one is
-    /// refused where it is written.
-    /// </summary>
     internal abstract class ArrayOperation : ValueExpression
     {
         internal static ValueExpression Count(ValueExpression source) => new CountOperation(source);
@@ -126,7 +121,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, OutputShape);
     }
 
-    /// <summary>Sum adds each selected value as a finite number, so text never concatenates.</summary>
     internal sealed class SumOperation : ArrayOperation
     {
         private readonly ValueExpression _projection;
@@ -179,7 +173,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
     }
 
-    /// <summary>Find gives null when nothing matches.</summary>
     internal sealed class FindOperation : ArrayOperation
     {
         private readonly Condition _predicate;
@@ -196,7 +189,6 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.Any), G.Null);
     }
 
-    /// <summary>Find gives null when nothing matches, then applies the selector to what it found.</summary>
     internal sealed class FindSelectOperation : ArrayOperation
     {
         private readonly Condition _predicate;

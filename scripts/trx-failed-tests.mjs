@@ -1,25 +1,4 @@
 #!/usr/bin/env node
-// Prints, one per line, the fully qualified name of every test in a TRX whose outcome is a
-// failure (Failed, Error, Timeout, Aborted, ...). With a second argument "passed" it prints the
-// tests that passed instead. Skipped (NotExecuted) and Inconclusive tests are neither.
-// With "annotations" it prints one GitHub Actions ::error command per failed test, carrying the
-// start of its failure message, so a red shard names its failures on the pull request's checks.
-// With "summary" it prints one ::notice command naming each fixture and how many of its tests
-// passed, so a green shard says what it proved.
-// With "flaky" and the TRX of the re-run it prints one ::warning command per test that failed in
-// the first file and passed in the re-run, carrying the start of the failure the re-run hid, so a
-// flaky test's check says why it failed (the failure artifacts are uploaded only for a red job).
-// A failure's annotation also carries the end of the page console the test wrote on failure
-// (PlaywrightTestBase's "Page Console Output"), and every error line in it, so the check shows what
-// the page said without the job's artifacts.
-//
-// Used by scripts/playwright.sh --retry-failed to re-run only what failed, to report which tests
-// then passed (the flaky list) and why they failed, and to annotate what still failed.
-//
-//   node scripts/trx-failed-tests.mjs <file.trx> [failed|passed|annotations|summary]
-//   node scripts/trx-failed-tests.mjs <file.trx> flaky <rerun.trx>
-//
-// A missing file prints nothing and exits 0: a crashed or hung run has no results to re-run.
 import { existsSync, readFileSync } from "node:fs";
 
 const modes = ["failed", "passed", "annotations", "summary", "flaky"];
@@ -52,8 +31,6 @@ if (mode === "summary") {
   console.log(summary(fqns));
   process.exit(0);
 }
-// GitHub shows ten error annotations per step, so a shard with more failures leads with one that
-// names them all; the detailed ones that follow are cut at ten.
 const annotationsShownPerStep = 10;
 if (mode === "annotations" && fqns.length > annotationsShownPerStep) {
   console.log(`::error title=${fqns.length} failed tests::${fqns.join("%0A")}`);
@@ -62,7 +39,6 @@ for (const fqn of fqns) {
   console.log(mode === "annotations" ? annotation("error", "Failed test", fqn, selected.get(fqn)) : fqn);
 }
 
-// Each test in the TRX whose outcome `wanted` accepts, with the message it failed with ("" if none).
 function results(path, wanted) {
   const selected = new Map();
   if (!existsSync(path)) return selected;
@@ -86,7 +62,6 @@ function results(path, wanted) {
   return selected;
 }
 
-// The failure message, and the page console the test wrote to its output when it failed.
 function failure(body) {
   const message = /<Message>([\s\S]*?)<\/Message>/.exec(body);
   const output = /<StdOut>([\s\S]*?)<\/StdOut>/.exec(body);
@@ -96,7 +71,6 @@ function failure(body) {
   };
 }
 
-// The page console's error lines, then its last thirty lines.
 function pageConsole(output) {
   const section = /=== Page Console Output ===\r?\n([\s\S]*?)=== End Console Output ===/.exec(output);
   if (!section) return "";
@@ -117,16 +91,12 @@ function unescapeXml(text) {
     .replace(/&amp;/g, "&");
 }
 
-// GitHub Actions workflow commands escape %, CR and LF in the message; the start of the failure
-// message names the defect, the end of the page console shows what the page did, and the artifact
-// carries the rest.
 function annotation(level, title, subject, { message, console }) {
   const text = `${subject}${message ? ` — ${message.slice(0, 3000)}` : ""}${console ? `\n${console}` : ""}`;
   const escaped = text.replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
   return `::${level} title=${title}::${escaped}`;
 }
 
-// "312 passed" and, one per line, each fixture with its passed count: WhenCoordinatorReviewsMoveIn (9).
 function summary(passed) {
   const perFixture = new Map();
   for (const fqn of passed) {

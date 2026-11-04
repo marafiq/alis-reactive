@@ -2,19 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As the front-desk coordinator, I want to book the community van for a resident's trip, have a nurse
-/// aide sent with every medical appointment, and be offered the next free time when the van is already
-/// out, so that no resident waits at the door for a van that is not coming.
-/// </summary>
-/// <remarks>
-/// The van is out at 10:00 AM (the dialysis run); 11:00 AM is the next free time. A drop-down raises change
-/// as soon as the coordinator picks an option, without leaving it (HTML, the select element's input and
-/// change events); a value the page writes raises none. Every member of the drop-down is exercised: its
-/// value written (the nurse aide, the next free time) and read (the time the van is out, the booking the
-/// server answers), Focus, Change with its value, and its value committed for the trip check the moment
-/// the coordinator picks an option.
-/// </remarks>
 [TestFixture]
 public class WhenDropdownSelectionChanges : PlaywrightTestBase
 {
@@ -48,7 +35,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         await Departure.Select(departure);
     }
 
-    // Margaret Hale's medical appointment at 10:00 AM, when the van is out.
     private async Task BookWhileTheVanIsOut()
     {
         await Choose("Margaret Hale", "Medical appointment", "10:00 AM");
@@ -110,7 +96,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(VanOut);
     }
 
-    // The click leaves the cursor on the button; the server's answer moves it to the time to change.
     [Test]
     public async Task when_the_van_is_out_the_cursor_waits_on_the_departure_time()
     {
@@ -135,7 +120,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(VanOut);
     }
 
-    // Refused in the browser: a booking sent to the server would answer 400, a console error.
     [Test]
     public async Task booking_with_nothing_chosen_says_what_is_missing()
     {
@@ -164,7 +148,6 @@ public class WhenDropdownSelectionChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Picking an option commits it without leaving the drop-down, so the trip is checked on the pick.
     [Test]
     public async Task putting_the_trip_back_to_choose_is_refused_at_once()
     {

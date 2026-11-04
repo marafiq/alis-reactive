@@ -1,5 +1,3 @@
-// Copies the Syncfusion files this app links, from the @syncfusion/ej2 package it depends on, into
-// wwwroot/vendor/syncfusion/ (build output). No framework package ships them.
 import { copyFileSync, mkdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { basename, dirname, join } from "node:path";

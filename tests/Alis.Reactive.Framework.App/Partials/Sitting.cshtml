@@ -6,10 +6,8 @@
 }
 <h1>A sitting with the resident</h1>
 
-@* No request validates the sitting's form: the server checks the next of kin against the resident's file. *@
 <form id="sitting-form">
     @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
-    @* The next of kin's own editor template, rendered under the member's prefix: its input binds as NextOfKin.Name. *@
     @Html.EditorFor(m => m.NextOfKin)
 </form>
 

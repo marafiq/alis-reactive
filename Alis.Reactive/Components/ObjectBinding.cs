@@ -9,10 +9,6 @@ using Alis.Reactive.PlanModel.Reactions;
 
 namespace Alis.Reactive.Components
 {
-    /// <summary>
-    /// Where a live declaration's object is and the plan it writes into. A write or a call lands in the
-    /// callback being built, whichever variable holds the object.
-    /// </summary>
     internal abstract class ObjectBinding
     {
         protected ObjectBinding(PlanBuildContext context)
@@ -22,7 +18,6 @@ namespace Alis.Reactive.Components
 
         internal PlanBuildContext Context { get; }
 
-        /// <summary>The object, found when the step runs.</summary>
         internal abstract Target Locate();
 
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
@@ -31,7 +26,6 @@ namespace Alis.Reactive.Components
             Context.AddStep(new SetStep(target, property.Path.TargetText, target.IsData ? Shape.Any : property.Shape, value));
         }
 
-        /// <summary>Reads the member at <paramref name="path"/>: a declared property, or a member of the data it holds.</summary>
         internal ValueExpression Read(Path path, Shape shape) => ValueExpression.Get(Locate(), path.Text, shape);
 
         internal void Call(ComponentMethod method, IReadOnlyList<ValueExpression> args)
@@ -47,10 +41,8 @@ namespace Alis.Reactive.Components
                 method.Awaits);
 
         internal void RunsAtThisLine(ValueExpression result) => Context.AddStep(new MethodResultStep(result));
-
     }
 
-    /// <summary>A component on an element the plan renders or locates by id.</summary>
     internal sealed class ComponentBinding : ObjectBinding
     {
         private readonly string _componentId;
@@ -71,10 +63,6 @@ namespace Alis.Reactive.Components
         }
     }
 
-    /// <summary>
-    /// The object an event hands its callback. Reactions run inside the callback, so a write lands before
-    /// the component reads the payload back; a call after an HTTP response reaches the same object.
-    /// </summary>
     internal sealed class EventPayloadBinding : ObjectBinding
     {
         internal EventPayloadBinding(PlanBuildContext context)
@@ -85,7 +73,6 @@ namespace Alis.Reactive.Components
         internal override Target Locate() => Target.Event;
     }
 
-    /// <summary>An object a registered plugin makes: a plugin by its name, a stream or a hub by its URL.</summary>
     internal sealed class ModuleBinding : ObjectBinding
     {
         private readonly Target _object;
@@ -99,10 +86,6 @@ namespace Alis.Reactive.Components
         internal override Target Locate() => _object;
     }
 
-    /// <summary>
-    /// The object one of another object's methods returns, such as a grid's column. The method runs once,
-    /// before the first use of the object in a block, and each use reads the object it returned.
-    /// </summary>
     internal sealed class ReturnedObjectBinding : ObjectBinding
     {
         internal ReturnedObjectBinding(ObjectBinding owner, ComponentMethod method, IReadOnlyList<ValueExpression> args)

@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Move-in reviews: one validator serves the page and the server. The server fills
-    /// in the coordinator on duty before it validates.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/MoveInReview")]
     public class MoveInReviewController : Controller

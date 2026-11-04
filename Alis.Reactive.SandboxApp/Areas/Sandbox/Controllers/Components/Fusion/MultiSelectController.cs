@@ -3,17 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Margaret Hale's diet order: the allergies the tray ticket prints, the snacks each texture allows, the
-    /// kitchen's supplement catalog, her hospital discharge summary, and the order the kitchen keeps.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/MultiSelect")]
     public sealed class MultiSelectController : Controller
     {
         private const string Food = "Food";
 
-        // The catalog answers after a moment; the page says it is searching while it waits.
         private static readonly TimeSpan CatalogLookup = TimeSpan.FromMilliseconds(1500);
 
         private static readonly IReadOnlyList<AllergyChoice> Allergies =
@@ -76,7 +71,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new() { Id = "pro-stat", Name = "Pro-Stat" }
         ];
 
-        // Her chart lists a peanut allergy; the discharge summary from her October hospital stay lists others.
         private static readonly string[] OnHerChart = ["peanuts"];
         private static readonly string[] OnHerDischargeSummary = ["shellfish", "penicillin"];
 
@@ -152,7 +146,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             _ => null
         };
 
-        // The kitchen prints the food allergies only, in the order the list shows them.
         private static string TicketFor(string[]? allergies)
         {
             var foods = Allergies

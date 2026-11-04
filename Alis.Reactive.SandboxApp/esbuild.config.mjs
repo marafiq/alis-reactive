@@ -1,11 +1,6 @@
 import * as esbuild from 'esbuild';
 import { fileURLToPath } from 'node:url';
 
-// Sandbox-only bundles; the framework package ships neither.
-//   sandbox-plugins     demo plugins registered on window.__alisPlugins
-//   sandbox-components  components the sandbox brings (Tom Select), constructed on alis:mount;
-//                       its CSS import is emitted beside it as sandbox-components.css
-// absWorkingDir stays at repo root so entry and output paths match build wrappers.
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const watch = process.argv.includes('--watch');
 

@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// A list a component holds, tested: whether it holds an item, whether the list is declared as an array, a
-/// list or a sequence, and whether it is empty. The slate's rows are the residents on the round; its own Add
-/// row button adds "Row 3".
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageTestsAList : AppPageTest
 {

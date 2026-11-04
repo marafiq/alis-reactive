@@ -142,12 +142,10 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Tab is required to fire the native change event.
         await Input(m => m.Address.ZipCode).ClickAsync();
         await Input(m => m.Address.ZipCode).PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");
 
-        // Wait for the change-triggered dispatch to reach the matching CustomEvent behavior.
         var status = Page.Locator("#zipcode-status");
         await Expect(status).ToContainTextAsync("Zip validated", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
@@ -159,7 +157,6 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Tab is required to fire the native change event.
         await Input(m => m.EmergencyPhone).ClickAsync();
         await Input(m => m.EmergencyPhone).PressSequentiallyAsync("555-0123");
         await Page.Keyboard.PressAsync("Tab");
@@ -175,7 +172,6 @@ public class WhenPartialsLoadWithValidation : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        // Partial dispatch should run before the parent validation submit path.
         await Input(m => m.Address.ZipCode).ClickAsync();
         await Input(m => m.Address.ZipCode).PressSequentiallyAsync("90210");
         await Page.Keyboard.PressAsync("Tab");

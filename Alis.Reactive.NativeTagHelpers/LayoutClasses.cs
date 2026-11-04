@@ -1,12 +1,7 @@
 namespace Alis.Reactive.NativeTagHelpers;
 
-/// <summary>
-/// Composes the class names the layout tag helpers write. Each names a part of the package's own markup
-/// and is styled by its stylesheet, <c>_content/AlisReactive.NativeTagHelpers/css/native-tag-helpers.css</c>.
-/// </summary>
 internal static class LayoutClasses
 {
-    /// <summary>Joins the non-empty classes in order; the page's own classes go last.</summary>
     internal static string Join(params string?[] classes) =>
         string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c)).Select(c => c!.Trim()));
 
@@ -24,7 +19,6 @@ internal static class LayoutClasses
         _ => throw new ArgumentOutOfRangeException(nameof(gap), gap, "Not a spacing scale step.")
     };
 
-    /// <summary>The space-below class; empty for <see cref="ElementSpacing.None"/>.</summary>
     internal static string SpaceBelow(ElementSpacing spacing) => spacing switch
     {
         ElementSpacing.None => "",

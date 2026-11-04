@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Maple wing roster: the coordinator corrects, admits and moves out residents. Every page starts from
-    /// the roster on file; an admission answers with the next resident on the waiting list, and a handoff
-    /// correction answers with the resident's corrected row. Nothing is kept between requests.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("EditingRoster")]
@@ -59,7 +54,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new MapleRosterResident { ResidentId = 6101, ResidentName = "Amina Patel", CareLevel = "Assisted Living", Suite = "101", RiskLevel = "Low", OpenTasks = 2, PrimaryNurse = "Nora Ellis" },
             new MapleRosterResident { ResidentId = 6102, ResidentName = "Grace Bennett", CareLevel = "Assisted Living", Suite = "104", RiskLevel = "Moderate", OpenTasks = 3, PrimaryNurse = "Malik Stone" },
             new MapleRosterResident { ResidentId = 6103, ResidentName = "Henry Liu", CareLevel = "Assisted Living", Suite = "108", RiskLevel = "Moderate", OpenTasks = 6, PrimaryNurse = "Elena Ruiz" },
-            // Irene Morgan's transfer to memory care on Willow wing is booked; she moves on Friday.
             new MapleRosterResident { ResidentId = 6104, ResidentName = "Irene Morgan", CareLevel = "Memory Care", Suite = "112", RiskLevel = "High", OpenTasks = 4, PrimaryNurse = "Owen Park" },
             new MapleRosterResident { ResidentId = 6105, ResidentName = "Jonah Reed", CareLevel = "Independent", Suite = "115", RiskLevel = "Low", OpenTasks = 1, PrimaryNurse = "Nora Ellis" },
             new MapleRosterResident { ResidentId = 6106, ResidentName = "Katherine Ortiz", CareLevel = "Assisted Living", Suite = "118", RiskLevel = "High", OpenTasks = 5, PrimaryNurse = "Malik Stone" }

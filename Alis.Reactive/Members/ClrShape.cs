@@ -7,20 +7,12 @@ using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.Members
 {
-    /// <summary>
-    /// The shape of a CLR type, as MVC binds it (grammar.md 2.1): text, number, boolean, date and instant,
-    /// an enum by name, a nullable of one, a collection as an array of its item's shape, and <c>any</c> for a
-    /// class. A caller that knows more about a class (a declaration's argument is an object of its members)
-    /// passes that policy to <see cref="Of(Type, Func{Type, Shape})"/>.
-    /// </summary>
     internal static class ClrShape
     {
         internal static Shape Of(Type type) => Of(type, _ => Shape.Any);
 
         internal static Shape OfValue(object? value) => value == null ? Shape.Any : Of(value.GetType());
 
-        /// <param name="type">The CLR type.</param>
-        /// <param name="ofClass">The shape of a class that is not a scalar, a nullable or a collection.</param>
         internal static Shape Of(Type type, Func<Type, Shape> ofClass)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
@@ -44,22 +36,16 @@ namespace Alis.Reactive.Members
             return ofClass(type);
         }
 
-        /// <summary>The members of a data class its JSON holds: its public properties with a getter, less those it ignores.</summary>
         internal static IEnumerable<PropertyInfo> SerializedProperties(Type type) =>
             type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(property => property.GetIndexParameters().Length == 0
                                    && property.GetMethod != null
                                    && property.GetCustomAttribute<JsonIgnoreAttribute>() == null);
 
-        /// <summary>A dictionary: JSON of any keys, which MVC binds as neither a list nor a class of members.</summary>
         internal static bool IsDictionaryLike(Type type) =>
             new[] { type }.Concat(type.GetInterfaces())
                 .Any(candidate => candidate.IsGenericType && IsDictionaryDefinition(candidate.GetGenericTypeDefinition()));
 
-        /// <summary>
-        /// A class of the app's own data (a server's class, a row, an event): an object of its members. A
-        /// delegate, a dictionary and a framework or library type are not.
-        /// </summary>
         internal static bool IsDataClass(Type type)
         {
             var ns = type.Namespace ?? "";
@@ -93,7 +79,6 @@ namespace Alis.Reactive.Members
 #endif
                ;
 
-        // Text and dictionaries enumerate, but MVC binds neither as a list.
         private static bool TryGetItemType(Type type, out Type itemType)
         {
             itemType = typeof(object);

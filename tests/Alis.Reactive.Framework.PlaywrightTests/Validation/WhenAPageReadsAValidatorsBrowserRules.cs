@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// The browser rules a validator declares, read back by a page as a component whose own JavaScript validates
-/// reads them (<c>plan.BrowserRules&lt;TValidator&gt;()</c>): each member with its rules by their classes, and
-/// whether each rule always applies or only while its condition holds.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageReadsAValidatorsBrowserRules : AppPageTest
 {

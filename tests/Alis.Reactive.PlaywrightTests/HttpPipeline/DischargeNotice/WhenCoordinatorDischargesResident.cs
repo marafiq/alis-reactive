@@ -2,17 +2,6 @@ using System.Collections.Concurrent;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.DischargeNotice;
 
-/// <summary>
-/// As a coordinator, I want a family notice that failed to show only what the notice service said,
-/// so that I never read the discharge confirmation as the reason the family was not told.
-/// </summary>
-/// <remarks>
-/// The family notice is a request chained after the discharge, and both notice services are down:
-/// Margaret Hill's family is reached by text message, whose service answers 503 with no body; Arthur
-/// Bell's by email, whose service answers 503 with its reason. Each failure writes the reason line
-/// before the status line, so once the status line shows the failure the reason line is final. Rosa
-/// Diaz's discharge is refused until her physician signs the order, so her family is not told anything.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorDischargesResident : PlaywrightTestBase
 {
@@ -56,9 +45,6 @@ public class WhenCoordinatorDischargesResident : PlaywrightTestBase
         AssertNoConsoleErrorsExcept(NoticeServiceDown);
     }
 
-    // A family notice follows only a discharge that went through. Margaret Hill's discharge and its
-    // notice both reach the server after any notice Rosa Diaz's refusal could have sent, so once
-    // Margaret's family line shows its answer, Rosa's would show one too.
     [Test]
     public async Task a_discharge_the_office_refuses_sends_the_family_no_notice()
     {

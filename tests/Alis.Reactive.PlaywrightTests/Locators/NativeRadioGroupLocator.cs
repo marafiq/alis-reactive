@@ -2,11 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Locates a <c>NativeRadioGroup</c>. The component id is the group's hidden value input; its
-/// options are the labelled radios beside it, found by the option text a user reads, scoped to this
-/// group.
-/// </summary>
 public sealed class NativeRadioGroupLocator
 {
     private readonly IPage _page;
@@ -23,12 +18,9 @@ public sealed class NativeRadioGroupLocator
     private ILocator Label(string optionText) =>
         Group.Locator("label").Filter(new() { Has = _page.GetByText(optionText, new() { Exact = true }) });
 
-    /// <summary>The radio of the option whose text is exactly <paramref name="optionText"/>.</summary>
     public ILocator Option(string optionText) => Label(optionText).Locator("input[type=radio]");
 
-    /// <summary>The bordered box of the option whose text is exactly <paramref name="optionText"/>.</summary>
     public ILocator Box(string optionText) => Label(optionText).Locator("> div");
 
-    /// <summary>Clicks the option whose text is exactly <paramref name="optionText"/>.</summary>
     public async Task Choose(string optionText) => await Label(optionText).ClickAsync();
 }

@@ -24,9 +24,6 @@
             .Else(routine => routine.Element("urgency").Text.Set("routine"));
     })); }
 
-@* Markup that raises the app's events when clicked (grammar.md 6.1, D4): the gate's button raises an event that
-   carries nothing; the bell raises the announcement without its payload; each row raises it with its own, and a
-   click on the visitor's Details button is a click on the visitor's row. *@
 <button type="button" @Html.Raises(GateEvents.Opened)>Open the gate</button>
 <button type="button" @Html.Raises(GateEvents.Announced)>Ring the gate bell</button>
 <ul>

@@ -23,7 +23,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new RoundNote { Resident = resident.Name, Note = resident.Note });
         }
 
-        // The round skips a resident who is out of the building; after the last room it is complete.
         [HttpPost("HandOff")]
         public IActionResult HandOff([FromBody] HandOffRequest request)
         {

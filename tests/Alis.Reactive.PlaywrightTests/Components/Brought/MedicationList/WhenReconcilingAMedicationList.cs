@@ -2,22 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Brought.MedicationList;
 
-/// <summary>
-/// As the admitting nurse, I want a new resident's medication list counted, totalled, ordered and searched
-/// as I reconcile it line by line against the pharmacy's delivery, so that nothing delivered is missed and
-/// nothing missing is given.
-/// </summary>
-/// <remarks>
-/// The list is a widget the sandbox wrote itself (Scripts/medication-list.ts, BroughtComponents/
-/// MedicationList): a list of objects with members of their own, read as data for the figures and as
-/// objects for the lines' names and units. The pharmacy's delivery is the server's answer, read the same
-/// way. Margaret Hale's list holds five lines: one controlled (lorazepam), one injection (insulin, the
-/// earliest dose at 07:00), one already reconciled (the lidocaine patch, the latest dose at 20:00), two
-/// starting with L, one of ten units or more; the delivery holds four of them, without the patch, and its
-/// warfarin label carries a trailing space. Every figure is worked out in the browser, so a dropped
-/// filter, a wrong order, a sum that concatenates, or a search that ignores case or spaces each shows a
-/// different figure; the empty list and the empty delivery show every figure at nothing.
-/// </remarks>
 [TestFixture]
 public class WhenReconcilingAMedicationList : PlaywrightTestBase
 {
@@ -45,8 +29,6 @@ public class WhenReconcilingAMedicationList : PlaywrightTestBase
         await Expect(Figure("list-count")).ToHaveTextAsync("5");
         await Expect(Figure("delivery-count")).ToHaveTextAsync("4", new() { Timeout = 5000 });
     }
-
-    // ── the list: a brought component's list of objects ─────────────────────
 
     [Test]
     public async Task the_list_opens_counted_and_totalled_in_units_cost_and_hours()
@@ -148,7 +130,6 @@ public class WhenReconcilingAMedicationList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Three doses fall before noon; the aspirin the page adds is due at 08:00 and makes four.
     [Test]
     public async Task the_doses_before_noon_are_counted_and_an_added_morning_dose_joins_them()
     {
@@ -184,7 +165,6 @@ public class WhenReconcilingAMedicationList : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The pharmacy's label reads "Warfarin 2 mg " with a trailing space: found once trimmed, not as written.
     [Test]
     public async Task the_pharmacys_padded_warfarin_is_found_once_trimmed_and_not_as_written()
     {

@@ -1,9 +1,7 @@
 namespace Alis.Reactive.Framework.App.Subscriptions;
 
-/// <summary>The front gate's board: announcements, raised by the board's own markup when it is clicked.</summary>
 public sealed class GatePage;
 
-/// <summary>An announcement at the gate: of a type when the board says which, the size of the party and how urgent it is.</summary>
 public sealed class Announcement
 {
     public string? Type { get; set; }
@@ -19,7 +17,6 @@ public enum GateUrgency
     Urgent,
 }
 
-/// <summary>A visit the gate escorts in, with the visitor it escorts: a payload that holds a record.</summary>
 public sealed class EscortedVisit
 {
     public GateVisitor Visitor { get; set; } = new();

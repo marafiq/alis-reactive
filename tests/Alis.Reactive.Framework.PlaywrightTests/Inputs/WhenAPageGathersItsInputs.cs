@@ -1,19 +1,11 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
-/// <summary>
-/// Inputs bound to a model's members: each posted under its member's name as its member's type, which the
-/// endpoint binds (I1, P4); a rule the browser can check holds the request and shows its message beside the
-/// input (I2); typing clears a message, and leaving an input re-checks it (I3).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageGathersItsInputs : AppPageTest
 {
     private ILocator Bound => Page.Locator("#bound");
 
     private ILocator Admit => Page.GetByRole(AriaRole.Button, new() { Name = "Admit", Exact = true });
-
-    // Nothing reached the endpoint: once no request is in flight, the line the endpoint's answer fills is
-    // still empty. Checked before the network settles, an empty line would pass while a request is on its way.
 
     private async Task Fill(string name, string age, string weight, string admitted, string arrives)
     {

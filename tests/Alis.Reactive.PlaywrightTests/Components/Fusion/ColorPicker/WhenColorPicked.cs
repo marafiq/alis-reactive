@@ -2,10 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ColorPicker;
 
-/// <summary>
-/// As a community's branding coordinator, I choose the brand and accent colors, am warned when the
-/// brand color would hide its white text, and review the colors before they go out.
-/// </summary>
 [TestFixture]
 public class WhenColorPicked : PlaywrightTestBase
 {
@@ -14,10 +10,8 @@ public class WhenColorPicked : PlaywrightTestBase
     private static readonly string BrandId = IdGenerator.For<ColorPickerModel>(m => m.ThemeColor);
     private static readonly string AccentId = IdGenerator.For<ColorPickerModel>(m => m.AccentColor);
 
-    // Each picker's popup lives in the body; only the one being used is open.
     private ILocator OpenPicker => Page.Locator(".e-colorpicker-popup.e-popup-open");
 
-    // The picker's own arrow button: the split button's secondary button, "<id>_dropdownbtn".
     private ILocator ArrowOf(string pickerId) =>
         Page.Locator($"#{pickerId}").Locator("xpath=..").Locator("button[id$='_dropdownbtn']");
 
@@ -50,7 +44,6 @@ public class WhenColorPicked : PlaywrightTestBase
         await Expect(OpenPicker).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(OpenPicker.Locator(".e-hex")).ToHaveValueAsync("#3b82f6");
 
-        // Enter presses the button without a mouse-down outside the picker, which would close it on its own.
         await Page.Locator("#choose-brand-color").PressAsync("Enter");
 
         await Expect(OpenPicker).ToHaveCountAsync(0, new() { Timeout = 5000 });

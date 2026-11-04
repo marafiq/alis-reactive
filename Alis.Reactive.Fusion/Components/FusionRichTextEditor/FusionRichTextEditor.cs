@@ -28,7 +28,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionRichTextEditorChangeArgs> Change =>
             Event<FusionRichTextEditorChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 
@@ -71,12 +70,9 @@ namespace Alis.Reactive.Fusion
             var builder = field.Helper.EJS().RichTextEditorFor(field.Expression)
                 .HtmlAttributes(new Dictionary<string, object> { ["name"] = field.BindingPath });
 
-            // RichTextEditorFor derives model.Id from the member name, and Render() uses model.Id for
-            // the textarea id and the script's appendTo target; set it to the framework's element ID.
             builder.model.Id = field.ElementId;
             build(builder);
 
-            // The editor writes its markup to Output instead of returning it.
             return field.Render<global::Alis.Reactive.Fusion.FusionRichTextEditor>(writer =>
             {
                 builder.Output = writer;

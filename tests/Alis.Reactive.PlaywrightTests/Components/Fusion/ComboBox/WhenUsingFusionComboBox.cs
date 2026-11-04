@@ -2,24 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ComboBox;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ComboBox;
 
-/// <summary>
-/// As a nurse on the morning medication pass, I want to choose the resident by scanning their wristband
-/// or by typing part of their last name, and see their room and allergies before I give a dose, so that
-/// every dose goes to the resident it is for and none goes to a resident whose allergies I have not read.
-/// </summary>
-/// <remarks>
-/// The 08:00 round on the Maple wing is Bell, Arthur (Maple 202); Hale, Margaret (Maple 214, penicillin);
-/// Okafor, Grace (Maple 221, sulfa drugs); Russo, Dominic (Maple 230, latex), in that order. Their
-/// wristbands read R-1031, R-1042, R-1057 and R-1063; R-2001 belongs to another round. Entering the
-/// resident picker opens its list; a resident chosen by name, not by wristband, must have the wristband
-/// checked, and the keyboard goes away once their chart shows. Recording a dose empties the picker and
-/// opens it for the next resident.
-/// Not exercised: that Change is the event that commits the picker's value. Only form validation listens
-/// for it, to re-check a field when it fires, and a medication pass validates no form; the value the
-/// input contract reads is what the Record gather sends. Change's IsInteracted cannot be told apart from
-/// the payload's e and event fields: EJ2 sets it from them. The render helper without a build step is
-/// not used: a picker rendered with no residents has nobody to choose.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionComboBox : PlaywrightTestBase
 {
@@ -47,7 +29,6 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
         await Expect(Resident.DropDownButton).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // The cart's scanner types the wristband's code into the wristband field and presses Enter.
     private async Task ScanWristband(string code)
     {
         var wristband = _plan.TextBox(m => m.Wristband);
@@ -97,7 +78,6 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Enter takes the highlighted resident and leaves the cursor in the picker; only the page moves it out.
     [Test]
     public async Task choosing_a_resident_by_name_puts_the_keyboard_away_once_their_chart_shows()
     {
@@ -185,7 +165,6 @@ public class WhenUsingFusionComboBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The clear button empties the picker and leaves its list open; only the page closes the list.
     [Test]
     public async Task clearing_the_resident_closes_the_list_and_takes_down_their_chart()
     {

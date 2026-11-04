@@ -5,10 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Framework.App.Rendering;
 
-/// <summary>
-/// A button with a plan of its own that renders the plan beside its markup when the markup is written, as a render
-/// helper may: ASP.NET Core writes a view's HTML content when the page is sent, after every view has run.
-/// </summary>
 public sealed class RecordButton<TModel> : IHtmlContent
     where TModel : class
 {
@@ -32,7 +28,6 @@ public sealed class RecordButton<TModel> : IHtmlContent
 
 public static class RecordButtonHtml
 {
-    /// <summary>A button that writes "recorded" into the element named, on a plan of its own.</summary>
     public static RecordButton<TModel> RecordButton<TModel>(this IHtmlHelper<TModel> html, string id, string text, string stateId)
         where TModel : class
     {

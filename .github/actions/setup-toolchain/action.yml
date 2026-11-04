@@ -26,9 +26,6 @@ runs:
         cache-dependency-path: package-lock.json
 
     - name: Cache the NuGet package folder
-      # actions/setup-dotnet's own cache needs committed packages.lock.json files, which this repo
-      # does not have (docs/CI.md, "Caching"). Keying on the project files gives the same effect:
-      # a hit while no PackageReference changed, a fresh restore when one did.
       uses: actions/cache@v6
       with:
         path: ~/.nuget/packages

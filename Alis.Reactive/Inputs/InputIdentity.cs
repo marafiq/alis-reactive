@@ -6,13 +6,6 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Inputs
 {
-    /// <summary>
-    /// What the framework dictates for an input before any component renders it: the element id
-    /// derived from the class that declares the bound member and the MVC binding name, the MVC binding
-    /// path the value posts under, and the shape of the member's value. The binding name carries the HTML
-    /// field prefix, so a partial rendered under two prefixes renders two inputs with two ids, and the page
-    /// that holds the member derives the same id as the editor template that renders it.
-    /// </summary>
     internal sealed class InputIdentity
     {
         private InputIdentity(ComponentId id, BindingPath binding, Shape valueShape)
@@ -32,9 +25,6 @@ namespace Alis.Reactive.Inputs
 
         internal string BindingName => Binding.Value;
 
-        /// <param name="expression">The member the input binds.</param>
-        /// <param name="bindingName">The MVC binding name, as MVC names it: under the view's field prefix already.</param>
-        /// <param name="htmlFieldPrefix">The view's field prefix, which the body path takes here.</param>
         internal static InputIdentity For<TModel, TValue>(
             Expression<Func<TModel, TValue>> expression,
             string bindingName,

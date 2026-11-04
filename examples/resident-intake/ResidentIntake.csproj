@@ -1,13 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <!-- A consumer: the packages, not the projects. scripts/example.sh packs them into ./nupkgs and builds
-       this app against that version; the gate's `example` job does the same and drives the app with
-       ci/smoke.mjs. Without a version passed in, the latest release on nuget.org. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <!-- The sandbox's secrets store, so one `dotnet user-secrets set Syncfusion:LicenseKey` serves both. -->
     <UserSecretsId>alis-sandbox-secrets</UserSecretsId>
     <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">1.0.0-rc.6</AlisReactiveVersion>
   </PropertyGroup>
@@ -17,20 +13,15 @@
     <PackageReference Include="AlisReactive.Native" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.Fusion" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.NativeTagHelpers" Version="$(AlisReactiveVersion)" />
-    <!-- The look this app chose; the component packages do not bring one. -->
     <PackageReference Include="AlisReactive.DesignSystem" Version="$(AlisReactiveVersion)" />
   </ItemGroup>
 
-  <!-- The app's own browser assets (package.json): its stylesheet, Tailwind over the theme the design
-       system copies into Styles\ before each build, and its copy of the Syncfusion files it links. -->
   <ItemGroup>
     <BrowserAssetInput Include="package.json;package-lock.json;copy-vendor.mjs;Styles\**\*.css;Views\**\*.cshtml" />
   </ItemGroup>
 
   <Target Name="BuildBrowserAssets" BeforeTargets="Build" Inputs="@(BrowserAssetInput)" Outputs="wwwroot\css\app.css;wwwroot\vendor\syncfusion\ej2.min.js">
     <Exec Command="npm run build" />
-    <!-- Tailwind leaves an output it would write unchanged as it was; stamping the outputs keeps the next
-         build incremental. -->
     <Touch Files="wwwroot\css\app.css;wwwroot\vendor\syncfusion\ej2.min.js" />
   </Target>
 

@@ -1,21 +1,3 @@
-// An applicant's intake sheet: a widget the sandbox wrote itself, with no knowledge of Alis.Reactive.
-// Its object lives on its host element as `intakeSheet`; BroughtComponents/IntakeSheet/IntakeSheet.cs
-// declares it to the framework. Each fact is held the way JavaScript holds it, so a page reads every
-// kind of value the framework converts:
-//
-//   properties  name (text), age (number), moveInDate (Date), veteran (boolean), careLevel (an
-//               option's text), monthlyRate (a number with cents); roomPreference, petCount,
-//               priorStayEnded, fluShot and diet, each of those or null when the sheet does not hold
-//               it; contact (an object: phone and relation); allergies (a list of text);
-//               waitlist (a number or null, what the waiting list says). All read and written.
-//   functions   summary() (text; the sheet counts how often it was written), yearsOver(minimum)
-//               (a number), waitlistPosition() (a promise of the waitlist number; the sheet counts
-//               how often it was asked), daysUntilMoveIn() (a number)
-//   methods     load(applicant), clear()
-//   events      changed, with the field that changed, the applicant's facts and the contact; raised
-//               once for each edit the coordinator commits on the sheet.
-//               Listeners are added with on(name, fn) and removed with off(name, fn).
-
 import "./intake-sheet.css";
 
 export type CareLevel = "independent" | "assisted" | "memoryCare";
@@ -43,7 +25,6 @@ export interface Applicant {
   allergies: string[];
 }
 
-/** What a changed listener receives: the field edited, the applicant's facts and the contact. */
 export interface SheetChange {
   readonly field: string;
   readonly applicant: Applicant;
@@ -203,7 +184,6 @@ export class IntakeSheet {
     this.show("diet");
   }
 
-  /** The family contact: an object with members of its own. */
   get contact(): Contact {
     return this.facts.contact;
   }
@@ -217,7 +197,6 @@ export class IntakeSheet {
     this.show("allergies");
   }
 
-  /** The applicant's number on the waiting list, or null while the list has not answered. */
   get waitlist(): number | null {
     return this.waitlistNumber;
   }
@@ -227,7 +206,6 @@ export class IntakeSheet {
     this.show("waitlist");
   }
 
-  /** Replaces every fact at once, as a waiting-list record arrives. */
   load(applicant: Applicant): void {
     this.facts = { ...applicant, contact: { ...applicant.contact }, allergies: [...applicant.allergies] };
     this.refresh();
@@ -238,7 +216,6 @@ export class IntakeSheet {
     this.refresh();
   }
 
-  /** The applicant in one line; the sheet counts each summary it writes. */
   summary(): string {
     this.summaries += 1;
     this.count();
@@ -255,7 +232,6 @@ export class IntakeSheet {
     return Math.round((this.facts.moveInDate.getTime() - today.getTime()) / 86_400_000);
   }
 
-  /** Asks the waiting list, which answers a moment later; the sheet counts each time it is asked. */
   waitlistPosition(): Promise<number | null> {
     this.waitlistChecks += 1;
     this.count();
@@ -323,9 +299,6 @@ export class IntakeSheet {
     for (const listener of [...(this.listeners.get(name) ?? [])]) listener(payload);
   }
 
-  // The controls are built once. A fact the page writes lands in its own control, and a question the
-  // page asks (the summary, the waiting list) moves only its counter, so an entry the coordinator is
-  // still typing is kept.
   private build(): void {
     const fields = element("div", "is-fields");
     fields.append(
@@ -351,7 +324,6 @@ export class IntakeSheet {
     this.host.replaceChildren(fields, footer);
   }
 
-  // Each control is named by its label alone, so a select's options never join its name.
   private field(text: string, control: Control): HTMLElement {
     this.controls.set(control.dataset.field!, control);
     control.setAttribute("aria-label", text);
@@ -442,8 +414,6 @@ function emptyApplicant(): Applicant {
   };
 }
 
-// A date as the server writes it ("2026-07-01T00:00:00") or as a date input holds it ("2026-07-01"),
-// read as that calendar day at local midnight.
 function parseDate(value: unknown): Date | null {
   if (value instanceof Date) return value;
   if (typeof value !== "string" || value === "") return null;

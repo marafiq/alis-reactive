@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Pharmacy connection: Riverside Pharmacy accepts the test order; Northgate Pharmacy's system is down
-    /// for maintenance and says so in its reply.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/PharmacyConnection")]
     public class PharmacyConnectionController : Controller

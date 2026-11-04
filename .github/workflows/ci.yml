@@ -1,9 +1,5 @@
 name: CI
 
-# Verification for every pull request and for pushes to main / release/*. This workflow NEVER
-# publishes — releasing is a pushed v* tag handled by nuget-publish.yml (docs/RELEASING.md), so
-# merging to main can never accidentally ship a package. The gate itself is defined once, in
-# gate.yml; this file only decides when it runs. Design and evidence: docs/CI.md.
 on:
   push:
     branches: [main, 'release/*']
@@ -28,13 +24,9 @@ on:
       - '.github/workflows/ci.yml'
       - '.github/workflows/gate.yml'
       - '.github/actions/**'
-  # No path filter on pull requests: a required check must always report (docs/CI.md, "Gating").
   pull_request:
   workflow_dispatch:
 
-# One live run per pull request: a new push supersedes the previous run, so a stale commit never
-# keeps the browser shards busy. Pushes to main and release/* are never cancelled (each commit is
-# a signal), and release tags have their own workflow with cancel-in-progress: false.
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}

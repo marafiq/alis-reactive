@@ -96,7 +96,6 @@
                     .CssClass(ButtonSecondary)
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                         p.Dispatch(NightRoundEvents.NoteFiled, new HandoverNote { Author = "Nurse Patel" })))
-                @* The chart's own flag button raises the declared event with the flag, as its markup carries it. *@
                 <button type="button" id="flag-fall-risk" class="@ButtonSecondary"
                         @Html.Raises(NightRoundEvents.ResidentFlagged, new ResidentFlag { Room = "14", Reason = "Fall risk" })>Flag Arthur Lee as a fall risk</button>
             </native-hstack>

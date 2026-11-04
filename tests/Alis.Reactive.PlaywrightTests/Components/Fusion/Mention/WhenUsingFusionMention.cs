@@ -2,20 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Mention;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Mention;
 
-/// <summary>
-/// As a night nurse, I want to name the people my shift handoff note is for with @ and see who it notifies,
-/// and to find the day nurse I hand the resident to, so that the right people read about Margaret Hale's night.
-/// </summary>
-/// <remarks>
-/// The note is Margaret Hale's; her care team is Dr. Amir Patel, Rosa Reyes, Nora Lind and Omar Haddad, and the
-/// day shift is Karen Holt, Luis Ortega, Kalani Brooks and Meera Shah. EJ2 opens the note's list when @ is typed;
-/// the page shows how to pick while it is open and offers to open it again when it closes without a pick. The
-/// hand-off field finds day nurses by the word typed in it (Search), at the point of the page the page names.
-/// Clear is pressed from the keyboard: EJ2 closes a Mention's list on any mousedown outside it, so a mouse click
-/// would close it even if HidePopup did nothing.
-/// Change's IsInteracted is not proven: EJ2 raises Change only for a pick made with a key or a click, so it is
-/// always true (mention.js:1231, 1553). Opened and Closed carry no data.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionMention : PlaywrightTestBase
 {
@@ -40,14 +26,12 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         _plan = await PagePlan<MentionModel>.FromPage(Page);
     }
 
-    // The Mention reads each key as it is released, so the note is typed key by key.
     private async Task TypeInTheNote(string text)
     {
         await Note.ClickAsync();
         await Note.PressSequentiallyAsync(text, new() { Delay = 30 });
     }
 
-    // Typed after @, a name's first letters narrow the list to that person; the pick waits for the narrowed list.
     private async Task MentionByFirstLetters(string letters, string name)
     {
         await Note.PressSequentiallyAsync("@" + letters, new() { Delay = 30 });
@@ -55,8 +39,6 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         await CareTeam.Item(name).ClickAsync();
     }
 
-    // The nurse brings the hand-off card into view before typing: EJ2 closes the list when the page scrolls,
-    // and a click on a button below the fold would scroll it between opening the list and reading it.
     private async Task FindDayNurses(string word)
     {
         await Find.ScrollIntoViewIfNeededAsync();
@@ -154,7 +136,6 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         await FindDayNurses("ka");
 
         await Expect(DayShift.Items).ToHaveTextAsync(new[] { "Karen Holt", "Kalani Brooks" }, new() { Timeout = 5000 });
-        // EJ2 places the list at the point of the page the Find button names: 64 pixels across, 640 down.
         await Expect(DayShift.Popup).ToHaveCSSAsync("left", "64px");
         await Expect(DayShift.Popup).ToHaveCSSAsync("top", "640px");
         AssertNoConsoleErrors();
@@ -179,7 +160,6 @@ public class WhenUsingFusionMention : PlaywrightTestBase
         await NavigateAndBoot();
         await FindDayNurses("ka");
 
-        // From Find, Tab reaches Clear; Enter presses it without a click that would close the list itself.
         await Page.Keyboard.PressAsync("Tab");
         await Expect(Page.Locator("#clear-day-nurse-btn")).ToBeFocusedAsync();
         await Expect(DayShift.Popup).ToBeVisibleAsync();

@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The executive director's occupancy and care-hours report. A board snapshot keeps the report with its
-    /// figures; the board packet takes the layout only and pulls the figures on the day of the meeting.
-    /// Snapshots live in the browser's session, one per community, so each browser world keeps its own.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/PivotView")]
     public class PivotViewController : Controller
@@ -90,8 +85,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static string SnapshotKey(string community) => "occupancySnapshot:" + community;
 
-        // The months a layout's census rows cover, in the order the report shows them; none when the layout
-        // was taken without its rows.
         private static IReadOnlyList<string> CensusMonths(string layout)
         {
             using var document = JsonDocument.Parse(layout);

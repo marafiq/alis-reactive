@@ -6,11 +6,8 @@
 }
 <h1>Emergency contacts</h1>
 
-@* The wing sits beside the sheet, not in it: each save sends it with the sheet's own inputs. *@
 @{ Html.InputField(plan, m => m.Wing, o => o.Label("Wing")).Entry(); }
 
-@* The contacts are one list partial in a slot, rendered with the page and again each time the desk adds or removes
-   a contact. The page's rules check every contact on the page when the sheet is saved. *@
 <form id="contacts-form">
     @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
     <div id="contact-rows">

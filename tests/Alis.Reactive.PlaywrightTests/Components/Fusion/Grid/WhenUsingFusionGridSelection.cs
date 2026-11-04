@@ -1,26 +1,11 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the activities director, I want to seat residents on Thursday's garden outing from the list of those
-/// who asked to go, start over when the plan changes, and book the bus with the page naming who goes, so
-/// that the bus leaves with the residents who were promised a seat and no more than it holds.
-/// </summary>
-/// <remarks>
-/// Six residents asked to go, in this order: Helen Park, Arthur Bell, Walter Kim, Irene Morgan, Rosa Diaz and
-/// Grace Bennett. The bus seats four. Rosa Diaz was turned away in September, so the director may start the
-/// bus with her. Booking sends the seated residents to the server, which names them or refuses the booking.
-/// Selection is the grid's own: a seated resident's row is highlighted (aria-selected).
-/// Not exercised: the RowSelected event and GetSelectedRowIndexes, which this page does not read
-/// (WhenUsingFusionGridDirectory.picking_a_resident_opens_their_card_without_filtering_the_directory and
-/// next_resident_opens_the_card_of_the_resident_below prove them).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridSelection : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/RosterSelection";
     private const string SignUpsId = "outing-sign-ups";
 
-    // The grid numbers its columns from 1; the hidden ID is the first.
     private const int ResidentColumn = 2;
 
     private ILocator Rows => Page.Locator($"#{SignUpsId} .e-row");
@@ -44,7 +29,6 @@ public class WhenUsingFusionGridSelection : PlaywrightTestBase
         await Expect(SeatedResidents).ToHaveCountAsync(4, new() { Timeout = 10000 });
     }
 
-    // Ctrl-click adds a resident to the residents already seated, or takes a seated one off.
     private async Task CtrlClick(string resident) =>
         await Row(resident).Locator($"td[aria-colindex='{ResidentColumn}']")
             .ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
@@ -88,7 +72,6 @@ public class WhenUsingFusionGridSelection : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Starting with Rosa Diaz starts the bus over: the four seated before her are off it.
     [Test]
     public async Task starting_with_the_resident_turned_away_last_time_seats_only_her()
     {

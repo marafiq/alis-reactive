@@ -1,11 +1,6 @@
-/* AlisReactive.Fusion: the styling its own markup needs, shipped as written
-   (~/_content/AlisReactive.Fusion/css/fusion.css). The Syncfusion theme and script are the app's: it
-   links the Tailwind3 theme and ej2.min.js of the @syncfusion/ej2 version Fusion's packages pin.
-   Looks sit in the framework's `alis` layer; the state mark below stays unlayered. */
 @layer theme, base, alis, components, utilities;
 
 @layer alis {
-  /* The dialog-edit form FusionGridEditTemplates.DialogForm writes: one labeled field per row. */
   .alis-grid-dialog-form {
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -25,8 +20,6 @@
   }
 }
 
-/* The mark the runtime puts on a refused input, carried by the Syncfusion wrapper around it: the
-   theme's border, hover and focus rules read these tokens, so the wrapper takes its error color. */
 .e-input-group:has(.alis-has-error),
 .e-input-group.alis-has-error {
   --color-sf-border: var(--color-sf-border-error, #dc2626);

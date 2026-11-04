@@ -3,17 +3,11 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.MedicationOrder;
 
-/// <summary>
-/// As a nurse, I want every medication line I enter to reach the pharmacy when I save the
-/// refill order, so that no resident misses a medication because a line was dropped.
-/// </summary>
 [TestFixture]
 public class WhenNurseSavesMedicationOrder : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/HttpPipeline/MedicationOrder";
 
-    // IdGenerator is the framework's own id rule, so indexed rows (m => m.Lines[0].Sku) resolve
-    // exactly as the view renders them; PagePlan keys rows by their last "__" segment and collides.
     private ILocator Field(Expression<Func<MedicationOrderModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}");
 

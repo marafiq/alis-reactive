@@ -1,17 +1,5 @@
-// A resident's call bell: a widget the sandbox wrote itself, with no knowledge of Alis.Reactive. Its
-// object lives on its host element as `callBell`; BroughtComponents/CallBell/CallBell.cs declares it to
-// the framework. It takes a listener the way a chart takes options.onClick: a function assigned to a
-// property named for the event, one function per property.
-//
-//   properties  room (read and written), ringing (read only), presses (read only)
-//   methods     clear()
-//   callbacks   onPressed = fn (room, presses), called when the resident presses the bell;
-//               onCleared = fn (room, presses), called when the ring is cleared.
-//               With no function assigned to onPressed, a press shows that no one is listening.
-
 import "./call-bell.css";
 
-/** What the bell hands a callback: which room, and how many times it has been pressed. */
 export interface BellCall {
   readonly room: string;
   readonly presses: number;
@@ -34,10 +22,8 @@ export class CallBell {
   private pressCount = 0;
   private status = "";
 
-  /** Called with each press; the bell shows "No one is listening" while nothing is assigned. */
   onPressed: BellCallback = null;
 
-  /** Called when the ring is cleared. */
   onCleared: BellCallback = null;
 
   constructor(host: CallBellHost) {
@@ -57,17 +43,14 @@ export class CallBell {
     this.render();
   }
 
-  /** Pressed and not yet cleared. */
   get ringing(): boolean {
     return this.isRinging;
   }
 
-  /** How many times the bell has been pressed. */
   get presses(): number {
     return this.pressCount;
   }
 
-  /** Clears the ring, as answering the call does; tells whoever listens for it. */
   clear(): void {
     this.isRinging = false;
     this.status = "";

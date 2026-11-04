@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Conditions;
 
-/// <summary>
-/// A condition that asks the user (<c>p.Confirm</c>, and <c>g.Confirm</c> in a group): Then runs when they
-/// agree and Else when they decline, and a question in a group is asked only when its term is reached.
-/// The app answers <c>alis.confirm</c> with its own dialog. The pain starts at 3.
-/// </summary>
 [TestFixture]
 public sealed class WhenAConditionAsksTheUser : AppPageTest
 {

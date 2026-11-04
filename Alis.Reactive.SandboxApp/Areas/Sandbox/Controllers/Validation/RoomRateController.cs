@@ -4,17 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Room rate sheet: the administrator names a room and sets its monthly rate. The confirmation
-    /// repeats what the server received, so a room only reaches the sheet named and priced.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/RoomRate")]
     public class RoomRateController : Controller
     {
         private readonly RoomRateValidator _validator;
 
-        // The validator depends on the community's rate policy, so the server takes it from DI, as the page does.
         public RoomRateController(RoomRateValidator validator)
         {
             _validator = validator;
@@ -34,7 +29,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
                 return BadRequest(new { errors = result.ErrorsByField });
 
             var rate = room.MonthlyRate.ToString("#,##0.00", CultureInfo.InvariantCulture);
-            // The validator requires the community fee.
             var communityFee = room.CommunityFee!.Value;
             var fee = communityFee == 0m
                 ? "community fee waived"

@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// The page's validator names a member whose editor template is loaded into a slot in a request of its own, the
-/// action rendering it for the member as EditorFor does (ViewData.TemplateInfo.HtmlFieldPrefix), so the template is
-/// a view of the member's own model with a plan of its own (ADR-0003 rules 1 and 3). The page's rule on the member
-/// checks the template's input, and the page's save sends it.
-/// </summary>
 [TestFixture]
 public sealed class WhenAMembersTemplateIsLoadedIntoASlot : AppPageTest
 {

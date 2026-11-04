@@ -2,18 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.CoreBehaviors.NightRound;
 
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors.NightRound;
 
-/// <summary>
-/// As the night nurse, I want the round to open as the page does, each room I check to be logged, room
-/// 12's bell and thermostat to be heard, and a note I file or a resident I flag to reach the desk, so that
-/// nothing on the Garden wing waits for me to say it twice.
-/// </summary>
-/// <remarks>
-/// Each test is one trigger: the page opening; a room chosen in a native dropdown; the bell pressed (a
-/// brought widget's callback, with its payload); the thermostat's schedule applied (a nested object's own
-/// event); a document event raised with a payload composed from two inputs, raised with a payload fixed
-/// in the view, and raised without one, so that its members read as missing; and a flag raised by the
-/// chart's own stamped button.
-/// </remarks>
 [TestFixture]
 public class WhenTheNightNurseStartsTheRound : PlaywrightTestBase
 {

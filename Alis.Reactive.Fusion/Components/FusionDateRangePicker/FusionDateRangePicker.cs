@@ -31,7 +31,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionDateRangePickerChangeArgs> Change =>
             Event<FusionDateRangePickerChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

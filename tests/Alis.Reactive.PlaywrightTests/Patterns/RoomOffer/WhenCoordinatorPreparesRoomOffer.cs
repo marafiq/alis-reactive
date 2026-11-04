@@ -3,25 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.RoomOffer;
 
 namespace Alis.Reactive.PlaywrightTests.Patterns.RoomOffer;
 
-/// <summary>
-/// As an admissions coordinator, I want the room offer to fill the deposit, the floor and the rate from the
-/// care level and the wing I choose, and to route the deposit to whoever signs it off, so that the offer I
-/// send a family is priced the way Maple Grove prices it.
-/// </summary>
-/// <remarks>
-/// Assisted living asks a $2,500 deposit; a respite stay asks none and is offered no room, its suite being
-/// assigned on arrival; memory care leaves the deposit to the coordinator. The executive director signs off
-/// a deposit of $5,000 or more, flagged in red; the business office one of $1,000 or more; a smaller one
-/// needs no sign-off. Maple rooms are on the first floor at $4,200 a month, Oak on the second at $4,800 and
-/// Cedar on the third at $6,100. The offer letter quotes the room's rate, whether a wing filled it or the
-/// coordinator typed one. The page writes the deposit and the rate into their fields, and the sign-off and
-/// the quote follow those writes as they follow typing, because the numeric field raises its change for a
-/// value written to it. A value written into a select raises no change in the browser, so the page never
-/// leaves a select's own reaction to follow a write: starting over clears the wing, the floor and the rate
-/// itself. The inputs' element ids are not exercised as such: nothing a coordinator sees depends on their
-/// spelling, the plan carries each id it renders, and the tests find the inputs through the plan. The
-/// room's members reach the server by their dotted names, which the sent offer proves.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorPreparesRoomOffer : PlaywrightTestBase
 {
@@ -287,7 +268,6 @@ public class WhenCoordinatorPreparesRoomOffer : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The care level was truly cleared: choosing the same level again is a change, and sets its deposit.
     [Test]
     public async Task choosing_assisted_living_again_after_starting_over_asks_the_deposit_again()
     {

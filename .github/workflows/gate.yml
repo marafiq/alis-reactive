@@ -1,15 +1,5 @@
 name: gate
 
-# The one verification gate. Every workflow that asks "is this commit good?" calls this file —
-# ci.yml on pull requests and pushes, nightly.yml on a schedule, nuget-publish.yml on a release
-# tag — so there is exactly one definition of the steps, the tool versions
-# (.github/actions/setup-toolchain), the shard partition (each Playwright project's
-# playwright.project.sh, run through scripts/playwright.sh --shard) and the timeouts. Locally the same
-# gate is `scripts/test.sh` (`--parallel` runs the same shards). In CI it is split into one
-# deterministic job and one job per browser shard (about 20 minutes instead of about 80), plus the
-# `example` job: the packages packed and consumed by examples/resident-intake, driven in a browser
-# (`scripts/example.sh --smoke`).
-# Design rationale, the evidence behind the numbers, and the change checklist: docs/CI.md.
 on:
   workflow_call:
     inputs:
@@ -41,7 +31,7 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # observed: about 2 minutes (docs/CI.md, "Facts")
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
 
@@ -54,14 +44,12 @@ jobs:
     name: playwright (${{ matrix.shard }})
     if: ${{ inputs.playwright }}
     runs-on: ubuntu-latest
-    # Expected: at most about 300 sandbox tests per shard, about 37 minutes on a slow runner, plus
-    # about 3 minutes of setup, single worker (docs/CI.md, "Sharding"). 60 leaves room for one re-run pass.
     timeout-minutes: 60
     permissions:
       contents: read
-      checks: write   # dorny/test-reporter writes the TRX summary as a check run
+      checks: write
     strategy:
-      fail-fast: false   # every shard reports; one red shard must not hide the others
+      fail-fast: false
       matrix:
         shard:
           - framework
@@ -75,8 +63,6 @@ jobs:
           - conditions-and-rest
           - class-names
     env:
-      # Without a registered license, EJ2 overlays a trial modal that intercepts every interaction:
-      # the actual cause of the historical red legs (fixed in 2d5f9562).
       Syncfusion__LicenseKey: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
     steps:
       - uses: actions/checkout@v7
@@ -87,10 +73,6 @@ jobs:
         run: scripts/build.sh
 
       - name: Install Playwright browsers
-        # Deliberately not cached: Playwright's CI guide says restoring a browser cache takes about
-        # as long as the download, and the OS dependencies are not cacheable (docs/CI.md).
-        # The script's own errors do not stop pwsh, so a failed install would pass and every test would then
-        # meet no browser: stop on the first error.
         run: pwsh -NoProfile -Command '$ErrorActionPreference = "Stop"; & tests/Alis.Reactive.Playwright.TestHost/bin/Debug/net10.0/playwright.ps1 install --with-deps chromium; exit $LASTEXITCODE'
 
       - name: Run shard ${{ matrix.shard }}
@@ -106,7 +88,7 @@ jobs:
           use-actions-summary: true
           list-suites: failed
           list-tests: failed
-          fail-on-error: false   # the test step already failed the job; this step only reports
+          fail-on-error: false
           fail-on-empty: false
 
       - name: Upload failure artifacts (logs, TRX, diagnostics, traces, screenshots)
@@ -114,7 +96,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: playwright-${{ matrix.shard }}
-          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
+          overwrite: true
           path: |
             tests/*/TestResults/observable/*.log
             tests/*/TestResults/observable/*.trx
@@ -128,14 +110,9 @@ jobs:
     name: example
     if: ${{ inputs.playwright }}
     runs-on: ubuntu-latest
-    # Observed locally with warm caches: 25 s from pack to PASS; the runner adds the browser install
-    # and a cold pack and restore (docs/CI.md, "Facts").
     timeout-minutes: 20
     env:
-      # Without a registered license, EJ2 overlays a trial dialog that intercepts every interaction.
       Syncfusion__LicenseKey: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
-      # A version no earlier run packed: the NuGet cache restores ~/.nuget/packages, and NuGet never
-      # re-extracts a version it already holds.
       EXAMPLE_VERSION: 0.0.0-ci.${{ github.run_id }}.${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v7
@@ -158,6 +135,6 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: example-smoke
-          overwrite: true   # a re-run of this job replaces the artifact instead of failing on the name
+          overwrite: true
           path: examples/resident-intake/ci/smoke.png
           if-no-files-found: warn

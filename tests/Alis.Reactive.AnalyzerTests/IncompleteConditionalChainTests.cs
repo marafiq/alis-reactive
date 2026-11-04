@@ -3,7 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>ALIS001: a condition a view starts and never completes with .Then() is not in the plan.</summary>
 [TestFixture]
 public class IncompleteConditionalChainTests
 {
@@ -64,7 +63,6 @@ public class IncompleteConditionalChainTests
             p.When(link.Get(q => q.Resident)).Eq("Maple");
             """));
 
-    // The C# the Razor compiler generates for a view whose DomReady pipeline holds the lines given.
     private static string View(string pipeline) => $$"""
         using System.Threading.Tasks;
         using Alis.Reactive;

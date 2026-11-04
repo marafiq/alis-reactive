@@ -5,10 +5,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInPacket;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 
-/// <summary>
-/// The move-in packet: saved to the resident's record as JSON, and sent to the business office, whose
-/// intake takes a form post. Each side answers with what it received, one sentence for each part.
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Patterns/MoveInPacket")]
 public class MoveInPacketController : Controller
@@ -36,7 +32,6 @@ public class MoveInPacketController : Controller
         return Ok(new PacketReceipt(status, Resident(packet), Care(packet), Schedule(packet), Billing(packet)));
     }
 
-    // "Margaret Thompson (RES-1042), assisted living, uses a wheelchair. Family phone (555) 123-4567."
     private static string Resident(MoveInPacketModel packet)
     {
         var careLevel = packet.CareLevel switch
@@ -59,13 +54,11 @@ public class MoveInPacketController : Controller
         return $"{packet.ResidentName} ({packet.ResidentId}), {careLevel}, {mobility}. {phone}";
     }
 
-    // "Allergies: Peanuts, Penicillin. Diet: Low sodium, Diabetic. Care notes: .... Care plan: ...."
     private static string Care(MoveInPacketModel packet)
     {
         var allergies = !packet.HasAllergies ? "No known allergies."
             : packet.Allergies is { Length: > 0 } listed ? $"Allergies: {string.Join(", ", listed)}."
             : "Allergies not listed.";
-        // An empty diet list reaches a JSON body as null: the multi-select holds no value until one is chosen.
         var diets = PacketDiet.All.Where(diet => packet.Diet is { } codes && codes.Contains(diet.Code)).Select(diet => diet.Name).ToList();
         var diet = diets.Count == 0 ? "Regular diet." : $"Diet: {string.Join(", ", diets)}.";
         var notes = string.IsNullOrWhiteSpace(packet.CareNotes) ? "No care notes." : $"Care notes: {packet.CareNotes.Trim()}";
@@ -74,7 +67,6 @@ public class MoveInPacketController : Controller
         return $"{allergies} {diet} {notes} {plan}";
     }
 
-    // "Moves in Monday, November 16, 2026. Morning medication at 8:30 AM. First physician visit ... Trial stay ...."
     private static string Schedule(MoveInPacketModel packet)
     {
         var moveIn = packet.MoveInDay is { } day ? $"Moves in {Day(day)}." : "No move-in day.";
@@ -86,7 +78,6 @@ public class MoveInPacketController : Controller
         return $"{moveIn} {medication} {visit} {trial}";
     }
 
-    // "Maple Grove Main Campus, Medicare (government), attending Dr. Anika Patel, $4,250.00 a month. Family updates by text."
     private static string Billing(MoveInPacketModel packet)
     {
         var community = PacketCommunity.All.FirstOrDefault(candidate => candidate.Code == packet.Community) is { } chosen
@@ -104,7 +95,6 @@ public class MoveInPacketController : Controller
 
     private static string Time(DateTime time) => time.ToString("h:mm tt", English);
 
-    // The editor writes HTML; the receipt quotes the words.
     private static string PlainText(string html) =>
         Regex.Replace(Regex.Replace(html, "<[^>]+>", " "), @"\s+", " ").Trim();
 }

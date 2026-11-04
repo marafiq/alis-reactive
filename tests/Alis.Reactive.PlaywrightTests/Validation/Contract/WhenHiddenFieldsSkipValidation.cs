@@ -39,7 +39,6 @@ public class WhenHiddenFieldsSkipValidation : PlaywrightTestBase
 
         await ClickWhenStable(SubmitBtn);
 
-        // The page did check the form: the reason for no contact is asked for, the veteran ID is not.
         await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
         await Expect(Result).ToHaveTextAsync("");

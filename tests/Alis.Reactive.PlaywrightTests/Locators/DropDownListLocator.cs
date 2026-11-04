@@ -2,9 +2,6 @@ using Microsoft.Playwright;
 
 namespace Alis.Reactive.PlaywrightTests.Locators;
 
-/// <summary>
-/// Syncfusion DropDownList uses <c>#{componentId}_popup</c> with <c>.e-list-item</c> options.
-/// </summary>
 public sealed class DropDownListLocator
 {
     private readonly IPage _page;
@@ -27,12 +24,8 @@ public sealed class DropDownListLocator
 
     public async Task Focus() => await Input.ClickAsync();
 
-    /// <summary>
-    /// Selects the exact option text without depending on focus from a prior popup.
-    /// </summary>
     public async Task Select(string text)
     {
-        // Clear prior focus before opening; Syncfusion keeps popup/focus state internally.
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
 
         await DropdownIcon.ClickWhenStableAsync(_page);

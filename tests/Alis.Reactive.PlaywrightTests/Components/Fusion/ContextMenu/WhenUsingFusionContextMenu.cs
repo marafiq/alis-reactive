@@ -3,29 +3,11 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ContextMen
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.ContextMenu;
 
-/// <summary>
-/// As the evening charge nurse on the Maple wing, I want to right-click a resident on the room board to move
-/// them to an open room, flag them for the night nurse or read their care plan, so that the wing's changes are
-/// made on the board the shift already works from, and never into a room someone else holds.
-/// </summary>
-/// <remarks>
-/// Each resident's card is the target of that resident's menu; the Actions button opens the same menu for a
-/// nurse on a keyboard or a tablet. The menu checks the rooms it offers as it lists them, holds the room list
-/// open while a move saves and closes once the move is saved. During the shift handover the board is
-/// read-only: the handover menu opens where the nurse right-clicked. The tests work on Arthur Bell, Maple 215.
-/// Not exercised:
-/// OnOpen's, OnClose's and BeforeClose's Items: each carries the items of the list opening or closing, the
-/// list BeforeOpen's Items carries, which the page reads.
-/// A menu item's Items: a submenu's items arrive as BeforeOpen's Items when the submenu opens.
-/// BeforeItemRender for the top list: EJ2 renders it when it creates the menu, before the page boots; the page
-/// reads BeforeItemRender for the room list, which renders when it opens.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionContextMenu : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/ContextMenu";
 
-    // Where the nurse right-clicks Arthur's card: on his name, near the card's top-left corner.
     private const float ClickX = 24;
     private const float ClickY = 16;
 
@@ -236,7 +218,6 @@ public class WhenUsingFusionContextMenu : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await StartTheHandover();
-        // Where the card is when the nurse clicks: the handover note that opens above the board then moves it down.
         var card = await ArthursCard.BoundingBoxAsync();
 
         await RightClickArthur();
@@ -244,7 +225,6 @@ public class WhenUsingFusionContextMenu : PlaywrightTestBase
         await Expect(HandoverMenu.Item("Open the handover report")).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(ArthursMenu.Root).ToBeHiddenAsync();
         await Expect(HandoverNote).ToHaveTextAsync("3 actions for Arthur Bell wait until the handover ends.");
-        // The click lands inside the card's 1px border; EJ2 opens the menu one pixel past the pointer.
         var menu = await HandoverMenu.Root.BoundingBoxAsync();
         Assert.That(menu!.X, Is.EqualTo(card!.X + ClickX + 1).Within(3), "the menu's left edge sits at the click");
         Assert.That(menu.Y, Is.EqualTo(card.Y + ClickY + 1).Within(3), "the menu's top edge sits at the click");

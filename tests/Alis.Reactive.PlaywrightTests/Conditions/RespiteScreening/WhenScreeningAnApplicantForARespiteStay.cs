@@ -2,25 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.RespiteScreening;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.RespiteScreening;
 
-/// <summary>
-/// As the admissions coordinator, I want an applicant's intake sheet checked against the community's
-/// rules as I fill it in, fact by fact, and held against the Garden wing's policy, so that a stay is
-/// never promised on a fact that fails a rule.
-/// </summary>
-/// <remarks>
-/// The intake sheet is a widget the sandbox wrote itself (Scripts/intake-sheet.ts, BroughtComponents/
-/// IntakeSheet); it holds each fact as its own kind: text, a number, a date, yes or no, an option, a
-/// number with cents, and each of those or nothing for the facts not yet asked, plus a contact object
-/// and a list of allergies. Every rule on the page reads one fact and says what it means, and every
-/// test edits that fact to each side of the rule's edge: the rule's line must change with the edit, so
-/// an operator one step off (greater for at least, a dropped cent, a date a day out, a missing fact
-/// read as zero, a case-folded text, a list read as text) names the wrong side. Margaret Hale opens the
-/// sheet on the edge of most rules: 62, moving in on 1 July 2026, a veteran, assisted living at $5,000,
-/// one pet, with no room preference, previous stay, flu shot or diet recorded. The wing's policy is
-/// asked for on each check and every fact is compared with the wing's, read when the check runs.
-/// Not exercised: an order over yes/no or an option (Gt on a bool compiles but says nothing a
-/// coordinator would write), and In over yes/no, which is Eq.
-/// </remarks>
 [TestFixture]
 public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
 {
@@ -43,7 +24,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("name-waiting")).ToHaveTextAsync("On the waiting list.", new() { Timeout = 5000 });
     }
 
-    // Typing into the sheet commits on blur, the way the sheet listens; a date commits as it is filled.
     private async Task Type(string label, string text)
     {
         var field = Field(label);
@@ -58,8 +38,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
     {
         await CheckWing.ClickAsync();
     }
-
-    // ── the applicant's name: text ──────────────────────────────────────────
 
     [Test]
     public async Task the_applicant_on_the_waiting_list_is_known_and_one_letter_off_is_not()
@@ -137,7 +115,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A blank name is still a name field on the sheet: blank is not missing.
     [Test]
     public async Task a_blank_name_is_still_on_the_sheet()
     {
@@ -214,8 +191,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("name-length")).ToHaveTextAsync("Too short for a full name.");
         AssertNoConsoleErrors();
     }
-
-    // ── age: a number ───────────────────────────────────────────────────────
 
     [Test]
     public async Task a_centenarian_is_exactly_one_hundred()
@@ -324,8 +299,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── the monthly rate: a number with cents ───────────────────────────────
-
     [Test]
     public async Task a_rate_one_cent_off_the_standard_is_not_the_standard_rate()
     {
@@ -406,8 +379,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("rate-minimum")).ToHaveTextAsync("Below the minimum rate.");
         AssertNoConsoleErrors();
     }
-
-    // ── the move-in date: a date ────────────────────────────────────────────
 
     [Test]
     public async Task moving_in_on_1_july_is_opening_day_and_2_july_is_not()
@@ -527,8 +498,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── veteran: yes or no ──────────────────────────────────────────────────
-
     [Test]
     public async Task a_veteran_is_told_to_the_va_liaison_and_a_civilian_is_not()
     {
@@ -566,8 +535,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("veteran-civilian")).ToHaveTextAsync("Served.");
         AssertNoConsoleErrors();
     }
-
-    // ── care level: an option ───────────────────────────────────────────────
 
     [Test]
     public async Task memory_care_is_the_secured_wing_and_assisted_living_is_not()
@@ -619,8 +586,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("care-garden")).ToHaveTextAsync("The Garden wing is not secured.");
         AssertNoConsoleErrors();
     }
-
-    // ── room preference: text, or nothing ───────────────────────────────────
 
     [Test]
     public async Task no_room_preference_is_recorded_until_one_is_typed()
@@ -685,8 +650,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("room-any")).ToHaveTextAsync("A particular room.");
         AssertNoConsoleErrors();
     }
-
-    // ── pets: a number, or nothing ──────────────────────────────────────────
 
     [Test]
     public async Task pets_read_as_not_asked_when_the_count_is_cleared_and_as_asked_at_zero()
@@ -786,8 +749,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── the previous stay: a date, or nothing ───────────────────────────────
-
     [Test]
     public async Task a_first_stay_has_no_previous_stay_until_one_is_dated()
     {
@@ -854,8 +815,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── the flu shot: yes or no, or nothing ─────────────────────────────────
-
     [Test]
     public async Task the_flu_shot_is_not_asked_until_answered()
     {
@@ -919,8 +878,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("flu-offer")).ToHaveTextAsync("Flu shot done.");
         AssertNoConsoleErrors();
     }
-
-    // ── the diet: an option, or nothing ─────────────────────────────────────
 
     [Test]
     public async Task no_diet_is_recorded_until_one_is_chosen()
@@ -1001,8 +958,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("diet-kitchen")).ToHaveTextAsync("The kitchen has a diet to prepare.");
         AssertNoConsoleErrors();
     }
-
-    // ── allergies and services: lists ───────────────────────────────────────
 
     [Test]
     public async Task allergies_listed_are_recorded_and_a_cleared_list_records_none()
@@ -1093,8 +1048,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // ── what the edit itself says ───────────────────────────────────────────
-
     [Test]
     public async Task editing_the_age_is_the_last_edit_and_editing_the_name_is_not()
     {
@@ -1133,8 +1086,6 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await Expect(Line("contact-child")).ToHaveTextAsync("The contact is not a child.");
         AssertNoConsoleErrors();
     }
-
-    // ── against the Garden wing: each fact compared with the wing's, read when the check runs ──
 
     [Test]
     public async Task the_wing_expects_margaret_hale_and_no_one_else()

@@ -1,8 +1,3 @@
-/* The Alis.Reactive theme: the tokens every framework stylesheet reads and every Tailwind utility of
-   an app resolves to. Shipped as written at ~/_content/AlisReactive.DesignSystem/css/theme.css and
-   copied into a consumer's project by the package's .targets, for `@import` into its own Tailwind
-   build; `static`, so every token is emitted on :root whether a utility uses it or not. Re-brand in a
-   later `@theme` block (with a build) or on `:root` (without one). */
 @theme static {
   --color-primary: #7A2E3B;
   --color-primary-light: #9B4A57;

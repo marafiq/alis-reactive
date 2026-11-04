@@ -1,14 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
-/// <summary>
-/// One member's field rendered twice on a page (I8): two elements cannot share one id, so a field rendered a
-/// second time is refused when the page renders, by the same plan or by another, with a message naming the
-/// element id and both views; a field rendered once renders and is sent.
-/// </summary>
 [TestFixture]
 public sealed class WhenAFieldIsRenderedTwice : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string path) => await Page.GotoAsync(BaseUrl + path);
 
     [Test]

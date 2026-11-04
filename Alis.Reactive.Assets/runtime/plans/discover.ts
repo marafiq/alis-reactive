@@ -1,6 +1,3 @@
-// Plan discovery is one of the two justified wide queries: the runtime finds the plan scripts in HTML
-// it did not author, at boot and in injected partials.
-
 import type { PlanDocument } from "../types/index";
 
 const PLAN_SELECTOR = "[data-reactive-plan]";
@@ -19,7 +16,6 @@ export function discoverPlans(root: ParentNode, remove: boolean): DiscoveredPlan
   return plans;
 }
 
-// An element's text is never null; an empty script fails to parse, as any text the framework did not write.
 function parsePlan(script: HTMLElement): PlanDocument {
   try {
     return JSON.parse(script.textContent!) as PlanDocument;

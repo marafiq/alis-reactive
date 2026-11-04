@@ -26,7 +26,6 @@ namespace Alis.Reactive.Native
         public Event<NativeDropDownChangeArgs> Change =>
             Event<NativeDropDownChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }
 

@@ -1,17 +1,10 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Validation;
 
-/// <summary>
-/// A form whose request no validator checks, whose error route shows the server's errors on it
-/// (<c>e.ValidationErrors(form)</c>): a message for a member the plan renders an input for comes back beside
-/// that input, and one for a member it renders no input for comes back to the plan's summary, for a root
-/// view's plan and for an element's plan of its own alike.
-/// </summary>
 [TestFixture]
 public sealed class WhenOnlyTheServerChecksAForm : AppPageTest
 {
     private ILocator Summary => Page.Locator("[data-reactive-validation-summary]");
 
-    // The field's own wrapper in the form: its label, its input and its message slot, and nothing of another field.
     private ILocator Field(string form, string label) =>
         Page.Locator($"#{form} > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
 

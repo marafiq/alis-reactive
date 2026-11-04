@@ -10,7 +10,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     {
         private const string ResidentId = "resident-42";
 
-        // Another Maple Grove resident's medical record number: a face sheet cannot take it.
         private const string WalterGrantsRecordNumber = "WGT4321";
 
         private static readonly CultureInfo English = CultureInfo.GetCultureInfo("en-US");
@@ -67,7 +66,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // The editor's own commit data carries the new rate as text under "value".
         [HttpPost("UpdateMonthlyRate")]
         public IActionResult UpdateMonthlyRate([FromBody] MonthlyRateChange change)
         {

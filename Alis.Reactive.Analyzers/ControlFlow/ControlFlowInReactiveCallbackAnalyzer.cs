@@ -117,8 +117,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             }
         }
 
-        // The walk stays in the callback's own render-time code: a nested lambda or local function declares
-        // for itself, and a statement already reported is not reported again for what it holds.
         private static bool IsTheCallbacksOwnCode(SyntaxNode node)
         {
             if (node is LambdaExpressionSyntax || node is AnonymousMethodExpressionSyntax || node is LocalFunctionStatementSyntax)

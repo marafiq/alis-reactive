@@ -6,7 +6,6 @@
 }
 <h1>A room on the ward</h1>
 
-@* Each input is rendered with no label of its own; the page labels it by the id the framework gives it. *@
 <form id="room-form">
     @{ Html.InputField(plan, m => m.Bed).Entry(); }
     @{ Html.InputField(plan, m => m.Note).Entry(); }

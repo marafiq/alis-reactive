@@ -1,13 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Members;
 
-/// <summary>
-/// A component's data: a value it holds whose members are read (P5), one field of each item of a list it
-/// holds (P6), a nullable property written from a value that is never missing (P7), a write-only property
-/// written from a value read when the step runs (P8), a field of the page's own class passed by its
-/// JavaScript name with a value of its type (M7) or alone (M8), an argument the declaration always passes
-/// (M9), and a value passed as the wider type the method declares (M10). Proven on the slate: Cy's card is
-/// due 2026-10-29, Ada's the 30th and Ben's the 27th.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageUsesAComponentsData : AppPageTest
 {

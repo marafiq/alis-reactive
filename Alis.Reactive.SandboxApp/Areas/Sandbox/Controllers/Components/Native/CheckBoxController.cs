@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
 {
-    /// <summary>
-    /// Shower log: Dorothy Reyes's evening shower, opened with the shower chair her care plan calls for
-    /// and saved as the care aide ticked it.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/CheckBox")]
     public class CheckBoxController : Controller

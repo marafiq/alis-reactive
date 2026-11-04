@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Admissions at Maple Grove places Eleanor Whitfield: the care levels the community offers, the wings
-    /// that offer each one with the wing that has a room open this week, and the placement itself, which
-    /// admissions refuses for a wing whose waitlist is full.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/DropDownList")]
     public sealed class DropDownListController : Controller
@@ -22,8 +17,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             new() { Code = "memory", Name = "Memory Care" }
         ];
 
-        // Each wing offers one care level; a wing with a room open this week takes a resident now, the
-        // others take her on their waitlist, unless it is full.
         private static readonly IReadOnlyList<CommunityWing> CommunityWings =
         [
             new("birch", "Birch", "Main building", "independent", OpenRoom: true),
@@ -40,7 +33,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             View("~/Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml",
                 new FusionDropDownListModel { CareLevels = CareLevels, Community = Community });
 
-        // The wings are Maple Grove's: a wing list asked of another community, or of none, is not found.
         [HttpGet("Wings")]
         public IActionResult Wings([FromQuery] string community, [FromQuery] WingListQuery query)
         {

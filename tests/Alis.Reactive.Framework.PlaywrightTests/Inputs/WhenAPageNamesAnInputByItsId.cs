@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Inputs;
 
-/// <summary>
-/// The id an input is rendered with, derived from its member (I7, ADR-0003 rule 1): the full name of the class
-/// that declares the member, with its dots, and the plus of a type nested in another, as underscores, then two
-/// underscores, then the member's whole path with its dots as underscores; and the id <c>IdGenerator.For</c>
-/// gives for a member, of a value type or typed, is the id of the input the field rendered for that member, so
-/// a label the page writes with it names that input.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageNamesAnInputByItsId : AppPageTest
 {

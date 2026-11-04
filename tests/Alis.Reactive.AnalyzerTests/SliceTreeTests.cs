@@ -3,11 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>
-/// ALIS010-ALIS013: a package that carries a SliceTree.txt is an inverted tree of slices (ADR-0004). A slice uses
-/// only slices in rows below it; a file sits in its namespace; a public class nothing derives from is sealed; the
-/// table and the folders agree. A package without a table is left alone unless it is a shipped one.
-/// </summary>
 [TestFixture]
 public class SliceTreeTests
 {
@@ -29,7 +24,6 @@ public class SliceTreeTests
 
     private static string Disagree(string what) => $"SliceTree.txt and the package disagree: {what}";
 
-    // The upper slice of the design system fixture.
     private static readonly (string Path, string Source) Stack = ("Layout/Stack.cs",
         """
         namespace Alis.Reactive.DesignSystem.Layout;

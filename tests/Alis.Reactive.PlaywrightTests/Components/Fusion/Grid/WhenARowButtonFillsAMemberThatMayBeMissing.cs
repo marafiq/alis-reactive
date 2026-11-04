@@ -1,10 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the developer of the wing's waiting list, I want a row button that fills an event's payload from a member
-/// that may be missing refused as the view renders, naming the fix, because the template engine writes a missing
-/// bed as the text "null" and the front desk would be asked to keep bed "null".
-/// </summary>
 [TestFixture]
 public class WhenARowButtonFillsAMemberThatMayBeMissing : PlaywrightTestBase
 {

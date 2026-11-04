@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>Discharge planning: the plan's rules depend on its own answers, on the page and on the server alike.</summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/DischargePlanning")]
     public class DischargePlanningController : Controller

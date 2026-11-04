@@ -3,23 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DateTimePicker;
 
-/// <summary>
-/// As a nurse, I want to book a resident's follow-up with his cardiologist at a time inside the window she
-/// set and inside her clinic hours, and see at once whether she is in at the time I enter, so that the
-/// resident is seen on time and never sent to a closed clinic.
-/// </summary>
-/// <remarks>
-/// Arthur Bell came home from hospital on Friday, November 6; Dr. Osei wants to see him between Monday,
-/// November 9 and Friday, November 20, and sees residents on weekdays from 9:00 AM to 4:00 PM. Her office is
-/// holding Thursday, November 12 at 2:00 PM. Each time entered asks the clinic whether she is in then; a time
-/// she is in, inside the window, is settled and the field lets the keyboard go. The page and the server check
-/// the window; only the server checks the clinic hours. A time the page refuses is never sent: the server
-/// would refuse it too, with a 400 the console reports and the tests refuse. A time refused as it is picked
-/// shows its message before Schedule is pressed, so that test counts the times sent. The browser runs in
-/// America/Los_Angeles, west of UTC: a time sent, answered or shown as a UTC instant would read eight hours
-/// early.
-/// Not exercised: the render helper without a build step, since the appointment shows a placeholder.
-/// </remarks>
 [TestFixture]
 public class WhenDateTimeSelected : PlaywrightTestBase
 {
@@ -37,10 +20,8 @@ public class WhenDateTimeSelected : PlaywrightTestBase
 
     private ConcurrentQueue<string> _schedulesSent = null!;
 
-    // West of UTC: a time read or written as a UTC instant would show and book eight hours early.
     public override BrowserNewContextOptions ContextOptions()
     {
-        // The NUnit base returns null when no options are configured; a zone needs an options object.
         var options = base.ContextOptions() ?? new BrowserNewContextOptions();
         options.TimezoneId = "America/Los_Angeles";
         return options;
@@ -58,7 +39,6 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         await Expect(Appointment.CalendarIcon).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
-    // Typing keeps the cursor in the field, and Enter does not move it.
     private async Task EnterTime(string dateTime)
     {
         await Appointment.Fill(dateTime);
@@ -116,8 +96,6 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The message comes as the time is entered, while the cursor is still in the field: the field is checked
-    // when the picker commits its time, not when the nurse leaves it or schedules.
     [Test]
     public async Task a_time_after_the_follow_up_is_due_is_refused_as_it_is_entered_and_the_cursor_stays()
     {
@@ -131,8 +109,6 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Friday, November 6 at 10:00 AM is in clinic hours but before the window opens: the clinic says she is in,
-    // and the page still keeps the cursor in the field.
     [Test]
     public async Task a_time_before_the_follow_up_window_opens_is_refused_as_it_is_entered_and_the_cursor_stays()
     {
@@ -147,9 +123,6 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The clinic is slow to answer about 6:00 PM: its answer is held until the nurse has entered 10:30 AM and seen
-    // that answer, then arrives about a time no longer in the field. Scheduling afterwards orders the check after
-    // the late answer was handled.
     [Test]
     public async Task a_late_answer_about_a_time_since_changed_does_not_replace_the_answer_for_the_time_entered()
     {
@@ -187,8 +160,6 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The message is on screen as soon as the time is picked, so the refused time is shown never to leave the
-    // page by the scheduling that follows: her first opening is the only time the clinic receives.
     [Test]
     public async Task a_time_before_dr_osei_can_see_arthur_is_not_scheduled()
     {
@@ -209,8 +180,6 @@ public class WhenDateTimeSelected : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Tuesday, November 10 is inside the window, so only the clinic refuses 6:00 PM. Scheduling moves the
-    // cursor to the button; the refusal brings it back to the appointment.
     [Test]
     public async Task a_time_outside_clinic_hours_is_refused_by_the_clinic_and_the_cursor_returns_to_it()
     {

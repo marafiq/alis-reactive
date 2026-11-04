@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 
-/// <summary>
-/// <c>OrderBy</c> and <c>OrderByDescending</c> over text, numbers, dates, moments and flags, and orders chained
-/// with filters and projections. Every order asked for differs from the order the residents endpoint answers
-/// them in: Cyd Marsh (81, admitted 2026-01-05, present, next visit 07:30 at +05:30), Ada Hartley (102,
-/// 2026-03-14, away, 08:00 at +09:00), Ben Hart (79, 2026-06-19, present, 21:00 the day before at -04:00) and
-/// Dot Ashton (80, 2025-11-02, away, 00:00 at +00:00).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageOrdersAnArray : AppPageTest
 {

@@ -2,32 +2,11 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.PivotView;
 
-/// <summary>
-/// As the executive director of Maple Grove, I want my monthly occupancy and care-hours report by wing and
-/// care level, as a table or a chart, so that I can see what each figure counts, bring in the month that
-/// just closed, and take the report to the board as a snapshot or in the board packet.
-/// </summary>
-/// <remarks>
-/// The report opens on July to September. North holds Assisted Living and Memory Care, South holds
-/// Assisted Living and Independent. In the table, column 1 holds the row headings, then each month its
-/// residents and its care hours: July 2 and 3, August 4 and 5, September 6 and 7; once October loads,
-/// August is 2 and 3 and October 6 and 7. Picking a figure says what it counts; drawing the report again
-/// (refresh, new data, a snapshot) clears the figure picked. A snapshot keeps the figures; the board packet
-/// takes the layout without them. Snapshots live in the browser's session, so each test keeps its own.
-/// Not exercised:
-/// writing <c>CurrentView</c>: EJ2 keeps it as a plain field that nothing on screen follows; its own
-/// toolbar switches the view, and Refresh resets the field from the display option.
-/// Reading <c>DataSourceSettings.Rows&lt;T&gt;()</c>: the page never needs the rows back.
-/// The cell's <c>ActualValue</c>: it differs from <c>Value</c> only in a drilled row whose subtotals are
-/// hidden, and this report shows every subtotal.
-/// The cell's <c>RowIndex</c> and <c>ColIndex</c>: positions in EJ2's cell matrix, which no figure names.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionPivotView : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/PivotView?community=maple-grove";
 
-    // The table numbers its columns from 1; column 1 holds the row headings.
     private const int JulyResidents = 2;
     private const int AugustResidents = 4;
     private const int SeptemberCareHours = 7;
@@ -46,7 +25,6 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
     private ILocator AddToBoardPacket => Page.Locator("#add-to-board-packet-btn");
     private ILocator BoardStatus => Page.Locator("#board-status");
 
-    // The layout's toast container holds one element per toast shown.
     private ILocator Toast => Page.Locator("#alisFusionToast .e-toast");
 
     private async Task NavigateAndBoot()
@@ -212,7 +190,6 @@ public class WhenUsingFusionPivotView : PlaywrightTestBase
         await Expect(Toast.Locator(".e-toast-progress")).ToHaveCountAsync(1);
         await Expect(Toast.Locator(".e-toast-close-icon")).ToHaveCountAsync(0);
 
-        // It counts down 2.5 seconds and fades; a toast left at the default five seconds would still show.
         await Expect(Toast).ToHaveCountAsync(0, new() { Timeout = 4500 });
         AssertNoConsoleErrors();
     }

@@ -6,10 +6,6 @@ using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.PlanModel.Writing
 {
-    /// <summary>
-    /// Where a step or a value is written: the plan's objects and fresh names, and the names a callback
-    /// binds (its event parameter, the responses of the requests it sits in, an array item).
-    /// </summary>
     internal sealed class Scope
     {
         private readonly PlanWriter _plan;
@@ -28,7 +24,6 @@ namespace Alis.Reactive.PlanModel.Writing
 
         internal static Scope ForHandler(PlanWriter plan, string eventParam) => new Scope(plan, eventParam, null, null, new ResultFrame(null));
 
-        /// <summary>The scope of a block: it binds the method results its statements use, and sees its parent's.</summary>
         internal Scope ForBlock() => new Scope(_plan, EventParam, _responses, _item, new ResultFrame(_results));
 
         internal PlanObjects Objects => _plan.Objects;
@@ -47,10 +42,6 @@ namespace Alis.Reactive.PlanModel.Writing
 
         internal Scope WithItem(string name) => new Scope(_plan, EventParam, _responses, name, _results);
 
-        /// <summary>
-        /// What a method returned, bound once per block by a <c>let</c> hoisted before the statement that
-        /// first reads it; a later read in the block, or in a block inside it, is the name (grammar.md 3.1).
-        /// </summary>
         internal Expr Result(object result, string stem, bool awaits, Func<Expr> call)
         {
             for (ResultFrame? frame = _results; frame != null; frame = frame.Outer)
@@ -63,10 +54,6 @@ namespace Alis.Reactive.PlanModel.Writing
             return G.Ref(name);
         }
 
-        /// <summary>
-        /// A promise's own line: written at the end of the block, at <paramref name="index"/>, unless a
-        /// statement of the block or of a block inside it bound the result first (grammar.md 3.1).
-        /// </summary>
         internal void DeferOwnLine(object result, int index, Func<IReadOnlyList<Statement>> write) =>
             _results.Defer(result, index, write);
 
@@ -79,7 +66,6 @@ namespace Alis.Reactive.PlanModel.Writing
             }
         }
 
-        /// <summary>The binding of the response the handle names; the innermost one for <see cref="ResponseHandle.Innermost"/>.</summary>
         internal string Response(ResponseHandle handle)
         {
             if (handle == ResponseHandle.Innermost && _responses != null) return _responses.Binding;
@@ -90,10 +76,6 @@ namespace Alis.Reactive.PlanModel.Writing
                 "response inside OnSuccess, OnError or Chained of its request; Finally runs whether or not one came.");
         }
 
-        /// <summary>
-        /// Writes one statement's worth of steps; the let that binds a method result the statement reads,
-        /// awaited when the method returns a promise, lands just before them.
-        /// </summary>
         internal IReadOnlyList<Statement> WithHoisted(Func<IReadOnlyList<Statement>> write) => _plan.WithHoisted(write);
 
         private sealed class ResultFrame
@@ -115,7 +97,6 @@ namespace Alis.Reactive.PlanModel.Writing
 
             internal void Defer(object result, int index, Func<IReadOnlyList<Statement>> write) => _deferred.Add((result, index, write));
 
-            // Later lines first, so an insertion never moves an earlier line's index.
             internal IEnumerable<(object Result, int Index, Func<IReadOnlyList<Statement>> Write)> Deferred =>
                 _deferred.OrderByDescending(deferred => deferred.Index);
         }
@@ -137,24 +118,17 @@ namespace Alis.Reactive.PlanModel.Writing
         }
     }
 
-    /// <summary>
-    /// A request's response, named by the routes that read it. A body read inside a nested route still
-    /// reads the response of the request it names; <see cref="Innermost"/> reads the nearest one.
-    /// </summary>
     internal sealed class ResponseHandle
     {
         internal static ResponseHandle Innermost { get; } = new ResponseHandle();
     }
 
-    /// <summary>The plan being written: its objects, its fresh names and the statements hoisted before the one being written.</summary>
     internal sealed class PlanWriter
     {
         private int _names;
 
         private readonly HashSet<object> _written = new HashSet<object>();
 
-        // The statements hoisted before the statement being written, such as the let that binds a method's
-        // result; null outside a statement, where no value reads a method's result.
         private List<Statement>? _hoisted;
 
         internal PlanWriter(string planId, PlanObjects objects)
@@ -192,10 +166,6 @@ namespace Alis.Reactive.PlanModel.Writing
         internal void Hoist(Statement statement) => _hoisted!.Add(statement);
     }
 
-    /// <summary>
-    /// The objects a plan names, in the order it first names them: elements by id and vendor, and the
-    /// modules a bundle registered (the document, HTTP, forms, slots, streams, hubs, plugins).
-    /// </summary>
     internal sealed class PlanObjects
     {
         internal const string DocumentId = "$document";
@@ -234,7 +204,6 @@ namespace Alis.Reactive.PlanModel.Writing
 
         internal string Confirm() => PluginObject(ConfirmId, "alis.confirm", "", PluginData.None);
 
-        // The page's one table of mounted inputs, which every plan joins with the inputs it rendered (grammar.md 6.3).
         internal string Model(ModelPluginData data)
         {
             _renderedInputs = data.Inputs;
@@ -252,7 +221,6 @@ namespace Alis.Reactive.PlanModel.Writing
 
         internal string Model() => PluginObject(ModelId, "alis.model", "", PluginData.None);
 
-        /// <summary>The mounted inputs inside the element with this id, whichever plan rendered them (grammar.md M1).</summary>
         internal string Inputs(string containerId) => PluginObject("$inputs:" + containerId, "alis.model", containerId, PluginData.None);
 
         internal string Form(string containerId, FormPluginData data) => PluginObject("$form:" + containerId, "alis.form", containerId, data);
@@ -277,8 +245,6 @@ namespace Alis.Reactive.PlanModel.Writing
         internal IReadOnlyDictionary<string, Vendor> Vendors() =>
             _vendors.OrderBy(v => v.Key, StringComparer.Ordinal).ToDictionary(v => v.Key, v => v.Value, StringComparer.Ordinal);
 
-        // A plugin object is declared once, with its data where it has any: the plan writes the model's
-        // inputs and each form's rules before any step names them.
         private string PluginObject(string id, string name, string key, PluginData data)
         {
             if (!_objects.ContainsKey(id))

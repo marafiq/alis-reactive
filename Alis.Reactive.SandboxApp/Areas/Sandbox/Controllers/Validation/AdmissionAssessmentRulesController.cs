@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Admission assessments: Save takes an assessment the page checked first; Print takes the
-    /// assessment as it is and runs the same validator, so the server's own verdict shows on the page.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/AdmissionAssessment")]
     public class AdmissionAssessmentRulesController : Controller

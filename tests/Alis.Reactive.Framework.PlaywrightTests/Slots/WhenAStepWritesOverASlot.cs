@@ -1,16 +1,8 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Slots;
 
-/// <summary>
-/// What a slot shows belongs to what was loaded into it (ADR-0003): a step that sets the text or HTML of an element
-/// some plan of the page loads into or unloads (<c>Into</c>, <c>Unload</c>) would leave what the slot loaded running
-/// under content it no longer shows, so the page is refused when it renders, naming <c>p.Unload</c>, whichever plan
-/// writes the step: the plan that loads the slot, a partial's plan beside it, or a plan that unloads it. A step that
-/// writes an element beside the slot is not refused.
-/// </summary>
 [TestFixture]
 public sealed class WhenAStepWritesOverASlot : AppPageTest
 {
-    // A refused page never boots, so it is opened as the developer meets it: the page the server answers.
     private async Task Render(string step) => await Page.GotoAsync($"{BaseUrl}/Slots/PassDesk?step={step}");
 
     private ILocator Message(string text) => Page.GetByText(text).First;

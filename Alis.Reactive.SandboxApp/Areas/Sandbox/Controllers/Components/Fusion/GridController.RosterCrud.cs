@@ -3,14 +3,8 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Cedar wing front desk: the desk admits a resident into a free suite, moves a resident to another
-    /// suite and records today's move-outs, and the roster follows each answer. Every page starts from the
-    /// roster on file; an answer checks the suites on file and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
-        // Frank Delgado's final invoice is still open, so the business office has not cleared his move-out.
         private const int CedarFinalInvoiceOpenResidentId = 7206;
 
         [HttpGet("RosterCrud"), ActionName("RosterCrud")]
@@ -40,7 +34,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new CedarAdmitted
             {
                 Resident = new CedarResident { ResidentId = 7207, ResidentName = name, Suite = suite, MovedIn = "Oct 14, 2026" },
-                // The roster runs in suite order; the new resident follows every lower suite.
                 Position = roster.Count(resident => string.CompareOrdinal(resident.Suite, suite) < 0),
                 Summary = $"{name} is admitted to suite {suite}."
             });

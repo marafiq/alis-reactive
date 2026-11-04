@@ -33,7 +33,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionSliderChangeArgs> Changed =>
             Event<FusionSliderChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Changed);
     }
 

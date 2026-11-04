@@ -9,8 +9,6 @@
 <form id="admission-form">
     @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
     <div id="room-slot">
-        @* The room's line is a partial of the admission's own model: rendered with the page when it shows the
-           room at once, or loaded here when a room is chosen. The page's rule on the room is the only one. *@
         @if (Model.ShowsRoom)
         {
             @await Html.PartialAsync("RoomLine", Model)

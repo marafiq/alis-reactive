@@ -1,23 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Plugins.ArrayManager;
 
-/// <summary>
-/// As the night supervisor at the ward desk, I want the ward's census read out (who is in residence, their
-/// care hours, where the round starts, anyone critical, any bed open), tonight's staffing planned from that
-/// census, and a visitor's pass printed, so that the night starts staffed for the residents actually on
-/// the ward and a visitor reaches them.
-/// </summary>
-/// <remarks>
-/// The census is read through the page's plugins (Scripts/sandbox-plugins.ts): the array plugin counts,
-/// filters, sums, plucks and tests the ward's residents by field name, the community plugin holds the beds
-/// per ward (5) and slugify makes the ward's code. Birch ward opens with the desk: five residents fill its
-/// five beds; Edith Morales, first on its list, is in hospital and Samuel Price on leave, so three are in
-/// residence and the round starts with Thomas Reed. The memory-care ward has three residents, one critical.
-/// The staffing service answers from the census it is sent: the ward's count in the X-Ward-Census header and
-/// the residents in residence in the query, so a wrong or missing value reads as a different plan.
-/// Not exercised here: a plugin member called only for its effect, which this page no longer makes (its
-/// analytics call changed nothing anyone sees); WhenWatchingTheVisitBoard's
-/// opening_the_board_records_it_in_the_activity_list fails when such a call (visitLog.Record) breaks.
-/// </remarks>
 [TestFixture]
 public class WhenWorkingTheWardDesk : PlaywrightTestBase
 {
@@ -63,7 +45,6 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The array plugin counts the residents the filter keeps: all five would read 5.
     [Test]
     public async Task only_the_residents_in_residence_are_counted_in_residence()
     {
@@ -73,7 +54,6 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // 4 + 6 + 5 hours for the residents in residence; with Edith Morales and Samuel Price it would be 20.
     [Test]
     public async Task todays_care_hours_are_those_of_the_residents_in_residence()
     {
@@ -83,7 +63,6 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Edith Morales is first on the list but in hospital.
     [Test]
     public async Task the_morning_round_starts_with_the_first_resident_in_residence()
     {
@@ -107,8 +86,6 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The ward's count against the community plugin's beds per ward: Birch's five fill its beds, the
-    // memory-care ward's three leave two open.
     [Test]
     public async Task a_ward_whose_residents_fill_every_bed_says_so_and_one_with_room_says_beds_are_open()
     {
@@ -123,7 +100,6 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The ward code is made from the ward's name each time a census loads.
     [Test]
     public async Task opening_the_memory_care_ward_reads_out_its_own_census_and_code()
     {
@@ -139,8 +115,6 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // An aide for every two of the 3 in residence, and a bed held for each of the 5 on the census who is
-    // away. A header carrying the 3 would hold 0 beds; a query carrying the 5 would ask for 3 aides.
     [Test]
     public async Task tonights_staffing_is_planned_from_the_census_and_the_residents_in_residence()
     {
@@ -154,9 +128,6 @@ public class WhenWorkingTheWardDesk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The desk issues the pass with details the page knows: each reaches the plugin as its declared kind, a
-    // bool (escorted), a long past int's range (the pass number), a DateTime (a Date on the day of the visit),
-    // a decimal (the parking fee) and a double (the hours). The plugin writes "?" for a detail of another kind.
     [Test]
     public async Task printing_daniel_reeds_pass_shows_it_escorted_numbered_dated_and_charged()
     {

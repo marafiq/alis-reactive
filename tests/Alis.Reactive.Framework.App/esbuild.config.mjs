@@ -2,11 +2,6 @@ import * as esbuild from 'esbuild';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// The framework test app's components in one bundle, built the way an app builds its own. A component
-// knows nothing of the framework (docs/design/framework-test-components.md): it imports only files of
-// its own folder, and the entry imports only components. Anything else fails the build.
-// Beside it, the second bundles a few Plugins pages load after it (Plugins/Bundles), each one file that
-// queues a plugin the runtime refuses, as a second bundle of an app would.
 const appDir = path.dirname(fileURLToPath(import.meta.url));
 const entry = path.join(appDir, 'components.ts');
 const componentsDir = path.join(appDir, 'Components');

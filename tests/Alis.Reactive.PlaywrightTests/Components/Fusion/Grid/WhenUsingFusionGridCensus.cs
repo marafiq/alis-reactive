@@ -2,32 +2,11 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the business office manager preparing the quarterly state census, I want to list the residents at or
-/// over an age, sort the census by any column and page through it, with the server answering every page, so
-/// that the counts I send the state are the community's own records and not a copy in my browser.
-/// </summary>
-/// <remarks>
-/// Maple Grove's census holds 45 residents, by name: Ada Lawson first, Edith Moore first on page two. Ages run
-/// 66 to 98; Oscar Flynn, 98, is the oldest, and Ada Lawson and Paul Dunn, 66, the youngest. Nine residents are
-/// 90 or older and 25 are 80 or older. The grid asks the server for every page, sort and page size through its
-/// DataStateChange event; the age box asks the grid to ask again. The server answers with the page, how many
-/// residents the census counts, and what the change was, worked out from what the grid sent: the rows to skip
-/// and take, whether it needs the count, the sort, the page moved to and from, the page size, and the age.
-/// Not exercised: DataStateChange's Name, which EJ2 writes as the event's own name on every payload
-/// (ej2-base observer.js:92), and its Action's Name, Type and Cancel: the Action is the actionBegin payload EJ2
-/// already ran (ej2-grids actions/data.js:609), so they read actionBegin, actionBegin and false whenever the
-/// event comes, and no server answer can depend on them. The page's answer to a refused request (400) is not
-/// exercised: the census refuses only a request the grid cannot make (pages of no residents, a column, a
-/// direction or a change it does not know), and every page, sort, page size and age the office manager can
-/// ask for is one it reads; the age box keeps the age between 60 and 110.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridCensus : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/Census";
 
-    // The grid numbers its columns from 1.
     private const int NameColumn = 1;
     private const int AgeColumn = 2;
 

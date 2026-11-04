@@ -53,7 +53,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionDropDownListChangeArgs> Change =>
             Event<FusionDropDownListChangeArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the list receives focus.</summary>

@@ -2,19 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.TextArea;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextArea;
 
-/// <summary>
-/// As a day-shift caregiver, I want to write Margaret Hale's daily care log note, starting from what the night
-/// shift wrote if I like, sign it as complete and save it to her daily log, so that the evening shift reads an
-/// accurate, signed account of her day.
-/// </summary>
-/// <remarks>
-/// The note starts empty under the night shift's note. Each time the caregiver leaves the note the log keeps a
-/// draft and says how long it is; the daily log answers a save with the note's length. A signed note is locked:
-/// the cursor does not stay in it, and a note that changes is no longer signed. Starting from the night shift's
-/// note writes it in at once with <c>DataBind</c>, so the note is already unsigned when <c>FocusIn</c> puts the
-/// cursor in it; without <c>DataBind</c> the note is still signed when the cursor arrives and is pushed out again.
-/// <c>FocusOut</c> runs from the note's own focus event, which a click on another control would not prove.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionTextArea : PlaywrightTestBase
 {

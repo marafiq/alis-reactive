@@ -9,7 +9,6 @@
 </head>
 <body class="alis-root">
     @RenderBody()
-    @* The app's components, then a second bundle of the app (Plugins/Bundles), then the runtime. *@
     <script src="/js/framework-components.js"></script>
     <script src="/js/@(ViewData["SecondBundle"]).js"></script>
     <script src="/_content/AlisReactive/js/alis-reactive.js"></script>

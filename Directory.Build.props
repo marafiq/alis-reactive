@@ -1,8 +1,5 @@
 <Project>
   <PropertyGroup>
-    <!-- VersionPrefix is the dev/local default only. Released versions come from the git tag:
-         nuget-publish.yml derives the version from the pushed v* tag (v1.0.0-rc.1 -> 1.0.0-rc.1)
-         and passes it to dotnet pack via -p:Version. Bump this only for local pack/dev convenience. -->
     <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>Alis Solutions</Authors>
     <Company>Alis Solutions</Company>
@@ -13,18 +10,9 @@
     <Copyright>Copyright (c) Alis Solutions 2026</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <LangVersion>14.0</LangVersion>
-    <!-- The public surface of a shipped package is the text in its PublicAPI files; drift is a build error, not a warning. -->
     <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0022;RS0024;RS0025;RS0048</WarningsAsErrors>
-    <!-- RS0026 (several overloads with optional parameters) is the DSL's design: an optional name: on every arity
-         so a developer types less; the declared surface text is the record a new overload is reviewed against. -->
     <NoWarn>$(NoWarn);RS0026</NoWarn>
-    <!-- The handoff point between the npm runtime build and the core package: esbuild writes the
-         runtime bundle into Alis.Reactive.Assets/dist/, and AlisReactive lists it from here as a
-         static web asset (build/AlisReactiveStaticWebAssets.targets). -->
     <AlisAssetsDist>$(MSBuildThisFileDirectory)Alis.Reactive.Assets\dist</AlisAssetsDist>
-    <!-- Production-grade package provenance: snupkg symbols + SourceLink (built into the .NET SDK
-         for GitHub repos via PublishRepositoryUrl) + deterministic CI builds. Lets consumers step
-         into the framework source and makes release builds reproducible. -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

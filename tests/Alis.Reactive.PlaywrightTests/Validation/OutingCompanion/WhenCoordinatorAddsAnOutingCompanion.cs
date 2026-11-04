@@ -4,15 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.OutingCompanion;
 
-/// <summary>
-/// As an activities coordinator, I want a companion's details asked for only while a companion is on
-/// the outing, so that adding one, removing one, or planning the outing alone each saves what it should.
-/// </summary>
-/// <remarks>
-/// The companion is a partial loaded into a slot of the outing form. Its rules arrive with it, check
-/// the form from the moment it is on the page, and leave with it when the slot is loaded with
-/// something else. The server checks the companion whenever one was sent.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorAddsAnOutingCompanion : PlaywrightTestBase
 {
@@ -32,7 +23,6 @@ public class WhenCoordinatorAddsAnOutingCompanion : PlaywrightTestBase
     private ILocator CompanionStatus => Page.Locator("#companion-status");
     private ILocator NoCompanion => Page.Locator("#no-companion");
 
-    // The companion's inputs arrive after boot, so they are found by the id the model member gives them.
     private ILocator CompanionField(Expression<Func<OutingModel, object?>> member) =>
         Page.Locator($"#{IdGenerator.For(member)}");
 

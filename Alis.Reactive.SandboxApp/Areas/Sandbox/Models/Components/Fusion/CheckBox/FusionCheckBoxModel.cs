@@ -1,9 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    // Journey: a new resident completes their Move-In Services Agreement with a
-    // move-in coordinator. Accepting the residency agreement unlocks the optional
-    // services; the coordinator can pre-select a recommended service, mark one for
-    // follow-up when the resident is undecided, or toggle one on the resident's behalf.
     public sealed class FusionCheckBoxModel
     {
         public bool AgreementAccepted { get; set; }

@@ -5,10 +5,6 @@ using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive.PlanModel.Values
 {
-    /// <summary>
-    /// The object a read, a write or a call goes to: an element, a plugin, or data a callback was handed
-    /// (the event's payload, a response body, an array item).
-    /// </summary>
     internal abstract class Target
     {
         private protected Target() { }
@@ -21,14 +17,12 @@ namespace Alis.Reactive.PlanModel.Values
             return new PluginTarget(objects => objects.Plugin(name));
         }
 
-        /// <summary>The stream object at a URL: <c>alis.stream</c> keyed by it.</summary>
         internal static Target Stream(string url)
         {
             if (url == null) throw new ArgumentNullException(nameof(url));
             return new PluginTarget(objects => objects.Stream(url));
         }
 
-        /// <summary>The hub object at a URL: <c>alis.hub</c> keyed by it.</summary>
         internal static Target Hub(string url)
         {
             if (url == null) throw new ArgumentNullException(nameof(url));
@@ -41,13 +35,10 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal static Target Item { get; } = new ItemTarget();
 
-        /// <summary>The value an expression gives: what a method call returns, or an item's value an array lambda reads further (its date, its text).</summary>
         internal static Target Returned(ValueExpression call) => new ReturnedTarget(call);
 
-        /// <summary>Data a callback received rather than an object the page holds; shown as it arrived.</summary>
         internal virtual bool IsData => false;
 
-        /// <summary>The expression for the object, and the path from it to where its members start.</summary>
         internal abstract (Expr Root, IReadOnlyList<string> Path) Write(Scope scope);
 
         private sealed class ElementTarget : Target

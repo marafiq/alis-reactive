@@ -19,7 +19,6 @@ public class MedicationRoundController : Controller
         });
     }
 
-    // The Maple wing's 08:00 doses on the round's day, as the eMAR lists them.
     private static List<RoundDose> DosesDue() =>
     [
         new()

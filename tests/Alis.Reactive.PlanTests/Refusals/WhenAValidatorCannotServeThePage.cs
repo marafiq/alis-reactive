@@ -2,7 +2,6 @@ using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Refusals;
 
-/// <summary>The rules a page carries come from a validator the app registered and wrote as rules; anything else is refused naming the fix.</summary>
 [TestFixture]
 public class WhenAValidatorCannotServeThePage
 {

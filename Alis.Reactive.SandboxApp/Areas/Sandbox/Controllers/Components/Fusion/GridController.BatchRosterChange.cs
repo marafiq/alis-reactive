@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Suite 205's turnover on Maple wing: the admissions coordinator records Ruth Carter's move-out and Walter Kim's
-    /// move-in as one change to the roster and saves it once housekeeping has turned the suite over. Every page starts
-    /// from the roster on record; a save answers with what the turnover recorded and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("BatchRosterChange"), ActionName("BatchRosterChange")]

@@ -3,14 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// The community's resident API, as the shift email's link reaches it. Every answer is scoped to the
-    /// community the X-Community header names: Helen Park (1042) and Arthur Bell (1043) live at Maple
-    /// Grove, and Cedar Point has neither. A chart names the dose due on the shift its query names; a
-    /// dose's last administration is looked up by the medication's name in the path; the shift notes come
-    /// a page at a time. The community's integration gateway forwards a partner check to the partner its
-    /// X-Partner header names: Riverside Pharmacy or Northgate Lab.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/ShiftEmailLink")]
     public class ShiftEmailLinkController : Controller
@@ -33,8 +25,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return Ok(new ShiftEmailChart(resident.Name, resident.Room, "Maple Grove", $"{due.Medication} at {due.Time}", due.Medication));
         }
 
-        // A medication's name may hold a slash (Carbidopa/Levodopa): the path carries it encoded, and the
-        // route keeps an encoded slash as it came, so the name is decoded here.
         [HttpGet("Residents/{residentId:int}/Doses/{medication}")]
         public IActionResult LastDose(int residentId, string medication, [FromHeader(Name = "X-Community")] string? community)
         {
@@ -83,8 +73,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             };
         }
 
-        // The community the X-Community header names scopes every answer; null when it is Maple Grove,
-        // the one community whose residents this API serves.
         private IActionResult? Refusal(int residentId, string? community)
         {
             if (string.IsNullOrWhiteSpace(community))
@@ -94,7 +82,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return null;
         }
 
-        // No static lookup table: a static collection in the sandbox is shared by every browser world.
         private static (string Name, string Room)? Resident(int residentId) => residentId switch
         {
             1042 => ("Helen Park", "Maple 214"),

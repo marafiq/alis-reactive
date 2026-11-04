@@ -14,7 +14,6 @@
         .NativeTextBox(b => b.Placeholder("555-0100").CssClass(Field)); }
 </native-grid>
 
-@* The companion's rules belong to this partial: they check the form while the companion is on it. *@
 @(Html.NativeButton("confirm-companion-btn", "Confirm companion")
     .CssClass("self-start rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
     .Reactive(plan, evt => evt.Click, (args, p) =>

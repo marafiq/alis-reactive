@@ -3,11 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Shift task tally: at shift change the evening charge nurse updates each resident's open tasks and
-    /// PRN doses, reviews the changes and sends them to the night shift. Every page starts from the
-    /// evening's counts; a review or a send answers with what the changes come to and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
         [HttpGet("ShiftTaskTally")]
@@ -16,7 +11,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/ShiftTaskTally.cshtml",
                 new ShiftTaskTallyModel { Residents = ShiftTallyOnTheWing() });
 
-        // The eMAR's evening medication pass left Grace Bennett with tasks the nurse's count does not have.
         [HttpGet("ShiftTaskTallyEmar")]
         public IActionResult ShiftTaskTallyEmar() =>
             Ok(new EmarTaskCount

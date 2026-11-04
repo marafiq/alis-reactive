@@ -145,7 +145,6 @@ namespace Alis.Reactive.Native
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
 #if NET48
-            // System.Web.Mvc NameFor honors the active HtmlFieldPrefix; ExpressionHelper.GetExpressionText drops it.
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression).ToHtmlString());
 #else
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression));
@@ -156,11 +155,8 @@ namespace Alis.Reactive.Native
 
             var encodedId = encoder.Encode(_elementId);
 
-            // The container is the component: the framework's check-list code (constructed on alis:mount,
-            // like an app's widget) gives it a value that reads the checked boxes and checks them when written.
             writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\" data-alis-check-list>");
 
-            // Hidden input keeps MVC form submission as CSV, in step with the checked boxes; it is not the component target.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
             for (int i = 0; i < _options.Count; i++)
@@ -191,8 +187,6 @@ namespace Alis.Reactive.Native
             writer.Write("</div>");
         }
 
-        // The property holds the checked values as a collection (string[], List<string>, ...) or, for a
-        // string property, as CSV text. Empty items check nothing, as the component's value drops them.
         private static string[] SelectedValues(object? rawValue)
         {
             if (rawValue is IEnumerable values && rawValue is not string)

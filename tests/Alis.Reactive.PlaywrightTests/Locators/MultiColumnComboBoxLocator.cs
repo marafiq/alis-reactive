@@ -19,12 +19,8 @@ public sealed class MultiColumnComboBoxLocator
 
     public async Task Focus() => await Wrapper.ClickWhenStableAsync(_page);
 
-    /// <summary>
-    /// Selects by typing text and pressing Enter so row ordering does not affect the gesture.
-    /// </summary>
     public async Task Select(string text)
     {
-        // Clear prior focus before opening; Syncfusion keeps popup/focus state internally.
         await _page.Locator("body").ClickAsync(new() { Position = new Position { X = 0, Y = 0 } });
         await Focus();
         await _page.Keyboard.TypeAsync(text);

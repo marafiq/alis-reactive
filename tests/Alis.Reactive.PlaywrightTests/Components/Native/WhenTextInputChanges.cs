@@ -2,20 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As the receptionist at the Maple Grove front desk, I want to sign each visitor in by name and the
-/// resident they came to see, have a returning visitor's name filled in from their phone, and see the
-/// badge I am about to hand over, so that the community always knows who is in the building.
-/// </summary>
-/// <remarks>
-/// Eleanor Vance (555-0142) and Thomas Reyes (555-0178) have visited before; any other number is a first
-/// visit. A text box raises change when the receptionist commits what was typed: on leaving the field, or
-/// on Enter in a single-line field (HTML, the input element's change event). A value the page writes
-/// raises none, so the badge reads the name the page has just filled in. Every member of the text box is
-/// exercised: its value written (a returning visitor's name, the empty form after a sign-in) and read (the
-/// badge, the sign-in the server answers), Focus, Change with its value, and its value committed for the
-/// name check on Enter.
-/// </remarks>
 [TestFixture]
 public class WhenTextInputChanges : PlaywrightTestBase
 {
@@ -39,7 +25,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         _plan = await PagePlan<NativeTextBoxModel>.FromPage(Page);
     }
 
-    // Tabbing out of the field commits what was typed.
     private static async Task WriteAndMoveOn(NativeTextBoxLocator field, string text)
     {
         await field.Fill(text);
@@ -84,7 +69,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // A cleared phone is not looked up: a lookup would answer 404, a console error.
     [Test]
     public async Task clearing_the_phone_puts_back_the_returning_visitor_hint()
     {
@@ -98,7 +82,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Enter commits the number without leaving the field, so only the page can move the cursor.
     [Test]
     public async Task a_first_time_visitors_phone_puts_the_cursor_in_their_name()
     {
@@ -143,7 +126,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Clearing the phone after a sign-in raises no change, so only the signed-in answer puts the hint back.
     [Test]
     public async Task signing_in_a_returning_visitor_puts_back_the_hint_for_the_next_one()
     {
@@ -159,7 +141,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The click leaves the cursor on the button; the signed-in answer moves it.
     [Test]
     public async Task after_a_sign_in_the_cursor_waits_in_the_phone_for_the_next_visitor()
     {
@@ -174,7 +155,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Refused in the browser: a sign-in sent to the server would answer 400, a console error.
     [Test]
     public async Task signing_in_without_a_name_says_the_name_is_needed()
     {
@@ -202,7 +182,6 @@ public class WhenTextInputChanges : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Enter commits the name without leaving the field, so the check runs on the commit, not on leaving.
     [Test]
     public async Task a_name_without_a_last_name_is_refused_as_soon_as_enter_is_pressed()
     {

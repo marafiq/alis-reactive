@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// The desk corrects a resident's room and the family's phone on one page, each through a partial of a model of its
-/// own whose plan is its own, and both inputs bind <c>Value</c>; the phone's joins the page last. Each partial reads
-/// and sends the input it rendered (grammar.md M8).
-/// </summary>
 [TestFixture]
 public sealed class WhenTwoPartialsOfOtherModelsBindOneName : AppPageTest
 {

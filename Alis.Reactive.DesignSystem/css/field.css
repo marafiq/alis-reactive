@@ -1,10 +1,3 @@
-/* The field the core writes around every input (Html.InputField): a column of the label, the input
-   and its message slot. The label's type comes from base.css, the message's from validation.css.
-   The field is symmetric about its input: the label's line (1rem) and a gap above it, the message's
-   line (1rem) and a gap below it. The wrapper keeps the room below while the message is hidden, as
-   the core's own stylesheet does, so a message that appears when a field is left never moves the
-   page under a click, and a control beside a field lines up with its input in a row that centers its
-   items, shown message or not. */
 @layer alis {
   .alis-root .alis-field {
     display: flex;

@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 
-/// <summary>
-/// An array operation's result used where a value is read beyond an element's text: a transformed array
-/// passed to a component's method, a count written into a component's property, and a transformed array
-/// sent as a request member the endpoint binds. The residents endpoint answers Cyd Marsh and Ben Hart
-/// present, Ada Hartley and Dot Ashton away; the slate holds the rows Ada, Ben and Cyd.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageUsesAnArraysResult : AppPageTest
 {

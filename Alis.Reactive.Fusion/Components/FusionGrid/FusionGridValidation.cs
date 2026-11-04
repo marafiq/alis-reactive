@@ -100,10 +100,6 @@ namespace Alis.Reactive.Fusion
         }
     }
 
-    /// <summary>
-    /// Translates a field's client rules into the EJ2 FormValidator object shape
-    /// <c>{ rule: [value, message] }</c>: each rule EJ2 decides as the server does, under EJ2's name.
-    /// </summary>
     internal static class Ej2ColumnRules
     {
         internal static Dictionary<string, object> From(BrowserField field)
@@ -111,7 +107,7 @@ namespace Alis.Reactive.Fusion
             var rules = new Dictionary<string, object>(StringComparer.Ordinal);
             foreach (var rule in field.Rules)
             {
-                if (!rule.IsUnconditional) continue; // EJ2 column rules are always-on
+                if (!rule.IsUnconditional) continue;
                 Add(rules, rule);
             }
             return rules;
@@ -131,7 +127,6 @@ namespace Alis.Reactive.Fusion
                 case MaxLengthRule max:
                     rules["maxLength"] = new object[] { max.Length, rule.Message };
                     break;
-                // EJ2 tests one pattern per column, with no flags; a second pattern, or one with flags, is the server's.
                 case PatternRule pattern when pattern.Flags.Length == 0 && !rules.ContainsKey("regex"):
                     rules["regex"] = new object[] { pattern.Pattern, rule.Message };
                     break;
@@ -144,8 +139,6 @@ namespace Alis.Reactive.Fusion
                 case RangeRule range when range.Inclusive && range.NumericBounds is { } bounds:
                     rules["range"] = new object[] { new[] { bounds.From, bounds.To }, rule.Message };
                     break;
-                // Other comparisons, exclusive ranges, credit card, at-least-one and empty have no EJ2
-                // FormValidator equivalent, so the server checks them on save.
             }
         }
     }

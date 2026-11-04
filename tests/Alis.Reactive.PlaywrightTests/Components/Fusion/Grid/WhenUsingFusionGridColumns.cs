@@ -2,21 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the staffing scheduler, I want to choose which columns the morning huddle sheet carries, lead it with
-/// each resident's risk when the huddle reviews falls, and head the wing column with the community's own word
-/// for a wing, so that the printed sheet carries only what the huddle reads, in the order it reads it.
-/// </summary>
-/// <remarks>
-/// The sheet lists five residents, Ada Lawson first, under Resident, Primary nurse, Next review, Risk, Wing and
-/// Care level. A column button leaves its column off the sheet when the sheet shows it (the grid's own column
-/// says whether it shows) and puts it back when it does not. Lead with risk moves the risk column into the
-/// resident's place at the front, and clearing the box moves it back into the place after the next review; the
-/// two columns are apart, so a move from the wrong column to the wrong place shows. The wing heading is written
-/// into the wing column and the headers are drawn again.
-/// Not exercised: writing a column's Visible (the page only reads it; hiding and showing go through HideColumn
-/// and ShowColumn), and moving headers by dragging, which is EJ2's own gesture and runs no plan.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridColumns : PlaywrightTestBase
 {

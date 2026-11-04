@@ -121,8 +121,6 @@
             @{ Html.InputField(plan, m => m.ReceivedBy, o => o.Label("Received by"))
                 .NativeTextBox(b => b.CssClass(Field)); }
             <native-hstack gap="Sm" align="Center" class="flex-wrap">
-                @* The link starts a plan of its own; its request checks the page's rule and sends the page's input,
-                   both inside the receipt it names. *@
                 @(Html.NativeActionLink("mark-delivered", "Mark delivered", Url.SandboxRoute("MarkDelivered", "PharmacyDelivery"), link => link
                     .Post()
                     .Gather<DeliveryReceipt>(g => g.Form())

@@ -19,7 +19,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // The log keeps a draft each time the caregiver leaves the note.
         [HttpPost("KeepDraft")]
         public IActionResult KeepDraft([FromBody] CareLogDraft draft)
         {

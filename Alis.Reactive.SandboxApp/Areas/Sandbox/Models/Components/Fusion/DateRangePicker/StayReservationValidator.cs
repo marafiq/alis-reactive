@@ -1,10 +1,6 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// A respite stay is reserved for the dates the coordinator picks, and covers at most 30 days: a longer
-    /// stay is an admission, a check only the server makes.
-    /// </summary>
     public class StayReservationValidator : ReactiveValidator<DateRangePickerModel>
     {
         public StayReservationValidator()

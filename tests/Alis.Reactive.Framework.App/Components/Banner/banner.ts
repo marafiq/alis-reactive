@@ -1,6 +1,3 @@
-// The banner: one per page, showing a message and how often it has flashed. It knows nothing of
-// Alis.Reactive; Banner.cs declares its members by these names.
-
 type Listener = (payload: unknown) => void;
 
 interface BannerHost extends HTMLElement {

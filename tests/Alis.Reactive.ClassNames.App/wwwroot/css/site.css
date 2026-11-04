@@ -1,7 +1,3 @@
-/* The app's own stylesheet, written for Bootstrap's class names: the names its fields render with
-   (Program.cs, AddReactiveClassNames). Bootstrap's own rules for these parts, reduced to what the
-   page uses. */
-
 body {
   font-family: system-ui, sans-serif;
   margin: 2rem;

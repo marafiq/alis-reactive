@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
-/// <summary>
-/// Walter Cho's heart rate check on the evening round. A reading is recorded at 72 bpm until the nurse
-/// enters another. A critical reading pages the rapid response team; a high one alerts the charge nurse,
-/// Dana Ortiz. Each answer names the heart rate it was sent.
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Conditions/VitalsAlert")]
 public class VitalsAlertController : Controller

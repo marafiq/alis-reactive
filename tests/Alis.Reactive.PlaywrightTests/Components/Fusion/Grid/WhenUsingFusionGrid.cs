@@ -1,13 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As a developer looking for a grid behavior, I want the components page to lead to the grid page and the
-/// grid page to list each grid journey as a card that opens it, so that every journey can be reached.
-/// </summary>
-/// <remarks>
-/// The grid page carries no grid of its own: each journey is its own page with its own fixture, so no test
-/// here opens a journey.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGrid : PlaywrightTestBase
 {
@@ -31,7 +23,6 @@ public class WhenUsingFusionGrid : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The card leads to the census journey's own page; what that page shows is its own fixture's to prove.
     [Test]
     public async Task the_census_by_age_card_leads_to_the_census()
     {

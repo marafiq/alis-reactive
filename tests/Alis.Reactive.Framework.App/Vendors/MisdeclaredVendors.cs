@@ -2,7 +2,6 @@ using Alis.Reactive.Framework.App.Components;
 
 namespace Alis.Reactive.Framework.App.Vendors;
 
-/// <summary>The mistakes a page can make in declaring its components' vendor, or in naming them, each refused where the page renders.</summary>
 public enum VendorMistake
 {
     NameAVendorStartingWithADigit,
@@ -11,13 +10,11 @@ public enum VendorMistake
     ReadTheSlateAsAMeter,
 }
 
-/// <summary>A page that declares a vendor wrongly, the way its mistake asks.</summary>
 public sealed class VendorRefusalsPage
 {
     public VendorMistake Mistake { get; set; }
 }
 
-/// <summary>The slate, declared with a vendor whose name starts with a digit.</summary>
 public sealed class DigitNamedSlate : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Define(
@@ -26,7 +23,6 @@ public sealed class DigitNamedSlate : Component
     public void Clear() => Method();
 }
 
-/// <summary>The slate, declared with a vendor whose object path ends in a dot.</summary>
 public sealed class StrayDotSlate : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Define(
@@ -35,7 +31,6 @@ public sealed class StrayDotSlate : Component
     public void Clear() => Method();
 }
 
-/// <summary>A board declared with a vendor of the slate's name that keeps its object somewhere else.</summary>
 public sealed class Board : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Define(

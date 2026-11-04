@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Outings: the companion is a partial the coordinator adds to the form and removes from it. The
-    /// server checks the outing with the companion's rules whenever a companion was sent.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/OutingCompanion")]
     public class OutingCompanionController : Controller

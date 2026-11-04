@@ -1,10 +1,5 @@
 namespace Alis.Reactive.ClassNames.PlaywrightTests.Notices;
 
-/// <summary>
-/// An app that chose its class names at startup (Bootstrap's) and links a stylesheet written for them and no
-/// framework stylesheet: its fields render with those names, a refused input carries the app's mark and shows
-/// its message in the app's style, and a corrected input loses both.
-/// </summary>
 [TestFixture]
 public sealed class WhenAnAppChoosesItsClassNames : AppPageTest
 {

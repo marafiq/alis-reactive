@@ -80,7 +80,6 @@ namespace Alis.Reactive
         {
             var options = configuration.CreateOptions();
 #if NET48
-            // System.Web.Mvc NameFor honors HtmlFieldPrefix and returns MvcHtmlString; the identity keeps the binding path as text.
             var bindingName = html.NameFor(expression).ToHtmlString();
 #else
             var bindingName = html.NameFor(expression);

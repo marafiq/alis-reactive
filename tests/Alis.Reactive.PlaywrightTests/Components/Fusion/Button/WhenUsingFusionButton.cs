@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Button;
 
-// Journey: a care-team member runs a resident's Daily Wellness Check-In.
-// The check-in opens personalised and locked; confirming the resident's identity unlocks it;
-// the visit's priority is set (complete icon, urgent style, recommended, follow-up); the action
-// can be triggered or focused for them; then the check-in is recorded and the server confirms it.
 [TestFixture]
 public class WhenUsingFusionButton : PlaywrightTestBase
 {
@@ -34,9 +30,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         await Expect(ActionButton.Button).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // RENDERS — the FusionButton builder renders the action, and the DomReady SetContent
-    // personalises its label for the assigned resident while the Content() source reads that
-    // label back into the visible "Action ready" line. The check-in opens locked.
     [Test]
     public async Task the_checkin_opens_personalised_and_ready_to_confirm()
     {
@@ -49,8 +42,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetDisabled — confirming the resident's identity unlocks the action; locking the visit
-    // disables it again. The visible enabled/disabled state of the action follows each write.
     [Test]
     public async Task confirming_identity_unlocks_the_action_and_locking_disables_it()
     {
@@ -68,9 +59,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Disabled() read source — the readiness check reads the action's disabled state into a
-    // condition: locked shows the "confirm identity" message, ready shows the "you can begin"
-    // message. The message follows the branch the Disabled() source routes.
     [Test]
     public async Task checking_readiness_reports_whether_the_visit_is_locked_or_ready()
     {
@@ -90,8 +78,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetIcon — marking the visit complete swaps the action's icon to a check on the right.
-    // The icon span carries the new icon CSS and the right-position class.
     [Test]
     public async Task marking_the_visit_complete_shows_a_check_icon_after_the_label()
     {
@@ -109,7 +95,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetCssClass — flagging the visit urgent applies the urgent style classes to the action.
     [Test]
     public async Task flagging_the_visit_urgent_restyles_the_action()
     {
@@ -129,8 +114,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetPrimary — making the check-in the recommended action promotes the button to Syncfusion's
-    // primary styling.
     [Test]
     public async Task recommending_the_checkin_promotes_it_to_the_primary_action()
     {
@@ -148,9 +131,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetToggle + Click() — enabling follow-up tracking turns the action into a toggle; the
-    // "Remind me" control then calls Click() on the action, which latches it into the active
-    // state. Without SetToggle the click would not latch; without Click() nothing fires.
     [Test]
     public async Task enabling_follow_up_then_reminding_latches_the_action_active()
     {
@@ -171,8 +151,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FocusIn() — the "Jump to the action" control moves keyboard focus onto the action button
-    // so a care-team member using the keyboard lands on it.
     [Test]
     public async Task jumping_to_the_action_moves_keyboard_focus_onto_it()
     {
@@ -190,10 +168,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // CssClass(), IsPrimary(), IsToggle() read sources — recording the check-in gathers the
-    // action's runtime state and the server confirmation the care-team member sees reflects each:
-    // the recommended phrasing (IsPrimary), the follow-up phrasing (IsToggle), and the priority
-    // style (CssClass).
     [Test]
     public async Task recording_the_checkin_confirms_its_recommendation_followup_and_priority_style()
     {
@@ -213,8 +187,6 @@ public class WhenUsingFusionButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // GATHERS — the framework gather pipeline carries the action's runtime sources into the POST
-    // body under their declared keys. (Framework gather test: asserts request.PostData.)
     [Test]
     public async Task recording_the_checkin_posts_the_action_state_to_the_server()
     {

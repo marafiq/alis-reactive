@@ -7,21 +7,14 @@ using Alis.Reactive.Members;
 
 namespace Alis.Reactive.Validation
 {
-    /// <summary>
-    /// The browser's form of a <c>When</c> condition. A C# condition has a browser form when every part of it
-    /// is a test of a model member against a value the condition fixes, joined by <c>&amp;&amp;</c>,
-    /// <c>||</c> and <c>!</c>.
-    /// </summary>
     internal static class BrowserCondition
     {
-        /// <summary>The condition's browser form, or null when part of it has none; the condition then says so where it is described.</summary>
         internal static Condition? From(LambdaExpression predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
             return new Translator(predicate.Parameters[0]).Translate(predicate.Body);
         }
 
-        /// <summary>Every condition of a nested <c>When</c>, outermost first.</summary>
         internal static Condition AllOf(IReadOnlyList<Condition> conditions) =>
             conditions.Count == 1 ? conditions[0] : Condition.All(conditions.ToArray());
 
@@ -195,8 +188,6 @@ namespace Alis.Reactive.Validation
                 call.Method.DeclaringType == typeof(string) && call.Method.Name == name
                 && call.Object == null && call.Arguments.Count == 1;
 
-            // A member chain rooted at the model: x.Name, x.Address.City, x.Score.Value. A member of a
-            // value .NET defines (x.Name.Length, x.Tags.Count, x.Date.Year) is not one the page binds.
             private bool IsField(Expression expression)
             {
                 var current = ModelMember(expression);
@@ -219,7 +210,6 @@ namespace Alis.Reactive.Validation
                 return isHasValue && IsField(nullable);
             }
 
-            // x.Score.Value reads x.Score: the browser's value is the number or nothing.
             private static Expression ModelMember(Expression expression)
             {
                 var current = Expressions.StripConvert(expression);

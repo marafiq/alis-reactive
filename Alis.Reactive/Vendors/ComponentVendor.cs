@@ -117,7 +117,6 @@ namespace Alis.Reactive
                 payload);
         }
 
-        /// <summary>The vendor as the plan carries it.</summary>
         internal Vendor ToGrammar() => new Vendor(_objectPath.TargetText, _listening, _payload);
 
         /// <inheritdoc />

@@ -3,10 +3,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.AnalyzerTests;
 
-/// <summary>
-/// ALIS004: a reactive callback declares plan entries at render time, so a condition written in C# decides
-/// nothing in the browser; a loop over render-time data and a local function declare entries and are fine.
-/// </summary>
 [TestFixture]
 public class ControlFlowInReactiveCallbackTests
 {
@@ -76,7 +72,6 @@ public class ControlFlowInReactiveCallbackTests
             if (Model.Resident == "Maple") p.Get("/wings/maple");
             """));
 
-    // The C# the Razor compiler generates for a view whose DomReady pipeline holds the lines given.
     private static string View(string pipeline) => $$"""
         using System.Threading.Tasks;
         using Alis.Reactive;

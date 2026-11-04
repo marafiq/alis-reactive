@@ -2,17 +2,13 @@ using System.Globalization;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.FileUpload
 {
-    /// <summary>The files a wound-care nurse attaches to Margaret Hale's record after a wound review.</summary>
     public class WoundAttachmentsModel
     {
         public string? WoundSite { get; set; }
 
-        /// <summary>The signed consent form and the wound photo.</summary>
         public IFormFile[]? Attachments { get; set; }
     }
 
-    // The record keeps PDFs and JPG or PNG photos of at most 5 MB. The browser checks that something is attached;
-    // only the server reads the files, so it alone refuses one too large or of the wrong kind, and names each file it received.
     public class WoundAttachmentsValidator : ReactiveValidator<WoundAttachmentsModel>
     {
         private const long MaxBytes = 5 * 1024 * 1024;
@@ -47,7 +43,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.FileUp
         };
     }
 
-    /// <summary>What the record answers when the files are attached.</summary>
     public sealed class WoundAttachmentsAnswer
     {
         public string Message { get; set; } = "";

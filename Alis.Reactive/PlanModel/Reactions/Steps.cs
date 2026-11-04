@@ -7,10 +7,6 @@ using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive.PlanModel.Reactions
 {
-    /// <summary>
-    /// The steps a callback runs, in the order they were written. A step is placed where it is written,
-    /// and a step still being configured (a request, a condition's arms) stays in its place.
-    /// </summary>
     internal sealed class Block
     {
         private readonly List<Step> _steps = new List<Step>();
@@ -27,12 +23,6 @@ namespace Alis.Reactive.PlanModel.Reactions
         }
     }
 
-    /// <summary>
-    /// The line a method that returns a value is written on. A method that returns its value runs here,
-    /// in the order the C# wrote it. A method that returns a promise is awaited by the statement that
-    /// first reads its result, wherever in the block or its branches that is, so a condition that waits
-    /// for it asks only when it is reached; it runs here only when no statement reads it.
-    /// </summary>
     internal sealed class MethodResultStep : Step
     {
         private readonly ValueExpression _result;
@@ -58,7 +48,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             });
     }
 
-    /// <summary>The authored unit of a pipeline; it writes the grammar's statements where it is used.</summary>
     internal abstract class Step
     {
         private protected Step() { }
@@ -66,7 +55,6 @@ namespace Alis.Reactive.PlanModel.Reactions
         internal abstract void WriteTo(List<Statement> block, Scope scope);
     }
 
-    /// <summary>Writes a property: of an element or a component, of a plugin, or of data the event handed its callback.</summary>
     internal sealed class SetStep : Step
     {
         private readonly Target _target;
@@ -91,7 +79,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             }));
     }
 
-    /// <summary>Calls a method; one declared to return a promise holds the steps after it until it settles.</summary>
     internal sealed class CallStep : Step
     {
         private readonly Target _target;
@@ -118,7 +105,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             }));
     }
 
-    /// <summary>Raises a custom event on the document, with its payload as the event's detail.</summary>
     internal sealed class DispatchStep : Step
     {
         private readonly string _event;
@@ -136,7 +122,6 @@ namespace Alis.Reactive.PlanModel.Reactions
                 new[] { G.Do(G.Call(G.Obj(scope.Objects.Document()), "raise", G.Lit(_event), _payload.Write(scope))) }));
     }
 
-    /// <summary>Loads the response into a slot: <c>Into(elementId)</c>.</summary>
     internal sealed class InjectStep : Step
     {
         private readonly string _slot;
@@ -155,7 +140,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             }));
     }
 
-    /// <summary>Unloads a slot: what the partial loaded into it brought is released, and the slot is emptied.</summary>
     internal sealed class UnloadStep : Step
     {
         private readonly string _slot;
@@ -169,7 +153,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             block.Add(G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "unload")));
     }
 
-    /// <summary>In an error route, the form shows the problems the server sent (grammar.md F8).</summary>
     internal sealed class ShowErrorsStep : Step
     {
         private readonly string _form;
@@ -187,11 +170,6 @@ namespace Alis.Reactive.PlanModel.Reactions
         }
     }
 
-    /// <summary>
-    /// When, ElseIf and Else: the first arm whose condition holds runs. Synchronous conditions share one
-    /// <c>if</c>; a condition that asks the user or waits for a promise guards the arms after it, so a
-    /// question is asked only when reached.
-    /// </summary>
     internal sealed class BranchStep : Step
     {
         private readonly List<(Condition Condition, Block Then)> _arms = new List<(Condition, Block)>();
@@ -233,9 +211,6 @@ namespace Alis.Reactive.PlanModel.Reactions
             return arms.Count == 0 ? rest : new[] { G.If(arms, rest) };
         }
 
-        // What runs when no synchronous arm before `index` matched: the arm that waits, guarding the arms
-        // after it, or the Else. Arms nested in an `if` are a block of their own: what a waiting arm binds
-        // there is read only there.
         private IReadOnlyList<Statement> Rest(int index, Scope scope)
         {
             if (index >= _arms.Count) return _else.Write(scope);

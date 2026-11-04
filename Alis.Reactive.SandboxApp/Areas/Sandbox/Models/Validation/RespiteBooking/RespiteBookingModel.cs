@@ -1,10 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// A short respite stay booked by the admissions coordinator. The community, daily rate,
-    /// expected nights, and transport answer are nullable in the model: blank means
-    /// "not entered yet", never zero or "no".
-    /// </summary>
     public class RespiteBookingModel
     {
         public string? ResidentName { get; set; }
@@ -12,14 +7,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public decimal? DailyRate { get; set; }
         public int? ExpectedNights { get; set; }
 
-        /// <summary>How an open-ended stay ends: who decides, and when.</summary>
         public string? EndOfStayPlan { get; set; }
 
-        /// <summary>When the family picks the resident up on the last day of a planned stay.</summary>
         public string? LastDayPickupTime { get; set; }
         public bool? NeedsTransport { get; set; }
     }
 
-    /// <summary>The booking confirmation the server returns once the stay is booked.</summary>
     public sealed record RespiteBookingConfirmation(string Confirmation);
 }

@@ -1,12 +1,8 @@
-// alis.form (grammar.md 6.4): validation messages, scope, unmounted fields, server errors, live checks.
-
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FormField, FormPluginData, ModelPluginData } from "../types/index";
 import type { FormObject } from "../plugins/form/form";
 import { e, element, fakeWidget, plan, plugin, s } from "./support/plan";
 
-// Each test runs a fresh runtime: the plugin registry, the forms and the model start empty, with no
-// reset hook shipped in the runtime for it.
 let Owner: (typeof import("../objects/owner"))["Owner"];
 let startOwner: (typeof import("../plans/start"))["startOwner"];
 let formPlugin: (typeof import("../plugins/form/form"))["formPlugin"];
@@ -27,7 +23,6 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-// A field and the input that renders it: a required text field, whose check passes when the value is not blank.
 interface Rendered {
   readonly id: string;
   readonly field: FormField;
@@ -53,7 +48,6 @@ function field(id: string, value = ""): string {
   return `<input id="${id}" value="${value}"><span><span id="${id}_error" hidden></span></span>`;
 }
 
-// The view renders each field's input, so the page's table holds it under its binding name (6.3).
 function startForm(
   rendered: Rendered[],
   containerId = "admission",
@@ -117,7 +111,6 @@ describe("validate", () => {
     expect(startForm([requiredField("Ghost", "Ghost", "Ghost is required.", e.lit(false))]).validate()).toBe(true);
   });
 
-  // Lines[*].Qty is required while the line's own Ordered holds: the second line is ordered, the first is not.
   it("checks each item a name with [*] names, reading the members of its own item", () => {
     render(`<form id="admission">${field("Qty0")}${field("Qty1")}${field("Ordered0", "no")}${field("Ordered1", "yes")}</form>`);
     const ordered = e.op("eq", e.call(e.obj("inputs"), ["valueOf"], [e.lit("Lines[*].Ordered"), e.ref("i")]), e.lit("yes"));
@@ -183,8 +176,6 @@ describe("live", () => {
     expect(errorText("Name")).toBe("Enter the resident's name.");
   });
 
-  // One validator serves a section saved on its own and the whole form: both containers list every
-  // field, and the section, contributed first, does not hold the resident's name.
   it("revalidates a field against the container that holds it, whichever container was contributed first", () => {
     render(`<form id="intake">${field("ResidentName")}<div id="contacts">${field("ContactPhone")}</div></form>`);
     const fields = [
@@ -237,8 +228,6 @@ describe("live", () => {
     expect(errorText("Rating")).toBe("Rate the visit.");
   });
 
-  // EJ2's MaskedTextBox commits from its own input handler when a value is pasted; the clear that typing
-  // brings must not undo the check that commit just made.
   it("keeps the message a commit raised by the same input event shows", () => {
     render(`<form id="admission"></form>`);
     const phone = fakeWidget("Phone", { value: "" });

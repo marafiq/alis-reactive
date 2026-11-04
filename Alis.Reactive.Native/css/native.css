@@ -1,12 +1,6 @@
-/* AlisReactive.Native: the styling its own markup needs, shipped as written
-   (~/_content/AlisReactive.Native/css/native.css). Colors and type read the design system's
-   tokens (--color-*) when an app links one, and fall back to neutral values when it does not.
-   Looks sit in the framework's `alis` layer, below an app's own utilities. */
-
 @layer theme, base, alis, components, utilities;
 
 @layer alis {
-/* Drawer panel: right/bottom, mobile full-width */
 .alis-drawer {
   position: fixed;
   inset: 0;
@@ -22,12 +16,10 @@
   transition: visibility 0s;
 }
 
-/* Overlay mode: full container captures clicks (dismiss on backdrop click) */
 .alis-drawer--overlay.alis-drawer--visible {
   pointer-events: auto;
 }
 
-/* Overlay is opt-in via --overlay modifier */
 .alis-drawer--overlay.alis-drawer--visible::before {
   content: "";
   position: absolute;
@@ -36,7 +28,6 @@
   animation: alis-drawer-fade-in 0.3s ease;
 }
 
-/* Size variants: default is 24rem; use SetSize() for typed widths. */
 .alis-drawer--sm .alis-drawer__panel { width: 28rem; }
 .alis-drawer--md .alis-drawer__panel { width: 36rem; }
 .alis-drawer--lg .alis-drawer__panel { width: 48rem; }
@@ -61,7 +52,6 @@
   transform: translateX(0);
 }
 
-/* Bottom position */
 .alis-drawer--bottom .alis-drawer__panel {
   top: auto;
   bottom: 0;
@@ -125,7 +115,6 @@
   to { opacity: 1; }
 }
 
-/* Mobile: full width */
 @media (max-width: 640px) {
   .alis-drawer__panel {
     width: 100%;
@@ -141,7 +130,6 @@
   }
 }
 
-/* Loader overlay: covers nearest positioned ancestor (or viewport via fixed) */
 .alis-loader {
   position: fixed;
   inset: 0;
@@ -157,7 +145,6 @@
   transition: opacity 0.2s ease, visibility 0s 0.2s;
 }
 
-/* When inside a target container, switch to absolute positioning */
 .alis-loader[data-target] {
   position: absolute;
 }
@@ -168,7 +155,6 @@
   transition: opacity 0.2s ease, visibility 0s;
 }
 
-/* Spinner */
 .alis-loader__spinner {
   width: 2.5rem;
   height: 2.5rem;
@@ -178,7 +164,6 @@
   animation: alis-loader-spin 0.7s linear infinite;
 }
 
-/* Message */
 .alis-loader__message {
   font-size: 0.875rem;
   font-weight: 500;
@@ -203,8 +188,6 @@
   }
 }
 
-/* Check list: one bordered option per box, the checked ones marked in the accent color.
-   CssClass and OptionCssClass replace .alis-check-list and .alis-check-list__option. */
 .alis-check-list {
   display: flex;
   flex-direction: column;
@@ -243,8 +226,6 @@
   line-height: calc(1 / 0.75);
 }
 
-/* Radio group: one bordered option per radio, the picked one marked in the accent color.
-   CssClass and OptionCssClass replace .alis-radio-group and .alis-radio-group__option. */
 .alis-radio-group {
   display: flex;
   flex-direction: column;

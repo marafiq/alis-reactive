@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// A visit and a sitting are booked on one page, each in a form of its own, and each form holds an input that binds
-/// <c>NextOfKin.Name</c>. The visit's rule reads the member from the input inside the visit's form before any
-/// elsewhere on the page (grammar.md M8), as the visit's save sends only what its form holds.
-/// </summary>
 [TestFixture]
 public sealed class WhenTwoFormsEachHoldAMembersInput : AppPageTest
 {

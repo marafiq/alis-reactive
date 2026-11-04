@@ -1,7 +1,3 @@
-// FusionMention: a Syncfusion Mention with a target turns its own element into the suggestion popup
-// and renames it when the popup first opens. The component's element is therefore a hidden span,
-// rendered with data-alis-mention naming the Mention's element, that carries the Mention's instance.
-
 import { onMount } from "../hooks";
 
 interface SyncfusionHost extends HTMLElement {

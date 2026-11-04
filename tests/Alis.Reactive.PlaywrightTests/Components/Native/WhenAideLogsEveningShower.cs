@@ -3,19 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Native.CheckBox;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As a care aide, I want the shower log to remind me of the shower chair a resident's care plan calls
-/// for, to put the shower details away when she declines, and to make me pass a skin concern to the nurse
-/// before I save, so that the evening shower is logged as it happened.
-/// </summary>
-/// <remarks>
-/// Dorothy Reyes's log opens with her care plan's shower chair ticked; the chair note reads that box when
-/// the log opens (its <c>Checked</c>) and follows it as the aide ticks it (its <c>Change</c> and the
-/// change's <c>Checked</c>). Declining the shower clears the water temperature (a <c>Checked</c> write,
-/// seen when the aide takes the refusal back), and a skin concern moves the cursor to telling the nurse
-/// (<c>Focus</c>). Unchecking the water temperature asks for it at once: a box's change is its commit,
-/// which checks it again. Every box is sent with the log, and the server's answer says what it received.
-/// </remarks>
 [TestFixture]
 public class WhenAideLogsEveningShower : PlaywrightTestBase
 {
@@ -170,8 +157,6 @@ public class WhenAideLogsEveningShower : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Leaving the nurse step for Save shows the message before Save is handled, so the refused log is shown never
-    // to leave the page by the save that follows: the log with the nurse told is the only one sent.
     [Test]
     public async Task a_skin_concern_must_be_passed_to_the_nurse_before_saving()
     {

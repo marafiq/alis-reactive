@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// The pet policy: a rule under a condition the server alone decides, declared so; and the same
-    /// condition written as a plain When, refused as the view renders. URL: /Sandbox/Validation/PetPolicy.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/PetPolicy")]
     public class PetPolicyController : Controller
@@ -22,7 +18,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         [HttpGet("")]
         public IActionResult Index() => View(ViewBase + "Index.cshtml", new PetPolicyModel());
 
-        // The same policy with its condition written as a plain When: the plan refuses it as the view renders.
         [HttpGet("Refused")]
         public IActionResult Refused() => View(ViewBase + "Refused.cshtml", new RefusedPetPolicyModel());
 

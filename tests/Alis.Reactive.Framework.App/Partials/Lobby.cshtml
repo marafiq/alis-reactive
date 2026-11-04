@@ -7,7 +7,6 @@
 <h1>The lobby</h1>
 
 <form id="lobby-form">
-    @* The visitor's line is a partial of the base class every visit record shares, rendered with the page's model. *@
     @await Html.PartialAsync("VisitorLine", Model)
     @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
 </form>

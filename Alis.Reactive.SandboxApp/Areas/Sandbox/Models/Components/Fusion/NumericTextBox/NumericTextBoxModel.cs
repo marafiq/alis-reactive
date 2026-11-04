@@ -1,7 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    // Journey: a care coordinator sets a resident's Monthly Service Plan — how many
-    // catered meals per week and how many wellness check-ins per week the resident receives.
     public class NumericTextBoxModel
     {
         public decimal MealsPerWeek { get; set; }

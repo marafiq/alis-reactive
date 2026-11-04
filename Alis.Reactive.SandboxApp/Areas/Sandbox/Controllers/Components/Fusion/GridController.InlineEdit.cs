@@ -4,14 +4,8 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Care-plan reviews: the Birch wing nurse moves a resident's next care-plan review, and the care team's
-    /// calendar books the new day or refuses it. Every page starts from the reviews on file; a booking answers
-    /// with the review as it now stands and keeps nothing.
-    /// </summary>
     public partial class GridController
     {
-        // The Sunday that ends the week the page lists as due.
         private static readonly DateOnly CarePlanReviewWeekEnds = new(2026, 10, 18);
 
         [HttpGet("InlineEdit"), ActionName("InlineEdit")]
@@ -32,7 +26,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("InlineEditReviews")]
         public IActionResult InlineEditReviews() => Ok(CarePlanReviewsOnFile());
 
-        // The care team meets on weekdays: a review moved to a weekend, or left without a day, keeps the day on file.
         [HttpPost("InlineEditBooking")]
         public IActionResult InlineEditBooking([FromBody] CarePlanReviewBooking booking)
         {
@@ -57,7 +50,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static DateOnly CarePlanReviewDate(string day) => DateOnly.ParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        // "Friday, October 16", as the nurse reads a day.
         private static string CarePlanReviewDay(string day) =>
             CarePlanReviewDate(day).ToString("dddd, MMMM d", CultureInfo.InvariantCulture);
 

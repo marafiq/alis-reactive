@@ -1,7 +1,6 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>The outing's own rules: what the page checks whether or not a companion is on it.</summary>
     public class OutingValidator : ReactiveValidator<OutingModel>
     {
         public OutingValidator()
@@ -20,7 +19,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    /// <summary>The companion's rules: what the companion partial brings to the form, and takes away with it.</summary>
     public class OutingCompanionRules : ReactiveValidator<OutingModel>
     {
         public OutingCompanionRules()

@@ -16,7 +16,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 new FusionBulletChartModel());
         }
 
-        // A wing's bar and its budget line end with the wing's place in the chart, as EJ2 names them.
         [HttpPost("WingShifts")]
         public IActionResult WingShifts([FromBody] WingShiftsRequest request)
         {

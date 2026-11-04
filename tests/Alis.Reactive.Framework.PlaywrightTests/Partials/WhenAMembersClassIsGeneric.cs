@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// An input binds a member a generic class declares (ADR-0003 rule 1): the id's scope is the class's
-/// namespace and its name as C# writes it, every character outside letters, digits and underscores made an
-/// underscore, then two underscores and the member's path, so a label the page writes with that id names it.
-/// </summary>
 [TestFixture]
 public sealed class WhenAMembersClassIsGeneric : AppPageTest
 {

@@ -2,28 +2,12 @@ using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 
-/// <summary>
-/// As the director of nursing at the morning falls huddle, I want to raise the fall risk of each resident who fell
-/// overnight in one step, change any other risk the team agrees on, and send the changes to care planning, so that
-/// every care plan reflects the risk the huddle decided before the day shift starts.
-/// </summary>
-/// <remarks>
-/// Aspen wing's risk board loads from the record: Amina Patel (room 201, Low), Henry Liu (204, Moderate), Grace
-/// Bennett (208, Low), Walter Grant (212, Moderate) and Ruth Carter (215, Low). Henry and Ruth fell overnight; their
-/// Raise to High buttons set their fall risk to High. Sending tells care planning each risk that differs from the
-/// record, the risk still being chosen in its cell included: the Send button takes the focus without the grid saving
-/// that cell (grid.js:5907-5919), so the send keeps it only through its own SaveCell.
-/// Not exercised:
-/// The pending changes' AddedRecords and DeletedRecords: the huddle adds and removes no residents, so both arrive
-/// empty (batch-edit.js:347-372).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionGridBatchRisk : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/BatchRiskReview";
     private const string BoardId = "falls-risk-board";
 
-    // The board numbers its columns from 1.
     private const int FallRiskColumn = 4;
 
     private static readonly Regex Changed = new("e-updatedtd");
@@ -84,7 +68,6 @@ public class WhenUsingFusionGridBatchRisk : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The risk list opens on the resident's own risk; the cell is still open when the director sends.
     [Test]
     public async Task a_risk_still_being_chosen_in_its_cell_is_sent_too()
     {

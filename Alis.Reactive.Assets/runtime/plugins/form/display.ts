@@ -1,8 +1,3 @@
-// Validation messages live in generated HTML: an inline slot {id}_error beside each field and one
-// summary per form, which the server renders. These helpers reach them by ID only. The `hidden`
-// attribute is a slot's one state; what a hidden slot looks like is the stylesheet's. A refused input's
-// element carries the class its binding names (alis.model M9), the app's choice.
-
 import { invalidClassOf } from "../model";
 
 export function showInline(componentDomId: string, message: string): void {
@@ -17,8 +12,6 @@ export function showInline(componentDomId: string, message: string): void {
   }
 }
 
-// The slot remembers that the server wrote its message, so leaving the field keeps it: the value the
-// server judged has not changed. A slot rendered again starts unmarked.
 export function showServerInline(componentDomId: string, message: string): void {
   showInline(componentDomId, message);
   const errorSpan = findErrorSpan(componentDomId);

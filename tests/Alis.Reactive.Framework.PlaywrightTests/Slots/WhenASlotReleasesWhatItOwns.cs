@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Slots;
 
-/// <summary>
-/// Unloading a slot releases every handler its owner holds (grammar 3.5), even when releasing one of them
-/// fails: the visitor card's own bell takes its callback property away when it is destroyed, so its handler
-/// cannot be released, and the card's handler of the lounge's bell is released all the same.
-/// </summary>
 [TestFixture]
 public sealed class WhenASlotReleasesWhatItOwns : AppPageTest
 {

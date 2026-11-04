@@ -1,6 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-// Trace coverage protects two-phase boot: listeners must wire before dom-ready dispatches.
 [TestFixture]
 public class WhenTraceReportsExecution : PlaywrightTestBase
 {

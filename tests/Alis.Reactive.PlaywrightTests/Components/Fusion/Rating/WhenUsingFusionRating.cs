@@ -2,20 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Rating;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Rating;
 
-/// <summary>
-/// As a resident answering the monthly care satisfaction survey, I want to rate October's care in stars, say what
-/// made the month harder when I lower my rating, and send it, so that the community hears how its care is going and
-/// I see how my month compares with everyone else's.
-/// </summary>
-/// <remarks>
-/// Margaret Hale rated September 3 stars. The survey starts unrated; four or five stars is thanked, three or fewer
-/// brings a call from the care manager, and lowering the rating asks what made October harder. The community
-/// answers a sent rating with October's average over its other 23 residents' ratings (95 stars) and hers.
-/// Not exercised: <c>DataBind</c>, because a rating written by the page is readable at once (the property setter
-/// stores it, ej2-base notify-property-change.js:70-77) and EJ2 raises no <c>valueChanged</c> for it
-/// (rating.js:499-506, 709-714), so no later step of the same pipeline can tell whether it was applied; only the
-/// stars repaint a tick later.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionRating : PlaywrightTestBase
 {

@@ -13,7 +13,6 @@ namespace Alis.Reactive
     /// </summary>
     public static class RuleBuilderExtensions
     {
-        // FluentValidation's limit on one pattern match, so a pattern cannot hold the server.
         private static readonly TimeSpan PatternTimeout = TimeSpan.FromSeconds(2);
 
         /// <summary>Requires a value: anything but null. In the browser, a filled input.</summary>
@@ -92,8 +91,6 @@ namespace Alis.Reactive
         /// <summary>The value differs from another member's.</summary>
         public static IRuleBuilderOptions<T, TProperty> NotEqual<T, TProperty>(this IRuleBuilder<T, TProperty> rule, Expression<Func<T, TProperty>> member) =>
             ComparedWithMember(rule, Comparison.NotEqual, member);
-
-        // ---- Order: a missing value passes (pair with NotNull to require one); a missing other member fails.
 
         /// <summary>The value is greater than <paramref name="value"/>.</summary>
         public static IRuleBuilderOptions<T, TProperty> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)

@@ -6,10 +6,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Alis.Reactive.Analyzers.ReactiveEvent
 {
-    /// <summary>
-    /// Reports duplicate <c>.Reactive()</c> calls for the same event on one builder chain.
-    /// Different events and separate component builders are valid independent wiring.
-    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateReactiveEventAnalyzer : DiagnosticAnalyzer
     {
@@ -80,10 +76,6 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
                 && memberAccess.Name.Identifier.Text == "Reactive";
         }
 
-        // The event selector is the argument written as evt => evt.Click, wherever the overload puts it:
-        // first on RenderedComponent.Reactive(selector, pipeline), second on
-        // NativeButtonBuilder.Reactive(plan, selector, pipeline). A pipeline lambda never has a bare member
-        // access as its body, so it is never taken for the selector.
         private static string? ExtractEventName(InvocationExpressionSyntax invocation)
         {
             foreach (var argument in invocation.ArgumentList.Arguments)

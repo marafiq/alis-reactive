@@ -3,17 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.OutingRoster;
 
-/// <summary>
-/// As an activities coordinator, I want to find the residents who use the mobility aids I choose and
-/// book the bus, so that everyone is found when I choose none and boarding help is booked only for the
-/// aids I choose.
-/// </summary>
-/// <remarks>
-/// The search sends the chosen aids in a GET query; the booking posts them as form data. Helen Park
-/// uses a walker, Arthur Bell a wheelchair, Frank Moore a cane; Rosa Diaz uses none, and nobody uses a
-/// mobility scooter. The bus has two boarding-help spaces. While a wheelchair is among the chosen aids,
-/// the page notes that the trip takes the lift bus and the lift-bus attendant can be chosen.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorPlansGardenOuting : PlaywrightTestBase
 {

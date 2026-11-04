@@ -3,15 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The staff navigation on the nurses' station tablet. The med tech is signed in unless the tablet was
-    /// switched to the business office; each page the navigation opens answers with what it says tonight.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/FusionMenu")]
     public class MenuController : Controller
     {
-        // What each page says tonight, by the id of the menu item that opens it.
         private static readonly IReadOnlyDictionary<string, string> PageSummaries = new Dictionary<string, string>
         {
             ["nav-census"] = "42 residents are on the census tonight; 3 are out on leave.",

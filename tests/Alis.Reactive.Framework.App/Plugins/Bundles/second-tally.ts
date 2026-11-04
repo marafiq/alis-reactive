@@ -1,7 +1,3 @@
-// A second bundle of an app that queues a plugin under a name the app's first bundle already took
-// ("tally"), as two bundles that each bring their own tally would. Only a page whose layout loads it
-// carries it.
-
 interface PendingPlugin {
   readonly name: string;
   readonly instance: unknown;

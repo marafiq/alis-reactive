@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// The community's person line, a partial of a model of its own, renders the concierge's next of kin under the
-/// member's prefix, so its input binds as <c>NextOfKin.Name</c> though no class of the page's model declares it.
-/// The page reaches the member by its binding name, as MVC binds it (grammar.md M8): <c>p.Bound</c> reads that
-/// input, a named send sends it and the page's rule checks it, and the partial's own bound read names its member
-/// under the prefix it was rendered with.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPartialOfAnotherModelRendersAMember : AppPageTest
 {

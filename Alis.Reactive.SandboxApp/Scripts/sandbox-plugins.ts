@@ -1,6 +1,3 @@
-// Sandbox plugins enqueue before runtime boot so root.ts can register them
-// before plan execution starts.
-
 interface PendingHostPlugin {
   readonly name: string;
   readonly instance: Record<string, unknown> | ((...args: unknown[]) => unknown);
@@ -45,7 +42,6 @@ registeredPlugins.push({
       .replace(/\s+/g, "-"),
 });
 
-// The community's fixed facts: how many beds each ward holds.
 registeredPlugins.push({
   name: "community",
   instance: {
@@ -55,8 +51,6 @@ registeredPlugins.push({
 
 const twoDigits = (value: number): string => String(value).padStart(2, "0");
 
-// A visitor pass's lines. Each argument is shown only when it arrives as its declared kind (a boolean,
-// a number, a Date), so a literal sent in the wrong shape reads "?".
 registeredPlugins.push({
   name: "visitorPass",
   instance: {
@@ -76,8 +70,6 @@ registeredPlugins.push({
   },
 });
 
-// The visit board's activity list: each line recorded is added to #board-activity, and entries
-// says how many lines the list holds.
 const visitLogLines: string[] = [];
 
 registeredPlugins.push({
@@ -98,7 +90,6 @@ registeredPlugins.push({
   },
 });
 
-// The visit board's spoken status line: the plugin is itself the function, and returns nothing.
 registeredPlugins.push({
   name: "announce",
   instance: (line: unknown) => {
@@ -107,7 +98,6 @@ registeredPlugins.push({
   },
 });
 
-// A person's initials: the plugin is itself the function, and returns a value.
 registeredPlugins.push({
   name: "initials",
   instance: (name: unknown) =>
@@ -118,10 +108,6 @@ registeredPlugins.push({
       .join(""),
 });
 
-// The wing's staff pager: an object with every kind of member a plugin can have. The channel is read
-// and written; the access code is written only and unlocks priority paging; send() returns a promise
-// that settles once the page is delivered, and only then counts it; status is an object with members
-// of its own; devices is a list of objects.
 interface PagerDevice {
   readonly name: string;
   readonly battery: number;
@@ -172,9 +158,6 @@ const pager = {
 
 registeredPlugins.push({ name: "pager", instance: pager });
 
-// The move-in letter the wing's desk reads: each line is written only from facts that arrive as their
-// declared kind (text, a number, a Date, a boolean, a number or null, an object, a list), so a fact
-// sent in the wrong kind reads "?".
 const ymd = (day: Date): string => `${day.getFullYear()}-${twoDigits(day.getMonth() + 1)}-${twoDigits(day.getDate())}`;
 const text = (value: unknown): string => (typeof value === "string" ? value : "?");
 

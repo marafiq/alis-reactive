@@ -11,14 +11,12 @@ namespace Alis.Reactive.Members
 {
     internal static class ExpressionPathHelper
     {
-        /// <summary>The JSON path a member chain reads in the browser: a response, a payload, an item.</summary>
         internal static Path ToJsonPath(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             return JsonPath(Steps(expression.Body));
         }
 
-        /// <summary>The JSON path of a member chain rooted at <paramref name="root"/>; false for any other expression.</summary>
         internal static bool TryJsonPath(Expression expression, ParameterExpression root, out Path path)
         {
             if (TrySteps(expression, out var steps, out var parameter) && parameter == root)
@@ -31,39 +29,24 @@ namespace Alis.Reactive.Members
             return false;
         }
 
-        /// <summary>The body path a gathered member is sent along: the members' own names, list positions, dictionary keys as names.</summary>
         internal static Path ToBodyPath(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             return BodyPath(Steps(expression.Body));
         }
 
-        /// <summary>The MVC binding name of a member chain: <c>Address.City</c>, <c>Lines[0].Sku</c>, <c>Administered[1042]</c>.</summary>
         internal static string ToMemberName(Expression memberChain)
         {
             if (memberChain == null) throw new ArgumentNullException(nameof(memberChain));
             return MvcName(Steps(memberChain));
         }
 
-        /// <summary>The MVC binding name of a chain of members from <paramref name="root"/>; false for any other expression, the root itself included.</summary>
         internal static bool TryMemberName(Expression memberChain, ParameterExpression root, out string name)
         {
             name = TrySteps(memberChain, out var steps, out var parameter) && parameter == root ? MvcName(steps) : "";
             return name.Length > 0;
         }
 
-        /// <summary>
-        /// The class whose scope the id of the member's input takes: the class that declares the chain's last
-        /// member, by its base definition (<c>KinCard</c> for <c>m =&gt; m.NextOfKin.Name</c>, the class that
-        /// declares <c>Phones</c> for <c>m =&gt; m.Phones[0]</c>). A member an interface declares, read on a class,
-        /// is declared by the class that implements it; read on the interface itself it is the interface, which
-        /// scopes no id.
-        /// </summary>
-        /// <remarks>
-        /// A lambda with no member (<c>m =&gt; m</c> in a template of a text member) is refused: the view's own
-        /// model is the member's type, not the class that declares the member, so its id would be one the page's
-        /// rules, sends and reads never derive.
-        /// </remarks>
         internal static Type ToDeclarer(LambdaExpression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
@@ -75,7 +58,6 @@ namespace Alis.Reactive.Members
             return DeclarerOf(bound.Access!);
         }
 
-        // Component IDs match MVC's Html.IdFor(), including nested-property underscores.
         internal static string ToMvcElementId(string propertyPath) =>
             propertyPath
                 .Replace(".", "_")
@@ -114,8 +96,6 @@ namespace Alis.Reactive.Members
                 ? path.AtIndex(step.Position)
                 : path.Then(step.IsKey ? step.Key : JsonMemberName.Of(step.Name)));
 
-        // A JSON body needs the member's structure, which the MVC name text cannot carry: Lines[0] and
-        // Administered[1042] read alike, yet one is a list item and the other a dictionary entry.
         private static Path BodyPath(IReadOnlyList<AccessStep> steps) =>
             steps.Aggregate(Path.None, (path, step) => step.IsPosition
                 ? path.AtIndex(step.Position)

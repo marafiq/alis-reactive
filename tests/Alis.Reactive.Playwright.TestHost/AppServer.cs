@@ -6,15 +6,6 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.Playwright.TestHost;
 
-/// <summary>
-/// Runs, on a free port, the web app a Playwright test assembly is written against: the app whose entry
-/// assembly the test project names. NUnit runs a setup fixture only from the test assembly itself, so each
-/// test project declares one in its root namespace:
-/// <code>[SetUpFixture] public sealed class Sandbox() : AppServer(typeof(Program).Assembly);</code>
-/// One app per test assembly: the address every page test opens is the assembly's.
-/// </summary>
-/// <param name="app">The app's entry assembly, as the test project references it.</param>
-/// <param name="environment">Environment variables the app runs with, beside the Development environment.</param>
 public abstract class AppServer(Assembly app, params (string Name, string Value)[] environment)
 {
     private const int CapturedOutputLines = 200;
@@ -102,8 +93,6 @@ public abstract class AppServer(Assembly app, params (string Name, string Value)
         return port;
     }
 
-    // The app is ready when its home page answers: the pipeline that serves the page serves its bundles,
-    // and the runner refuses to start when a bundle is missing or stale.
     private static async Task<bool> AnswersHome(HttpClient http, Process server, string url, OutputTail output)
     {
         for (var attempt = 0; attempt < ReadinessAttempts; attempt++)
@@ -119,7 +108,6 @@ public abstract class AppServer(Assembly app, params (string Name, string Value)
             }
             catch (HttpRequestException)
             {
-                // Not listening yet.
             }
 
             await Task.Delay(ReadinessDelayMs);
@@ -128,7 +116,6 @@ public abstract class AppServer(Assembly app, params (string Name, string Value)
         return false;
     }
 
-    // The app's own folder, where its views and wwwroot are: <name>/<name>.csproj above the test output.
     private static string ContentRoot(string name)
     {
         for (var dir = TestContext.CurrentContext.TestDirectory; dir is not null; dir = Path.GetDirectoryName(dir))

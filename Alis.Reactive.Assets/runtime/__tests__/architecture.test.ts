@@ -1,14 +1,9 @@
-// Architecture enforcement: fails the suite when runtime source drifts from the boundaries the
-// runtime's CLAUDE.md prescribes. The rules live here as code, so prose never has to track which
-// files hold an exception: the allowlists below do.
 import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 
-// Vitest runs from the workspace root (vitest.config.ts lives there).
 const runtimeDir = resolve(process.cwd(), "runtime");
 
-// The generated contract and the test suite itself are outside the rules' scope.
 const outOfScope = [/^__tests__\//, /^types\//];
 
 function walk(dir: string): string[] {
@@ -27,8 +22,6 @@ function runtimeSourceFiles(): string[] {
     .filter(file => !outOfScope.some(pattern => pattern.test(file)));
 }
 
-// Rationale comments may name vendors and DOM APIs; only code counts as a violation. Comments are
-// blanked instead of removed so reported line numbers match the file.
 function codeOnly(source: string): string {
   const blank = (match: string): string => match.replace(/[^\n]/g, " ");
   return source
@@ -50,13 +43,10 @@ function violationsOf(pattern: RegExp, isAllowed: (file: string) => boolean): st
 }
 
 describe("architecture: plan-driven IDs, no DOM scanning", () => {
-  // The plan carries every id the runtime needs, so a wide DOM query means the plan is missing
-  // information. The only justified wide queries are external boundaries: HTML the runtime did not
-  // author, and cleanup by an attribute the runtime itself stamped.
   const wideQueryBoundaries = new Set([
-    "plans/discover.ts", // plan scripts in the page and in loaded HTML
-    "plugins/slot.ts", // the scripts of loaded HTML, run the way a parsed page runs them
-    "realtime/retry-indicator.ts", // self-stamped retry markers inside the developer-owned container
+    "plans/discover.ts",
+    "plugins/slot.ts",
+    "realtime/retry-indicator.ts",
   ]);
 
   it("wide DOM queries appear only at justified external boundaries", () => {
@@ -69,8 +59,6 @@ describe("architecture: plan-driven IDs, no DOM scanning", () => {
 });
 
 describe("architecture: vendor isolation", () => {
-  // A vendor is data in the plan (where its object lives, how it subscribes, what a listener
-  // receives), so the runtime names no vendor. Vendor code lives in components/, beside the runtime.
   it("the runtime holds no Syncfusion knowledge", () => {
     const violations = violationsOf(/Syncfusion|rawFile|ej2_instances|\bej\b/, () => false);
     expect(violations, "Syncfusion knowledge in the runtime: carry it in the vendor declaration").toEqual([]);
@@ -78,8 +66,6 @@ describe("architecture: vendor isolation", () => {
 });
 
 describe("architecture: import directions", () => {
-  // The interpreter is the core and imports nothing that knows a feature: grammar evaluates and
-  // executes, objects locate, plans start owners, and the plugins are the vocabulary on top.
   const allowed: Record<string, readonly string[]> = {
     grammar: ["grammar", "types", "shared", "diagnostics"],
     objects: ["objects", "grammar", "types", "shared", "diagnostics"],
@@ -118,10 +104,6 @@ describe("architecture: import directions", () => {
 });
 
 describe("architecture: the framework's components are built like an app's", () => {
-  // components/ holds the framework's own components (Native, Fusion, the app-level objects). They
-  // construct on alis:mount and queue plugins in window.__alisPlugins, the hooks an app's components
-  // use, so neither side imports the other: a component the framework ships needs nothing a brought
-  // one cannot have.
   const assetsDir = resolve(runtimeDir, "..");
   const componentsDir = join(assetsDir, "components");
 

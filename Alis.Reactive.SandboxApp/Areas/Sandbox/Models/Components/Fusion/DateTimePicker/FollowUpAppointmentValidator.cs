@@ -1,10 +1,6 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// The follow-up falls inside the window Dr. Osei set, and inside her clinic hours, a check only the
-    /// server makes.
-    /// </summary>
     public class FollowUpAppointmentValidator : ReactiveValidator<DateTimePickerModel>
     {
         public FollowUpAppointmentValidator()

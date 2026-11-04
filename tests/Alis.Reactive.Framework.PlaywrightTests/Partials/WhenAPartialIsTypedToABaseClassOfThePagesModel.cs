@@ -1,10 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Partials;
 
-/// <summary>
-/// A partial typed to a base class of the page's model renders a member the base class declares (ADR-0003
-/// rule 1): its input's id is scoped by that class, so the page reaches it by the member, and a rule written
-/// once for an interface the class implements, read on the page's model, finds the same input.
-/// </summary>
 [TestFixture]
 public sealed class WhenAPartialIsTypedToABaseClassOfThePagesModel : AppPageTest
 {

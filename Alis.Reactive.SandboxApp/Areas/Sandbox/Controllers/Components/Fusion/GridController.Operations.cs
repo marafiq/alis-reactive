@@ -4,11 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// The South wing's clinical updates board: the charge nurse applies the updates the pharmacy and the
-    /// therapy team sent this morning, and records what the clinical review team decided for the resident she
-    /// picks. Each answer names the resident by key; every page starts from the same board, keeping nothing.
-    /// </summary>
     public partial class GridController
     {
         private static readonly string[] ClinicalUpdatesRiskLevels = { "Low", "Moderate", "High" };
@@ -22,7 +17,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("ClinicalUpdatesBoard")]
         public IActionResult ClinicalUpdatesBoard() => Ok(ClinicalUpdatesOnFile());
 
-        // The pharmacy added two evening med-pass tasks for Irene Morgan.
         [HttpPost("ClinicalUpdatesPharmacy")]
         public IActionResult ClinicalUpdatesPharmacy()
         {
@@ -36,7 +30,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        // This morning's assessment raised Grace Bennett's fall risk.
         [HttpPost("ClinicalUpdatesTherapy")]
         public IActionResult ClinicalUpdatesTherapy()
         {
@@ -60,7 +53,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (review.ReviewOpenTasks is not { } openTasks)
                 return BadRequest(new ClinicalUpdatesRefusal { Summary = "Enter the open tasks the review team left." });
 
-            // A clinical review books the next one three months on.
             var nextReview = DateOnly.ParseExact(picked.NextReview, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddMonths(3);
             var reviewed = new ClinicalUpdatesResident
             {

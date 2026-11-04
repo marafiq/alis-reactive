@@ -5,10 +5,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessme
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
-/// <summary>
-/// The admissions nurse's screening, one step at a time. Each step's draft is saved under the screening's id in
-/// the browser session, so each browser keeps its own screenings and no other browser sees them.
-/// </summary>
 [Area("Sandbox")]
 [Route("Sandbox/Conditions/AdmissionAssessment")]
 public class AdmissionAssessmentController : Controller
@@ -30,7 +26,6 @@ public class AdmissionAssessmentController : Controller
         step2 ??= new Step2ClinicalModel();
         step3 ??= new Step3FunctionalModel();
 
-        // Later-step plans read Step 1 values through Active Plan hidden fields.
         step2.PrimaryDiagnosis = step1.PrimaryDiagnosis;
         step2.ResidentName = step1.ResidentName;
         step3.Age = step1.Age;
@@ -124,7 +119,6 @@ public class AdmissionAssessmentController : Controller
         return Ok(new PhysicianSearchResponse { Physicians = filtered });
     }
 
-    // Each alert names what the page sent it, so an alert missing a field reads differently.
     [HttpPost("AlertElopement")]
     public async Task<IActionResult> AlertElopement([FromBody] AlertElopementRequest? request)
     {
@@ -256,14 +250,12 @@ public class AdmissionAssessmentController : Controller
         });
     }
 
-    // The submit answers to every step's rules: each step's messages join the others' by field.
     private static void CollectErrors(ValidationResult result, Dictionary<string, string[]> errors)
     {
         foreach (var field in result.ErrorsByField)
             errors[field.Key] = errors.TryGetValue(field.Key, out var earlier) ? [.. earlier, .. field.Value] : field.Value;
     }
 
-    // A step this browser has not saved for the screening has no draft.
     private bool TryGetDraft<TStep>(string screeningId, [NotNullWhen(true)] out TStep? draft) where TStep : class
     {
         var json = HttpContext.Session.GetString(DraftKey<TStep>(screeningId));

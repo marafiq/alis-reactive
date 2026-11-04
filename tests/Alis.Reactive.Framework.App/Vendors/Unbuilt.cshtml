@@ -7,7 +7,6 @@
 }
 <h1>A component not built yet</h1>
 
-@* The slate's element without the class its script builds a slate on, so no slate object is made for it. *@
 @(plan.Render<Slate>("unbuilt-slate", new HtmlString("<div id=\"unbuilt-slate\"></div>"))
     .Reactive(slate => slate.RowAdded, (added, p) => p.Element("row-heard").Text.Set(added.Label)))
 

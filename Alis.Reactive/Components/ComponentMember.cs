@@ -5,12 +5,6 @@ using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.Components
 {
-    /// <summary>
-    /// A declared property: its path from the object a page holds, and the one shape of its value, which a
-    /// read converts to and a write converts from: a class of the app's own data is an object of its members
-    /// by their JSON names, so a date member is a Date on both sides.
-    /// </summary>
-    /// <typeparam name="TValue">The C# type of the value.</typeparam>
     internal sealed class ComponentProperty<TValue>
     {
         private ComponentProperty(Path path)
@@ -28,10 +22,6 @@ namespace Alis.Reactive.Components
         internal static ComponentProperty<TValue> At(Path path) => new ComponentProperty<TValue>(path);
     }
 
-    /// <summary>
-    /// A declared method: the C# member that declares it, its path from the object a page holds, the shapes
-    /// its arguments are converted to, and whether it returns a promise the steps after it wait for.
-    /// </summary>
     internal sealed class ComponentMethod
     {
         private ComponentMethod(string name, Path path, IReadOnlyList<Shape> argumentShapes, bool awaits)
@@ -57,7 +47,6 @@ namespace Alis.Reactive.Components
             new ComponentMethod(name, path, argumentShapes, awaits);
     }
 
-    /// <summary>The members of an element <c>p.Element(...)</c> reaches: its text, HTML, hidden attribute and class list.</summary>
     internal static class BrowserElementMembers
     {
         private static readonly IReadOnlyList<Shape> OneText = new[] { Shape.String };

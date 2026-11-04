@@ -58,10 +58,6 @@ namespace Alis.Reactive
             Writer = writer;
         }
 
-        /// <summary>
-        /// Renders the field wrapper (label + validation error elements) around content
-        /// written by the callback, or the content alone for a hidden field.
-        /// </summary>
         internal void Render(Action writeContent)
         {
             if (Options.IsHidden)

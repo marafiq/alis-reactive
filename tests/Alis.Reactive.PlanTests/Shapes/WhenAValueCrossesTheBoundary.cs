@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Html;
 
 namespace Alis.Reactive.PlanTests.Shapes;
 
-/// <summary>
-/// A value changes type in one place, <c>as(expr, shape)</c>, by the shape its C# type declares
-/// (grammar.md 2.1): where it is read and where it is written, and nowhere else.
-/// </summary>
 [TestFixture]
 public class WhenAValueCrossesTheBoundary
 {

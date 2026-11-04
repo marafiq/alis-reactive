@@ -3,16 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.RoomHold;
 
-/// <summary>
-/// As a coordinator, I want to be told why the server refused a room hold, even when the reason is
-/// about the room rather than anything I typed, so that I choose another room instead of guessing.
-/// </summary>
-/// <remarks>
-/// The room travels in a hidden field, so neither the page's own "choose a room" check nor the
-/// server's refusal has a message slot beside an input; the hold form's summary, which the page places in
-/// the hold's card, is where both show. Which rooms are held is known only to the server's hold book, which it asks asynchronously.
-/// The reservations office's own validator, registered by its module, never reaches the page either.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
 {
@@ -42,7 +32,6 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         _plan = await PagePlan<RoomHoldModel>.FromPage(Page);
     }
 
-    // Leaving the field first lets its message settle, so the click lands on Place Hold.
     private async Task WriteProspectName(string name)
     {
         await ProspectName.Fill(name);
@@ -60,13 +49,11 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
 
         await ClickWhenStable(PlaceHold);
 
-        // The room has a browser rule but no message slot, so the server's refusal of it goes to the summary.
         await Expect(ValidationSummary).ToBeVisibleAsync();
         await Expect(ValidationSummary).ToHaveTextAsync(RoomHeldElsewhere);
         await Expect(_plan.ErrorFor(m => m.ProspectName)).ToBeHiddenAsync();
         await Expect(RoomHoldStatus).ToHaveTextAsync("No room held yet.");
 
-        // Only the server knows which rooms are held, so placing the hold again asks it again.
         await Page.RunAndWaitForResponseAsync(
             async () => await ClickWhenStable(PlaceHold),
             "**/Sandbox/Validation/RoomHold/Hold**");
@@ -75,8 +62,6 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
-    // The page places the hold form's summary in the hold's card, above the form, so the reason is read where
-    // the coordinator is working, not after the page.
     [Test]
     public async Task the_reason_shows_in_the_holds_card_where_the_page_places_it()
     {
@@ -110,8 +95,6 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         AssertNoConsoleErrorsExcept("the server responded with a status of 400");
     }
 
-    // The office's one-hold-per-prospect rule asks the office's hold book, which only the server can:
-    // the hold is sent and the server answers by the name.
     [Test]
     public async Task a_prospect_who_already_holds_a_room_is_refused_by_the_reservations_office()
     {
@@ -156,8 +139,6 @@ public class WhenCoordinatorHoldsRoom : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The room is chosen by a button that writes the hidden field; no one types in it. The field's own
-    // change is what takes the summary's ask away, before any hold is placed.
     [Test]
     public async Task choosing_a_room_takes_the_summarys_ask_for_one_away_before_a_hold_is_placed()
     {

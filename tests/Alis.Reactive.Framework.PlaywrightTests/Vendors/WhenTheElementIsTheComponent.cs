@@ -1,9 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Vendors;
 
-/// <summary>
-/// A component whose element is its object and whose events are DOM events (V3): its properties are the
-/// element's, and a listener's payload is the event's detail, or the element that raised an event with none.
-/// </summary>
 [TestFixture]
 public sealed class WhenTheElementIsTheComponent : AppPageTest
 {

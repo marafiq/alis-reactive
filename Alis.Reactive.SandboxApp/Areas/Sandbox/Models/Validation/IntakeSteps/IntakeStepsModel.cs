@@ -1,22 +1,16 @@
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// A new resident's intake, taken in steps inside one form: the resident first, then the care
-    /// they need. Each step's fields arrive with the step and leave when the next one replaces it.
-    /// </summary>
     public class IntakeStepsModel
     {
         public string? ResidentName { get; set; }
         public string? FamilyPhone { get; set; }
         public string? CareLevel { get; set; }
 
-        /// <summary>The aid the resident walks with; the care step asks once a care level is chosen.</summary>
         public string? MobilityAid { get; set; }
         public string? MobilityNotes { get; set; }
     }
 
-    /// <summary>The resident step's rules: the step checks only the fields it shows.</summary>
     public class IntakeResidentValidator : ReactiveValidator<IntakeStepsModel>
     {
         public IntakeResidentValidator()
@@ -28,7 +22,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    /// <summary>The care step's rules. Which care levels have an open room is known only to the server.</summary>
     public class IntakeCareValidator : ReactiveValidator<IntakeStepsModel>
     {
         public const string FullCareLevel = "Memory care";
@@ -44,6 +37,5 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
-    /// <summary>The confirmation the server returns once the intake is saved.</summary>
     public sealed record IntakeConfirmation(string Confirmation);
 }

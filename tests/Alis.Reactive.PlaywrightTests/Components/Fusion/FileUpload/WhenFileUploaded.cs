@@ -2,22 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.FileUpload
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.FileUpload;
 
-/// <summary>
-/// As a wound-care nurse, I want to attach a resident's signed consent form and a photo of her wound to her record
-/// after a wound review, and have the record refuse a file it cannot keep and tell me what it received, so that the
-/// wound record holds the right documents and nothing I sent goes missing without my knowing.
-/// </summary>
-/// <remarks>
-/// Margaret Hale's left heel wound is reviewed. The checklist ticks off the consent form while a PDF is chosen and
-/// the photo while a JPG or PNG is chosen, following each choice and each removal; an empty file is a scan that did
-/// not take and is not added. The form re-checks the files each time the uploader's files change
-/// (<c>FilesChanged</c>, which the framework raises once EJ2 has added or removed them, since EJ2's own
-/// <c>selected</c> and <c>removing</c> come before). The record keeps PDFs and JPG or PNG photos of at most 5 MB: the
-/// server reads the files and refuses the whole attachment when one is too large or of another kind, naming each
-/// file it received with its size.
-/// The file items' <c>RawFile</c> is read through <c>Files</c>, which the attach sends. Files are chosen through the
-/// file dialog; dropped or pasted files reach the same <c>selected</c> event (uploader.js:1264, 936).
-/// </remarks>
 [TestFixture]
 public class WhenFileUploaded : PlaywrightTestBase
 {

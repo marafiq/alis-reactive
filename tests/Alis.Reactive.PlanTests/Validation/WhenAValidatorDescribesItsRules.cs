@@ -3,7 +3,6 @@ using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Validation;
 
-/// <summary>A validator's rules are written once; the page carries the checks the browser can make, bound to the inputs.</summary>
 [TestFixture]
 public class WhenAValidatorDescribesItsRules
 {

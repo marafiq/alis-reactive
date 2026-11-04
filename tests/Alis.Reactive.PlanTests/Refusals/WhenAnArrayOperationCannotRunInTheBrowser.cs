@@ -2,7 +2,6 @@ using Alis.Reactive.PlanTests.Support;
 
 namespace Alis.Reactive.PlanTests.Refusals;
 
-/// <summary>An array operation is a C# lambda the plan carries for the browser; one the browser cannot run is refused where it is written.</summary>
 [TestFixture]
 public class WhenAnArrayOperationCannotRunInTheBrowser
 {

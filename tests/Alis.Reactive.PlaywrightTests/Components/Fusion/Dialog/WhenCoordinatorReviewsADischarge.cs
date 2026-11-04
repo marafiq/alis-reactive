@@ -2,17 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Dialog;
 
-/// <summary>
-/// As a care coordinator, I review a resident's discharge in a dialog that opens only when no care
-/// task is still open, loads the discharge summary when it opens, and closes only on a choice.
-/// </summary>
-/// <remarks>
-/// The review can be dragged aside by its title so the coordinator can read the page beneath it; a click
-/// outside it brings it back to the middle of the window and asks for the choice. Only a dragged review
-/// shows what <c>RefreshPosition</c> does: a modal dialog's container centers it with CSS as it grows, and a
-/// drag takes that centering away until the position is refreshed. Where the review sits is the outcome,
-/// so that test reads it from the review's own box. The open, close and overlay-click events carry no data.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
 {
@@ -26,7 +15,6 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
     private ILocator Blocked => Page.Locator("#discharge-blocked");
     private ILocator Overlay => Page.Locator("#discharge-dialog + .e-dlg-overlay");
 
-    // The review's title bar, where the coordinator takes hold of it to drag it.
     private ILocator ReviewTitle => Dialog.Locator(".e-dlg-header");
 
     private NativeCheckBoxLocator CareTasksOpen =>
@@ -50,7 +38,6 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
         await Page.Mouse.UpAsync();
     }
 
-    // The horizontal middle of the review, in the window.
     private async Task<float> ReviewMiddle()
     {
         var box = await Dialog.BoundingBoxAsync();
@@ -65,7 +52,6 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
 
         await ReviewDischarge.ClickAsync();
 
-        // beforeOpen cancels the open and says why; the review never starts.
         await Expect(Blocked).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Blocked).ToHaveTextAsync("Close Margaret's open care tasks before reviewing her discharge.");
         await Expect(Dialog).ToBeHiddenAsync();
@@ -96,7 +82,6 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
 
         await ReviewDischarge.ClickAsync();
 
-        // Show opens the dialog; its open event marks the review in progress and loads the summary.
         await Expect(Dialog).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(ReviewStatus).ToHaveTextAsync("in progress", new() { Timeout = 5000 });
         await Expect(Summary).ToContainTextAsync("goes home with her daughter on Friday", new() { Timeout = 10000 });
@@ -110,7 +95,6 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
 
         await Page.Keyboard.PressAsync("Escape");
 
-        // beforeClose sees a close the coordinator started and cancels it.
         await Expect(ChooseHint).ToBeVisibleAsync(new() { Timeout = 5000 });
         await Expect(Dialog).ToBeVisibleAsync();
         await Expect(ReviewStatus).ToHaveTextAsync("in progress");
@@ -151,8 +135,6 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
 
         await Page.Locator("#discharge-not-yet").ClickAsync();
 
-        // Hide closes the dialog (a close the page asked for is not cancelled); its close event
-        // marks the review closed.
         await Expect(Dialog).ToBeHiddenAsync(new() { Timeout = 5000 });
         await Expect(ReviewStatus).ToHaveTextAsync("closed", new() { Timeout = 5000 });
         await Expect(Page.Locator("#discharge-decision")).ToBeEmptyAsync();

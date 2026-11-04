@@ -13,8 +13,6 @@ namespace Alis.Reactive.PlanModel.Requests
             return RequireShape<TProp>("header", name.Value);
         }
 
-        // A route value is one path segment: a scalar. A value whose shape is not declared (a plugin
-        // result or a payload read typed as object) is the developer's to keep scalar.
         internal static void RouteParameter(string placeholder, Shape shape)
         {
             var undeclared = shape is AnyShape;
@@ -25,7 +23,6 @@ namespace Alis.Reactive.PlanModel.Requests
                 $"shape '{shape.DescribeContract()}'. Use string, a number, bool, a date, or their nullable forms.");
         }
 
-        // A query key may repeat, and MVC binds an array from every value; a scalar takes the first.
         internal static Shape UrlQueryParameter<TProp>(string name)
         {
             var shape = ClrShape.Of(typeof(TProp));

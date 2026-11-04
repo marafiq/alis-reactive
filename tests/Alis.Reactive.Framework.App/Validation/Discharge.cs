@@ -1,6 +1,5 @@
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>A discharge summary, saved as a draft or signed off: each stage has rules of its own.</summary>
 public sealed class DischargeSummary
 {
     public string? Resident { get; set; } = "Ada";
@@ -16,17 +15,11 @@ public sealed class DischargeSummary
     public string? Medication { get; set; } = "None";
 }
 
-/// <summary>How the resident leaves.</summary>
 public sealed class Transport
 {
     public string? Carrier { get; set; } = "Family car";
 }
 
-/// <summary>
-/// The rules of a discharge by stage: the resident and the transport for every stage, the summary's presence
-/// for a draft, its length and the signature for the sign-off, the ward for no stage, and the handback's
-/// rules brought in whatever the stage.
-/// </summary>
 public sealed class DischargeRules : ReactiveValidator<DischargeSummary>
 {
     public DischargeRules()
@@ -47,7 +40,6 @@ public sealed class DischargeRules : ReactiveValidator<DischargeSummary>
     }
 }
 
-/// <summary>The transport's rule, asked at the sign-off alone.</summary>
 public sealed class TransportRules : ReactiveValidator<Transport>
 {
     public TransportRules()
@@ -56,7 +48,6 @@ public sealed class TransportRules : ReactiveValidator<Transport>
     }
 }
 
-/// <summary>The handback's rule, asked of a draft alone.</summary>
 public sealed class HandbackRules : ReactiveValidator<DischargeSummary>
 {
     public HandbackRules()

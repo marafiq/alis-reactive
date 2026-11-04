@@ -1,13 +1,11 @@
 
 namespace Alis.Reactive.Framework.App.Validation;
 
-/// <summary>A note about a resident.</summary>
 public interface IShiftNote
 {
     string? Resident { get; }
 }
 
-/// <summary>The note one shift leaves the next: saved as a draft while it is written, then handed over.</summary>
 public sealed class HandoverNote : IShiftNote
 {
     public string? Resident { get; set; }
@@ -15,13 +13,11 @@ public sealed class HandoverNote : IShiftNote
     public string? Note { get; set; }
 }
 
-/// <summary>A note of an incident, checked by rules written once for any note.</summary>
 public sealed class IncidentNote : IShiftNote
 {
     public string? Resident { get; set; }
 }
 
-/// <summary>The rules every handover note is checked by, whether it is saved as a draft or handed over.</summary>
 public sealed class HandoverRules : ReactiveValidator<HandoverNote>
 {
     public HandoverRules()
@@ -30,7 +26,6 @@ public sealed class HandoverRules : ReactiveValidator<HandoverNote>
     }
 }
 
-/// <summary>Rules a draft alone would be checked by: the note is written before it is handed over.</summary>
 public sealed class HandoverDraftRules : ReactiveValidator<HandoverNote>
 {
     public HandoverDraftRules()
@@ -39,7 +34,6 @@ public sealed class HandoverDraftRules : ReactiveValidator<HandoverNote>
     }
 }
 
-/// <summary>Rules written once for any note about a resident.</summary>
 public sealed class NoteRules<TNote> : ReactiveValidator<TNote> where TNote : class, IShiftNote
 {
     public NoteRules()
@@ -48,7 +42,6 @@ public sealed class NoteRules<TNote> : ReactiveValidator<TNote> where TNote : cl
     }
 }
 
-/// <summary>The second validator a handover page names for its one form.</summary>
 public enum HandoverMistake
 {
     DraftAndHandoverRules,

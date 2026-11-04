@@ -3,22 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.MultiSelec
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.MultiSelect;
 
-/// <summary>
-/// As a dietitian, I want to record a resident's allergies, the snacks her texture allows, the dishes she
-/// will not eat and her supplements in one diet order, and see the tray ticket the kitchen will print, so
-/// that her tray never carries what she reacts to or refuses.
-/// </summary>
-/// <remarks>
-/// Margaret Hale's chart lists a peanut allergy; her hospital discharge summary lists shellfish and
-/// penicillin. Allergies are grouped Food, Medication, Environmental and None; the tray ticket prints the
-/// food allergies only, and the page says whether the allergies on file are from her chart, changed by the
-/// dietitian, or copied from the discharge summary. Choosing a texture fills the snack list with what that
-/// texture allows and opens it (pureed: Applesauce, Pudding, Yogurt). The kitchen substitutes up to three
-/// dishes; the third closes the list. The supplement field offers the kitchen's most-ordered supplements
-/// (Magic Cup, Ensure Plus) until the catalog answers a search, 1.5 seconds later.
-/// Not exercised: the render helper without a build step: a MultiSelect with no items has nothing to
-/// choose. Change's e, element and oldValue fields are not declared; IsInteracted is EJ2's reading of e.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionMultiSelect : PlaywrightTestBase
 {
@@ -54,7 +38,6 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
         await Expect(AllergyChips).ToHaveTextAsync(new[] { "Peanuts" }, new() { Timeout = 5000 });
     }
 
-    // A list with check boxes stays open while dishes are ticked.
     private async Task TickDish(string dish) =>
         await ClickWhenStable(Dislikes.PopupItems.GetByText(dish, new() { Exact = true }));
 
@@ -198,8 +181,6 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Nothing among the usual supplements matches "glu"; the list keeps them rather than saying nothing
-    // matches, and the status still says searching after the list is seen.
     [Test]
     public async Task while_the_catalog_is_searched_the_list_keeps_the_usual_supplements()
     {
@@ -232,8 +213,6 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Leaving the emptied allergies shows the message before Save is pressed, so the refused order is shown never
-    // to leave the page by the save that follows: the order with No known allergies is the only one sent.
     [Test]
     public async Task saving_without_her_allergies_asks_for_them()
     {

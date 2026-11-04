@@ -12,7 +12,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string City { get; set; } = "";
     }
 
-    /// <summary>The document events the DispatchSource page raises and hears.</summary>
     public static class DispatchSourceEvents
     {
         public static readonly AppEvent DoTransfer = AppEvent.Declare();

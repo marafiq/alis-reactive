@@ -1,6 +1,4 @@
-/* The look of a refusal: the field's message, the form's summary, and the mark on the refused input. */
 @layer alis {
-  /* One line of 1rem: the room field.css reserves for it while it is hidden. */
   .alis-root .alis-field__message {
     font-size: 0.75rem;
     line-height: 1rem;
@@ -32,8 +30,6 @@
   }
 }
 
-/* The mark the runtime puts on the refused input itself; a state, so it stays above an app's utilities.
-   A Syncfusion wrapper takes its mark from AlisReactive.Fusion's stylesheet. */
 .alis-root .alis-has-error {
   border-color: var(--color-error);
   --tw-ring-color: var(--color-error);

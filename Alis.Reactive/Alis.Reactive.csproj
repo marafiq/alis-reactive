@@ -1,8 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-    <!-- The Razor SDK makes this a Razor class library, so the runtime script ships as a static web
-         asset. There are no Razor files to compile. -->
-
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
         <Nullable>enable</Nullable>
@@ -18,9 +15,6 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <!-- net48 ships the same DSL: plan domain (builders, plan model, JSON serialization,
-         validation metadata) AND the Razor/Html authoring layer. The authoring layer
-         binds to ASP.NET MVC5 (System.Web.Mvc) on net48 instead of ASP.NET Core. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="System.Text.Json" Version="10.0.12" />
@@ -30,10 +24,6 @@
         <Reference Include="System.Web" />
     </ItemGroup>
 
-    <!-- The runtime script npm builds into Alis.Reactive.Assets/dist, and the stylesheet for what the
-         core writes, shipped as written. Served at ~/_content/AlisReactive/{RelativePath} (net10) and
-         copied to Content\AlisReactive\{RelativePath} (net48). Where and how:
-         build\AlisReactiveStaticWebAssets.targets. -->
     <ItemGroup>
         <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js" RelativePath="js/alis-reactive.js" />
         <AlisReactiveStaticWebAsset Include="css\alis-reactive.css" RelativePath="css/alis-reactive.css" />
@@ -41,7 +31,6 @@
 
     <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />
 
-    <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS009) -->
     <ItemGroup>
         <None Include="..\Alis.Reactive.Analyzers\bin\$(Configuration)\netstandard2.0\Alis.Reactive.Analyzers.dll"
               Pack="true"
@@ -49,12 +38,9 @@
               Visible="false" />
     </ItemGroup>
 
-    <!-- The typed-API analyzer (ALIS009) runs on the core's own public surface. -->
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <!-- The package's slice rows, bottom row first; ALIS010-ALIS013 lock ADR-0004 against them in every build. -->
         <AdditionalFiles Include="SliceTree.txt" />
-        <!-- The public surface per target: a public symbol is a line in PublicAPI.Unshipped.txt, or the build fails (RS0016, RS0017). -->
         <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />

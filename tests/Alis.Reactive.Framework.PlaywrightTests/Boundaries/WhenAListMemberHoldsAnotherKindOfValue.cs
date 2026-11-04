@@ -1,11 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Boundaries;
 
-/// <summary>
-/// An array operation over a member declared a list whose component keeps an object there, which is no
-/// list (grammar.md 2.2, toArray): the step fails at the component, so the steps after it do not run and
-/// the page goes on. The slate keeps its header as an object; the page's declaration says it is a list of
-/// text.
-/// </summary>
 [TestFixture]
 public sealed class WhenAListMemberHoldsAnotherKindOfValue : AppPageTest
 {

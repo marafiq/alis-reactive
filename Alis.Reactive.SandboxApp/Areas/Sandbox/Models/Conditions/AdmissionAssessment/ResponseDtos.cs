@@ -1,6 +1,5 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
 
-/// <summary>An alert's answer: what the service that took the alert says it will do.</summary>
 public class ScreeningAlertResponse
 {
     public string Message { get; set; } = "";

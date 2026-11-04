@@ -1,20 +1,7 @@
 #!/bin/sh
-# Install this repo's git hooks. Idempotent — run after clone or hook changes:
-#   sh scripts/install-git-hooks.sh
-#
-# Why this exists: `main` and every `release/*` branch move by pull request only
-# (docs/BRANCHING.md). A pre-commit guard refuses a direct commit on those
-# branches, so every committer in this clone — people, Claude, subagents, Codex —
-# is turned back onto a short-lived branch before the server-side ruleset would
-# reject the push. Same idea as pre-commit-hooks' `no-commit-to-branch`:
-# https://github.com/pre-commit/pre-commit-hooks#no-commit-to-branch
 set -e
 cd "$(git rev-parse --show-toplevel)"
 
-# Root-cause guard for a known landmine: a stale ABSOLUTE core.hooksPath (left
-# behind when a clone is moved on disk) can point at a directory that no longer
-# exists, which silently disables ALL hooks. If the resolved hooks dir is
-# missing, drop the override so git falls back to the repo's real .git/hooks.
 hooks="$(git rev-parse --git-path hooks)"
 if [ ! -d "$hooks" ]; then
   git config --unset core.hooksPath 2>/dev/null || true
@@ -24,11 +11,6 @@ mkdir -p "$hooks"
 
 cat > "$hooks/pre-commit" <<'HOOK'
 #!/bin/sh
-# Protected-branch guard — installed by scripts/install-git-hooks.sh (do not
-# hand-edit; re-run the installer to change it). `main` and `release/*` move by
-# pull request only (docs/BRANCHING.md). Override once, rarely — for example a
-# merge commit made deliberately on a release branch:
-#   ALIS_ALLOW_PROTECTED=1 git commit ...
 current="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 case "$current" in
   main|release/*)

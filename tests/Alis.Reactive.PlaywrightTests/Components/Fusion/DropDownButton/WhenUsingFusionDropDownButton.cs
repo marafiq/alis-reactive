@@ -3,22 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.DropDownBu
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.DropDownButton;
 
-/// <summary>
-/// As a charge nurse at the end of the evening shift, I want to print my wing's reports from one menu, so that
-/// the night shift starts with the handoff on paper and no report is printed twice.
-/// </summary>
-/// <remarks>
-/// The menu offers Shift handoff, Medication pass, Incident summary and Midnight census, which waits for the
-/// midnight head count. It stays locked until a wing is chosen; choosing one unlocks it and puts the keyboard
-/// on it. A disabled button takes no focus, so the unlock is applied with DataBind before FocusIn; without
-/// DataBind the button is still disabled when FocusIn runs and never gets the keyboard. No incident was logged
-/// this shift, so the incident summary has nothing to print.
-/// Not exercised: reading Content, Disabled and CssClass back (no step here needs the menu's own label, state
-/// or classes; the writes below prove the same JavaScript members); Toggle closing an open menu (every gesture
-/// that reaches the page while the menu is open closes it on its own, a click outside or on an item);
-/// Select's Item.Disabled (a disabled item cannot be clicked or reached by the arrow keys, so every Select the
-/// nurse can raise carries false and nothing on the page could differ).
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionDropDownButton : PlaywrightTestBase
 {
@@ -145,7 +129,6 @@ public class WhenUsingFusionDropDownButton : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The menu closes as the item is chosen; only the page opens it again.
     [Test]
     public async Task after_a_report_with_nothing_in_it_the_menu_opens_again_for_another_choice()
     {

@@ -1,6 +1,5 @@
 namespace Alis.Reactive.ClassNames.App.Notices;
 
-/// <summary>A notice with one required title.</summary>
 public sealed class Notice
 {
     public string? Title { get; set; }

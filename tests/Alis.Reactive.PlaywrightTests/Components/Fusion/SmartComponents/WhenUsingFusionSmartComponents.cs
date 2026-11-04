@@ -2,22 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.SmartCompo
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.SmartComponents;
 
-/// <summary>
-/// As an admissions coordinator, I want a referral letter, opened from the inbox or pasted, to fill in the
-/// referral form, and to write my intake note with suggested phrases but never a suggested dose, so that a
-/// referral is filed quickly and says nothing the hospital did not.
-/// </summary>
-/// <remarks>
-/// Smart Paste reads the letter from the page's letter box (EJ2 reads an element with the ID custom-clipboard
-/// before the clipboard, smart-paste-button.js:359-368) and sends it with the form's fields to the page's
-/// assist endpoint; the intake note asks the page's suggestion endpoint what comes next after a pause in typing
-/// (smart-textarea.js:157-268). The sandbox reaches no AI service: its endpoints stand in for one, reading the
-/// letter's labelled lines (Patient, Referring physician, Level of care, Reason for referral) and completing
-/// a note that ends in "family" or "metformin". What a real model would infer from a letter in free prose, or
-/// suggest for any other note, is not exercised. Opening a referral from the inbox loads its letter and clicks
-/// Fill in from the letter (Click); a saved referral locks that button (Disabled), and Save reads the lock to
-/// refuse a second save.
-/// </remarks>
 [TestFixture]
 public class WhenUsingFusionSmartComponents : PlaywrightTestBase
 {
@@ -199,7 +183,6 @@ public class WhenUsingFusionSmartComponents : PlaywrightTestBase
     {
         await NavigateAndBoot();
         await WriteInTheNote("Family");
-        // The suggestion shows in the note, after the cursor, until Tab takes it.
         await Expect(Note).ToHaveValueAsync("Family tour scheduled for Thursday ", new() { Timeout = 10000 });
 
         await Note.PressAsync("Tab");
@@ -223,7 +206,6 @@ public class WhenUsingFusionSmartComponents : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The suggestion shows in the note, after the cursor, until Tab takes it.
     [Test]
     public async Task a_suggested_phrase_after_a_left_out_dose_takes_the_dose_warning_down()
     {

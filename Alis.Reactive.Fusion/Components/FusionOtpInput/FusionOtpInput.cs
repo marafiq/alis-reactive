@@ -35,7 +35,6 @@ namespace Alis.Reactive.Fusion
         public Event<FusionOtpInputValueChangedArgs> ValueChanged =>
             Event<FusionOtpInputValueChangedArgs>();
 
-        /// <inheritdoc />
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);
 
         /// <summary>Raised when a field receives focus.</summary>

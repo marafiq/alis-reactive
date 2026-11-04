@@ -12,7 +12,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         [HttpGet("")]
         public IActionResult Index() => View(ViewBase + "Index.cshtml", new NightCallModel());
 
-        // The desk's card while someone is on duty: its plan listens to the room's bell.
         [HttpGet("DeskOnDuty")]
         public IActionResult DeskOnDuty() => PartialView(ViewBase + "_DeskOnDuty.cshtml", new DeskOnDutyModel());
 

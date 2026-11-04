@@ -11,14 +11,10 @@ node_modules/
 /tools/*
 !/tools/PlanContractGenerator/
 
-# SonarQube scanner output
 .sonarqube/
 .DS_Store
 TestResults/
 
-# Browser assets `npm run build:all` builds: the framework bundles in Alis.Reactive.Assets/dist/
-# (served as static web assets and packed into the NuGets), the sandbox's own bundles, and the
-# sandbox's copy of the Syncfusion files it links (copy-vendor.mjs).
 Alis.Reactive.Assets/dist/
 Alis.Reactive.DesignSystem/dist/
 Alis.Reactive.SandboxApp/wwwroot/vendor/
@@ -27,12 +23,8 @@ Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js
 Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.css
 Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 
-# The framework test app's components bundle and stylesheet, built by its own npm build before each
-# dotnet build.
 tests/Alis.Reactive.Framework.App/wwwroot/js/
 tests/Alis.Reactive.Framework.App/wwwroot/css/
-# The example builds as an app outside this repository would (scripts/example.sh): its stylesheet,
-# its Syncfusion copy and the smoke's output.
 examples/resident-intake/wwwroot/css/app.css
 examples/resident-intake/wwwroot/vendor/
 examples/resident-intake/ci/app.log

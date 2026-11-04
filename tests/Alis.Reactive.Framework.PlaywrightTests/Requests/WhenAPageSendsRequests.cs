@@ -1,12 +1,5 @@
 namespace Alis.Reactive.Framework.PlaywrightTests.Requests;
 
-/// <summary>
-/// A page's requests, each reaching an endpoint that says what it received: where gathered members go (the
-/// route, the query, the JSON body, form data, headers), values read when the request is sent (a component's
-/// property, a plugin, a method's result: M4, and a value that is never missing in a member that may be empty),
-/// the answer's routes (success, an error by status, any error),
-/// and the order around a request (chained, parallel, while loading, finally).
-/// </summary>
 [TestFixture]
 public sealed class WhenAPageSendsRequests : AppPageTest
 {
