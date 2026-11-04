@@ -31,6 +31,8 @@ public sealed class DayTrip
     public List<string?> Seats { get; set; } = new() { "1A", "1B" };
 
     public string? Coach { get; set; } = "Blue";
+
+    public List<string?> Tickets { get; set; } = new() { "T-1", "T-2" };
 }
 
 public sealed class TripGuest
@@ -85,6 +87,9 @@ public sealed class DayTripRules : ReactiveValidator<DayTrip>
         RuleForEach(x => x.Stops).Must(stop => stop is "Pier" or "Park" or "Museum").WithMessage("Pick a stop on the route.").DependentRules(() =>
             RuleFor(x => x.ReturnBy).NotEmpty().WithMessage("Say when the trip returns."));
         RuleForEach(x => x.Seats).NotEmpty().WithMessage("Give each seat.").DependentRules(() =>
-            RuleFor(x => x.Coach).NotEmpty().WithMessage("Name the coach."));
+        {
+            RuleFor(x => x.Coach).NotEmpty().WithMessage("Name the coach.");
+            RuleForEach(x => x.Tickets).NotEmpty().WithMessage("Give each ticket.");
+        });
     }
 }

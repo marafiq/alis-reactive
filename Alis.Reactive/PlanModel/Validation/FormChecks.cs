@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
@@ -73,11 +74,14 @@ namespace Alis.Reactive.PlanModel.Validation
 
         internal override ValueExpression Value(FieldReference field) => ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
 
-        internal ValueExpression ItemIndexes(FieldReference item) => ValueExpression.ReadBoundItemIndexes(NameOf(item), _formId, Indexes);
+        internal ValueExpression ItemIndexes(FieldReference item)
+            => ValueExpression.ReadBoundItemIndexes(NameOf(item), _formId, Indexes, OwnerDepthOf(item));
 
         internal CheckedField Check(BrowserField field)
             => new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);
 
         private string NameOf(FieldReference field) => HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
+
+        private static int OwnerDepthOf(FieldReference item) => item.Path.Split(new[] { "[*]" }, StringSplitOptions.None).Length - 2;
     }
 }

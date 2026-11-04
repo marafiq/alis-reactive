@@ -34,6 +34,8 @@
         Html.InputField(plan, m => m.Seats[1], o => o.Label("Second seat")).Entry();
     }
     @{ Html.InputField(plan, m => m.Coach, o => o.Label("Coach")).Entry(); }
+    @{ Html.InputField(plan, m => m.Tickets[0], o => o.Label("First ticket")).Entry(); }
+    @{ Html.InputField(plan, m => m.Tickets[1], o => o.Label("Second ticket")).Entry(); }
 </div>
 
 <p>Saved: <span id="saved"></span></p>

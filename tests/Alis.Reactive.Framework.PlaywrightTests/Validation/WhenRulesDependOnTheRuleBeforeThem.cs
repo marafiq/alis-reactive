@@ -140,6 +140,31 @@ public sealed class WhenRulesDependOnTheRuleBeforeThem : AppPageTest
     }
 
     [Test]
+    public async Task a_dependent_lists_rule_after_a_lists_browser_checks_waits_for_every_item_of_that_list_not_its_own_index()
+    {
+        await Open("/Validation/DayTrip");
+        var secondTicketWanted = Field("Second ticket").GetByText("Give each ticket.", new() { Exact = true });
+
+        await Write("First seat", "");
+        await Write("Second ticket", "");
+        await Save();
+        await Expect(Field("First seat").GetByText("Give each seat.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(secondTicketWanted).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Write("First seat", "1D");
+        await Save();
+        await Expect(secondTicketWanted).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "every seat passes, so the browser asks for the ticket and holds the request");
+
+        await Write("Second ticket", "T-3");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
     public async Task a_dependent_rule_after_a_lists_browser_checks_applies_in_the_browser_when_the_form_holds_no_item()
     {
         await Open("/Validation/DayTrip?seats=false");

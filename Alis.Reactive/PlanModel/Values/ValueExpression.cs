@@ -125,8 +125,8 @@ namespace Alis.Reactive.PlanModel.Values
         internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes)
             => new BoundRead(name, shape, formId, G.Ref(itemIndexes));
 
-        internal static ValueExpression ReadBoundItemIndexes(string itemName, string formId, string ownerIndexes)
-            => new BoundItemIndexesRead(itemName, formId, G.Ref(ownerIndexes));
+        internal static ValueExpression ReadBoundItemIndexes(string itemName, string formId, string indexes, int ownerDepth)
+            => new BoundItemIndexesRead(itemName, formId, G.Call(G.Ref(indexes), "slice", G.Lit(0), G.Lit(ownerDepth)));
 
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
