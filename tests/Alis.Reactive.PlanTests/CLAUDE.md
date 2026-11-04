@@ -35,11 +35,11 @@ developer would meet it and asserts the message names the thing and the way out;
 
 ## Goldens
 
-Every golden on disk is checked against `plan.schema.json`, the schema generated from the grammar
+Every golden on disk is checked against `Alis.Reactive.Assets/runtime/types/plan.schema.json`, the schema generated from the grammar
 (`Contract/WhenAPlanIsEmbedded.cs`); a plan the grammar's classes could not have written fails there.
 
 A golden is reviewed, never just regenerated. `ALIS_UPDATE_GOLDENS=1 dotnet test tests/Alis.Reactive.PlanTests`
-rewrites every golden; read each diff against `grammar.md` before committing it, and say in the
+rewrites every golden; read each diff against `docs/design/grammar.md` before committing it, and say in the
 commit what changed in what a page carries and why.
 
 The runtime runs these goldens: `Alis.Reactive.Assets/runtime/__tests__/authored-plans.test.ts`

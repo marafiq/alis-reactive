@@ -8,7 +8,7 @@ paths:
 Every view, in the sandbox, the test apps and the examples. A view carries no JavaScript (root CLAUDE.md).
 
 - `ReactivePlan<T>()` is the one plan call: a page, and a partial with its own model, each start a plan with
-  it, and every plan stands alone; its id keys nothing (ADR-0003 rule 3). A view that starts a plan ends
+  it, and every plan stands alone; its id keys nothing (`docs/adr/0003-partials-compose-by-member-and-form.md`, rule 3). A view that starts a plan ends
   with `@Html.RenderPlan(plan)`; without it the plan's components register but its triggers, requests,
   conditions and rules never reach the page. Each plan starts under its owner: the page, or the slot whose
   element holds the plan's script.

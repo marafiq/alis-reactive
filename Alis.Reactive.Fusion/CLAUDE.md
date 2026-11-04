@@ -37,7 +37,7 @@ public Event<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBo
   method) runs once per callback, before the first line that uses its result, or at its own line
   when no line does; every later use reads what it returned, except that an async result first
   used inside a branch's arm or a request's part is asked again by a line outside it
-  (`docs/design/grammar.md` 3.1).
+  (`docs/design/grammar.md#31-bindings`).
 - `Object<T>()` on a property declares an object the component holds, with members and events of
   its own; `Objects<T>()` a list of them (`At(i)`, `Count`, `Each(item => item.Field)`).
 - `Arg<T>` parameters take a literal or a value read when the step runs, in the JavaScript method's

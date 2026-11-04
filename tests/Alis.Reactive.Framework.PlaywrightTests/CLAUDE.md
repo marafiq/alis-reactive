@@ -15,6 +15,6 @@ its Framework tests section included.
 - What these tests run of the framework: `scripts/framework-coverage.sh` (npm run coverage:framework)
   records the runtime's block coverage per page and instruments the core's assemblies with
   dotnet-coverage, then writes `tests/TestResults/framework-coverage/<stamp>/report.md`: the share of
-  `runtime/**` and of the core's C# the tests ran, and every line they did not. It is feedback while
+  `Alis.Reactive.Assets/runtime/**` and of the core's C# the tests ran, and every line they did not. It is feedback while
   coding, like typecheck, never a gate or a proof (root CLAUDE.md): a line it reports not run points at
   a missing test or at code the framework does not need, and a Playwright test settles which.

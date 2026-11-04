@@ -20,7 +20,7 @@ shipped components and the sandbox journeys and adds the Component and journey t
 1. **One promise, named as the promise.** A test proves one thing a developer or a user is promised: what a
    public member's XML docs say, a behavior of `docs/design/grammar.md`, or what a role sees on a journey.
    The fixture is the situation (`WhenAPageBranches`, `WhenCoordinatorAssignsABed`); the test is the promise
-   as a sentence (`a_branch_runs_only_when_its_condition_holds`). A name that describes code
+   as a sentence (`else_runs_only_when_no_arm_holds`). A name that describes code
    (`writes_a_let_statement`, `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise.
 2. **The public surface only.** Arrange as a developer does: Razor helpers, plan builders, validators
    registered through DI, components declared on `Component`. No `InternalsVisibleTo`, no internal
@@ -43,8 +43,8 @@ shipped components and the sandbox journeys and adds the Component and journey t
    proves only the happy path passes while the feature lies.
 7. **No tautology.** Expected values are literals read from the promise, never computed by the code under
    test, copied from its output, or accepted as a recorded snapshot. A test never asserts what it typed or
-   set itself, or what the compiler already guarantees. `ToHaveText` when the text is known, not
-   `ToContainText`.
+   set itself, or what the compiler already guarantees. `ToHaveTextAsync` when the text is known, not
+   `ToContainTextAsync`.
 8. **Independent and deterministic.** A fresh page for each test; no order between tests; no shared mutable
    data; per-page world keys, never process-global flags. No sleep, no retry, no skipped, ignored or
    commented-out test, no try/catch around an assertion. Wait for the observable state, never for time.
@@ -105,7 +105,7 @@ pipeline; invalid input shows its message inline; a condition turns a rule on an
 clears the message without a resubmit; its value is gathered into the request; a valid form submits and the
 page shows the server's answer.
 
-**Names.** Folders are the concern (`Patterns/BedAssignment/`); the folder carries the vendor, so names
+**Names.** Folders are the concern (`**/Patterns/BedAssignment/`); the folder carries the vendor, so names
 carry no vendor prefix (`Components/Fusion/DatePicker/WhenDateSelected.cs`).
 
 ## Review

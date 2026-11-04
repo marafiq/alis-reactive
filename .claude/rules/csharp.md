@@ -38,7 +38,7 @@ values propagate silently. A fallback is a rare, deliberate, justified exception
 
 ## Validation Design
 
-The reference is `docs/design/grammar.md` section 7: the validator grammar (`ReactiveValidator<T>`, FluentValidation's
+The reference is `docs/design/grammar.md#7-validation-projection`: the validator grammar (`ReactiveValidator<T>`, FluentValidation's
 syntax), what each check decides on the server and the browser form the plan carries, and what stays on the server by
 what it is. The principles that hold:
 
@@ -49,7 +49,7 @@ what it is. The principles that hold:
   endpoint validates by the same set.
 - Errors are reported under the member's path, as model binding names it; `WithName` changes only the name a message
   says. A nested object's rules come through `SetValidator`, `ChildRules` or `Include`, prefixed by the member's path.
-- A date reaches the browser as the text MVC binds (`yyyy-MM-dd` at midnight); the facility's timezone is the app's.
+- A date reaches the browser as the text MVC binds (`"yyyy-MM-dd"` at midnight); the facility's timezone is the app's.
 
 ### Live Re-Validation
 - Industry standard: clear on input, re-validate on blur and on the input's commit event.
@@ -65,7 +65,7 @@ These are the worked examples.
 **Revealing names over complex conditions.** Extract boolean expressions into named
 variables that explain intent. The name is the documentation.
 
-```csharp
+```csharp illustration
 // Wrong: condition is opaque
 if (field.Shape != null && field.Shape.Kind != "none" && !field.IsServerOnly)
     ExtractRule(field);
@@ -78,7 +78,7 @@ if (requiresClientValidation)
 
 **Avoid nesting.** Use early returns and guard clauses to flatten control flow.
 
-```csharp
+```csharp illustration
 // Wrong: nested
 if (component != null)
 {

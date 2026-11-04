@@ -39,6 +39,7 @@ real boundary too; an error at one names the object, the path and the plan.
 and several suites stub the network or fake a vendor. Rebuild the bundle (`scripts/build.sh`) before
 `scripts/playwright.sh`.
 
-The console log shows errors and warnings by default; a page raises the level once, with
-`data-alis-trace="info|debug|trace"` on `<html>`. The sandbox layout sets `trace`, and the Playwright
-base waits for the info-level `[alis:boot] booted` line.
+The console log shows errors and warnings by default; a page sets another level once, with
+`data-alis-trace` on `<html>` (`off`, `error`, `info`, `debug` or `trace`). The sandbox layout sets
+`trace`. The Playwright base waits for `data-alis-booted` on `<html>`, which the runtime sets once the
+page has booted.
