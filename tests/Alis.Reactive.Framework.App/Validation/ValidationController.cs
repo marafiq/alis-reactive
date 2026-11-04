@@ -361,6 +361,21 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
+    public IActionResult Nameplate(NameplateName name = NameplateName.Spoken)
+    {
+        ViewData["Name"] = name;
+        return View(new Nameplate());
+    }
+
+    [HttpPost("/Validation/Nameplate")]
+    public IActionResult SaveNameplate([FromBody] Nameplate nameplate, [FromServices] SpokenNameplateRules rules)
+    {
+        var result = rules.Validate(nameplate);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"saved {nameplate.Resident}" });
+    }
+
     public IActionResult RoomMove() => View(new RoomMove());
 
     [HttpPost("/Validation/RoomMove")]
