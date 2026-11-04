@@ -493,15 +493,25 @@
           "items": {
             "$ref": "#/$defs/Expr"
           }
+        },
+        "members": {
+          "$ref": "#/$defs/PathMembers"
         }
       },
       "required": [
         "kind",
         "target",
         "path",
-        "args"
+        "args",
+        "members"
       ],
       "additionalProperties": false
+    },
+    "PathMembers": {
+      "enum": [
+        "required",
+        "optional"
+      ]
     },
     "GetExpr": {
       "type": "object",
@@ -517,12 +527,16 @@
           "items": {
             "type": "string"
           }
+        },
+        "members": {
+          "$ref": "#/$defs/PathMembers"
         }
       },
       "required": [
         "kind",
         "target",
-        "path"
+        "path",
+        "members"
       ],
       "additionalProperties": false
     },
@@ -958,13 +972,17 @@
         },
         "value": {
           "$ref": "#/$defs/Expr"
+        },
+        "members": {
+          "$ref": "#/$defs/PathMembers"
         }
       },
       "required": [
         "kind",
         "target",
         "path",
-        "value"
+        "value",
+        "members"
       ],
       "additionalProperties": false
     },

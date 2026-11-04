@@ -34,7 +34,7 @@ export class PlanObjects implements Objects {
   private subscribeElement(locator: ElementObjectLocator, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const vendor = this.vendor(locator);
     const root = vendorObject(this.requireElement(locator), locator.vendor, vendor);
-    const target = path.length === 0 ? root : read(root, path, "checked", `#${locator.id}`);
+    const target = path.length === 0 ? root : read(root, path, "required", `#${locator.id}`);
     owner.onDispose(subscribeVendor(target, locator.vendor, vendor, event, listener));
   }
 

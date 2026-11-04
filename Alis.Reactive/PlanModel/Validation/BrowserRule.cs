@@ -157,7 +157,7 @@ namespace Alis.Reactive
 
         private protected static Expr Matches(Expr v, string pattern) => G.Op(Operator.Matches, v, G.Lit(pattern), G.Lit(""));
 
-        private protected static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.Any);
+        private protected static Expr TextLength(Expr v) => G.Get(G.Op(Operator.ToText, v), new[] { "length" }, Shape.Any, PathMembers.Optional);
 
         private protected static Expr BlankOrDefault(Expr v, Shape fieldShape)
         {
@@ -191,7 +191,7 @@ namespace Alis.Reactive
                     return G.Op(Operator.Cond, G.Eq(value, G.Null), G.Lit(0), G.Op(Operator.ToNumber, value));
                 case "date":
                 case "instant":
-                    return G.Call(G.Op(Operator.ToDate, value), "getTime");
+                    return G.Call(G.Op(Operator.ToDate, value), PathMembers.Optional, "getTime");
                 case "boolean":
                     return G.Op(Operator.Cond, G.Op(Operator.ToBoolean, value), G.Lit(1), G.Lit(0));
                 default:
@@ -213,7 +213,7 @@ namespace Alis.Reactive
                     return G.Op(Operator.Cond, G.Eq(value, G.Null), G.False, G.Op(Operator.ToBoolean, value));
                 case "date":
                 case "instant":
-                    return G.Call(G.Op(Operator.ToDate, value), "getTime");
+                    return G.Call(G.Op(Operator.ToDate, value), PathMembers.Optional, "getTime");
                 default:
                     return value;
             }

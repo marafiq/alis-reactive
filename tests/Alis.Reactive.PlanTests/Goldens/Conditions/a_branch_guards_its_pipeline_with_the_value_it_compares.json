@@ -45,7 +45,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "string"
@@ -94,7 +95,8 @@
                       },
                       "path": [
                         "value"
-                      ]
+                      ],
+                      "members": "required"
                     },
                     "shape": {
                       "kind": "string"
@@ -125,7 +127,8 @@
                     "shape": {
                       "kind": "string"
                     }
-                  }
+                  },
+                  "members": "required"
                 }
               ]
             }

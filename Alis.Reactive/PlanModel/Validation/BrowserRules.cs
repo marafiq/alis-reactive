@@ -77,7 +77,7 @@ namespace Alis.Reactive
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
-            => G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0));
+            => G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any, PathMembers.Optional), G.Lit(0));
     }
 
     /// <summary>
@@ -112,7 +112,7 @@ namespace Alis.Reactive
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
-            => G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0)));
+            => G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any, PathMembers.Optional), G.Lit(0)));
     }
 
     /// <summary>Nothing chosen, or the enum member the type's default binds as: what <see cref="BrowserRule.Empty"/> asks of an enum.</summary>
@@ -207,7 +207,8 @@ namespace Alis.Reactive
 
             var separator = G.Or(G.Eq(G.Ref(character), G.Lit("-")), G.Eq(G.Ref(character), G.Lit(" ")));
             var withoutSeparators = G.Call(
-                G.Call(G.Call(G.Op(Operator.ToText, v), "split", G.Lit("")), "filter", G.Fn(G.Not(separator), character)),
+                G.Call(G.Call(G.Op(Operator.ToText, v), PathMembers.Optional, "split", G.Lit("")), PathMembers.Optional, "filter", G.Fn(G.Not(separator), character)),
+                PathMembers.Optional,
                 "join",
                 G.Lit(""));
             var digitValue = G.Op(Operator.ToNumber, G.Ref(digit));
@@ -217,7 +218,8 @@ namespace Alis.Reactive
                 G.Op(Operator.Cond, G.Op(Operator.Gt, doubled, G.Lit(9)), G.Op(Operator.Sub, doubled, G.Lit(9)), doubled),
                 digitValue);
             var total = G.Call(
-                G.Call(G.Call(G.Ref(digits), "split", G.Lit("")), "reverse"),
+                G.Call(G.Call(G.Ref(digits), PathMembers.Optional, "split", G.Lit("")), PathMembers.Optional, "reverse"),
+                PathMembers.Optional,
                 "reduce",
                 G.Fn(G.Op(Operator.Add, G.Ref(sum), weighted), sum, digit, index),
                 G.Lit(0));

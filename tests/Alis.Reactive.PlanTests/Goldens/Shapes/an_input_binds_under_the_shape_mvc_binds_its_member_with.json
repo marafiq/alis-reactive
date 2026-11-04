@@ -55,7 +55,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "nullable",
@@ -89,7 +90,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "date"
@@ -117,7 +119,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "instant"
@@ -145,7 +148,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "array",
@@ -251,7 +255,8 @@
                           "kind": "record",
                           "fields": []
                         }
-                      ]
+                      ],
+                      "members": "required"
                     }
                   },
                   {
@@ -274,9 +279,11 @@
                           },
                           "path": [
                             "arrays"
-                          ]
+                          ],
+                          "members": "required"
                         }
-                      ]
+                      ],
+                      "members": "optional"
                     }
                   },
                   {
@@ -295,7 +302,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "members": "required"
           },
           "await": true
         }

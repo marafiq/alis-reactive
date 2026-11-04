@@ -61,7 +61,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "members": "required"
           },
           "await": false
         }
@@ -84,19 +85,31 @@
           "value": {
             "kind": "as",
             "expr": {
-              "kind": "get",
-              "target": {
-                "kind": "ref",
-                "name": "e"
-              },
-              "path": [
-                "room"
+              "kind": "op",
+              "op": "coalesce",
+              "args": [
+                {
+                  "kind": "get",
+                  "target": {
+                    "kind": "ref",
+                    "name": "e"
+                  },
+                  "path": [
+                    "room"
+                  ],
+                  "members": "optional"
+                },
+                {
+                  "kind": "lit",
+                  "value": ""
+                }
               ]
             },
             "shape": {
               "kind": "string"
             }
-          }
+          },
+          "members": "required"
         }
       ]
     }

@@ -111,8 +111,9 @@ namespace Alis.Reactive.PlanModel.Values
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
-            Shape shape)
-            => new CallExpression(target, path, args, argShapes, shape);
+            Shape shape,
+            PathMembers members)
+            => new CallExpression(target, path, args, argShapes, shape, members);
 
         internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits)
             => new MethodResultExpression(call, member, awaits);
@@ -126,7 +127,7 @@ namespace Alis.Reactive.PlanModel.Values
             => new BoundRead(name, shape, formId, G.Ref(itemIndexes));
 
         internal static ValueExpression ReadBoundItemIndexes(string itemName, string formId, string indexes, int ownerDepth)
-            => new BoundItemIndexesRead(itemName, formId, G.Call(G.Ref(indexes), "slice", G.Lit(0), G.Lit(ownerDepth)));
+            => new BoundItemIndexesRead(itemName, formId, G.Call(G.Ref(indexes), PathMembers.Optional, "slice", G.Lit(0), G.Lit(ownerDepth)));
 
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
@@ -196,7 +197,7 @@ namespace Alis.Reactive.PlanModel.Values
         {
             var (root, prefix) = _target.Write(scope);
             var path = prefix.Concat(_path).ToList();
-            return path.Count == 0 ? G.As(root, _shape) : G.Get(root, path, _shape);
+            return path.Count == 0 ? G.As(root, _shape) : G.Get(root, path, _shape, _target.Members);
         }
     }
 
@@ -207,19 +208,22 @@ namespace Alis.Reactive.PlanModel.Values
         private readonly IReadOnlyList<ValueExpression> _args;
         private readonly IReadOnlyList<Shape> _argShapes;
         private readonly Shape _shape;
+        private readonly PathMembers _members;
 
         internal CallExpression(
             Target target,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
-            Shape shape)
+            Shape shape,
+            PathMembers members)
         {
             _target = target ?? throw new ArgumentNullException(nameof(target));
             _path = path ?? throw new ArgumentNullException(nameof(path));
             _args = args ?? throw new ArgumentNullException(nameof(args));
             _argShapes = argShapes ?? throw new ArgumentNullException(nameof(argShapes));
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            _members = members;
         }
 
         internal override Shape OutputShape => _shape;
@@ -234,7 +238,7 @@ namespace Alis.Reactive.PlanModel.Values
         {
             var (root, prefix) = _target.Write(scope);
             var args = _args.Select(arg => arg.Write(scope)).ToList();
-            return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, shape);
+            return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, shape, _members);
         }
     }
 
@@ -275,7 +279,7 @@ namespace Alis.Reactive.PlanModel.Values
         internal override Expr Write(Scope scope)
         {
             var values = _shape.DescribesArray ? "queryAll" : "query";
-            return G.Get(G.Get(G.Obj(scope.Objects.Document()), new[] { values }, Shape.Any), new[] { _key }, _shape);
+            return G.Get(G.Get(G.Obj(scope.Objects.Document()), new[] { values }, Shape.Any, PathMembers.Required), new[] { _key }, _shape, PathMembers.Optional);
         }
     }
 
@@ -301,12 +305,12 @@ namespace Alis.Reactive.PlanModel.Values
         internal override Expr Write(Scope scope)
         {
             if (_containerId != Page)
-                return G.Call(G.Obj(scope.Objects.Inputs(_containerId)), new[] { "valueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any);
+                return G.Call(G.Obj(scope.Objects.Inputs(_containerId)), new[] { "valueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any, PathMembers.Required);
 
             var args = scope.Objects.TryFindOnlyInputItRendered(_name, out var own)
                 ? new[] { G.Lit(_name), _indexes, G.Lit(own) }
                 : new[] { G.Lit(_name), _indexes };
-            return G.Call(G.Obj(scope.Objects.Model()), new[] { "valueOf" }, args, Shape.Any);
+            return G.Call(G.Obj(scope.Objects.Model()), new[] { "valueOf" }, args, Shape.Any, PathMembers.Required);
         }
     }
 
@@ -326,7 +330,7 @@ namespace Alis.Reactive.PlanModel.Values
         internal override Shape OutputShape => Shape.Any;
 
         internal override Expr Write(Scope scope)
-            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "indexesOf" }, new[] { G.Lit(_itemName), _ownerIndexes }, Shape.Any);
+            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "indexesOf" }, new[] { G.Lit(_itemName), _ownerIndexes }, Shape.Any, PathMembers.Required);
     }
 
     internal sealed class RecordExpression : ValueExpression

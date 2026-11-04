@@ -121,7 +121,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "members": "required"
           },
           "await": true
         },
@@ -137,7 +138,8 @@
                 },
                 "path": [
                   "ok"
-                ]
+                ],
+                "members": "optional"
               },
               "then": [
                 {
@@ -160,9 +162,11 @@
                         },
                         "path": [
                           "body"
-                        ]
+                        ],
+                        "members": "optional"
                       }
-                    ]
+                    ],
+                    "members": "required"
                   },
                   "await": false
                 }
@@ -189,7 +193,8 @@
             "path": [
               "unload"
             ],
-            "args": []
+            "args": [],
+            "members": "required"
           },
           "await": false
         }

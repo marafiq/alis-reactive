@@ -45,7 +45,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "string"
@@ -94,7 +95,8 @@
                       },
                       "path": [
                         "value"
-                      ]
+                      ],
+                      "members": "required"
                     },
                     "shape": {
                       "kind": "string"
@@ -125,7 +127,8 @@
                     "shape": {
                       "kind": "string"
                     }
-                  }
+                  },
+                  "members": "required"
                 }
               ]
             },
@@ -144,7 +147,8 @@
                       },
                       "path": [
                         "value"
-                      ]
+                      ],
+                      "members": "required"
                     },
                     "shape": {
                       "kind": "string"
@@ -175,7 +179,8 @@
                     "shape": {
                       "kind": "string"
                     }
-                  }
+                  },
+                  "members": "required"
                 }
               ]
             }
@@ -199,7 +204,8 @@
                 "shape": {
                   "kind": "string"
                 }
-              }
+              },
+              "members": "required"
             }
           ]
         }

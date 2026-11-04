@@ -21,6 +21,13 @@ public sealed class Meter : Component
     public Event<MeterLevelChanged> LevelChanged => Event<MeterLevelChanged>();
 
     public Event<MeterAsChanged> Change => Event<MeterAsChanged>();
+
+    public Event<MeterResetting> Resetting => Event<MeterResetting>();
+}
+
+public sealed class MeterResetting : JsObject
+{
+    public void PreventDefault() => Method();
 }
 
 public sealed class MeterLevelChanged : JsObject

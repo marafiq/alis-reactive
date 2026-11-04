@@ -58,7 +58,8 @@
                 "kind": "lit",
                 "value": "Admit Helen?"
               }
-            ]
+            ],
+            "members": "required"
           },
           "await": true
         },
@@ -89,7 +90,8 @@
                     "shape": {
                       "kind": "string"
                     }
-                  }
+                  },
+                  "members": "required"
                 }
               ]
             }

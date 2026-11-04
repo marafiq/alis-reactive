@@ -6,15 +6,34 @@
 }
 <h1>A dispatch the page cannot render</h1>
 
-@if (Model.Mistake == DispatchMistake.PayloadWithNoField)
+@switch (Model.Mistake)
 {
-    @(plan.Button("call", "Call")
-        .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => { })))
-}
-else
-{
-    @(plan.Button("call", "Call")
-        .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => payload.Set(x => x, new Called()))))
+    case DispatchMistake.PayloadWithNoField:
+        @(plan.Button("call", "Call")
+            .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => { })))
+        break;
+    case DispatchMistake.SelectorThatIsNoMember:
+        @(plan.Button("call", "Call")
+            .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => payload.Set(x => x, new Called()))))
+        break;
+    case DispatchMistake.MemberSetTwice:
+        @(plan.Button("call", "Call")
+            .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => payload
+                .Set(x => x.Room, "4")
+                .Set(x => x.Room, "5"))))
+        break;
+    case DispatchMistake.ObjectSetOverItsMember:
+        @(plan.Button("call", "Call")
+            .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => payload
+                .Set(x => x.Bed.Number, 2)
+                .Set(x => x.Bed, new CallBed { Number = 3 }))))
+        break;
+    case DispatchMistake.MemberSetUnderItsObject:
+        @(plan.Button("call", "Call")
+            .Reactive(button => button.Click, p => p.Dispatch(PanelEvents.NurseCalled, payload => payload
+                .Set(x => x.Bed, new CallBed { Number = 3 })
+                .Set(x => x.Bed.Number, 2))))
+        break;
 }
 
 @Html.RenderPlan(plan)

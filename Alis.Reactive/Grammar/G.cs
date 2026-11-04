@@ -20,9 +20,10 @@ namespace Alis.Reactive.Grammar
         internal static ObjExpr Obj(string id) => new ObjExpr(id);
         internal static RefExpr Ref(string name) => new RefExpr(name);
 
-        internal static Expr Get(Expr target, IReadOnlyList<string> path, Shape shape) => As(new GetExpr(target, path), shape);
+        internal static Expr Get(Expr target, IReadOnlyList<string> path, Shape shape, PathMembers members)
+            => As(new GetExpr(target, path, members), shape);
 
-        internal static Expr Get(Expr target, params string[] path) => new GetExpr(target, path);
+        internal static Expr Get(Expr target, PathMembers members, params string[] path) => new GetExpr(target, path, members);
 
         internal static Expr As(Expr value, Shape shape)
         {
@@ -36,19 +37,26 @@ namespace Alis.Reactive.Grammar
             return new AsExpr(value, shape);
         }
 
-        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, IReadOnlyList<Shape> argShapes, Shape shape)
+        internal static Expr Call(
+            Expr target,
+            IReadOnlyList<string> path,
+            IReadOnlyList<Expr> args,
+            IReadOnlyList<Shape> argShapes,
+            Shape shape,
+            PathMembers members)
         {
             if (argShapes.Count != args.Count)
                 throw new ArgumentException("A call declares one shape per argument.", nameof(argShapes));
-            return As(new CallExpr(target, path, args.Select((arg, index) => As(arg, argShapes[index])).ToList()), shape);
+            return As(new CallExpr(target, path, args.Select((arg, index) => As(arg, argShapes[index])).ToList(), members), shape);
         }
 
-        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, Shape shape)
-            => As(new CallExpr(target, path, args), shape);
+        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, Shape shape, PathMembers members)
+            => As(new CallExpr(target, path, args, members), shape);
 
-        internal static Expr Call(Expr target, string member, params Expr[] args) => new CallExpr(target, new[] { member }, args);
+        internal static Expr Call(Expr target, PathMembers members, string member, params Expr[] args)
+            => new CallExpr(target, new[] { member }, args, members);
 
-        internal static Expr Apply(FnExpr fn, params Expr[] args) => new CallExpr(fn, NoPath, args);
+        internal static Expr Apply(FnExpr fn, params Expr[] args) => new CallExpr(fn, NoPath, args, PathMembers.Required);
 
         internal static FnExpr Fn(Expr body, params string[] parameters) => new FnExpr(parameters, body);
 
@@ -72,8 +80,8 @@ namespace Alis.Reactive.Grammar
 
         internal static Expr List(IEnumerable<Expr> items) => new ListExpr(items.ToList());
 
-        internal static Statement Set(Expr target, IReadOnlyList<string> path, Shape shape, Expr value)
-            => new SetStatement(target, path, As(value, shape));
+        internal static Statement Set(Expr target, IReadOnlyList<string> path, Shape shape, Expr value, PathMembers members)
+            => new SetStatement(target, path, As(value, shape), members);
 
         internal static Statement Do(Expr expr, bool awaits = false) => new DoStatement(expr, awaits);
         internal static Statement Let(string name, Expr expr, bool awaits = false) => new LetStatement(name, expr, awaits);

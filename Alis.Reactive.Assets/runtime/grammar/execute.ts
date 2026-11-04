@@ -2,7 +2,7 @@ import type { Expr, SetStatement, Statement } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { logger } from "../diagnostics/trace";
 import { toJavaScriptString } from "../shared/javascript-string";
-import { childScope, evaluate, evaluateStatement, isPromise, labelOf, modeOf, type Scope } from "./evaluate";
+import { childScope, evaluate, evaluateStatement, isPromise, labelOf, type Scope } from "./evaluate";
 import { write } from "./paths";
 
 const log = logger("execute");
@@ -36,7 +36,7 @@ function set(statement: SetStatement, scope: Scope): void {
   const target = evaluate(statement.target, scope);
   const value = evaluate(statement.value, scope);
   log.trace("set", { target: traceName(statement.target), path: statement.path, value });
-  write(target, statement.path, value, modeOf(statement.target), labelOf(statement.target));
+  write(target, statement.path, value, statement.members, labelOf(statement.target));
 }
 
 function perform(expr: Expr, awaits: boolean, scope: Scope): Completion {

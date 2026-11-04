@@ -1,3 +1,4 @@
+import type { PathMembers } from "../types/index";
 import { toArray } from "./operators";
 import { isMissing } from "./shape";
 
@@ -9,14 +10,12 @@ export function canHaveMembers(value: unknown): value is Holder {
   return (typeof value === "object" && value !== null) || typeof value === "function";
 }
 
-export type PathMode = "checked" | "optional";
-
-export function read(root: unknown, path: readonly string[], mode: PathMode, label: string): unknown {
+export function read(root: unknown, path: readonly string[], members: PathMembers, label: string): unknown {
   let current = root;
   for (let index = 0; index < path.length; index++) {
     const key = path[index]!;
-    if (key === EACH_ITEM) return eachItem(current, path, index, mode, label);
-    if (mode === "optional") {
+    if (key === EACH_ITEM) return eachItem(current, path, index, members, label);
+    if (members === "optional") {
       if (isMissing(current)) return undefined;
       current = (current as Holder)[key];
       continue;
@@ -28,18 +27,18 @@ export function read(root: unknown, path: readonly string[], mode: PathMode, lab
   return current;
 }
 
-function eachItem(list: unknown, path: readonly string[], index: number, mode: PathMode, label: string): unknown[] {
+function eachItem(list: unknown, path: readonly string[], index: number, members: PathMembers, label: string): unknown[] {
   const listPath = path.slice(0, index).join(".");
   const itemLabel = listPath === "" ? `${label}[]` : `${label}.${listPath}[]`;
   const rest = path.slice(index + 1);
-  return toArray(list).map(item => read(item, rest, mode, itemLabel));
+  return toArray(list).map(item => read(item, rest, members, itemLabel));
 }
 
-export function write(root: unknown, path: readonly string[], value: unknown, mode: PathMode, label: string): void {
+export function write(root: unknown, path: readonly string[], value: unknown, members: PathMembers, label: string): void {
   const last = path.length - 1;
-  const holder = requireHolder(read(root, path.slice(0, last), mode, label), label, path, last);
+  const holder = requireHolder(read(root, path.slice(0, last), members, label), label, path, last);
   const key = path[last]!;
-  if (mode === "checked" && !(key in holder)) throw missingMember(label, path, last);
+  if (members === "required" && !(key in holder)) throw missingMember(label, path, last);
   holder[key] = value;
 }
 
@@ -47,21 +46,21 @@ export function call(
   root: unknown,
   path: readonly string[],
   args: readonly unknown[],
-  mode: PathMode,
+  members: PathMembers,
   label: string,
 ): unknown {
   if (path.length === 0) {
-    if (mode === "optional" && isMissing(root)) return undefined;
+    if (members === "optional" && isMissing(root)) return undefined;
     if (typeof root !== "function") throw new Error(`[alis] ${label} is not a function`);
     return (root as (...values: unknown[]) => unknown)(...args);
   }
 
   const last = path.length - 1;
-  const holderValue = read(root, path.slice(0, last), mode, label);
-  if (mode === "optional" && isMissing(holderValue)) return undefined;
-  const holder = mode === "optional" ? (holderValue as Holder) : requireHolder(holderValue, label, path, last);
+  const holderValue = read(root, path.slice(0, last), members, label);
+  if (members === "optional" && isMissing(holderValue)) return undefined;
+  const holder = members === "optional" ? (holderValue as Holder) : requireHolder(holderValue, label, path, last);
   const method = holder[path[last]!];
-  if (mode === "optional" && isMissing(method)) return undefined;
+  if (members === "optional" && isMissing(method)) return undefined;
   if (typeof method !== "function") {
     throw new Error(`[alis] ${label}.${path.join(".")} is not a function`);
   }

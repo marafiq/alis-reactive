@@ -1,7 +1,7 @@
 import type { CallExpr, Expr, OpExpr, RecordExpr } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { Environment } from "./environment";
-import { call, read, type PathMode } from "./paths";
+import { call, read } from "./paths";
 import { isMissing, shaped } from "./shape";
 import * as ops from "./operators";
 
@@ -27,7 +27,7 @@ export function evaluate(expr: Expr, scope: Scope): unknown {
     case "lit":    return expr.value;
     case "obj":    return scope.objects.object(expr.id);
     case "ref":    return scope.env.lookup(expr.name);
-    case "get":    return read(evaluate(expr.target, scope), expr.path, modeOf(expr.target), labelOf(expr.target));
+    case "get":    return read(evaluate(expr.target, scope), expr.path, expr.members, labelOf(expr.target));
     case "as":     return shaped(evaluate(expr.expr, scope), expr.shape);
     case "call":   return evaluateCall(expr, scope, false);
     case "fn":     return closure(expr.params, expr.body, scope);
@@ -36,10 +36,6 @@ export function evaluate(expr: Expr, scope: Scope): unknown {
     case "op":     return operate(expr, scope);
     default:       return assertNever(expr, "expression");
   }
-}
-
-export function modeOf(target: Expr): PathMode {
-  return target.kind === "obj" ? "checked" : "optional";
 }
 
 export function labelOf(target: Expr): string {
@@ -54,7 +50,7 @@ function evaluateCall(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): 
   const target = evaluate(expr.target, scope);
   const args = expr.args.map(arg => evaluate(arg, scope));
   const label = labelOf(expr.target);
-  const result = call(target, expr.path, args, modeOf(expr.target), label);
+  const result = call(target, expr.path, args, expr.members, label);
   if (isPromise(result) && !mayReturnPromise) throw unawaitedPromise(label, expr.path);
   return result;
 }

@@ -114,7 +114,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "members": "required"
           },
           "await": true
         }

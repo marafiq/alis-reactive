@@ -42,4 +42,26 @@ public sealed class WhenTheElementIsTheComponent : AppPageTest
 
         await Expect(Page.Locator("#change-read")).ToHaveTextAsync("2");
     }
+
+    [Test]
+    public async Task a_custom_event_with_no_detail_hands_the_pipeline_the_event_whose_methods_it_calls()
+    {
+        await Open("/Vendors/Element");
+        await Button("Set the level to 7").ClickAsync();
+        await Expect(Meter.GetByText("Level 7 of 10")).ToBeVisibleAsync();
+
+        await Meter.GetByRole(AriaRole.Button, new() { Name = "Reset" }).ClickAsync();
+
+        await Expect(Meter.GetByText("Level 7 of 10")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_custom_event_whose_pipeline_calls_nothing_on_it_goes_on_as_the_component_raised_it()
+    {
+        await Open("/Vendors/Element");
+
+        await Meter.GetByRole(AriaRole.Button, new() { Name = "Reset" }).ClickAsync();
+
+        await Expect(Meter.GetByText("Level 0 of 10")).ToBeVisibleAsync();
+    }
 }

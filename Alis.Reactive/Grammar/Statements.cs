@@ -12,11 +12,12 @@ namespace Alis.Reactive.Grammar
 
     internal sealed class SetStatement : Statement
     {
-        internal SetStatement(Expr target, IReadOnlyList<string> path, Expr value)
+        internal SetStatement(Expr target, IReadOnlyList<string> path, Expr value, PathMembers members)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target));
             Path = path ?? throw new ArgumentNullException(nameof(path));
             Value = value ?? throw new ArgumentNullException(nameof(value));
+            Members = members;
             if (path.Count == 0) throw new ArgumentException("A set needs the member it writes.", nameof(path));
         }
 
@@ -24,6 +25,7 @@ namespace Alis.Reactive.Grammar
         public Expr Target { get; }
         public IReadOnlyList<string> Path { get; }
         public Expr Value { get; }
+        public PathMembers Members { get; }
     }
 
     internal sealed class DoStatement : Statement

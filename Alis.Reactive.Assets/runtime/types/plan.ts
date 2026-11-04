@@ -149,12 +149,18 @@ export interface CallExpr {
   target: Expr;
   path: string[];
   args: Expr[];
+  members: PathMembers;
 }
+
+export type PathMembers =
+  | "required"
+  | "optional";
 
 export interface GetExpr {
   kind: "get";
   target: Expr;
   path: string[];
+  members: PathMembers;
 }
 
 export interface ListExpr {
@@ -304,6 +310,7 @@ export interface SetStatement {
   target: Expr;
   path: string[];
   value: Expr;
+  members: PathMembers;
 }
 
 export interface TryStatement {

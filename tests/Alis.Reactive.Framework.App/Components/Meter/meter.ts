@@ -7,7 +7,11 @@ class Meter extends HTMLElement {
     this.value = Number(this.getAttribute("level") ?? "0");
     const down = this.stepButton("Lower", -1);
     const up = this.stepButton("Raise", 1);
-    this.replaceChildren(this.levelLine, down, up);
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.textContent = "Reset";
+    reset.addEventListener("click", () => this.reset());
+    this.replaceChildren(this.levelLine, down, up, reset);
     this.show();
   }
 
@@ -38,6 +42,13 @@ class Meter extends HTMLElement {
     this.show();
     this.dispatchEvent(new CustomEvent("levelChanged", { detail: { level: this.value, previous } }));
     this.dispatchEvent(new Event("change"));
+  }
+
+  private reset(): void {
+    const allowed = this.dispatchEvent(new CustomEvent("resetting", { cancelable: true }));
+    if (!allowed) return;
+    this.value = 0;
+    this.show();
   }
 
   private show(): void {

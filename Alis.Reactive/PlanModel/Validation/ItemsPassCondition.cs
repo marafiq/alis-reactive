@@ -43,7 +43,7 @@ namespace Alis.Reactive.PlanModel.Validation
             var item = FieldReference.ItemOf(_collection).PrefixedBy(_collection.Path + "[*]");
             var value = _values.Value(item).Write(scope);
             var everyCheckPasses = G.And(_rules.Select(rule => Passes(rule, value, item.Shape, scope)).ToList());
-            return G.Call(_values.ItemIndexes(item).Write(scope), "every", G.Fn(everyCheckPasses, FormFieldValues.Indexes));
+            return G.Call(_values.ItemIndexes(item).Write(scope), PathMembers.Optional, "every", G.Fn(everyCheckPasses, FormFieldValues.Indexes));
         }
 
         private Expr Passes(BrowserRule rule, Expr value, Shape itemShape, Scope scope)

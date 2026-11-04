@@ -1,6 +1,8 @@
 import type {
-  Expr, FnExpr, Handler, ObjectLocator, Operator, PlanDocument, Shape, Statement, Vendor,
+  Expr, FnExpr, Handler, ObjectLocator, Operator, PathMembers, PlanDocument, Shape, Statement, Vendor,
 } from "../../types/index";
+
+const locatedOrData = (target: Expr): PathMembers => (target.kind === "obj" ? "required" : "optional");
 
 export const s = {
   string: { kind: "string" } as Shape,
@@ -19,8 +21,9 @@ export const e = {
   as: (expr: Expr, shape: Shape): Expr => ({ kind: "as", expr, shape }),
   obj: (id: string): Expr => ({ kind: "obj", id }),
   ref: (name: string): Expr => ({ kind: "ref", name }),
-  get: (target: Expr, path: string[]): Expr => ({ kind: "get", target, path }),
-  call: (target: Expr, path: string[], args: Expr[] = []): Expr => ({ kind: "call", target, path, args }),
+  get: (target: Expr, path: string[], members = locatedOrData(target)): Expr => ({ kind: "get", target, path, members }),
+  call: (target: Expr, path: string[], args: Expr[] = [], members = locatedOrData(target)): Expr =>
+    ({ kind: "call", target, path, args, members }),
   fn: (params: string[], body: Expr): FnExpr => ({ kind: "fn", params, body }),
   record: (fields: Record<string, Expr>): Expr => ({
     kind: "record",
@@ -31,7 +34,8 @@ export const e = {
 };
 
 export const st = {
-  set: (target: Expr, path: string[], value: Expr): Statement => ({ kind: "set", target, path, value }),
+  set: (target: Expr, path: string[], value: Expr, members = locatedOrData(target)): Statement =>
+    ({ kind: "set", target, path, value, members }),
   do: (expr: Expr, awaits = false): Statement => ({ kind: "do", expr, await: awaits }),
   let: (name: string, expr: Expr, awaits = false): Statement => ({ kind: "let", name, expr, await: awaits }),
   if: (arms: [Expr, Statement[]][], otherwise: Statement[] = []): Statement =>

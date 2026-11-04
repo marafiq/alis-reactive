@@ -317,7 +317,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 var methodArgs = call.Arguments.Select(argument => CompileValue(argument, element)).ToList();
                 var unconverted = methodArgs.Select(_ => Shape.Any).ToList();
                 return ValueExpression.Call(
-                    Target.Returned(CompileValue(call.Object, element)), new[] { methodName }, methodArgs, unconverted, ClrShape.Of(call.Type));
+                    Target.Returned(CompileValue(call.Object, element)), new[] { methodName }, methodArgs, unconverted, ClrShape.Of(call.Type), PathMembers.Optional);
             }
 
             if (TryTest(call, element, out var test))
@@ -383,7 +383,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 or ExpressionType.LessThan or ExpressionType.LessThanOrEqual;
 
         private static ValueExpression DateCall(ValueExpression date, string method)
-            => ValueExpression.Call(Target.Returned(date), new[] { method }, Array.Empty<ValueExpression>(), Array.Empty<Shape>(), Shape.Number);
+            => ValueExpression.Call(Target.Returned(date), new[] { method }, Array.Empty<ValueExpression>(), Array.Empty<Shape>(), Shape.Number, PathMembers.Optional);
 
         private static string NameOf(MemberInfo member) => CSharpTypeName.Of(member.DeclaringType!) + "." + member.Name;
 

@@ -59,7 +59,7 @@ export interface Changing {
   requested: string;
   readonly current: string;
   cancel: boolean;
-  reason: string;
+  reason?: string;
   clamp(): void;
 }
 
@@ -190,6 +190,10 @@ export class Slate {
     const row = this.rows[index];
     if (row === undefined) throw new RangeError(`The slate has no row ${index}.`);
     return row;
+  }
+
+  findRow(label: string): Row | undefined {
+    return this.rows.find(row => row.label === label);
   }
 
   rowFrom(index: number, fromLast: boolean): Row {
@@ -347,14 +351,13 @@ export class Slate {
       requested,
       current: this.titleText,
       cancel: false,
-      reason: "",
       clamp() {
         this.requested = this.requested.split(" ")[0] ?? this.requested;
       },
     };
     this.listeners.emit("changing", change);
     if (change.cancel) {
-      this.reasonLine.textContent = change.reason;
+      this.reasonLine.textContent = change.reason ?? "";
       return;
     }
     this.reasonLine.textContent = "";

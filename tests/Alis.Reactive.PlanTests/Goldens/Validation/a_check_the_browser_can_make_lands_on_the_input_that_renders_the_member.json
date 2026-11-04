@@ -45,7 +45,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "string"
@@ -171,7 +172,8 @@
                 "path": [
                   "validate"
                 ],
-                "args": []
+                "args": [],
+                "members": "required"
               },
               "then": [
                 {
@@ -227,7 +229,8 @@
                                   "kind": "record",
                                   "fields": []
                                 }
-                              ]
+                              ],
+                              "members": "required"
                             }
                           },
                           {
@@ -250,9 +253,11 @@
                                   },
                                   "path": [
                                     "arrays"
-                                  ]
+                                  ],
+                                  "members": "required"
                                 }
-                              ]
+                              ],
+                              "members": "optional"
                             }
                           },
                           {
@@ -271,7 +276,8 @@
                           }
                         ]
                       }
-                    ]
+                    ],
+                    "members": "required"
                   },
                   "await": true
                 }

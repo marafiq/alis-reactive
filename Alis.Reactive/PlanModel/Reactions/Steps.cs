@@ -75,7 +75,7 @@ namespace Alis.Reactive.PlanModel.Reactions
             {
                 var value = _value.Write(scope);
                 var (root, prefix) = _target.Write(scope);
-                return new[] { G.Set(root, prefix.Concat(_path).ToList(), _shape, value) };
+                return new[] { G.Set(root, prefix.Concat(_path).ToList(), _shape, value, _target.Members) };
             }));
     }
 
@@ -101,7 +101,33 @@ namespace Alis.Reactive.PlanModel.Reactions
             {
                 var args = _args.Select(arg => arg.Write(scope)).ToList();
                 var (root, prefix) = _target.Write(scope);
-                return new[] { G.Do(G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, Shape.Any), _awaits) };
+                return new[] { G.Do(G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, Shape.Any, PathMembers.Required), _awaits) };
+            }));
+    }
+
+    internal sealed class ClassChangeStep : Step
+    {
+        private readonly Target _element;
+        private readonly IReadOnlyList<string> _path;
+        private readonly Shape _nameShape;
+        private readonly ValueExpression _name;
+
+        internal ClassChangeStep(Target element, IReadOnlyList<string> path, Shape nameShape, ValueExpression name)
+        {
+            _element = element ?? throw new ArgumentNullException(nameof(element));
+            _path = path ?? throw new ArgumentNullException(nameof(path));
+            _nameShape = nameShape ?? throw new ArgumentNullException(nameof(nameShape));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+        }
+
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.AddRange(scope.WithHoisted(() =>
+            {
+                var name = scope.Fresh("c");
+                var (root, prefix) = _element.Write(scope);
+                var change = G.Do(G.Call(root, prefix.Concat(_path).ToList(), new[] { G.Ref(name) }, new[] { _nameShape }, Shape.Any, PathMembers.Required));
+                var nameIsMissing = G.Eq(G.Ref(name), G.Null);
+                return new[] { G.Let(name, _name.Write(scope)), G.If(G.Not(nameIsMissing), new[] { change }, G.NoStatements) };
             }));
     }
 
@@ -119,7 +145,7 @@ namespace Alis.Reactive.PlanModel.Reactions
 
         internal override void WriteTo(List<Statement> block, Scope scope)
             => block.AddRange(scope.WithHoisted(() =>
-                new[] { G.Do(G.Call(G.Obj(scope.Objects.Document()), "raise", G.Lit(_event), _payload.Write(scope))) }));
+                new[] { G.Do(G.Call(G.Obj(scope.Objects.Document()), PathMembers.Required, "raise", G.Lit(_event), _payload.Write(scope))) }));
     }
 
     internal sealed class InjectStep : Step
@@ -136,7 +162,7 @@ namespace Alis.Reactive.PlanModel.Reactions
         internal override void WriteTo(List<Statement> block, Scope scope)
             => block.AddRange(scope.WithHoisted(() => new[]
             {
-                G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "load", _content.Write(scope))),
+                G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), PathMembers.Required, "load", _content.Write(scope))),
             }));
     }
 
@@ -150,7 +176,7 @@ namespace Alis.Reactive.PlanModel.Reactions
         }
 
         internal override void WriteTo(List<Statement> block, Scope scope)
-            => block.Add(G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "unload")));
+            => block.Add(G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), PathMembers.Required, "unload")));
     }
 
     internal sealed class ShowErrorsStep : Step
@@ -166,7 +192,7 @@ namespace Alis.Reactive.PlanModel.Reactions
         {
             var form = G.Obj(scope.Objects.Form(_form));
             var response = scope.Response(ResponseHandle.Innermost);
-            block.Add(G.Do(G.Call(form, "showErrors", G.Get(G.Ref(response), new[] { "body" }, Shape.Any))));
+            block.Add(G.Do(G.Call(form, PathMembers.Required, "showErrors", G.Get(G.Ref(response), new[] { "body" }, Shape.Any, PathMembers.Optional))));
         }
     }
 

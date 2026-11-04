@@ -251,7 +251,7 @@ namespace Alis.Reactive.PlanModel.Document
             {
                 if (!_inputs.TryFindForComponent(ComponentId.Of(declared.Id), out var rendered)) continue;
 
-                var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.ValuePath.Text, rendered.Shape);
+                var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.ValuePath.Text, rendered.Shape, PathMembers.Required);
                 inputs.Add(
                     declared.Id,
                     new InputBinding(

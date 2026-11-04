@@ -52,7 +52,7 @@ namespace Alis.Reactive.PlanModel.Requests
 
             var exchange = scope.WithHoisted(() => new[]
             {
-                G.Let(response, G.Call(G.Obj(scope.Objects.Http()), "send", SendArgument(method, input, scope)), awaits: true),
+                G.Let(response, G.Call(G.Obj(scope.Objects.Http()), PathMembers.Required, "send", SendArgument(method, input, scope)), awaits: true),
             }).ToList();
             exchange.AddRange(Routes.Write(response, routeScope));
 
@@ -66,14 +66,14 @@ namespace Alis.Reactive.PlanModel.Requests
 
             if (Validation is { } validation)
             {
-                var valid = G.Call(G.Obj(scope.Objects.Form(validation.Form)), "validate");
+                var valid = G.Call(G.Obj(scope.Objects.Form(validation.Form)), PathMembers.Required, "validate");
                 return new[] { G.If(valid, sentence, G.NoStatements) };
             }
 
             return sentence;
         }
 
-        internal static Expr Ok(string response) => G.Get(G.Ref(response), new[] { "ok" }, Shape.Any);
+        internal static Expr Ok(string response) => G.Get(G.Ref(response), new[] { "ok" }, Shape.Any, PathMembers.Optional);
 
         private Expr SendArgument(string method, GatheredInput input, Scope scope)
         {
@@ -93,8 +93,8 @@ namespace Alis.Reactive.PlanModel.Requests
             if (input.Form is { } form)
             {
                 var inputs = G.Obj(scope.Objects.Inputs(form));
-                body = nested ? G.Call(inputs, "fill", body) : G.Op(Operator.Merge, body, G.Get(inputs, "fields"));
-                arrays = G.Call(arrays, "concat", G.Get(inputs, new[] { "arrays" }, Shape.Any));
+                body = nested ? G.Call(inputs, PathMembers.Required, "fill", body) : G.Op(Operator.Merge, body, G.Get(inputs, PathMembers.Required, "fields"));
+                arrays = G.Call(arrays, PathMembers.Optional, "concat", G.Get(inputs, new[] { "arrays" }, Shape.Any, PathMembers.Required));
             }
 
             return G.Record(
@@ -183,7 +183,7 @@ namespace Alis.Reactive.PlanModel.Requests
         private static IReadOnlyList<Statement> Route(
             IReadOnlyList<(int Status, Block Route)> statuses, Block? catchAll, string response, Scope routeScope)
         {
-            var status = G.Get(G.Ref(response), new[] { "status" }, Shape.Any);
+            var status = G.Get(G.Ref(response), new[] { "status" }, Shape.Any, PathMembers.Optional);
             var arms = statuses
                 .Select(route => new Arm(G.Eq(status, G.Lit(route.Status)), route.Route.Write(routeScope)))
                 .ToList();

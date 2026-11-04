@@ -36,9 +36,9 @@ function subscribeByMethod(
   event: string,
   vendorListener: VendorListener,
 ): () => void {
-  call(root, [listen.subscribe], [event, vendorListener], "checked", `${vendorName} ${listen.subscribe}`);
+  call(root, [listen.subscribe], [event, vendorListener], "required", `${vendorName} ${listen.subscribe}`);
   return () => {
-    call(root, [listen.unsubscribe], [event, vendorListener], "checked", `${vendorName} ${listen.unsubscribe}`);
+    call(root, [listen.unsubscribe], [event, vendorListener], "required", `${vendorName} ${listen.unsubscribe}`);
   };
 }
 
@@ -50,17 +50,17 @@ interface AssignedListener {
 
 function assignListener(root: unknown, vendorName: string, event: string, vendorListener: VendorListener): () => void {
   const label = `${vendorName} ${event}`;
-  const previous = read(root, [event], "checked", label);
+  const previous = read(root, [event], "required", label);
   const assigned = function (this: unknown, ...args: unknown[]): void {
     if (typeof previous === "function") previous.apply(this, args);
     if (!assigned.disposed) vendorListener(args[0]);
   } as AssignedListener;
   assigned.previous = previous;
   assigned.disposed = false;
-  write(root, [event], assigned, "checked", label);
+  write(root, [event], assigned, "required", label);
   return () => {
     assigned.disposed = true;
-    if (read(root, [event], "checked", label) === assigned) write(root, [event], live(assigned.previous), "checked", label);
+    if (read(root, [event], "required", label) === assigned) write(root, [event], live(assigned.previous), "required", label);
   };
 }
 

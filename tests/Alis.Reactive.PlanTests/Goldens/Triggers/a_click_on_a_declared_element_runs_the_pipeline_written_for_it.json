@@ -48,7 +48,8 @@
             "shape": {
               "kind": "string"
             }
-          }
+          },
+          "members": "required"
         }
       ]
     }

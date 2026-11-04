@@ -47,15 +47,17 @@ namespace Alis.Reactive.Grammar
 
     internal sealed class GetExpr : Expr
     {
-        internal GetExpr(Expr target, IReadOnlyList<string> path)
+        internal GetExpr(Expr target, IReadOnlyList<string> path, PathMembers members)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target));
             Path = path ?? throw new ArgumentNullException(nameof(path));
+            Members = members;
         }
 
         public string Kind => "get";
         public Expr Target { get; }
         public IReadOnlyList<string> Path { get; }
+        public PathMembers Members { get; }
     }
 
     internal sealed class AsExpr : Expr
@@ -74,17 +76,19 @@ namespace Alis.Reactive.Grammar
 
     internal sealed class CallExpr : Expr
     {
-        internal CallExpr(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args)
+        internal CallExpr(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, PathMembers members)
         {
             Target = target ?? throw new ArgumentNullException(nameof(target));
             Path = path ?? throw new ArgumentNullException(nameof(path));
             Args = args ?? throw new ArgumentNullException(nameof(args));
+            Members = members;
         }
 
         public string Kind => "call";
         public Expr Target { get; }
         public IReadOnlyList<string> Path { get; }
         public IReadOnlyList<Expr> Args { get; }
+        public PathMembers Members { get; }
     }
 
     internal sealed class FnExpr : Expr

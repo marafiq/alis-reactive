@@ -39,6 +39,8 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal virtual bool IsData => false;
 
+        internal abstract PathMembers Members { get; }
+
         internal abstract (Expr Root, IReadOnlyList<string> Path) Write(Scope scope);
 
         private sealed class ElementTarget : Target
@@ -49,6 +51,8 @@ namespace Alis.Reactive.PlanModel.Values
             {
                 _id = id ?? throw new ArgumentNullException(nameof(id));
             }
+
+            internal override PathMembers Members => PathMembers.Required;
 
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(scope.Objects.Element(_id)), G.NoPath);
         }
@@ -62,12 +66,16 @@ namespace Alis.Reactive.PlanModel.Values
                 _object = @object;
             }
 
+            internal override PathMembers Members => PathMembers.Required;
+
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Obj(_object(scope.Objects)), G.NoPath);
         }
 
         private sealed class EventTarget : Target
         {
             internal override bool IsData => true;
+
+            internal override PathMembers Members => PathMembers.Optional;
 
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Ref(scope.EventParam), G.NoPath);
         }
@@ -84,6 +92,8 @@ namespace Alis.Reactive.PlanModel.Values
 
             internal override bool IsData => true;
 
+            internal override PathMembers Members => PathMembers.Optional;
+
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope)
             {
                 return (G.Ref(scope.Response(_handle)), Body);
@@ -93,6 +103,8 @@ namespace Alis.Reactive.PlanModel.Values
         private sealed class ItemTarget : Target
         {
             internal override bool IsData => true;
+
+            internal override PathMembers Members => PathMembers.Optional;
 
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (G.Ref(scope.Item), G.NoPath);
         }
@@ -105,6 +117,8 @@ namespace Alis.Reactive.PlanModel.Values
             {
                 _call = call ?? throw new ArgumentNullException(nameof(call));
             }
+
+            internal override PathMembers Members => PathMembers.Optional;
 
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (_call.Write(scope), G.NoPath);
         }

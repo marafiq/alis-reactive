@@ -68,8 +68,8 @@ namespace Alis.Reactive
             Set(property, value);
         }
 
-        internal void Call(ComponentMethod method, ValueExpression argument)
-            => _context.AddStep(new CallStep(Target.Element(_id), method.Path.TargetText, new[] { argument }, method.ArgumentShapes, method.Awaits));
+        internal void ChangeClass(ComponentMethod method, ValueExpression name)
+            => _context.AddStep(new ClassChangeStep(Target.Element(_id), method.Path.TargetText, method.ArgumentShapes[0], name));
     }
 
     /// <summary>
@@ -94,13 +94,14 @@ namespace Alis.Reactive
         /// <param name="value">The text.</param>
         public void Set(string value) => _element.SetContent(_property, _content, ValueExpression.Literal(value));
 
-        /// <summary>Sets it to a value read when the step runs: a number, a date or any text, shown as it arrives.</summary>
+        /// <summary>Sets it to a value read when the step runs: a number, a date or any text, shown as it arrives, and nothing when the value is missing.</summary>
         /// <typeparam name="TValue">The value's type.</typeparam>
         /// <param name="source">The value.</param>
         public void Set<TValue>(TypedSource<TValue> source)
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
-            _element.SetContent(_property, _content, source.Expression.AsArrived());
+            var shownOrNothing = ValueExpression.Operation(Operator.Coalesce, Shape.Any, source.Expression.AsArrived(), ValueExpression.Literal(""));
+            _element.SetContent(_property, _content, shownOrNothing);
         }
     }
 
@@ -118,17 +119,17 @@ namespace Alis.Reactive
         public ReactiveArray<string> Items
             => new ReactiveArray<string>(_element.Read("classList"), Shape.String);
 
-        /// <summary>Adds a class.</summary>
+        /// <summary>Adds a class; a missing name adds none.</summary>
         /// <param name="name">The class, or a value read when the step runs.</param>
-        public void Add(Arg<string> name) => _element.Call(BrowserElementMembers.AddClass, Of(name));
+        public void Add(Arg<string> name) => _element.ChangeClass(BrowserElementMembers.AddClass, Of(name));
 
-        /// <summary>Removes a class.</summary>
+        /// <summary>Removes a class; a missing name removes none.</summary>
         /// <param name="name">The class, or a value read when the step runs.</param>
-        public void Remove(Arg<string> name) => _element.Call(BrowserElementMembers.RemoveClass, Of(name));
+        public void Remove(Arg<string> name) => _element.ChangeClass(BrowserElementMembers.RemoveClass, Of(name));
 
-        /// <summary>Adds the class when the element lacks it, removes it when it has it.</summary>
+        /// <summary>Adds the class when the element lacks it, removes it when it has it; a missing name changes none.</summary>
         /// <param name="name">The class, or a value read when the step runs.</param>
-        public void Toggle(Arg<string> name) => _element.Call(BrowserElementMembers.ToggleClass, Of(name));
+        public void Toggle(Arg<string> name) => _element.ChangeClass(BrowserElementMembers.ToggleClass, Of(name));
 
         private static ValueExpression Of(Arg<string> name)
         {

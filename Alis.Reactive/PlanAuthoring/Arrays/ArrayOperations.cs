@@ -85,7 +85,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             return G.Fn(projection.Write(scope.WithItem(item)), item);
         }
 
-        private protected static Expr Length(Expr items) => G.Get(items, new[] { "length" }, Shape.Number);
+        private protected static Expr Length(Expr items) => G.Get(items, new[] { "length" }, Shape.Number, PathMembers.Optional);
     }
 
     internal sealed class CountOperation : ArrayOperation
@@ -105,7 +105,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         }
 
         private protected override Expr Operate(Expr items, Scope scope)
-            => G.Call(items, new[] { "filter" }, new Expr[] { PerItem(_predicate, scope) }, OutputShape);
+            => G.Call(items, new[] { "filter" }, new Expr[] { PerItem(_predicate, scope) }, OutputShape, PathMembers.Optional);
     }
 
     internal sealed class MapOperation : ArrayOperation
@@ -118,7 +118,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         }
 
         private protected override Expr Operate(Expr items, Scope scope)
-            => G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, OutputShape);
+            => G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, OutputShape, PathMembers.Optional);
     }
 
     internal sealed class SumOperation : ArrayOperation
@@ -136,7 +136,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             var item = scope.Fresh("x");
             var term = _projection.Write(scope.WithItem(item));
             var add = G.Fn(G.Op(Operator.Add, G.Ref(total), G.Op(Operator.Finite, term)), total, item);
-            return G.Call(items, new[] { "reduce" }, new Expr[] { add, G.Lit(0) }, Shape.Number);
+            return G.Call(items, new[] { "reduce" }, new Expr[] { add, G.Lit(0) }, Shape.Number, PathMembers.Optional);
         }
     }
 
@@ -157,7 +157,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         }
 
         private protected override Expr Operate(Expr items, Scope scope)
-            => G.Call(items, new[] { "some" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
+            => G.Call(items, new[] { "some" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean, PathMembers.Optional);
     }
 
     internal sealed class EveryOperation : ArrayOperation
@@ -170,7 +170,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         }
 
         private protected override Expr Operate(Expr items, Scope scope)
-            => G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
+            => G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean, PathMembers.Optional);
     }
 
     internal sealed class FindOperation : ArrayOperation
@@ -186,7 +186,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             => G.As(Found(items, _predicate, scope), OutputShape);
 
         internal static Expr Found(Expr items, Condition predicate, Scope scope)
-            => G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.Any), G.Null);
+            => G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.Any, PathMembers.Optional), G.Null);
     }
 
     internal sealed class FindSelectOperation : ArrayOperation
@@ -228,7 +228,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             var right = scope.Fresh("b");
             var compare = G.Op(Operator.Order, _key.Write(scope.WithItem(left)), _key.Write(scope.WithItem(right)));
             if (_descending) compare = G.Op(Operator.Neg, compare);
-            return G.Call(items, new[] { "toSorted" }, new Expr[] { G.Fn(compare, left, right) }, OutputShape);
+            return G.Call(items, new[] { "toSorted" }, new Expr[] { G.Fn(compare, left, right) }, OutputShape, PathMembers.Optional);
         }
     }
 }

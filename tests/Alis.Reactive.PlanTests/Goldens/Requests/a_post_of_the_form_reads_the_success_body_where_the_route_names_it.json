@@ -45,7 +45,8 @@
                 },
                 "path": [
                   "value"
-                ]
+                ],
+                "members": "required"
               },
               "shape": {
                 "kind": "string"
@@ -145,7 +146,8 @@
                           "kind": "record",
                           "fields": []
                         }
-                      ]
+                      ],
+                      "members": "required"
                     }
                   },
                   {
@@ -168,9 +170,11 @@
                           },
                           "path": [
                             "arrays"
-                          ]
+                          ],
+                          "members": "required"
                         }
-                      ]
+                      ],
+                      "members": "optional"
                     }
                   },
                   {
@@ -189,7 +193,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "members": "required"
           },
           "await": true
         },
@@ -205,7 +210,8 @@
                 },
                 "path": [
                   "ok"
-                ]
+                ],
+                "members": "optional"
               },
               "then": [
                 {
@@ -220,20 +226,32 @@
                   "value": {
                     "kind": "as",
                     "expr": {
-                      "kind": "get",
-                      "target": {
-                        "kind": "ref",
-                        "name": "res1"
-                      },
-                      "path": [
-                        "body",
-                        "confirmation"
+                      "kind": "op",
+                      "op": "coalesce",
+                      "args": [
+                        {
+                          "kind": "get",
+                          "target": {
+                            "kind": "ref",
+                            "name": "res1"
+                          },
+                          "path": [
+                            "body",
+                            "confirmation"
+                          ],
+                          "members": "optional"
+                        },
+                        {
+                          "kind": "lit",
+                          "value": ""
+                        }
                       ]
                     },
                     "shape": {
                       "kind": "string"
                     }
-                  }
+                  },
+                  "members": "required"
                 }
               ]
             }
