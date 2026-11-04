@@ -54,4 +54,28 @@ public sealed class WhenARuleSetHoldsChildRules : AppPageTest
         await Expect(Saved).ToHaveTextAsync("saved for Ada");
         await Expect(Field("Pharmacy phone").GetByText("Give the pharmacy's phone.")).ToBeHiddenAsync();
     }
+
+    [Test]
+    public async Task an_inline_rule_written_in_a_set_of_its_own_keeps_that_set()
+    {
+        await Open("/Validation/MoveIn?stage=Settle");
+
+        await Write("Pharmacy fax", "");
+        await Save();
+        await Expect(Field("Pharmacy fax").GetByText("Give the pharmacy's fax.", new() { Exact = true })).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Write("Pharmacy fax", "555-0198");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("Settle saved for Ada");
+
+        await Open("/Validation/MoveIn?stage=Arrive");
+
+        await Write("Pharmacy fax", "");
+        await Save();
+
+        await Expect(Saved).ToHaveTextAsync("Arrive saved for Ada");
+        await Expect(Field("Pharmacy fax").GetByText("Give the pharmacy's fax.")).ToBeHiddenAsync();
+    }
 }
