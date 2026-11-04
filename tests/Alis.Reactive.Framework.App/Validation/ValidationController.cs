@@ -293,6 +293,31 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"{transfer.Resident} moved to {transfer.Ward}" });
     }
 
+    public IActionResult RoomMove() => View(new RoomMove());
+
+    [HttpPost("/Validation/RoomMove")]
+    public async Task<IActionResult> MoveRoom([FromBody] RoomMove move, [FromServices] RoomMoveRules rules, CancellationToken cancellation)
+    {
+        var result = await rules.ValidateAsync(move, cancellation);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"{move.Resident} moved to {move.Room}" });
+    }
+
+    [HttpPost("/Validation/RoomMoveWithoutWaiting")]
+    public IActionResult MoveRoomWithoutWaiting([FromBody] RoomMove move, [FromServices] RoomMoveRules rules)
+    {
+        try
+        {
+            rules.Validate(move);
+            return Json(new Booked { Summary = "saved" });
+        }
+        catch (InvalidOperationException refused)
+        {
+            return Json(new Booked { Summary = refused.Message });
+        }
+    }
+
     [HttpPost("/Validation/TransferWithoutWaiting")]
     public IActionResult SaveTransferWithoutWaiting([FromBody] WardTransfer transfer, [FromServices] TransferRules rules)
     {
