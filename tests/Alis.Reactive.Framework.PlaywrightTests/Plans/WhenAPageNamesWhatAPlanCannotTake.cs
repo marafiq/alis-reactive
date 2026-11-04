@@ -147,6 +147,23 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
     }
 
     [Test]
+    public async Task a_value_that_holds_itself_is_refused_where_the_view_writes_it()
+    {
+        await Render("HandOverARoundThatHoldsItself");
+
+        await Expect(Message("A HandedRound nests more than 32 levels deep, or holds itself; a plan carries a value once.")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_value_holding_what_a_plan_cannot_carry_is_refused_naming_what_it_can()
+    {
+        await Render("HandOverARoundThatHoldsAComputation");
+
+        await Expect(Message(
+            "A Func<string> cannot be written into a plan. A value fixed when the view renders is text, a number, a boolean, a date, a Guid, a time, an enum, a data class, a dictionary or a collection of those.")).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task an_error_route_for_a_status_http_does_not_have_is_refused()
     {
         await Render("RouteAStatusHttpDoesNotHave");

@@ -28,6 +28,9 @@ The runtime executes; it does not defend (root CLAUDE.md, Architecture). A check
 real boundary too; an error at one names the object, the path and the plan.
 
 - `objects/vendor-driver.ts` follows a vendor's plan data for every component.
+- `grammar/paths.ts`: a required read or call takes any present value as its holder, since text and
+  numbers have members in JavaScript; a write needs an object. An optional one reads nothing past a
+  missing holder.
 - Sync stays sync: a handler with no awaited statement never returns a promise, so a vendor reads
   a payload's `cancel` in the same turn. Only `do`/`let` with `await` wait.
 - One switch per generated union, ending in `assertNever`, so a node added in C# fails typecheck here

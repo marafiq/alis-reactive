@@ -66,6 +66,22 @@ public enum PlanMistake
     ChainTwoRequests,
     WriteAStepAfterItsCallbackReturned,
     RegisterAPluginTwice,
+    HandOverARoundThatHoldsItself,
+    HandOverARoundThatHoldsAComputation,
+}
+
+public static class RoundEvents
+{
+    public static readonly AppEvent<HandedRound> Handed = AppEvent.Declare<HandedRound>();
+}
+
+public sealed class HandedRound
+{
+    public string Ward { get; set; } = "";
+
+    public HandedRound? Next { get; set; }
+
+    public Func<string>? Describe { get; set; }
 }
 
 public sealed class NightLog : Plugin

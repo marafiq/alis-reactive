@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Writing;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanModel.Values
 {
@@ -68,7 +69,7 @@ namespace Alis.Reactive.PlanModel.Values
             if (ClrShape.IsDataClass(value.GetType()))
             {
                 return Record(ClrShape.SerializedProperties(value.GetType())
-                    .Select(member => (JsonMemberName.Of(member.Name), LiteralFor(member.GetValue(value), ClrShape.Of(member.PropertyType), depth + 1)))
+                    .Select(member => (JsonMemberName.Of(member), LiteralFor(member.GetValue(value), ClrShape.Of(member.PropertyType), depth + 1)))
                     .ToList());
             }
 
@@ -100,11 +101,11 @@ namespace Alis.Reactive.PlanModel.Values
             return declared == null ? memberName : declared.Name;
         }
 
-        internal static ValueExpression Get(Target target, IReadOnlyList<string> path, Shape shape)
+        internal static ValueExpression Get(Target target, Path path, Shape shape)
             => new GetExpression(target, path, shape);
 
         internal static ValueExpression Get(Target target, Shape shape)
-            => new GetExpression(target, G.NoPath, shape);
+            => new GetExpression(target, Path.None, shape);
 
         internal static CallExpression Call(
             Target target,
@@ -178,10 +179,10 @@ namespace Alis.Reactive.PlanModel.Values
     internal sealed class GetExpression : ValueExpression
     {
         private readonly Target _target;
-        private readonly IReadOnlyList<string> _path;
+        private readonly Path _path;
         private readonly Shape _shape;
 
-        internal GetExpression(Target target, IReadOnlyList<string> path, Shape shape)
+        internal GetExpression(Target target, Path path, Shape shape)
         {
             _target = target ?? throw new ArgumentNullException(nameof(target));
             _path = path ?? throw new ArgumentNullException(nameof(path));
@@ -196,8 +197,21 @@ namespace Alis.Reactive.PlanModel.Values
         internal override Expr Write(Scope scope)
         {
             var (root, prefix) = _target.Write(scope);
-            var path = prefix.Concat(_path).ToList();
-            return path.Count == 0 ? G.As(root, _shape) : G.Get(root, path, _shape, _target.Members);
+            return Read(root, prefix, _path, _shape, _target.Members);
+        }
+
+        internal static Expr Read(Expr root, IReadOnlyList<string> prefix, Path path, Shape shape, PathMembers members)
+        {
+            var dataPastARequiredMember = path.ReadsData && members == PathMembers.Required;
+            if (!dataPastARequiredMember)
+            {
+                var whole = prefix.Concat(path.Text).ToList();
+                return whole.Count == 0 ? G.As(root, shape) : G.Get(root, whole, shape, members);
+            }
+
+            var declared = prefix.Concat(path.DeclaredText).ToArray();
+            var holder = declared.Length == 0 ? root : G.Get(root, members, declared);
+            return G.Get(holder, path.DataTextFromDeclared, shape, PathMembers.Optional);
         }
     }
 

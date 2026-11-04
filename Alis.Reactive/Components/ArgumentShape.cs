@@ -19,7 +19,7 @@ namespace Alis.Reactive.Components
         {
             var fields = new Dictionary<string, Shape>(StringComparer.Ordinal);
             foreach (var property in ClrShape.SerializedProperties(type))
-                fields[JsonMemberName.Of(property.Name)] = Of(property.PropertyType, enclosingRecords);
+                fields[JsonMemberName.Of(property)] = Of(property.PropertyType, enclosingRecords);
             enclosingRecords.Remove(type);
             return Shape.ObjectOf(fields);
         }

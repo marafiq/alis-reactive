@@ -6,6 +6,7 @@ using Alis.Reactive.PlanAuthoring.Arrays;
 using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Reactions;
 using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive
 {
@@ -57,7 +58,7 @@ namespace Alis.Reactive
         /// <summary>Hides the element: sets its <c>hidden</c> attribute.</summary>
         public void Hide() => Set(BrowserElementMembers.Hidden, ValueExpression.Literal(true));
 
-        internal ValueExpression Read(string member) => ValueExpression.Get(Target.Element(_id), new[] { member }, Shape.Any);
+        internal ValueExpression Read(string member) => ValueExpression.Get(Target.Element(_id), Path.None.Then(member), Shape.Any);
 
         internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
             => _context.AddStep(new SetStep(Target.Element(_id), property.Path.TargetText, property.Shape, value));

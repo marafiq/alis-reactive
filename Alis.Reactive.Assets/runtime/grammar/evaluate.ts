@@ -1,4 +1,4 @@
-import type { CallExpr, Expr, OpExpr, RecordExpr } from "../types/index";
+import type { CallExpr, Expr, GetExpr, OpExpr, RecordExpr } from "../types/index";
 import { assertNever } from "../shared/assert-never";
 import { Environment } from "./environment";
 import { call, read } from "./paths";
@@ -27,7 +27,7 @@ export function evaluate(expr: Expr, scope: Scope): unknown {
     case "lit":    return expr.value;
     case "obj":    return scope.objects.object(expr.id);
     case "ref":    return scope.env.lookup(expr.name);
-    case "get":    return read(evaluate(expr.target, scope), expr.path, expr.members, labelOf(expr.target));
+    case "get":    return evaluateGet(expr, scope);
     case "as":     return shaped(evaluate(expr.expr, scope), expr.shape);
     case "call":   return evaluateCall(expr, scope, false);
     case "fn":     return closure(expr.params, expr.body, scope);
@@ -44,6 +44,17 @@ export function labelOf(target: Expr): string {
 
 export function evaluateStatement(expr: Expr, scope: Scope): unknown {
   return expr.kind === "call" ? evaluateCall(expr, scope, true) : evaluate(expr, scope);
+}
+
+function evaluateGet(expr: GetExpr, scope: Scope): unknown {
+  const label = labelOf(expr.target);
+  const value = read(evaluate(expr.target, scope), expr.path, expr.members, label);
+  if (isPromise(value)) throw heldPromise(label, expr.path);
+  return value;
+}
+
+function heldPromise(label: string, path: readonly string[]): Error {
+  return new Error(`[alis] ${label}.${path.join(".")} holds a promise where the plan reads a value`);
 }
 
 function evaluateCall(expr: CallExpr, scope: Scope, mayReturnPromise: boolean): unknown {

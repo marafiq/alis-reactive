@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -22,14 +23,28 @@ namespace Alis.Reactive.Razor
             var attributes = new StringBuilder(Of(eventName));
             foreach (var member in ClrShape.SerializedProperties(typeof(TPayload)))
             {
+                var name = CarriedName<TPayload>(member);
                 var value = Carried<TPayload>(member).GetValue(payload);
                 if (value == null) continue;
                 var text = TextOf(JsonSerializer.SerializeToElement(value, member.PropertyType, ValueText));
-                attributes.Append(' ').Append(DatasetAttribute(JsonMemberName.Of(member.Name)))
+                attributes.Append(' ').Append(DatasetAttribute(name))
                     .Append("=\"").Append(WebUtility.HtmlEncode(text)).Append('"');
             }
             return attributes.ToString();
         }
+
+        private static string CarriedName<TPayload>(PropertyInfo member)
+        {
+            var name = JsonMemberName.Of(member);
+            if (IsCamelCase(name)) return name;
+            throw new InvalidOperationException(
+                $"'{CSharpTypeName.Of(typeof(TPayload))}.{member.Name}' is named '{name}', and markup carries each member of the " +
+                "payload it raises as an attribute whose name the browser lowercases, so a name it carries is camel case: a " +
+                "lowercase first letter, then letters, digits or underscores. Rename it, or raise the payload from a pipeline, with p.Dispatch.");
+        }
+
+        private static bool IsCamelCase(string name)
+            => name.Length > 0 && name[0] >= 'a' && name[0] <= 'z' && name.All(letter => char.IsLetterOrDigit(letter) || letter == '_');
 
         private static PropertyInfo Carried<TPayload>(PropertyInfo member)
         {

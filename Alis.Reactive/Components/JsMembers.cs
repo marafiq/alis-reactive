@@ -28,7 +28,10 @@ namespace Alis.Reactive
 
         internal override ValueExpression Expression => Owner.Binding.Read(Member.Path, Shape);
 
-        /// <summary>Reads a member of the value, for a value that is data: <c>args.Slot.Get(s =&gt; s.Label)</c>.</summary>
+        /// <summary>
+        /// Reads a member of the value, for a value that is data: <c>args.Slot.Get(s =&gt; s.Label)</c>. It reads as nothing
+        /// while the property holds no value or the value lacks the member.
+        /// </summary>
         /// <typeparam name="TResult">The C# type of the member.</typeparam>
         /// <param name="path">The member to read, for example <c>s =&gt; s.Label</c>.</param>
         public TypedSource<TResult> Get<TResult>(Expression<Func<TValue, TResult>> path)
@@ -37,7 +40,7 @@ namespace Alis.Reactive
             var dataPath = ExpressionPathHelper.ToJsonPath(path);
             if (dataPath.IsNone)
                 throw new ArgumentException("Select a member of the value, for example s => s.Label.", nameof(path));
-            return new MemberRead<TResult>(Owner.Binding.Locate, Member.Path.Append(dataPath));
+            return new MemberRead<TResult>(Owner.Binding.Locate, Member.Path.ThenData(dataPath));
         }
     }
 
@@ -147,7 +150,10 @@ namespace Alis.Reactive
     /// <summary>Reads a field of each item of a list property.</summary>
     public static class ListPropertyExtensions
     {
-        /// <summary>A field of each item, as a list: <c>planner.Slots.Each(slot =&gt; slot.Day)</c> reads every slot's <c>day</c>.</summary>
+        /// <summary>
+        /// A field of each item, as a list: <c>planner.Slots.Each(slot =&gt; slot.Day)</c> reads every slot's <c>day</c>. An
+        /// item without the field reads it as nothing.
+        /// </summary>
         /// <typeparam name="TItem">The C# type of an item.</typeparam>
         /// <typeparam name="TField">The C# type of the field.</typeparam>
         /// <param name="list">The list property.</param>
@@ -163,7 +169,7 @@ namespace Alis.Reactive
                 throw new ArgumentException("Select a field of the item, for example slot => slot.Day.", nameof(field));
             return new ReadOnly<IReadOnlyList<TField>>(
                 list.Owner,
-                ComponentProperty<IReadOnlyList<TField>>.At(list.Member.Path.Each().Append(fieldPath)));
+                ComponentProperty<IReadOnlyList<TField>>.At(list.Member.Path.ThenData(Path.None.Each().Append(fieldPath))));
         }
     }
 

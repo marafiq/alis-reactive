@@ -109,8 +109,8 @@ namespace Alis.Reactive
         /// <remarks>
         /// Each member of the payload is one attribute holding its value as text, which the listener reads as the
         /// member's type, as it reads every value: text, a number, a bool, a date, a Guid or an enum. A member left
-        /// null is read as missing. A member that is a record or a list is refused when the view renders; a payload
-        /// that holds one is raised from a pipeline, with <c>p.Dispatch</c>.
+        /// null is read as missing. A member that is a record or a list, or whose name is not camel case, is refused
+        /// when the view renders; a payload that holds one is raised from a pipeline, with <c>p.Dispatch</c>.
         /// </remarks>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
         /// <param name="html">The view's HTML helper.</param>

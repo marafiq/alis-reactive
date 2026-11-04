@@ -6,7 +6,12 @@
 }
 <h1>A booking</h1>
 
+<p>Booked room: <span id="booked-room"></span></p>
 <p>Refused because: <span id="refused"></span></p>
+
+@(plan.Button("book-open", "Book the open room")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Bookings/Open")
+        .Response(r => r.OnSuccess<BookingConfirmation>((confirmed, s) => s.Element("booked-room").Text.Set(confirmed.Get(x => x.Room))))))
 
 @(plan.Button("book-taken", "Book the taken room")
     .Reactive(button => button.Click, p => p.Post("/Requests/Bookings/Taken")

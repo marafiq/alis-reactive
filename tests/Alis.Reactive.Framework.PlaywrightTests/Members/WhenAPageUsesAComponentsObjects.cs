@@ -72,6 +72,18 @@ public sealed class WhenAPageUsesAComponentsObjects : AppPageTest
     }
 
     [Test]
+    public async Task a_field_of_each_item_of_a_list_every_object_holds_is_read_object_by_object()
+    {
+        await Open("/Members/Objects");
+        await Button("Note the chart on the first row").ClickAsync();
+        await Button("Note the call on the third row").ClickAsync();
+
+        await Button("Read the notes of every row").ClickAsync();
+
+        await Expect(Page.Locator("#row-notes")).ToHaveTextAsync("chart,,call");
+    }
+
+    [Test]
     public async Task a_list_a_method_returns_is_read_as_it_stands_when_the_pipeline_runs()
     {
         await Open("/Members/Objects");

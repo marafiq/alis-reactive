@@ -65,6 +65,7 @@ export interface Changing {
 
 export class Row {
   private isMarked = false;
+  readonly notes: { text: string }[] = [];
 
   constructor(readonly label: string, private readonly changed: () => void) {}
 
@@ -76,11 +77,26 @@ export class Row {
     this.isMarked = true;
     this.changed();
   }
+
+  note(text: string): void {
+    this.notes.push({ text });
+    this.changed();
+  }
 }
 
 export interface Card {
-  name: string;
+  name?: string;
   due: Date;
+}
+
+interface CardKeptTheOldWay {
+  name: { first: string };
+  due: string;
+}
+
+function cardName(card: Card): string {
+  if (card.name === undefined) return "(unnamed)";
+  return typeof card.name === "string" ? card.name : "(kept the old way)";
 }
 
 function order(a: unknown, b: unknown): number {
@@ -238,6 +254,17 @@ export class Slate {
     this.show();
   }
 
+  startCard(due: Date): void {
+    this.cardList.push({ due });
+    this.show();
+  }
+
+  keepCardTheOldWay(): void {
+    const kept: CardKeptTheOldWay = { name: { first: "Dee" }, due: "the first" };
+    this.cardList.push(kept as unknown as Card);
+    this.show();
+  }
+
   get startedAt(): number {
     return this.startedAtMs;
   }
@@ -294,6 +321,10 @@ export class Slate {
 
   get status(): string {
     return this.saveStatus;
+  }
+
+  get ready(): Promise<string> {
+    return aMoment().then(() => "ready");
   }
 
   async save(): Promise<void> {
@@ -370,7 +401,7 @@ export class Slate {
     this.noteLine.textContent = this.noteText;
     this.summaryLine.textContent = this.summaryText;
     this.placedLine.textContent = this.placedText;
-    this.cardsLine.textContent = this.cardList.length === 0 ? "" : `Cards: ${this.cardList.map(card => card.name).join(" · ")}`;
+    this.cardsLine.textContent = this.cardList.length === 0 ? "" : `Cards: ${this.cardList.map(cardName).join(" · ")}`;
     this.limitLine.textContent = this.limitValue === null ? "No limit" : `Limit: ${this.limitValue}`;
     this.list.replaceChildren(...this.rows.map(row => {
       const item = document.createElement("li");

@@ -7,6 +7,7 @@ using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Reactions;
 using Alis.Reactive.PlanModel.Requests;
 using Alis.Reactive.PlanModel.Validation;
+using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.WireTerms;
 
@@ -251,7 +252,7 @@ namespace Alis.Reactive.PlanModel.Document
             {
                 if (!_inputs.TryFindForComponent(ComponentId.Of(declared.Id), out var rendered)) continue;
 
-                var value = G.Get(G.Obj(objects.Element(declared.Id)), rendered.ValuePath.Text, rendered.Shape, PathMembers.Required);
+                var value = GetExpression.Read(G.Obj(objects.Element(declared.Id)), G.NoPath, rendered.ValuePath, rendered.Shape, PathMembers.Required);
                 inputs.Add(
                     declared.Id,
                     new InputBinding(

@@ -97,7 +97,7 @@ namespace Alis.Reactive.Members
         private static Path JsonPath(IReadOnlyList<AccessStep> steps)
             => steps.Aggregate(Path.None, (path, step) => step.IsPosition
                 ? path.AtIndex(step.Position)
-                : path.Then(step.IsKey ? step.Key : JsonMemberName.Of(step.Name)));
+                : path.Then(step.IsKey ? step.Key : JsonMemberName.Of(step.Access!.Member)));
 
         private static Path BodyPath(IReadOnlyList<AccessStep> steps)
             => steps.Aggregate(Path.None, (path, step) => step.IsPosition

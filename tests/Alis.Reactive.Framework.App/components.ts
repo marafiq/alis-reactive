@@ -10,3 +10,4 @@ import "./Components/FilePicker/file-picker";
 import "./Components/Banner/banner";
 import "./Components/Choice/choice";
 import "./Components/Stamp/stamp";
+import "./Components/TagPicker/tag-picker";

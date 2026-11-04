@@ -16,6 +16,6 @@ namespace Alis.Reactive.Components
         }
 
         internal override ValueExpression Expression
-            => _path.IsNone ? ValueExpression.Get(_locate(), Shape) : ValueExpression.Get(_locate(), _path.Text, Shape);
+            => ValueExpression.Get(_locate(), _path, Shape);
     }
 }

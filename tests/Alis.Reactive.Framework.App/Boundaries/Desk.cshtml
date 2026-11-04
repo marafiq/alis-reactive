@@ -11,6 +11,7 @@
 <p>Title: <span id="title"></span></p>
 <p>Looking Ben up: <span id="asked"></span> · found: <span id="found"></span> · then: <span id="went-on"></span></p>
 <p>Counting the header: <span id="header-asked"></span> · headers: <span id="header-count"></span> · then: <span id="header-went-on"></span></p>
+<p>Asking whether the slate is ready: <span id="ready-asked"></span> · ready: <span id="ready"></span> · then: <span id="ready-went-on"></span></p>
 
 @(plan.Button("read-title", "Read the title")
     .Reactive(button => button.Click, p => p.Element("title").Text.Set(p.Component<Slate>("slate").Title)))
@@ -27,6 +28,13 @@
         p.Element("header-asked").Text.Set("asked");
         p.Element("header-count").Text.Set(p.From(p.Component<ListedSlate>("slate").Header).Count());
         p.Element("header-went-on").Text.Set("went on");
+    }))
+@(plan.Button("read-ready", "Ask whether the slate is ready")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("ready-asked").Text.Set("asked");
+        p.Element("ready").Text.Set(p.Component<EagerSlate>("slate").Ready);
+        p.Element("ready-went-on").Text.Set("went on");
     }))
 
 @Html.RenderPlan(plan)

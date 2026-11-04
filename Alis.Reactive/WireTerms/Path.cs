@@ -43,45 +43,67 @@ namespace Alis.Reactive.WireTerms
 
     internal sealed class Path
     {
-        internal static readonly Path None = new Path(Array.Empty<PathSegment>());
+        internal static readonly Path None = new Path(Array.Empty<PathSegment>(), null);
+
+        private readonly int? _dataFrom;
 
         internal IReadOnlyList<PathSegment> Segments { get; }
 
         internal bool IsNone => Segments.Count == 0;
 
-        private Path(IReadOnlyList<PathSegment> segments)
+        private Path(IReadOnlyList<PathSegment> segments, int? dataFrom)
         {
             Segments = segments;
+            _dataFrom = dataFrom;
         }
 
         internal Path Then(string name)
         {
             var list = new List<PathSegment>(Segments) { PathSegment.Property(name) };
-            return new Path(list);
+            return new Path(list, _dataFrom);
         }
 
         internal Path AtIndex(int index)
         {
             var list = new List<PathSegment>(Segments) { PathSegment.AtIndex(index) };
-            return new Path(list);
+            return new Path(list, _dataFrom);
         }
 
         internal Path Each()
         {
             var list = new List<PathSegment>(Segments) { PathSegment.EachItem };
-            return new Path(list);
+            return new Path(list, _dataFrom);
         }
 
         internal Path Append(Path tail)
         {
             var list = new List<PathSegment>(Segments);
             list.AddRange(tail.Segments);
-            return new Path(list);
+            return new Path(list, _dataFrom ?? Segments.Count + tail._dataFrom);
+        }
+
+        internal Path ThenData(Path data)
+        {
+            var list = new List<PathSegment>(Segments);
+            list.AddRange(data.Segments);
+            return new Path(list, _dataFrom ?? Segments.Count);
         }
 
         internal bool ReadsEachItem => Segments.Any(segment => segment.IsEachItem);
 
         internal IReadOnlyList<string> Text => Segments.Select(segment => segment.ToPathText()).ToList();
+
+        internal IReadOnlyList<string> DeclaredText => Segments.Take(DeclaredCount).Select(segment => segment.ToPathText()).ToList();
+
+        internal IReadOnlyList<string> DataTextFromDeclared
+            => Segments.Take(DeclaredCount).Where(segment => segment.IsEachItem)
+                .Concat(Segments.Skip(DeclaredCount))
+                .Select(segment => segment.ToPathText())
+                .ToList();
+
+        private int DeclaredCount => _dataFrom ?? Segments.Count;
+
+        internal bool ReadsData => DeclaredCount < Segments.Count;
 
         internal IReadOnlyList<string> TargetText => ReadsEachItem
             ? throw new InvalidOperationException($"'{this}' reads each item of a list; it can be read, not written, called or subscribed to.")
@@ -109,7 +131,7 @@ namespace Alis.Reactive.WireTerms
                     : PathSegment.Property(step));
             }
 
-            return new Path(segments);
+            return new Path(segments, null);
         }
 
         public override string ToString()

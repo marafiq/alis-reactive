@@ -101,6 +101,15 @@
         plan.RegisterPlugin<NightLog>();
         plan.RegisterPlugin<NightLog>();
         break;
+    case PlanMistake.HandOverARoundThatHoldsItself:
+        var round = new HandedRound { Ward = "East" };
+        round.Next = round;
+        @(plan.Button("hand-over", "Hand over the round").Reactive(button => button.Click, p => p.Dispatch(RoundEvents.Handed, round)))
+        break;
+    case PlanMistake.HandOverARoundThatHoldsAComputation:
+        var described = new HandedRound { Ward = "East", Describe = () => "East wing, night" };
+        @(plan.Button("hand-over", "Hand over the round").Reactive(button => button.Click, p => p.Dispatch(RoundEvents.Handed, described)))
+        break;
 }
 
 @Html.RenderPlan(plan)

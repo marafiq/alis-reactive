@@ -8,6 +8,7 @@
 
 <p>The gate is <span id="gate">shut</span>.</p>
 <p>Last announcement: <span id="announcement"></span>, <span id="party"></span>, <span id="urgency"></span></p>
+<p>Called in by: <span id="called-by"></span></p>
 
 @{ Html.On(plan, t => t
     .CustomEvent(GateEvents.Opened, p => p.Element("gate").Text.Set("open"))
@@ -22,6 +23,7 @@
         p.When(announced.Get(x => x.Urgency)).Eq(GateUrgency.Urgent)
             .Then(urgent => urgent.Element("urgency").Text.Set("urgent"))
             .Else(routine => routine.Element("urgency").Text.Set("routine"));
+        p.Element("called-by").Text.Set(announced.Get(x => x.CalledBy));
     })); }
 
 <button type="button" @Html.Raises(GateEvents.Opened)>Open the gate</button>
@@ -30,7 +32,7 @@
     <li @Html.Raises(GateEvents.Announced, new Announcement { Type = "a visitor", PartySize = 1 })>
         A visitor at the gate <button type="button">Details</button>
     </li>
-    <li><button type="button" @Html.Raises(GateEvents.Announced, new Announcement { Type = "a delivery", PartySize = 1 })>A delivery at the gate</button></li>
+    <li><button type="button" @Html.Raises(GateEvents.Announced, new Announcement { Type = "a delivery", PartySize = 1, CalledBy = "the porter" })>A delivery at the gate</button></li>
     <li><button type="button" @Html.Raises(GateEvents.Announced, new Announcement { Type = "a coach party", PartySize = 12, Urgency = GateUrgency.Urgent })>A coach party at the gate</button></li>
 </ul>
 

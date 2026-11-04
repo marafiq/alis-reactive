@@ -9,6 +9,9 @@ public sealed class RequestsController : Controller
 
     public IActionResult Booking() => View(new BookingPage());
 
+    [HttpPost("/Requests/Bookings/Open")]
+    public IActionResult BookOpen() => Json(new BookingConfirmation { Room = "4" });
+
     [HttpPost("/Requests/Bookings/Taken")]
     public IActionResult BookTaken() => Conflict(new BookingProblem { Reason = "room 2 is taken" });
 

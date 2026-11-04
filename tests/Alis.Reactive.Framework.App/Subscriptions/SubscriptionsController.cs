@@ -8,5 +8,7 @@ public sealed class SubscriptionsController : Controller
 
     public IActionResult EscortedVisit() => View(new GatePage());
 
+    public IActionResult SignedVisit() => View(new GatePage());
+
     public IActionResult HeldObjectEvent() => View(new GatePage());
 }

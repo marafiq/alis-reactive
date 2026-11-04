@@ -58,6 +58,16 @@ public sealed class WhenMarkupRaisesAnEvent : AppPageTest
     }
 
     [Test]
+    public async Task a_member_named_its_own_way_reaches_the_listener_by_that_name()
+    {
+        await Open("/Subscriptions/Gate");
+
+        await Button("A delivery at the gate").ClickAsync();
+
+        await Expect(Page.Locator("#called-by")).ToHaveTextAsync("the porter");
+    }
+
+    [Test]
     public async Task a_click_inside_markup_that_raises_an_event_raises_that_markups_event()
     {
         await Open("/Subscriptions/Gate");
@@ -76,6 +86,18 @@ public sealed class WhenMarkupRaisesAnEvent : AppPageTest
             "'EscortedVisit.Visitor' is a GateVisitor, and markup carries each member of the payload it raises as the " +
             "text of one attribute, so a member it carries is text, a number, a bool, a date, a Guid or an enum. Raise " +
             "a payload that holds a record or a list from a pipeline, with p.Dispatch.").First)
+            .ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task markup_raising_a_member_named_so_no_attribute_carries_it_back_is_refused_naming_the_fix()
+    {
+        await Page.GotoAsync(BaseUrl + "/Subscriptions/SignedVisit");
+
+        await Expect(Page.GetByText(
+            "'SignedVisit.Signature' is named 'Signature', and markup carries each member of the payload it raises as an " +
+            "attribute whose name the browser lowercases, so a name it carries is camel case: a lowercase first letter, " +
+            "then letters, digits or underscores. Rename it, or raise the payload from a pipeline, with p.Dispatch.").First)
             .ToBeVisibleAsync();
     }
 }

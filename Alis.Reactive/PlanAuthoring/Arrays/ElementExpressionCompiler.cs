@@ -36,7 +36,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 [MemberOf<DateTime>(date => date.Hour)] = date => DateCall(date, "getHours"),
                 [MemberOf<DateTime>(date => date.Minute)] = date => DateCall(date, "getMinutes"),
                 [MemberOf<DateTime>(date => date.Second)] = date => DateCall(date, "getSeconds"),
-                [MemberOf<string>(text => text.Length)] = text => ValueExpression.Get(Target.Returned(text), new[] { "length" }, Shape.Number),
+                [MemberOf<string>(text => text.Length)] = text => ValueMemberExpression.Read(text, "length", Shape.Number),
             };
 
         private static readonly MemberInfo DayOfWeekMember = MemberOf<DateTime>(date => date.DayOfWeek);
@@ -220,9 +220,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             if (TryDataPath(node, element, out var path))
             {
                 var shape = ClrShape.Of(node.Type);
-                return path.IsNone
-                    ? ValueExpression.Get(Target.Item, shape)
-                    : ValueExpression.Get(Target.Item, path.Text, shape);
+                return ValueExpression.Get(Target.Item, path, shape);
             }
 
             switch (node)
@@ -315,9 +313,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             if (call.Object != null && PureMethodName(call.Method) is string methodName)
             {
                 var methodArgs = call.Arguments.Select(argument => CompileValue(argument, element)).ToList();
-                var unconverted = methodArgs.Select(_ => Shape.Any).ToList();
-                return ValueExpression.Call(
-                    Target.Returned(CompileValue(call.Object, element)), new[] { methodName }, methodArgs, unconverted, ClrShape.Of(call.Type), PathMembers.Optional);
+                return ValueMemberExpression.Call(CompileValue(call.Object, element), methodName, methodArgs, ClrShape.Of(call.Type));
             }
 
             if (TryTest(call, element, out var test))
@@ -383,7 +379,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
                 or ExpressionType.LessThan or ExpressionType.LessThanOrEqual;
 
         private static ValueExpression DateCall(ValueExpression date, string method)
-            => ValueExpression.Call(Target.Returned(date), new[] { method }, Array.Empty<ValueExpression>(), Array.Empty<Shape>(), Shape.Number, PathMembers.Optional);
+            => ValueMemberExpression.Call(date, method, Array.Empty<ValueExpression>(), Shape.Number);
 
         private static string NameOf(MemberInfo member) => CSharpTypeName.Of(member.DeclaringType!) + "." + member.Name;
 

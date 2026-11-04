@@ -11,6 +11,13 @@ public sealed class HastySlate : Component
     public TypedSource<string> Lookup(Arg<string> label) => Method<string>(label);
 }
 
+public sealed class EagerSlate : Component
+{
+    public override ComponentVendor Vendor => Slate.SlateVendor;
+
+    public ReadOnly<string> Ready => ReadOnly<string>();
+}
+
 public sealed class ListedSlate : Component
 {
     public override ComponentVendor Vendor => Slate.SlateVendor;

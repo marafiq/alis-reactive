@@ -12,6 +12,7 @@
 <p>Cards: <span id="holds-cards"></span></p>
 <p>Placed: <span id="placed"></span></p>
 <p>Flags counted: <span id="flags"></span></p>
+<p>Placed on: <span id="placed-on"></span></p>
 
 @(plan.Button("limit-three", "Limit the slate to 3")
     .Reactive(button => button.Click, p => p.Component<Slate>("slate").Limit.Set(3)))
@@ -35,6 +36,10 @@
     }))
 @(plan.Button("place-plain", "Place a line with no flag")
     .Reactive(button => button.Click, p => p.Component<Slate>("slate").Place("Ben", 2m, false, new DateTime(2026, 10, 28))))
+@(plan.Button("place-afternoon", "Place a line at half past two")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Place("Cy", 3m, false, new DateTime(2026, 10, 28, 14, 30, 0))))
+@(plan.Button("show-placed-on", "Show when the line was placed")
+    .Reactive(button => button.Click, p => p.Element("placed-on").Text.Set(p.Component<Slate>("slate").PlacedOn)))
 @(plan.Button("ask-placed", "Has a line been placed?")
     .Reactive(button => button.Click, p => p.When(p.Component<Slate>("slate").HasPlaced).Eq(true)
         .Then(t => t.Element("placed").Text.Set("a line is placed"))

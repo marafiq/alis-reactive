@@ -62,6 +62,28 @@ public sealed class WhenAComponentKeepsAnotherKindOfValue : AppPageTest
     }
 
     [Test]
+    public async Task a_day_shown_as_text_reads_as_the_day_mvc_binds()
+    {
+        await Open("/Members/Kinds");
+        await Click("Place a line with no flag");
+
+        await Click("Show when the line was placed");
+
+        await Expect(Line("placed-on")).ToHaveTextAsync("2026-10-28");
+    }
+
+    [Test]
+    public async Task a_moment_shown_as_text_reads_as_its_local_day_and_time()
+    {
+        await Open("/Members/Kinds");
+        await Click("Place a line at half past two");
+
+        await Click("Show when the line was placed");
+
+        await Expect(Line("placed-on")).ToHaveTextAsync("2026-10-28T14:30:00");
+    }
+
+    [Test]
     public async Task a_timestamp_read_as_a_day_arrives_as_a_day_where_a_method_takes_one()
     {
         await Open("/Members/Kinds");

@@ -39,6 +39,10 @@ public sealed class Slate : Component
 
     public void Fill(Arg<SlateCard> card) => Method(card);
 
+    public void StartCard(Arg<DateTime> due) => Method(due);
+
+    public void KeepCardTheOldWay() => Method();
+
     public TypedSource<bool> Has(Arg<string> label) => Method<bool>(label);
 
     public TypedSource<decimal> Total() => Method<decimal>();
@@ -70,6 +74,8 @@ public sealed class Slate : Component
     public ReadOnly<bool> HoldsCards => ReadOnly<bool>(name: "cards");
 
     public ReadOnly<bool> HasPlaced => ReadOnly<bool>(name: "placedOn");
+
+    public ReadOnly<DateTime?> PlacedOn => ReadOnly<DateTime?>();
 
     public ReadOnly<int> PlacedFlags => ReadOnly<int>(name: "placedFlag");
 
@@ -140,5 +146,14 @@ public sealed class SlateRow : JsObject
 {
     public ReadOnly<string> Label => ReadOnly<string>();
 
+    public ReadOnly<IReadOnlyList<SlateNote>> Notes => ReadOnly<IReadOnlyList<SlateNote>>();
+
     public void Mark() => Method();
+
+    public void Note(Arg<string> text) => Method(text);
+}
+
+public sealed class SlateNote
+{
+    public string Text { get; set; } = "";
 }

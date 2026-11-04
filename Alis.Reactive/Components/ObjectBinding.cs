@@ -26,7 +26,7 @@ namespace Alis.Reactive.Components
             Context.AddStep(new SetStep(target, property.Path.TargetText, target.IsData ? Shape.Any : property.Shape, value));
         }
 
-        internal ValueExpression Read(Path path, Shape shape) => ValueExpression.Get(Locate(), path.Text, shape);
+        internal ValueExpression Read(Path path, Shape shape) => ValueExpression.Get(Locate(), path, shape);
 
         internal void Call(ComponentMethod method, IReadOnlyList<ValueExpression> args)
         {

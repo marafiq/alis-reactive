@@ -20,7 +20,7 @@ export function read(root: unknown, path: readonly string[], members: PathMember
       current = (current as Holder)[key];
       continue;
     }
-    const holder = requireHolder(current, label, path, index);
+    const holder = requirePresent(current, label, path, index);
     if (!(key in holder)) throw missingMember(label, path, index);
     current = holder[key];
   }
@@ -58,7 +58,7 @@ export function call(
   const last = path.length - 1;
   const holderValue = read(root, path.slice(0, last), members, label);
   if (members === "optional" && isMissing(holderValue)) return undefined;
-  const holder = members === "optional" ? (holderValue as Holder) : requireHolder(holderValue, label, path, last);
+  const holder = members === "optional" ? (holderValue as Holder) : requirePresent(holderValue, label, path, last);
   const method = holder[path[last]!];
   if (members === "optional" && isMissing(method)) return undefined;
   if (typeof method !== "function") {
@@ -67,10 +67,19 @@ export function call(
   return (method as (...values: unknown[]) => unknown).apply(holder, [...args]);
 }
 
+function requirePresent(value: unknown, label: string, path: readonly string[], index: number): Holder {
+  if (!isMissing(value)) return Object(value) as Holder;
+  throw notAnObject(value, label, path, index);
+}
+
 function requireHolder(value: unknown, label: string, path: readonly string[], index: number): Holder {
   if (canHaveMembers(value)) return value;
+  throw notAnObject(value, label, path, index);
+}
+
+function notAnObject(value: unknown, label: string, path: readonly string[], index: number): Error {
   const at = path.slice(0, index).join(".");
-  throw new Error(`[alis] ${label}${at ? "." + at : ""} is ${value === null ? "null" : typeof value}, not an object`);
+  return new Error(`[alis] ${label}${at ? "." + at : ""} is ${value === null ? "null" : typeof value}, not an object`);
 }
 
 function missingMember(label: string, path: readonly string[], index: number): Error {

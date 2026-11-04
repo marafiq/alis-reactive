@@ -18,6 +18,14 @@ public sealed class InputsController : Controller
             $"arrives {admitted.Arrives.ToUniversalTime().ToString("HH:mm", CultureInfo.InvariantCulture)} UTC"),
     });
 
+    public IActionResult Tags() => View(new TagsPage());
+
+    [HttpPost]
+    public IActionResult Tags([FromBody] TagsPage tagged) => Json(new TagsEcho
+    {
+        Summary = string.Join(" · ", tagged.Codes.Select(code => code ?? "(no code)")),
+    });
+
     public IActionResult Booking() => View(new BookingPage());
 
     [HttpPost]

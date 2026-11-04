@@ -21,6 +21,44 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         internal override Expr Write(Scope scope) => _condition.Write(scope);
     }
 
+    internal sealed class ValueMemberExpression : ValueExpression
+    {
+        private readonly ValueExpression _value;
+        private readonly string _member;
+        private readonly IReadOnlyList<ValueExpression> _args;
+        private readonly bool _called;
+        private readonly Shape _shape;
+
+        private ValueMemberExpression(ValueExpression value, string member, IReadOnlyList<ValueExpression> args, bool called, Shape shape)
+        {
+            _value = value ?? throw new ArgumentNullException(nameof(value));
+            _member = member ?? throw new ArgumentNullException(nameof(member));
+            _args = args ?? throw new ArgumentNullException(nameof(args));
+            _called = called;
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+        }
+
+        internal static ValueExpression Read(ValueExpression value, string member, Shape shape)
+            => new ValueMemberExpression(value, member, Array.Empty<ValueExpression>(), called: false, shape);
+
+        internal static ValueExpression Call(ValueExpression value, string method, IReadOnlyList<ValueExpression> args, Shape shape)
+            => new ValueMemberExpression(value, method, args, called: true, shape);
+
+        internal override Shape OutputShape => _shape;
+
+        internal override bool ReadsAwaited => _value.ReadsAwaited || _args.Any(arg => arg.ReadsAwaited);
+
+        internal override Expr Write(Scope scope)
+        {
+            var value = scope.Fresh("value");
+            var member = _called
+                ? G.Call(G.Ref(value), new[] { _member }, _args.Select(arg => arg.Write(scope)).ToList(), _shape, PathMembers.Required)
+                : G.Get(G.Ref(value), new[] { _member }, _shape, PathMembers.Required);
+            var nothingOrMember = G.Op(Operator.Cond, G.Eq(G.Ref(value), G.Null), G.Null, member);
+            return G.Apply(G.Fn(nothingOrMember, value), _value.Write(scope));
+        }
+    }
+
     internal abstract class ArrayOperation : ValueExpression
     {
         internal static ValueExpression Count(ValueExpression source) => new CountOperation(source);
