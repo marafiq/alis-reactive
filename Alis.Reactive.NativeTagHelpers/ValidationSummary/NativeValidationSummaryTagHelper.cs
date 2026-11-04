@@ -44,7 +44,9 @@ public sealed class NativeValidationSummaryTagHelper(IHtmlHelper html) : TagHelp
             throw new InvalidOperationException(
                 "The native-validation-summary tag helper requires a form attribute: the element id of the form a request " +
                 "validates (Validate<TValidator>(\"formId\")) or shows the server's errors on (e.ValidationErrors(\"formId\")).");
-        } ((IViewContextAware)html).Contextualize(ViewContext);
+        }
+
+        ((IViewContextAware)html).Contextualize(ViewContext);
         output.TagName = null;
         output.Content.SetHtmlContent(html.FormSummary(Form, CssClass));
     }
