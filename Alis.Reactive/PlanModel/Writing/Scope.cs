@@ -40,6 +40,8 @@ namespace Alis.Reactive.PlanModel.Writing
         internal Scope WithResponse(ResponseHandle handle, string binding)
             => new Scope(_plan, EventParam, new ResponseFrame(handle, binding, _responses), _item, _results);
 
+        internal bool HasResponse => _responses != null;
+
         internal Scope WithItem(string name) => new Scope(_plan, EventParam, _responses, name, _results);
 
         internal Expr Result(object result, string stem, bool awaits, Func<Expr> call)

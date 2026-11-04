@@ -66,6 +66,17 @@ public sealed class WhenAPageNamesWhatAPlanCannotTake : AppPageTest
     }
 
     [Test]
+    public async Task validation_errors_shown_outside_a_request_are_refused_naming_the_check_without_a_request()
+    {
+        await Render("ShowValidationErrorsOutsideARequest");
+
+        await Expect(Message(
+            "shows the validation errors of form 'visit-form' outside the routes of a request, so no response carries them: " +
+            "write ValidationErrors in OnError of the request that receives them, or check the form in the browser without a " +
+            "request with Validate<TValidator>(\"visit-form\").")).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task a_finally_that_reads_its_requests_response_is_refused()
     {
         await Render("ReadTheResponseInFinally");

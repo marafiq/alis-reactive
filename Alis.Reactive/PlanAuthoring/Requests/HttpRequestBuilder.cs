@@ -114,7 +114,7 @@ namespace Alis.Reactive
         {
             if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
             Step.Validation = validation;
-            _context.ValidateBefore(Step, validation);
+            _context.Validates(Step, validation);
             return this;
         }
 

@@ -270,6 +270,8 @@ Alis.Reactive.PipelineBuilder<TModel>.Into(string! elementId) -> Alis.Reactive.P
 Alis.Reactive.PipelineBuilder<TModel>.Stream<TStream>(Alis.Reactive.ServerPushSource<TStream!>! stream) -> TStream!
 Alis.Reactive.PipelineBuilder<TModel>.Unload(string! elementId) -> Alis.Reactive.PipelineBuilder<TModel!>!
 Alis.Reactive.PipelineBuilder<TModel>.Url<TQuery>() -> Alis.Reactive.UrlQuery<TQuery!>!
+Alis.Reactive.PipelineBuilder<TModel>.Validate<TValidationSource>(string! formId) -> Alis.Reactive.PipelineBuilder<TModel!>!
+Alis.Reactive.PipelineBuilder<TModel>.Validate<TValidationSource>(string! formId, string! ruleSet) -> Alis.Reactive.PipelineBuilder<TModel!>!
 Alis.Reactive.PipelineBuilder<TModel>.ValidationErrors(string! formId) -> Alis.Reactive.PipelineBuilder<TModel!>!
 Alis.Reactive.PlanExtensions
 Alis.Reactive.Plugin

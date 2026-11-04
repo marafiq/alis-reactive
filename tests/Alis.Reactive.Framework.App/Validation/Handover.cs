@@ -46,4 +46,5 @@ public enum HandoverMistake
 {
     DraftAndHandoverRules,
     OneRulesForTwoNotes,
+    CheckedAndHandedOverByTwoValidators,
 }

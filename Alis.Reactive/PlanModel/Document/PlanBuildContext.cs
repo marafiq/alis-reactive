@@ -22,8 +22,8 @@ namespace Alis.Reactive.PlanModel.Document
         private readonly List<(Func<PlanObjects, string> On, IReadOnlyList<string> Path, string Event, Block Body)> _handlers =
             new List<(Func<PlanObjects, string>, IReadOnlyList<string>, string, Block)>();
         private readonly HashSet<string> _plugins = new HashSet<string>(StringComparer.Ordinal);
-        private readonly List<(RequestStep Request, FormValidation Validation)> _validatedRequests =
-            new List<(RequestStep, FormValidation)>();
+        private readonly List<(Step Owner, FormValidation Validation)> _validations =
+            new List<(Step, FormValidation)>();
         private readonly Dictionary<string, IReadOnlyList<CheckedField>> _forms =
             new Dictionary<string, IReadOnlyList<CheckedField>>(StringComparer.Ordinal);
         private readonly HashSet<string> _slots = new HashSet<string>(StringComparer.Ordinal);
@@ -165,11 +165,11 @@ namespace Alis.Reactive.PlanModel.Document
             _declaredById.Add(declared.Id, declared);
         }
 
-        internal void ValidateBefore(RequestStep request, FormValidation validation)
+        internal void Validates(Step owner, FormValidation validation)
         {
-            foreach (var (other, otherValidation) in _validatedRequests)
+            foreach (var (other, otherValidation) in _validations)
             {
-                if (other == request || otherValidation.Form != validation.Form) continue;
+                if (other == owner || otherValidation.Form != validation.Form) continue;
                 if (otherValidation.Validator != validation.Validator)
                 {
                     throw new InvalidOperationException(
@@ -186,12 +186,12 @@ namespace Alis.Reactive.PlanModel.Document
                 }
             }
 
-            var index = _validatedRequests.FindIndex(validated => validated.Request == request);
-            if (index < 0) _validatedRequests.Add((request, validation));
-            else _validatedRequests[index] = (request, validation);
+            var index = _validations.FindIndex(validated => validated.Owner == owner);
+            if (index < 0) _validations.Add((owner, validation));
+            else _validations[index] = (owner, validation);
         }
 
-        internal IReadOnlyList<(RequestStep Request, FormValidation Validation)> ValidatedRequests => _validatedRequests;
+        internal IReadOnlyList<FormValidation> Validations => _validations.Select(validated => validated.Validation).ToList();
 
         internal void ShowErrorsOn(string formId)
         {
@@ -200,7 +200,7 @@ namespace Alis.Reactive.PlanModel.Document
         }
 
         internal IReadOnlyList<string> Forms
-            => _validatedRequests
+            => _validations
                 .Select(validated => validated.Validation.Form)
                 .Concat(_forms.Keys)
                 .Distinct(StringComparer.Ordinal)

@@ -112,6 +112,8 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"ordered from the {meal.Menu} menu" });
     }
 
+    public IActionResult FallReport() => View(new FallReport());
+
     public IActionResult Handover() => View(new HandoverNote());
 
     public IActionResult HandoverRefused(HandoverMistake mistake)

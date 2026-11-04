@@ -42,6 +42,10 @@
         }))
         <span id="booked"></span>
         break;
+    case PlanMistake.ShowValidationErrorsOutsideARequest:
+        <form id="visit-form"></form>
+        @(plan.Button("check", "Check the visit").Reactive(button => button.Click, p => p.ValidationErrors("visit-form")))
+        break;
     case PlanMistake.ReadTheResponseInFinally:
         TypedSource<string>? answer = null;
         @(plan.Button("send", "Send").Reactive(button => button.Click, p => p.Post("/Plans/Visits")

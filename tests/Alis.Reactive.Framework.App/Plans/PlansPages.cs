@@ -57,6 +57,7 @@ public enum PlanMistake
     RouteAStatusHttpDoesNotHave,
     ReadAnotherPlansComponent,
     ReadAResponseOutsideItsRoutes,
+    ShowValidationErrorsOutsideARequest,
     ReadTheResponseInFinally,
     LoadTheResponseInFinally,
     RouteASuccessTwice,

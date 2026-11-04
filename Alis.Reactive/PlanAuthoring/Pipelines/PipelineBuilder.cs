@@ -8,6 +8,7 @@ using Alis.Reactive.Members;
 using Alis.Reactive.PlanAuthoring.Pipelines;
 using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Reactions;
+using Alis.Reactive.PlanModel.Requests;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Writing;
 
@@ -231,6 +232,48 @@ namespace Alis.Reactive
         /// <typeparam name="TQuery">The query class.</typeparam>
         /// <returns>The query, whose members are value sources.</returns>
         public UrlQuery<TQuery> Url<TQuery>() where TQuery : class => new UrlQuery<TQuery>();
+
+        /// <summary>
+        /// Checks the form in the browser by <typeparamref name="TValidationSource"/>'s rules, with no request, and shows
+        /// each message as a request that validates the form shows it. The steps after it run whether or not the form is
+        /// valid; to send only a valid form, validate its request: <c>p.Post(url).Validate&lt;TValidator&gt;(formId)</c>.
+        /// </summary>
+        /// <remarks>
+        /// A form is checked by one validator and one rule set: a request or a check that names another pair for the
+        /// same form is refused where the page renders.
+        /// </remarks>
+        /// <typeparam name="TValidationSource">The validator whose rules the form is checked by.</typeparam>
+        /// <param name="formId">The element that holds the form's inputs.</param>
+        /// <returns>This pipeline builder.</returns>
+        public PipelineBuilder<TModel> Validate<TValidationSource>(string formId)
+            where TValidationSource : class
+            => Validate(formId, new FormValidation(source => source.GetBrowserRules<TValidationSource>(), typeof(TValidationSource), formId, ruleSet: null));
+
+        /// <summary>
+        /// Checks the form in the browser by the rules of one set of the validator (<c>RuleSet("Issue", ..)</c>), with
+        /// no request, and shows each message as a request that validates the form by that set shows it. The steps
+        /// after it run whether or not the form is valid. A set the validator does not declare is refused where the
+        /// page renders, naming the declared sets.
+        /// </summary>
+        /// <typeparam name="TValidationSource">The validator whose rules the form is checked by.</typeparam>
+        /// <param name="formId">The element that holds the form's inputs.</param>
+        /// <param name="ruleSet">The set, as the validator's <c>RuleSet</c> named it.</param>
+        /// <returns>This pipeline builder.</returns>
+        public PipelineBuilder<TModel> Validate<TValidationSource>(string formId, string ruleSet)
+            where TValidationSource : class
+        {
+            if (string.IsNullOrWhiteSpace(ruleSet)) throw new ArgumentException("A rule set has a name people read.", nameof(ruleSet));
+            return Validate(formId, new FormValidation(source => source.GetBrowserRules<TValidationSource>(ruleSet), typeof(TValidationSource), formId, ruleSet));
+        }
+
+        private PipelineBuilder<TModel> Validate(string formId, FormValidation validation)
+        {
+            if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
+            var check = new ValidateStep(formId);
+            Context.AddStep(check);
+            Context.Validates(check, validation);
+            return this;
+        }
 
         /// <summary>
         /// Shows the response's validation errors on the form's fields and summary. It belongs inside an

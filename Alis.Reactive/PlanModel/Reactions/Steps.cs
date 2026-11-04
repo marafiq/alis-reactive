@@ -190,10 +190,31 @@ namespace Alis.Reactive.PlanModel.Reactions
 
         internal override void WriteTo(List<Statement> block, Scope scope)
         {
+            if (!scope.HasResponse)
+            {
+                throw new InvalidOperationException(
+                    $"Plan '{scope.PlanId}' shows the validation errors of form '{_form}' outside the routes of a request, so no " +
+                    "response carries them: write ValidationErrors in OnError of the request that receives them, or check the " +
+                    $"form in the browser without a request with Validate<TValidator>(\"{_form}\").");
+            }
+
             var form = G.Obj(scope.Objects.Form(_form));
             var response = scope.Response(ResponseHandle.Innermost);
             block.Add(G.Do(G.Call(form, PathMembers.Required, "showErrors", G.Get(G.Ref(response), new[] { "body" }, Shape.Any, PathMembers.Optional))));
         }
+    }
+
+    internal sealed class ValidateStep : Step
+    {
+        private readonly string _form;
+
+        internal ValidateStep(string form)
+        {
+            _form = form ?? throw new ArgumentNullException(nameof(form));
+        }
+
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.Add(G.Do(G.Call(G.Obj(scope.Objects.Form(_form)), PathMembers.Required, "validate")));
     }
 
     internal sealed class BranchStep : Step

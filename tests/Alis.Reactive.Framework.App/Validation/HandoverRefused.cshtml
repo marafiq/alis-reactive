@@ -30,6 +30,12 @@
             .Gather(g => g.Form())
             .Validate<NoteRules<IncidentNote>>("handover-form")))
         break;
+    case HandoverMistake.CheckedAndHandedOverByTwoValidators:
+        @(plan.Button("check-draft", "Check the draft").Reactive(button => button.Click, p => p.Validate<HandoverDraftRules>("handover-form")))
+        @(plan.Button("hand-over", "Hand over").Reactive(button => button.Click, p => p.Post("/Validation/Handover")
+            .Gather(g => g.Form())
+            .Validate<HandoverRules>("handover-form")))
+        break;
 }
 
 @Html.RenderPlan(plan)

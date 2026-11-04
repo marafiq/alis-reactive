@@ -116,16 +116,14 @@ namespace Alis.Reactive
         {
             _context.DeclareRenderedInputs();
 
-            var validated = _context.ValidatedRequests;
-            var oneByForm = validated
-                .Select(request => request.Validation)
+            var oneByForm = _context.Validations
                 .GroupBy(validation => validation.Form, StringComparer.Ordinal)
                 .Select(sameForm => sameForm.First())
                 .ToList();
             if (oneByForm.Count > 0)
             {
-                var ruleSource = RequireBrowserRuleSource(
-                    _services, CSharpTypeName.Of(validated[0].Validation.Validator), $"Request at '{validated[0].Request.Url}'");
+                var first = oneByForm[0];
+                var ruleSource = RequireBrowserRuleSource(_services, CSharpTypeName.Of(first.Validator), $"Form '{first.Form}'");
                 foreach (var validation in oneByForm)
                 {
                     var fields = validation.Rules(ruleSource);
