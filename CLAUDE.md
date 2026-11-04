@@ -114,10 +114,15 @@ Everything else stays sync.
   through builders (`Html.On`, `Html.InputField`, `p.Get`, `p.When`).
 - The public surface of a shipped package is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`
   (`PublicAPI.Shipped.txt` once released). A public symbol missing from it or a line without a symbol
-  fails the build (RS0016, RS0017); a change to the surface is a reviewed diff of that file.
+  fails the build (RS0016, RS0017); a change to the surface is a reviewed diff of that file. A line
+  leaves that file only when the commit names the door that replaces it (a rename, or the one name
+  that stays when two did the same thing).
+- Never lose typed nature or a feature. Nothing is removed, made internal or loosened to a string
+  because nothing calls it: coverage is never complete, so a member with no caller is unproven, not
+  dead. Prove it with a sandbox page and a Playwright test.
 - Component slices are self-contained. Duplication between slices beats a shared base class.
 - Root cause, not patch. After two failed attempts, stop and research. Leave touched files cleaner:
-  delete dead code and helpers that map to no DSL behavior.
+  delete private helpers no feature reaches.
 - C# 14, compiled for `net48` and `net10.0` (TagHelpers are net10-only). A net48 language error means
   rework to what PolySharp polyfills; host-type splits go behind `#if NET48`.
 
