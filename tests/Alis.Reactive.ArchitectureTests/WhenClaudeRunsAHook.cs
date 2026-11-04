@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
@@ -49,104 +48,6 @@ public class WhenClaudeRunsAHook
 
         Assert.That(handWritten, Is.Not.Empty, $"No hand-written file sits beside the contract in {contractFolder} or shares its names");
         Assert.That(refused, Is.Empty, "A hook refused an edit to a hand-written file:\n" + string.Join("\n", refused));
-    }
-
-    [Test]
-    public void a_raw_test_run_of_the_solution_or_of_each_playwright_project_is_refused()
-    {
-        var (browser, _) = TestProjects();
-        var commands = browser.Select(project => $"dotnet test {project}")
-            .Append("dotnet test")
-            .Append("dotnet test Alis.Reactive.slnx")
-            .ToList();
-        var allowed = commands.Where(command => DecisionFor("Bash", new { command }) != "deny").ToList();
-
-        Assert.That(browser, Is.Not.Empty, "No test project that references Microsoft.Playwright was found");
-        Assert.That(allowed, Is.Empty, "Playwright runs only through scripts/playwright.sh, yet a hook allowed:\n" + string.Join("\n", allowed));
-    }
-
-    [Test]
-    public void a_raw_test_run_of_each_non_browser_project_is_allowed()
-    {
-        var (_, other) = TestProjects();
-        var refused = other.Select(project => $"dotnet test {project}")
-            .Where(command => DecisionFor("Bash", new { command }) == "deny")
-            .ToList();
-
-        Assert.That(other, Is.Not.Empty, "No test project without Microsoft.Playwright was found");
-        Assert.That(refused, Is.Empty, "A hook refused a test project that opens no browser:\n" + string.Join("\n", refused));
-    }
-
-    [Test]
-    public void a_git_stash_in_any_form_is_refused()
-    {
-        string[] commands =
-        [
-            "git stash",
-            "git stash pop",
-            "git stash apply stash@{0}",
-            "git stash drop stash@{0}",
-            "git stash list",
-            "git -C .worktrees/redesign stash push -m wip",
-            "cd tests && git stash",
-            "echo $(git stash list)",
-        ];
-        var allowed = commands.Where(command => DecisionFor("Bash", new { command }) != "deny").ToList();
-
-        Assert.That(allowed, Is.Empty, "stash@{0} holds work that is never popped, applied or dropped, yet a hook allowed:\n" + string.Join("\n", allowed));
-    }
-
-    [Test]
-    public void a_git_command_that_names_a_stash_only_in_its_text_is_allowed()
-    {
-        string[] commands =
-        [
-            "git status",
-            "git log --grep stash",
-            "git commit -m \"stash the draft\"",
-            "git show --stat HEAD",
-        ];
-        var refused = commands.Where(command => DecisionFor("Bash", new { command }) == "deny").ToList();
-
-        Assert.That(refused, Is.Empty, "A hook refused a git command that runs no stash:\n" + string.Join("\n", refused));
-    }
-
-    [Test]
-    public void reading_the_user_secrets_is_refused()
-    {
-        string[] commands =
-        [
-            "dotnet user-secrets list",
-            "dotnet user-secrets list --project Alis.Reactive.SandboxApp",
-            "dotnet user-secrets --project Alis.Reactive.SandboxApp list",
-            "cat ~/.microsoft/usersecrets/alis-sandbox/secrets.json",
-        ];
-        string[] files =
-        [
-            "/Users/dev/.microsoft/usersecrets/alis-sandbox/secrets.json",
-            @"C:\Users\dev\AppData\Roaming\Microsoft\UserSecrets\alis-sandbox\secrets.json",
-        ];
-        var allowed = commands.Where(command => DecisionFor("Bash", new { command }) != "deny")
-            .Concat(files.Where(file => DecisionFor("Read", new { file_path = file }) != "deny").Select(file => "Read " + file))
-            .ToList();
-
-        Assert.That(allowed, Is.Empty, "User secrets are never read, yet a hook allowed:\n" + string.Join("\n", allowed));
-    }
-
-    [Test]
-    public void a_command_or_read_that_names_user_secrets_without_reading_them_is_allowed()
-    {
-        string[] commands =
-        [
-            "git grep -n UserSecretsId",
-            "dotnet user-secrets --help",
-        ];
-        string[] files = [Path.Combine(Repository.Root, "Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj")];
-        var refused = commands.Where(command => DecisionFor("Bash", new { command }) == "deny")
-            .Concat(files.Where(file => DecisionFor("Read", new { file_path = file }) == "deny").Select(file => "Read " + file))
-            .ToList();
-
-        Assert.That(refused, Is.Empty, "A hook refused a command or read that prints no secret:\n" + string.Join("\n", refused));
     }
 
     private static IReadOnlyList<(string Event, string Matcher, string Command)> HookCommands()
@@ -198,28 +99,5 @@ public class WhenClaudeRunsAHook
         var contract = schemas[0][..schemas[0].LastIndexOf('/')] + "/plan.ts";
         Assert.That(Repository.TrackedFiles, Does.Contain(contract), "The generated plan.ts sits beside plan.schema.json");
         return [contract, schemas[0]];
-    }
-
-    private static (IReadOnlyList<string> Browser, IReadOnlyList<string> Other) TestProjects()
-    {
-        var projects = Repository.TrackedFiles.Where(file => file.EndsWith(".csproj", StringComparison.Ordinal)).ToList();
-        var opensABrowser = projects.Where(project => PackagesOf(project).Contains("Microsoft.Playwright")).ToHashSet();
-        var testProjects = projects.Where(project => PackagesOf(project).Contains("Microsoft.NET.Test.Sdk")).ToList();
-        var browser = testProjects.Where(project => opensABrowser.Contains(project) || ProjectsReferencedBy(project).Any(opensABrowser.Contains)).ToList();
-        string Folder(string project) => project[..project.LastIndexOf('/')];
-        return (browser.Select(Folder).ToList(), testProjects.Except(browser).Select(Folder).ToList());
-    }
-
-    private static HashSet<string> PackagesOf(string project)
-        => XDocument.Load(Path.Combine(Repository.Root, project)).Descendants("PackageReference")
-            .Select(reference => (string?)reference.Attribute("Include") ?? "")
-            .ToHashSet(StringComparer.Ordinal);
-
-    private static IEnumerable<string> ProjectsReferencedBy(string project)
-    {
-        var folder = Path.GetDirectoryName(Path.Combine(Repository.Root, project))!;
-        return XDocument.Load(Path.Combine(Repository.Root, project)).Descendants("ProjectReference")
-            .Select(reference => Path.GetRelativePath(Repository.Root, Path.GetFullPath(Path.Combine(folder, (string?)reference.Attribute("Include") ?? "")))
-                .Replace('\\', '/'));
     }
 }

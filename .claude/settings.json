@@ -1,4 +1,24 @@
 {
+  "permissions": {
+    "deny": [
+      "Bash(git stash)",
+      "Bash(git stash *)",
+      "Bash(git -C * stash)",
+      "Bash(git -C * stash *)",
+      "Bash(dotnet user-secrets list)",
+      "Bash(dotnet user-secrets list *)",
+      "Bash(dotnet user-secrets * list)",
+      "Bash(dotnet user-secrets * list *)",
+      "Read(~/.microsoft/usersecrets/**)",
+      "Read(//**/AppData/Roaming/Microsoft/UserSecrets/**)",
+      "Bash(dotnet test)",
+      "Bash(dotnet test .)",
+      "Bash(dotnet test -*)",
+      "Bash(dotnet test *.sln*)",
+      "Bash(dotnet test *PlaywrightTests*)",
+      "Bash(dotnet vstest *)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -17,28 +37,6 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-generated.mjs\""
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-playwright-wrapper.mjs\""
-          },
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-stash-and-secrets.mjs\""
-          }
-        ]
-      },
-      {
-        "matcher": "Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-stash-and-secrets.mjs\""
           }
         ]
       }

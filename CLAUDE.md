@@ -12,8 +12,9 @@ Behavior is done when a Playwright test proves it in a real browser, and not bef
 - A real gesture (click, type, select) and a visible outcome. No `page.evaluate()`, no
   `ej2_instances`, no DOM poking. One exception: gather-pipeline tests may assert `request.PostData`.
 - The test fails when the behavior breaks. Ask what defect would still pass it.
-- Run through `scripts/playwright.sh` on assets built from the current source. A hook blocks raw
-  `dotnet test` on the Playwright project or the solution.
+- Run through `scripts/playwright.sh` on assets built from the current source. A deny rule in
+  `.claude/settings.json` refuses raw `dotnet test` on a Playwright project or the solution; a
+  non-browser project runs when it is named first (`dotnet test tests/Alis.Reactive.ArchitectureTests`).
 - The test rules are `.claude/rules/tests.md`; they load when you open a file under `tests/`.
 
 Playwright is the only verification; everything else is waste as proof. Typecheck, vitest, PlanTests and
@@ -125,8 +126,8 @@ Everything else stays sync.
   behavior so a test passes. A member's real shape comes from the installed package or the vendor's
   source.
 - Never read secrets: no `dotnet user-secrets list`, nothing that prints a secret's value. When a
-  secret may be missing, say so without reading the store. `.claude/hooks/protect-stash-and-secrets.mjs`
-  refuses both.
+  secret may be missing, say so without reading the store. Deny rules in `.claude/settings.json`
+  refuse both.
 - Component slices are self-contained. Duplication between slices beats a shared base class.
 - Root cause, not patch. After two failed attempts, stop and research. Leave touched files cleaner:
   delete private helpers no feature reaches.
@@ -139,7 +140,7 @@ Everything else stays sync.
   `scripts/verify-release-tag.sh` checks it and `.github/workflows/nuget-publish.yml` publishes it.
 - Branch from `origin/main` in a worktree and land by pull request (`feature/`, `fix/`, `chore/`). A
   SessionStart hook installs the pre-commit guard that refuses commits on `main`. `git stash` is never
-  run: `stash@{0}` holds work that stays put, and the same hook refuses it.
+  run: `stash@{0}` holds work that stays put, and a deny rule refuses it.
 
   ```bash
   git worktree add .worktrees/<name> -b feature/<name> origin/main
