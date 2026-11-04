@@ -51,6 +51,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\SmokeModel.cs" />
+    <Compile Include="Models\SmokeModelRules.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +67,7 @@
     <PackageReference Include="AlisReactive.Native" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="AlisReactive.DesignSystem" Version="$(AlisReactiveVersion)" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.22" />
   </ItemGroup>
   <PropertyGroup>
     <AlisReactiveVersion Condition="'$(AlisReactiveVersion)' == ''">1.0.0-rc.1</AlisReactiveVersion>

@@ -16,8 +16,8 @@ Every view, in the sandbox, the test apps and the examples. A view carries no Ja
   them, whichever plan rendered them.
 - Every input goes through `Html.InputField(plan, m => m.X, o => ...)`, with its label and rules; every other
   element a plan names has an id the developer chose.
-- Use the framework, never a workaround: `Html.On` for load, `Html.NativeButton(plan, id, text)` and
-  `.Reactive(evt => evt.Click, ...)` for a button, `.Validate<TValidator>(formId)` for validation,
+- Use the framework, never a workaround: `Html.On` for load, `Html.NativeButton(id, text)` and
+  `.Reactive(plan, evt => evt.Click, (args, p) => ...)` for a button, `.Validate<TValidator>(formId)` for validation,
   `p.Element(id)` for the page's elements, `.Gather(g => g.Form())` for a form's values.
 - Validators register through DI before the view renders; a form's scope is its validator's scope.
 - A page carries only what a real application page would: no echo spans, no debug divs, nothing that exists

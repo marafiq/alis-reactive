@@ -7,8 +7,22 @@
 <h1 id="smoke-heading">net48 Runtime Smoke</h1>
 <p>Classic ASP.NET MVC 5 on real .NET Framework 4.8, consuming the shipped AlisReactive net48 packages.</p>
 
-@{ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
-    .NativeTextBox(b => b.Placeholder("Type your name")); }
+<div id="smoke-form">
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
+        .NativeTextBox(b => b.Placeholder("Type your name")); }
+</div>
+
+<div style="margin-top: 1rem;">
+    @(Html.NativeButton("save-name", "Save the name")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post(Url.Action("Save", "Home"))
+             .Gather(g => g.Form("smoke-form"))
+             .Validate<SmokeModelRules>("smoke-form")
+             .Response(r => r.OnSuccess(s => s.Element("save-status").Text.Set("The server saved the name.")));
+        }))
+    <span id="save-status"></span>
+</div>
 
 <div style="margin-top: 1rem;">
     @{ Html.InputField(plan, m => m.ShowDetails, o => o.Label("Show the proof"))

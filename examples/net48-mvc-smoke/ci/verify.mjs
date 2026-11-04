@@ -34,8 +34,19 @@ if (await proof.isVisible()) throw new Error('#reactive-proof is visible before 
 await page.locator('input[type=checkbox]').first().check();
 await proof.waitFor({ state: 'visible', timeout: 10000 });
 
+const save = page.getByRole('button', { name: 'Save the name' });
+const refusal = page.getByText('Enter your name.', { exact: true });
+const saved = page.getByText('The server saved the name.', { exact: true });
+await save.click();
+await refusal.waitFor({ state: 'visible', timeout: 10000 });
+if (await saved.isVisible()) throw new Error('The empty name reached the server: the rules of the validator registered through DependencyResolver did not run in the browser.');
+await page.getByLabel('Name', { exact: true }).fill('Ada Lovelace');
+await save.click();
+await saved.waitFor({ state: 'visible', timeout: 10000 });
+if (await refusal.isVisible()) throw new Error('The refusal stayed after a valid name was saved.');
+
 await page.screenshot({ path: shot, fullPage: true });
-console.log('PASS: net48 runtime booted and the reactive reaction ran (#reactive-proof shown after checkbox toggle).');
+console.log('PASS: net48 runtime booted, the reactive reaction ran, the browser refused an empty name with the rule of a validator registered through DependencyResolver, and the server saved a valid one.');
 if (consoleErrors.length) console.log('Browser console errors (non-fatal):\n  ' + consoleErrors.join('\n  '));
 
 await browser.close();
