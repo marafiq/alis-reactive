@@ -24,12 +24,13 @@ this with less:
 4. **Types.** Nothing loses a type. No string names a member, field, event, method or path (analyzer
    ALIS009). Invalid states are unrepresentable rather than refused at runtime.
 5. **Simplicity.** The smallest design that fully works: fewer types, files, layers and concepts.
-   Delete before adding. Residue (dead code, a helper for no behavior, a name that lies) goes.
-6. **Proof.** It can be proven by tests that meet `.claude/memory/framework-test-principles.md`.
+   Delete before adding. Residue (a private helper no feature reaches, a name that lies) goes; a
+   feature never goes because nothing calls it (root CLAUDE.md, Rules).
+6. **Proof.** It can be proven by tests that meet `.claude/rules/tests.md`.
 7. **Production grade.** It holds on net48 and net10, fails loud at real boundaries, and a new
    engineer could take it to production from its docs.
 
-Read the root `CLAUDE.md`, `.claude/memory/coding-principles.md` and the design docs the brief names
+Read the root `CLAUDE.md`, `.claude/rules/csharp.md` and the design docs the brief names
 before you design.
 
 ## Scope

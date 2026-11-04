@@ -1,30 +1,9 @@
 # Playwright Behavior Tests
 
-Root CLAUDE.md is authoritative. Read `.claude/memory/bdd-principles.md` before writing or
-modifying any test here. Fixtures are C#: `.claude/memory/coding-principles.md` applies to
-them like any production code.
+Root CLAUDE.md is authoritative; the test rules are `.claude/rules/tests.md`. This project proves the
+shipped components and the sandbox journeys.
 
-## What a test is
-
-One user-visible behavior, full stack: the view renders the plan, the runtime
-boots it, a real gesture happens, the browser visibly changes. Isolated (fresh
-navigation, no ordering, no shared state), vertical (no mocking), behavior-named
-(one sentence the user role would say). A suite derives from one senior-living
-journey and owns its nested slice — model, view, fixture
-(`.claude/memory/bdd-principles.md` → Nested Vertical Slices).
-
-## Non-negotiables
-
-- Real gestures only. No `page.evaluate()`, no `ej2_instances`, no DOM poking.
-  One exception: framework gather-pipeline tests may assert `request.PostData`.
-- Unhappy-path criteria are mandatory. A suite that only proves the happy path
-  passes while the feature lies. Every assertion must be unsatisfiable by the
-  defect it guards — ask "what failure would still pass this test?"
-- Eyes before automation. Observe the behavior in a real browser before writing
-  the test that pins it.
-- Deterministic and hermetic. A test owns its world — per-page world keys, no
-  process-global flags, no dependence on ambient server events. If a test
-  passes only in isolation or only in sequence, it is broken.
+- A test never depends on ambient server events.
 - Locators: prefer `PagePlan<TModel>` expressions (`Locators/`); raw locators only for
   explicit-ID elements.
 
@@ -33,12 +12,12 @@ journey and owns its nested slice — model, view, fixture
 Triage in order: is the criterion right, the arrangement right, the tooling
 right? All yes → verify manually in browser to classify locator bug vs app bug.
 Locator bugs are fixed in `Locators/`, app bugs in the app.
-Never hack the test to pass. After two fail-fix rounds, stop coding and
-research.
+Never hack the test to pass. Research a Syncfusion behavior with
+`[component] [framework] playwright [behavior]`; Chrome MCP tools behave
+differently from Playwright, so debug a Syncfusion component with a
+Playwright diagnostic test, not by clicking in Chrome.
 
 ## Running
 
-Always through `scripts/playwright.sh` (use `--filter` to focus). It rejects
-stale browser assets — rebuild runtime assets after any TS change. Raw
-`dotnet test` on this project is unsupported. Never kill the sandbox by process
-name; a parallel suite may own a sibling instance — kill by port.
+`scripts/playwright.sh` (use `--filter` to focus) rejects stale browser assets:
+run `scripts/build.sh` after any TS change.

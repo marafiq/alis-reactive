@@ -3,11 +3,11 @@
     <File Path="CLAUDE.md" />
     <File Path=".claude/settings.json" />
   </Folder>
-  <Folder Name="/.claude/memory/">
-    <File Path=".claude/memory/bdd-principles.md" />
-    <File Path=".claude/memory/coding-principles.md" />
-    <File Path=".claude/memory/docs-principles.md" />
-    <File Path=".claude/memory/framework-test-principles.md" />
+  <Folder Name="/.claude/rules/">
+    <File Path=".claude/rules/csharp.md" />
+    <File Path=".claude/rules/docs.md" />
+    <File Path=".claude/rules/tests.md" />
+    <File Path=".claude/rules/views.md" />
   </Folder>
   <Folder Name="/docs/">
     <File Path="docs/design/grammar.md" />

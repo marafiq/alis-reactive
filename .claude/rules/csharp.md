@@ -1,24 +1,16 @@
 ---
-name: Coding Principles
-description: Consolidated principles for Alis.Reactive development — API surface, fail-fast, plan-render, research discipline, secrets, validation design, and session mistake patterns
-type: reference
+paths:
+  - "**/*.cs"
 ---
 
-# Coding Principles
+# C#
 
-## The Public Surface Is Reviewed
+## The public surface
 
-The public surface of a shipped package is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`
-(root CLAUDE.md): a public symbol added, removed or changed without that text fails the build (RS0016,
-RS0017), so every surface change is a diff a reviewer reads.
-
-- Before any change: grep all call sites, read every affected file, present evidence.
+- Before a change to the surface, read every caller and every affected file.
 - Making an internal member public widens the surface: it needs the same reason and review as any
-  other surface change.
+  other surface change (root CLAUDE.md, Rules).
 - Fusion HtmlExtension methods use the `Fusion` prefix (e.g., `.FusionDropDownList()`).
-- An event payload is a class deriving `JsObject`: `ReadOnly<T>` for what it carries, `Property<T>` for
-  what the vendor reads back (`Alis.Reactive.Fusion/CLAUDE.md`). "Gets" voice in XML docs.
-- No "Syncfusion" prefix in XML docs — use framework class names (e.g., "FusionAutoComplete").
 
 Callback parameter naming convention (locked):
 
@@ -44,45 +36,6 @@ values propagate silently. A fallback is a rare, deliberate, justified exception
 - If a third-party library lacks the interface you need, write your own.
 - If it feels like a workaround, it IS a workaround — find the clean solution.
 
-## Plan-Render Rule
-
-Every view that starts a plan MUST call `@Html.RenderPlan(plan)`.
-
-- `ReactivePlan<T>()` is the one plan call: a page, and a partial with its own model, each start a plan
-  with it (ADR-0003 rule 3). Every plan stands alone; the plan id keys nothing.
-- A partial's inputs join the page's forms by the ids their members give them and by the element that
-  holds them, whichever plan rendered them.
-
-The runtime discovers every `[data-reactive-plan]` block and starts it under its owner (the page, or the
-slot whose element holds its script). Without RenderPlan, entries are lost: components register but
-reactive behaviors (conditions, HTTP, validation) never serialize.
-
-No manual JS in views. No `document.addEventListener` in `.cshtml`. No `window.alis`.
-No inline `<script>` blocks. `root.ts` handles discovery and boot automatically.
-
-## Research Before Iterate
-
-After 2 rounds of fail-fix-fail, STOP coding and use WebSearch.
-
-The loop:
-1. Run 1 failing test.
-2. See the error.
-3. Check browser / find where same pattern works.
-4. Make the change.
-5. Run that 1 test.
-6. If fail, go back to step 2.
-7. After 2 rounds of fail: research on the internet.
-
-Search for: `[component name] [framework] playwright [specific behavior]`.
-Chrome MCP tools behave differently from Playwright — do not trust MCP for SF component
-debugging. Run Playwright diagnostic tests instead of manual browser clicking for SF components.
-
-## Never Read Secrets
-
-Never run `dotnet user-secrets list` or any command that reads/displays secret values.
-When the user says a secret is set up, trust them and move on. If something fails due to
-a missing secret, mention the possibility without reading the secret store.
-
 ## Validation Design
 
 The reference is `docs/design/grammar.md` section 7: the validator grammar (`ReactiveValidator<T>`, FluentValidation's
@@ -105,7 +58,8 @@ what it is. The principles that hold:
 
 ## Code Hygiene — Worked Examples
 
-Revealing names, variables close to use, no nesting, no dead code, small single-purpose methods.
+Revealing names, variables close to use, no nesting, no private code no feature reaches, small
+single-purpose methods.
 These are the worked examples.
 
 **Revealing names over complex conditions.** Extract boolean expressions into named

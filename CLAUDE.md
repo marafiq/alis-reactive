@@ -14,20 +14,13 @@ Behavior is done when a Playwright test proves it in a real browser, and not bef
 - The test fails when the behavior breaks. Ask what defect would still pass it.
 - Run through `scripts/playwright.sh` on assets built from the current source. A hook blocks raw
   `dotnet test` on the Playwright project or the solution.
-- Read `.claude/memory/bdd-principles.md` before writing a test.
-  `tests/Alis.Reactive.PlaywrightTests/CLAUDE.md` has the local rules.
+- The test rules are `.claude/rules/tests.md`; they load when you open a file under `tests/`.
 
-Playwright is the only verification; everything else is waste as proof. Typecheck, vitest and
+Playwright is the only verification; everything else is waste as proof. Typecheck, vitest, PlanTests and
 `dotnet build` are feedback while coding, nothing more. Do not build other gates, coverage maps,
 checklists or proof artifacts. A done report names the Playwright run and the line of output that
 proves it, and says plainly what was not exercised. net48 is proven only by the `verify-net48` CI
 run.
-
-Tests of the framework itself follow `.claude/memory/framework-test-principles.md`: one promise per
-test, arranged through the public surface, against a real browser and a real server, with no test
-doubles and no component library on the page. Read it before writing or judging a framework test.
-`tests/Alis.Reactive.PlanTests` and the runtime's vitest suites do not meet it yet (they assert
-recorded plans, or run in jsdom with stubs), so they are feedback while coding, like typecheck.
 
 ```bash
 scripts/playwright.sh --filter "FullyQualifiedName~Components.Fusion.Grid"  # focused proof
@@ -54,7 +47,8 @@ by the typed SDK that already exists (read the source; it is rich), not by old d
 old artifact-gated onboarding pipeline was removed on purpose; do not rebuild it. Design:
 `docs/design/bring-your-own-component.md`. A component, shipped or brought, is one declaration
 class (members and events by their JavaScript names) and a render helper, built on the core's
-public surface, with zero TypeScript runtime changes.
+public surface, with zero TypeScript runtime changes: a component that seems to need one means the
+plan is missing information, and the C# side carries it.
 
 ## Architecture
 
@@ -120,6 +114,16 @@ Everything else stays sync.
 - Never lose typed nature or a feature. Nothing is removed, made internal or loosened to a string
   because nothing calls it: coverage is never complete, so a member with no caller is unproven, not
   dead. Prove it with a sandbox page and a Playwright test.
+- Comments are exceptional. Make the code say it: a name, an extracted function, a guard at the
+  boundary. Keep a comment only for what code cannot show (a vendor or protocol quirk, a spec
+  citation). A comment a change makes false or redundant is deleted, not reworded. XML docs on the
+  public surface are the developer's IntelliSense and follow `.claude/rules/docs.md`.
+- Raise a gap, never invent. When a view, component or test needs a door the DSL or the vendor's
+  public API lacks, name the gap with its use case; never invent a member, a syntax or a runtime
+  behavior so a test passes. A member's real shape comes from the installed package or the vendor's
+  source.
+- Never read secrets: no `dotnet user-secrets list`, nothing that prints a secret's value. When a
+  secret may be missing, say so without reading the store.
 - Component slices are self-contained. Duplication between slices beats a shared base class.
 - Root cause, not patch. After two failed attempts, stop and research. Leave touched files cleaner:
   delete private helpers no feature reaches.
@@ -137,6 +141,16 @@ Everything else stays sync.
   git worktree add .worktrees/<name> -b feature/<name> origin/main
   ```
 
+- A unit of work moves through five states. Each exit shows in git or a run's log, never in a
+  checklist or an artifact:
+  1. Restate the goal in your own words; a new direction waits for the owner's yes.
+  2. Read every file the unit touches, whole, at HEAD.
+  3. Change.
+  4. Prove. Behavior: a `scripts/playwright.sh` result line, the test first failing on a planted
+     defect. Rules and docs: each rule found in one file, every removed line traced to its home. A
+     failure goes back to 3, twice at most; then stop and research.
+  5. Commit one unit: what changed, the proof line, what was not exercised. Work an agent finished
+     is landed or dropped, with the reason, in the same session.
 - A review names the branch and HEAD SHA it read. A finding counts only if its `file:line` exists
   at HEAD.
 - `scripts/doctor.sh` (preflight), `scripts/build.sh`, `scripts/run.sh` (sandbox at
@@ -148,9 +162,9 @@ Everything else stays sync.
 ## Local guidance
 
 The code and its XML docs are the reference: read the declaration, the builder and a sandbox
-page before writing a view, a component or a test. Conventions with worked examples: `.claude/memory/coding-principles.md` (C# naming, callback
-parameter names, fail-fast), `.claude/memory/docs-principles.md` (docs voice) and
-`.claude/memory/bdd-principles.md` (Playwright BDD rules).
+page before writing a view, a component or a test.
 
-`CLAUDE.md` files in the runtime, Fusion, sandbox and Playwright test directories add local rules
-when you work there; this file wins on conflict. `AGENTS.md` is a symlink to this file.
+Rules for one kind of file live in `.claude/rules/` and load when you open such a file: `tests.md`
+(files under `tests/`), `views.md` (`.cshtml`), `csharp.md` (`.cs`) and `docs.md` (docs, Markdown and
+XML docs). `CLAUDE.md` files in the runtime, Fusion, sandbox and test folders hold what is true of
+that folder. This file wins on conflict. `AGENTS.md` is a symlink to this file.

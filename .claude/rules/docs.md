@@ -1,8 +1,11 @@
 ---
-name: docs-principles
-description: Consolidated documentation and XML docs writing principles — voice, structure, style, and verification
-type: reference
+paths:
+  - "docs/**"
+  - "**/*.md"
+  - "**/*.cs"
 ---
+
+# Docs and XML docs
 
 ## Dev-Facing Voice
 
@@ -13,7 +16,7 @@ Write from the developer's perspective. The developer reads docs to understand w
 - No implementation details in summary/remarks: script tags, data attributes, hidden divs, THelper closure, HtmlEncoder belong in code comments, not XML docs.
 - "C# Fluent Builders" not "C# Modules" or "C# DSL". Framework users write fluent C# to express intent.
 - "boot" not "auto-boot". Do not leak implementation module names.
-- Avoid "parent/child" jargon. Use "view" and "partial view" (concrete ASP.NET terms). Say "owning view" if you must distinguish.
+- Avoid jargon; prefer the concrete ASP.NET terms developers already know: "view" and "partial view", not "parent/child". Say "owning view" if you must distinguish.
 - Use plain English. "open and close" not "bookend". Lead with common words.
 
 ## Question-Driven Structure
@@ -36,7 +39,7 @@ Cascade examples use real Gather pattern (`Patterns/BedAssignment/Index.cshtml:3
 
 "If you get anything wrong in terms of syntax or explanation, users will not use it. It will never come back."
 
-## XML Docs: 12-Point Voice Rules
+## XML docs
 
 1. `<summary>` = dev language always. `<remarks>` = can go deeper but frame as "what this means for you".
 2. Code comments (`//`) inside method bodies CAN speak internal language -- they target maintainers.
@@ -44,12 +47,8 @@ Cascade examples use real Gather pattern (`Patterns/BedAssignment/Index.cshtml:3
 4. Do not document `this` param on single-param extensions. When other params exist, include `html` minimally to avoid CS1573.
 5. Code comments must be truthful. Research actual behavior before writing.
 6. No em-dashes in XML docs. Rider grammar linter flags them as redundant punctuation. Use colons or restructure.
-7. Run Rider diagnostics on every file touched before committing.
-8. When launching doc agents, the FIRST instruction must be: read `.claude/memory/docs-principles.md`. Do not bury it in a setup section.
-9. No "runtime" in summaries or remarks (see Dev-Facing Voice above).
-10. No implementation details in summaries (see Dev-Facing Voice above).
-11. Avoid jargon; prefer concrete ASP.NET terms developers already know.
-12. Use plain English; lead with common words.
+7. "Gets" voice for a property; framework class names, never a "Syncfusion" prefix (e.g., "FusionAutoComplete").
+8. A doc agent's brief names `.claude/rules/docs.md` first, before any setup.
 
 ## Workflow
 

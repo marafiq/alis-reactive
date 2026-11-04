@@ -2,7 +2,7 @@
 
 Root CLAUDE.md is authoritative.
 
-**Status:** these tests do not meet `.claude/memory/framework-test-principles.md`: no browser runs
+**Status:** these tests do not meet `.claude/rules/tests.md`: no browser runs
 the plan, and the goldens assert the plan JSON, which a behavior-keeping refactor changes. They are
 feedback while coding; the refusal tests are the closest to the rules, since a refusal's message is
 what a developer sees.

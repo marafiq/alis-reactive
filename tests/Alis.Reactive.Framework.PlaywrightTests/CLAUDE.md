@@ -1,11 +1,10 @@
 # Framework Playwright tests
 
-Root CLAUDE.md is authoritative. These tests prove the framework itself, and they follow
-`.claude/memory/framework-test-principles.md`, not the component rules in `bdd-principles.md`.
+Root CLAUDE.md is authoritative. These tests prove the framework itself: `.claude/rules/tests.md`,
+its Framework tests section included.
 
 - The app is `tests/Alis.Reactive.Framework.App`: the core (validation included), and the components
-  of `docs/design/framework-test-components.md`, brought the way any app brings one. No component
-  library, no test doubles, no log-line assertions. It consumes the design system as an app does (the
+  of `docs/design/framework-test-components.md`, brought the way any app brings one. It consumes the design system as an app does (the
   compiled default linked, the theme in its own Tailwind build, `alis-root` on `body`); `/Validation/Notice`
   renders on `_CoreOnly`, the core's stylesheet alone, for the promise that a refusal is complete without one.
 - A fixture derives from `AppPageTest` and opens its page with `Open(path)`. A slice's fixture sits at

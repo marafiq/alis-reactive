@@ -205,7 +205,7 @@ until proven otherwise. The convention:
    quarantines must show the shard's test count dropping by exactly the quarantined tests.
 3. Quarantine expires after **14 days**: fix and remove the category, or delete the test with the
    reason in the commit. A quarantined test is never `[Ignore]`d and never has its assertions
-   weakened (BDD Rule 3, `.claude/memory/bdd-principles.md`).
+   weakened (rules 5 and 8, `.claude/rules/tests.md`).
 
 | Test (FQN) | Issue | Quarantined on | Expires | Owner |
 |------------|-------|----------------|---------|-------|

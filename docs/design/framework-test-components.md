@@ -13,7 +13,7 @@ Where they live: `tests/Alis.Reactive.Framework.App/Components/<Name>/` (declara
 and TypeScript together). Their tests: `tests/Alis.Reactive.Framework.PlaywrightTests`, one vertical
 slice per framework area, mirroring the app's slice folders. A component grows the members a slice needs
 when that slice lands, so no member exists without the test that proves it. The rules every test follows:
-`.claude/memory/framework-test-principles.md`.
+`.claude/rules/tests.md`.
 
 ## What the components must be
 
