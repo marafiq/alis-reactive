@@ -25,7 +25,3 @@ Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
 
 tests/Alis.Reactive.Framework.App/wwwroot/js/
 tests/Alis.Reactive.Framework.App/wwwroot/css/
-examples/resident-intake/wwwroot/css/app.css
-examples/resident-intake/wwwroot/vendor/
-examples/resident-intake/ci/app.log
-examples/resident-intake/ci/smoke.png

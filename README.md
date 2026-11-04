@@ -10,8 +10,7 @@ any JavaScript component (Syncfusion, native inputs, their own) through one type
 
 **Start here.**
 
-- **Using the packages:** reference them and register them ([In your application](#in-your-application));
-  `examples/resident-intake` is a complete app built only from the packed packages.
+- **Using the packages:** reference them and register them ([In your application](#in-your-application)).
 - **Working on the framework:** `scripts/doctor.sh`, `scripts/build.sh`, `scripts/run.sh`, then open
   http://localhost:5220 ([Getting started](#getting-started)).
 
@@ -35,7 +34,7 @@ multi-target **`net48` and `net10.0`** — the *same* DSL on both runtimes (brid
 ### In your application
 
 Register the packages you use in `Program.cs` (MVC 5 on net48: in `Global.asax` or your container's
-startup). `examples/resident-intake/Program.cs` is the worked example.
+startup).
 
 ```csharp
 using Alis.Reactive;
@@ -71,13 +70,12 @@ The sandbox's home page is the index of its pages. Each script prints its option
 `npm run build:packages` builds the runtime bundle into `Alis.Reactive.Assets/dist/` and the design
 system's compiled default into `Alis.Reactive.DesignSystem/dist/` (both gitignored); `npm run build:all`
 also builds the sandbox's own assets. Every app builds its own in its `dotnet build`, after the design
-system copies the theme in: the sandbox, the framework test app and the example. Each package ships
+system copies the theme in: the sandbox and the framework test app. Each package ships
 its own files the way a Razor class library does: as static web assets.
 
 | Consumer | How it gets the files |
 |----------|-----------------------|
 | **Sandbox** | Project references. In Development the app serves each file at `~/_content/{PackageId}/...` from where npm wrote it, so a watcher's rebuild shows on the next request |
-| `examples/resident-intake` | Package references from `./nupkgs`, as an app outside this repository: `scripts/example.sh` packs, builds it against that version and runs it; `--smoke` drives it in a browser, as the gate's `example` job does |
 | **ASP.NET Core app (net10.0)** | Package references. The same `~/_content/{PackageId}/...` paths; publish copies the files under `wwwroot/_content/` |
 | **ASP.NET MVC 5 app (net48)** | Package references. Each package's `build\net48\{PackageId}.targets` copies its files into the web project at `Content\{PackageId}\` after every build |
 
@@ -167,8 +165,8 @@ markup, and the brand on Syncfusion components, all scoped to `.alis-root`.
    ```
 
    Build with Tailwind's CLI (`npx @tailwindcss/cli -i Styles/app.css -o wwwroot/css/app.css --minify`)
-   after the first `dotnet build`, and link the output last. The sandbox, the framework test app and
-   `examples/resident-intake` do exactly this.
+   after the first `dotnet build`, and link the output last. The sandbox and the framework test app do
+   exactly this.
 
 The cascade: every framework stylesheet opens with `@layer theme, base, alis, components, utilities;`
 and keeps its looks in `alis`, so Tailwind's Preflight sits below them and your utilities above; a state
@@ -206,10 +204,10 @@ The framework's stylesheets style the defaults; an app that renames styles its o
 | `Alis.Reactive.DesignSystem/` | The design system: a Tailwind theme and its compiled default stylesheet, built in its own npm workspace, no C# |
 | `Alis.Reactive.Assets/` | The TypeScript runtime and the framework's own component code, an npm workspace that esbuild bundles into `AlisReactive` (its `.csproj` compiles nothing; it shows the workspace in the solution) |
 | `Alis.Reactive.SandboxApp/` | The development workbench: one page per primitive or component, driven by the Playwright tests |
-| `examples/` | `resident-intake`, an app built only from the packed packages; `net48-mvc-smoke`, the MVC 5 app CI runs under IIS Express |
+| `examples/` | `net48-mvc-smoke`, the MVC 5 app CI runs under IIS Express |
 | `tests/` | The test projects (Playwright, NUnit, analyzers, architecture) and the apps they drive |
 | `tools/` | `PlanContractGenerator`, which writes the runtime's `plan.ts` and `plan.schema.json` from the C# grammar |
-| `scripts/` | The command-line wrappers: doctor, build, run, test, Playwright, pack, example; each prints its options with `--help` |
+| `scripts/` | The command-line wrappers: doctor, build, run, test, Playwright, pack; each prints its options with `--help` |
 | `build/` | MSBuild targets: the two the packages ship (static web assets, the net48 `Content` copy) and the one the repo's apps use to build their browser assets |
 | `.github/` | CI workflows, Dependabot and release notes |
 | `.claude/`, `CLAUDE.md`, `AGENTS.md` | The rules, principles and hooks every contributor and coding agent follows (`AGENTS.md` links to `CLAUDE.md`) |

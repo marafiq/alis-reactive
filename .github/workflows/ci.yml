@@ -13,7 +13,6 @@ on:
       - 'Alis.Reactive.Analyzers/**'
       - 'Alis.Reactive.SandboxApp/**'
       - 'tests/**'
-      - 'examples/resident-intake/**'
       - 'build/**'
       - 'Alis.Reactive.slnx'
       - 'Directory.Build.props'

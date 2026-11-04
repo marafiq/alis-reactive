@@ -9,7 +9,6 @@ const NUGET_IDS = ["Syncfusion.EJ2.AspNet.Core", "Syncfusion.EJ2.MVC5"];
 const UMBRELLA = "@syncfusion/ej2";
 const APPS = [
   { manifest: "Alis.Reactive.SandboxApp/package.json", lock: "package-lock.json" },
-  { manifest: "examples/resident-intake/package.json", lock: "examples/resident-intake/package-lock.json" },
 ];
 
 function readJson(path) {
