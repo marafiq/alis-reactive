@@ -72,6 +72,71 @@ public sealed class WhenACheckWaits : AppPageTest
     }
 
     [Test]
+    public async Task a_check_that_waits_is_handed_the_cancellation_its_validation_was_given()
+    {
+        await Open("/Validation/RoomMove");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Call off the room book", Exact = true }).ClickAsync();
+        await Expect(Saved).ToHaveTextAsync("The room book was called off.");
+
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("Ada moved to E-14");
+    }
+
+    [Test]
+    public async Task a_check_that_waits_in_a_child_validator_answers_beside_the_childs_member()
+    {
+        await Open("/Validation/RoomMove");
+
+        await Write("Escort's badge", "V-0");
+        await Save();
+        await Expect(Field("Escort's badge").GetByText("Badge V-0 is revoked.", new() { Exact = true })).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make a check that waits, so the request goes");
+
+        await Write("Escort's badge", "V-2");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("Ada moved to E-14");
+    }
+
+    [Test]
+    public async Task a_check_that_waits_on_each_item_of_a_list_answers_beside_the_item_it_refuses()
+    {
+        await Open("/Validation/RoomMove");
+
+        await Write("Second box", "Box-9");
+        await Save();
+        await Expect(Field("Second box").GetByText("The store has no room for Box-9.", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(Field("First box").GetByText("The store has no room for")).ToBeHiddenAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the browser does not make a check that waits, so the request goes");
+
+        await Write("Second box", "Box-3");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("Ada moved to E-14");
+    }
+
+    [Test]
+    public async Task asked_without_waiting_a_validator_whose_child_validator_waits_refuses_and_names_the_checks_that_wait()
+    {
+        await Open("/Validation/RoomMove");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save the escort without waiting", Exact = true }).ClickAsync();
+
+        await Expect(Saved).ToHaveTextAsync("EscortedRoomMoveRules has a rule that waits (MustAsync, CustomAsync or WhenAsync); validate with ValidateAsync.");
+    }
+
+    [TestCase("AfterMustAsync")]
+    [TestCase("AfterCustomAsync")]
+    [TestCase("UnderWhenAsync")]
+    public async Task dependent_rules_after_a_rule_that_waits_are_refused_where_the_page_reads_the_rules(string dependents)
+    {
+        await Page.GotoAsync($"{BaseUrl}/Validation/RoomMove?dependents={dependents}");
+
+        await Expect(Page.GetByText(
+            "DependentRules follows a rule on 'Room' that waits (MustAsync, CustomAsync or WhenAsync), and a condition does not wait: " +
+            "write the dependent rules under WhenOnServer with the same test.").First).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task asked_without_waiting_the_validator_refuses_and_names_the_checks_that_wait()
     {
         await Open("/Validation/RoomMove");

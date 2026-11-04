@@ -380,7 +380,11 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"saved {nameplate.Resident}" });
     }
 
-    public IActionResult RoomMove() => View(new RoomMove());
+    public IActionResult RoomMove(RoomMoveDependents dependents = RoomMoveDependents.None)
+    {
+        ViewData["Dependents"] = dependents;
+        return View(new RoomMove());
+    }
 
     [HttpPost("/Validation/RoomMove")]
     public async Task<IActionResult> MoveRoom([FromBody] RoomMove move, [FromServices] RoomMoveRules rules, CancellationToken cancellation)
@@ -389,6 +393,36 @@ public sealed class ValidationController : Controller
         if (!result.IsValid)
             return BadRequest(new { errors = result.ErrorsByField });
         return Json(new Booked { Summary = $"{move.Resident} moved to {move.Room}" });
+    }
+
+    [HttpPost("/Validation/RoomMoveCalledOff")]
+    public async Task<IActionResult> MoveRoomCalledOff([FromBody] RoomMove move, [FromServices] RoomMoveRules rules)
+    {
+        using var calledOff = new CancellationTokenSource();
+        calledOff.Cancel();
+        try
+        {
+            var result = await rules.ValidateAsync(move, calledOff.Token);
+            return Json(new Booked { Summary = result.IsValid ? "checked" : "refused" });
+        }
+        catch (OperationCanceledException)
+        {
+            return Json(new Booked { Summary = "The room book was called off." });
+        }
+    }
+
+    [HttpPost("/Validation/EscortWithoutWaiting")]
+    public IActionResult SaveEscortWithoutWaiting([FromBody] RoomMove move, [FromServices] EscortedRoomMoveRules rules)
+    {
+        try
+        {
+            rules.Validate(move);
+            return Json(new Booked { Summary = "saved" });
+        }
+        catch (InvalidOperationException refused)
+        {
+            return Json(new Booked { Summary = refused.Message });
+        }
     }
 
     [HttpPost("/Validation/RoomMoveWithoutWaiting")]
