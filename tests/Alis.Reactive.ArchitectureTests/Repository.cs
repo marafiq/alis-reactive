@@ -7,11 +7,13 @@ internal static class Repository
 {
     internal static readonly string Root = Find(AppContext.BaseDirectory);
 
+    private static readonly Lazy<IReadOnlyList<string>> Tracked = new(ListTrackedFiles);
+
     /// <summary>
     /// The files git tracks that are on disk, by their path from the root with '/' between folders. A worktree under
     /// the root is another checkout, never the code.
     /// </summary>
-    internal static readonly IReadOnlyList<string> TrackedFiles = ListTrackedFiles();
+    internal static IReadOnlyList<string> TrackedFiles => Tracked.Value;
 
     private static string Find(string from)
     {

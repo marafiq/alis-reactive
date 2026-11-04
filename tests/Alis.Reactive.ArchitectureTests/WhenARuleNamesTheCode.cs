@@ -88,7 +88,8 @@ public class WhenARuleNamesTheCode
         var audit = Findings.Value;
         var problems = NotInTheRepo.Where(entry => !audit.Listed.Contains(entry))
             .Select(entry => $"`{entry}` is cited by no rule; delete it from the list")
-            .Concat(NotInTheRepo.Where(IsInTheRepo).Select(entry => $"`{entry}` is in the repo; delete it from the list"))
+            .Concat(NotInTheRepo.Except(WhatTheRulesForbid).Where(IsInTheRepo).Select(entry => $"`{entry}` is in the repo; delete it from the list"))
+            .Concat(WhatTheRulesForbid.Where(IsInTheRepo).Select(entry => $"`{entry}` is in the code, which a rule forbids; change the code, not the list"))
             .ToList();
 
         AssertNone(problems, "The list of what rules cite from outside the repo holds only what a rule cites and the repo lacks:");
