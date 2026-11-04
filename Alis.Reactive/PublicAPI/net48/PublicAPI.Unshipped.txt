@@ -34,6 +34,15 @@ Alis.Reactive.BrowserFile.Type.set -> void
 Alis.Reactive.BrowserRule
 Alis.Reactive.BrowserRule.IsUnconditional.get -> bool
 Alis.Reactive.BrowserRule.Message.get -> string!
+Alis.Reactive.BrowserRule.When(Alis.Reactive.Condition! condition) -> Alis.Reactive.BrowserRule!
+Alis.Reactive.BrowserRuleSet
+Alis.Reactive.BrowserRuleSet.Add(System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserField!>! fields, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.Add(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.BrowserRule! rule) -> void
+Alis.Reactive.BrowserRuleSet.Add(System.Linq.Expressions.LambdaExpression! owner, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserField!>! fields, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.AddItemRules(System.Linq.Expressions.LambdaExpression! collection, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserRule!>! rules, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.AddItems(System.Linq.Expressions.LambdaExpression! collection, System.Collections.Generic.IEnumerable<Alis.Reactive.BrowserField!>! itemFields, Alis.Reactive.Condition! when) -> void
+Alis.Reactive.BrowserRuleSet.BrowserRuleSet() -> void
+Alis.Reactive.BrowserRuleSet.Fields.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
 Alis.Reactive.ChildElement
 Alis.Reactive.ChildElement.GetAttribute(string! name) -> string?
 Alis.Reactive.ChildElement.HasAttribute(string! name) -> bool
@@ -52,6 +61,7 @@ Alis.Reactive.CustomContext<T>.AddFailure<TMember>(System.Linq.Expressions.Expre
 Alis.Reactive.CustomContext<T>.Model.get -> T
 Alis.Reactive.ComponentVendor
 Alis.Reactive.ComponentVendor.Name.get -> string!
+Alis.Reactive.Condition
 Alis.Reactive.ConditionExtensions
 Alis.Reactive.ConditionOperators
 Alis.Reactive.ConditionSourceBuilder<TModel, TProp, TNext>
@@ -146,6 +156,9 @@ Alis.Reactive.HttpRequestBuilder<TModel>.Validate<TValidationSource>(string! for
 Alis.Reactive.HttpRequestBuilder<TModel>.WhileLoading(System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.HttpRequestBuilder<TModel!>!
 Alis.Reactive.IAppLevelComponent
 Alis.Reactive.IAppLevelComponent.DefaultId.get -> string!
+Alis.Reactive.IBrowserRuleSource
+Alis.Reactive.IBrowserRuleSource.GetBrowserRules<TValidator>() -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
+Alis.Reactive.IBrowserRuleSource.GetBrowserRules<TValidator>(string! ruleSet) -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
 Alis.Reactive.IComponent
 Alis.Reactive.IComponent.Vendor.get -> Alis.Reactive.ComponentVendor!
 Alis.Reactive.IConditionBuilder
@@ -376,6 +389,7 @@ Alis.Reactive.SignalRReconnectedArgs
 Alis.Reactive.SignalRReconnectedArgs.ConnectionId.get -> Alis.Reactive.ReadOnly<string!>!
 Alis.Reactive.SignalRReconnectedArgs.SignalRReconnectedArgs() -> void
 Alis.Reactive.SignalRSource<THub>
+Alis.Reactive.TextTest
 Alis.Reactive.TriggerBuilder<TModel>
 Alis.Reactive.TriggerBuilder<TModel>.CustomEvent(Alis.Reactive.AppEvent! appEvent, System.Action<Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
 Alis.Reactive.TriggerBuilder<TModel>.CustomEvent<TPayload>(Alis.Reactive.AppEvent<TPayload!>! appEvent, System.Action<Alis.Reactive.Data<TPayload!>!, Alis.Reactive.PipelineBuilder<TModel!>!>! pipeline) -> Alis.Reactive.TriggerBuilder<TModel!>!
@@ -399,6 +413,7 @@ Alis.Reactive.ValidationResult
 Alis.Reactive.ValidationResult.Errors.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValidationFailure!>!
 Alis.Reactive.ValidationResult.ErrorsByField.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string![]!>!
 Alis.Reactive.ValidationResult.IsValid.get -> bool
+Alis.Reactive.ValueTest
 Alis.Reactive.VendorEventPayload
 Alis.Reactive.VendorEventPayload.Argument = 0 -> Alis.Reactive.VendorEventPayload
 Alis.Reactive.VendorEventPayload.Element = 1 -> Alis.Reactive.VendorEventPayload
@@ -413,11 +428,25 @@ override Alis.Reactive.AppEvent<TPayload>.ToString() -> string!
 override Alis.Reactive.Comparison.ToString() -> string!
 override Alis.Reactive.ComponentVendor.ToString() -> string!
 override Alis.Reactive.Field.ToString() -> string!
+override Alis.Reactive.TextTest.ToString() -> string!
 override Alis.Reactive.ValidationFailure.ToString() -> string!
+override Alis.Reactive.ValueTest.ToString() -> string!
 static Alis.Reactive.AppEvent.Declare(string? name = null, string! declaredBy = "") -> Alis.Reactive.AppEvent!
 static Alis.Reactive.AppEvent.Declare<TPayload>(string? name = null, string! declaredBy = "") -> Alis.Reactive.AppEvent<TPayload!>!
 static Alis.Reactive.Arg.implicit operator Alis.Reactive.Arg!(Alis.Reactive.Field! field) -> Alis.Reactive.Arg!
 static Alis.Reactive.Arg<T>.implicit operator Alis.Reactive.Arg<T>!(T value) -> Alis.Reactive.Arg<T>!
+static Alis.Reactive.BrowserRule.Between<TValue>(TValue from, TValue to, bool inclusive, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Compare<TValue>(Alis.Reactive.Comparison! comparison, TValue value, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.CompareWith(Alis.Reactive.Comparison! comparison, System.Linq.Expressions.LambdaExpression! peer, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.CreditCard(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Email(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Empty(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Matches(string! pattern, string! flags, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.MaxLength(int length, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.MinLength(int length, string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.NotEmpty(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.NotNull(string! message) -> Alis.Reactive.BrowserRule!
+static Alis.Reactive.BrowserRule.Url(string! message) -> Alis.Reactive.BrowserRule!
 static Alis.Reactive.Comparison.Equal.get -> Alis.Reactive.Comparison!
 static Alis.Reactive.Comparison.GreaterThan.get -> Alis.Reactive.Comparison!
 static Alis.Reactive.Comparison.GreaterThanOrEqual.get -> Alis.Reactive.Comparison!
@@ -428,6 +457,15 @@ static Alis.Reactive.ComponentInput.Of<TValue, TArgs>(Alis.Reactive.ReadOnly<TVa
 static Alis.Reactive.ComponentVendor.Define(string! name, string! objectPath, string! subscribe, string! unsubscribe, Alis.Reactive.VendorEventPayload payload) -> Alis.Reactive.ComponentVendor!
 static Alis.Reactive.ComponentVendor.DefineCallbackProperties(string! name, string! objectPath, Alis.Reactive.VendorEventPayload payload) -> Alis.Reactive.ComponentVendor!
 static Alis.Reactive.ComponentVendor.Native.get -> Alis.Reactive.ComponentVendor!
+static Alis.Reactive.Condition.All(params Alis.Reactive.Condition![]! terms) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Always.get -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Any(params Alis.Reactive.Condition![]! terms) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Compare(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.Comparison! comparison, System.Linq.Expressions.Expression! value) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Holds(System.Linq.Expressions.LambdaExpression! collection, System.Linq.Expressions.Expression! item) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.In(System.Linq.Expressions.LambdaExpression! member, System.Linq.Expressions.Expression! values) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Is(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.ValueTest! test) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Not(Alis.Reactive.Condition! term) -> Alis.Reactive.Condition!
+static Alis.Reactive.Condition.Text(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.TextTest! test, string! text) -> Alis.Reactive.Condition!
 static Alis.Reactive.ConditionExtensions.Confirm<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! message) -> Alis.Reactive.GuardBuilder<TModel!>!
 static Alis.Reactive.ConditionExtensions.When<TModel, TProp>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GuardBuilder<TModel!>!>!
 static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.IEnumerable<TItem>!, TNext!>! source, TItem item) -> TNext!
@@ -538,4 +576,14 @@ static Alis.Reactive.RuleBuilderExtensions.PrecisionScale<T>(this Alis.Reactive.
 static Alis.Reactive.RuleBuilderExtensions.Url<T>(this Alis.Reactive.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.IRuleBuilderOptions<T, string?>!
 static Alis.Reactive.ServerPushStream.At<TStream>(string! url) -> Alis.Reactive.ServerPushSource<TStream!>!
 static Alis.Reactive.SignalRHub.At<THub>(string! url) -> Alis.Reactive.SignalRSource<THub!>!
+static Alis.Reactive.TextTest.Contains.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.TextTest.EndsWith.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.TextTest.Matches.get -> Alis.Reactive.TextTest!
+static Alis.Reactive.TextTest.StartsWith.get -> Alis.Reactive.TextTest!
 static Alis.Reactive.UrlVersionExtensions.AppendVersion(this System.Web.Mvc.UrlHelper! url, string! contentPath) -> string!
+static Alis.Reactive.ValueTest.Falsy.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.IsEmpty.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.IsNull.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.NotEmpty.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.NotNull.get -> Alis.Reactive.ValueTest!
+static Alis.Reactive.ValueTest.Truthy.get -> Alis.Reactive.ValueTest!

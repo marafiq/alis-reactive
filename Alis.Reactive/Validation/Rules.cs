@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Alis.Reactive.Inputs;
 using Alis.Reactive.PlanModel.Validation;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive.Validation
 {

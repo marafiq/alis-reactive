@@ -5,11 +5,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Inputs;
+using Alis.Reactive.PlanModel.Conditions;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.Members;
 
-namespace Alis.Reactive.PlanModel.Conditions
+namespace Alis.Reactive
 {
     /// <summary>
     /// A condition as the plan evaluates it: one node per comparison family, each carrying exactly its
@@ -19,17 +20,17 @@ namespace Alis.Reactive.PlanModel.Conditions
     /// plan reads. A condition that waits (a method result that is a promise, a user decision) guards its
     /// branches with the statements that settle it first.
     /// </summary>
-    internal abstract class Condition
+    public abstract class Condition
     {
         private protected Condition() { }
 
         /// <summary>No condition: it always holds, and a rule under it always applies.</summary>
-        internal static Condition Always { get; } = new TrueCondition();
+        public static Condition Always { get; } = new TrueCondition();
 
         /// <summary>Tests the member's value alone.</summary>
         /// <param name="member">The member, as a path from the model: <c>x =&gt; x.IsVeteran</c>.</param>
         /// <param name="test">The test.</param>
-        internal static Condition Is(LambdaExpression member, ValueTest test)
+        public static Condition Is(LambdaExpression member, ValueTest test)
         {
             if (test == null) throw new ArgumentNullException(nameof(test));
             return new MemberTest(FieldReference.Of(member), (left, shape) => Unary(test, left, shape));
@@ -39,7 +40,7 @@ namespace Alis.Reactive.PlanModel.Conditions
         /// <param name="member">The member, as a path from the model.</param>
         /// <param name="comparison">The comparison.</param>
         /// <param name="value">The value, a constant or a captured variable, read as the member's type: an enum compared through its number is its member.</param>
-        internal static Condition Compare(LambdaExpression member, Comparison comparison, Expression value)
+        public static Condition Compare(LambdaExpression member, Comparison comparison, Expression value)
         {
             if (comparison == null) throw new ArgumentNullException(nameof(comparison));
             var field = FieldReference.Of(member);
@@ -51,7 +52,7 @@ namespace Alis.Reactive.PlanModel.Conditions
         /// <summary>The member is one of the values.</summary>
         /// <param name="member">The member, as a path from the model.</param>
         /// <param name="values">The values, a constant or captured collection, each read as the member's type.</param>
-        internal static Condition In(LambdaExpression member, Expression values)
+        public static Condition In(LambdaExpression member, Expression values)
         {
             var field = FieldReference.Of(member);
             var fixedValues = Expressions.Evaluate(values) as IEnumerable
@@ -65,7 +66,7 @@ namespace Alis.Reactive.PlanModel.Conditions
         /// <param name="member">The text member, as a path from the model.</param>
         /// <param name="test">The test.</param>
         /// <param name="text">The text, or the pattern for <see cref="TextTest.Matches"/>.</param>
-        internal static Condition Text(LambdaExpression member, TextTest test, string text)
+        public static Condition Text(LambdaExpression member, TextTest test, string text)
         {
             if (test == null) throw new ArgumentNullException(nameof(test));
             if (text == null) throw new ArgumentNullException(nameof(text));
@@ -75,7 +76,7 @@ namespace Alis.Reactive.PlanModel.Conditions
         /// <summary>The collection member holds the item.</summary>
         /// <param name="collection">The collection member, as a path from the model.</param>
         /// <param name="item">The item, a constant or a captured variable, read as its own type.</param>
-        internal static Condition Holds(LambdaExpression collection, Expression item)
+        public static Condition Holds(LambdaExpression collection, Expression item)
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
             var itemType = Expressions.TypeOf(item);
@@ -87,15 +88,15 @@ namespace Alis.Reactive.PlanModel.Conditions
 
         /// <summary>Every term holds.</summary>
         /// <param name="terms">The terms, at least one.</param>
-        internal static Condition All(params Condition[] terms) => new AllCondition(Required(terms));
+        public static Condition All(params Condition[] terms) => new AllCondition(Required(terms));
 
         /// <summary>At least one term holds.</summary>
         /// <param name="terms">The terms, at least one.</param>
-        internal static Condition Any(params Condition[] terms) => new AnyCondition(Required(terms));
+        public static Condition Any(params Condition[] terms) => new AnyCondition(Required(terms));
 
         /// <summary>The term does not hold.</summary>
         /// <param name="term">The term.</param>
-        internal static Condition Not(Condition term) => new NotCondition(term ?? throw new ArgumentNullException(nameof(term)));
+        public static Condition Not(Condition term) => new NotCondition(term ?? throw new ArgumentNullException(nameof(term)));
 
         internal static Condition Unary(ValueTest test, ValueExpression left, Shape shape) =>
             new UnaryCondition(test, left, shape);

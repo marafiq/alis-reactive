@@ -7,7 +7,6 @@ using Alis.Reactive.Inputs;
 using Alis.Reactive.PlanModel.Validation;
 using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.Members;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive
 {
@@ -38,46 +37,46 @@ namespace Alis.Reactive
 
         /// <summary>A value is entered: not blank, and not the type's default. A list has at least one item.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule NotEmpty(string message) => new NotEmptyRule(message, Condition.Always);
+        public static BrowserRule NotEmpty(string message) => new NotEmptyRule(message, Condition.Always);
 
         /// <summary>A value is bound. A list is never null in the browser, so the rule stays on the server for a list.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule NotNull(string message) => new NotNullRule(message, Condition.Always);
+        public static BrowserRule NotNull(string message) => new NotNullRule(message, Condition.Always);
 
         /// <summary>Nothing is entered. A list has no items.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule Empty(string message) => new EmptyRule(message, Condition.Always);
+        public static BrowserRule Empty(string message) => new EmptyRule(message, Condition.Always);
 
         /// <summary>Text at least <paramref name="length"/> characters long.</summary>
         /// <param name="length">The fewest characters.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule MinLength(int length, string message) => new MinLengthRule(length, message, Condition.Always);
+        public static BrowserRule MinLength(int length, string message) => new MinLengthRule(length, message, Condition.Always);
 
         /// <summary>Text at most <paramref name="length"/> characters long.</summary>
         /// <param name="length">The most characters.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule MaxLength(int length, string message) => new MaxLengthRule(length, message, Condition.Always);
+        public static BrowserRule MaxLength(int length, string message) => new MaxLengthRule(length, message, Condition.Always);
 
         /// <summary>An email address, as <c>EmailAddress()</c> reads one: one @, neither first nor last.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule Email(string message) => new PatternRule(EmailPattern, "", message, Condition.Always);
+        public static BrowserRule Email(string message) => new PatternRule(EmailPattern, "", message, Condition.Always);
 
         /// <summary>
         /// An <c>http</c> or <c>https</c> URL, its scheme in any case, as the server's absolute URL reads it.
         /// The browser checks the scheme; the server also checks the rest.
         /// </summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule Url(string message) => new PatternRule(UrlPattern, "", message, Condition.Always);
+        public static BrowserRule Url(string message) => new PatternRule(UrlPattern, "", message, Condition.Always);
 
         /// <summary>A card number that passes the Luhn check.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule CreditCard(string message) => new CreditCardRule(message, Condition.Always);
+        public static BrowserRule CreditCard(string message) => new CreditCardRule(message, Condition.Always);
 
         /// <summary>Text the JavaScript regular expression <paramref name="pattern"/> matches.</summary>
         /// <param name="pattern">A pattern that reads the same in JavaScript and .NET.</param>
         /// <param name="flags">JavaScript flags: <c>i</c>, <c>m</c>, <c>s</c>; empty for none.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule Matches(string pattern, string flags, string message)
+        public static BrowserRule Matches(string pattern, string flags, string message)
         {
             if (string.IsNullOrEmpty(pattern)) throw new ArgumentException("A browser pattern needs its text.", nameof(pattern));
             return new PatternRule(pattern, flags ?? "", message, Condition.Always);
@@ -88,7 +87,7 @@ namespace Alis.Reactive
         /// <param name="comparison">The comparison.</param>
         /// <param name="value">The fixed value.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule Compare<TValue>(Comparison comparison, TValue value, string message)
+        public static BrowserRule Compare<TValue>(Comparison comparison, TValue value, string message)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
             return new FixedComparisonRule(comparison, value, ClrShape.Of(value.GetType()), message, Condition.Always);
@@ -98,7 +97,7 @@ namespace Alis.Reactive
         /// <param name="comparison">The comparison.</param>
         /// <param name="peer">The other member, as a path from the model: <c>x =&gt; x.AdmitDate</c>.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule CompareWith(Comparison comparison, LambdaExpression peer, string message) =>
+        public static BrowserRule CompareWith(Comparison comparison, LambdaExpression peer, string message) =>
             new MemberComparisonRule(comparison, FieldReference.Of(peer), message, Condition.Always);
 
         /// <summary>The value lies between two bounds of its own type.</summary>
@@ -107,7 +106,7 @@ namespace Alis.Reactive
         /// <param name="to">The upper bound.</param>
         /// <param name="inclusive">Whether the bounds themselves pass.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        internal static BrowserRule Between<TValue>(TValue from, TValue to, bool inclusive, string message)
+        public static BrowserRule Between<TValue>(TValue from, TValue to, bool inclusive, string message)
         {
             if (from == null) throw new ArgumentNullException(nameof(from));
             if (to == null) throw new ArgumentNullException(nameof(to));
@@ -121,7 +120,7 @@ namespace Alis.Reactive
 
         /// <summary>The same rule, applied only while <paramref name="condition"/> holds.</summary>
         /// <param name="condition">The condition.</param>
-        internal BrowserRule When(Condition condition) => Under(condition ?? throw new ArgumentNullException(nameof(condition)));
+        public BrowserRule When(Condition condition) => Under(condition ?? throw new ArgumentNullException(nameof(condition)));
 
         internal Condition Condition { get; private set; }
 

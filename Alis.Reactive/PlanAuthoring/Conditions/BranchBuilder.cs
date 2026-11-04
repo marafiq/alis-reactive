@@ -2,7 +2,6 @@ using System;
 using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Reactions;
 using Alis.Reactive.PlanAuthoring.Conditions;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive
 {

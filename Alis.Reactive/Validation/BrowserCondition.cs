@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Alis.Reactive.Members;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive.Validation
 {

@@ -22,6 +22,8 @@ public sealed class ValidationController : Controller
 
     public IActionResult RulesReadBack() => View(new VisitBooking());
 
+    public IActionResult RuleSetRefused(RuleSetMistake mistake) => View(new RuleSetRefusalsPage { Mistake = mistake });
+
     public IActionResult Notice() => View(new Notice());
 
     public IActionResult Bounds() => View(new BoundsForm());

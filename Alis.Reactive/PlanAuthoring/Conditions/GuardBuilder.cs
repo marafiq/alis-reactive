@@ -1,7 +1,6 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.PlanAuthoring.Conditions;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive
 {

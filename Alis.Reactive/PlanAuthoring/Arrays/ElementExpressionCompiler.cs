@@ -10,7 +10,6 @@ using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.WireTerms;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Members;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive.PlanAuthoring.Arrays
 {

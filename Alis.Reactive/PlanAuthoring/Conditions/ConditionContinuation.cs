@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Reactions;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive.PlanAuthoring.Conditions
 {

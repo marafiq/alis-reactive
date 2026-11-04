@@ -4,7 +4,6 @@ using System.Linq;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Writing;
-using Alis.Reactive.PlanModel.Conditions;
 
 namespace Alis.Reactive.PlanAuthoring.Arrays
 {
