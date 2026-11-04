@@ -1,78 +1,79 @@
-// Native loader markup is a layout singleton rendered by @Html.NativeLoader().
-// Side-effect module uses its well-known DOM IDs directly; DSL show/hide
-// calls still target the app-level component through native set reactions.
+// Native loader markup is a layout singleton rendered by @Html.NativeLoader() as an <alis-loader>
+// element. DSL show/hide calls still target it through native set reactions; the element follows its
+// own visible class and keeps itself on the page.
 export {};
 
-// The auto-hide of the Show in progress. A Hide cancels it and a later Show restarts it, so a
-// timeout never outlives the Hide of the request that set it.
-let pendingAutoHide: ReturnType<typeof setTimeout> | undefined;
+const VISIBLE_CLASS = "alis-loader--visible";
 
-// A targeted loader lives inside the element it covers. When that element leaves the page (a drawer
-// closes, a partial is replaced), the loader goes back to the page hidden: it is an app-level object
-// and must stay mounted for the next Show or Hide.
-let targetRemovalWatch: MutationObserver | undefined;
+class Loader extends HTMLElement {
+  // The auto-hide of the Show in progress. A Hide cancels it and a later Show restarts it, so a
+  // timeout never outlives the Hide of the request that set it.
+  private pendingAutoHide: ReturnType<typeof setTimeout> | undefined;
 
-function watchTargetRemoval(loader: HTMLElement): void {
-  targetRemovalWatch?.disconnect();
-  targetRemovalWatch = new MutationObserver(() => {
-    if (loader.isConnected) return;
-    document.body.appendChild(loader);
-    loader.classList.remove("alis-loader--visible");
-    loader.setAttribute("aria-hidden", "true");
-  });
-  targetRemovalWatch.observe(document.body, { childList: true, subtree: true });
-}
+  private coversTarget = false;
 
-function handleVisible(loader: HTMLElement): void {
-  const targetId = loader.dataset.target;
-  if (targetId) {
-    const target = document.getElementById(targetId);
-    if (target) {
-      target.style.position = "relative";
-      target.appendChild(loader);
-      watchTargetRemoval(loader);
-    }
+  constructor() {
+    super();
+    new MutationObserver(() => this.followVisibleClass())
+      .observe(this, { attributes: true, attributeFilter: ["class"] });
   }
 
-  clearTimeout(pendingAutoHide);
-  const timeout = loader.dataset.timeout;
-  if (timeout) {
-    const ms = parseInt(timeout, 10);
-    if (ms > 0) {
-      pendingAutoHide = setTimeout(() => {
-        loader.classList.remove("alis-loader--visible");
-        loader.setAttribute("aria-hidden", "true");
-      }, ms);
-    }
+  // A targeted loader lives inside the element it covers. When that element leaves the page (Into
+  // replaces it, the drawer closes and clears it, any script removes it), the loader goes back to the
+  // page hidden before the removing call returns: it is an app-level object, so the next Show or Hide,
+  // even in the same reaction, must find it.
+  disconnectedCallback(): void {
+    const movedWithinThePage = this.isConnected;
+    if (movedWithinThePage || !this.coversTarget) return;
+
+    this.uncover();
+    this.classList.remove(VISIBLE_CLASS);
+    this.setAttribute("aria-hidden", "true");
   }
-}
 
-function handleHidden(loader: HTMLElement): void {
-  clearTimeout(pendingAutoHide);
-  targetRemovalWatch?.disconnect();
-  if (loader.parentElement !== document.body) {
-    document.body.appendChild(loader);
-  }
-  delete loader.dataset.target;
-  delete loader.dataset.timeout;
-  const msg = document.getElementById("alis-loader-message");
-  if (msg) msg.textContent = "";
-}
-
-function init(): void {
-  const loader = document.getElementById("alis-loader");
-  if (!loader) return;
-
-  const observer = new MutationObserver(() => {
-    const visible = loader.classList.contains("alis-loader--visible");
-    if (visible) {
-      handleVisible(loader);
+  private followVisibleClass(): void {
+    if (this.classList.contains(VISIBLE_CLASS)) {
+      this.cover();
     } else {
-      handleHidden(loader);
+      this.uncover();
     }
-  });
+  }
 
-  observer.observe(loader, { attributes: true, attributeFilter: ["class"] });
+  private cover(): void {
+    const targetId = this.dataset.target;
+    if (targetId) {
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.style.position = "relative";
+        target.appendChild(this);
+        this.coversTarget = true;
+      }
+    }
+
+    clearTimeout(this.pendingAutoHide);
+    const timeout = this.dataset.timeout;
+    if (timeout) {
+      const ms = parseInt(timeout, 10);
+      if (ms > 0) {
+        this.pendingAutoHide = setTimeout(() => {
+          this.classList.remove(VISIBLE_CLASS);
+          this.setAttribute("aria-hidden", "true");
+        }, ms);
+      }
+    }
+  }
+
+  private uncover(): void {
+    clearTimeout(this.pendingAutoHide);
+    this.coversTarget = false;
+    if (this.parentElement !== document.body) {
+      document.body.appendChild(this);
+    }
+    delete this.dataset.target;
+    delete this.dataset.timeout;
+    const message = document.getElementById("alis-loader-message");
+    if (message) message.textContent = "";
+  }
 }
 
-init();
+customElements.define("alis-loader", Loader);
