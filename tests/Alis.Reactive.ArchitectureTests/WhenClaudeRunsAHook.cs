@@ -77,6 +77,78 @@ public class WhenClaudeRunsAHook
         Assert.That(refused, Is.Empty, "A hook refused a test project that opens no browser:\n" + string.Join("\n", refused));
     }
 
+    [Test]
+    public void a_git_stash_in_any_form_is_refused()
+    {
+        string[] commands =
+        [
+            "git stash",
+            "git stash pop",
+            "git stash apply stash@{0}",
+            "git stash drop stash@{0}",
+            "git stash list",
+            "git -C .worktrees/redesign stash push -m wip",
+            "cd tests && git stash",
+            "echo $(git stash list)",
+        ];
+        var allowed = commands.Where(command => DecisionFor("Bash", new { command }) != "deny").ToList();
+
+        Assert.That(allowed, Is.Empty, "stash@{0} holds work that is never popped, applied or dropped, yet a hook allowed:\n" + string.Join("\n", allowed));
+    }
+
+    [Test]
+    public void a_git_command_that_names_a_stash_only_in_its_text_is_allowed()
+    {
+        string[] commands =
+        [
+            "git status",
+            "git log --grep stash",
+            "git commit -m \"stash the draft\"",
+            "git show --stat HEAD",
+        ];
+        var refused = commands.Where(command => DecisionFor("Bash", new { command }) == "deny").ToList();
+
+        Assert.That(refused, Is.Empty, "A hook refused a git command that runs no stash:\n" + string.Join("\n", refused));
+    }
+
+    [Test]
+    public void reading_the_user_secrets_is_refused()
+    {
+        string[] commands =
+        [
+            "dotnet user-secrets list",
+            "dotnet user-secrets list --project Alis.Reactive.SandboxApp",
+            "dotnet user-secrets --project Alis.Reactive.SandboxApp list",
+            "cat ~/.microsoft/usersecrets/alis-sandbox/secrets.json",
+        ];
+        string[] files =
+        [
+            "/Users/dev/.microsoft/usersecrets/alis-sandbox/secrets.json",
+            @"C:\Users\dev\AppData\Roaming\Microsoft\UserSecrets\alis-sandbox\secrets.json",
+        ];
+        var allowed = commands.Where(command => DecisionFor("Bash", new { command }) != "deny")
+            .Concat(files.Where(file => DecisionFor("Read", new { file_path = file }) != "deny").Select(file => "Read " + file))
+            .ToList();
+
+        Assert.That(allowed, Is.Empty, "User secrets are never read, yet a hook allowed:\n" + string.Join("\n", allowed));
+    }
+
+    [Test]
+    public void a_command_or_read_that_names_user_secrets_without_reading_them_is_allowed()
+    {
+        string[] commands =
+        [
+            "git grep -n UserSecretsId",
+            "dotnet user-secrets --help",
+        ];
+        string[] files = [Path.Combine(Repository.Root, "Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj")];
+        var refused = commands.Where(command => DecisionFor("Bash", new { command }) == "deny")
+            .Concat(files.Where(file => DecisionFor("Read", new { file_path = file }) == "deny").Select(file => "Read " + file))
+            .ToList();
+
+        Assert.That(refused, Is.Empty, "A hook refused a command or read that prints no secret:\n" + string.Join("\n", refused));
+    }
+
     private static IReadOnlyList<(string Event, string Matcher, string Command)> HookCommands()
     {
         using var settings = JsonDocument.Parse(File.ReadAllText(Path.Combine(Repository.Root, ".claude/settings.json")));

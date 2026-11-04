@@ -125,7 +125,8 @@ Everything else stays sync.
   behavior so a test passes. A member's real shape comes from the installed package or the vendor's
   source.
 - Never read secrets: no `dotnet user-secrets list`, nothing that prints a secret's value. When a
-  secret may be missing, say so without reading the store.
+  secret may be missing, say so without reading the store. `.claude/hooks/protect-stash-and-secrets.mjs`
+  refuses both.
 - Component slices are self-contained. Duplication between slices beats a shared base class.
 - Root cause, not patch. After two failed attempts, stop and research. Leave touched files cleaner:
   delete private helpers no feature reaches.
@@ -137,7 +138,8 @@ Everything else stays sync.
 - `main` is the trunk and the release line. A release is an annotated `vX.Y.Z[-rc.N]` tag on `main`:
   `scripts/verify-release-tag.sh` checks it and `.github/workflows/nuget-publish.yml` publishes it.
 - Branch from `origin/main` in a worktree and land by pull request (`feature/`, `fix/`, `chore/`). A
-  SessionStart hook installs the pre-commit guard that refuses commits on `main`.
+  SessionStart hook installs the pre-commit guard that refuses commits on `main`. `git stash` is never
+  run: `stash@{0}` holds work that stays put, and the same hook refuses it.
 
   ```bash
   git worktree add .worktrees/<name> -b feature/<name> origin/main
