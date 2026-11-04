@@ -104,6 +104,7 @@ public class IntakeController : Controller
     public IActionResult Save([FromBody] ResidentIntakeModel? model)
     {
         if (model == null)
+        {
             return BadRequest(new
             {
                 errors = new Dictionary<string, string[]>
@@ -111,6 +112,7 @@ public class IntakeController : Controller
                     ["FirstName"] = ["Request body is required."]
                 }
             });
+        }
 
         var result = new IntakeValidator().Validate(model);
         if (!result.IsValid)
