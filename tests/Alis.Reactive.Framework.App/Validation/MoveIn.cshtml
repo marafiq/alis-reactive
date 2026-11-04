@@ -1,0 +1,42 @@
+@using Alis.Reactive.Framework.App.Validation
+@model MoveInPacket
+@{
+    ViewData["Title"] = "A move-in by stage";
+    var plan = Html.ReactivePlan<MoveInPacket>();
+    var stage = ViewData["Stage"] as string;
+}
+<h1>A move-in by stage</h1>
+<p>Stage: <span id="stage">@(stage ?? "none")</span></p>
+
+<div id="movein-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    @{ Html.InputField(plan, m => m.Keys[0], o => o.Label("First key")).Entry(); }
+    @{ Html.InputField(plan, m => m.Keys[1], o => o.Label("Second key")).Entry(); }
+    @{ Html.InputField(plan, m => m.Insurer, o => o.Label("Insurer")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@if (stage == null)
+{
+    @(plan.Button("save", "Save")
+        .Reactive(button => button.Click, p => p.Post("/Validation/MoveIn")
+            .Gather(g => g.Form())
+            .Validate<MoveInRules>("movein-form")
+            .Response(r => r
+                .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+                .OnError(400, e => e.ValidationErrors("movein-form")))))
+}
+else
+{
+    var saveUrl = "/Validation/MoveIn/" + stage;
+    @(plan.Button("save", "Save")
+        .Reactive(button => button.Click, p => p.Post(saveUrl)
+            .Gather(g => g.Form())
+            .Validate<MoveInRules>("movein-form", stage)
+            .Response(r => r
+                .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+                .OnError(400, e => e.ValidationErrors("movein-form")))))
+}
+
+@Html.RenderPlan(plan)

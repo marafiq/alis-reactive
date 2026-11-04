@@ -326,6 +326,30 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
+    public IActionResult MoveIn(string? stage)
+    {
+        ViewData["Stage"] = stage;
+        return View(new MoveInPacket());
+    }
+
+    [HttpPost("/Validation/MoveIn")]
+    public IActionResult SaveMoveIn([FromBody] MoveInPacket packet, [FromServices] MoveInRules rules)
+    {
+        var result = rules.Validate(packet);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"saved for {packet.Resident}" });
+    }
+
+    [HttpPost("/Validation/MoveIn/{stage}")]
+    public IActionResult SaveMoveInStage(string stage, [FromBody] MoveInPacket packet, [FromServices] MoveInRules rules)
+    {
+        var result = rules.Validate(packet, stage);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"{stage} saved for {packet.Resident}" });
+    }
+
     public IActionResult RoomMove() => View(new RoomMove());
 
     [HttpPost("/Validation/RoomMove")]
