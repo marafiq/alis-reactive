@@ -293,6 +293,28 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"{transfer.Resident} moved to {transfer.Ward}" });
     }
 
+    public IActionResult LinenRound() => View(new LinenRound());
+
+    [HttpPost("/Validation/LinenRound")]
+    public IActionResult SaveLinenRound([FromBody] LinenRound round, [FromServices] LinenRoundRules rules)
+    {
+        var result = rules.Validate(round);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
+    public IActionResult MedicationRound() => View(new MedicationRound());
+
+    [HttpPost("/Validation/MedicationRound")]
+    public IActionResult SaveMedicationRound([FromBody] MedicationRound round, [FromServices] MedicationRoundRules rules)
+    {
+        var result = rules.Validate(round);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     public IActionResult RoomMove() => View(new RoomMove());
 
     [HttpPost("/Validation/RoomMove")]

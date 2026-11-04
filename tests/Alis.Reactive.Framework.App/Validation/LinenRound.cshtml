@@ -1,0 +1,26 @@
+@using Alis.Reactive.Framework.App.Validation
+@model LinenRound
+@{
+    ViewData["Title"] = "A linen round";
+    var plan = Html.ReactivePlan<LinenRound>();
+}
+<h1>A linen round</h1>
+
+<div id="round-form">
+    @{ Html.InputField(plan, m => m.Rooms[0], o => o.Label("First room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Rooms[1], o => o.Label("Second room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Carts[0], o => o.Label("First cart")).Entry(); }
+    @{ Html.InputField(plan, m => m.Carts[1], o => o.Label("Second cart")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/LinenRound")
+        .Gather(g => g.Form())
+        .Validate<LinenRoundRules>("round-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("round-form")))))
+
+@Html.RenderPlan(plan)
