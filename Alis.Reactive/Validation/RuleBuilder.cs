@@ -21,8 +21,8 @@ namespace Alis.Reactive
         /// <summary>
         /// What the server does after a check of this rule fails: <see cref="CascadeMode.Continue"/> runs the rest
         /// and answers with every failing check, <see cref="CascadeMode.Stop"/> answers with the first alone, as
-        /// the browser shows one message per input. It overrides the validator's
-        /// <c>RuleLevelCascadeMode</c> for this rule.
+        /// the browser shows one message per input. On a list, <c>Stop</c> ends the whole rule at its first failing
+        /// item: no later item is checked. It overrides the validator's <c>RuleLevelCascadeMode</c> for this rule.
         /// </summary>
         /// <param name="mode">The mode.</param>
         IRuleBuilder<T, TProperty> Cascade(CascadeMode mode);

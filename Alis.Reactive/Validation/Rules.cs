@@ -391,7 +391,7 @@ namespace Alis.Reactive.Validation
                 {
                     var failures = run.Failures.Count;
                     await part.Validate(instance, item, prefix, path, FieldDisplayName, run).ConfigureAwait(false);
-                    if (StopsAtFirstFailure && run.Failures.Count > failures) break;
+                    if (StopsAtFirstFailure && run.Failures.Count > failures) return;
                 }
             }
         }
