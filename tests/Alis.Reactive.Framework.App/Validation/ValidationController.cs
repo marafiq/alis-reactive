@@ -380,6 +380,21 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"saved {nameplate.Resident}" });
     }
 
+    [HttpPost("/Validation/NameplateBlank")]
+    public IActionResult SaveNameplateBlank([FromBody] Nameplate nameplate)
+    {
+        try
+        {
+            var rules = HttpContext.RequestServices.GetRequiredService<EmptyNameplateRules>();
+            rules.Validate(nameplate);
+            return Json(new Booked { Summary = $"saved {nameplate.Resident}" });
+        }
+        catch (ArgumentException refused)
+        {
+            return Json(new Booked { Summary = refused.Message });
+        }
+    }
+
     public IActionResult RoomMove(RoomMoveDependents dependents = RoomMoveDependents.None)
     {
         ViewData["Dependents"] = dependents;

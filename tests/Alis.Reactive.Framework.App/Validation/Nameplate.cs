@@ -10,6 +10,7 @@ public enum NameplateName
     Spoken,
     Empty,
     Spaces,
+    Null,
 }
 
 public sealed class SpokenNameplateRules : ReactiveValidator<Nameplate>
@@ -25,6 +26,14 @@ public sealed class EmptyNameplateRules : ReactiveValidator<Nameplate>
     public EmptyNameplateRules()
     {
         RuleFor(x => x.Resident).NotEmpty().WithName("");
+    }
+}
+
+public sealed class NullNameplateRules : ReactiveValidator<Nameplate>
+{
+    public NullNameplateRules()
+    {
+        RuleFor(x => x.Resident).NotEmpty().WithName(null!);
     }
 }
 

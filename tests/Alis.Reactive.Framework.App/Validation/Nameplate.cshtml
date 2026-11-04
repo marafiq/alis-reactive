@@ -33,6 +33,15 @@
             .Gather(g => g.Form())
             .Validate<SpacedNameplateRules>("nameplate-form")))
         break;
+    case NameplateName.Null:
+        @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/Nameplate")
+            .Gather(g => g.Form())
+            .Validate<NullNameplateRules>("nameplate-form")))
+        break;
 }
+@(plan.Button("save-blank", "Save under a blank name")
+    .Reactive(button => button.Click, p => p.Post("/Validation/NameplateBlank")
+        .Gather(g => g.Form("nameplate-form"))
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
 
 @Html.RenderPlan(plan)

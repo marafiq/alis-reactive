@@ -20,11 +20,22 @@ public sealed class WhenARuleIsGivenAName : AppPageTest
 
     [TestCase("Empty")]
     [TestCase("Spaces")]
+    [TestCase("Null")]
     public async Task a_name_without_text_is_refused_where_the_page_reads_the_rules(string name)
     {
         await Page.GotoAsync($"{BaseUrl}/Validation/Nameplate?name={name}");
 
         await Expect(Page.GetByText("A name people read has text.").First).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task a_name_without_text_is_refused_where_an_endpoint_validates_with_the_rules()
+    {
+        await Open("/Validation/Nameplate");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save under a blank name", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#saved")).ToHaveTextAsync("A name people read has text. (Parameter 'displayName')");
     }
 
     [Test]
