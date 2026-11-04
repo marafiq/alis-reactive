@@ -16,8 +16,9 @@ Runs the ordered verification gate:
   4. npm test
   5. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
   6. dotnet build
-  7. non-Playwright dotnet test projects, if any
-  8. scripts/playwright.sh --no-build, every Playwright project (or every CI shard at once with --parallel)
+  7. dotnet format: no C# file it would change (the solution, and examples/ by folder)
+  8. non-Playwright dotnet test projects, if any
+  9. scripts/playwright.sh --no-build, every Playwright project (or every CI shard at once with --parallel)
 
 Options:
   --parallel  Run the Playwright leg as every project's CI shards (scripts/playwright.sh
@@ -196,6 +197,10 @@ node scripts/pin-syncfusion.mjs --check
 
 gate "compiling C# projects ($configuration)"
 dotnet build --configuration "$configuration"
+
+gate "checking C# formatting (dotnet format)"
+dotnet format whitespace Alis.Reactive.slnx --verify-no-changes --no-restore
+dotnet format whitespace --folder examples --verify-no-changes
 
 run_dotnet_tests
 

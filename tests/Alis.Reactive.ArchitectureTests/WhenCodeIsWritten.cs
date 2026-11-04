@@ -38,22 +38,22 @@ public class WhenCodeIsWritten
         var commented = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var target in Targets)
-        foreach (var package in sources.GroupBy(file => shippedPackages.FirstOrDefault(name => file.StartsWith(name + "/", StringComparison.Ordinal))))
-        {
-            var trees = package.Select(file => CSharpSyntaxTree.ParseText(Read(file), target, file)).ToList();
-            var compilation = package.Key == null ? null : CSharpCompilation.Create(package.Key, trees);
-            foreach (var tree in trees)
+            foreach (var package in sources.GroupBy(file => shippedPackages.FirstOrDefault(name => file.StartsWith(name + "/", StringComparison.Ordinal))))
             {
-                var model = compilation?.GetSemanticModel(tree);
-                foreach (var trivia in tree.GetRoot().DescendantTrivia())
+                var trees = package.Select(file => CSharpSyntaxTree.ParseText(Read(file), target, file)).ToList();
+                var compilation = package.Key == null ? null : CSharpCompilation.Create(package.Key, trees);
+                foreach (var tree in trees)
                 {
-                    var isComment = trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) || trivia.IsKind(SyntaxKind.MultiLineCommentTrivia);
-                    var isXmlDoc = trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) || trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia);
-                    if (isComment || (isXmlDoc && !DocumentsThePublicSurface(trivia, model)))
-                        commented.Add($"{tree.FilePath}:{tree.GetLineSpan(trivia.FullSpan).StartLinePosition.Line + 1}");
+                    var model = compilation?.GetSemanticModel(tree);
+                    foreach (var trivia in tree.GetRoot().DescendantTrivia())
+                    {
+                        var isComment = trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) || trivia.IsKind(SyntaxKind.MultiLineCommentTrivia);
+                        var isXmlDoc = trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) || trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia);
+                        if (isComment || (isXmlDoc && !DocumentsThePublicSurface(trivia, model)))
+                            commented.Add($"{tree.FilePath}:{tree.GetLineSpan(trivia.FullSpan).StartLinePosition.Line + 1}");
+                    }
                 }
             }
-        }
 
         Assert.That(shippedPackages, Is.Not.Empty, "No folder holding a PublicAPI folder was found");
         Assert.That(sources, Is.Not.Empty, "No tracked C# was found");
@@ -107,6 +107,23 @@ public class WhenCodeIsWritten
                 commented.Add($"{file}:{line}");
 
         AssertNone(commented, NameItInstead + " A shebang, a heredoc's body and the version Dependabot reads beside a pinned action are not comments.");
+    }
+
+    [Test]
+    public void editorconfig_carries_no_comment()
+    {
+        var commented = new SortedSet<string>(StringComparer.Ordinal);
+        var editorconfigs = Repository.TrackedFiles.Where(file => Path.GetFileName(file) == ".editorconfig").ToList();
+        Assert.That(editorconfigs, Is.Not.Empty, "No tracked .editorconfig was found");
+        foreach (var file in editorconfigs)
+        {
+            var lines = Read(file).Split('\n');
+            for (var index = 0; index < lines.Length; index++)
+                if (lines[index].TrimStart() is ['#' or ';', ..])
+                    commented.Add($"{file}:{index + 1}");
+        }
+
+        AssertNone(commented, NameItInstead);
     }
 
     private static List<string> TrackedFilesEndingIn(string extension) =>

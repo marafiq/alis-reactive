@@ -34,7 +34,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static readonly IReadOnlyDictionary<string, int> HoursThisWeek = new Dictionary<string, int>
         {
-            ["N-201"] = 32, ["N-202"] = 24, ["N-203"] = 36, ["N-204"] = 16, ["N-205"] = 40, ["A-301"] = 12, ["A-302"] = 0
+            ["N-201"] = 32,
+            ["N-202"] = 24,
+            ["N-203"] = 36,
+            ["N-204"] = 16,
+            ["N-205"] = 40,
+            ["A-301"] = 12,
+            ["A-302"] = 0
         };
 
         [HttpGet("")]

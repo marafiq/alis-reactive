@@ -77,8 +77,8 @@ public class IntakeController : Controller
         {
             "sunrise" => ("Sunrise Senior Living", "123 Garden Lane, Springfield, IL 62701", "(555) 234-5678", 48),
             "oakwood" => ("Oakwood Care Center", "456 Oak Avenue, Riverside, CA 92501", "(555) 345-6789", 36),
-            "maple"   => ("Maple Grove Residence", "789 Maple Drive, Madison, WI 53703", "(555) 456-7890", 60),
-            _         => ("", "", "", 0)
+            "maple" => ("Maple Grove Residence", "789 Maple Drive, Madison, WI 53703", "(555) 456-7890", 60),
+            _ => ("", "", "", 0)
         };
 
         if (string.IsNullOrEmpty(name))
