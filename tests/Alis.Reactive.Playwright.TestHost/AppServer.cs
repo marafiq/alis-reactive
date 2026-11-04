@@ -32,7 +32,7 @@ public abstract class AppServer(Assembly app, params (string Name, string Value)
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"\"{app.Location}\" --urls {url}",
+                Arguments = $"\"{app.Location}\" --urls {url} --alis-test-host {Environment.ProcessId}",
                 WorkingDirectory = ContentRoot(name),
                 UseShellExecute = false,
                 RedirectStandardOutput = true,

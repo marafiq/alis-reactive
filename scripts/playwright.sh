@@ -350,6 +350,26 @@ if [ "$list_only" -eq 1 ]; then
   exit 0
 fi
 
+stop_apps_whose_test_run_ended() {
+  local pid args url host
+  while read -r pid args; do
+    [[ "$args" =~ --urls[[:space:]]+(http://localhost:[0-9]+)[[:space:]]+--alis-test-host[[:space:]]+([0-9]+) ]] || continue
+    url="${BASH_REMATCH[1]}"
+    host="${BASH_REMATCH[2]}"
+    kill -0 "$host" 2>/dev/null && continue
+    echo "[playwright:runner] stopping an app its test run left behind: pid $pid at $url (test host $host has exited)"
+    kill "$pid" 2>/dev/null || continue
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+      kill -0 "$pid" 2>/dev/null || break
+      sleep 0.5
+    done
+    if kill -0 "$pid" 2>/dev/null; then kill -9 "$pid" 2>/dev/null || true; fi
+  done < <(ps -eo pid=,args=)
+}
+
+stop_apps_whose_test_run_ended
+trap stop_apps_whose_test_run_ended EXIT
+
 attempt_trx=""
 
 run_attempt() {
