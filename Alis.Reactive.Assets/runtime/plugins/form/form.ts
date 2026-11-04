@@ -6,7 +6,7 @@ import { asText } from "../../grammar/shape";
 import { isRecord } from "../../shared/record";
 import { logger } from "../../diagnostics/trace";
 import { COMMIT_EVENT } from "../../plans/mount-events";
-import { containedInputs, isMountedInput, namedInputs, type NamedInput } from "../model";
+import { boundNameOf, containedInputs, isMountedInput, namedInputs, type NamedInput } from "../model";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
   showInline, showServerInline, showsServerMessage, showSummaryDiv, summaryHasEntries,
@@ -17,7 +17,11 @@ const log = logger("validation");
 interface Entry {
   readonly field: FormField;
   readonly objects: PlanObjects;
+}
+
+interface Form {
   readonly summary: string;
+  entries: Entry[];
 }
 
 export interface FormObject {
@@ -25,16 +29,16 @@ export interface FormObject {
   showErrors(problem: unknown): void;
 }
 
-const formsByContainer = new Map<string, Entry[]>();
+const forms = new Map<string, Form>();
 let inputsListened = false;
 
-function entriesOf(containerId: string): Entry[] {
-  let entries = formsByContainer.get(containerId);
-  if (!entries) {
-    entries = [];
-    formsByContainer.set(containerId, entries);
+function formOf(containerId: string, summary: string): Form {
+  let form = forms.get(containerId);
+  if (!form) {
+    form = { summary, entries: [] };
+    forms.set(containerId, form);
   }
-  return entries;
+  return form;
 }
 
 function addSummaryError(summary: HTMLElement | null, key: string, message: string): void {
@@ -117,7 +121,7 @@ function unmountedField(entry: Entry, summary: HTMLElement | null): boolean {
 }
 
 function validate(containerId: string, summaryId: string): boolean {
-  const entries = entriesOf(containerId);
+  const { entries } = formOf(containerId, summaryId);
   const container = document.getElementById(containerId);
   if (container === null) {
     if (entries.length === 0) return true;
@@ -144,21 +148,21 @@ interface Holder {
 
 function holdersOf(element: HTMLElement): Holder[] {
   const holders: Holder[] = [];
-  for (const [containerId, entries] of formsByContainer) {
-    const container = entries.length > 0 ? document.getElementById(containerId) : null;
+  for (const [containerId, form] of forms) {
+    const container = document.getElementById(containerId);
     if (container === null || !container.contains(element)) continue;
-    const checks = entries.flatMap(entry =>
+    const checks = form.entries.flatMap(entry =>
       namedInputs(entry.field.name).filter(input => input.id === element.id).map(input => ({ entry, input })));
-    if (checks.length === 0) continue;
-    holders.push({ summary: document.getElementById(checks[0]!.entry.summary), checks });
+    holders.push({ summary: document.getElementById(form.summary), checks });
   }
   return holders;
 }
 
 function revalidate(element: HTMLElement): void {
   const holders = holdersOf(element);
+  const name = boundNameOf(element.id);
   clearInline(element.id);
-  for (const { summary, checks } of holders) removeSummaryError(summary, checks[0]!.input.name);
+  for (const { summary } of holders) removeSummaryError(summary, name);
   for (const { summary, checks } of holders) {
     for (const { entry, input } of checks) {
       if (!evaluateInput(entry, input, summary)) return;
@@ -238,14 +242,14 @@ export const formPlugin: Plugin = {
   }),
   contribute({ key, data: contributed, owner, objects }: Contribution) {
     const data = contributed as FormPluginData;
-    const entries = entriesOf(key);
-    const added = data.fields.map(field => ({ field, objects, summary: data.summary }));
-    entries.push(...added);
+    const form = formOf(key, data.summary);
+    const added = data.fields.map(field => ({ field, objects }));
+    form.entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
     listenToInputs();
 
     owner.onDispose(() => {
-      formsByContainer.set(key, entriesOf(key).filter(entry => !added.includes(entry)));
+      form.entries = form.entries.filter(entry => !added.includes(entry));
       clearAndHide(document.getElementById(data.summary));
     });
   },

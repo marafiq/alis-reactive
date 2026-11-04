@@ -46,6 +46,17 @@ public sealed class ValidationController : Controller
 
     public IActionResult OutingCard() => View(new ResidentOuting());
 
+    public IActionResult LateReturn() => View(new ResidentReturn());
+
+    [HttpPost("/Validation/LateReturn")]
+    public IActionResult SignBackIn([FromBody] ResidentReturn residentReturn, [FromServices] ResidentReturnRules rules)
+    {
+        var result = rules.Validate(residentReturn);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = $"{residentReturn.Resident} signed back in" });
+    }
+
     [HttpPost("/Validation/Outing")]
     public IActionResult SignOutForAnOuting([FromBody] ResidentOuting outing)
     {

@@ -56,6 +56,10 @@ export function invalidClassOf(id: string): string {
   return mountedInput(id)!.binding.invalidClass;
 }
 
+export function boundNameOf(id: string): string {
+  return mountedInput(id)!.binding.name;
+}
+
 export function isMountedInput(element: HTMLElement): boolean {
   if (element.id === "") return false;
   return mountedInput(element.id)?.objects.element(element.id) === element;
