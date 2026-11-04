@@ -19,7 +19,7 @@ if (mode === "flaky") {
   const passedOnRerun = results(rerunTrxPath, passed);
   for (const fqn of [...failedFirst.keys()].sort()) {
     if (passedOnRerun.has(fqn)) {
-      console.log(annotation("warning", "Flaky test", `${fqn} failed, then passed on re-run (docs/CI.md, "Flaky tests")`, failedFirst.get(fqn)));
+      console.log(annotation("warning", "Flaky test", `${fqn} failed, then passed on re-run`, failedFirst.get(fqn)));
     }
   }
   process.exit(0);

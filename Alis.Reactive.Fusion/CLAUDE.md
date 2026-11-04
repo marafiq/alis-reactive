@@ -36,8 +36,7 @@ public Event<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBo
 - A method that returns a value or an object (`Method<T>()`, `MethodAsync<T>()`, `Object<T>()` on a
   method) runs once per callback, before the first line that uses its result, or at its own line
   when no line does; every later use reads what it returned, except that an async result first
-  used inside a branch's arm or a request's part is asked again by a line outside it
-  (`docs/design/grammar.md#31-bindings`).
+  used inside a branch's arm or a request's part is asked again by a line outside it.
 - `Object<T>()` on a property declares an object the component holds, with members and events of
   its own; `Objects<T>()` a list of them (`At(i)`, `Count`, `Each(item => item.Field)`).
 - `Arg<T>` parameters take a literal or a value read when the step runs, in the JavaScript method's
@@ -50,8 +49,6 @@ public Event<FusionNumericTextBoxChangeArgs> Change => Event<FusionNumericTextBo
 - An event payload is a class deriving `JsObject`: `ReadOnly<T>` for what it carries, `Property<T>`
   for what EJ2 reads back after the handler (`Cancel`, `PreventDefaultAction`), and methods for what it
   can do (`UpdateData`). Plain data inside a payload (a row, an action) stays a plain class.
-
-The method in full: `docs/design/bring-your-own-component.md`.
 
 ## When editing here
 

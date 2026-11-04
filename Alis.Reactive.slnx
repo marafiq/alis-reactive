@@ -9,10 +9,6 @@
     <File Path=".claude/rules/tests.md" />
     <File Path=".claude/rules/views.md" />
   </Folder>
-  <Folder Name="/docs/">
-    <File Path="docs/design/grammar.md" />
-    <File Path="docs/design/bring-your-own-component.md" />
-  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Alis.Reactive.AnalyzerTests/Alis.Reactive.AnalyzerTests.csproj" />
     <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />

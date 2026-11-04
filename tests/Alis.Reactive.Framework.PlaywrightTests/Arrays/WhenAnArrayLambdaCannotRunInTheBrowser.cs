@@ -29,7 +29,7 @@ public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
     {
         await Render("ComputeAProjection");
 
-        await Expect(Message("An array lambda reads the item (x => x), its members (x => x.Field, x => x.A.B), and the members, methods and operators of the member table (grammar.md 2.3); a computed object and arithmetic have no form the plan writes.")).ToBeVisibleAsync();
+        await Expect(Message("An array lambda reads the item (x => x), its members (x => x.Field, x => x.A.B), and the members, methods and operators a plan can call on a value; a computed object and arithmetic have no form the plan writes.")).ToBeVisibleAsync();
     }
 
     [Test]

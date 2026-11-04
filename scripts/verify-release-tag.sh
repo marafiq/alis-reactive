@@ -53,7 +53,7 @@ for branch_ref in refs/remotes/origin/main $(git for-each-ref --format='%(refnam
   fi
 done
 if [ -z "$reachable_from" ]; then
-  fail 6 "Commit $commit (tag $tag) is not reachable from origin/main or any origin/release/* branch. Releases are cut from main (or from a release/X.Y hotfix line): merge first, then tag the merged commit. See docs/RELEASING.md."
+  fail 6 "Commit $commit (tag $tag) is not reachable from origin/main or any origin/release/* branch. Releases are cut from main (or from a release/X.Y hotfix line): merge first, then tag the merged commit."
 fi
 
 echo "[verify-tag] $tag is annotated: $(git for-each-ref "$ref" --format='%(taggername) %(taggeremail) %(taggerdate:iso8601) -- %(contents:subject)')"

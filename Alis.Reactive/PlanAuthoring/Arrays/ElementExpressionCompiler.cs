@@ -247,7 +247,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
 
             throw new InvalidOperationException(
                 "An array lambda reads the item (x => x), its members (x => x.Field, x => x.A.B), and the members, " +
-                "methods and operators of the member table (grammar.md 2.3); a computed object and arithmetic have " +
+                "methods and operators a plan can call on a value; a computed object and arithmetic have " +
                 "no form the plan writes. Project the value on the server. Got: " + node);
         }
 

@@ -18,7 +18,7 @@ shipped components and the sandbox journeys and adds the Component and journey t
 ## The rules
 
 1. **One promise, named as the promise.** A test proves one thing a developer or a user is promised: what a
-   public member's XML docs say, a behavior of `docs/design/grammar.md`, or what a role sees on a journey.
+   public member's XML docs say, a behavior of the plan grammar (`Alis.Reactive/Grammar`), or what a role sees on a journey.
    The fixture is the situation (`WhenAPageBranches`, `WhenCoordinatorAssignsABed`); the test is the promise
    as a sentence (`else_runs_only_when_no_arm_holds`). A name that describes code
    (`writes_a_let_statement`, `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise.

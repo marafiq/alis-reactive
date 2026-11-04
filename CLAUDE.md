@@ -44,8 +44,8 @@ inverts that: a developer brings any component through framework abstractions by
 typed properties, methods and events, every framework feature works for it unchanged, and the
 framework supplies more defaults so the developer types less. Steer the redesign by this vision and
 by the typed SDK that already exists (read the source; it is rich), not by old docs or plans. The
-old artifact-gated onboarding pipeline was removed on purpose; do not rebuild it. Design:
-`docs/design/bring-your-own-component.md`. A component, shipped or brought, is one declaration
+old artifact-gated onboarding pipeline was removed on purpose; do not rebuild it. A component,
+shipped or brought, is one declaration
 class (members and events by their JavaScript names) and a render helper, built on the core's
 public surface, with zero TypeScript runtime changes: a component that seems to need one means the
 plan is missing information, and the C# side carries it.
@@ -55,7 +55,8 @@ plan is missing information, and the C# side carries it.
 C# DSL → steps, values and conditions that each write the plan grammar where they are used
 (`Alis.Reactive/PlanModel`) → plan JSON in the view (`Html.RenderPlan(plan)`) → generated TS contract
 (`runtime/types/plan.ts`) → TypeScript runtime executes the plan. There is one C# model; no semantic
-graph and no lowering pass sit between the builders and the grammar. The grammar is specified in `docs/design/grammar.md`.
+graph and no lowering pass sit between the builders and the grammar. The grammar is the sealed nodes in
+`Alis.Reactive/Grammar`.
 
 - C# never executes browser behavior. The runtime never invents behavior the plan does not carry.
   Make invalid behavior unrepresentable in the plan domain.
@@ -133,10 +134,10 @@ Everything else stays sync.
 
 ## Workflow
 
-- `main` is the trunk and the release line. A release is an annotated `vX.Y.Z[-rc.N]` tag on `main`
-  (`docs/RELEASING.md`, `docs/BRANCHING.md`, `docs/CI.md`).
-- Branch from `origin/main` in a worktree and land by pull request (`feature/`, `fix/`, `chore/`,
-  `docs/`). A SessionStart hook installs the pre-commit guard that refuses commits on `main`.
+- `main` is the trunk and the release line. A release is an annotated `vX.Y.Z[-rc.N]` tag on `main`:
+  `scripts/verify-release-tag.sh` checks it and `.github/workflows/nuget-publish.yml` publishes it.
+- Branch from `origin/main` in a worktree and land by pull request (`feature/`, `fix/`, `chore/`). A
+  SessionStart hook installs the pre-commit guard that refuses commits on `main`.
 
   ```bash
   git worktree add .worktrees/<name> -b feature/<name> origin/main
@@ -155,8 +156,8 @@ Everything else stays sync.
 - A review names the branch and HEAD SHA it read. A finding counts only if its `file:line` exists
   at HEAD.
 - `scripts/doctor.sh` (preflight), `scripts/build.sh`, `scripts/run.sh` (sandbox at
-  http://localhost:5220), `scripts/pack.sh <version>`. Watchers:
-  `docs/developer-cli.md#ui-developer-workflows`.
+  http://localhost:5220), `scripts/pack.sh <version>`. Watchers: `npm run watch:runtime` and the other
+  watch scripts in `package.json`.
 - Syncfusion EJ2 33.1.47 with npm and NuGet pinned together; upgrade with
   `node scripts/pin-syncfusion.mjs <version>`.
 

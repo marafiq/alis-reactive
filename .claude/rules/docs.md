@@ -1,6 +1,5 @@
 ---
 paths:
-  - "docs/**"
   - "**/*.md"
   - "**/*.cs"
 ---
@@ -56,8 +55,7 @@ or `<param>` earns its place: concise, accurate, and written for the developer r
 
 A CLAUDE.md, or a file under `.claude/rules` or `.claude/agents`, names the code in backticks, and
 `tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` fails once what it names moves or is renamed. A path
-is written from the root or from the rule's folder, a section as an anchor (`docs/design/grammar.md#31-bindings`),
-never a line. Text the code writes goes in quotes (`"yyyy-MM-dd"`). A C# block quotes declarations as the code
+is written from the root or from the rule's folder, never with a line. Text the code writes goes in quotes (`"yyyy-MM-dd"`). A C# block quotes declarations as the code
 declares them, or is marked `csharp illustration`. What a rule cites from outside the repo goes on that test's list.
 
 ## Workflow

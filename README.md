@@ -15,9 +15,8 @@ any JavaScript component (Syncfusion, native inputs, their own) through one type
 - **Working on the framework:** `scripts/doctor.sh`, `scripts/build.sh`, `scripts/run.sh`, then open
   http://localhost:5220 ([Getting started](#getting-started)).
 
-**Look next:** [the map of this repository](#the-repository), `docs/design/grammar.md` (what a plan
-means), `docs/design/bring-your-own-component.md` (bring a component), `docs/developer-cli.md` (every
-command), and `CLAUDE.md` (the rules every contributor and coding agent follows).
+**Look next:** [the map of this repository](#the-repository) and `CLAUDE.md` (the rules every
+contributor and coding agent follows).
 
 ## Packages
 
@@ -64,8 +63,7 @@ scripts/build.sh    # npm dependencies, browser bundles, dotnet build
 scripts/run.sh      # the sandbox at http://localhost:5220
 ```
 
-The sandbox's home page is the index of its pages. Every command, the watchers for live edits, and the
-narrowest proof for each kind of change are in [docs/developer-cli.md](docs/developer-cli.md).
+The sandbox's home page is the index of its pages. Each script prints its options with `--help`.
 
 ## How the bundles ship
 
@@ -210,10 +208,9 @@ The framework's stylesheets style the defaults; an app that renames styles its o
 | `examples/` | `resident-intake`, an app built only from the packed packages; `net48-mvc-smoke`, the MVC 5 app CI runs under IIS Express |
 | `tests/` | The test projects (Playwright, NUnit, analyzers, architecture) and the apps they drive |
 | `tools/` | `PlanContractGenerator`, which writes the runtime's `plan.ts` and `plan.schema.json` from the C# grammar |
-| `scripts/` | The command-line wrappers: doctor, build, run, test, Playwright, pack, example ([docs/developer-cli.md](docs/developer-cli.md)) |
+| `scripts/` | The command-line wrappers: doctor, build, run, test, Playwright, pack, example; each prints its options with `--help` |
 | `build/` | MSBuild targets: the two the packages ship (static web assets, the net48 `Content` copy) and the one the repo's apps use to build their browser assets |
-| `docs/` | The grammar, the component guide, the ADRs, and how CI, branching and releasing work |
-| `.github/` | CI workflows, Dependabot, release notes and the pull-request template |
+| `.github/` | CI workflows, Dependabot and release notes |
 | `.claude/`, `CLAUDE.md`, `AGENTS.md` | The rules, principles and hooks every contributor and coding agent follows (`AGENTS.md` links to `CLAUDE.md`) |
 | `Alis.Reactive.slnx` | The solution: every project except the two examples |
 | `Directory.Build.props`, `global.json` | Shared build settings (version, language, package metadata, public-surface checks) and the pinned .NET SDK |

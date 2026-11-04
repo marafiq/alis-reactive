@@ -27,7 +27,7 @@ namespace Alis.Reactive.Analyzers.SliceTree
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "ADR-0004: a package is an inverted tree of concept slices, one per folder, each using only the slices in rows below it in the package's SliceTree.txt.");
+            description: "a package is an inverted tree of concept slices, one per folder, each using only the slices in rows below it in the package's SliceTree.txt.");
 
         private static readonly DiagnosticDescriptor Namespace = new DiagnosticDescriptor(
             NamespaceId,
@@ -36,7 +36,7 @@ namespace Alis.Reactive.Analyzers.SliceTree
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "ADR-0004: every public type of a package is in the package's one namespace; an internal-only file's namespace is its folder.");
+            description: "every public type of a package is in the package's one namespace; an internal-only file's namespace is its folder.");
 
         private static readonly DiagnosticDescriptor Sealed = new DiagnosticDescriptor(
             SealedId,
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Analyzers.SliceTree
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "ADR-0004: a public class that no type in its package derives from is sealed; the open classes are the bases with a subclass beside them.");
+            description: "a public class that no type in its package derives from is sealed; the open classes are the bases with a subclass beside them.");
 
         private static readonly DiagnosticDescriptor Table = new DiagnosticDescriptor(
             TableId,
@@ -54,7 +54,7 @@ namespace Alis.Reactive.Analyzers.SliceTree
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "ADR-0004: each shipped package carries a SliceTree.txt whose rows name every folder once, and every entry names a folder.");
+            description: "each shipped package carries a SliceTree.txt whose rows name every folder once, and every entry names a folder.");
 
         private static readonly DiagnosticDescriptor MissingTable = new DiagnosticDescriptor(
             TableId,
@@ -63,7 +63,7 @@ namespace Alis.Reactive.Analyzers.SliceTree
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "ADR-0004: each shipped package carries a SliceTree.txt whose rows name every folder once, and every entry names a folder.",
+            description: "each shipped package carries a SliceTree.txt whose rows name every folder once, and every entry names a folder.",
             customTags: WellKnownDiagnosticTags.CompilationEnd);
 
         private static readonly ImmutableArray<OperationKind> OperationKinds =

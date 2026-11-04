@@ -1,7 +1,7 @@
 # TS Runtime: the grammar interpreter
 
 Root CLAUDE.md is authoritative. This directory runs the plans C# renders. The plan is a small
-grammar (`docs/design/grammar.md`, normative): objects located on elements or made by registered
+grammar (the sealed nodes of `Alis.Reactive/Grammar`, generated into `types/plan.ts`): objects located on elements or made by registered
 plugins, handlers of their events, six statements and ten expressions. The interpreter names no
 feature; every feature is a plugin.
 

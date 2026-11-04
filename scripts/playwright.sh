@@ -207,8 +207,8 @@ Options:
   --project <name>      Run one project. Without --project or --shard, every project runs,
                         each against its own app, and a filter applies to each.
   --filter <expr>       VSTest filter expression to pass through unchanged.
-  --shard <name>        Run one CI shard: a fixed, documented partition of its project's tests
-                        (docs/CI.md, "Sharding"). Selects the project that declares it. Cannot be
+  --shard <name>        Run one CI shard: a fixed partition of a project's tests, declared in its
+                        playwright.project.sh. Selects that project. Cannot be
                         combined with --project or --filter.
   --list-shards         Print every project's CI shard names, one per line, and exit.
   --list-projects       Print the project names, one per line, and exit.
@@ -217,7 +217,7 @@ Options:
                         per line, without running them: dotnet test --list-tests for the
                         discovered set (it ignores --filter), then the same filter grammar
                         applied by scripts/vstest-filter.mjs. A project's shard lists together
-                        must equal its full list, each test exactly once (docs/CI.md, "Sharding").
+                        must equal its full list, each test exactly once.
   --retry-failed <n>    After a red run, re-run only the failed tests, up to n more
                         times (default 0). A test that then passes is reported as flaky:
                         [playwright:flaky] lines and TestResults/observable/flaky-<stamp>.txt.
@@ -488,7 +488,7 @@ run_project() {
         echo
         sed 's/^/- `/; s/$/`/' "$flaky_path"
         echo
-        echo "Two red runs in a row is a regression or a quarantine candidate: docs/CI.md, \"Flaky tests\"."
+        echo "Two red runs in a row is a regression or a quarantine candidate."
       } >> "$GITHUB_STEP_SUMMARY"
     fi
     if [ "${GITHUB_ACTIONS:-}" = "true" ]; then

@@ -18,7 +18,7 @@ seconds.
 
 ## What a test is
 
-One promise of the grammar (`docs/design/grammar.md`), stated in the test's name as the sentence a
+One promise of the grammar (`Alis.Reactive/Grammar`), stated in the test's name as the sentence a
 developer would say, with the plan it writes kept beside it as a golden under
 `Goldens/<Fixture>/<test>.json`. The assertions name the part of the plan that carries the promise;
 the golden pins the rest. A refusal test authors the mistake through the typed builders the way a
@@ -39,7 +39,7 @@ Every golden on disk is checked against `Alis.Reactive.Assets/runtime/types/plan
 (`Contract/WhenAPlanIsEmbedded.cs`); a plan the grammar's classes could not have written fails there.
 
 A golden is reviewed, never just regenerated. `ALIS_UPDATE_GOLDENS=1 dotnet test tests/Alis.Reactive.PlanTests`
-rewrites every golden; read each diff against `docs/design/grammar.md` before committing it, and say in the
+rewrites every golden; read each diff against the grammar's nodes before committing it, and say in the
 commit what changed in what a page carries and why.
 
 The runtime runs these goldens: `Alis.Reactive.Assets/runtime/__tests__/authored-plans.test.ts`

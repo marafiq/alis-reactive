@@ -45,7 +45,7 @@ values propagate silently. A fallback is a rare, deliberate, justified exception
 
 ## Validation Design
 
-The reference is `docs/design/grammar.md#7-validation-projection`: the validator grammar (`ReactiveValidator<T>`, FluentValidation's
+The reference is the code in `Alis.Reactive/Validation`: the validator grammar (`ReactiveValidator<T>`, FluentValidation's
 syntax), what each check decides on the server and the browser form the plan carries, and what stays on the server by
 what it is. The principles that hold:
 

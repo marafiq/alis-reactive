@@ -12,7 +12,6 @@
     <None Include="bundle.ts" />
     <None Include="*.json" />
     <None Include="*.mjs" />
-    <None Include="*.md" />
   </ItemGroup>
 
 </Project>

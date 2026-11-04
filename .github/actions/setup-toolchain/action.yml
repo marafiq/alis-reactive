@@ -2,7 +2,6 @@ name: Set up the Alis.Reactive toolchain
 description: >-
   One definition of the build toolchain for every workflow: the .NET SDK pinned by global.json,
   Node with the npm cache, and a NuGet package cache. Change a version here, never in a workflow.
-  Rationale and the caching decisions: docs/CI.md.
 
 inputs:
   node-version:

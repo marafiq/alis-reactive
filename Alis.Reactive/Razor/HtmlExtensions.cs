@@ -73,7 +73,7 @@ namespace Alis.Reactive
         /// </summary>
         /// <remarks>
         /// A click inside several such elements raises the event of the nearest. The listener is any plan's
-        /// <c>t.CustomEvent(appEvent, ...)</c>; the element needs no plan of its own (grammar.md 6.1, D4).
+        /// <c>t.CustomEvent(appEvent, ...)</c>; the element needs no plan of its own.
         /// </remarks>
         /// <param name="html">The view's HTML helper.</param>
         /// <param name="appEvent">The event, declared once with <see cref="AppEvent.Declare(string, string)"/>.</param>
@@ -110,7 +110,7 @@ namespace Alis.Reactive
         /// Each member of the payload is one attribute holding its value as text, which the listener reads as the
         /// member's type, as it reads every value: text, a number, a bool, a date, a Guid or an enum. A member left
         /// null is read as missing. A member that is a record or a list is refused when the view renders; a payload
-        /// that holds one is raised from a pipeline, with <c>p.Dispatch</c> (grammar.md 6.1, D4).
+        /// that holds one is raised from a pipeline, with <c>p.Dispatch</c>.
         /// </remarks>
         /// <typeparam name="TPayload">The payload the event declares.</typeparam>
         /// <param name="html">The view's HTML helper.</param>
