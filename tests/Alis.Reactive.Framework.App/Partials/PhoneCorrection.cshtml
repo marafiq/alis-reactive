@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Partials
+@model PhoneCorrection
+@{
+    var plan = Html.ReactivePlan<PhoneCorrection>();
+}
+<section class="phone-correction">
+    <h2>The family's phone</h2>
+    @{ Html.InputField(plan, m => m.Value, o => o.Label("Phone")).Entry(); }
+
+    <p>The phone saved: <span id="phone-saved"></span></p>
+
+    @(plan.Button("save-phone", "Save the phone")
+        .Reactive(button => button.Click, p => p.Post("/Partials/CorrectPhone")
+            .Gather(g => g.Form(m => m.Value))
+            .Response(r => r.OnSuccess<PartialsEcho>((echo, s) => s.Element("phone-saved").Text.Set(echo.Get(x => x.Summary))))))
+</section>
+
+@Html.RenderPlan(plan)

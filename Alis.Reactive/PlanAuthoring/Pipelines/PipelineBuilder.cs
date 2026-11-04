@@ -124,16 +124,17 @@ namespace Alis.Reactive
                 HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
 
         /// <summary>
-        /// A member of this plan's model as MVC binds it: the input that binds the member's name, whichever view
-        /// rendered it, read as the server binds what it posts; missing when no input on the page binds the member,
-        /// as the server sees a member no input posts.
+        /// A member of this plan's model as MVC binds it: the input this view rendered for the member or, when it
+        /// rendered none, the input that binds the member's name, whichever view rendered it, read as the server binds
+        /// what it posts; missing when that input is not on the page, as the server sees a member no input posts.
         /// </summary>
         /// <remarks>
         /// It reads a member a partial renders only sometimes, conditionally or loaded later, where a component
         /// read fails because the component is not on the page:
-        /// <c>p.When(p.Bound(m =&gt; m.NextOfKin.Name)).IsNull()</c>. It is the read the form's rules and named
-        /// sends make, by the same binding name, so the page judges the member as they do; of two inputs that bind
-        /// the name, it reads the one that joined the page last, the one a form holding both sends.
+        /// <c>p.When(p.Bound(m =&gt; m.NextOfKin.Name)).IsNull()</c>. It is the read the named sends make, by the
+        /// same binding name. A partial that renders its own input for a name another partial's input also binds
+        /// reads its own. When only other views render inputs for the name, it reads the one that joined the page
+        /// last, the one a form holding both sends.
         /// </remarks>
         /// <typeparam name="TProp">The member's type.</typeparam>
         /// <param name="member">

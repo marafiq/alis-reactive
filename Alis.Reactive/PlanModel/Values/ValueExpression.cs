@@ -133,8 +133,9 @@ namespace Alis.Reactive.PlanModel.Values
         internal static ValueExpression ReadUrl(string key, Shape shape) => new UrlRead(key, shape);
 
         /// <summary>
-        /// A member as MVC binds it, by its binding name: the input on the page that binds it, whichever view rendered
-        /// it; missing when none is on the page (grammar.md M8).
+        /// A member as MVC binds it, by its binding name: the input the plan rendered for it or, when it rendered none,
+        /// the input on the page that binds it, whichever view rendered it; missing when none is on the page
+        /// (grammar.md M8).
         /// </summary>
         internal static ValueExpression ReadBound(string name, Shape shape) =>
             new BoundRead(name, shape, BoundRead.Page, G.List(Array.Empty<Expr>()));
@@ -332,8 +333,13 @@ namespace Alis.Reactive.PlanModel.Values
         // second time.
         internal override Expr Write(Scope scope)
         {
-            var inputs = _containerId == Page ? scope.Objects.Model() : scope.Objects.Inputs(_containerId);
-            return G.Call(G.Obj(inputs), new[] { "valueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any);
+            if (_containerId != Page)
+                return G.Call(G.Obj(scope.Objects.Inputs(_containerId)), new[] { "valueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any);
+
+            var args = scope.Objects.TryFindOnlyInputItRendered(_name, out var own)
+                ? new[] { G.Lit(_name), _indexes, G.Lit(own) }
+                : new[] { G.Lit(_name), _indexes };
+            return G.Call(G.Obj(scope.Objects.Model()), new[] { "valueOf" }, args, Shape.Any);
         }
     }
 

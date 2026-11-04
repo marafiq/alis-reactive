@@ -154,8 +154,9 @@ namespace Alis.Reactive
         /// rendered for a member of the page's model.
         /// </summary>
         /// <remarks>
-        /// Each is read as <c>p.Bound</c> reads it: of two inputs that bind one name, the one that joined the page
-        /// last, the one a form holding both sends; nothing when no input on the page binds it. A request other than
+        /// Each is read as <c>p.Bound</c> reads it: the input this view rendered for the member; when it rendered none,
+        /// of the inputs other views render for its name the one that joined the page last, the one a form holding both
+        /// sends; nothing when that input is not on the page. A request other than
         /// the view model must have a member for each binding name, prefix included, of a type the input's value binds
         /// to; the view is refused when it renders otherwise.
         /// </remarks>

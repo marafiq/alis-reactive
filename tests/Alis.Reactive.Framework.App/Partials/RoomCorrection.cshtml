@@ -1,0 +1,23 @@
+@using Alis.Reactive.Framework.App.Partials
+@model RoomCorrection
+@{
+    var plan = Html.ReactivePlan<RoomCorrection>();
+}
+<section class="room-correction">
+    <h2>The resident's room</h2>
+    <div id="room-shelf">@{ Html.InputField(plan, m => m.Value, o => o.Label("Room")).Entry(); }</div>
+
+    <p>The room on file: <span id="room-read"></span></p>
+    <p>The room saved: <span id="room-saved"></span></p>
+
+    @(plan.Button("read-room", "Read the room")
+        .Reactive(button => button.Click, p => p.Element("room-read").Text.Set(p.Bound(m => m.Value))))
+    @(plan.Button("save-room", "Save the room")
+        .Reactive(button => button.Click, p => p.Post("/Partials/CorrectRoom")
+            .Gather(g => g.Form(m => m.Value))
+            .Response(r => r.OnSuccess<PartialsEcho>((echo, s) => s.Element("room-saved").Text.Set(echo.Get(x => x.Summary))))))
+    @(plan.Button("put-room-away", "Put the room's field away")
+        .Reactive(button => button.Click, p => p.Unload("room-shelf")))
+</section>
+
+@Html.RenderPlan(plan)

@@ -644,7 +644,13 @@ slot's load or unload, 3.5) removes exactly the entries it contributed and keeps
     of the item they check: the input inside the form first, as its `Form()` sends it, else a member the
     request sends beside the form.
   - On the page's table, `plugin("alis.model", "")`, whose container is the page, `p.Bound(m => ..)` and
-    a `Form(m => ..)` field read through it, at no index (`[]`).
+    a `Form(m => ..)` field read through it, at no index (`[]`). When their plan rendered exactly one input
+    that binds the name, the read names it, `valueOf(name, [], inputId)`: that input, or missing once it has
+    left the page, never another view's, so a partial reads its own input though another partial's input binds
+    the same name (cards of several models, each binding `Value`). A plan that rendered none (or several)
+    names none and reads the input another view rendered for the member, of several the one contributed last,
+    the one a form holding both sends. A plan that renders its own input for a name, in a form that also holds
+    another view's input of that name, reads its own while that form sends the last.
 
   The member's name is the same whichever view renders its input, so the page's rule, its bound read
   and its named send reach the input a partial of any model, an editor template or a slot's content

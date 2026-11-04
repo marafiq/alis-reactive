@@ -123,6 +123,16 @@ public sealed class PartialsController : Controller
 
     public IActionResult Changeover() => View(new ChangeoverPage());
 
+    public IActionResult Corrections() => View(new CorrectionsPage());
+
+    /// <summary>Binds a room correction as any endpoint does and says which room it bound.</summary>
+    [HttpPost]
+    public IActionResult CorrectRoom([FromBody] RoomCorrection correction) => Said($"room {correction.Value ?? "none"}");
+
+    /// <summary>Binds a phone correction as any endpoint does and says which phone it bound.</summary>
+    [HttpPost]
+    public IActionResult CorrectPhone([FromBody] PhoneCorrection correction) => Said($"phone {correction.Value ?? "none"}");
+
     public IActionResult Bookings() => View(new BookingsPage());
 
     /// <summary>Binds the visit as any endpoint does, checks it by the visit's rules, and says whom it booked.</summary>

@@ -146,6 +146,10 @@
                                     {
                                       "kind": "list",
                                       "items": []
+                                    },
+                                    {
+                                      "kind": "lit",
+                                      "value": "Alis_Reactive_PlanTests_Support_Contact__NextOfKin_Name"
                                     }
                                   ]
                                 }

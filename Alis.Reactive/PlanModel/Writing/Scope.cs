@@ -207,6 +207,7 @@ namespace Alis.Reactive.PlanModel.Writing
         private readonly List<string> _order = new List<string>();
         private readonly Dictionary<string, ComponentVendor> _elementVendors = new Dictionary<string, ComponentVendor>(StringComparer.Ordinal);
         private readonly Dictionary<string, Vendor> _vendors = new Dictionary<string, Vendor>(StringComparer.Ordinal);
+        private IReadOnlyDictionary<string, InputBinding> _renderedInputs = new Dictionary<string, InputBinding>(StringComparer.Ordinal);
 
         internal PlanObjects(IEnumerable<DeclaredObject> declared)
         {
@@ -234,7 +235,20 @@ namespace Alis.Reactive.PlanModel.Writing
         internal string Confirm() => PluginObject(ConfirmId, "alis.confirm", "", PluginData.None);
 
         // The page's one table of mounted inputs, which every plan joins with the inputs it rendered (grammar.md 6.3).
-        internal string Model(ModelPluginData data) => PluginObject(ModelId, "alis.model", "", data);
+        internal string Model(ModelPluginData data)
+        {
+            _renderedInputs = data.Inputs;
+            return PluginObject(ModelId, "alis.model", "", data);
+        }
+
+        internal bool TryFindOnlyInputItRendered(string bindingName, out string inputId)
+        {
+            inputId = "";
+            var rendered = _renderedInputs.Where(input => input.Value.Name == bindingName).Select(input => input.Key).ToList();
+            if (rendered.Count != 1) return false;
+            inputId = rendered[0];
+            return true;
+        }
 
         internal string Model() => PluginObject(ModelId, "alis.model", "", PluginData.None);
 

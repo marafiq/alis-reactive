@@ -257,6 +257,26 @@ public sealed class BookingRules : ReactiveValidator<BookingsPage>
     }
 }
 
+/// <summary>
+/// A desk that corrects a resident's room and the family's phone on one page, each through a partial of a model of
+/// its own (RoomCorrection, PhoneCorrection) whose plan is its own; both inputs bind Value.
+/// </summary>
+public sealed class CorrectionsPage
+{
+}
+
+/// <summary>A correction of the resident's room.</summary>
+public sealed class RoomCorrection
+{
+    public string? Value { get; set; }
+}
+
+/// <summary>A correction of the family's phone.</summary>
+public sealed class PhoneCorrection
+{
+    public string? Value { get; set; }
+}
+
 /// <summary>What an endpoint bound, in its own words.</summary>
 public sealed class PartialsEcho
 {

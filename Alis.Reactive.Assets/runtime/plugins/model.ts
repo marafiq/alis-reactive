@@ -27,7 +27,8 @@
 //    that binds the pattern at those indexes, the first `[*]` the first index, the one inside the container, else
 //    the one elsewhere on the page, the one contributed last of several; missing when none is on the page, as the
 //    server sees a member no input posts. A form's tests read on the form's container; a bound read and a named
-//    send read on the page's table, whose container is the page.
+//    send read on the page's table, whose container is the page, and a plan that rendered the input for the name
+//    names it (`inputId`): that input, or missing once it has left the page, never another view's.
 
 import type { BodyStep, InputBinding, ModelPluginData } from "../types/index";
 import type { Contribution, Plugin } from "../objects/plugins";
@@ -50,7 +51,7 @@ interface ModelInput {
 }
 
 export interface BoundValues {
-  valueOf(pattern: string, indexes: readonly number[]): unknown;
+  valueOf(pattern: string, indexes: readonly number[], inputId?: string): unknown;
 }
 
 export interface ContainedInputs extends BoundValues {
@@ -117,15 +118,17 @@ function escapedForPattern(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function boundValueIn(holder: Node, pattern: string, indexes: readonly number[]): unknown {
-  const at = namedInputs(pattern).filter(input => input.indexes.every((index, position) => index === indexes[position]));
+function boundValueIn(holder: Node, pattern: string, indexes: readonly number[], inputId?: string): unknown {
+  const at = namedInputs(pattern)
+    .filter(input => input.indexes.every((index, position) => index === indexes[position]))
+    .filter(input => inputId === undefined || input.id === inputId);
   const held = at.filter(input => holder.contains(input.element));
   const read = held.length > 0 ? held[held.length - 1] : at[at.length - 1];
   return read?.value;
 }
 
 const pageModel: BoundValues = {
-  valueOf: (pattern, indexes) => boundValueIn(document, pattern, indexes),
+  valueOf: (pattern, indexes, inputId) => boundValueIn(document, pattern, indexes, inputId),
 };
 
 export function containedInputs(containerId: string): ContainedInputs {
