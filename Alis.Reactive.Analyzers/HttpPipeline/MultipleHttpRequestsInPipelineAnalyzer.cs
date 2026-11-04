@@ -23,8 +23,8 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
                          "Use Parallel(...) for concurrent requests or separate triggers for independent requests.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -76,7 +76,9 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
 
                 if (!StartsHttpChainOnParameter(exprStatement.Expression, pipelineParamName,
                     context.SemanticModel, requestExtensionsType, context.CancellationToken))
+                {
                     continue;
+                }
 
                 httpStatementCount++;
                 if (httpStatementCount >= 2)

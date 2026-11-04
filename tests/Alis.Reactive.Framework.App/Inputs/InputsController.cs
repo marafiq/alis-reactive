@@ -35,8 +35,8 @@ public sealed class InputsController : Controller
             booking.Tags is { Count: > 0 } tags ? "tags " + string.Join(" and ", tags.Select(tag => $"'{tag}'")) : "no tags"),
     };
 
-    private string Bound(string label, string member, string value) =>
-        ModelState.TryGetValue(member, out var entry) && entry.Errors.Count > 0
+    private string Bound(string label, string member, string value)
+        => ModelState.TryGetValue(member, out var entry) && entry.Errors.Count > 0
             ? $"{label} '{entry.AttemptedValue}' not bound"
             : $"{label} {value}";
 
@@ -78,8 +78,8 @@ public sealed class InputsController : Controller
     });
 
     [HttpPost("/Inputs/Contacts/Posted")]
-    public IActionResult ContactsPosted([FromForm] ContactsPage contacts) =>
-        Content($"Posted: primary {Said(contacts.Primary)}, alternate {Said(contacts.Alternate)}");
+    public IActionResult ContactsPosted([FromForm] ContactsPage contacts)
+        => Content($"Posted: primary {Said(contacts.Primary)}, alternate {Said(contacts.Alternate)}");
 
     private static string Said(ContactCard card) => $"{card.Name ?? "none"} ({card.Phones.FirstOrDefault() ?? "none"})";
 

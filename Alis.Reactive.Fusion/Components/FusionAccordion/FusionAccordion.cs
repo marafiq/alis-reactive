@@ -33,8 +33,8 @@ namespace Alis.Reactive.Fusion
         public void EnableItem(Arg<int> index, Arg<bool> isEnable) => Method(index, isEnable);
 
         /// <summary>Raised after an item expands or collapses.</summary>
-        public Event<FusionAccordionExpandedArgs> Expanded =>
-            Event<FusionAccordionExpandedArgs>();
+        public Event<FusionAccordionExpandedArgs> Expanded
+            => Event<FusionAccordionExpandedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionAccordion.Expanded"/>.</summary>

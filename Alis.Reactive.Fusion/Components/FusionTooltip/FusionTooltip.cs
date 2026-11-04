@@ -29,24 +29,24 @@ namespace Alis.Reactive.Fusion
         public void Refresh() => Method();
 
         /// <summary>Raised before the tooltip opens.</summary>
-        public Event<FusionTooltipBeforeOpenArgs> BeforeOpen =>
-            Event<FusionTooltipBeforeOpenArgs>();
+        public Event<FusionTooltipBeforeOpenArgs> BeforeOpen
+            => Event<FusionTooltipBeforeOpenArgs>();
 
         /// <summary>Raised before the tooltip closes.</summary>
-        public Event<FusionTooltipBeforeCloseArgs> BeforeClose =>
-            Event<FusionTooltipBeforeCloseArgs>();
+        public Event<FusionTooltipBeforeCloseArgs> BeforeClose
+            => Event<FusionTooltipBeforeCloseArgs>();
 
         /// <summary>Raised after the tooltip opens.</summary>
-        public Event<FusionTooltipAfterOpenArgs> AfterOpen =>
-            Event<FusionTooltipAfterOpenArgs>();
+        public Event<FusionTooltipAfterOpenArgs> AfterOpen
+            => Event<FusionTooltipAfterOpenArgs>();
 
         /// <summary>Raised after the tooltip closes.</summary>
-        public Event<FusionTooltipAfterCloseArgs> AfterClose =>
-            Event<FusionTooltipAfterCloseArgs>();
+        public Event<FusionTooltipAfterCloseArgs> AfterClose
+            => Event<FusionTooltipAfterCloseArgs>();
 
         /// <summary>Raised before the tooltip renders its content.</summary>
-        public Event<FusionTooltipBeforeRenderArgs> BeforeRender =>
-            Event<FusionTooltipBeforeRenderArgs>();
+        public Event<FusionTooltipBeforeRenderArgs> BeforeRender
+            => Event<FusionTooltipBeforeRenderArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionTooltip.BeforeOpen"/>.</summary>

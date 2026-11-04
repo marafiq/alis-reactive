@@ -1,8 +1,8 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.WireTerms;
-using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
@@ -53,8 +53,10 @@ namespace Alis.Reactive
         internal ValueExpression Build()
         {
             if (_draft.IsEmpty)
+            {
                 throw new InvalidOperationException(
                     "Dispatch payload must have at least one field. An event with no payload is declared with AppEvent.Declare() and raised with Dispatch(appEvent).");
+            }
 
             return _draft.ToValueExpression();
         }

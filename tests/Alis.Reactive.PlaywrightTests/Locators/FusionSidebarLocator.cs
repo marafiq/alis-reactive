@@ -19,6 +19,6 @@ public sealed class FusionSidebarLocator
 
     public ILocator ClosedRoot => _page.Locator($"#{_componentId}.e-close");
 
-    public ILocator NavLink(string text) =>
-        Root.GetByRole(AriaRole.Link, new() { Name = text });
+    public ILocator NavLink(string text)
+        => Root.GetByRole(AriaRole.Link, new() { Name = text });
 }

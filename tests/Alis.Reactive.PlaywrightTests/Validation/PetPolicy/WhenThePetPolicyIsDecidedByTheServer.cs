@@ -16,11 +16,11 @@ public class WhenThePetPolicyIsDecidedByTheServer : PlaywrightTestBase
     private ILocator PolicyStatus => Page.Locator("#policy-status");
     private ILocator ValidationSummary => Page.Locator("[data-reactive-validation-summary]");
 
-    private ILocator Field(Expression<Func<PetPolicyModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator Field(Expression<Func<PetPolicyModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
-    private ILocator ErrorFor(Expression<Func<PetPolicyModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}_error");
+    private ILocator ErrorFor(Expression<Func<PetPolicyModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}_error");
 
     private async Task NavigateAndBoot()
     {

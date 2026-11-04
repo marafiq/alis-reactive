@@ -9,55 +9,55 @@ public class IncompleteConditionalChainTests
     private const string Message = "Incomplete conditional chain — call .Then() to complete the condition";
 
     [Test]
-    public Task a_source_chosen_without_an_operator_is_reported() =>
-        Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
+    public Task a_source_chosen_without_an_operator_is_reported()
+        => Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             [|p.When(link.Get(q => q.Resident))|];
             """));
 
     [Test]
-    public Task a_guard_without_then_is_reported() =>
-        Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
+    public Task a_guard_without_then_is_reported()
+        => Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             [|p.When(link.Get(q => q.Resident)).Eq("Maple")|];
             """));
 
     [Test]
-    public Task an_all_guard_without_then_is_reported() =>
-        Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
+    public Task an_all_guard_without_then_is_reported()
+        => Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             [|p.When(link.Get(q => q.Resident)).Eq("Maple").And(link.Get(q => q.Wing)).Eq("East")|];
             """));
 
     [Test]
-    public Task an_any_guard_without_then_is_reported() =>
-        Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
+    public Task an_any_guard_without_then_is_reported()
+        => Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             [|p.When(link.Get(q => q.Resident)).Eq("Maple").Or(link.Get(q => q.Wing)).Eq("East")|];
             """));
 
     [Test]
-    public Task a_confirm_without_then_is_reported() =>
-        Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
+    public Task a_confirm_without_then_is_reported()
+        => Fixture.Reports<IncompleteConditionalChainAnalyzer>("ALIS001", Message, Fixture.View, View(
             """
             [|p.Confirm("Discharge this resident?")|];
             """));
 
     [Test]
-    public Task a_condition_completed_with_then_is_not_reported() =>
-        Fixture.ReportsNothing<IncompleteConditionalChainAnalyzer>(Fixture.View, View(
+    public Task a_condition_completed_with_then_is_not_reported()
+        => Fixture.ReportsNothing<IncompleteConditionalChainAnalyzer>(Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             p.When(link.Get(q => q.Resident)).Eq("Maple").Then(maple => maple.Get("/wings/maple"));
             """));
 
     [Test]
-    public Task a_file_that_is_not_a_view_is_left_alone() =>
-        Fixture.ReportsNothing<IncompleteConditionalChainAnalyzer>(Fixture.Controller, View(
+    public Task a_file_that_is_not_a_view_is_left_alone()
+        => Fixture.ReportsNothing<IncompleteConditionalChainAnalyzer>(Fixture.Controller, View(
             """
             var link = p.Url<ShiftQuery>();
             p.When(link.Get(q => q.Resident)).Eq("Maple");

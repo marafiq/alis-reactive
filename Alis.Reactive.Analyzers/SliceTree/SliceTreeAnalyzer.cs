@@ -73,8 +73,8 @@ namespace Alis.Reactive.Analyzers.SliceTree
                 .Distinct()
                 .ToImmutableArray();
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Edge, Namespace, Sealed, Table, MissingTable);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Edge, Namespace, Sealed, Table, MissingTable);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -92,8 +92,11 @@ namespace Alis.Reactive.Analyzers.SliceTree
             if (table == null || text == null)
             {
                 if (AnalyzerHelpers.ShippedAssemblies.Contains(assemblyName))
+                {
                     context.RegisterCompilationEndAction(end => end.ReportDiagnostic(
                         Diagnostic.Create(MissingTable, Location.None, $"'{assemblyName}' ships without a {TableFileName}")));
+                }
+
                 return;
             }
 
@@ -232,7 +235,9 @@ namespace Alis.Reactive.Analyzers.SliceTree
 
                 if (type.TypeKind == TypeKind.Class && type.DeclaredAccessibility == Accessibility.Public
                     && !type.IsSealed && !type.IsAbstract && !type.IsStatic && !bases.Value.Contains(type))
+                {
                     context.ReportDiagnostic(Diagnostic.Create(Sealed, at, type.ToDisplayString()));
+                }
             }
 
             public void AnalyzeMember(SymbolAnalysisContext context)
@@ -310,7 +315,10 @@ namespace Alis.Reactive.Analyzers.SliceTree
             {
                 if (definition.ContainingAssembly == null
                     || !SymbolEqualityComparer.Default.Equals(definition.ContainingAssembly, compilation.Assembly))
+                {
                     return null;
+                }
+
                 var declared = definition;
                 while (declared.DeclaringSyntaxReferences.IsEmpty)
                 {
@@ -335,19 +343,26 @@ namespace Alis.Reactive.Analyzers.SliceTree
             private static IEnumerable<INamedTypeSymbol> AllTypes(INamespaceSymbol @namespace)
             {
                 foreach (var type in @namespace.GetTypeMembers())
+                {
                     foreach (var nested in WithNested(type))
                         yield return nested;
+                }
+
                 foreach (var child in @namespace.GetNamespaceMembers())
+                {
                     foreach (var type in AllTypes(child))
                         yield return type;
+                }
             }
 
             private static IEnumerable<INamedTypeSymbol> WithNested(INamedTypeSymbol type)
             {
                 yield return type;
                 foreach (var nested in type.GetTypeMembers())
+                {
                     foreach (var inner in WithNested(nested))
                         yield return inner;
+                }
             }
 
             private static void Parameters(Site site, ImmutableArray<IParameterSymbol> parameters, System.Threading.CancellationToken cancellationToken)
@@ -363,8 +378,10 @@ namespace Alis.Reactive.Analyzers.SliceTree
             private static void Constraints(Site site, ImmutableArray<ITypeParameterSymbol> typeParameters)
             {
                 foreach (var typeParameter in typeParameters)
+                {
                     foreach (var constraint in typeParameter.ConstraintTypes)
                         site.Type(constraint);
+                }
             }
 
             private static void Attributes(Site site, ImmutableArray<AttributeData> attributes, System.Threading.CancellationToken cancellationToken)
@@ -392,11 +409,11 @@ namespace Alis.Reactive.Analyzers.SliceTree
                 foreach (var parameter in method.Parameters) site.Type(parameter.Type);
             }
 
-            private static bool DeclaresPublicType(MemberDeclarationSyntax member) =>
-                DeclaresType(member) && member.Modifiers.Any(SyntaxKind.PublicKeyword);
+            private static bool DeclaresPublicType(MemberDeclarationSyntax member)
+                => DeclaresType(member) && member.Modifiers.Any(SyntaxKind.PublicKeyword);
 
-            private static bool DeclaresType(MemberDeclarationSyntax member) =>
-                member is BaseTypeDeclarationSyntax || member is DelegateDeclarationSyntax;
+            private static bool DeclaresType(MemberDeclarationSyntax member)
+                => member is BaseTypeDeclarationSyntax || member is DelegateDeclarationSyntax;
 
             private static SyntaxToken Identifier(MemberDeclarationSyntax member) => member switch
             {
@@ -483,14 +500,20 @@ namespace Alis.Reactive.Analyzers.SliceTree
                     case IFunctionPointerTypeSymbol functionPointer:
                         foreach (var inner in Named(functionPointer.Signature.ReturnType)) yield return inner;
                         foreach (var parameter in functionPointer.Signature.Parameters)
+                        {
                             foreach (var inner in Named(parameter.Type))
                                 yield return inner;
+                        }
+
                         yield break;
                     case INamedTypeSymbol named:
                         yield return named;
                         foreach (var argument in named.TypeArguments)
+                        {
                             foreach (var inner in Named(argument))
                                 yield return inner;
+                        }
+
                         yield break;
                 }
             }

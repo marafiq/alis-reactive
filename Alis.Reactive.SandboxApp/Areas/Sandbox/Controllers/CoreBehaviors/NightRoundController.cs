@@ -8,7 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.CoreBehaviors
     public class NightRoundController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/CoreBehaviors/NightRound/Index.cshtml", new NightRoundModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/CoreBehaviors/NightRound/Index.cshtml", new NightRoundModel());
     }
 }

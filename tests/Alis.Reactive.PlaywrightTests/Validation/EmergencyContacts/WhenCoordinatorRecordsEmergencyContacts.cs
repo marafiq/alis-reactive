@@ -14,11 +14,11 @@ public class WhenCoordinatorRecordsEmergencyContacts : PlaywrightTestBase
     private ConcurrentQueue<string> _intakesSent = null!;
     private ConcurrentQueue<string> _contactSavesSent = null!;
 
-    private ILocator Field(Expression<Func<EmergencyContactsModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator Field(Expression<Func<EmergencyContactsModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
-    private ILocator ErrorFor(Expression<Func<EmergencyContactsModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}_error");
+    private ILocator ErrorFor(Expression<Func<EmergencyContactsModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}_error");
 
     private ILocator IntakeHeading => Page.GetByRole(AriaRole.Heading, new() { Name = "Resident Intake: Emergency Contacts" });
     private ILocator SaveIntake => Page.Locator("#save-emergency-contacts-btn");

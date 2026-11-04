@@ -46,8 +46,8 @@ public class WhenUsingFusionGridCareOps : PlaywrightTestBase
     private DropDownListLocator NewCareLevel => new(Page, IdGenerator.For<CareOpsViewModel>(m => m.NewCareLevel));
     private DropDownListLocator NewRiskLevel => new(Page, IdGenerator.For<CareOpsViewModel>(m => m.NewRiskLevel));
     private NumericTextBoxLocator NewOpenTasks => new(Page, IdGenerator.For<CareOpsViewModel>(m => m.NewOpenTasks));
-    private ILocator ErrorFor(System.Linq.Expressions.Expression<Func<CareOpsViewModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}_error");
+    private ILocator ErrorFor(System.Linq.Expressions.Expression<Func<CareOpsViewModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}_error");
 
     private ConcurrentQueue<string> _dischargesSent = null!;
 

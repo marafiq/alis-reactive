@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.PlanModel.Document;
-using Alis.Reactive.PlanModel.Reactions;
-using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Inputs;
 using Alis.Reactive.Members;
-using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.PlanAuthoring.Pipelines;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Reactions;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive
 {
@@ -114,8 +114,8 @@ namespace Alis.Reactive
         /// </param>
         /// <returns>The component: <c>rate.Min.Set(0m)</c>, <c>rate.Increment()</c>, <c>p.When(rate.Value).Gt(1m)</c>.</returns>
         public TComponent Component<TComponent>(Expression<Func<TModel, object?>> expr)
-            where TComponent : JsObject, IComponent, new() =>
-            Live<TComponent>(IdGenerator.ForMember(
+            where TComponent : JsObject, IComponent, new()
+            => Live<TComponent>(IdGenerator.ForMember(
                 ExpressionPathHelper.ToDeclarer(expr),
                 HtmlFieldPrefix.Join(Context.FieldPrefix, ExpressionPathHelper.ToMemberName(expr.Body))));
 
@@ -157,16 +157,16 @@ namespace Alis.Reactive
         /// <returns>The component, whose members the page uses directly.</returns>
         public TComponent Component<TComponent, TOtherModel>(Expression<Func<TOtherModel, object?>> expr)
             where TComponent : JsObject, IComponent, new()
-            where TOtherModel : class =>
-            Live<TComponent>(IdGenerator.For(expr));
+            where TOtherModel : class
+            => Live<TComponent>(IdGenerator.For(expr));
 
         /// <summary>The component the view rendered with an id it chose.</summary>
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <param name="refId">The component's element id.</param>
         /// <returns>The component: <c>grid.Refresh()</c>, <c>grid.SelectRow(0)</c>.</returns>
         public TComponent Component<TComponent>(string refId)
-            where TComponent : JsObject, IComponent, new() =>
-            Live<TComponent>(refId);
+            where TComponent : JsObject, IComponent, new()
+            => Live<TComponent>(refId);
 
         /// <summary>An app object the layout renders once, at the id its declaration names: Toast, Drawer, Loader.</summary>
         /// <typeparam name="TComponent">The app object's declaration.</typeparam>

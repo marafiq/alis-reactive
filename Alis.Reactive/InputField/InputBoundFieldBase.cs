@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Linq.Expressions;
-using Alis.Reactive.Inputs;
 using Alis.Reactive.InputField;
+using Alis.Reactive.Inputs;
 
 namespace Alis.Reactive
 {
@@ -41,8 +41,8 @@ namespace Alis.Reactive
 
         private readonly InputIdentity _identity;
 
-        internal void AddRenderedInput(IInputComponent component) =>
-            Plan.AddRenderedInput(component.RenderedAs(_identity));
+        internal void AddRenderedInput(IInputComponent component)
+            => Plan.AddRenderedInput(component.RenderedAs(_identity));
 
         internal InputBoundFieldBase(
             THelper helper,
@@ -96,7 +96,7 @@ namespace Alis.Reactive
             ReactivePlan<TModel> plan,
             Expression<Func<TModel, TProp>> expression,
             InputFieldOptions options,
-            InputIdentity identity) =>
-            new BoundInputField<TModel, TProp>(plan, expression, options, identity);
+            InputIdentity identity)
+            => new BoundInputField<TModel, TProp>(plan, expression, options, identity);
     }
 }

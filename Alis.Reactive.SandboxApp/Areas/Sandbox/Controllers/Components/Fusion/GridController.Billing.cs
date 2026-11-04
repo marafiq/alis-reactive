@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -115,10 +115,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var census = GetBillingCensus();
             var name = request.NewResidentName!.Trim();
             if (census.Any(r => r.ResidentName.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            {
                 return ValidationError(new Dictionary<string, string[]>
                 {
                     [nameof(ResidentBillingViewModel.NewResidentName)] = [$"{name} already has charges this month."]
                 });
+            }
 
             var row = new ResidentBillingItem
             {
@@ -167,15 +169,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return seed;
         }
 
-        private void SaveBillingCensus(List<ResidentBillingItem> census) =>
-            HttpContext.Session.SetString(BillingSessionKey, JsonSerializer.Serialize(census));
+        private void SaveBillingCensus(List<ResidentBillingItem> census)
+            => HttpContext.Session.SetString(BillingSessionKey, JsonSerializer.Serialize(census));
 
-        private static HashSet<int> BillingPicked(BillingBulkRequest request) =>
-            (request.SelectedRecords ?? new List<ResidentBillingItem>()).Select(r => r.ResidentId).ToHashSet();
+        private static HashSet<int> BillingPicked(BillingBulkRequest request)
+            => (request.SelectedRecords ?? new List<ResidentBillingItem>()).Select(r => r.ResidentId).ToHashSet();
 
         private static IEnumerable<ResidentBillingItem> FilterBilling(
-            IEnumerable<ResidentBillingItem> source, string? careLevel, string? wing, string? status) =>
-            source
+            IEnumerable<ResidentBillingItem> source, string? careLevel, string? wing, string? status)
+            => source
                 .Where(r => string.IsNullOrWhiteSpace(careLevel) || r.CareLevel.Equals(careLevel, StringComparison.OrdinalIgnoreCase))
                 .Where(r => string.IsNullOrWhiteSpace(wing) || r.Wing.Equals(wing, StringComparison.OrdinalIgnoreCase))
                 .Where(r => string.IsNullOrWhiteSpace(status) || r.BillingStatus.Equals(status, StringComparison.OrdinalIgnoreCase));
@@ -220,8 +222,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return $"{residents}{scope}: {BillingDollars(rows.Sum(r => r.BalanceDue))} outstanding.";
         }
 
-        private static decimal BillingBalance(ResidentBillingItem r) =>
-            r.BillingStatus == "Paid" ? 0m : r.MonthlyRate + r.AddOnCharges;
+        private static decimal BillingBalance(ResidentBillingItem r)
+            => r.BillingStatus == "Paid" ? 0m : r.MonthlyRate + r.AddOnCharges;
 
         private static string BillingDollars(decimal amount) => "$" + amount.ToString("N0", CultureInfo.InvariantCulture);
 

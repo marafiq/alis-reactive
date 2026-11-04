@@ -55,7 +55,10 @@ namespace Alis.Reactive.Analyzers
                 if (baseType.IsGenericType
                     && SymbolEqualityComparer.Default.Equals(
                         baseType.ConstructedFrom, reactiveValidatorType))
+                {
                     return true;
+                }
+
                 baseType = baseType.BaseType;
             }
 
@@ -75,7 +78,10 @@ namespace Alis.Reactive.Analyzers
         {
             if (invocation.Expression is MemberAccessExpressionSyntax memberAccess
                 && memberAccess.Expression is InvocationExpressionSyntax receiver)
+            {
                 return receiver;
+            }
+
             return null;
         }
     }

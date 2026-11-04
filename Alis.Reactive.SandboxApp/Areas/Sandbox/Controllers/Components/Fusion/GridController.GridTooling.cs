@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("GridTooling"), ActionName("GridTooling")]
-        public IActionResult ShiftSchedulePage() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/Grid/GridTooling.cshtml", new ShiftScheduleViewModel());
+        public IActionResult ShiftSchedulePage()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/Grid/GridTooling.cshtml", new ShiftScheduleViewModel());
 
         [HttpGet("GridToolingShifts")]
         public IActionResult GridToolingShifts()

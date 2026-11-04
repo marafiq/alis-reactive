@@ -118,8 +118,8 @@ namespace Alis.Reactive.Fusion
             return html.ToString();
         }
 
-        internal static string SelectedWhenRowHolds(string fieldName, string value) =>
-            "${if(" + fieldName + " === '" + value.Replace("\\", "\\\\").Replace("'", "\\'") + "')} selected${/if}";
+        internal static string SelectedWhenRowHolds(string fieldName, string value)
+            => "${if(" + fieldName + " === '" + value.Replace("\\", "\\\\").Replace("'", "\\'") + "')} selected${/if}";
     }
 
     /// <summary>
@@ -140,24 +140,24 @@ namespace Alis.Reactive.Fusion
         /// <param name="field">The edited member, for example <c>r =&gt; r.Name</c>.</param>
         /// <param name="label">The label shown above the field.</param>
         /// <returns>This builder, for the next field.</returns>
-        public FusionGridDialogFormBuilder<TRow> Text<TField>(Expression<Func<TRow, TField>> field, string label) =>
-            AddField(field, label, name => "<input name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
+        public FusionGridDialogFormBuilder<TRow> Text<TField>(Expression<Func<TRow, TField>> field, string label)
+            => AddField(field, label, name => "<input name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
 
         /// <summary>Adds a labeled numeric field bound to a typed row field.</summary>
         /// <typeparam name="TField">The type of the edited member.</typeparam>
         /// <param name="field">The edited member, for example <c>r =&gt; r.OpenTasks</c>.</param>
         /// <param name="label">The label shown above the field.</param>
         /// <returns>This builder, for the next field.</returns>
-        public FusionGridDialogFormBuilder<TRow> Number<TField>(Expression<Func<TRow, TField>> field, string label) =>
-            AddField(field, label, name => "<input type=\"number\" name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
+        public FusionGridDialogFormBuilder<TRow> Number<TField>(Expression<Func<TRow, TField>> field, string label)
+            => AddField(field, label, name => "<input type=\"number\" name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
 
         /// <summary>Adds a labeled date field bound to a typed row field.</summary>
         /// <typeparam name="TField">The type of the edited member.</typeparam>
         /// <param name="field">The edited member, for example <c>r =&gt; r.NextReviewDate</c>.</param>
         /// <param name="label">The label shown above the field.</param>
         /// <returns>This builder, for the next field.</returns>
-        public FusionGridDialogFormBuilder<TRow> Date<TField>(Expression<Func<TRow, TField>> field, string label) =>
-            AddField(field, label, name => "<input type=\"date\" name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
+        public FusionGridDialogFormBuilder<TRow> Date<TField>(Expression<Func<TRow, TField>> field, string label)
+            => AddField(field, label, name => "<input type=\"date\" name=\"" + name + "\" value=\"${" + name + "}\" class=\"e-field e-input\" />");
 
         /// <summary>Adds a labeled single-select field bound to a typed row field.</summary>
         /// <typeparam name="TField">The type of the edited member.</typeparam>
@@ -166,8 +166,8 @@ namespace Alis.Reactive.Fusion
         /// <param name="options">The option texts; each is also the option's value, and empty texts are skipped.</param>
         /// <returns>This builder, for the next field.</returns>
         public FusionGridDialogFormBuilder<TRow> Select<TField>(
-            Expression<Func<TRow, TField>> field, string label, IEnumerable<string> options) =>
-            AddField(field, label, name => BuildSelect(name, options));
+            Expression<Func<TRow, TField>> field, string label, IEnumerable<string> options)
+            => AddField(field, label, name => BuildSelect(name, options));
 
         private FusionGridDialogFormBuilder<TRow> AddField<TField>(
             Expression<Func<TRow, TField>> field, string label, Func<string, string> editor)

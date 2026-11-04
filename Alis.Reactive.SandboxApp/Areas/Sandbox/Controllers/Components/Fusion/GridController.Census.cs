@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("Census"), ActionName("Census")]
-        public IActionResult AgeCensusPage() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/Grid/Census.cshtml", new AgeCensusViewModel());
+        public IActionResult AgeCensusPage()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/Grid/Census.cshtml", new AgeCensusViewModel());
 
         [HttpPost("CensusResidents")]
         public IActionResult CensusResidents([FromBody] AgeCensusQuery query)
@@ -57,8 +57,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return ordered.ThenBy(r => r.Name, StringComparer.Ordinal);
         }
 
-        private static Func<AgeCensusResident, IComparable> AgeCensusSortKey(string column) =>
-            column switch
+        private static Func<AgeCensusResident, IComparable> AgeCensusSortKey(string column)
+            => column switch
             {
                 "name" => r => r.Name,
                 "age" => r => r.Age,
@@ -77,8 +77,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return query.RequiresCounts ? $"{range} of {counted} residents{ages}." : $"{range}{ages}.";
         }
 
-        private static string AgeCensusChange(AgeCensusQuery query, int counted) =>
-            query.Change switch
+        private static string AgeCensusChange(AgeCensusQuery query, int counted)
+            => query.Change switch
             {
                 "" => "Every resident, by name.",
                 FusionGridAction.Paging => AgeCensusPageChange(query, counted),

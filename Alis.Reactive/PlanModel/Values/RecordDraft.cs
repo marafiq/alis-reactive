@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Alis.Reactive.WireTerms;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanModel.Values
 {

@@ -29,10 +29,10 @@ public static class DayPickerHtml
         string id,
         IReadOnlyList<DateTime> days,
         IReadOnlyList<DateTime> booked)
-        where TModel : class =>
-        plan.Render<DayPicker>(id, new HtmlString(
+        where TModel : class
+        => plan.Render<DayPicker>(id, new HtmlString(
             $"<div class=\"day-picker\" id=\"{HtmlEncoder.Default.Encode(id)}\" data-days=\"{Days(days)}\" data-booked=\"{Days(booked)}\"></div>"));
 
-    private static string Days(IReadOnlyList<DateTime> days) =>
-        string.Join("|", days.Select(day => day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)));
+    private static string Days(IReadOnlyList<DateTime> days)
+        => string.Join("|", days.Select(day => day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)));
 }

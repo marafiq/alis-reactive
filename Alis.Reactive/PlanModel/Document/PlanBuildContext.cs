@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Inputs;
+using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Reactions;
 using Alis.Reactive.PlanModel.Requests;
 using Alis.Reactive.PlanModel.Validation;
 using Alis.Reactive.PlanModel.Writing;
-using Alis.Reactive.Members;
 using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanModel.Document
@@ -49,9 +49,12 @@ namespace Alis.Reactive.PlanModel.Document
         internal void Seal()
         {
             if (Rendered)
+            {
                 throw new InvalidOperationException(
                     $"The plan of {View} is rendered twice, so every handler it holds would run twice: render it once, " +
                     "after the last behavior written to it.");
+            }
+
             Rendered = true;
         }
 
@@ -92,17 +95,20 @@ namespace Alis.Reactive.PlanModel.Document
             get
             {
                 if (_blocks.Count == 0)
+                {
                     throw new InvalidOperationException(
                         "A reaction step was written outside any callback. Write it inside a trigger, a component's " +
                         ".Reactive, Then, Else, OnSuccess, OnError, WhileLoading, Finally or OnAllSettled callback.");
+                }
+
                 return _blocks.Peek();
             }
         }
 
         internal void AddStep(Step step) => ActiveBlock.Add(step);
 
-        internal void On(Func<PlanObjects, string> on, IReadOnlyList<string> path, string eventName, Block body) =>
-            _handlers.Add((on, path, eventName, body));
+        internal void On(Func<PlanObjects, string> on, IReadOnlyList<string> path, string eventName, Block body)
+            => _handlers.Add((on, path, eventName, body));
 
         internal void DeclareElement(string elementId)
         {
@@ -116,9 +122,12 @@ namespace Alis.Reactive.PlanModel.Document
             if (_declaredById.TryGetValue(componentId, out var existing))
             {
                 if (existing.Vendor.Name != vendor.Name)
+                {
                     throw new InvalidOperationException(
                         $"Element '{componentId}' is named as a component of vendor '{existing.Vendor.Name}' and as one of vendor " +
                         $"'{vendor.Name}', but an element holds one component: name it by the declaration of the component its view renders.");
+                }
+
                 return;
             }
 
@@ -143,9 +152,11 @@ namespace Alis.Reactive.PlanModel.Document
         internal void RegisterPlugin(string name)
         {
             if (!_plugins.Add(name))
+            {
                 throw new InvalidOperationException(
                     $"Plugin '{name}' is registered twice on the plan of {View}: register it once, and use the plugin " +
                     "RegisterPlugin returned wherever the view needs it.");
+            }
         }
 
         private void Add(DeclaredObject declared)
@@ -160,14 +171,19 @@ namespace Alis.Reactive.PlanModel.Document
             {
                 if (other == request || otherValidation.Form != validation.Form) continue;
                 if (otherValidation.Validator != validation.Validator)
+                {
                     throw new InvalidOperationException(
                         $"Form '{validation.Form}' is validated by {CSharpTypeName.Of(otherValidation.Validator)} and by " +
                         $"{CSharpTypeName.Of(validation.Validator)}, but a form takes one validator. Give each validator a " +
                         "form of its own, or write one validator whose rules differ by When conditions.");
+                }
+
                 if (otherValidation.RuleSet != validation.RuleSet)
+                {
                     throw new InvalidOperationException(
                         $"Form '{validation.Form}' is validated by {CSharpTypeName.Of(validation.Validator)} under {otherValidation.DescribedRuleSet} " +
                         $"and under {validation.DescribedRuleSet}, but a form takes one validator and one rule set. Give each a form of its own.");
+                }
             }
 
             var index = _validatedRequests.FindIndex(validated => validated.Request == request);
@@ -183,8 +199,8 @@ namespace Alis.Reactive.PlanModel.Document
             if (!_forms.ContainsKey(formId)) _forms.Add(formId, Array.Empty<CheckedField>());
         }
 
-        internal IReadOnlyList<string> Forms =>
-            _validatedRequests
+        internal IReadOnlyList<string> Forms
+            => _validatedRequests
                 .Select(validated => validated.Validation.Form)
                 .Concat(_forms.Keys)
                 .Distinct(StringComparer.Ordinal)
@@ -206,8 +222,10 @@ namespace Alis.Reactive.PlanModel.Document
 
             var forms = new FormWriter(Scope.ForHandler(plan, "$form"));
             foreach (var declared in _declared)
+            {
                 if (_forms.TryGetValue(declared.Id, out var fields))
                     objects.Form(declared.Id, forms.Form(declared.Id, fields));
+            }
 
             var handlers = _handlers
                 .Select(handler =>

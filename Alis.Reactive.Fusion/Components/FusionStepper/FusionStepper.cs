@@ -35,16 +35,16 @@ namespace Alis.Reactive.Fusion
         public void RefreshProgressbar() => Method();
 
         /// <summary>Raised after the active step changes.</summary>
-        public Event<FusionStepperChangedArgs> StepChanged =>
-            Event<FusionStepperChangedArgs>();
+        public Event<FusionStepperChangedArgs> StepChanged
+            => Event<FusionStepperChangedArgs>();
 
         /// <summary>Raised before the active step changes.</summary>
-        public Event<FusionStepperChangingArgs> StepChanging =>
-            Event<FusionStepperChangingArgs>();
+        public Event<FusionStepperChangingArgs> StepChanging
+            => Event<FusionStepperChangingArgs>();
 
         /// <summary>Raised when the user clicks a step.</summary>
-        public Event<FusionStepperClickArgs> StepClick =>
-            Event<FusionStepperClickArgs>();
+        public Event<FusionStepperClickArgs> StepClick
+            => Event<FusionStepperClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionStepper.StepChanged"/>.</summary>

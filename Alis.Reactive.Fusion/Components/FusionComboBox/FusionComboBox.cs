@@ -48,18 +48,18 @@ namespace Alis.Reactive.Fusion
         public void Clear() => Method();
 
         /// <summary>Raised when the selected value changes.</summary>
-        public Event<FusionComboBoxChangeArgs> Change =>
-            Event<FusionComboBoxChangeArgs>();
+        public Event<FusionComboBoxChangeArgs> Change
+            => Event<FusionComboBoxChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
-        public Event<FusionComboBoxFocusArgs> Focus =>
-            Event<FusionComboBoxFocusArgs>();
+        public Event<FusionComboBoxFocusArgs> Focus
+            => Event<FusionComboBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
-        public Event<FusionComboBoxBlurArgs> Blur =>
-            Event<FusionComboBoxBlurArgs>();
+        public Event<FusionComboBoxBlurArgs> Blur
+            => Event<FusionComboBoxBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionComboBox.Change"/>.</summary>

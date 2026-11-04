@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {

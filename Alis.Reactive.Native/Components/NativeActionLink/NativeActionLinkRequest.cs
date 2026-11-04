@@ -41,13 +41,13 @@ namespace Alis.Reactive.Native
         /// <typeparam name="TComponent">The component's declaration.</typeparam>
         /// <param name="refId">The component's id.</param>
         public TComponent Component<TComponent>(string refId)
-            where TComponent : JsObject, IComponent, new() =>
-            _pipeline.Component<TComponent>(refId);
+            where TComponent : JsObject, IComponent, new()
+            => _pipeline.Component<TComponent>(refId);
 
         /// <summary>Asks the user first; the request goes in <c>Then</c>, and <c>Else</c> runs when they decline.</summary>
         /// <param name="message">The question.</param>
-        public NativeActionLinkConfirm<TModel> Confirm(string message) =>
-            new NativeActionLinkConfirm<TModel>(_pipeline.Confirm(message), _href, _sent);
+        public NativeActionLinkConfirm<TModel> Confirm(string message)
+            => new NativeActionLinkConfirm<TModel>(_pipeline.Confirm(message), _href, _sent);
     }
 
     /// <summary>A link's question to the user, before its request.</summary>
@@ -83,15 +83,19 @@ namespace Alis.Reactive.Native
         {
             _sent++;
             if (_sent > 1)
+            {
                 throw new InvalidOperationException(
                     $"A NativeActionLink sends one request, to its href '{href}'; this one sends a second.");
+            }
         }
 
         internal void RequireOne(string href)
         {
             if (_sent == 0)
+            {
                 throw new InvalidOperationException(
                     $"The NativeActionLink to '{href}' sends no request; call Get(), Post(), Put() or Delete().");
+            }
         }
     }
 }

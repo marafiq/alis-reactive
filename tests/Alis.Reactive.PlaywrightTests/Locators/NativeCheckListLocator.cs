@@ -15,8 +15,8 @@ public sealed class NativeCheckListLocator
 
     private ILocator Root => _page.Locator($"#{_componentId}");
 
-    public ILocator Box(string optionText) =>
-        Root.Locator("label")
+    public ILocator Box(string optionText)
+        => Root.Locator("label")
             .Filter(new() { Has = _page.GetByText(optionText, new() { Exact = true }) })
             .Locator("input[type=checkbox]");
 

@@ -14,10 +14,10 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
     private ILocator AddToConference => Page.Locator("#add-to-conference");
     private ILocator Status => Page.Locator("#review-status");
     private ILocator PickedResidents => Reviews.SelectedRows.Locator($"td[aria-colindex='{ResidentColumn}']");
-    private ILocator StartReview(string resident) =>
-        Reviews.Row(resident).GetByRole(AriaRole.Button, new() { Name = "Start review" });
-    private ILocator ReadySuite(string resident) =>
-        Reviews.Row(resident).GetByRole(AriaRole.Button, new() { Name = "Ready the suite" });
+    private ILocator StartReview(string resident)
+        => Reviews.Row(resident).GetByRole(AriaRole.Button, new() { Name = "Start review" });
+    private ILocator ReadySuite(string resident)
+        => Reviews.Row(resident).GetByRole(AriaRole.Button, new() { Name = "Ready the suite" });
 
     private async Task NavigateAndBoot()
     {
@@ -25,8 +25,8 @@ public class WhenUsingFusionGridReview : PlaywrightTestBase
         await Expect(Reviews.Rows).ToHaveCountAsync(6, new() { Timeout = 10000 });
     }
 
-    private async Task Pick(string resident) =>
-        await Reviews.Cell(resident, ResidentColumn).ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
+    private async Task Pick(string resident)
+        => await Reviews.Cell(resident, ResidentColumn).ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
 
     [Test]
     public async Task the_first_page_lists_six_residents_and_counts_its_one_high_risk_resident()

@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("KeyedUpdate"), ActionName("KeyedUpdate")]
-        public IActionResult EveningRoundsPage() =>
-            View(
+        public IActionResult EveningRoundsPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/KeyedUpdate.cshtml",
                 new KeyedUpdateModel { Nurse = "Dana Cole, RN", Wing = "East" });
 
@@ -63,8 +63,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 : new EveningRoundsChart { Resident = picked, Summary = $"Nothing new on {picked.ResidentName}'s chart." });
         }
 
-        private static EveningRoundsRefusal EveningRoundsNobodyPicked() =>
-            new() { Summary = "Pick a resident on the board first." };
+        private static EveningRoundsRefusal EveningRoundsNobodyPicked()
+            => new() { Summary = "Pick a resident on the board first." };
 
         private static List<EveningRoundsResident> EveningRoundsBoard() => new()
         {

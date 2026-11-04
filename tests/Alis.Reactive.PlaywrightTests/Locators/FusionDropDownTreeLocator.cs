@@ -21,8 +21,8 @@ public sealed class FusionDropDownTreeLocator
 
     public ILocator Tree => _page.Locator($"#{_componentId}_tree");
 
-    public ILocator TreeItemText(string text) =>
-        Tree.Locator(".e-list-text").GetByText(text, new() { Exact = true });
+    public ILocator TreeItemText(string text)
+        => Tree.Locator(".e-list-text").GetByText(text, new() { Exact = true });
 
     public async Task Open(int timeoutMs = 15000)
     {

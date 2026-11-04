@@ -37,18 +37,18 @@ namespace Alis.Reactive
         /// <returns>New plan instance scoped to this view.</returns>
 #if NET48
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
-            where TModel : class =>
-            new ReactivePlan<TModel>(services: null, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
+            where TModel : class
+            => new ReactivePlan<TModel>(services: null, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
-        private static string FieldPrefixOf<TModel>(HtmlHelper<TModel> html) =>
-            html.ViewData.TemplateInfo.HtmlFieldPrefix;
+        private static string FieldPrefixOf<TModel>(HtmlHelper<TModel> html)
+            => html.ViewData.TemplateInfo.HtmlFieldPrefix;
 #else
         public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
-            where TModel : class =>
-            new ReactivePlan<TModel>(html.ViewContext.HttpContext.RequestServices, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
+            where TModel : class
+            => new ReactivePlan<TModel>(html.ViewContext.HttpContext.RequestServices, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));
 
-        private static string FieldPrefixOf<TModel>(IHtmlHelper<TModel> html) =>
-            html.ViewData.TemplateInfo.HtmlFieldPrefix;
+        private static string FieldPrefixOf<TModel>(IHtmlHelper<TModel> html)
+            => html.ViewData.TemplateInfo.HtmlFieldPrefix;
 #endif
 
         /// <summary>
@@ -71,12 +71,12 @@ namespace Alis.Reactive
         /// <returns>HTML content containing the plan JSON consumed by the runtime.</returns>
 #if NET48
         public static IHtmlString RenderPlan<TModel>(this HtmlHelper<TModel> html, ReactivePlan<TModel> plan)
-            where TModel : class =>
-            new MvcHtmlString(PlanMarkup(plan, RenderedPage.Of(html.ViewContext)));
+            where TModel : class
+            => new MvcHtmlString(PlanMarkup(plan, RenderedPage.Of(html.ViewContext)));
 #else
         public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan)
-            where TModel : class =>
-            new HtmlString(PlanMarkup(plan, RenderedPage.Of(html.ViewContext)));
+            where TModel : class
+            => new HtmlString(PlanMarkup(plan, RenderedPage.Of(html.ViewContext)));
 #endif
 
         /// <summary>
@@ -95,11 +95,11 @@ namespace Alis.Reactive
         /// <param name="cssClass">Classes the summary element carries.</param>
         /// <returns>The summary's element.</returns>
 #if NET48
-        public static IHtmlString FormSummary(this HtmlHelper html, string formId, string? cssClass = null) =>
-            new MvcHtmlString(PlacedSummary(html.ViewContext, formId, cssClass));
+        public static IHtmlString FormSummary(this HtmlHelper html, string formId, string? cssClass = null)
+            => new MvcHtmlString(PlacedSummary(html.ViewContext, formId, cssClass));
 #else
-        public static IHtmlContent FormSummary(this IHtmlHelper html, string formId, string? cssClass = null) =>
-            new HtmlString(PlacedSummary(html.ViewContext, formId, cssClass));
+        public static IHtmlContent FormSummary(this IHtmlHelper html, string formId, string? cssClass = null)
+            => new HtmlString(PlacedSummary(html.ViewContext, formId, cssClass));
 #endif
 
         private static string PlacedSummary(ViewContext view, string formId, string? cssClass)
@@ -108,10 +108,13 @@ namespace Alis.Reactive
             var page = RenderedPage.Of(view);
             var place = $"where {RenderedPage.ViewPathOf(view)} placed it";
             if (!page.SummaryRenders(formId, place))
+            {
                 throw new System.InvalidOperationException(
                     $"The summary of form '{formId}' placed in {RenderedPage.ViewPathOf(view)} renders a second time on this " +
                     $"page: it was rendered {page.SummaryPlaceOf(formId)}. A form's summary renders once: place it before the " +
                     "@Html.RenderPlan(plan) of the first plan that validates the form or shows its errors, and only once.");
+            }
+
             return FormSummaries.Markup(formId, cssClass);
         }
 

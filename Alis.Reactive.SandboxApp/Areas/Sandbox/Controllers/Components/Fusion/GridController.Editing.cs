@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -9,8 +9,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult EditingRoster() => Ok(MapleRosterOnFile());
 
         [HttpPost("EditingAdmission")]
-        public IActionResult EditingAdmission() =>
-            Ok(new MapleRosterResident
+        public IActionResult EditingAdmission()
+            => Ok(new MapleRosterResident
             {
                 ResidentId = 6107,
                 ResidentName = "Rosa Diaz",
@@ -32,6 +32,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var resident = MapleRosterOnFile().FirstOrDefault(r =>
                 string.Equals(r.ResidentName, correction.ResidentName!.Trim(), StringComparison.OrdinalIgnoreCase));
             if (resident == null)
+            {
                 return BadRequest(new
                 {
                     errors = new Dictionary<string, string[]>
@@ -39,6 +40,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                         [nameof(ResidentGridEditingModel.ResidentName)] = [$"No resident named {correction.ResidentName} lives on Maple wing."]
                     }
                 });
+            }
 
             resident.RiskLevel = correction.RiskLevel!;
             resident.OpenTasks = (int)correction.OpenTasks!.Value;

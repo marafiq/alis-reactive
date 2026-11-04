@@ -33,12 +33,12 @@ namespace Alis.Reactive.Fusion
         public void Prev() => Method();
 
         /// <summary>Raised before the slide changes.</summary>
-        public Event<FusionCarouselSlideChangingArgs> SlideChanging =>
-            Event<FusionCarouselSlideChangingArgs>();
+        public Event<FusionCarouselSlideChangingArgs> SlideChanging
+            => Event<FusionCarouselSlideChangingArgs>();
 
         /// <summary>Raised after the slide changes.</summary>
-        public Event<FusionCarouselSlideChangedArgs> SlideChanged =>
-            Event<FusionCarouselSlideChangedArgs>();
+        public Event<FusionCarouselSlideChangedArgs> SlideChanged
+            => Event<FusionCarouselSlideChangedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionCarousel.SlideChanging"/>.</summary>

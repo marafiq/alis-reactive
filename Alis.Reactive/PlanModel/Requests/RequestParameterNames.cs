@@ -1,7 +1,7 @@
 using System;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.WireTerms;
 using Alis.Reactive.Members;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanModel.Requests
 {
@@ -34,9 +34,11 @@ namespace Alis.Reactive.PlanModel.Requests
         {
             var shape = ClrShape.Of(typeof(TProp));
             if (!shape.IsScalar)
+            {
                 throw new InvalidOperationException(
                     $"{label} '{name}' requires a scalar type, but got shape '{shape.DescribeContract()}'. " +
                     "Use string, int, bool, DateTime, or their nullable variants" + (label == "URL param" ? ", or an array of them." : "."));
+            }
 
             return shape;
         }

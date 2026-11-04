@@ -18,8 +18,8 @@ namespace Alis.Reactive.Validation
 
         internal virtual bool IsAsync => false;
 
-        internal virtual Task<bool> PassesAsync(T instance, TValue value, MessageArguments arguments, CancellationToken cancellation) =>
-            Task.FromResult(Passes(instance, value, arguments));
+        internal virtual Task<bool> PassesAsync(T instance, TValue value, MessageArguments arguments, CancellationToken cancellation)
+            => Task.FromResult(Passes(instance, value, arguments));
 
         internal virtual void NameRenderArguments(MessageArguments arguments)
         {
@@ -101,8 +101,8 @@ namespace Alis.Reactive.Validation
             return value.Length >= _min && (_max == -1 || value.Length <= _max);
         }
 
-        internal override void NameRenderArguments(MessageArguments arguments) =>
-            arguments.With("MinLength", _min).With("MaxLength", _max);
+        internal override void NameRenderArguments(MessageArguments arguments)
+            => arguments.With("MinLength", _min).With("MaxLength", _max);
 
         public IEnumerable<BrowserRule> ForBrowser(string message)
         {
@@ -122,11 +122,11 @@ namespace Alis.Reactive.Validation
 
         internal override string Template => Templates.Pattern;
 
-        internal override bool Passes(T instance, string? value, MessageArguments arguments) =>
-            value == null || _pattern.IsMatch(value);
+        internal override bool Passes(T instance, string? value, MessageArguments arguments)
+            => value == null || _pattern.IsMatch(value);
 
-        internal static PatternCheck<T> For(Regex pattern) =>
-            JavaScriptPattern.Reads(pattern) ? new BrowserPatternCheck(pattern) : new PatternCheck<T>(pattern);
+        internal static PatternCheck<T> For(Regex pattern)
+            => JavaScriptPattern.Reads(pattern) ? new BrowserPatternCheck(pattern) : new PatternCheck<T>(pattern);
 
         private sealed class BrowserPatternCheck : PatternCheck<T>, IBrowserCheck
         {
@@ -137,8 +137,8 @@ namespace Alis.Reactive.Validation
                 _regex = pattern;
             }
 
-            public IEnumerable<BrowserRule> ForBrowser(string message) =>
-                new[] { BrowserRule.Matches(_regex.ToString(), JavaScriptPattern.Flags(_regex), message) };
+            public IEnumerable<BrowserRule> ForBrowser(string message)
+                => new[] { BrowserRule.Matches(_regex.ToString(), JavaScriptPattern.Flags(_regex), message) };
         }
     }
 
@@ -150,11 +150,11 @@ namespace Alis.Reactive.Validation
             @"\\[AZzG]|\(\?[imnsxIMNSX-]+[:)]|\(\?>|\(\?#|\(\?'|\(\?<\w*-\w+>|\(\?\(|\\[pP]\{|\[[^\]]*-\[",
             RegexOptions.CultureInvariant);
 
-        internal static bool Reads(Regex pattern) =>
-            (pattern.Options & NoJavaScriptForm) == 0 && !DotNetOnlySyntax.IsMatch(pattern.ToString());
+        internal static bool Reads(Regex pattern)
+            => (pattern.Options & NoJavaScriptForm) == 0 && !DotNetOnlySyntax.IsMatch(pattern.ToString());
 
-        internal static string Flags(Regex pattern) =>
-            (pattern.Options.HasFlag(RegexOptions.IgnoreCase) ? "i" : "")
+        internal static string Flags(Regex pattern)
+            => (pattern.Options.HasFlag(RegexOptions.IgnoreCase) ? "i" : "")
             + (pattern.Options.HasFlag(RegexOptions.Multiline) ? "m" : "")
             + (pattern.Options.HasFlag(RegexOptions.Singleline) ? "s" : "");
     }
@@ -221,8 +221,8 @@ namespace Alis.Reactive.Validation
             _operand = operand;
         }
 
-        internal override string Template =>
-            _comparison == Comparison.Equal ? Templates.Equal
+        internal override string Template
+            => _comparison == Comparison.Equal ? Templates.Equal
             : _comparison == Comparison.NotEqual ? Templates.NotEqual
             : _comparison == Comparison.GreaterThan ? Templates.GreaterThan
             : _comparison == Comparison.GreaterThanOrEqual ? Templates.GreaterThanOrEqual
@@ -241,8 +241,8 @@ namespace Alis.Reactive.Validation
             return _comparison.Orders(Comparer.Default.Compare(value, other));
         }
 
-        internal override void NameRenderArguments(MessageArguments arguments) =>
-            arguments.With("ComparisonValue", _operand.RenderName).With("ComparisonProperty", _operand.DisplayName);
+        internal override void NameRenderArguments(MessageArguments arguments)
+            => arguments.With("ComparisonValue", _operand.RenderName).With("ComparisonProperty", _operand.DisplayName);
 
         public IEnumerable<BrowserRule> ForBrowser(string message) => _operand.ForBrowser(_comparison, message);
     }
@@ -276,8 +276,8 @@ namespace Alis.Reactive.Validation
 
             internal override object? RenderName => _value;
 
-            internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message) =>
-                _value == null ? Array.Empty<BrowserRule>() : new[] { BrowserRule.Compare(comparison, _value, message) };
+            internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message)
+                => _value == null ? Array.Empty<BrowserRule>() : new[] { BrowserRule.Compare(comparison, _value, message) };
         }
 
         private sealed class MemberOperand : Operand<T, TValue>
@@ -295,8 +295,8 @@ namespace Alis.Reactive.Validation
 
             internal override object? RenderName => DisplayName;
 
-            internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message) =>
-                _member.Path == null
+            internal override IEnumerable<BrowserRule> ForBrowser(Comparison comparison, string message)
+                => _member.Path == null
                     ? Array.Empty<BrowserRule>()
                     : new[] { BrowserRule.CompareWith(comparison, _member.Expression, message) };
         }
@@ -313,10 +313,13 @@ namespace Alis.Reactive.Validation
             if (from == null) throw new ArgumentNullException(nameof(from), "A range needs both bounds.");
             if (to == null) throw new ArgumentNullException(nameof(to), "A range needs both bounds.");
             if (Comparer.Default.Compare(to, from) < 0)
+            {
                 throw new ArgumentOutOfRangeException(
                     nameof(to),
                     $"{(inclusive ? "InclusiveBetween" : "ExclusiveBetween")}({from}, {to}) has its upper bound below its lower bound: " +
                     "write the lower bound first.");
+            }
+
             _from = from;
             _to = to;
             _inclusive = inclusive;
@@ -332,11 +335,11 @@ namespace Alis.Reactive.Validation
             return _inclusive ? fromOrder >= 0 && toOrder <= 0 : fromOrder > 0 && toOrder < 0;
         }
 
-        internal override void NameRenderArguments(MessageArguments arguments) =>
-            arguments.With("From", _from).With("To", _to);
+        internal override void NameRenderArguments(MessageArguments arguments)
+            => arguments.With("From", _from).With("To", _to);
 
-        public IEnumerable<BrowserRule> ForBrowser(string message) =>
-            new[] { BrowserRule.Between(_from, _to, _inclusive, message) };
+        public IEnumerable<BrowserRule> ForBrowser(string message)
+            => new[] { BrowserRule.Between(_from, _to, _inclusive, message) };
     }
 
     internal sealed class PrecisionScaleCheck<T, TValue> : Check<T, TValue>, IBrowserCheck
@@ -370,8 +373,8 @@ namespace Alis.Reactive.Validation
             return false;
         }
 
-        internal override void NameRenderArguments(MessageArguments arguments) =>
-            arguments.With("ExpectedPrecision", _precision).With("ExpectedScale", _scale);
+        internal override void NameRenderArguments(MessageArguments arguments)
+            => arguments.With("ExpectedPrecision", _precision).With("ExpectedScale", _scale);
 
         public IEnumerable<BrowserRule> ForBrowser(string message)
         {
@@ -421,8 +424,8 @@ namespace Alis.Reactive.Validation
 
         internal override string Template => Templates.InEnum;
 
-        internal override bool Passes(T instance, TValue value, MessageArguments arguments) =>
-            value == null || (_flags ? (Bits(value) & ~_mask) == 0 : Enum.IsDefined(_enumType, value));
+        internal override bool Passes(T instance, TValue value, MessageArguments arguments)
+            => value == null || (_flags ? (Bits(value) & ~_mask) == 0 : Enum.IsDefined(_enumType, value));
 
         public IEnumerable<BrowserRule> ForBrowser(string message)
         {
@@ -433,13 +436,13 @@ namespace Alis.Reactive.Validation
             return new[] { BrowserRule.Matches(pattern, "i", message) };
         }
 
-        private ulong Bits(object value) =>
-            Enum.GetUnderlyingType(_enumType) == typeof(ulong)
+        private ulong Bits(object value)
+            => Enum.GetUnderlyingType(_enumType) == typeof(ulong)
                 ? Convert.ToUInt64(value, CultureInfo.InvariantCulture)
                 : unchecked((ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture));
 
-        private string Number(object value) =>
-            Enum.GetUnderlyingType(_enumType) == typeof(ulong)
+        private string Number(object value)
+            => Enum.GetUnderlyingType(_enumType) == typeof(ulong)
                 ? Convert.ToUInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture)
                 : Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
     }
@@ -471,10 +474,10 @@ namespace Alis.Reactive.Validation
 
         internal override bool IsAsync => true;
 
-        internal override bool Passes(T instance, TValue value, MessageArguments arguments) =>
-            throw new InvalidOperationException("A rule that waits (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync.");
+        internal override bool Passes(T instance, TValue value, MessageArguments arguments)
+            => throw new InvalidOperationException("A rule that waits (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync.");
 
-        internal override Task<bool> PassesAsync(T instance, TValue value, MessageArguments arguments, CancellationToken cancellation) =>
-            _predicate(instance, value, cancellation);
+        internal override Task<bool> PassesAsync(T instance, TValue value, MessageArguments arguments, CancellationToken cancellation)
+            => _predicate(instance, value, cancellation);
     }
 }

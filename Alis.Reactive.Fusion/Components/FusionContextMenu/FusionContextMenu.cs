@@ -32,28 +32,28 @@ namespace Alis.Reactive.Fusion
         public void Close() => Method();
 
         /// <summary>Raised before each item renders.</summary>
-        public Event<FusionContextMenuBeforeItemRenderArgs> BeforeItemRender =>
-            Event<FusionContextMenuBeforeItemRenderArgs>();
+        public Event<FusionContextMenuBeforeItemRenderArgs> BeforeItemRender
+            => Event<FusionContextMenuBeforeItemRenderArgs>();
 
         /// <summary>Raised before a menu level opens.</summary>
-        public Event<FusionContextMenuBeforeOpenArgs> BeforeOpen =>
-            Event<FusionContextMenuBeforeOpenArgs>();
+        public Event<FusionContextMenuBeforeOpenArgs> BeforeOpen
+            => Event<FusionContextMenuBeforeOpenArgs>();
 
         /// <summary>Raised after a menu level opens.</summary>
-        public Event<FusionContextMenuOpenCloseArgs> OnOpen =>
-            Event<FusionContextMenuOpenCloseArgs>();
+        public Event<FusionContextMenuOpenCloseArgs> OnOpen
+            => Event<FusionContextMenuOpenCloseArgs>();
 
         /// <summary>Raised before a menu level closes.</summary>
-        public Event<FusionContextMenuBeforeCloseArgs> BeforeClose =>
-            Event<FusionContextMenuBeforeCloseArgs>();
+        public Event<FusionContextMenuBeforeCloseArgs> BeforeClose
+            => Event<FusionContextMenuBeforeCloseArgs>();
 
         /// <summary>Raised after a menu level closes.</summary>
-        public Event<FusionContextMenuOpenCloseArgs> OnClose =>
-            Event<FusionContextMenuOpenCloseArgs>();
+        public Event<FusionContextMenuOpenCloseArgs> OnClose
+            => Event<FusionContextMenuOpenCloseArgs>();
 
         /// <summary>Raised when the user selects an item.</summary>
-        public Event<FusionContextMenuSelectArgs> Select =>
-            Event<FusionContextMenuSelectArgs>();
+        public Event<FusionContextMenuSelectArgs> Select
+            => Event<FusionContextMenuSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionContextMenu.BeforeItemRender"/>.</summary>

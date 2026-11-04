@@ -16,8 +16,8 @@ public sealed class WhenAnEnumMustBeLeftAtItsDefault : AppPageTest
         };
     }
 
-    private ILocator MenuRefused =>
-        Page.Locator("#meal-form > div")
+    private ILocator MenuRefused
+        => Page.Locator("#meal-form > div")
             .Filter(new() { Has = Page.GetByLabel("Menu") })
             .GetByText("Guests are served the regular menu.", new() { Exact = true });
 

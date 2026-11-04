@@ -30,8 +30,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         ];
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/DropDownTree/Index.cshtml", new FusionDropDownTreeModel
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/DropDownTree/Index.cshtml", new FusionDropDownTreeModel
             {
                 MovingIn = Arrivals.Select(arrival => new MovingInResident { Id = arrival.Id, Name = arrival.Name }).ToList(),
                 BuildingPlan = Plan
@@ -80,11 +80,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new RoomAssignmentBooked { Message = $"{arrival.Name} moves into {room.Text} on {arrival.MoveInDay}." });
         }
 
-        private static Arrival? FindArrival(string? residentId) =>
-            Arrivals.FirstOrDefault(arrival => arrival.Id == residentId);
+        private static Arrival? FindArrival(string? residentId)
+            => Arrivals.FirstOrDefault(arrival => arrival.Id == residentId);
 
-        private static BuildingPlanNode? FindNode(string[]? value) =>
-            Plan.FirstOrDefault(node => node.Value == value?.FirstOrDefault());
+        private static BuildingPlanNode? FindNode(string[]? value)
+            => Plan.FirstOrDefault(node => node.Value == value?.FirstOrDefault());
 
         private sealed record Arrival(string Id, string Name, string MoveInDay, string? DepositRoom);
     }

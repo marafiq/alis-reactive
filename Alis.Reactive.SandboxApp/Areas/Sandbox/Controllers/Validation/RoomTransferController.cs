@@ -9,16 +9,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class RoomTransferController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/RoomTransfer/Index.cshtml", new RoomTransferModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/RoomTransfer/Index.cshtml", new RoomTransferModel());
 
         [HttpPost("Request")]
-        public Task<IActionResult> RequestTransfer([FromBody] RoomTransferModel? transfer) =>
-            RequestAsync(transfer, "Transfer");
+        public Task<IActionResult> RequestTransfer([FromBody] RoomTransferModel? transfer)
+            => RequestAsync(transfer, "Transfer");
 
         [HttpPost("RequestUrgent")]
-        public Task<IActionResult> RequestUrgentTransfer([FromBody] RoomTransferModel? transfer) =>
-            RequestAsync(transfer, "Urgent transfer");
+        public Task<IActionResult> RequestUrgentTransfer([FromBody] RoomTransferModel? transfer)
+            => RequestAsync(transfer, "Urgent transfer");
 
         [HttpPost("Housekeeping")]
         public IActionResult Housekeeping([FromBody] RoomTransferModel? transfer)

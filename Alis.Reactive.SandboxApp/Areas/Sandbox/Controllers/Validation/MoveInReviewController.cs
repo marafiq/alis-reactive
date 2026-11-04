@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class MoveInReviewController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/MoveInReview/Index.cshtml", new MoveInReviewModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/MoveInReview/Index.cshtml", new MoveInReviewModel());
 
         [HttpPost("Save")]
         public IActionResult Save([FromBody] MoveInReviewModel? review)

@@ -1,9 +1,9 @@
 using System;
-using Alis.Reactive.PlanModel.Document;
-using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive
 {
@@ -149,10 +149,13 @@ namespace Alis.Reactive
             if (declaredEvent == null) throw new ArgumentException("Select one of the declared events, for example s => s.Alert.", nameof(declaredEvent));
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
             if (declaredEvent.ObjectPath.Count > 0)
+            {
                 throw new ArgumentException(
                     $"'{declaredEvent.Name}' is an event of '{string.Join(".", declaredEvent.ObjectPath)}', an object the stream or hub " +
                     "holds. A stream or a hub raises its own events only: declare the event on the stream or the hub itself.",
                     nameof(declaredEvent));
+            }
+
             var args = declaredEvent.Args;
             args.BindTo(new EventPayloadBinding(_context));
             _context.On(on, G.NoPath, declaredEvent.Name, PipelineBuilder<TModel>.Build(_context, p => pipeline(args, p)));

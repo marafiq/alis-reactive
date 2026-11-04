@@ -13,8 +13,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         private static readonly string[] Allergens = { "Penicillin", "Latex", "Sulfa", "Codeine", "Aspirin" };
 
-        public static bool Lists(string? allergen) =>
-            Array.Exists(Allergens, listed => string.Equals(listed, allergen?.Trim(), StringComparison.OrdinalIgnoreCase));
+        public static bool Lists(string? allergen)
+            => Array.Exists(Allergens, listed => string.Equals(listed, allergen?.Trim(), StringComparison.OrdinalIgnoreCase));
     }
 
     public class MedicationLine

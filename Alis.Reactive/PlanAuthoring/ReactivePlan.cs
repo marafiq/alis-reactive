@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Alis.Reactive.Inputs;
-using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.Inputs;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Validation;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.WireTerms;
@@ -93,16 +93,16 @@ namespace Alis.Reactive
         /// <example><c>FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.BrowserRules&lt;ResidentCareItemValidator&gt;())</c></example>
         /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
         /// <returns>Each field the validator names, with the rules the browser can evaluate.</returns>
-        public IReadOnlyList<BrowserField> BrowserRules<TValidator>() where TValidator : class =>
-            RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
+        public IReadOnlyList<BrowserField> BrowserRules<TValidator>() where TValidator : class
+            => RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>();
 
         /// <summary>The browser rules <typeparamref name="TValidator"/> declares in one set (<c>RuleSet("Issue", ..)</c>).</summary>
         /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
         /// <param name="ruleSet">The set, as the validator's <c>RuleSet</c> named it; a set it does not declare is refused.</param>
         /// <returns>Each field the set names, with the rules the browser can evaluate.</returns>
-        public IReadOnlyList<BrowserField> BrowserRules<TValidator>(string ruleSet) where TValidator : class =>
-            RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
+        public IReadOnlyList<BrowserField> BrowserRules<TValidator>(string ruleSet) where TValidator : class
+            => RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
                 .GetBrowserRules<TValidator>(ruleSet);
 
         internal string Serialize()

@@ -38,8 +38,8 @@ public class WhenUsingFusionMultiSelect : PlaywrightTestBase
         await Expect(AllergyChips).ToHaveTextAsync(new[] { "Peanuts" }, new() { Timeout = 5000 });
     }
 
-    private async Task TickDish(string dish) =>
-        await ClickWhenStable(Dislikes.PopupItems.GetByText(dish, new() { Exact = true }));
+    private async Task TickDish(string dish)
+        => await ClickWhenStable(Dislikes.PopupItems.GetByText(dish, new() { Exact = true }));
 
     private async Task SearchSupplements(string typed)
     {

@@ -17,6 +17,6 @@ public sealed class FusionMentionLocator
 
     public ILocator Items => Popup.Locator(".e-list-item");
 
-    public ILocator Item(string text) =>
-        Items.Filter(new() { HasTextRegex = new System.Text.RegularExpressions.Regex($"^\\s*{System.Text.RegularExpressions.Regex.Escape(text)}\\s*$") });
+    public ILocator Item(string text)
+        => Items.Filter(new() { HasTextRegex = new System.Text.RegularExpressions.Regex($"^\\s*{System.Text.RegularExpressions.Regex.Escape(text)}\\s*$") });
 }

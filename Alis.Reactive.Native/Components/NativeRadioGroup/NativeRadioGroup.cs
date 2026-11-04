@@ -22,8 +22,8 @@ namespace Alis.Reactive.Native
         public void Focus() => Method();
 
         /// <summary>Raised when the user chooses an option.</summary>
-        public Event<NativeRadioGroupChangeArgs> Change =>
-            Event<NativeRadioGroupChangeArgs>();
+        public Event<NativeRadioGroupChangeArgs> Change
+            => Event<NativeRadioGroupChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

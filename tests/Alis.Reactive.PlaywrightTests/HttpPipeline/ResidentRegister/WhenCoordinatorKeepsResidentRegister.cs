@@ -17,8 +17,8 @@ public class WhenCoordinatorKeepsResidentRegister : PlaywrightTestBase
 
     private SemaphoreSlim _released = null!;
 
-    private ILocator Field(Expression<Func<ResidentRegisterModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator Field(Expression<Func<ResidentRegisterModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
     private ILocator Loading => Page.Locator("#register-loading");
     private ILocator RecordCount => Page.Locator("#register-record-count");
@@ -51,8 +51,8 @@ public class WhenCoordinatorKeepsResidentRegister : PlaywrightTestBase
         });
     }
 
-    private async Task Answer(string button) =>
-        await ClickWhenStable(ConfirmDialog.GetByRole(AriaRole.Button, new() { Name = button }));
+    private async Task Answer(string button)
+        => await ClickWhenStable(ConfirmDialog.GetByRole(AriaRole.Button, new() { Name = button }));
 
     private async Task MoveTo(string resident, string room)
     {

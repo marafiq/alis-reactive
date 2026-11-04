@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.BedAssignment;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 
@@ -22,8 +22,8 @@ public class BedAssignmentController : Controller
     ];
 
     [HttpGet("")]
-    public IActionResult Index() =>
-        View("~/Areas/Sandbox/Views/Patterns/BedAssignment/Index.cshtml", new BedAssignmentModel { Wings = Wings });
+    public IActionResult Index()
+        => View("~/Areas/Sandbox/Views/Patterns/BedAssignment/Index.cshtml", new BedAssignmentModel { Wings = Wings });
 
     [HttpGet("Rooms")]
     public IActionResult Rooms([FromQuery] WingRoomsQuery query)
@@ -61,11 +61,11 @@ public class BedAssignmentController : Controller
         return Ok(new BedAssignmentAnswer($"{Resident} is assigned bed {assignment.Bed} in room {assignment.Room}, {wing.Name} wing."));
     }
 
-    private static IEnumerable<string> BedsOf(string? wing, string? room) =>
-        OpenRooms.Where(open => open.Wing == wing && open.Room == room).SelectMany(open => open.Beds.Select(letter => $"{open.Room}-{letter}"));
+    private static IEnumerable<string> BedsOf(string? wing, string? room)
+        => OpenRooms.Where(open => open.Wing == wing && open.Room == room).SelectMany(open => open.Beds.Select(letter => $"{open.Room}-{letter}"));
 
-    private static string BedName(string code) =>
-        code.EndsWith("-A", StringComparison.Ordinal) ? $"Bed {code}, by the window" : $"Bed {code}, by the door";
+    private static string BedName(string code)
+        => code.EndsWith("-A", StringComparison.Ordinal) ? $"Bed {code}, by the window" : $"Bed {code}, by the door";
 
     private static string Counted(int count, string noun) => count == 1 ? $"1 {noun}" : $"{count} {noun}s";
 }

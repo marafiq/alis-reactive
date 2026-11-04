@@ -146,10 +146,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 return Conflict(new WorkOrderRefusal { Message = $"Work order {changed.Number} is no longer on the board." });
 
             if (existing.Number == WithdrawnWorkOrder)
+            {
                 return Conflict(new WorkOrderRefusal
                 {
                     Message = "The family in Birch 106 withdrew the faucet request this morning, so the work order stays where it was."
                 });
+            }
 
             if (WaitsForItsPart(existing, changed))
             {
@@ -204,8 +206,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private bool WaitsForItsPart(WorkOrder existing, WorkOrder changed) =>
-            existing.Number == WheelchairWorkOrder
+        private bool WaitsForItsPart(WorkOrder existing, WorkOrder changed)
+            => existing.Number == WheelchairWorkOrder
             && existing.Status == WorkOrderStatus.Open
             && changed.Status == WorkOrderStatus.InProgress
             && HttpContext.Session.GetString(BrakeCableArrivedKey) == null;
@@ -249,8 +251,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return json == null ? SeededBoard() : JsonSerializer.Deserialize<List<WorkOrder>>(json)!;
         }
 
-        private void SaveBoard(List<WorkOrder> board) =>
-            HttpContext.Session.SetString(BoardKey, JsonSerializer.Serialize(board));
+        private void SaveBoard(List<WorkOrder> board)
+            => HttpContext.Session.SetString(BoardKey, JsonSerializer.Serialize(board));
 
         private int TakeNextNumber()
         {
@@ -259,8 +261,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return next;
         }
 
-        private static List<WorkOrder> SeededBoard() =>
-        [
+        private static List<WorkOrder> SeededBoard()
+        => [
             Seed(101, WorkOrderStatus.Open, 0, "Wheelchair brakes slipping", "Maple 118", MaintenanceWing.Maple, WorkOrderPriority.Routine, "Dev Patel"),
             Seed(102, WorkOrderStatus.Open, 1, "Call light not working", "Maple 214", MaintenanceWing.Maple, WorkOrderPriority.Urgent, "Dev Patel"),
             Seed(104, WorkOrderStatus.Done, 0, "Window sticks when opened", "Maple 210", MaintenanceWing.Maple, WorkOrderPriority.Routine, "Dev Patel") with { SignedOff = true, FinishedToday = true },
@@ -272,8 +274,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             Seed(107, WorkOrderStatus.Done, 1, "Hang new curtains", "Birch 101", MaintenanceWing.Birch, WorkOrderPriority.Routine, "Ana Ruiz") with { SignedOff = true, FinishedToday = true }
         ];
 
-        private static WorkOrder Seed(int number, string status, int queue, string summary, string room, string wing, string priority, string technician) =>
-            new()
+        private static WorkOrder Seed(int number, string status, int queue, string summary, string room, string wing, string priority, string technician)
+            => new()
             {
                 Number = number,
                 Status = status,

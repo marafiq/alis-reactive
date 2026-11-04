@@ -141,7 +141,9 @@ public sealed class PagePlan<TModel> where TModel : class
             if (componentEntry.Value.ComponentKey.EndsWith("__" + bindingPath, StringComparison.OrdinalIgnoreCase) ||
                 componentEntry.Value.ComponentKey.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase) ||
                 componentEntry.Key.EndsWith(bindingPath, StringComparison.OrdinalIgnoreCase))
+            {
                 return componentEntry.Value;
+            }
         }
         return null;
     }

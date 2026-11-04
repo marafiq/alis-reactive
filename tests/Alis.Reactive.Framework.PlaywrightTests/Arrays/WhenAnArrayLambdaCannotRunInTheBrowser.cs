@@ -3,8 +3,8 @@ namespace Alis.Reactive.Framework.PlaywrightTests.Arrays;
 [TestFixture]
 public sealed class WhenAnArrayLambdaCannotRunInTheBrowser : AppPageTest
 {
-    private async Task Render(string mistake) =>
-        await Page.GotoAsync($"{BaseUrl}/Arrays/Refused?mistake={mistake}");
+    private async Task Render(string mistake)
+        => await Page.GotoAsync($"{BaseUrl}/Arrays/Refused?mistake={mistake}");
 
     private ILocator Message(string text) => Page.GetByText(text).First;
 

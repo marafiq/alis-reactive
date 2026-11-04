@@ -159,7 +159,7 @@ namespace Alis.Reactive.Native
 
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
-            for (int i = 0; i < _options.Count; i++)
+            for (var i = 0; i < _options.Count; i++)
             {
                 var option = _options[i];
                 var checkboxId = $"{_elementId}_c{i}";
@@ -190,10 +190,12 @@ namespace Alis.Reactive.Native
         private static string[] SelectedValues(object? rawValue)
         {
             if (rawValue is IEnumerable values && rawValue is not string)
+            {
                 return values.Cast<object?>()
                     .Select(value => FormattableString.Invariant($"{value}"))
                     .Where(value => value.Length > 0)
                     .ToArray();
+            }
 
             return (rawValue?.ToString() ?? "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }

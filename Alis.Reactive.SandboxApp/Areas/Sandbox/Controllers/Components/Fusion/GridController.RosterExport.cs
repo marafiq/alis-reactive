@@ -1,19 +1,19 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("RosterExport"), ActionName("RosterExport")]
-        public IActionResult MonthlyCensusPage() =>
-            View(
+        public IActionResult MonthlyCensusPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterExport.cshtml",
                 new RosterExportModel { Month = "2026-10" });
 
         [HttpGet("RosterExportCensus")]
-        public IActionResult RosterExportCensus([FromQuery] MonthlyCensusQuery query) =>
-            query.Month switch
+        public IActionResult RosterExportCensus([FromQuery] MonthlyCensusQuery query)
+            => query.Month switch
             {
                 "2026-09" => Ok(MonthlyCensusOf("September 2026", SeptemberCensus())),
                 "2026-10" => Ok(MonthlyCensusOf("October 2026", OctoberCensus())),

@@ -21,8 +21,8 @@ namespace Alis.Reactive.Native
         public void Focus() => Method();
 
         /// <summary>Raised when the user checks or clears a box.</summary>
-        public Event<NativeCheckListChangeArgs> Change =>
-            Event<NativeCheckListChangeArgs>();
+        public Event<NativeCheckListChangeArgs> Change
+            => Event<NativeCheckListChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

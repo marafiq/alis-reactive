@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.MedicationRound;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
@@ -19,8 +19,8 @@ public class MedicationRoundController : Controller
         });
     }
 
-    private static List<RoundDose> DosesDue() =>
-    [
+    private static List<RoundDose> DosesDue()
+    => [
         new()
         {
             Resident = "Margaret Hale", Room = "214", Medication = "Metoprolol 25 mg tablet",

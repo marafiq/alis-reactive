@@ -49,16 +49,16 @@ namespace Alis.Reactive.Fusion
         public void FocusIn() => Method();
 
         /// <summary>Raised when the progress starts.</summary>
-        public Event<FusionProgressButtonProgressArgs> Begin =>
-            Event<FusionProgressButtonProgressArgs>();
+        public Event<FusionProgressButtonProgressArgs> Begin
+            => Event<FusionProgressButtonProgressArgs>();
 
         /// <summary>Raised as the progress advances.</summary>
-        public Event<FusionProgressButtonProgressArgs> Progress =>
-            Event<FusionProgressButtonProgressArgs>();
+        public Event<FusionProgressButtonProgressArgs> Progress
+            => Event<FusionProgressButtonProgressArgs>();
 
         /// <summary>Raised when the progress completes.</summary>
-        public Event<FusionProgressButtonProgressArgs> End =>
-            Event<FusionProgressButtonProgressArgs>();
+        public Event<FusionProgressButtonProgressArgs> End
+            => Event<FusionProgressButtonProgressArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionProgressButton.Begin"/>, <see cref="FusionProgressButton.Progress"/> and <see cref="FusionProgressButton.End"/>.</summary>

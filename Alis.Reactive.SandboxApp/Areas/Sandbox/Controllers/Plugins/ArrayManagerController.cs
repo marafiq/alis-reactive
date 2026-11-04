@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Plugins
     public class ArrayManagerController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Plugins/ArrayManager/Index.cshtml", new WardDeskModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Plugins/ArrayManager/Index.cshtml", new WardDeskModel());
 
         [HttpGet("Residents")]
         public IActionResult Residents() => Ok(new WardCensusResponse

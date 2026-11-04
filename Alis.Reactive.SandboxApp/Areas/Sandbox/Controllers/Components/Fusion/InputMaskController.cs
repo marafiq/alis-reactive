@@ -26,7 +26,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private static string AsDialed(string digits) =>
-            $"({digits.Substring(0, 3)}) {digits.Substring(3, 3)}-{digits.Substring(6)}";
+        private static string AsDialed(string digits)
+            => $"({digits.Substring(0, 3)}) {digits.Substring(3, 3)}-{digits.Substring(6)}";
     }
 }

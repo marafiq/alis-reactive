@@ -33,22 +33,22 @@ namespace Alis.Reactive.Fusion
         public void AddIcon(Arg<string> position, Arg<string> icons) => Method(position, icons);
 
         /// <summary>Raised on every edit while typing.</summary>
-        public Event<FusionTextBoxInputArgs> Input =>
-            Event<FusionTextBoxInputArgs>();
+        public Event<FusionTextBoxInputArgs> Input
+            => Event<FusionTextBoxInputArgs>();
 
         /// <summary>Raised when the text changes and focus leaves the input.</summary>
-        public Event<FusionTextBoxChangeArgs> Change =>
-            Event<FusionTextBoxChangeArgs>();
+        public Event<FusionTextBoxChangeArgs> Change
+            => Event<FusionTextBoxChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
-        public Event<FusionTextBoxFocusArgs> Focus =>
-            Event<FusionTextBoxFocusArgs>();
+        public Event<FusionTextBoxFocusArgs> Focus
+            => Event<FusionTextBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
-        public Event<FusionTextBoxBlurArgs> Blur =>
-            Event<FusionTextBoxBlurArgs>();
+        public Event<FusionTextBoxBlurArgs> Blur
+            => Event<FusionTextBoxBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionTextBox.Input"/>.</summary>

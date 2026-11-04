@@ -25,32 +25,32 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
     {
         internal static ValueExpression Count(ValueExpression source) => new CountOperation(source);
 
-        internal static ValueExpression Filter(ValueExpression source, Condition predicate, Shape itemShape) =>
-            new FilterOperation(source, predicate, Shape.ArrayOf(itemShape));
+        internal static ValueExpression Filter(ValueExpression source, Condition predicate, Shape itemShape)
+            => new FilterOperation(source, predicate, Shape.ArrayOf(itemShape));
 
-        internal static ValueExpression Map(ValueExpression source, ValueExpression projection, Shape resultItemShape) =>
-            new MapOperation(source, projection, Shape.ArrayOf(resultItemShape));
+        internal static ValueExpression Map(ValueExpression source, ValueExpression projection, Shape resultItemShape)
+            => new MapOperation(source, projection, Shape.ArrayOf(resultItemShape));
 
-        internal static ValueExpression Sum(ValueExpression source, ValueExpression projection) =>
-            new SumOperation(source, projection);
+        internal static ValueExpression Sum(ValueExpression source, ValueExpression projection)
+            => new SumOperation(source, projection);
 
         internal static ValueExpression Any(ValueExpression source) => new HasItemsOperation(source);
 
-        internal static ValueExpression Any(ValueExpression source, Condition predicate) =>
-            new SomeOperation(source, predicate);
+        internal static ValueExpression Any(ValueExpression source, Condition predicate)
+            => new SomeOperation(source, predicate);
 
-        internal static ValueExpression Every(ValueExpression source, Condition predicate) =>
-            new EveryOperation(source, predicate);
+        internal static ValueExpression Every(ValueExpression source, Condition predicate)
+            => new EveryOperation(source, predicate);
 
-        internal static ValueExpression Find(ValueExpression source, Condition predicate, Shape itemShape) =>
-            new FindOperation(source, predicate, itemShape);
+        internal static ValueExpression Find(ValueExpression source, Condition predicate, Shape itemShape)
+            => new FindOperation(source, predicate, itemShape);
 
         internal static ValueExpression Find(
-            ValueExpression source, Condition predicate, ValueExpression projection, Shape resultShape) =>
-            new FindSelectOperation(source, predicate, projection, resultShape);
+            ValueExpression source, Condition predicate, ValueExpression projection, Shape resultShape)
+            => new FindSelectOperation(source, predicate, projection, resultShape);
 
-        internal static ValueExpression OrderBy(ValueExpression source, ValueExpression key, Shape itemShape, bool descending) =>
-            new OrderByOperation(source, key, Shape.ArrayOf(itemShape), descending);
+        internal static ValueExpression OrderBy(ValueExpression source, ValueExpression key, Shape itemShape, bool descending)
+            => new OrderByOperation(source, key, Shape.ArrayOf(itemShape), descending);
 
         private readonly ValueExpression _source;
         private readonly Shape _shape;
@@ -104,8 +104,8 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
 
-        private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "filter" }, new Expr[] { PerItem(_predicate, scope) }, OutputShape);
+        private protected override Expr Operate(Expr items, Scope scope)
+            => G.Call(items, new[] { "filter" }, new Expr[] { PerItem(_predicate, scope) }, OutputShape);
     }
 
     internal sealed class MapOperation : ArrayOperation
@@ -117,8 +117,8 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             _projection = projection ?? throw new ArgumentNullException(nameof(projection));
         }
 
-        private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, OutputShape);
+        private protected override Expr Operate(Expr items, Scope scope)
+            => G.Call(items, new[] { "map" }, new Expr[] { PerItem(_projection, scope) }, OutputShape);
     }
 
     internal sealed class SumOperation : ArrayOperation
@@ -156,8 +156,8 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
 
-        private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "some" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
+        private protected override Expr Operate(Expr items, Scope scope)
+            => G.Call(items, new[] { "some" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
     }
 
     internal sealed class EveryOperation : ArrayOperation
@@ -169,8 +169,8 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
 
-        private protected override Expr Operate(Expr items, Scope scope) =>
-            G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
+        private protected override Expr Operate(Expr items, Scope scope)
+            => G.Call(items, new[] { "every" }, new Expr[] { PerItem(_predicate, scope) }, Shape.Boolean);
     }
 
     internal sealed class FindOperation : ArrayOperation
@@ -182,11 +182,11 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
         }
 
-        private protected override Expr Operate(Expr items, Scope scope) =>
-            G.As(Found(items, _predicate, scope), OutputShape);
+        private protected override Expr Operate(Expr items, Scope scope)
+            => G.As(Found(items, _predicate, scope), OutputShape);
 
-        internal static Expr Found(Expr items, Condition predicate, Scope scope) =>
-            G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.Any), G.Null);
+        internal static Expr Found(Expr items, Condition predicate, Scope scope)
+            => G.Op(Operator.Coalesce, G.Call(items, new[] { "find" }, new Expr[] { PerItem(predicate, scope) }, Shape.Any), G.Null);
     }
 
     internal sealed class FindSelectOperation : ArrayOperation
@@ -226,7 +226,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         {
             var left = scope.Fresh("a");
             var right = scope.Fresh("b");
-            Expr compare = G.Op(Operator.Order, _key.Write(scope.WithItem(left)), _key.Write(scope.WithItem(right)));
+            var compare = G.Op(Operator.Order, _key.Write(scope.WithItem(left)), _key.Write(scope.WithItem(right)));
             if (_descending) compare = G.Op(Operator.Neg, compare);
             return G.Call(items, new[] { "toSorted" }, new Expr[] { G.Fn(compare, left, right) }, OutputShape);
         }

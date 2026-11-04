@@ -9,8 +9,8 @@ public class WhenUsingFusionGridInlineEdit : PlaywrightTestBase
     private const int NextReviewColumn = 5;
 
     private ILocator Rows => Page.Locator($"#{GridId} .e-row");
-    private ILocator NextReview(string resident) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{NextReviewColumn}']");
+    private ILocator NextReview(string resident)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{NextReviewColumn}']");
     private ILocator RowBeingEdited => Page.Locator($"#{GridId} .e-editedrow");
     private ILocator ResidentBeingEdited => Page.Locator($"#{GridId}residentName");
     private ILocator DayEditor => RowBeingEdited.Locator("input[name='nextReview']");

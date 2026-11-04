@@ -17,7 +17,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
             RuleFor(x => x.TransferDate)
                 .NotNull().WithMessage("Choose the transfer day.")
-                .MustAsync((day, cancellation) => HousekeepingTurnsRoomsOnAsync(day, cancellation))
+                .MustAsync((day, _) => HousekeepingTurnsRoomsOnAsync(day))
                 .WithMessage("Housekeeping does not turn rooms on a Sunday.");
 
             RuleFor(x => x.Reason).MaximumLength(100).WithMessage("Keep the reason under 100 characters.").ServerOnly();
@@ -28,13 +28,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 RuleFor(x => x.WeekendApprover).NotEmpty().WithMessage("A weekend transfer needs the administrator on call to approve it."));
         }
 
-        private static bool OnTheSameWing(string? from, string? to) =>
-            from == null || to == null || from.Length < 2 || to.Length < 2 || from.Substring(0, 2) == to.Substring(0, 2);
+        private static bool OnTheSameWing(string? from, string? to)
+            => from == null || to == null || from.Length < 2 || to.Length < 2 || from.Substring(0, 2) == to.Substring(0, 2);
 
-        private static Task<bool> HousekeepingTurnsRoomsOnAsync(DateTime? day, CancellationToken cancellation) =>
-            Task.FromResult(day?.DayOfWeek != DayOfWeek.Sunday);
+        private static Task<bool> HousekeepingTurnsRoomsOnAsync(DateTime? day)
+            => Task.FromResult(day?.DayOfWeek != DayOfWeek.Sunday);
 
-        private static bool FallsOnAWeekend(DateTime? day) =>
-            day is { DayOfWeek: DayOfWeek.Saturday or DayOfWeek.Sunday };
+        private static bool FallsOnAWeekend(DateTime? day)
+            => day is { DayOfWeek: DayOfWeek.Saturday or DayOfWeek.Sunday };
     }
 }

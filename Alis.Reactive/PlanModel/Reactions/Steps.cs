@@ -40,8 +40,8 @@ namespace Alis.Reactive.PlanModel.Reactions
                 block.AddRange(OwnLine(scope));
         }
 
-        private IReadOnlyList<Statement> OwnLine(Scope scope) =>
-            scope.WithHoisted(() =>
+        private IReadOnlyList<Statement> OwnLine(Scope scope)
+            => scope.WithHoisted(() =>
             {
                 _result.Write(scope);
                 return G.NoStatements;
@@ -70,8 +70,8 @@ namespace Alis.Reactive.PlanModel.Reactions
             _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithHoisted(() =>
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.AddRange(scope.WithHoisted(() =>
             {
                 var value = _value.Write(scope);
                 var (root, prefix) = _target.Write(scope);
@@ -96,8 +96,8 @@ namespace Alis.Reactive.PlanModel.Reactions
             _awaits = awaits;
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithHoisted(() =>
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.AddRange(scope.WithHoisted(() =>
             {
                 var args = _args.Select(arg => arg.Write(scope)).ToList();
                 var (root, prefix) = _target.Write(scope);
@@ -117,8 +117,8 @@ namespace Alis.Reactive.PlanModel.Reactions
             _payload = payload ?? throw new ArgumentNullException(nameof(payload));
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithHoisted(() =>
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.AddRange(scope.WithHoisted(() =>
                 new[] { G.Do(G.Call(G.Obj(scope.Objects.Document()), "raise", G.Lit(_event), _payload.Write(scope))) }));
     }
 
@@ -133,8 +133,8 @@ namespace Alis.Reactive.PlanModel.Reactions
             _content = content ?? throw new ArgumentNullException(nameof(content));
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithHoisted(() => new[]
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.AddRange(scope.WithHoisted(() => new[]
             {
                 G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "load", _content.Write(scope))),
             }));
@@ -149,8 +149,8 @@ namespace Alis.Reactive.PlanModel.Reactions
             _slot = slot ?? throw new ArgumentNullException(nameof(slot));
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.Add(G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "unload")));
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.Add(G.Do(G.Call(G.Obj(scope.Objects.Slot(_slot)), "unload")));
     }
 
     internal sealed class ShowErrorsStep : Step
@@ -194,8 +194,8 @@ namespace Alis.Reactive.PlanModel.Reactions
             _hasElse = true;
         }
 
-        internal override void WriteTo(List<Statement> block, Scope scope) =>
-            block.AddRange(scope.WithHoisted(() => Arms(0, scope)));
+        internal override void WriteTo(List<Statement> block, Scope scope)
+            => block.AddRange(scope.WithHoisted(() => Arms(0, scope)));
 
         private IReadOnlyList<Statement> Arms(int start, Scope scope)
         {

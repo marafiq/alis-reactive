@@ -2,8 +2,8 @@ namespace Alis.Reactive.NativeTagHelpers;
 
 internal static class LayoutClasses
 {
-    internal static string Join(params string?[] classes) =>
-        string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c)).Select(c => c!.Trim()));
+    internal static string Join(params string?[] classes)
+        => string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c)).Select(c => c!.Trim()));
 
     internal static string Gap(SpacingScale gap) => gap switch
     {

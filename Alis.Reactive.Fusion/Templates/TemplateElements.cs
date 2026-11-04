@@ -31,8 +31,8 @@ namespace Alis.Reactive.Fusion.Templates
             return $"<a href=\"{href}\"{css.ClassAttribute}>{text}</a>";
         }
 
-        internal static string EventButton(string text, string eventName, string detailAttribute, string valueBinding, TemplateCss css) =>
-            $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
+        internal static string EventButton(string text, string eventName, string detailAttribute, string valueBinding, TemplateCss css)
+            => $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
             $"{detailAttribute}=\"{valueBinding}\">{text}</button>";
 
         internal static string DetailAttribute<TPayload, TProperty>(string text, Expression<Func<TPayload, TProperty>> member)
@@ -97,11 +97,11 @@ namespace Alis.Reactive.Fusion.Templates
             _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal override string ClassAttribute =>
-            string.IsNullOrEmpty(_value) ? "" : $" class=\"{_value}\"";
+        internal override string ClassAttribute
+            => string.IsNullOrEmpty(_value) ? "" : $" class=\"{_value}\"";
 
-        internal override string AppendTo(string baseClass) =>
-            string.IsNullOrEmpty(_value) ? baseClass : $"{baseClass} {_value}";
+        internal override string AppendTo(string baseClass)
+            => string.IsNullOrEmpty(_value) ? baseClass : $"{baseClass} {_value}";
     }
 
     internal abstract class TemplateAltText

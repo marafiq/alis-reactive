@@ -27,8 +27,8 @@ namespace Alis.Reactive.Analyzers.Validation
         private static readonly ImmutableHashSet<string> ServerOnlyMethods =
             ImmutableHashSet.Create(StringComparer.Ordinal, "Must", "MustAsync");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -69,7 +69,9 @@ namespace Alis.Reactive.Analyzers.Validation
 
             if (!AnalyzerHelpers.InheritsFromReactiveValidator(
                 classDecl, context.SemanticModel, reactiveValidatorType, context.CancellationToken))
+            {
                 return;
+            }
 
             context.ReportDiagnostic(
                 Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), methodName));

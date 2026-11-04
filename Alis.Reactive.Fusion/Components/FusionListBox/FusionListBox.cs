@@ -42,8 +42,8 @@ namespace Alis.Reactive.Fusion
         public void EnableItems(Arg<string[]> items, Arg<bool> enable, Arg<bool> isValue) => Method(items, enable, isValue);
 
         /// <summary>Raised when the selection changes.</summary>
-        public Event<FusionListBoxChangeArgs> Change =>
-            Event<FusionListBoxChangeArgs>();
+        public Event<FusionListBoxChangeArgs> Change
+            => Event<FusionListBoxChangeArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionListBox.Change"/>.</summary>

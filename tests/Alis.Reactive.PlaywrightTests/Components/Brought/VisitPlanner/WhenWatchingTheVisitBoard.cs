@@ -50,8 +50,8 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
         return okaforDesk;
     }
 
-    private PlannerField PlannerOn(IPage desk) =>
-        new(desk.Locator($"#{_plan.FindComponent(m => m.VisitSlots)!.ElementId}"));
+    private PlannerField PlannerOn(IPage desk)
+        => new(desk.Locator($"#{_plan.FindComponent(m => m.VisitSlots)!.ElementId}"));
 
     [Test]
     public async Task the_board_reads_the_wing_code_quiet_times_and_first_weekend_time_off_the_planner()
@@ -319,11 +319,11 @@ public class WhenWatchingTheVisitBoard : PlaywrightTestBase
 
         internal ILocator Times => _root.Locator("button.vp-slot");
 
-        internal ILocator Time(string label) =>
-            _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
+        internal ILocator Time(string label)
+            => _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
 
-        internal ILocator TakenUnder(string label) =>
-            _root.Locator("li.vp-item")
+        internal ILocator TakenUnder(string label)
+            => _root.Locator("li.vp-item")
                 .Filter(new() { Has = _root.Page.GetByRole(AriaRole.Button, new() { Name = label, Exact = true }) })
                 .Locator(".vp-taken");
     }

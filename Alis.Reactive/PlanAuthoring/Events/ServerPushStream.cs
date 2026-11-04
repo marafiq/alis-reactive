@@ -43,8 +43,8 @@ namespace Alis.Reactive
         /// <typeparam name="TStream">The stream's declaration.</typeparam>
         /// <param name="url">The stream's URL.</param>
         public static ServerPushSource<TStream> At<TStream>(string url)
-            where TStream : ServerPushStream, new() =>
-            new ServerPushSource<TStream>(DeclaredName.RequiredUrl(url), new TStream());
+            where TStream : ServerPushStream, new()
+            => new ServerPushSource<TStream>(DeclaredName.RequiredUrl(url), new TStream());
 
         /// <summary>The connection's state: <see cref="Connecting"/>, <see cref="Open"/> or <see cref="Closed"/>.</summary>
         public ReadOnly<int> ReadyState => ReadOnly<int>();

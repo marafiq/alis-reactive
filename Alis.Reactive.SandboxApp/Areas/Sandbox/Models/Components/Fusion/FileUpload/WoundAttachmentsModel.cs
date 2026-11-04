@@ -28,8 +28,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.FileUp
 
         private static bool Accepted(IFormFile file) => IsKept(file) && file.Length <= MaxBytes;
 
-        private static bool IsKept(IFormFile file) =>
-            Kinds.Contains(Path.GetExtension(file.FileName), StringComparer.OrdinalIgnoreCase);
+        private static bool IsKept(IFormFile file)
+            => Kinds.Contains(Path.GetExtension(file.FileName), StringComparer.OrdinalIgnoreCase);
 
         private static string Problem(IFormFile file) => IsKept(file)
             ? $"{file.FileName} is larger than 5 MB."

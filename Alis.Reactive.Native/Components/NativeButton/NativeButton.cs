@@ -28,8 +28,8 @@ namespace Alis.Reactive.Native
         public void Focus() => Method();
 
         /// <summary>Raised when the user clicks the button.</summary>
-        public Event<NativeButtonClickArgs> Click =>
-            Event<NativeButtonClickArgs>();
+        public Event<NativeButtonClickArgs> Click
+            => Event<NativeButtonClickArgs>();
     }
 
     /// <summary>Payload of <see cref="NativeButton.Click"/>; carries no data.</summary>

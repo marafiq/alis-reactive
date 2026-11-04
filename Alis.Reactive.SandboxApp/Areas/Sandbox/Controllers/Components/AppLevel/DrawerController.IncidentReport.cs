@@ -8,12 +8,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
         private static readonly TimeSpan FilingTime = TimeSpan.FromMilliseconds(1200);
 
         [HttpGet("IncidentReport")]
-        public IActionResult IncidentReport() =>
-            View("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/IncidentReport.cshtml", new IncidentReportPageModel());
+        public IActionResult IncidentReport()
+            => View("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/IncidentReport.cshtml", new IncidentReportPageModel());
 
         [HttpGet("IncidentReport/Form")]
-        public IActionResult IncidentReportForm() =>
-            PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_IncidentReportPartial.cshtml",
+        public IActionResult IncidentReportForm()
+            => PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_IncidentReportPartial.cshtml",
                 new IncidentReportModel());
 
         [HttpPost("IncidentReport/File")]

@@ -44,12 +44,12 @@ namespace Alis.Reactive.Fusion
         public void RemoveItems(Arg<string[]> items, Arg<bool> isUniqueId) => Method(items, isUniqueId);
 
         /// <summary>Raised when the user clicks the primary button.</summary>
-        public Event<FusionSplitButtonClickArgs> Click =>
-            Event<FusionSplitButtonClickArgs>();
+        public Event<FusionSplitButtonClickArgs> Click
+            => Event<FusionSplitButtonClickArgs>();
 
         /// <summary>Raised when the user selects a popup item.</summary>
-        public Event<FusionSplitButtonSelectArgs> Select =>
-            Event<FusionSplitButtonSelectArgs>();
+        public Event<FusionSplitButtonSelectArgs> Select
+            => Event<FusionSplitButtonSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionSplitButton.Click"/>; carries no data.</summary>

@@ -1,6 +1,6 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -9,8 +9,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private const int AdmissionsFirstReviewWithinDays = 14;
 
         [HttpGet("ResidentEditForm"), ActionName("ResidentEditForm")]
-        public IActionResult AdmissionsDeskPage() =>
-            View(
+        public IActionResult AdmissionsDeskPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/ResidentEditForm.cshtml",
                 new AdmissionsDeskViewModel
                 {
@@ -26,8 +26,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 });
 
         [HttpGet("ResidentEditFormDesk")]
-        public IActionResult ResidentEditFormDesk() =>
-            Ok(new AdmissionsDesk { Residents = AdmissionsResidentsOnFile(), Referrals = AdmissionsReferralsOnFile() });
+        public IActionResult ResidentEditFormDesk()
+            => Ok(new AdmissionsDesk { Residents = AdmissionsResidentsOnFile(), Referrals = AdmissionsReferralsOnFile() });
 
         [HttpPost("ResidentEditFormCorrect")]
         public IActionResult ResidentEditFormCorrect([FromBody] ResidentRecordCorrection correction)
@@ -52,12 +52,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             var reviewIsOnTime = DateOnly.TryParseExact(completed.FirstReview, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var review)
                 && review >= moveIn && review <= latest;
             if (!reviewIsOnTime)
+            {
                 return BadRequest(new AdmissionsDesk
                 {
                     Residents = AdmissionsResidentsOnFile(),
                     Referrals = AdmissionsReferralsOnFile(),
                     Summary = $"{completed.ResidentName}'s first care review must fall between moving in on {AdmissionsDay(onFile.MoveInDay)} and {latest.ToString("dddd, MMMM d", CultureInfo.InvariantCulture)}."
                 });
+            }
 
             var residents = AdmissionsResidentsOnFile();
             residents.Add(new AdmissionsResident
@@ -80,8 +82,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static DateOnly AdmissionsDate(string day) => DateOnly.ParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        private static string AdmissionsDay(string day) =>
-            DateOnly.TryParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
+        private static string AdmissionsDay(string day)
+            => DateOnly.TryParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
                 ? date.ToString("dddd, MMMM d", CultureInfo.InvariantCulture)
                 : "not booked";
 

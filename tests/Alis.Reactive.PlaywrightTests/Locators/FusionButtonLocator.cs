@@ -17,8 +17,8 @@ public sealed class FusionButtonLocator
 
     public ILocator Icon => Button.Locator("span.e-btn-icon");
 
-    public async Task<string> ClassAttribute() =>
-        await Button.GetAttributeAsync("class") ?? string.Empty;
+    public async Task<string> ClassAttribute()
+        => await Button.GetAttributeAsync("class") ?? string.Empty;
 
     public async Task<bool> HasClass(string className)
     {
@@ -26,6 +26,6 @@ public sealed class FusionButtonLocator
         return classes.Split(' ').Contains(className);
     }
 
-    public async Task<string> IconClassAttribute() =>
-        await Icon.GetAttributeAsync("class") ?? string.Empty;
+    public async Task<string> IconClassAttribute()
+        => await Icon.GetAttributeAsync("class") ?? string.Empty;
 }

@@ -8,9 +8,11 @@ namespace Alis.Reactive.Members
         {
             var underlying = Nullable.GetUnderlyingType(type) ?? type;
             if (underlying == typeof(TimeSpan))
+            {
                 throw new InvalidOperationException(
                     "A TimeSpan has no order the browser can compute as C# does: it reaches the browser as its text, and " +
                     "\"1.02:00:00\" sorts before \"23:00:00\". Order it on the server, or read the length as a number.");
+            }
         }
     }
 }

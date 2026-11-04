@@ -8,6 +8,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 public class AdmissionDecisionController : Controller
 {
     [HttpGet("")]
-    public IActionResult Index() =>
-        View("~/Areas/Sandbox/Views/Conditions/AdmissionDecision/Index.cshtml", new AdmissionDecisionModel());
+    public IActionResult Index()
+        => View("~/Areas/Sandbox/Views/Conditions/AdmissionDecision/Index.cshtml", new AdmissionDecisionModel());
 }

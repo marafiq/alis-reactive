@@ -21,8 +21,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("Wizard")]
-        public IActionResult Wizard() =>
-            View(ViewBase + "Wizard.cshtml", new AdmissionWizardModel { AdmissionId = Guid.NewGuid().ToString("N") });
+        public IActionResult Wizard()
+            => View(ViewBase + "Wizard.cshtml", new AdmissionWizardModel { AdmissionId = Guid.NewGuid().ToString("N") });
 
         [HttpPost("Wizard/LoadStep")]
         public IActionResult LoadWizardStep([FromBody] AdmissionStepRequest request)
@@ -96,8 +96,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private IActionResult StepPartial<T>(string view, T model) =>
-            PartialView(ViewBase + view, model);
+        private IActionResult StepPartial<T>(string view, T model)
+            => PartialView(ViewBase + view, model);
 
         private static AdmissionReview Review(AdmissionDrafts drafts, string admissionId)
         {

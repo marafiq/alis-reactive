@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     public class DischargeNoticeController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/DischargeNotice/Index.cshtml", new DischargeNoticePageModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/DischargeNotice/Index.cshtml", new DischargeNoticePageModel());
 
         [HttpPost("Discharge/{resident}")]
         public IActionResult Discharge(string resident)
@@ -23,8 +23,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         }
 
         [HttpPost("NotifyFamily")]
-        public IActionResult NotifyFamily([FromBody] FamilyNoticeRequest? notice) =>
-            notice?.Channel == "email"
+        public IActionResult NotifyFamily([FromBody] FamilyNoticeRequest? notice)
+            => notice?.Channel == "email"
                 ? StatusCode(StatusCodes.Status503ServiceUnavailable,
                     new FamilyNoticeResult("The email service is down for maintenance."))
                 : StatusCode(StatusCodes.Status503ServiceUnavailable);

@@ -16,8 +16,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         ];
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/ComboBox/Index.cshtml", new FusionComboBoxModel
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/ComboBox/Index.cshtml", new FusionComboBoxModel
             {
                 Round = Round.Select(resident => new RoundResident { Id = resident.Id, Name = resident.Name }).ToList()
             });
@@ -44,8 +44,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private static ChartedResident? Find(string? residentId) =>
-            Round.FirstOrDefault(resident => resident.Id == residentId);
+        private static ChartedResident? Find(string? residentId)
+            => Round.FirstOrDefault(resident => resident.Id == residentId);
 
         private sealed record ChartedResident(string Id, string Name, string Room, string Allergies);
     }

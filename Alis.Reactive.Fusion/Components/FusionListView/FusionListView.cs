@@ -34,8 +34,8 @@ namespace Alis.Reactive.Fusion
         public void UncheckAllItems() => Method();
 
         /// <summary>Raised when an item is selected.</summary>
-        public Event<FusionListViewSelectArgs> Select =>
-            Event<FusionListViewSelectArgs>();
+        public Event<FusionListViewSelectArgs> Select
+            => Event<FusionListViewSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionListView.Select"/>.</summary>

@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
     public class ShiftReportController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Native/ShiftReport/Index.cshtml", new ShiftAlertReviewModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Native/ShiftReport/Index.cshtml", new ShiftAlertReviewModel());
 
         [HttpGet("Day")]
         public IActionResult DayShift() => Ok(new ShiftAlertsResponse
@@ -38,7 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             },
         });
 
-        private static ShiftAlert Alert(string resident, string severity, int priority, bool acknowledged) =>
-            new ShiftAlert { Resident = resident, Severity = severity, Priority = priority, Acknowledged = acknowledged };
+        private static ShiftAlert Alert(string resident, string severity, int priority, bool acknowledged)
+            => new ShiftAlert { Resident = resident, Severity = severity, Priority = priority, Acknowledged = acknowledged };
     }
 }

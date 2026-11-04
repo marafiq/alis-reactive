@@ -199,7 +199,7 @@ gate "compiling C# projects ($configuration)"
 dotnet build --configuration "$configuration"
 
 gate "checking C# formatting (dotnet format)"
-dotnet format whitespace Alis.Reactive.slnx --verify-no-changes --no-restore
+dotnet format Alis.Reactive.slnx --verify-no-changes --severity warn --no-restore
 dotnet format whitespace --folder examples --verify-no-changes
 
 run_dotnet_tests

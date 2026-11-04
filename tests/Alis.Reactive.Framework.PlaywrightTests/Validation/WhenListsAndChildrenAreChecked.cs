@@ -20,8 +20,8 @@ public sealed class WhenListsAndChildrenAreChecked : AppPageTest
         };
     }
 
-    private ILocator Field(string label) =>
-        Page.Locator("#household-form > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
+    private ILocator Field(string label)
+        => Page.Locator("#household-form > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
 
     private Task Write(string label, string text) => Page.GetByLabel(label, new() { Exact = true }).FillAsync(text);
 

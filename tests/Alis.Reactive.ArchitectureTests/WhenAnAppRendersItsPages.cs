@@ -105,8 +105,11 @@ internal static class Sweep
         {
             var values = new RouteValueDictionary(action.RouteValues);
             if (action.AttributeRouteInfo?.Template is string template)
+            {
                 foreach (Match parameter in Placeholder.Matches(template))
                     values[parameter.Groups[1].Value] = Sample(parameter.Groups[2].Value);
+            }
+
             var path = links.GetPathByAction(action.ActionName, action.ControllerName, values)
                 ?? throw new InvalidOperationException($"{action.DisplayName} has no path.");
             yield return ($"{action.ControllerName}.{action.ActionName}", path);

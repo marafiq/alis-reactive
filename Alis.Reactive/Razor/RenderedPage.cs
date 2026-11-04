@@ -47,11 +47,13 @@ namespace Alis.Reactive.Razor
         internal void Input(string elementId, string bindingName, string viewPath)
         {
             if (_viewByElementId.TryGetValue(elementId, out var firstView))
+            {
                 throw new InvalidOperationException(
                     $"Input '{bindingName}' renders element id '{elementId}' a second time on this page: first in {firstView}, " +
                     $"then in {viewPath}. An element id names one element, so the page would reach only the first: render " +
                     "the field once, or each copy under a field prefix of its own (Html.EditorFor, or a partial given a " +
                     "ViewDataDictionary whose TemplateInfo has its own HtmlFieldPrefix).");
+            }
 
             _viewByElementId.Add(elementId, viewPath);
         }

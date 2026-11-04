@@ -18,8 +18,8 @@ public sealed class WhenValuesAreComparedUnderTheirShape : AppPageTest
         };
     }
 
-    private ILocator Field(string label) =>
-        Page.Locator("#sameness-form > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
+    private ILocator Field(string label)
+        => Page.Locator("#sameness-form > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
 
     private Task Save() => Page.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
 

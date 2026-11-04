@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -134,8 +134,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("CareOpsActionRows")]
-        public IActionResult CareOpsActionRows() =>
-            PartialView(
+        public IActionResult CareOpsActionRows()
+            => PartialView(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/_CareOpsActionRows.cshtml",
                 GetCareCensus().Where(r => r.RiskLevel == "High").OrderBy(r => r.ResidentName, StringComparer.Ordinal).ToList());
 
@@ -169,8 +169,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return seed;
         }
 
-        private void SaveCareCensus(List<ResidentCareItem> census) =>
-            HttpContext.Session.SetString(CareSessionKey, JsonSerializer.Serialize(census));
+        private void SaveCareCensus(List<ResidentCareItem> census)
+            => HttpContext.Session.SetString(CareSessionKey, JsonSerializer.Serialize(census));
 
         private OkObjectResult CareBoard(List<ResidentCareItem> census, string? filterRisk, string? filterCareLevel, string summary)
         {
@@ -178,8 +178,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new CareOpsResponse { Result = rows.Take(CarePageSize).ToList(), Count = rows.Count, Summary = summary });
         }
 
-        private static IEnumerable<ResidentCareItem> CareChosen(IEnumerable<ResidentCareItem> census, string? risk, string? careLevel) =>
-            census
+        private static IEnumerable<ResidentCareItem> CareChosen(IEnumerable<ResidentCareItem> census, string? risk, string? careLevel)
+            => census
                 .Where(r => risk == null || r.RiskLevel == risk)
                 .Where(r => careLevel == null || r.CareLevel == careLevel);
 
@@ -189,13 +189,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return census.Where(r => picked.Contains(r.ResidentId)).OrderBy(r => r.ResidentName, StringComparer.Ordinal).ToList();
         }
 
-        private static string CareNames(List<ResidentCareItem> residents) =>
-            residents.Count == 1
+        private static string CareNames(List<ResidentCareItem> residents)
+            => residents.Count == 1
                 ? residents[0].ResidentName
                 : $"{string.Join(", ", residents.Take(residents.Count - 1).Select(r => r.ResidentName))} and {residents[^1].ResidentName}";
 
-        private static string? CareFilter(string? chip) =>
-            string.IsNullOrWhiteSpace(chip) || chip == "All" ? null : chip;
+        private static string? CareFilter(string? chip)
+            => string.IsNullOrWhiteSpace(chip) || chip == "All" ? null : chip;
 
         private static IEnumerable<ResidentCareItem> SortCare(
             IEnumerable<ResidentCareItem> source, List<FusionGridSortColumn>? sorted)
@@ -236,8 +236,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return $"{who}: {tasks} open care {(tasks == 1 ? "task" : "tasks")}.";
         }
 
-        private static ResidentCareItem CareResident(int id, string name, string wing, string careLevel, string risk, string nurse, int openTasks, string nextReview) =>
-            new() { ResidentId = id, ResidentName = name, Wing = wing, CareLevel = careLevel, RiskLevel = risk, PrimaryNurse = nurse, OpenTasks = openTasks, NextReview = nextReview };
+        private static ResidentCareItem CareResident(int id, string name, string wing, string careLevel, string risk, string nurse, int openTasks, string nextReview)
+            => new() { ResidentId = id, ResidentName = name, Wing = wing, CareLevel = careLevel, RiskLevel = risk, PrimaryNurse = nurse, OpenTasks = openTasks, NextReview = nextReview };
 
         private static List<ResidentCareItem> CareCensusOnFile() => new()
         {

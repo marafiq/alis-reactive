@@ -26,8 +26,8 @@ namespace Alis.Reactive.PlanModel.Validation
 
         internal FormFieldValues Values { get; }
 
-        internal CheckedField With(IReadOnlyList<BrowserRule> rules) =>
-            new CheckedField(Name, Shape, Rules.Concat(rules).ToArray(), Values);
+        internal CheckedField With(IReadOnlyList<BrowserRule> rules)
+            => new CheckedField(Name, Shape, Rules.Concat(rules).ToArray(), Values);
 
         internal static IEnumerable<CheckedField> Bind(string formId, IReadOnlyList<BrowserField> fields, string fieldPrefix)
         {
@@ -73,8 +73,8 @@ namespace Alis.Reactive.PlanModel.Validation
 
         internal override ValueExpression Value(FieldReference field) => ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
 
-        internal CheckedField Check(BrowserField field) =>
-            new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);
+        internal CheckedField Check(BrowserField field)
+            => new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);
 
         private string NameOf(FieldReference field) => HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
     }

@@ -17,8 +17,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         }
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/RoomHold/Index.cshtml", new RoomHoldModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/RoomHold/Index.cshtml", new RoomHoldModel());
 
         [HttpPost("Hold")]
         public async Task<IActionResult> Hold([FromBody] RoomHoldModel? hold)

@@ -9,8 +9,8 @@ public class WhenNurseRecordsMedicationPass : PlaywrightTestBase
     private const string Path = "/Sandbox/HttpPipeline/MedicationPass";
     private const int HelenPark = 1042;
 
-    private ILocator Field(Expression<Func<MedicationPassModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator Field(Expression<Func<MedicationPassModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
     private ILocator RecordPass => Page.Locator("#record-medication-pass-btn");
     private ILocator PassStatus => Page.Locator("#medication-pass-status");

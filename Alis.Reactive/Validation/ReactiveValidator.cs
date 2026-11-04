@@ -176,9 +176,12 @@ namespace Alis.Reactive
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             var sets = RuleSets.Named(ruleSet);
             if (_sets.Any)
+            {
                 throw new InvalidOperationException(
                     $"RuleSet '{sets}' is written inside RuleSet '{_sets}'; a set holds rules, not sets. " +
                     $"A rule in both is written once, under RuleSet(\"{_sets}, {sets}\", () => ..).");
+            }
+
             foreach (var name in sets.Names)
                 if (!_declaredSets.Contains(name, StringComparer.Ordinal)) _declaredSets.Add(name);
             _sets = sets;
@@ -196,15 +199,15 @@ namespace Alis.Reactive
         /// <param name="predicate">The condition over the model.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition does not hold.</returns>
-        public IConditionBuilder When(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(RuleCondition<T>.When(predicate), rules);
+        public IConditionBuilder When(Expression<Func<T, bool>> predicate, Action rules)
+            => Branch(RuleCondition<T>.When(predicate), rules);
 
         /// <summary>Applies the rules <paramref name="rules"/> declares only when <paramref name="predicate"/> does not hold.</summary>
         /// <param name="predicate">The condition over the model.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
-        public IConditionBuilder Unless(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(RuleCondition<T>.Unless(predicate), rules);
+        public IConditionBuilder Unless(Expression<Func<T, bool>> predicate, Action rules)
+            => Branch(RuleCondition<T>.Unless(predicate), rules);
 
         /// <summary>
         /// Applies the rules only when <paramref name="predicate"/> holds, decided by the server alone: for a
@@ -214,15 +217,15 @@ namespace Alis.Reactive
         /// <param name="predicate">The condition over the model.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition does not hold.</returns>
-        public IConditionBuilder WhenOnServer(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(RuleCondition<T>.OnServer(predicate), rules);
+        public IConditionBuilder WhenOnServer(Expression<Func<T, bool>> predicate, Action rules)
+            => Branch(RuleCondition<T>.OnServer(predicate), rules);
 
         /// <summary>Applies the rules only when <paramref name="predicate"/> does not hold, decided by the server alone.</summary>
         /// <param name="predicate">The condition over the model.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
-        public IConditionBuilder UnlessOnServer(Expression<Func<T, bool>> predicate, Action rules) =>
-            Branch(RuleCondition<T>.OnServer(predicate).Negated(), rules);
+        public IConditionBuilder UnlessOnServer(Expression<Func<T, bool>> predicate, Action rules)
+            => Branch(RuleCondition<T>.OnServer(predicate).Negated(), rules);
 
         /// <summary>
         /// Applies the rules only when <paramref name="predicate"/> holds, asked while the rules run and waited
@@ -233,8 +236,8 @@ namespace Alis.Reactive
         /// <param name="predicate">The condition over the model, answered later.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition does not hold.</returns>
-        public IConditionBuilder WhenAsync(Func<T, CancellationToken, Task<bool>> predicate, Action rules) =>
-            Branch(RuleCondition<T>.OnServerAsync(predicate), rules);
+        public IConditionBuilder WhenAsync(Func<T, CancellationToken, Task<bool>> predicate, Action rules)
+            => Branch(RuleCondition<T>.OnServerAsync(predicate), rules);
 
         /// <summary>
         /// Applies the rules only when <paramref name="predicate"/> does not hold, asked while the rules run
@@ -243,8 +246,8 @@ namespace Alis.Reactive
         /// <param name="predicate">The condition over the model, answered later.</param>
         /// <param name="rules">Declares the rules.</param>
         /// <returns>Its <c>Otherwise</c> declares the rules for when the condition holds.</returns>
-        public IConditionBuilder UnlessAsync(Func<T, CancellationToken, Task<bool>> predicate, Action rules) =>
-            Branch(RuleCondition<T>.OnServerAsync(predicate).Negated(), rules);
+        public IConditionBuilder UnlessAsync(Func<T, CancellationToken, Task<bool>> predicate, Action rules)
+            => Branch(RuleCondition<T>.OnServerAsync(predicate).Negated(), rules);
 
         /// <inheritdoc />
         public ValidationResult Validate(T instance) => Validate(instance, RuleSetSelection.Default);
@@ -253,12 +256,12 @@ namespace Alis.Reactive
         public ValidationResult Validate(T instance, string ruleSet) => Validate(instance, Select(ruleSet));
 
         /// <inheritdoc />
-        public Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = default) =>
-            ValidateAsync(instance, RuleSetSelection.Default, cancellation);
+        public Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = default)
+            => ValidateAsync(instance, RuleSetSelection.Default, cancellation);
 
         /// <inheritdoc />
-        public Task<ValidationResult> ValidateAsync(T instance, string ruleSet, CancellationToken cancellation = default) =>
-            ValidateAsync(instance, Select(ruleSet), cancellation);
+        public Task<ValidationResult> ValidateAsync(T instance, string ruleSet, CancellationToken cancellation = default)
+            => ValidateAsync(instance, Select(ruleSet), cancellation);
 
         private ValidationResult Validate(T instance, RuleSetSelection selection)
         {
@@ -282,8 +285,8 @@ namespace Alis.Reactive
 
         internal override bool IsAsync(RuleSetSelection selection) => _rules.Any(rule => rule.RunsUnder(selection) && rule.IsAsync(selection));
 
-        internal override IEnumerable<string> DeclaredRuleSets =>
-            _declaredSets.Concat(_rules.SelectMany(rule => rule.ReachableRuleSets)).Distinct(StringComparer.Ordinal);
+        internal override IEnumerable<string> DeclaredRuleSets
+            => _declaredSets.Concat(_rules.SelectMany(rule => rule.ReachableRuleSets)).Distinct(StringComparer.Ordinal);
 
         internal override IReadOnlyList<BrowserField> BrowserRules(RuleSetSelection selection)
         {

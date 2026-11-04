@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
@@ -212,15 +212,21 @@ public class AdmissionAssessmentController : Controller
         {
             if (step1.PrimaryDiagnosis is "Alzheimer's" or "Parkinson's"
                 && string.IsNullOrEmpty(step2?.CognitiveAssessmentId))
+            {
                 errors["CognitiveAssessmentId"] = ["Cognitive assessment must be saved"];
+            }
 
             if (step1.PrimaryDiagnosis == "Heart Disease"
                 && string.IsNullOrEmpty(step2?.CardiacAssessmentId))
+            {
                 errors["CardiacAssessmentId"] = ["Cardiac assessment must be saved"];
+            }
 
             if (step1.PrimaryDiagnosis == "Diabetes"
                 && string.IsNullOrEmpty(step2?.DiabetesAssessmentId))
+            {
                 errors["DiabetesAssessmentId"] = ["Diabetes assessment must be saved"];
+            }
         }
 
         TryGetDraft<Step3FunctionalModel>(id, out var step3);
@@ -263,11 +269,11 @@ public class AdmissionAssessmentController : Controller
         return draft != null;
     }
 
-    private bool HasDraft<TStep>(string screeningId) =>
-        HttpContext.Session.GetString(DraftKey<TStep>(screeningId)) != null;
+    private bool HasDraft<TStep>(string screeningId)
+        => HttpContext.Session.GetString(DraftKey<TStep>(screeningId)) != null;
 
-    private void SaveDraft<TStep>(string screeningId, TStep draft) =>
-        HttpContext.Session.SetString(DraftKey<TStep>(screeningId), JsonSerializer.Serialize(draft));
+    private void SaveDraft<TStep>(string screeningId, TStep draft)
+        => HttpContext.Session.SetString(DraftKey<TStep>(screeningId), JsonSerializer.Serialize(draft));
 
     private static string DraftKey<TStep>(string screeningId) => $"{DraftKeyPrefix}{typeof(TStep).Name}:{screeningId}";
 }

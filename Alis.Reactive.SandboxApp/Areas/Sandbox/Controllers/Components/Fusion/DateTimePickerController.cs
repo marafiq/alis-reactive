@@ -38,7 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new FollowUpBooked($"Arthur Bell sees Dr. Osei on {WrittenOut(followUp.FollowUpAppointment!.Value)}."));
         }
 
-        private static string WrittenOut(DateTime visit) =>
-            visit.ToString("dddd, MMMM d 'at' h:mm tt", CultureInfo.InvariantCulture);
+        private static string WrittenOut(DateTime visit)
+            => visit.ToString("dddd, MMMM d 'at' h:mm tt", CultureInfo.InvariantCulture);
     }
 }

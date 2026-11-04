@@ -69,21 +69,21 @@ public class SandboxStaticStateTests
         }
     }
 
-    private static string? AutoPropertyName(FieldInfo field) =>
-        field.Name.StartsWith('<') && field.Name.EndsWith(">k__BackingField", StringComparison.Ordinal)
+    private static string? AutoPropertyName(FieldInfo field)
+        => field.Name.StartsWith('<') && field.Name.EndsWith(">k__BackingField", StringComparison.Ordinal)
             ? field.Name[1..field.Name.IndexOf('>')]
             : null;
 
-    private static bool IsStoreShaped(Type type) =>
-        typeof(IDictionary).IsAssignableFrom(type)
+    private static bool IsStoreShaped(Type type)
+        => typeof(IDictionary).IsAssignableFrom(type)
         || type.Namespace == "System.Collections.Concurrent"
         || ImplementsGenericInterface(type, typeof(IDictionary<,>))
         || ImplementsGenericInterface(type, typeof(ISet<>));
 
-    private static bool IsCollection(Type type) =>
-        type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
+    private static bool IsCollection(Type type)
+        => type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
 
-    private static bool ImplementsGenericInterface(Type type, Type genericInterface) =>
-        type.GetInterfaces().Append(type).Any(i =>
+    private static bool ImplementsGenericInterface(Type type, Type genericInterface)
+        => type.GetInterfaces().Append(type).Any(i =>
             i.IsGenericType && i.GetGenericTypeDefinition() == genericInterface);
 }

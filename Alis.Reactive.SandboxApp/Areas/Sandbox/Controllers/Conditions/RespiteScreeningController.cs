@@ -9,8 +9,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 public class RespiteScreeningController : Controller
 {
     [HttpGet("")]
-    public IActionResult Index() =>
-        View("~/Areas/Sandbox/Views/Conditions/RespiteScreening/Index.cshtml", new RespiteScreeningModel());
+    public IActionResult Index()
+        => View("~/Areas/Sandbox/Views/Conditions/RespiteScreening/Index.cshtml", new RespiteScreeningModel());
 
     [HttpGet("Policy")]
     public IActionResult Policy() => Ok(new WingPolicy

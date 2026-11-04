@@ -24,8 +24,8 @@ namespace Alis.Reactive.Fusion
         public void Disable(Arg<bool> value) => Method(value);
 
         /// <summary>Raised when the user clicks a toolbar item.</summary>
-        public Event<FusionToolbarClickedArgs> Clicked =>
-            Event<FusionToolbarClickedArgs>();
+        public Event<FusionToolbarClickedArgs> Clicked
+            => Event<FusionToolbarClickedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionToolbar.Clicked"/>.</summary>

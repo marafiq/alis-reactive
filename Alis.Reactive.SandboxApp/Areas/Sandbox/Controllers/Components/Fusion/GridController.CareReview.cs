@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -8,14 +8,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private const string WingReviewUnderWay = "Under way";
 
         [HttpGet("CareReview"), ActionName("CareReview")]
-        public IActionResult WingReviewPage() =>
-            View(
+        public IActionResult WingReviewPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml",
                 new WingReviewViewModel { Wing = "East", Director = "Joan Avery, RN", PageSize = 6 });
 
         [HttpGet("CareReviewWaitingList")]
-        public IActionResult WingReviewWaitingList() =>
-            View(
+        public IActionResult WingReviewWaitingList()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareReviewWaitingList.cshtml",
                 new WingReviewViewModel { Wing = "East", Director = "Joan Avery, RN", PageSize = 6 });
 

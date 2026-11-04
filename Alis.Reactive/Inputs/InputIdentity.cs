@@ -1,8 +1,8 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.WireTerms;
 using Alis.Reactive.Members;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.Inputs
 {

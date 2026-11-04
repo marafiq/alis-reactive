@@ -27,28 +27,28 @@ namespace Alis.Reactive.Fusion
         public void Close() => Method();
 
         /// <summary>Raised before each item renders.</summary>
-        public Event<FusionMenuBeforeItemRenderArgs> BeforeItemRender =>
-            Event<FusionMenuBeforeItemRenderArgs>();
+        public Event<FusionMenuBeforeItemRenderArgs> BeforeItemRender
+            => Event<FusionMenuBeforeItemRenderArgs>();
 
         /// <summary>Raised before a menu level opens.</summary>
-        public Event<FusionMenuBeforeOpenArgs> BeforeOpen =>
-            Event<FusionMenuBeforeOpenArgs>();
+        public Event<FusionMenuBeforeOpenArgs> BeforeOpen
+            => Event<FusionMenuBeforeOpenArgs>();
 
         /// <summary>Raised after a menu level opens.</summary>
-        public Event<FusionMenuOpenCloseArgs> OnOpen =>
-            Event<FusionMenuOpenCloseArgs>();
+        public Event<FusionMenuOpenCloseArgs> OnOpen
+            => Event<FusionMenuOpenCloseArgs>();
 
         /// <summary>Raised before a menu level closes.</summary>
-        public Event<FusionMenuBeforeCloseArgs> BeforeClose =>
-            Event<FusionMenuBeforeCloseArgs>();
+        public Event<FusionMenuBeforeCloseArgs> BeforeClose
+            => Event<FusionMenuBeforeCloseArgs>();
 
         /// <summary>Raised after a menu level closes.</summary>
-        public Event<FusionMenuOpenCloseArgs> OnClose =>
-            Event<FusionMenuOpenCloseArgs>();
+        public Event<FusionMenuOpenCloseArgs> OnClose
+            => Event<FusionMenuOpenCloseArgs>();
 
         /// <summary>Raised when the user selects an item.</summary>
-        public Event<FusionMenuSelectArgs> Select =>
-            Event<FusionMenuSelectArgs>();
+        public Event<FusionMenuSelectArgs> Select
+            => Event<FusionMenuSelectArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionMenu.BeforeItemRender"/>.</summary>

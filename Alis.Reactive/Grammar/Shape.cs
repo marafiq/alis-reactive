@@ -39,8 +39,8 @@ namespace Alis.Reactive.Grammar
             return new ObjectShape(new ReadOnlyDictionary<string, Shape>(fields));
         }
 
-        private static Shape Wrappable(Shape shape, string parameter) =>
-            shape ?? throw new ArgumentNullException(parameter);
+        private static Shape Wrappable(Shape shape, string parameter)
+            => shape ?? throw new ArgumentNullException(parameter);
 
         internal bool TryGetArrayItemShape(out Shape item)
         {
@@ -71,8 +71,8 @@ namespace Alis.Reactive.Grammar
             _ => Kind == other.Kind,
         };
 
-        private static bool SameFields(IReadOnlyDictionary<string, Shape> mine, IReadOnlyDictionary<string, Shape> theirs) =>
-            mine.Count == theirs.Count
+        private static bool SameFields(IReadOnlyDictionary<string, Shape> mine, IReadOnlyDictionary<string, Shape> theirs)
+            => mine.Count == theirs.Count
             && mine.All(field => theirs.TryGetValue(field.Key, out var shape) && field.Value.Equals(shape));
 
         public override bool Equals(object? obj) => Equals(obj as Shape);

@@ -32,14 +32,14 @@ namespace Alis.Reactive.Fusion
         public void HidePopup() => Method();
 
         /// <summary>Raised when the selection changes.</summary>
-        public Event<FusionMultiSelectChangeArgs> Change =>
-            Event<FusionMultiSelectChangeArgs>();
+        public Event<FusionMultiSelectChangeArgs> Change
+            => Event<FusionMultiSelectChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
-        public Event<FusionMultiSelectFilteringArgs> Filtering =>
-            Event<FusionMultiSelectFilteringArgs>();
+        public Event<FusionMultiSelectFilteringArgs> Filtering
+            => Event<FusionMultiSelectFilteringArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionMultiSelect.Change"/>.</summary>
@@ -70,8 +70,8 @@ namespace Alis.Reactive.Fusion
         /// <summary>Hands filtered items to the popup; valid after an HTTP response returns.</summary>
         /// <typeparam name="TItems">The items' type, such as the server's own list.</typeparam>
         /// <param name="items">The items to show, read when the step runs.</param>
-        public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
-            Method(Pass<IEnumerable<object>, TItems>(items));
+        public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object>
+            => Method(Pass<IEnumerable<object>, TItems>(items));
     }
 
     /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionMultiSelect"/> for a model-bound field.</summary>

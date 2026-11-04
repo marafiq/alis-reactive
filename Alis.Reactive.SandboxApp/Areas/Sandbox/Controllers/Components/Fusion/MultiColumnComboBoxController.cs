@@ -44,8 +44,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         };
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/MultiColumnComboBox/Index.cshtml", new FusionMultiColumnComboBoxModel
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/MultiColumnComboBox/Index.cshtml", new FusionMultiColumnComboBoxModel
             {
                 OpenShifts = Shifts.Select(shift => new OpenShiftOption { Code = shift.Code, Label = shift.Label }).ToList(),
                 Roster = RosterOf(includeAgency: false)
@@ -61,8 +61,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("Roster")]
-        public IActionResult Roster([FromQuery] RosterQuery query) =>
-            Ok(new CoverageRoster { Nurses = RosterOf(query.IncludeAgency) });
+        public IActionResult Roster([FromQuery] RosterQuery query)
+            => Ok(new CoverageRoster { Nurses = RosterOf(query.IncludeAgency) });
 
         [HttpGet("Hours")]
         public IActionResult Hours([FromQuery] NurseHoursQuery query)
@@ -95,8 +95,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new CoverageConfirmation { Message = $"{nurse.Name} covers {shift.Description}." });
         }
 
-        private static IReadOnlyList<RosterNurse> RosterOf(bool includeAgency) =>
-            Nurses.Where(nurse => includeAgency || nurse.Employer == Staff).ToList();
+        private static IReadOnlyList<RosterNurse> RosterOf(bool includeAgency)
+            => Nurses.Where(nurse => includeAgency || nurse.Employer == Staff).ToList();
 
         private static CoverageShift? FindShift(string? code) => Shifts.FirstOrDefault(shift => shift.Code == code);
 

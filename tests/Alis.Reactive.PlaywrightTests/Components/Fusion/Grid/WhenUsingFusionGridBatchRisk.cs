@@ -13,8 +13,8 @@ public class WhenUsingFusionGridBatchRisk : PlaywrightTestBase
     private static readonly Regex Changed = new("e-updatedtd");
 
     private ILocator Rows => Page.Locator($"#{BoardId} .e-row");
-    private ILocator FallRisk(string resident) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{FallRiskColumn}']");
+    private ILocator FallRisk(string resident)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{FallRiskColumn}']");
     private ILocator FallRiskEditor => Page.Locator($"#{BoardId} select[name='fallRisk']");
     private ILocator RaiseHenry => Page.Locator("#raise-risk-6402");
     private ILocator RaiseRuth => Page.Locator("#raise-risk-6405");

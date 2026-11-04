@@ -97,10 +97,12 @@ namespace Alis.Reactive.WireTerms
             {
                 var step = steps[index];
                 if (string.IsNullOrWhiteSpace(step))
+                {
                     throw new ArgumentException(
                         $"Path '{text}' contains an empty segment at index {index}. " +
                         "Use dot-separated property names without consecutive, leading, or trailing dots.",
                         nameof(text));
+                }
 
                 segments.Add(int.TryParse(step, NumberStyles.None, CultureInfo.InvariantCulture, out var position)
                     ? PathSegment.AtIndex(position)

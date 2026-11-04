@@ -1,9 +1,9 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Members;
 using Alis.Reactive.PlanAuthoring.Arrays;
+using Alis.Reactive.PlanModel.Values;
 
 namespace Alis.Reactive
 {
@@ -32,8 +32,8 @@ namespace Alis.Reactive
         /// <summary>Keeps only the elements that match the per-element predicate.</summary>
         /// <param name="predicate">The test each kept element passes, for example <c>r =&gt; r.Active</c>.</param>
         /// <returns>The matching elements, in their order.</returns>
-        public ReactiveArray<TElement> Where(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveArray<TElement>(
+        public ReactiveArray<TElement> Where(Expression<Func<TElement, bool>> predicate)
+            => new ReactiveArray<TElement>(
                 ArrayOperation.Filter(_source, Predicate(predicate), _elementShape),
                 _elementShape);
 
@@ -56,8 +56,8 @@ namespace Alis.Reactive
         /// <exception cref="InvalidOperationException">
         /// Thrown when the key is not a scalar, or is a <see cref="TimeSpan"/>, whose text does not order as its length does.
         /// </exception>
-        public ReactiveArray<TElement> OrderBy<TKey>(Expression<Func<TElement, TKey>> key) =>
-            Order(key, descending: false);
+        public ReactiveArray<TElement> OrderBy<TKey>(Expression<Func<TElement, TKey>> key)
+            => Order(key, descending: false);
 
         /// <summary>Orders elements descending by a per-element key.</summary>
         /// <typeparam name="TKey">The key's type: a string, number, date, bool or enum.</typeparam>
@@ -66,8 +66,8 @@ namespace Alis.Reactive
         /// <exception cref="InvalidOperationException">
         /// Thrown when the key is not a scalar, or is a <see cref="TimeSpan"/>, whose text does not order as its length does.
         /// </exception>
-        public ReactiveArray<TElement> OrderByDescending<TKey>(Expression<Func<TElement, TKey>> key) =>
-            Order(key, descending: true);
+        public ReactiveArray<TElement> OrderByDescending<TKey>(Expression<Func<TElement, TKey>> key)
+            => Order(key, descending: true);
 
         private ReactiveArray<TElement> Order<TKey>(Expression<Func<TElement, TKey>> key, bool descending)
         {
@@ -76,10 +76,12 @@ namespace Alis.Reactive
             var keyShape = ClrShape.Of(typeof(TKey));
             var keyIsSortableScalar = keyShape is StringShape or NumberShape or BooleanShape or DateShape or InstantShape or NullableShape;
             if (!keyIsSortableScalar)
+            {
                 throw new InvalidOperationException(
                     "OrderBy key must project to a scalar (string, number, date, bool, enum), not '" +
                     CSharpTypeName.Of(typeof(TKey)) + "'. Project a scalar field, e.g. .OrderBy(x => x.StartDate), " +
                     "not .OrderBy(x => x.Address).");
+            }
 
             return new ReactiveArray<TElement>(
                 ArrayOperation.OrderBy(_source, Projection(key), _elementShape, descending),
@@ -88,55 +90,55 @@ namespace Alis.Reactive
 
         /// <summary>Counts all elements.</summary>
         /// <returns>The count, read when the step runs.</returns>
-        public ReactiveValue<int> Count() =>
-            new ReactiveValue<int>(ArrayOperation.Count(_source));
+        public ReactiveValue<int> Count()
+            => new ReactiveValue<int>(ArrayOperation.Count(_source));
 
         /// <summary>Counts the elements that match the predicate.</summary>
         /// <param name="predicate">The test each counted element passes.</param>
         /// <returns>The count, read when the step runs.</returns>
-        public ReactiveValue<int> Count(Expression<Func<TElement, bool>> predicate) =>
-            Where(predicate).Count();
+        public ReactiveValue<int> Count(Expression<Func<TElement, bool>> predicate)
+            => Where(predicate).Count();
 
         /// <summary>True when the array is non-empty.</summary>
         /// <returns>Whether any element exists, read when the step runs.</returns>
-        public ReactiveValue<bool> Any() =>
-            new ReactiveValue<bool>(ArrayOperation.Any(_source));
+        public ReactiveValue<bool> Any()
+            => new ReactiveValue<bool>(ArrayOperation.Any(_source));
 
         /// <summary>True when any element matches the predicate.</summary>
         /// <param name="predicate">The test an element passes.</param>
         /// <returns>Whether any element passes, read when the step runs.</returns>
-        public ReactiveValue<bool> Any(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<bool>(ArrayOperation.Any(_source, Predicate(predicate)));
+        public ReactiveValue<bool> Any(Expression<Func<TElement, bool>> predicate)
+            => new ReactiveValue<bool>(ArrayOperation.Any(_source, Predicate(predicate)));
 
         /// <summary>True when every element matches the predicate.</summary>
         /// <param name="predicate">The test every element passes.</param>
         /// <returns>Whether every element passes, read when the step runs.</returns>
-        public ReactiveValue<bool> All(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<bool>(ArrayOperation.Every(_source, Predicate(predicate)));
+        public ReactiveValue<bool> All(Expression<Func<TElement, bool>> predicate)
+            => new ReactiveValue<bool>(ArrayOperation.Every(_source, Predicate(predicate)));
 
         /// <summary>Sums an integer per-element selector.</summary>
         /// <param name="selector">The number each element adds, for example <c>r =&gt; r.OpenTasks</c>.</param>
         /// <returns>The sum, read when the step runs.</returns>
-        public ReactiveValue<int> Sum(Expression<Func<TElement, int>> selector) =>
-            new ReactiveValue<int>(ArrayOperation.Sum(_source, Projection(selector)));
+        public ReactiveValue<int> Sum(Expression<Func<TElement, int>> selector)
+            => new ReactiveValue<int>(ArrayOperation.Sum(_source, Projection(selector)));
 
         /// <summary>Sums a decimal per-element selector.</summary>
         /// <param name="selector">The number each element adds.</param>
         /// <returns>The sum, read when the step runs.</returns>
-        public ReactiveValue<decimal> Sum(Expression<Func<TElement, decimal>> selector) =>
-            new ReactiveValue<decimal>(ArrayOperation.Sum(_source, Projection(selector)));
+        public ReactiveValue<decimal> Sum(Expression<Func<TElement, decimal>> selector)
+            => new ReactiveValue<decimal>(ArrayOperation.Sum(_source, Projection(selector)));
 
         /// <summary>Sums a double per-element selector.</summary>
         /// <param name="selector">The number each element adds.</param>
         /// <returns>The sum, read when the step runs.</returns>
-        public ReactiveValue<double> Sum(Expression<Func<TElement, double>> selector) =>
-            new ReactiveValue<double>(ArrayOperation.Sum(_source, Projection(selector)));
+        public ReactiveValue<double> Sum(Expression<Func<TElement, double>> selector)
+            => new ReactiveValue<double>(ArrayOperation.Sum(_source, Projection(selector)));
 
         /// <summary>Finds the first element matching the predicate, or null when none match.</summary>
         /// <param name="predicate">The test the element passes.</param>
         /// <returns>The element, read when the step runs.</returns>
-        public ReactiveValue<TElement> Find(Expression<Func<TElement, bool>> predicate) =>
-            new ReactiveValue<TElement>(ArrayOperation.Find(_source, Predicate(predicate), _elementShape));
+        public ReactiveValue<TElement> Find(Expression<Func<TElement, bool>> predicate)
+            => new ReactiveValue<TElement>(ArrayOperation.Find(_source, Predicate(predicate), _elementShape));
 
         /// <summary>Finds a per-element field from the first element matching the predicate.</summary>
         /// <typeparam name="TField">The field's type.</typeparam>

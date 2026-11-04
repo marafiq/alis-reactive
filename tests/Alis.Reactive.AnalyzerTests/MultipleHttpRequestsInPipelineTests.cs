@@ -10,23 +10,23 @@ public class MultipleHttpRequestsInPipelineTests
         "Multiple HTTP requests in one pipeline — only the last request survives. Use Parallel(...) for concurrent requests or separate triggers for independent requests.";
 
     [Test]
-    public Task a_second_request_in_one_pipeline_is_reported() =>
-        Fixture.Reports<MultipleHttpRequestsInPipelineAnalyzer>("ALIS008", Message, Fixture.View, View(
+    public Task a_second_request_in_one_pipeline_is_reported()
+        => Fixture.Reports<MultipleHttpRequestsInPipelineAnalyzer>("ALIS008", Message, Fixture.View, View(
             """
             p.Get("/pharmacy");
             [|p.Get("/lab");|]
             """));
 
     [Test]
-    public Task requests_sent_side_by_side_are_not_reported() =>
-        Fixture.ReportsNothing<MultipleHttpRequestsInPipelineAnalyzer>(Fixture.View, View(
+    public Task requests_sent_side_by_side_are_not_reported()
+        => Fixture.ReportsNothing<MultipleHttpRequestsInPipelineAnalyzer>(Fixture.View, View(
             """
             p.Parallel(pharmacy => pharmacy.Get("/pharmacy"), lab => lab.Get("/lab"));
             """));
 
     [Test]
-    public Task a_file_that_is_not_a_view_is_left_alone() =>
-        Fixture.ReportsNothing<MultipleHttpRequestsInPipelineAnalyzer>(Fixture.Controller, View(
+    public Task a_file_that_is_not_a_view_is_left_alone()
+        => Fixture.ReportsNothing<MultipleHttpRequestsInPipelineAnalyzer>(Fixture.Controller, View(
             """
             p.Get("/pharmacy");
             p.Get("/lab");

@@ -21,8 +21,8 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant Reactive Plan behaviors.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {

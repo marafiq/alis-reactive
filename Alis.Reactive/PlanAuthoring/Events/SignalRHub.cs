@@ -33,8 +33,8 @@ namespace Alis.Reactive
         /// <typeparam name="THub">The hub's declaration.</typeparam>
         /// <param name="url">The hub's URL.</param>
         public static SignalRSource<THub> At<THub>(string url)
-            where THub : SignalRHub, new() =>
-            new SignalRSource<THub>(DeclaredName.RequiredUrl(url), new THub());
+            where THub : SignalRHub, new()
+            => new SignalRSource<THub>(DeclaredName.RequiredUrl(url), new THub());
 
         /// <summary>The connection's state.</summary>
         public ReadOnly<SignalRConnectionState> State => ReadOnly<SignalRConnectionState>();
@@ -54,43 +54,43 @@ namespace Alis.Reactive
         /// <summary>Declares a hub method the page sends with no argument; the steps after it wait until it is sent.</summary>
         /// <param name="name">The hub method's name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected void Send(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), name: "send", declaredBy: declaredBy);
+        protected void Send(string? name = null, [CallerMemberName] string declaredBy = "")
+            => MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), name: "send", declaredBy: declaredBy);
 
         /// <summary>Declares a hub method the page sends with one argument; the steps after it wait until it is sent.</summary>
         /// <param name="argument">The argument: a literal, or a value read when the step runs.</param>
         /// <param name="name">The hub method's name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected void Send(Arg argument, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), argument, name: "send", declaredBy: declaredBy);
+        protected void Send(Arg argument, string? name = null, [CallerMemberName] string declaredBy = "")
+            => MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), argument, name: "send", declaredBy: declaredBy);
 
         /// <summary>Declares a hub method the page invokes with no argument; the steps after it wait until the server completes it.</summary>
         /// <param name="name">The hub method's name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected void Invoke(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), name: "invoke", declaredBy: declaredBy);
+        protected void Invoke(string? name = null, [CallerMemberName] string declaredBy = "")
+            => MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), name: "invoke", declaredBy: declaredBy);
 
         /// <summary>Declares a hub method the page invokes with one argument; the steps after it wait until the server completes it.</summary>
         /// <param name="argument">The argument: a literal, or a value read when the step runs.</param>
         /// <param name="name">The hub method's name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected void Invoke(Arg argument, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), argument, name: "invoke", declaredBy: declaredBy);
+        protected void Invoke(Arg argument, string? name = null, [CallerMemberName] string declaredBy = "")
+            => MethodAsync(Fixed(DeclaredName.Of(name, declaredBy)), argument, name: "invoke", declaredBy: declaredBy);
 
         /// <summary>Declares a hub method the page invokes with no argument and whose answer it reads; the step that first reads the answer waits for it.</summary>
         /// <typeparam name="TResult">The C# type of the answer.</typeparam>
         /// <param name="name">The hub method's name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected TypedSource<TResult> Invoke<TResult>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            MethodAsync<TResult>(Fixed(DeclaredName.Of(name, declaredBy)), name: "invoke", declaredBy: declaredBy);
+        protected TypedSource<TResult> Invoke<TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
+            => MethodAsync<TResult>(Fixed(DeclaredName.Of(name, declaredBy)), name: "invoke", declaredBy: declaredBy);
 
         /// <summary>Declares a hub method the page invokes with one argument and whose answer it reads; the step that first reads the answer waits for it.</summary>
         /// <typeparam name="TResult">The C# type of the answer.</typeparam>
         /// <param name="argument">The argument: a literal, or a value read when the step runs.</param>
         /// <param name="name">The hub method's name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        protected TypedSource<TResult> Invoke<TResult>(Arg argument, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            MethodAsync<TResult>(Fixed(DeclaredName.Of(name, declaredBy)), argument, name: "invoke", declaredBy: declaredBy);
+        protected TypedSource<TResult> Invoke<TResult>(Arg argument, string? name = null, [CallerMemberName] string declaredBy = "")
+            => MethodAsync<TResult>(Fixed(DeclaredName.Of(name, declaredBy)), argument, name: "invoke", declaredBy: declaredBy);
     }
 
     /// <summary>A hub connection's state, as the SignalR client names it.</summary>

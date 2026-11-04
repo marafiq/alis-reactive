@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel.Writing;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive.PlanModel.Values
 {
@@ -48,40 +48,47 @@ namespace Alis.Reactive.PlanModel.Values
             if (value is string || value is bool || Scalar.IsNumber(value)) return LiteralRaw(value, shape);
             if (value is char || ClrShape.Of(value.GetType()).IsScalar) return LiteralRaw(JsonTextOf(value), shape);
             if (depth > 32)
+            {
                 throw new InvalidOperationException(
                     $"A {CSharpTypeName.Of(value.GetType())} nests more than 32 levels deep, or holds itself; a plan carries a value once.");
+            }
 
             if (ClrShape.IsDictionaryLike(value.GetType()))
+            {
                 return Record(((IEnumerable)value).Cast<object>()
                     .Select(entry => (KeyText(entry), LiteralFor(ValueOf(entry), Shape.Any, depth + 1)))
                     .ToList());
+            }
+
             if (value is IEnumerable items)
             {
                 var itemShape = shape.TryGetArrayItemShape(out var declared) ? declared : Shape.Any;
                 return List(items.Cast<object?>().Select(item => LiteralFor(item, itemShape, depth + 1)).ToList(), shape);
             }
             if (ClrShape.IsDataClass(value.GetType()))
+            {
                 return Record(ClrShape.SerializedProperties(value.GetType())
                     .Select(member => (JsonMemberName.Of(member.Name), LiteralFor(member.GetValue(value), ClrShape.Of(member.PropertyType), depth + 1)))
                     .ToList());
+            }
 
             throw new InvalidOperationException(
                 $"A {CSharpTypeName.Of(value.GetType())} cannot be written into a plan. A value fixed when the view renders is text, " +
                 "a number, a boolean, a date, a Guid, a time, an enum, a data class, a dictionary or a collection of those.");
         }
 
-        private static string JsonTextOf(object value) =>
-            JsonSerializer.SerializeToElement(value, value.GetType()).GetString()
+        private static string JsonTextOf(object value)
+            => JsonSerializer.SerializeToElement(value, value.GetType()).GetString()
             ?? throw new InvalidOperationException($"A {CSharpTypeName.Of(value.GetType())} is not written as text.");
 
-        private static string KeyText(object entry) =>
-            Convert.ToString(Property(entry, "Key"), CultureInfo.InvariantCulture)
+        private static string KeyText(object entry)
+            => Convert.ToString(Property(entry, "Key"), CultureInfo.InvariantCulture)
             ?? throw new InvalidOperationException("A dictionary written into a plan has no null key.");
 
         private static object? ValueOf(object entry) => Property(entry, "Value");
 
-        private static object? Property(object entry, string name) =>
-            entry.GetType().GetProperty(name)!.GetValue(entry);
+        private static object? Property(object entry, string name)
+            => entry.GetType().GetProperty(name)!.GetValue(entry);
 
         private static string JavaScriptTextOf(Enum option)
         {
@@ -93,30 +100,30 @@ namespace Alis.Reactive.PlanModel.Values
             return declared == null ? memberName : declared.Name;
         }
 
-        internal static ValueExpression Get(Target target, IReadOnlyList<string> path, Shape shape) =>
-            new GetExpression(target, path, shape);
+        internal static ValueExpression Get(Target target, IReadOnlyList<string> path, Shape shape)
+            => new GetExpression(target, path, shape);
 
-        internal static ValueExpression Get(Target target, Shape shape) =>
-            new GetExpression(target, G.NoPath, shape);
+        internal static ValueExpression Get(Target target, Shape shape)
+            => new GetExpression(target, G.NoPath, shape);
 
         internal static CallExpression Call(
             Target target,
             IReadOnlyList<string> path,
             IReadOnlyList<ValueExpression> args,
             IReadOnlyList<Shape> argShapes,
-            Shape shape) =>
-            new CallExpression(target, path, args, argShapes, shape);
+            Shape shape)
+            => new CallExpression(target, path, args, argShapes, shape);
 
-        internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits) =>
-            new MethodResultExpression(call, member, awaits);
+        internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits)
+            => new MethodResultExpression(call, member, awaits);
 
         internal static ValueExpression ReadUrl(string key, Shape shape) => new UrlRead(key, shape);
 
-        internal static ValueExpression ReadBound(string name, Shape shape) =>
-            new BoundRead(name, shape, BoundRead.Page, G.List(Array.Empty<Expr>()));
+        internal static ValueExpression ReadBound(string name, Shape shape)
+            => new BoundRead(name, shape, BoundRead.Page, G.List(Array.Empty<Expr>()));
 
-        internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes) =>
-            new BoundRead(name, shape, formId, G.Ref(itemIndexes));
+        internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes)
+            => new BoundRead(name, shape, formId, G.Ref(itemIndexes));
 
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
@@ -141,8 +148,8 @@ namespace Alis.Reactive.PlanModel.Values
             return new ListExpression(items.ToList(), shape);
         }
 
-        internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands) =>
-            new OperationExpression(op, operands, shape);
+        internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands)
+            => new OperationExpression(op, operands, shape);
     }
 
     internal sealed class LiteralExpression : ValueExpression
@@ -179,8 +186,8 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
-        internal override ValueExpression AsArrived() =>
-            _target.IsData ? new GetExpression(_target, _path, Shape.Any) : this;
+        internal override ValueExpression AsArrived()
+            => _target.IsData ? new GetExpression(_target, _path, Shape.Any) : this;
 
         internal override Expr Write(Scope scope)
         {
@@ -245,8 +252,8 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override bool ReadsAwaited => _awaits || _call.ReadsAwaited;
 
-        internal override Expr Write(Scope scope) =>
-            G.As(scope.Result(this, JsonMemberName.Of(_member), _awaits, () => _call.WriteUnconverted(scope)), OutputShape);
+        internal override Expr Write(Scope scope)
+            => G.As(scope.Result(this, JsonMemberName.Of(_member), _awaits, () => _call.WriteUnconverted(scope)), OutputShape);
     }
 
     internal sealed class UrlRead : ValueExpression
@@ -315,8 +322,8 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override bool ReadsAwaited => _fields.Any(member => member.Value.ReadsAwaited);
 
-        internal override Expr Write(Scope scope) =>
-            G.Record(_fields.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
+        internal override Expr Write(Scope scope)
+            => G.Record(_fields.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
     }
 
     internal sealed class ListExpression : ValueExpression
@@ -353,7 +360,7 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
-        internal override Expr Write(Scope scope) =>
-            G.As(G.Op(_op, _operands.Select(operand => operand.Write(scope)).ToArray()), _shape);
+        internal override Expr Write(Scope scope)
+            => G.As(G.Op(_op, _operands.Select(operand => operand.Write(scope)).ToArray()), _shape);
     }
 }

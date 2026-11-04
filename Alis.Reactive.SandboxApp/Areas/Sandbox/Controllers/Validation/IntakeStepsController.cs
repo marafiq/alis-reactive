@@ -28,8 +28,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         }
 
         [HttpGet("MobilityQuestions")]
-        public IActionResult MobilityQuestions([FromQuery] string? careLevel) =>
-            PartialView(Views + "_MobilityQuestions.cshtml", new IntakeStepsModel { CareLevel = careLevel });
+        public IActionResult MobilityQuestions([FromQuery] string? careLevel)
+            => PartialView(Views + "_MobilityQuestions.cshtml", new IntakeStepsModel { CareLevel = careLevel });
 
         [HttpPost("Finish")]
         public IActionResult Finish([FromBody] IntakeStepsModel? intake)

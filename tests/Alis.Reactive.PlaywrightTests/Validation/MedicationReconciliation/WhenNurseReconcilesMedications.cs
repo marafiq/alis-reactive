@@ -21,14 +21,14 @@ public class WhenNurseReconcilesMedications : PlaywrightTestBase
     private ILocator MarStatus => Page.Locator("#mar-status");
     private ILocator ValidationSummary => Page.Locator("[data-reactive-validation-summary]");
     private NativeCheckBoxLocator HasAllergies => _plan.NativeCheckBox(m => m.HasAllergies);
-    private NativeCheckListLocator AdministrationChecks =>
-        new(Page, IdGenerator.For<MedicationReconciliationModel, List<string>>(m => m.AdministrationChecks));
+    private NativeCheckListLocator AdministrationChecks
+        => new(Page, IdGenerator.For<MedicationReconciliationModel, List<string>>(m => m.AdministrationChecks));
 
-    private ILocator Field(Expression<Func<MedicationReconciliationModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator Field(Expression<Func<MedicationReconciliationModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
-    private ILocator ErrorFor(Expression<Func<MedicationReconciliationModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}_error");
+    private ILocator ErrorFor(Expression<Func<MedicationReconciliationModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}_error");
 
     private async Task NavigateAndBoot()
     {

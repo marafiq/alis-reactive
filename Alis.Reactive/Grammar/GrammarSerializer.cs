@@ -17,8 +17,8 @@ namespace Alis.Reactive.Grammar
 
     internal sealed class CamelCaseEnum<TEnum> : JsonConverter<TEnum> where TEnum : struct, Enum
     {
-        public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options) =>
-            writer.WriteStringValue(JsonNamingPolicy.CamelCase.ConvertName(value.ToString()));
+        public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
+            => writer.WriteStringValue(JsonNamingPolicy.CamelCase.ConvertName(value.ToString()));
 
         public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             => throw new NotSupportedException("Plan types are write-only.");

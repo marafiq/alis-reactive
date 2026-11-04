@@ -18,10 +18,10 @@ public class RazorViewScopeTests
     [TestCase(Fixture.View, TestName = "the Razor source generator's path, Views_Home_Index_cshtml.g.cs")]
     [TestCase("obj/Debug/net10.0/Razor/Views/Home/Index.cshtml.g.cs", TestName = "the build-time Razor pipeline's path, Index.cshtml.g.cs")]
     [TestCase("Views/Home/Index.cshtml", TestName = "a view compiled under its own path, Index.cshtml")]
-    public Task a_view_is_seen_under_each_path_the_razor_compiler_gives_it(string path) =>
-        Fixture.Reports<MultipleHttpRequestsInPipelineAnalyzer>("ALIS008", Message, path, MultipleHttpRequestsInPipelineTests.View(Pipeline));
+    public Task a_view_is_seen_under_each_path_the_razor_compiler_gives_it(string path)
+        => Fixture.Reports<MultipleHttpRequestsInPipelineAnalyzer>("ALIS008", Message, path, MultipleHttpRequestsInPipelineTests.View(Pipeline));
 
     [Test]
-    public Task a_file_that_is_not_a_view_is_left_alone() =>
-        Fixture.ReportsNothing<MultipleHttpRequestsInPipelineAnalyzer>(Fixture.Controller, MultipleHttpRequestsInPipelineTests.View(Pipeline.Replace("[|", "").Replace("|]", "")));
+    public Task a_file_that_is_not_a_view_is_left_alone()
+        => Fixture.ReportsNothing<MultipleHttpRequestsInPipelineAnalyzer>(Fixture.Controller, MultipleHttpRequestsInPipelineTests.View(Pipeline.Replace("[|", "").Replace("|]", "")));
 }

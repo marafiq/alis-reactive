@@ -63,27 +63,27 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         }
 
         [HttpPut("FrontDesk/Hold/{slotId}")]
-        public IActionResult ChangeVisitors(string slotId, [FromBody] VisitorsChange? change) =>
-            Ok(new DeskMessage { Message = $"{LabelOf(slotId)} now expects {change?.Visitors:0} visitors." });
+        public IActionResult ChangeVisitors(string slotId, [FromBody] VisitorsChange? change)
+            => Ok(new DeskMessage { Message = $"{LabelOf(slotId)} now expects {change?.Visitors:0} visitors." });
 
         [HttpDelete("FrontDesk/Hold/{slotId}")]
-        public IActionResult ReleaseHold(string slotId) =>
-            Ok(new DeskMessage { Message = $"Released {LabelOf(slotId)}." });
+        public IActionResult ReleaseHold(string slotId)
+            => Ok(new DeskMessage { Message = $"Released {LabelOf(slotId)}." });
 
         [HttpDelete("FrontDesk/Holds/{residentId}")]
-        public IActionResult ReleaseEveryHold(string residentId, [FromBody] FamilyRelease? release) =>
-            Ok(new DeskMessage
+        public IActionResult ReleaseEveryHold(string residentId, [FromBody] FamilyRelease? release)
+            => Ok(new DeskMessage
             {
                 Message = $"Released every hold the {Capitalized(release?.Family ?? "")} family had for {Find(residentId)?.Name ?? residentId}.",
             });
 
         [HttpPost("FrontDesk/Badge/{slotId}")]
-        public IActionResult PrintBadge(string slotId, [FromBody] HoldRequest? badge) =>
-            Ok(new DeskMessage { Message = $"Badge printed for the {Capitalized(badge?.Family ?? "")} family, {LabelOf(slotId)}." });
+        public IActionResult PrintBadge(string slotId, [FromBody] HoldRequest? badge)
+            => Ok(new DeskMessage { Message = $"Badge printed for the {Capitalized(badge?.Family ?? "")} family, {LabelOf(slotId)}." });
 
         [HttpGet("FrontDesk/Arrival/{slotId}")]
-        public IActionResult Arrival(string slotId) =>
-            PartialView(ViewBase + "_ArrivalCard.cshtml", new ArrivalCard
+        public IActionResult Arrival(string slotId)
+            => PartialView(ViewBase + "_ArrivalCard.cshtml", new ArrivalCard
             {
                 Time = LabelOf(slotId),
                 Room = slotId.StartsWith("sat", StringComparison.Ordinal) || slotId.StartsWith("sun", StringComparison.Ordinal)
@@ -103,7 +103,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
             return slotId;
         }
 
-        private static string Capitalized(string name) =>
-            name.Length == 0 ? name : char.ToUpperInvariant(name[0]) + name.Substring(1);
+        private static string Capitalized(string name)
+            => name.Length == 0 ? name : char.ToUpperInvariant(name[0]) + name.Substring(1);
     }
 }

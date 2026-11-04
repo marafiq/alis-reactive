@@ -32,19 +32,19 @@ namespace Alis.Reactive.PlanModel.Writing
 
         internal string EventParam { get; }
 
-        internal string Item =>
-            _item ?? throw new InvalidOperationException("An array element is read outside an array operation.");
+        internal string Item
+            => _item ?? throw new InvalidOperationException("An array element is read outside an array operation.");
 
         internal string Fresh(string stem) => _plan.Fresh(stem);
 
-        internal Scope WithResponse(ResponseHandle handle, string binding) =>
-            new Scope(_plan, EventParam, new ResponseFrame(handle, binding, _responses), _item, _results);
+        internal Scope WithResponse(ResponseHandle handle, string binding)
+            => new Scope(_plan, EventParam, new ResponseFrame(handle, binding, _responses), _item, _results);
 
         internal Scope WithItem(string name) => new Scope(_plan, EventParam, _responses, name, _results);
 
         internal Expr Result(object result, string stem, bool awaits, Func<Expr> call)
         {
-            for (ResultFrame? frame = _results; frame != null; frame = frame.Outer)
+            for (var frame = _results; frame != null; frame = frame.Outer)
                 if (frame.TryGet(result, out var bound)) return G.Ref(bound);
 
             var name = Fresh(stem);
@@ -54,8 +54,8 @@ namespace Alis.Reactive.PlanModel.Writing
             return G.Ref(name);
         }
 
-        internal void DeferOwnLine(object result, int index, Func<IReadOnlyList<Statement>> write) =>
-            _results.Defer(result, index, write);
+        internal void DeferOwnLine(object result, int index, Func<IReadOnlyList<Statement>> write)
+            => _results.Defer(result, index, write);
 
         internal void WriteDeferred(List<Statement> block)
         {
@@ -97,8 +97,8 @@ namespace Alis.Reactive.PlanModel.Writing
 
             internal void Defer(object result, int index, Func<IReadOnlyList<Statement>> write) => _deferred.Add((result, index, write));
 
-            internal IEnumerable<(object Result, int Index, Func<IReadOnlyList<Statement>> Write)> Deferred =>
-                _deferred.OrderByDescending(deferred => deferred.Index);
+            internal IEnumerable<(object Result, int Index, Func<IReadOnlyList<Statement>> Write)> Deferred
+                => _deferred.OrderByDescending(deferred => deferred.Index);
         }
 
         private sealed class ResponseFrame
@@ -242,8 +242,8 @@ namespace Alis.Reactive.PlanModel.Writing
             return snapshot;
         }
 
-        internal IReadOnlyDictionary<string, Vendor> Vendors() =>
-            _vendors.OrderBy(v => v.Key, StringComparer.Ordinal).ToDictionary(v => v.Key, v => v.Value, StringComparer.Ordinal);
+        internal IReadOnlyDictionary<string, Vendor> Vendors()
+            => _vendors.OrderBy(v => v.Key, StringComparer.Ordinal).ToDictionary(v => v.Key, v => v.Value, StringComparer.Ordinal);
 
         private string PluginObject(string id, string name, string key, PluginData data)
         {

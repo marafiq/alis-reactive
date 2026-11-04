@@ -34,8 +34,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("Page")]
-        public IActionResult OpenPage([FromQuery] string? page) =>
-            page != null && PageSummaries.TryGetValue(page, out var summary)
+        public IActionResult OpenPage([FromQuery] string? page)
+            => page != null && PageSummaries.TryGetValue(page, out var summary)
                 ? Ok(new StaffPage { Summary = summary })
                 : NotFound();
     }

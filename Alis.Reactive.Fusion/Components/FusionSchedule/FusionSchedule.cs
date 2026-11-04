@@ -87,45 +87,45 @@ namespace Alis.Reactive.Fusion
         public void ScrollTo(Arg<string> hour) => Method(hour);
 
         /// <summary>Raised when the user clicks a cell.</summary>
-        public Event<FusionScheduleCellClickArgs> CellClick =>
-            Event<FusionScheduleCellClickArgs>();
+        public Event<FusionScheduleCellClickArgs> CellClick
+            => Event<FusionScheduleCellClickArgs>();
 
         /// <summary>Raised when the user clicks an event.</summary>
-        public Event<FusionScheduleEventClickArgs> EventClick =>
-            Event<FusionScheduleEventClickArgs>();
+        public Event<FusionScheduleEventClickArgs> EventClick
+            => Event<FusionScheduleEventClickArgs>();
 
         /// <summary>
         /// Raised before an action runs: a move to another date or view, or an event added, saved or deleted.
         /// </summary>
         /// <typeparam name="TEvent">Your event class; the payload's records read the events the action carries as it.</typeparam>
-        public Event<FusionScheduleActionBeginArgs<TEvent>> ActionBegin<TEvent>() where TEvent : class =>
-            Event<FusionScheduleActionBeginArgs<TEvent>>();
+        public Event<FusionScheduleActionBeginArgs<TEvent>> ActionBegin<TEvent>() where TEvent : class
+            => Event<FusionScheduleActionBeginArgs<TEvent>>();
 
         /// <summary>Raised after an action completes.</summary>
-        public Event<FusionScheduleActionCompleteArgs> ActionComplete =>
-            Event<FusionScheduleActionCompleteArgs>();
+        public Event<FusionScheduleActionCompleteArgs> ActionComplete
+            => Event<FusionScheduleActionCompleteArgs>();
 
         /// <summary>Raised before the view or date changes.</summary>
-        public Event<FusionScheduleNavigatingArgs> Navigating =>
-            Event<FusionScheduleNavigatingArgs>();
+        public Event<FusionScheduleNavigatingArgs> Navigating
+            => Event<FusionScheduleNavigatingArgs>();
 
         /// <summary>Raised before a popup opens: an event's details, the event editor, a delete alert, ...</summary>
         /// <typeparam name="TEvent">Your event class; the payload's <c>Data</c> reads the event the popup is for as it.</typeparam>
-        public Event<FusionSchedulePopupOpenArgs<TEvent>> PopupOpen<TEvent>() where TEvent : class =>
-            Event<FusionSchedulePopupOpenArgs<TEvent>>();
+        public Event<FusionSchedulePopupOpenArgs<TEvent>> PopupOpen<TEvent>() where TEvent : class
+            => Event<FusionSchedulePopupOpenArgs<TEvent>>();
 
         /// <summary>Raised before a popup closes.</summary>
-        public Event<FusionSchedulePopupCloseArgs> PopupClose =>
-            Event<FusionSchedulePopupCloseArgs>();
+        public Event<FusionSchedulePopupCloseArgs> PopupClose
+            => Event<FusionSchedulePopupCloseArgs>();
 
         /// <summary>Raised after the schedule binds its events.</summary>
-        public Event<FusionScheduleDataBoundArgs> DataBound =>
-            Event<FusionScheduleDataBoundArgs>();
+        public Event<FusionScheduleDataBoundArgs> DataBound
+            => Event<FusionScheduleDataBoundArgs>();
 
         /// <summary>Raised after each event renders.</summary>
         /// <typeparam name="TEvent">Your event class; the payload's <c>Data</c> reads the rendered event as it.</typeparam>
-        public Event<FusionScheduleEventRenderedArgs<TEvent>> EventRendered<TEvent>() where TEvent : class, new() =>
-            Event<FusionScheduleEventRenderedArgs<TEvent>>();
+        public Event<FusionScheduleEventRenderedArgs<TEvent>> EventRendered<TEvent>() where TEvent : class, new()
+            => Event<FusionScheduleEventRenderedArgs<TEvent>>();
     }
 
     /// <summary>Payload of <see cref="FusionSchedule.CellClick"/>.</summary>

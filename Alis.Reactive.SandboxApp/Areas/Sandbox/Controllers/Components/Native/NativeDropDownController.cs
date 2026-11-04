@@ -52,7 +52,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
             return Ok(new VanBooked { Message = $"Van booked for {resident}: {booking.Trip} at {booking.Departure}, {escort}." });
         }
 
-        private static SelectListItem[] Options(IEnumerable<string> texts) =>
-            texts.Select(text => new SelectListItem(text, text)).ToArray();
+        private static SelectListItem[] Options(IEnumerable<string> texts)
+            => texts.Select(text => new SelectListItem(text, text)).ToArray();
     }
 }

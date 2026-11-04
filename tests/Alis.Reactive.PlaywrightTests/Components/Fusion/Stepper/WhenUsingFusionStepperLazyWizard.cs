@@ -41,8 +41,8 @@ public class WhenUsingFusionStepperLazyWizard : PlaywrightTestBase
 
     private FusionTextBoxLocator Coordinator => new(Page, IdGenerator.For<AdmissionReview>(m => m.AdmissionCoordinator));
 
-    private ILocator MessageFor<TStep>(Expression<Func<TStep, object?>> field) where TStep : class =>
-        Page.Locator($"#{IdGenerator.For(field)}_error");
+    private ILocator MessageFor<TStep>(Expression<Func<TStep, object?>> field) where TStep : class
+        => Page.Locator($"#{IdGenerator.For(field)}_error");
 
     private async Task OpenTheAdmission()
     {

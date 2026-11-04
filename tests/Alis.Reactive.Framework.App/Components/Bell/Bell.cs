@@ -27,6 +27,6 @@ public sealed class BellRung : JsObject
 public static class BellHtml
 {
     public static RenderedComponent<Bell, TModel> Bell<TModel>(this ReactivePlan<TModel> plan, string id)
-        where TModel : class =>
-        plan.Render<Bell>(id, new HtmlString($"<div class=\"bell\" id=\"{HtmlEncoder.Default.Encode(id)}\"></div>"));
+        where TModel : class
+        => plan.Render<Bell>(id, new HtmlString($"<div class=\"bell\" id=\"{HtmlEncoder.Default.Encode(id)}\"></div>"));
 }

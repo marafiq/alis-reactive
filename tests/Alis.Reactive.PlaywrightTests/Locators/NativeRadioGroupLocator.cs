@@ -15,8 +15,8 @@ public sealed class NativeRadioGroupLocator
 
     private ILocator Group => _page.Locator($"#{_componentId}").Locator("xpath=..");
 
-    private ILocator Label(string optionText) =>
-        Group.Locator("label").Filter(new() { Has = _page.GetByText(optionText, new() { Exact = true }) });
+    private ILocator Label(string optionText)
+        => Group.Locator("label").Filter(new() { Has = _page.GetByText(optionText, new() { Exact = true }) });
 
     public ILocator Option(string optionText) => Label(optionText).Locator("input[type=radio]");
 

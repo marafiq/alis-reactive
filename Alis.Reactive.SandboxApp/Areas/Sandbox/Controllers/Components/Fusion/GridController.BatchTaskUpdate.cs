@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("BatchTaskUpdate"), ActionName("BatchTaskUpdate")]
-        public IActionResult DayTaskBoardPage() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchTaskUpdate.cshtml", new DayTaskBoardViewModel());
+        public IActionResult DayTaskBoardPage()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchTaskUpdate.cshtml", new DayTaskBoardViewModel());
 
         [HttpGet("DayTaskBoardResidents")]
         public IActionResult DayTaskBoardResidents() => Ok(DayTaskBoardOnRecord());

@@ -81,8 +81,11 @@ namespace Alis.Reactive
         private static string OneClass(string value, string name)
         {
             if (string.IsNullOrWhiteSpace(value) || value.Any(char.IsWhiteSpace))
+            {
                 throw new ArgumentException(
                     $"{name} is one class name, added to and removed from a refused input on its own; '{value}' is not one.", name);
+            }
+
             return value;
         }
     }

@@ -19,7 +19,7 @@ public sealed class FilesChanged : JsObject;
 public static class FileInputHtml
 {
     public static RenderedComponent<FileInput, TModel> FileInput<TModel, TProp>(this InputBoundField<TModel, TProp> field)
-        where TModel : class =>
-        field.Render<FileInput>(new HtmlString(
+        where TModel : class
+        => field.Render<FileInput>(new HtmlString(
             $"<input id=\"{HtmlEncoder.Default.Encode(field.ElementId)}\" name=\"{HtmlEncoder.Default.Encode(field.BindingPath)}\" type=\"file\" multiple>"));
 }

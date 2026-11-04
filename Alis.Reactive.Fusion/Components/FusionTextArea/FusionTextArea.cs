@@ -28,22 +28,22 @@ namespace Alis.Reactive.Fusion
         public void FocusOut() => Method();
 
         /// <summary>Raised on every edit while typing.</summary>
-        public Event<FusionTextAreaInputArgs> Input =>
-            Event<FusionTextAreaInputArgs>();
+        public Event<FusionTextAreaInputArgs> Input
+            => Event<FusionTextAreaInputArgs>();
 
         /// <summary>Raised when the text changes and focus leaves the textarea.</summary>
-        public Event<FusionTextAreaChangeArgs> Change =>
-            Event<FusionTextAreaChangeArgs>();
+        public Event<FusionTextAreaChangeArgs> Change
+            => Event<FusionTextAreaChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the textarea receives focus.</summary>
-        public Event<FusionTextAreaFocusArgs> Focus =>
-            Event<FusionTextAreaFocusArgs>();
+        public Event<FusionTextAreaFocusArgs> Focus
+            => Event<FusionTextAreaFocusArgs>();
 
         /// <summary>Raised when the textarea loses focus.</summary>
-        public Event<FusionTextAreaBlurArgs> Blur =>
-            Event<FusionTextAreaBlurArgs>();
+        public Event<FusionTextAreaBlurArgs> Blur
+            => Event<FusionTextAreaBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionTextArea.Input"/>.</summary>

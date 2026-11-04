@@ -37,8 +37,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         [HttpGet("")]
         [HttpGet("Index")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/ChipList/Index.cshtml", new ChipListModel
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/ChipList/Index.cshtml", new ChipListModel
             {
                 Destinations = Places.Select(destination => new OutingDestination { Id = destination.Id, Name = destination.Name }).ToList(),
                 Interests = Interests.Select(interest => new OutingInterest { Id = interest.Id, Name = interest.Name }).ToList(),
@@ -85,8 +85,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return Ok(new OutingPosted { Message = $"Posted the {destination.Name} trip to the activities calendar, {tags}, {repeats}." });
         }
 
-        private static Place? FindDestination(string? id) =>
-            Places.FirstOrDefault(destination => destination.Id == id);
+        private static Place? FindDestination(string? id)
+            => Places.FirstOrDefault(destination => destination.Id == id);
 
         private static string Sentence(IEnumerable<string> items)
         {

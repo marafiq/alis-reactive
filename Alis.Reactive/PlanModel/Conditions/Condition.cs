@@ -5,10 +5,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Inputs;
+using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Conditions;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Writing;
-using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
@@ -98,26 +98,26 @@ namespace Alis.Reactive
         /// <param name="term">The term.</param>
         public static Condition Not(Condition term) => new NotCondition(term ?? throw new ArgumentNullException(nameof(term)));
 
-        internal static Condition Unary(ValueTest test, ValueExpression left, Shape shape) =>
-            new UnaryCondition(test, left, shape);
+        internal static Condition Unary(ValueTest test, ValueExpression left, Shape shape)
+            => new UnaryCondition(test, left, shape);
 
-        internal static Condition Ordered(Comparison comparison, ValueExpression left, ValueExpression right, Shape shape) =>
-            new OrderedCondition(comparison, left, right, shape);
+        internal static Condition Ordered(Comparison comparison, ValueExpression left, ValueExpression right, Shape shape)
+            => new OrderedCondition(comparison, left, right, shape);
 
-        internal static Condition Membership(ValueExpression left, IReadOnlyList<ValueExpression> items, bool negated, Shape shape) =>
-            new MembershipCondition(left, items, negated, shape);
+        internal static Condition Membership(ValueExpression left, IReadOnlyList<ValueExpression> items, bool negated, Shape shape)
+            => new MembershipCondition(left, items, negated, shape);
 
-        internal static Condition Range(ValueExpression left, ValueExpression low, ValueExpression high, Shape shape) =>
-            new RangeCondition(left, low, high, shape);
+        internal static Condition Range(ValueExpression left, ValueExpression low, ValueExpression high, Shape shape)
+            => new RangeCondition(left, low, high, shape);
 
-        internal static Condition ArrayContains(ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape) =>
-            new ArrayContainsCondition(left, item, collectionShape, itemShape);
+        internal static Condition ArrayContains(ValueExpression left, ValueExpression item, Shape collectionShape, Shape itemShape)
+            => new ArrayContainsCondition(left, item, collectionShape, itemShape);
 
-        internal static Condition Text(TextTest test, ValueExpression left, string text, Shape shape) =>
-            new TextCondition(test, left, text, shape);
+        internal static Condition Text(TextTest test, ValueExpression left, string text, Shape shape)
+            => new TextCondition(test, left, text, shape);
 
-        internal static Condition MinLength(ValueExpression left, int length, Shape shape) =>
-            new MinLengthCondition(left, length, shape);
+        internal static Condition MinLength(ValueExpression left, int length, Shape shape)
+            => new MinLengthCondition(left, length, shape);
 
         internal static Condition Confirm(string message) => new ConfirmCondition(message);
 
@@ -140,8 +140,8 @@ namespace Alis.Reactive
 
         internal abstract Expr Write(Scope scope);
 
-        internal virtual IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            new[] { G.If(Write(scope), then, otherwise) };
+        internal virtual IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+            => new[] { G.If(Write(scope), then, otherwise) };
 
         private static IReadOnlyList<Condition> Required(Condition[] terms)
         {
@@ -176,8 +176,8 @@ namespace Alis.Reactive
 
         internal override Condition Bound(FieldValues fields) => _test(fields.Value(_field), _field.Shape);
 
-        internal override Expr Write(Scope scope) =>
-            throw new InvalidOperationException($"The test of '{_field.Path}' is bound to the form's inputs before it is written.");
+        internal override Expr Write(Scope scope)
+            => throw new InvalidOperationException($"The test of '{_field.Path}' is bound to the form's inputs before it is written.");
     }
 
     internal abstract class ValueCondition : Condition
@@ -200,8 +200,8 @@ namespace Alis.Reactive
 
         private protected Expr Left(Scope scope) => G.As(Raw(scope), Shape);
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+            => IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
     }
 
     internal sealed class UnaryCondition : ValueCondition
@@ -342,8 +342,8 @@ namespace Alis.Reactive
             _length = length;
         }
 
-        internal override Expr Write(Scope scope) =>
-            G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.Any), G.Lit(_length));
+        internal override Expr Write(Scope scope)
+            => G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.Any), G.Lit(_length));
     }
 
     internal sealed class TrueCondition : Condition
@@ -372,8 +372,8 @@ namespace Alis.Reactive
 
         internal override Expr Write(Scope scope) => G.And(Terms.Select(term => term.Write(scope)).ToList());
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            IsSynchronous ? base.Guard(then, otherwise, scope) : AllOf(0, then, otherwise, scope);
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+            => IsSynchronous ? base.Guard(then, otherwise, scope) : AllOf(0, then, otherwise, scope);
 
         private IReadOnlyList<Statement> AllOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
         {
@@ -408,8 +408,8 @@ namespace Alis.Reactive
 
         internal override Expr Write(Scope scope) => G.Or(Terms.Select(term => term.Write(scope)).ToList());
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            IsSynchronous ? base.Guard(then, otherwise, scope) : AnyOf(0, then, otherwise, scope);
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+            => IsSynchronous ? base.Guard(then, otherwise, scope) : AnyOf(0, then, otherwise, scope);
 
         private IReadOnlyList<Statement> AnyOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
         {
@@ -444,8 +444,8 @@ namespace Alis.Reactive
 
         internal override Expr Write(Scope scope) => G.Not(_term.Write(scope));
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope) =>
-            IsSynchronous ? base.Guard(then, otherwise, scope) : _term.Guard(otherwise, then, scope);
+        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+            => IsSynchronous ? base.Guard(then, otherwise, scope) : _term.Guard(otherwise, then, scope);
     }
 
     internal sealed class ConfirmCondition : Condition
@@ -459,8 +459,8 @@ namespace Alis.Reactive
 
         internal override bool IsSynchronous => false;
 
-        internal override Expr Write(Scope scope) =>
-            throw new InvalidOperationException("A user decision cannot be part of a synchronous condition.");
+        internal override Expr Write(Scope scope)
+            => throw new InvalidOperationException("A user decision cannot be part of a synchronous condition.");
 
         internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
         {

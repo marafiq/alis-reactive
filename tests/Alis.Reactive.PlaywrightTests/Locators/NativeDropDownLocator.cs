@@ -15,6 +15,6 @@ public sealed class NativeDropDownLocator
 
     public ILocator Input => _page.Locator($"#{_componentId}");
 
-    public async Task Select(string text) =>
-        await Input.SelectOptionAsync(new SelectOptionValue { Label = text });
+    public async Task Select(string text)
+        => await Input.SelectOptionAsync(new SelectOptionValue { Label = text });
 }

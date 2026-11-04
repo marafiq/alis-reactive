@@ -18,8 +18,8 @@ public sealed class WhenAFormIsCheckedOnBothSides : AppPageTest
         };
     }
 
-    private ILocator Field(string label) =>
-        Page.Locator("#visit-form > div").Filter(new()
+    private ILocator Field(string label)
+        => Page.Locator("#visit-form > div").Filter(new()
         {
             Has = Page.GetByLabel(new System.Text.RegularExpressions.Regex($"^{System.Text.RegularExpressions.Regex.Escape(label)}( \\*)?$")),
         });

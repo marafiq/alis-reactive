@@ -21,8 +21,8 @@ public sealed class RequestsController : Controller
     public IActionResult Resident(int id, [FromQuery] string? wing) => Said($"resident {id} in {wing ?? "no wing"}");
 
     [HttpPost("/Requests/Notes")]
-    public IActionResult Note([FromBody] NoteRequest note) =>
-        Said($"note '{note.Text}' titled {note.Title ?? "nothing"}, tally {note.Tally}, amount {Number(note.Amount)}");
+    public IActionResult Note([FromBody] NoteRequest note)
+        => Said($"note '{note.Text}' titled {note.Title ?? "nothing"}, tally {note.Tally}, amount {Number(note.Amount)}");
 
     [HttpPut("/Requests/Notes/{id}")]
     public IActionResult PutNote(int id, [FromBody] NoteRequest note) => Said($"put note {id}: '{note.Text}'");
@@ -31,8 +31,8 @@ public sealed class RequestsController : Controller
     public IActionResult DeleteNote(int id) => Said($"deleted note {id}");
 
     [HttpPost("/Requests/Upload")]
-    public IActionResult Upload([FromForm] NoteRequest note) =>
-        Said($"form '{note.Text}' from {(Request.HasFormContentType ? "form data" : "something else")}, amount {Number(note.Amount)}");
+    public IActionResult Upload([FromForm] NoteRequest note)
+        => Said($"form '{note.Text}' from {(Request.HasFormContentType ? "form data" : "something else")}, amount {Number(note.Amount)}");
 
     [HttpGet("/Requests/Headers")]
     public IActionResult Headers() => Said($"shift {Request.Headers["X-Shift"]} at the {Request.Headers["X-Desk"]} desk");
@@ -41,8 +41,8 @@ public sealed class RequestsController : Controller
     public IActionResult Total(decimal total) => Said($"total {Number(total)} in the path");
 
     [HttpGet("/Requests/Refuse")]
-    public IActionResult Refuse([FromQuery] int status) =>
-        status == 409 ? StatusCode(409, new Refusal { Reason = "The room is taken" }) : StatusCode(status);
+    public IActionResult Refuse([FromQuery] int status)
+        => status == 409 ? StatusCode(409, new Refusal { Reason = "The room is taken" }) : StatusCode(status);
 
     [HttpGet("/Requests/First")]
     public IActionResult First() => Json(new FirstAnswer { Next = "the second step" });
@@ -58,8 +58,8 @@ public sealed class RequestsController : Controller
     }
 
     [HttpPost("/Requests/Estimates")]
-    public IActionResult Estimate([FromBody] EstimateRequest estimate) =>
-        Said(estimate.Estimate is decimal value ? $"estimate {Number(value)}" : "no estimate");
+    public IActionResult Estimate([FromBody] EstimateRequest estimate)
+        => Said(estimate.Estimate is decimal value ? $"estimate {Number(value)}" : "no estimate");
 
     public IActionResult Outage() => View(new OutagePage());
 
@@ -93,51 +93,51 @@ public sealed class RequestsController : Controller
     public IActionResult Census() => View(new CensusPage());
 
     [HttpGet("/Requests/Census/Asked")]
-    public IActionResult CensusAsked([FromQuery] CensusQuery query) =>
-        Said($"query {QueryText()}, bound wing {query.Wing ?? "none"} and wings {Listed(query.Wings)}");
+    public IActionResult CensusAsked([FromQuery] CensusQuery query)
+        => Said($"query {QueryText()}, bound wing {query.Wing ?? "none"} and wings {Listed(query.Wings)}");
 
     [HttpPost("/Requests/Census/Posted")]
-    public IActionResult CensusPosted() =>
-        Said("fields " + string.Join(", ", Request.Form.Select(field => $"{field.Key}='{field.Value}'")));
+    public IActionResult CensusPosted()
+        => Said("fields " + string.Join(", ", Request.Form.Select(field => $"{field.Key}='{field.Value}'")));
 
     [HttpPost("/Requests/Census/Labels")]
-    public IActionResult LabelsKept([FromBody] CensusLabels labels) =>
-        Said("labels " + string.Join(" and ", (labels.Labels ?? []).Select(label => label is null ? "null" : $"'{label}'")));
+    public IActionResult LabelsKept([FromBody] CensusLabels labels)
+        => Said("labels " + string.Join(" and ", (labels.Labels ?? []).Select(label => label is null ? "null" : $"'{label}'")));
 
     [HttpGet("/Requests/Census/Cards")]
     public IActionResult CardsAsked() => Said($"asked with query {QueryText()}");
 
     private string QueryText() => Request.QueryString.HasValue ? Request.QueryString.Value! : "nothing";
 
-    private static string Listed(List<string>? items) =>
-        items is null || items.Count == 0 ? "none" : string.Join(" and ", items.Select(item => item ?? "an empty one"));
+    private static string Listed(List<string>? items)
+        => items is null || items.Count == 0 ? "none" : string.Join(" and ", items.Select(item => item ?? "an empty one"));
 
     public IActionResult Round() => View(new RoundPage { Doses = { [1042] = new() } });
 
     [HttpPost("/Requests/Rounds")]
-    public IActionResult RecordRound([FromForm] RoundPage round) =>
-        Said(round.Doses.TryGetValue(1042, out var dose) ? $"dose for 1042: {dose.Amount ?? "none"}" : "no dose for 1042");
+    public IActionResult RecordRound([FromForm] RoundPage round)
+        => Said(round.Doses.TryGetValue(1042, out var dose) ? $"dose for 1042: {dose.Amount ?? "none"}" : "no dose for 1042");
 
     public IActionResult SignIn() => View(new SignInPage());
 
     [HttpPost("/Requests/SignIns")]
-    public IActionResult SignIns([FromBody] SignInRequest signIn) =>
-        Said($"{signIn.Visitor ?? "no one"}, party of {signIn.Party}, note {signIn.Note ?? "none"}");
+    public IActionResult SignIns([FromBody] SignInRequest signIn)
+        => Said($"{signIn.Visitor ?? "no one"}, party of {signIn.Party}, note {signIn.Note ?? "none"}");
 
     [HttpPost("/Requests/Passes")]
     public IActionResult Pass([FromBody] PassRequest pass) => Said($"pass {pass.PassID}");
 
     [HttpPost("/Requests/Parties")]
-    public IActionResult Party([FromBody] PartyRequest party) =>
-        Said(party.Party is int count ? $"party of {count}" : "no party");
+    public IActionResult Party([FromBody] PartyRequest party)
+        => Said(party.Party is int count ? $"party of {count}" : "no party");
 
     [HttpPost("/Requests/Lines")]
-    public IActionResult Lines([FromBody] LineNotes lines) =>
-        Said($"first line: {lines.Lines?.FirstOrDefault()?.Note ?? "none"}");
+    public IActionResult Lines([FromBody] LineNotes lines)
+        => Said($"first line: {lines.Lines?.FirstOrDefault()?.Note ?? "none"}");
 
     [HttpPost("/Requests/Doses")]
-    public IActionResult Doses([FromBody] DoseRecord record) =>
-        Said(record.Doses?.TryGetValue(1042, out var dose) == true ? $"dose for 1042: {dose}" : "no dose for 1042");
+    public IActionResult Doses([FromBody] DoseRecord record)
+        => Said(record.Doses?.TryGetValue(1042, out var dose) == true ? $"dose for 1042: {dose}" : "no dose for 1042");
 
     [HttpPost("/Requests/Extras")]
     public IActionResult Extras([FromBody] GuideExtras extras) => Said($"guide {extras.Guide?.ToString() ?? "none"}");

@@ -13,8 +13,8 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
     private ILocator Result => Page.Locator("#result");
 
-    private ILocator ErrorFor(string fieldName) =>
-        Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
+    private ILocator ErrorFor(string fieldName)
+        => Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
     private ILocator Input(Expression<Func<ResidentModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
 
@@ -46,8 +46,8 @@ public class WhenAjaxPartialsLoadWithValidation : PlaywrightTestBase
         await Input(m => m.Address.ZipCode).FillAsync("92262");
     }
 
-    private Task<IRequest> SubmitAndCaptureRequest() =>
-        Page.RunAndWaitForRequestAsync(
+    private Task<IRequest> SubmitAndCaptureRequest()
+        => Page.RunAndWaitForRequestAsync(
             () => ClickWhenStable(SubmitBtn),
             request => request.Method == "POST" && request.Url.Contains("/SubmitAjaxPartial"));
 

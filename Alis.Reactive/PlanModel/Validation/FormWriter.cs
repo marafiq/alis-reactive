@@ -16,8 +16,8 @@ namespace Alis.Reactive.PlanModel.Validation
             _scope = scope;
         }
 
-        internal FormPluginData Form(string formId, IReadOnlyList<CheckedField> fields) =>
-            new FormPluginData(FormSummaries.IdOf(formId), fields.Select(Field).ToList());
+        internal FormPluginData Form(string formId, IReadOnlyList<CheckedField> fields)
+            => new FormPluginData(FormSummaries.IdOf(formId), fields.Select(Field).ToList());
 
         private FormField Field(CheckedField field)
         {
@@ -27,10 +27,10 @@ namespace Alis.Reactive.PlanModel.Validation
             return new FormField(field.Name, tests);
         }
 
-        private FnExpr When(BrowserRule rule, FormFieldValues values) =>
-            G.Fn(rule.Condition.Bound(values).Write(_scope), FormFieldValues.Indexes);
+        private FnExpr When(BrowserRule rule, FormFieldValues values)
+            => G.Fn(rule.Condition.Bound(values).Write(_scope), FormFieldValues.Indexes);
 
-        private FnExpr Check(BrowserRule rule, CheckedField field) =>
-            G.Fn(rule.Check(G.Ref(Value), field.Shape, field.Values, _scope), Value, FormFieldValues.Indexes);
+        private FnExpr Check(BrowserRule rule, CheckedField field)
+            => G.Fn(rule.Check(G.Ref(Value), field.Shape, field.Values, _scope), Value, FormFieldValues.Indexes);
     }
 }

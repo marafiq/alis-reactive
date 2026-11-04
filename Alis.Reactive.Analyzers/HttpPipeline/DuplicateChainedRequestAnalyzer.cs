@@ -21,8 +21,8 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             description: "A response has one follow-up request. The request builder refuses a second .Chained() when the view renders; this reports one written in the same fluent chain as the view compiles.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {

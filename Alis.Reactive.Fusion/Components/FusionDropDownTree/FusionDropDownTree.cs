@@ -38,8 +38,8 @@ namespace Alis.Reactive.Fusion
         public void Clear() => Method();
 
         /// <summary>Raised when the selection changes.</summary>
-        public Event<FusionDropDownTreeChangeArgs> Change =>
-            Event<FusionDropDownTreeChangeArgs>();
+        public Event<FusionDropDownTreeChangeArgs> Change
+            => Event<FusionDropDownTreeChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

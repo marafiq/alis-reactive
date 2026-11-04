@@ -27,18 +27,18 @@ namespace Alis.Reactive.Fusion
         public void FocusIn() => Method();
 
         /// <summary>Raised when the text is committed (on blur after an edit), as the EJ2 TextArea it extends.</summary>
-        public Event<FusionSmartTextAreaChangeArgs> Change =>
-            Event<FusionSmartTextAreaChangeArgs>();
+        public Event<FusionSmartTextAreaChangeArgs> Change
+            => Event<FusionSmartTextAreaChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised before a suggestion is inserted.</summary>
-        public Event<FusionSmartTextAreaBeforeSuggestionInsertArgs> BeforeSuggestionInsert =>
-            Event<FusionSmartTextAreaBeforeSuggestionInsertArgs>();
+        public Event<FusionSmartTextAreaBeforeSuggestionInsertArgs> BeforeSuggestionInsert
+            => Event<FusionSmartTextAreaBeforeSuggestionInsertArgs>();
 
         /// <summary>Raised after a suggestion is inserted.</summary>
-        public Event<FusionSmartTextAreaAfterSuggestionInsertArgs> AfterSuggestionInsert =>
-            Event<FusionSmartTextAreaAfterSuggestionInsertArgs>();
+        public Event<FusionSmartTextAreaAfterSuggestionInsertArgs> AfterSuggestionInsert
+            => Event<FusionSmartTextAreaAfterSuggestionInsertArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionSmartTextArea.Change"/>.</summary>

@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class DischargePlanningController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/DischargePlanning/Index.cshtml", new DischargePlanModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/DischargePlanning/Index.cshtml", new DischargePlanModel());
 
         [HttpPost("Save")]
         public IActionResult Save([FromBody] DischargePlanModel? plan)

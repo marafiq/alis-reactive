@@ -34,8 +34,8 @@ namespace Alis.Reactive.ContractGeneration
                 _declarations = declarations;
             }
 
-            internal string TypeScript() =>
-                string.Join("\n\n", _declarations.Select(declaration => declaration.TypeScript())) + "\n";
+            internal string TypeScript()
+                => string.Join("\n\n", _declarations.Select(declaration => declaration.TypeScript())) + "\n";
 
             internal string Schema()
             {
@@ -118,8 +118,10 @@ namespace Alis.Reactive.ContractGeneration
                     ?? throw new InvalidOperationException($"{variant.Name} is a variant of {family.Name} and declares no Kind."));
                 var expected = char.ToUpperInvariant(kind[0]) + kind.Substring(1) + family.Name;
                 if (variant.Name != expected)
+                {
                     throw new InvalidOperationException(
                         $"{variant.Name} writes kind \"{kind}\" of {family.Name}; the class is named {expected}.");
+                }
             }
             return variants;
         }
@@ -145,8 +147,8 @@ namespace Alis.Reactive.ContractGeneration
             return members;
         }
 
-        private static object ConstantOf(Type node, PropertyInfo property) =>
-            property.GetValue(RuntimeHelpers.GetUninitializedObject(node))!;
+        private static object ConstantOf(Type node, PropertyInfo property)
+            => property.GetValue(RuntimeHelpers.GetUninitializedObject(node))!;
 
         private sealed class Reference
         {
@@ -161,8 +163,8 @@ namespace Alis.Reactive.ContractGeneration
             internal JsonNode Schema { get; }
             internal Type? Referenced { get; }
 
-            internal static Reference Constant(object value) =>
-                new Reference(JsonSerializer.Serialize(value), new JsonObject { ["const"] = JsonValue.Create(value) }, null);
+            internal static Reference Constant(object value)
+                => new Reference(JsonSerializer.Serialize(value), new JsonObject { ["const"] = JsonValue.Create(value) }, null);
 
             internal static Reference Of(Type type, string member)
             {
@@ -215,8 +217,8 @@ namespace Alis.Reactive.ContractGeneration
 
             internal abstract JsonNode Schema();
 
-            private protected string Union(IEnumerable<string> alternatives) =>
-                "export type " + Name + " =\n" + string.Join("\n", alternatives.Select(alternative => "  | " + alternative)) + ";";
+            private protected string Union(IEnumerable<string> alternatives)
+                => "export type " + Name + " =\n" + string.Join("\n", alternatives.Select(alternative => "  | " + alternative)) + ";";
         }
 
         private sealed class Node : Declaration
@@ -261,8 +263,8 @@ namespace Alis.Reactive.ContractGeneration
 
             internal override string TypeScript() => Union(_variants);
 
-            internal override JsonNode Schema() =>
-                new JsonObject { ["oneOf"] = new JsonArray(_variants.Select(variant => (JsonNode)new JsonObject { ["$ref"] = "#/$defs/" + variant }).ToArray()) };
+            internal override JsonNode Schema()
+                => new JsonObject { ["oneOf"] = new JsonArray(_variants.Select(variant => (JsonNode)new JsonObject { ["$ref"] = "#/$defs/" + variant }).ToArray()) };
         }
 
         private sealed class Names : Declaration
@@ -276,8 +278,8 @@ namespace Alis.Reactive.ContractGeneration
 
             internal override string TypeScript() => Union(_values.Select(value => JsonSerializer.Serialize(value)));
 
-            internal override JsonNode Schema() =>
-                new JsonObject { ["enum"] = new JsonArray(_values.Select(value => (JsonNode)value).ToArray()) };
+            internal override JsonNode Schema()
+                => new JsonObject { ["enum"] = new JsonArray(_values.Select(value => (JsonNode)value).ToArray()) };
         }
 
         private sealed class Builtin : Declaration
@@ -293,8 +295,8 @@ namespace Alis.Reactive.ContractGeneration
 
             internal override string TypeScript() => Union(_typeScript);
 
-            internal override JsonNode Schema() =>
-                new JsonObject { ["type"] = new JsonArray(_schemaTypes.Select(type => (JsonNode)type).ToArray()) };
+            internal override JsonNode Schema()
+                => new JsonObject { ["type"] = new JsonArray(_schemaTypes.Select(type => (JsonNode)type).ToArray()) };
         }
     }
 }

@@ -29,8 +29,8 @@ namespace Alis.Reactive.Fusion
         public void FocusOut() => Method();
 
         /// <summary>Raised when the selected date and time change.</summary>
-        public Event<FusionDateTimePickerChangeArgs> Change =>
-            Event<FusionDateTimePickerChangeArgs>();
+        public Event<FusionDateTimePickerChangeArgs> Change
+            => Event<FusionDateTimePickerChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

@@ -15,20 +15,20 @@ public sealed class FusionTabLocator
 
     public ILocator Root => _page.Locator($"#{_componentId}");
 
-    public ILocator Header(int index) =>
-        Root.Locator(".e-tab-header .e-toolbar-item").Nth(index);
+    public ILocator Header(int index)
+        => Root.Locator(".e-tab-header .e-toolbar-item").Nth(index);
 
-    public ILocator ActiveHeader =>
-        Root.Locator(".e-tab-header .e-toolbar-item.e-active");
+    public ILocator ActiveHeader
+        => Root.Locator(".e-tab-header .e-toolbar-item.e-active");
 
-    public ILocator ActiveContent =>
-        Root.Locator(".e-content > .e-item.e-active");
+    public ILocator ActiveContent
+        => Root.Locator(".e-content > .e-item.e-active");
 
-    public ILocator VisibleHeaders =>
-        Root.Locator(".e-tab-header .e-toolbar-item:not(.e-hidden)");
+    public ILocator VisibleHeaders
+        => Root.Locator(".e-tab-header .e-toolbar-item:not(.e-hidden)");
 
-    public ILocator HeaderByText(string label) =>
-        Root.Locator(".e-tab-header .e-toolbar-item").Filter(new() { HasTextString = label });
+    public ILocator HeaderByText(string label)
+        => Root.Locator(".e-tab-header .e-toolbar-item").Filter(new() { HasTextString = label });
 
     public async Task OpenSection(int index) => await Header(index).ClickAsync();
 }

@@ -29,8 +29,8 @@ public class WhenUsingFusionGridSelection : PlaywrightTestBase
         await Expect(SeatedResidents).ToHaveCountAsync(4, new() { Timeout = 10000 });
     }
 
-    private async Task CtrlClick(string resident) =>
-        await Row(resident).Locator($"td[aria-colindex='{ResidentColumn}']")
+    private async Task CtrlClick(string resident)
+        => await Row(resident).Locator($"td[aria-colindex='{ResidentColumn}']")
             .ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
 
     [Test]

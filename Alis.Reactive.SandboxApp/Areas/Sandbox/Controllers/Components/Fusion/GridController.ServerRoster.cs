@@ -1,20 +1,20 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("ServerRoster"), ActionName("ServerRoster")]
-        public IActionResult ResidentRosterPage() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/Grid/ServerRoster.cshtml", new ResidentRosterViewModel());
+        public IActionResult ResidentRosterPage()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/Grid/ServerRoster.cshtml", new ResidentRosterViewModel());
 
         [HttpGet("RecordRosterCedar")]
         public IActionResult RecordRosterCedar() => Ok(RecordRosterPageOf("Cedar"));
 
         [HttpPost("RecordRosterWingResidents")]
-        public IActionResult RecordRosterWingResidents([FromBody] RecordRosterWingQuery query) =>
-            Ok(new RecordRosterWing { Wing = query.Wing, Page = RecordRosterPageOf(query.Wing) });
+        public IActionResult RecordRosterWingResidents([FromBody] RecordRosterWingQuery query)
+            => Ok(new RecordRosterWing { Wing = query.Wing, Page = RecordRosterPageOf(query.Wing) });
 
         [HttpPost("RecordRosterTodaysArrival")]
         public IActionResult RecordRosterTodaysArrival()

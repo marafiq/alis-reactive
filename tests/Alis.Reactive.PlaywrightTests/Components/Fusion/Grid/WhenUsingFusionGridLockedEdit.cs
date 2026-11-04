@@ -9,8 +9,8 @@ public class WhenUsingFusionGridLockedEdit : PlaywrightTestBase
     private const int FamilyPhoneColumn = 6;
 
     private ILocator Rows => Page.Locator($"#{GridId} .e-row");
-    private ILocator FamilyPhone(string resident) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{FamilyPhoneColumn}']");
+    private ILocator FamilyPhone(string resident)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{FamilyPhoneColumn}']");
     private ILocator RowBeingEdited => Page.Locator($"#{GridId} .e-editedrow");
     private ILocator Editor(string field) => Page.Locator($"#{GridId}{field}");
     private ILocator UpdateRuthsRecord => Page.Locator("#update-record-6403");

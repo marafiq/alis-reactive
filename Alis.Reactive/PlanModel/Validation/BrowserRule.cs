@@ -4,9 +4,9 @@ using System.Globalization;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Inputs;
+using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Validation;
 using Alis.Reactive.PlanModel.Writing;
-using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
@@ -97,8 +97,8 @@ namespace Alis.Reactive
         /// <param name="comparison">The comparison.</param>
         /// <param name="peer">The other member, as a path from the model: <c>x =&gt; x.AdmitDate</c>.</param>
         /// <param name="message">The message shown when the rule fails.</param>
-        public static BrowserRule CompareWith(Comparison comparison, LambdaExpression peer, string message) =>
-            new MemberComparisonRule(comparison, FieldReference.Of(peer), message, Condition.Always);
+        public static BrowserRule CompareWith(Comparison comparison, LambdaExpression peer, string message)
+            => new MemberComparisonRule(comparison, FieldReference.Of(peer), message, Condition.Always);
 
         /// <summary>The value lies between two bounds of its own type.</summary>
         /// <typeparam name="TValue">The bounds' type, which is the member's.</typeparam>
@@ -112,9 +112,12 @@ namespace Alis.Reactive
             if (to == null) throw new ArgumentNullException(nameof(to));
             var shape = ClrShape.Of(from.GetType());
             if (!shape.Equals(ClrShape.Of(to.GetType())))
+            {
                 throw new ArgumentException(
                     "Client validation range bounds must have the same shape. " +
                     $"Lower bound is '{shape.Kind}', upper bound is '{ClrShape.Of(to.GetType()).Kind}'.");
+            }
+
             return new RangeRule(from, to, inclusive, shape, message, Condition.Always);
         }
 
@@ -132,8 +135,8 @@ namespace Alis.Reactive
             return true;
         }
 
-        internal virtual BrowserRule PrefixedBy(string prefix, Condition outer) =>
-            Under(Condition.Combine(outer, Condition.PrefixedBy(prefix)));
+        internal virtual BrowserRule PrefixedBy(string prefix, Condition outer)
+            => Under(Condition.Combine(outer, Condition.PrefixedBy(prefix)));
 
         internal abstract Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope);
 
@@ -167,8 +170,8 @@ namespace Alis.Reactive
 
         private protected static Expr NothingEntered(Expr v) => G.Not(Matches(v, "[\\s\\S]"));
 
-        private protected static string? DefaultMemberOf(Type memberType) =>
-            memberType.IsEnum ? EnumMember.Default(memberType)?.ToString() : null;
+        private protected static string? DefaultMemberOf(Type memberType)
+            => memberType.IsEnum ? EnumMember.Default(memberType)?.ToString() : null;
 
         private protected static Expr IsNumber(Expr value) => G.Eq(G.Op(Operator.Finite, value), value);
 
@@ -216,8 +219,8 @@ namespace Alis.Reactive
             }
         }
 
-        private static Expr Nullable(Expr value, Shape inner, Func<Expr, Shape, Expr> convert) =>
-            G.Op(Operator.Cond, G.Eq(value, G.Null), G.Null, convert(value, inner));
+        private static Expr Nullable(Expr value, Shape inner, Func<Expr, Shape, Expr> convert)
+            => G.Op(Operator.Cond, G.Eq(value, G.Null), G.Null, convert(value, inner));
 
         private protected static decimal? AsNumber(object? value) => value switch
         {

@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 public class PharmacyReviewController : Controller
 {
     [HttpGet("")]
-    public IActionResult Index() =>
-        View("~/Areas/Sandbox/Views/Conditions/PharmacyReview/Index.cshtml", new PharmacyReviewModel());
+    public IActionResult Index()
+        => View("~/Areas/Sandbox/Views/Conditions/PharmacyReview/Index.cshtml", new PharmacyReviewModel());
 
     [HttpGet("Residents/{residentId}/Profile")]
     public IActionResult Profile(string residentId) => residentId switch
@@ -35,8 +35,8 @@ public class PharmacyReviewController : Controller
     };
 
     [HttpPost("Residents/{residentId}/Review")]
-    public IActionResult Review(string residentId, [FromBody] PharmacyReviewOrder? order) =>
-        (residentId, Normalized(order?.Medication)) switch
+    public IActionResult Review(string residentId, [FromBody] PharmacyReviewOrder? order)
+        => (residentId, Normalized(order?.Medication)) switch
         {
             ("helen", "aspirin") => Ok(new PharmacyReviewAnswer("interaction", 7,
                 "Major interaction (7 of 10): aspirin with warfarin raises the risk of bleeding.")),

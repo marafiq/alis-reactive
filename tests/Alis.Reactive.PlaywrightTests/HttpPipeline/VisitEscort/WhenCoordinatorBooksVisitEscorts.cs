@@ -225,7 +225,7 @@ public class WhenCoordinatorBooksVisitEscorts : PlaywrightTestBase
         internal ILocator Times => _root.Locator("button.vp-slot");
         internal ILocator Booked => _root.Locator("button.vp-slot[aria-pressed='true']");
 
-        internal ILocator Time(string label) =>
-            _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
+        internal ILocator Time(string label)
+            => _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
     }
 }

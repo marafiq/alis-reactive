@@ -1,7 +1,7 @@
 using System;
+using Alis.Reactive.PlanAuthoring.Conditions;
 using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Reactions;
-using Alis.Reactive.PlanAuthoring.Conditions;
 
 namespace Alis.Reactive
 {
@@ -27,16 +27,16 @@ namespace Alis.Reactive
         /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed value source.</summary>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="source">Typed condition value source.</param>
-        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> ElseIf<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>> ElseIf<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, GuardBuilder<TModel>>(
                 source, graph => new GuardBuilder<TModel>(graph, ConditionContinuation<TModel>.ForBranch(this)));
 
         /// <summary>Adds the default branch that runs when no earlier branch matched.</summary>
         /// <param name="pipeline">Builds the reactions for the default branch.</param>
-        public void Else(Action<PipelineBuilder<TModel>> pipeline) =>
-            _branch.SetElse(PipelineBuilder<TModel>.Build(_context, pipeline));
+        public void Else(Action<PipelineBuilder<TModel>> pipeline)
+            => _branch.SetElse(PipelineBuilder<TModel>.Build(_context, pipeline));
 
-        internal void AddArm(Condition condition, Action<PipelineBuilder<TModel>> pipeline) =>
-            _branch.AddArm(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
+        internal void AddArm(Condition condition, Action<PipelineBuilder<TModel>> pipeline)
+            => _branch.AddArm(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
     }
 }

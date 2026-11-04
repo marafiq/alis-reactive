@@ -18,6 +18,6 @@ public sealed class Roster : Component
 public static class RosterHtml
 {
     public static RenderedComponent<Roster, TModel> Roster<TModel>(this ReactivePlan<TModel> plan, string id)
-        where TModel : class =>
-        plan.Render<Roster>(id, new HtmlString($"<div class=\"roster\" id=\"{HtmlEncoder.Default.Encode(id)}\"></div>"));
+        where TModel : class
+        => plan.Render<Roster>(id, new HtmlString($"<div class=\"roster\" id=\"{HtmlEncoder.Default.Encode(id)}\"></div>"));
 }

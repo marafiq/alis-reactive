@@ -103,5 +103,4 @@ namespace Alis.Reactive.Native
             writer.Write("</button>");
         }
     }
-
 }

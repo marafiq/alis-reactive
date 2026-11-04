@@ -120,8 +120,8 @@ namespace Alis.Reactive
         internal static InputFieldConfiguration Default { get; } =
             new DefaultInputFieldConfiguration();
 
-        internal static InputFieldConfiguration Configured(Action<InputFieldOptions> configure) =>
-            new ConfiguredInputFieldConfiguration(configure);
+        internal static InputFieldConfiguration Configured(Action<InputFieldOptions> configure)
+            => new ConfiguredInputFieldConfiguration(configure);
 
         internal abstract InputFieldOptions CreateOptions();
     }

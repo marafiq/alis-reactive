@@ -39,8 +39,8 @@ namespace Alis.Reactive.Fusion
         public void FocusIn() => Method();
 
         /// <summary>Raised when the radio button becomes checked.</summary>
-        public Event<FusionRadioButtonChangeArgs> Change =>
-            Event<FusionRadioButtonChangeArgs>();
+        public Event<FusionRadioButtonChangeArgs> Change
+            => Event<FusionRadioButtonChangeArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionRadioButton.Change"/>.</summary>

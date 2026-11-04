@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         public static DateTime OfferedTime => new DateTime(2026, 11, 12, 14, 0, 0);
 
-        public static bool InClinicHours(DateTime visit) =>
-            visit.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)
+        public static bool InClinicHours(DateTime visit)
+            => visit.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)
             && visit.TimeOfDay >= TimeSpan.FromHours(9)
             && visit.TimeOfDay <= TimeSpan.FromHours(16);
 

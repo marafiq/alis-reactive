@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -108,8 +108,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return residents;
         }
 
-        private static IActionResult ValidationError(IReadOnlyDictionary<string, string[]> errors) =>
-            new BadRequestObjectResult(new { errors });
+        private static IActionResult ValidationError(IReadOnlyDictionary<string, string[]> errors)
+            => new BadRequestObjectResult(new { errors });
 
         private static bool TryValidate<T>(IValidator<T> validator, T model, out IActionResult error)
         {

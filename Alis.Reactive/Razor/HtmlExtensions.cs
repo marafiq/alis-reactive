@@ -98,8 +98,8 @@ namespace Alis.Reactive
 #else
         public static IHtmlContent Raises<TPayload>(this IHtmlHelper html, AppEvent<TPayload> appEvent)
 #endif
-            where TPayload : class, new() =>
-            Attributes(MarkupRaise.Of((appEvent ?? throw new ArgumentNullException(nameof(appEvent))).Name));
+            where TPayload : class, new()
+            => Attributes(MarkupRaise.Of((appEvent ?? throw new ArgumentNullException(nameof(appEvent))).Name));
 
         /// <summary>
         /// The attributes that make an element of the view raise a declared event with a payload fixed when the
@@ -122,8 +122,8 @@ namespace Alis.Reactive
 #else
         public static IHtmlContent Raises<TPayload>(this IHtmlHelper html, AppEvent<TPayload> appEvent, TPayload payload)
 #endif
-            where TPayload : class, new() =>
-            Attributes(MarkupRaise.Of(
+            where TPayload : class, new()
+            => Attributes(MarkupRaise.Of(
                 (appEvent ?? throw new ArgumentNullException(nameof(appEvent))).Name,
                 payload ?? throw new ArgumentNullException(nameof(payload))));
 

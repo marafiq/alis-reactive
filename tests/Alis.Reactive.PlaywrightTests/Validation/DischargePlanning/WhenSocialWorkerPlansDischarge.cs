@@ -36,8 +36,8 @@ public class WhenSocialWorkerPlansDischarge : PlaywrightTestBase
         await Write(m => m.ResidentName, "Helen Park");
     }
 
-    private async Task Write(Expression<Func<DischargePlanModel, object?>> field, string text) =>
-        await _plan.TextBox(field).FillAndBlur(text);
+    private async Task Write(Expression<Func<DischargePlanModel, object?>> field, string text)
+        => await _plan.TextBox(field).FillAndBlur(text);
 
     [Test]
     public async Task a_resident_going_home_needs_a_home_address()

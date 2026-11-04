@@ -11,8 +11,8 @@ public class WhenUsingFusionGridBeginEditNormal : PlaywrightTestBase
     private const int OpenTasksColumn = 5;
 
     private ILocator Rows => Page.Locator($"#{ReviewListId} .e-row");
-    private ILocator Cell(string resident, int column) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator Cell(string resident, int column)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
     private ILocator ReviewForm => Page.Locator($"#{ReviewListId}_dialogEdit_wrapper");
     private ILocator ReviewField(string field) => ReviewForm.Locator($"[name='{field}']");
     private ILocator ReviewButton(string text) => ReviewForm.Locator(".e-footer-content button", new() { HasText = text });

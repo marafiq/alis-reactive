@@ -12,8 +12,8 @@ public class WhenNewOperatorConditionsWork : PlaywrightTestBase
     private ILocator Input(Expression<Func<OperatorConditionModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator Result => Page.Locator("#result");
-    private ILocator ErrorFor(string field) =>
-        Page.Locator($"#op-form span[data-valmsg-for='{field}']");
+    private ILocator ErrorFor(string field)
+        => Page.Locator($"#op-form span[data-valmsg-for='{field}']");
 
     private async Task EnterAnEmployedAdult()
     {

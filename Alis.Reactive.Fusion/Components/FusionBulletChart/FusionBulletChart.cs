@@ -29,12 +29,12 @@ namespace Alis.Reactive.Fusion
         public TypedSource<int> GetActualIndex(Arg<int> index, Arg<int> totalLength) => Method<int>(index, totalLength);
 
         /// <summary>Raised before a tooltip renders.</summary>
-        public Event<FusionBulletChartTooltipRenderArgs> TooltipRender =>
-            Event<FusionBulletChartTooltipRenderArgs>();
+        public Event<FusionBulletChartTooltipRenderArgs> TooltipRender
+            => Event<FusionBulletChartTooltipRenderArgs>();
 
         /// <summary>Raised when the user clicks the chart.</summary>
-        public Event<FusionBulletChartMouseClickArgs> BulletChartMouseClick =>
-            Event<FusionBulletChartMouseClickArgs>();
+        public Event<FusionBulletChartMouseClickArgs> BulletChartMouseClick
+            => Event<FusionBulletChartMouseClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionBulletChart.TooltipRender"/>.</summary>

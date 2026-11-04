@@ -5,11 +5,11 @@ public sealed class WhenAPageComparesTwoDaysItReads : AppPageTest
 {
     private ILocator Line(string id) => Page.Locator($"#{id}");
 
-    private Task Arrive(string day) =>
-        Page.Locator("#arrive").GetByRole(AriaRole.Button, new() { Name = $"Pick {day}", Exact = true }).ClickAsync();
+    private Task Arrive(string day)
+        => Page.Locator("#arrive").GetByRole(AriaRole.Button, new() { Name = $"Pick {day}", Exact = true }).ClickAsync();
 
-    private Task Leave(string day) =>
-        Page.Locator("#leave").GetByRole(AriaRole.Button, new() { Name = $"Pick {day}", Exact = true }).ClickAsync();
+    private Task Leave(string day)
+        => Page.Locator("#leave").GetByRole(AriaRole.Button, new() { Name = $"Pick {day}", Exact = true }).ClickAsync();
 
     private Task CheckTheStay() => Page.GetByRole(AriaRole.Button, new() { Name = "Check the stay", Exact = true }).ClickAsync();
 

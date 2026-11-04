@@ -17,14 +17,14 @@ public sealed class FusionPivotViewLocator
 
     public ILocator Chart => _page.Locator($"#{_componentId}_chart");
 
-    public ILocator ColumnHeading(string text) =>
-        Table.Locator(".e-gridheader").GetByText(text, new() { Exact = true }).First;
+    public ILocator ColumnHeading(string text)
+        => Table.Locator(".e-gridheader").GetByText(text, new() { Exact = true }).First;
 
-    public ILocator RowHeading(string text) =>
-        Table.Locator("td.e-rowsheader").GetByText(text, new() { Exact = true });
+    public ILocator RowHeading(string text)
+        => Table.Locator("td.e-rowsheader").GetByText(text, new() { Exact = true });
 
-    public ILocator Figure(string rowHeading, int column) =>
-        Table.Locator("tr.e-row")
+    public ILocator Figure(string rowHeading, int column)
+        => Table.Locator("tr.e-row")
             .Filter(new() { Has = _page.Locator("td.e-rowsheader").GetByText(rowHeading, new() { Exact = true }) })
             .Locator($"td.e-valuescontent[aria-colindex='{column}']");
 

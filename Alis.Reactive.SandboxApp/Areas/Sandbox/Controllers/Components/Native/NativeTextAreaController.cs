@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
     public class NativeTextAreaController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Native/NativeTextArea/Index.cshtml", new NativeTextAreaModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Native/NativeTextArea/Index.cshtml", new NativeTextAreaModel());
 
         [HttpPost("Send")]
         public IActionResult Send([FromBody] NativeTextAreaModel? handover)

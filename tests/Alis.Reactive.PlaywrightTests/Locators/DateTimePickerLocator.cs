@@ -102,6 +102,6 @@ public sealed class DateTimePickerLocator
         }
     }
 
-    private static async Task WaitForTitleChange(ILocator title, string previousText, int timeoutMs = 5000) =>
-        await Assertions.Expect(title).Not.ToHaveTextAsync(previousText, new() { Timeout = timeoutMs });
+    private static async Task WaitForTitleChange(ILocator title, string previousText, int timeoutMs = 5000)
+        => await Assertions.Expect(title).Not.ToHaveTextAsync(previousText, new() { Timeout = timeoutMs });
 }

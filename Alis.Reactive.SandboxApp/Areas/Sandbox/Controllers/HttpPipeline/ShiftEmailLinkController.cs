@@ -10,8 +10,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         private const string MapleGrove = "maple-grove";
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/ShiftEmailLink/Index.cshtml", new ShiftEmailLinkPageModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/ShiftEmailLink/Index.cshtml", new ShiftEmailLinkPageModel());
 
         [HttpGet("Residents/{residentId:int}/Chart")]
         public IActionResult Chart(int residentId, string? shift, [FromHeader(Name = "X-Community")] string? community)

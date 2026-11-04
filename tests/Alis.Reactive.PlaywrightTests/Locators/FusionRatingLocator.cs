@@ -15,9 +15,9 @@ public sealed class FusionRatingLocator
 
     public ILocator RatingList => _page.Locator($"#{_componentId}_item-list");
 
-    public ILocator Star(int position) =>
-        RatingList.Locator(".e-rating-item-container").Nth(position - 1);
+    public ILocator Star(int position)
+        => RatingList.Locator(".e-rating-item-container").Nth(position - 1);
 
-    public async Task RateStars(int position) =>
-        await Star(position).ClickAsync();
+    public async Task RateStars(int position)
+        => await Star(position).ClickAsync();
 }

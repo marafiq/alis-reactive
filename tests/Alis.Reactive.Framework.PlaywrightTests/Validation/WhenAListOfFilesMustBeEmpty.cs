@@ -16,15 +16,15 @@ public sealed class WhenAListOfFilesMustBeEmpty : AppPageTest
         };
     }
 
-    private ILocator PhotosRefused =>
-        Page.Locator("#unphotographed-form > div")
+    private ILocator PhotosRefused
+        => Page.Locator("#unphotographed-form > div")
             .Filter(new() { Has = Page.GetByLabel("Photos") })
             .GetByText("This resident declined photographs; attach none.", new() { Exact = true });
 
     private ILocator ReportStatus => Page.Locator("#report-status");
 
-    private Task ChooseAPhoto() =>
-        Page.GetByLabel("Photos").SetInputFilesAsync(new FilePayload
+    private Task ChooseAPhoto()
+        => Page.GetByLabel("Photos").SetInputFilesAsync(new FilePayload
         {
             Name = "bruise.png",
             MimeType = "image/png",

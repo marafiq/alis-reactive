@@ -22,8 +22,8 @@ namespace Alis.Reactive.Native
         public void Focus() => Method();
 
         /// <summary>Raised when the value changes and the element loses focus.</summary>
-        public Event<NativeTextBoxChangeArgs> Change =>
-            Event<NativeTextBoxChangeArgs>();
+        public Event<NativeTextBoxChangeArgs> Change
+            => Event<NativeTextBoxChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

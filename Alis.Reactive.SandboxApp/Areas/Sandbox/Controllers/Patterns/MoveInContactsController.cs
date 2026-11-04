@@ -16,16 +16,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns
         public IActionResult Alternate() => View(ViewBase + "Alternate.cshtml", new MoveInContactsModel());
 
         [HttpPost("SavePacket")]
-        public IActionResult SavePacket([FromBody] MoveInContactsModel? packet) =>
-            packet == null ? BadRequest() : Ok(new ContactsSaved(DescribePacket(packet)));
+        public IActionResult SavePacket([FromBody] MoveInContactsModel? packet)
+            => packet == null ? BadRequest() : Ok(new ContactsSaved(DescribePacket(packet)));
 
         [HttpPost("SaveForm")]
-        public IActionResult SaveForm([FromForm] MoveInContactsModel? packet) =>
-            packet == null ? BadRequest() : Ok(new ContactsSaved(DescribePacket(packet)));
+        public IActionResult SaveForm([FromForm] MoveInContactsModel? packet)
+            => packet == null ? BadRequest() : Ok(new ContactsSaved(DescribePacket(packet)));
 
         [HttpPost("SaveContact")]
-        public IActionResult SaveContact([FromBody] MoveInContactsModel? packet) =>
-            packet == null
+        public IActionResult SaveContact([FromBody] MoveInContactsModel? packet)
+            => packet == null
                 ? BadRequest()
                 : Ok(new ContactsSaved($"Next of kin: {Describe(packet.NextOfKin)}; alternate: {Describe(packet.Alternate)}."));
 
@@ -37,7 +37,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns
             return $"{packet.Resident.First} {packet.Resident.Last}; contacts: {contacts}.";
         }
 
-        private static string Describe(MoveInContact contact) =>
-            string.IsNullOrWhiteSpace(contact.Name) ? "none" : $"{contact.Name} ({contact.Phone})";
+        private static string Describe(MoveInContact contact)
+            => string.IsNullOrWhiteSpace(contact.Name) ? "none" : $"{contact.Name} ({contact.Phone})";
     }
 }

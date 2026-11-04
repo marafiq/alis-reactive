@@ -91,71 +91,71 @@ namespace Alis.Reactive.Fusion
 
         /// <summary>Raised before a card action runs.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanActionArgs<TCard>> ActionBegin<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanActionArgs<TCard>>();
+        public Event<FusionKanbanActionArgs<TCard>> ActionBegin<TCard>() where TCard : class, new()
+            => Event<FusionKanbanActionArgs<TCard>>();
 
         /// <summary>Raised after a card action completes.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanActionArgs<TCard>> ActionComplete<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanActionArgs<TCard>>();
+        public Event<FusionKanbanActionArgs<TCard>> ActionComplete<TCard>() where TCard : class, new()
+            => Event<FusionKanbanActionArgs<TCard>>();
 
         /// <summary>Raised before the board binds its cards.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanDataBindingArgs<TCard>> DataBinding<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanDataBindingArgs<TCard>>();
+        public Event<FusionKanbanDataBindingArgs<TCard>> DataBinding<TCard>() where TCard : class, new()
+            => Event<FusionKanbanDataBindingArgs<TCard>>();
 
         /// <summary>Raised after the board binds its cards.</summary>
-        public Event<FusionKanbanEmptyArgs> DataBound =>
-            Event<FusionKanbanEmptyArgs>();
+        public Event<FusionKanbanEmptyArgs> DataBound
+            => Event<FusionKanbanEmptyArgs>();
 
         /// <summary>Raised when the user clicks a card.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanCardClickArgs<TCard>> CardClick<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanCardClickArgs<TCard>>();
+        public Event<FusionKanbanCardClickArgs<TCard>> CardClick<TCard>() where TCard : class, new()
+            => Event<FusionKanbanCardClickArgs<TCard>>();
 
         /// <summary>Raised when the user double-clicks a card.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanCardClickArgs<TCard>> CardDoubleClick<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanCardClickArgs<TCard>>();
+        public Event<FusionKanbanCardClickArgs<TCard>> CardDoubleClick<TCard>() where TCard : class, new()
+            => Event<FusionKanbanCardClickArgs<TCard>>();
 
         /// <summary>Raised before each column header renders.</summary>
-        public Event<FusionKanbanQueryCellInfoArgs> QueryCellInfo =>
-            Event<FusionKanbanQueryCellInfoArgs>();
+        public Event<FusionKanbanQueryCellInfoArgs> QueryCellInfo
+            => Event<FusionKanbanQueryCellInfoArgs>();
 
         /// <summary>Raised after each card renders.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanCardRenderedArgs<TCard>> CardRendered<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanCardRenderedArgs<TCard>>();
+        public Event<FusionKanbanCardRenderedArgs<TCard>> CardRendered<TCard>() where TCard : class, new()
+            => Event<FusionKanbanCardRenderedArgs<TCard>>();
 
         /// <summary>Raised when the user starts dragging a card.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanDragArgs<TCard>> DragStart<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanDragArgs<TCard>>();
+        public Event<FusionKanbanDragArgs<TCard>> DragStart<TCard>() where TCard : class, new()
+            => Event<FusionKanbanDragArgs<TCard>>();
 
         /// <summary>Raised as the user drags a card.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanDragArgs<TCard>> Drag<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanDragArgs<TCard>>();
+        public Event<FusionKanbanDragArgs<TCard>> Drag<TCard>() where TCard : class, new()
+            => Event<FusionKanbanDragArgs<TCard>>();
 
         /// <summary>Raised when the user drops a card.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanDragArgs<TCard>> DragStop<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanDragArgs<TCard>>();
+        public Event<FusionKanbanDragArgs<TCard>> DragStop<TCard>() where TCard : class, new()
+            => Event<FusionKanbanDragArgs<TCard>>();
 
         /// <summary>Raised before the card dialog opens.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanDialogArgs<TCard>> DialogOpen<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanDialogArgs<TCard>>();
+        public Event<FusionKanbanDialogArgs<TCard>> DialogOpen<TCard>() where TCard : class, new()
+            => Event<FusionKanbanDialogArgs<TCard>>();
 
         /// <summary>Raised before the card dialog closes.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanDialogArgs<TCard>> DialogClose<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanDialogArgs<TCard>>();
+        public Event<FusionKanbanDialogArgs<TCard>> DialogClose<TCard>() where TCard : class, new()
+            => Event<FusionKanbanDialogArgs<TCard>>();
 
         /// <summary>Raised when the user changes cards; send the change to the server, then end or cancel it.</summary>
         /// <typeparam name="TCard">Your card class.</typeparam>
-        public Event<FusionKanbanDataSourceChangedArgs<TCard>> DataSourceChanged<TCard>() where TCard : class, new() =>
-            Event<FusionKanbanDataSourceChangedArgs<TCard>>();
+        public Event<FusionKanbanDataSourceChangedArgs<TCard>> DataSourceChanged<TCard>() where TCard : class, new()
+            => Event<FusionKanbanDataSourceChangedArgs<TCard>>();
     }
 
     /// <summary>Payload of an event that carries no data.</summary>

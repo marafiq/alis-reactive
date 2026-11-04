@@ -13,8 +13,8 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
     private ILocator Result => Page.Locator("#result");
 
-    private ILocator ErrorFor(string fieldName) =>
-        Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
+    private ILocator ErrorFor(string fieldName)
+        => Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
     private ILocator Input(Expression<Func<ResidentModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
 

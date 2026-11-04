@@ -46,16 +46,16 @@ namespace Alis.Reactive.Fusion
         public void ScrollToBottom() => Method();
 
         /// <summary>Raised when the user sends a prompt.</summary>
-        public Event<FusionAIAssistViewPromptRequestArgs> PromptRequest =>
-            Event<FusionAIAssistViewPromptRequestArgs>();
+        public Event<FusionAIAssistViewPromptRequestArgs> PromptRequest
+            => Event<FusionAIAssistViewPromptRequestArgs>();
 
         /// <summary>Raised when the prompt text changes.</summary>
-        public Event<FusionAIAssistViewPromptChangedArgs> PromptChanged =>
-            Event<FusionAIAssistViewPromptChangedArgs>();
+        public Event<FusionAIAssistViewPromptChangedArgs> PromptChanged
+            => Event<FusionAIAssistViewPromptChangedArgs>();
 
         /// <summary>Raised when the user stops a response.</summary>
-        public Event<FusionAIAssistViewStopRespondingClickArgs> StopRespondingClick =>
-            Event<FusionAIAssistViewStopRespondingClickArgs>();
+        public Event<FusionAIAssistViewStopRespondingClickArgs> StopRespondingClick
+            => Event<FusionAIAssistViewStopRespondingClickArgs>();
     }
 
     /// <summary>A prompt with its response, for <see cref="FusionAIAssistView.AddPromptResponseModel"/>.</summary>

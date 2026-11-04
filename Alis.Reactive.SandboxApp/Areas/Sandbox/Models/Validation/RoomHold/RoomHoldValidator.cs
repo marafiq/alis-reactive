@@ -14,11 +14,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .Equal(true).WithMessage("The family must agree that the hold lapses after 48 hours.");
 
             RuleFor(x => x.RoomCode)
-                .MustAsync(async (room, cancellation) => !await IsHeldForAnotherFamilyAsync(room, cancellation))
+                .MustAsync(async (room, _) => !await IsHeldForAnotherFamilyAsync(room))
                 .WithMessage($"{HeldRoom} is already held for another family. Choose another room.");
         }
 
-        private static Task<bool> IsHeldForAnotherFamilyAsync(string? room, CancellationToken cancellation) =>
-            Task.FromResult(room == HeldRoom);
+        private static Task<bool> IsHeldForAnotherFamilyAsync(string? room)
+            => Task.FromResult(room == HeldRoom);
     }
 }

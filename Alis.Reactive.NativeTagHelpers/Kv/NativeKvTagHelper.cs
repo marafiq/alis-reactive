@@ -38,12 +38,16 @@ public sealed class NativeKvTagHelper : TagHelper
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         if (string.IsNullOrWhiteSpace(Label))
+        {
             throw new InvalidOperationException(
                 "The native-kv tag helper requires a non-empty label attribute. A key/value pair cannot render without a label.");
+        }
 
         if (string.IsNullOrWhiteSpace(Value))
+        {
             throw new InvalidOperationException(
                 "The native-kv tag helper requires a non-empty value attribute. A key/value pair cannot render without a value.");
+        }
 
         output.TagName = "dl";
         output.TagMode = TagMode.StartTagAndEndTag;

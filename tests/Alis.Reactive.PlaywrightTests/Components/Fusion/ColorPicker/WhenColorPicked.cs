@@ -12,8 +12,8 @@ public class WhenColorPicked : PlaywrightTestBase
 
     private ILocator OpenPicker => Page.Locator(".e-colorpicker-popup.e-popup-open");
 
-    private ILocator ArrowOf(string pickerId) =>
-        Page.Locator($"#{pickerId}").Locator("xpath=..").Locator("button[id$='_dropdownbtn']");
+    private ILocator ArrowOf(string pickerId)
+        => Page.Locator($"#{pickerId}").Locator("xpath=..").Locator("button[id$='_dropdownbtn']");
 
     private Task OpenBranding() => NavigateToAndWaitForBoot(Path);
 

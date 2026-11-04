@@ -17,8 +17,8 @@ public sealed class FusionKanbanLocator
 
     public ILocator Card(string text) => Root.Locator(".e-card").Filter(new() { HasText = text });
 
-    public ILocator Cell(string columnKey, string swimlaneKey) =>
-        Root.Locator($"tr.e-swimlane-row[data-key='{swimlaneKey}'] + tr td.e-content-cells[data-key='{columnKey}']");
+    public ILocator Cell(string columnKey, string swimlaneKey)
+        => Root.Locator($"tr.e-swimlane-row[data-key='{swimlaneKey}'] + tr td.e-content-cells[data-key='{columnKey}']");
 
     public ILocator CardsIn(ILocator cell) => cell.Locator(".e-card");
 
@@ -32,8 +32,8 @@ public sealed class FusionKanbanLocator
 
     public ILocator DialogField(string member) => _page.Locator($"#{_componentId}_dialog_wrapper [name='{member}']");
 
-    public ILocator DialogButton(string text) =>
-        _page.Locator($"#{_componentId}_dialog_wrapper .e-footer-content button").Filter(new() { HasText = text });
+    public ILocator DialogButton(string text)
+        => _page.Locator($"#{_componentId}_dialog_wrapper .e-footer-content button").Filter(new() { HasText = text });
 
     public async Task PickUpAndCarry(ILocator card, ILocator over, float heightFraction = 0.5f)
     {

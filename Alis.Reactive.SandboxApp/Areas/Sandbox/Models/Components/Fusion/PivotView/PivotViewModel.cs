@@ -99,8 +99,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.PivotV
             int northAssisted, int northAssistedHours,
             int memoryCare, int memoryCareHours,
             int southAssisted, int southAssistedHours,
-            int independent, int independentHours) =>
-            new[]
+            int independent, int independentHours)
+            => new[]
             {
                 Row("North", "Assisted Living", month, northAssisted, northAssistedHours),
                 Row("North", "Memory Care", month, memoryCare, memoryCareHours),
@@ -108,7 +108,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.PivotV
                 Row("South", "Independent", month, independent, independentHours)
             };
 
-        private static OccupancyCensusRow Row(string wing, string careLevel, string month, int residents, int careHours) =>
-            new() { Wing = wing, CareLevel = careLevel, Month = month, Residents = residents, CareHours = careHours };
+        private static OccupancyCensusRow Row(string wing, string careLevel, string month, int residents, int careHours)
+            => new() { Wing = wing, CareLevel = careLevel, Month = month, Residents = residents, CareHours = careHours };
     }
 }

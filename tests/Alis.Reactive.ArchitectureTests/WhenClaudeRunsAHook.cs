@@ -138,8 +138,8 @@ public class WhenClaudeRunsAHook
         return (browser.Select(Folder).ToList(), testProjects.Except(browser).Select(Folder).ToList());
     }
 
-    private static HashSet<string> PackagesOf(string project) =>
-        XDocument.Load(Path.Combine(Repository.Root, project)).Descendants("PackageReference")
+    private static HashSet<string> PackagesOf(string project)
+        => XDocument.Load(Path.Combine(Repository.Root, project)).Descendants("PackageReference")
             .Select(reference => (string?)reference.Attribute("Include") ?? "")
             .ToHashSet(StringComparer.Ordinal);
 

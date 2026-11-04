@@ -33,8 +33,8 @@ namespace Alis.Reactive.Validation
 
         internal bool Waits => _waits != null;
 
-        internal Task<bool> HoldsAsync(T instance, RuleSetSelection selection, CancellationToken cancellation) =>
-            _waits != null ? _waits(instance, selection, cancellation) : Task.FromResult(_holds(instance, selection));
+        internal Task<bool> HoldsAsync(T instance, RuleSetSelection selection, CancellationToken cancellation)
+            => _waits != null ? _waits(instance, selection, cancellation) : Task.FromResult(_holds(instance, selection));
 
         internal static RuleCondition<T> OnServerAsync(Func<T, CancellationToken, Task<bool>> predicate)
         {
@@ -42,8 +42,8 @@ namespace Alis.Reactive.Validation
             return new RuleCondition<T>((instance, _, cancellation) => predicate(instance, cancellation));
         }
 
-        internal static RuleCondition<T> Passing<TValue>(Rule<T, TValue> rule) =>
-            new RuleCondition<T>(rule.PassesOn, rule.BrowserPassing, null);
+        internal static RuleCondition<T> Passing<TValue>(Rule<T, TValue> rule)
+            => new RuleCondition<T>(rule.PassesOn, rule.BrowserPassing, null);
 
         internal static RuleCondition<T> When(Expression<Func<T, bool>> predicate)
         {
@@ -64,18 +64,21 @@ namespace Alis.Reactive.Validation
 
         internal static RuleCondition<T> ServerOnly { get; } = new RuleCondition<T>((_, _) => true, () => null, null);
 
-        internal RuleCondition<T> Negated() =>
-            _waits is { } waits
+        internal RuleCondition<T> Negated()
+            => _waits is { } waits
                 ? new RuleCondition<T>(async (instance, selection, cancellation) => !await waits(instance, selection, cancellation).ConfigureAwait(false))
                 : new RuleCondition<T>((instance, selection) => !_holds(instance, selection), () => _browser() is Condition browser ? Condition.Not(browser) : null, _unreadable);
 
         internal bool TryForBrowser(out Condition browser)
         {
             if (_unreadable != null)
+            {
                 throw new InvalidOperationException(
                     $"The condition '{_unreadable}' has no browser form. Write it as tests of model members against fixed " +
                     "values (==, !=, <, <=, >, >=, string.IsNullOrEmpty, Contains, StartsWith, EndsWith, Regex.IsMatch, HasValue, " +
                     "joined by &&, || and !), or declare that the server alone decides it: WhenOnServer or UnlessOnServer.");
+            }
+
             browser = _browser()!;
             return browser != null;
         }
@@ -244,9 +247,12 @@ namespace Alis.Reactive.Validation
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             var waits = Sets.Any ? Sets.Names.Any(name => IsAsync(RuleSetSelection.Of(name))) : IsAsync(RuleSetSelection.Default);
             if (waits)
+            {
                 throw new InvalidOperationException(
                     $"DependentRules follows a rule on '{FieldPath}' that waits (MustAsync, CustomAsync or WhenAsync), and a condition does not wait: " +
                     "write the dependent rules under WhenOnServer with the same test.");
+            }
+
             _host.DeclareUnder(RuleCondition<T>.Passing(this), rules);
             return this;
         }
@@ -400,8 +406,8 @@ namespace Alis.Reactive.Validation
 
         public bool IsAsync(RuleSetSelection selection) => _scope.Waits || (_included is ReactiveValidator rules && rules.IsAsync(selection));
 
-        public IEnumerable<string> ReachableRuleSets =>
-            _included is ReactiveValidator rules && !_sets.Any ? rules.DeclaredRuleSets : Enumerable.Empty<string>();
+        public IEnumerable<string> ReachableRuleSets
+            => _included is ReactiveValidator rules && !_sets.Any ? rules.DeclaredRuleSets : Enumerable.Empty<string>();
 
         public async Task Validate(T instance, string prefix, ValidationRun run)
         {

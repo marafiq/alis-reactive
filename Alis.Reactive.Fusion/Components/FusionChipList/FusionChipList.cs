@@ -94,12 +94,12 @@ namespace Alis.Reactive.Fusion
         public Property<int[]> SelectedChipIndexes => Property<int[]>("selectedChips");
 
         /// <summary>Raised when the user clicks a chip.</summary>
-        public Event<FusionChipListClickArgs> Click =>
-            Event<FusionChipListClickArgs>();
+        public Event<FusionChipListClickArgs> Click
+            => Event<FusionChipListClickArgs>();
 
         /// <summary>Raised after a chip is removed, by its delete icon or by <see cref="RemoveByIndex"/> and <see cref="RemoveByIndexes"/>.</summary>
-        public Event<FusionChipListDeletedArgs> Deleted =>
-            Event<FusionChipListDeletedArgs>();
+        public Event<FusionChipListDeletedArgs> Deleted
+            => Event<FusionChipListDeletedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionChipList.Click"/>.</summary>

@@ -19,8 +19,8 @@ public sealed class MultiSelectLocator
 
     public ILocator PopupItems => Popup.Locator(".e-list-item");
 
-    public ILocator PopupItem(string text) =>
-        PopupItems.Filter(new() { HasText = text });
+    public ILocator PopupItem(string text)
+        => PopupItems.Filter(new() { HasText = text });
 
     public async Task Open()
     {

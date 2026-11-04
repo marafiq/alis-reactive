@@ -31,16 +31,16 @@ namespace Alis.Reactive
         /// <summary>Declares an event that carries no payload.</summary>
         /// <param name="name">The DOM event name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
-        public static AppEvent Declare(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new AppEvent(DeclaredName.Of(name, declaredBy));
+        public static AppEvent Declare(string? name = null, [CallerMemberName] string declaredBy = "")
+            => new AppEvent(DeclaredName.Of(name, declaredBy));
 
         /// <summary>Declares an event whose detail is a <typeparamref name="TPayload"/>.</summary>
         /// <typeparam name="TPayload">The payload a dispatcher sends and a listener reads.</typeparam>
         /// <param name="name">The DOM event name, when it is not the declaring member's name camel-cased.</param>
         /// <param name="declaredBy">The declaring member; the compiler supplies it.</param>
         public static AppEvent<TPayload> Declare<TPayload>(string? name = null, [CallerMemberName] string declaredBy = "")
-            where TPayload : class, new() =>
-            new AppEvent<TPayload>(DeclaredName.Of(name, declaredBy));
+            where TPayload : class, new()
+            => new AppEvent<TPayload>(DeclaredName.Of(name, declaredBy));
 
         /// <inheritdoc />
         public override string ToString() => Name;
@@ -65,16 +65,19 @@ namespace Alis.Reactive
         {
             if (name != null) return Required(name);
             if (string.IsNullOrWhiteSpace(declaredBy))
+            {
                 throw new ArgumentException(
                     "Declare an event or a hub method as a member of a class, for example public static readonly AppEvent Saved = AppEvent.Declare();",
                     nameof(declaredBy));
+            }
+
             return JsonMemberName.Of(declaredBy);
         }
 
-        internal static string Required(string name) =>
-            string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("An event needs a name.", nameof(name)) : name;
+        internal static string Required(string name)
+            => string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("An event needs a name.", nameof(name)) : name;
 
-        internal static string RequiredUrl(string url) =>
-            string.IsNullOrWhiteSpace(url) ? throw new ArgumentException("A stream or hub needs a URL.", nameof(url)) : url;
+        internal static string RequiredUrl(string url)
+            => string.IsNullOrWhiteSpace(url) ? throw new ArgumentException("A stream or hub needs a URL.", nameof(url)) : url;
     }
 }

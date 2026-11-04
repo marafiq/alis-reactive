@@ -17,8 +17,8 @@ public sealed class FusionDropDownButtonLocator
 
     public ILocator Popup => _page.Locator($"#{_componentId}-popup");
 
-    public ILocator Item(string text) =>
-        _page.Locator($"//*[@id='{_componentId}-popup']//li[contains(concat(' ', normalize-space(@class), ' '), ' e-item ') and normalize-space(.)='{text}']");
+    public ILocator Item(string text)
+        => _page.Locator($"//*[@id='{_componentId}-popup']//li[contains(concat(' ', normalize-space(@class), ' '), ' e-item ') and normalize-space(.)='{text}']");
 
     public async Task Choose(string text)
     {

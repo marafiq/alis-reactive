@@ -10,8 +10,8 @@ public class WhenUsingFusionGridServerRoster : PlaywrightTestBase
     private const int CareLevelColumn = 4;
 
     private ILocator Rows => Page.Locator($"#{RosterId} .e-row");
-    private ILocator Cell(string resident, int column) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator Cell(string resident, int column)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
     private ILocator Wing => Page.Locator("#roster-wing");
     private ILocator Status => Page.Locator("#roster-record-status");
 

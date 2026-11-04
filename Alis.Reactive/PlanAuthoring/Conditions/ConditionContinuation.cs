@@ -45,11 +45,11 @@ namespace Alis.Reactive.PlanAuthoring.Conditions
 
     internal abstract class ConditionContinuation<TModel> where TModel : class
     {
-        internal static ConditionContinuation<TModel> InCallback(PlanBuildContext context) =>
-            new CallbackConditionContinuation<TModel>(context, context.ActiveBlock);
+        internal static ConditionContinuation<TModel> InCallback(PlanBuildContext context)
+            => new CallbackConditionContinuation<TModel>(context, context.ActiveBlock);
 
-        internal static ConditionContinuation<TModel> ForBranch(BranchBuilder<TModel> branch) =>
-            new BranchConditionContinuation<TModel>(branch);
+        internal static ConditionContinuation<TModel> ForBranch(BranchBuilder<TModel> branch)
+            => new BranchConditionContinuation<TModel>(branch);
 
         internal abstract BranchBuilder<TModel> Then(
             Condition condition,

@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("BatchChangeReview"), ActionName("BatchChangeReview")]
-        public IActionResult NightChecksPage() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchChangeReview.cshtml", new NightChecksViewModel());
+        public IActionResult NightChecksPage()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchChangeReview.cshtml", new NightChecksViewModel());
 
         [HttpGet("NightChecksTonight")]
         public IActionResult NightChecksTonight() => Ok(NightChecksRecorded());

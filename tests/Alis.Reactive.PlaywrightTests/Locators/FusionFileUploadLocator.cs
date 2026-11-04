@@ -23,6 +23,6 @@ public sealed class FusionFileUploadLocator
 
     public async Task Choose(params FilePayload[] files) => await Input.SetInputFilesAsync(files);
 
-    public async Task Remove(string fileName) =>
-        await Choices.Filter(new() { HasText = fileName }).Locator(".e-file-remove-btn").ClickAsync();
+    public async Task Remove(string fileName)
+        => await Choices.Filter(new() { HasText = fileName }).Locator(".e-file-remove-btn").ClickAsync();
 }

@@ -17,8 +17,8 @@ public sealed class FusionSliderLocator
 
     public ILocator Handle(int index = 0) => Host.Locator(".e-handle").Nth(index);
 
-    public async Task<string?> ValueNow(int index = 0) =>
-        await Handle(index).GetAttributeAsync("aria-valuenow");
+    public async Task<string?> ValueNow(int index = 0)
+        => await Handle(index).GetAttributeAsync("aria-valuenow");
 
     public async Task NudgeUp(int index = 0)
     {

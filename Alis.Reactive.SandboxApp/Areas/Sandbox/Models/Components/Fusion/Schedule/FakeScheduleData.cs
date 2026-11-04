@@ -71,8 +71,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             Description = $"New assignment | {staff.Name} ({staff.Role})",
         };
 
-        private static string ShiftLabel(int shiftId) =>
-            Shifts.FirstOrDefault(s => s.Id == shiftId)?.Text?.Split(' ')[0] ?? "Shift";
+        private static string ShiftLabel(int shiftId)
+            => Shifts.FirstOrDefault(s => s.Id == shiftId)?.Text?.Split(' ')[0] ?? "Shift";
 
         private static int StableSeed(string facilityId, DateTime sunday)
         {

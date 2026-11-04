@@ -8,12 +8,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     public class ShiftHandoverController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/ShiftHandover/Index.cshtml", new ShiftHandoverPageModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/ShiftHandover/Index.cshtml", new ShiftHandoverPageModel());
 
         [HttpGet("MarkRead/{resident}")]
-        public IActionResult OpenNote(string resident) =>
-            ResidentName(resident) is { } name
+        public IActionResult OpenNote(string resident)
+            => ResidentName(resident) is { } name
                 ? Content($"{name}'s handover note is open. Mark it read from the handover page.", "text/plain")
                 : NotFound();
 

@@ -25,12 +25,12 @@ public sealed class FormsController : Controller
     public IActionResult FrontDesk() => View(new FrontDeskPage());
 
     [HttpPost]
-    public IActionResult LogVisit() =>
-        BadRequest(new { errors = new Dictionary<string, string[]> { ["Resident"] = ["Say whom the visitor came to see."] } });
+    public IActionResult LogVisit()
+        => BadRequest(new { errors = new Dictionary<string, string[]> { ["Resident"] = ["Say whom the visitor came to see."] } });
 
     [HttpPost]
-    public IActionResult LogParcel() =>
-        BadRequest(new { errors = new Dictionary<string, string[]> { ["SignedBy"] = ["Say who signs for the parcel."] } });
+    public IActionResult LogParcel()
+        => BadRequest(new { errors = new Dictionary<string, string[]> { ["SignedBy"] = ["Say who signs for the parcel."] } });
 
     public IActionResult Stay() => View(new StayPage());
 
@@ -42,6 +42,6 @@ public sealed class FormsController : Controller
         : BadRequest(new { errors = new Dictionary<string, string[]> { ["Guest"] = ["No guest of that name is expected."] } });
 
     [HttpPost]
-    public IActionResult BookStay() =>
-        BadRequest(new { errors = new Dictionary<string, string[]> { ["StartsOn"] = ["Say when the stay starts."] } });
+    public IActionResult BookStay()
+        => BadRequest(new { errors = new Dictionary<string, string[]> { ["StartsOn"] = ["Say when the stay starts."] } });
 }

@@ -11,26 +11,26 @@ namespace Alis.Reactive
         /// <summary>Sends a GET request from this step; gathered values go to the query string.</summary>
         /// <param name="pipeline">The pipeline the request is written in.</param>
         /// <param name="url">The URL, built with <c>Url.Action</c> or a route template.</param>
-        public static HttpRequestBuilder<TModel> Get<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class =>
-            Request(pipeline).Get(url);
+        public static HttpRequestBuilder<TModel> Get<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class
+            => Request(pipeline).Get(url);
 
         /// <summary>Sends a POST request from this step; gathered values go to the body.</summary>
         /// <param name="pipeline">The pipeline the request is written in.</param>
         /// <param name="url">The URL.</param>
-        public static HttpRequestBuilder<TModel> Post<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class =>
-            Request(pipeline).Post(url);
+        public static HttpRequestBuilder<TModel> Post<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class
+            => Request(pipeline).Post(url);
 
         /// <summary>Sends a PUT request from this step; gathered values go to the body.</summary>
         /// <param name="pipeline">The pipeline the request is written in.</param>
         /// <param name="url">The URL.</param>
-        public static HttpRequestBuilder<TModel> Put<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class =>
-            Request(pipeline).Put(url);
+        public static HttpRequestBuilder<TModel> Put<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class
+            => Request(pipeline).Put(url);
 
         /// <summary>Sends a DELETE request from this step; gathered values go to the body.</summary>
         /// <param name="pipeline">The pipeline the request is written in.</param>
         /// <param name="url">The URL.</param>
-        public static HttpRequestBuilder<TModel> Delete<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class =>
-            Request(pipeline).Delete(url);
+        public static HttpRequestBuilder<TModel> Delete<TModel>(this PipelineBuilder<TModel> pipeline, string url) where TModel : class
+            => Request(pipeline).Delete(url);
 
         /// <summary>
         /// Sends several requests at once, each branch starting with its method:

@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class FallRiskScreeningController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/FallRiskScreening/Index.cshtml", new FallRiskScreeningModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/FallRiskScreening/Index.cshtml", new FallRiskScreeningModel());
 
         [HttpPost("Save")]
         public IActionResult Save([FromBody] FallRiskScreeningModel? screening)

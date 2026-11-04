@@ -23,8 +23,8 @@ public class WhenCoordinatorAddsAnOutingCompanion : PlaywrightTestBase
     private ILocator CompanionStatus => Page.Locator("#companion-status");
     private ILocator NoCompanion => Page.Locator("#no-companion");
 
-    private ILocator CompanionField(Expression<Func<OutingModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator CompanionField(Expression<Func<OutingModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
     private async Task NavigateAndBoot()
     {

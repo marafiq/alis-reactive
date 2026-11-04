@@ -43,8 +43,8 @@ namespace Alis.Reactive.Grammar
             return As(new CallExpr(target, path, args.Select((arg, index) => As(arg, argShapes[index])).ToList()), shape);
         }
 
-        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, Shape shape) =>
-            As(new CallExpr(target, path, args), shape);
+        internal static Expr Call(Expr target, IReadOnlyList<string> path, IReadOnlyList<Expr> args, Shape shape)
+            => As(new CallExpr(target, path, args), shape);
 
         internal static Expr Call(Expr target, string member, params Expr[] args) => new CallExpr(target, new[] { member }, args);
 
@@ -54,11 +54,11 @@ namespace Alis.Reactive.Grammar
 
         internal static Expr Op(Operator op, params Expr[] args) => new OpExpr(op, args);
 
-        internal static Expr And(IReadOnlyList<Expr> terms) =>
-            terms.Count == 1 ? terms[0] : new OpExpr(Operator.And, terms);
+        internal static Expr And(IReadOnlyList<Expr> terms)
+            => terms.Count == 1 ? terms[0] : new OpExpr(Operator.And, terms);
 
-        internal static Expr Or(IReadOnlyList<Expr> terms) =>
-            terms.Count == 1 ? terms[0] : new OpExpr(Operator.Or, terms);
+        internal static Expr Or(IReadOnlyList<Expr> terms)
+            => terms.Count == 1 ? terms[0] : new OpExpr(Operator.Or, terms);
 
         internal static Expr And(params Expr[] terms) => And((IReadOnlyList<Expr>)terms);
         internal static Expr Or(params Expr[] terms) => Or((IReadOnlyList<Expr>)terms);
@@ -67,25 +67,25 @@ namespace Alis.Reactive.Grammar
 
         internal static Expr Record(IEnumerable<RecordField> fields) => new RecordExpr(fields.ToList());
 
-        internal static Expr Record(params (string Name, Expr Value)[] fields) =>
-            new RecordExpr(fields.Select(f => new RecordField(f.Name, f.Value)).ToList());
+        internal static Expr Record(params (string Name, Expr Value)[] fields)
+            => new RecordExpr(fields.Select(f => new RecordField(f.Name, f.Value)).ToList());
 
         internal static Expr List(IEnumerable<Expr> items) => new ListExpr(items.ToList());
 
-        internal static Statement Set(Expr target, IReadOnlyList<string> path, Shape shape, Expr value) =>
-            new SetStatement(target, path, As(value, shape));
+        internal static Statement Set(Expr target, IReadOnlyList<string> path, Shape shape, Expr value)
+            => new SetStatement(target, path, As(value, shape));
 
         internal static Statement Do(Expr expr, bool awaits = false) => new DoStatement(expr, awaits);
         internal static Statement Let(string name, Expr expr, bool awaits = false) => new LetStatement(name, expr, awaits);
 
-        internal static Statement If(Expr when, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise) =>
-            new IfStatement(new[] { new Arm(when, then) }, otherwise);
+        internal static Statement If(Expr when, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise)
+            => new IfStatement(new[] { new Arm(when, then) }, otherwise);
 
-        internal static Statement If(IReadOnlyList<Arm> arms, IReadOnlyList<Statement> otherwise) =>
-            new IfStatement(arms, otherwise);
+        internal static Statement If(IReadOnlyList<Arm> arms, IReadOnlyList<Statement> otherwise)
+            => new IfStatement(arms, otherwise);
 
-        internal static Statement Try(IReadOnlyList<Statement> body, IReadOnlyList<Statement> cleanup) =>
-            new TryStatement(body, cleanup);
+        internal static Statement Try(IReadOnlyList<Statement> body, IReadOnlyList<Statement> cleanup)
+            => new TryStatement(body, cleanup);
 
         internal static Statement All(IReadOnlyList<IReadOnlyList<Statement>> blocks) => new AllStatement(blocks);
 

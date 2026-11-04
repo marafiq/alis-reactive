@@ -53,14 +53,14 @@ namespace Alis.Reactive.Fusion
         public void Clear() => Method();
 
         /// <summary>Raised when the selected value changes.</summary>
-        public Event<FusionAutoCompleteChangeArgs> Change =>
-            Event<FusionAutoCompleteChangeArgs>();
+        public Event<FusionAutoCompleteChangeArgs> Change
+            => Event<FusionAutoCompleteChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised as the user types, before the popup filters its items.</summary>
-        public Event<FusionAutoCompleteFilteringArgs> Filtering =>
-            Event<FusionAutoCompleteFilteringArgs>();
+        public Event<FusionAutoCompleteFilteringArgs> Filtering
+            => Event<FusionAutoCompleteFilteringArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionAutoComplete.Change"/>.</summary>
@@ -109,8 +109,8 @@ namespace Alis.Reactive.Fusion
         /// <summary>Hands filtered items to the popup; valid after an HTTP response returns.</summary>
         /// <typeparam name="TItems">The items' type, such as the server's own list.</typeparam>
         /// <param name="items">The items to show, read when the step runs.</param>
-        public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object> =>
-            Method(Pass<IEnumerable<object>, TItems>(items));
+        public void UpdateData<TItems>(TypedSource<TItems> items) where TItems : IEnumerable<object>
+            => Method(Pass<IEnumerable<object>, TItems>(items));
     }
 
     /// <summary>Renders a <see cref="FusionAutoComplete"/> for a model-bound field.</summary>

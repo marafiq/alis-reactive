@@ -45,12 +45,12 @@ namespace Alis.Reactive.Fusion
         public void CreateCalculatedFieldDialog() => Method();
 
         /// <summary>Raised after the pivot renders its data.</summary>
-        public Event<FusionPivotViewDataBoundArgs> DataBound =>
-            Event<FusionPivotViewDataBoundArgs>();
+        public Event<FusionPivotViewDataBoundArgs> DataBound
+            => Event<FusionPivotViewDataBoundArgs>();
 
         /// <summary>Raised when the user selects a cell.</summary>
-        public Event<FusionPivotViewCellSelectingArgs> CellSelecting =>
-            Event<FusionPivotViewCellSelectingArgs>();
+        public Event<FusionPivotViewCellSelectingArgs> CellSelecting
+            => Event<FusionPivotViewCellSelectingArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionPivotView.DataBound"/>; carries no data.</summary>

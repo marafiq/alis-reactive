@@ -89,8 +89,10 @@ namespace Alis.Reactive.Native
             }
 
             if (IsReservedAttribute(name))
+            {
                 throw new InvalidOperationException(
                     $"Attribute '{name}' is reserved by NativeActionLink and cannot be overridden.");
+            }
 
             _attributes[name] = value ?? throw new ArgumentNullException(nameof(value));
             return this;

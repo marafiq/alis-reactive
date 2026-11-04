@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Conditions;
+using Alis.Reactive.PlanModel.Values;
 
 namespace Alis.Reactive
 {
@@ -92,8 +92,8 @@ namespace Alis.Reactive
             return _next(Condition.Ordered(op, Left, right.Expression, Shape));
         }
 
-        internal TNext CompareWithText(TextTest test, string text) =>
-            _next(Condition.Text(test, Left, text ?? throw new ArgumentNullException(nameof(text)), Shape));
+        internal TNext CompareWithText(TextTest test, string text)
+            => _next(Condition.Text(test, Left, text ?? throw new ArgumentNullException(nameof(text)), Shape));
 
         internal TNext CompareWithLength(int length)
         {

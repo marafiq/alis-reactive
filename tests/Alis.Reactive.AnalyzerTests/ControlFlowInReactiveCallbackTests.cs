@@ -6,26 +6,26 @@ namespace Alis.Reactive.AnalyzerTests;
 [TestFixture]
 public class ControlFlowInReactiveCallbackTests
 {
-    private static string Message(string construct) =>
-        $"'{construct}' is not allowed inside a reactive callback — a callback declares plan entries at render time; a condition is p.When(...).Then(...).Else(...)";
+    private static string Message(string construct)
+        => $"'{construct}' is not allowed inside a reactive callback — a callback declares plan entries at render time; a condition is p.When(...).Then(...).Else(...)";
 
     [Test]
-    public Task an_if_statement_in_a_pipeline_is_reported() =>
-        Fixture.Reports<ControlFlowInReactiveCallbackAnalyzer>("ALIS004", Message("if/else"), Fixture.View, View(
+    public Task an_if_statement_in_a_pipeline_is_reported()
+        => Fixture.Reports<ControlFlowInReactiveCallbackAnalyzer>("ALIS004", Message("if/else"), Fixture.View, View(
             """
             [|if (Model.Resident == "Maple") p.Get("/wings/maple");|]
             """));
 
     [Test]
-    public Task a_ternary_in_a_pipeline_is_reported() =>
-        Fixture.Reports<ControlFlowInReactiveCallbackAnalyzer>("ALIS004", Message("ternary ?:"), Fixture.View, View(
+    public Task a_ternary_in_a_pipeline_is_reported()
+        => Fixture.Reports<ControlFlowInReactiveCallbackAnalyzer>("ALIS004", Message("ternary ?:"), Fixture.View, View(
             """
             p.Get([|Model.Resident == "Maple" ? "/wings/maple" : "/wings/grove"|]);
             """));
 
     [Test]
-    public Task an_if_statement_inside_a_loop_is_reported() =>
-        Fixture.Reports<ControlFlowInReactiveCallbackAnalyzer>("ALIS004", Message("if/else"), Fixture.View, View(
+    public Task an_if_statement_inside_a_loop_is_reported()
+        => Fixture.Reports<ControlFlowInReactiveCallbackAnalyzer>("ALIS004", Message("if/else"), Fixture.View, View(
             """
             foreach (var wing in Model.Wings)
             {
@@ -34,8 +34,8 @@ public class ControlFlowInReactiveCallbackTests
             """));
 
     [Test]
-    public Task a_condition_the_plan_carries_is_not_reported() =>
-        Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.View, View(
+    public Task a_condition_the_plan_carries_is_not_reported()
+        => Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             p.When(link.Get(q => q.Resident)).Eq("Maple")
@@ -44,8 +44,8 @@ public class ControlFlowInReactiveCallbackTests
             """));
 
     [Test]
-    public Task a_loop_declaring_one_condition_per_wing_is_not_reported() =>
-        Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.View, View(
+    public Task a_loop_declaring_one_condition_per_wing_is_not_reported()
+        => Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             foreach (var wing in Model.Wings)
@@ -55,8 +55,8 @@ public class ControlFlowInReactiveCallbackTests
             """));
 
     [Test]
-    public Task a_local_function_declaring_into_the_branch_it_is_given_is_not_reported() =>
-        Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.View, View(
+    public Task a_local_function_declaring_into_the_branch_it_is_given_is_not_reported()
+        => Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.View, View(
             """
             var link = p.Url<ShiftQuery>();
             void TellTheDesk(PipelineBuilder<Shift> branch, string wing) => branch.Element("desk").Text.Set(wing);
@@ -66,8 +66,8 @@ public class ControlFlowInReactiveCallbackTests
             """));
 
     [Test]
-    public Task a_file_that_is_not_a_view_is_left_alone() =>
-        Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.Controller, View(
+    public Task a_file_that_is_not_a_view_is_left_alone()
+        => Fixture.ReportsNothing<ControlFlowInReactiveCallbackAnalyzer>(Fixture.Controller, View(
             """
             if (Model.Resident == "Maple") p.Get("/wings/maple");
             """));

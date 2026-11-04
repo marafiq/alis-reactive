@@ -125,5 +125,4 @@ namespace Alis.Reactive.Native
 #endif
         }
     }
-
 }

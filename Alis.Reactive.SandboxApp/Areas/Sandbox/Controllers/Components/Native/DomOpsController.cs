@@ -8,7 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
     public class DomOpsController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml", new LunchSeatingModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml", new LunchSeatingModel());
     }
 }

@@ -33,8 +33,8 @@ public class WhenUsingFusionKanban : PlaywrightTestBase
 
     private ILocator Cell(string column, string wing) => Board.Cell(column, wing);
 
-    private ILocator DialogInput<TValue>(Expression<Func<WorkOrder, TValue>> member) =>
-        Board.DialogField(Field.Of(member).Name);
+    private ILocator DialogInput<TValue>(Expression<Func<WorkOrder, TValue>> member)
+        => Board.DialogField(Field.Of(member).Name);
 
     public override BrowserNewContextOptions ContextOptions()
     {

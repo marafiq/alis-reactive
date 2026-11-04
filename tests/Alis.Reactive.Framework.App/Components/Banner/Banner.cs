@@ -25,6 +25,6 @@ public sealed class Banner : Component, IAppLevelComponent
 
 public static class BannerHtml
 {
-    public static IHtmlContent Banner(this IHtmlHelper html) =>
-        new HtmlString($"<div class=\"banner\" id=\"{Components.Banner.ElementId}\"></div>");
+    public static IHtmlContent Banner(this IHtmlHelper html)
+        => new HtmlString($"<div class=\"banner\" id=\"{Components.Banner.ElementId}\"></div>");
 }

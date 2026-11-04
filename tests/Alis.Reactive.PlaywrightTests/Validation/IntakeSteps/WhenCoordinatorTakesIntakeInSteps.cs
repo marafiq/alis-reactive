@@ -33,8 +33,8 @@ public class WhenCoordinatorTakesIntakeInSteps : PlaywrightTestBase
     private ILocator AskNurseToReview => Page.Locator("#ask-nurse-review-btn");
     private ILocator NurseReviewStatus => Page.Locator("#nurse-review-status");
 
-    private ILocator Input(Expression<Func<IntakeStepsModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator Input(Expression<Func<IntakeStepsModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
     private async Task NavigateAndBoot()
     {

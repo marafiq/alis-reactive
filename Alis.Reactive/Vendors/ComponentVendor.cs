@@ -126,9 +126,12 @@ namespace Alis.Reactive
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (!NamePattern.IsMatch(name))
+            {
                 throw new ArgumentException(
                     "Vendor name '" + name + "' must start with a letter and contain only ASCII letters, digits, underscore, or hyphen.",
                     nameof(name));
+            }
+
             return name;
         }
     }

@@ -32,12 +32,12 @@ namespace Alis.Reactive.Fusion
         public void Toggle() => Method();
 
         /// <summary>Raised when the sidebar opens.</summary>
-        public Event<FusionSidebarTransitionArgs> Open =>
-            Event<FusionSidebarTransitionArgs>();
+        public Event<FusionSidebarTransitionArgs> Open
+            => Event<FusionSidebarTransitionArgs>();
 
         /// <summary>Raised when the sidebar closes.</summary>
-        public Event<FusionSidebarTransitionArgs> Close =>
-            Event<FusionSidebarTransitionArgs>();
+        public Event<FusionSidebarTransitionArgs> Close
+            => Event<FusionSidebarTransitionArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionSidebar.Open"/> and <see cref="FusionSidebar.Close"/>.</summary>

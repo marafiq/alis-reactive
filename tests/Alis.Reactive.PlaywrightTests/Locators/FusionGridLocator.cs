@@ -26,11 +26,11 @@ public sealed class FusionGridLocator
 
     public ILocator VisibleHeaders => Root.Locator(".e-headercell:visible .e-headertext");
 
-    public ILocator Header(string text) =>
-        Root.Locator(".e-headercell .e-headertext").Filter(new() { HasTextRegex = new Regex("^" + Regex.Escape(text) + "$") });
+    public ILocator Header(string text)
+        => Root.Locator(".e-headercell .e-headertext").Filter(new() { HasTextRegex = new Regex("^" + Regex.Escape(text) + "$") });
 
-    public ILocator PagerPage(int number) =>
-        Root.Locator(".e-pager .e-numericitem").Filter(new() { HasTextRegex = new Regex($"^{number}$") });
+    public ILocator PagerPage(int number)
+        => Root.Locator(".e-pager .e-numericitem").Filter(new() { HasTextRegex = new Regex($"^{number}$") });
 
     public ILocator PageSizeChoice => Root.Locator(".e-pager .e-pagerdropdown");
 

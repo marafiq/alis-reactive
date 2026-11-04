@@ -30,12 +30,12 @@ public sealed class EntryCommitted : JsObject
 public static class EntryHtml
 {
     public static RenderedComponent<Entry, TModel> Entry<TModel, TProp>(this InputBoundField<TModel, TProp> field)
-        where TModel : class =>
-        field.Render<Entry>(Markup(field, "text"));
+        where TModel : class
+        => field.Render<Entry>(Markup(field, "text"));
 
     public static RenderedComponent<Entry, TModel> HiddenEntry<TModel, TProp>(this InputBoundField<TModel, TProp> field)
-        where TModel : class =>
-        field.Render<Entry>(Markup(field, "hidden"));
+        where TModel : class
+        => field.Render<Entry>(Markup(field, "hidden"));
 
     private static HtmlString Markup<TModel, TProp>(InputBoundField<TModel, TProp> field, string type)
         where TModel : class

@@ -34,8 +34,8 @@ namespace Alis.Reactive
         /// <typeparam name="TModel">View model the property path starts at.</typeparam>
         /// <param name="expression">Model property expression, for example <c>m =&gt; m.Address.City</c>.</param>
         /// <returns>A scoped element ID like <c>Namespace_Address__Address_City</c>.</returns>
-        public static string For<TModel>(Expression<Func<TModel, object?>> expression) =>
-            ForMember(ExpressionPathHelper.ToDeclarer(expression), ExpressionPathHelper.ToMemberName(expression.Body));
+        public static string For<TModel>(Expression<Func<TModel, object?>> expression)
+            => ForMember(ExpressionPathHelper.ToDeclarer(expression), ExpressionPathHelper.ToMemberName(expression.Body));
 
         /// <summary>
         /// Generates an element ID from a typed model expression, avoiding boxing for value types.
@@ -44,16 +44,19 @@ namespace Alis.Reactive
         /// <typeparam name="TProp">Property type, preserving type safety for value types.</typeparam>
         /// <param name="expression">Model property expression, for example <c>m =&gt; m.FacilityId</c>.</param>
         /// <returns>A scoped element ID like <c>Namespace_Model__FacilityId</c>.</returns>
-        public static string For<TModel, TProp>(Expression<Func<TModel, TProp>> expression) =>
-            ForMember(ExpressionPathHelper.ToDeclarer(expression), ExpressionPathHelper.ToMemberName(expression.Body));
+        public static string For<TModel, TProp>(Expression<Func<TModel, TProp>> expression)
+            => ForMember(ExpressionPathHelper.ToDeclarer(expression), ExpressionPathHelper.ToMemberName(expression.Body));
 
         internal static string ForMember(Type declarer, string mvcName)
         {
             if (declarer.IsInterface)
+            {
                 throw new InvalidOperationException(
                     $"Input '{mvcName}' binds a member that {CSharpTypeName.Of(declarer)} declares. An input's id is scoped by the " +
                     "class that declares its member, so the page's rules, sends and reads of it would not find it: type the view " +
                     "to the class, or a base class, that declares it.");
+            }
+
             return Scope(declarer) + "__" + ExpressionPathHelper.ToMvcElementId(mvcName);
         }
 
@@ -70,7 +73,7 @@ namespace Alis.Reactive
             return name.ToString();
         }
 
-        private static bool IsIdCharacter(char character) =>
-            character is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9' or '_';
+        private static bool IsIdCharacter(char character)
+            => character is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9' or '_';
     }
 }

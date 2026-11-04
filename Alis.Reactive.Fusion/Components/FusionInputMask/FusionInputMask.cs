@@ -22,8 +22,8 @@ namespace Alis.Reactive.Fusion
         public void FocusIn() => Method();
 
         /// <summary>Raised when the value changes.</summary>
-        public Event<FusionInputMaskChangeArgs> Change =>
-            Event<FusionInputMaskChangeArgs>();
+        public Event<FusionInputMaskChangeArgs> Change
+            => Event<FusionInputMaskChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

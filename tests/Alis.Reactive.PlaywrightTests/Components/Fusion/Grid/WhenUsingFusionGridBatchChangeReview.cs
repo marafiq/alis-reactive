@@ -15,8 +15,8 @@ public class WhenUsingFusionGridBatchChangeReview : PlaywrightTestBase
     private static readonly Regex Changed = new("e-updatedtd");
 
     private ILocator Rows => Page.Locator($"#{ChecksId} .e-row");
-    private ILocator Checks(string resident) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{ChecksColumn}']");
+    private ILocator Checks(string resident)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{ChecksColumn}']");
     private ILocator ChecksEditor => Page.Locator($"#{ChecksId}checksDone");
     private ILocator ChangesToSave => Page.Locator($"#{ReviewId} .e-row");
     private ILocator ChangeToSave(string resident) => ChangesToSave.Filter(new() { HasText = resident });

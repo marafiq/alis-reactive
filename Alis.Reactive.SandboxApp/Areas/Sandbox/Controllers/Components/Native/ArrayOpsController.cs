@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
     public class ArrayOpsController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml", new WingCensusModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml", new WingCensusModel());
 
         [HttpGet("Maple")]
         public IActionResult MapleWing() => Ok(new WingCensusResponse
@@ -43,8 +43,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
         });
 
         private static CensusResident Resident(
-            string name, string status, int age, int morse, int doses, decimal charges, double hours, int review) =>
-            new CensusResident
+            string name, string status, int age, int morse, int doses, decimal charges, double hours, int review)
+            => new CensusResident
             {
                 Name = name,
                 Status = status,

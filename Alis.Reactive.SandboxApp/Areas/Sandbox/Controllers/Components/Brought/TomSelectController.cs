@@ -40,8 +40,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         }
 
         [HttpGet("Recommendation")]
-        public IActionResult Recommendation() =>
-            Ok(new SuiteRecommendationResponse { SuiteType = "memory-care" });
+        public IActionResult Recommendation()
+            => Ok(new SuiteRecommendationResponse { SuiteType = "memory-care" });
 
         [HttpPost("Reserve")]
         public IActionResult Reserve([FromBody] SuiteAssignmentModel assignment)
@@ -56,16 +56,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         }
 
         [HttpGet("WelcomePacket")]
-        public IActionResult WelcomePacket() =>
-            Ok(new MoveInDocumentResponse { Title = "Welcome packet prepared." });
+        public IActionResult WelcomePacket()
+            => Ok(new MoveInDocumentResponse { Title = "Welcome packet prepared." });
 
         [HttpGet("MoveInChecklist")]
-        public IActionResult MoveInChecklist() =>
-            Ok(new MoveInDocumentResponse { Title = "Move-in checklist prepared." });
+        public IActionResult MoveInChecklist()
+            => Ok(new MoveInDocumentResponse { Title = "Move-in checklist prepared." });
 
         [HttpGet("Companion")]
-        public IActionResult Companion() =>
-            PartialView(ViewBase + "_CompanionSuite.cshtml", new CompanionSuiteModel());
+        public IActionResult Companion()
+            => PartialView(ViewBase + "_CompanionSuite.cshtml", new CompanionSuiteModel());
 
         [HttpGet("NoCompanion")]
         public IActionResult NoCompanion() => PartialView(ViewBase + "_NoCompanion.cshtml");

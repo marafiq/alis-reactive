@@ -34,18 +34,18 @@ namespace Alis.Reactive.Fusion
         public void Decrement() => Method();
 
         /// <summary>Raised when the value changes.</summary>
-        public Event<FusionNumericTextBoxChangeArgs> Change =>
-            Event<FusionNumericTextBoxChangeArgs>();
+        public Event<FusionNumericTextBoxChangeArgs> Change
+            => Event<FusionNumericTextBoxChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 
         /// <summary>Raised when the input receives focus.</summary>
-        public Event<FusionNumericTextBoxFocusArgs> Focus =>
-            Event<FusionNumericTextBoxFocusArgs>();
+        public Event<FusionNumericTextBoxFocusArgs> Focus
+            => Event<FusionNumericTextBoxFocusArgs>();
 
         /// <summary>Raised when the input loses focus.</summary>
-        public Event<FusionNumericTextBoxBlurArgs> Blur =>
-            Event<FusionNumericTextBoxBlurArgs>();
+        public Event<FusionNumericTextBoxBlurArgs> Blur
+            => Event<FusionNumericTextBoxBlurArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionNumericTextBox.Change"/>.</summary>

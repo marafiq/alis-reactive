@@ -36,16 +36,16 @@ namespace Alis.Reactive.Fusion
         public void HidePopup() => Method();
 
         /// <summary>Raised when the user picks a suggestion.</summary>
-        public Event<FusionMentionChangeArgs> Change =>
-            Event<FusionMentionChangeArgs>();
+        public Event<FusionMentionChangeArgs> Change
+            => Event<FusionMentionChangeArgs>();
 
         /// <summary>Raised after the suggestion popup opens.</summary>
-        public Event<FusionMentionPopupArgs> Opened =>
-            Event<FusionMentionPopupArgs>();
+        public Event<FusionMentionPopupArgs> Opened
+            => Event<FusionMentionPopupArgs>();
 
         /// <summary>Raised after the suggestion popup closes.</summary>
-        public Event<FusionMentionPopupArgs> Closed =>
-            Event<FusionMentionPopupArgs>();
+        public Event<FusionMentionPopupArgs> Closed
+            => Event<FusionMentionPopupArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionMention.Change"/>.</summary>

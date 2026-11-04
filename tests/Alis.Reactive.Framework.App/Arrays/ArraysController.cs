@@ -25,6 +25,6 @@ public sealed class ArraysController : Controller
     public IActionResult Census() => Json(new Census { Residents = Register.Residents(), Visitors = null });
 
     [HttpPost]
-    public IActionResult Notify([FromBody] Notice notice) =>
-        Json(new NoticeEcho { Summary = $"{notice.Names.Count} named: {string.Join(" and ", notice.Names)}" });
+    public IActionResult Notify([FromBody] Notice notice)
+        => Json(new NoticeEcho { Summary = $"{notice.Names.Count} named: {string.Join(" and ", notice.Names)}" });
 }

@@ -14,8 +14,8 @@ public class WhenUsingFusionGridBatchEdit : PlaywrightTestBase
     private static readonly Regex Changed = new("e-updatedtd");
 
     private ILocator Rows => Page.Locator($"#{BoardId} .e-row");
-    private ILocator Cell(string resident, int column) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator Cell(string resident, int column)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
     private ILocator OpenTasksEditor => Page.Locator($"#{BoardId}openTasks");
     private ILocator ChangedCells => Page.Locator($"#{BoardId} .e-updatedtd");
     private ILocator StartWithTheFirstResident => Page.Locator("#board-start");

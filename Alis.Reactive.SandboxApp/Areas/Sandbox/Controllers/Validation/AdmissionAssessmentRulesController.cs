@@ -8,16 +8,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class AdmissionAssessmentRulesController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/AdmissionAssessment/Index.cshtml", new AdmissionAssessmentModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/AdmissionAssessment/Index.cshtml", new AdmissionAssessmentModel());
 
         [HttpPost("Save")]
-        public IActionResult Save([FromBody] AdmissionAssessmentModel? assessment) =>
-            Accept(assessment, "saved");
+        public IActionResult Save([FromBody] AdmissionAssessmentModel? assessment)
+            => Accept(assessment, "saved");
 
         [HttpPost("Print")]
-        public IActionResult Print([FromBody] AdmissionAssessmentModel? assessment) =>
-            Accept(assessment, "printed");
+        public IActionResult Print([FromBody] AdmissionAssessmentModel? assessment)
+            => Accept(assessment, "printed");
 
         private IActionResult Accept(AdmissionAssessmentModel? assessment, string outcome)
         {

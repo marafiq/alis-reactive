@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Alis.Reactive.Components;
+using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.WireTerms;
-using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
@@ -59,11 +59,11 @@ namespace Alis.Reactive
             $"'{CSharpTypeName.Of(GetType())}' is a declaration, not a live object. Reach one inside a callback: " +
             $"p.Component<{CSharpTypeName.Of(GetType())}>(..), the payload an event hands its callback, or a registered plugin.");
 
-        internal void BindTo(ObjectBinding binding) =>
-            _binding = binding ?? throw new ArgumentNullException(nameof(binding));
+        internal void BindTo(ObjectBinding binding)
+            => _binding = binding ?? throw new ArgumentNullException(nameof(binding));
 
-        internal static TObject Nested<TObject>(JsObject holder, Path path) where TObject : JsObject, new() =>
-            new TObject { _holder = holder, _holderPath = path };
+        internal static TObject Nested<TObject>(JsObject holder, Path path) where TObject : JsObject, new()
+            => new TObject { _holder = holder, _holderPath = path };
 
         private bool IsReturned => _returned || (_holder?.IsReturned ?? false);
 
@@ -71,22 +71,22 @@ namespace Alis.Reactive
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}(string, string)"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
-        protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new ReadOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
+        protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "")
+            => new ReadOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
         /// <summary>Declares a property the page reads and writes.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased. A member of an object the component holds belongs to that object's declaration (<see cref="Object{TObject}(string, string)"/>); a field of each item of a list is read with <see cref="ListPropertyExtensions.Each{TItem, TField}"/>.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
-        protected Property<TValue> Property<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new Property<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
+        protected Property<TValue> Property<TValue>(string? name = null, [CallerMemberName] string declaredBy = "")
+            => new Property<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
         /// <summary>Declares a property the page writes and never reads: the object has a setter and no getter.</summary>
         /// <typeparam name="TValue">The C# type of the value.</typeparam>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the property.</param>
-        protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new WriteOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
+        protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "")
+            => new WriteOnly<TValue>(this, ComponentProperty<TValue>.At(JavaScriptPath(name, declaredBy)));
 
         /// <summary>
         /// Declares an object with members of its own, declared as its own class. On a property it is the
@@ -99,8 +99,8 @@ namespace Alis.Reactive
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the object.</param>
         protected TObject Object<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
-            where TObject : JsObject, new() =>
-            DeclaresMethod(declaredBy)
+            where TObject : JsObject, new()
+            => DeclaresMethod(declaredBy)
                 ? ReturnedObject<TObject>(name, declaredBy)
                 : Nested<TObject>(this, JavaScriptPath(name, declaredBy));
 
@@ -114,8 +114,8 @@ namespace Alis.Reactive
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TObject Object<TObject>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "")
-            where TObject : JsObject, new() =>
-            ReturnedObject<TObject>(name, declaredBy, first);
+            where TObject : JsObject, new()
+            => ReturnedObject<TObject>(name, declaredBy, first);
 
         /// <summary>Declares a method that returns an object with members of its own, for two arguments.</summary>
         /// <typeparam name="TObject">The declaration of the object the method returns.</typeparam>
@@ -124,8 +124,8 @@ namespace Alis.Reactive
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
         protected TObject Object<TObject>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "")
-            where TObject : JsObject, new() =>
-            ReturnedObject<TObject>(name, declaredBy, first, second);
+            where TObject : JsObject, new()
+            => ReturnedObject<TObject>(name, declaredBy, first, second);
 
         /// <summary>
         /// Declares a list of objects with members of their own. On a property it is the list the property
@@ -137,31 +137,31 @@ namespace Alis.Reactive
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the list.</param>
         protected Objects<TItem> Objects<TItem>(string? name = null, [CallerMemberName] string declaredBy = "")
-            where TItem : JsObject, new() =>
-            DeclaresMethod(declaredBy)
+            where TItem : JsObject, new()
+            => DeclaresMethod(declaredBy)
                 ? new Objects<TItem>(ReturnedObject<ReturnedList>(name, declaredBy), Path.None)
                 : new Objects<TItem>(this, JavaScriptPath(name, declaredBy));
 
         /// <summary>Declares a method that returns nothing and takes no argument: <c>public void Refresh() =&gt; Method();</c>.</summary>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void Method(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: false);
+        protected void Method(string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: false);
 
         /// <summary>Declares a method that returns nothing, for one argument.</summary>
         /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void Method(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: false, first);
+        protected void Method(Arg first, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: false, first);
 
         /// <summary>Declares a method that returns nothing, for two arguments.</summary>
         /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
         /// <param name="second">The second argument.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void Method(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: false, first, second);
+        protected void Method(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: false, first, second);
 
         /// <summary>Declares a method that returns nothing, for three arguments.</summary>
         /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
@@ -169,8 +169,8 @@ namespace Alis.Reactive
         /// <param name="third">The third argument.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void Method(Arg first, Arg second, Arg third, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: false, first, second, third);
+        protected void Method(Arg first, Arg second, Arg third, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: false, first, second, third);
 
         /// <summary>Declares a method that returns nothing, for four arguments.</summary>
         /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
@@ -179,29 +179,29 @@ namespace Alis.Reactive
         /// <param name="fourth">The fourth argument.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void Method(Arg first, Arg second, Arg third, Arg fourth, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: false, first, second, third, fourth);
+        protected void Method(Arg first, Arg second, Arg third, Arg fourth, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: false, first, second, third, fourth);
 
         /// <summary>Declares a method that returns a promise and takes no argument; the steps after it wait for the promise to settle.</summary>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void MethodAsync(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: true);
+        protected void MethodAsync(string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: true);
 
         /// <summary>Declares a method that returns a promise, for one argument; the steps after it wait for the promise to settle.</summary>
         /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void MethodAsync(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: true, first);
+        protected void MethodAsync(Arg first, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: true, first);
 
         /// <summary>Declares a method that returns a promise, for two arguments; the steps after it wait for the promise to settle.</summary>
         /// <param name="first">The first argument: a literal, or a value read when the step runs.</param>
         /// <param name="second">The second argument.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected void MethodAsync(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Run(name, declaredBy, awaits: true, first, second);
+        protected void MethodAsync(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Run(name, declaredBy, awaits: true, first, second);
 
         /// <summary>
         /// Declares a method that returns a value and takes no argument:
@@ -211,16 +211,16 @@ namespace Alis.Reactive
         /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; <c>""</c> calls a plugin that is itself a function.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected TypedSource<TResult> Method<TResult>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Result<TResult>(name, declaredBy, awaits: false);
+        protected TypedSource<TResult> Method<TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
+            => Result<TResult>(name, declaredBy, awaits: false);
 
         /// <summary>Declares a method that returns a value, for one argument.</summary>
         /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
         /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased; <c>""</c> calls a plugin that is itself a function.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected TypedSource<TResult> Method<TResult>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Result<TResult>(name, declaredBy, awaits: false, first);
+        protected TypedSource<TResult> Method<TResult>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Result<TResult>(name, declaredBy, awaits: false, first);
 
         /// <summary>Declares a method that returns a value, for two arguments.</summary>
         /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
@@ -228,8 +228,8 @@ namespace Alis.Reactive
         /// <param name="second">The second argument.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected TypedSource<TResult> Method<TResult>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Result<TResult>(name, declaredBy, awaits: false, first, second);
+        protected TypedSource<TResult> Method<TResult>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Result<TResult>(name, declaredBy, awaits: false, first, second);
 
         /// <summary>Declares a method that returns a value, for three arguments.</summary>
         /// <typeparam name="TResult">The C# type of the returned value.</typeparam>
@@ -238,8 +238,8 @@ namespace Alis.Reactive
         /// <param name="third">The third argument.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected TypedSource<TResult> Method<TResult>(Arg first, Arg second, Arg third, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Result<TResult>(name, declaredBy, awaits: false, first, second, third);
+        protected TypedSource<TResult> Method<TResult>(Arg first, Arg second, Arg third, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Result<TResult>(name, declaredBy, awaits: false, first, second, third);
 
         /// <summary>
         /// Declares a method that returns a promise of a value and takes no argument:
@@ -249,16 +249,16 @@ namespace Alis.Reactive
         /// <typeparam name="TResult">The C# type of the settled value.</typeparam>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected TypedSource<TResult> MethodAsync<TResult>(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Result<TResult>(name, declaredBy, awaits: true);
+        protected TypedSource<TResult> MethodAsync<TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
+            => Result<TResult>(name, declaredBy, awaits: true);
 
         /// <summary>Declares a method that returns a promise of a value, for one argument; the step that first uses the result waits for the promise.</summary>
         /// <typeparam name="TResult">The C# type of the settled value.</typeparam>
         /// <param name="first">The argument: a literal, or a value read when the step runs.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected TypedSource<TResult> MethodAsync<TResult>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Result<TResult>(name, declaredBy, awaits: true, first);
+        protected TypedSource<TResult> MethodAsync<TResult>(Arg first, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Result<TResult>(name, declaredBy, awaits: true, first);
 
         /// <summary>Declares a method that returns a promise of a value, for two arguments; the step that first uses the result waits for the promise.</summary>
         /// <typeparam name="TResult">The C# type of the settled value.</typeparam>
@@ -266,8 +266,8 @@ namespace Alis.Reactive
         /// <param name="second">The second argument.</param>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the method.</param>
-        protected TypedSource<TResult> MethodAsync<TResult>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "") =>
-            Result<TResult>(name, declaredBy, awaits: true, first, second);
+        protected TypedSource<TResult> MethodAsync<TResult>(Arg first, Arg second, string? name = null, [CallerMemberName] string declaredBy = "")
+            => Result<TResult>(name, declaredBy, awaits: true, first, second);
 
         /// <summary>
         /// Declares an event whose listener receives a payload, declared as its own class:
@@ -280,8 +280,8 @@ namespace Alis.Reactive
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the event.</param>
         protected Event<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = "")
-            where TArgs : JsObject, new() =>
-            new Event<TArgs>(EventNamed(name, declaredBy), new TArgs(), ObjectPath());
+            where TArgs : JsObject, new()
+            => new Event<TArgs>(EventNamed(name, declaredBy), new TArgs(), ObjectPath());
 
         /// <summary>
         /// Declares an event whose listener receives nothing: <c>public Event Unlocked =&gt; Event();</c>.
@@ -289,8 +289,8 @@ namespace Alis.Reactive
         /// </summary>
         /// <param name="name">The JavaScript name, when it is not the C# name camel-cased.</param>
         /// <param name="declaredBy">Supplied by the compiler: the C# member that declares the event.</param>
-        protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "") =>
-            new Event(EventNamed(name, declaredBy), ObjectPath());
+        protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "")
+            => new Event(EventNamed(name, declaredBy), ObjectPath());
 
         /// <summary>
         /// An argument the JavaScript method always takes and the page never chooses:
@@ -308,11 +308,11 @@ namespace Alis.Reactive
         /// <typeparam name="TDeclared">The type the JavaScript method declares.</typeparam>
         /// <typeparam name="TSource">The type of the value passed, assignable to it.</typeparam>
         /// <param name="value">The value read when the step runs.</param>
-        protected static Arg Pass<TDeclared, TSource>(TypedSource<TSource> value) where TSource : TDeclared =>
-            Arg.Declared<TDeclared, TSource>(value);
+        protected static Arg Pass<TDeclared, TSource>(TypedSource<TSource> value) where TSource : TDeclared
+            => Arg.Declared<TDeclared, TSource>(value);
 
-        private void Run(string? name, string declaredBy, bool awaits, params Arg[] args) =>
-            Binding.Call(MethodNamed(name, declaredBy, awaits, args), Expressions(args));
+        private void Run(string? name, string declaredBy, bool awaits, params Arg[] args)
+            => Binding.Call(MethodNamed(name, declaredBy, awaits, args), Expressions(args));
 
         private TypedSource<TResult> Result<TResult>(string? name, string declaredBy, bool awaits, params Arg[] args)
         {
@@ -328,15 +328,18 @@ namespace Alis.Reactive
             return new TObject { _binding = binding, _returned = true };
         }
 
-        private ComponentMethod MethodNamed(string? name, string declaredBy, bool awaits, Arg[] args) =>
-            ComponentMethod.Of(declaredBy, JavaScriptPath(name, declaredBy), args.Select(arg => arg.Shape).ToList(), awaits);
+        private ComponentMethod MethodNamed(string? name, string declaredBy, bool awaits, Arg[] args)
+            => ComponentMethod.Of(declaredBy, JavaScriptPath(name, declaredBy), args.Select(arg => arg.Shape).ToList(), awaits);
 
         private string EventNamed(string? name, string declaredBy)
         {
             if (IsReturned)
+            {
                 throw new InvalidOperationException(
                     $"'{CSharpTypeName.Of(GetType())}.{declaredBy}' declares an event on an object a method returns. Events belong " +
                     "to the component and to the objects it holds (Object<T>() on a property).");
+            }
+
             return name == null ? JavaScriptNameOf(declaredBy) : OwnName(name, declaredBy);
         }
 
@@ -366,15 +369,18 @@ namespace Alis.Reactive
                 .Where(member => member.Name == declaredBy || member.Name.EndsWith("." + declaredBy, StringComparison.Ordinal))
                 .ToArray();
             if (members.Length == 0)
+            {
                 throw new ArgumentException(
                     $"'{CSharpTypeName.Of(GetType())}' has no member '{declaredBy}'. Declare an object as a C# property or method, " +
                     "for example public Settings Settings => Object<Settings>(); or public Reading Reading() => Object<Reading>();",
                     nameof(declaredBy));
+            }
+
             return members.All(member => member is MethodInfo);
         }
 
-        private static IReadOnlyList<ValueExpression> Expressions(Arg[] args) =>
-            args.Select(arg => arg.Expression).ToList();
+        private static IReadOnlyList<ValueExpression> Expressions(Arg[] args)
+            => args.Select(arg => arg.Expression).ToList();
 
         private static string JavaScriptNameOf(string declaredBy)
         {

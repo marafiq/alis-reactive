@@ -72,8 +72,8 @@ public abstract class PlaywrightTestBase : AppPageTest
             " });");
     }
 
-    protected async Task NavigateTo(string path) =>
-        await Page.GotoAsync($"{BaseUrl}{path}", new() { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 60000 });
+    protected async Task NavigateTo(string path)
+        => await Page.GotoAsync($"{BaseUrl}{path}", new() { WaitUntil = WaitUntilState.DOMContentLoaded, Timeout = 60000 });
 
     protected async Task NavigateToAndWaitForBoot(
         string path,
@@ -144,8 +144,8 @@ public abstract class PlaywrightTestBase : AppPageTest
                                      $"Messages: [{string.Join(", ", messages.Take(10))}]");
     }
 
-    protected async Task ClickWhenStable(ILocator locator, int timeoutMs = 60000) =>
-        await locator.ClickAsync(new() { Timeout = timeoutMs });
+    protected async Task ClickWhenStable(ILocator locator, int timeoutMs = 60000)
+        => await locator.ClickAsync(new() { Timeout = timeoutMs });
 
     private List<string> SnapshotConsoleMessages()
     {
@@ -163,8 +163,8 @@ public abstract class PlaywrightTestBase : AppPageTest
         }
     }
 
-    private List<string> SnapshotUnexpectedConsoleErrors() =>
-        SnapshotConsoleErrors()
+    private List<string> SnapshotUnexpectedConsoleErrors()
+        => SnapshotConsoleErrors()
             .Where(error => !IgnoredNavigationErrors.Any(error.Contains))
             .ToList();
 
@@ -178,8 +178,8 @@ public abstract class PlaywrightTestBase : AppPageTest
         }
     }
 
-    private async Task WaitForReactiveBoot(int timeoutMs) =>
-        await Page.Locator(ReactiveBootedMarkerSelector).WaitForAsync(new()
+    private async Task WaitForReactiveBoot(int timeoutMs)
+        => await Page.Locator(ReactiveBootedMarkerSelector).WaitForAsync(new()
         {
             State = WaitForSelectorState.Attached,
             Timeout = Math.Max(timeoutMs, ReactiveBootTimeoutMs),

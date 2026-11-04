@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Alis.Reactive.WireTerms;
 using Alis.Reactive.Members;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanAuthoring.Requests
 {
@@ -57,11 +57,11 @@ namespace Alis.Reactive.PlanAuthoring.Requests
             return bothCollections && ItemType(inputCore) == ItemType(memberCore);
         }
 
-        private static bool IsCollection(Type type) =>
-            type != typeof(string) && (type.IsArray || SequenceOf(type) != null);
+        private static bool IsCollection(Type type)
+            => type != typeof(string) && (type.IsArray || SequenceOf(type) != null);
 
-        private static bool IsOpen(Type type) =>
-            type == typeof(object) || DictionaryValueType(type) != null;
+        private static bool IsOpen(Type type)
+            => type == typeof(object) || DictionaryValueType(type) != null;
 
         private static Type ItemType(Type collection)
         {
@@ -72,8 +72,8 @@ namespace Alis.Reactive.PlanAuthoring.Requests
             return SequenceOf(collection)?.GetGenericArguments()[0] ?? typeof(object);
         }
 
-        private static Type? SequenceOf(Type type) =>
-            new[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(candidate =>
+        private static Type? SequenceOf(Type type)
+            => new[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(candidate =>
                 candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>));
 
         private static Type? DictionaryValueType(Type type)

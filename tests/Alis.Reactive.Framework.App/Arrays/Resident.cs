@@ -69,8 +69,8 @@ public sealed class NoticeEcho
 
 public static class Register
 {
-    public static List<Resident> Residents() =>
-    [
+    public static List<Resident> Residents()
+    => [
         new()
         {
             Name = "Cyd Marsh", Nickname = "", Age = 81, Present = true, Balance = 12.50m, Weight = 61.5, Score = 7,

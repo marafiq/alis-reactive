@@ -15,8 +15,8 @@ namespace Alis.Reactive.Validation
             return new Translator(predicate.Parameters[0]).Translate(predicate.Body);
         }
 
-        internal static Condition AllOf(IReadOnlyList<Condition> conditions) =>
-            conditions.Count == 1 ? conditions[0] : Condition.All(conditions.ToArray());
+        internal static Condition AllOf(IReadOnlyList<Condition> conditions)
+            => conditions.Count == 1 ? conditions[0] : Condition.All(conditions.ToArray());
 
         private sealed class Translator
         {
@@ -116,11 +116,11 @@ namespace Alis.Reactive.Validation
                 return null;
             }
 
-            private Condition Is(Expression member, ValueTest test) =>
-                Condition.Is(Lambda(member), test);
+            private Condition Is(Expression member, ValueTest test)
+                => Condition.Is(Lambda(member), test);
 
-            private Condition In(Expression member, Expression values) =>
-                Condition.In(Lambda(member), values);
+            private Condition In(Expression member, Expression values)
+                => Condition.In(Lambda(member), values);
 
             private LambdaExpression Lambda(Expression member) => Expression.Lambda(ModelMember(member), _model);
 
@@ -184,8 +184,8 @@ namespace Alis.Reactive.Validation
                 return true;
             }
 
-            private static bool IsStringMethod(MethodCallExpression call, string name) =>
-                call.Method.DeclaringType == typeof(string) && call.Method.Name == name
+            private static bool IsStringMethod(MethodCallExpression call, string name)
+                => call.Method.DeclaringType == typeof(string) && call.Method.Name == name
                 && call.Object == null && call.Arguments.Count == 1;
 
             private bool IsField(Expression expression)

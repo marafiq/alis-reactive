@@ -19,12 +19,12 @@ namespace Alis.Reactive.PlanTests.Support;
 internal static class Page
 {
     internal static (IHtmlHelper<TModel> Html, ReactivePlan<TModel> Plan) Of<TModel>(Action<IServiceCollection>? registered = null)
-        where TModel : class =>
-        ViewOf<TModel>(registered ?? Registered.Nothing(), fieldPrefix: "");
+        where TModel : class
+        => ViewOf<TModel>(registered ?? Registered.Nothing(), fieldPrefix: "");
 
     internal static (IHtmlHelper<TModel> Html, ReactivePlan<TModel> Plan) Partial<TModel>(string fieldPrefix)
-        where TModel : class =>
-        ViewOf<TModel>(Registered.Nothing(), fieldPrefix);
+        where TModel : class
+        => ViewOf<TModel>(Registered.Nothing(), fieldPrefix);
 
     private static (IHtmlHelper<TModel>, ReactivePlan<TModel>) ViewOf<TModel>(Action<IServiceCollection> registered, string fieldPrefix)
         where TModel : class
@@ -79,8 +79,10 @@ internal static class Page
             _ => Enumerable.Empty<JsonNode?>(),
         };
         foreach (var child in children.OfType<JsonNode>())
+        {
             foreach (var descendant in child.Nodes())
                 yield return descendant;
+        }
     }
 
     internal static string Describe(this JsonNode shape)
@@ -100,8 +102,8 @@ file sealed class NamedView(string path) : IView
 {
     public string Path => path;
 
-    public Task RenderAsync(ViewContext context) =>
-        throw new NotSupportedException($"{path} is authored by the plan tests, never run.");
+    public Task RenderAsync(ViewContext context)
+        => throw new NotSupportedException($"{path} is authored by the plan tests, never run.");
 }
 
 public sealed class TextInput : Component, IInputComponent

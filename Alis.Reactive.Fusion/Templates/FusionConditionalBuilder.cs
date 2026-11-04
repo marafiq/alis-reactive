@@ -24,16 +24,16 @@ namespace Alis.Reactive.Fusion
         /// Adds a <c>span</c> bound to a template model property.
         /// </summary>
         /// <param name="property">Template model property.</param>
-        public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property) =>
-            Span(property, TemplateCss.None);
+        public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property)
+            => Span(property, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> bound to a template model property.
         /// </summary>
         /// <param name="property">Template model property.</param>
         /// <param name="css">CSS class.</param>
-        public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css) =>
-            Span(property, TemplateCss.Class(css));
+        public FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, string css)
+            => Span(property, TemplateCss.Class(css));
 
         private FusionConditionalBuilder<TModel> Span<TProperty>(Expression<Func<TModel, TProperty>> property, TemplateCss css)
         {
@@ -45,16 +45,16 @@ namespace Alis.Reactive.Fusion
         /// Adds a <c>span</c> with literal text.
         /// </summary>
         /// <param name="text">Literal span text.</param>
-        public FusionConditionalBuilder<TModel> Span(string text) =>
-            Span(text, TemplateCss.None);
+        public FusionConditionalBuilder<TModel> Span(string text)
+            => Span(text, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>span</c> with literal text.
         /// </summary>
         /// <param name="text">Literal span text.</param>
         /// <param name="css">CSS class.</param>
-        public FusionConditionalBuilder<TModel> Span(string text, string css) =>
-            Span(text, TemplateCss.Class(css));
+        public FusionConditionalBuilder<TModel> Span(string text, string css)
+            => Span(text, TemplateCss.Class(css));
 
         private FusionConditionalBuilder<TModel> Span(string text, TemplateCss css)
         {
@@ -88,16 +88,16 @@ namespace Alis.Reactive.Fusion
         /// Adds a Syncfusion icon <c>span</c>.
         /// </summary>
         /// <param name="iconName">Syncfusion icon CSS class.</param>
-        public FusionConditionalBuilder<TModel> Icon(string iconName) =>
-            Icon(iconName, TemplateCss.None);
+        public FusionConditionalBuilder<TModel> Icon(string iconName)
+            => Icon(iconName, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled Syncfusion icon <c>span</c>.
         /// </summary>
         /// <param name="iconName">Syncfusion icon CSS class.</param>
         /// <param name="css">CSS class.</param>
-        public FusionConditionalBuilder<TModel> Icon(string iconName, string css) =>
-            Icon(iconName, TemplateCss.Class(css));
+        public FusionConditionalBuilder<TModel> Icon(string iconName, string css)
+            => Icon(iconName, TemplateCss.Class(css));
 
         private FusionConditionalBuilder<TModel> Icon(string iconName, TemplateCss css)
         {
@@ -121,16 +121,16 @@ namespace Alis.Reactive.Fusion
         /// Adds an <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
         /// <param name="srcProperty">Template model property used for <c>src</c>.</param>
-        public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty) =>
-            Img(srcProperty, TemplateCss.None);
+        public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty)
+            => Img(srcProperty, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled <c>img</c> whose <c>src</c> is bound to a template model property.
         /// </summary>
         /// <param name="srcProperty">Template model property used for <c>src</c>.</param>
         /// <param name="css">CSS class.</param>
-        public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css) =>
-            Img(srcProperty, TemplateCss.Class(css));
+        public FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, string css)
+            => Img(srcProperty, TemplateCss.Class(css));
 
         private FusionConditionalBuilder<TModel> Img<TProperty>(Expression<Func<TModel, TProperty>> srcProperty, TemplateCss css)
         {
@@ -164,8 +164,8 @@ namespace Alis.Reactive.Fusion
             AppEvent<TPayload> raises,
             Expression<Func<TPayload, TProperty>> member,
             Expression<Func<TModel, TProperty>> from)
-            where TPayload : class, new() =>
-            EventButton(text, raises, member, from, TemplateCss.None);
+            where TPayload : class, new()
+            => EventButton(text, raises, member, from, TemplateCss.None);
 
         /// <summary>
         /// Adds a styled button whose click raises a declared document event, its payload member filled
@@ -184,8 +184,8 @@ namespace Alis.Reactive.Fusion
             Expression<Func<TPayload, TProperty>> member,
             Expression<Func<TModel, TProperty>> from,
             string css)
-            where TPayload : class, new() =>
-            EventButton(text, raises, member, from, TemplateCss.Class(css));
+            where TPayload : class, new()
+            => EventButton(text, raises, member, from, TemplateCss.Class(css));
 
         private FusionConditionalBuilder<TModel> EventButton<TPayload, TProperty>(
             string text,

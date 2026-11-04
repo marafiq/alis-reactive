@@ -25,8 +25,8 @@ namespace Alis.Reactive.Fusion
         /// Raised when the content changed: when focus leaves the editor (IsInteracted true), and while the
         /// person types, at the editor's save interval (IsInteracted false).
         /// </summary>
-        public Event<FusionRichTextEditorChangeArgs> Change =>
-            Event<FusionRichTextEditorChangeArgs>();
+        public Event<FusionRichTextEditorChangeArgs> Change
+            => Event<FusionRichTextEditorChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

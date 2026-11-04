@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Components;
 using Alis.Reactive.Grammar;
+using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.WireTerms;
-using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
@@ -52,8 +52,8 @@ namespace Alis.Reactive
 
         /// <summary>Writes a literal.</summary>
         /// <param name="value">The value to write.</param>
-        public void Set(TValue value) =>
-            Owner.Binding.Set(Member, value is Arg source
+        public void Set(TValue value)
+            => Owner.Binding.Set(Member, value is Arg source
                 ? source.Expression
                 : ValueExpression.LiteralFor(value, Member.Shape));
 
@@ -87,8 +87,8 @@ namespace Alis.Reactive
 
         /// <summary>Writes a literal.</summary>
         /// <param name="value">The value to write.</param>
-        public void Set(TValue value) =>
-            _owner.Binding.Set(_member, value is Arg source
+        public void Set(TValue value)
+            => _owner.Binding.Set(_member, value is Arg source
                 ? source.Expression
                 : ValueExpression.LiteralFor(value, _member.Shape));
 
@@ -215,8 +215,8 @@ namespace Alis.Reactive
             return new DeclaredArg(field, ClrShape.OfValue(field));
         }
 
-        private protected static ValueExpression ExpressionOf(object? value, Shape shape) =>
-            value is Arg source ? source.Expression : ValueExpression.LiteralFor(value, shape);
+        private protected static ValueExpression ExpressionOf(object? value, Shape shape)
+            => value is Arg source ? source.Expression : ValueExpression.LiteralFor(value, shape);
 
         private sealed class DeclaredArg : Arg
         {

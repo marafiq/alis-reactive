@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private const int CedarFinalInvoiceOpenResidentId = 7206;
 
         [HttpGet("RosterCrud"), ActionName("RosterCrud")]
-        public IActionResult CedarFrontDeskPage() =>
-            View(
+        public IActionResult CedarFrontDeskPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterCrud.cshtml",
                 new RosterCrudModel { MovingOutToday = CedarMovingOutToday() });
 
@@ -65,10 +65,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (leaving == null)
                 return BadRequest(new CedarDeskRefusal { Summary = "That resident is not moving out today." });
             if (leaving.ResidentId == CedarFinalInvoiceOpenResidentId)
+            {
                 return Conflict(new CedarDeskRefusal
                 {
                     Summary = $"{leaving.ResidentName}'s final invoice is still open; the business office closes it before the move-out."
                 });
+            }
 
             return Ok(new CedarMovedOut
             {

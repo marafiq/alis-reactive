@@ -29,14 +29,14 @@ namespace Alis.Reactive.PlanModel.Validation
             _values = values;
         }
 
-        internal override IEnumerable<FieldReference> Fields =>
-            new[] { _field }.Concat(_rules.SelectMany(rule => rule.Fields.Concat(rule.Condition.Fields)));
+        internal override IEnumerable<FieldReference> Fields
+            => new[] { _field }.Concat(_rules.SelectMany(rule => rule.Fields.Concat(rule.Condition.Fields)));
 
-        internal override Condition PrefixedBy(string prefix) =>
-            new RulesPassCondition(_field.PrefixedBy(prefix), _rules.Select(rule => rule.PrefixedBy(prefix, Always)).ToList());
+        internal override Condition PrefixedBy(string prefix)
+            => new RulesPassCondition(_field.PrefixedBy(prefix), _rules.Select(rule => rule.PrefixedBy(prefix, Always)).ToList());
 
-        internal override Condition Bound(FieldValues fields) =>
-            new RulesPassCondition(_field, _rules, fields.Value(_field), fields as FormFieldValues
+        internal override Condition Bound(FieldValues fields)
+            => new RulesPassCondition(_field, _rules, fields.Value(_field), fields as FormFieldValues
                 ?? throw new ArgumentException("The rules a member's rules depend on are bound to a form's inputs.", nameof(fields)));
 
         internal override Expr Write(Scope scope)

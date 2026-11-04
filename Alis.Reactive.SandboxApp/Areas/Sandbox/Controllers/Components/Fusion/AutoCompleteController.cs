@@ -24,8 +24,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static readonly string[] OnCallTonight = ["dr-reyes", "dr-lim"];
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml", new FusionAutoCompleteModel
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml", new FusionAutoCompleteModel
             {
                 CareTeam = Listings(CareTeam),
                 Attending = CareTeam[0]
@@ -87,8 +87,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static DirectoryEntry? Find(string? id) => Physicians.FirstOrDefault(entry => entry.Id == id);
 
-        private static List<PhysicianListing> Listings(IEnumerable<string> ids) =>
-            ids.Select(id => Listing(Find(id)!)).ToList();
+        private static List<PhysicianListing> Listings(IEnumerable<string> ids)
+            => ids.Select(id => Listing(Find(id)!)).ToList();
 
         private static PhysicianListing Listing(DirectoryEntry entry) => new() { Id = entry.Id, Name = entry.Name };
 

@@ -13,7 +13,7 @@ public sealed class Button : Component
 public static class ButtonHtml
 {
     public static RenderedComponent<Button, TModel> Button<TModel>(this ReactivePlan<TModel> plan, string id, string text)
-        where TModel : class =>
-        plan.Render<Button>(id, new HtmlString(
+        where TModel : class
+        => plan.Render<Button>(id, new HtmlString(
             $"<button type=\"button\" id=\"{HtmlEncoder.Default.Encode(id)}\">{HtmlEncoder.Default.Encode(text)}</button>"));
 }

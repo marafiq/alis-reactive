@@ -22,8 +22,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
         public IActionResult ReturnItem() => Ok(new ReturnResult("Damaged item returned to the pharmacy."));
 
         [HttpGet("MarkDelivered")]
-        public IActionResult OpenDelivery() =>
-            Content("The delivery slip is open. Mark it delivered from the delivery page.", "text/plain");
+        public IActionResult OpenDelivery()
+            => Content("The delivery slip is open. Mark it delivered from the delivery page.", "text/plain");
 
         [HttpPost("MarkDelivered")]
         public IActionResult MarkDelivered([FromBody] DeliveryReceipt? receipt)

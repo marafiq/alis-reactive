@@ -67,18 +67,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Brought
         }
 
         [HttpGet("Companion")]
-        public IActionResult Companion() =>
-            PartialView(ViewBase + "_CompanionVisits.cshtml", new CompanionVisitPlanModel());
+        public IActionResult Companion()
+            => PartialView(ViewBase + "_CompanionVisits.cshtml", new CompanionVisitPlanModel());
 
         [HttpGet("NoCompanion")]
         public IActionResult NoCompanion() => PartialView(ViewBase + "_NoCompanion.cshtml");
 
         [HttpPost("CompanionHold")]
-        public IActionResult CompanionHold([FromBody] CompanionVisitPlanModel? plan) =>
-            Ok(new CompanionHoldResponse { Held = string.Join(", ", plan?.VisitSlots ?? new List<string>()) });
+        public IActionResult CompanionHold([FromBody] CompanionVisitPlanModel? plan)
+            => Ok(new CompanionHoldResponse { Held = string.Join(", ", plan?.VisitSlots ?? new List<string>()) });
 
-        private static ResidentSeed? Find(string? residentId) =>
-            Array.Find(Residents, resident => resident.Id == residentId);
+        private static ResidentSeed? Find(string? residentId)
+            => Array.Find(Residents, resident => resident.Id == residentId);
 
         private sealed record SlotSeed(string Id, string Label, string Day, bool Quiet = false);
 

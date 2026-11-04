@@ -18,8 +18,8 @@ public sealed class WhenAnEntryHoldsOnlyWhitespace : AppPageTest
 
     private ILocator RideStatus => Page.Locator("#ride-status");
 
-    private ILocator Message(string label, string message) =>
-        Page.Locator("#ride-form > div")
+    private ILocator Message(string label, string message)
+        => Page.Locator("#ride-form > div")
             .Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) })
             .GetByText(message, new() { Exact = true });
 

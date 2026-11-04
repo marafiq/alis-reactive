@@ -31,8 +31,8 @@ namespace Alis.Reactive.Fusion
         public void DataBind() => Method();
 
         /// <summary>Raised when the user clicks an item.</summary>
-        public Event<FusionBreadcrumbItemClickArgs> ItemClick =>
-            Event<FusionBreadcrumbItemClickArgs>();
+        public Event<FusionBreadcrumbItemClickArgs> ItemClick
+            => Event<FusionBreadcrumbItemClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionBreadcrumb.ItemClick"/>.</summary>

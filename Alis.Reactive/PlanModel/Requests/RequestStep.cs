@@ -78,13 +78,16 @@ namespace Alis.Reactive.PlanModel.Requests
         private Expr SendArgument(string method, GatheredInput input, Scope scope)
         {
             if (input.IsEmpty && _format != "json")
+            {
                 throw new InvalidOperationException(
                     $"The {method} request to '{_url}' gathers nothing, so it has no form data to send: remove AsFormData() or gather a value.");
+            }
+
             var format = _format;
             var nested = method != "GET" && format == "json";
             var body = nested ? Nested(input.Payload).Write(scope) : G.Record(FlatValues(input.Payload, scope));
 
-            Expr arrays = G.List(input.Payload
+            var arrays = G.List(input.Payload
                 .Where(member => member.Value.OutputShape.DescribesArray)
                 .Select(member => (Expr)G.Lit(member.Name.Value)));
             if (input.Form is { } form)
@@ -104,11 +107,11 @@ namespace Alis.Reactive.PlanModel.Requests
                 ("format", G.Lit(format)));
         }
 
-        private static Expr Named(IReadOnlyList<(string Name, ValueExpression Value)> members, Scope scope) =>
-            G.Record(members.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
+        private static Expr Named(IReadOnlyList<(string Name, ValueExpression Value)> members, Scope scope)
+            => G.Record(members.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
 
-        private static List<RecordField> FlatValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope) =>
-            payload.Select(member => new RecordField(member.Name.Value, member.Value.Write(scope))).ToList();
+        private static List<RecordField> FlatValues(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload, Scope scope)
+            => payload.Select(member => new RecordField(member.Name.Value, member.Value.Write(scope))).ToList();
 
         private static ValueExpression Nested(IReadOnlyList<(BindingPath Name, ValueExpression Value)> payload)
         {
@@ -140,9 +143,12 @@ namespace Alis.Reactive.PlanModel.Requests
         internal void OnError(Block route)
         {
             if (_error != null)
+            {
                 throw new InvalidOperationException(
                     "A response has one OnError without a status; write every step of it in that one callback, and route " +
                     "a status of its own with OnError(status, ..).");
+            }
+
             _error = route;
         }
 
@@ -157,8 +163,11 @@ namespace Alis.Reactive.PlanModel.Requests
         internal void ContinueWith(RequestStep request)
         {
             if (Chained != null)
+            {
                 throw new InvalidOperationException(
                     "A response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..)).");
+            }
+
             Chained = request;
         }
 

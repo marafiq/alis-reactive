@@ -1,6 +1,6 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -9,8 +9,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static readonly string[] ClinicalUpdatesRiskLevels = { "Low", "Moderate", "High" };
 
         [HttpGet("Operations"), ActionName("Operations")]
-        public IActionResult ClinicalUpdatesPage() =>
-            View(
+        public IActionResult ClinicalUpdatesPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/Operations.cshtml",
                 new ClinicalUpdatesViewModel { Wing = "South", RiskLevels = ClinicalUpdatesRiskLevels.ToList() });
 

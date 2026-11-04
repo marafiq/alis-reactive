@@ -16,8 +16,8 @@ public sealed class WhenAListOfFilesIsRequired : AppPageTest
         };
     }
 
-    private ILocator PhotoWanted =>
-        Page.Locator("#incident-form > div")
+    private ILocator PhotoWanted
+        => Page.Locator("#incident-form > div")
             .Filter(new() { Has = Page.GetByLabel("Photos") })
             .GetByText("Attach a photo of the incident.", new() { Exact = true });
 

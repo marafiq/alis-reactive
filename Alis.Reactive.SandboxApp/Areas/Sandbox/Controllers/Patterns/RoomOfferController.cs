@@ -1,6 +1,6 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.RoomOffer;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 
@@ -11,8 +11,8 @@ public class RoomOfferController : Controller
     private static readonly CultureInfo Dollars = CultureInfo.GetCultureInfo("en-US");
 
     [HttpGet("")]
-    public IActionResult Index() =>
-        View("~/Areas/Sandbox/Views/Patterns/RoomOffer/Index.cshtml", new RoomOfferModel());
+    public IActionResult Index()
+        => View("~/Areas/Sandbox/Views/Patterns/RoomOffer/Index.cshtml", new RoomOfferModel());
 
     [HttpPost("Send")]
     public IActionResult Send([FromBody] RoomOfferModel? offer)

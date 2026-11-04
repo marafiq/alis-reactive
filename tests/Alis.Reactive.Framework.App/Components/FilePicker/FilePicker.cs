@@ -28,7 +28,7 @@ public sealed class FilesChosen : JsObject;
 public static class FilePickerHtml
 {
     public static RenderedComponent<FilePicker, TModel> FilePicker<TModel, TProp>(this InputBoundField<TModel, TProp> field)
-        where TModel : class =>
-        field.Render<FilePicker>(new HtmlString(
+        where TModel : class
+        => field.Render<FilePicker>(new HtmlString(
             $"<input class=\"file-picker\" id=\"{HtmlEncoder.Default.Encode(field.ElementId)}\" type=\"file\" multiple>"));
 }

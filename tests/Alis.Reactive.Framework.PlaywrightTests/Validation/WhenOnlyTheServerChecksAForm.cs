@@ -5,8 +5,8 @@ public sealed class WhenOnlyTheServerChecksAForm : AppPageTest
 {
     private ILocator Summary => Page.Locator("[data-reactive-validation-summary]");
 
-    private ILocator Field(string form, string label) =>
-        Page.Locator($"#{form} > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
+    private ILocator Field(string form, string label)
+        => Page.Locator($"#{form} > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
 
     private async Task SignOut(string resident)
     {

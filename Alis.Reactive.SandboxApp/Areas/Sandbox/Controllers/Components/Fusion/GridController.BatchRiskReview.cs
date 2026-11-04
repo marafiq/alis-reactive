@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("BatchRiskReview"), ActionName("BatchRiskReview")]
-        public IActionResult FallsHuddlePage() =>
-            View(
+        public IActionResult FallsHuddlePage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchRiskReview.cshtml",
                 new FallsHuddleViewModel
                 {

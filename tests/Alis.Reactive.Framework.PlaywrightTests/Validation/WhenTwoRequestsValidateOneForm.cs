@@ -18,8 +18,8 @@ public sealed class WhenTwoRequestsValidateOneForm : AppPageTest
 
     private ILocator Saved => Page.Locator("#saved");
 
-    private ILocator ResidentWanted =>
-        Page.Locator("#handover-form > div")
+    private ILocator ResidentWanted
+        => Page.Locator("#handover-form > div")
             .Filter(new() { Has = Page.GetByLabel("Resident") })
             .GetByText("Name the resident.", new() { Exact = true });
 

@@ -31,8 +31,8 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
     private DropDownListLocator Facility => _plan.DropDownList(m => m.SelectedFacilityId);
     private NativeCheckBoxLocator ScheduleLocked => _plan.NativeCheckBox(m => m.ScheduleLocked);
     private NativeCheckBoxLocator NeedsCoverageOnly => _plan.NativeCheckBox(m => m.NeedsCoverageOnly);
-    private DropDownListLocator NewShiftStaff =>
-        new(Page, IdGenerator.For<NewAssignmentModel>(m => m.StaffId));
+    private DropDownListLocator NewShiftStaff
+        => new(Page, IdGenerator.For<NewAssignmentModel>(m => m.StaffId));
 
     private static DateTime OpenHourToday => DateTime.Today.AddHours(16);
 
@@ -66,13 +66,13 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         return SummaryOf(facility, ((to - from).Days + 1) * 3, from, to);
     }
 
-    private static Regex SummaryOf(string facility, int shifts, DateTime from, DateTime to) =>
-        new("^" + Regex.Escape($"{facility}: ") + @"\d+" +
+    private static Regex SummaryOf(string facility, int shifts, DateTime from, DateTime to)
+        => new("^" + Regex.Escape($"{facility}: ") + @"\d+" +
             Regex.Escape($" of {shifts} shifts need coverage from {from.ToString("MMMM d", CultureInfo.InvariantCulture)} " +
                          $"to {to.ToString("MMMM d, yyyy", CultureInfo.InvariantCulture)}.") + "$");
 
-    private async Task<int> ShiftsNeedingCoverage() =>
-        int.Parse(Regex.Match(await Summary.InnerTextAsync(), @": (\d+) of").Groups[1].Value, CultureInfo.InvariantCulture);
+    private async Task<int> ShiftsNeedingCoverage()
+        => int.Parse(Regex.Match(await Summary.InnerTextAsync(), @": (\d+) of").Groups[1].Value, CultureInfo.InvariantCulture);
 
     private async Task ClickOpenHourToday()
     {
@@ -96,8 +96,8 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
         await ClickWhenStable(Page.Locator("#btn-create-assignment"));
     }
 
-    private ILocator StaffChoice(string staff) =>
-        AssignmentForm.GetByRole(AriaRole.Radio, new() { Name = staff, Exact = true });
+    private ILocator StaffChoice(string staff)
+        => AssignmentForm.GetByRole(AriaRole.Radio, new() { Name = staff, Exact = true });
 
     private async Task<(DateTime Start, int Group)> ChooseTomForTheFirstOpenShift()
     {
@@ -116,11 +116,11 @@ public class WhenUsingFusionSchedule : PlaywrightTestBase
 
     private static DateTime FallsPreventionStart => DateTime.Today.AddDays(2 - (int)DateTime.Today.DayOfWeek).AddHours(14.5);
 
-    private ILocator FallsPrevention =>
-        Schedule.Appointment("In-service: Falls prevention", FallsPreventionStart, groupIndex: 0);
+    private ILocator FallsPrevention
+        => Schedule.Appointment("In-service: Falls prevention", FallsPreventionStart, groupIndex: 0);
 
-    private ILocator RenamedFallsPrevention =>
-        Schedule.Appointment(RenamedFallsPreventionTitle, FallsPreventionStart, groupIndex: 0);
+    private ILocator RenamedFallsPrevention
+        => Schedule.Appointment(RenamedFallsPreventionTitle, FallsPreventionStart, groupIndex: 0);
 
     private async Task OpenFallsPreventionInTheEditor()
     {

@@ -36,9 +36,11 @@ namespace Alis.Reactive
         {
             var physicalPath = HostingEnvironment.MapPath(contentPath);
             if (physicalPath == null || !File.Exists(physicalPath))
+            {
                 throw new InvalidOperationException(
                     $"No file is at {contentPath} ({physicalPath}). A package's build copies its browser files into " +
                     "Content\\{PackageId}\\; build the app before it serves a page.");
+            }
 
             var written = File.GetLastWriteTimeUtc(physicalPath);
             var version = Versions.AddOrUpdate(

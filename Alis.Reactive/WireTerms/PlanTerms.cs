@@ -102,10 +102,12 @@ namespace Alis.Reactive.WireTerms
         {
             var hasInvalidCharacters = !Pattern.IsMatch(value);
             if (hasInvalidCharacters)
+            {
                 throw new ArgumentException(
                     "Route param name '" + value + "' contains invalid characters. " +
                     "Names must match [a-zA-Z0-9_] (ASCII only) to align with URL template placeholders.",
                     nameof(value));
+            }
         }
 
         internal static RouteParameterName Of(string value) => new RouteParameterName(value);

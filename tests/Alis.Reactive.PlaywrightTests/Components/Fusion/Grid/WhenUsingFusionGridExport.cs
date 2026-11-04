@@ -30,8 +30,8 @@ public class WhenUsingFusionGridExport : PlaywrightTestBase
     private PagePlan<RosterExportModel> _plan = null!;
 
     private ILocator Rows => Page.Locator($"#{CensusId} .e-row");
-    private ILocator CensusDays(string resident) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{CensusDaysColumn}']");
+    private ILocator CensusDays(string resident)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{CensusDaysColumn}']");
     private ILocator Summary => Page.Locator("#census-summary");
     private ILocator DownloadExcel => Page.Locator("#download-census-excel");
     private ILocator DownloadCsv => Page.Locator("#download-census-csv");
@@ -53,8 +53,8 @@ public class WhenUsingFusionGridExport : PlaywrightTestBase
         return (download.SuggestedFilename, await File.ReadAllBytesAsync(path));
     }
 
-    private static string[] CsvLines(byte[] csv) =>
-        Encoding.UTF8.GetString(csv).TrimStart('﻿').Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+    private static string[] CsvLines(byte[] csv)
+        => Encoding.UTF8.GetString(csv).TrimStart('﻿').Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
     private static string WorkbookStrings(byte[] xlsx)
     {

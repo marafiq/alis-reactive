@@ -13,7 +13,10 @@ namespace Alis.Reactive.Members
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             while (expression is UnaryExpression unary
                    && (unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked))
+            {
                 expression = unary.Operand;
+            }
+
             return expression;
         }
 
@@ -32,8 +35,8 @@ namespace Alis.Reactive.Members
             return reads.Found;
         }
 
-        internal static bool IsValueMember(MemberInfo member) =>
-            member.DeclaringType?.Namespace?.StartsWith("System", StringComparison.Ordinal) == true;
+        internal static bool IsValueMember(MemberInfo member)
+            => member.DeclaringType?.Namespace?.StartsWith("System", StringComparison.Ordinal) == true;
 
         internal static bool TryContains(MethodCallExpression call, out Expression source, out Expression item)
         {
@@ -61,8 +64,8 @@ namespace Alis.Reactive.Members
             return true;
         }
 
-        private static bool IsNullComparer(Expression comparer) =>
-            StripConvert(comparer) is ConstantExpression constant && constant.Value == null;
+        private static bool IsNullComparer(Expression comparer)
+            => StripConvert(comparer) is ConstantExpression constant && constant.Value == null;
 
         private static Expression WithoutSpanConversion(Expression expression)
         {

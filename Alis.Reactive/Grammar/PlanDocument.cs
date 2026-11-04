@@ -40,8 +40,8 @@ namespace Alis.Reactive.Grammar
         public VendorListening Listen { get; }
         public VendorEventPayload Payload { get; }
 
-        internal bool SameAs(Vendor other) =>
-            string.Join(".", ObjectPath) == string.Join(".", other.ObjectPath)
+        internal bool SameAs(Vendor other)
+            => string.Join(".", ObjectPath) == string.Join(".", other.ObjectPath)
             && Listen.SameAs(other.Listen)
             && Payload == other.Payload;
     }
@@ -68,8 +68,8 @@ namespace Alis.Reactive.Grammar
         public string Subscribe { get; }
         public string Unsubscribe { get; }
 
-        internal override bool SameAs(VendorListening other) =>
-            other is MethodVendorListening method && method.Subscribe == Subscribe && method.Unsubscribe == Unsubscribe;
+        internal override bool SameAs(VendorListening other)
+            => other is MethodVendorListening method && method.Subscribe == Subscribe && method.Unsubscribe == Unsubscribe;
     }
 
     internal sealed class AssignmentVendorListening : VendorListening

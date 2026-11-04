@@ -118,8 +118,8 @@ namespace Alis.Reactive
 
     internal static class RuleTarget
     {
-        internal static IRuleTarget<T, TValue> Of<T, TValue>(IRuleBuilder<T, TValue> rule) =>
-            rule as IRuleTarget<T, TValue>
+        internal static IRuleTarget<T, TValue> Of<T, TValue>(IRuleBuilder<T, TValue> rule)
+            => rule as IRuleTarget<T, TValue>
             ?? throw new ArgumentException("Write a check on a rule a ReactiveValidator declares: RuleFor(x => x.Member).", nameof(rule));
     }
 }

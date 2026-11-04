@@ -79,8 +79,8 @@ public sealed class Slate : Component
 
     public void AddRowBy(Arg<string> label) => Method(label, Fixed("page"));
 
-    public void SummarizeAny<TItems>(TypedSource<TItems> labels) where TItems : IEnumerable<object> =>
-        Method(Pass<IEnumerable<object>, TItems>(labels), name: "summarize");
+    public void SummarizeAny<TItems>(TypedSource<TItems> labels) where TItems : IEnumerable<object>
+        => Method(Pass<IEnumerable<object>, TItems>(labels), name: "summarize");
 
     public ReadOnly<string[]> LabelArray => ReadOnly<string[]>(name: "labels");
 

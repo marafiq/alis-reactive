@@ -37,8 +37,8 @@ namespace Alis.Reactive.Inputs
     {
         private readonly Dictionary<string, RenderedInput> _inputs = new Dictionary<string, RenderedInput>(StringComparer.Ordinal);
 
-        internal IReadOnlyList<KeyValuePair<string, RenderedInput>> Entries =>
-            new List<KeyValuePair<string, RenderedInput>>(_inputs);
+        internal IReadOnlyList<KeyValuePair<string, RenderedInput>> Entries
+            => new List<KeyValuePair<string, RenderedInput>>(_inputs);
 
         internal void Add(RenderedInput input) => _inputs.Add(input.BindingPath, input);
 

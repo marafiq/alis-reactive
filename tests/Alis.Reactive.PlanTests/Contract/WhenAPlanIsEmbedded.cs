@@ -20,13 +20,13 @@ public class WhenAPlanIsEmbedded
         Assert.That(result.IsValid, Is.True, $"{golden} does not conform to plan.schema.json:\n{Errors(result)}");
     }
 
-    private static IEnumerable<string> Goldens() =>
-        Directory.EnumerateFiles(Golden.Root, "*.json", SearchOption.AllDirectories)
+    private static IEnumerable<string> Goldens()
+        => Directory.EnumerateFiles(Golden.Root, "*.json", SearchOption.AllDirectories)
             .Select(path => Path.GetRelativePath(Golden.Root, path))
             .OrderBy(path => path, StringComparer.Ordinal);
 
-    private static string Errors(EvaluationResults result) =>
-        string.Join("\n", (result.Details ?? [])
+    private static string Errors(EvaluationResults result)
+        => string.Join("\n", (result.Details ?? [])
             .Where(detail => detail.Errors != null)
             .Select(detail => $"  {detail.InstanceLocation}: {string.Join("; ", detail.Errors!.Select(error => error.Key + ": " + error.Value))}"));
 }

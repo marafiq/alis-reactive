@@ -9,8 +9,9 @@ paths:
 
 `dotnet format` formats C# by the root `.editorconfig`: Roslyn's own, changed only where this repo's rules
 differ. A guard clause stays on one line, and CA1822 looks only at private members, because a plan node's
-`Kind` must stay an instance member for the serializer to write it. `scripts/test.sh` fails on any file the
-formatter would change. Never format by hand or by script.
+`Kind` must stay an instance member for the serializer to write it. `dotnet build` fails on every rule the
+`.editorconfig` raises to a warning, and `scripts/test.sh` fails on any file the formatter would change.
+Never format by hand or by script.
 
 ## The public surface
 

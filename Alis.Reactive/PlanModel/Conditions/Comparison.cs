@@ -36,8 +36,8 @@ namespace Alis.Reactive
 
         internal bool IsEquality { get; }
 
-        internal bool Orders(int order) =>
-            this == GreaterThan ? order > 0
+        internal bool Orders(int order)
+            => this == GreaterThan ? order > 0
             : this == GreaterThanOrEqual ? order >= 0
             : this == LessThan ? order < 0
             : order <= 0;

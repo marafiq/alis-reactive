@@ -40,8 +40,8 @@ namespace Alis.Reactive.Razor
                 "number, a bool, a date, a Guid or an enum. Raise a payload that holds a record or a list from a pipeline, with p.Dispatch.");
         }
 
-        private static string TextOf(JsonElement value) =>
-            value.ValueKind == JsonValueKind.String ? value.GetString()! : value.GetRawText();
+        private static string TextOf(JsonElement value)
+            => value.ValueKind == JsonValueKind.String ? value.GetString()! : value.GetRawText();
 
         private static string DatasetAttribute(string member)
         {

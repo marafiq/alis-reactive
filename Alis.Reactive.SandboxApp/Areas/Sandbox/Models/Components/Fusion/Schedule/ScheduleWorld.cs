@@ -33,8 +33,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             };
         }
 
-        public ShiftAssignment? FindAssignment(int assignmentId) =>
-            OpenedWeeks().SelectMany(week => week.Assignments).FirstOrDefault(a => a.Id == assignmentId);
+        public ShiftAssignment? FindAssignment(int assignmentId)
+            => OpenedWeeks().SelectMany(week => week.Assignments).FirstOrDefault(a => a.Id == assignmentId);
 
         public ShiftAssignment? AssignStaff(int assignmentId, int staffId)
         {
@@ -103,8 +103,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             };
         }
 
-        private ShiftAssignment? FindInService(int inServiceId) =>
-            FindAssignment(inServiceId) is { IsInService: true } inService ? inService : null;
+        private ShiftAssignment? FindInService(int inServiceId)
+            => FindAssignment(inServiceId) is { IsInService: true } inService ? inService : null;
 
         private static string TrainingOf(ShiftAssignment inService) => inService.Subject.Replace(InServicePrefix, "");
 
@@ -147,14 +147,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
             return seeded;
         }
 
-        private IEnumerable<(string Key, List<ShiftAssignment> Assignments)> OpenedWeeks() =>
-            _session.Keys
+        private IEnumerable<(string Key, List<ShiftAssignment> Assignments)> OpenedWeeks()
+            => _session.Keys
                 .Where(key => key.StartsWith(WeekKeyPrefix, StringComparison.Ordinal))
                 .ToList()
                 .Select(key => (key, JsonSerializer.Deserialize<List<ShiftAssignment>>(_session.GetString(key)!)!));
 
-        private void Save(string key, List<ShiftAssignment> week) =>
-            _session.SetString(key, JsonSerializer.Serialize(week));
+        private void Save(string key, List<ShiftAssignment> week)
+            => _session.SetString(key, JsonSerializer.Serialize(week));
 
         private static string WeekKey(string facilityId, DateTime sunday) => $"{WeekKeyPrefix}{facilityId}|{sunday:yyyy-MM-dd}";
 

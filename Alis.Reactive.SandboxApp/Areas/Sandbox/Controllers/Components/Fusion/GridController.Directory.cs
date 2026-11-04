@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.Fusion;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -9,8 +9,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private const int DirectoryPageSize = 8;
 
         [HttpGet("Directory"), ActionName("Directory")]
-        public IActionResult DirectoryPage() =>
-            View(
+        public IActionResult DirectoryPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/Directory.cshtml",
                 new DirectoryViewModel { SurnameTabs = DirectorySurnameTabs() });
 
@@ -46,8 +46,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpPost("DirectoryNextOnRounds")]
-        public IActionResult DirectoryNextOnRounds([FromBody] DirectoryNextRequest request) =>
-            Ok(new DirectoryNextResident
+        public IActionResult DirectoryNextOnRounds([FromBody] DirectoryNextRequest request)
+            => Ok(new DirectoryNextResident
             {
                 RowIndex = request.SelectedRowIndexes.Count == 0 ? -1 : request.SelectedRowIndexes.Max() + 1
             });
@@ -102,8 +102,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static string DirectoryResidentNoun(int count) => count == 1 ? "resident" : "residents";
 
-        private static string DirectoryChange(DirectoryQuery query, int total) =>
-            query.Change switch
+        private static string DirectoryChange(DirectoryQuery query, int total)
+            => query.Change switch
             {
                 "" => "Every resident, in surname order.",
                 FusionGridAction.Paging => $"Page {query.ChangedToPage} of {Math.Max(1, (total + query.Take - 1) / query.Take)}.",
@@ -140,11 +140,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return active == null ? "Search cleared." : $"Searched for \"{active.Key}\".";
         }
 
-        private static string DirectoryFilterWords(FusionGridTextFilterCriterion leaf) =>
-            $"{DirectoryColumnOf(leaf.Field).Label} {DirectoryOperatorWords(leaf.Operator)} \"{leaf.Value}\"";
+        private static string DirectoryFilterWords(FusionGridTextFilterCriterion leaf)
+            => $"{DirectoryColumnOf(leaf.Field).Label} {DirectoryOperatorWords(leaf.Operator)} \"{leaf.Value}\"";
 
-        private static string DirectoryOperatorWords(string comparison) =>
-            comparison switch
+        private static string DirectoryOperatorWords(string comparison)
+            => comparison switch
             {
                 "equal" => "is",
                 "notequal" => "is not",
@@ -154,11 +154,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 _ => throw new ArgumentException($"The directory cannot compare by '{comparison}'.")
             };
 
-        private static IEnumerable<FusionGridTextFilterCriterion> DirectoryFilterLeaves(IEnumerable<FusionGridTextFilterCriterion> nodes) =>
-            nodes.SelectMany(node => node.IsComplex ? DirectoryFilterLeaves(node.Predicates) : new[] { node });
+        private static IEnumerable<FusionGridTextFilterCriterion> DirectoryFilterLeaves(IEnumerable<FusionGridTextFilterCriterion> nodes)
+            => nodes.SelectMany(node => node.IsComplex ? DirectoryFilterLeaves(node.Predicates) : new[] { node });
 
-        private static IEnumerable<DirectoryEntry> DirectoryFiltered(IEnumerable<DirectoryEntry> residents, List<FusionGridTextFilterCriterion> where) =>
-            residents.Where(resident => where.All(node => DirectorySatisfies(resident, node)));
+        private static IEnumerable<DirectoryEntry> DirectoryFiltered(IEnumerable<DirectoryEntry> residents, List<FusionGridTextFilterCriterion> where)
+            => residents.Where(resident => where.All(node => DirectorySatisfies(resident, node)));
 
         private static bool DirectorySatisfies(DirectoryEntry resident, FusionGridTextFilterCriterion node)
         {
@@ -173,8 +173,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             };
         }
 
-        private static IEnumerable<DirectoryEntry> DirectorySearched(IEnumerable<DirectoryEntry> residents, List<FusionGridSearchDescriptor> search) =>
-            search.Where(s => s.Key.Length > 0).Aggregate(
+        private static IEnumerable<DirectoryEntry> DirectorySearched(IEnumerable<DirectoryEntry> residents, List<FusionGridSearchDescriptor> search)
+            => search.Where(s => s.Key.Length > 0).Aggregate(
                 residents,
                 (found, s) => found.Where(resident => s.Fields.Any(field =>
                     DirectoryCompare(DirectoryColumnOf(field).Text(resident), s.Operator, s.Key, s.IgnoreCase, s.IgnoreAccent))));
@@ -230,8 +230,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 .ToList();
         }
 
-        private static DirectoryColumn DirectoryColumnOf(string field) =>
-            Array.Find(DirectoryColumns, column => column.Field == field)
+        private static DirectoryColumn DirectoryColumnOf(string field)
+            => Array.Find(DirectoryColumns, column => column.Field == field)
                 ?? throw new ArgumentException($"The directory has no column '{field}'.");
 
         private static string DirectoryFirstNameFirst(string surnameFirst)
@@ -251,8 +251,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private const string DirectoryAccented = "ÁáÉéÍíÓóÚúËëÖöÜüÑñ";
         private const string DirectoryUnaccented = "AaEeIiOoUuEeOoUuNn";
 
-        private static DirectoryResident ToDirectoryResident(DirectoryEntry entry) =>
-            new()
+        private static DirectoryResident ToDirectoryResident(DirectoryEntry entry)
+            => new()
             {
                 ResidentId = entry.ResidentId,
                 ResidentName = entry.ResidentName,

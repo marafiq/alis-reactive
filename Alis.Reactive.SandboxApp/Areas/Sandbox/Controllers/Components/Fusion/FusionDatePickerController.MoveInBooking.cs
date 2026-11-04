@@ -7,8 +7,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     public partial class FusionDatePickerController
     {
         [HttpGet("MoveInBooking")]
-        public IActionResult MoveInBooking() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/FusionDatePicker/MoveInBooking.cshtml", new MoveInBookingModel());
+        public IActionResult MoveInBooking()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/FusionDatePicker/MoveInBooking.cshtml", new MoveInBookingModel());
 
         [HttpPost("MoveInBooking/Book")]
         public IActionResult BookMoveIn([FromBody] MoveInBookingModel? booking)

@@ -62,8 +62,8 @@ namespace Alis.Reactive.Analyzers.ControlFlow
                          "function declare entries too, so they are allowed.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -100,7 +100,9 @@ namespace Alis.Reactive.Analyzers.ControlFlow
 
             if (!HasAnalyzedParameter(lambda, context.SemanticModel,
                 pipelineBuilderType, triggerBuilderType, context.CancellationToken))
+            {
                 return;
+            }
 
             foreach (var node in lambda.Body.DescendantNodesAndSelf(IsTheCallbacksOwnCode))
             {

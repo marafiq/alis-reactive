@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     public class OutingRosterController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/OutingRoster/Index.cshtml", new OutingRosterModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/OutingRoster/Index.cshtml", new OutingRosterModel());
 
         [HttpGet("Residents")]
         public IActionResult Residents([FromQuery] OutingRosterModel roster)

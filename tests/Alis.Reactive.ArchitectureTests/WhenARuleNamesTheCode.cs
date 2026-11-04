@@ -45,32 +45,32 @@ public class WhenARuleNamesTheCode
     private static readonly Lazy<Audit> Findings = new(RunAudit);
 
     [Test]
-    public void every_rule_file_is_read_whole() =>
-        AssertNone(Findings.Value.Unread, "A rule file this guard cannot read is a rule it cannot keep true:");
+    public void every_rule_file_is_read_whole()
+        => AssertNone(Findings.Value.Unread, "A rule file this guard cannot read is a rule it cannot keep true:");
 
     [Test]
-    public void every_path_a_rule_names_is_in_the_repo() =>
-        AssertNone(Findings.Value.Paths, "A rule names a path the repo does not hold. Name the file as it is now, by its path from the rule's folder or the root:");
+    public void every_path_a_rule_names_is_in_the_repo()
+        => AssertNone(Findings.Value.Paths, "A rule names a path the repo does not hold. Name the file as it is now, by its path from the rule's folder or the root:");
 
     [Test]
-    public void every_glob_a_rule_file_loads_on_matches_a_file() =>
-        AssertNone(Findings.Value.Scopes, "A rule file's paths glob matches no file, so the rule never loads:");
+    public void every_glob_a_rule_file_loads_on_matches_a_file()
+        => AssertNone(Findings.Value.Scopes, "A rule file's paths glob matches no file, so the rule never loads:");
 
     [Test]
-    public void every_name_a_rule_cites_is_one_the_code_uses() =>
-        AssertNone(Findings.Value.Names, "A rule cites a name no C#, TypeScript or file in the repo uses. Name it as the code does now:");
+    public void every_name_a_rule_cites_is_one_the_code_uses()
+        => AssertNone(Findings.Value.Names, "A rule cites a name no C#, TypeScript or file in the repo uses. Name it as the code does now:");
 
     [Test]
-    public void every_text_a_rule_quotes_occurs_in_the_source() =>
-        AssertNone(Findings.Value.Texts, "A rule quotes text that occurs in no source file. Quote it as the code writes it now:");
+    public void every_text_a_rule_quotes_occurs_in_the_source()
+        => AssertNone(Findings.Value.Texts, "A rule quotes text that occurs in no source file. Quote it as the code writes it now:");
 
     [Test]
-    public void every_member_a_rule_quotes_is_declared_as_quoted() =>
-        AssertNone(Findings.Value.Members, "A rule quotes a member no declaration in the code matches. Quote the declaration as it is now, or mark the block `csharp illustration`:");
+    public void every_member_a_rule_quotes_is_declared_as_quoted()
+        => AssertNone(Findings.Value.Members, "A rule quotes a member no declaration in the code matches. Quote the declaration as it is now, or mark the block `csharp illustration`:");
 
     [Test]
-    public void every_option_a_rule_passes_to_a_script_is_one_the_script_reads() =>
-        AssertNone(Findings.Value.Options, "A rule passes an option or names an npm script the repo does not have:");
+    public void every_option_a_rule_passes_to_a_script_is_one_the_script_reads()
+        => AssertNone(Findings.Value.Options, "A rule passes an option or names an npm script the repo does not have:");
 
     [Test]
     public void every_listed_exception_is_cited_and_needed()
@@ -85,8 +85,8 @@ public class WhenARuleNamesTheCode
         AssertNone(problems, "The list of what rules cite from outside the repo holds only what a rule cites and the repo lacks:");
     }
 
-    private static void AssertNone(IReadOnlyCollection<string> problems, string header) =>
-        Assert.That(problems, Is.Empty, header + "\n" + string.Join("\n", problems));
+    private static void AssertNone(IReadOnlyCollection<string> problems, string header)
+        => Assert.That(problems, Is.Empty, header + "\n" + string.Join("\n", problems));
 
     private sealed record Citation(string At, string Text, bool IsShellLine);
 
@@ -103,8 +103,8 @@ public class WhenARuleNamesTheCode
         public readonly HashSet<string> Listed = new(StringComparer.Ordinal);
     }
 
-    private static IReadOnlyList<RuleFile> ReadRules() =>
-        Repository.TrackedFiles
+    private static IReadOnlyList<RuleFile> ReadRules()
+        => Repository.TrackedFiles
             .Where(path => Path.GetFileName(path) == "CLAUDE.md" || Regex.IsMatch(path, @"^\.claude/(rules|agents)/[^/]+\.md$"))
             .Select(ReadRule)
             .ToList();
@@ -161,8 +161,11 @@ public class WhenARuleNamesTheCode
     {
         var folders = new HashSet<string>(StringComparer.Ordinal);
         foreach (var file in Repository.TrackedFiles)
+        {
             for (var slash = file.IndexOf('/'); slash > 0; slash = file.IndexOf('/', slash + 1))
                 folders.Add(file[..slash]);
+        }
+
         return (Repository.TrackedFiles.ToHashSet(StringComparer.Ordinal), folders);
     }
 
@@ -221,8 +224,10 @@ public class WhenARuleNamesTheCode
         }
 
         if (unparsed.Count > 0)
+        {
             throw new InvalidOperationException("The guard reads the code through Roslyn and could not parse it, so a name in it would go unseen:\n"
                                                 + string.Join("\n", unparsed));
+        }
 
         names.UnionWith(Scripts.Tracked.Identifiers);
         foreach (var code in Scripts.Tracked.Code) source.Append(code).Append('\0');
@@ -303,11 +308,11 @@ public class WhenARuleNamesTheCode
         }
     }
 
-    private static bool IsPathShaped(string word) =>
-        !word.StartsWith('/') && !word.StartsWith('-') && !word.StartsWith('"') && (word.Contains('/') || FileName.IsMatch(word));
+    private static bool IsPathShaped(string word)
+        => !word.StartsWith('/') && !word.StartsWith('-') && !word.StartsWith('"') && (word.Contains('/') || FileName.IsMatch(word));
 
-    private static bool IsShellCommand(string[] words) =>
-        ShellCommands.Contains(words[0]) || EnvironmentAssignment.IsMatch(words[0]) || words.Any(word => IsPathShaped(word) && Script.IsMatch(word));
+    private static bool IsShellCommand(string[] words)
+        => ShellCommands.Contains(words[0]) || EnvironmentAssignment.IsMatch(words[0]) || words.Any(word => IsPathShaped(word) && Script.IsMatch(word));
 
     private static bool IsListed(string cited, Audit audit)
     {
@@ -316,8 +321,8 @@ public class WhenARuleNamesTheCode
         return true;
     }
 
-    private static bool IsInTheRepo(string entry) =>
-        IsPathShaped(entry) ? Resolve(CitedPath.Match(entry).Groups["path"].Value, "").Count > 0
+    private static bool IsInTheRepo(string entry)
+        => IsPathShaped(entry) ? Resolve(CitedPath.Match(entry).Groups["path"].Value, "").Count > 0
         : Identifier.IsMatch(entry) ? Code.Value.Names.Contains(entry)
         : Code.Value.Source.Contains(entry, StringComparison.Ordinal);
 
@@ -447,8 +452,10 @@ public class WhenARuleNamesTheCode
             .Select(token => token.ValueText)
             .Where(name => name.Length > 1 && name.Any(char.IsUpper));
         foreach (var name in names)
+        {
             if (!IsListed(name, audit) && !Code.Value.Names.Contains(name))
                 audit.Names.Add($"{at}: `{name}` (in `{code}`)");
+        }
     }
 
     private static void CheckQuoted(QuotedMember quoted, Audit audit)
@@ -471,6 +478,6 @@ public class WhenARuleNamesTheCode
         _ => "",
     };
 
-    private static string Normal(MemberDeclarationSyntax member) =>
-        member.WithAttributeLists(default).WithoutTrivia().NormalizeWhitespace().ToFullString();
+    private static string Normal(MemberDeclarationSyntax member)
+        => member.WithAttributeLists(default).WithoutTrivia().NormalizeWhitespace().ToFullString();
 }

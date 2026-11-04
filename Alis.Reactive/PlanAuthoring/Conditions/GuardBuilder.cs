@@ -36,22 +36,22 @@ namespace Alis.Reactive
         }
 
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
                 source, next => new AllGuard<TModel>(ConditionComposition.All(Graph, next), _continuation));
 
         /// <summary>Also requires a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
+        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>>(
                 source, next => new AnyGuard<TModel>(ConditionComposition.Any(Graph, next), _continuation));
 
         /// <summary>Alternatively accepts a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
+        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Negates this one comparison.</summary>
         public GuardBuilder<TModel> Not() => new GuardBuilder<TModel>(Condition.Not(Graph), _continuation);
@@ -77,13 +77,13 @@ namespace Alis.Reactive
         }
 
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>> And<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, AllGuard<TModel>>(
                 source, next => new AllGuard<TModel>(ConditionComposition.All(Graph, next), _continuation));
 
         /// <summary>Also requires a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
+        public AllGuard<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new AllGuard<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Runs <paramref name="pipeline"/> when every comparison holds.</summary>
         /// <param name="pipeline">The reactions of the branch.</param>
@@ -106,13 +106,13 @@ namespace Alis.Reactive
         }
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>> Or<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, AnyGuard<TModel>>(
                 source, next => new AnyGuard<TModel>(ConditionComposition.Any(Graph, next), _continuation));
 
         /// <summary>Alternatively accepts a group, whose own <c>And</c> and <c>Or</c> are evaluated first.</summary>
-        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
+        public AnyGuard<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new AnyGuard<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)), _continuation);
 
         /// <summary>Runs <paramref name="pipeline"/> when any comparison holds.</summary>
         /// <param name="pipeline">The reactions of the branch.</param>
@@ -130,22 +130,22 @@ namespace Alis.Reactive
         internal GroupGuard(Condition graph) : base(graph) { }
 
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
                 source, next => new GroupAll<TModel>(ConditionComposition.All(Graph, next)));
 
         /// <summary>Also requires a nested group.</summary>
-        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
+        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>>(
                 source, next => new GroupAny<TModel>(ConditionComposition.Any(Graph, next)));
 
         /// <summary>Alternatively accepts a nested group.</summary>
-        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
+        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
 
         /// <summary>Negates this one comparison.</summary>
         public GroupGuard<TModel> Not() => new GroupGuard<TModel>(Condition.Not(Graph));
@@ -158,13 +158,13 @@ namespace Alis.Reactive
         internal GroupAll(Condition graph) : base(graph) { }
 
         /// <summary>Also requires a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>> And<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, GroupAll<TModel>>(
                 source, next => new GroupAll<TModel>(ConditionComposition.All(Graph, next)));
 
         /// <summary>Also requires a nested group.</summary>
-        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
+        public GroupAll<TModel> And(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new GroupAll<TModel>(ConditionComposition.All(Graph, ConditionComposition.Group(group)));
     }
 
     /// <summary>Comparisons inside a group of which one must hold: continue with <c>Or</c>.</summary>
@@ -174,12 +174,12 @@ namespace Alis.Reactive
         internal GroupAny(Condition graph) : base(graph) { }
 
         /// <summary>Alternatively accepts a comparison of a value read when the condition runs.</summary>
-        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source) =>
-            new ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>>(
+        public ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>> Or<TProp>(TypedSource<TProp> source)
+            => new ConditionSourceBuilder<TModel, TProp, GroupAny<TModel>>(
                 source, next => new GroupAny<TModel>(ConditionComposition.Any(Graph, next)));
 
         /// <summary>Alternatively accepts a nested group.</summary>
-        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group) =>
-            new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
+        public GroupAny<TModel> Or(Func<ConditionStart<TModel>, Guard<TModel>> group)
+            => new GroupAny<TModel>(ConditionComposition.Any(Graph, ConditionComposition.Group(group)));
     }
 }

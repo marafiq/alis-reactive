@@ -72,7 +72,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     public static class WristbandRules
     {
-        public static IRuleBuilderOptions<T, string?> WristbandCode<T>(this IRuleBuilder<T, string?> rule) =>
-            rule.Matches(@"^WB-\d{6}$").WithMessage("Enter the wristband code as WB- and six digits, like WB-104233.");
+        public static IRuleBuilderOptions<T, string?> WristbandCode<T>(this IRuleBuilder<T, string?> rule)
+            => rule.Matches(@"^WB-\d{6}$").WithMessage("Enter the wristband code as WB- and six digits, like WB-104233.");
     }
 }

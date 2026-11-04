@@ -29,8 +29,8 @@ namespace Alis.Reactive.Fusion
         public void Toggle() => Method();
 
         /// <summary>Raised when the color changes.</summary>
-        public Event<FusionColorPickerChangeArgs> Change =>
-            Event<FusionColorPickerChangeArgs>();
+        public Event<FusionColorPickerChangeArgs> Change
+            => Event<FusionColorPickerChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

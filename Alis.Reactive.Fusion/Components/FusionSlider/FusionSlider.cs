@@ -26,12 +26,12 @@ namespace Alis.Reactive.Fusion
         public void DataBind() => Method();
 
         /// <summary>Raised as the handle moves.</summary>
-        public Event<FusionSliderChangeArgs> Change =>
-            Event<FusionSliderChangeArgs>();
+        public Event<FusionSliderChangeArgs> Change
+            => Event<FusionSliderChangeArgs>();
 
         /// <summary>Raised when the handle comes to rest.</summary>
-        public Event<FusionSliderChangeArgs> Changed =>
-            Event<FusionSliderChangeArgs>();
+        public Event<FusionSliderChangeArgs> Changed
+            => Event<FusionSliderChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Changed);
     }

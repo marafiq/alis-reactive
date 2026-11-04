@@ -17,8 +17,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Brought
 
         public static MedicationItem Line(
             string name, int units, decimal cost, double hours, MedicationRoute route, int hour,
-            bool controlled = false, bool reconciled = false) =>
-            new MedicationItem
+            bool controlled = false, bool reconciled = false)
+            => new MedicationItem
             {
                 Name = name,
                 Units = units,

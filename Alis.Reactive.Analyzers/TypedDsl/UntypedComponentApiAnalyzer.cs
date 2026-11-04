@@ -32,8 +32,8 @@ namespace Alis.Reactive.Analyzers.TypedDsl
 
         private const string ExemptionAttribute = "Alis.Reactive.TypedDslExemptionAttribute";
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -79,7 +79,7 @@ namespace Alis.Reactive.Analyzers.TypedDsl
 
         private static bool IsExposed(ISymbol symbol)
         {
-            for (ISymbol current = symbol; current != null && !(current is INamespaceSymbol); current = current.ContainingSymbol)
+            for (var current = symbol; current != null && !(current is INamespaceSymbol); current = current.ContainingSymbol)
             {
                 var exposed = current.DeclaredAccessibility == Accessibility.Public
                     || current.DeclaredAccessibility == Accessibility.Protected
@@ -142,8 +142,8 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             return false;
         }
 
-        private static bool IsNamed(ITypeSymbol type, string definitionName) =>
-            type is INamedTypeSymbol named && named.OriginalDefinition.ToDisplayString() == definitionName;
+        private static bool IsNamed(ITypeSymbol type, string definitionName)
+            => type is INamedTypeSymbol named && named.OriginalDefinition.ToDisplayString() == definitionName;
 
         private static bool IsUntypedValue(ITypeSymbol type)
         {
@@ -158,15 +158,15 @@ namespace Alis.Reactive.Analyzers.TypedDsl
             return false;
         }
 
-        private static bool IsDelegate(INamedTypeSymbol type) =>
-            type.TypeKind == TypeKind.Delegate
+        private static bool IsDelegate(INamedTypeSymbol type)
+            => type.TypeKind == TypeKind.Delegate
             || (type.Name == "Expression" && type.ContainingNamespace?.ToDisplayString() == "System.Linq.Expressions");
 
-        private static bool IsUntypedArgument(ITypeSymbol type) =>
-            type.ToDisplayString() == "Alis.Reactive.Arg";
+        private static bool IsUntypedArgument(ITypeSymbol type)
+            => type.ToDisplayString() == "Alis.Reactive.Arg";
 
-        private static bool IsMemberNamingString(IParameterSymbol parameter) =>
-            parameter.Type.SpecialType == SpecialType.System_String
+        private static bool IsMemberNamingString(IParameterSymbol parameter)
+            => parameter.Type.SpecialType == SpecialType.System_String
             && MemberNamingParameters.Contains(parameter.Name);
 
         private static string Describe(ITypeSymbol type) => type.ToDisplayString();

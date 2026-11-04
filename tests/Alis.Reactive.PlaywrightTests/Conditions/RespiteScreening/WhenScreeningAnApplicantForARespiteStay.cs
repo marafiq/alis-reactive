@@ -31,8 +31,8 @@ public class WhenScreeningAnApplicantForARespiteStay : PlaywrightTestBase
         await field.BlurAsync();
     }
 
-    private async Task Choose(string label, string option) =>
-        await Field(label).SelectOptionAsync(new SelectOptionValue { Label = option });
+    private async Task Choose(string label, string option)
+        => await Field(label).SelectOptionAsync(new SelectOptionValue { Label = option });
 
     private async Task CheckTheWing()
     {

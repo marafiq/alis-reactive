@@ -75,9 +75,11 @@ namespace Alis.Reactive.Fusion
             var path = PropertyPathOf(field);
             var declared = _fields.FirstOrDefault(candidate => candidate.FieldName == path);
             if (declared == null)
+            {
                 throw new InvalidOperationException(
                     $"No client validation rules are declared for '{path}'. " +
                     "Add a rule for it on the validator, or remove the ValidationRules emit for this column.");
+            }
 
             var rules = Ej2ColumnRules.From(declared);
             return rules.Count == 0 ? null : rules;

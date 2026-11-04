@@ -8,12 +8,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
         private const int MargaretHillId = 2107;
 
         [HttpGet("ShiftNote")]
-        public IActionResult ShiftNote() =>
-            View("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/ShiftNote.cshtml", new ShiftNotePageModel());
+        public IActionResult ShiftNote()
+            => View("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/ShiftNote.cshtml", new ShiftNotePageModel());
 
         [HttpGet("ShiftNote/Form")]
-        public IActionResult ShiftNoteForm() =>
-            PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_ShiftNotePartial.cshtml",
+        public IActionResult ShiftNoteForm()
+            => PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_ShiftNotePartial.cshtml",
                 new ShiftNoteModel { ResidentId = MargaretHillId });
 
         [HttpPost("ShiftNote/Save")]

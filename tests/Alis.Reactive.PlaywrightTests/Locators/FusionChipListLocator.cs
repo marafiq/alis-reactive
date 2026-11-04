@@ -18,8 +18,8 @@ public sealed class FusionChipListLocator
 
     public ILocator Chips => Root.Locator(".e-chip");
 
-    public ILocator Chip(string text) =>
-        Chips.Filter(new() { HasTextRegex = new Regex("^" + Regex.Escape(text) + "$") });
+    public ILocator Chip(string text)
+        => Chips.Filter(new() { HasTextRegex = new Regex("^" + Regex.Escape(text) + "$") });
 
     public ILocator SelectedChips => Root.Locator(".e-chip.e-active");
 

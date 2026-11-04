@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("ResidentAdmissionAudit"), ActionName("ResidentAdmissionAudit")]
-        public IActionResult MoveInDayPage() =>
-            View(
+        public IActionResult MoveInDayPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/ResidentAdmissionAudit.cshtml",
                 new MoveInDayViewModel
                 {

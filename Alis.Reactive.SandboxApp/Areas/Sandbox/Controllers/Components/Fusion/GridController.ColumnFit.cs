@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("ColumnFit"), ActionName("ColumnFit")]
-        public IActionResult MedPassSheetPage() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/Grid/ColumnFit.cshtml", new MedPassSheetViewModel());
+        public IActionResult MedPassSheetPage()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/Grid/ColumnFit.cshtml", new MedPassSheetViewModel());
 
         [HttpGet("ColumnFitDoses")]
         public IActionResult ColumnFitDoses() => Ok(new List<MedPassDose>

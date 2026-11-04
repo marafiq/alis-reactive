@@ -27,8 +27,8 @@ public class WhenSpecializedRulesApply : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
     }
 
-    private void AssertNothingSent() =>
-        Assert.That(_checksSent, Is.Empty, "The browser refused the value, so the page sent nothing.");
+    private void AssertNothingSent()
+        => Assert.That(_checksSent, Is.Empty, "The browser refused the value, so the page sent nothing.");
 
     [Test]
     public async Task when_billing_enters_invalid_card_number_error_shows()

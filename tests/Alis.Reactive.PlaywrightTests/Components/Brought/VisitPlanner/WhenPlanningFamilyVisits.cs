@@ -420,15 +420,15 @@ public class WhenPlanningFamilyVisits : PlaywrightTestBase
         internal ILocator Times => _root.Locator("button.vp-slot");
         internal ILocator Booked => _root.Locator("button.vp-slot[aria-pressed='true']");
 
-        internal ILocator Time(string label) =>
-            _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
+        internal ILocator Time(string label)
+            => _root.GetByRole(AriaRole.Button, new() { Name = label, Exact = true });
 
         internal ILocator NoteUnder(string label) => ItemOf(label).Locator(".vp-note");
 
         internal ILocator WaitlistUnder(string label) => ItemOf(label).Locator(".vp-waitlist");
 
-        private ILocator ItemOf(string label) =>
-            _root.Locator("li.vp-item")
+        private ILocator ItemOf(string label)
+            => _root.Locator("li.vp-item")
                 .Filter(new() { Has = _root.Page.GetByRole(AriaRole.Button, new() { Name = label, Exact = true }) });
     }
 }

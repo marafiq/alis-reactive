@@ -9,8 +9,8 @@ namespace Alis.Reactive.Components
     {
         internal static Shape Of(Type type) => Of(type, new HashSet<Type>());
 
-        private static Shape Of(Type type, HashSet<Type> enclosingRecords) =>
-            ClrShape.Of(type, candidate =>
+        private static Shape Of(Type type, HashSet<Type> enclosingRecords)
+            => ClrShape.Of(type, candidate =>
                 IsDataClass(candidate) && enclosingRecords.Add(candidate) ? RecordOf(candidate, enclosingRecords) : Shape.Any);
 
         private static bool IsDataClass(Type type) => ClrShape.IsDataClass(type) && !typeof(JsObject).IsAssignableFrom(type);

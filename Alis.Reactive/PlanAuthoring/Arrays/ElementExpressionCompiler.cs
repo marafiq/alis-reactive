@@ -6,10 +6,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Alis.Reactive.PlanModel.Values;
-using Alis.Reactive.WireTerms;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive.PlanAuthoring.Arrays
 {
@@ -47,23 +47,23 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
 
         private const string Tests = "String.Contains, String.StartsWith, String.EndsWith, String.IsNullOrEmpty, Enumerable.Contains and Regex.IsMatch";
 
-        private static string? PureMethodName(MethodInfo method) =>
-            PureMethods.TryGetValue(method, out var name) ? name : method.GetCustomAttribute<PureMethodAttribute>()?.JavaScriptName;
+        private static string? PureMethodName(MethodInfo method)
+            => PureMethods.TryGetValue(method, out var name) ? name : method.GetCustomAttribute<PureMethodAttribute>()?.JavaScriptName;
 
-        private static IEnumerable<string> PureMethodNames(Type? objectType) =>
-            PureMethods.Keys
+        private static IEnumerable<string> PureMethodNames(Type? objectType)
+            => PureMethods.Keys
                 .Concat(objectType?.GetMethods().Where(method => method.GetCustomAttribute<PureMethodAttribute>() != null) ?? Enumerable.Empty<MethodInfo>())
                 .Select(NameOf)
                 .Distinct();
 
-        private static MethodInfo MethodOf<T>(Expression<Func<T, object?>> call) =>
-            ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
+        private static MethodInfo MethodOf<T>(Expression<Func<T, object?>> call)
+            => ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
 
-        private static MethodInfo StaticMethodOf(Expression<Func<object?>> call) =>
-            ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
+        private static MethodInfo StaticMethodOf(Expression<Func<object?>> call)
+            => ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
 
-        private static MemberInfo MemberOf<T>(Expression<Func<T, object?>> read) =>
-            ((MemberExpression)Expressions.StripConvert(read.Body)).Member;
+        private static MemberInfo MemberOf<T>(Expression<Func<T, object?>> read)
+            => ((MemberExpression)Expressions.StripConvert(read.Body)).Member;
 
         internal static Condition CompilePredicate(LambdaExpression predicate)
         {
@@ -159,11 +159,20 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             var right = Unconverted(binary.Right);
 
             Expression memberOperand;
-            if (Expressions.Reads(left, element)) memberOperand = left;
-            else if (Expressions.Reads(right, element)) memberOperand = right;
-            else throw new InvalidOperationException(
+            if (Expressions.Reads(left, element))
+            {
+                memberOperand = left;
+            }
+            else if (Expressions.Reads(right, element))
+            {
+                memberOperand = right;
+            }
+            else
+            {
+                throw new InvalidOperationException(
                 "Array predicate comparison must reference the element on at least one side; " +
                 "comparing two constants is a developer mistake. Got: " + binary);
+            }
 
             if (!ComparisonFor(binary.NodeType).IsEquality) BrowserOrder.Require(memberOperand.Type);
 
@@ -287,10 +296,12 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             }
 
             if (IsDayOfWeek(member))
+            {
                 throw new InvalidOperationException(
                     "'DateTime.DayOfWeek' is read in the browser as getDay(), the day's number, so a lambda reads it only " +
                     "to compare it with a DayOfWeek (x => x.Admitted.DayOfWeek == DayOfWeek.Saturday). Project it on " +
                     "the server. Got: " + member);
+            }
 
             throw new InvalidOperationException(
                 $"'{NameOf(member.Member)}' is a member of a value .NET defines that has no JavaScript form; a lambda may read " +
@@ -325,10 +336,12 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             while (node is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } conversion)
             {
                 if (Narrows(conversion.Operand.Type, conversion.Type))
+                {
                     throw new InvalidOperationException(
                         $"A cast from {CSharpTypeName.Of(conversion.Operand.Type)} to {CSharpTypeName.Of(conversion.Type)} changes the value as C# computes it " +
                         "(a whole number drops the fraction, a narrower number wraps), and a browser's number does not. " +
                         "Project the value on the server. Got: " + expression);
+                }
 
                 node = conversion.Operand;
             }
@@ -360,22 +373,22 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
             [typeof(ulong)] = (8, false),
         };
 
-        private static bool IsDayOfWeek(Expression expression) =>
-            expression is MemberExpression member && member.Member.Equals(DayOfWeekMember);
+        private static bool IsDayOfWeek(Expression expression)
+            => expression is MemberExpression member && member.Member.Equals(DayOfWeekMember);
 
-        private static bool IsTest(ExpressionType nodeType) =>
-            nodeType is ExpressionType.AndAlso or ExpressionType.OrElse or ExpressionType.Not
+        private static bool IsTest(ExpressionType nodeType)
+            => nodeType is ExpressionType.AndAlso or ExpressionType.OrElse or ExpressionType.Not
                 or ExpressionType.Equal or ExpressionType.NotEqual
                 or ExpressionType.GreaterThan or ExpressionType.GreaterThanOrEqual
                 or ExpressionType.LessThan or ExpressionType.LessThanOrEqual;
 
-        private static ValueExpression DateCall(ValueExpression date, string method) =>
-            ValueExpression.Call(Target.Returned(date), new[] { method }, Array.Empty<ValueExpression>(), Array.Empty<Shape>(), Shape.Number);
+        private static ValueExpression DateCall(ValueExpression date, string method)
+            => ValueExpression.Call(Target.Returned(date), new[] { method }, Array.Empty<ValueExpression>(), Array.Empty<Shape>(), Shape.Number);
 
         private static string NameOf(MemberInfo member) => CSharpTypeName.Of(member.DeclaringType!) + "." + member.Name;
 
-        private static Comparison ComparisonFor(ExpressionType nodeType) =>
-            nodeType switch
+        private static Comparison ComparisonFor(ExpressionType nodeType)
+            => nodeType switch
             {
                 ExpressionType.Equal => Comparison.Equal,
                 ExpressionType.NotEqual => Comparison.NotEqual,
@@ -406,9 +419,11 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
         {
             var argument = Unconverted(expression);
             if (Expressions.Reads(argument, element))
+            {
                 throw new InvalidOperationException(
                     "A text test's text (Contains, StartsWith, EndsWith, Regex.IsMatch's pattern) must be a constant or a " +
                     "captured value, not a read of the item: the plan writes it as a literal. Got: " + argument);
+            }
 
             return Expressions.Evaluate(argument) as string
                 ?? throw new InvalidOperationException("String operation arguments must be text. Got: " + argument);

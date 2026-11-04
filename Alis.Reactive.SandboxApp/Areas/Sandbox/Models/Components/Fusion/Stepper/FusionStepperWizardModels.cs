@@ -77,11 +77,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Steppe
             _session = session;
         }
 
-        public T Load<T>(string admissionId) where T : new() =>
-            _session.GetString(Key<T>(admissionId)) is { } json ? JsonSerializer.Deserialize<T>(json) ?? new T() : new T();
+        public T Load<T>(string admissionId) where T : new()
+            => _session.GetString(Key<T>(admissionId)) is { } json ? JsonSerializer.Deserialize<T>(json) ?? new T() : new T();
 
-        public void Save<T>(string admissionId, T step) =>
-            _session.SetString(Key<T>(admissionId), JsonSerializer.Serialize(step));
+        public void Save<T>(string admissionId, T step)
+            => _session.SetString(Key<T>(admissionId), JsonSerializer.Serialize(step));
 
         private static string Key<T>(string admissionId) => $"admission:{admissionId}:{typeof(T).Name}";
     }

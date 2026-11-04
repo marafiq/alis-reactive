@@ -52,14 +52,17 @@ namespace Alis.Reactive.Members
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             var bound = Steps(expression.Body).LastOrDefault(step => step.IsMember);
             if (!bound.IsMember)
+            {
                 throw new InvalidOperationException(
                     $"{expression} binds no member. An input's id is scoped by the class that declares the member it binds: " +
                     "render the input in a view of that class, like m => m.Name.");
+            }
+
             return DeclarerOf(bound.Access!);
         }
 
-        internal static string ToMvcElementId(string propertyPath) =>
-            propertyPath
+        internal static string ToMvcElementId(string propertyPath)
+            => propertyPath
                 .Replace(".", "_")
                 .Replace("[", "_")
                 .Replace("]", "_");
@@ -91,13 +94,13 @@ namespace Alis.Reactive.Members
             return getter.GetBaseDefinition().DeclaringType!;
         }
 
-        private static Path JsonPath(IReadOnlyList<AccessStep> steps) =>
-            steps.Aggregate(Path.None, (path, step) => step.IsPosition
+        private static Path JsonPath(IReadOnlyList<AccessStep> steps)
+            => steps.Aggregate(Path.None, (path, step) => step.IsPosition
                 ? path.AtIndex(step.Position)
                 : path.Then(step.IsKey ? step.Key : JsonMemberName.Of(step.Name)));
 
-        private static Path BodyPath(IReadOnlyList<AccessStep> steps) =>
-            steps.Aggregate(Path.None, (path, step) => step.IsPosition
+        private static Path BodyPath(IReadOnlyList<AccessStep> steps)
+            => steps.Aggregate(Path.None, (path, step) => step.IsPosition
                 ? path.AtIndex(step.Position)
                 : path.Then(step.IsKey ? step.Key : step.Name));
 
@@ -157,8 +160,8 @@ namespace Alis.Reactive.Members
             return false;
         }
 
-        private static bool IsDictionary(Type collectionType) =>
-            typeof(System.Collections.IDictionary).IsAssignableFrom(collectionType)
+        private static bool IsDictionary(Type collectionType)
+            => typeof(System.Collections.IDictionary).IsAssignableFrom(collectionType)
             || new[] { collectionType }.Concat(collectionType.GetInterfaces()).Any(IsGenericDictionaryContract);
 
         private static bool IsGenericDictionaryContract(Type contract)
@@ -197,8 +200,8 @@ namespace Alis.Reactive.Members
             return false;
         }
 
-        private static int EvaluateIndex(Expression expression) =>
-            Convert.ToInt32(Expressions.Evaluate(expression), CultureInfo.InvariantCulture);
+        private static int EvaluateIndex(Expression expression)
+            => Convert.ToInt32(Expressions.Evaluate(expression), CultureInfo.InvariantCulture);
 
         private readonly struct AccessStep
         {

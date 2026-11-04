@@ -38,7 +38,7 @@ public sealed class MeterAsChanged : JsObject
 public static class MeterHtml
 {
     public static RenderedComponent<Meter, TModel> Meter<TModel>(this ReactivePlan<TModel> plan, string id, int level, int max)
-        where TModel : class =>
-        plan.Render<Meter>(id, new HtmlString(
+        where TModel : class
+        => plan.Render<Meter>(id, new HtmlString(
             $"<fw-meter id=\"{HtmlEncoder.Default.Encode(id)}\" level=\"{level}\" max=\"{max}\"></fw-meter>"));
 }

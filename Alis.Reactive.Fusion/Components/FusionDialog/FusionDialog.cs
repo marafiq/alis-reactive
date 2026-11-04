@@ -32,24 +32,24 @@ namespace Alis.Reactive.Fusion
         public void RefreshPosition() => Method();
 
         /// <summary>Raised before the dialog opens.</summary>
-        public Event<FusionDialogBeforeOpenArgs> BeforeOpen =>
-            Event<FusionDialogBeforeOpenArgs>();
+        public Event<FusionDialogBeforeOpenArgs> BeforeOpen
+            => Event<FusionDialogBeforeOpenArgs>();
 
         /// <summary>Raised before the dialog closes.</summary>
-        public Event<FusionDialogBeforeCloseArgs> BeforeClose =>
-            Event<FusionDialogBeforeCloseArgs>();
+        public Event<FusionDialogBeforeCloseArgs> BeforeClose
+            => Event<FusionDialogBeforeCloseArgs>();
 
         /// <summary>Raised after the dialog opens.</summary>
-        public Event<FusionDialogOpenArgs> Open =>
-            Event<FusionDialogOpenArgs>();
+        public Event<FusionDialogOpenArgs> Open
+            => Event<FusionDialogOpenArgs>();
 
         /// <summary>Raised after the dialog closes.</summary>
-        public Event<FusionDialogCloseArgs> Close =>
-            Event<FusionDialogCloseArgs>();
+        public Event<FusionDialogCloseArgs> Close
+            => Event<FusionDialogCloseArgs>();
 
         /// <summary>Raised when the user clicks the modal overlay.</summary>
-        public Event<FusionDialogOverlayClickArgs> OverlayClick =>
-            Event<FusionDialogOverlayClickArgs>();
+        public Event<FusionDialogOverlayClickArgs> OverlayClick
+            => Event<FusionDialogOverlayClickArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionDialog.BeforeOpen"/>.</summary>

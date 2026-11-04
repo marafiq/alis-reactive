@@ -18,8 +18,8 @@ public class WhenUsingFusionGridEditing : PlaywrightTestBase
 
     private ILocator Roster => Page.Locator($"#{RosterId}");
     private ILocator Rows => Page.Locator($"#{RosterId} .e-row");
-    private ILocator Cell(string resident, int column) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator Cell(string resident, int column)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
     private ILocator Editor(string field) => Page.Locator($"#{RosterId}{field}");
     private ILocator RowBeingEdited => Page.Locator($"#{RosterId} .e-editedrow");
     private ILocator Status => Page.Locator("#roster-status");

@@ -147,7 +147,7 @@ namespace Alis.Reactive.Native
 
             writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" data-alis-radio-group />");
 
-            for (int i = 0; i < _options.Count; i++)
+            for (var i = 0; i < _options.Count; i++)
             {
                 var option = _options[i];
                 var radioId = $"{_elementId}_r{i}";

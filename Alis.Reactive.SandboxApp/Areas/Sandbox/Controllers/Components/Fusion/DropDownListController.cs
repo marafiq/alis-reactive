@@ -29,8 +29,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         ];
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml",
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/DropDownList/Index.cshtml",
                 new FusionDropDownListModel { CareLevels = CareLevels, Community = Community });
 
         [HttpGet("Wings")]

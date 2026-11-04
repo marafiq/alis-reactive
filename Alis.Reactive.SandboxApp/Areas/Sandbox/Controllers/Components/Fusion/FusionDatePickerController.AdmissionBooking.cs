@@ -7,8 +7,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     public partial class FusionDatePickerController
     {
         [HttpGet("CarePlanReview")]
-        public IActionResult ProposeCarePlanReview([FromQuery] CarePlanReviewQuery query) =>
-            query.AdmissionDay is { } admissionDay
+        public IActionResult ProposeCarePlanReview([FromQuery] CarePlanReviewQuery query)
+            => query.AdmissionDay is { } admissionDay
                 ? Ok(new CarePlanReviewProposal(admissionDay.Date.AddDays(14)))
                 : BadRequest();
 

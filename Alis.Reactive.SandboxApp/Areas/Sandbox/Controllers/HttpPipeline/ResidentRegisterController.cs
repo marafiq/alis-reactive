@@ -12,8 +12,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         private const string ChangesKey = "residentRegisterChanges";
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View(ViewFolder + "Index.cshtml", new ResidentRegisterModel { Records = CurrentRecords() });
+        public IActionResult Index()
+            => View(ViewFolder + "Index.cshtml", new ResidentRegisterModel { Records = CurrentRecords() });
 
         [HttpGet("Summary")]
         public IActionResult Summary()
@@ -108,8 +108,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return json == null ? new RegisterChanges() : JsonSerializer.Deserialize<RegisterChanges>(json)!;
         }
 
-        private void Save(RegisterChanges changes) =>
-            HttpContext.Session.SetString(ChangesKey, JsonSerializer.Serialize(changes));
+        private void Save(RegisterChanges changes)
+            => HttpContext.Session.SetString(ChangesKey, JsonSerializer.Serialize(changes));
 
         private sealed class RegisterChanges
         {

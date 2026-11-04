@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     public class PharmacyConnectionController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/PharmacyConnection/Index.cshtml", new PharmacyConnectionModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/PharmacyConnection/Index.cshtml", new PharmacyConnectionModel());
 
         [HttpGet("TestOrder/{pharmacyId}")]
         public IActionResult TestOrder(string pharmacyId) => pharmacyId switch

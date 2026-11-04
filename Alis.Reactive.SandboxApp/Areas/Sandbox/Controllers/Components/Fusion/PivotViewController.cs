@@ -30,8 +30,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("Census")]
-        public IActionResult Census([FromQuery] OccupancyCensusQuery query) =>
-            query.Community != null && OccupancyCensusData.Communities.ContainsKey(query.Community)
+        public IActionResult Census([FromQuery] OccupancyCensusQuery query)
+            => query.Community != null && OccupancyCensusData.Communities.ContainsKey(query.Community)
                 ? Ok(new OccupancyCensus { Period = OccupancyCensusData.LatestPeriod, Rows = OccupancyCensusData.Latest })
                 : NotFound();
 

@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.AdmissionWizard;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 
@@ -16,8 +16,8 @@ public class AdmissionWizardController : Controller
     private T GetDraft<T>(string id) where T : class, new()
         => TryGetDraft<T>(id, out var draft) ? draft : new T();
 
-    private static string EnsureId(string? existing) =>
-        string.IsNullOrEmpty(existing) ? NewScreeningId() : existing;
+    private static string EnsureId(string? existing)
+        => string.IsNullOrEmpty(existing) ? NewScreeningId() : existing;
 
     private const string ViewBase = "~/Areas/Sandbox/Views/Patterns/AdmissionWizard/";
 
@@ -101,8 +101,8 @@ public class AdmissionWizardController : Controller
         };
     }
 
-    private IActionResult StepPartial<T>(string view, T model) =>
-        PartialView(ViewBase + view, model);
+    private IActionResult StepPartial<T>(string view, T model)
+        => PartialView(ViewBase + view, model);
 
     private Step2ClinicalModel BuildStep2Model(string id)
     {
@@ -249,8 +249,8 @@ public class AdmissionWizardController : Controller
         return draft != null;
     }
 
-    private void SaveDraft<TStep>(string screeningId, TStep draft) =>
-        HttpContext.Session.SetString(DraftKey<TStep>(screeningId), JsonSerializer.Serialize(draft));
+    private void SaveDraft<TStep>(string screeningId, TStep draft)
+        => HttpContext.Session.SetString(DraftKey<TStep>(screeningId), JsonSerializer.Serialize(draft));
 
     private static string DraftKey<TStep>(string screeningId) => $"{DraftKeyPrefix}{typeof(TStep).Name}:{screeningId}";
 }

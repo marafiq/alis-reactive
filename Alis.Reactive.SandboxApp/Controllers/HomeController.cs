@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Controllers;
 

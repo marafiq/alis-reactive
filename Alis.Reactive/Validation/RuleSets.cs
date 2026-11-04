@@ -52,11 +52,11 @@ namespace Alis.Reactive.Validation
 
         internal bool Selects(RuleSets sets) => _ruleSet == null ? !sets.Any : sets.Contains(_ruleSet);
 
-        internal ValidationResult Validate<TModel>(IValidator<TModel> validator, TModel instance) =>
-            _ruleSet == null ? validator.Validate(instance) : validator.Validate(instance, _ruleSet);
+        internal ValidationResult Validate<TModel>(IValidator<TModel> validator, TModel instance)
+            => _ruleSet == null ? validator.Validate(instance) : validator.Validate(instance, _ruleSet);
 
-        internal Task<ValidationResult> ValidateAsync<TModel>(IValidator<TModel> validator, TModel instance, CancellationToken cancellation) =>
-            _ruleSet == null ? validator.ValidateAsync(instance, cancellation) : validator.ValidateAsync(instance, _ruleSet, cancellation);
+        internal Task<ValidationResult> ValidateAsync<TModel>(IValidator<TModel> validator, TModel instance, CancellationToken cancellation)
+            => _ruleSet == null ? validator.ValidateAsync(instance, cancellation) : validator.ValidateAsync(instance, _ruleSet, cancellation);
 
         public override string ToString() => _ruleSet ?? "no rule set";
     }

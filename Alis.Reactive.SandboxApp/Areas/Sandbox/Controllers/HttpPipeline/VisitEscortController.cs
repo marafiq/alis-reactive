@@ -9,8 +9,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     public class VisitEscortController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/VisitEscort/Index.cshtml", new VisitEscortModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/VisitEscort/Index.cshtml", new VisitEscortModel());
 
         [HttpGet("Week/{resident}")]
         public IActionResult Week(string resident) => resident switch
@@ -42,12 +42,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         }
 
         [HttpDelete("Escorts/{slot}")]
-        public IActionResult Release(string slot, [FromBody] EscortRelease? release) =>
-            Ok(new EscortMessage($"{Label(slot)}: escort released ({release?.Reason ?? "no reason given"})."));
+        public IActionResult Release(string slot, [FromBody] EscortRelease? release)
+            => Ok(new EscortMessage($"{Label(slot)}: escort released ({release?.Reason ?? "no reason given"})."));
 
         [HttpPost("Share")]
-        public IActionResult Share([FromBody] WeekShare? share) =>
-            string.IsNullOrWhiteSpace(share?.Summary)
+        public IActionResult Share([FromBody] WeekShare? share)
+            => string.IsNullOrWhiteSpace(share?.Summary)
                 ? Ok(new EscortMessage("Nothing to share yet: no visit is booked."))
                 : Ok(new EscortMessage($"Sent to the family: {share.Summary}. {Visits(share.VisitsLeft)} left this week."));
 
@@ -62,11 +62,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         }
 
         [HttpGet("Seating")]
-        public IActionResult Seating([FromQuery] PartyQuery query) =>
-            Ok(new EscortMessage($"The family room seats {query.Party.Visitors} visitors and {Named(query.Companions.FirstOrDefault()?.Name)}."));
+        public IActionResult Seating([FromQuery] PartyQuery query)
+            => Ok(new EscortMessage($"The family room seats {query.Party.Visitors} visitors and {Named(query.Companions.FirstOrDefault()?.Name)}."));
 
-        private static List<VisitSlot> Times(params string[] ids) =>
-            ids.Select(id => new VisitSlot { Id = id, Label = Label(id), Day = DayOf(id) }).ToList();
+        private static List<VisitSlot> Times(params string[] ids)
+            => ids.Select(id => new VisitSlot { Id = id, Label = Label(id), Day = DayOf(id) }).ToList();
 
         private static string Label(string slot) => slot switch
         {

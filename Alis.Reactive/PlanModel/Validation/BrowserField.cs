@@ -44,20 +44,20 @@ namespace Alis.Reactive
 
         internal FieldReference Reference { get; }
 
-        internal BrowserField PrefixedBy(string prefix, Condition outer) =>
-            new BrowserField(
+        internal BrowserField PrefixedBy(string prefix, Condition outer)
+            => new BrowserField(
                 Reference.PrefixedBy(prefix),
                 Rules.Select(rule => rule.PrefixedBy(prefix, outer)),
                 ItemFields.Select(field => field.OwnedUnder(prefix, outer)));
 
-        internal BrowserField UnderItem(string itemName) =>
-            PrefixedBy(itemName, _ownerCondition);
+        internal BrowserField UnderItem(string itemName)
+            => PrefixedBy(itemName, _ownerCondition);
 
-        internal BrowserField ScopedBy(Condition condition) =>
-            new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition));
+        internal BrowserField ScopedBy(Condition condition)
+            => new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition));
 
-        private BrowserField OwnedUnder(string prefix, Condition condition) =>
-            new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
+        private BrowserField OwnedUnder(string prefix, Condition condition)
+            => new BrowserField(Reference, Rules, ItemFields, Condition.Combine(condition, _ownerCondition.PrefixedBy(prefix)));
     }
 
     /// <summary>
@@ -133,8 +133,8 @@ namespace Alis.Reactive
         /// <param name="owner">The member that holds them, as a path from the validator's model.</param>
         /// <param name="fields">The child validator's members and rules.</param>
         /// <param name="when">The condition the child's rule is declared under.</param>
-        public void Add(LambdaExpression owner, IEnumerable<BrowserField> fields, Condition when) =>
-            AddUnder(FieldReference.Of(owner).Path, fields, when);
+        public void Add(LambdaExpression owner, IEnumerable<BrowserField> fields, Condition when)
+            => AddUnder(FieldReference.Of(owner).Path, fields, when);
 
         private void AddUnder(string prefix, IEnumerable<BrowserField> fields, Condition when)
         {
@@ -152,8 +152,8 @@ namespace Alis.Reactive
         }
 
         /// <summary>Every member the validator names, with its rules, where it first named it.</summary>
-        public IReadOnlyList<BrowserField> Fields =>
-            _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields)).ToArray();
+        public IReadOnlyList<BrowserField> Fields
+            => _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields)).ToArray();
 
         private void AddRule(FieldReference field, BrowserRule rule)
         {
@@ -172,9 +172,12 @@ namespace Alis.Reactive
             if (_fields.TryGetValue(field.Path, out var existing))
             {
                 if (!existing.Field.Shape.Equals(field.Shape))
+                {
                     throw new InvalidOperationException(
                         $"Client validation field '{field.Path}' was declared with conflicting shapes: " +
                         $"'{existing.Field.Shape.Kind}' and '{field.Shape.Kind}'.");
+                }
+
                 return existing;
             }
 

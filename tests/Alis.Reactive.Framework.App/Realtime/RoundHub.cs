@@ -8,16 +8,16 @@ public sealed class RoundHub : Hub
 
     public Task ClearBoard() => Clients.Caller.SendAsync(Feed.BoardCleared.Name);
 
-    public Task Ping(string resident) =>
-        Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident, status = "up" });
+    public Task Ping(string resident)
+        => Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident, status = "up" });
 
     public string Acknowledge(string nurse) => $"acknowledged by {nurse}";
 
-    public Task Tidy() =>
-        Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident = "everyone", status = "tidying" });
+    public Task Tidy()
+        => Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident = "everyone", status = "tidying" });
 
-    public Task TidyFor(string resident) =>
-        Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident, status = "tidying" });
+    public Task TidyFor(string resident)
+        => Clients.Caller.SendAsync(Feed.StatusChanged.Name, new { resident, status = "tidying" });
 
     public string Roster() => "Ada and Ben";
 

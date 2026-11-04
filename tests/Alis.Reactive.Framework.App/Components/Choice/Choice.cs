@@ -27,13 +27,13 @@ public static class ChoiceHtml
 
     public static RenderedComponent<Choice<TEnum>, TModel> Choice<TModel, TEnum>(this InputBoundField<TModel, TEnum> field)
         where TModel : class
-        where TEnum : struct, Enum =>
-        field.Render<Choice<TEnum>>(writer => Write<TEnum>(writer, field.ElementId, Held(field), blank: false));
+        where TEnum : struct, Enum
+        => field.Render<Choice<TEnum>>(writer => Write<TEnum>(writer, field.ElementId, Held(field), blank: false));
 
     public static RenderedComponent<Choice<TEnum>, TModel> Choice<TModel, TEnum>(this InputBoundField<TModel, TEnum?> field)
         where TModel : class
-        where TEnum : struct, Enum =>
-        field.Render<Choice<TEnum>>(writer => Write<TEnum>(writer, field.ElementId, Held(field), blank: true));
+        where TEnum : struct, Enum
+        => field.Render<Choice<TEnum>>(writer => Write<TEnum>(writer, field.ElementId, Held(field), blank: true));
 
     private static object? Held<TModel, TProp>(InputBoundField<TModel, TProp> field)
         where TModel : class

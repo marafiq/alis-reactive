@@ -35,8 +35,8 @@ public class WhenUsingFusionContextMenu : PlaywrightTestBase
         _plan = await PagePlan<FusionContextMenuModel>.FromPage(Page);
     }
 
-    private async Task RightClickArthur() =>
-        await ArthursCard.ClickAsync(new() { Button = MouseButton.Right, Position = new() { X = ClickX, Y = ClickY } });
+    private async Task RightClickArthur()
+        => await ArthursCard.ClickAsync(new() { Button = MouseButton.Right, Position = new() { X = ClickX, Y = ClickY } });
 
     private async Task OpenArthursMenu()
     {

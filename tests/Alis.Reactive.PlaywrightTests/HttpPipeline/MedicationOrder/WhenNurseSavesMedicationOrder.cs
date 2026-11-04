@@ -8,8 +8,8 @@ public class WhenNurseSavesMedicationOrder : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/HttpPipeline/MedicationOrder";
 
-    private ILocator Field(Expression<Func<MedicationOrderModel, object?>> member) =>
-        Page.Locator($"#{IdGenerator.For(member)}");
+    private ILocator Field(Expression<Func<MedicationOrderModel, object?>> member)
+        => Page.Locator($"#{IdGenerator.For(member)}");
 
     private ILocator SaveOrder => Page.Locator("#save-medication-order-btn");
     private ILocator OrderStatus => Page.Locator("#medication-order-status");

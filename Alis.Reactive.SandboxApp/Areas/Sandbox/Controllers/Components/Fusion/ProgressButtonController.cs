@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     public sealed class ProgressButtonController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/ProgressButton/Index.cshtml", new FusionProgressButtonModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/ProgressButton/Index.cshtml", new FusionProgressButtonModel());
 
         [HttpPost("Send")]
         public IActionResult Send([FromBody] MedicationPassSendRequest request) => request.Pharmacy switch

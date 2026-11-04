@@ -17,8 +17,8 @@ public class WhenCoordinatorReviewsADischarge : PlaywrightTestBase
 
     private ILocator ReviewTitle => Dialog.Locator(".e-dlg-header");
 
-    private NativeCheckBoxLocator CareTasksOpen =>
-        new(Page, IdGenerator.For<DialogModel>(m => m.CareTasksOpen));
+    private NativeCheckBoxLocator CareTasksOpen
+        => new(Page, IdGenerator.For<DialogModel>(m => m.CareTasksOpen));
 
     private async Task OpenTheReview()
     {

@@ -228,8 +228,8 @@ public sealed class ValidationController : Controller
     }
 
     [HttpPost("/Validation/Book/Failures")]
-    public IActionResult BookFailures([FromBody] VisitBooking booking, [FromServices] VisitRules rules) =>
-        Json(new Booked { Summary = string.Join("; ", rules.Validate(booking).Errors) });
+    public IActionResult BookFailures([FromBody] VisitBooking booking, [FromServices] VisitRules rules)
+        => Json(new Booked { Summary = string.Join("; ", rules.Validate(booking).Errors) });
 
     public IActionResult Discharge(string? stage)
     {

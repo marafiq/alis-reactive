@@ -38,6 +38,7 @@ public class WhenCodeIsWritten
         var commented = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var target in Targets)
+        {
             foreach (var package in sources.GroupBy(file => shippedPackages.FirstOrDefault(name => file.StartsWith(name + "/", StringComparison.Ordinal))))
             {
                 var trees = package.Select(file => CSharpSyntaxTree.ParseText(Read(file), target, file)).ToList();
@@ -54,6 +55,7 @@ public class WhenCodeIsWritten
                     }
                 }
             }
+        }
 
         Assert.That(shippedPackages, Is.Not.Empty, "No folder holding a PublicAPI folder was found");
         Assert.That(sources, Is.Not.Empty, "No tracked C# was found");
@@ -72,14 +74,22 @@ public class WhenCodeIsWritten
     {
         var commented = new SortedSet<string>(StringComparer.Ordinal);
         foreach (var view in TrackedFilesEndingIn(".cshtml"))
+        {
             foreach (Match comment in RazorComment.Matches(Read(view)))
                 commented.Add($"{view}:{LineOf(Read(view), comment.Index)}");
+        }
+
         foreach (var stylesheet in TrackedFilesEndingIn(".css"))
+        {
             foreach (var line in CssCommentLines(Read(stylesheet)))
                 commented.Add($"{stylesheet}:{line}");
+        }
+
         foreach (var buildFile in Repository.TrackedFiles.Where(file => XmlBuildFiles.Contains(Path.GetExtension(file))))
+        {
             foreach (var comment in XDocument.Parse(Read(buildFile), LoadOptions.SetLineInfo).DescendantNodes().OfType<XComment>())
                 commented.Add($"{buildFile}:{((IXmlLineInfo)comment).LineNumber}");
+        }
 
         AssertNone(commented, NameItInstead);
     }
@@ -89,11 +99,16 @@ public class WhenCodeIsWritten
     {
         var commented = new SortedSet<string>(StringComparer.Ordinal);
         foreach (var json in TrackedFilesEndingIn(".json"))
+        {
             foreach (var line in JsonCommentLines(File.ReadAllBytes(Path.Combine(Repository.Root, json))))
                 commented.Add($"{json}:{line}");
+        }
+
         foreach (var webForm in TrackedFilesEndingIn(".asax"))
+        {
             foreach (Match comment in WebFormsComment.Matches(Read(webForm)))
                 commented.Add($"{webForm}:{LineOf(Read(webForm), comment.Index)}");
+        }
 
         AssertNone(commented, NameItInstead);
     }
@@ -103,8 +118,10 @@ public class WhenCodeIsWritten
     {
         var commented = new SortedSet<string>(StringComparer.Ordinal);
         foreach (var file in Repository.TrackedFiles.Where(file => Path.GetExtension(file) is ".sh" or ".yml" or ".yaml" || Path.GetFileName(file) == ".gitignore"))
+        {
             foreach (var line in HashCommentLines(Read(file), isShell: file.EndsWith(".sh", StringComparison.Ordinal)))
                 commented.Add($"{file}:{line}");
+        }
 
         AssertNone(commented, NameItInstead + " A shebang, a heredoc's body and the version Dependabot reads beside a pinned action are not comments.");
     }
@@ -119,22 +136,24 @@ public class WhenCodeIsWritten
         {
             var lines = Read(file).Split('\n');
             for (var index = 0; index < lines.Length; index++)
+            {
                 if (lines[index].TrimStart() is ['#' or ';', ..])
                     commented.Add($"{file}:{index + 1}");
+            }
         }
 
         AssertNone(commented, NameItInstead);
     }
 
-    private static List<string> TrackedFilesEndingIn(string extension) =>
-        Repository.TrackedFiles.Where(file => file.EndsWith(extension, StringComparison.Ordinal)).ToList();
+    private static List<string> TrackedFilesEndingIn(string extension)
+        => Repository.TrackedFiles.Where(file => file.EndsWith(extension, StringComparison.Ordinal)).ToList();
 
     private static string Read(string file) => File.ReadAllText(Path.Combine(Repository.Root, file));
 
     private static int LineOf(string text, int index) => text.AsSpan(0, index).Count('\n') + 1;
 
-    private static void AssertNone(IReadOnlyCollection<string> commented, string message) =>
-        Assert.That(commented, Is.Empty, message + "\n" + string.Join("\n", commented));
+    private static void AssertNone(IReadOnlyCollection<string> commented, string message)
+        => Assert.That(commented, Is.Empty, message + "\n" + string.Join("\n", commented));
 
     private static bool DocumentsThePublicSurface(SyntaxTrivia doc, SemanticModel? model)
     {
@@ -153,7 +172,7 @@ public class WhenCodeIsWritten
 
     private static bool IsPublicSurface(ISymbol symbol)
     {
-        for (ISymbol? current = symbol; current is not null and not INamespaceSymbol; current = current.ContainingType)
+        for (var current = symbol; current is not null and not INamespaceSymbol; current = current.ContainingType)
         {
             var reachable = current.DeclaredAccessibility switch
             {
@@ -204,8 +223,11 @@ public class WhenCodeIsWritten
         var json = file.AsSpan(file.AsSpan().StartsWith(Encoding.UTF8.Preamble) ? Encoding.UTF8.Preamble.Length : 0);
         var reader = new Utf8JsonReader(json, new JsonReaderOptions { CommentHandling = JsonCommentHandling.Allow, AllowTrailingCommas = true });
         while (reader.Read())
+        {
             if (reader.TokenType == JsonTokenType.Comment)
                 lines.Add(json[..(int)reader.TokenStartIndex].Count((byte)'\n') + 1);
+        }
+
         return lines;
     }
 

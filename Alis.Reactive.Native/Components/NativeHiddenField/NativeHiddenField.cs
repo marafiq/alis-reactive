@@ -31,8 +31,8 @@ namespace Alis.Reactive.Native
         /// writes commits as one the user changes does: the field's rules check it again at once. Writing
         /// the value the field already holds raises nothing.
         /// </summary>
-        public Event<NativeHiddenFieldChangeArgs> Change =>
-            Event<NativeHiddenFieldChangeArgs>();
+        public Event<NativeHiddenFieldChangeArgs> Change
+            => Event<NativeHiddenFieldChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

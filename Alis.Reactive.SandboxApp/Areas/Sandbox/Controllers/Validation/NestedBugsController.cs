@@ -8,18 +8,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class NestedBugsController : Controller
     {
         [HttpGet("NestedCondition")]
-        public IActionResult NestedCondition() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/NestedCondition.cshtml",
+        public IActionResult NestedCondition()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/NestedCondition.cshtml",
                 new NestedAddressModel());
 
         [HttpGet("ParentChild")]
-        public IActionResult ParentChild() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/ParentChild.cshtml",
+        public IActionResult ParentChild()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/ParentChild.cshtml",
                 new ParentChildModel());
 
         [HttpGet("IncludeConditional")]
-        public IActionResult IncludeConditional() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/IncludeConditional.cshtml",
+        public IActionResult IncludeConditional()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/IncludeConditional.cshtml",
                 new IncludeModel());
 
         [HttpPost("SubmitNestedAddress")]
@@ -53,8 +53,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         }
 
         [HttpGet("OperatorConditions")]
-        public IActionResult OperatorConditions() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/OperatorConditions.cshtml",
+        public IActionResult OperatorConditions()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/OperatorConditions.cshtml",
                 new OperatorConditionModel());
 
         [HttpPost("SubmitOperatorConditions")]

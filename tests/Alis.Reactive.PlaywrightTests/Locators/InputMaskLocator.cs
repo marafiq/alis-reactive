@@ -36,8 +36,8 @@ public sealed class InputMaskLocator
         await Input.PressAsync("Backspace");
     }
 
-    private static bool HasEnteredCharacters(string maskedValue) =>
-        maskedValue.Any(char.IsLetterOrDigit);
+    private static bool HasEnteredCharacters(string maskedValue)
+        => maskedValue.Any(char.IsLetterOrDigit);
 
     public async Task Type(string characters)
     {

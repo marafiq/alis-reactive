@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("FamilyContacts")]
-        public IActionResult FamilyContacts() =>
-            View(
+        public IActionResult FamilyContacts()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/FamilyContacts.cshtml",
                 new FamilyContactsViewModel { Contacts = FamilyContactsOnFile() });
 

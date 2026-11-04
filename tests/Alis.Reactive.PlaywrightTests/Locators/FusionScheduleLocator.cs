@@ -24,8 +24,8 @@ public sealed class FusionScheduleLocator
 
     public ILocator Appointments(Regex text) => Root.Locator(".e-appointment").Filter(new() { HasTextRegex = text });
 
-    public ILocator Appointment(string subject, DateTime start, int groupIndex) =>
-        Root.Locator($".e-appointment[data-group-index='{groupIndex}']").And(
+    public ILocator Appointment(string subject, DateTime start, int groupIndex)
+        => Root.Locator($".e-appointment[data-group-index='{groupIndex}']").And(
             Root.GetByRole(AriaRole.Button, new()
             {
                 NameRegex = new Regex(
@@ -46,11 +46,11 @@ public sealed class FusionScheduleLocator
             CultureInfo.InvariantCulture);
     }
 
-    public async Task<int> GroupOf(ILocator appointment) =>
-        int.Parse(await appointment.GetAttributeAsync("data-group-index") ?? "", CultureInfo.InvariantCulture);
+    public async Task<int> GroupOf(ILocator appointment)
+        => int.Parse(await appointment.GetAttributeAsync("data-group-index") ?? "", CultureInfo.InvariantCulture);
 
-    public ILocator Cell(DateTime start, int groupIndex) =>
-        Root.Locator($"td.e-work-cells[data-group-index='{groupIndex}'][data-date='{new DateTimeOffset(start).ToUnixTimeMilliseconds()}']");
+    public ILocator Cell(DateTime start, int groupIndex)
+        => Root.Locator($"td.e-work-cells[data-group-index='{groupIndex}'][data-date='{new DateTimeOffset(start).ToUnixTimeMilliseconds()}']");
 
     public async Task ClickEmptyPartOf(ILocator cell)
     {
@@ -59,8 +59,8 @@ public sealed class FusionScheduleLocator
         await cell.ClickAsync(new() { Position = new() { X = 4, Y = box.Height - 4 } });
     }
 
-    public ILocator ViewButton(string view) =>
-        Root.Locator(".e-schedule-toolbar").GetByRole(AriaRole.Button, new() { Name = view, Exact = true });
+    public ILocator ViewButton(string view)
+        => Root.Locator(".e-schedule-toolbar").GetByRole(AriaRole.Button, new() { Name = view, Exact = true });
 
     public ILocator Next => Root.Locator(".e-toolbar-item.e-next button");
 

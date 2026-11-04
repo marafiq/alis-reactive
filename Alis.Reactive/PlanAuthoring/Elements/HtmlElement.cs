@@ -1,11 +1,11 @@
 using System;
 using Alis.Reactive.Components;
-using Alis.Reactive.PlanAuthoring.Arrays;
-using Alis.Reactive.PlanModel.Document;
-using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Members;
+using Alis.Reactive.PlanAuthoring.Arrays;
+using Alis.Reactive.PlanModel.Document;
 using Alis.Reactive.PlanModel.Reactions;
+using Alis.Reactive.PlanModel.Values;
 
 namespace Alis.Reactive
 {
@@ -48,8 +48,8 @@ namespace Alis.Reactive
         /// <summary>The element's child elements (<c>children</c>), for counting and testing:
         /// <c>var seats = p.Element($"{table}-seats").Children;</c> counts the seats needing close supervision
         /// with <c>seats.Count(seat =&gt; seat.GetAttribute("data-supervision") == "close")</c>.</summary>
-        public ReactiveArray<ChildElement> Children =>
-            new ReactiveArray<ChildElement>(Read("children"), ClrShape.Of(typeof(ChildElement)));
+        public ReactiveArray<ChildElement> Children
+            => new ReactiveArray<ChildElement>(Read("children"), ClrShape.Of(typeof(ChildElement)));
 
         /// <summary>Shows the element: removes its <c>hidden</c> attribute.</summary>
         public void Show() => Set(BrowserElementMembers.Hidden, ValueExpression.Literal(false));
@@ -59,8 +59,8 @@ namespace Alis.Reactive
 
         internal ValueExpression Read(string member) => ValueExpression.Get(Target.Element(_id), new[] { member }, Shape.Any);
 
-        internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value) =>
-            _context.AddStep(new SetStep(Target.Element(_id), property.Path.TargetText, property.Shape, value));
+        internal void Set<TValue>(ComponentProperty<TValue> property, ValueExpression value)
+            => _context.AddStep(new SetStep(Target.Element(_id), property.Path.TargetText, property.Shape, value));
 
         internal void SetContent(ComponentProperty<string> property, string content, ValueExpression value)
         {
@@ -68,8 +68,8 @@ namespace Alis.Reactive
             Set(property, value);
         }
 
-        internal void Call(ComponentMethod method, ValueExpression argument) =>
-            _context.AddStep(new CallStep(Target.Element(_id), method.Path.TargetText, new[] { argument }, method.ArgumentShapes, method.Awaits));
+        internal void Call(ComponentMethod method, ValueExpression argument)
+            => _context.AddStep(new CallStep(Target.Element(_id), method.Path.TargetText, new[] { argument }, method.ArgumentShapes, method.Awaits));
     }
 
     /// <summary>
@@ -115,8 +115,8 @@ namespace Alis.Reactive
         }
 
         /// <summary>The classes the element has, for counting and testing.</summary>
-        public ReactiveArray<string> Items =>
-            new ReactiveArray<string>(_element.Read("classList"), Shape.String);
+        public ReactiveArray<string> Items
+            => new ReactiveArray<string>(_element.Read("classList"), Shape.String);
 
         /// <summary>Adds a class.</summary>
         /// <param name="name">The class, or a value read when the step runs.</param>
@@ -150,13 +150,13 @@ namespace Alis.Reactive
         /// <summary>The value of the child's attribute, read in the browser: <c>seat =&gt; seat.GetAttribute("data-supervision")</c>.</summary>
         /// <param name="name">The attribute's name.</param>
         [PureMethod("getAttribute")]
-        public string? GetAttribute(string name) =>
-            throw new InvalidOperationException("A child element is read in the browser, inside an array predicate or projection.");
+        public string? GetAttribute(string name)
+            => throw new InvalidOperationException("A child element is read in the browser, inside an array predicate or projection.");
 
         /// <summary>Whether the child has the attribute, with a value or none, read in the browser: <c>seat =&gt; seat.HasAttribute("data-wheelchair")</c>.</summary>
         /// <param name="name">The attribute's name.</param>
         [PureMethod("hasAttribute")]
-        public bool HasAttribute(string name) =>
-            throw new InvalidOperationException("A child element is read in the browser, inside an array predicate or projection.");
+        public bool HasAttribute(string name)
+            => throw new InvalidOperationException("A child element is read in the browser, inside an array predicate or projection.");
     }
 }

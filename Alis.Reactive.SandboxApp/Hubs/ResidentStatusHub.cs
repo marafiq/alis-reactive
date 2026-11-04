@@ -15,8 +15,8 @@ public class ResidentStatusHub : Hub
         return base.OnConnectedAsync();
     }
 
-    public static bool RefusesNegotiate(HttpRequest request) =>
-        request.Path.Equals("/hubs/resident-status/negotiate", StringComparison.OrdinalIgnoreCase)
+    public static bool RefusesNegotiate(HttpRequest request)
+        => request.Path.Equals("/hubs/resident-status/negotiate", StringComparison.OrdinalIgnoreCase)
         && BrokenDrills.GetValueOrDefault(request.Query["drill"].ToString());
 
     public override Task OnDisconnectedAsync(Exception? exception)
@@ -26,8 +26,8 @@ public class ResidentStatusHub : Hub
         return base.OnDisconnectedAsync(exception);
     }
 
-    public Task ClearBoard() =>
-        Clients.Clients(ConnectionsOf(DrillIdFor(Context))).SendAsync(new ResidentStatusFeed().BoardCleared.Name);
+    public Task ClearBoard()
+        => Clients.Clients(ConnectionsOf(DrillIdFor(Context))).SendAsync(new ResidentStatusFeed().BoardCleared.Name);
 
     public string Acknowledge(string acknowledgedBy)
     {
@@ -51,11 +51,11 @@ public class ResidentStatusHub : Hub
 
     public static void RestoreDrill(string drillId) => BrokenDrills[drillId] = false;
 
-    public static IReadOnlyList<string> ConnectionsOf(string drillId) =>
-        DrillConnections.TryGetValue(drillId, out var connections) ? connections.Keys.ToList() : [];
+    public static IReadOnlyList<string> ConnectionsOf(string drillId)
+        => DrillConnections.TryGetValue(drillId, out var connections) ? connections.Keys.ToList() : [];
 
-    private static string DrillIdFor(HubCallerContext context) =>
-        context.GetHttpContext()?.Request.Query["drill"].ToString() ?? "";
+    private static string DrillIdFor(HubCallerContext context)
+        => context.GetHttpContext()?.Request.Query["drill"].ToString() ?? "";
 }
 
 public sealed class ResidentStatusFeed : SignalRHub

@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("CareStaffColumns"), ActionName("CareStaffColumns")]
-        public IActionResult HuddleSheetPage() =>
-            View(
+        public IActionResult HuddleSheetPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/CareStaffColumns.cshtml",
                 new HuddleSheetViewModel { WingHeading = "Wing" });
 

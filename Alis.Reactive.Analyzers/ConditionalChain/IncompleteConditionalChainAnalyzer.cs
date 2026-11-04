@@ -29,8 +29,8 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
             "Alis.Reactive.AllGuard`1",
             "Alis.Reactive.AnyGuard`1");
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {

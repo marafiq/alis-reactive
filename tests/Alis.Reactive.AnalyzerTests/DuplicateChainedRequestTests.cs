@@ -10,8 +10,8 @@ public class DuplicateChainedRequestTests
         "Duplicate .Chained() call — a response has one Chained request; chain the next request from that one's own Response(r => r.Chained(..))";
 
     [Test]
-    public Task a_second_chained_on_one_response_is_reported() =>
-        Fixture.Reports<DuplicateChainedRequestAnalyzer>("ALIS007", Message, Fixture.View, View(
+    public Task a_second_chained_on_one_response_is_reported()
+        => Fixture.Reports<DuplicateChainedRequestAnalyzer>("ALIS007", Message, Fixture.View, View(
             """
             p.Post("/discharge").Response(r => r
                 .Chained(family => family.Post("/notify-family"))
@@ -19,8 +19,8 @@ public class DuplicateChainedRequestTests
             """));
 
     [Test]
-    public Task a_follow_up_chained_from_the_first_follow_up_is_not_reported() =>
-        Fixture.ReportsNothing<DuplicateChainedRequestAnalyzer>(Fixture.View, View(
+    public Task a_follow_up_chained_from_the_first_follow_up_is_not_reported()
+        => Fixture.ReportsNothing<DuplicateChainedRequestAnalyzer>(Fixture.View, View(
             """
             p.Post("/discharge").Response(r => r
                 .Chained(family => family.Post("/notify-family")
@@ -28,8 +28,8 @@ public class DuplicateChainedRequestTests
             """));
 
     [Test]
-    public Task a_file_that_is_not_a_view_is_left_alone() =>
-        Fixture.ReportsNothing<DuplicateChainedRequestAnalyzer>(Fixture.Controller, View(
+    public Task a_file_that_is_not_a_view_is_left_alone()
+        => Fixture.ReportsNothing<DuplicateChainedRequestAnalyzer>(Fixture.Controller, View(
             """
             p.Post("/discharge").Response(r => r
                 .Chained(family => family.Post("/notify-family"))

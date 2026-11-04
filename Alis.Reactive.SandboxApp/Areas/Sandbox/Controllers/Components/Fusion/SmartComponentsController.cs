@@ -56,8 +56,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("Letter")]
-        public IActionResult Letter([FromQuery] ReferralLetterQuery query) =>
-            Letters.TryGetValue(query.ReferralId, out var letter) ? PartialView(LetterView, letter) : NotFound();
+        public IActionResult Letter([FromQuery] ReferralLetterQuery query)
+            => Letters.TryGetValue(query.ReferralId, out var letter) ? PartialView(LetterView, letter) : NotFound();
 
         [HttpPost("Save")]
         public IActionResult Save([FromBody] ReferralIntakeSave referral)
@@ -91,8 +91,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "text/plain");
         }
 
-        private static string Instructions(SmartAssistRequest request) =>
-            request.Messages.FirstOrDefault(message => message.Role == "system")?.Content ?? string.Empty;
+        private static string Instructions(SmartAssistRequest request)
+            => request.Messages.FirstOrDefault(message => message.Role == "system")?.Content ?? string.Empty;
 
         private static string UserText(SmartAssistRequest request)
         {

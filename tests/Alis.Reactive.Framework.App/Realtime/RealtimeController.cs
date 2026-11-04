@@ -154,8 +154,8 @@ public sealed class RealtimeController(LineExchange exchange) : Controller
         }
     }
 
-    private Task Write(string name, object data, CancellationToken stopped) =>
-        WriteData(name, JsonSerializer.Serialize(data), stopped);
+    private Task Write(string name, object data, CancellationToken stopped)
+        => WriteData(name, JsonSerializer.Serialize(data), stopped);
 
     private async Task WriteData(string name, string data, CancellationToken stopped)
     {

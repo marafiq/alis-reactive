@@ -27,8 +27,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         [HttpGet("")]
         [HttpGet("Index")]
-        public IActionResult Index() =>
-            View(
+        public IActionResult Index()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/ContextMenu/Index.cshtml",
                 new FusionContextMenuModel
                 {
@@ -37,8 +37,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 });
 
         [HttpGet("RoomCheck")]
-        public IActionResult RoomCheck([FromQuery] string? room) =>
-            Ok(RoomCode(room) == HeldRoom
+        public IActionResult RoomCheck([FromQuery] string? room)
+            => Ok(RoomCode(room) == HeldRoom
                 ? new RoomCheck { Held = true, Note = "Maple 218 is held for tonight's 9:00 PM admission." }
                 : new RoomCheck());
 
@@ -52,11 +52,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 return BadRequest(new ResidentMoveResult { Message = "The board could not find that resident or room." });
 
             if (code == HeldRoom)
+            {
                 return Conflict(new ResidentMoveResult
                 {
                     Message = $"{room} is held for tonight's admission; choose another room for {resident.Name}.",
                     Room = resident.Room
                 });
+            }
 
             var openAfterMove = OpenRooms.Select(open => open.Name).Where(open => open != room).Append(resident.Room).Order();
             return Ok(new ResidentMoveResult

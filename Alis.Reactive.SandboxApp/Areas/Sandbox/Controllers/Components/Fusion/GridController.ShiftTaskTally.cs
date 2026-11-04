@@ -1,19 +1,19 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("ShiftTaskTally")]
-        public IActionResult ShiftTaskTally() =>
-            View(
+        public IActionResult ShiftTaskTally()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/ShiftTaskTally.cshtml",
                 new ShiftTaskTallyModel { Residents = ShiftTallyOnTheWing() });
 
         [HttpGet("ShiftTaskTallyEmar")]
-        public IActionResult ShiftTaskTallyEmar() =>
-            Ok(new EmarTaskCount
+        public IActionResult ShiftTaskTallyEmar()
+            => Ok(new EmarTaskCount
             {
                 ResidentId = 6202,
                 OpenTasks = 5,
@@ -44,8 +44,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private static string DescribeTally(IEnumerable<ShiftTallyResident> changed) =>
-            string.Join("; ", changed.Select(r =>
+        private static string DescribeTally(IEnumerable<ShiftTallyResident> changed)
+            => string.Join("; ", changed.Select(r =>
                 $"{r.ResidentName}, {Counted(r.OpenTasks, "open task")} and {Counted(r.PrnDoses, "PRN dose")}"));
 
         private static string Counted(int count, string thing) => count == 1 ? $"1 {thing}" : $"{count} {thing}s";

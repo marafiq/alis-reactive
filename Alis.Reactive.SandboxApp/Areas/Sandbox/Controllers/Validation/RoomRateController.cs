@@ -16,8 +16,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         }
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/RoomRate/Index.cshtml", new RoomRateModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/RoomRate/Index.cshtml", new RoomRateModel());
 
         [HttpPost("Add")]
         public IActionResult Add([FromBody] RoomRateModel? room)

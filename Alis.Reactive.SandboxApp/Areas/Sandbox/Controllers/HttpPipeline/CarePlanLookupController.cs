@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
     public class CarePlanLookupController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/CarePlanLookup/Index.cshtml", new CarePlanLookupModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/CarePlanLookup/Index.cshtml", new CarePlanLookupModel());
 
         [HttpGet("CarePlan/{residentId:int}")]
         public IActionResult CarePlan(int residentId) => residentId switch

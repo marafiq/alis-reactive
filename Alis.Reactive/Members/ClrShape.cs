@@ -36,14 +36,14 @@ namespace Alis.Reactive.Members
             return ofClass(type);
         }
 
-        internal static IEnumerable<PropertyInfo> SerializedProperties(Type type) =>
-            type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        internal static IEnumerable<PropertyInfo> SerializedProperties(Type type)
+            => type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(property => property.GetIndexParameters().Length == 0
                                    && property.GetMethod != null
                                    && property.GetCustomAttribute<JsonIgnoreAttribute>() == null);
 
-        internal static bool IsDictionaryLike(Type type) =>
-            new[] { type }.Concat(type.GetInterfaces())
+        internal static bool IsDictionaryLike(Type type)
+            => new[] { type }.Concat(type.GetInterfaces())
                 .Any(candidate => candidate.IsGenericType && IsDictionaryDefinition(candidate.GetGenericTypeDefinition()));
 
         internal static bool IsDataClass(Type type)
@@ -115,8 +115,8 @@ namespace Alis.Reactive.Members
                    || definition == typeof(ISet<>);
         }
 
-        private static bool IsDictionaryDefinition(Type definition) =>
-            definition == typeof(Dictionary<,>)
+        private static bool IsDictionaryDefinition(Type definition)
+            => definition == typeof(Dictionary<,>)
             || definition == typeof(IDictionary<,>)
             || definition == typeof(IReadOnlyDictionary<,>);
     }

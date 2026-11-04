@@ -21,8 +21,8 @@ namespace Alis.Reactive.Fusion
         private ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();
 
         /// <summary>Raised when the user selects files, before the uploader adds them; set <c>Cancel</c> to refuse them.</summary>
-        public Event<FusionFileUploadSelectedArgs> Selected =>
-            Event<FusionFileUploadSelectedArgs>();
+        public Event<FusionFileUploadSelectedArgs> Selected
+            => Event<FusionFileUploadSelectedArgs>();
 
         /// <summary>
         /// Raised once the uploader holds the files the user chose: after files are added or a selection is
@@ -34,8 +34,8 @@ namespace Alis.Reactive.Fusion
         /// <c>filesChanged</c> once it has. The input commits on it, so a form re-checks the files the user
         /// now sees. Clearing the files (a form reset) raises nothing.
         /// </remarks>
-        public Event<FusionFileUploadFilesChangedArgs> FilesChanged =>
-            Event<FusionFileUploadFilesChangedArgs>();
+        public Event<FusionFileUploadFilesChangedArgs> FilesChanged
+            => Event<FusionFileUploadFilesChangedArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Files, committedBy: FilesChanged);
     }

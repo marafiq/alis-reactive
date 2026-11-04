@@ -18,6 +18,6 @@ public sealed class FusionContextMenuLocator
 
     public ILocator Lists => Root.Locator("xpath=..");
 
-    public ILocator Item(string text) =>
-        Lists.GetByRole(AriaRole.Menuitem).Filter(new() { HasTextRegex = new Regex($@"^\s*{Regex.Escape(text)}\s*$") });
+    public ILocator Item(string text)
+        => Lists.GetByRole(AriaRole.Menuitem).Filter(new() { HasTextRegex = new Regex($@"^\s*{Regex.Escape(text)}\s*$") });
 }

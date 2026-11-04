@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Grammar;
-using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Inputs;
 using Alis.Reactive.PlanModel.Validation;
+using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Writing;
 
 namespace Alis.Reactive
@@ -27,8 +27,8 @@ namespace Alis.Reactive
             return true;
         }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Not(BlankOrDefault(value, fieldShape));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Not(BlankOrDefault(value, fieldShape));
     }
 
     /// <summary>
@@ -64,8 +64,8 @@ namespace Alis.Reactive
         /// <summary>The member the type's default binds as, which the rule refuses.</summary>
         public string DefaultMember { get; }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Not(G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember))));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Not(G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember))));
     }
 
     /// <summary>A list has at least one item: what <see cref="BrowserRule.NotEmpty"/> asks of a list.</summary>
@@ -76,8 +76,8 @@ namespace Alis.Reactive
         {
         }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0));
     }
 
     /// <summary>
@@ -99,8 +99,8 @@ namespace Alis.Reactive
             return true;
         }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            BlankOrDefault(value, fieldShape);
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => BlankOrDefault(value, fieldShape);
     }
 
     /// <summary>A list has no items: what <see cref="BrowserRule.Empty"/> asks of a list.</summary>
@@ -111,8 +111,8 @@ namespace Alis.Reactive
         {
         }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0)));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Not(G.Op(Operator.Gt, G.Get(value, new[] { "length" }, Shape.Any), G.Lit(0)));
     }
 
     /// <summary>Nothing chosen, or the enum member the type's default binds as: what <see cref="BrowserRule.Empty"/> asks of an enum.</summary>
@@ -127,8 +127,8 @@ namespace Alis.Reactive
         /// <summary>The member the type's default binds as, which the rule takes.</summary>
         public string DefaultMember { get; }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember)));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Or(NothingEntered(value), G.Eq(G.Op(Operator.ToText, value), G.Lit(DefaultMember)));
     }
 
     /// <summary>Text at least <see cref="Length"/> characters long.</summary>
@@ -143,8 +143,8 @@ namespace Alis.Reactive
         /// <summary>The fewest characters.</summary>
         public int Length { get; }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Or(Absent(value), G.Op(Operator.Gte, TextLength(value), G.Lit(Length)));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Or(Absent(value), G.Op(Operator.Gte, TextLength(value), G.Lit(Length)));
     }
 
     /// <summary>Text at most <see cref="Length"/> characters long.</summary>
@@ -159,8 +159,8 @@ namespace Alis.Reactive
         /// <summary>The most characters.</summary>
         public int Length { get; }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Or(Absent(value), G.Op(Operator.Lte, TextLength(value), G.Lit(Length)));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Or(Absent(value), G.Op(Operator.Lte, TextLength(value), G.Lit(Length)));
     }
 
     /// <summary>
@@ -182,8 +182,8 @@ namespace Alis.Reactive
         /// <summary>JavaScript flags: <c>i</c>, <c>m</c>, <c>s</c>; empty for none.</summary>
         public string Flags { get; }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Or(Absent(value), G.Op(Operator.Matches, value, G.Lit(Pattern), G.Lit(Flags)));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Or(Absent(value), G.Op(Operator.Matches, value, G.Lit(Pattern), G.Lit(Flags)));
     }
 
     /// <summary>A card number that passes the Luhn check.</summary>
@@ -194,8 +194,8 @@ namespace Alis.Reactive
         {
         }
 
-        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) =>
-            G.Or(Absent(value), CardNumber(value, scope));
+        internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
+            => G.Or(Absent(value), CardNumber(value, scope));
 
         private static Expr CardNumber(Expr v, Scope scope)
         {
@@ -292,8 +292,8 @@ namespace Alis.Reactive
 
         private protected override bool ComparesWithMember => false;
 
-        private protected override Expr Target(FormFieldValues values, Scope scope) =>
-            ValueExpression.LiteralFor(_value, Shape).Write(scope);
+        private protected override Expr Target(FormFieldValues values, Scope scope)
+            => ValueExpression.LiteralFor(_value, Shape).Write(scope);
     }
 
     /// <summary>The value compares with another member of the model, read as the page binds it.</summary>
@@ -309,8 +309,8 @@ namespace Alis.Reactive
 
         internal override IEnumerable<FieldReference> Fields => new[] { _peer };
 
-        internal override BrowserRule PrefixedBy(string prefix, Condition outer) =>
-            new MemberComparisonRule(Comparison, _peer.PrefixedBy(prefix), Message, Condition.Combine(outer, Condition.PrefixedBy(prefix)));
+        internal override BrowserRule PrefixedBy(string prefix, Condition outer)
+            => new MemberComparisonRule(Comparison, _peer.PrefixedBy(prefix), Message, Condition.Combine(outer, Condition.PrefixedBy(prefix)));
 
         private protected override bool ComparesWithMember => true;
 
@@ -337,8 +337,8 @@ namespace Alis.Reactive
         public bool Inclusive { get; }
 
         /// <summary>The bounds as numbers, which is what a component's numeric range takes; null for dates or text.</summary>
-        public (decimal From, decimal To)? NumericBounds =>
-            AsNumber(_from) is decimal from && AsNumber(_to) is decimal to ? (from, to) : null;
+        public (decimal From, decimal To)? NumericBounds
+            => AsNumber(_from) is decimal from && AsNumber(_to) is decimal to ? (from, to) : null;
 
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {

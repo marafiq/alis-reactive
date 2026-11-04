@@ -23,8 +23,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Native
         }
 
         [HttpGet("ReturningVisitor")]
-        public IActionResult FindReturningVisitor([FromQuery] ReturningVisitorQuery query) =>
-            query.Phone switch
+        public IActionResult FindReturningVisitor([FromQuery] ReturningVisitorQuery query)
+            => query.Phone switch
             {
                 "555-0142" => Ok(new ReturningVisitor
                 {

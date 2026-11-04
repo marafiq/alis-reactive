@@ -15,8 +15,8 @@ public class WhenCoordinatorExplainsACareLevel : PlaywrightTestBase
     private ILocator Explain => Page.Locator("#explain-memory-care");
     private ILocator GotIt => Page.Locator("#explanation-done");
 
-    private NativeCheckBoxLocator HideExplanations =>
-        new(Page, IdGenerator.For<TooltipModel>(m => m.HideExplanations));
+    private NativeCheckBoxLocator HideExplanations
+        => new(Page, IdGenerator.For<TooltipModel>(m => m.HideExplanations));
 
     [Test]
     public async Task explaining_memory_care_shows_the_explanation_and_highlights_the_term()

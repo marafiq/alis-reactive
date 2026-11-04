@@ -75,8 +75,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static readonly string[] OnHerDischargeSummary = ["shellfish", "penicillin"];
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/MultiSelect/Index.cshtml", new FusionMultiSelectModel
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/MultiSelect/Index.cshtml", new FusionMultiSelectModel
             {
                 Allergies = OnHerChart,
                 Texture = "regular",
@@ -89,15 +89,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
 
         [HttpGet("TrayTicket")]
-        public IActionResult TrayTicket([FromQuery] TrayTicketQuery query) =>
-            Ok(new TrayTicketLine { Line = TicketFor(query.Allergies) });
+        public IActionResult TrayTicket([FromQuery] TrayTicketQuery query)
+            => Ok(new TrayTicketLine { Line = TicketFor(query.Allergies) });
 
         [HttpGet("Discharge")]
         public IActionResult Discharge() => Ok(new DischargeAllergies { Allergies = OnHerDischargeSummary });
 
         [HttpGet("Snacks")]
-        public IActionResult Snacks([FromQuery] SnackQuery query) =>
-            SnacksFor(query.Texture) is { } snacks ? Ok(new TextureSnacks { Snacks = snacks }) : NotFound();
+        public IActionResult Snacks([FromQuery] SnackQuery query)
+            => SnacksFor(query.Texture) is { } snacks ? Ok(new TextureSnacks { Snacks = snacks }) : NotFound();
 
         [HttpGet("Supplements")]
         public async Task<IActionResult> Supplements([FromQuery] SupplementSearch search)
@@ -155,11 +155,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return foods.Count == 0 ? "Tray ticket: no food allergies." : $"Tray ticket: {string.Join(", ", foods)}.";
         }
 
-        private static string Names(IEnumerable<AllergyChoice> choices, string[]? ids) =>
-            Join(ids, id => choices.FirstOrDefault(choice => choice.Id == id)?.Name);
+        private static string Names(IEnumerable<AllergyChoice> choices, string[]? ids)
+            => Join(ids, id => choices.FirstOrDefault(choice => choice.Id == id)?.Name);
 
-        private static string Names(IEnumerable<MenuChoice> choices, string[]? ids) =>
-            Join(ids, id => Named(choices, id)?.Name);
+        private static string Names(IEnumerable<MenuChoice> choices, string[]? ids)
+            => Join(ids, id => Named(choices, id)?.Name);
 
         private static string Join(string[]? ids, Func<string, string?> nameOf)
         {
@@ -167,7 +167,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             return names.Count == 0 ? "none" : string.Join(", ", names);
         }
 
-        private static MenuChoice? Named(IEnumerable<MenuChoice> choices, string? id) =>
-            choices.FirstOrDefault(choice => choice.Id == id);
+        private static MenuChoice? Named(IEnumerable<MenuChoice> choices, string? id)
+            => choices.FirstOrDefault(choice => choice.Id == id);
     }
 }

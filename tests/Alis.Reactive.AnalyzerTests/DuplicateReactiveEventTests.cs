@@ -10,8 +10,8 @@ public class DuplicateReactiveEventTests
         "Multiple .Reactive() calls for 'Click' on the same builder chain. Combine into a single .Reactive() call.";
 
     [Test]
-    public Task a_button_wiring_the_same_event_twice_is_reported() =>
-        Fixture.Reports<DuplicateReactiveEventAnalyzer>("ALIS003", Message, Fixture.View, View(
+    public Task a_button_wiring_the_same_event_twice_is_reported()
+        => Fixture.Reports<DuplicateReactiveEventAnalyzer>("ALIS003", Message, Fixture.View, View(
             """
             [|Html.NativeButton("send", "Send the offer")
                 .Reactive(plan, evt => evt.Click, (click, p) => p.Post("/offer"))
@@ -19,8 +19,8 @@ public class DuplicateReactiveEventTests
             """));
 
     [Test]
-    public Task a_rendered_component_wiring_the_same_event_twice_is_reported() =>
-        Fixture.Reports<DuplicateReactiveEventAnalyzer>("ALIS003", Message, Fixture.View, View(
+    public Task a_rendered_component_wiring_the_same_event_twice_is_reported()
+        => Fixture.Reports<DuplicateReactiveEventAnalyzer>("ALIS003", Message, Fixture.View, View(
             """
             [|plan.Render<NativeButton>("send", new HtmlString("<button id=\"send\">Send the offer</button>"))
                 .Reactive(evt => evt.Click, (click, p) => p.Post("/offer"))
@@ -28,8 +28,8 @@ public class DuplicateReactiveEventTests
             """));
 
     [Test]
-    public Task different_events_on_one_chain_are_not_reported() =>
-        Fixture.ReportsNothing<DuplicateReactiveEventAnalyzer>(Fixture.View, View(
+    public Task different_events_on_one_chain_are_not_reported()
+        => Fixture.ReportsNothing<DuplicateReactiveEventAnalyzer>(Fixture.View, View(
             """
             plan.Render<Thermostat>("thermostat", new HtmlString("<div id=\"thermostat\"></div>"))
                 .Reactive(evt => evt.Changed, (reading, p) => p.Element("degrees").Text.Set(reading.Degrees))
@@ -37,16 +37,16 @@ public class DuplicateReactiveEventTests
             """));
 
     [Test]
-    public Task the_same_event_on_two_components_is_not_reported() =>
-        Fixture.ReportsNothing<DuplicateReactiveEventAnalyzer>(Fixture.View, View(
+    public Task the_same_event_on_two_components_is_not_reported()
+        => Fixture.ReportsNothing<DuplicateReactiveEventAnalyzer>(Fixture.View, View(
             """
             Html.NativeButton("send", "Send the offer").Reactive(plan, evt => evt.Click, (click, p) => p.Post("/offer"));
             Html.NativeButton("start-over", "Start over").Reactive(plan, evt => evt.Click, (click, p) => p.Get("/offer/new"));
             """));
 
     [Test]
-    public Task a_file_that_is_not_a_view_is_left_alone() =>
-        Fixture.ReportsNothing<DuplicateReactiveEventAnalyzer>(Fixture.Controller, View(
+    public Task a_file_that_is_not_a_view_is_left_alone()
+        => Fixture.ReportsNothing<DuplicateReactiveEventAnalyzer>(Fixture.Controller, View(
             """
             Html.NativeButton("send", "Send the offer")
                 .Reactive(plan, evt => evt.Click, (click, p) => p.Post("/offer"))

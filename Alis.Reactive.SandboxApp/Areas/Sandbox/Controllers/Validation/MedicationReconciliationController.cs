@@ -19,12 +19,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         }
 
         [HttpPost("Save")]
-        public IActionResult Save([FromBody] MedicationReconciliationModel? reconciliation) =>
-            Accept(reconciliation, "Reconciliation saved");
+        public IActionResult Save([FromBody] MedicationReconciliationModel? reconciliation)
+            => Accept(reconciliation, "Reconciliation saved");
 
         [HttpPost("Print")]
-        public IActionResult Print([FromBody] MedicationReconciliationModel? reconciliation) =>
-            Accept(reconciliation, "MAR printed");
+        public IActionResult Print([FromBody] MedicationReconciliationModel? reconciliation)
+            => Accept(reconciliation, "MAR printed");
 
         private IActionResult Accept(MedicationReconciliationModel? reconciliation, string outcome)
         {

@@ -1,6 +1,6 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -9,8 +9,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private static readonly DateOnly CarePlanReviewWeekEnds = new(2026, 10, 18);
 
         [HttpGet("InlineEdit"), ActionName("InlineEdit")]
-        public IActionResult CarePlanReviewsPage() =>
-            View(
+        public IActionResult CarePlanReviewsPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/InlineEdit.cshtml",
                 new CarePlanReviewsViewModel
                 {
@@ -50,8 +50,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static DateOnly CarePlanReviewDate(string day) => DateOnly.ParseExact(day, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        private static string CarePlanReviewDay(string day) =>
-            CarePlanReviewDate(day).ToString("dddd, MMMM d", CultureInfo.InvariantCulture);
+        private static string CarePlanReviewDay(string day)
+            => CarePlanReviewDate(day).ToString("dddd, MMMM d", CultureInfo.InvariantCulture);
 
         private static List<CarePlanReview> CarePlanReviewsOnFile() => new()
         {

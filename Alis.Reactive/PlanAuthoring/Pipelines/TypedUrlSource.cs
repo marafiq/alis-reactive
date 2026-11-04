@@ -1,5 +1,5 @@
-using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Requests;
+using Alis.Reactive.PlanModel.Values;
 
 namespace Alis.Reactive.PlanAuthoring.Pipelines
 {
@@ -13,7 +13,7 @@ namespace Alis.Reactive.PlanAuthoring.Pipelines
             _paramName = paramName;
         }
 
-        internal override ValueExpression Expression =>
-            ValueExpression.ReadUrl(_paramName, shape: Shape);
+        internal override ValueExpression Expression
+            => ValueExpression.ReadUrl(_paramName, shape: Shape);
     }
 }

@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     public partial class GridController
     {
         [HttpGet("BatchCellEdit"), ActionName("BatchCellEdit")]
-        public IActionResult TaskCountPage() =>
-            View(
+        public IActionResult TaskCountPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/BatchCellEdit.cshtml",
                 new TaskCountViewModel { Residents = TaskCountOnFile() });
 

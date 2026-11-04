@@ -13,8 +13,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         public IActionResult Index() => View(Views + "Index.cshtml", new OutingModel());
 
         [HttpGet("Companion")]
-        public IActionResult Companion() =>
-            PartialView(Views + "_Companion.cshtml", new OutingModel { Companion = new OutingCompanion() });
+        public IActionResult Companion()
+            => PartialView(Views + "_Companion.cshtml", new OutingModel { Companion = new OutingCompanion() });
 
         [HttpGet("NoCompanion")]
         public IActionResult NoCompanion() => PartialView(Views + "_NoCompanion.cshtml");

@@ -32,34 +32,34 @@ namespace Alis.Reactive.Fusion
         public FusionInPlaceEditorElement Element => Object<FusionInPlaceEditorElement>();
 
         /// <summary>Raised before the editor opens.</summary>
-        public Event<FusionInPlaceEditorBeginEditArgs> BeginEdit =>
-            Event<FusionInPlaceEditorBeginEditArgs>();
+        public Event<FusionInPlaceEditorBeginEditArgs> BeginEdit
+            => Event<FusionInPlaceEditorBeginEditArgs>();
 
         /// <summary>Raised before the editor closes.</summary>
-        public Event<FusionInPlaceEditorEndEditArgs> EndEdit =>
-            Event<FusionInPlaceEditorEndEditArgs>();
+        public Event<FusionInPlaceEditorEndEditArgs> EndEdit
+            => Event<FusionInPlaceEditorEndEditArgs>();
 
         /// <summary>Raised when the value changes.</summary>
-        public Event<FusionInPlaceEditorChangeArgs> Change =>
-            Event<FusionInPlaceEditorChangeArgs>();
+        public Event<FusionInPlaceEditorChangeArgs> Change
+            => Event<FusionInPlaceEditorChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: EndEdit);
 
         /// <summary>Raised before the value is submitted.</summary>
-        public Event<FusionInPlaceEditorActionBeginArgs> ActionBegin =>
-            Event<FusionInPlaceEditorActionBeginArgs>();
+        public Event<FusionInPlaceEditorActionBeginArgs> ActionBegin
+            => Event<FusionInPlaceEditorActionBeginArgs>();
 
         /// <summary>Raised after the value is submitted.</summary>
-        public Event<FusionInPlaceEditorActionSuccessArgs> ActionSuccess =>
-            Event<FusionInPlaceEditorActionSuccessArgs>();
+        public Event<FusionInPlaceEditorActionSuccessArgs> ActionSuccess
+            => Event<FusionInPlaceEditorActionSuccessArgs>();
 
         /// <summary>Raised when the user clicks save.</summary>
-        public Event<FusionInPlaceEditorSubmitClickArgs> SubmitClick =>
-            Event<FusionInPlaceEditorSubmitClickArgs>();
+        public Event<FusionInPlaceEditorSubmitClickArgs> SubmitClick
+            => Event<FusionInPlaceEditorSubmitClickArgs>();
 
         /// <summary>Raised when the user clicks cancel.</summary>
-        public Event<FusionInPlaceEditorCancelClickArgs> CancelClick =>
-            Event<FusionInPlaceEditorCancelClickArgs>();
+        public Event<FusionInPlaceEditorCancelClickArgs> CancelClick
+            => Event<FusionInPlaceEditorCancelClickArgs>();
     }
 
     /// <summary>The element the in-place editor renders into.</summary>
@@ -267,7 +267,7 @@ namespace Alis.Reactive.Fusion
             _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal override InPlaceEditorBuilder ApplyTo(InPlaceEditorBuilder builder) =>
-            builder.Value(_value);
+        internal override InPlaceEditorBuilder ApplyTo(InPlaceEditorBuilder builder)
+            => builder.Value(_value);
     }
 }

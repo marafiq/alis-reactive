@@ -43,11 +43,11 @@ public class WhenDecidingARespiteStay : PlaywrightTestBase
         await field.BlurAsync();
     }
 
-    private async Task Choose(string label, string option) =>
-        await Field(label).SelectOptionAsync(new SelectOptionValue { Label = option });
+    private async Task Choose(string label, string option)
+        => await Field(label).SelectOptionAsync(new SelectOptionValue { Label = option });
 
-    private async Task Answer(string button) =>
-        await ClickWhenStable(ConfirmDialog.GetByRole(AriaRole.Button, new() { Name = button }));
+    private async Task Answer(string button)
+        => await ClickWhenStable(ConfirmDialog.GetByRole(AriaRole.Button, new() { Name = button }));
 
     [Test]
     public async Task of_age_with_a_bed_outside_memory_care_is_approved_and_without_a_bed_or_in_memory_care_is_not()

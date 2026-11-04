@@ -12,8 +12,8 @@ public class WhenUsingFusionGridActionCompleteSaveEdit : PlaywrightTestBase
     private const int NurseColumn = 4;
 
     private ILocator Rows => Page.Locator($"#{RosterId} .e-row");
-    private ILocator Cell(string resident, int column) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator Cell(string resident, int column)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
     private ILocator Editor(string field) => Page.Locator($"#{RosterId}{field}");
     private ILocator PharmacyNotice => Page.Locator("#pharmacy-notice");
 

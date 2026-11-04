@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
@@ -8,8 +8,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         private const int GardenOutingBusSeats = 4;
 
         [HttpGet("RosterSelection"), ActionName("RosterSelection")]
-        public IActionResult GardenOutingPage() =>
-            View(
+        public IActionResult GardenOutingPage()
+            => View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Grid/RosterSelection.cshtml",
                 new RosterSelectionModel
                 {
@@ -30,10 +30,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
             var overBy = riders.Count - GardenOutingBusSeats;
             if (overBy > 0)
+            {
                 return BadRequest(new GardenOutingBooked
                 {
                     Summary = $"The bus seats {GardenOutingBusSeats}; take {GardenOutingResidents(overBy)} off before booking."
                 });
+            }
 
             return Ok(new GardenOutingBooked
             {
@@ -44,8 +46,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 
         private static string GardenOutingResidents(int count) => count == 1 ? "1 resident" : $"{count} residents";
 
-        private static string GardenOutingNames(List<string> names) =>
-            names.Count == 1 ? names[0] : $"{string.Join(", ", names.Take(names.Count - 1))} and {names[^1]}";
+        private static string GardenOutingNames(List<string> names)
+            => names.Count == 1 ? names[0] : $"{string.Join(", ", names.Take(names.Count - 1))} and {names[^1]}";
 
         private static List<GardenOutingSignUp> GardenOutingSignUps() => new()
         {

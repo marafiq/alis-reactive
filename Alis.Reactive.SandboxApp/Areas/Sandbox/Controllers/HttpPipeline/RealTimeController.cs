@@ -41,8 +41,8 @@ public class RealTimeController : Controller
     }
 
     [HttpGet("ResidentPanelClosed")]
-    public IActionResult ResidentPanelClosed() =>
-        PartialView("~/Areas/Sandbox/Views/HttpPipeline/RealTime/_ResidentPanelClosed.cshtml");
+    public IActionResult ResidentPanelClosed()
+        => PartialView("~/Areas/Sandbox/Views/HttpPipeline/RealTime/_ResidentPanelClosed.cshtml");
 
     [HttpPost("PushResidentStatus")]
     public async Task<IActionResult> PushResidentStatus([FromBody] ResidentStatusPayload payload, [FromQuery] string? drill)
@@ -110,8 +110,8 @@ public class RealTimeController : Controller
 
     private static readonly ConcurrentDictionary<string, FacilityDrillWorld> DrillWorlds = new();
 
-    private static FacilityDrillWorld DrillWorldFor(string? drillId) =>
-        DrillWorlds.GetOrAdd(drillId ?? "", _ => new FacilityDrillWorld());
+    private static FacilityDrillWorld DrillWorldFor(string? drillId)
+        => DrillWorlds.GetOrAdd(drillId ?? "", _ => new FacilityDrillWorld());
 
     public record OutageDrillRequest(string DrillId);
 

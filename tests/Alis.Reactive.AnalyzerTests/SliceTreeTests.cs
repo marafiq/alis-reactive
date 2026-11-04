@@ -13,14 +13,14 @@ public class SliceTreeTests
     private const string TagHelpers = "Alis.Reactive.NativeTagHelpers";
     private const string TagHelpersTable = ".\n*\n";
 
-    private static string Upward(string from, string symbol, string to) =>
-        $"'{from}' uses '{symbol}' of slice '{to}', a row above it in SliceTree.txt; a slice uses only slices in rows below it";
+    private static string Upward(string from, string symbol, string to)
+        => $"'{from}' uses '{symbol}' of slice '{to}', a row above it in SliceTree.txt; a slice uses only slices in rows below it";
 
-    private static string SameRow(string from, string symbol, string to) =>
-        $"'{from}' uses '{symbol}' of slice '{to}', the same row in SliceTree.txt; a slice uses only slices in rows below it";
+    private static string SameRow(string from, string symbol, string to)
+        => $"'{from}' uses '{symbol}' of slice '{to}', the same row in SliceTree.txt; a slice uses only slices in rows below it";
 
-    private static string WrongNamespace(string file, string actual, string expected) =>
-        $"'{file}' is in namespace '{actual}'; expected '{expected}': a file that declares a public type has the package namespace, any other file's namespace is its folder";
+    private static string WrongNamespace(string file, string actual, string expected)
+        => $"'{file}' is in namespace '{actual}'; expected '{expected}': a file that declares a public type has the package namespace, any other file's namespace is its folder";
 
     private static string Disagree(string what) => $"SliceTree.txt and the package disagree: {what}";
 
@@ -35,8 +35,8 @@ public class SliceTreeTests
         """);
 
     [Test]
-    public Task a_call_into_a_slice_above_is_reported_where_it_is_written() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS010",
+    public Task a_call_into_a_slice_above_is_reported_where_it_is_written()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS010",
             Upward("Tokens", "Alis.Reactive.DesignSystem.Layout.Stack.Width()", "Layout"),
             ("Tokens/Color.cs",
                 """
@@ -52,8 +52,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task a_base_type_in_a_slice_above_is_reported_at_the_class() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS010",
+    public Task a_base_type_in_a_slice_above_is_reported_at_the_class()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS010",
             Upward("Tokens", "Alis.Reactive.DesignSystem.Layout.Stack", "Layout"),
             ("Tokens/Color.cs",
                 """
@@ -68,8 +68,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task a_generic_argument_in_a_slice_above_is_reported_at_the_parameter() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS010",
+    public Task a_generic_argument_in_a_slice_above_is_reported_at_the_parameter()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS010",
             Upward("Tokens", "Alis.Reactive.DesignSystem.Layout.Stack", "Layout"),
             ("Tokens/Color.cs",
                 """
@@ -88,8 +88,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task two_slices_of_one_wildcard_row_using_each_other_are_reported() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(Fusion, FusionTable, "ALIS010",
+    public Task two_slices_of_one_wildcard_row_using_each_other_are_reported()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(Fusion, FusionTable, "ALIS010",
             SameRow("Components/FusionGrid", "Alis.Reactive.Fusion.Components.FusionToast.ToastHelper.Text", "Components/FusionToast"),
             ("FusionThing.cs",
                 """
@@ -137,8 +137,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task each_top_folder_of_a_star_row_is_its_own_slice() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(TagHelpers, TagHelpersTable, "ALIS010",
+    public Task each_top_folder_of_a_star_row_is_its_own_slice()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(TagHelpers, TagHelpersTable, "ALIS010",
             SameRow("Card", "Alis.Reactive.NativeTagHelpers.Kv.KvTagHelper.Open()", "Kv"),
             ("Spacing.cs",
                 """
@@ -170,8 +170,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task the_root_files_are_the_lowest_slice() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(Fusion, FusionTable, "ALIS010",
+    public Task the_root_files_are_the_lowest_slice()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(Fusion, FusionTable, "ALIS010",
             Upward(".", "Alis.Reactive.Fusion.Templates.Template.Name", "Templates"),
             ("FusionThing.cs",
                 """
@@ -211,8 +211,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task a_slice_using_a_slice_below_it_is_not_reported() =>
-        Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable,
+    public Task a_slice_using_a_slice_below_it_is_not_reported()
+        => Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable,
             ("Tokens/Color.cs",
                 """
                 namespace Alis.Reactive.DesignSystem.Tokens;
@@ -235,8 +235,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task an_applications_own_folders_are_left_alone() =>
-        Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(Fixture.AppAssembly, table: null,
+    public Task an_applications_own_folders_are_left_alone()
+        => Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(Fixture.AppAssembly, table: null,
             ("Tokens/Color.cs",
                 """
                 using MapleGrove.Web.Layout;
@@ -259,8 +259,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task a_folder_without_a_row_is_reported_at_its_file() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS013",
+    public Task a_folder_without_a_row_is_reported_at_its_file()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS013",
             Disagree("folder 'Themes' has no row"),
             ("Tokens/Color.cs",
                 """
@@ -281,8 +281,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task a_row_entry_that_names_no_folder_is_reported_in_the_table() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, "Tokens\n[|Layout|]\n", "ALIS013",
+    public Task a_row_entry_that_names_no_folder_is_reported_in_the_table()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, "Tokens\n[|Layout|]\n", "ALIS013",
             Disagree("entry 'Layout' names no folder"),
             ("Tokens/Color.cs",
                 """
@@ -294,8 +294,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task a_type_declared_in_two_slices_is_reported() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS013",
+    public Task a_type_declared_in_two_slices_is_reported()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS013",
             Disagree("'Alis.Reactive.DesignSystem.Color' is declared in slices 'Tokens' and 'Layout'"),
             ("Tokens/Color.cs",
                 """
@@ -315,8 +315,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task an_internal_file_in_the_package_namespace_is_reported() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS011",
+    public Task an_internal_file_in_the_package_namespace_is_reported()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS011",
             WrongNamespace("Tokens/Color.cs", "Alis.Reactive.DesignSystem", "Alis.Reactive.DesignSystem.Tokens"),
             ("Tokens/Color.cs",
                 """
@@ -329,8 +329,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task a_public_types_file_in_its_folder_namespace_is_reported() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS011",
+    public Task a_public_types_file_in_its_folder_namespace_is_reported()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS011",
             WrongNamespace("Tokens/Color.cs", "Alis.Reactive.DesignSystem.Tokens", "Alis.Reactive.DesignSystem"),
             ("Tokens/Color.cs",
                 """
@@ -343,8 +343,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task the_right_namespaces_are_not_reported() =>
-        Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(Fusion, FusionTable,
+    public Task the_right_namespaces_are_not_reported()
+        => Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(Fusion, FusionTable,
             ("FusionThing.cs",
                 """
                 namespace Alis.Reactive.Fusion;
@@ -379,8 +379,8 @@ public class SliceTreeTests
                 """));
 
     [Test]
-    public Task a_public_class_nothing_derives_from_is_reported() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS012",
+    public Task a_public_class_nothing_derives_from_is_reported()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable, "ALIS012",
             "'Alis.Reactive.DesignSystem.Color' is public and nothing in the package derives from it; seal it",
             ("Tokens/Color.cs",
                 """
@@ -393,8 +393,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task a_public_class_with_a_subclass_in_the_package_is_not_reported() =>
-        Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable,
+    public Task a_public_class_with_a_subclass_in_the_package_is_not_reported()
+        => Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable,
             ("Tokens/Color.cs",
                 """
                 namespace Alis.Reactive.DesignSystem;
@@ -410,8 +410,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task abstract_static_and_internal_classes_are_not_reported() =>
-        Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable,
+    public Task abstract_static_and_internal_classes_are_not_reported()
+        => Fixture.ReportsNothingInPackage<SliceTreeAnalyzer>(DesignSystem, DesignSystemTable,
             ("Tokens/Color.cs",
                 """
                 namespace Alis.Reactive.DesignSystem;
@@ -431,8 +431,8 @@ public class SliceTreeTests
             Stack);
 
     [Test]
-    public Task a_shipped_package_without_a_table_is_reported() =>
-        Fixture.ReportsInPackage<SliceTreeAnalyzer>(Fusion, table: null, "ALIS013",
+    public Task a_shipped_package_without_a_table_is_reported()
+        => Fixture.ReportsInPackage<SliceTreeAnalyzer>(Fusion, table: null, "ALIS013",
             Disagree("'Alis.Reactive.Fusion' ships without a SliceTree.txt"),
             ("Templates/Form.cs",
                 """

@@ -8,7 +8,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.CoreBehaviors
     public class RoomWhiteboardController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/CoreBehaviors/RoomWhiteboard/Index.cshtml", new RoomWhiteboardModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/CoreBehaviors/RoomWhiteboard/Index.cshtml", new RoomWhiteboardModel());
     }
 }

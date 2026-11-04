@@ -10,8 +10,8 @@ public class WhenUsingFusionGridShiftTaskTally : PlaywrightTestBase
     private const int PrnDosesColumn = 5;
 
     private ILocator Rows => Page.Locator($"#{TallyId} .e-row");
-    private ILocator Cell(string resident, int column) =>
-        Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
+    private ILocator Cell(string resident, int column)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{column}']");
     private ILocator Editor(string field) => Page.Locator($"#{TallyId}{field}");
     private ILocator StartTally => Page.Locator("#tally-start");
     private ILocator SyncFromEmar => Page.Locator("#tally-emar-sync");

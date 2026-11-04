@@ -42,8 +42,8 @@ namespace Alis.Reactive
         /// The messages by field, in the order the rules are written: what a 400 response sends as
         /// <c>errors</c> for the page to show beside each field.
         /// </summary>
-        public IReadOnlyDictionary<string, string[]> ErrorsByField =>
-            Errors.GroupBy(error => error.PropertyName, StringComparer.Ordinal)
+        public IReadOnlyDictionary<string, string[]> ErrorsByField
+            => Errors.GroupBy(error => error.PropertyName, StringComparer.Ordinal)
                 .ToDictionary(messages => messages.Key, messages => messages.Select(error => error.ErrorMessage).ToArray(), StringComparer.Ordinal);
     }
 }

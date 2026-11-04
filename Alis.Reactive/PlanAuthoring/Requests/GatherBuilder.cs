@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Alis.Reactive.PlanModel.Requests;
-using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.Inputs;
 using Alis.Reactive.Members;
 using Alis.Reactive.PlanAuthoring.Requests;
+using Alis.Reactive.PlanModel.Requests;
+using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive
@@ -184,8 +184,10 @@ namespace Alis.Reactive
         public GatherBuilder<TRequest, TModel> Header(string name, string value)
         {
             if (value == null)
+            {
                 throw new ArgumentNullException(nameof(value),
                     $"Header '{name}' needs a value. A value read at runtime takes the source overload.");
+            }
 
             _draft.AddHeader(HeaderName.Of(name).Value, ValueExpression.Literal(value));
             return this;

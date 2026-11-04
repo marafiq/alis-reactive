@@ -43,8 +43,8 @@ namespace Alis.Reactive.Components
 
         internal bool Awaits { get; }
 
-        internal static ComponentMethod Of(string name, Path path, IReadOnlyList<Shape> argumentShapes, bool awaits) =>
-            new ComponentMethod(name, path, argumentShapes, awaits);
+        internal static ComponentMethod Of(string name, Path path, IReadOnlyList<Shape> argumentShapes, bool awaits)
+            => new ComponentMethod(name, path, argumentShapes, awaits);
     }
 
     internal static class BrowserElementMembers

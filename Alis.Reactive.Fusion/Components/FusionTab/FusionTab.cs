@@ -32,8 +32,8 @@ namespace Alis.Reactive.Fusion
         public void HideTab(Arg<int> index, Arg<bool> value) => Method(index, value);
 
         /// <summary>Raised after a tab is selected.</summary>
-        public Event<FusionTabSelectedArgs> Selected =>
-            Event<FusionTabSelectedArgs>();
+        public Event<FusionTabSelectedArgs> Selected
+            => Event<FusionTabSelectedArgs>();
     }
 
     /// <summary>Payload of <see cref="FusionTab.Selected"/>.</summary>

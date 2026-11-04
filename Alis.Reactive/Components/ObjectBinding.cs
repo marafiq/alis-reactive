@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Reactions;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.WireTerms;
-using Alis.Reactive.PlanModel.Reactions;
 
 namespace Alis.Reactive.Components
 {
@@ -34,8 +34,8 @@ namespace Alis.Reactive.Components
             Context.AddStep(new CallStep(target, method.Path.TargetText, args, method.ArgumentShapes, method.Awaits));
         }
 
-        internal ValueExpression Invoke(ComponentMethod method, IReadOnlyList<ValueExpression> args, Shape returns) =>
-            ValueExpression.MethodResult(
+        internal ValueExpression Invoke(ComponentMethod method, IReadOnlyList<ValueExpression> args, Shape returns)
+            => ValueExpression.MethodResult(
                 ValueExpression.Call(Locate(), method.Path.TargetText, args, method.ArgumentShapes, returns),
                 method.Name,
                 method.Awaits);

@@ -42,8 +42,8 @@ namespace Alis.Reactive.Fusion
         public void HidePopup() => Method();
 
         /// <summary>Raised when the selection changes.</summary>
-        public Event<FusionMultiColumnComboBoxChangeArgs> Change =>
-            Event<FusionMultiColumnComboBoxChangeArgs>();
+        public Event<FusionMultiColumnComboBoxChangeArgs> Change
+            => Event<FusionMultiColumnComboBoxChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

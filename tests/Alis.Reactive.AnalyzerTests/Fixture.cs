@@ -81,8 +81,8 @@ internal static class Fixture
             .GetAnalyzerDiagnosticsAsync();
     }
 
-    private static string DescribeInPackage(string id, string path, TextSpan span, string message) =>
-        $"{id} {path} ({span.Start}..{span.End}) {message}";
+    private static string DescribeInPackage(string id, string path, TextSpan span, string message)
+        => $"{id} {path} ({span.Start}..{span.End}) {message}";
 
     private static (string? Table, (string Path, string Source)[] Files, string MarkedPath, TextSpan MarkedSpan) UnmarkPackage(string? table, (string Path, string Source)[] files)
     {
@@ -132,8 +132,8 @@ internal static class Fixture
             .GetAnalyzerDiagnosticsAsync();
     }
 
-    private static string Describe(string id, TextSpan span, string message, string source) =>
-        $"{id} [|{source.Substring(span.Start, span.Length)}|] ({span.Start}..{span.End}) {message}";
+    private static string Describe(string id, TextSpan span, string message, string source)
+        => $"{id} [|{source.Substring(span.Start, span.Length)}|] ({span.Start}..{span.End}) {message}";
 
     private static (string Source, TextSpan Span) Unmark(string markedSource)
     {

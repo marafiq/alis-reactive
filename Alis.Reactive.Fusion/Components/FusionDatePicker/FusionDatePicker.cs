@@ -29,8 +29,8 @@ namespace Alis.Reactive.Fusion
         public void FocusOut() => Method();
 
         /// <summary>Raised when the selected date changes.</summary>
-        public Event<FusionDatePickerChangeArgs> Change =>
-            Event<FusionDatePickerChangeArgs>();
+        public Event<FusionDatePickerChangeArgs> Change
+            => Event<FusionDatePickerChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

@@ -10,8 +10,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
         private static readonly TimeSpan CarePlanSaveDuration = TimeSpan.FromSeconds(3);
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Components/AppLevel/Loader/Index.cshtml", new CarePlanReviewModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Components/AppLevel/Loader/Index.cshtml", new CarePlanReviewModel());
 
         [HttpGet("Census")]
         public IActionResult Census() => Ok(new CensusSummary("42 residents in today's census."));

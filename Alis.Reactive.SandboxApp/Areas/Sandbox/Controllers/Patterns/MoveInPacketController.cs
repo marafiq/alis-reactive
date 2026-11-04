@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInPacket;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns;
 
@@ -12,17 +12,17 @@ public class MoveInPacketController : Controller
     private static readonly CultureInfo English = CultureInfo.GetCultureInfo("en-US");
 
     [HttpGet("")]
-    public IActionResult Index() =>
-        View("~/Areas/Sandbox/Views/Patterns/MoveInPacket/Index.cshtml",
+    public IActionResult Index()
+        => View("~/Areas/Sandbox/Views/Patterns/MoveInPacket/Index.cshtml",
             new MoveInPacketModel { ResidentId = "RES-1042", ResidentName = "Margaret Thompson" });
 
     [HttpPost("Save")]
-    public IActionResult Save([FromBody] MoveInPacketModel? packet) =>
-        packet == null ? BadRequest() : Received($"Saved to {packet.ResidentName}'s move-in packet.", packet);
+    public IActionResult Save([FromBody] MoveInPacketModel? packet)
+        => packet == null ? BadRequest() : Received($"Saved to {packet.ResidentName}'s move-in packet.", packet);
 
     [HttpPost("SendToBusinessOffice")]
-    public IActionResult SendToBusinessOffice([FromForm] MoveInPacketModel packet) =>
-        Received($"The business office received {packet.ResidentName}'s move-in packet.", packet);
+    public IActionResult SendToBusinessOffice([FromForm] MoveInPacketModel packet)
+        => Received($"The business office received {packet.ResidentName}'s move-in packet.", packet);
 
     private IActionResult Received(string status, MoveInPacketModel packet)
     {
@@ -95,6 +95,6 @@ public class MoveInPacketController : Controller
 
     private static string Time(DateTime time) => time.ToString("h:mm tt", English);
 
-    private static string PlainText(string html) =>
-        Regex.Replace(Regex.Replace(html, "<[^>]+>", " "), @"\s+", " ").Trim();
+    private static string PlainText(string html)
+        => Regex.Replace(Regex.Replace(html, "<[^>]+>", " "), @"\s+", " ").Trim();
 }

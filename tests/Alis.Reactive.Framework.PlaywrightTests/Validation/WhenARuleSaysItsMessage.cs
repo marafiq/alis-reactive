@@ -20,8 +20,8 @@ public sealed class WhenARuleSaysItsMessage : AppPageTest
         };
     }
 
-    private ILocator Field(string label) =>
-        Page.Locator("#notice-form > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
+    private ILocator Field(string label)
+        => Page.Locator("#notice-form > div").Filter(new() { Has = Page.GetByLabel(label, new() { Exact = true }) });
 
     private Task Write(string label, string text) => Page.GetByLabel(label, new() { Exact = true }).FillAsync(text);
 

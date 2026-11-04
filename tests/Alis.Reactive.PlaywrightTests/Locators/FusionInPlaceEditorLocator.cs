@@ -29,8 +29,8 @@ public sealed class FusionInPlaceEditorLocator
 
     public ILocator CancelButton => Root.Locator(".e-btn-cancel");
 
-    public ILocator ListItem(string text) =>
-        _page.Locator(".e-popup-open li.e-list-item").Filter(new() { HasTextString = text });
+    public ILocator ListItem(string text)
+        => _page.Locator(".e-popup-open li.e-list-item").Filter(new() { HasTextString = text });
 
     public async Task Open()
     {

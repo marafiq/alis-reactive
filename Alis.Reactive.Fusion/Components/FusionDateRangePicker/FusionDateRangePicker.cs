@@ -28,8 +28,8 @@ namespace Alis.Reactive.Fusion
         public Property<DateTime[]> Value => Property<DateTime[]>();
 
         /// <summary>Raised when the selected range changes.</summary>
-        public Event<FusionDateRangePickerChangeArgs> Change =>
-            Event<FusionDateRangePickerChangeArgs>();
+        public Event<FusionDateRangePickerChangeArgs> Change
+            => Event<FusionDateRangePickerChangeArgs>();
 
         ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
     }

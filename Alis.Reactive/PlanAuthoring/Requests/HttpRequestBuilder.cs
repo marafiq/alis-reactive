@@ -27,8 +27,8 @@ namespace Alis.Reactive
 
         /// <summary>Builds the request from the view model's own members, for an endpoint that binds the view model.</summary>
         /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
-        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel, TModel>> gather) =>
-            Gather<TModel>(gather);
+        public HttpRequestBuilder<TModel> Gather(Action<GatherBuilder<TModel, TModel>> gather)
+            => Gather<TModel>(gather);
 
         /// <summary>
         /// Builds the request the endpoint binds: a member named like a URL <c>{placeholder}</c> fills the path,
@@ -91,8 +91,8 @@ namespace Alis.Reactive
         /// <typeparam name="TValidationSource">Source type whose metadata declares the client validation rules.</typeparam>
         /// <param name="formId">DOM element ID of the form container for error display.</param>
         public HttpRequestBuilder<TModel> Validate<TValidationSource>(string formId)
-            where TValidationSource : class =>
-            Validate(formId, new FormValidation(source => source.GetBrowserRules<TValidationSource>(), typeof(TValidationSource), formId, ruleSet: null));
+            where TValidationSource : class
+            => Validate(formId, new FormValidation(source => source.GetBrowserRules<TValidationSource>(), typeof(TValidationSource), formId, ruleSet: null));
 
         /// <summary>
         /// Runs client validation for the form before sending the request, by the rules of one set of the validator

@@ -52,7 +52,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         }
 
         [HttpPost("Sign")]
-        public IActionResult Sign([FromBody] BoardSignature? signature) =>
-            string.IsNullOrWhiteSpace(signature?.Wing) ? BadRequest() : NoContent();
+        public IActionResult Sign([FromBody] BoardSignature? signature)
+            => string.IsNullOrWhiteSpace(signature?.Wing) ? BadRequest() : NoContent();
     }
 }

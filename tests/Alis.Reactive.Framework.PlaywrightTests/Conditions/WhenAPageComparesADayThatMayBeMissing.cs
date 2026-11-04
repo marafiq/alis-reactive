@@ -5,11 +5,11 @@ public sealed class WhenAPageComparesADayThatMayBeMissing : AppPageTest
 {
     private ILocator Line(string id) => Page.Locator($"#{id}");
 
-    private Task Pick(string day) =>
-        Page.Locator("#visit").GetByRole(AriaRole.Button, new() { Name = $"Pick {day}", Exact = true }).ClickAsync();
+    private Task Pick(string day)
+        => Page.Locator("#visit").GetByRole(AriaRole.Button, new() { Name = $"Pick {day}", Exact = true }).ClickAsync();
 
-    private Task ClearTheDay() =>
-        Page.Locator("#visit").GetByRole(AriaRole.Button, new() { Name = "Clear the day", Exact = true }).ClickAsync();
+    private Task ClearTheDay()
+        => Page.Locator("#visit").GetByRole(AriaRole.Button, new() { Name = "Clear the day", Exact = true }).ClickAsync();
 
     [Test]
     public async Task is_null_holds_while_no_day_is_picked()

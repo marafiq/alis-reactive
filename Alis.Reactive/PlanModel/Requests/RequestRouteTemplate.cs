@@ -15,8 +15,8 @@ namespace Alis.Reactive.PlanModel.Requests
             _placeholders = placeholders ?? throw new ArgumentNullException(nameof(placeholders));
         }
 
-        internal static RequestRouteTemplate For(string url) =>
-            new RequestRouteTemplate(
+        internal static RequestRouteTemplate For(string url)
+            => new RequestRouteTemplate(
                 url ?? throw new ArgumentNullException(nameof(url)),
                 ReadPlaceholders(url));
 
@@ -90,11 +90,11 @@ namespace Alis.Reactive.PlanModel.Requests
             return endIndex;
         }
 
-        private static InvalidOperationException InvalidTemplate(string url, string reason) =>
-            InvalidTemplate(url, reason, null);
+        private static InvalidOperationException InvalidTemplate(string url, string reason)
+            => InvalidTemplate(url, reason, null);
 
-        private static InvalidOperationException InvalidTemplate(string url, string reason, Exception? inner) =>
-            new InvalidOperationException(
+        private static InvalidOperationException InvalidTemplate(string url, string reason, Exception? inner)
+            => new InvalidOperationException(
                 $"URL template '{url}' is invalid: {reason}.",
                 inner);
     }

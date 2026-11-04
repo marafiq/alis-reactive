@@ -1,6 +1,6 @@
 using System.Globalization;
-using Microsoft.AspNetCore.Mvc;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.ResidentAdmission;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.Workflows
 {
@@ -11,8 +11,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.Workflows
         private static readonly CultureInfo Dollars = CultureInfo.GetCultureInfo("en-US");
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Patterns/BddExperiment/Index.cshtml", new AdmitResidentModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Patterns/BddExperiment/Index.cshtml", new AdmitResidentModel());
 
         [HttpPost("Submit")]
         public IActionResult Submit([FromBody] AdmitResidentModel? admission)

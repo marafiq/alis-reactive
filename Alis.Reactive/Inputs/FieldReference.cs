@@ -27,8 +27,11 @@ namespace Alis.Reactive.Inputs
             if (member == null) throw new ArgumentNullException(nameof(member));
             var body = Expressions.StripConvert(member.Body);
             if (member.Parameters.Count != 1 || !ExpressionPathHelper.TryMemberName(body, member.Parameters[0], out var name))
+            {
                 throw new ArgumentException(
                     $"A browser rule names a member of the model, like x => x.Address.City; {member} does not.", nameof(member));
+            }
+
             return new FieldReference(name, body.Type, ClrShape.Of(body.Type));
         }
 
@@ -39,8 +42,8 @@ namespace Alis.Reactive.Inputs
             return new FieldReference("", itemType, ClrShape.Of(itemType));
         }
 
-        internal FieldReference PrefixedBy(string prefix) =>
-            prefix.Length == 0 ? this
+        internal FieldReference PrefixedBy(string prefix)
+            => prefix.Length == 0 ? this
             : Path.Length == 0 ? new FieldReference(prefix, Type, Shape)
             : new FieldReference(prefix + "." + Path, Type, Shape);
 
@@ -48,8 +51,11 @@ namespace Alis.Reactive.Inputs
         {
             if (type.IsArray) return type.GetElementType();
             foreach (var candidate in new[] { type }.Concat(type.GetInterfaces()))
+            {
                 if (candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     return candidate.GetGenericArguments()[0];
+            }
+
             return null;
         }
     }

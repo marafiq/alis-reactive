@@ -17,8 +17,8 @@ public class WhenUsingFusionBulletChart : PlaywrightTestBase
     private ILocator ShiftsPanel => Page.Locator("#wing-shifts");
     private ILocator ShiftsHint => Page.Locator("#wing-shifts-hint");
     private ILocator UpNext => Page.Locator("#huddle-next");
-    private ILocator Reviewed(string wing) =>
-        _plan.Element(_plan.FindComponent(m => m.ReviewedWings)!.ElementId)
+    private ILocator Reviewed(string wing)
+        => _plan.Element(_plan.FindComponent(m => m.ReviewedWings)!.ElementId)
             .GetByRole(AriaRole.Checkbox, new() { Name = wing, Exact = true });
 
     private async Task NavigateAndBoot()

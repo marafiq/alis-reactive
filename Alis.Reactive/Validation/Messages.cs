@@ -73,8 +73,8 @@ namespace Alis.Reactive.Validation
             return this;
         }
 
-        internal string Fill(string template) =>
-            Placeholder.Replace(template, match =>
+        internal string Fill(string template)
+            => Placeholder.Replace(template, match =>
             {
                 if (!_values.TryGetValue(match.Groups[1].Value, out var value)) return match.Value;
                 return match.Groups[2].Success
