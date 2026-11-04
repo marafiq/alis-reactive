@@ -350,6 +350,17 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = $"{stage} saved for {packet.Resident}" });
     }
 
+    public IActionResult PharmacyOrder() => View(new PharmacyOrder());
+
+    [HttpPost("/Validation/PharmacyOrder")]
+    public IActionResult SavePharmacyOrder([FromBody] PharmacyOrder order, [FromServices] PharmacyOrderRules rules)
+    {
+        var result = rules.Validate(order);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
     public IActionResult RoomMove() => View(new RoomMove());
 
     [HttpPost("/Validation/RoomMove")]
