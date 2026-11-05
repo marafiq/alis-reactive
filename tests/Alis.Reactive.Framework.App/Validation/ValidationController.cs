@@ -12,7 +12,11 @@ public sealed class ValidationController : Controller
 
     public IActionResult Escort() => View(new EscortRequest());
 
-    public IActionResult EscortRefused(EscortUnreadable unreadable = EscortUnreadable.LengthOfText)
+    public IActionResult RoomRound() => View(new RoomRound());
+
+    public IActionResult CareNote() => View(new CareNote());
+
+    public IActionResult EscortRefused(EscortUnreadable unreadable = EscortUnreadable.TrimmedText)
     {
         ViewData["Unreadable"] = unreadable;
         return View(new EscortRequest());
@@ -208,6 +212,24 @@ public sealed class ValidationController : Controller
     public IActionResult SaveEscort([FromBody] EscortRequest request, [FromServices] EscortRules rules)
     {
         var result = rules.Validate(request);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
+    [HttpPost("/Validation/RoomRound")]
+    public IActionResult SaveRoomRound([FromBody] RoomRound round, [FromServices] RoomRoundRules rules)
+    {
+        var result = rules.Validate(round);
+        if (!result.IsValid)
+            return BadRequest(new { errors = result.ErrorsByField });
+        return Json(new Booked { Summary = "saved" });
+    }
+
+    [HttpPost("/Validation/CareNote")]
+    public IActionResult SaveCareNote([FromBody] CareNote note, [FromServices] CareNoteRules rules)
+    {
+        var result = rules.Validate(note);
         if (!result.IsValid)
             return BadRequest(new { errors = result.ErrorsByField });
         return Json(new Booked { Summary = "saved" });

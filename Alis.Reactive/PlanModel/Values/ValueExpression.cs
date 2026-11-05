@@ -134,6 +134,9 @@ namespace Alis.Reactive.PlanModel.Values
         internal static ValueExpression ReadBoundItemIndexes(string itemName, string formId, string indexes, int ownerDepth)
             => new BoundItemIndexesRead(itemName, formId, G.Call(G.Ref(indexes), PathMembers.Optional, "slice", G.Lit(0), G.Lit(ownerDepth)));
 
+        internal static ValueExpression ReadSent(string name, Shape shape, string formId, string itemIndexes)
+            => new SentRead(name, shape, formId, G.Ref(itemIndexes));
+
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
@@ -355,6 +358,27 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Expr Write(Scope scope)
             => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "indexesOf" }, new[] { G.Lit(_itemName), _ownerIndexes }, Shape.Any, PathMembers.Required);
+    }
+
+    internal sealed class SentRead : ValueExpression
+    {
+        private readonly string _name;
+        private readonly Shape _shape;
+        private readonly string _formId;
+        private readonly Expr _indexes;
+
+        internal SentRead(string name, Shape shape, string formId, Expr indexes)
+        {
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            _formId = formId ?? throw new ArgumentNullException(nameof(formId));
+            _indexes = indexes ?? throw new ArgumentNullException(nameof(indexes));
+        }
+
+        internal override Shape OutputShape => _shape;
+
+        internal override Expr Write(Scope scope)
+            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "sentValueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any, PathMembers.Required);
     }
 
     internal sealed class RecordExpression : ValueExpression

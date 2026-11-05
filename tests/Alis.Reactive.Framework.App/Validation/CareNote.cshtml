@@ -1,0 +1,26 @@
+@using Alis.Reactive.Framework.App.Validation
+@model CareNote
+@{
+    ViewData["Title"] = "A care note";
+    var plan = Html.ReactivePlan<CareNote>();
+}
+<h1>A care note</h1>
+
+<div id="note-form">
+    @{ Html.InputField(plan, m => m.Observation, o => o.Label("Observation")).Entry(); }
+    @{ Html.InputField(plan, m => m.Reviewer, o => o.Label("Reviewer")).Entry(); }
+    @{ Html.InputField(plan, m => m.Initials, o => o.Label("Initials")).Entry(); }
+    @{ Html.InputField(plan, m => m.Witness, o => o.Label("Witness")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/CareNote")
+        .Gather(g => g.Form())
+        .Validate<CareNoteRules>("note-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("note-form")))))
+
+@Html.RenderPlan(plan)

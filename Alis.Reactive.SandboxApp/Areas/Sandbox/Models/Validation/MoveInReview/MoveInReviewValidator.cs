@@ -26,7 +26,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
                 .When(x => x.FallRiskScore >= 5 && x.FallRiskScore <= 7)
                 .MaximumLength(120).WithMessage("Keep the reassessment plan under 120 characters.");
 
-            WhenOnServer(x => x.MobilityNotes != null && x.MobilityNotes.Length > 60, () =>
+            When(x => x.MobilityNotes != null && x.MobilityNotes.Length > 60, () =>
                 RuleFor(x => x.TherapistReviewer).NotEmpty().WithMessage("A mobility plan this long needs a therapist to review it."));
 
             When(x => x.UsesWheelchair || x.UsesOxygen, () =>

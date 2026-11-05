@@ -7,6 +7,8 @@ public sealed class WardTransfer
     public string? Ward { get; set; } = "West";
 
     public string? ApprovedBy { get; set; }
+
+    public string? EscortedBy { get; set; } = "Sam";
 }
 
 public static class BedBook
@@ -26,5 +28,7 @@ public sealed class TransferRules : ReactiveValidator<WardTransfer>
         RuleFor(x => x.Ward).NotEmpty().WithMessage("Name the ward.");
         WhenAsync((transfer, cancellation) => BedBook.IsFullAsync(transfer.Ward, cancellation), () =>
             RuleFor(x => x.ApprovedBy).NotEmpty().WithMessage("A full ward takes a transfer with an approver's name."));
+        UnlessAsync((transfer, cancellation) => BedBook.IsFullAsync(transfer.Ward, cancellation), () =>
+            RuleFor(x => x.EscortedBy).NotEmpty().WithMessage("A ward with room takes a transfer with an escort's name."));
     }
 }

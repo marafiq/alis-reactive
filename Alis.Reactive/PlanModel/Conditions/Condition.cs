@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Grammar;
@@ -60,6 +61,13 @@ namespace Alis.Reactive
             var members = fixedValues.Cast<object?>().Select(value => LiteralOf(field.Type, value)).ToArray();
             return new MemberTest(field, (left, shape) =>
                 Membership(left, members.Select(value => ValueExpression.LiteralFor(value, shape)).ToList(), negated: false, shape));
+        }
+
+        internal static Condition CompareLength(LambdaExpression member, Comparison comparison, Expression length)
+        {
+            if (comparison == null) throw new ArgumentNullException(nameof(comparison));
+            var fixedLength = Convert.ToInt32(Expressions.Evaluate(length), CultureInfo.InvariantCulture);
+            return new MemberTest(FieldReference.Of(member), (left, shape) => new LengthCondition(comparison, left, fixedLength, shape));
         }
 
         /// <summary>Tests a text member against fixed text.</summary>
@@ -347,6 +355,21 @@ namespace Alis.Reactive
 
         internal override Expr Write(Scope scope)
             => G.Op(Operator.Gte, G.Get(G.Op(Operator.ToText, Left(scope)), new[] { "length" }, Shape.Any, PathMembers.Optional), G.Lit(_length));
+    }
+
+    internal sealed class LengthCondition : ValueCondition
+    {
+        private readonly Comparison _comparison;
+        private readonly int _length;
+
+        internal LengthCondition(Comparison comparison, ValueExpression left, int length, Shape shape) : base(left, shape)
+        {
+            _comparison = comparison;
+            _length = length;
+        }
+
+        internal override Expr Write(Scope scope)
+            => G.Op(_comparison.Operation, G.Get(Left(scope), new[] { "length" }, Shape.Number, PathMembers.Optional), G.Lit(_length));
     }
 
     internal sealed class TrueCondition : Condition

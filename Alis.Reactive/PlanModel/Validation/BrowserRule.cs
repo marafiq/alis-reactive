@@ -35,15 +35,15 @@ namespace Alis.Reactive
         /// <summary>Whether the rule always applies, rather than only when a condition holds.</summary>
         public bool IsUnconditional => Condition.IsAlways;
 
-        /// <summary>A value is entered: not blank, and not the type's default. A list has at least one item.</summary>
+        /// <summary>A value is entered: not blank, and not the type's default. A list has at least one item. The rule stays on the server for an object.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule NotEmpty(string message) => new NotEmptyRule(message, Condition.Always);
 
-        /// <summary>A value is bound. A list is never null in the browser, so the rule stays on the server for a list.</summary>
+        /// <summary>A value is bound. A list is never null in the browser, and an object none of whose members is sent binds as the model's default, so the rule stays on the server for both.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule NotNull(string message) => new NotNullRule(message, Condition.Always);
 
-        /// <summary>Nothing is entered. A list has no items.</summary>
+        /// <summary>Nothing is entered. A list has no items. The rule stays on the server for an object.</summary>
         /// <param name="message">The message shown when the rule fails.</param>
         public static BrowserRule Empty(string message) => new EmptyRule(message, Condition.Always);
 
@@ -154,6 +154,8 @@ namespace Alis.Reactive
         private const long DayAfterEarliestDate = -62135510400000;
 
         private protected static Expr Absent(Expr v) => G.Eq(v, G.Null);
+
+        private protected static bool IsObject(FieldReference field) => ClrShape.IsDataClass(field.Type);
 
         private protected static Expr Matches(Expr v, string pattern) => G.Op(Operator.Matches, v, G.Lit(pattern), G.Lit(""));
 

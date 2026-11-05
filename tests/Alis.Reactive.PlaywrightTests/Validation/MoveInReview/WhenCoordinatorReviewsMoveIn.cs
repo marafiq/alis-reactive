@@ -204,7 +204,7 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
     }
 
     [Test]
-    public async Task a_long_mobility_plan_is_sent_and_the_server_asks_for_a_therapist_to_review_it()
+    public async Task a_long_mobility_plan_needs_a_therapist_to_review_it_before_it_is_sent()
     {
         const string LongPlan = "Walker at all times, two-person assist on stairs, gait belt for transfers";
         await NavigateAndBoot();
@@ -217,14 +217,14 @@ public class WhenCoordinatorReviewsMoveIn : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.TherapistReviewer)).ToHaveTextAsync("A mobility plan this long needs a therapist to review it.");
         await Expect(ValidationSummary).ToBeHiddenAsync();
         await Expect(ReviewStatus).ToHaveTextAsync("Not saved yet.");
-        Assert.That(_reviewsSent, Has.Count.EqualTo(1), "The page cannot decide this rule, so the server is asked.");
+        Assert.That(_reviewsSent, Is.Empty, "The page decides the plan's length, so nothing is sent.");
 
         await Write(m => m.TherapistReviewer, "Dana Ortiz, PT");
         await ClickWhenStable(SaveReview);
         await Expect(ReviewStatus).ToHaveTextAsync(Saved);
         await Expect(ValidationSummary).ToBeHiddenAsync();
-        Assert.That(_reviewsSent, Has.Count.EqualTo(2));
-        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+        Assert.That(_reviewsSent, Has.Count.EqualTo(1));
+        AssertNoConsoleErrors();
     }
 
     [Test]

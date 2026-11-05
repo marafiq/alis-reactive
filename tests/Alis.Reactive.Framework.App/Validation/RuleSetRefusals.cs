@@ -14,7 +14,7 @@ public sealed class RuleSetRefusalsPage
 
 public enum EscortUnreadable
 {
-    LengthOfText,
+    TrimmedText,
     OrderAgainstNothing,
     TextEquals,
 }

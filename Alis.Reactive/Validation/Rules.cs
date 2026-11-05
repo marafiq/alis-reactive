@@ -76,6 +76,7 @@ namespace Alis.Reactive.Validation
                 throw new InvalidOperationException(
                     $"The condition '{_unreadable}' has no browser form. Write it as tests of model members against fixed " +
                     "values (==, !=, <, <=, >, >=, string.IsNullOrEmpty, Contains, StartsWith, EndsWith, Regex.IsMatch, HasValue, " +
+                    "a text's Length, a list's Count, Length or Any(), " +
                     "joined by &&, || and !), or declare that the server alone decides it: WhenOnServer or UnlessOnServer.");
             }
 

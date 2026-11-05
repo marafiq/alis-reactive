@@ -11,6 +11,7 @@ namespace Alis.Reactive
     /// <summary>
     /// A value is entered: not blank, and not the type's default. On a list, at least one item; on an
     /// enum, a member other than the default one, and on a nullable enum, whose default is null, any member.
+    /// On an object the rule stays with the server, as <see cref="NotNullRule"/> says.
     /// </summary>
     public sealed class NotEmptyRule : BrowserRule
     {
@@ -24,7 +25,7 @@ namespace Alis.Reactive
             rule = field.Shape is ArrayShape ? new AtLeastOneRule(Message, Condition)
                 : DefaultMemberOf(field.Type) is string member ? new NotDefaultMemberRule(member, Message, Condition)
                 : this;
-            return true;
+            return !IsObject(field);
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)
@@ -34,7 +35,9 @@ namespace Alis.Reactive
     /// <summary>
     /// A value is bound: text that is not blank, or a nullable with a value. A list is never null in the
     /// browser, and a number, a boolean, a date or an enum that cannot be null always binds, so on those
-    /// the rule stays with the server, which always passes it.
+    /// the rule stays with the server, which always passes it. An object none of whose members is sent
+    /// binds as the model's default, which the browser cannot see, so on an object the rule stays with the
+    /// server too.
     /// </summary>
     public sealed class NotNullRule : BrowserRule
     {
@@ -46,7 +49,7 @@ namespace Alis.Reactive
         internal override bool TryFor(FieldReference field, out BrowserRule rule)
         {
             rule = this;
-            return field.Shape is not ArrayShape && (!field.Type.IsValueType || Nullable.GetUnderlyingType(field.Type) != null);
+            return field.Shape is not ArrayShape && !IsObject(field) && (!field.Type.IsValueType || Nullable.GetUnderlyingType(field.Type) != null);
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope) => G.Not(NothingEntered(value));
@@ -82,7 +85,8 @@ namespace Alis.Reactive
 
     /// <summary>
     /// Nothing is entered. On a list, no items; on an enum, nothing chosen or the default member, and on a
-    /// nullable enum, whose default is null, nothing chosen.
+    /// nullable enum, whose default is null, nothing chosen. On an object the rule stays with the server, as
+    /// <see cref="NotNullRule"/> says.
     /// </summary>
     public sealed class EmptyRule : BrowserRule
     {
@@ -96,7 +100,7 @@ namespace Alis.Reactive
             rule = field.Shape is ArrayShape ? new NoItemsRule(Message, Condition)
                 : DefaultMemberOf(field.Type) is string member ? new DefaultMemberRule(member, Message, Condition)
                 : this;
-            return true;
+            return !IsObject(field);
         }
 
         internal override Expr Check(Expr value, Shape fieldShape, FormFieldValues values, Scope scope)

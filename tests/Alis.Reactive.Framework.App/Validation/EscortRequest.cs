@@ -186,6 +186,6 @@ public sealed class UnreadableEscortRules : ReactiveValidator<EscortRequest>
 {
     public UnreadableEscortRules()
     {
-        RuleFor(x => x.ForMore).NotEmpty().When(x => x.Wing != null && x.Wing.Length > 3).WithMessage("Needed for a long wing name.");
+        RuleFor(x => x.ForMore).NotEmpty().When(x => x.Wing != null && x.Wing.Trim() == "East").WithMessage("Needed for the east wing.");
     }
 }

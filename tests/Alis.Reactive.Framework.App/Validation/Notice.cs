@@ -68,6 +68,8 @@ public sealed class Notice
     public string? Escort { get; set; } = "Cy";
 
     public string? Parking { get; set; } = "P-1";
+
+    public string? Badge { get; set; } = "B-1";
 }
 
 public sealed class NoticeAddress
@@ -116,5 +118,6 @@ public sealed class NoticeRules : ReactiveValidator<Notice>
         RuleFor(x => x.Locker).MustAsync(async (locker, cancellation) => { await Task.Yield(); return locker != "L-0"; }).WithMessage("That locker is taken.");
         RuleFor(x => x.Escort).NotEmpty().WhenOnServer(x => x.Wing > 5).WithMessage("The far wings need an escort.");
         RuleFor(x => x.Parking).NotEmpty().UnlessOnServer(x => x.Wing > 5).WithMessage("The near wings need parking.");
+        UnlessOnServer(x => x.Wing > 5, () => RuleFor(x => x.Badge).NotEmpty().WithMessage("The near wings need a badge."));
     }
 }

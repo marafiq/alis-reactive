@@ -24,6 +24,7 @@ export interface BoundValues {
 }
 
 export interface ContainedInputs extends BoundValues {
+  sentValueOf(pattern: string, indexes: readonly number[]): unknown;
   fill(record: Record<string, unknown>): Record<string, unknown>;
   readonly fields: Record<string, unknown>;
   readonly arrays: string[];
@@ -51,6 +52,10 @@ function bindInput(input: ModelInput): unknown {
 function mountedInput(id: string): ModelInput | undefined {
   const input = inputsById.get(id)?.[0];
   return input !== undefined && input.objects.element(id) !== null ? input : undefined;
+}
+
+function mountedInputs(): ModelInput[] {
+  return [...inputsById.keys()].map(mountedInput).filter((input): input is ModelInput => input !== undefined);
 }
 
 export function invalidClassOf(id: string): string {
@@ -119,16 +124,12 @@ export function containedInputs(containerId: string): ContainedInputs {
   };
   const inside = (): ModelInput[] => {
     const holder = container();
-    const held: ModelInput[] = [];
-    for (const id of inputsById.keys()) {
-      const input = mountedInput(id);
-      if (input !== undefined && holder.contains(input.objects.element(id))) held.push(input);
-    }
-    return held;
+    return mountedInputs().filter(input => holder.contains(input.objects.element(input.id)));
   };
   return {
     valueOf: (pattern, indexes) => boundValueIn(container(), pattern, indexes),
     indexesOf: (itemPattern, ownerIndexes) => itemIndexesIn(container(), itemPattern, ownerIndexes),
+    sentValueOf: (pattern, indexes) => sentValueIn(container(), pattern, indexes),
     fill(record: Record<string, unknown>) {
       for (const input of inside()) assignAt(record, input.binding.body, bindInput(input));
       return record;
@@ -147,6 +148,34 @@ export function containedInputs(containerId: string): ContainedInputs {
       return ids;
     },
   };
+}
+
+function nameAt(pattern: string, indexes: readonly number[]): string {
+  return pattern.split("[*]").reduce((name, part, position) => `${name}[${indexes[position - 1]}]${part}`);
+}
+
+function sentValueIn(holder: Node, pattern: string, indexes: readonly number[]): unknown {
+  const name = nameAt(pattern, indexes);
+  const sending = mountedInputs().filter(input => sends(input.binding.name, name));
+  const held = sending.filter(input => holder.contains(input.objects.element(input.id)));
+  return sentBy(held.length > 0 ? held : sending, name);
+}
+
+function sends(bound: string, name: string): boolean {
+  return bound === name || bound.startsWith(`${name}.`) || bound.startsWith(`${name}[`);
+}
+
+function sentBy(inputs: readonly ModelInput[], name: string): unknown {
+  if (inputs.length === 0) return undefined;
+  const sent: Record<string, unknown> = {};
+  for (const input of inputs) assignAt(sent, input.binding.body, bindInput(input));
+  const { body, name: bound } = inputs[0]!.binding;
+  const stepsPastName = stepsOf(bound) - stepsOf(name);
+  return body.slice(0, body.length - stepsPastName).reduce<unknown>((value, step) => (value as Record<BodyStep, unknown>)[step], sent);
+}
+
+function stepsOf(name: string): number {
+  return name.match(/[^.[\]]+/g)!.length;
 }
 
 function assignAt(root: Record<string, unknown>, path: readonly BodyStep[], value: unknown): void {

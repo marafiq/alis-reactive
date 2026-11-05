@@ -47,6 +47,8 @@ public sealed class ContactSheetRules : ReactiveValidator<ContactSheet>
             contact.RuleFor(x => x.Name).Must(name => name != "Front desk").WithMessage("Give the contact's own name, not the front desk.");
             contact.RuleFor(x => x.Phone).NotEmpty().WithMessage("Give the guardian a phone the desk can call.").When(x => x.Relationship == "Guardian");
         });
+        When(x => x.Wing == "Hospice", () =>
+            RuleFor(x => x.Contacts).NotEmpty().WithMessage("The hospice wing keeps a contact on file."));
         When(x => x.Wing == "Memory care", () =>
             RuleForEach(x => x.Contacts).ChildRules(contact =>
                 contact.RuleFor(x => x.Phone).NotEmpty().WithMessage("The memory care wing calls every contact: give each a phone.")));

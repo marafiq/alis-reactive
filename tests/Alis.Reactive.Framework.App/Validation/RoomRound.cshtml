@@ -1,0 +1,37 @@
+@using Alis.Reactive.Framework.App.Validation
+@model RoomRound
+@{
+    ViewData["Title"] = "A room round";
+    var plan = Html.ReactivePlan<RoomRound>();
+}
+<h1>A room round</h1>
+
+<div id="round-form">
+    @{ Html.InputField(plan, m => m.Needs, o => o.Label("Needs")).TagPicker(); }
+    @{ Html.InputField(plan, m => m.Rooms[0], o => o.Label("First room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Rooms[1], o => o.Label("Second room")).Entry(); }
+    @{ Html.InputField(plan, m => m.EastKey, o => o.Label("East key")).Entry(); }
+    @{ Html.InputField(plan, m => m.Porter, o => o.Label("Porter")).Entry(); }
+    @{ Html.InputField(plan, m => m.Trolley, o => o.Label("Trolley")).Entry(); }
+    @{ Html.InputField(plan, m => m.Helper, o => o.Label("Helper")).Entry(); }
+    @{ Html.InputField(plan, m => m.Checklist, o => o.Label("Checklist")).Entry(); }
+    @{ Html.InputField(plan, m => m.Lift, o => o.Label("Lift")).Entry(); }
+    @{ Html.InputField(plan, m => m.Lead.Name, o => o.Label("Lead")).Entry(); }
+    @{ Html.InputField(plan, m => m.Badge, o => o.Label("Badge")).Entry(); }
+</div>
+
+<div id="beside-the-form">
+    @{ Html.InputField(plan, m => m.Wings[0], o => o.Label("Wing")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/RoomRound")
+        .Gather(g => g.Form())
+        .Validate<RoomRoundRules>("round-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("round-form")))))
+
+@Html.RenderPlan(plan)

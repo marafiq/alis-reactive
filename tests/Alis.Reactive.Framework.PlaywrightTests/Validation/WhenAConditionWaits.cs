@@ -57,6 +57,24 @@ public sealed class WhenAConditionWaits : AppPageTest
     }
 
     [Test]
+    public async Task a_rule_unless_a_condition_that_waits_is_answered_by_the_server_only_while_the_condition_fails()
+    {
+        await Open("/Validation/Transfer");
+        var message = Field("Escorted by").GetByText("A ward with room takes a transfer with an escort's name.");
+        await Write("Escorted by", "");
+
+        await Save();
+        await Expect(message).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Has.Count.EqualTo(1), "the browser holds no rule under a condition that waits");
+
+        await Write("Ward", "East");
+        await Write("Approved by", "Dr Bell");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("Ada moved to East");
+        await Expect(message).ToBeHiddenAsync();
+    }
+
+    [Test]
     public async Task asked_without_waiting_the_validator_refuses_and_names_the_condition()
     {
         await Open("/Validation/Transfer");

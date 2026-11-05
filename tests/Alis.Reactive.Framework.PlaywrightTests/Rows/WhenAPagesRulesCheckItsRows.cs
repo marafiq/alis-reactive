@@ -89,6 +89,23 @@ public sealed class WhenAPagesRulesCheckItsRows : AppPageTest
     }
 
     [Test]
+    public async Task a_rule_on_the_list_reads_the_rows_on_the_page()
+    {
+        await Open("/Rows/Contacts?contacts=0");
+        await Input("Wing").FillAsync("Hospice");
+
+        await Click("Save the contacts");
+        await Expect(Summary.GetByText("The hospice wing keeps a contact on file.")).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the sheet");
+
+        await Click("Add a contact");
+        await Input("Contact 1").FillAsync("Di");
+        await Click("Save the contacts");
+        await Expect(Saved).ToHaveTextAsync("Ada's contacts: Di");
+    }
+
+    [Test]
     public async Task a_rows_rule_reads_the_members_of_its_own_row()
     {
         await Open("/Rows/Contacts");

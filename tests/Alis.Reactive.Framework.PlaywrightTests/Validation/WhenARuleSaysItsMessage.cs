@@ -116,6 +116,24 @@ public sealed class WhenARuleSaysItsMessage : AppPageTest
     }
 
     [Test]
+    public async Task rules_the_server_applies_unless_the_validators_condition_holds_are_asked_only_then()
+    {
+        await Open("/Validation/Notice");
+        var message = Field("Badge").GetByText("The near wings need a badge.", new() { Exact = true });
+        await Write("Badge", "");
+
+        await Write("Wing", "2");
+        await Save();
+        await Expect(message).ToBeVisibleAsync();
+        lock (_saves) Assert.That(_saves, Is.EqualTo(new[] { "POST" }), "the server decides the condition");
+
+        await Write("Wing", "6");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(message).ToBeHiddenAsync();
+    }
+
+    [Test]
     public async Task the_notice_as_it_starts_is_saved()
     {
         await Open("/Validation/Notice");

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -80,6 +81,11 @@ namespace Alis.Reactive.Validation
 
             private Condition? Compared(BinaryExpression expression)
             {
+                if (TryLength(expression.Left, out var measured) && IsFixed(expression.Right))
+                    return Condition.CompareLength(Lambda(measured), ComparisonOf(expression.NodeType), expression.Right);
+                if (TryLength(expression.Right, out measured) && IsFixed(expression.Left))
+                    return Condition.CompareLength(Lambda(measured), ComparisonOf(Mirrored(expression.NodeType)), expression.Left);
+
                 var fieldOnLeft = IsField(expression.Left) && IsFixed(expression.Right);
                 var fieldOnRight = IsField(expression.Right) && IsFixed(expression.Left);
                 if (!fieldOnLeft && !fieldOnRight) return null;
@@ -113,8 +119,29 @@ namespace Alis.Reactive.Validation
                 if (TryCollectionContains(call, out var collection, out var item))
                     return Condition.Holds(Lambda(collection), item);
 
+                if (IsAnyItem(call))
+                    return Is(call.Arguments[0], ValueTest.NotEmpty);
+
                 return null;
             }
+
+            private bool TryLength(Expression expression, out Expression measured)
+            {
+                measured = null!;
+                if (!(Expressions.StripConvert(expression) is MemberExpression member) || member.Expression == null) return false;
+
+                var holder = Expressions.StripConvert(member.Expression);
+                var isText = holder.Type == typeof(string);
+                var isList = !isText && typeof(IEnumerable).IsAssignableFrom(holder.Type);
+                var measures = member.Member.Name == nameof(string.Length) ? isText || holder.Type.IsArray
+                    : member.Member.Name == nameof(ICollection.Count) && isList;
+                measured = holder;
+                return measures && IsField(holder);
+            }
+
+            private bool IsAnyItem(MethodCallExpression call)
+                => call.Method.DeclaringType == typeof(Enumerable) && call.Method.Name == nameof(Enumerable.Any)
+                && call.Arguments.Count == 1 && IsField(call.Arguments[0]);
 
             private Condition Is(Expression member, ValueTest test)
                 => Condition.Is(Lambda(member), test);

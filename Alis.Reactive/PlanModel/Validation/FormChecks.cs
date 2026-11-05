@@ -11,24 +11,26 @@ namespace Alis.Reactive.PlanModel.Validation
 {
     internal sealed class CheckedField
     {
-        internal CheckedField(string name, Shape shape, IReadOnlyList<BrowserRule> rules, FormFieldValues values)
+        internal CheckedField(string name, FieldReference reference, IReadOnlyList<BrowserRule> rules, FormFieldValues values)
         {
             Name = name;
-            Shape = shape;
+            Reference = reference;
             Rules = rules;
             Values = values;
         }
 
         internal string Name { get; }
 
-        internal Shape Shape { get; }
+        internal FieldReference Reference { get; }
+
+        internal Shape Shape => Reference.Shape;
 
         internal IReadOnlyList<BrowserRule> Rules { get; }
 
         internal FormFieldValues Values { get; }
 
         internal CheckedField With(IReadOnlyList<BrowserRule> rules)
-            => new CheckedField(Name, Shape, Rules.Concat(rules).ToArray(), Values);
+            => new CheckedField(Name, Reference, Rules.Concat(rules).ToArray(), Values);
 
         internal static IEnumerable<CheckedField> Bind(string formId, IReadOnlyList<BrowserField> fields, string fieldPrefix)
         {
@@ -72,13 +74,21 @@ namespace Alis.Reactive.PlanModel.Validation
 
         internal const string Indexes = "i";
 
-        internal override ValueExpression Value(FieldReference field) => ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
+        internal override ValueExpression Value(FieldReference field)
+            => IsList(field) ? Sent(field) : ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
+
+        internal Expr Checked(FieldReference field, Expr entered, Scope scope)
+            => IsList(field) ? Sent(field).Write(scope) : entered;
 
         internal ValueExpression ItemIndexes(FieldReference item)
             => ValueExpression.ReadBoundItemIndexes(NameOf(item), _formId, Indexes, OwnerDepthOf(item));
 
         internal CheckedField Check(BrowserField field)
-            => new CheckedField(NameOf(field.Reference), field.Reference.Shape, field.Rules, this);
+            => new CheckedField(NameOf(field.Reference), field.Reference, field.Rules, this);
+
+        private ValueExpression Sent(FieldReference field) => ValueExpression.ReadSent(NameOf(field), field.Shape, _formId, Indexes);
+
+        private static bool IsList(FieldReference field) => field.Shape.DescribesArray;
 
         private string NameOf(FieldReference field) => HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
 

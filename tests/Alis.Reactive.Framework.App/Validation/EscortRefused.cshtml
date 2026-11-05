@@ -13,7 +13,7 @@
 
 @switch (unreadable)
 {
-    case EscortUnreadable.LengthOfText:
+    case EscortUnreadable.TrimmedText:
         @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/Escort")
             .Gather(g => g.Form())
             .Validate<UnreadableEscortRules>("escort-form")))
