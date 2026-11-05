@@ -5,8 +5,9 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
 /// <summary>
-/// As a care coordinator, I want to close a course list, a calendar or a trainer list in the training
-/// drawer with Escape, so that the drawer, and the training notes I typed in it, are still there to save.
+/// As a care coordinator, I want Escape to leave the training drawer open, so that closing a course list
+/// or pressing it by habit never throws away the training notes I typed; and I want Escape to close the
+/// training history drawer, which holds nothing to lose.
 /// </summary>
 [TestFixture]
 public class WhenCoordinatorRecordsStaffTraining : PlaywrightTestBase
@@ -14,18 +15,18 @@ public class WhenCoordinatorRecordsStaffTraining : PlaywrightTestBase
     private const string Path = "/Sandbox/Components/Drawer/StaffTraining";
 
     private ILocator Drawer => Page.Locator("#alis-drawer");
+    private ILocator DrawerTitle => Page.Locator("#alis-drawer-title");
+    private ILocator CloseDrawer => Page.Locator("#alis-drawer-close");
     private ILocator RecordTraining => Page.Locator("#record-training-btn");
+    private ILocator TrainingHistoryButton => Page.Locator("#training-history-btn");
     private ILocator SaveTraining => Page.Locator("#save-training-btn");
     private ILocator TrainingStatus => Page.Locator("#training-status");
+    private ILocator TrainingHistory => Page.Locator("#training-history");
 
     private ComponentScope TrainingForm => new(Page, typeof(StaffTrainingRecordModel));
     private ILocator Notes => Page.Locator($"#{TrainingForm.IdFor(nameof(StaffTrainingRecordModel.Notes))}");
     private MultiSelectLocator Courses => TrainingForm.MultiSelect(nameof(StaffTrainingRecordModel.Courses));
-    private DatePickerLocator CompletedOn => TrainingForm.DatePicker(nameof(StaffTrainingRecordModel.CompletedOn));
-    private DropDownListLocator Trainer => TrainingForm.DropDownList(nameof(StaffTrainingRecordModel.TrainerId));
 
-    // The drawer drops this class the moment it starts closing, while its slide-out keeps it
-    // painted for a moment, so whether it is open is read from the class rather than from paint.
     private static readonly Regex DrawerOpen = new("alis-drawer--visible");
 
     private const string TrainingNotes = "Practised two-person transfers with Mr. Alvarez.";
@@ -35,15 +36,10 @@ public class WhenCoordinatorRecordsStaffTraining : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
         await ClickWhenStable(RecordTraining);
-        await Expect(Notes).ToBeVisibleAsync();
         await Notes.FillAsync(TrainingNotes);
     }
 
-    private async Task ExpectTheDrawerStillHoldsTheNotes()
-    {
-        await Expect(Drawer).ToHaveClassAsync(DrawerOpen);
-        await Expect(Notes).ToHaveValueAsync(TrainingNotes);
-    }
+    private async Task OpenTheTrainingHistory() => await ClickWhenStable(TrainingHistoryButton);
 
     [Test]
     public async Task escaping_the_course_list_keeps_the_drawer_and_the_notes_to_save()
@@ -55,37 +51,33 @@ public class WhenCoordinatorRecordsStaffTraining : PlaywrightTestBase
         await Page.Keyboard.PressAsync("Escape");
 
         await Expect(Courses.Popup).ToBeHiddenAsync();
-        await ExpectTheDrawerStillHoldsTheNotes();
+        await Expect(Drawer).ToHaveClassAsync(DrawerOpen);
+        await Expect(Notes).ToHaveValueAsync(TrainingNotes);
         await ClickWhenStable(SaveTraining);
         await Expect(TrainingStatus).ToHaveTextAsync($"Training recorded: {TrainingNotes}");
+        await Expect(Drawer).Not.ToHaveClassAsync(DrawerOpen);
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task escaping_the_calendar_keeps_the_drawer_and_the_notes()
+    public async Task escape_with_nothing_open_keeps_the_drawer_and_the_notes()
     {
         await OpenTheTrainingDrawerAndTypeNotes();
-        await ClickWhenStable(CompletedOn.CalendarIcon);
-        await Expect(CompletedOn.Popup).ToBeVisibleAsync();
+        await Expect(Notes).ToBeFocusedAsync();
 
         await Page.Keyboard.PressAsync("Escape");
 
-        await Expect(CompletedOn.Popup).ToBeHiddenAsync();
-        await ExpectTheDrawerStillHoldsTheNotes();
+        await Expect(Drawer).ToHaveClassAsync(DrawerOpen);
+        await Expect(Notes).ToHaveValueAsync(TrainingNotes);
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task escape_on_the_date_closes_the_drawer_once_the_calendar_is_closed()
+    public async Task the_close_button_still_closes_the_training_drawer()
     {
         await OpenTheTrainingDrawerAndTypeNotes();
-        await ClickWhenStable(CompletedOn.CalendarIcon);
-        await Expect(CompletedOn.Popup).ToBeVisibleAsync();
-        await Page.Keyboard.PressAsync("Escape");
-        await Expect(CompletedOn.Popup).ToBeHiddenAsync();
-        await Expect(CompletedOn.Input).ToBeFocusedAsync();
 
-        await Page.Keyboard.PressAsync("Escape");
+        await ClickWhenStable(CloseDrawer);
 
         await Expect(Drawer).Not.ToHaveClassAsync(DrawerOpen);
         await Expect(Notes).ToBeHiddenAsync();
@@ -93,16 +85,48 @@ public class WhenCoordinatorRecordsStaffTraining : PlaywrightTestBase
     }
 
     [Test]
-    public async Task escaping_the_trainer_list_keeps_the_drawer_and_the_notes()
+    public async Task escape_closes_the_training_history()
     {
-        await OpenTheTrainingDrawerAndTypeNotes();
-        await Trainer.Open();
-        await Expect(Trainer.Popup).ToBeVisibleAsync();
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 10000);
+        await OpenTheTrainingHistory();
+        await Expect(TrainingHistory).ToBeVisibleAsync();
 
         await Page.Keyboard.PressAsync("Escape");
 
-        await Expect(Trainer.Popup).ToBeHiddenAsync();
-        await ExpectTheDrawerStillHoldsTheNotes();
+        await Expect(Drawer).Not.ToHaveClassAsync(DrawerOpen);
+        await Expect(TrainingHistory).ToBeHiddenAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task escape_closes_the_history_opened_after_the_close_button_closed_the_training_drawer()
+    {
+        await OpenTheTrainingDrawerAndTypeNotes();
+        await ClickWhenStable(CloseDrawer);
+        await OpenTheTrainingHistory();
+        await Expect(DrawerTitle).ToHaveTextAsync("Training History");
+        await Expect(Drawer).ToHaveClassAsync(DrawerOpen);
+
+        await Page.Keyboard.PressAsync("Escape");
+
+        await Expect(Drawer).Not.ToHaveClassAsync(DrawerOpen);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task escape_closes_the_history_opened_after_saving_closed_the_training_drawer()
+    {
+        await OpenTheTrainingDrawerAndTypeNotes();
+        await ClickWhenStable(SaveTraining);
+        await Expect(TrainingStatus).ToHaveTextAsync($"Training recorded: {TrainingNotes}");
+        await OpenTheTrainingHistory();
+        await Expect(DrawerTitle).ToHaveTextAsync("Training History");
+        await Expect(Drawer).ToHaveClassAsync(DrawerOpen);
+
+        await Page.Keyboard.PressAsync("Escape");
+
+        await Expect(Drawer).Not.ToHaveClassAsync(DrawerOpen);
         AssertNoConsoleErrors();
     }
 }

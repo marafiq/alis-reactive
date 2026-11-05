@@ -163,6 +163,7 @@ COMP_ACTION :=
 
   -- App-level (NativeDrawer)
   | .SetSize(DrawerSize.Sm|Md|Lg)
+  | .KeepOpenOnEscape()   -- until the drawer next closes; the close button and Close() still close it
   | .Open()
   | .Close()
 

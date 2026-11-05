@@ -19,16 +19,28 @@
                 <native-heading level="H2">Ana Reyes, CNA</native-heading>
                 <p id="training-status" class="text-sm text-text-muted">No training recorded this month.</p>
             </native-vstack>
-            @(Html.NativeButton("record-training-btn", "Record Training")
-                .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
-                .Reactive(plan, evt => evt.Click, (args, p) =>
-                {
-                    p.Element("alis-drawer-title").SetText("Record Training");
-                    p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
-                    p.Get(Url.SandboxRoute("StaffTrainingForm", "Drawer"))
-                     .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
-                    p.Component<NativeDrawer>().Open();
-                }))
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("training-history-btn", "Training History")
+                    .CssClass("rounded-md border border-border px-4 py-2 text-sm font-medium text-text hover:bg-surface-muted")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Element("alis-drawer-title").SetText("Training History");
+                        p.Component<NativeDrawer>().SetSize(DrawerSize.Sm);
+                        p.Get(Url.SandboxRoute("StaffTrainingHistory", "Drawer"))
+                         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                        p.Component<NativeDrawer>().Open();
+                    }))
+                @(Html.NativeButton("record-training-btn", "Record Training")
+                    .CssClass("rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Element("alis-drawer-title").SetText("Record Training");
+                        p.Component<NativeDrawer>().SetSize(DrawerSize.Md).KeepOpenOnEscape();
+                        p.Get(Url.SandboxRoute("StaffTrainingForm", "Drawer"))
+                         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+                        p.Component<NativeDrawer>().Open();
+                    }))
+            </native-hstack>
         </native-hstack>
     </native-card-body></native-card>
 </native-vstack>
