@@ -73,7 +73,8 @@ graph and no lowering pass sit between the builders and the grammar. The grammar
   - In an array lambda, a member .NET defines on the value's type (Trim, Length, Year, DayOfWeek compared)
     reads nothing on a missing value and stops its pipeline on a value that lacks it. In a validator's
     condition, a missing text's Length or list's Count reads nothing, so no comparison with it holds.
-  - A validator's rule or condition on a list reads the list the form sends, from one input or its item inputs.
+  - A validator reads a list or an object as the form sends it, from one input or the inputs under it, the form's
+    before the page's.
   - A value read that holds a promise stops its pipeline; a method that returns one is declared with `MethodAsync`.
   - A method called inside a condition (a term of When, And, Or, ElseIf or a group) runs only when its term is reached.
   - A missing value set as an element's text or HTML shows nothing; a missing class name changes no class.

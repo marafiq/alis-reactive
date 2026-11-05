@@ -6,6 +6,8 @@ public sealed class WhenARuleIsOnAListOrAnObjectItsInputsHold : AppPageTest
     private const string NoRoom = "Name a room for the round.";
     private const string NoLead = "Name a lead for the round.";
     private const string EmptyLead = "Give the round a lead.";
+    private const string Steward = "A round with no lead takes a steward.";
+    private const string Deputy = "A round with a lead names a deputy.";
     private const string Badge = "The north wing asks for a badge.";
     private const string EastKey = "Take the east key for E-9.";
     private const string Porter = "Two rooms or more call for a porter.";
@@ -50,7 +52,7 @@ public sealed class WhenARuleIsOnAListOrAnObjectItsInputsHold : AppPageTest
     }
 
     [Test]
-    public async Task a_rule_that_an_object_is_bound_is_left_to_the_server()
+    public async Task an_object_its_member_inputs_hold_is_not_refused_in_the_browser()
     {
         await Open("/Validation/RoomRound");
 
@@ -59,6 +61,24 @@ public sealed class WhenARuleIsOnAListOrAnObjectItsInputsHold : AppPageTest
         await Expect(Saved).ToHaveTextAsync("saved");
         await Expect(Page.GetByText(NoLead)).ToBeHiddenAsync();
         await Expect(Page.GetByText(EmptyLead)).ToBeHiddenAsync();
+    }
+
+    [Test]
+    public async Task a_condition_on_an_object_its_member_inputs_hold_reads_it_as_there()
+    {
+        await Open("/Validation/RoomRound");
+        await Write("Steward", "");
+        await Write("Deputy", "");
+
+        await Save();
+        await Expect(Field("Deputy").GetByText(Deputy)).ToBeVisibleAsync();
+        await Expect(Field("Steward").GetByText(Steward)).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Write("Deputy", "Jo");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
     }
 
     [Test]

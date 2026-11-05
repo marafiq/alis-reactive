@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Grammar;
 using Alis.Reactive.Inputs;
+using Alis.Reactive.Members;
 using Alis.Reactive.PlanModel.Conditions;
 using Alis.Reactive.PlanModel.Values;
 using Alis.Reactive.PlanModel.Writing;
@@ -75,10 +76,10 @@ namespace Alis.Reactive.PlanModel.Validation
         internal const string Indexes = "i";
 
         internal override ValueExpression Value(FieldReference field)
-            => IsList(field) ? Sent(field) : ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
+            => IsListOrObject(field) ? Sent(field) : ValueExpression.ReadBound(NameOf(field), field.Shape, _formId, Indexes);
 
         internal Expr Checked(FieldReference field, Expr entered, Scope scope)
-            => IsList(field) ? Sent(field).Write(scope) : entered;
+            => IsListOrObject(field) ? Sent(field).Write(scope) : entered;
 
         internal ValueExpression ItemIndexes(FieldReference item)
             => ValueExpression.ReadBoundItemIndexes(NameOf(item), _formId, Indexes, OwnerDepthOf(item));
@@ -88,7 +89,7 @@ namespace Alis.Reactive.PlanModel.Validation
 
         private ValueExpression Sent(FieldReference field) => ValueExpression.ReadSent(NameOf(field), field.Shape, _formId, Indexes);
 
-        private static bool IsList(FieldReference field) => field.Shape.DescribesArray;
+        private static bool IsListOrObject(FieldReference field) => field.Shape.DescribesArray || ClrShape.IsDataClass(field.Type);
 
         private string NameOf(FieldReference field) => HtmlFieldPrefix.Join(_fieldPrefix, field.Path);
 

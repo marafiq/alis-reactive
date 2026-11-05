@@ -23,6 +23,10 @@ public sealed class RoomRound
     public List<string?> Wings { get; set; } = new() { "East" };
 
     public string? Badge { get; set; } = "yes";
+
+    public string? Steward { get; set; } = "yes";
+
+    public string? Deputy { get; set; } = "yes";
 }
 
 public sealed class RoundLead
@@ -37,6 +41,8 @@ public sealed class RoomRoundRules : ReactiveValidator<RoomRound>
         RuleFor(x => x.Rooms).NotEmpty().WithMessage("Name a room for the round.");
         RuleFor(x => x.Lead).NotNull().WithMessage("Name a lead for the round.");
         RuleFor(x => x.Lead).NotEmpty().WithMessage("Give the round a lead.");
+        RuleFor(x => x.Steward).NotEmpty().When(x => x.Lead == null).WithMessage("A round with no lead takes a steward.");
+        RuleFor(x => x.Deputy).NotEmpty().When(x => x.Lead != null).WithMessage("A round with a lead names a deputy.");
         RuleFor(x => x.Badge).NotEmpty().When(x => x.Wings.Contains("North")).WithMessage("The north wing asks for a badge.");
         RuleFor(x => x.EastKey).NotEmpty().When(x => x.Rooms.Contains("E-9")).WithMessage("Take the east key for E-9.");
         RuleFor(x => x.Porter).NotEmpty().When(x => x.Rooms.Count >= 2).WithMessage("Two rooms or more call for a porter.");
