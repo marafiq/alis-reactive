@@ -1,0 +1,68 @@
+@model ShiftCardPageModel
+@using Alis.Reactive.Native
+@using Alis.Reactive.Fusion
+@using Syncfusion.EJ2.Schedule
+@{
+    ViewData["Title"] = "Shift Cards";
+    const string ScheduleId = "shift-card-schedule";
+    var plan = Html.ReactivePlan<ShiftCardPageModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get(Url.SandboxRoute("ShiftCardShifts", "Schedule"))
+         .Response(r => r.OnSuccess<ShiftCardDay>((day, s) =>
+         {
+             var schedule = s.Component<FusionSchedule>(ScheduleId);
+             schedule.EventSettings.Events<ShiftCardShift>().Set(day.Get(d => d.Shifts));
+             schedule.DataBind();
+             s.Element("shift-card-day-status").Text.Set(day.Get(d => d.Summary));
+         }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Shift Cards</native-heading>
+    <native-text color="Secondary">
+        Today's floor schedule. Open a shift to see its handover card and acknowledge the handover.
+    </native-text>
+    <p id="shift-card-day-status" class="text-sm text-text-muted">Loading today's shifts...</p>
+    <p id="shift-card-signoffs" class="text-sm text-text-muted">No handover signed off yet today.</p>
+
+    <section class="rounded-lg border border-border bg-white shadow-sm" style="height: 640px;">
+        @(Html.FusionSchedule(plan, ScheduleId, b =>
+            {
+                b.Width("100%"); b.Height("100%");
+                b.CurrentView(View.Day); b.SelectedDate(DateTime.Today);
+                b.Views(new List<ScheduleView> { new ScheduleView { Option = View.Day } });
+                b.StartHour("07:00"); b.EndHour("19:00");
+                b.EventSettings(new ScheduleEventSettings
+                {
+                    Fields = new ScheduleField
+                    {
+                        Id = "id",
+                        Subject = new ScheduleFieldOptions { Name = "subject" },
+                        StartTime = new ScheduleFieldOptions { Name = "startTime" },
+                        EndTime = new ScheduleFieldOptions { Name = "endTime" },
+                    },
+                });
+                b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
+                {
+                    Content = "<div id='shift-card-content'></div>",
+                });
+            })
+            .Reactive(evt => evt.PopupOpen<ShiftCardShift>(), (args, p) =>
+            {
+                var opened = args.Data.Get(x => x.Id);
+                p.When(args.Type).Eq("QuickInfo").And(opened).Truthy()
+                 .Then(t =>
+                 {
+                     t.Get(Url.SandboxRoute("ShiftCardDetails", "Schedule"))
+                      .Gather<ShiftCardQuery>(g => g.Set(x => x.ShiftId, opened))
+                      .Response(r => r.OnSuccess(s => s.Into("shift-card-content")));
+                 })
+                 .Else(e => { args.Cancel.Set(true); });
+            }))
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

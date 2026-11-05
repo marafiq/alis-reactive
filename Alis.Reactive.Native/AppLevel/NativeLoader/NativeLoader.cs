@@ -30,6 +30,10 @@ namespace Alis.Reactive.Native
         public string DefaultId => ElementId;
 
         /// <summary>The ID of the element the loader covers on its next show; hiding clears it.</summary>
+        /// <remarks>
+        /// When the element it covers leaves the page, for example replaced by <c>Into</c>, the loader returns to
+        /// the page hidden at once, so a <c>Show</c> or <c>Hide</c> later in the same pipeline still finds it.
+        /// </remarks>
         public Property<string> Target => Property<string>();
 
         /// <summary>Milliseconds after which the next show hides itself; hiding clears it.</summary>
@@ -55,10 +59,10 @@ namespace Alis.Reactive.Native
         {
             return new HtmlString(
 #endif
-                "<div id=\"" + Alis.Reactive.Native.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
+                "<alis-loader id=\"" + Alis.Reactive.Native.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-loader__spinner\"></div>\n" +
                 "  <p id=\"alis-loader-message\" class=\"alis-loader__message\"></p>\n" +
-                "</div>\n");
+                "</alis-loader>\n");
         }
     }
 }

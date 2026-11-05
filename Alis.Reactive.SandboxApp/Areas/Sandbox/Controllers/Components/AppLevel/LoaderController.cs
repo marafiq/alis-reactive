@@ -5,7 +5,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 {
     [Area("Sandbox")]
     [Route("Sandbox/Components/Loader")]
-    public class LoaderController : Controller
+    public partial class LoaderController : Controller
     {
         private static readonly TimeSpan CarePlanSaveDuration = TimeSpan.FromSeconds(3);
 

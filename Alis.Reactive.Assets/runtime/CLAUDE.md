@@ -20,14 +20,17 @@ feature; every feature is a plugin.
   the page.
 - The framework's own component code (Native and Fusion widgets, Confirm, Drawer, Loader) is not
   here: it lives in `../components/`, constructs on `alis:mount` and queues plugins, as an app's
-  does. `../bundle.ts` imports it before this runtime. Neither side imports the other.
+  does. `../bundle.ts` imports it before this runtime. Neither side imports the other. The loader is
+  the custom element "alis-loader", so it is back on the page before the call that removed what it
+  covers returns.
 
 ## Posture
 
 The runtime executes; it does not defend (root CLAUDE.md, Architecture). A checked member path is a
 real boundary too; an error at one names the object, the path and the plan.
 
-- `objects/vendor-driver.ts` follows a vendor's plan data for every component.
+- `objects/vendor-driver.ts` follows a vendor's plan data for every component. An owner removes a
+  listener only while the element still holds, at the vendor's object path, the object it was added to.
 - `grammar/paths.ts`: a required read or call takes any present value as its holder, since text and
   numbers have members in JavaScript; a write needs an object. An optional one reads nothing past a
   missing holder.

@@ -24,6 +24,9 @@ namespace Alis.Reactive
     /// public static readonly ComponentVendor CallBell = ComponentVendor.DefineCallbackProperties(
     ///     "callbell", objectPath: "callBell", payload: VendorEventPayload.Argument);
     /// </code>
+    /// A handler's listener is removed when the partial view that added it unloads. A component its host
+    /// destroyed first, so that its element no longer holds it at the object path, took its listeners with it,
+    /// and nothing is removed.
     /// </remarks>
     public sealed class ComponentVendor
     {

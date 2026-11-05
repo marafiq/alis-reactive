@@ -4,7 +4,7 @@ import { read } from "../grammar/paths";
 import { assertNever } from "../shared/assert-never";
 import { pluginNamed } from "./plugins";
 import type { Owner } from "./owner";
-import { subscribeVendor, vendorObject, type Listener } from "./vendor-driver";
+import { stillHolds, subscribeVendor, vendorObject, type Listener } from "./vendor-driver";
 
 export class PlanObjects implements Objects {
   constructor(readonly plan: PlanDocument) {}
@@ -33,9 +33,13 @@ export class PlanObjects implements Objects {
 
   private subscribeElement(locator: ElementObjectLocator, path: readonly string[], event: string, listener: Listener, owner: Owner): void {
     const vendor = this.vendor(locator);
-    const root = vendorObject(this.requireElement(locator), locator.vendor, vendor);
+    const element = this.requireElement(locator);
+    const root = vendorObject(element, locator.vendor, vendor);
     const target = path.length === 0 ? root : read(root, path, "required", `#${locator.id}`);
-    owner.onDispose(subscribeVendor(target, locator.vendor, vendor, event, listener));
+    const unsubscribe = subscribeVendor(target, locator.vendor, vendor, event, listener);
+    owner.onDispose(() => {
+      if (stillHolds(element, vendor, root)) unsubscribe();
+    });
   }
 
   private locator(id: string): ObjectLocator {

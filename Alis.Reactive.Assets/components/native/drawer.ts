@@ -5,6 +5,8 @@ type DrawerSize = (typeof SIZES)[number];
 
 const VISIBLE = "alis-drawer--visible";
 
+const escapesTakenByAnOpenPopup = new WeakSet<KeyboardEvent>();
+
 function sizeClass(size: DrawerSize): string {
   return `alis-drawer--${size}`;
 }
@@ -51,6 +53,25 @@ function resetAfterClose(container: HTMLElement): void {
   if (title) title.textContent = "";
 }
 
+function controlsAnOpenPopup(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  const popupIsOpen = target.getAttribute("aria-expanded") === "true";
+  const hasPopup = target.getAttribute("aria-haspopup");
+  const controlsAPopup = target.getAttribute("role") === "combobox" || (hasPopup !== null && hasPopup !== "false");
+  return popupIsOpen && controlsAPopup;
+}
+
+function notePopupEscape(event: KeyboardEvent): void {
+  if (event.key === "Escape" && controlsAnOpenPopup(event.target)) escapesTakenByAnOpenPopup.add(event);
+}
+
+function closeOnEscape(container: HTMLElement, event: KeyboardEvent): void {
+  if (event.key !== "Escape" || !container.classList.contains(VISIBLE)) return;
+  const takenByAPopup = event.defaultPrevented || escapesTakenByAnOpenPopup.has(event);
+  if (takenByAPopup) return;
+  close(container);
+}
+
 onMount("#alis-drawer", container => {
   declareMembers(container);
 
@@ -59,11 +80,8 @@ onMount("#alis-drawer", container => {
     closeBtn.addEventListener("click", () => close(container));
   }
 
-  document.addEventListener("keydown", (e: KeyboardEvent) => {
-    if (e.key === "Escape" && container.classList.contains(VISIBLE)) {
-      close(container);
-    }
-  });
+  document.addEventListener("keydown", notePopupEscape, { capture: true });
+  document.addEventListener("keydown", event => closeOnEscape(container, event));
 
   container.addEventListener("transitionend", () => {
     if (!container.classList.contains(VISIBLE)) {

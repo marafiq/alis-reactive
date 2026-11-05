@@ -13,6 +13,10 @@ export function vendorObject(element: HTMLElement, vendorName: string, vendor: V
   throw new Error(`[alis] #${element.id} has no ${vendorName} object yet (${vendor.objectPath.join(".")})`);
 }
 
+export function stillHolds(element: HTMLElement, vendor: Vendor, object: unknown): boolean {
+  return read(element, vendor.objectPath, "optional", `#${element.id}`) === object;
+}
+
 export function subscribeVendor(
   root: unknown,
   vendorName: string,

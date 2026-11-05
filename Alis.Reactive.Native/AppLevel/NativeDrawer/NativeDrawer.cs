@@ -21,6 +21,8 @@ namespace Alis.Reactive.Native
     /// drawer.Open();
     /// </code>
     /// Load its content into <c>alis-drawer-content</c> and its heading into <c>alis-drawer-title</c>.
+    /// Escape closes the drawer. While a list or a calendar inside it is open, Escape closes that instead and
+    /// the drawer keeps its content: a popup that handles the key, or one open on the control that has focus.
     /// </remarks>
     public sealed class NativeDrawer : NativeComponent, IAppLevelComponent
     {

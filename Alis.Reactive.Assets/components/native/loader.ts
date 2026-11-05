@@ -1,90 +1,86 @@
-import { onMount } from "../hooks";
-
 const VISIBLE = "alis-loader--visible";
 
-function show(loader: HTMLElement): void {
-  loader.classList.add(VISIBLE);
-  loader.removeAttribute("aria-hidden");
-}
+class LoaderElement extends HTMLElement {
+  private pendingAutoHide: ReturnType<typeof setTimeout> | undefined;
+  private coversTarget = false;
 
-function hide(loader: HTMLElement): void {
-  loader.classList.remove(VISIBLE);
-  loader.setAttribute("aria-hidden", "true");
-}
+  constructor() {
+    super();
+    new MutationObserver(() => this.followVisibleClass())
+      .observe(this, { attributes: true, attributeFilter: ["class"] });
+  }
 
-let pendingAutoHide: ReturnType<typeof setTimeout> | undefined;
+  get target(): string {
+    return this.dataset.target ?? "";
+  }
 
-let targetRemovalWatch: MutationObserver | undefined;
+  set target(elementId: string) {
+    this.dataset.target = elementId;
+  }
 
-function watchTargetRemoval(loader: HTMLElement): void {
-  targetRemovalWatch?.disconnect();
-  targetRemovalWatch = new MutationObserver(() => {
-    if (loader.isConnected) return;
-    document.body.appendChild(loader);
-    hide(loader);
-  });
-  targetRemovalWatch.observe(document.body, { childList: true, subtree: true });
-}
+  get timeout(): number {
+    return Number(this.dataset.timeout ?? 0);
+  }
 
-function handleVisible(loader: HTMLElement): void {
-  const targetId = loader.dataset.target;
-  if (targetId) {
-    const target = document.getElementById(targetId);
-    if (target) {
-      target.style.position = "relative";
-      target.appendChild(loader);
-      watchTargetRemoval(loader);
+  set timeout(ms: number) {
+    this.dataset.timeout = `${ms}`;
+  }
+
+  show(): void {
+    this.classList.add(VISIBLE);
+    this.removeAttribute("aria-hidden");
+  }
+
+  hide(): void {
+    this.classList.remove(VISIBLE);
+    this.setAttribute("aria-hidden", "true");
+  }
+
+  disconnectedCallback(): void {
+    const movedWithinThePage = this.isConnected;
+    if (movedWithinThePage || !this.coversTarget) return;
+
+    this.uncover();
+    this.hide();
+  }
+
+  private followVisibleClass(): void {
+    if (this.classList.contains(VISIBLE)) this.cover();
+    else this.uncover();
+  }
+
+  private cover(): void {
+    const targetId = this.dataset.target;
+    if (targetId) {
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.style.position = "relative";
+        target.appendChild(this);
+        this.coversTarget = true;
+      }
+    }
+
+    clearTimeout(this.pendingAutoHide);
+    const timeout = this.dataset.timeout;
+    if (timeout) {
+      const ms = parseInt(timeout, 10);
+      if (ms > 0) {
+        this.pendingAutoHide = setTimeout(() => this.hide(), ms);
+      }
     }
   }
 
-  clearTimeout(pendingAutoHide);
-  const timeout = loader.dataset.timeout;
-  if (timeout) {
-    const ms = parseInt(timeout, 10);
-    if (ms > 0) {
-      pendingAutoHide = setTimeout(() => hide(loader), ms);
+  private uncover(): void {
+    clearTimeout(this.pendingAutoHide);
+    this.coversTarget = false;
+    if (this.parentElement !== document.body) {
+      document.body.appendChild(this);
     }
+    delete this.dataset.target;
+    delete this.dataset.timeout;
+    const message = document.getElementById("alis-loader-message");
+    if (message) message.textContent = "";
   }
 }
 
-function handleHidden(loader: HTMLElement): void {
-  clearTimeout(pendingAutoHide);
-  targetRemovalWatch?.disconnect();
-  if (loader.parentElement !== document.body) {
-    document.body.appendChild(loader);
-  }
-  delete loader.dataset.target;
-  delete loader.dataset.timeout;
-  const msg = document.getElementById("alis-loader-message");
-  if (msg) msg.textContent = "";
-}
-
-onMount("#alis-loader", loader => {
-  Object.assign(loader, {
-    show: () => show(loader),
-    hide: () => hide(loader),
-  });
-  Object.defineProperties(loader, {
-    target: {
-      get: () => loader.dataset.target ?? "",
-      set: (elementId: string) => { loader.dataset.target = elementId; },
-      configurable: true,
-    },
-    timeout: {
-      get: () => Number(loader.dataset.timeout ?? 0),
-      set: (ms: number) => { loader.dataset.timeout = `${ms}`; },
-      configurable: true,
-    },
-  });
-
-  const observer = new MutationObserver(() => {
-    const visible = loader.classList.contains(VISIBLE);
-    if (visible) {
-      handleVisible(loader);
-    } else {
-      handleHidden(loader);
-    }
-  });
-
-  observer.observe(loader, { attributes: true, attributeFilter: ["class"] });
-});
+customElements.define("alis-loader", LoaderElement);
