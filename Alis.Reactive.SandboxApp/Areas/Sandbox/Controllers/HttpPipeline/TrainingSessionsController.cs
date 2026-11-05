@@ -33,6 +33,45 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             return Ok(new TrainingRoomAnswer($"Room 2 is free at {Clock(startsAt.Value)}."));
         }
 
+        [HttpGet("Trainer")]
+        public IActionResult Trainer([FromHeader(Name = "X-Session-Start")] DateTimeOffset? startsAt)
+        {
+            if (startsAt == null) return BadRequest();
+
+            return Ok(new TrainerAvailability($"Grace Okafor, RN is free at {ClockWithOffset(startsAt.Value)}."));
+        }
+
+        [HttpGet("Day/{startsAt}")]
+        public IActionResult Day(DateTimeOffset startsAt)
+        {
+            var day = startsAt.ToString("dddd", CultureInfo.InvariantCulture);
+            return Ok(new TrainingDayPlan($"{day} plan starts at {ClockWithOffset(startsAt)}."));
+        }
+
+        [HttpPost("Projector")]
+        public IActionResult Projector([FromForm] TrainingSessionModel? session)
+        {
+            if (session?.StartsAt == null) return BadRequest();
+
+            return Ok(new ProjectorReservation($"Projector reserved for {ClockWithOffset(session.StartsAt.Value)}."));
+        }
+
+        [HttpGet("Hall")]
+        public IActionResult HallFree([FromQuery] DateTimeOffset[]? days)
+        {
+            if (days is not { Length: 2 }) return BadRequest();
+
+            return Ok(new TrainingHallAnswer($"The hall is free from {DayWithOffset(days[0])} to {DayWithOffset(days[1])}."));
+        }
+
+        [HttpPost("Hall")]
+        public IActionResult HoldHall([FromForm] DateTimeOffset[]? days)
+        {
+            if (days is not { Length: 2 }) return BadRequest();
+
+            return Ok(new TrainingHallAnswer($"The hall is held from {DayWithOffset(days[0])} to {DayWithOffset(days[1])}."));
+        }
+
         [HttpPost("Book")]
         public IActionResult Book([FromBody] TrainingSessionModel? session)
         {
@@ -65,5 +104,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         }
 
         private static string Clock(DateTimeOffset time) => time.ToString("h:mm tt", CultureInfo.InvariantCulture);
+
+        private static string DayWithOffset(DateTimeOffset day) =>
+            $"{day.ToString("dddd, MMMM d", CultureInfo.InvariantCulture)} (UTC{day.ToString("zzz", CultureInfo.InvariantCulture)})";
+
+        private static string ClockWithOffset(DateTimeOffset time) =>
+            $"{Clock(time)} (UTC{time.ToString("zzz", CultureInfo.InvariantCulture)})";
     }
 }

@@ -15,6 +15,7 @@ namespace Alis.Reactive.Native.AppLevel
     public static class NativeDrawerExtensions
     {
         private static readonly string[] SizeClasses = { "alis-drawer--sm", "alis-drawer--md", "alis-drawer--lg" };
+        private const string KeepsOpenOnEscapeClass = "alis-drawer--keeps-open-on-escape";
 
         private static readonly ComponentMethod RemoveAttributeMethod =
             ComponentMethod.Named("removeAttribute").WithArgs<string>();
@@ -50,6 +51,24 @@ namespace Alis.Reactive.Native.AppLevel
         }
 
         /// <summary>
+        /// Keeps the drawer open when the user presses Escape, until the drawer next closes.
+        /// </summary>
+        /// <remarks>
+        /// Call it in the pipeline that opens a drawer holding a form, so that Escape closes a list or a
+        /// calendar in the form without closing the drawer and discarding what was typed. The close button
+        /// and <see cref="Close{TModel}"/> still close the drawer. Once the drawer closes, Escape closes it
+        /// again until the next pipeline that opens it calls this.
+        /// </remarks>
+        public static ComponentRef<NativeDrawer, TModel> KeepOpenOnEscape<TModel>(
+            this ComponentRef<NativeDrawer, TModel> self)
+            where TModel : class
+        {
+            self.EmitCall(ClassAddMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(KeepsOpenOnEscapeClass) });
+            return self;
+        }
+
+        /// <summary>
         /// Opens the drawer, making it visible and accessible.
         /// </summary>
         public static ComponentRef<NativeDrawer, TModel> Open<TModel>(
@@ -72,6 +91,8 @@ namespace Alis.Reactive.Native.AppLevel
         {
             self.EmitCall(ClassRemoveMethod,
                 new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal("alis-drawer--visible") });
+            self.EmitCall(ClassRemoveMethod,
+                new System.Collections.Generic.List<ValueExpression> { ValueExpression.Literal(KeepsOpenOnEscapeClass) });
             return self;
         }
 

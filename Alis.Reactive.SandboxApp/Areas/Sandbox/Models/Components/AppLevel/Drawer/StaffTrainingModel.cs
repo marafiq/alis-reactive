@@ -2,7 +2,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     /// <summary>
     /// Staff training: the coordinator records a caregiver's training in the drawer, picking courses,
-    /// a date and a trainer from lists and a calendar that open over the form.
+    /// a date and a trainer from lists and a calendar that open over the form, and reads the training
+    /// the caregiver completed before.
     /// </summary>
     public class StaffTrainingPageModel
     {
@@ -23,7 +24,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     /// <summary>A trainer who runs courses.</summary>
     public sealed record TrainingTrainer(string Id, string Name);
 
-    /// <summary>The courses and trainers the training form offers.</summary>
+    /// <summary>A course the caregiver completed, as the training history lists it.</summary>
+    public sealed record CompletedTraining(string Course, string CompletedOn, string Trainer);
+
+    /// <summary>The courses and trainers the training form offers, and the training already completed.</summary>
     public static class StaffTrainingOptions
     {
         public static readonly IReadOnlyList<TrainingCourse> Courses =
@@ -38,6 +42,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         [
             new("rn-okafor", "Grace Okafor, RN"),
             new("rn-lindqvist", "Erik Lindqvist, RN"),
+        ];
+
+        public static readonly IReadOnlyList<CompletedTraining> History =
+        [
+            new("Infection control", "September 12", "Grace Okafor, RN"),
+            new("Medication safety", "August 3", "Erik Lindqvist, RN"),
         ];
     }
 

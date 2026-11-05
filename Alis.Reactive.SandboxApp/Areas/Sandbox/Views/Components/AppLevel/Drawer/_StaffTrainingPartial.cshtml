@@ -1,6 +1,7 @@
 @model StaffTrainingRecordModel
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
 @using Alis.Reactive.Fusion.Components
 @using Syncfusion.EJ2.DropDowns
 @{
@@ -36,6 +37,7 @@
              .Response(r => r.OnSuccess<StaffTrainingRecorded>((json, s) =>
              {
                  s.Element("training-status").SetText(json, x => x.Confirmation);
+                 s.Component<NativeDrawer>().Close();
              }));
         }))
 </form>

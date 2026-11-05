@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 {
     /// <summary>
-    /// Staff training: the coordinator records a caregiver's training from the drawer. The course list,
-    /// the calendar and the trainer list open over the form, and Escape closes only what is open.
+    /// Staff training: the coordinator records a caregiver's training in a drawer that stays open on
+    /// Escape, and reads past training in a drawer that Escape closes.
     /// </summary>
     public partial class DrawerController
     {
@@ -17,6 +17,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
         public IActionResult StaffTrainingForm() =>
             PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_StaffTrainingPartial.cshtml",
                 new StaffTrainingRecordModel());
+
+        [HttpGet("StaffTraining/History")]
+        public IActionResult StaffTrainingHistory() =>
+            PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_StaffTrainingHistoryPartial.cshtml",
+                StaffTrainingOptions.History);
 
         [HttpPost("StaffTraining/Record")]
         public IActionResult RecordStaffTraining([FromBody] StaffTrainingRecordModel? record)

@@ -3,22 +3,29 @@
 // calls still target the app-level component through native set reactions.
 export {};
 
-// Escape closes the innermost open thing. A popup inside the drawer either
-// handles the key (preventDefault) or announces itself open through ARIA on the
-// control the key was pressed on; the control closes its popup while it handles
-// the key, so that state is read before it does, in the capture phase.
-const escapesForAnOpenPopup = new WeakSet<KeyboardEvent>();
-
-function controlsAnOpenPopup(target: EventTarget | null): boolean {
-  if (!(target instanceof Element)) return false;
-  const popupIsOpen = target.getAttribute("aria-expanded") === "true";
-  const hasPopup = target.getAttribute("aria-haspopup");
-  const controlsAPopup = target.getAttribute("role") === "combobox" || (hasPopup !== null && hasPopup !== "false");
-  return popupIsOpen && controlsAPopup;
-}
+const VISIBLE_CLASS = "alis-drawer--visible";
+const KEEPS_OPEN_ON_ESCAPE_CLASS = "alis-drawer--keeps-open-on-escape";
+const SIZE_CLASSES = ["alis-drawer--sm", "alis-drawer--md", "alis-drawer--lg"];
 
 function close(container: HTMLElement): void {
-  container.classList.remove("alis-drawer--visible");
+  container.classList.remove(VISIBLE_CLASS, KEEPS_OPEN_ON_ESCAPE_CLASS);
+}
+
+function closeOnEscape(container: HTMLElement, e: KeyboardEvent): void {
+  if (e.key !== "Escape") return;
+  const isOpen = container.classList.contains(VISIBLE_CLASS);
+  const keepsOpenOnEscape = container.classList.contains(KEEPS_OPEN_ON_ESCAPE_CLASS);
+  if (isOpen && !keepsOpenOnEscape) close(container);
+}
+
+function resetOnceClosed(container: HTMLElement): void {
+  if (container.classList.contains(VISIBLE_CLASS)) return;
+  container.setAttribute("aria-hidden", "true");
+  container.classList.remove(...SIZE_CLASSES);
+  const content = document.getElementById("alis-drawer-content");
+  if (content) content.innerHTML = "";
+  const title = document.getElementById("alis-drawer-title");
+  if (title) title.textContent = "";
 }
 
 function init(): void {
@@ -30,27 +37,8 @@ function init(): void {
     closeBtn.addEventListener("click", () => close(container));
   }
 
-  document.addEventListener("keydown", (e: KeyboardEvent) => {
-    if (e.key === "Escape" && controlsAnOpenPopup(e.target)) escapesForAnOpenPopup.add(e);
-  }, { capture: true });
-
-  document.addEventListener("keydown", (e: KeyboardEvent) => {
-    if (e.key !== "Escape" || !container.classList.contains("alis-drawer--visible")) return;
-    const handledByAPopup = e.defaultPrevented || escapesForAnOpenPopup.has(e);
-    if (handledByAPopup) return;
-    close(container);
-  });
-
-  container.addEventListener("transitionend", () => {
-    if (!container.classList.contains("alis-drawer--visible")) {
-      container.setAttribute("aria-hidden", "true");
-      container.classList.remove("alis-drawer--sm", "alis-drawer--md", "alis-drawer--lg");
-      const content = document.getElementById("alis-drawer-content");
-      if (content) content.innerHTML = "";
-      const title = document.getElementById("alis-drawer-title");
-      if (title) title.textContent = "";
-    }
-  });
+  document.addEventListener("keydown", (e: KeyboardEvent) => closeOnEscape(container, e));
+  container.addEventListener("transitionend", () => resetOnceClosed(container));
 }
 
 init();
