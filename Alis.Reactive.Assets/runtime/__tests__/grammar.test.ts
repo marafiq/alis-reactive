@@ -18,8 +18,11 @@ function scopeWith(located: Record<string, unknown> = {}, bindings: Record<strin
 
 const value = (expr: Parameters<typeof evaluate>[0], scope = scopeWith()) => evaluate(expr, scope);
 
+const zoneOfTheRun = process.env.TZ;
+
 afterEach(() => {
   document.body.innerHTML = "";
+  process.env.TZ = zoneOfTheRun;
 });
 
 describe("values convert at the boundary, by shape", () => {
@@ -40,11 +43,31 @@ describe("values convert at the boundary, by shape", () => {
     expect([date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()]).toEqual([2026, 5, 1, 0]);
   });
 
-  it("reads an instant as the exact moment its text names, and writes it back in UTC", () => {
+  it("reads an instant as the exact moment its text names, and writes it back as the local clock with its offset", () => {
+    process.env.TZ = "America/Los_Angeles";
     const arrives = value(e.as(e.lit("2026-10-11T10:30:00+05:00"), s.instant)) as Date;
     expect(arrives.toISOString()).toBe("2026-10-11T05:30:00.000Z");
-    expect(value(e.op("toText", e.as(e.lit("2026-10-11T10:30:00+05:00"), s.instant)))).toBe("2026-10-11T05:30:00.000Z");
+    expect(value(e.op("toText", e.as(e.lit("2026-10-11T10:30:00+05:00"), s.instant)))).toBe("2026-10-10T22:30:00-07:00");
     expect(value(e.op("eq", e.as(e.lit("2026-10-11T05:30:00Z"), s.instant), e.as(e.lit(Date.UTC(2026, 9, 11, 5, 30)), s.date)))).toBe(true);
+  });
+
+  it.each([
+    ["UTC", "2026-11-04T17:00:00Z"],
+    ["America/Chicago", "2026-11-04T11:00:00-06:00"],
+    ["Asia/Kolkata", "2026-11-04T22:30:00+05:30"],
+    ["Asia/Kathmandu", "2026-11-04T22:45:00+05:45"],
+    ["Asia/Shanghai", "2026-11-05T01:00:00+08:00"],
+  ])("writes an instant in %s as that clock with its offset", (zone, expected) => {
+    process.env.TZ = zone;
+    const text = value(e.op("toText", e.as(e.lit(Date.UTC(2026, 10, 4, 17, 0, 0, 0)), s.instant))) as string;
+    expect(text).toBe(expected);
+    expect(Date.parse(text)).toBe(Date.UTC(2026, 10, 4, 17, 0, 0, 0));
+  });
+
+  it("writes an instant with the offset its own day had, either side of a daylight-saving change", () => {
+    process.env.TZ = "America/Los_Angeles";
+    expect(value(e.op("toText", e.as(e.lit(Date.UTC(2027, 0, 13, 17, 0)), s.instant)))).toBe("2027-01-13T09:00:00-08:00");
+    expect(value(e.op("toText", e.as(e.lit(Date.UTC(2027, 6, 14, 16, 0)), s.instant)))).toBe("2027-07-14T09:00:00-07:00");
   });
 
   it("keeps a missing value missing", () => {

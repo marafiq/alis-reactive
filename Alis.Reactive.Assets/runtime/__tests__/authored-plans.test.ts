@@ -17,8 +17,11 @@ beforeEach(async () => {
   registerPlugin("alis.slot", (await import("../plugins/slot")).slotPlugin);
 });
 
+const zoneOfTheRun = process.env.TZ;
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  process.env.TZ = zoneOfTheRun;
   document.body.innerHTML = "";
 });
 
@@ -134,6 +137,7 @@ describe("requests", () => {
   });
 
   it("the form posts each input converted to the shape its member binds with", async () => {
+    process.env.TZ = "Asia/Kolkata";
     const plan = authored("Shapes", "an_input_binds_under_the_shape_mvc_binds_its_member_with");
     const sent = server();
     const elements = mount(plan);
@@ -144,7 +148,7 @@ describe("requests", () => {
     type(input(elements, "Notes"), "walker");
     startOwner(Owner.page(), [plan]);
     await vi.waitFor(() => expect(sent).toHaveLength(1));
-    expect(sent[0]!.body).toEqual({ Weight: 70, MeasuredOn: "2026-10-27", RecordedAt: "2026-10-27T05:30:00.000Z", Notes: ["walker"] });
+    expect(sent[0]!.body).toEqual({ Weight: 70, MeasuredOn: "2026-10-27", RecordedAt: "2026-10-27T11:00:00+05:30", Notes: ["walker"] });
   });
 });
 

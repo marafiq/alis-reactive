@@ -5,6 +5,13 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 {
     private ILocator Booked => Page.Locator("#booked");
 
+    public override BrowserNewContextOptions ContextOptions()
+    {
+        var options = base.ContextOptions() ?? new BrowserNewContextOptions();
+        options.TimezoneId = "Asia/Kolkata";
+        return options;
+    }
+
     private async Task Book(string day, string called, string guests)
     {
         await Page.GetByLabel("Day", new() { Exact = true }).FillAsync(day);
@@ -29,7 +36,17 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await Book("", "2026-10-27T05:30:00Z", "2");
 
-        await Expect(Booked).ToHaveTextAsync("day 0001-01-01 00:00:00.000, called 2026-10-27 05:30:00 +00:00, guests 2, no tags");
+        await Expect(Booked).ToHaveTextAsync("day 0001-01-01 00:00:00.000, called 2026-10-27 11:00:00 +05:30, guests 2, no tags");
+    }
+
+    [Test]
+    public async Task a_moment_is_sent_as_the_browsers_clock_with_its_offset()
+    {
+        await Open("/Inputs/Booking");
+
+        await Book("2026-10-27", "2026-10-27T05:30:00Z", "2");
+
+        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 00:00:00.000, called 2026-10-27 11:00:00 +05:30, guests 2, no tags");
     }
 
     [Test]
@@ -49,7 +66,7 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await Book("2026-10-27T14:30", "2026-10-27T05:30:00Z", "2");
 
-        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 14:30:00.000, called 2026-10-27 05:30:00 +00:00, guests 2, no tags");
+        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 14:30:00.000, called 2026-10-27 11:00:00 +05:30, guests 2, no tags");
     }
 
     [Test]
@@ -59,7 +76,7 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await Book("2026-10-27T14:30:15.250", "2026-10-27T05:30:00Z", "2");
 
-        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 14:30:15.250, called 2026-10-27 05:30:00 +00:00, guests 2, no tags");
+        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 14:30:15.250, called 2026-10-27 11:00:00 +05:30, guests 2, no tags");
     }
 
     [Test]
@@ -69,7 +86,7 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await Book("2026-02-30", "2026-10-27T05:30:00Z", "2");
 
-        await Expect(Booked).ToHaveTextAsync("day '2026-02-30' not bound, called 2026-10-27 05:30:00 +00:00, guests 2, no tags");
+        await Expect(Booked).ToHaveTextAsync("day '2026-02-30' not bound, called 2026-10-27 11:00:00 +05:30, guests 2, no tags");
     }
 
     [Test]
@@ -79,7 +96,7 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await Book("next Tuesday", "2026-10-27T05:30:00Z", "2");
 
-        await Expect(Booked).ToHaveTextAsync("day 'next Tuesday' not bound, called 2026-10-27 05:30:00 +00:00, guests 2, no tags");
+        await Expect(Booked).ToHaveTextAsync("day 'next Tuesday' not bound, called 2026-10-27 11:00:00 +05:30, guests 2, no tags");
     }
 
     [Test]
@@ -89,7 +106,7 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await Book("2026-10-27", "2026-10-27T05:30:00Z", "two");
 
-        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 00:00:00.000, called 2026-10-27 05:30:00 +00:00, guests 'two' not bound, no tags");
+        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 00:00:00.000, called 2026-10-27 11:00:00 +05:30, guests 'two' not bound, no tags");
     }
 
     [Test]
@@ -99,7 +116,7 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await BookAsJson("");
 
-        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 00:00:00.000, called 2026-10-27 05:30:00 +00:00, guests 2, no tags");
+        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 00:00:00.000, called 2026-10-27 11:00:00 +05:30, guests 2, no tags");
     }
 
     [Test]
@@ -109,6 +126,6 @@ public sealed class WhenTypedTextIsSentAsItsMembersType : AppPageTest
 
         await BookAsJson("garden");
 
-        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 00:00:00.000, called 2026-10-27 05:30:00 +00:00, guests 2, tags 'garden'");
+        await Expect(Booked).ToHaveTextAsync("day 2026-10-27 00:00:00.000, called 2026-10-27 11:00:00 +05:30, guests 2, tags 'garden'");
     }
 }

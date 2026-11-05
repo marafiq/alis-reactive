@@ -1,0 +1,160 @@
+@model TrainingSessionModel
+@using Alis.Reactive.Native
+@using Alis.Reactive.Fusion
+@using Syncfusion.EJ2.Schedule
+@{
+    ViewData["Title"] = "Training Sessions";
+    const string FormId = "training-session-form";
+    const string WeekId = "training-week";
+    const string Button = "rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors";
+    const string PrimaryButton = "rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent/90 transition-colors";
+    var plan = Html.ReactivePlan<TrainingSessionModel>();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get(Url.SandboxRoute("Week", "TrainingSessions"))
+         .Response(r => r.OnSuccess<TrainingWeek>((week, s) =>
+         {
+             var schedule = s.Component<FusionSchedule>(WeekId);
+             schedule.EventSettings.Events<TrainingWeekSession>().Set(week.Get(w => w.Sessions));
+             schedule.DataBind();
+         }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Training Sessions</native-heading>
+    <native-text color="Secondary">
+        Maple Grove caregiver training. Book a session, check a room, a trainer and a projector for it, plan its day, hold the training hall, and confirm the week. Times are on your own clock.
+    </native-text>
+
+    <native-card><native-card-body>
+        <form id="training-session-form" class="flex flex-col gap-4">
+            @{ Html.InputField(plan, m => m.StartsAt, o => o.Label("Session starts"))
+                .FusionDateTimePicker(b => b.Placeholder("Choose a date and time")); }
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("check-room-btn", "Check Room")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("Room", "TrainingSessions"))
+                         .Gather(g => g.Form(m => m.StartsAt))
+                         .Response(r => r.OnSuccess<TrainingRoomAnswer>((room, s) =>
+                             s.Element("training-room").Text.Set(room.Get(x => x.Room))));
+                    }))
+                @(Html.NativeButton("book-session-btn", "Book Session")
+                    .CssClass(PrimaryButton)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("Book", "TrainingSessions"))
+                         .Gather(g => g.Form())
+                         .Validate<TrainingSessionValidator>(FormId)
+                         .Response(r => r
+                            .OnSuccess<TrainingSessionBooked>((booked, s) =>
+                                s.Element("training-booking").Text.Set(booked.Get(x => x.Confirmation)))
+                            .OnError(400, e => e.ValidationErrors(FormId)));
+                    }))
+            </native-hstack>
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("check-trainer-btn", "Check Trainer")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("Trainer", "TrainingSessions"))
+                         .Gather(g => g.Header("X-Session-Start", p.Bound(m => m.StartsAt)))
+                         .Response(r => r.OnSuccess<TrainerAvailability>((trainer, s) =>
+                             s.Element("training-trainer").Text.Set(trainer.Get(x => x.Trainer))));
+                    }))
+                @(Html.NativeButton("plan-day-btn", "Plan the Day")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRouteTemplate("Day", "TrainingSessions", "startsAt"))
+                         .Gather(g => g.Form(m => m.StartsAt))
+                         .Response(r => r.OnSuccess<TrainingDayPlan>((day, s) =>
+                             s.Element("training-day").Text.Set(day.Get(x => x.Plan))));
+                    }))
+                @(Html.NativeButton("reserve-projector-btn", "Reserve Projector")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("Projector", "TrainingSessions"))
+                         .Gather(g => g.Form(FormId))
+                         .AsFormData()
+                         .Response(r => r.OnSuccess<ProjectorReservation>((projector, s) =>
+                             s.Element("training-projector").Text.Set(projector.Get(x => x.Confirmation))));
+                    }))
+            </native-hstack>
+            <p class="text-sm">Room: <span id="training-room" class="font-medium">Not checked yet.</span></p>
+            <p class="text-sm">Booking: <span id="training-booking" class="font-medium">Not booked.</span></p>
+            <p class="text-sm">Trainer: <span id="training-trainer" class="font-medium">Not checked yet.</span></p>
+            <p class="text-sm">Day: <span id="training-day" class="font-medium">Not planned.</span></p>
+            <p class="text-sm">Projector: <span id="training-projector" class="font-medium">Not reserved.</span></p>
+            @{ Html.InputField(plan, m => m.HallDays, o => o.Label("Training hall days"))
+                .FusionDateRangePicker(b => b.Placeholder("Choose the first and last day")); }
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("check-hall-btn", "Check Hall")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("HallFree", "TrainingSessions"))
+                         .Gather(g => g.Form(m => m.HallDays))
+                         .Response(r => r.OnSuccess<TrainingHallAnswer>((hall, s) =>
+                             s.Element("training-hall").Text.Set(hall.Get(x => x.Hall))));
+                    }))
+                @(Html.NativeButton("hold-hall-btn", "Hold Hall")
+                    .CssClass(Button)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("HoldHall", "TrainingSessions"))
+                         .Gather(g => g.Form(m => m.HallDays))
+                         .AsFormData()
+                         .Response(r => r.OnSuccess<TrainingHallAnswer>((hall, s) =>
+                             s.Element("training-hall").Text.Set(hall.Get(x => x.Hall))));
+                    }))
+            </native-hstack>
+            <p class="text-sm">Hall: <span id="training-hall" class="font-medium">Not checked yet.</span></p>
+        </form>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Sm">
+            <native-hstack justify="Between" align="Center">
+                <native-heading level="H2">Week of January 11, 2027</native-heading>
+                @(Html.NativeButton("confirm-week-btn", "Confirm Week")
+                    .CssClass(PrimaryButton)
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("ConfirmWeek", "TrainingSessions"))
+                         .Gather<TrainingWeekConfirmation>(g => g.Set(
+                             x => x.Sessions,
+                             p.Component<FusionSchedule>(WeekId).GetEvents<ConfirmedTrainingSession>()))
+                         .Response(r => r.OnSuccess<TrainingWeekConfirmed>((confirmed, s) =>
+                             s.Element("training-week-status").Text.Set(confirmed.Get(x => x.Confirmation))));
+                    }))
+            </native-hstack>
+            <p id="training-week-status" class="text-sm text-text-muted">Week not confirmed.</p>
+            <section style="height: 560px;">
+                @(Html.FusionSchedule(plan, WeekId, b =>
+                    {
+                        b.Width("100%"); b.Height("100%");
+                        b.CurrentView(View.Week); b.SelectedDate(new DateTime(2027, 1, 11));
+                        b.Views(new List<ScheduleView> { new ScheduleView { Option = View.Week } });
+                        b.StartHour("07:00"); b.EndHour("19:00");
+                        b.EventSettings(new ScheduleEventSettings
+                        {
+                            Fields = new ScheduleField
+                            {
+                                Id = "id",
+                                Subject = new ScheduleFieldOptions { Name = "subject" },
+                                StartTime = new ScheduleFieldOptions { Name = "startTime" },
+                                EndTime = new ScheduleFieldOptions { Name = "endTime" },
+                            },
+                        });
+                    }))
+            </section>
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>
+
+@Html.RenderPlan(plan)

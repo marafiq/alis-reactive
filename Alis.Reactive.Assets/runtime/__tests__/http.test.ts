@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { send, type HttpRequest } from "../plugins/http";
-import { shaped } from "../grammar/shape";
+import { bound, shaped } from "../grammar/shape";
 
 interface Captured {
   url: string;
@@ -22,8 +22,11 @@ function request(overrides: Partial<HttpRequest>): HttpRequest {
   return { method: "GET", url: "/residents", route: {}, values: {}, arrays: [], headers: {}, format: "json", ...overrides };
 }
 
+const zoneOfTheRun = process.env.TZ;
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  process.env.TZ = zoneOfTheRun;
 });
 
 describe("route", () => {
@@ -65,13 +68,21 @@ describe("JSON", () => {
     expect((calls[0]!.init.headers as Record<string, string>)["Content-Type"]).toBe("application/json");
   });
 
-  it("sends an instant (a DateTimeOffset) as the exact moment, in JSON and as text", async () => {
+  it("sends an instant (a DateTimeOffset) as the local clock with its offset, in JSON and as text", async () => {
+    process.env.TZ = "Asia/Kolkata";
     const calls = respondWith(null, null);
     const arrives = shaped(new Date(Date.UTC(2026, 9, 11, 5, 30)), { kind: "instant" });
     await send(request({ method: "POST", values: { arrives, visits: [arrives] } }));
     await send(request({ method: "GET", values: { arrives } }));
-    expect(calls[0]!.init.body).toBe('{"arrives":"2026-10-11T05:30:00.000Z","visits":["2026-10-11T05:30:00.000Z"]}');
-    expect(calls[1]!.url).toContain("arrives=2026-10-11T05%3A30%3A00.000Z");
+    expect(calls[0]!.init.body).toBe('{"arrives":"2026-10-11T11:00:00+05:30","visits":["2026-10-11T11:00:00+05:30"]}');
+    expect(calls[1]!.url).toContain("arrives=2026-10-11T11%3A00%3A00%2B05%3A30");
+  });
+
+  it("sends an instant nothing bound as the earliest moment at offset zero, whatever the browser's zone", async () => {
+    process.env.TZ = "America/Los_Angeles";
+    const calls = respondWith(null, null);
+    await send(request({ method: "POST", values: { arrives: bound("", { kind: "instant" }) } }));
+    expect(calls[0]!.init.body).toBe('{"arrives":"0001-01-01T00:00:00Z"}');
   });
 
   it("sends no body for an empty record", async () => {

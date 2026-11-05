@@ -36,7 +36,7 @@ export function bound(value: unknown, shape: Shape): unknown {
     case "number":  return nothingBound ? 0 : converted;
     case "boolean": return nothingBound ? false : converted;
     case "date":    return nothingBound ? earliestDate() : converted;
-    case "instant": return nothingBound ? new Instant(EARLIEST_INSTANT) : converted;
+    case "instant": return nothingBound ? new Instant(EARLIEST_INSTANT, 0) : converted;
     case "array":
     case "object":
     case "nullable": return converted;
@@ -76,7 +76,7 @@ export function asText(value: unknown): string | undefined {
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return `${value}`;
   if (value instanceof Date && !Number.isFinite(value.getTime())) return undefined;
-  if (value instanceof Instant) return value.toISOString();
+  if (value instanceof Instant) return instantText(value);
   if (value instanceof Date) return localDateText(value);
   if (Array.isArray(value)) return toJavaScriptString(value);
   return undefined;
@@ -95,15 +95,34 @@ export function asDate(value: unknown): Date | undefined {
 }
 
 export class Instant extends Date {
+  constructor(time: number, readonly minutesEastOfUtc: number) {
+    super(time);
+  }
+
   override toJSON(): string {
-    return this.toISOString();
+    return instantText(this);
   }
 }
 
 export function asInstant(value: unknown): Instant | undefined {
   if (value instanceof Instant) return value;
   const date = asDate(value);
-  return date === undefined ? undefined : new Instant(date.getTime());
+  return date === undefined ? undefined : new Instant(date.getTime(), -Math.round(date.getTimezoneOffset()));
+}
+
+function instantText(instant: Instant): string {
+  const clock = new Date(instant.getTime() + instant.minutesEastOfUtc * 60_000);
+  const day = `${`${clock.getUTCFullYear()}`.padStart(4, "0")}-${twoDigits(clock.getUTCMonth() + 1)}-${twoDigits(clock.getUTCDate())}`;
+  const time = `${twoDigits(clock.getUTCHours())}:${twoDigits(clock.getUTCMinutes())}:${twoDigits(clock.getUTCSeconds())}`;
+  const milliseconds = clock.getUTCMilliseconds() === 0 ? "" : `.${`${clock.getUTCMilliseconds()}`.padStart(3, "0")}`;
+  return `${day}T${time}${milliseconds}${offsetText(instant.minutesEastOfUtc)}`;
+}
+
+function offsetText(minutesEastOfUtc: number): string {
+  if (minutesEastOfUtc === 0) return "Z";
+  const sign = minutesEastOfUtc > 0 ? "+" : "-";
+  const magnitude = Math.abs(minutesEastOfUtc);
+  return `${sign}${twoDigits(Math.floor(magnitude / 60))}:${twoDigits(magnitude % 60)}`;
 }
 
 function localDateText(date: Date): string {
