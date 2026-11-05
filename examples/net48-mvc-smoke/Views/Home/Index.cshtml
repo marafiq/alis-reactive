@@ -26,8 +26,8 @@
 
 @{ Html.On(plan, t => t.CustomEvent<Net48MvcSmoke.Models.TrainingSession>("session-picked", (session, p) =>
     {
-        p.Get("/Home/Day/{id}")
-         .Gather(g => g.RouteParam("id", session, s => s.StartsAt))
+        p.Get("/Home/Day")
+         .Gather(g => g.FromEvent(session, s => s.StartsAt, "startsAt"))
          .Response(r => r.OnSuccess(s => s.Into("training-day")));
     })); }
 

@@ -28,8 +28,8 @@ await page.screenshot({ path: shot, fullPage: true });
 console.log('PASS: net48 runtime booted and the reactive reaction ran (#reactive-proof shown after checkbox toggle).');
 if (consoleErrors.length) console.log('Browser console errors (non-fatal):\n  ' + consoleErrors.join('\n  '));
 
-// 3. A date route param reaches an MVC 5 action as the session's clock and offset, in a zone west of UTC
-//    and one east of it on the half hour.
+// 3. A date in the query reaches an MVC 5 action as the session's clock and offset, in a zone west of UTC
+//    and one east of it on the half hour. IIS refuses a date with its time in a path segment (404.0, 404.11).
 const dayPlans = [
   { timeZone: 'America/Los_Angeles', plan: 'Wednesday plan starts at 9:00 AM (UTC-08:00).' },
   { timeZone: 'Asia/Kolkata', plan: 'Wednesday plan starts at 10:30 PM (UTC+05:30).' },
@@ -39,7 +39,7 @@ for (const { timeZone, plan } of dayPlans) {
   const context = await browser.newContext({ timezoneId: timeZone });
   const dayPage = await context.newPage();
   await dayPage.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-  const dayResponse = dayPage.waitForResponse((r) => r.url().includes('/Home/Day/'), { timeout: 10000 });
+  const dayResponse = dayPage.waitForResponse((r) => r.url().includes('/Home/Day?'), { timeout: 10000 });
   await dayPage.locator('#plan-day-btn').click();
   const response = await dayResponse;
   const body = await response.text();
@@ -57,4 +57,4 @@ for (const { timeZone, plan } of dayPlans) {
 }
 
 await browser.close();
-if (dayFailures.length) throw new Error('A date route param did not reach the MVC 5 action:\n  ' + dayFailures.join('\n  '));
+if (dayFailures.length) throw new Error('A date in the query did not reach the MVC 5 action:\n  ' + dayFailures.join('\n  '));

@@ -12,9 +12,9 @@ namespace Net48MvcSmoke.Controllers
             return View(new SmokeModel());
         }
 
-        public ActionResult Day(DateTimeOffset id)
+        public ActionResult Day(DateTimeOffset startsAt)
         {
-            return Content(string.Format(CultureInfo.InvariantCulture, "{0:dddd} plan starts at {0:h:mm tt} (UTC{0:zzz}).", id));
+            return Content(string.Format(CultureInfo.InvariantCulture, "{0:dddd} plan starts at {0:h:mm tt} (UTC{0:zzz}).", startsAt));
         }
     }
 }

@@ -4,8 +4,8 @@ A classic, non-SDK **ASP.NET MVC 5** web app on **real .NET Framework 4.8**, con
 `AlisReactive` net48 NuGet packages. It exists to **prove the runtime boots in a browser on .NET
 Framework** — not just that the libraries compile. CI (`.github/workflows/verify-net48.yml`,
 `net48-runtime-iis` job) builds it on `windows-latest`, hosts it under **IIS Express**, drives it with
-**Playwright** (toggle a checkbox → a reactive conditional reveals a proof element), and uploads a
-screenshot artifact.
+**Playwright** (toggle a checkbox → a reactive conditional reveals a proof element; plan the day → a date
+reaches an MVC 5 action in the query, in two time zones), and uploads a screenshot artifact.
 
 It is intentionally **not** in `Alis.Reactive.slnx` — `dotnet`/`.slnx` does not build classic web apps;
 CI builds it with MSBuild.
@@ -22,6 +22,7 @@ A real .NET Framework 4.8 consumer hits the same issues. Each is captured here w
 | 4 | **Native components are Html helpers, not Tag Helpers.** `<native-*>` Tag Helpers live in the net10-only `AlisReactive.NativeTagHelpers` package and do not exist under System.Web MVC 5. | Use `Html.InputField(plan, m => m.X).NativeTextBox(...)` / `.NativeCheckBox(...)` (`Views/Home/Index.cshtml`). |
 | 5 | **Razor parses `@` inside HTML comments.** `<!-- ... @Html.RenderPlan ... -->` is compiled as code (`CS1502`). | Use Razor comments `@* ... *@` instead. |
 | 6 | **Client validation** on net48 resolves `ReactiveValidator<T>` through MVC5's `DependencyResolver` — a real consumer registers it in `Global.asax` `Application_Start`. | **Not exercised by this native-only smoke** (no validator is registered here); tracked in `docs/net48-windows-verification.md`. |
+| 7 | **A date in a route segment.** In IIS's default configuration a date with its time never reaches the action from a path segment: `/Home/Day/2027-01-13T09%3A00%3A00.000-08%3A00` answers 404.0, and an offset east of UTC (`%2B05%3A30`) answers 404.11 (verify-net48 run 42060760178). | Send the date as a request field, which a GET puts in the query: `g.FromEvent(session, s => s.StartsAt, "startsAt")` (`Views/Home/Index.cshtml`) or `g.Include(...)`. |
 
 ## Run it locally on Windows
 
