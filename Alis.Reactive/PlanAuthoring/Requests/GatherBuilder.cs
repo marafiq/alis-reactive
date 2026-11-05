@@ -146,6 +146,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a scalar typed source.</summary>
+        /// <remarks>On ASP.NET MVC 5 under IIS, a date with its time in a route segment is refused before it reaches
+        /// the action. Send a date as a request field (<c>Include</c> or <c>FromEvent</c>), which a GET puts in the query.</remarks>
         /// <typeparam name="TProp">Source value type.</typeparam>
         /// <param name="paramName">Route template placeholder name without braces.</param>
         /// <param name="source">Typed value source evaluated before the request is sent.</param>
@@ -159,6 +161,8 @@ namespace Alis.Reactive.Builders.Requests
         }
 
         /// <summary>Binds a route template parameter to a scalar value from the triggering event payload.</summary>
+        /// <remarks>On ASP.NET MVC 5 under IIS, a date with its time in a route segment is refused before it reaches
+        /// the action. Send a date as a request field (<c>Include</c> or <c>FromEvent</c>), which a GET puts in the query.</remarks>
         /// <typeparam name="TPayload">Trigger payload contract.</typeparam>
         /// <typeparam name="TProp">Selected event-payload route value type.</typeparam>
         /// <param name="paramName">Route template placeholder name without braces.</param>
