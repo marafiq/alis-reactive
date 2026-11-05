@@ -181,10 +181,10 @@ public class WhenTimeSelected : PlaywrightTestBase
         await ScheduleButton.ClickAsync();
 
         // The Value() source fed the gather body; the server echoes the scheduled
-        // time as HH:mm. The exact hour is timezone-shifted by the runtime's
-        // toISOString gather serialization, so the assertion proves a real time
-        // round-tripped (not the "an unscheduled time" null fallback) without
-        // pinning the runner's offset.
+        // time as HH:mm. The time goes out with the browser's offset and the server
+        // binds it into a DateTime in its own zone, so the hour depends on where the
+        // browser and the server run. The assertion proves a real time round-tripped
+        // (not the "an unscheduled time" null fallback) without pinning either zone.
         await Expect(ScheduleConfirmation)
             .ToHaveTextAsync(new System.Text.RegularExpressions.Regex(
                 @"^Morning medication scheduled for \d{2}:\d{2}\.$"),

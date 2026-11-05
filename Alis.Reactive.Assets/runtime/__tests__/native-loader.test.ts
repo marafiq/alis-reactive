@@ -1,24 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import "../components/native/loader";
 
-// The loader module wires itself to #alis-loader when imported, so each test renders the layout
-// element first and imports a fresh module. The helpers below make the same DOM calls the DSL
-// emits for SetTimeout, Show, and Hide (NativeLoaderExtensions).
+// The loader module defines the <alis-loader> element once; each test renders the layout's loader
+// fresh. The helpers below make the same DOM calls the DSL emits for SetTimeout, Show, and Hide
+// (NativeLoaderExtensions).
 let loader: HTMLElement;
 
-beforeEach(async () => {
+beforeEach(() => {
   vi.useFakeTimers();
-  document.body.innerHTML = `<div id="alis-loader" aria-hidden="true"><span id="alis-loader-message"></span></div>`;
+  document.body.innerHTML =
+    `<alis-loader id="alis-loader" aria-hidden="true"><span id="alis-loader-message"></span></alis-loader>`;
   loader = document.getElementById("alis-loader") as HTMLElement;
-  vi.resetModules();
-  await import("../components/native/loader");
 });
 
 afterEach(() => {
   vi.useRealTimers();
-  document.body.innerHTML = "";
 });
 
-// Mutation observers run as microtasks.
+// The loader follows its visible class from a mutation observer, which runs as a microtask.
 async function show(timeoutMs?: number): Promise<void> {
   if (timeoutMs !== undefined) loader.setAttribute("data-timeout", `${timeoutMs}`);
   loader.classList.add("alis-loader--visible");
@@ -82,20 +81,13 @@ describe("native loader target", () => {
     return content;
   }
 
-  // The removal is seen by one observer and the hide by the next, each a microtask.
-  async function settle(): Promise<void> {
-    await Promise.resolve();
-    await Promise.resolve();
-  }
-
-  it("stays on the page, hidden, when the element it covers is removed", async () => {
+  it("is back on the page, hidden, in the same turn the element it covers is removed", async () => {
     const drawerContent = renderDrawerForm("resident-form");
     loader.setAttribute("data-target", "resident-form");
     await show();
     expect(loader.parentElement?.id).toBe("resident-form");
 
     drawerContent.innerHTML = "";
-    await settle();
 
     expect(document.getElementById("alis-loader")).toBe(loader);
     expect(loader.parentElement).toBe(document.body);
@@ -103,12 +95,23 @@ describe("native loader target", () => {
     expect(loader.hasAttribute("data-target")).toBe(false);
   });
 
+  it("is back on the page in the same turn the target's own content is replaced", async () => {
+    renderDrawerForm("resident-form");
+    loader.setAttribute("data-target", "resident-form");
+    await show();
+    const form = document.getElementById("resident-form") as HTMLElement;
+
+    form.innerHTML = `<p>Saved.</p>`;
+
+    expect(document.getElementById("alis-loader")).toBe(loader);
+    expect(isShown()).toBe(false);
+  });
+
   it("covers the next target after the element it covered was removed", async () => {
     loader.setAttribute("data-target", "resident-form");
     const firstContent = renderDrawerForm("resident-form");
     await show();
     firstContent.remove();
-    await settle();
 
     // The next Show finds the loader by id, as the DSL's Show does.
     loader = document.getElementById("alis-loader") as HTMLElement;
@@ -118,5 +121,11 @@ describe("native loader target", () => {
 
     expect(loader.parentElement?.id).toBe("incident-form");
     expect(isShown()).toBe(true);
+  });
+
+  it("leaves the page with the layout when it covers nothing", () => {
+    document.body.innerHTML = "";
+
+    expect(document.getElementById("alis-loader")).toBeNull();
   });
 });

@@ -32,6 +32,8 @@ namespace Alis.Reactive.Native.AppLevel
         /// <remarks>
         /// Loader moves inside the target element and covers it fully.
         /// If not called, the loader covers the entire viewport.
+        /// When the target leaves the page, for example replaced by <c>Into</c>, the loader returns to the
+        /// page hidden at once, so a <c>Show</c> or <c>Hide</c> later in the same pipeline still finds it.
         /// </remarks>
         /// <param name="targetId">Container element ID.</param>
         public static ComponentRef<NativeLoader, TModel> SetTarget<TModel>(
@@ -94,10 +96,10 @@ namespace Alis.Reactive.Native.AppLevel
         {
             return new HtmlString(
 #endif
-                "<div id=\"" + AppLevel.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
+                "<alis-loader id=\"" + AppLevel.NativeLoader.ElementId + "\" class=\"alis-loader\" aria-hidden=\"true\">\n" +
                 "  <div class=\"alis-loader__spinner\"></div>\n" +
                 "  <p id=\"alis-loader-message\" class=\"alis-loader__message\"></p>\n" +
-                "</div>\n");
+                "</alis-loader>\n");
         }
     }
 }

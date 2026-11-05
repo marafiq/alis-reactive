@@ -9,7 +9,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Schedule")]
-    public class ScheduleController : Controller
+    public partial class ScheduleController : Controller
     {
         [HttpGet("")]
         public IActionResult Index()

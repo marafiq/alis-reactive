@@ -1,6 +1,7 @@
 import type { RequestPlan } from "../../types/index";
 import type { ResolvedRequestInput } from "./gather";
 import { resolveRouteParams } from "./url-template";
+import { requestJsonBody } from "./request-wire-format";
 
 export interface ResolvedFetch {
   readonly url: string;
@@ -62,7 +63,7 @@ function applyRequestBody(
   if (!bodyHasFields) return;
 
   headers["Content-Type"] = "application/json";
-  init.body = JSON.stringify(resolvedBody);
+  init.body = requestJsonBody(resolvedBody);
 }
 
 function applyRequestHeaders(resolvedInput: ResolvedRequestInput, headers: Record<string, string>): void {

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { resolveRequestInput } from "../../../execution/requests/gather";
+import { requestJsonBody } from "../../../execution/requests/request-wire-format";
 import type {
   JsonValue,
   BrowserObjectContract,
@@ -19,6 +20,8 @@ const dateShape: Shape = { kind: "date" };
 const rawShape: Shape = { kind: "raw" };
 const objectShape: Shape = { kind: "object", fields: {}, additional: true };
 const isoDate = "2026-01-02T03:04:05.000Z";
+const pacificWireDate = "2026-01-01T19:04:05.000-08:00";
+const zoneOfTheRun = process.env.TZ;
 
 const emptyPlan: PlanDocument = {
   version: 3,
@@ -177,6 +180,7 @@ function componentValueRead(id: string, shape: Shape): ValueExpression {
 
 afterEach(() => {
   history.replaceState({}, "", "/");
+  process.env.TZ = zoneOfTheRun;
 });
 
 describe("resolveRequestInput", () => {
@@ -189,7 +193,8 @@ describe("resolveRequestInput", () => {
     });
   });
 
-  it("emits JSON bodies from explicit body field assignments", () => {
+  it("emits JSON bodies from explicit body field assignments, a date as its local clock with its offset", () => {
+    process.env.TZ = "America/Los_Angeles";
     const input = gatherInput([
       assignment("resident.scheduledFor", literal(isoDate, dateShape)),
       assignment("resident.metadata", literal({ acuity: "high" }, objectShape)),
@@ -197,9 +202,9 @@ describe("resolveRequestInput", () => {
       assignment("nickname", literal("", stringShape)),
     ]);
 
-    expect(resolveBody(input)).toEqual({
+    expect(JSON.parse(requestJsonBody(resolveBody(input) as Record<string, unknown>))).toEqual({
       resident: {
-        scheduledFor: isoDate,
+        scheduledFor: pacificWireDate,
         metadata: { acuity: "high" },
       },
       tags: ["fall-risk", "new"],
@@ -351,12 +356,13 @@ describe("resolveRequestInput", () => {
     expect([...body.keys()]).toEqual([]);
   });
 
-  it("sends each date of a nullable date collection as an ISO date", () => {
+  it("sends each date of a nullable date collection as its local clock with its offset", () => {
+    process.env.TZ = "America/Los_Angeles";
     const nullableStay = { kind: "nullable", inner: arrayShape(dateShape) } as const;
     const plan = componentValuesPlan([{ id: "stay-period", shape: nullableStay, value: [Date.parse(isoDate)] }]);
     const input = gatherInput([assignment("stay", componentValueRead("stay-period", nullableStay))]);
 
-    expect(resolveRequestInput(input, "GET", plan, {}).urlParams).toEqual([`stay=${encodeURIComponent(isoDate)}`]);
+    expect(resolveRequestInput(input, "GET", plan, {}).urlParams).toEqual([`stay=${encodeURIComponent(pacificWireDate)}`]);
   });
 
   it("keeps a JSON body as it was for a multi-value value that is missing: null is written, undefined left out", () => {

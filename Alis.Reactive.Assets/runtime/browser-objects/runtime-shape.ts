@@ -70,7 +70,7 @@ export class RuntimeShape {
       return RuntimeShape.from(this.shape.inner).formatForWire(value);
     }
 
-    if (this.isDateTimestamp(value)) return new Date(value).toISOString();
+    if (this.isDateTimestamp(value)) return new Date(value);
 
     return value;
   }
