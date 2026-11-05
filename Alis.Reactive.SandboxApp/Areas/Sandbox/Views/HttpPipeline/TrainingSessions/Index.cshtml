@@ -18,7 +18,7 @@
 <native-vstack gap="Lg">
     <native-heading level="H1">Training Sessions</native-heading>
     <native-text color="Secondary">
-        Maple Grove caregiver training. Book a session, check a room for it, and confirm the week. Times are on your own clock.
+        Maple Grove caregiver training. Book a session, check a room, a trainer and a projector for it, plan its day, hold the training hall, and confirm the week. Times are on your own clock.
     </native-text>
 
     <native-card><native-card-body>
@@ -47,8 +47,64 @@
                             .OnError(400, e => e.ValidationErrors("training-session-form")));
                     }))
             </native-hstack>
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("check-trainer-btn", "Check Trainer")
+                    .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("Trainer", "TrainingSessions"))
+                         .Gather(g => g.Header("X-Session-Start", p.Component<FusionDateTimePicker>(m => m.StartsAt).Value()))
+                         .Response(r => r.OnSuccess<TrainerAvailability>((json, s) =>
+                             s.Element("training-trainer").SetText(json, x => x.Trainer)));
+                    }))
+                @(Html.NativeButton("plan-day-btn", "Plan the Day")
+                    .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get("/Sandbox/HttpPipeline/TrainingSessions/Day/{startsAt}")
+                         .Gather(g => g.RouteParam("startsAt", p.Component<FusionDateTimePicker>(m => m.StartsAt).Value()))
+                         .Response(r => r.OnSuccess<TrainingDayPlan>((json, s) =>
+                             s.Element("training-day").SetText(json, x => x.Plan)));
+                    }))
+                @(Html.NativeButton("reserve-projector-btn", "Reserve Projector")
+                    .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("Projector", "TrainingSessions"), g => g.IncludeAll())
+                         .AsFormData()
+                         .Response(r => r.OnSuccess<ProjectorReservation>((json, s) =>
+                             s.Element("training-projector").SetText(json, x => x.Confirmation)));
+                    }))
+            </native-hstack>
             <p class="text-sm">Room: <span id="training-room" class="font-medium">Not checked yet.</span></p>
             <p class="text-sm">Booking: <span id="training-booking" class="font-medium">Not booked.</span></p>
+            <p class="text-sm">Trainer: <span id="training-trainer" class="font-medium">Not checked yet.</span></p>
+            <p class="text-sm">Day: <span id="training-day" class="font-medium">Not planned.</span></p>
+            <p class="text-sm">Projector: <span id="training-projector" class="font-medium">Not reserved.</span></p>
+            @{ Html.InputField(plan, m => m.HallDays, o => o.Label("Training hall days"))
+                .FusionDateRangePicker(b => b.Placeholder("Choose the first and last day")); }
+            <native-hstack gap="Sm">
+                @(Html.NativeButton("check-hall-btn", "Check Hall")
+                    .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Get(Url.SandboxRoute("HallFree", "TrainingSessions"))
+                         .Gather(g => g.Include(p.Component<FusionDateRangePicker>(m => m.HallDays).Value(), "days"))
+                         .Response(r => r.OnSuccess<TrainingHallAnswer>((json, s) =>
+                             s.Element("training-hall").SetText(json, x => x.Hall)));
+                    }))
+                @(Html.NativeButton("hold-hall-btn", "Hold Hall")
+                    .CssClass("rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium hover:bg-surface-muted transition-colors")
+                    .Reactive(plan, evt => evt.Click, (args, p) =>
+                    {
+                        p.Post(Url.SandboxRoute("HoldHall", "TrainingSessions"))
+                         .Gather(g => g.Include(p.Component<FusionDateRangePicker>(m => m.HallDays).Value(), "days"))
+                         .AsFormData()
+                         .Response(r => r.OnSuccess<TrainingHallAnswer>((json, s) =>
+                             s.Element("training-hall").SetText(json, x => x.Hall)));
+                    }))
+            </native-hstack>
+            <p class="text-sm">Hall: <span id="training-hall" class="font-medium">Not checked yet.</span></p>
         </form>
     </native-card-body></native-card>
 

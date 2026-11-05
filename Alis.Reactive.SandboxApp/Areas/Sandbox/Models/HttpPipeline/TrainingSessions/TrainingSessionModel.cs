@@ -11,6 +11,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     public class TrainingSessionModel
     {
         public DateTimeOffset? StartsAt { get; set; }
+        public DateTimeOffset[]? HallDays { get; set; }
     }
 
     /// <summary>A session needs a start, and sessions start between 7:00 AM and 7:00 PM on the picked clock.</summary>
@@ -36,6 +37,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     /// <summary>The room free at the picked time.</summary>
     public sealed record TrainingRoomAnswer(string Room);
+
+    /// <summary>The trainer free at the time sent in a request header.</summary>
+    public sealed record TrainerAvailability(string Trainer);
+
+    /// <summary>The day's plan, for the time sent in the request path.</summary>
+    public sealed record TrainingDayPlan(string Plan);
+
+    /// <summary>The projector reserved for the time posted as form data.</summary>
+    public sealed record ProjectorReservation(string Confirmation);
+
+    /// <summary>The training hall for the days picked, sent as a list in the query string or in form data.</summary>
+    public sealed record TrainingHallAnswer(string Hall);
 
     /// <summary>A session on the week's schedule, as the schedule loads it.</summary>
     public sealed record TrainingWeekSession(int Id, string Subject, DateTime StartTime, DateTime EndTime);
