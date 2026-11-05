@@ -11,4 +11,8 @@ public sealed class SubscriptionsController : Controller
     public IActionResult SignedVisit() => View(new GatePage());
 
     public IActionResult HeldObjectEvent() => View(new GatePage());
+
+    public IActionResult Noticeboard() => View(new NoticeboardPage());
+
+    public IActionResult NoticeboardDesk() => PartialView(new NoticeboardDesk());
 }

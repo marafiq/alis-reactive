@@ -21,8 +21,13 @@ namespace Alis.Reactive.Native
     /// drawer.Open();
     /// </code>
     /// Load its content into <c>alis-drawer-content</c> and its heading into <c>alis-drawer-title</c>.
-    /// Escape closes the drawer. While a list or a calendar inside it is open, Escape closes that instead and
-    /// the drawer keeps its content: a popup that handles the key, or one open on the control that has focus.
+    /// Escape, the close button and <see cref="Close"/> close the drawer. A partial view whose content closing
+    /// would lose keeps the drawer open by handling <see cref="BeforeClose"/>, and its handler lasts while the
+    /// partial view is in the drawer:
+    /// <code>
+    /// plan.Component&lt;NativeDrawer&gt;().Reactive(evt =&gt; evt.BeforeClose, (args, p) =&gt;
+    ///     p.When(args.ClosedBy).Eq(DrawerClosedBy.Escape).Then(_ =&gt; args.Cancel.Set(true)));
+    /// </code>
     /// </remarks>
     public sealed class NativeDrawer : NativeComponent, IAppLevelComponent
     {
@@ -40,6 +45,36 @@ namespace Alis.Reactive.Native
 
         /// <summary>Slides the drawer out; its content and heading clear when it has closed.</summary>
         public void Close() => Method();
+
+        /// <summary>Raised before the open drawer closes, by Escape, its close button or <see cref="Close"/>.</summary>
+        /// <remarks>Set <c>args.Cancel</c> in the handler to keep the drawer open.</remarks>
+        public Event<NativeDrawerBeforeCloseArgs> BeforeClose => Event<NativeDrawerBeforeCloseArgs>();
+    }
+
+    /// <summary>Payload of <see cref="NativeDrawer.BeforeClose"/>.</summary>
+    public sealed class NativeDrawerBeforeCloseArgs : JsObject
+    {
+        /// <summary>Gets what is closing the drawer.</summary>
+        public ReadOnly<DrawerClosedBy> ClosedBy => ReadOnly<DrawerClosedBy>();
+
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to keep the drawer open.</summary>
+        public Property<bool> Cancel => Property<bool>();
+    }
+
+    /// <summary>What closes a <see cref="NativeDrawer"/>.</summary>
+    public enum DrawerClosedBy
+    {
+        /// <summary>The user pressed Escape.</summary>
+        [JsonStringEnumMemberName("escape")]
+        Escape,
+
+        /// <summary>The user clicked the drawer's close button.</summary>
+        [JsonStringEnumMemberName("closeButton")]
+        CloseButton,
+
+        /// <summary>A pipeline called <see cref="NativeDrawer.Close"/>.</summary>
+        [JsonStringEnumMemberName("close")]
+        Close
     }
 
     /// <summary>The width of the <see cref="NativeDrawer"/> panel.</summary>

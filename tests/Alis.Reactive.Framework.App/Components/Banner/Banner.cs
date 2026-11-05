@@ -21,6 +21,13 @@ public sealed class Banner : Component, IAppLevelComponent
     public Property<string> Message => Property<string>();
 
     public void Flash() => Method();
+
+    public Event<BannerFlashedArgs> Flashed => Event<BannerFlashedArgs>();
+}
+
+public sealed class BannerFlashedArgs : JsObject
+{
+    public ReadOnly<int> Times => ReadOnly<int>();
 }
 
 public static class BannerHtml

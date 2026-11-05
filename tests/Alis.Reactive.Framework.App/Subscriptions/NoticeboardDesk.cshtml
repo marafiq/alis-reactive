@@ -1,0 +1,12 @@
+@using Alis.Reactive.Framework.App.Components
+@using Alis.Reactive.Framework.App.Subscriptions
+@model NoticeboardDesk
+@{
+    var plan = Html.ReactivePlan<NoticeboardDesk>();
+    plan.Component<Banner>().Reactive(evt => evt.Flashed, (flashed, p) => p.Element("desk-heard").Text.Set(flashed.Times));
+}
+<section id="noticeboard-desk">
+    <h2>The desk</h2>
+</section>
+
+@Html.RenderPlan(plan)

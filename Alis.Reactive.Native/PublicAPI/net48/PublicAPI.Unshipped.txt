@@ -9,6 +9,10 @@ Alis.Reactive.Native.DrawerSize
 Alis.Reactive.Native.DrawerSize.Lg = 2 -> Alis.Reactive.Native.DrawerSize
 Alis.Reactive.Native.DrawerSize.Md = 1 -> Alis.Reactive.Native.DrawerSize
 Alis.Reactive.Native.DrawerSize.Sm = 0 -> Alis.Reactive.Native.DrawerSize
+Alis.Reactive.Native.DrawerClosedBy
+Alis.Reactive.Native.DrawerClosedBy.Close = 2 -> Alis.Reactive.Native.DrawerClosedBy
+Alis.Reactive.Native.DrawerClosedBy.CloseButton = 1 -> Alis.Reactive.Native.DrawerClosedBy
+Alis.Reactive.Native.DrawerClosedBy.Escape = 0 -> Alis.Reactive.Native.DrawerClosedBy
 Alis.Reactive.Native.NativeActionLink
 Alis.Reactive.Native.NativeActionLink.Click.get -> Alis.Reactive.Event<Alis.Reactive.Native.NativeActionLinkClickArgs!>!
 Alis.Reactive.Native.NativeActionLink.NativeActionLink() -> void
@@ -84,11 +88,16 @@ Alis.Reactive.Native.NativeCheckListHtmlExtensions
 Alis.Reactive.Native.NativeComponent
 Alis.Reactive.Native.NativeComponent.NativeComponent() -> void
 Alis.Reactive.Native.NativeDrawer
+Alis.Reactive.Native.NativeDrawer.BeforeClose.get -> Alis.Reactive.Event<Alis.Reactive.Native.NativeDrawerBeforeCloseArgs!>!
 Alis.Reactive.Native.NativeDrawer.Close() -> void
 Alis.Reactive.Native.NativeDrawer.DefaultId.get -> string!
 Alis.Reactive.Native.NativeDrawer.NativeDrawer() -> void
 Alis.Reactive.Native.NativeDrawer.Open() -> void
 Alis.Reactive.Native.NativeDrawer.Size.get -> Alis.Reactive.Property<Alis.Reactive.Native.DrawerSize>!
+Alis.Reactive.Native.NativeDrawerBeforeCloseArgs
+Alis.Reactive.Native.NativeDrawerBeforeCloseArgs.Cancel.get -> Alis.Reactive.Property<bool>!
+Alis.Reactive.Native.NativeDrawerBeforeCloseArgs.ClosedBy.get -> Alis.Reactive.ReadOnly<Alis.Reactive.Native.DrawerClosedBy>!
+Alis.Reactive.Native.NativeDrawerBeforeCloseArgs.NativeDrawerBeforeCloseArgs() -> void
 Alis.Reactive.Native.NativeDrawerHtmlExtensions
 Alis.Reactive.Native.NativeDropDown
 Alis.Reactive.Native.NativeDropDown.Change.get -> Alis.Reactive.Event<Alis.Reactive.Native.NativeDropDownChangeArgs!>!

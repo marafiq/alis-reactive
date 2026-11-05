@@ -80,6 +80,23 @@ namespace Alis.Reactive
             return new RenderedComponent<TComponent, TModel>(this, elementId, markup);
         }
 
+        /// <summary>
+        /// Joins an app object the layout renders once (NativeDrawer, NativeLoader, FusionToast) to this plan, so
+        /// the view handles its events with <c>.Reactive(...)</c>.
+        /// </summary>
+        /// <remarks>A partial view's handler lasts while the partial view is on the page.</remarks>
+        /// <example>
+        /// <code>
+        /// plan.Component&lt;NativeDrawer&gt;().Reactive(evt =&gt; evt.BeforeClose, (args, p) =&gt;
+        ///     p.When(args.ClosedBy).Eq(DrawerClosedBy.Escape).Then(_ =&gt; args.Cancel.Set(true)));
+        /// </code>
+        /// </example>
+        /// <typeparam name="TComponent">The app object's declaration.</typeparam>
+        /// <returns>The app object, ready for <c>.Reactive(...)</c>.</returns>
+        public RenderedComponent<TComponent, TModel> Component<TComponent>()
+            where TComponent : IAppLevelComponent, new()
+            => new RenderedComponent<TComponent, TModel>(this, new TComponent().DefaultId);
+
         internal void AddRenderedInput(RenderedInput input)
         {
             if (input == null) throw new ArgumentNullException(nameof(input));

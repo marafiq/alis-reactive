@@ -320,6 +320,7 @@ Alis.Reactive.ReactivePlan<TModel>
 Alis.Reactive.ReactivePlan<TModel>.BrowserRules<TValidator>() -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
 Alis.Reactive.ReactivePlan<TModel>.BrowserRules<TValidator>(string! ruleSet) -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.BrowserField!>!
 Alis.Reactive.ReactivePlan<TModel>.RegisterPlugin<TPlugin>() -> TPlugin!
+Alis.Reactive.ReactivePlan<TModel>.Component<TComponent>() -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
 Alis.Reactive.ReactivePlan<TModel>.Render<TComponent>(string! elementId, Microsoft.AspNetCore.Html.IHtmlContent! markup) -> Alis.Reactive.RenderedComponent<TComponent, TModel!>!
 Alis.Reactive.ReactiveValidator
 Alis.Reactive.ReactiveValidator<T>

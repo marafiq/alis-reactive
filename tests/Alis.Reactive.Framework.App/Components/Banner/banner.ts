@@ -26,6 +26,7 @@ export class Banner {
   flash(): void {
     this.flashes += 1;
     this.show();
+    for (const listener of this.listeners.get("flashed") ?? []) listener({ times: this.flashes });
   }
 
   on(name: string, listener: Listener): void {

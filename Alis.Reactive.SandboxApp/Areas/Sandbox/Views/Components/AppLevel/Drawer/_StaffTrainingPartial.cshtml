@@ -4,6 +4,11 @@
 @using Syncfusion.EJ2.DropDowns
 @{
     var plan = Html.ReactivePlan<StaffTrainingRecordModel>();
+
+    plan.Component<NativeDrawer>().Reactive(evt => evt.BeforeClose, (args, p) =>
+        p.When(args.ClosedBy).Eq(DrawerClosedBy.Escape).Then(_ => args.Cancel.Set(true))
+         .ElseIf(args.ClosedBy).Eq(DrawerClosedBy.CloseButton)
+         .Then(discarded => discarded.Element("training-status").Text.Set("Training not recorded.")));
 }
 
 <form id="staff-training-form" class="flex flex-col gap-4">
@@ -35,6 +40,7 @@
              .Response(r => r.OnSuccess<StaffTrainingRecorded>((json, s) =>
              {
                  s.Element("training-status").Text.Set(json.Get(x => x.Confirmation));
+                 s.Component<NativeDrawer>().Close();
              }));
         }))
 </form>

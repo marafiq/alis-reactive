@@ -14,6 +14,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
             => PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_StaffTrainingPartial.cshtml",
                 new StaffTrainingRecordModel());
 
+        [HttpGet("StaffTraining/History")]
+        public IActionResult StaffTrainingHistory()
+            => PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_StaffTrainingHistoryPartial.cshtml",
+                StaffTrainingOptions.History);
+
         [HttpPost("StaffTraining/Record")]
         public IActionResult RecordStaffTraining([FromBody] StaffTrainingRecordModel? record)
         {

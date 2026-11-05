@@ -16,6 +16,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
     public sealed record TrainingTrainer(string Id, string Name);
 
+    public sealed record CompletedTraining(string Course, string CompletedOn, string Trainer);
+
     public static class StaffTrainingOptions
     {
         public static readonly IReadOnlyList<TrainingCourse> Courses =
@@ -30,6 +32,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         [
             new("rn-okafor", "Grace Okafor, RN"),
             new("rn-lindqvist", "Erik Lindqvist, RN"),
+        ];
+
+        public static readonly IReadOnlyList<CompletedTraining> History =
+        [
+            new("Infection control", "September 12", "Grace Okafor, RN"),
+            new("Medication safety", "August 3", "Erik Lindqvist, RN"),
         ];
     }
 
