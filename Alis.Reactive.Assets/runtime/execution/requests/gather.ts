@@ -5,7 +5,7 @@ import type { PlanDocument, GatherRequestInput, RequestInputAssignment, HttpMeth
 import type { ExecContext } from "../../types/index";
 import { assertNever } from "../../shared/assert-never";
 import { evaluateValue } from "../../values/evaluate";
-import { toString } from "../../shared/shape-convert";
+import { requestWireText } from "./request-wire-format";
 import { RuntimePlan, type RuntimeComponent } from "../../browser-objects/runtime-plan";
 import { RuntimeShape } from "../../browser-objects/runtime-shape";
 import {
@@ -130,7 +130,7 @@ function requestScalarWireValue(
   shape: RuntimeShape,
 ): string {
   const wire = shape.formatForWire(value);
-  const stringConversion = toString(wire);
+  const stringConversion = requestWireText(wire);
   if (stringConversion.ok) return stringConversion.value;
 
   throw new Error(`[alis] ${targetKind} "${name}" cannot be serialized as a scalar: ${stringConversion.error}`);

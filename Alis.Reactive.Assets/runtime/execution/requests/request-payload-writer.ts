@@ -3,7 +3,7 @@
 // items carrying a File in rawFile.
 
 import type { RequestPayloadTarget, HttpMethod, PathSegment, RequestBodyFormat } from "../../types/index";
-import { toString } from "../../shared/shape-convert";
+import { requestWireText } from "./request-wire-format";
 import { scope } from "../../diagnostics/trace";
 import { assertNever } from "../../shared/assert-never";
 import { plainObjectRecordFrom } from "../../browser-objects/object-record";
@@ -226,7 +226,7 @@ function requestInputArrayItemValue(item: RequestInputArrayItem): unknown {
 }
 
 function scalarWireValue(value: unknown, name: string): string {
-  const stringConversion = toString(value);
+  const stringConversion = requestWireText(value);
   if (stringConversion.ok) return stringConversion.value;
 
   throw new Error(`[alis] gather value "${name}" cannot be serialized as a scalar: ${stringConversion.error}`);
