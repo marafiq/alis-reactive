@@ -24,6 +24,10 @@
     <dt>While loading</dt><dd id="loading"></dd>
     <dt>Finally</dt><dd id="finished"></dd>
     <dt>Finally inside a route</dt><dd id="finished-inside"></dd>
+    <dt>Put, checked against its body</dt><dd id="put-checked"></dd>
+    <dt>Asked with a query</dt><dd id="asked"></dd>
+    <dt>The limit header</dt><dd id="limit-header"></dd>
+    <dt>A route inside a route</dt><dd><span id="inner-own"></span> · after <span id="inner-outer"></span></dd>
 </dl>
 
 @(plan.Button("get-resident", "Get the resident")
@@ -126,5 +130,38 @@
             .Finally(f => f.Element("finished-inside").Text.Set(first.Get(x => x.Next)))))))
 @(plan.Button("add-four", "Add 4 to the tally")
     .Reactive(button => button.Click, p => tally.Add(4)))
+@(plan.Button("put-checked-note", "Put the checked note")
+    .Reactive(button => button.Click, p => p.Put("/Requests/Notes/{id}/Checked")
+        .Gather<NoteRequest>(g => g.Set(x => x.Id, 7).Set(x => x.Text, "Checked"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("put-checked").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("ask-resident", "Ask where the resident is")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Residents/{id}/Asked")
+        .Gather<ResidentQuery>(g => g.Set(x => x.Id, 1042).Set(x => x.Wing, "Garden"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("asked").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("ask-north", "Ask on the north ward")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Residents/{id}/Asked?ward=North")
+        .Gather<ResidentQuery>(g => g.Set(x => x.Id, 1042).Set(x => x.Wing, "Garden"))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("asked").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("send-limit", "Send the slate's limit")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Headers/Limit")
+        .Gather(g => g.Header("X-Limit", p.Component<Slate>("slate").Limit))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("limit-header").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("limit-slate", "Give the slate a limit of 3")
+    .Reactive(button => button.Click, p => p.Component<Slate>("slate").Limit.Set(3)))
+@(plan.Button("read-both", "Read both answers")
+    .Reactive(button => button.Click, p => p.Get("/Requests/First")
+        .Response(r => r.OnSuccess<FirstAnswer>((first, s) => s.Get("/Requests/Second")
+            .Gather<SecondQuery>(g => g.Set(x => x.From, "the inner request"))
+            .Response(inner => inner.OnSuccess<Echo>((echo, i) =>
+            {
+                i.Element("inner-own").Text.Set(echo.Get(x => x.Summary));
+                i.Element("inner-outer").Text.Set(first.Get(x => x.Next));
+            }))))))
+@(plan.Button("finish-then-chain", "Finish, then take the second step")
+    .Reactive(button => button.Click, p => p.Get("/Requests/First")
+        .Finally(f => f.Component<Slate>("slate").Title.Set("the finally"))
+        .Response(r => r.Chained(next => next.Get("/Requests/Second")
+            .Gather<SecondQuery>(g => g.Set(x => x.From, p.Component<Slate>("slate").Title))
+            .Response(second => second.OnSuccess<Echo>((echo, s) => s.Element("chained").Text.Set(echo.Get(x => x.Summary))))))))
 
 @Html.RenderPlan(plan)

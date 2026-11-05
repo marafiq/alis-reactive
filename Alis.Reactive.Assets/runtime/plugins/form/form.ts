@@ -171,19 +171,14 @@ function revalidate(element: HTMLElement): void {
 }
 
 function showErrors(containerId: string, summaryId: string, problem: unknown): void {
-  if (!isRecord(problem)) {
-    log.error("server-errors.not-a-record", { id: containerId });
-    return;
-  }
-
   const inputs = containedInputs(containerId).ids;
   const summary = document.getElementById(summaryId);
   clearInlineMessages(inputs);
   clearAndHide(summary);
 
-  const errors = problem["errors"];
+  const errors = isRecord(problem) ? problem["errors"] : undefined;
   if (!isRecord(errors)) {
-    log.warn("server-errors.wrong-shape");
+    log.warn("server-errors.none", { id: containerId });
     return;
   }
 

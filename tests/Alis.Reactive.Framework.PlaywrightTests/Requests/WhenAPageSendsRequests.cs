@@ -39,6 +39,49 @@ public sealed class WhenAPageSendsRequests : AppPageTest
     }
 
     [Test]
+    public async Task a_put_sends_the_member_that_fills_its_route_in_its_body_too()
+    {
+        await Open("/Requests/Desk");
+
+        await Button("Put the checked note").ClickAsync();
+
+        await Expect(Line("put-checked")).ToHaveTextAsync("put note 7, as its body says");
+    }
+
+    [Test]
+    public async Task a_get_sends_the_member_that_fills_its_route_in_its_path_and_not_in_its_query()
+    {
+        await Open("/Requests/Desk");
+
+        await Button("Ask where the resident is").ClickAsync();
+
+        await Expect(Line("asked")).ToHaveTextAsync("resident 1042, asked with query ?Wing=Garden");
+    }
+
+    [Test]
+    public async Task a_url_that_already_holds_a_query_keeps_it_and_adds_the_gathered_members()
+    {
+        await Open("/Requests/Desk");
+
+        await Button("Ask on the north ward").ClickAsync();
+
+        await Expect(Line("asked")).ToHaveTextAsync("resident 1042, asked with query ?ward=North&Wing=Garden");
+    }
+
+    [Test]
+    public async Task a_header_whose_value_reads_nothing_is_not_sent()
+    {
+        await Open("/Requests/Desk");
+        await Button("Send the slate's limit").ClickAsync();
+        await Expect(Line("limit-header")).ToHaveTextAsync("no limit header");
+
+        await Button("Give the slate a limit of 3").ClickAsync();
+        await Button("Send the slate's limit").ClickAsync();
+
+        await Expect(Line("limit-header")).ToHaveTextAsync("limit header '3'");
+    }
+
+    [Test]
     public async Task a_delete_reaches_the_endpoint_its_route_names()
     {
         await Open("/Requests/Desk");
@@ -148,6 +191,16 @@ public sealed class WhenAPageSendsRequests : AppPageTest
     }
 
     [Test]
+    public async Task finally_runs_before_the_chained_request_is_sent()
+    {
+        await Open("/Requests/Desk");
+
+        await Button("Finish, then take the second step").ClickAsync();
+
+        await Expect(Line("chained")).ToHaveTextAsync("second, after the finally");
+    }
+
+    [Test]
     public async Task parallel_requests_each_run_their_own_route_and_on_all_settled_runs_after_both()
     {
         await Open("/Requests/Desk");
@@ -190,5 +243,16 @@ public sealed class WhenAPageSendsRequests : AppPageTest
         await Button("Finish inside the first answer").ClickAsync();
 
         await Expect(Line("finished-inside")).ToHaveTextAsync("the second step");
+    }
+
+    [Test]
+    public async Task a_route_inside_a_route_reads_its_own_answer_and_the_answer_around_it()
+    {
+        await Open("/Requests/Desk");
+
+        await Button("Read both answers").ClickAsync();
+
+        await Expect(Line("inner-own")).ToHaveTextAsync("second, after the inner request");
+        await Expect(Line("inner-outer")).ToHaveTextAsync("the second step");
     }
 }

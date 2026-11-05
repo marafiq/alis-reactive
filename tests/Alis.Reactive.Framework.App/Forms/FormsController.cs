@@ -14,6 +14,35 @@ public sealed class FormsController : Controller
         Summary = $"resident {outing.Resident ?? "none"}, companion {outing.Companion ?? "none"}, note {outing.Note ?? "none"}",
     });
 
+    [HttpPost]
+    public IActionResult BoundForm([FromForm] OutingPage outing) => Json(new FormsEcho
+    {
+        Summary = $"resident {outing.Resident ?? "none"}, companion {outing.Companion ?? "none"}, note {outing.Note ?? "none"}",
+    });
+
+    public IActionResult Gatehouse() => View(new GatehousePage());
+
+    [HttpPost]
+    public IActionResult SignVisitor() => BadRequest(new
+    {
+        errors = new Dictionary<string, string[]>
+        {
+            ["Visitor"] = ["Name the visitor."],
+            ["Resident"] = ["Say whom the visitor came to see."],
+        },
+    });
+
+    [HttpPost]
+    public IActionResult GateDown()
+        => new ContentResult { StatusCode = 500, ContentType = "text/html", Content = "<p>The gate's server is down.</p>" };
+
+    [HttpPost]
+    public IActionResult GateDropped()
+    {
+        HttpContext.Abort();
+        return new EmptyResult();
+    }
+
     public IActionResult Lunch() => View(new LunchPage());
 
     [HttpPost]

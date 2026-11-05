@@ -94,6 +94,76 @@ public sealed class WhenARequestFails : AppPageTest
     }
 
     [Test]
+    public async Task a_while_loading_that_fails_sends_nothing_runs_no_finally_and_stops_the_steps_after_it()
+    {
+        await Open("/Requests/Outage");
+        await Click("Look up while writing into the ledger");
+        await Expect(Line("loading-answer")).ToHaveTextAsync("limit 5");
+        await Expect(Line("loading-finished")).ToHaveTextAsync("1");
+        await Expect(Line("loading-after")).ToHaveTextAsync("1");
+        await Click("Put the ledger away");
+        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
+
+        await Click("Look up while writing into the ledger");
+
+        await Expect(Line("loading-tried")).ToHaveTextAsync("2");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Line("loading-finished")).ToHaveTextAsync("1");
+        await Expect(Line("loading-after")).ToHaveTextAsync("1");
+        lock (_limitLookups) Assert.That(_limitLookups, Has.Count.EqualTo(1), "only the first look-up was sent");
+    }
+
+    [Test]
+    public async Task a_request_its_form_holds_back_runs_neither_while_loading_nor_finally_and_the_steps_after_it_run()
+    {
+        await Open("/Requests/Outage");
+
+        await Click("Send the signed ledger");
+        await Expect(Page.GetByText("Sign for the ledger.")).ToBeVisibleAsync();
+        await Expect(Line("signed-after")).ToHaveTextAsync("1");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Expect(Line("signed-loading")).ToBeEmptyAsync();
+        await Expect(Line("signed-finished")).ToBeEmptyAsync();
+
+        await Page.GetByLabel("Signer", new() { Exact = true }).FillAsync("Ada");
+        await Click("Send the signed ledger");
+        await Expect(Line("signed-answer")).ToHaveTextAsync("ledger titled Signed ledger");
+        await Expect(Line("signed-loading")).ToHaveTextAsync("2");
+        await Expect(Line("signed-finished")).ToHaveTextAsync("2");
+    }
+
+    [Test]
+    public async Task a_request_whose_named_form_is_not_on_the_page_sends_nothing_runs_its_finally_and_stops_the_steps_after_it()
+    {
+        await Open("/Requests/Outage");
+        await Click("Look up by the ledger's section");
+        await Expect(Line("section-answer")).ToHaveTextAsync("limit 4");
+        await Expect(Line("section-after")).ToHaveTextAsync("1");
+        await Click("Put the ledger away");
+        await Expect(Line("ledger-shelf")).ToBeEmptyAsync();
+
+        await Click("Look up by the ledger's section");
+
+        await Expect(Line("section-tried")).ToHaveTextAsync("2");
+        await Expect(Line("section-finished")).ToHaveTextAsync("2");
+        await Expect(Line("section-after")).ToHaveTextAsync("1");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_limitLookups) Assert.That(_limitLookups, Has.Count.EqualTo(1), "only the first look-up was sent");
+    }
+
+    [Test]
+    public async Task an_error_route_reads_nothing_of_a_body_that_never_came()
+    {
+        await Open("/Requests/Outage");
+        await Click("Ask for a taken room");
+        await Expect(Line("reason")).ToHaveTextAsync("The room is taken");
+
+        await Click("Ask for a room when the line drops");
+
+        await Expect(Line("reason")).ToBeEmptyAsync();
+    }
+
+    [Test]
     public async Task a_parallel_branch_that_cannot_be_built_stops_neither_the_other_branch_nor_what_runs_once_both_settle()
     {
         await Open("/Requests/Outage");
@@ -165,5 +235,15 @@ public sealed class WhenARequestFails : AppPageTest
         await Click("Ask for a file of bytes");
 
         await Expect(Line("bytes")).ToHaveTextAsync("no text in the answer");
+    }
+
+    [Test]
+    public async Task a_json_answer_with_no_text_runs_the_success_route_with_no_body_the_page_reads()
+    {
+        await Open("/Requests/Outage");
+
+        await Click("Ask for JSON with no text");
+
+        await Expect(Line("empty-json")).ToHaveTextAsync("no text in the answer");
     }
 }

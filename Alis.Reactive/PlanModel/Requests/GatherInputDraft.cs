@@ -38,17 +38,18 @@ namespace Alis.Reactive.PlanModel.Requests
             var template = RequestRouteTemplate.For(url);
             var payload = new List<(BindingPath, ValueExpression)>();
             var route = new List<(string, ValueExpression)>();
+            var sendsABody = method != "GET";
             foreach (var (member, value) in _members)
             {
                 var placeholder = template.PlaceholderFor(member);
-                if (placeholder == null)
+                if (placeholder != null)
                 {
-                    payload.Add((member, value));
-                    continue;
+                    RequestScalarTarget.RouteParameter(placeholder, value.OutputShape);
+                    route.Add((placeholder, value));
                 }
 
-                RequestScalarTarget.RouteParameter(placeholder, value.OutputShape);
-                route.Add((placeholder, value));
+                var bodyCarriesIt = placeholder == null || sendsABody;
+                if (bodyCarriesIt) payload.Add((member, value));
             }
 
             template.RequireEveryPlaceholderFilled(route.Select(member => member.Item1));

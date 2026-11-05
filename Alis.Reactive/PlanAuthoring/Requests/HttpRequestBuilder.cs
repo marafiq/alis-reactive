@@ -31,8 +31,8 @@ namespace Alis.Reactive
             => Gather<TModel>(gather);
 
         /// <summary>
-        /// Builds the request the endpoint binds: a member named like a URL <c>{placeholder}</c> fills the path,
-        /// and the others go to the query string for GET and to the body otherwise.
+        /// Builds the request the endpoint binds: a member named like a URL <c>{placeholder}</c> fills the path, and
+        /// the body too when the request has one; the others go to the query string for GET and to the body otherwise.
         /// </summary>
         /// <typeparam name="TRequest">The class the endpoint binds.</typeparam>
         /// <param name="gather">Sets the members, the form's inputs and the headers sent.</param>
@@ -42,7 +42,7 @@ namespace Alis.Reactive
             if (gather == null) throw new ArgumentNullException(nameof(gather));
             var draft = new GatherInputDraft();
             gather(new GatherBuilder<TRequest, TModel>(draft, _context.FieldPrefix));
-            Step.Gather = draft;
+            Step.GatherFrom(draft);
             return this;
         }
 
@@ -55,7 +55,7 @@ namespace Alis.Reactive
         /// <param name="pipeline">Builds the pre-request reaction graph, such as showing a spinner.</param>
         public HttpRequestBuilder<TModel> WhileLoading(Action<PipelineBuilder<TModel>> pipeline)
         {
-            Step.WhileLoading = PipelineBuilder<TModel>.Build(_context, pipeline);
+            Step.LoadWith(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -75,7 +75,7 @@ namespace Alis.Reactive
         /// <param name="pipeline">Builds the cleanup reaction graph to run after the request settles.</param>
         public HttpRequestBuilder<TModel> Finally(Action<PipelineBuilder<TModel>> pipeline)
         {
-            Step.Finally = PipelineBuilder<TModel>.Build(_context, pipeline);
+            Step.FinishWith(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
         }
 
@@ -113,7 +113,7 @@ namespace Alis.Reactive
         private HttpRequestBuilder<TModel> Validate(string formId, FormValidation validation)
         {
             if (string.IsNullOrWhiteSpace(formId)) throw new ArgumentException("Form ID required.", nameof(formId));
-            Step.Validation = validation;
+            Step.ValidateBy(validation);
             _context.Validates(Step, validation);
             return this;
         }
@@ -124,7 +124,7 @@ namespace Alis.Reactive
         {
             var builder = new ResponseBuilder<TModel>(_context);
             response(builder);
-            Step.Routes = builder.Routes;
+            Step.RouteBy(builder.Routes);
             return this;
         }
     }

@@ -17,8 +17,9 @@ namespace Alis.Reactive
     /// <para>
     /// <typeparamref name="TRequest"/> is the class the action binds, so every parameter name comes from a
     /// typed member. Where a member goes follows MVC's rule for route values: a member whose name matches a
-    /// <c>{placeholder}</c> in the URL fills the path; the others go to the query string for GET, and to the
-    /// JSON or form-data body otherwise.
+    /// <c>{placeholder}</c> in the URL fills the path, and a request with a body sends it in the body too, so an
+    /// endpoint that binds the class from its body (<c>Put(int id, [FromBody] Note note)</c>) reads it there; the
+    /// others go to the query string for GET, and to the JSON or form-data body otherwise.
     /// </para>
     /// <para>
     /// A form input of a partial is sent under the view's field prefix, and in a JSON body a number in that
@@ -194,6 +195,7 @@ namespace Alis.Reactive
         }
 
         /// <summary>Sends an HTTP header whose value is read when the request is sent.</summary>
+        /// <remarks>A value that reads nothing sends no header.</remarks>
         /// <typeparam name="TValue">A scalar value type.</typeparam>
         /// <param name="name">The header name.</param>
         /// <param name="source">The value source.</param>

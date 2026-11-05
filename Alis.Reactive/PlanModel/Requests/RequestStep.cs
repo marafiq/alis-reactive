@@ -13,7 +13,12 @@ namespace Alis.Reactive.PlanModel.Requests
     {
         private readonly string _method;
         private readonly string _url;
+        private readonly HashSet<string> _authored = new HashSet<string>(StringComparer.Ordinal);
         private string _format = "json";
+        private GatherInputDraft _gather = new GatherInputDraft();
+        private Block _whileLoading = new Block();
+        private Block _finally = new Block();
+        private ResponseRoutes _routes = new ResponseRoutes();
 
         internal RequestStep(string method, string url)
         {
@@ -22,19 +27,48 @@ namespace Alis.Reactive.PlanModel.Requests
             _url = url ?? throw new ArgumentNullException(nameof(url));
         }
 
-        internal GatherInputDraft Gather { get; set; } = new GatherInputDraft();
+        internal FormValidation? Validation { get; private set; }
 
-        internal Block WhileLoading { get; set; } = new Block();
+        internal void Format(string format)
+        {
+            Author("format", "A request has one body format: call AsJson() or AsFormData() once.");
+            _format = format;
+        }
 
-        internal Block Finally { get; set; } = new Block();
+        internal void GatherFrom(GatherInputDraft gather)
+        {
+            Author("gather", "A request has one Gather; set every member and header of it in that one callback.");
+            _gather = gather;
+        }
 
-        internal ResponseRoutes Routes { get; set; } = new ResponseRoutes();
+        internal void LoadWith(Block whileLoading)
+        {
+            Author("while-loading", "A request has one WhileLoading; write every step of it in that one callback.");
+            _whileLoading = whileLoading;
+        }
 
-        internal FormValidation? Validation { get; set; }
+        internal void FinishWith(Block cleanup)
+        {
+            Author("finally", "A request has one Finally; write every step of it in that one callback.");
+            _finally = cleanup;
+        }
 
-        internal string Url => _url;
+        internal void RouteBy(ResponseRoutes routes)
+        {
+            Author("response", "A request has one Response; write every route of it in that one callback.");
+            _routes = routes;
+        }
 
-        internal void Format(string format) => _format = format;
+        internal void ValidateBy(FormValidation validation)
+        {
+            Author("validate", "A request validates one form: call Validate<TValidator>(formId) once.");
+            Validation = validation;
+        }
+
+        private void Author(string part, string refusal)
+        {
+            if (!_authored.Add(part)) throw new InvalidOperationException(refusal);
+        }
 
         internal override void WriteTo(List<Statement> block, Scope scope) => block.AddRange(Write(scope));
 
@@ -42,27 +76,27 @@ namespace Alis.Reactive.PlanModel.Requests
         {
             var scope = Validation == null ? around : around.ForBlock();
             var method = _method;
-            var input = Gather.Resolve(method, _url, Validation);
+            var input = _gather.Resolve(method, _url, Validation);
             var response = scope.Fresh("res");
-            var routeScope = scope.WithResponse(Routes.Handle, response);
+            var routeScope = scope.WithResponse(_routes.Handle, response);
 
             var sentence = new List<Statement>();
-            sentence.AddRange(WhileLoading.Write(scope));
-            var cleanup = Finally.Write(scope);
+            sentence.AddRange(_whileLoading.Write(scope));
+            var cleanup = _finally.Write(scope);
 
             var exchange = scope.WithHoisted(() => new[]
             {
                 G.Let(response, G.Call(G.Obj(scope.Objects.Http()), PathMembers.Required, "send", SendArgument(method, input, scope)), awaits: true),
             }).ToList();
-            exchange.AddRange(Routes.Write(response, routeScope));
+            exchange.AddRange(_routes.Write(response, routeScope));
 
             if (cleanup.Count == 0)
                 sentence.AddRange(exchange);
             else
                 sentence.Add(G.Try(exchange, cleanup));
 
-            if (Routes.Chained != null)
-                sentence.Add(G.If(Ok(response), Routes.Chained.Write(routeScope.ForBlock()), G.NoStatements));
+            if (_routes.Chained != null)
+                sentence.Add(G.If(Ok(response), _routes.Chained.Write(routeScope.ForBlock()), G.NoStatements));
 
             if (Validation is { } validation)
             {

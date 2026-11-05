@@ -30,6 +30,17 @@ public sealed class RequestsController : Controller
     [HttpPut("/Requests/Notes/{id}")]
     public IActionResult PutNote(int id, [FromBody] NoteRequest note) => Said($"put note {id}: '{note.Text}'");
 
+    [HttpPut("/Requests/Notes/{id}/Checked")]
+    public IActionResult PutChecked(int id, [FromBody] NoteRequest note)
+        => Said(id == note.Id ? $"put note {id}, as its body says" : $"put note {id}, but its body says {note.Id}");
+
+    [HttpGet("/Requests/Residents/{id}/Asked")]
+    public IActionResult ResidentAsked(int id) => Said($"resident {id}, asked with query {QueryText()}");
+
+    [HttpGet("/Requests/Headers/Limit")]
+    public IActionResult LimitHeader()
+        => Said(Request.Headers.TryGetValue("X-Limit", out var limit) ? $"limit header '{limit}'" : "no limit header");
+
     [HttpDelete("/Requests/Notes/{id}")]
     public IActionResult DeleteNote(int id) => Said($"deleted note {id}");
 
@@ -93,6 +104,9 @@ public sealed class RequestsController : Controller
     [HttpGet("/Requests/Bytes")]
     public IActionResult Bytes() => File(System.Text.Encoding.UTF8.GetBytes("ledger.bin"), "application/octet-stream");
 
+    [HttpGet("/Requests/EmptyJson")]
+    public IActionResult EmptyJson() => Content("", "application/json");
+
     public IActionResult Census() => View(new CensusPage());
 
     [HttpGet("/Requests/Census/Asked")]
@@ -155,6 +169,8 @@ public sealed class RequestsController : Controller
     public IActionResult Escorts([FromBody] EscortPage visit) => Said($"escort {visit.Escort.Name ?? "none"}");
 
     public IActionResult Refused(GatherMistake mistake) => View("Refusals", new GatherRefusalsPage { Mistake = mistake });
+
+    public IActionResult Repeated(RepeatedPart part) => View("RepeatRefusals", new RepeatRefusalsPage { Part = part });
 
     public IActionResult CarePlan() => View(new CarePlanPage());
 

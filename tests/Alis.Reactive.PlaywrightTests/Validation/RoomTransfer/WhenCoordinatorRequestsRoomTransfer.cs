@@ -222,7 +222,7 @@ public class WhenCoordinatorRequestsRoomTransfer : PlaywrightTestBase
         await Expect(_plan.ErrorFor(m => m.ToRoom)).ToHaveTextAsync("");
         await Expect(_plan.ErrorFor(m => m.ResidentName)).ToHaveTextAsync("");
         Assert.That(_housekeepingAsked, Has.Count.EqualTo(1));
-        AssertNoConsoleErrorsExcept(ServerRefusal, "server-errors.not-a-record");
+        AssertNoConsoleErrorsExcept(ServerRefusal);
     }
 
     [Test]

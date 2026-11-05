@@ -35,4 +35,26 @@ public sealed class WhenAFormSendsWhatItHolds : AppPageTest
 
         await Expect(Page.Locator("#outing-bound")).ToHaveTextAsync("resident none, companion Bo, note none");
     }
+
+    [Test]
+    public async Task an_input_bound_to_a_member_the_request_also_sets_wins_in_a_json_body_and_the_other_set_members_are_sent()
+    {
+        await Open("/Forms/Outing");
+        await FillTheOuting();
+
+        await Button("Book the outing with names set").ClickAsync();
+
+        await Expect(Page.Locator("#outing-bound")).ToHaveTextAsync("resident Ann, companion Bo, note Back at five");
+    }
+
+    [Test]
+    public async Task an_input_bound_to_a_member_the_request_also_sets_wins_in_form_data_and_the_other_set_members_are_sent()
+    {
+        await Open("/Forms/Outing");
+        await FillTheOuting();
+
+        await Button("Book the outing with names set, as form data").ClickAsync();
+
+        await Expect(Page.Locator("#outing-bound")).ToHaveTextAsync("resident Ann, companion Bo, note Back at five");
+    }
 }

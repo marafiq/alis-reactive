@@ -283,7 +283,8 @@ namespace Alis.Reactive
         /// A message goes beside the mounted input inside the form that binds the name the server reports it under,
         /// whichever plan rendered it (the page, a partial, an editor template, a slot's content), and to the
         /// form's summary (<c>{formId}_validation_summary</c>) when no such input shows it. The form need not be
-        /// validated.
+        /// validated. An answer that carries no validation errors (no body, text, or JSON without <c>errors</c>)
+        /// clears the messages the form shows and shows none.
         /// </remarks>
         /// <param name="formId">The element that holds the form's inputs.</param>
         /// <returns>This pipeline builder.</returns>

@@ -55,6 +55,13 @@ public sealed class StayPage
     public string? StartsOn { get; set; }
 }
 
+public sealed class GatehousePage
+{
+    public string? Visitor { get; set; }
+
+    public string? Resident { get; set; }
+}
+
 public sealed class FormsEcho
 {
     public string Summary { get; set; } = "";

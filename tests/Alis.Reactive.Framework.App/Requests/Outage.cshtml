@@ -8,7 +8,11 @@
 <h1>When a request fails</h1>
 
 @plan.Slate("keeper", title: "Keeper")
-<div id="ledger-shelf">@plan.Slate("ledger", title: "Night ledger")</div>
+<div id="ledger-shelf">@plan.Slate("ledger", title: "Night ledger")<section id="ledger-section" aria-label="The ledger's section"></section></div>
+
+<form id="sign-form">
+    @{ Html.InputField(plan, m => m.Signer, o => o.Label("Signer")).Entry(); }
+</form>
 
 <dl>
     <dt>The ledger's title sent</dt>
@@ -23,10 +27,18 @@
     <dd>tried <span id="both-tried"></span> · the ledger <span id="both-ledger"></span> · the desk <span id="both-desk"></span> · settled <span id="both-settled"></span></dd>
     <dt>Two answers written at once, one into the ledger</dt>
     <dd>tried <span id="pair-tried"></span> · the ledger <span id="pair-ledger"></span> · the desk <span id="pair-desk"></span> · settled <span id="pair-settled"></span></dd>
+    <dt>Looked up while writing into the ledger</dt>
+    <dd>tried <span id="loading-tried"></span> · answered <span id="loading-answer"></span> · finished <span id="loading-finished"></span> · went on <span id="loading-after"></span></dd>
+    <dt>The signed ledger sent</dt>
+    <dd>tried <span id="signed-tried"></span> · loading <span id="signed-loading"></span> · answered <span id="signed-answer"></span> · finished <span id="signed-finished"></span> · went on <span id="signed-after"></span></dd>
+    <dt>Looked up by the ledger's section</dt>
+    <dd>tried <span id="section-tried"></span> · answered <span id="section-answer"></span> · finished <span id="section-finished"></span> · went on <span id="section-after"></span></dd>
+    <dt>The reason a room was refused</dt><dd id="reason"></dd>
     <dt>A connection that drops</dt><dd id="dropped"></dd>
     <dt>An answer cut short</dt><dd id="garbled"></dd>
     <dt>A page in XHTML</dt><dd id="xhtml"></dd>
     <dt>A file of bytes</dt><dd id="bytes"></dd>
+    <dt>JSON with no text</dt><dd id="empty-json"></dd>
     <dt>Attempts counted</dt><dd id="attempts"></dd>
 </dl>
 
@@ -122,6 +134,49 @@
                     .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("pair-desk").Text.Set(tally.Total))))
             .OnAllSettled(s => s.Element("pair-settled").Text.Set(tally.Total));
     }))
+@(plan.Button("look-up-loading", "Look up while writing into the ledger")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("loading-tried").Text.Set(tally.Total);
+        p.Get("/Requests/Limits/{limit}")
+            .Gather<LimitRoute>(g => g.Set(x => x.Limit, 5))
+            .WhileLoading(w => w.Component<Slate>("ledger").Title.Set("looking up"))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("loading-answer").Text.Set(echo.Get(x => x.Summary))))
+            .Finally(f => f.Element("loading-finished").Text.Set(tally.Total));
+        p.Element("loading-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("send-signed", "Send the signed ledger")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("signed-tried").Text.Set(tally.Total);
+        p.Post("/Requests/Ledger")
+            .Gather<LedgerNote>(g => g.Set(x => x.Title, "Signed ledger"))
+            .Validate<OutageRules>("sign-form")
+            .WhileLoading(w => w.Element("signed-loading").Text.Set(tally.Total))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("signed-answer").Text.Set(echo.Get(x => x.Summary))))
+            .Finally(f => f.Element("signed-finished").Text.Set(tally.Total));
+        p.Element("signed-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("look-up-section", "Look up by the ledger's section")
+    .Reactive(button => button.Click, p =>
+    {
+        tally.Add(1);
+        p.Element("section-tried").Text.Set(tally.Total);
+        p.Get("/Requests/Limits/{limit}")
+            .Gather<LimitRoute>(g => g.Set(x => x.Limit, 4).Form("ledger-section"))
+            .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("section-answer").Text.Set(echo.Get(x => x.Summary))))
+            .Finally(f => f.Element("section-finished").Text.Set(tally.Total));
+        p.Element("section-after").Text.Set(tally.Total);
+    }))
+@(plan.Button("ask-taken", "Ask for a taken room")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Refuse")
+        .Gather<RefuseQuery>(g => g.Set(x => x.Status, 409))
+        .Response(r => r.OnError<Refusal>((refusal, e) => e.Element("reason").Text.Set(refusal.Get(x => x.Reason))))))
+@(plan.Button("ask-taken-dropped", "Ask for a room when the line drops")
+    .Reactive(button => button.Click, p => p.Get("/Requests/Dropped")
+        .Response(r => r.OnError<Refusal>((refusal, e) => e.Element("reason").Text.Set(refusal.Get(x => x.Reason))))))
 
 @(plan.Button("ask-dropped", "Ask an endpoint that drops the connection")
     .Reactive(button => button.Click, p => p.Get("/Requests/Dropped")
@@ -143,5 +198,12 @@
         .Response(r => r.OnSuccess<string>((file, s) => s.When(file).IsEmpty()
             .Then(t => t.Element("bytes").Text.Set("no text in the answer"))
             .Else(e => e.Element("bytes").Text.Set(file))))))
+@(plan.Button("ask-empty-json", "Ask for JSON with no text")
+    .Reactive(button => button.Click, p => p.Get("/Requests/EmptyJson")
+        .Response(r => r
+            .OnSuccess<string>((answer, s) => s.When(answer).IsEmpty()
+                .Then(t => t.Element("empty-json").Text.Set("no text in the answer"))
+                .Else(e => e.Element("empty-json").Text.Set(answer)))
+            .OnError(e => e.Element("empty-json").Text.Set("the answer could not be read")))))
 
 @Html.RenderPlan(plan)
