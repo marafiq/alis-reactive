@@ -3,6 +3,20 @@
 // calls still target the app-level component through native set reactions.
 export {};
 
+// Escape closes the innermost open thing. A popup inside the drawer either
+// handles the key (preventDefault) or announces itself open through ARIA on the
+// control the key was pressed on; the control closes its popup while it handles
+// the key, so that state is read before it does, in the capture phase.
+const escapesForAnOpenPopup = new WeakSet<KeyboardEvent>();
+
+function controlsAnOpenPopup(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  const popupIsOpen = target.getAttribute("aria-expanded") === "true";
+  const hasPopup = target.getAttribute("aria-haspopup");
+  const controlsAPopup = target.getAttribute("role") === "combobox" || (hasPopup !== null && hasPopup !== "false");
+  return popupIsOpen && controlsAPopup;
+}
+
 function close(container: HTMLElement): void {
   container.classList.remove("alis-drawer--visible");
 }
@@ -17,9 +31,14 @@ function init(): void {
   }
 
   document.addEventListener("keydown", (e: KeyboardEvent) => {
-    if (e.key === "Escape" && container.classList.contains("alis-drawer--visible")) {
-      close(container);
-    }
+    if (e.key === "Escape" && controlsAnOpenPopup(e.target)) escapesForAnOpenPopup.add(e);
+  }, { capture: true });
+
+  document.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key !== "Escape" || !container.classList.contains("alis-drawer--visible")) return;
+    const handledByAPopup = e.defaultPrevented || escapesForAnOpenPopup.has(e);
+    if (handledByAPopup) return;
+    close(container);
   });
 
   container.addEventListener("transitionend", () => {

@@ -1,0 +1,44 @@
+@model StaffTrainingRecordModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Fusion.Components
+@using Syncfusion.EJ2.DropDowns
+@{
+    var plan = Html.ResolvePlan<StaffTrainingRecordModel>();
+}
+
+<form id="staff-training-form" class="flex flex-col gap-4">
+    @{ Html.InputField(plan, m => m.Notes, o => o.Label("Training notes"))
+        .NativeTextArea(b => b.Rows(3).Placeholder("What the caregiver practised, and anything to follow up")); }
+
+    @{ Html.InputField(plan, m => m.Courses, o => o.Label("Courses completed"))
+        .FusionMultiSelect(b => b
+            .DataSource(StaffTrainingOptions.Courses)
+            .Fields<TrainingCourse>(t => t.Text, v => v.Value)
+            .Placeholder("Select courses")
+            .Mode(VisualMode.CheckBox)
+            .AllowFiltering(true)); }
+
+    @{ Html.InputField(plan, m => m.CompletedOn, o => o.Label("Completed on"))
+        .FusionDatePicker(b => b.Placeholder("Select a date")); }
+
+    @{ Html.InputField(plan, m => m.TrainerId, o => o.Label("Trainer"))
+        .FusionDropDownList(b => b
+            .DataSource(StaffTrainingOptions.Trainers)
+            .Fields<TrainingTrainer>(t => t.Name, v => v.Id)
+            .Placeholder("Select a trainer")); }
+
+    @(Html.NativeButton("save-training-btn", "Save Training")
+        .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post(Url.SandboxRoute("RecordStaffTraining", "Drawer"), g => g.IncludeAll())
+             .Response(r => r.OnSuccess<StaffTrainingRecorded>((json, s) =>
+             {
+                 s.Element("training-status").SetText(json, x => x.Confirmation);
+             }));
+        }))
+</form>
+
+@Html.EJS().ScriptManager()
+@Html.RenderPlan(plan)
