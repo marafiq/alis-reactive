@@ -6,6 +6,8 @@ using Alis.Reactive.Grammar;
 
 namespace Alis.Reactive.PlanModel.Writing
 {
+    internal delegate IReadOnlyList<Statement> BranchWriter(Scope scope);
+
     internal sealed class Scope
     {
         private readonly PlanWriter _plan;

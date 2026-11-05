@@ -28,6 +28,10 @@ public sealed class ConditionsController : Controller
 
     public IActionResult Availability() => View(new AvailabilityPage());
 
+    public IActionResult Calendar() => View(new CalendarPage());
+
+    public IActionResult Queue() => View(new QueuePage());
+
     public IActionResult Decisions() => View(new DecisionsPage());
 
     public IActionResult ElseIfAfterElse() => View(new RefusedPage());

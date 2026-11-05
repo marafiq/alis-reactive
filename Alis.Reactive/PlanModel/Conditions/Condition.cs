@@ -136,12 +136,15 @@ namespace Alis.Reactive
 
         internal virtual Condition Bound(FieldValues fields) => this;
 
-        internal virtual bool IsSynchronous => true;
+        internal virtual bool Asks => false;
 
         internal abstract Expr Write(Scope scope);
 
-        internal virtual IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
-            => new[] { G.If(Write(scope), then, otherwise) };
+        internal virtual IReadOnlyList<Statement> Guard(BranchWriter then, BranchWriter otherwise, Scope scope)
+        {
+            var test = Write(scope);
+            return new[] { G.If(test, then(scope.ForBlock()), otherwise(scope.ForBlock())) };
+        }
 
         private static IReadOnlyList<Condition> Required(Condition[] terms)
         {
@@ -192,16 +195,16 @@ namespace Alis.Reactive
 
         private protected Shape Shape { get; }
 
-        private protected virtual bool ReadsAwaited => _left.ReadsAwaited;
+        private protected virtual IEnumerable<ValueExpression> Operands => new[] { _left };
 
-        internal override bool IsSynchronous => !ReadsAwaited;
+        internal override bool Asks => Operands.Any(operand => operand.ReadsMethodResult);
 
         private protected Expr Raw(Scope scope) => _left.Write(scope);
 
         private protected Expr Left(Scope scope) => G.As(Raw(scope), Shape);
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
-            => IsSynchronous ? base.Guard(then, otherwise, scope) : scope.WithHoisted(() => base.Guard(then, otherwise, scope));
+        internal override IReadOnlyList<Statement> Guard(BranchWriter then, BranchWriter otherwise, Scope scope)
+            => Asks ? scope.WithHoisted(() => base.Guard(then, otherwise, scope)) : base.Guard(then, otherwise, scope);
     }
 
     internal sealed class UnaryCondition : ValueCondition
@@ -236,7 +239,7 @@ namespace Alis.Reactive
             _right = right ?? throw new ArgumentNullException(nameof(right));
         }
 
-        private protected override bool ReadsAwaited => base.ReadsAwaited || _right.ReadsAwaited;
+        private protected override IEnumerable<ValueExpression> Operands => base.Operands.Append(_right);
 
         internal override Expr Write(Scope scope) => G.Op(_comparison.Operation, Left(scope), _right.WriteAs(Shape, scope));
     }
@@ -252,7 +255,7 @@ namespace Alis.Reactive
             _negated = negated;
         }
 
-        private protected override bool ReadsAwaited => base.ReadsAwaited || _items.Any(item => item.ReadsAwaited);
+        private protected override IEnumerable<ValueExpression> Operands => base.Operands.Concat(_items);
 
         internal override Expr Write(Scope scope)
         {
@@ -277,7 +280,7 @@ namespace Alis.Reactive
             _high = high ?? throw new ArgumentNullException(nameof(high));
         }
 
-        private protected override bool ReadsAwaited => base.ReadsAwaited || _low.ReadsAwaited || _high.ReadsAwaited;
+        private protected override IEnumerable<ValueExpression> Operands => base.Operands.Concat(new[] { _low, _high });
 
         internal override Expr Write(Scope scope)
         {
@@ -301,7 +304,7 @@ namespace Alis.Reactive
             _itemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
         }
 
-        private protected override bool ReadsAwaited => base.ReadsAwaited || _item.ReadsAwaited;
+        private protected override IEnumerable<ValueExpression> Operands => base.Operands.Append(_item);
 
         internal override Expr Write(Scope scope)
         {
@@ -368,24 +371,28 @@ namespace Alis.Reactive
 
         internal override Condition Bound(FieldValues fields) => new AllCondition(Terms.Select(term => term.Bound(fields)).ToList());
 
-        internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
+        internal override bool Asks => Terms.Any(term => term.Asks);
 
         internal override Expr Write(Scope scope) => G.And(Terms.Select(term => term.Write(scope)).ToList());
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
-            => IsSynchronous ? base.Guard(then, otherwise, scope) : AllOf(0, then, otherwise, scope);
-
-        private IReadOnlyList<Statement> AllOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+        internal override IReadOnlyList<Statement> Guard(BranchWriter then, BranchWriter otherwise, Scope scope)
         {
-            if (start >= Terms.Count) return then;
-            var synchronous = Terms.Skip(start).TakeWhile(term => term.IsSynchronous).ToList();
-            if (synchronous.Count > 0)
+            if (!Asks) return base.Guard(then, otherwise, scope);
+            var failed = otherwise(scope.ForBlock());
+            return AllOf(0, then, _ => failed, scope);
+        }
+
+        private IReadOnlyList<Statement> AllOf(int start, BranchWriter then, BranchWriter otherwise, Scope scope)
+        {
+            if (start >= Terms.Count) return then(scope);
+            var testedInPlace = Terms.Skip(start).TakeWhile(term => !term.Asks).ToList();
+            if (testedInPlace.Count > 0)
             {
-                var guard = G.And(synchronous.Select(term => term.Write(scope)).ToList());
-                return new[] { G.If(guard, AllOf(start + synchronous.Count, then, otherwise, scope.ForBlock()), otherwise) };
+                var guard = G.And(testedInPlace.Select(term => term.Write(scope)).ToList());
+                return new[] { G.If(guard, AllOf(start + testedInPlace.Count, then, otherwise, scope.ForBlock()), otherwise(scope)) };
             }
 
-            return Terms[start].Guard(AllOf(start + 1, then, otherwise, scope.ForBlock()), otherwise, scope);
+            return Terms[start].Guard(next => AllOf(start + 1, then, otherwise, next), otherwise, scope);
         }
     }
 
@@ -404,24 +411,28 @@ namespace Alis.Reactive
 
         internal override Condition Bound(FieldValues fields) => new AnyCondition(Terms.Select(term => term.Bound(fields)).ToList());
 
-        internal override bool IsSynchronous => Terms.All(term => term.IsSynchronous);
+        internal override bool Asks => Terms.Any(term => term.Asks);
 
         internal override Expr Write(Scope scope) => G.Or(Terms.Select(term => term.Write(scope)).ToList());
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
-            => IsSynchronous ? base.Guard(then, otherwise, scope) : AnyOf(0, then, otherwise, scope);
-
-        private IReadOnlyList<Statement> AnyOf(int start, IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+        internal override IReadOnlyList<Statement> Guard(BranchWriter then, BranchWriter otherwise, Scope scope)
         {
-            if (start >= Terms.Count) return otherwise;
-            var synchronous = Terms.Skip(start).TakeWhile(term => term.IsSynchronous).ToList();
-            if (synchronous.Count > 0)
+            if (!Asks) return base.Guard(then, otherwise, scope);
+            var held = then(scope.ForBlock());
+            return AnyOf(0, _ => held, otherwise, scope);
+        }
+
+        private IReadOnlyList<Statement> AnyOf(int start, BranchWriter then, BranchWriter otherwise, Scope scope)
+        {
+            if (start >= Terms.Count) return otherwise(scope);
+            var testedInPlace = Terms.Skip(start).TakeWhile(term => !term.Asks).ToList();
+            if (testedInPlace.Count > 0)
             {
-                var guard = G.Or(synchronous.Select(term => term.Write(scope)).ToList());
-                return new[] { G.If(guard, then, AnyOf(start + synchronous.Count, then, otherwise, scope.ForBlock())) };
+                var guard = G.Or(testedInPlace.Select(term => term.Write(scope)).ToList());
+                return new[] { G.If(guard, then(scope), AnyOf(start + testedInPlace.Count, then, otherwise, scope.ForBlock())) };
             }
 
-            return Terms[start].Guard(then, AnyOf(start + 1, then, otherwise, scope.ForBlock()), scope);
+            return Terms[start].Guard(then, next => AnyOf(start + 1, then, otherwise, next), scope);
         }
     }
 
@@ -440,12 +451,12 @@ namespace Alis.Reactive
 
         internal override Condition Bound(FieldValues fields) => new NotCondition(_term.Bound(fields));
 
-        internal override bool IsSynchronous => _term.IsSynchronous;
+        internal override bool Asks => _term.Asks;
 
         internal override Expr Write(Scope scope) => G.Not(_term.Write(scope));
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
-            => IsSynchronous ? base.Guard(then, otherwise, scope) : _term.Guard(otherwise, then, scope);
+        internal override IReadOnlyList<Statement> Guard(BranchWriter then, BranchWriter otherwise, Scope scope)
+            => Asks ? _term.Guard(otherwise, then, scope) : base.Guard(then, otherwise, scope);
     }
 
     internal sealed class ConfirmCondition : Condition
@@ -457,18 +468,18 @@ namespace Alis.Reactive
             _message = message ?? throw new ArgumentNullException(nameof(message));
         }
 
-        internal override bool IsSynchronous => false;
+        internal override bool Asks => true;
 
         internal override Expr Write(Scope scope)
             => throw new InvalidOperationException("A user decision cannot be part of a synchronous condition.");
 
-        internal override IReadOnlyList<Statement> Guard(IReadOnlyList<Statement> then, IReadOnlyList<Statement> otherwise, Scope scope)
+        internal override IReadOnlyList<Statement> Guard(BranchWriter then, BranchWriter otherwise, Scope scope)
         {
             var accepted = scope.Fresh("ok");
             return new[]
             {
                 G.Let(accepted, G.Call(G.Obj(scope.Objects.Confirm()), PathMembers.Required, "ask", G.Lit(_message)), awaits: true),
-                G.If(G.Ref(accepted), then, otherwise),
+                G.If(G.Ref(accepted), then(scope.ForBlock()), otherwise(scope.ForBlock())),
             };
         }
     }

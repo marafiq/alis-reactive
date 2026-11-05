@@ -39,6 +39,8 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal virtual bool IsData => false;
 
+        internal virtual IEnumerable<ValueExpression> Operands => Array.Empty<ValueExpression>();
+
         internal abstract PathMembers Members { get; }
 
         internal abstract (Expr Root, IReadOnlyList<string> Path) Write(Scope scope);
@@ -119,6 +121,8 @@ namespace Alis.Reactive.PlanModel.Values
             }
 
             internal override PathMembers Members => PathMembers.Optional;
+
+            internal override IEnumerable<ValueExpression> Operands => new[] { _call };
 
             internal override (Expr, IReadOnlyList<string>) Write(Scope scope) => (_call.Write(scope), G.NoPath);
         }

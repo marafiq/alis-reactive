@@ -73,6 +73,7 @@ graph and no lowering pass sit between the builders and the grammar. The grammar
   - In an array lambda, a member .NET defines on the value's type (Trim, Length, Year, DayOfWeek compared)
     reads nothing on a missing value and stops its pipeline on a value that lacks it.
   - A value read that holds a promise stops its pipeline; a method that returns one is declared with `MethodAsync`.
+  - A method called inside a condition (a term of When, And, Or, ElseIf or a group) runs only when its term is reached.
   - A missing value set as an element's text or HTML shows nothing; a missing class name changes no class.
   - A member is named as System.Text.Json names it: its JsonPropertyName, else camel case. Literals, lambda
     reads, argument shapes and markup raise agree; markup refuses a name an attribute cannot carry back.

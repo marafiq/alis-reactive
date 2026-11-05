@@ -61,20 +61,23 @@ namespace Alis.Reactive.PlanAuthoring.Conditions
     {
         private readonly PlanBuildContext _context;
         private readonly Block _callback;
+        private readonly int _sentenceStart;
 
         internal CallbackConditionContinuation(PlanBuildContext context, Block callback)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+            _sentenceStart = callback.Count;
         }
 
         internal override BranchBuilder<TModel> Then(
             Condition condition,
             Action<PipelineBuilder<TModel>> pipeline)
         {
+            _callback.AskResultsWhereRead(from: _sentenceStart);
             var branch = new BranchStep(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
             _callback.Add(branch);
-            return new BranchBuilder<TModel>(_context, branch);
+            return new BranchBuilder<TModel>(_context, branch, _callback);
         }
     }
 

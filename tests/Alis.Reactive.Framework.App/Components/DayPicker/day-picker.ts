@@ -64,6 +64,17 @@ export class DayPicker {
     return free;
   }
 
+  isOpen(): boolean {
+    const day = this.picked;
+    if (day === null) {
+      this.checkLine.textContent = "No day to check";
+      return false;
+    }
+    const open = !this.booked.has(dayText(day));
+    this.checkLine.textContent = `${dayText(day)} is ${open ? "open" : "closed"}`;
+    return open;
+  }
+
   on(name: string, listener: Listener): void {
     const named = this.listeners.get(name) ?? new Set<Listener>();
     named.add(listener);

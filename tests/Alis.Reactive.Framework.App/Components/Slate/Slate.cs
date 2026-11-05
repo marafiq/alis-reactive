@@ -94,6 +94,16 @@ public sealed class Slate : Component
 
     public ReadOnly<IEnumerable<string>> LabelSequence => ReadOnly<IEnumerable<string>>(name: "labels");
 
+    public ReadOnly<IList<string>> LabelIndexedList => ReadOnly<IList<string>>(name: "labels");
+
+    public ReadOnly<ICollection<string>> LabelCollection => ReadOnly<ICollection<string>>(name: "labels");
+
+    public ReadOnly<IReadOnlyCollection<string>> LabelReadOnlyCollection => ReadOnly<IReadOnlyCollection<string>>(name: "labels");
+
+    public ReadOnly<HashSet<string>> LabelHashSet => ReadOnly<HashSet<string>>(name: "labels");
+
+    public ReadOnly<ISet<string>> LabelSet => ReadOnly<ISet<string>>(name: "labels");
+
     public Event Cleared => Event();
 
     public Event<SlateRowAdded> RowAdded => Event<SlateRowAdded>();

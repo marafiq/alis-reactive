@@ -26,6 +26,10 @@ public sealed class CarePlanPage;
 
 public sealed class AvailabilityPage;
 
+public sealed class CalendarPage;
+
+public sealed class QueuePage;
+
 public sealed class DecisionsPage;
 
 public sealed class RefusedPage;

@@ -20,7 +20,11 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal virtual ValueExpression AsArrived() => this;
 
-        internal virtual bool ReadsAwaited => false;
+        internal virtual bool ReadsAwaited => Operands.Any(operand => operand.ReadsAwaited);
+
+        internal virtual bool ReadsMethodResult => Operands.Any(operand => operand.ReadsMethodResult);
+
+        private protected virtual IEnumerable<ValueExpression> Operands => Array.Empty<ValueExpression>();
 
         internal abstract Expr Write(Scope scope);
 
@@ -191,6 +195,8 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
+        private protected override IEnumerable<ValueExpression> Operands => _target.Operands;
+
         internal override ValueExpression AsArrived()
             => _target.IsData ? new GetExpression(_target, _path, Shape.Any) : this;
 
@@ -242,7 +248,7 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
-        internal override bool ReadsAwaited => _args.Any(arg => arg.ReadsAwaited);
+        private protected override IEnumerable<ValueExpression> Operands => _target.Operands.Concat(_args);
 
         internal override Expr Write(Scope scope) => WriteCall(scope, _shape);
 
@@ -271,7 +277,11 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _call.OutputShape;
 
-        internal override bool ReadsAwaited => _awaits || _call.ReadsAwaited;
+        internal override bool ReadsAwaited => _awaits || base.ReadsAwaited;
+
+        internal override bool ReadsMethodResult => true;
+
+        private protected override IEnumerable<ValueExpression> Operands => new[] { _call };
 
         internal override Expr Write(Scope scope)
             => G.As(scope.Result(this, JsonMemberName.Of(_member), _awaits, () => _call.WriteUnconverted(scope)), OutputShape);
@@ -360,7 +370,7 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => _shape;
 
-        internal override bool ReadsAwaited => _fields.Any(member => member.Value.ReadsAwaited);
+        private protected override IEnumerable<ValueExpression> Operands => _fields.Select(member => member.Value);
 
         internal override Expr Write(Scope scope)
             => G.Record(_fields.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
@@ -380,7 +390,7 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal override Shape OutputShape => Shape;
 
-        internal override bool ReadsAwaited => Items.Any(item => item.ReadsAwaited);
+        private protected override IEnumerable<ValueExpression> Operands => Items;
 
         internal override Expr Write(Scope scope) => G.List(Items.Select(item => item.Write(scope)));
     }
@@ -399,6 +409,8 @@ namespace Alis.Reactive.PlanModel.Values
         }
 
         internal override Shape OutputShape => _shape;
+
+        private protected override IEnumerable<ValueExpression> Operands => _operands;
 
         internal override Expr Write(Scope scope)
             => G.As(G.Op(_op, _operands.Select(operand => operand.Write(scope)).ToArray()), _shape);

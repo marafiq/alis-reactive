@@ -470,8 +470,13 @@ static Alis.Reactive.Condition.Not(Alis.Reactive.Condition! term) -> Alis.Reacti
 static Alis.Reactive.Condition.Text(System.Linq.Expressions.LambdaExpression! member, Alis.Reactive.TextTest! test, string! text) -> Alis.Reactive.Condition!
 static Alis.Reactive.ConditionExtensions.Confirm<TModel>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, string! message) -> Alis.Reactive.GuardBuilder<TModel!>!
 static Alis.Reactive.ConditionExtensions.When<TModel, TProp>(this Alis.Reactive.PipelineBuilder<TModel!>! pipeline, Alis.Reactive.TypedSource<TProp>! source) -> Alis.Reactive.ConditionSourceBuilder<TModel!, TProp, Alis.Reactive.GuardBuilder<TModel!>!>!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.HashSet<TItem>!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.ICollection<TItem>!, TNext!>! source, TItem item) -> TNext!
 static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.IEnumerable<TItem>!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.IList<TItem>!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.IReadOnlyCollection<TItem>!, TNext!>! source, TItem item) -> TNext!
 static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.IReadOnlyList<TItem>!, TNext!>! source, TItem item) -> TNext!
+static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.ISet<TItem>!, TNext!>! source, TItem item) -> TNext!
 static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, System.Collections.Generic.List<TItem>!, TNext!>! source, TItem item) -> TNext!
 static Alis.Reactive.ConditionOperators.ArrayContains<TModel, TItem, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TItem[]!, TNext!>! source, TItem item) -> TNext!
 static Alis.Reactive.ConditionOperators.Between<TModel, TValue, TNext>(this Alis.Reactive.ConditionSourceBuilder<TModel!, TValue, TNext!>! source, TValue low, TValue high) -> TNext!

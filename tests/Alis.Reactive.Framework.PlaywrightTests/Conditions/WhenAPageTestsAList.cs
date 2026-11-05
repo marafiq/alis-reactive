@@ -23,6 +23,11 @@ public sealed class WhenAPageTestsAList : AppPageTest
     [TestCase("array-row-3", TestName = "a_list_declared_as_an_array_holds_an_item_once_it_is_added")]
     [TestCase("list-row-3", TestName = "a_list_declared_as_a_list_holds_an_item_once_it_is_added")]
     [TestCase("sequence-row-3", TestName = "a_list_declared_as_a_sequence_holds_an_item_once_it_is_added")]
+    [TestCase("indexed-list-row-3", TestName = "a_list_declared_as_an_indexed_list_holds_an_item_once_it_is_added")]
+    [TestCase("collection-row-3", TestName = "a_list_declared_as_a_collection_holds_an_item_once_it_is_added")]
+    [TestCase("read-only-collection-row-3", TestName = "a_list_declared_as_a_read_only_collection_holds_an_item_once_it_is_added")]
+    [TestCase("hash-set-row-3", TestName = "a_list_declared_as_a_hash_set_holds_an_item_once_it_is_added")]
+    [TestCase("set-row-3", TestName = "a_list_declared_as_a_set_holds_an_item_once_it_is_added")]
     public async Task a_list_holds_an_item_whatever_collection_it_is_declared_as(string line)
     {
         await Open("/Conditions/Round");

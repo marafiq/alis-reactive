@@ -46,7 +46,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
 
         internal override Shape OutputShape => _shape;
 
-        internal override bool ReadsAwaited => _value.ReadsAwaited || _args.Any(arg => arg.ReadsAwaited);
+        private protected override IEnumerable<ValueExpression> Operands => new[] { _value }.Concat(_args);
 
         internal override Expr Write(Scope scope)
         {
@@ -101,7 +101,7 @@ namespace Alis.Reactive.PlanAuthoring.Arrays
 
         internal override Shape OutputShape => _shape;
 
-        internal override bool ReadsAwaited => _source.ReadsAwaited;
+        private protected override IEnumerable<ValueExpression> Operands => new[] { _source };
 
         internal override Expr Write(Scope scope)
         {

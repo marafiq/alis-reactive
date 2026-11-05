@@ -5,6 +5,7 @@ import "./Components/Tally/tally";
 import "./Components/Entry/entry";
 import "./Components/Roster/roster";
 import "./Components/DayPicker/day-picker";
+import "./Components/Dispenser/dispenser";
 import "./Components/ConfirmDialog/confirm-dialog";
 import "./Components/FilePicker/file-picker";
 import "./Components/Banner/banner";

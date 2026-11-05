@@ -146,5 +146,30 @@ namespace Alis.Reactive
         public static TNext ArrayContains<TModel, TItem, TNext>(this ConditionSourceBuilder<TModel, IEnumerable<TItem>, TNext> source, TItem item)
             where TModel : class where TNext : Guard<TModel>
             => source.ContainsItem(item);
+
+        /// <summary>Matches a collection that holds <paramref name="item"/>.</summary>
+        public static TNext ArrayContains<TModel, TItem, TNext>(this ConditionSourceBuilder<TModel, IReadOnlyCollection<TItem>, TNext> source, TItem item)
+            where TModel : class where TNext : Guard<TModel>
+            => source.ContainsItem(item);
+
+        /// <summary>Matches a collection that holds <paramref name="item"/>.</summary>
+        public static TNext ArrayContains<TModel, TItem, TNext>(this ConditionSourceBuilder<TModel, ICollection<TItem>, TNext> source, TItem item)
+            where TModel : class where TNext : Guard<TModel>
+            => source.ContainsItem(item);
+
+        /// <summary>Matches a list that holds <paramref name="item"/>.</summary>
+        public static TNext ArrayContains<TModel, TItem, TNext>(this ConditionSourceBuilder<TModel, IList<TItem>, TNext> source, TItem item)
+            where TModel : class where TNext : Guard<TModel>
+            => source.ContainsItem(item);
+
+        /// <summary>Matches a set that holds <paramref name="item"/>.</summary>
+        public static TNext ArrayContains<TModel, TItem, TNext>(this ConditionSourceBuilder<TModel, HashSet<TItem>, TNext> source, TItem item)
+            where TModel : class where TNext : Guard<TModel>
+            => source.ContainsItem(item);
+
+        /// <summary>Matches a set that holds <paramref name="item"/>.</summary>
+        public static TNext ArrayContains<TModel, TItem, TNext>(this ConditionSourceBuilder<TModel, ISet<TItem>, TNext> source, TItem item)
+            where TModel : class where TNext : Guard<TModel>
+            => source.ContainsItem(item);
     }
 }

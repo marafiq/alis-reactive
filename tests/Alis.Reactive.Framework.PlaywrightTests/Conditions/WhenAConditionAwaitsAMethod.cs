@@ -79,6 +79,20 @@ public sealed class WhenAConditionAwaitsAMethod : AppPageTest
     }
 
     [Test]
+    public async Task an_awaited_result_its_condition_and_its_then_both_read_is_awaited_once_each_time_the_pipeline_runs()
+    {
+        await Open("/Conditions/Queue");
+
+        await Click("Ask the desk for a number");
+        await Expect(Line("desk-number")).ToHaveTextAsync("1");
+        await Expect(Page.Locator("#dispenser")).ToHaveTextAsync("Next number: 2");
+
+        await Click("Ask the desk for a number");
+        await Expect(Line("desk-number")).ToHaveTextAsync("2");
+        await Expect(Page.Locator("#dispenser")).ToHaveTextAsync("Next number: 3");
+    }
+
+    [Test]
     public async Task not_over_an_awaited_term_holds_when_the_answer_is_no()
     {
         await Open("/Conditions/Availability");

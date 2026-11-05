@@ -17,11 +17,15 @@ namespace Alis.Reactive
     {
         private readonly PlanBuildContext _context;
         private readonly BranchStep _branch;
+        private readonly Block _callback;
+        private int _sentenceStart;
 
-        internal BranchBuilder(PlanBuildContext context, BranchStep branch)
+        internal BranchBuilder(PlanBuildContext context, BranchStep branch, Block callback)
         {
             _context = context;
             _branch = branch;
+            _callback = callback;
+            _sentenceStart = callback.Count;
         }
 
         /// <summary>Adds the next ordered <c>ElseIf</c> branch from a typed value source.</summary>
@@ -37,6 +41,10 @@ namespace Alis.Reactive
             => _branch.SetElse(PipelineBuilder<TModel>.Build(_context, pipeline));
 
         internal void AddArm(Condition condition, Action<PipelineBuilder<TModel>> pipeline)
-            => _branch.AddArm(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
+        {
+            _callback.AskResultsWhereRead(from: _sentenceStart);
+            _branch.AddArm(condition, PipelineBuilder<TModel>.Build(_context, pipeline));
+            _sentenceStart = _callback.Count;
+        }
     }
 }

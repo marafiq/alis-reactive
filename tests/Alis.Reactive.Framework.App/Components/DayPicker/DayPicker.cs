@@ -19,6 +19,8 @@ public sealed class DayPicker : Component
 
     public TypedSource<bool> IsFree() => MethodAsync<bool>();
 
+    public TypedSource<bool> IsOpen() => Method<bool>();
+
     public Event Changed => Event();
 }
 

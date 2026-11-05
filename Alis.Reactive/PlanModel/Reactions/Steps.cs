@@ -13,6 +13,13 @@ namespace Alis.Reactive.PlanModel.Reactions
 
         internal void Add(Step step) => _steps.Add(step ?? throw new ArgumentNullException(nameof(step)));
 
+        internal int Count => _steps.Count;
+
+        internal void AskResultsWhereRead(int from)
+        {
+            foreach (var result in _steps.Skip(from).OfType<MethodResultStep>()) result.AskWhereRead();
+        }
+
         internal IReadOnlyList<Statement> Write(Scope scope)
         {
             var block = new List<Statement>();
@@ -26,15 +33,18 @@ namespace Alis.Reactive.PlanModel.Reactions
     internal sealed class MethodResultStep : Step
     {
         private readonly ValueExpression _result;
+        private bool _askedWhereRead;
 
         internal MethodResultStep(ValueExpression result)
         {
             _result = result ?? throw new ArgumentNullException(nameof(result));
         }
 
+        internal void AskWhereRead() => _askedWhereRead = true;
+
         internal override void WriteTo(List<Statement> block, Scope scope)
         {
-            if (_result.ReadsAwaited)
+            if (_result.ReadsAwaited || _askedWhereRead)
                 scope.DeferOwnLine(_result, block.Count, () => OwnLine(scope));
             else
                 block.AddRange(OwnLine(scope));
@@ -248,7 +258,7 @@ namespace Alis.Reactive.PlanModel.Reactions
         {
             var arms = new List<Arm>();
             var index = start;
-            while (index < _arms.Count && _arms[index].Condition.IsSynchronous)
+            while (index < _arms.Count && !_arms[index].Condition.Asks)
             {
                 arms.Add(new Arm(_arms[index].Condition.Write(scope), _arms[index].Then.Write(scope)));
                 index++;
@@ -262,7 +272,7 @@ namespace Alis.Reactive.PlanModel.Reactions
         {
             if (index >= _arms.Count) return _else.Write(scope);
             var (condition, then) = _arms[index];
-            return condition.Guard(then.Write(scope), Arms(index + 1, scope.ForBlock()), scope);
+            return condition.Guard(then.Write, next => Arms(index + 1, next), scope);
         }
     }
 }
