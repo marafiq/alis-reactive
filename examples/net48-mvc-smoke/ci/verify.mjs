@@ -49,4 +49,31 @@ await page.screenshot({ path: shot, fullPage: true });
 console.log('PASS: net48 runtime booted, the reactive reaction ran, the browser refused an empty name with the rule of a validator registered through DependencyResolver, and the server saved a valid one.');
 if (consoleErrors.length) console.log('Browser console errors (non-fatal):\n  ' + consoleErrors.join('\n  '));
 
+const dayPlans = [
+  { timeZone: 'America/Los_Angeles', plan: 'Wednesday plan starts at 9:00 AM (UTC-08:00).' },
+  { timeZone: 'Asia/Kolkata', plan: 'Wednesday plan starts at 10:30 PM (UTC+05:30).' },
+];
+const dayFailures = [];
+for (const { timeZone, plan } of dayPlans) {
+  const context = await browser.newContext({ timezoneId: timeZone });
+  const dayPage = await context.newPage();
+  await dayPage.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+  const dayResponse = dayPage.waitForResponse((r) => r.url().includes('/Home/Day?'), { timeout: 10000 });
+  await dayPage.locator('#plan-day-btn').click();
+  const response = await dayResponse;
+  const body = await response.text();
+  console.log(`${timeZone}: GET ${response.url()} -> ${response.status()}`);
+  const dayShown = dayPage.locator('#training-day');
+  if (response.status() === 200) await dayShown.filter({ hasText: plan }).waitFor({ timeout: 5000 }).catch(() => {});
+  const shown = (await dayShown.textContent())?.trim();
+  if (response.status() === 200 && shown === plan) {
+    console.log(`PASS: ${timeZone}: #training-day shows "${shown}"`);
+  } else {
+    console.log(`=== ${timeZone}: response body (first 1500 chars) ===\n${body.slice(0, 1500)}`);
+    dayFailures.push(`${timeZone}: expected "${plan}", page shows "${shown}", server answered ${response.status()}`);
+  }
+  await context.close();
+}
+
 await browser.close();
+if (dayFailures.length) throw new Error('A date in the query did not reach the MVC 5 action:\n  ' + dayFailures.join('\n  '));

@@ -19,7 +19,9 @@ namespace Alis.Reactive
     /// typed member. Where a member goes follows MVC's rule for route values: a member whose name matches a
     /// <c>{placeholder}</c> in the URL fills the path, and a request with a body sends it in the body too, so an
     /// endpoint that binds the class from its body (<c>Put(int id, [FromBody] Note note)</c>) reads it there; the
-    /// others go to the query string for GET, and to the JSON or form-data body otherwise.
+    /// others go to the query string for GET, and to the JSON or form-data body otherwise. On ASP.NET MVC 5 under
+    /// IIS, a date with its time in the path is refused before it reaches the action: give it a member no
+    /// placeholder names, and a GET sends it in the query.
     /// </para>
     /// <para>
     /// A form input of a partial is sent under the view's field prefix, and in a JSON body a number in that

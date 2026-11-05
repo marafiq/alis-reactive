@@ -39,4 +39,17 @@
     <strong>Reactive runtime executed on .NET Framework 4.8 &#10003;</strong>
 </div>
 
+<div style="margin-top: 1rem;">
+    @(Html.NativeButton("plan-day-btn", "Plan the Day")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Get(Url.Action("Day", "Home"))
+             .Gather<Net48MvcSmoke.Models.TrainingSession>(g => g.Set(
+                 x => x.StartsAt,
+                 new DateTimeOffset(2027, 1, 13, 9, 0, 0, TimeSpan.FromHours(-8))))
+             .Response(r => r.OnSuccess(s => s.Into("training-day")));
+        }))
+    <span id="training-day">Not planned.</span>
+</div>
+
 @Html.RenderPlan(plan)
