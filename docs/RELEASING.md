@@ -180,6 +180,26 @@ the tagged version before pushing, pushes with `--skip-duplicate` (re-runs are i
 creates or updates the GitHub Release with the packages attached and notes generated per
 `.github/release.yml`.
 
+## Publishing credential
+
+How does the publish run get a nuget.org key? Through nuget.org
+[Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing): the
+`NuGet/login` step trades the run's GitHub OIDC token for an API key that lives one hour. The
+repository stores no nuget.org key, so none can expire between releases. The policy lives on
+nuget.org under the package owner `madnan.rafiq` (profile menu, "Trusted Publishing"):
+
+| Field | Value |
+|-------|-------|
+| Repository Owner | `marafiq` |
+| Repository | `alis-reactive` |
+| Workflow File | `nuget-publish.yml` |
+| Environment | `nuget-release` |
+
+The login step's `user` is that owner. Renaming the workflow file or the environment needs the policy
+changed with it, or the next release fails at login with nothing pushed. It replaced a stored
+`NUGET_API_KEY` secret, which expired: `v1.0.0-rc.8` passed every gate and then got 403 "The specified
+API key has expired" at the push (run 42101513784), so rc.8 was never published.
+
 ## Verify a release
 
 ```bash
@@ -206,6 +226,8 @@ version so nobody's build breaks.
 
 ```bash
 # Unlist every one of the six package ids at the bad version (dotnet nuget delete unlists on nuget.org).
+# No key is stored for this: create a short-lived one on nuget.org (scope "Unlist package", glob
+# AlisReactive*) and delete it afterwards, or unlist each version on its package page (Manage package).
 for id in AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.FluentValidator AlisReactive.DesignSystem AlisReactive.NativeTagHelpers; do
   dotnet nuget delete "$id" 1.0.0-rc.4 --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --non-interactive
 done
@@ -247,7 +269,7 @@ Reference: [`dotnet nuget delete`](https://learn.microsoft.com/en-us/dotnet/core
 | Re-run the same tag, or re-push it | `--skip-duplicate` skips published versions; the GitHub Release is updated, not duplicated |
 | Pack regression (missing/extra package, wrong version) | The six-package assertion fails **before** anything is pushed |
 | Two releases triggered at once | Serialized by the `nuget-release` concurrency group; an in-flight publish is never cancelled |
-| `NUGET_API_KEY` not configured | Fails immediately with a clear message, before packing |
+| No nuget.org Trusted Publishing policy matches the repository, workflow file and environment | The login step fails after packing and before the push; nothing is published |
 | Partial publish (network drop mid-push) | Re-run the workflow: published packages are skipped, the rest are pushed |
 | Push / merge to `main` | Publishes nothing; only a `v*` tag does |
 | Reproducibility | SDK pinned by `global.json`; deterministic build (`Directory.Build.props`); the release summary names the exact commit |

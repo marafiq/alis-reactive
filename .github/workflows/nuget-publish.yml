@@ -14,7 +14,9 @@ name: Publish NuGet packages
 #               (a red shard stops the release; re-run the failed jobs, publishing is idempotent)
 #   pack-and-publish  six packages at the tagged version -> nuget.org -> GitHub Release
 #                     (runs in the `nuget-release` environment; add a required reviewer there for
-#                      a manual approval click before anything is pushed)
+#                      a manual approval click before anything is pushed). nuget.org Trusted
+#                     Publishing trades this run's GitHub OIDC token for a one-hour API key, so no
+#                     long-lived key is stored or can expire (docs/RELEASING.md, "Publishing credential").
 # Runbook: docs/RELEASING.md. Branch model and cutover: docs/BRANCHING.md.
 on:
   push:
@@ -97,7 +99,8 @@ jobs:
       group: nuget-release
       cancel-in-progress: false
     permissions:
-      contents: write   # to create the GitHub Release; nuget.org publish uses the API key, not GH Packages
+      contents: write   # to create the GitHub Release
+      id-token: write   # the OIDC token nuget.org Trusted Publishing exchanges for a one-hour API key
     env:
       PACKAGE_VERSION: ${{ needs.verify-tag.outputs.package_version }}
       PRERELEASE: ${{ needs.verify-tag.outputs.prerelease }}
@@ -114,15 +117,6 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: package-lock.json
-
-      - name: Fail early if the publish secret is missing
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          if [ -z "$NUGET_API_KEY" ]; then
-            echo "::error::NUGET_API_KEY secret is not set — cannot publish. Add it in repo Settings -> Secrets and variables -> Actions."
-            exit 1
-          fi
 
       - name: Pack NuGet packages
         # pack.sh runs npm ci + npm run build:all itself, then packs all six at -p:Version.
@@ -154,13 +148,23 @@ jobs:
             ./nupkgs/*.snupkg
           retention-days: 30
 
+      - name: Log in to NuGet.org (Trusted Publishing)
+        # Right before the push: the key it returns lives one hour. It fails, and nothing is pushed,
+        # when no nuget.org policy matches this repository, workflow file and environment.
+        id: nuget-login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: madnan.rafiq
+
       - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           # --skip-duplicate makes re-runs idempotent: an already-published version is skipped, not an error.
           # Pushing *.nupkg auto-pushes the adjacent *.snupkg symbol packages.
           dotnet nuget push ./nupkgs/*.nupkg \
             --source "https://api.nuget.org/v3/index.json" \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --api-key "$NUGET_API_KEY" \
             --skip-duplicate
 
       - name: Create or update the GitHub Release (idempotent)
