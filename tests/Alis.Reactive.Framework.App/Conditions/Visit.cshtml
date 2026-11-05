@@ -1,0 +1,59 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model VisitPage
+@{
+    ViewData["Title"] = "Book a visit";
+    var plan = Html.ReactivePlan<VisitPage>();
+    var days = new[]
+    {
+        new DateTime(2026, 10, 26), new DateTime(2026, 10, 27), new DateTime(2026, 10, 28),
+        new DateTime(2026, 10, 29), new DateTime(2026, 10, 30),
+    };
+    var openDay = new DateTime(2026, 10, 27);
+}
+<h1>Book a visit</h1>
+<p>The open day is 2026-10-27; the open week runs from it to 2026-10-29.</p>
+
+@(plan.DayPicker("visit", days, booked: Array.Empty<DateTime>())
+    .Reactive(picker => picker.Changed, p =>
+    {
+        var day = p.Component<DayPicker>("visit").Day;
+        p.When(day).IsNull()
+            .Then(t => t.Element("none-picked").Text.Set("pick a day"))
+            .Else(e => e.Element("none-picked").Text.Set("a day is picked"));
+        p.When(day).NotNull()
+            .Then(t => t.Element("some-picked").Text.Set("ready to book"))
+            .Else(e => e.Element("some-picked").Text.Set("nothing to book"));
+        p.When(day).Eq(openDay)
+            .Then(t => t.Element("open-day").Text.Set("the open day"))
+            .Else(e => e.Element("open-day").Text.Set("not the open day"));
+        p.When(day).NotEq(openDay)
+            .Then(t => t.Element("another-day").Text.Set("another day"))
+            .Else(e => e.Element("another-day").Text.Set("the open day itself"));
+        p.When(day).Lt(openDay)
+            .Then(t => t.Element("before").Text.Set("before the open day"))
+            .Else(e => e.Element("before").Text.Set("not before the open day"));
+        p.When(day).Lte(openDay)
+            .Then(t => t.Element("by").Text.Set("by the open day"))
+            .Else(e => e.Element("by").Text.Set("not by the open day"));
+        p.When(day).Gt(openDay)
+            .Then(t => t.Element("after").Text.Set("after the open day"))
+            .Else(e => e.Element("after").Text.Set("not after the open day"));
+        p.When(day).Gte(openDay)
+            .Then(t => t.Element("from").Text.Set("from the open day on"))
+            .Else(e => e.Element("from").Text.Set("not from the open day on"));
+        p.When(day).Between(openDay, new DateTime(2026, 10, 29))
+            .Then(t => t.Element("open-week").Text.Set("in the open week"))
+            .Else(e => e.Element("open-week").Text.Set("outside the open week"));
+    }))
+
+<p>Picked: <span id="none-picked"></span></p>
+<p>Booking: <span id="some-picked"></span></p>
+<p>Open day: <span id="open-day"></span></p>
+<p>Another day: <span id="another-day"></span></p>
+<p>Before: <span id="before"></span></p>
+<p>By: <span id="by"></span></p>
+<p>After: <span id="after"></span></p>
+<p>From: <span id="from"></span></p>
+<p>Open week: <span id="open-week"></span></p>
+
+@Html.RenderPlan(plan)

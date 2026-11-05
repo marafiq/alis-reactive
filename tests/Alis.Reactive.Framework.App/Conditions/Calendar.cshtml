@@ -1,0 +1,66 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model CalendarPage
+@{
+    ViewData["Title"] = "Plan a visit on an open day";
+    var plan = Html.ReactivePlan<CalendarPage>();
+    var days = new[] { new DateTime(2026, 10, 27), new DateTime(2026, 10, 28) };
+    var closed = new[] { new DateTime(2026, 10, 28) };
+}
+<h1>Plan a visit on an open day</h1>
+
+@plan.DayPicker("visit", days, closed)
+<h2>Pain</h2>
+@plan.Meter("pain", level: 2, max: 5)
+
+<p>Visit: <span id="visit-plan"></span></p>
+<p>Transport, when pain is under 4 and the day is open: <span id="transport"></span></p>
+<p>Go ahead, when pain is 4 or more, or the day is open: <span id="go-ahead"></span></p>
+<p>Escort, when pain is under 4 and the day is open or 2026-10-28: <span id="escort"></span></p>
+<p>Reminder, when pain is under 4 and the day is open: <span id="reminder"></span></p>
+
+@(plan.Button("plan-visit", "Plan the visit")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        p.When(visit.Day).IsNull()
+            .Then(t => t.Element("visit-plan").Text.Set("pick a day first"))
+            .ElseIf(visit.IsOpen()).Truthy()
+            .Then(t => t.Element("visit-plan").Text.Set("visit planned"))
+            .Else(e => e.Element("visit-plan").Text.Set("that day is closed"));
+    }))
+@(plan.Button("book-transport", "Book transport")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        p.When(p.Component<Meter>("pain").Level).Lt(4).And(visit.IsOpen()).Truthy()
+            .Then(t => t.Element("transport").Text.Set("transport booked"))
+            .Else(e => e.Element("transport").Text.Set("no transport"));
+    }))
+@(plan.Button("ask-go-ahead", "Go ahead with the visit")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        p.When(p.Component<Meter>("pain").Level).Gte(4).Or(visit.IsOpen()).Truthy()
+            .Then(t => t.Element("go-ahead").Text.Set("the visit goes ahead"))
+            .Else(e => e.Element("go-ahead").Text.Set("find another day"));
+    }))
+@(plan.Button("book-escort", "Book an escort")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        p.When(p.Component<Meter>("pain").Level).Lt(4)
+            .And(g => g.When(visit.IsOpen()).Truthy().Or(visit.Day).Eq(new DateTime(2026, 10, 28)))
+            .Then(t => t.Element("escort").Text.Set("escort booked"))
+            .Else(e => e.Element("escort").Text.Set("no escort"));
+    }))
+@(plan.Button("set-reminder", "Set a reminder")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        var open = visit.IsOpen();
+        p.When(p.Component<Meter>("pain").Level).Lt(4).And(open).Truthy()
+            .Then(t => t.Element("reminder").Text.Set("reminder set"))
+            .Else(e => e.Element("reminder").Text.Set("no reminder"));
+    }))
+
+@Html.RenderPlan(plan)

@@ -1,582 +1,442 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using Alis.Reactive.Serialization;
+using Alis.Reactive.Grammar;
+using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Writing;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Values
 {
-    /// <summary>
-    /// Wire base for Reactive Plan value nodes authored through DSL value expressions.
-    /// </summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ValueExpression>))]
     internal abstract class ValueExpression
     {
         private protected ValueExpression() { }
 
         internal abstract Shape OutputShape { get; }
 
-        internal static ValueExpression Literal(bool value) =>
-            new LiteralExpression(value, Shape.Boolean);
+        internal virtual ValueExpression AsArrived() => this;
 
-        internal static ValueExpression Literal(string value) =>
-            new LiteralExpression(value, Shape.String);
+        internal virtual bool ReadsAwaited => Operands.Any(operand => operand.ReadsAwaited);
 
-        internal static ValueExpression Literal(int value) =>
-            new LiteralExpression(value, Shape.Number);
+        internal virtual bool ReadsMethodResult => Operands.Any(operand => operand.ReadsMethodResult);
 
-        internal static ValueExpression Literal(long value) =>
-            new LiteralExpression(value, Shape.Number);
+        private protected virtual IEnumerable<ValueExpression> Operands => Array.Empty<ValueExpression>();
 
-        internal static ValueExpression Literal(decimal value) =>
-            new LiteralExpression(value, Shape.Number);
+        internal abstract Expr Write(Scope scope);
 
-        internal static ValueExpression Literal(double value) =>
-            new LiteralExpression(value, Shape.Number);
+        internal virtual Expr WriteAs(Shape shape, Scope scope) => G.As(Write(scope), shape);
 
-        internal static ValueExpression Literal(DateTime value) =>
-            new LiteralExpression(value.ToString("O"), Shape.Date);
+        internal static ValueExpression Literal(bool value) => new LiteralExpression(Scalar.Of(value), Shape.Boolean);
 
-        internal static ValueExpression Null() =>
-            new LiteralExpression(null, Shape.None);
+        internal static ValueExpression Literal(string value) => new LiteralExpression(Scalar.Of(value), Shape.String);
 
-        /// <summary>Stores a literal value without inspecting it; callers provide the plan shape explicitly.</summary>
-        internal static ValueExpression LiteralRaw(object? value, Shape shape) =>
-            new LiteralExpression(value, shape);
+        internal static ValueExpression Literal(int value) => new LiteralExpression(Scalar.Of(value), Shape.Number);
 
-        internal static ValueExpression LiteralFromValue(object? value)
+        internal static ValueExpression Literal(DateTime value) => new LiteralExpression(Scalar.Of(value.ToString("O")), Shape.Date);
+
+        internal static ValueExpression Null() => new LiteralExpression(Scalar.Null, Shape.Any);
+
+        private static ValueExpression LiteralRaw(object value, Shape shape) => new LiteralExpression(Scalar.Of(value), shape);
+
+        internal static ValueExpression LiteralFor(object? value, Shape shape) => LiteralFor(value, shape, depth: 0);
+
+        private static ValueExpression LiteralFor(object? value, Shape shape, int depth)
         {
             if (value == null) return Null();
+            if (value is DateTime date) return Literal(date);
+            if (value is Field field) return Literal(field.Name);
+            if (value is Enum option) return LiteralRaw(JavaScriptTextOf(option), shape);
+            if (value is string || value is bool || Scalar.IsNumber(value)) return LiteralRaw(value, shape);
+            if (value is char || ClrShape.Of(value.GetType()).IsScalar) return LiteralRaw(JsonTextOf(value), shape);
+            if (depth > 32)
+            {
+                throw new InvalidOperationException(
+                    $"A {CSharpTypeName.Of(value.GetType())} nests more than 32 levels deep, or holds itself; a plan carries a value once.");
+            }
 
-            return LiteralRaw(value, Shape.FromValue(value));
+            if (ClrShape.IsDictionaryLike(value.GetType()))
+            {
+                return Record(((IEnumerable)value).Cast<object>()
+                    .Select(entry => (KeyText(entry), LiteralFor(ValueOf(entry), Shape.Any, depth + 1)))
+                    .ToList());
+            }
+
+            if (value is IEnumerable items)
+            {
+                var itemShape = shape.TryGetArrayItemShape(out var declared) ? declared : Shape.Any;
+                return List(items.Cast<object?>().Select(item => LiteralFor(item, itemShape, depth + 1)).ToList(), shape);
+            }
+            if (ClrShape.IsDataClass(value.GetType()))
+            {
+                return Record(ClrShape.SerializedProperties(value.GetType())
+                    .Select(member => (JsonMemberName.Of(member), LiteralFor(member.GetValue(value), ClrShape.Of(member.PropertyType), depth + 1)))
+                    .ToList());
+            }
+
+            throw new InvalidOperationException(
+                $"A {CSharpTypeName.Of(value.GetType())} cannot be written into a plan. A value fixed when the view renders is text, " +
+                "a number, a boolean, a date, a Guid, a time, an enum, a data class, a dictionary or a collection of those.");
         }
 
-        /// <summary>Reads a URL query parameter; untyped URL reads default to string shape.</summary>
-        internal static ValueExpression ReadUrl(string paramName) =>
-            Read(UrlSource.Instance, paramName, Shape.String);
+        private static string JsonTextOf(object value)
+            => JsonSerializer.SerializeToElement(value, value.GetType()).GetString()
+            ?? throw new InvalidOperationException($"A {CSharpTypeName.Of(value.GetType())} is not written as text.");
 
-        internal static ValueExpression ReadUrl(string paramName, Shape shape) =>
-            Read(UrlSource.Instance, paramName, shape);
+        private static string KeyText(object entry)
+            => Convert.ToString(Property(entry, "Key"), CultureInfo.InvariantCulture)
+            ?? throw new InvalidOperationException("A dictionary written into a plan has no null key.");
 
-        /// <summary>
-        /// Reads a DOM member by element ID. The path is carried so <c>RuntimePath</c>
-        /// can traverse without a component contract.
-        /// </summary>
-        internal static ValueExpression ReadDom(string elementId, string member, Shape shape) =>
-            Read(DomSource.Of(elementId), member, Path.Parse(member), shape);
+        private static object? ValueOf(object entry) => Property(entry, "Value");
 
-        internal static ValueExpression Read(Source from, string member) =>
-            new ReadExpression(ValueRead.Property(from, member, Shape.None));
+        private static object? Property(object entry, string name)
+            => entry.GetType().GetProperty(name)!.GetValue(entry);
 
-        internal static ValueExpression Read(Source from, string member, Path path) =>
-            new ReadExpression(ValueRead.Property(from, member, path, Shape.None));
-
-        internal static ValueExpression Read(Source from, string member, Shape shape) =>
-            new ReadExpression(ValueRead.Property(from, member, shape));
-
-        internal static ValueExpression Read(Source from, string member, Path path, Shape shape) =>
-            new ReadExpression(ValueRead.Property(from, member, path, shape));
-
-        internal static ValueExpression ReadPayload(PayloadSource from, string path) =>
-            Read(from, path, Path.Parse(path));
-
-        internal static ValueExpression ReadPayload(PayloadSource from, string path, Shape shape) =>
-            Read(from, path, Path.Parse(path), shape);
-
-        internal static ValueExpression ReadWholePayload(PayloadSource from) =>
-            new ReadExpression(ValueRead.WholePayload(from, Shape.None));
-
-        internal static ValueExpression ReadWholePayload(PayloadSource from, Shape shape) =>
-            new ReadExpression(ValueRead.WholePayload(from, shape));
-
-        /// <summary>Reads the current array element itself (identity, <c>x =&gt; x</c>) for primitive-element arrays.</summary>
-        internal static ValueExpression ReadWholeElement() =>
-            new ReadExpression(ValueRead.WholeElement(PayloadSource.Element(), Shape.None));
-
-        internal static ValueExpression ReadWholeElement(Shape shape) =>
-            new ReadExpression(ValueRead.WholeElement(PayloadSource.Element(), shape));
-
-        internal static ValueExpression Invoke(RuntimeObjectSource from, string method, Shape returns, IReadOnlyList<ValueExpression> args) =>
-            new ReadExpression(ValueRead.Method(from, method, returns, args));
-
-        /// <summary>
-        /// Invokes a method on the current array element. The path carries receiver
-        /// traversal plus method name so <c>RuntimePath.call</c> binds the correct owner.
-        /// </summary>
-        internal static ValueExpression InvokeElement(string receiverPath, string method, Shape returns, IReadOnlyList<ValueExpression> args)
+        private static string JavaScriptTextOf(Enum option)
         {
-            var fullPath = string.IsNullOrEmpty(receiverPath) ? method : receiverPath + "." + method;
-            return new ReadExpression(ValueRead.Method(PayloadSource.Element(), method, Path.Parse(fullPath), returns, args));
+            var memberName = option.ToString();
+            var member = option.GetType().GetField(memberName);
+            var declared = member == null
+                ? null
+                : (JsonStringEnumMemberNameAttribute?)Attribute.GetCustomAttribute(member, typeof(JsonStringEnumMemberNameAttribute));
+            return declared == null ? memberName : declared.Name;
         }
 
-        internal static ObjectExpression Object(IReadOnlyDictionary<string, ValueExpression> fields)
-        {
-            var objectFields = ObjectFields(fields);
-            return new ObjectExpression(objectFields.Fields, objectFields.Shape);
-        }
+        internal static ValueExpression Get(Target target, Path path, Shape shape)
+            => new GetExpression(target, path, shape);
 
-        internal static ObjectExpression Object(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
-        {
-            var objectFields = ObjectFields(fields);
-            return new ObjectExpression(objectFields.Fields, shape);
-        }
+        internal static ValueExpression Get(Target target, Shape shape)
+            => new GetExpression(target, Path.None, shape);
 
-        internal static ValueExpression Array(IReadOnlyList<ValueExpression> items)
-        {
-            var arrayItems = ArrayItems(items);
-            return new ArrayExpression(arrayItems.Items, arrayItems.Shape);
-        }
+        internal static CallExpression Call(
+            Target target,
+            IReadOnlyList<string> path,
+            IReadOnlyList<ValueExpression> args,
+            IReadOnlyList<Shape> argShapes,
+            Shape shape,
+            PathMembers members)
+            => new CallExpression(target, path, args, argShapes, shape, members);
 
-        internal static ValueExpression Array(IReadOnlyList<ValueExpression> items, Shape shape)
-        {
-            var arrayItems = ArrayItems(items);
-            return new ArrayExpression(arrayItems.Items, shape);
-        }
+        internal static ValueExpression MethodResult(CallExpression call, string member, bool awaits)
+            => new MethodResultExpression(call, member, awaits);
 
-        internal static ValueExpression ArrayCount(ValueExpression source, Shape itemShape) =>
-            new ArrayOperationExpression("count", source, itemShape, Shape.Number);
+        internal static ValueExpression ReadUrl(string key, Shape shape) => new UrlRead(key, shape);
 
-        internal static ValueExpression ArrayFilter(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
-            new ArrayOperationExpression("filter", source, itemShape, Shape.ArrayOf(itemShape), predicate);
+        internal static ValueExpression ReadBound(string name, Shape shape)
+            => new BoundRead(name, shape, BoundRead.Page, G.List(Array.Empty<Expr>()));
 
-        internal static ValueExpression ArrayMap(ValueExpression source, ValueExpression projection, Shape itemShape, Shape resultItemShape) =>
-            new ArrayOperationExpression("map", source, itemShape, Shape.ArrayOf(resultItemShape), predicate: null, projection: projection);
+        internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes)
+            => new BoundRead(name, shape, formId, G.Ref(itemIndexes));
 
-        /// <summary>Sums a selector result, or the numeric elements themselves when projection is null.</summary>
-        internal static ValueExpression ArraySum(ValueExpression source, ValueExpression? projection, Shape itemShape) =>
-            new ArrayOperationExpression("sum", source, itemShape, Shape.Number, predicate: null, projection: projection);
+        internal static ValueExpression ReadBoundItemIndexes(string itemName, string formId, string indexes, int ownerDepth)
+            => new BoundItemIndexesRead(itemName, formId, G.Call(G.Ref(indexes), PathMembers.Optional, "slice", G.Lit(0), G.Lit(ownerDepth)));
 
-        /// <summary>Null predicate means non-empty; otherwise evaluate against each element.</summary>
-        internal static ValueExpression ArrayAny(ValueExpression source, ConditionGraph? predicate, Shape itemShape) =>
-            new ArrayOperationExpression("any", source, itemShape, Shape.Boolean, predicate: predicate);
+        internal static ValueExpression ReadSent(string name, Shape shape, string formId, string itemIndexes)
+            => new SentRead(name, shape, formId, G.Ref(itemIndexes));
 
-        internal static ValueExpression ArrayAll(ValueExpression source, ConditionGraph predicate, Shape itemShape) =>
-            new ArrayOperationExpression("all", source, itemShape, Shape.Boolean, predicate: predicate);
-
-        /// <summary>Finds the first matching element or projection; runtime returns null when none match.</summary>
-        internal static ValueExpression ArrayFind(
-            ValueExpression source, ConditionGraph? predicate, ValueExpression? projection, Shape itemShape, Shape resultShape) =>
-            new ArrayOperationExpression("find", source, itemShape, resultShape, predicate: predicate, projection: projection);
-
-        internal static ValueExpression ArrayOrderBy(ValueExpression source, ValueExpression key, Shape itemShape, bool descending) =>
-            new ArrayOperationExpression(
-                descending ? "orderByDescending" : "orderBy", source, itemShape, Shape.ArrayOf(itemShape), predicate: null, projection: key);
-
-        private static (IReadOnlyDictionary<string, ValueExpression> Fields, Shape Shape) ObjectFields(
-            IReadOnlyDictionary<string, ValueExpression> fields)
+        internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
             if (fields == null) throw new ArgumentNullException(nameof(fields));
-
-            var snapshot = new Dictionary<string, ValueExpression>(StringComparer.Ordinal);
-            var shapeFields = new Dictionary<string, Shape>(StringComparer.Ordinal);
-            foreach (var field in fields)
+            var shapes = new Dictionary<string, Shape>(StringComparer.Ordinal);
+            foreach (var (name, value) in fields)
             {
-                var fieldName = ObjectFieldName(field.Key);
-                var fieldValue = ObjectFieldValue(field.Value, fieldName);
-                snapshot[fieldName] = fieldValue;
-                shapeFields[fieldName] = fieldValue.OutputShape;
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ArgumentException("Object field name must not be null or whitespace.", nameof(fields));
+                if (value == null) throw new ArgumentException($"Object field '{name}' must have a value.", nameof(fields));
+                if (shapes.ContainsKey(name)) throw new ArgumentException($"Object field '{name}' is named twice.", nameof(fields));
+                shapes.Add(name, value.OutputShape);
             }
 
-            return (snapshot, Shape.ObjectOf(shapeFields));
+            return new RecordExpression(fields.ToList(), Shape.ObjectOf(shapes));
         }
 
-        private static string ObjectFieldName(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Object field name must not be null or whitespace.", nameof(value));
-
-            return value;
-        }
-
-        private static ValueExpression ObjectFieldValue(ValueExpression value, string fieldName)
-        {
-            if (value == null)
-                throw new ArgumentException(
-                    "Object field '" + fieldName + "' must have a value expression.",
-                    nameof(value));
-
-            return value;
-        }
-
-        private static (IReadOnlyList<ValueExpression> Items, Shape Shape) ArrayItems(
-            IReadOnlyList<ValueExpression> items)
+        internal static ValueExpression List(IReadOnlyList<ValueExpression> items, Shape shape)
         {
             if (items == null) throw new ArgumentNullException(nameof(items));
-            if (items.Count == 0)
-                return (System.Array.Empty<ValueExpression>(), Shape.ArrayOf(Shape.Any));
-
-            var snapshot = new List<ValueExpression>();
-            foreach (var item in items)
-            {
-                if (item == null)
-                    throw new ArgumentException("Array item must not be null.", nameof(items));
-
-                snapshot.Add(item);
-            }
-
-            return (snapshot, ArrayShape(snapshot));
+            if (items.Any(item => item == null)) throw new ArgumentException("Array item must not be null.", nameof(items));
+            return new ListExpression(items.ToList(), shape);
         }
 
-        private static Shape ArrayShape(IReadOnlyList<ValueExpression> items)
-        {
-            if (!TryFindSpecificArrayItemShape(items, out var itemShape))
-                return Shape.ArrayOf(Shape.Any);
-
-            return ArrayItemsShareShape(items, itemShape)
-                ? Shape.ArrayOf(itemShape)
-                : Shape.ArrayOf(Shape.Any);
-        }
-
-        private static bool TryFindSpecificArrayItemShape(
-            IReadOnlyList<ValueExpression> items,
-            [NotNullWhen(true)] out Shape? shape)
-        {
-            foreach (var item in items)
-            {
-                if (item.OutputShape.IsNone) continue;
-
-                shape = item.OutputShape;
-                return true;
-            }
-
-            shape = null;
-            return false;
-        }
-
-        private static bool ArrayItemsShareShape(IReadOnlyList<ValueExpression> items, Shape expected)
-        {
-            foreach (var item in items)
-            {
-                var itemShape = item.OutputShape;
-                if (itemShape.IsNone)
-                    return false;
-                if (!itemShape.Equals(expected))
-                    return false;
-            }
-
-            return true;
-        }
+        internal static ValueExpression Operation(Operator op, Shape shape, params ValueExpression[] operands)
+            => new OperationExpression(op, operands, shape);
     }
 
-    /// <summary>Literal value node serialized directly into generated plan JSON.</summary>
-    /// <remarks>
-    /// Created when a literal is passed to a builder such as <c>p.Element("id").SetText("hello")</c>.
-    /// </remarks>
     internal sealed class LiteralExpression : ValueExpression
     {
-        /// <summary>Wire discriminator for literal value nodes. Always <c>"literal"</c>.</summary>
-        public string Kind => "literal";
-        /// <summary>Serialized literal payload; may be <see langword="null"/> for explicit null values.</summary>
-        [JsonInclude]
-        public object? Value { get; }
-        /// <summary>Output shape declared by the authoring layer, or <see cref="PlanModel.Shape.None"/> when unspecified.</summary>
-        public Shape Shape { get; }
-
-        internal LiteralExpression(object? value, Shape shape)
+        internal LiteralExpression(Scalar value, Shape shape)
         {
-            Value = value;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
             Shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        internal override Shape OutputShape => Shape;
-    }
+        internal Scalar Value { get; }
 
-    /// <summary>Value-read node resolved from a source when the Reactive Plan executes.</summary>
-    /// <remarks>
-    /// Created by source-reading builders such as <c>p.Plugin&lt;int&gt;("array", "count").Arg(json, x =&gt; x.Items)</c>.
-    /// </remarks>
-    internal sealed class ReadExpression : ValueExpression
-    {
-        private readonly ValueRead _read;
-
-        /// <summary>Wire discriminator for value read nodes. Always <c>"read"</c>.</summary>
-        public string Kind => "read";
-        /// <summary>
-        /// Source object or payload scope for this read, such as a component, plugin, or event payload.
-        /// </summary>
-        public Source From => _read.From;
-        /// <summary>Plan member name resolved against the value source.</summary>
-        public string Member => _read.Member.Value;
-        /// <summary>Nested runtime traversal path, or empty for direct member reads.</summary>
-        public Path Path => _read.Path;
-        /// <summary>Output shape declared by the authoring layer, or <see cref="PlanModel.Shape.None"/> when unspecified.</summary>
-        public Shape Shape => _read.Shape;
-        /// <summary>Access contract that tells the runtime whether to read a property or invoke a method.</summary>
-        public ValueReadAccess Access => _read.Access;
-
-        internal ReadExpression(ValueRead read)
-        {
-            _read = read ?? throw new ArgumentNullException(nameof(read));
-        }
-
-        internal override Shape OutputShape => Shape;
-    }
-
-    internal sealed class ValueRead
-    {
-        private ValueRead(ValueReadTarget target, Shape shape, ValueReadAccess access)
-        {
-            Target = target ?? throw new ArgumentNullException(nameof(target));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-            Access = access ?? throw new ArgumentNullException(nameof(access));
-        }
-
-        internal Source From => Target.From;
-        internal MemberName Member => Target.Member;
-        internal Path Path => Target.Path;
         internal Shape Shape { get; }
-        internal ValueReadAccess Access { get; }
 
-        private ValueReadTarget Target { get; }
+        internal override Shape OutputShape => Shape;
 
-        internal static ValueRead Property(Source from, string member, Shape shape) =>
-            new ValueRead(
-                ValueReadTarget.ForMember(from, member),
-                shape,
-                ValueReadAccess.Property);
+        internal override Expr Write(Scope scope) => G.Lit(Value, Shape);
 
-        internal static ValueRead Property(Source from, string member, Path path, Shape shape) =>
-            new ValueRead(
-                ValueReadTarget.ForMember(from, member, path),
-                shape,
-                ValueReadAccess.Property);
-
-        internal static ValueRead Method(RuntimeObjectSource from, string member, Shape shape, IReadOnlyList<ValueExpression> args) =>
-            new ValueRead(
-                ValueReadTarget.ForMember(from, member),
-                shape,
-                ValueReadAccess.Method(args));
-
-        internal static ValueRead Method(Source from, string member, Path path, Shape shape, IReadOnlyList<ValueExpression> args) =>
-            new ValueRead(
-                ValueReadTarget.ForMember(from, member, path),
-                shape,
-                ValueReadAccess.Method(args));
-
-        internal static ValueRead WholePayload(PayloadSource from, Shape shape) =>
-            new ValueRead(
-                ValueReadTarget.ForWholePayload(from),
-                shape,
-                ValueReadAccess.Property);
-
-        internal static ValueRead WholeElement(PayloadSource from, Shape shape) =>
-            new ValueRead(
-                ValueReadTarget.ForWholeElement(from),
-                shape,
-                ValueReadAccess.Property);
+        internal override Expr WriteAs(Shape shape, Scope scope) => G.Lit(Value, shape);
     }
 
-    internal sealed class ValueReadTarget
+    internal sealed class GetExpression : ValueExpression
     {
-        private const string WholePayloadMember = "responseBody";
-        private const string WholeElementMember = "elementValue";
+        private readonly Target _target;
+        private readonly Path _path;
+        private readonly Shape _shape;
 
-        private ValueReadTarget(Source from, MemberName member, Path path)
+        internal GetExpression(Target target, Path path, Shape shape)
         {
-            From = from ?? throw new ArgumentNullException(nameof(from));
-            Member = member ?? throw new ArgumentNullException(nameof(member));
-            Path = path ?? throw new ArgumentNullException(nameof(path));
+            _target = target ?? throw new ArgumentNullException(nameof(target));
+            _path = path ?? throw new ArgumentNullException(nameof(path));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
         }
 
-        internal Source From { get; }
-        internal MemberName Member { get; }
-        internal Path Path { get; }
+        internal override Shape OutputShape => _shape;
 
-        internal static ValueReadTarget ForMember(Source from, string member) =>
-            ForMember(from, MemberName.Of(member));
+        private protected override IEnumerable<ValueExpression> Operands => _target.Operands;
 
-        internal static ValueReadTarget ForMember(Source from, string member, Path path) =>
-            new ValueReadTarget(from, MemberName.Of(member), path);
+        internal override ValueExpression AsArrived()
+            => _target.IsData ? new GetExpression(_target, _path, Shape.Any) : this;
 
-        internal static ValueReadTarget ForWholePayload(PayloadSource from) =>
-            new ValueReadTarget(from, MemberName.Of(WholePayloadMember), Path.None);
-
-        internal static ValueReadTarget ForWholeElement(PayloadSource from) =>
-            new ValueReadTarget(from, MemberName.Of(WholeElementMember), Path.None);
-
-        private static ValueReadTarget ForMember(Source from, MemberName member) =>
-            new ValueReadTarget(from, member, ValueReadPath.For(from, member));
-    }
-
-    internal static class ValueReadPath
-    {
-        internal static Path For(Source from, MemberName member)
+        internal override Expr Write(Scope scope)
         {
-            if (from == null) throw new ArgumentNullException(nameof(from));
-            if (member == null) throw new ArgumentNullException(nameof(member));
-
-            if (from is PayloadSource) return PayloadReadPath.FromMember(member);
-
-            return Path.None;
-        }
-    }
-
-    internal static class PayloadReadPath
-    {
-        internal static Path FromMember(MemberName member)
-        {
-            if (member == null) throw new ArgumentNullException(nameof(member));
-
-            return Path.Parse(member.Value);
-        }
-    }
-
-    /// <summary>Base wire contract for how a value read accesses its target member.</summary>
-    [JsonConverter(typeof(PlanNodeDiscriminator<ValueReadAccess>))]
-    internal abstract class ValueReadAccess
-    {
-        private protected ValueReadAccess() { }
-
-        internal static ValueReadAccess Property { get; } =
-            new PropertyValueReadAccess();
-
-        internal static ValueReadAccess Method(IReadOnlyList<ValueExpression> args) =>
-            new MethodValueReadAccess(args);
-
-        /// <summary>Wire discriminator for the read access shape.</summary>
-        public abstract string Kind { get; }
-    }
-
-    /// <summary>Access contract for reading a source member as a property.</summary>
-    internal sealed class PropertyValueReadAccess : ValueReadAccess
-    {
-        /// <summary>Wire discriminator for property reads. Always <c>"property"</c>.</summary>
-        public override string Kind => "property";
-    }
-
-    /// <summary>Access contract for invoking a source member as a method.</summary>
-    internal sealed class MethodValueReadAccess : ValueReadAccess
-    {
-        private readonly IReadOnlyList<ValueExpression> _args;
-
-        internal MethodValueReadAccess(IReadOnlyList<ValueExpression> args)
-        {
-            _args = OrderedArguments(args);
+            var (root, prefix) = _target.Write(scope);
+            return Read(root, prefix, _path, _shape, _target.Members);
         }
 
-        /// <summary>Wire discriminator for method reads. Always <c>"method"</c>.</summary>
-        public override string Kind => "method";
-
-        /// <summary>Argument value expressions evaluated in call order before invocation.</summary>
-        public IReadOnlyList<ValueExpression> Args => _args;
-
-        private static IReadOnlyList<ValueExpression> OrderedArguments(IReadOnlyList<ValueExpression> items)
+        internal static Expr Read(Expr root, IReadOnlyList<string> prefix, Path path, Shape shape, PathMembers members)
         {
-            if (items == null) throw new ArgumentNullException(nameof(items));
-            if (items.Count == 0)
-                return Array.Empty<ValueExpression>();
-
-            var snapshot = new List<ValueExpression>();
-            foreach (var item in items)
+            var dataPastARequiredMember = path.ReadsData && members == PathMembers.Required;
+            if (!dataPastARequiredMember)
             {
-                if (item == null)
-                    throw new ArgumentException("Value argument must not be null.", nameof(items));
-
-                snapshot.Add(item);
+                var whole = prefix.Concat(path.Text).ToList();
+                return whole.Count == 0 ? G.As(root, shape) : G.Get(root, whole, shape, members);
             }
 
-            return snapshot;
+            var declared = prefix.Concat(path.DeclaredText).ToArray();
+            var holder = declared.Length == 0 ? root : G.Get(root, members, declared);
+            return G.Get(holder, path.DataTextFromDeclared, shape, PathMembers.Optional);
         }
     }
 
-    /// <summary>Object value node assembled from named field expressions.</summary>
-    internal sealed class ObjectExpression : ValueExpression
+    internal sealed class CallExpression : ValueExpression
     {
-        private readonly IReadOnlyDictionary<string, ValueExpression> _fields;
+        private readonly Target _target;
+        private readonly IReadOnlyList<string> _path;
+        private readonly IReadOnlyList<ValueExpression> _args;
+        private readonly IReadOnlyList<Shape> _argShapes;
+        private readonly Shape _shape;
+        private readonly PathMembers _members;
 
-        /// <summary>Wire discriminator for object value nodes. Always <c>"object"</c>.</summary>
-        public string Kind => "object";
-        /// <summary>Field map evaluated by name when the runtime builds the object value.</summary>
-        public IReadOnlyDictionary<string, ValueExpression> Fields => _fields;
-        /// <summary>Output shape declared by the authoring layer, or <see cref="PlanModel.Shape.None"/> when unspecified.</summary>
-        public Shape Shape { get; }
-
-        internal ObjectExpression(IReadOnlyDictionary<string, ValueExpression> fields, Shape shape)
-        {
-            _fields = fields ?? throw new ArgumentNullException(nameof(fields));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal override Shape OutputShape => Shape;
-    }
-
-    /// <summary>Array value node assembled from ordered item expressions.</summary>
-    internal sealed class ArrayExpression : ValueExpression
-    {
-        private readonly IReadOnlyList<ValueExpression> _items;
-
-        /// <summary>Wire discriminator for array value nodes. Always <c>"array"</c>.</summary>
-        public string Kind => "array";
-        /// <summary>Item expressions evaluated in order when the runtime builds the array value.</summary>
-        public IReadOnlyList<ValueExpression> Items => _items;
-        /// <summary>Output shape declared by the authoring layer, or <see cref="PlanModel.Shape.None"/> when unspecified.</summary>
-        public Shape Shape { get; }
-
-        internal ArrayExpression(IReadOnlyList<ValueExpression> items, Shape shape)
-        {
-            _items = items ?? throw new ArgumentNullException(nameof(items));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-        }
-
-        internal override Shape OutputShape => Shape;
-    }
-
-    /// <summary>Deterministic operation over the elements of an array-shaped value.</summary>
-    /// <remarks>
-    /// One node with an <c>Op</c> sub-discriminator. The runtime normalizes
-    /// array-like or iterable source values at the input boundary, then produces
-    /// the declared output. Predicate and projection are present only for
-    /// operations that need them.
-    /// </remarks>
-    internal sealed class ArrayOperationExpression : ValueExpression
-    {
-        /// <summary>Wire discriminator for array operation nodes. Always <c>"array-op"</c>.</summary>
-        public string Kind => "array-op";
-        /// <summary>Operation name dispatched by the runtime, such as <c>count</c> or <c>filter</c>.</summary>
-        public string Op { get; }
-        /// <summary>Value expression evaluated before the runtime normalizes the source to an array.</summary>
-        public ValueExpression Source { get; }
-        /// <summary>Per-element predicate, or null when the operation does not use one.</summary>
-        /// <remarks>
-        /// Nullable by design: count, map, sum, and ordering do not use a
-        /// predicate; any may omit it for non-empty checks; filter, all, and find
-        /// require one. Absence is modeled as null and omitted from JSON instead
-        /// of using an "always true" sentinel, because "no predicate" and
-        /// "match all" are different plan states. Predicates use the sync
-        /// condition subset, never confirm, so per-element evaluation stays on
-        /// the immediate lane.
-        /// </remarks>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ConditionGraph? Predicate { get; }
-        /// <summary>Per-element projection, or <see langword="null"/> when the operation does not use one.</summary>
-        /// <remarks>
-        /// Nullable by design: count, filter, any, and all omit projection; map,
-        /// sum, and ordering require a selector; find includes one only for field
-        /// projection. It is evaluated against the element scope.
-        /// </remarks>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public ValueExpression? Projection { get; }
-        /// <summary>Element shape expected from the source array.</summary>
-        public Shape ItemShape { get; }
-        /// <summary>Output shape produced by the operation.</summary>
-        public Shape Shape { get; }
-
-        internal ArrayOperationExpression(
-            string op,
-            ValueExpression source,
-            Shape itemShape,
+        internal CallExpression(
+            Target target,
+            IReadOnlyList<string> path,
+            IReadOnlyList<ValueExpression> args,
+            IReadOnlyList<Shape> argShapes,
             Shape shape,
-            ConditionGraph? predicate = null,
-            ValueExpression? projection = null)
+            PathMembers members)
         {
-            Op = op ?? throw new ArgumentNullException(nameof(op));
-            Source = source ?? throw new ArgumentNullException(nameof(source));
-            ItemShape = itemShape ?? throw new ArgumentNullException(nameof(itemShape));
-            Shape = shape ?? throw new ArgumentNullException(nameof(shape));
-            Predicate = predicate;
-            Projection = projection;
+            _target = target ?? throw new ArgumentNullException(nameof(target));
+            _path = path ?? throw new ArgumentNullException(nameof(path));
+            _args = args ?? throw new ArgumentNullException(nameof(args));
+            _argShapes = argShapes ?? throw new ArgumentNullException(nameof(argShapes));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            _members = members;
         }
 
+        internal override Shape OutputShape => _shape;
+
+        private protected override IEnumerable<ValueExpression> Operands => _target.Operands.Concat(_args);
+
+        internal override Expr Write(Scope scope) => WriteCall(scope, _shape);
+
+        internal Expr WriteUnconverted(Scope scope) => WriteCall(scope, Shape.Any);
+
+        private Expr WriteCall(Scope scope, Shape shape)
+        {
+            var (root, prefix) = _target.Write(scope);
+            var args = _args.Select(arg => arg.Write(scope)).ToList();
+            return G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, shape, _members);
+        }
+    }
+
+    internal sealed class MethodResultExpression : ValueExpression
+    {
+        private readonly CallExpression _call;
+        private readonly string _member;
+        private readonly bool _awaits;
+
+        internal MethodResultExpression(CallExpression call, string member, bool awaits)
+        {
+            _call = call ?? throw new ArgumentNullException(nameof(call));
+            _member = member ?? throw new ArgumentNullException(nameof(member));
+            _awaits = awaits;
+        }
+
+        internal override Shape OutputShape => _call.OutputShape;
+
+        internal override bool ReadsAwaited => _awaits || base.ReadsAwaited;
+
+        internal override bool ReadsMethodResult => true;
+
+        private protected override IEnumerable<ValueExpression> Operands => new[] { _call };
+
+        internal override Expr Write(Scope scope)
+            => G.As(scope.Result(this, JsonMemberName.Of(_member), _awaits, () => _call.WriteUnconverted(scope)), OutputShape);
+    }
+
+    internal sealed class UrlRead : ValueExpression
+    {
+        private readonly string _key;
+        private readonly Shape _shape;
+
+        internal UrlRead(string key, Shape shape)
+        {
+            _key = key ?? throw new ArgumentNullException(nameof(key));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+        }
+
+        internal override Shape OutputShape => _shape;
+
+        internal override Expr Write(Scope scope)
+        {
+            var values = _shape.DescribesArray ? "queryAll" : "query";
+            return G.Get(G.Get(G.Obj(scope.Objects.Document()), new[] { values }, Shape.Any, PathMembers.Required), new[] { _key }, _shape, PathMembers.Optional);
+        }
+    }
+
+    internal sealed class BoundRead : ValueExpression
+    {
+        internal const string Page = "";
+
+        private readonly string _name;
+        private readonly Shape _shape;
+        private readonly string _containerId;
+        private readonly Expr _indexes;
+
+        internal BoundRead(string name, Shape shape, string containerId, Expr indexes)
+        {
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            _containerId = containerId ?? throw new ArgumentNullException(nameof(containerId));
+            _indexes = indexes ?? throw new ArgumentNullException(nameof(indexes));
+        }
+
+        internal override Shape OutputShape => _shape;
+
+        internal override Expr Write(Scope scope)
+        {
+            if (_containerId != Page)
+                return G.Call(G.Obj(scope.Objects.Inputs(_containerId)), new[] { "valueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any, PathMembers.Required);
+
+            var args = scope.Objects.TryFindOnlyInputItRendered(_name, out var own)
+                ? new[] { G.Lit(_name), _indexes, G.Lit(own) }
+                : new[] { G.Lit(_name), _indexes };
+            return G.Call(G.Obj(scope.Objects.Model()), new[] { "valueOf" }, args, Shape.Any, PathMembers.Required);
+        }
+    }
+
+    internal sealed class BoundItemIndexesRead : ValueExpression
+    {
+        private readonly string _itemName;
+        private readonly string _formId;
+        private readonly Expr _ownerIndexes;
+
+        internal BoundItemIndexesRead(string itemName, string formId, Expr ownerIndexes)
+        {
+            _itemName = itemName ?? throw new ArgumentNullException(nameof(itemName));
+            _formId = formId ?? throw new ArgumentNullException(nameof(formId));
+            _ownerIndexes = ownerIndexes ?? throw new ArgumentNullException(nameof(ownerIndexes));
+        }
+
+        internal override Shape OutputShape => Shape.Any;
+
+        internal override Expr Write(Scope scope)
+            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "indexesOf" }, new[] { G.Lit(_itemName), _ownerIndexes }, Shape.Any, PathMembers.Required);
+    }
+
+    internal sealed class SentRead : ValueExpression
+    {
+        private readonly string _name;
+        private readonly Shape _shape;
+        private readonly string _formId;
+        private readonly Expr _indexes;
+
+        internal SentRead(string name, Shape shape, string formId, Expr indexes)
+        {
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+            _formId = formId ?? throw new ArgumentNullException(nameof(formId));
+            _indexes = indexes ?? throw new ArgumentNullException(nameof(indexes));
+        }
+
+        internal override Shape OutputShape => _shape;
+
+        internal override Expr Write(Scope scope)
+            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "sentValueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any, PathMembers.Required);
+    }
+
+    internal sealed class RecordExpression : ValueExpression
+    {
+        private readonly IReadOnlyList<(string Name, ValueExpression Value)> _fields;
+        private readonly Shape _shape;
+
+        internal RecordExpression(IReadOnlyList<(string Name, ValueExpression Value)> fields, Shape shape)
+        {
+            _fields = fields;
+            _shape = shape;
+        }
+
+        internal override Shape OutputShape => _shape;
+
+        private protected override IEnumerable<ValueExpression> Operands => _fields.Select(member => member.Value);
+
+        internal override Expr Write(Scope scope)
+            => G.Record(_fields.Select(member => new RecordField(member.Name, member.Value.Write(scope))));
+    }
+
+    internal sealed class ListExpression : ValueExpression
+    {
+        internal ListExpression(IReadOnlyList<ValueExpression> items, Shape shape)
+        {
+            Items = items;
+            Shape = shape;
+        }
+
+        internal IReadOnlyList<ValueExpression> Items { get; }
+
+        internal Shape Shape { get; }
+
         internal override Shape OutputShape => Shape;
+
+        private protected override IEnumerable<ValueExpression> Operands => Items;
+
+        internal override Expr Write(Scope scope) => G.List(Items.Select(item => item.Write(scope)));
+    }
+
+    internal sealed class OperationExpression : ValueExpression
+    {
+        private readonly Operator _op;
+        private readonly IReadOnlyList<ValueExpression> _operands;
+        private readonly Shape _shape;
+
+        internal OperationExpression(Operator op, IReadOnlyList<ValueExpression> operands, Shape shape)
+        {
+            _op = op;
+            _operands = operands;
+            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
+        }
+
+        internal override Shape OutputShape => _shape;
+
+        private protected override IEnumerable<ValueExpression> Operands => _operands;
+
+        internal override Expr Write(Scope scope)
+            => G.As(G.Op(_op, _operands.Select(operand => operand.Write(scope)).ToArray()), _shape);
     }
 }

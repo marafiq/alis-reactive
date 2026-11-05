@@ -3,19 +3,6 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAsse
 public class ScreeningAlertResponse
 {
     public string Message { get; set; } = "";
-    public string Urgency { get; set; } = "";
-}
-
-public class SaveSectionResponse
-{
-    public string Id { get; set; } = "";
-    public string Message { get; set; } = "";
-}
-
-public class VerifyVaResponse
-{
-    public string Message { get; set; } = "";
-    public bool Eligible { get; set; }
 }
 
 public class SubmitScreeningResponse

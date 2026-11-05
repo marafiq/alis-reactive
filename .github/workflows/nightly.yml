@@ -1,14 +1,8 @@
 name: Nightly browser gate
 
-# The watched browser signal for main. Pull requests run the browser shards too, but that check is
-# not required to merge (docs/CI.md, "Gating"): GitHub-hosted runners are slow and occasionally
-# flaky, and a required check that flakes teaches people to ignore red. This scheduled run of the
-# full gate on main's tip is the run whose failure opens (or updates) an issue.
-# GitHub runs scheduled workflows on the default branch only, may delay them under load, and
-# disables them after 60 days without repository activity.
 on:
   schedule:
-    - cron: '30 3 * * 1-5'   # 03:30 UTC, Monday to Friday
+    - cron: '30 3 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -52,7 +46,7 @@ jobs:
             --color B60205 --description "The scheduled browser gate on main failed"
           body="The nightly browser gate failed on \`${GITHUB_SHA}\`: ${RUN_URL}
 
-          Read the per-shard summaries and the uploaded failure artifacts (Playwright traces, screenshots, TRX, diagnostics). A test that fails twice in a row is a regression or a quarantine candidate — the rules are in docs/CI.md (\"Flaky tests\")."
+          Read the per-shard summaries and the uploaded failure artifacts (Playwright traces, screenshots, TRX, diagnostics). A test that fails twice in a row is a regression or a quarantine candidate."
           existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --label "$label" --state open --json number --jq '.[0].number // empty')"
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"

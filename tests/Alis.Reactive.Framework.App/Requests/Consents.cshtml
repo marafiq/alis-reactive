@@ -1,0 +1,19 @@
+@using Alis.Reactive.Framework.App.Requests
+@model ConsentsPage
+@{
+    ViewData["Title"] = "Signed consents";
+    var plan = Html.ReactivePlan<ConsentsPage>();
+}
+<h1>Signed consents</h1>
+
+@{ Html.InputField(plan, m => m.Consents, o => o.Label("Consents")).FilePicker(); }
+
+<p>Received: <span id="received"></span></p>
+
+@(plan.Button("send", "Send the consents")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Consents")
+        .Gather<ConsentFiles>(g => g.Form(m => m.Consents))
+        .AsFormData()
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("received").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

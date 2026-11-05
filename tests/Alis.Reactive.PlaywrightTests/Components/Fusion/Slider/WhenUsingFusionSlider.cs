@@ -1,18 +1,13 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Slider;
 
-// Journey: a resident sets their Comfort & Care Preferences. The page carries over
-// the room temperature and afternoon rest window they saved last month. The resident
-// adjusts the temperature with the slider, can apply the care team's recommendation,
-// sets the rest window, then saves.
 [TestFixture]
 public class WhenUsingFusionSlider : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Slider";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SliderModel";
-    private const string RoomTemperatureId = GeneratedTypeScope + "__RoomTemperature";
-    private const string QuietHoursId = GeneratedTypeScope + "__QuietHours";
+    private static readonly string RoomTemperatureId = IdGenerator.For<SliderModel>(m => m.RoomTemperature);
+    private static readonly string QuietHoursId = IdGenerator.For<SliderModel>(m => m.QuietHours);
 
     private FusionSliderLocator RoomTemperature => new(Page, RoomTemperatureId);
     private FusionSliderLocator QuietHours => new(Page, QuietHoursId);
@@ -37,7 +32,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         await Expect(RoomTemperature.Handle()).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // RENDERS — the FusionSlider builder renders the slider bound to the carried-over model value.
     [Test]
     public async Task preferences_open_showing_the_temperature_carried_over_from_last_month()
     {
@@ -49,9 +43,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // INTERACTS / Change — nudging the handle fires the Change event through the .Reactive wiring;
-    // the FusionSliderChangeArgs payload carries Text into the live reading and Value into the
-    // comfort-zone branch as the resident moves the slider.
     [Test]
     public async Task warming_the_room_updates_the_live_reading_and_the_comfort_note()
     {
@@ -67,8 +58,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Changed — when the handle settles, the Changed event's PreviousValue records the value before
-    // the change and Action names how it changed.
     [Test]
     public async Task adjusting_the_temperature_records_what_it_changed_from()
     {
@@ -82,8 +71,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // IsInteracted — a temperature the resident chose reads as their own; a temperature applied for
-    // them reads as a recommendation. FusionSliderChangeArgs.IsInteracted distinguishes the two.
     [Test]
     public async Task choosing_a_temperature_reads_differently_from_applying_a_recommendation()
     {
@@ -101,7 +88,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetValue — applying the recommendation writes 72 onto the slider and repaints the handle there.
     [Test]
     public async Task applying_the_recommended_temperature_moves_the_slider_to_72()
     {
@@ -114,8 +100,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Value() — the guidance button reads the slider's current value through a condition; a warm
-    // setting routes the overnight-check message.
     [Test]
     public async Task checking_a_warm_temperature_warns_about_an_overnight_check()
     {
@@ -134,8 +118,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetRangeValue + RangeValue — applying the recommended window writes both handles, and the
-    // RangeValue source reads the written window back into the saved summary.
     [Test]
     public async Task applying_the_recommended_rest_window_moves_both_handles_and_updates_the_summary()
     {
@@ -150,8 +132,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SUBMITS — the Value() and RangeValue() sources feed the gather body; the server confirmation
-    // the resident sees reflects the submitted temperature and rest window.
     [Test]
     public async Task saving_confirms_the_temperature_and_rest_window()
     {
@@ -166,8 +146,6 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // GATHERS — the framework gather pipeline carries the Value() and RangeValue() sources into the
-    // POST body under their declared keys. (Framework gather test: asserts request.PostData.)
     [Test]
     public async Task saving_posts_the_temperature_and_rest_window_to_the_server()
     {
@@ -182,9 +160,9 @@ public class WhenUsingFusionSlider : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"roomTemperature\":68"),
+        Assert.That(body, Does.Contain("\"RoomTemperature\":68"),
             "the gather pipeline must carry the Value() source under its declared key");
-        Assert.That(body, Does.Contain("\"quietHours\":[13,15]"),
+        Assert.That(body, Does.Contain("\"QuietHours\":[13,15]"),
             "the gather pipeline must carry the RangeValue() source under its declared key");
 
         AssertNoConsoleErrors();

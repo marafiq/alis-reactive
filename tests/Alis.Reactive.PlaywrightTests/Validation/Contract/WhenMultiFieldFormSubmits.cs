@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 
@@ -6,26 +8,25 @@ namespace Alis.Reactive.PlaywrightTests.Validation.Contract;
 public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Validation/Contract";
-    private const string ResidentModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_ResidentModel__";
 
     private ILocator SubmitBtn => Page.Locator("#submit-btn");
     private ILocator SummaryDiv => Page.Locator("[data-reactive-validation-summary]");
     private ILocator Result => Page.Locator("#result");
 
-    private ILocator ErrorFor(string fieldName) =>
-        Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
+    private ILocator ErrorFor(string fieldName)
+        => Page.Locator($"#resident-form span[data-valmsg-for='{fieldName}']");
 
-    private ILocator Input(string suffix) => Page.Locator($"#{ResidentModelIdPrefix}{suffix}");
+    private ILocator Input(Expression<Func<ResidentModel, object?>> member) => Page.Locator($"#{IdGenerator.For(member)}");
 
     private async Task FillAllRequired()
     {
-        await Input("Name").FillAsync("Jane Smith");
-        await Input("Email").FillAsync("jane@care.com");
-        await Input("ConfirmEmail").FillAsync("jane@care.com");
-        await Input("CareLevel").SelectOptionAsync("Independent");
-        await Input("Address_Street").FillAsync("123 Main St");
-        await Input("Address_City").FillAsync("Springfield");
-        await Input("Address_ZipCode").FillAsync("62704");
+        await Input(m => m.Name).FillAsync("Jane Smith");
+        await Input(m => m.Email).FillAsync("jane@care.com");
+        await Input(m => m.ConfirmEmail).FillAsync("jane@care.com");
+        await Input(m => m.CareLevel).SelectOptionAsync("Independent");
+        await Input(m => m.Address.Street).FillAsync("123 Main St");
+        await Input(m => m.Address.City).FillAsync("Springfield");
+        await Input(m => m.Address.ZipCode).FillAsync("62704");
     }
 
     [Test]
@@ -36,14 +37,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("Name")).ToContainTextAsync("'Name' is required");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' is required.");
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
-        await Expect(ErrorFor("Email")).ToContainTextAsync("'Email' is required");
+        await Expect(ErrorFor("Email")).ToHaveTextAsync("'Email' is required.");
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
-        await Expect(ErrorFor("CareLevel")).ToContainTextAsync("required");
+        await Expect(ErrorFor("CareLevel")).ToHaveTextAsync("'Care Level' is required.");
 
-        await Expect(Input("Name")).ToHaveClassAsync(new Regex("alis-has-error"));
-        await Expect(Input("Email")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(Input(m => m.Name)).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(Input(m => m.Email)).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(Input(m => m.Name)).ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         await Expect(Result).ToHaveTextAsync("");
@@ -58,12 +60,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Name").FillAsync("A");
+        await Input(m => m.Name).FillAsync("A");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("Name")).ToContainTextAsync("minimum length");
+        await Expect(ErrorFor("Name")).ToHaveTextAsync("'Name' must have a minimum length of 2.");
+        await Expect(Input(m => m.Name)).ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
+        await Expect(Input(m => m.Email)).Not.ToHaveCSSAsync("border-color", "rgb(220, 38, 38)");
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -74,13 +79,14 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_ZipCode").FillAsync("abc");
+        await Input(m => m.Address.ZipCode).FillAsync("abc");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("Address.ZipCode")).ToContainTextAsync("5 digits");
-        await Expect(Input("Address_ZipCode")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(ErrorFor("Address.ZipCode")).ToHaveTextAsync("'Zip Code' must be 5 digits.");
+        await Expect(Input(m => m.Address.ZipCode)).ToHaveClassAsync(new Regex("alis-has-error"));
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -91,14 +97,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Email").FillAsync("resident@care.com");
-        await Input("ConfirmEmail").FillAsync("wrong@email.com");
+        await Input(m => m.Email).FillAsync("resident@care.com");
+        await Input(m => m.ConfirmEmail).FillAsync("wrong@email.com");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
-        await Expect(Input("ConfirmEmail")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(ErrorFor("ConfirmEmail")).ToHaveTextAsync("'Confirm Email' must match 'Email'.");
+        await Expect(Input(m => m.ConfirmEmail)).ToHaveClassAsync(new Regex("alis-has-error"));
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -112,8 +119,10 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         await SubmitBtn.ClickAsync();
 
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -125,8 +134,10 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await FillAllRequired();
         await SubmitBtn.ClickAsync();
 
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -136,11 +147,11 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("IsVeteran").CheckAsync();
+        await Input(m => m.IsVeteran).CheckAsync();
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(ErrorFor("VeteranId")).ToHaveTextAsync("'Veteran ID' is required when veteran.");
         await Expect(ErrorFor("VeteranId")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -153,13 +164,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("IsVeteran").CheckAsync();
-        await Input("VeteranId").FillAsync("V12345");
+        await Input(m => m.IsVeteran).CheckAsync();
+        await Input(m => m.VeteranId).FillAsync("V12345");
 
         await SubmitBtn.ClickAsync();
 
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -169,13 +182,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Assisted Living");
-        await Input("PhysicianName").FillAsync("Dr. Smith");
+        await Input(m => m.CareLevel).SelectOptionAsync("Assisted Living");
+        await Input(m => m.PhysicianName).FillAsync("Dr. Smith");
 
         await SubmitBtn.ClickAsync();
 
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -185,18 +200,16 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Memory Care");
-        await Input("PhysicianName").FillAsync("Dr. Smith");
+        await Input(m => m.CareLevel).SelectOptionAsync("Memory Care");
+        await Input(m => m.PhysicianName).FillAsync("Dr. Smith");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
+        await Expect(ErrorFor("MemoryAssessmentScore")).ToHaveTextAsync("'Memory Assessment' is required for Memory Care.");
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
-
-    // Fusion NumericTextBox validates inline with regular validation errors.
 
     [Test]
     public async Task memory_care_with_fusion_numeric_validates_and_succeeds()
@@ -205,18 +218,16 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Memory Care");
-        await Input("PhysicianName").FillAsync("Dr. Smith");
-        await Input("ReasonForNoContact").FillAsync("No relatives");
+        await Input(m => m.CareLevel).SelectOptionAsync("Memory Care");
+        await Input(m => m.PhysicianName).FillAsync("Dr. Smith");
+        await Input(m => m.ReasonForNoContact).FillAsync("No relatives");
 
-        // Leave the Fusion NumericTextBox empty so submit exercises inline validation.
         await SubmitBtn.ClickAsync();
-        await Expect(ErrorFor("MemoryAssessmentScore")).ToContainTextAsync("required");
+        await Expect(ErrorFor("MemoryAssessmentScore")).ToHaveTextAsync("'Memory Assessment' is required for Memory Care.");
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        // Tab commits the Syncfusion value before the next submit.
-        var scoreInput = Page.Locator($"#{ResidentModelIdPrefix}MemoryAssessmentScore");
+        var scoreInput = Input(m => m.MemoryAssessmentScore);
         await scoreInput.ClickAsync();
         await scoreInput.FillAsync("85");
         await scoreInput.PressAsync("Tab");
@@ -236,12 +247,14 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Independent");
+        await Input(m => m.CareLevel).SelectOptionAsync("Independent");
 
         await SubmitBtn.ClickAsync();
 
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("PhysicianName")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -251,11 +264,11 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Assisted Living");
+        await Input(m => m.CareLevel).SelectOptionAsync("Assisted Living");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
+        await Expect(ErrorFor("PhysicianName")).ToHaveTextAsync("'Physician' is required unless Independent.");
         await Expect(ErrorFor("PhysicianName")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
@@ -268,11 +281,11 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Memory Care");
+        await Input(m => m.CareLevel).SelectOptionAsync("Memory Care");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("PhysicianName")).ToContainTextAsync("required");
+        await Expect(ErrorFor("PhysicianName")).ToHaveTextAsync("'Physician' is required unless Independent.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
@@ -286,9 +299,10 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await FillAllRequired();
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("ReasonForNoContact")).ToContainTextAsync("required");
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -299,14 +313,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("HasEmergencyContact").CheckAsync();
-        await Input("EmergencyName").FillAsync("John");
-        await Input("EmergencyPhone").FillAsync("555-0123");
+        await Input(m => m.HasEmergencyContact).CheckAsync();
+        await Input(m => m.EmergencyName).FillAsync("John");
+        await Input(m => m.EmergencyPhone).FillAsync("555-0123");
 
         await SubmitBtn.ClickAsync();
 
+        await Expect(Result).ToHaveTextAsync("Admission saved", new() { Timeout = 5000 });
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        AssertNoConsoleErrors();
     }
 
     [Test]
@@ -318,14 +333,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await FillAllRequired();
 
         await SubmitBtn.ClickAsync();
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
-        await Input("IsVeteran").CheckAsync();
+        await Input(m => m.IsVeteran).CheckAsync();
         await SubmitBtn.ClickAsync();
-        await Expect(ErrorFor("VeteranId")).ToContainTextAsync("required");
+        await Expect(ErrorFor("VeteranId")).ToHaveTextAsync("'Veteran ID' is required when veteran.");
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        await Input("IsVeteran").UncheckAsync();
+        await Input(m => m.IsVeteran).UncheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("VeteranId")).Not.ToBeVisibleAsync();
 
@@ -345,13 +361,13 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        await Input("HasEmergencyContact").CheckAsync();
+        await Input(m => m.HasEmergencyContact).CheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("EmergencyName")).ToBeVisibleAsync();
         await Expect(ErrorFor("ReasonForNoContact")).Not.ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        await Input("HasEmergencyContact").UncheckAsync();
+        await Input(m => m.HasEmergencyContact).UncheckAsync();
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("ReasonForNoContact")).ToBeVisibleAsync();
         await Expect(ErrorFor("EmergencyName")).Not.ToBeVisibleAsync();
@@ -371,14 +387,14 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
-        await Input("Name").FillAsync("Jane Smith");
+        await Input(m => m.Name).FillAsync("Jane Smith");
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
 
         await FillAllRequired();
-        await Input("ReasonForNoContact").FillAsync("No relatives nearby");
+        await Input(m => m.ReasonForNoContact).FillAsync("No relatives nearby");
         await SubmitBtn.ClickAsync();
 
         await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
@@ -394,14 +410,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_Street").FillAsync("");
-        await Input("ReasonForNoContact").FillAsync("No relatives");
+        await Input(m => m.Address.Street).FillAsync("");
+        await Input(m => m.ReasonForNoContact).FillAsync("No relatives");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("Address.Street")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.Street")).ToHaveTextAsync("'Street' is required.");
         await Expect(ErrorFor("Address.Street")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -412,14 +429,15 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_City").FillAsync("");
-        await Input("ReasonForNoContact").FillAsync("No relatives");
+        await Input(m => m.Address.City).FillAsync("");
+        await Input(m => m.ReasonForNoContact).FillAsync("No relatives");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("Address.City")).ToContainTextAsync("required");
+        await Expect(ErrorFor("Address.City")).ToHaveTextAsync("'City' is required.");
         await Expect(ErrorFor("Address.City")).ToBeVisibleAsync();
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
         AssertNoConsoleErrors();
     }
 
@@ -430,13 +448,31 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Email").FillAsync("not-an-email");
+        await Input(m => m.Email).FillAsync("not-an-email");
 
         await SubmitBtn.ClickAsync();
 
-        await Expect(ErrorFor("Email")).ToContainTextAsync("valid email");
-        await Expect(Input("Email")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(ErrorFor("Email")).ToHaveTextAsync("'Email' must be a valid email address.");
+        await Expect(Input(m => m.Email)).ToHaveClassAsync(new Regex("alis-has-error"));
         await Expect(SummaryDiv).ToBeHiddenAsync();
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task an_email_with_no_dot_after_the_at_is_accepted_as_the_server_accepts_it()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 5000);
+
+        await FillAllRequired();
+        await Input(m => m.Email).FillAsync("jane@sunnyacres");
+        await Input(m => m.ConfirmEmail).FillAsync("jane@sunnyacres");
+        await Input(m => m.ReasonForNoContact).FillAsync("No relatives nearby");
+        await SubmitBtn.ClickAsync();
+
+        await Expect(Result).ToContainTextAsync("Admission saved", new() { Timeout = 5000 });
+        await Expect(ErrorFor("Email")).Not.ToBeVisibleAsync();
         AssertNoConsoleErrors();
     }
 
@@ -448,13 +484,13 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
 
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Name")).ToBeVisibleAsync();
-        await Expect(Input("Name")).ToHaveClassAsync(new Regex("alis-has-error"));
+        await Expect(Input(m => m.Name)).ToHaveClassAsync(new Regex("alis-has-error"));
 
-        await Input("Name").FillAsync("Robert Thompson");
-        await Input("Name").BlurAsync();
+        await Input(m => m.Name).FillAsync("Robert Thompson");
+        await Input(m => m.Name).BlurAsync();
 
         await Expect(ErrorFor("Name")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
-        await Expect(Input("Name")).Not.ToHaveClassAsync(new Regex("alis-has-error"), new() { Timeout = 2000 });
+        await Expect(Input(m => m.Name)).Not.ToHaveClassAsync(new Regex("alis-has-error"), new() { Timeout = 2000 });
 
         AssertNoConsoleErrors();
     }
@@ -468,8 +504,8 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("Email")).ToBeVisibleAsync();
 
-        await Input("Email").FillAsync("robert@care.com");
-        await Input("Email").BlurAsync();
+        await Input(m => m.Email).FillAsync("robert@care.com");
+        await Input(m => m.Email).BlurAsync();
 
         await Expect(ErrorFor("Email")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
 
@@ -483,13 +519,13 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Address_ZipCode").FillAsync("abc");
+        await Input(m => m.Address.ZipCode).FillAsync("abc");
         await SubmitBtn.ClickAsync();
 
         await Expect(ErrorFor("Address.ZipCode")).ToBeVisibleAsync();
 
-        await Input("Address_ZipCode").FillAsync("62704");
-        await Input("Address_ZipCode").BlurAsync();
+        await Input(m => m.Address.ZipCode).FillAsync("62704");
+        await Input(m => m.Address.ZipCode).BlurAsync();
 
         await Expect(ErrorFor("Address.ZipCode")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
 
@@ -502,27 +538,27 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        await Input("Name").FillAsync("Eleanor Davis");
-        await Input("Email").FillAsync("eleanor@care.com");
-        await Input("ConfirmEmail").FillAsync("eleanor@care.com");
-        await Input("CareLevel").SelectOptionAsync("Memory Care");
+        await Input(m => m.Name).FillAsync("Eleanor Davis");
+        await Input(m => m.Email).FillAsync("eleanor@care.com");
+        await Input(m => m.ConfirmEmail).FillAsync("eleanor@care.com");
+        await Input(m => m.CareLevel).SelectOptionAsync("Memory Care");
 
-        await Input("IsVeteran").CheckAsync();
-        await Input("VeteranId").FillAsync("V99999");
+        await Input(m => m.IsVeteran).CheckAsync();
+        await Input(m => m.VeteranId).FillAsync("V99999");
 
-        await Input("PhysicianName").FillAsync("Dr. Martinez");
-        var assessmentInput = Page.Locator($"#{ResidentModelIdPrefix}MemoryAssessmentScore");
+        await Input(m => m.PhysicianName).FillAsync("Dr. Martinez");
+        var assessmentInput = Input(m => m.MemoryAssessmentScore);
         await assessmentInput.ClickAsync();
         await assessmentInput.FillAsync("72");
         await assessmentInput.PressAsync("Tab");
 
-        await Input("HasEmergencyContact").CheckAsync();
-        await Input("EmergencyName").FillAsync("Michael Davis");
-        await Input("EmergencyPhone").FillAsync("555-9876");
+        await Input(m => m.HasEmergencyContact).CheckAsync();
+        await Input(m => m.EmergencyName).FillAsync("Michael Davis");
+        await Input(m => m.EmergencyPhone).FillAsync("555-9876");
 
-        await Input("Address_Street").FillAsync("456 Oak Lane");
-        await Input("Address_City").FillAsync("Portland");
-        await Input("Address_ZipCode").FillAsync("97201");
+        await Input(m => m.Address.Street).FillAsync("456 Oak Lane");
+        await Input(m => m.Address.City).FillAsync("Portland");
+        await Input(m => m.Address.ZipCode).FillAsync("97201");
 
         await SubmitBtn.ClickAsync();
 
@@ -544,14 +580,14 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("Email").FillAsync("test@care.com");
-        await Input("ConfirmEmail").FillAsync("wrong@care.com");
+        await Input(m => m.Email).FillAsync("test@care.com");
+        await Input(m => m.ConfirmEmail).FillAsync("wrong@care.com");
 
         await SubmitBtn.ClickAsync();
-        await Expect(ErrorFor("ConfirmEmail")).ToContainTextAsync("must match");
+        await Expect(ErrorFor("ConfirmEmail")).ToHaveTextAsync("'Confirm Email' must match 'Email'.");
 
-        await Input("ConfirmEmail").FillAsync("test@care.com");
-        await Input("ConfirmEmail").BlurAsync();
+        await Input(m => m.ConfirmEmail).FillAsync("test@care.com");
+        await Input(m => m.ConfirmEmail).BlurAsync();
 
         await Expect(ErrorFor("ConfirmEmail")).Not.ToBeVisibleAsync(new() { Timeout = 2000 });
 
@@ -565,16 +601,18 @@ public class WhenMultiFieldFormSubmits : PlaywrightTestBase
         await WaitForTraceMessage("booted", 5000);
 
         await FillAllRequired();
-        await Input("CareLevel").SelectOptionAsync("Memory Care");
-        await Input("PhysicianName").FillAsync("Dr. Smith");
+        await Input(m => m.CareLevel).SelectOptionAsync("Memory Care");
+        await Input(m => m.PhysicianName).FillAsync("Dr. Smith");
 
         await SubmitBtn.ClickAsync();
         await Expect(ErrorFor("MemoryAssessmentScore")).ToBeVisibleAsync();
 
-        await Input("CareLevel").SelectOptionAsync("Assisted Living");
+        await Input(m => m.CareLevel).SelectOptionAsync("Assisted Living");
         await SubmitBtn.ClickAsync();
 
+        await Expect(ErrorFor("ReasonForNoContact")).ToHaveTextAsync("'Reason' is required when no emergency contact.");
         await Expect(ErrorFor("MemoryAssessmentScore")).Not.ToBeVisibleAsync();
-        AssertNoConsoleErrorsExcept("400");
+        await Expect(Result).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
     }
 }

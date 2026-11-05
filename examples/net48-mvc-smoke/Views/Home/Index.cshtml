@@ -7,38 +7,47 @@
 <h1 id="smoke-heading">net48 Runtime Smoke</h1>
 <p>Classic ASP.NET MVC 5 on real .NET Framework 4.8, consuming the shipped AlisReactive net48 packages.</p>
 
-@{ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
-    .NativeTextBox(b => b.Placeholder("Type your name")); }
+<div id="smoke-form">
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Name"))
+        .NativeTextBox(b => b.Placeholder("Type your name")); }
+</div>
+
+<div style="margin-top: 1rem;">
+    @(Html.NativeButton("save-name", "Save the name")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Post(Url.Action("Save", "Home"))
+             .Gather(g => g.Form("smoke-form"))
+             .Validate<SmokeModelRules>("smoke-form")
+             .Response(r => r.OnSuccess(s => s.Element("save-status").Text.Set("The server saved the name.")));
+        }))
+    <span id="save-status"></span>
+</div>
 
 <div style="margin-top: 1rem;">
     @{ Html.InputField(plan, m => m.ShowDetails, o => o.Label("Show the proof"))
-        .NativeCheckBox(b => b.Reactive(plan, evt => evt.Changed, (args, pipeline) =>
+        .NativeCheckBox()
+        .Reactive(evt => evt.Change, (args, pipeline) =>
         {
-            pipeline.When(args, a => a.Checked).Truthy()
+            pipeline.When(args.Checked).Truthy()
                 .Then(t => t.Element("reactive-proof").Show())
                 .Else(e => e.Element("reactive-proof").Hide());
-        })); }
+        }); }
 </div>
 
 <div id="reactive-proof" hidden style="margin-top: 1rem; padding: 1rem; border: 2px solid green; border-radius: 8px;">
     <strong>Reactive runtime executed on .NET Framework 4.8 &#10003;</strong>
 </div>
 
-@{ Html.On(plan, t => t.CustomEvent<Net48MvcSmoke.Models.TrainingSession>("session-picked", (session, p) =>
-    {
-        p.Get("/Home/Day")
-         .Gather(g => g.FromEvent(session, s => s.StartsAt, "startsAt"))
-         .Response(r => r.OnSuccess(s => s.Into("training-day")));
-    })); }
-
 <div style="margin-top: 1rem;">
     @(Html.NativeButton("plan-day-btn", "Plan the Day")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Dispatch("session-picked", new Net48MvcSmoke.Models.TrainingSession
-            {
-                StartsAt = new DateTimeOffset(2027, 1, 13, 9, 0, 0, TimeSpan.FromHours(-8))
-            });
+            p.Get(Url.Action("Day", "Home"))
+             .Gather<Net48MvcSmoke.Models.TrainingSession>(g => g.Set(
+                 x => x.StartsAt,
+                 new DateTimeOffset(2027, 1, 13, 9, 0, 0, TimeSpan.FromHours(-8))))
+             .Response(r => r.OnSuccess(s => s.Into("training-day")));
         }))
     <span id="training-day">Not planned.</span>
 </div>

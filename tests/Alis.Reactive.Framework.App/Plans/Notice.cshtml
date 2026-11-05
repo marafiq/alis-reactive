@@ -1,0 +1,19 @@
+@using Alis.Reactive.Framework.App.Plans
+@model Notice
+@{
+    // Two plans of one model in one partial: the notice's, and its share button's.
+    var plan = Html.ReactivePlan<Notice>();
+    var share = Html.ReactivePlan<Notice>();
+}
+<section id="notice">
+    <h2>Visiting hours change on Sunday</h2>
+    <p>Read: <span id="notice-read"></span> · shared: <span id="notice-shared"></span></p>
+
+    @(plan.Button("read-notice", "Mark the notice read")
+        .Reactive(button => button.Click, p => p.Element("notice-read").Text.Set("read")))
+    @(share.Button("share-notice", "Share the notice")
+        .Reactive(button => button.Click, p => p.Element("notice-shared").Text.Set("shared")))
+</section>
+
+@Html.RenderPlan(plan)
+@Html.RenderPlan(share)

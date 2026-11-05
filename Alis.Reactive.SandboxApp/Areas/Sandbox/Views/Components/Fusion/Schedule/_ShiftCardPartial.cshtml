@@ -1,21 +1,36 @@
 @model ShiftCardModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native
+@using Alis.Reactive.Fusion
 @{
-    var plan = Html.ResolvePlan<ShiftCardModel>();
+    var plan = Html.ReactivePlan<ShiftCardModel>();
 }
 
 <div class="flex flex-col gap-2 p-3">
-    <p class="text-sm text-text-secondary">Handover for @Model.Subject</p>
+    <p class="text-sm text-text-secondary">Handover for @Model.Subject, revision @Model.Revision</p>
     @(Html.FusionProgressButton(plan, "acknowledge-handover-btn", b => b
         .Content("Acknowledge handover")
-        .Duration(300)
+        .Duration(2000)
         .EnableProgress(true))
-        .Reactive(evt => evt.Began, (args, p) =>
+        .Reactive(evt => evt.Begin, (args, p) =>
         {
-            p.Element("shift-card-status").SetText($"Handover acknowledged for {Model.Subject}.");
+            p.Element("shift-card-status").Text.Set($"Handover acknowledged for {Model.Subject}.");
+        })
+        .Reactive(evt => evt.End, (args, p) =>
+        {
+            p.Post(Url.SandboxRoute("ShiftCardSignOff", "Schedule", new { shiftId = Model.ShiftId, revision = Model.Revision }))
+             .Response(r => r.OnSuccess<ShiftCardSignOffs>((json, s) =>
+             {
+                 s.Element("shift-card-signoffs").Text.Set(json.Get(x => x.Summary));
+             }));
         }))
-    <p id="shift-card-status" class="text-sm text-text-muted">Handover not acknowledged yet.</p>
+    @(Html.NativeButton("latest-handover-btn", "Load the latest handover")
+        .CssClass("self-start rounded-md border border-border px-3 py-1 text-sm")
+        .Reactive(plan, evt => evt.Click, (args, p) =>
+        {
+            p.Get(Url.SandboxRoute("ShiftCardDetails", "Schedule", new { shiftId = Model.ShiftId, revision = Model.Revision + 1 }))
+             .Response(r => r.OnSuccess(s => s.Into("shift-card-content")));
+        }))
+    <p id="shift-card-status" class="text-sm text-text-muted">Handover revision @Model.Revision not acknowledged yet.</p>
 </div>
 
 @Html.EJS().ScriptManager()

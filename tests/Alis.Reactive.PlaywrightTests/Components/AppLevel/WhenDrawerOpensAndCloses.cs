@@ -152,10 +152,8 @@ public class WhenDrawerOpensAndCloses : PlaywrightTestBase
 
         await Page.GetByText("Assisted Living", new() { Exact = true }).ClickAsync();
 
-        // Server intentionally delays the success response.
         await ClickWhenStable(Page.Locator("#drawer-submit-btn"));
 
-        // Drawer is fully closed only after the close transition finishes.
         await Expect(Drawer).ToHaveAttributeAsync("aria-hidden", "true", new() { Timeout = 30000 });
 
         AssertNoConsoleErrors();

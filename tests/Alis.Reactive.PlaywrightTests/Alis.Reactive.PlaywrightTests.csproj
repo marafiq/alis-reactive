@@ -10,13 +10,11 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.63.0" />
-        <PackageReference Include="NUnit" Version="4.6.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../Alis.Reactive.Playwright.Extensions/Alis.Reactive.Playwright.Extensions.csproj" />
+        <ProjectReference Include="../Alis.Reactive.Playwright.TestHost/Alis.Reactive.Playwright.TestHost.csproj" />
         <ProjectReference Include="../../Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
     </ItemGroup>
 

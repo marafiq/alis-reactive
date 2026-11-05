@@ -1,0 +1,151 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+namespace Alis.Reactive.WireTerms
+{
+    internal sealed class PathSegment
+    {
+        private readonly string _text;
+        private readonly int _index;
+
+        private PathSegment(string kind, string text, int index)
+        {
+            Kind = kind;
+            _text = text;
+            _index = index;
+        }
+
+        internal string Kind { get; }
+
+        internal static PathSegment Property(string name) => new PathSegment("property", MemberName.Of(name).Value, -1);
+
+        internal static PathSegment AtIndex(int index)
+        {
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, "Path index must not be negative.");
+            return new PathSegment("index", index.ToString(CultureInfo.InvariantCulture), index);
+        }
+
+        internal static PathSegment EachItem { get; } = new PathSegment("each", "[]", -1);
+
+        internal bool IsEachItem => Kind == "each";
+
+        internal bool IsIndex => Kind == "index";
+
+        internal int Index => IsIndex
+            ? _index
+            : throw new InvalidOperationException($"'{_text}' names a member, not a position.");
+
+        internal string ToPathText() => _text;
+    }
+
+    internal sealed class Path
+    {
+        internal static readonly Path None = new Path(Array.Empty<PathSegment>(), null);
+
+        private readonly int? _dataFrom;
+
+        internal IReadOnlyList<PathSegment> Segments { get; }
+
+        internal bool IsNone => Segments.Count == 0;
+
+        private Path(IReadOnlyList<PathSegment> segments, int? dataFrom)
+        {
+            Segments = segments;
+            _dataFrom = dataFrom;
+        }
+
+        internal Path Then(string name)
+        {
+            var list = new List<PathSegment>(Segments) { PathSegment.Property(name) };
+            return new Path(list, _dataFrom);
+        }
+
+        internal Path AtIndex(int index)
+        {
+            var list = new List<PathSegment>(Segments) { PathSegment.AtIndex(index) };
+            return new Path(list, _dataFrom);
+        }
+
+        internal Path Each()
+        {
+            var list = new List<PathSegment>(Segments) { PathSegment.EachItem };
+            return new Path(list, _dataFrom);
+        }
+
+        internal Path Append(Path tail)
+        {
+            var list = new List<PathSegment>(Segments);
+            list.AddRange(tail.Segments);
+            return new Path(list, _dataFrom ?? Segments.Count + tail._dataFrom);
+        }
+
+        internal Path ThenData(Path data)
+        {
+            var list = new List<PathSegment>(Segments);
+            list.AddRange(data.Segments);
+            return new Path(list, _dataFrom ?? Segments.Count);
+        }
+
+        internal bool ReadsEachItem => Segments.Any(segment => segment.IsEachItem);
+
+        internal IReadOnlyList<string> Text => Segments.Select(segment => segment.ToPathText()).ToList();
+
+        internal IReadOnlyList<string> DeclaredText => Segments.Take(DeclaredCount).Select(segment => segment.ToPathText()).ToList();
+
+        internal IReadOnlyList<string> DataTextFromDeclared
+            => Segments.Take(DeclaredCount).Where(segment => segment.IsEachItem)
+                .Concat(Segments.Skip(DeclaredCount))
+                .Select(segment => segment.ToPathText())
+                .ToList();
+
+        private int DeclaredCount => _dataFrom ?? Segments.Count;
+
+        internal bool ReadsData => DeclaredCount < Segments.Count;
+
+        internal IReadOnlyList<string> TargetText => ReadsEachItem
+            ? throw new InvalidOperationException($"'{this}' reads each item of a list; it can be read, not written, called or subscribed to.")
+            : Text;
+
+        internal static Path Parse(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return None;
+
+            var steps = text.Replace("]", "").Replace('[', '.').Split('.');
+            var segments = new List<PathSegment>(steps.Length);
+            for (var index = 0; index < steps.Length; index++)
+            {
+                var step = steps[index];
+                if (string.IsNullOrWhiteSpace(step))
+                {
+                    throw new ArgumentException(
+                        $"Path '{text}' contains an empty segment at index {index}. " +
+                        "Use dot-separated property names without consecutive, leading, or trailing dots.",
+                        nameof(text));
+                }
+
+                segments.Add(int.TryParse(step, NumberStyles.None, CultureInfo.InvariantCulture, out var position)
+                    ? PathSegment.AtIndex(position)
+                    : PathSegment.Property(step));
+            }
+
+            return new Path(segments, null);
+        }
+
+        public override string ToString()
+        {
+            if (Segments.Count == 0) return string.Empty;
+
+            var parts = new List<string>(Segments.Count);
+            foreach (var segment in Segments)
+            {
+                if (segment.IsEachItem && parts.Count > 0) parts[parts.Count - 1] += "[]";
+                else parts.Add(segment.ToPathText());
+            }
+
+            return string.Join(".", parts);
+        }
+    }
+}

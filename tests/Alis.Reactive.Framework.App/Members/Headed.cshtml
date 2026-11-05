@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Members
+@model HeadedPage
+@{
+    ViewData["Title"] = "A header reached through an interface";
+    var plan = Html.ReactivePlan<HeadedPage>();
+}
+<h1>A header reached through an interface</h1>
+
+@plan.Slate("slate", title: "Day round")
+
+@(plan.Button("set-caption", "Set the caption through the board")
+    .Reactive(button => button.Click, p =>
+    {
+        IHeadedBoard board = p.Component<HeadedSlate>("slate");
+        board.Header.Caption.Set("Board round");
+    }))
+
+@Html.RenderPlan(plan)

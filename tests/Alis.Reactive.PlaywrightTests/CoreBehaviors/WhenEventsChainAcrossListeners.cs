@@ -1,6 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.CoreBehaviors;
 
-// Dispatch chain under test: dom-ready -> "test" -> "test-received" -> "final".
 [TestFixture]
 public class WhenEventsChainAcrossListeners : PlaywrightTestBase
 {
@@ -18,7 +17,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
 
         await Expect(step1).ToContainTextAsync("dom-ready fired");
         await Expect(step2).ToContainTextAsync("\"test\" received");
-        await Expect(step3).ToContainTextAsync("\"test-received\" received");
+        await Expect(step3).ToContainTextAsync("\"testReceived\" received");
 
         AssertNoConsoleErrors();
     }
@@ -29,7 +28,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var finalDispatch = _consoleMessages
+        var finalDispatch = ConsoleMessages
             .FirstOrDefault(m => m.Contains("[alis:execute]")
                                  && m.Contains("dispatch")
                                  && m.Contains("\"event\":\"final\""));
@@ -60,7 +59,6 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
     [Test]
     public async Task dom_updates_preserve_class_coherence()
     {
-        // Text assertions do not expose stale classes; this catches remove/add drift.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
@@ -68,9 +66,9 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         var statusClasses = await status.GetAttributeAsync("class") ?? "";
 
         Assert.That(statusClasses, Does.Contain("text-green-600"),
-            "AddClass('text-green-600') must have applied");
+            "ClassList.Add('text-green-600') must have applied");
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-            "RemoveClass('text-text-muted') must have removed the initial muted class");
+            "ClassList.Remove('text-text-muted') must have removed the initial muted class");
 
         AssertNoConsoleErrors();
     }
@@ -78,27 +76,25 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
     [Test]
     public async Task dispatches_occur_in_chronological_order_in_trace()
     {
-        // If boot executes dom-ready before wiring listeners, the chain may partially fire
-        // or fire out of order.
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 5000);
 
-        var dispatches = _consoleMessages
+        var dispatches = ConsoleMessages
             .Where(m => m.Contains("[alis:execute]") && m.Contains("dispatch"))
             .ToList();
 
         var testDispatchIndex = dispatches.FindIndex(m =>
-            m.Contains("\"event\":\"test\"") && !m.Contains("test-received"));
+            m.Contains("\"event\":\"test\"") && !m.Contains("testReceived"));
         var receivedDispatchIndex = dispatches.FindIndex(m =>
-            m.Contains("\"event\":\"test-received\""));
+            m.Contains("\"event\":\"testReceived\""));
         var finalDispatchIndex = dispatches.FindIndex(m =>
             m.Contains("\"event\":\"final\""));
 
         Assert.That(testDispatchIndex, Is.GreaterThanOrEqualTo(0), "test dispatch must be traced");
         Assert.That(receivedDispatchIndex, Is.GreaterThan(testDispatchIndex),
-            "test-received must dispatch after test");
+            "testReceived must dispatch after test");
         Assert.That(finalDispatchIndex, Is.GreaterThan(receivedDispatchIndex),
-            "final must dispatch after test-received");
+            "final must dispatch after testReceived");
     }
 
     [Test]
@@ -128,7 +124,7 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         var statusClasses = await chainStatus.GetAttributeAsync("class") ?? "";
 
         Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-            "RemoveClass('text-text-muted') must have executed on #chain-status — " +
+            "ClassList.Remove('text-text-muted') must have executed on #chain-status — " +
             "proves the 'final' event arrived AND the element update pipeline ran in order");
 
         AssertNoConsoleErrors();
@@ -146,11 +142,11 @@ public class WhenEventsChainAcrossListeners : PlaywrightTestBase
         Assert.Multiple(() =>
         {
             Assert.That(statusClasses, Does.Contain("text-green-600"),
-                "AddClass('text-green-600') must have applied — success color after full 3-hop chain");
+                "ClassList.Add('text-green-600') must have applied — success color after full 3-hop chain");
             Assert.That(statusClasses, Does.Contain("font-semibold"),
-                "AddClass('font-semibold') must have applied — emphasis after full 3-hop chain");
+                "ClassList.Add('font-semibold') must have applied — emphasis after full 3-hop chain");
             Assert.That(statusClasses, Does.Not.Contain("text-text-muted"),
-                "RemoveClass('text-text-muted') must have stripped the initial muted class — " +
+                "ClassList.Remove('text-text-muted') must have stripped the initial muted class — " +
                 "stale class would cause conflicting green+muted styles");
         });
 

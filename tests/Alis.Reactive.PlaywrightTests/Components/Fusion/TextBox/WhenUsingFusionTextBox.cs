@@ -1,20 +1,13 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.TextBox;
 
-// Journey: a care coordinator updates a resident's profile card — the preferred name the
-// resident goes by (shown to staff on the directory) and a dietary note kitchen staff read.
-// The card opens with the name on file, the coordinator edits it (live preview, then a
-// committed record showing what changed and who changed it), can pull in the legal name,
-// focus the field to edit and blur it when done, review and update the dietary note, then
-// save the profile to the resident record.
 [TestFixture]
 public class WhenUsingFusionTextBox : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/TextBox";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_TextBoxModel";
-    private const string PreferredNameId = GeneratedTypeScope + "__PreferredName";
-    private const string DietaryNoteId = GeneratedTypeScope + "__DietaryNote";
+    private static readonly string PreferredNameId = IdGenerator.For<TextBoxModel>(m => m.PreferredName);
+    private static readonly string DietaryNoteId = IdGenerator.For<TextBoxModel>(m => m.DietaryNote);
 
     private FusionTextBoxLocator PreferredName => new(Page, PreferredNameId);
     private FusionTextBoxLocator DietaryNote => new(Page, DietaryNoteId);
@@ -41,8 +34,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         await Expect(PreferredName.Input).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // RENDERS — the FusionTextBox builder renders the field bound to the name on file, and the
-    // DomReady AddAppendIcon adds the directory-search affordance inside the input.
     [Test]
     public async Task profile_opens_showing_the_name_on_file_with_a_directory_search_affordance()
     {
@@ -55,9 +46,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // INTERACTS — typing into the field fires the Input event through the .Reactive wiring; the
-    // FusionTextBoxInputArgs payload carries the new Value into the live directory preview and the
-    // PreviousValue into the "replacing the name on record" line.
     [Test]
     public async Task typing_a_new_preferred_name_updates_the_directory_preview()
     {
@@ -73,9 +61,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Committing an edit proves FusionTextBoxChangeArgs delivers Value (the saved name),
-    // PreviousValue (what it changed from), and IsInteracted=true routing the "edited by you"
-    // branch when the coordinator typed the change themselves.
     [Test]
     public async Task finishing_a_name_edit_records_the_saved_name_and_what_it_changed_from()
     {
@@ -90,9 +75,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetValue writes the legal name onto the field and the Value() source reads it back into the
-    // preview; the programmatic write fires Changed with IsInteracted=false, routing the
-    // "filled from the record" branch — the distinction from a hand-typed edit.
     [Test]
     public async Task filling_the_legal_name_records_it_as_filled_from_the_record_not_a_manual_edit()
     {
@@ -107,7 +89,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FocusIn moves focus into the name field when the coordinator chooses to edit it.
     [Test]
     public async Task starting_an_edit_focuses_the_name_field()
     {
@@ -120,7 +101,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FocusOut removes focus from the name field when the coordinator marks the edit done.
     [Test]
     public async Task marking_the_edit_done_moves_focus_off_the_name_field()
     {
@@ -136,8 +116,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // INTERACTS (dietary) — focusing the dietary field fires the Focus event; FusionTextBoxFocusArgs
-    // carries the Value already on file so the coordinator sees the existing note as they start.
     [Test]
     public async Task opening_the_dietary_field_shows_the_note_already_on_file()
     {
@@ -152,8 +130,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Leaving the dietary field fires the Blur event; FusionTextBoxBlurArgs carries the updated
-    // Value, which the card confirms as the captured note for kitchen staff.
     [Test]
     public async Task leaving_the_dietary_field_captures_the_updated_note()
     {
@@ -168,8 +144,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // The Value() source feeds the save guard: with no name, the When(...).NotEmpty() condition takes
-    // the Else branch and the coordinator is asked for a name instead of a save being attempted.
     [Test]
     public async Task saving_a_profile_without_a_name_asks_for_one_first()
     {
@@ -184,8 +158,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SUBMITS — the Value() source feeds the gather body; the server confirmation the coordinator
-    // sees reflects the saved preferred name.
     [Test]
     public async Task saving_the_profile_confirms_it_with_the_residents_name()
     {
@@ -200,8 +172,6 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // GATHERS — the framework gather pipeline carries both Value() sources into the POST body under
-    // their declared keys. (Framework gather test: asserts request.PostData.)
     [Test]
     public async Task saving_posts_the_preferred_name_and_dietary_note_to_the_server()
     {
@@ -219,9 +189,9 @@ public class WhenUsingFusionTextBox : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"preferredName\":\"Margie\""),
+        Assert.That(body, Does.Contain("\"PreferredName\":\"Margie\""),
             "the gather pipeline must carry the preferred-name Value() source under its declared key");
-        Assert.That(body, Does.Contain("\"dietaryNote\":\"Low sodium, no shellfish\""),
+        Assert.That(body, Does.Contain("\"DietaryNote\":\"Low sodium, no shellfish\""),
             "the gather pipeline must carry the dietary-note Value() source under its declared key");
 
         AssertNoConsoleErrors();

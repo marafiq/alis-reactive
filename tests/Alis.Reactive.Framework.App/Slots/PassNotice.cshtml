@@ -1,0 +1,10 @@
+@using Alis.Reactive.Framework.App.Slots
+@model PassNotice
+@{
+    // A notice of its own model beside the pass desk: its step writes the text of the slot the desk loads the pass into.
+    var plan = Html.ReactivePlan<PassNotice>();
+}
+@(plan.Button("no-pass", "No pass today")
+    .Reactive(button => button.Click, p => p.Element("pass-slot").Text.Set("No pass today.")))
+
+@Html.RenderPlan(plan)

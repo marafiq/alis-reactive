@@ -1,0 +1,72 @@
+@layer alis {
+  .alis-root {
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+    letter-spacing: -0.011em;
+  }
+
+  .alis-root input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+  .alis-root select,
+  .alis-root textarea {
+    appearance: none;
+    background-color: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: inherit;
+  }
+
+  .alis-root input:not([type="checkbox"]):not([type="radio"]):focus,
+  .alis-root select:focus,
+  .alis-root textarea:focus {
+    border-color: var(--color-primary);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 0;
+    --tw-ring-color: var(--color-primary);
+  }
+
+  .alis-root input::placeholder,
+  .alis-root textarea::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .alis-root input[type="checkbox"],
+  .alis-root input[type="radio"] {
+    color: var(--color-primary);
+    accent-color: var(--color-primary);
+  }
+
+  .alis-root input:disabled,
+  .alis-root select:disabled,
+  .alis-root textarea:disabled {
+    background-color: var(--color-surface-alt);
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .alis-root label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.375rem;
+  }
+
+  .alis-root pre { border-radius: 0.75rem; overflow-x: auto; }
+  .alis-root code { font-family: var(--font-mono); font-size: 0.8125rem; }
+  .alis-root pre code { font-size: 0.75rem; line-height: 1.7; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .alis-root *, .alis-root *::before, .alis-root *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

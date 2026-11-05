@@ -1,0 +1,31 @@
+@using Alis.Reactive.Framework.App.Validation
+@model HandoverNote
+@{
+    ViewData["Title"] = "Hand over the shift";
+    var plan = Html.ReactivePlan<HandoverNote>();
+}
+<h1>Hand over the shift</h1>
+
+<div id="handover-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Required().Label("Resident")).Entry(); }
+    @{ Html.InputField(plan, m => m.Note, o => o.Label("Note")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save-draft", "Save the draft")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Handover/Draft")
+        .Gather(g => g.Form())
+        .Validate<HandoverRules>("handover-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("handover-form")))))
+@(plan.Button("hand-over", "Hand over")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Handover")
+        .Gather(g => g.Form())
+        .Validate<HandoverRules>("handover-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("handover-form")))))
+
+@Html.RenderPlan(plan)

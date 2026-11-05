@@ -3,10 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Resident intake: emergency contacts are recorded only when the resident has them, and then
-    /// every contact needs a phone number.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/EmergencyContacts")]
     public class EmergencyContactsController : Controller
@@ -25,14 +21,26 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 
             var result = new EmergencyContactsValidator().Validate(intake);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new EmergencyContactsConfirmation(ConfirmationFor(intake)));
+        }
+
+        [HttpPost("SaveContacts")]
+        public IActionResult SaveContacts([FromBody] EmergencyContactsModel? intake)
+        {
+            if (intake == null) return BadRequest();
+
+            var contacts = intake.HasContacts ? intake.Contacts : new List<EmergencyContact>();
+            var contactValidator = new EmergencyContactValidator();
+            var errors = contacts
+                .SelectMany((contact, index) => contactValidator.Validate(contact).Errors
+                    .Select(error => (Name: $"Contacts[{index}].{error.PropertyName}", error.ErrorMessage)))
+                .GroupBy(error => error.Name)
+                .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
+            if (errors.Count > 0) return BadRequest(new { errors });
+
+            return Ok(new EmergencyContactsConfirmation($"Emergency contacts saved: {contacts.Count}."));
         }
 
         private static string ConfirmationFor(EmergencyContactsModel intake)

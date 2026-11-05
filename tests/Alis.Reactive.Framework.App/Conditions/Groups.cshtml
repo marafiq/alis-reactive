@@ -1,0 +1,60 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model TriagePage
+@{
+    ViewData["Title"] = "Groups";
+    var plan = Html.ReactivePlan<TriagePage>();
+}
+<h1>Groups</h1>
+
+<h2>Pain</h2>
+@plan.Meter("pain", level: 0, max: 5)
+<h2>Fall risk</h2>
+@plan.Meter("risk", level: 0, max: 5)
+@{ Html.InputField(plan, m => m.Ward, o => o.Label("Ward")).Entry(); }
+
+<p>Watch, when pain and fall risk are over 1 and either is 5: <span id="watch"></span></p>
+<p>Check in, when the ward is Isolation, or pain is 5, or both are over 2: <span id="check-in"></span></p>
+<p>Ease, on a ward, when pain is over 2 and fall risk is over 2 or the ward is North: <span id="ease"></span></p>
+<p>Alert, on a ward, when pain is 5, or fall risk is over 3 on North: <span id="alert"></span></p>
+<p>Calm, on a ward, when pain is not over 3: <span id="calm"></span></p>
+<p>Steady, on a ward, when pain and fall risk are over 1 and pain is under 5: <span id="steady"></span></p>
+<p>Round, on a ward, when pain and fall risk are over 1 on North or South: <span id="round"></span></p>
+<p>Flag, on a ward, when pain is 5, fall risk is 5, or the ward is Isolation: <span id="flag"></span></p>
+<p>Visit, on a ward, when pain is 5, fall risk is 5, or there is pain in Isolation: <span id="visit"></span></p>
+
+@(plan.Button("decide", "Decide")
+    .Reactive(button => button.Click, p =>
+    {
+        var pain = p.Component<Meter>("pain").Level;
+        var risk = p.Component<Meter>("risk").Level;
+        var ward = p.Component<Entry>(m => m.Ward).Value;
+        p.When(pain).Gt(1).And(risk).Gt(1).And(g => g.When(pain).Eq(5).Or(risk).Eq(5))
+            .Then(t => t.Element("watch").Text.Set("watch"))
+            .Else(e => e.Element("watch").Text.Set("no watch"));
+        p.When(ward).Eq("Isolation").Or(pain).Eq(5).Or(g => g.When(risk).Gt(2).And(pain).Gt(2))
+            .Then(t => t.Element("check-in").Text.Set("check in"))
+            .Else(e => e.Element("check-in").Text.Set("no check-in"));
+        p.When(ward).NotEmpty().And(g => g.When(pain).Gt(2).And(inner => inner.When(risk).Gt(2).Or(ward).Eq("North")))
+            .Then(t => t.Element("ease").Text.Set("ease"))
+            .Else(e => e.Element("ease").Text.Set("no ease"));
+        p.When(ward).NotEmpty().And(g => g.When(pain).Eq(5).Or(inner => inner.When(risk).Gt(3).And(ward).Eq("North")))
+            .Then(t => t.Element("alert").Text.Set("alert"))
+            .Else(e => e.Element("alert").Text.Set("no alert"));
+        p.When(ward).NotEmpty().And(g => g.When(pain).Gt(3).Not())
+            .Then(t => t.Element("calm").Text.Set("calm"))
+            .Else(e => e.Element("calm").Text.Set("not calm"));
+        p.When(ward).NotEmpty().And(g => g.When(pain).Gt(1).And(risk).Gt(1).And(pain).Lt(5))
+            .Then(t => t.Element("steady").Text.Set("steady"))
+            .Else(e => e.Element("steady").Text.Set("not steady"));
+        p.When(ward).NotEmpty().And(g => g.When(pain).Gt(1).And(risk).Gt(1).And(inner => inner.When(ward).Eq("North").Or(ward).Eq("South")))
+            .Then(t => t.Element("round").Text.Set("round"))
+            .Else(e => e.Element("round").Text.Set("no round"));
+        p.When(ward).NotEmpty().And(g => g.When(pain).Eq(5).Or(risk).Eq(5).Or(ward).Eq("Isolation"))
+            .Then(t => t.Element("flag").Text.Set("flag"))
+            .Else(e => e.Element("flag").Text.Set("no flag"));
+        p.When(ward).NotEmpty().And(g => g.When(pain).Eq(5).Or(risk).Eq(5).Or(inner => inner.When(ward).Eq("Isolation").And(pain).Gt(0)))
+            .Then(t => t.Element("visit").Text.Set("visit"))
+            .Else(e => e.Element("visit").Text.Set("no visit"));
+    }))
+
+@Html.RenderPlan(plan)

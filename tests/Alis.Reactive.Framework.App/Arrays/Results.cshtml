@@ -1,0 +1,28 @@
+@using Alis.Reactive.Framework.App.Arrays
+@model ResultsPage
+@{
+    ViewData["Title"] = "Array results";
+    var plan = Html.ReactivePlan<ResultsPage>();
+}
+<h1>Array results</h1>
+
+@plan.Roster("roster")
+@plan.Meter("meter", level: 0, max: 5)
+@plan.Slate("slate", title: "Day round", "Ada", "Ben", "Cyd")
+
+<p>The notice endpoint bound: <span id="noticed"></span></p>
+
+@(plan.Button("show-present", "Show the present residents on the roster")
+    .Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+        .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+            s.Component<Roster>("roster").Show(s.From(residents).Where(x => x.Present).OrderBy(x => x.Name).Select(x => x.Name))))))
+@(plan.Button("meter-present", "Set the meter to the number present")
+    .Reactive(button => button.Click, p => p.Get("/Arrays/Residents")
+        .Response(r => r.OnSuccess<List<Resident>>((residents, s) =>
+            s.Component<Meter>("meter").Level.Set(s.From(residents).Count(x => x.Present))))))
+@(plan.Button("notify", "Send a notice about the rows other than Ben")
+    .Reactive(button => button.Click, p => p.Post("/Arrays/Notify")
+        .Gather<Notice>(g => g.Set(x => x.Names, p.From(p.Component<Slate>("slate").Rows.Each(row => row.Label)).Where(label => label != "Ben")))
+        .Response(r => r.OnSuccess<NoticeEcho>((echo, s) => s.Element("noticed").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,20 @@
+@using Alis.Reactive.Framework.App.Partials
+@model KeyholderLine
+@{
+    // The keyholder's editor template: EditorFor renders it under the member's prefix, so its input binds as
+    // Keyholder.Name. It starts a plan of its own model, which no other view on the page starts.
+    var plan = Html.ReactivePlan<KeyholderLine>();
+}
+<section id="keyholder-line">
+    @{ Html.InputField(plan, m => m.Name, o => o.Label("Keyholder")).Entry(); }
+
+    @(plan.Button("hand-over", "Hand the keys over")
+        .Reactive(button => button.Click, p => p.Post("/Partials/HandOver")
+            .Gather(g => g.Form())
+            .Validate<KeyholderLineRules>("handover-form")
+            .Response(r => r
+                .OnSuccess<PartialsEcho>((echo, s) => s.Element("handed-over").Text.Set(echo.Get(x => x.Summary)))
+                .OnError(400, e => e.ValidationErrors("handover-form")))))
+</section>
+
+@Html.RenderPlan(plan)

@@ -1,62 +1,96 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
-using Alis.Reactive.PlanModel;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using Alis.Reactive.Grammar;
+using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 
-namespace Alis.Reactive.Builders.Arrays
+namespace Alis.Reactive.PlanAuthoring.Arrays
 {
-    /// <summary>
-    /// Compiles a captured per-element lambda into the closed plan-node algebra. A predicate
-    /// becomes a SYNC <see cref="ConditionGraph"/> (compare/all/any/not) whose leaves read the
-    /// element scope; reads rooted at the lambda parameter become element reads, everything else
-    /// is evaluated to a literal. Anything outside the supported set throws at plan render time
-    /// (when the Razor view is first requested) — keeping the captured DSL deterministic.
-    /// </summary>
     internal static class ElementExpressionCompiler
     {
-        // Pure, deterministic, side-effect-free element methods only. A per-element method call is a
-        // value projection, so it must not mutate; side-effecting methods (e.g. grid Row.setCellValue)
-        // belong in a per-element reaction (foreach), not a projection. Grow this set deliberately.
-        private static readonly HashSet<string> PureElementMethods = new HashSet<string>(StringComparer.Ordinal)
+        private static readonly IReadOnlyDictionary<MethodInfo, string> PureMethods = new Dictionary<MethodInfo, string>
         {
-            "getDay", "getMonth", "getFullYear", "getDate", "getHours", "getMinutes", "getSeconds", "getTime",
-            "toUpperCase", "toLowerCase", "trim",
-            "getAttribute", "hasAttribute",
+            [MethodOf<string>(text => text.Trim())] = "trim",
+            [MethodOf<string>(text => text.TrimStart())] = "trimStart",
+            [MethodOf<string>(text => text.TrimEnd())] = "trimEnd",
+            [MethodOf<string>(text => text.ToUpper())] = "toUpperCase",
+            [MethodOf<string>(text => text.ToUpperInvariant())] = "toUpperCase",
+            [MethodOf<string>(text => text.ToLower())] = "toLowerCase",
+            [MethodOf<string>(text => text.ToLowerInvariant())] = "toLowerCase",
         };
 
-        internal static ConditionGraph CompilePredicate(LambdaExpression predicate)
+        private static readonly IReadOnlyDictionary<MemberInfo, Func<ValueExpression, ValueExpression>> ValueMembers =
+            new Dictionary<MemberInfo, Func<ValueExpression, ValueExpression>>
+            {
+                [MemberOf<DateTime>(date => date.Year)] = date => DateCall(date, "getFullYear"),
+                [MemberOf<DateTime>(date => date.Month)] = date =>
+                    ValueExpression.Operation(Operator.Add, Shape.Number, DateCall(date, "getMonth"), ValueExpression.Literal(1)),
+                [MemberOf<DateTime>(date => date.Day)] = date => DateCall(date, "getDate"),
+                [MemberOf<DateTime>(date => date.Hour)] = date => DateCall(date, "getHours"),
+                [MemberOf<DateTime>(date => date.Minute)] = date => DateCall(date, "getMinutes"),
+                [MemberOf<DateTime>(date => date.Second)] = date => DateCall(date, "getSeconds"),
+                [MemberOf<string>(text => text.Length)] = text => ValueMemberExpression.Read(text, "length", Shape.Number),
+            };
+
+        private static readonly MemberInfo DayOfWeekMember = MemberOf<DateTime>(date => date.DayOfWeek);
+
+        private static readonly MethodInfo IsNullOrEmpty = StaticMethodOf(() => string.IsNullOrEmpty(""));
+
+        private static readonly MethodInfo IsMatch = StaticMethodOf(() => Regex.IsMatch("", ""));
+
+        private const string Tests = "String.Contains, String.StartsWith, String.EndsWith, String.IsNullOrEmpty, Enumerable.Contains and Regex.IsMatch";
+
+        private static string? PureMethodName(MethodInfo method)
+            => PureMethods.TryGetValue(method, out var name) ? name : method.GetCustomAttribute<PureMethodAttribute>()?.JavaScriptName;
+
+        private static IEnumerable<string> PureMethodNames(Type? objectType)
+            => PureMethods.Keys
+                .Concat(objectType?.GetMethods().Where(method => method.GetCustomAttribute<PureMethodAttribute>() != null) ?? Enumerable.Empty<MethodInfo>())
+                .Select(NameOf)
+                .Distinct();
+
+        private static MethodInfo MethodOf<T>(Expression<Func<T, object?>> call)
+            => ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
+
+        private static MethodInfo StaticMethodOf(Expression<Func<object?>> call)
+            => ((MethodCallExpression)Expressions.StripConvert(call.Body)).Method;
+
+        private static MemberInfo MemberOf<T>(Expression<Func<T, object?>> read)
+            => ((MemberExpression)Expressions.StripConvert(read.Body)).Member;
+
+        internal static Condition CompilePredicate(LambdaExpression predicate)
         {
             if (predicate == null) throw new ArgumentNullException(nameof(predicate));
 
-            return CompileCondition(Unwrap(predicate.Body), predicate.Parameters[0]);
+            return CompileCondition(predicate.Body, predicate.Parameters[0]);
         }
 
-        /// <summary>
-        /// Compiles a per-element value selector (<c>x =&gt; x.Balance</c>, <c>x =&gt; x</c>) to a
-        /// value expression read against the element scope. v1 supports element member reads and
-        /// the element itself; richer projections (object init, arithmetic) throw at plan render time.
-        /// </summary>
         internal static ValueExpression CompileProjection(LambdaExpression projection)
         {
             if (projection == null) throw new ArgumentNullException(nameof(projection));
 
-            return CompileValue(Unwrap(projection.Body), projection.Parameters[0]);
+            return CompileValue(projection.Body, projection.Parameters[0]);
         }
 
-        private static ConditionGraph CompileCondition(Expression body, ParameterExpression element)
+        private static Condition CompileCondition(Expression expression, ParameterExpression element)
         {
+            var body = Unconverted(expression);
+
             if (body is BinaryExpression binary)
             {
                 switch (binary.NodeType)
                 {
                     case ExpressionType.AndAlso:
-                        return ConditionGraph.All(
-                            CompileCondition(Unwrap(binary.Left), element),
-                            CompileCondition(Unwrap(binary.Right), element));
+                        return Condition.All(CompileCondition(binary.Left, element), CompileCondition(binary.Right, element));
                     case ExpressionType.OrElse:
-                        return ConditionGraph.Any(
-                            CompileCondition(Unwrap(binary.Left), element),
-                            CompileCondition(Unwrap(binary.Right), element));
+                        return Condition.Any(CompileCondition(binary.Left, element), CompileCondition(binary.Right, element));
                     case ExpressionType.Equal:
                     case ExpressionType.NotEqual:
                     case ExpressionType.GreaterThan:
@@ -68,184 +102,327 @@ namespace Alis.Reactive.Builders.Arrays
             }
 
             if (body is UnaryExpression unary && unary.NodeType == ExpressionType.Not)
-                return ConditionGraph.Not(CompileCondition(Unwrap(unary.Operand), element));
+                return Condition.Not(CompileCondition(unary.Operand, element));
 
-            if (body is MethodCallExpression call && call.Object != null && TryStringOperator(call, out var textOperator))
-            {
-                var argument = Unwrap(call.Arguments[0]);
-                if (ReferencesParameter(argument, element))
-                    throw new InvalidOperationException(
-                        "String operation arguments (Contains/StartsWith/EndsWith) must be constants or captured " +
-                        "values, not element-scope reads — the runtime text operand requires a literal. Got: " + argument);
-
-                return ConditionGraph.Compare(
-                    textOperator,
-                    ComparisonOperands.Binary(
-                        CompileValue(Unwrap(call.Object), element),
-                        CompileValue(argument, element),
-                        Shape.String));
-            }
+            if (body is MethodCallExpression call && TryTest(call, element, out var test))
+                return test;
 
             if (body.Type == typeof(bool))
-                return ConditionGraph.Compare(
-                    CompareOperator.Truthy,
-                    ComparisonOperands.Unary(CompileValue(body, element), Shape.Boolean));
+                return Condition.Unary(ValueTest.Truthy, CompileValue(body, element), Shape.Boolean);
 
             throw new InvalidOperationException(
-                "Array predicate supports comparisons (== != > >= < <=), logical (&& || !), " +
-                "string Contains/StartsWith/EndsWith, and boolean members. Unsupported node: " +
-                body.NodeType + " (" + body + ").");
+                "An array predicate is a test of the item: a comparison (== != > >= < <=), && || !, a text test " +
+                "(Contains, StartsWith, EndsWith, string.IsNullOrEmpty, Regex.IsMatch), Contains over fixed values, " +
+                "or a boolean value. Got a " + CSharpTypeName.Of(body.Type) + ": " + body);
         }
 
-        private static ConditionGraph CompileComparison(BinaryExpression binary, ParameterExpression element)
+        private static bool TryTest(MethodCallExpression call, ParameterExpression element, out Condition test)
         {
-            var left = Unwrap(binary.Left);
-            var right = Unwrap(binary.Right);
+            test = Condition.Always;
+            if (!Expressions.Reads(call, element)) return false;
 
-            // Runtime coerces BOTH operands to one Shape before comparing (sync-condition
-            // applies condition.shape to each side, then ===), so the comparison Shape must come
-            // from the typed member operand — never positionally from whichever side is written
-            // first. This mirrors ConditionSourceBuilder, which derives its single shape from the
-            // member's declared type, not from a literal. C# already forbids cross-category
-            // comparisons, so this keeps a literal-on-left predicate (e.g. 65 < x.Age) shaped by
-            // the member, not the literal.
+            if (call.Object != null && TryTextTest(call, out var textTest))
+            {
+                test = Condition.Text(textTest, CompileValue(call.Object, element), FixedText(call.Arguments[0], element), Shape.String);
+                return true;
+            }
+
+            if (call.Method == IsNullOrEmpty)
+            {
+                test = Condition.Unary(ValueTest.IsEmpty, CompileValue(call.Arguments[0], element), Shape.String);
+                return true;
+            }
+
+            if (call.Method == IsMatch)
+            {
+                test = Condition.Text(TextTest.Matches, CompileValue(call.Arguments[0], element), FixedText(call.Arguments[1], element), Shape.String);
+                return true;
+            }
+
+            if (Expressions.TryContains(call, out var source, out var candidate) && !Expressions.Reads(source, element))
+            {
+                var item = Unconverted(candidate);
+                var shape = ClrShape.Of(item.Type);
+                var values = Expressions.Evaluate(source) as IEnumerable
+                    ?? throw new InvalidOperationException("Contains needs the values to look in. Got: " + source);
+                var literals = values.Cast<object?>().Select(value => ValueExpression.LiteralFor(value, shape)).ToList();
+                test = Condition.Membership(CompileValue(item, element), literals, negated: false, shape);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static Condition CompileComparison(BinaryExpression binary, ParameterExpression element)
+        {
+            var left = Unconverted(binary.Left);
+            var right = Unconverted(binary.Right);
+
             Expression memberOperand;
-            if (ReferencesParameter(left, element)) memberOperand = left;
-            else if (ReferencesParameter(right, element)) memberOperand = right;
-            else throw new InvalidOperationException(
+            if (Expressions.Reads(left, element))
+            {
+                memberOperand = left;
+            }
+            else if (Expressions.Reads(right, element))
+            {
+                memberOperand = right;
+            }
+            else
+            {
+                throw new InvalidOperationException(
                 "Array predicate comparison must reference the element on at least one side; " +
                 "comparing two constants is a developer mistake. Got: " + binary);
+            }
 
-            var shape = Shape.FromClrType(memberOperand.Type);
+            if (!ComparisonFor(binary.NodeType).IsEquality) BrowserOrder.Require(memberOperand.Type);
 
-            return ConditionGraph.Compare(
-                CompareOperatorFor(binary.NodeType),
-                ComparisonOperands.Binary(CompileValue(left, element), CompileValue(right, element), shape));
+            if (IsDayOfWeek(left) || IsDayOfWeek(right))
+                return Condition.Ordered(ComparisonFor(binary.NodeType), DayNumber(left, element), DayNumber(right, element), Shape.Number);
+
+            var shape = ClrShape.Of(memberOperand.Type);
+
+            return Condition.Ordered(
+                ComparisonFor(binary.NodeType),
+                CompileOperand(left, element, memberOperand.Type),
+                CompileOperand(right, element, memberOperand.Type),
+                shape);
+        }
+
+        private static ValueExpression CompileOperand(Expression operand, ParameterExpression element, Type memberType)
+        {
+            var enumType = EnumMember.TypeOf(memberType);
+            if (enumType == null || Expressions.Reads(operand, element)) return CompileValue(operand, element);
+
+            var value = Expressions.Evaluate(operand);
+            var member = value == null ? null : EnumMember.Of(enumType, value);
+            return ValueExpression.LiteralFor(member, ClrShape.Of(memberType));
+        }
+
+        private static ValueExpression DayNumber(Expression operand, ParameterExpression element)
+        {
+            if (IsDayOfWeek(operand)) return DateCall(CompileValue(((MemberExpression)operand).Expression!, element), "getDay");
+            if (Expressions.Reads(operand, element)) return CompileValue(operand, element);
+
+            var day = Expressions.Evaluate(operand);
+            return day == null ? ValueExpression.Null() : ValueExpression.LiteralFor(Convert.ToInt32(day, CultureInfo.InvariantCulture), Shape.Number);
         }
 
         private static ValueExpression CompileValue(Expression expression, ParameterExpression element)
         {
-            var node = Unwrap(expression);
+            var node = Unconverted(expression);
 
-            if (TryElementPath(node, element, out var path))
+            if (!Expressions.Reads(node, element))
             {
-                var shape = Shape.FromClrType(node.Type);
-                return path.Length == 0
-                    ? ValueExpression.ReadWholeElement(shape)
-                    : ValueExpression.ReadPayload(PayloadSource.Element(), path, shape);
+                var value = Expressions.Evaluate(node);
+                return ValueExpression.LiteralFor(value, ClrShape.OfValue(value));
             }
 
-            // Per-element method call (x => x.GetDay(), x => x.Address.GetFormatted()) — the receiver must
-            // be rooted at the element and the method must be deterministic. Reuses the RuntimePath.call engine.
-            if (node is MethodCallExpression call && call.Object != null && TryElementPath(call.Object, element, out var receiverPath))
+            if (TryDataPath(node, element, out var path))
             {
-                var methodName = LowerFirstLetter(call.Method.Name);
-                if (!PureElementMethods.Contains(methodName))
-                    throw new InvalidOperationException(
-                        "Element method '" + methodName + "' is not an allowed pure array DSL method. Add it to " +
-                        "ElementExpressionCompiler.PureElementMethods only if deterministic and side-effect-free, or use a server-side " +
-                        "projection. Side-effecting per-element calls need a reaction, not a projection. Got: " + node);
-
-                var methodArgs = new List<ValueExpression>();
-                foreach (var methodArgument in call.Arguments)
-                    methodArgs.Add(CompileValue(Unwrap(methodArgument), element));
-
-                return ValueExpression.InvokeElement(receiverPath, methodName, Shape.FromClrType(node.Type), methodArgs);
+                var shape = ClrShape.Of(node.Type);
+                return ValueExpression.Get(Target.Item, path, shape);
             }
 
-            if (ReferencesParameter(node, element))
-                throw new InvalidOperationException(
-                    "Element selector must be a member access (x => x.Field, x => x.A.B) or the element " +
-                    "itself (x => x). Object-init and arithmetic projections are not supported in v1. Got: " + node);
+            switch (node)
+            {
+                case MemberExpression member when TryMember(member, element, out var read):
+                    return read;
+                case MethodCallExpression call:
+                    return CompileCall(call, element);
+                case BinaryExpression { NodeType: ExpressionType.Coalesce, Conversion: null } coalesce:
+                    return ValueExpression.Operation(
+                        Operator.Coalesce, ClrShape.Of(coalesce.Type), CompileValue(coalesce.Left, element), CompileValue(coalesce.Right, element));
+                case ConditionalExpression conditional:
+                    return ValueExpression.Operation(
+                        Operator.Cond, ClrShape.Of(conditional.Type),
+                        new HoldsExpression(CompileCondition(conditional.Test, element)),
+                        CompileValue(conditional.IfTrue, element),
+                        CompileValue(conditional.IfFalse, element));
+            }
 
-            // Parameter-free: a constant or captured value — evaluate it to a literal.
-            var value = Expression.Lambda(node).Compile().DynamicInvoke();
-            return ValueExpression.LiteralFromValue(value);
+            if (node.Type == typeof(bool) && IsTest(node.NodeType))
+                return new HoldsExpression(CompileCondition(node, element));
+
+            throw new InvalidOperationException(
+                "An array lambda reads the item (x => x), its members (x => x.Field, x => x.A.B), and the members, " +
+                "methods and operators a plan can call on a value; a computed object and arithmetic have " +
+                "no form the plan writes. Project the value on the server. Got: " + node);
         }
 
-        private static bool ReferencesParameter(Expression expression, ParameterExpression element)
+        private static bool TryDataPath(Expression node, ParameterExpression element, out Path path)
         {
-            var finder = new ParameterUsageVisitor(element);
-            finder.Visit(expression);
-            return finder.Found;
-        }
-
-        private sealed class ParameterUsageVisitor : ExpressionVisitor
-        {
-            private readonly ParameterExpression _parameter;
-
-            internal ParameterUsageVisitor(ParameterExpression parameter) => _parameter = parameter;
-
-            internal bool Found { get; private set; }
-
-            protected override Expression VisitParameter(ParameterExpression node)
+            var link = node;
+            while (link is MemberExpression { Expression: { } owner } member)
             {
-                if (node == _parameter) Found = true;
-                return base.VisitParameter(node);
-            }
-        }
+                if (Expressions.IsValueMember(member.Member))
+                {
+                    path = Path.None;
+                    return false;
+                }
 
-        private static bool TryElementPath(Expression expression, ParameterExpression element, out string path)
-        {
-            var segments = new List<string>();
-            var current = Unwrap(expression);
-            while (current is MemberExpression member && member.Expression != null)
-            {
-                segments.Insert(0, JsonMemberName.Of(member.Member.Name));
-                current = Unwrap(member.Expression);
+                link = Expressions.StripConvert(owner);
             }
 
-            if (current == element)
+            return ExpressionPathHelper.TryJsonPath(node, element, out path);
+        }
+
+        private static bool TryMember(MemberExpression member, ParameterExpression element, out ValueExpression read)
+        {
+            read = null!;
+            if (!Expressions.IsValueMember(member.Member)) return false;
+
+            var owner = member.Expression!;
+            if (Nullable.GetUnderlyingType(owner.Type) != null)
             {
-                path = string.Join(".", segments);
+                if (member.Member.Name == nameof(Nullable<int>.Value))
+                {
+                    read = CompileValue(owner, element);
+                    return true;
+                }
+
+                if (member.Member.Name == nameof(Nullable<int>.HasValue))
+                {
+                    read = new HoldsExpression(Condition.Unary(ValueTest.NotNull, CompileValue(owner, element), ClrShape.Of(owner.Type)));
+                    return true;
+                }
+            }
+
+            if (ValueMembers.TryGetValue(member.Member, out var javaScriptForm))
+            {
+                read = javaScriptForm(CompileValue(owner, element));
                 return true;
             }
 
-            path = string.Empty;
-            return false;
+            if (IsDayOfWeek(member))
+            {
+                throw new InvalidOperationException(
+                    "'DateTime.DayOfWeek' is read in the browser as getDay(), the day's number, so a lambda reads it only " +
+                    "to compare it with a DayOfWeek (x => x.Admitted.DayOfWeek == DayOfWeek.Saturday). Project it on " +
+                    "the server. Got: " + member);
+            }
+
+            throw new InvalidOperationException(
+                $"'{NameOf(member.Member)}' is a member of a value .NET defines that has no JavaScript form; a lambda may read " +
+                string.Join(", ", ValueMembers.Keys.Select(NameOf)) +
+                ", DateTime.DayOfWeek (compared with a DayOfWeek), Nullable.Value and Nullable.HasValue. " +
+                "Project the value on the server. Got: " + member);
         }
 
-        private static CompareOperator CompareOperatorFor(ExpressionType nodeType) =>
-            nodeType switch
+        private static ValueExpression CompileCall(MethodCallExpression call, ParameterExpression element)
+        {
+            if (call.Object != null && PureMethodName(call.Method) is string methodName)
             {
-                ExpressionType.Equal => CompareOperator.Eq,
-                ExpressionType.NotEqual => CompareOperator.Neq,
-                ExpressionType.GreaterThan => CompareOperator.Gt,
-                ExpressionType.GreaterThanOrEqual => CompareOperator.Gte,
-                ExpressionType.LessThan => CompareOperator.Lt,
-                ExpressionType.LessThanOrEqual => CompareOperator.Lte,
+                var methodArgs = call.Arguments.Select(argument => CompileValue(argument, element)).ToList();
+                return ValueMemberExpression.Call(CompileValue(call.Object, element), methodName, methodArgs, ClrShape.Of(call.Type));
+            }
+
+            if (TryTest(call, element, out var test))
+                return new HoldsExpression(test);
+
+            throw new InvalidOperationException(
+                $"'{NameOf(call.Method)}' has no pure JavaScript form the plan can call on an item; " +
+                "the lambda may call " + string.Join(", ", PureMethodNames(call.Object?.Type)) +
+                ", and test with " + Tests + ". Project the value on the server, or write a reaction for a call that " +
+                "changes the item. Got: " + call);
+        }
+
+        private static Expression Unconverted(Expression expression)
+        {
+            var node = expression;
+            while (node is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } conversion)
+            {
+                if (Narrows(conversion.Operand.Type, conversion.Type))
+                {
+                    throw new InvalidOperationException(
+                        $"A cast from {CSharpTypeName.Of(conversion.Operand.Type)} to {CSharpTypeName.Of(conversion.Type)} changes the value as C# computes it " +
+                        "(a whole number drops the fraction, a narrower number wraps), and a browser's number does not. " +
+                        "Project the value on the server. Got: " + expression);
+                }
+
+                node = conversion.Operand;
+            }
+
+            return node;
+        }
+
+        private static bool Narrows(Type from, Type to)
+        {
+            var source = Nullable.GetUnderlyingType(from) ?? from;
+            var target = Nullable.GetUnderlyingType(to) ?? to;
+            if (!WholeNumbers.TryGetValue(target, out var whole)) return false;
+            if (source == typeof(double) || source == typeof(float) || source == typeof(decimal)) return true;
+            if (!WholeNumbers.TryGetValue(source, out var cast)) return false;
+
+            var holdsEvery = cast.Signed == whole.Signed ? whole.Bytes >= cast.Bytes : !cast.Signed && whole.Bytes > cast.Bytes;
+            return !holdsEvery;
+        }
+
+        private static readonly IReadOnlyDictionary<Type, (int Bytes, bool Signed)> WholeNumbers = new Dictionary<Type, (int, bool)>
+        {
+            [typeof(sbyte)] = (1, true),
+            [typeof(byte)] = (1, false),
+            [typeof(short)] = (2, true),
+            [typeof(ushort)] = (2, false),
+            [typeof(int)] = (4, true),
+            [typeof(uint)] = (4, false),
+            [typeof(long)] = (8, true),
+            [typeof(ulong)] = (8, false),
+        };
+
+        private static bool IsDayOfWeek(Expression expression)
+            => expression is MemberExpression member && member.Member.Equals(DayOfWeekMember);
+
+        private static bool IsTest(ExpressionType nodeType)
+            => nodeType is ExpressionType.AndAlso or ExpressionType.OrElse or ExpressionType.Not
+                or ExpressionType.Equal or ExpressionType.NotEqual
+                or ExpressionType.GreaterThan or ExpressionType.GreaterThanOrEqual
+                or ExpressionType.LessThan or ExpressionType.LessThanOrEqual;
+
+        private static ValueExpression DateCall(ValueExpression date, string method)
+            => ValueMemberExpression.Call(date, method, Array.Empty<ValueExpression>(), Shape.Number);
+
+        private static string NameOf(MemberInfo member) => CSharpTypeName.Of(member.DeclaringType!) + "." + member.Name;
+
+        private static Comparison ComparisonFor(ExpressionType nodeType)
+            => nodeType switch
+            {
+                ExpressionType.Equal => Comparison.Equal,
+                ExpressionType.NotEqual => Comparison.NotEqual,
+                ExpressionType.GreaterThan => Comparison.GreaterThan,
+                ExpressionType.GreaterThanOrEqual => Comparison.GreaterThanOrEqual,
+                ExpressionType.LessThan => Comparison.LessThan,
+                ExpressionType.LessThanOrEqual => Comparison.LessThanOrEqual,
                 _ => throw new InvalidOperationException("Unsupported comparison node: " + nodeType),
             };
 
-        private static bool TryStringOperator(MethodCallExpression call, out CompareOperator op)
+        private static bool TryTextTest(MethodCallExpression call, out TextTest test)
         {
             if (call.Object?.Type == typeof(string) && call.Arguments.Count == 1)
             {
                 switch (call.Method.Name)
                 {
-                    case "Contains": op = CompareOperator.Contains; return true;
-                    case "StartsWith": op = CompareOperator.StartsWith; return true;
-                    case "EndsWith": op = CompareOperator.EndsWith; return true;
+                    case "Contains": test = TextTest.Contains; return true;
+                    case "StartsWith": test = TextTest.StartsWith; return true;
+                    case "EndsWith": test = TextTest.EndsWith; return true;
                 }
             }
 
-            op = CompareOperator.Eq;
+            test = TextTest.Contains;
             return false;
         }
 
-        private static Expression Unwrap(Expression expression)
+        private static string FixedText(Expression expression, ParameterExpression element)
         {
-            while (expression is UnaryExpression unary &&
-                   (unary.NodeType == ExpressionType.Convert || unary.NodeType == ExpressionType.ConvertChecked))
+            var argument = Unconverted(expression);
+            if (Expressions.Reads(argument, element))
             {
-                expression = unary.Operand;
+                throw new InvalidOperationException(
+                    "A text test's text (Contains, StartsWith, EndsWith, Regex.IsMatch's pattern) must be a constant or a " +
+                    "captured value, not a read of the item: the plan writes it as a literal. Got: " + argument);
             }
 
-            return expression;
+            return Expressions.Evaluate(argument) as string
+                ?? throw new InvalidOperationException("String operation arguments must be text. Got: " + argument);
         }
-
-        // Element methods are JavaScript methods, named by their first letter lowered.
-        private static string LowerFirstLetter(string name) =>
-            string.IsNullOrEmpty(name) ? name : char.ToLowerInvariant(name[0]) + name.Substring(1);
     }
 }

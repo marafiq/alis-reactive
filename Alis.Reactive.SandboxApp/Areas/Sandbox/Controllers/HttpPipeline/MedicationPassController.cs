@@ -3,11 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Medication pass: the nurse ticks each resident whose dose was given and records the pass
-    /// as JSON. Doses are keyed by resident id, so the confirmation lists the residents the
-    /// server received as given, and a dose lost between the page and the server shows up.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/MedicationPass")]
     public class MedicationPassController : Controller
@@ -31,8 +26,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         {
             if (pass == null) return BadRequest();
 
-            return Ok(new MedicationPassConfirmation(ConfirmationFor(pass)));
+            return Ok(new MedicationPassConfirmation(ConfirmationFor(pass), "Next pass at 8:00 PM."));
         }
+
+        [HttpGet("Refills")]
+        public IActionResult Refills() => Ok(new RefillOrder("Refills ordered from Maple Pharmacy."));
 
         private static string ConfirmationFor(MedicationPassModel pass)
         {

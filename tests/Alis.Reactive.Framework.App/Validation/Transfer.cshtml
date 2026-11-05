@@ -1,0 +1,30 @@
+@using Alis.Reactive.Framework.App.Validation
+@model WardTransfer
+@{
+    ViewData["Title"] = "A transfer the bed book decides";
+    var plan = Html.ReactivePlan<WardTransfer>();
+}
+<h1>A transfer the bed book decides</h1>
+
+<div id="transfer-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    @{ Html.InputField(plan, m => m.Ward, o => o.Label("Ward")).Entry(); }
+    @{ Html.InputField(plan, m => m.ApprovedBy, o => o.Label("Approved by")).Entry(); }
+    @{ Html.InputField(plan, m => m.EscortedBy, o => o.Label("Escorted by")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Transfer")
+        .Gather(g => g.Form())
+        .Validate<TransferRules>("transfer-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("transfer-form")))))
+@(plan.Button("save-without-waiting", "Save without waiting")
+    .Reactive(button => button.Click, p => p.Post("/Validation/TransferWithoutWaiting")
+        .Gather(g => g.Form("transfer-form"))
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

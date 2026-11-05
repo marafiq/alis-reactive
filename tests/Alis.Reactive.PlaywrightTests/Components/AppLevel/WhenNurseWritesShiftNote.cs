@@ -3,10 +3,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
-/// <summary>
-/// As a nurse, I want to write a resident's shift note in their drawer and back out of a discharge
-/// with Escape, so that the drawer, and the note I was writing in it, are still there to finish.
-/// </summary>
 [TestFixture]
 public class WhenNurseWritesShiftNote : PlaywrightTestBase
 {
@@ -20,8 +16,6 @@ public class WhenNurseWritesShiftNote : PlaywrightTestBase
     private ILocator DischargeResident => Page.Locator("#discharge-resident-btn");
     private ILocator ShiftNoteStatus => Page.Locator("#shift-note-status");
 
-    // The drawer drops this class the moment it starts closing, while its slide-out keeps it
-    // painted for a moment, so whether it is open is read from the class rather than from paint.
     private static readonly Regex DrawerOpen = new("alis-drawer--visible");
 
     private const string ShiftNoteText = "Refused breakfast; ate a full lunch.";

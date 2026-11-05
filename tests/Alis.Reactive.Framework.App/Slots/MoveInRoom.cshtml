@@ -1,0 +1,11 @@
+@using Alis.Reactive.Framework.App.Slots
+@model MoveInRoom
+@{
+    var plan = Html.ReactivePlan<MoveInRoom>();
+}
+<section id="room-step">
+    <h2>The room</h2>
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+</section>
+
+@Html.RenderPlan(plan)

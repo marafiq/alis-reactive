@@ -1,14 +1,14 @@
+using System.Globalization;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Shift cards: today's floor schedule, where each shift's card loads its handover from the server.
-    /// Schedule rebuilds the card each time it opens, so the charge nurse opens and closes cards all shift.
-    /// </summary>
     public partial class ScheduleController
     {
+        private const string SignOffsKeyPrefix = "shift-card-signoffs:";
+
         private static readonly IReadOnlyList<(int Id, string Subject, int StartHour, int EndHour)> TodaysShifts =
         [
             (1, "Morning medication pass", 9, 11),
@@ -16,8 +16,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         ];
 
         [HttpGet("ShiftCard")]
-        public IActionResult ShiftCard() =>
-            View("~/Areas/Sandbox/Views/Components/Fusion/Schedule/ShiftCard.cshtml", new ShiftCardPageModel());
+        public IActionResult ShiftCard()
+            => View("~/Areas/Sandbox/Views/Components/Fusion/Schedule/ShiftCard.cshtml", new ShiftCardPageModel());
 
         [HttpGet("ShiftCard/Shifts")]
         public IActionResult ShiftCardShifts()
@@ -31,11 +31,30 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         }
 
         [HttpGet("ShiftCard/Details")]
-        public IActionResult ShiftCardDetails(int shiftId)
+        public IActionResult ShiftCardDetails(int shiftId, int revision = 1)
         {
-            var shift = TodaysShifts.Single(candidate => candidate.Id == shiftId);
+            var shift = TodaysShifts.FirstOrDefault(candidate => candidate.Id == shiftId);
+            if (shift.Id == 0) return NotFound();
+
             return PartialView("~/Areas/Sandbox/Views/Components/Fusion/Schedule/_ShiftCardPartial.cshtml",
-                new ShiftCardModel { ShiftId = shift.Id, Subject = shift.Subject });
+                new ShiftCardModel { ShiftId = shift.Id, Subject = shift.Subject, Revision = revision });
+        }
+
+        [HttpPost("ShiftCard/SignOff")]
+        public IActionResult ShiftCardSignOff(int shiftId, int revision)
+        {
+            var shift = TodaysShifts.FirstOrDefault(candidate => candidate.Id == shiftId);
+            if (shift.Id == 0) return NotFound();
+
+            var key = SignOffsKeyPrefix + shiftId.ToString(CultureInfo.InvariantCulture);
+            var signedOff = (HttpContext.Session.GetString(key) ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Append(revision.ToString(CultureInfo.InvariantCulture))
+                .ToList();
+            HttpContext.Session.SetString(key, string.Join(",", signedOff));
+
+            var revisions = signedOff.Count == 1 ? $"revision {signedOff[0]}" : $"revisions {string.Join(" and ", signedOff)}";
+            return Ok(new ShiftCardSignOffs($"{shift.Subject} handover signed off: {revisions}."));
         }
     }
 }

@@ -1,0 +1,22 @@
+@using Alis.Reactive.Framework.App.Plugins
+@model LedgerPage
+@{
+    ViewData["Title"] = "A plugin no script registered";
+    var plan = Html.ReactivePlan<LedgerPage>();
+    var ledger = plan.RegisterPlugin<Ledger>();
+}
+<h1>A plugin no script registered</h1>
+
+<p>Adding tried: <span id="add-tried"></span> · added: <span id="added"></span> · greeting: <span id="greeting"></span></p>
+
+@(plan.Button("add-to-ledger", "Add to the ledger")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("add-tried").Text.Set("tried");
+        ledger.Add(1);
+        p.Element("added").Text.Set("added");
+    }))
+@(plan.Button("greet", "Say hello")
+    .Reactive(button => button.Click, p => p.Element("greeting").Text.Set("hello")))
+
+@Html.RenderPlan(plan)

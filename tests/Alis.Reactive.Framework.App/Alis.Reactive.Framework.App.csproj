@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj" />
+        <ProjectReference Include="..\..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
+    </ItemGroup>
+
+    <Import Project="..\..\Alis.Reactive.DesignSystem\build\AlisReactive.DesignSystem.targets" />
+
+    <ItemGroup>
+        <BrowserAssetInput Include="Components\**\*.*;components.ts;Plugins\Bundles\**\*.*;esbuild.config.mjs;tsconfig.json;package.json;Styles\**\*.*" />
+        <BrowserAssetOutput Include="wwwroot\js\framework-components.js;wwwroot\css\framework.css" />
+    </ItemGroup>
+
+    <Target Name="BuildBrowserAssets" BeforeTargets="Build" Condition="'$(BuildReactiveBrowserAssets)' != 'false'"
+            Inputs="@(BrowserAssetInput)" Outputs="@(BrowserAssetOutput)">
+        <Exec WorkingDirectory="$(MSBuildProjectDirectory)\..\.." Command="npm run build -w tests/Alis.Reactive.Framework.App" />
+        <Touch Files="@(BrowserAssetOutput)" />
+    </Target>
+
+</Project>

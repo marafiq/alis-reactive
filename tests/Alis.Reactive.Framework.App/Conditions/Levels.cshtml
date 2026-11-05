@@ -1,0 +1,54 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model LevelsPage
+@{
+    ViewData["Title"] = "Pain score";
+    var plan = Html.ReactivePlan<LevelsPage>();
+}
+<h1>Pain score</h1>
+
+@plan.Meter("pain", level: 3, max: 5)
+
+<p>Above 3: <span id="above"></span></p>
+<p>At least 3: <span id="at-least"></span></p>
+<p>Below 3: <span id="below"></span></p>
+<p>At most 3: <span id="at-most"></span></p>
+<p>Exactly 3: <span id="exactly"></span></p>
+<p>Other than 3: <span id="other-than"></span></p>
+<p>From 2 to 4: <span id="within"></span></p>
+<p>Any pain: <span id="in-pain"></span></p>
+<p>No pain: <span id="pain-free"></span></p>
+
+@(plan.Button("assess", "Assess")
+    .Reactive(button => button.Click, p =>
+    {
+        var pain = p.Component<Meter>("pain").Level;
+        p.When(pain).Gt(3)
+            .Then(t => t.Element("above").Text.Set("above 3"))
+            .Else(e => e.Element("above").Text.Set("not above 3"));
+        p.When(pain).Gte(3)
+            .Then(t => t.Element("at-least").Text.Set("3 or more"))
+            .Else(e => e.Element("at-least").Text.Set("less than 3"));
+        p.When(pain).Lt(3)
+            .Then(t => t.Element("below").Text.Set("below 3"))
+            .Else(e => e.Element("below").Text.Set("not below 3"));
+        p.When(pain).Lte(3)
+            .Then(t => t.Element("at-most").Text.Set("3 or less"))
+            .Else(e => e.Element("at-most").Text.Set("more than 3"));
+        p.When(pain).Eq(3)
+            .Then(t => t.Element("exactly").Text.Set("exactly 3"))
+            .Else(e => e.Element("exactly").Text.Set("not 3"));
+        p.When(pain).NotEq(3)
+            .Then(t => t.Element("other-than").Text.Set("other than 3"))
+            .Else(e => e.Element("other-than").Text.Set("3 itself"));
+        p.When(pain).Between(2, 4)
+            .Then(t => t.Element("within").Text.Set("within 2 to 4"))
+            .Else(e => e.Element("within").Text.Set("outside 2 to 4"));
+        p.When(pain).Truthy()
+            .Then(t => t.Element("in-pain").Text.Set("in pain"))
+            .Else(e => e.Element("in-pain").Text.Set("no pain"));
+        p.When(pain).Falsy()
+            .Then(t => t.Element("pain-free").Text.Set("pain-free"))
+            .Else(e => e.Element("pain-free").Text.Set("not pain-free"));
+    }))
+
+@Html.RenderPlan(plan)

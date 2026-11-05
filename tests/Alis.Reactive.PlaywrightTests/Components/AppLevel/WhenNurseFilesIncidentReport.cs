@@ -4,15 +4,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
-/// <summary>
-/// As a nurse, I want a report I filed from the drawer to be filed even if I close the drawer while
-/// it is still filing, so that I can move on and file the next report without reloading the page.
-/// </summary>
-/// <remarks>
-/// Each filing request is held at the browser until the test releases it, then sent on unchanged to
-/// the real server. What the page shows while a report is filing is then checked before the answer
-/// can arrive, however fast the server is.
-/// </remarks>
 [TestFixture]
 public class WhenNurseFilesIncidentReport : PlaywrightTestBase
 {
@@ -32,8 +23,6 @@ public class WhenNurseFilesIncidentReport : PlaywrightTestBase
     private ILocator Loader => Page.Locator("#alis-loader");
     private ILocator LoaderOverForm => Form.Locator("#alis-loader");
 
-    // The drawer drops this class the moment it starts closing, while its slide-out keeps it
-    // painted for a moment, so whether it is open is read from the class rather than from paint.
     private static readonly Regex DrawerOpen = new("alis-drawer--visible");
 
     private async Task NavigateAndBoot()
@@ -62,7 +51,6 @@ public class WhenNurseFilesIncidentReport : PlaywrightTestBase
         await Summary.FillAsync(summary);
     }
 
-    // The drawer lets go of the form once its slide-out ends; until then the loader is still inside it.
     private async Task CloseTheDrawer()
     {
         await Page.Keyboard.PressAsync("Escape");
@@ -70,7 +58,6 @@ public class WhenNurseFilesIncidentReport : PlaywrightTestBase
         await Expect(Form).Not.ToBeAttachedAsync();
     }
 
-    // A loader taken off the page also counts as hidden, so it must be attached as well.
     private async Task ExpectTheLoaderOnThePageAndHidden()
     {
         await Expect(Loader).ToBeAttachedAsync();

@@ -1,5 +1,5 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.CareLevelCascade;
 using Microsoft.AspNetCore.Mvc;
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions;
 
@@ -9,15 +9,9 @@ public class CareLevelCascadeController : Controller
 {
     [HttpGet("")]
     public IActionResult Index()
-    {
-        ViewBag.CareLevels = new List<string>
+        => View("~/Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml", new CareLevelModel
         {
-            "Independent", "Assisted Living", "Memory Care", "Skilled Nursing"
-        };
-        ViewBag.Protocols = new List<string>
-        {
-            "", "Basic Support", "Enhanced Monitoring", "Full Clinical"
-        };
-        return View("~/Areas/Sandbox/Views/Conditions/CareLevelCascade/Index.cshtml", new CareLevelModel());
-    }
+            CareLevel = "Assisted Living",
+            Protocol = "Basic Support",
+        });
 }

@@ -1,9 +1,8 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.AdmissionAssessment;
 
-public class VerifyVeteranRequest
+public sealed class PhysicianSearchQuery
 {
-    public string VaId { get; set; } = "";
-    public string ServiceBranch { get; set; } = "";
+    public string Q { get; set; } = "";
 }
 
 public class AlertElopementRequest

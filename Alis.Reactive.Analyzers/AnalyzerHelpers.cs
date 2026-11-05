@@ -10,14 +10,22 @@ namespace Alis.Reactive.Analyzers
         internal static readonly ImmutableHashSet<string> HttpMethodNames =
             ImmutableHashSet.Create("Get", "Post", "Put", "Delete");
 
-        /// <summary>Identifies Razor-generated files that view-only analyzers should inspect.</summary>
+        internal static readonly ImmutableHashSet<string> ShippedAssemblies =
+            ImmutableHashSet.Create(
+                StringComparer.Ordinal,
+                "Alis.Reactive",
+                "Alis.Reactive.Fusion",
+                "Alis.Reactive.Native",
+                "Alis.Reactive.NativeTagHelpers");
+
         internal static bool IsRazorGeneratedFile(SyntaxTree tree)
         {
             var path = tree.FilePath;
             if (string.IsNullOrEmpty(path)) return false;
 
             return path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase)
-                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
+                || path.EndsWith(".cshtml.g.cs", StringComparison.OrdinalIgnoreCase)
+                || path.EndsWith("_cshtml.g.cs", StringComparison.OrdinalIgnoreCase);
         }
 
         internal static ClassDeclarationSyntax? FindContainingClass(SyntaxNode node)
@@ -32,7 +40,6 @@ namespace Alis.Reactive.Analyzers
             return null;
         }
 
-        /// <summary>Checks direct or indirect <c>ReactiveValidator&lt;T&gt;</c> inheritance.</summary>
         internal static bool InheritsFromReactiveValidator(
             ClassDeclarationSyntax classDecl,
             SemanticModel semanticModel,
@@ -48,14 +55,16 @@ namespace Alis.Reactive.Analyzers
                 if (baseType.IsGenericType
                     && SymbolEqualityComparer.Default.Equals(
                         baseType.ConstructedFrom, reactiveValidatorType))
+                {
                     return true;
+                }
+
                 baseType = baseType.BaseType;
             }
 
             return false;
         }
 
-        /// <summary>Matches a closed generic type against its unbound generic definition.</summary>
         internal static bool IsClosedGenericOf(ITypeSymbol? type, INamedTypeSymbol? openGenericType)
         {
             if (openGenericType == null) return false;
@@ -64,13 +73,15 @@ namespace Alis.Reactive.Analyzers
             return SymbolEqualityComparer.Default.Equals(named.ConstructedFrom, openGenericType);
         }
 
-        /// <summary>Finds the previous invocation in a fluent method chain.</summary>
         internal static InvocationExpressionSyntax? GetReceiverInvocation(
             InvocationExpressionSyntax invocation)
         {
             if (invocation.Expression is MemberAccessExpressionSyntax memberAccess
                 && memberAccess.Expression is InvocationExpressionSyntax receiver)
+            {
                 return receiver;
+            }
+
             return null;
         }
     }

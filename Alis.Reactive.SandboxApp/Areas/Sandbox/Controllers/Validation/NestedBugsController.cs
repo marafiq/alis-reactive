@@ -8,18 +8,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
     public class NestedBugsController : Controller
     {
         [HttpGet("NestedCondition")]
-        public IActionResult NestedCondition() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/NestedCondition.cshtml",
+        public IActionResult NestedCondition()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/NestedCondition.cshtml",
                 new NestedAddressModel());
 
         [HttpGet("ParentChild")]
-        public IActionResult ParentChild() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/ParentChild.cshtml",
+        public IActionResult ParentChild()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/ParentChild.cshtml",
                 new ParentChildModel());
 
         [HttpGet("IncludeConditional")]
-        public IActionResult IncludeConditional() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/IncludeConditional.cshtml",
+        public IActionResult IncludeConditional()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/IncludeConditional.cshtml",
                 new IncludeModel());
 
         [HttpPost("SubmitNestedAddress")]
@@ -28,8 +28,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { Name = new[] { "Request body required." } } });
             var result = new NestedAddressParentValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
 
@@ -39,8 +38,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { ParentFlag = new[] { "Request body required." } } });
             var result = new ParentChildBugValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
 
@@ -50,14 +48,13 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { IsEmployed = new[] { "Request body required." } } });
             var result = new IncludeBugValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
 
         [HttpGet("OperatorConditions")]
-        public IActionResult OperatorConditions() =>
-            View("~/Areas/Sandbox/Views/Validation/NestedBugs/OperatorConditions.cshtml",
+        public IActionResult OperatorConditions()
+            => View("~/Areas/Sandbox/Views/Validation/NestedBugs/OperatorConditions.cshtml",
                 new OperatorConditionModel());
 
         [HttpPost("SubmitOperatorConditions")]
@@ -66,8 +63,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             if (model == null) return BadRequest(new { errors = new { Age = new[] { "Request body required." } } });
             var result = new OperatorConditionValidator().Validate(model);
             if (!result.IsValid)
-                return BadRequest(new { errors = result.Errors.GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray()) });
+                return BadRequest(new { errors = result.ErrorsByField });
             return Ok(new { message = "Saved" });
         }
     }

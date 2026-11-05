@@ -1,0 +1,18 @@
+@using Alis.Reactive.Framework.App.Inputs
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model CirclePage
+@{
+    ViewData["Title"] = "A resident's circle";
+
+    // One card for each item of the list, under the prefix MVC gives a list item: Members[0], Members[1].
+    var first = new ViewDataDictionary(ViewData) { { "Heading", "First member" }, { "Slug", "first" } };
+    first.TemplateInfo.HtmlFieldPrefix = "Members[0]";
+    var second = new ViewDataDictionary(ViewData) { { "Heading", "Second member" }, { "Slug", "second" } };
+    second.TemplateInfo.HtmlFieldPrefix = "Members[1]";
+}
+<h1>A resident's circle</h1>
+
+@await Html.PartialAsync("CircleCard", new ContactCard(), first)
+@await Html.PartialAsync("CircleCard", new ContactCard(), second)
+
+<p>The endpoint bound: <span id="circle-bound"></span></p>

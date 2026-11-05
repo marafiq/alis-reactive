@@ -1,18 +1,13 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.NumericTextBox;
 
-// Journey: a care coordinator sets a resident's Monthly Service Plan — how many catered
-// meals and wellness check-ins the resident receives each week. The plan carries over from
-// last month; the coordinator adjusts meals with steppers and plan templates, gets guidance
-// on wellness check-ins, then saves the plan.
 [TestFixture]
 public class WhenNumericValueEntered : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NumericTextBox";
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NumericTextBoxModel";
-    private const string MealsId = GeneratedTypeScope + "__MealsPerWeek";
-    private const string WellnessId = GeneratedTypeScope + "__WellnessChecksPerWeek";
+    private static readonly string MealsId = IdGenerator.For<NumericTextBoxModel>(m => m.MealsPerWeek);
+    private static readonly string WellnessId = IdGenerator.For<NumericTextBoxModel>(m => m.WellnessChecksPerWeek);
 
     private NumericTextBoxLocator Meals => new(Page, MealsId);
     private NumericTextBoxLocator Wellness => new(Page, WellnessId);
@@ -38,8 +33,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         await Expect(Meals.Input).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // RENDERS — the FusionNumericTextBox builder renders both fields bound to the plan carried
-    // over from last month: 7 meals and 2 wellness check-ins.
     [Test]
     public async Task plan_opens_showing_the_meals_carried_over_from_last_month()
     {
@@ -52,8 +45,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // INTERACTS — typing a new meal count fires Changed through the .Reactive wiring; the
-    // FusionNumericTextBoxChangeArgs.Value carries the new number into the visible summary.
     [Test]
     public async Task entering_a_new_meal_count_updates_what_the_resident_receives()
     {
@@ -67,8 +58,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FusionNumericTextBoxChangeArgs.PreviousValue carries the value before the change: lowering
-    // 7 to 5 records the prior 7.
     [Test]
     public async Task lowering_the_meal_count_records_what_it_changed_from()
     {
@@ -82,8 +71,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FusionNumericTextBoxChangeArgs.IsInteracted is true when the coordinator types the value
-    // themselves; the source line reads as an entered number.
     [Test]
     public async Task a_meal_count_the_coordinator_typed_is_marked_as_entered()
     {
@@ -96,8 +83,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // IsInteracted is false when a plan template writes the value through SetValue; the same source
-    // line reads as applied-from-template, distinguishing it from a typed entry.
     [Test]
     public async Task a_meal_count_applied_from_a_template_is_marked_as_applied()
     {
@@ -110,7 +95,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Increment raises the meal count by one step; the summary follows.
     [Test]
     public async Task adding_a_meal_raises_the_weekly_meal_count_by_one()
     {
@@ -124,7 +108,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Decrement lowers the meal count by one step; the summary follows.
     [Test]
     public async Task removing_a_meal_lowers_the_weekly_meal_count_by_one()
     {
@@ -138,7 +121,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetValue writes the standard plan's meal count (14) onto the field.
     [Test]
     public async Task applying_the_standard_plan_sets_meals_to_fourteen()
     {
@@ -152,8 +134,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetMin lowers the field's minimum so a reduced-diet plan can go below the standard floor of 4.
-    // Before: entering 3 clamps up to the minimum of 4. After SetMin(2): entering 3 sticks at 3.
     [Test]
     public async Task allowing_a_reduced_diet_lets_the_meal_count_drop_below_the_standard_floor()
     {
@@ -174,7 +154,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Focus fires when the wellness field gains focus, showing nurse-visit guidance.
     [Test]
     public async Task selecting_the_wellness_field_shows_guidance_on_check_ins()
     {
@@ -190,7 +169,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Blur fires when the wellness field loses focus, tidying the guidance to a saved-state note.
     [Test]
     public async Task leaving_the_wellness_field_tidies_the_guidance()
     {
@@ -207,8 +185,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FocusIn moves focus into the wellness field, which fires Focus and shows the guidance —
-    // proving FocusIn placed the cursor there without the coordinator clicking the field.
     [Test]
     public async Task start_entering_wellness_moves_the_cursor_into_the_field()
     {
@@ -225,8 +201,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // FocusOut removes focus from the wellness field, which fires Blur and tidies the guidance —
-    // proving FocusOut took the cursor out without the coordinator tabbing away.
     [Test]
     public async Task done_with_wellness_moves_the_cursor_out_of_the_field()
     {
@@ -243,8 +217,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SUBMITS — the Value() source feeds the gather body; the server confirmation the coordinator
-    // sees reflects the saved meal count.
     [Test]
     public async Task saving_the_plan_confirms_the_meal_count_to_the_coordinator()
     {
@@ -260,8 +232,6 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // GATHERS — the framework gather pipeline carries the meals Value() source into the POST body
-    // under the declared key. (Framework gather test: asserts request.PostData.)
     [Test]
     public async Task saving_the_plan_posts_the_meal_count_to_the_server()
     {
@@ -278,7 +248,7 @@ public class WhenNumericValueEntered : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"mealsPerWeek\":12"),
+        Assert.That(body, Does.Contain("\"MealsPerWeek\":12"),
             "the gather pipeline must carry the meals Value() source under its declared key");
 
         AssertNoConsoleErrors();

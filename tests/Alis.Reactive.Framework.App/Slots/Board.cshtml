@@ -1,0 +1,13 @@
+@using Alis.Reactive.Framework.App.Slots
+@model HallBoard
+@{
+    var plan = Html.ReactivePlan<HallBoard>();
+}
+<section id="board">
+    <h2>The notice board</h2>
+    <div id="note-slot"></div>
+</section>
+
+@{ Html.On(plan, t => t.CustomEvent(HallEvents.Rang, (rang, p) => p.Element("board-heard").Text.Set(rang.Get(x => x.Times)))); }
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,38 @@
+@using Alis.Reactive.Framework.App.Slots
+@model DeskPage
+@{
+    ViewData["Title"] = "The front desk";
+    var plan = Html.ReactivePlan<DeskPage>();
+}
+<h1>The front desk</h1>
+
+@(plan.Bell("bell")
+    .Reactive(bell => bell.OnRung, (ring, p) =>
+    {
+        p.Element("page-heard").Text.Set(ring.Times);
+        p.Dispatch(DeskEvents.Rang, rang => rang.Set(x => x.Times, ring.Times));
+    }))
+
+<p>The page heard ring: <span id="page-heard"></span></p>
+<p>The card heard ring: <span id="card-heard"></span></p>
+<p>Write attempted at ring: <span id="write-tried"></span> · finished at ring: <span id="write-done"></span></p>
+<p>Rings read: <span id="bell-read"></span></p>
+
+<div id="card-slot"></div>
+
+@(plan.Button("open-card", "Open the card")
+    .Reactive(button => button.Click, p => p.Get("/Slots/Card").Response(r => r.OnSuccess(s => s.Into("card-slot")))))
+@(plan.Button("close-card", "Close the card")
+    .Reactive(button => button.Click, p => p.Unload("card-slot")))
+@(plan.Button("write-card", "Write into the card")
+    .Reactive(button => button.Click, p =>
+    {
+        var bell = p.Component<Bell>("bell");
+        p.Element("write-tried").Text.Set(bell.Rings);
+        p.Element("card-status").Text.Set("from the page");
+        p.Element("write-done").Text.Set(bell.Rings);
+    }))
+@(plan.Button("read-bell", "Read the rings")
+    .Reactive(button => button.Click, p => p.Element("bell-read").Text.Set(p.Component<Bell>("bell").Rings)))
+
+@Html.RenderPlan(plan)

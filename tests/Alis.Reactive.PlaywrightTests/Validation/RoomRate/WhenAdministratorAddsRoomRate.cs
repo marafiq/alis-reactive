@@ -1,20 +1,8 @@
 using System.Collections.Concurrent;
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.RoomRate;
 
-/// <summary>
-/// As a community administrator, I want a room name of only spaces, a blank or $0 monthly rate, and an
-/// undecided community fee to be asked for before the room is sent, so that I correct them on the page
-/// instead of waiting for the server to refuse them; a $0 community fee is taken as a waived fee.
-/// </summary>
-/// <remarks>
-/// Each test fills the field it is about first and a valid field last: leaving an invalid field shows
-/// its message, which moves the Add Room button, so the click must not be what leaves it. An "asks for"
-/// test then corrects the field and adds the room: exactly one add request proves the first Add Room
-/// sent nothing, whenever a send would have happened.
-/// </remarks>
 [TestFixture]
 public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
 {
@@ -164,6 +152,73 @@ public class WhenAdministratorAddsRoomRate : PlaywrightTestBase
 
         await Expect(RoomRateStatus).ToHaveTextAsync(
             "Maple 214 added to the rate sheet at $4,200.00 a month, community fee waived.");
+        AssertTheRoomWasSentOnce();
+    }
+
+    [Test]
+    public async Task a_monthly_rate_over_the_communitys_cap_is_asked_for_in_the_rate_policys_words()
+    {
+        await NavigateAndBoot();
+        await MonthlyRate.Fill("20000");
+        await RoomName.Fill("Maple 214");
+        await CommunityFee.Fill("1500");
+
+        await ClickWhenStable(AddRoom);
+
+        await Expect(_plan.ErrorFor(m => m.MonthlyRate)).ToHaveTextAsync("Maple Grove caps a room at $15,000 a month.");
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        await MonthlyRate.Fill("15000");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync(
+            "Maple 214 added to the rate sheet at $15,000.00 a month, community fee $1,500.00.");
+        AssertTheRoomWasSentOnce();
+    }
+
+    [Test]
+    public async Task a_community_fee_that_is_not_less_than_the_monthly_rate_is_asked_for()
+    {
+        await NavigateAndBoot();
+        await CommunityFee.Fill("5000");
+        await RoomName.Fill("Maple 214");
+        await MonthlyRate.Fill("4200");
+
+        await ClickWhenStable(AddRoom);
+
+        await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("The community fee must be less than the monthly rate.");
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        await CommunityFee.Fill("4200");
+        await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("");
+        await RoomName.Fill("Maple 214");
+        await Expect(_plan.ErrorFor(m => m.CommunityFee)).ToHaveTextAsync("The community fee must be less than the monthly rate.");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        await CommunityFee.Fill("1500");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync(
+            "Maple 214 added to the rate sheet at $4,200.00 a month, community fee $1,500.00.");
+        AssertTheRoomWasSentOnce();
+    }
+
+    [Test]
+    public async Task a_suite_needs_its_square_footage()
+    {
+        await NavigateAndBoot();
+        await RoomName.Fill("Maple Garden Suite");
+        await MonthlyRate.Fill("6800");
+        await CommunityFee.Fill("2000");
+
+        await ClickWhenStable(AddRoom);
+
+        await Expect(_plan.ErrorFor(m => m.SquareFeet)).ToHaveTextAsync("Give the suite's square footage.");
+        await Expect(RoomRateStatus).ToHaveTextAsync("No room added yet.");
+
+        await _plan.TextBox(m => m.SquareFeet).Fill("650");
+        await ClickWhenStable(AddRoom);
+        await Expect(RoomRateStatus).ToHaveTextAsync(
+            "Maple Garden Suite added to the rate sheet at $6,800.00 a month, community fee $2,000.00.");
         AssertTheRoomWasSentOnce();
     }
 

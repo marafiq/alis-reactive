@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// Configures and renders a native HTML radio button group bound to a model property.
@@ -27,7 +27,7 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type represented by the selected radio option.</typeparam>
-    public class NativeRadioGroupBuilder<TModel, TProp> :
+    public sealed class NativeRadioGroupBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
     {
@@ -39,12 +39,10 @@ namespace Alis.Reactive.Native.Components
 #endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
         private readonly List<RadioButtonItem> _options = new List<RadioButtonItem>();
-        private string _cssClass = "flex flex-col gap-2";
-        private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
+        private string _cssClass = "alis-radio-group";
+        private string _optionCssClass = "alis-radio-group__option";
 
-        // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeRadioGroupBuilder(
 #if NET48
             HtmlHelper<TModel> html,
@@ -52,20 +50,12 @@ namespace Alis.Reactive.Native.Components
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId)
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
         }
-
-        internal string ElementId => _elementId;
-
-        internal string BindingPath => _bindingPath;
-
-        internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
         /// Adds radio options supplied outside the fluent builder, such as controller
@@ -146,9 +136,6 @@ namespace Alis.Reactive.Native.Components
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
 #if NET48
-            // net48: read the raw model value directly. System.Web.Mvc ValueFor returns an
-            // already-HTML-encoded MvcHtmlString, which would double-encode in the hidden input.
-            // (ModelState-aware re-render after a failed POST is a net10-only nicety.)
             var selectedValue = _html.ViewData.Eval(System.Web.Mvc.ExpressionHelper.GetExpressionText(_expression))?.ToString() ?? "";
 #else
             var selectedValue = _html.ValueFor(_expression, "{0}")?.ToString() ?? "";
@@ -158,15 +145,13 @@ namespace Alis.Reactive.Native.Components
 
             writer.Write($"<div class=\"{encoder.Encode(_cssClass)}\">");
 
-            // Hidden input is the Reactive Plan component target and intentionally omits a name attribute.
-            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" />");
+            writer.Write($"<input type=\"hidden\" id=\"{encodedId}\" value=\"{encoder.Encode(selectedValue)}\" data-alis-radio-group />");
 
-            for (int i = 0; i < _options.Count; i++)
+            for (var i = 0; i < _options.Count; i++)
             {
                 var option = _options[i];
                 var radioId = $"{_elementId}_r{i}";
 
-                // Label stays display:block per design system; inner div supplies flex layout.
                 writer.Write("<label>");
                 writer.Write($"<div class=\"{encoder.Encode(_optionCssClass)}\">");
 
@@ -178,11 +163,11 @@ namespace Alis.Reactive.Native.Components
                 radioHtml.WriteTo(writer, HtmlEncoder.Default);
 #endif
 
-                writer.Write("<div class=\"flex flex-col\">");
-                writer.Write($"<span class=\"text-sm font-medium leading-none\">{encoder.Encode(option.Text)}</span>");
+                writer.Write("<div class=\"alis-radio-group__text\">");
+                writer.Write($"<span class=\"alis-radio-group__label\">{encoder.Encode(option.Text)}</span>");
                 if (option.Description != null)
                 {
-                    writer.Write($"<span class=\"text-xs text-content-secondary mt-1\">{encoder.Encode(option.Description)}</span>");
+                    writer.Write($"<span class=\"alis-radio-group__description\">{encoder.Encode(option.Description)}</span>");
                 }
                 writer.Write("</div>");
 
@@ -191,9 +176,6 @@ namespace Alis.Reactive.Native.Components
             }
 
             writer.Write("</div>");
-
-            // Inline initialization works on page load and partial injection without DOM scanning.
-            writer.Write($@"<script>(function(){{var h=document.getElementById(""{encodedId}"");h.isInteracted=false;h.parentElement.addEventListener(""change"",function(e){{if(e.target.type!==""radio"")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(""change"",{{bubbles:true}}));}});}})();</script>");
         }
     }
 }

@@ -1,0 +1,176 @@
+import type { Plugin } from "../objects/plugins";
+import { asText, isMissing } from "../grammar/shape";
+import { logger } from "../diagnostics/trace";
+import { toJavaScriptString } from "../shared/javascript-string";
+
+const log = logger("http");
+
+export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+
+export interface HttpRequest {
+  readonly method: HttpMethod;
+  readonly url: string;
+  readonly route: Record<string, unknown>;
+  readonly values: Record<string, unknown>;
+  readonly arrays: readonly string[];
+  readonly headers: Record<string, unknown>;
+  readonly format: "json" | "form-data";
+}
+
+export interface HttpResponse {
+  readonly status: number;
+  readonly ok: boolean;
+  readonly body: unknown;
+}
+
+const ROUTE_PLACEHOLDER = /\{(\w+)\}/g;
+
+export async function send(request: HttpRequest): Promise<HttpResponse> {
+  const { url, init } = prepare(request);
+  log.debug("fetch.send", { method: request.method, url });
+  const started = performance.now();
+
+  let response: Response;
+  try {
+    response = await fetch(url, init);
+  } catch (error) {
+    const event = error instanceof TypeError ? "fetch.network-error" : "fetch.client-error";
+    log.error(event, { error: toJavaScriptString(error), method: request.method, url });
+    return { status: 0, ok: false, body: undefined };
+  }
+
+  log.debug("fetch.response", {
+    method: request.method,
+    url,
+    status: response.status,
+    ms: Math.round(performance.now() - started),
+  });
+
+  try {
+    const body = await readBody(response);
+    return { status: response.status, ok: response.ok, body };
+  } catch (error) {
+    log.error("fetch.body-unreadable", { error: toJavaScriptString(error), method: request.method, url });
+    return { status: 0, ok: false, body: undefined };
+  }
+}
+
+function prepare(request: HttpRequest): { url: string; init: RequestInit } {
+  const routed = fillRoute(request.url, request.route);
+  const init: RequestInit = { method: request.method };
+  const headers = headersOf(request.headers);
+
+  if (request.method === "GET") {
+    const query = queryPairs(request.values, request.arrays);
+    const url = query.length === 0 ? routed : `${routed}${routed.includes("?") ? "&" : "?"}${query.join("&")}`;
+    if (Object.keys(headers).length > 0) init.headers = headers;
+    return { url, init };
+  }
+
+  if (request.format === "form-data") {
+    init.body = formData(request.values, request.arrays);
+  } else if (Object.keys(request.values).length > 0) {
+    headers["Content-Type"] = "application/json";
+    init.body = JSON.stringify(request.values, jsonValue);
+  }
+  if (Object.keys(headers).length > 0) init.headers = headers;
+  return { url: routed, init };
+}
+
+function fillRoute(template: string, route: Record<string, unknown>): string {
+  return template.replace(ROUTE_PLACEHOLDER, (_match, name: string) => {
+    const value = route[name];
+    if (isMissing(value)) throw new Error(`[alis] route param "${name}" evaluated to null; cannot build URL`);
+    return encodeURIComponent(wireText(value, name));
+  });
+}
+
+function headersOf(source: Record<string, unknown>): Record<string, string> {
+  const headers: Record<string, string> = {};
+  for (const [name, value] of Object.entries(source)) {
+    if (isMissing(value)) continue;
+    headers[name] = wireText(value, name);
+  }
+  return headers;
+}
+
+function queryPairs(values: Record<string, unknown>, arrays: readonly string[]): string[] {
+  const pairs: string[] = [];
+  const pair = (name: string, value: unknown): void => {
+    if (fileOf(value) !== undefined) throw new Error("[alis] File objects cannot be sent via GET");
+    pairs.push(`${encodeURIComponent(name)}=${encodeURIComponent(wireText(value, name))}`);
+  };
+  for (const [name, value] of Object.entries(values)) {
+    const items = itemsOf(value);
+    if (items !== undefined) {
+      for (const item of items) pair(name, item);
+      continue;
+    }
+    if (isMissing(value) && arrays.includes(name)) continue;
+    pair(name, value);
+  }
+  return pairs;
+}
+
+function fileOf(value: unknown): File | undefined {
+  return value instanceof File ? value : undefined;
+}
+
+function formData(values: Record<string, unknown>, arrays: readonly string[]): FormData {
+  const data = new FormData();
+  const append = (name: string, value: unknown): void => {
+    const file = fileOf(value);
+    if (file !== undefined) data.append(name, file, file.name);
+    else data.append(name, wireText(value, name));
+  };
+  for (const [name, value] of Object.entries(values)) {
+    const items = itemsOf(value);
+    if (items !== undefined) {
+      for (const item of items) append(name, item);
+      continue;
+    }
+    if (isMissing(value) && arrays.includes(name)) continue;
+    append(name, value);
+  }
+  return data;
+}
+
+function itemsOf(value: unknown): unknown[] | undefined {
+  if (Array.isArray(value)) return value;
+  if (typeof FileList !== "undefined" && value instanceof FileList) return Array.from(value);
+  return undefined;
+}
+
+function wireText(value: unknown, name: string): string {
+  if (isMissing(value)) return "";
+  const text = asText(value);
+  if (text === undefined) throw new Error(`[alis] "${name}" cannot be sent as text: ${toJavaScriptString(value)}`);
+  return text;
+}
+
+function jsonValue(this: unknown, key: string, value: unknown): unknown {
+  if (fileOf(value) !== undefined) throw new Error("[alis] File objects require form-data body format");
+  const held = (this as Record<string, unknown>)[key];
+  if (held instanceof Date) return asText(held) ?? null;
+  return value;
+}
+
+async function readBody(response: Response): Promise<unknown> {
+  const contentType = response.headers.get("Content-Type");
+  if (contentType === null) return undefined;
+  const separator = contentType.indexOf(";");
+  const mediaType = (separator === -1 ? contentType : contentType.slice(0, separator)).trim().toLowerCase();
+
+  if (mediaType === "application/json" || mediaType.endsWith("+json")) {
+    const text = await response.text();
+    return text.trim().length === 0 ? undefined : JSON.parse(text);
+  }
+  if (mediaType.startsWith("text/") || mediaType.includes("html")) return response.text();
+  return undefined;
+}
+
+export const httpPlugin: Plugin = {
+  object: () => httpObject,
+};
+
+const httpObject = { send };

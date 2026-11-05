@@ -1,0 +1,30 @@
+@using Alis.Reactive.Framework.App.Validation
+@model Household
+@{
+    ViewData["Title"] = "A household";
+    var plan = Html.ReactivePlan<Household>();
+}
+<h1>A household</h1>
+
+<div id="household-form">
+    @{ Html.InputField(plan, m => m.Tags[0], o => o.Label("First tag")).Entry(); }
+    @{ Html.InputField(plan, m => m.Tags[1], o => o.Label("Second tag")).Entry(); }
+    @{ Html.InputField(plan, m => m.Rooms[0], o => o.Label("First room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Rooms[1], o => o.Label("Second room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Caller.Phone, o => o.Label("Phone to call")).Entry(); }
+    @{ Html.InputField(plan, m => m.Caller.Extensions[0], o => o.Label("Extension")).Entry(); }
+    @{ Html.InputField(plan, m => m.Visitors[0].Name, o => o.Label("First visitor")).Entry(); }
+    @{ Html.InputField(plan, m => m.Note, o => o.Label("Note")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Household")
+        .Gather(g => g.Form())
+        .Validate<HouseholdRules>("household-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("household-form")))))
+
+@Html.RenderPlan(plan)

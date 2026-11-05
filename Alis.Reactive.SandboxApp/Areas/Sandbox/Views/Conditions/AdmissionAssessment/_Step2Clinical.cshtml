@@ -1,6 +1,5 @@
 @model Step2ClinicalModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native
 @{
     var plan = Html.ReactivePlan<Step2ClinicalModel>();
     var saveStep2Url = Url.Action("SaveStep2", "AdmissionAssessment", new { area = "Sandbox" })
@@ -14,13 +13,11 @@
         Each section can be saved independently.
     </p>
 
-    <!-- Shared Active Plan fields populated by Step 1 and nested clinical partials. -->
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
-    @Html.HiddenFieldFor(plan, m => m.PrimaryDiagnosis)
-    @Html.HiddenFieldFor(plan, m => m.ResidentName)
-    @Html.HiddenFieldFor(plan, m => m.CareUnit)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.PrimaryDiagnosis)
+    @Html.NativeHiddenField(plan, m => m.ResidentName)
+    @Html.NativeHiddenField(plan, m => m.CareUnit)
 
-    <!-- Step 1 diagnosis conditions target these IDs across step plans. -->
     <div id="cognitive-section" hidden>
         @await Html.PartialAsync("~/Areas/Sandbox/Views/Conditions/AdmissionAssessment/_CognitiveAssessment.cshtml", Model)
     </div>
@@ -40,27 +37,27 @@
             {
                 p.Element("step-2").Hide();
                 p.Element("step-1").Show();
-                p.Element("step-ind-2").RemoveClass("font-bold");
-                p.Element("step-ind-2").RemoveClass("text-accent");
-                p.Element("step-ind-1").AddClass("font-bold");
-                p.Element("step-ind-1").AddClass("text-accent");
+                p.Element("step-ind-2").ClassList.Remove("font-bold");
+                p.Element("step-ind-2").ClassList.Remove("text-accent");
+                p.Element("step-ind-1").ClassList.Add("font-bold");
+                p.Element("step-ind-1").ClassList.Add("text-accent");
             }))
         @(Html.NativeButton("next-2", "Next: Functional \u2192")
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(saveStep2Url,
-                    g => g.IncludeAll())
+                p.Post(saveStep2Url)
+                 .Gather(g => g.Form())
                  .Validate<Step2Validator>("step2-form")
                  .Response(r => r
                     .OnSuccess<SaveStepResponse>((json, s) =>
                     {
                         s.Element("step-2").Hide();
                         s.Element("step-3").Show();
-                        s.Element("step-ind-2").RemoveClass("font-bold");
-                        s.Element("step-ind-2").RemoveClass("text-accent");
-                        s.Element("step-ind-3").AddClass("font-bold");
-                        s.Element("step-ind-3").AddClass("text-accent");
+                        s.Element("step-ind-2").ClassList.Remove("font-bold");
+                        s.Element("step-ind-2").ClassList.Remove("text-accent");
+                        s.Element("step-ind-3").ClassList.Add("font-bold");
+                        s.Element("step-ind-3").ClassList.Add("text-accent");
                     })
                     .OnError(400, e =>
                     {

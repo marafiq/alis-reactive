@@ -1,20 +1,16 @@
-using Alis.Reactive.Fusion.Components;
+using Alis.Reactive.Fusion;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// Point-in-Time Schedule state for server-filtered data loading.
-    /// Filters drive each data-source request; the schedule never holds the full dataset.
-    /// </summary>
     public class PointInTimeScheduleModel
     {
         public string? SelectedFacilityId { get; set; }
+
+        public bool ScheduleLocked { get; set; }
+
+        public bool NeedsCoverageOnly { get; set; }
     }
 
-    /// <summary>
-    /// Shift assignment event rendered by the Schedule data source.
-    /// Maps to Syncfusion Schedule eventSettings.dataSource items.
-    /// </summary>
     public class ShiftAssignment
     {
         public int Id { get; set; }
@@ -33,11 +29,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? ResidentNames { get; set; }
         public string Description { get; set; } = "";
         public string? CategoryColor { get; set; }
+
+        public bool IsInService { get; set; }
+
+        public string OpenBy { get; set; } = "";
+
+        public bool IsStaffedShift => !IsUnassigned && !IsInService;
     }
 
-    /// <summary>
-    /// Shift resource mapped to Syncfusion Schedule resources[].dataSource items.
-    /// </summary>
     public class ShiftResource
     {
         public int Id { get; set; }
@@ -45,18 +44,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Color { get; set; } = "";
     }
 
-    /// <summary>
-    /// Facility option for the Schedule filter dropdown.
-    /// </summary>
     public class Facility
     {
         public string Id { get; set; } = "";
         public string Name { get; set; } = "";
     }
 
-    /// <summary>
-    /// Staff option for assignment dialog dropdowns.
-    /// </summary>
     public class StaffMember
     {
         public int Id { get; set; }
@@ -65,64 +58,86 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string Phone { get; set; } = "";
     }
 
-    /// <summary>
-    /// Schedule data-source response for server-filtered assignment loading.
-    /// </summary>
     public class ScheduleDataResponse
     {
         public List<ShiftAssignment> Assignments { get; set; } = new();
-        public List<ShiftResource> Shifts { get; set; } = new();
-        public int UnassignedCount { get; set; }
-    }
-
-    public class ScheduleViewRouteResponse
-    {
-        public string CurrentView { get; set; } = "";
         public string Summary { get; set; } = "";
     }
 
-    public class ScheduleEventsAuditRequest
+    public sealed class ScheduleAssignmentsQuery
     {
-        public List<FusionScheduleEventData> Events { get; set; } = new();
+        public string CurrentView { get; set; } = "";
+        public DateTime CurrentDate { get; set; }
+        public string? SelectedFacilityId { get; set; }
     }
 
-    public class ScheduleEventsAuditResponse
+    public sealed class EditAssignmentQuery
     {
-        public int Count { get; set; }
+        public int AssignmentId { get; set; }
     }
 
-    /// <summary>
-    /// Payload for schedule action CustomEvents dispatched by QuickInfo template buttons.
-    /// Matches the { detail: { id: ... } } shape from EventButton.
-    /// </summary>
+    public sealed class NewAssignmentQuery
+    {
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public int GroupIndex { get; set; }
+        public string? SelectedFacilityId { get; set; }
+    }
+
+    public sealed class AgencyCoverRequest
+    {
+        public List<ShiftAssignment> Shifts { get; set; } = new();
+    }
+
+    public sealed class AgencyCoverAnswer
+    {
+        public string Summary { get; set; } = "";
+    }
+
+    public sealed class InServiceClaimRequest
+    {
+        public int InServiceId { get; set; }
+    }
+
+    public sealed class InServiceChange
+    {
+        public int InServiceId { get; set; }
+        public string Subject { get; set; } = "";
+        public string Description { get; set; } = "";
+    }
+
+    public sealed class InServiceRemoval
+    {
+        public int InServiceId { get; set; }
+    }
+
+    public sealed class InServiceAnswer
+    {
+        public string Note { get; set; } = "";
+    }
+
     public class ScheduleActionPayload
     {
         public int Id { get; set; }
     }
 
-    /// <summary>
-    /// Staff option for the edit form dropdown.
-    /// </summary>
     public class StaffOption
     {
         public string Text { get; set; } = "";
         public int Value { get; set; }
     }
 
-    /// <summary>
-    /// Assign-staff request for a shift slot.
-    /// </summary>
     public class AssignStaffRequest
     {
         public int AssignmentId { get; set; }
         public int? StaffId { get; set; }
-        public string? Notes { get; set; }
     }
 
-    /// <summary>
-    /// New-assignment form model loaded into FusionDialog via Into().
-    /// CellClicked provides startTime/endTime/groupIndex — controller maps groupIndex to shiftId.
-    /// </summary>
+    public sealed class CancelShiftRequest
+    {
+        public int AssignmentId { get; set; }
+    }
+
     public class NewAssignmentModel
     {
         public string? StartTime { get; set; }
@@ -131,5 +146,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? FacilityId { get; set; }
         public int? StaffId { get; set; }
         public string? Notes { get; set; }
+    }
+
+    public static class PointInTimeScheduleEvents
+    {
+        public static readonly AppEvent<ScheduleActionPayload> ScheduleEdit = AppEvent.Declare<ScheduleActionPayload>();
+        public static readonly AppEvent<ScheduleActionPayload> ScheduleReassign = AppEvent.Declare<ScheduleActionPayload>();
     }
 }

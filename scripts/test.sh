@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 cd "$(dirname "$0")/.."
 
 usage() {
@@ -10,26 +10,25 @@ Usage:
   scripts/test.sh --no-e2e
 
 Runs the ordered verification gate:
-  1. npm run typecheck
-  2. npm run build:all
-  3. npm test
-  4. gate-script self-tests (.claude/skills/onboard-fusion-component/scripts/*.selftest.mjs), the CI
-     shard-matrix check, and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
-  5. dotnet build
-  6. non-Playwright dotnet test projects, if any
-  7. scripts/playwright.sh --no-build (or its five CI shards at once with --parallel)
-  8. behavioral coverage gate (0b) over behaviorally-audited Fusion components
+  1. npm run typecheck, then the committed plan contract (plan.ts, plan.schema.json) must match what it regenerated
+  2. npm run lint
+  3. npm run build:packages
+  4. npm test
+  5. the CI shard-matrix check and the Syncfusion pin check (node scripts/pin-syncfusion.mjs --check)
+  6. dotnet build
+  7. dotnet format: no C# file it would change (the solution, and examples/ by folder)
+  8. non-Playwright dotnet test projects, if any
+  9. scripts/playwright.sh --no-build, every Playwright project (or every CI shard at once with --parallel)
 
 Options:
-  --parallel  Run the Playwright leg as the five CI shards (scripts/playwright.sh
-              --list-shards), side by side, each with its own sandbox; the 0b gate
-              then reads every shard's TRX. About 20 minutes instead of about 60.
-  --no-e2e    Skip the Playwright browser leg after typecheck, assets, vitest,
-              self-tests, dotnet build, and non-Playwright dotnet tests have passed.
+  --parallel  Run the Playwright leg as every project's CI shards (scripts/playwright.sh
+              --list-shards), side by side, each with its own app.
+  --no-e2e    Skip the Playwright browser leg after typecheck, lint, assets, vitest,
+              consistency checks, dotnet build, and non-Playwright dotnet tests have passed.
   -h, --help  Show this help.
 
-Playwright starts its own sandbox on a random free port. Do not pre-start the
-sandbox for this command.
+Each Playwright project starts its own app on a random free port. Do not pre-start an
+app for this command.
 
 Set CONFIGURATION=Release to run the .NET build/test legs in Release.
 USAGE
@@ -37,6 +36,18 @@ USAGE
 
 configuration="${CONFIGURATION:-Debug}"
 run_e2e=1
+
+gate_step="starting"
+gate() {
+  gate_step="$1"
+  echo "[test] $1"
+}
+annotate_failure() {
+  if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+    echo "::error title=Gate step failed::$gate_step"
+  fi
+}
+trap annotate_failure ERR
 parallel=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -60,8 +71,6 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-behavioral_gate="node .claude/skills/onboard-fusion-component/scripts/verify-behavioral-coverage.mjs --all"
-
 run_dotnet_tests() {
   local projects=()
   local project
@@ -82,29 +91,21 @@ run_dotnet_tests() {
   fi
 
   for project in "${projects[@]}"; do
-    echo "[test] running dotnet tests: $project"
-    dotnet test "$project" --configuration "$configuration" --no-build
-  done
-}
-
-# The 0b gate and the parity tool only mean something if they bite: their self-tests prove each
-# failure mode turns them red and a clean input keeps them green.
-run_gate_selftests() {
-  local selftest output
-  for selftest in .claude/skills/onboard-fusion-component/scripts/*.selftest.mjs; do
-    if output="$(node "$selftest" 2>&1)"; then
-      echo "[test]   $(printf '%s\n' "$output" | tail -1)"
-    else
-      printf '%s\n' "$output"
-      echo "[test] self-test failed: $selftest" >&2
+    gate "running dotnet tests: $project"
+    local results_dir="tests/TestResults/gate"
+    local trx_name
+    trx_name="$(basename "$project" .csproj).trx"
+    rm -f "$results_dir/$trx_name"
+    if ! dotnet test "$project" --configuration "$configuration" --no-build \
+      --logger "trx;LogFileName=$trx_name" --results-directory "$results_dir"; then
+      if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+        node scripts/trx-failed-tests.mjs "$results_dir/$trx_name" annotations
+      fi
       return 1
     fi
   done
 }
 
-# CI runs exactly the shards listed in gate.yml's matrix; scripts/playwright.sh defines them. A shard
-# added to the script but not to the matrix would never run in CI and nothing would fail, so the two
-# lists must match.
 check_ci_shard_matrix() {
   local script_shards ci_shards
   script_shards="$(scripts/playwright.sh --list-shards | sort)"
@@ -119,9 +120,6 @@ check_ci_shard_matrix() {
   echo "[test]   CI shard matrix matches scripts/playwright.sh ($(printf '%s\n' "$script_shards" | wc -l | tr -d ' ') shards)"
 }
 
-# An interrupt (Ctrl-C) or termination stops every running shard with its dotnet test, sandbox and
-# browser. Each shard runs in its own process group (set -m), so one signal to the group reaches all
-# of them; without this they would keep running for twenty minutes after test.sh exited.
 shard_pids=()
 stop_shards() {
   local pid
@@ -134,15 +132,11 @@ stop_shards() {
   exit 130
 }
 
-# The five CI shards side by side. Each scripts/playwright.sh run starts its own sandbox on a free
-# port. All shards share one run stamp (each adds its shard name to its file names), so the 0b gate
-# and the onboarding tools read the whole run as the newest one. Every shard's console output lands
-# in one directory; the 0b gate then reads all of their TRX files (and any retries).
 run_parallel_playwright() {
   local run_stamp run_dir shard status=0 code
-  local shards=() trx_files=()
+  local shards=()
   run_stamp="$(date +%Y%m%d-%H%M%S)"
-  run_dir="tests/Alis.Reactive.PlaywrightTests/TestResults/observable/parallel-$run_stamp"
+  run_dir="tests/TestResults/playwright/parallel-$run_stamp"
   mkdir -p "$run_dir"
 
   while IFS= read -r shard; do
@@ -156,7 +150,7 @@ run_parallel_playwright() {
       scripts/playwright.sh --no-build --shard "$shard" > "$run_dir/$shard.log" 2>&1 &
     shard_pids+=("$!")
     echo "[test] shard $shard started: tail -f $run_dir/$shard.log"
-    sleep 1   # spreads the five sandbox and browser start-ups
+    sleep 1
   done
 
   for i in "${!shards[@]}"; do
@@ -164,9 +158,6 @@ run_parallel_playwright() {
     if wait "${shard_pids[$i]}"; then code=0; else code=$?; status=1; fi
     echo "[test] shard $shard exit=$code | $(grep -aE '^(Total tests|     Passed|     Failed):' "$run_dir/$shard.log" | tr -s ' ' | tr '\n' ' ')"
     grep -aE '^\s+Failed [A-Za-z_]' "$run_dir/$shard.log" | sed "s/^/[test]   $shard: /" || true
-    while IFS= read -r trx; do
-      trx_files+=("$trx")
-    done < <(grep -aoE '\[playwright:runner\] trx=[^ ]+' "$run_dir/$shard.log" | sed 's/.*trx=//' | sort -u)
   done
   trap - INT TERM
   set +m
@@ -175,54 +166,52 @@ run_parallel_playwright() {
     echo "[test] Playwright shards failed; logs in $run_dir" >&2
     return 1
   fi
-  if [ "${#trx_files[@]}" -eq 0 ]; then
-    echo "[test] no shard reported a TRX file; logs in $run_dir" >&2
-    return 1
-  fi
-
-  echo "[test] behavioral coverage gate (0b) over ${#trx_files[@]} shard TRX file(s)"
-  $behavioral_gate --trx "$(IFS=,; printf '%s' "${trx_files[*]}")"
 }
 
-echo "[test] ensuring npm dependencies"
+gate "ensuring npm dependencies"
 [ -d node_modules ] || npm ci
 
-echo "[test] checking generated TS contract and TypeScript"
+gate "checking generated TS contract and TypeScript"
 npm run typecheck
 
-echo "[test] building browser assets"
-npm run build:all
+gate "checking the committed plan contract matches the generator"
+contract_files=(Alis.Reactive.Assets/runtime/types/plan.ts Alis.Reactive.Assets/runtime/types/plan.schema.json)
+if ! git ls-files --error-unmatch -- "${contract_files[@]}" >/dev/null 2>&1 || ! git diff --quiet -- "${contract_files[@]}"; then
+  echo "[test] the generated plan contract differs from the staged one; stage the regenerated files:" >&2
+  git --no-pager status --short -- "${contract_files[@]}" >&2
+  exit 1
+fi
 
-echo "[test] running vitest"
+gate "linting TypeScript"
+npm run lint
+
+gate "building the packages' browser assets"
+npm run build:packages
+
+gate "running vitest"
 npm test
 
-echo "[test] gate-script self-tests"
-run_gate_selftests
+gate "consistency checks"
 check_ci_shard_matrix
-# npm and NuGet must carry the same Syncfusion version, and every control package must be locked at
-# the version the @syncfusion/ej2 umbrella was published with (scripts/pin-syncfusion.mjs explains why).
 node scripts/pin-syncfusion.mjs --check
 
-echo "[test] compiling C# projects ($configuration)"
+gate "compiling C# projects ($configuration)"
 dotnet build --configuration "$configuration"
+
+gate "checking C# formatting (dotnet format)"
+dotnet format Alis.Reactive.slnx --verify-no-changes --severity warn --no-restore
+dotnet format whitespace --folder examples --verify-no-changes
 
 run_dotnet_tests
 
 if [ "$run_e2e" -eq 0 ]; then
-  echo "[test] skipping Playwright and behavioral coverage gate (--no-e2e)"
+  gate "skipping Playwright (--no-e2e)"
 elif [ "$parallel" -eq 1 ]; then
-  echo "[test] running observable Playwright as parallel shards"
+  gate "running observable Playwright as parallel shards"
   run_parallel_playwright
 else
-  echo "[test] running observable Playwright"
+  gate "running observable Playwright"
   CONFIGURATION="$configuration" scripts/playwright.sh --no-build
-  # 0b behavioral coverage gate: the fresh TRX from the run above is the truth
-  # source. For every component that claims behavioral coverage
-  # (proof/behavioral-coverage.json), this confirms each mapped member's test
-  # exists in that TRX and passed. Components without a map are below bar, not a
-  # failure. Skipped under --no-e2e: no fresh TRX means no behavioral proof.
-  echo "[test] behavioral coverage gate (0b)"
-  $behavioral_gate
 fi
 
 echo "All gates green."

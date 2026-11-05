@@ -1,0 +1,102 @@
+import type { Expr, SetStatement, Statement } from "../types/index";
+import { assertNever } from "../shared/assert-never";
+import { logger } from "../diagnostics/trace";
+import { toJavaScriptString } from "../shared/javascript-string";
+import { childScope, evaluate, evaluateStatement, isPromise, labelOf, type Scope } from "./evaluate";
+import { write } from "./paths";
+
+const log = logger("execute");
+
+export type Completion = void | Promise<void>;
+
+export function executeBlock(statements: readonly Statement[], scope: Scope): Completion {
+  return runFrom(statements, 0, scope);
+}
+
+function runFrom(statements: readonly Statement[], start: number, scope: Scope): Completion {
+  for (let index = start; index < statements.length; index++) {
+    const completion = execute(statements[index]!, scope);
+    if (isPromise(completion)) return completion.then(() => runFrom(statements, index + 1, scope));
+  }
+}
+
+function execute(statement: Statement, scope: Scope): Completion {
+  switch (statement.kind) {
+    case "set": return set(statement, scope);
+    case "do":  return perform(statement.expr, statement.await, scope);
+    case "let": return bind(statement.name, statement.expr, statement.await, scope);
+    case "if":  return branch(statement, scope);
+    case "all": return all(statement.blocks, scope);
+    case "try": return attempt(statement.body, statement.finally, scope);
+    default:    return assertNever(statement, "statement");
+  }
+}
+
+function set(statement: SetStatement, scope: Scope): void {
+  const target = evaluate(statement.target, scope);
+  const value = evaluate(statement.value, scope);
+  log.trace("set", { target: traceName(statement.target), path: statement.path, value });
+  write(target, statement.path, value, statement.members, labelOf(statement.target));
+}
+
+function perform(expr: Expr, awaits: boolean, scope: Scope): Completion {
+  if (expr.kind === "call") log.trace("call", { target: traceName(expr.target), path: expr.path });
+  const result = evaluateStatement(expr, scope);
+  if (!isPromise(result)) return;
+  if (awaits) return result.then(() => undefined);
+  result.catch(error => log.error("call.rejected", { error: toJavaScriptString(error) }));
+}
+
+function traceName(target: Expr): string {
+  return target.kind === "obj" ? target.id : labelOf(target);
+}
+
+function bind(name: string, expr: Expr, awaits: boolean, scope: Scope): Completion {
+  const value = awaits ? evaluateStatement(expr, scope) : evaluate(expr, scope);
+  if (awaits && isPromise(value)) return value.then(settled => scope.env.bind(name, settled));
+  scope.env.bind(name, value);
+}
+
+function branch(statement: Extract<Statement, { kind: "if" }>, scope: Scope): Completion {
+  for (const arm of statement.arms) {
+    if (evaluate(arm.when, scope)) return executeBlock(arm.then, childScope(scope));
+  }
+  return executeBlock(statement.else, childScope(scope));
+}
+
+function all(blocks: readonly (readonly Statement[])[], scope: Scope): Completion {
+  const pending: Promise<void>[] = [];
+  for (const block of blocks) {
+    try {
+      const completion = executeBlock(block, childScope(scope));
+      if (isPromise(completion)) pending.push(completion);
+    } catch (error) {
+      log.error("all.block-failed", { error: toJavaScriptString(error) });
+    }
+  }
+  if (pending.length === 0) return;
+  return Promise.allSettled(pending).then(results => {
+    for (const result of results) {
+      if (result.status === "rejected") log.error("all.block-failed", { error: toJavaScriptString(result.reason) });
+    }
+  });
+}
+
+function attempt(body: readonly Statement[], cleanup: readonly Statement[], scope: Scope): Completion {
+  let completion: Promise<void>;
+  try {
+    completion = executeBlock(body, scope) as Promise<void>;
+  } catch (error) {
+    return rethrowAfter(executeBlock(cleanup, childScope(scope)), error);
+  }
+
+  return completion.then(
+    () => executeBlock(cleanup, childScope(scope)),
+    error => rethrowAfter(executeBlock(cleanup, childScope(scope)), error),
+  );
+}
+
+function rethrowAfter(cleanup: Completion, error: unknown): Completion {
+  if (isPromise(cleanup)) return cleanup.then(() => { throw error; });
+  throw error;
+}

@@ -1,0 +1,8 @@
+@model string
+@{
+    // A template of a text member: its input binds the model itself, under the member's prefix (Visitor).
+    var plan = Html.ReactivePlan<string>();
+}
+@{ Html.InputField(plan, m => m, o => o.Label("Visitor")).Entry(); }
+
+@Html.RenderPlan(plan)

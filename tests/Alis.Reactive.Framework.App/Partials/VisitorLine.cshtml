@@ -1,0 +1,11 @@
+@using Alis.Reactive.Framework.App.Partials
+@model VisitRecord
+@{
+    // A partial of the base class: any page whose model is a visit record renders the visitor with it.
+    var plan = Html.ReactivePlan<VisitRecord>();
+}
+<section id="visitor-line">
+    @{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+</section>
+
+@Html.RenderPlan(plan)

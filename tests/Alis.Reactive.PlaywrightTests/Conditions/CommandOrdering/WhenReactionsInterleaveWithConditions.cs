@@ -1,6 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Conditions.CommandOrdering;
 
-// Post-condition reactions must run after the selected condition branch.
 [TestFixture]
 public class WhenReactionsInterleaveWithConditions : PlaywrightTestBase
 {

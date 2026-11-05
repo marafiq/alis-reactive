@@ -1,74 +1,93 @@
-// Runtime boot waits for DOM readiness, drains queued host-page plugins, then
-// boots discovered [data-reactive-plan] scripts.
-
-import { boot, trace } from "./lifecycle/boot";
-import { init as initConfirm } from "./components/fusion/confirm";
-import { initNativeActionLinks } from "./components/native/native-action-link";
-import "./components/native/drawer";  // side-effect: wires close button + Escape key
-import "./components/native/loader";  // side-effect: handles target positioning + timeout
-import { composeInitialPlans } from "./lifecycle/applied-plans";
 import type { PlanDocument } from "./types/index";
-import type { TraceLevel } from "./diagnostics/trace";
-import { registerPlugin } from "./plugins/catalog";
+import { pluginOf, registerPlugin } from "./objects/plugins";
+import { Owner } from "./objects/owner";
+import { discoverPlans, type DiscoveredPlan } from "./plans/discover";
+import { announceMount } from "./plans/mount-events";
+import { startOwners, type OwnedPlans } from "./plans/start";
+import { documentPlugin } from "./plugins/document";
+import { httpPlugin } from "./plugins/http";
+import { modelPlugin } from "./plugins/model";
+import { formPlugin } from "./plugins/form/form";
+import { slotOwner, slotPlugin } from "./plugins/slot";
+import { streamPlugin } from "./realtime/stream";
+import { hubPlugin } from "./realtime/hub";
+import { levelOf, logger, setLevel } from "./diagnostics/trace";
 
-interface PendingHostPlugin {
+const log = logger("boot");
+
+interface PendingPlugin {
   readonly name: string;
   readonly instance: unknown;
 }
 
-interface PluginQueueWindow extends Window {
-  __alisPlugins?: PendingHostPlugin[];
+interface RuntimeWindow extends Window {
+  __alisPlugins?: PendingPlugin[];
 }
 
-startRuntimeWhenDocumentIsReady();
+registerPlugin("alis.document", documentPlugin);
+registerPlugin("alis.http", httpPlugin);
+registerPlugin("alis.model", modelPlugin);
+registerPlugin("alis.form", formPlugin);
+registerPlugin("alis.slot", slotPlugin);
+registerPlugin("alis.stream", streamPlugin);
+registerPlugin("alis.hub", hubPlugin);
 
-function startRuntimeWhenDocumentIsReady(): void {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", startRuntime, { once: true });
-    return;
-  }
-
-  startRuntime();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", start, { once: true });
+} else {
+  start();
 }
 
-function startRuntime(): void {
-  drainPluginQueue();
+function start(): void {
+  setLevel(levelOf(document.documentElement));
+  const runtimeWindow = window as RuntimeWindow;
+  for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, pluginOf(plugin.name, plugin.instance));
+  delete runtimeWindow.__alisPlugins;
 
-  initConfirm();
-  initNativeActionLinks();
+  announceMount(document.body);
 
-  for (const activePlan of composeInitialPlans(discoverBootPlans())) {
-    boot(activePlan);
-  }
+  const discovered = discoverPlans(document, false);
+  const planIds = discovered.map(({ plan }) => plan.planId);
+  log.info("booting", { plans: planIds });
+  startOwners(ownersAtBoot(discovered));
+
+  document.documentElement.dataset["alisBooted"] = "true";
+  log.info("booted", { plans: planIds });
 }
 
-function drainPluginQueue(): void {
-  const pluginQueue = window as PluginQueueWindow;
-  const pendingPlugins = pluginQueue.__alisPlugins;
-  if (pendingPlugins === undefined) return;
-
-  for (const entry of pendingPlugins) {
-    registerPlugin(entry.name, entry.instance);
-  }
-  delete pluginQueue.__alisPlugins;
-}
-
-function discoverBootPlans(): PlanDocument[] {
-  const planElements = document.querySelectorAll<HTMLElement>("[data-reactive-plan]");
-  const bootPlans: PlanDocument[] = [];
-
-  for (const planElement of planElements) {
-    const traceLevel = planElement.dataset.trace as TraceLevel | undefined;
-    if (traceLevel) trace.setLevel(traceLevel);
-
-    try {
-      const planJson = planElement.textContent?.trim();
-      if (!planJson) throw new Error("[alis] empty plan element");
-      bootPlans.push(JSON.parse(planJson));
-    } catch (error) {
-      throw new Error(`[alis] failed to parse plan JSON from [data-reactive-plan] element: ${(error as Error).message}`);
+function ownersAtBoot(discovered: readonly DiscoveredPlan[]): OwnedPlans[] {
+  const slotIds = new Set(discovered.flatMap(({ plan }) => slotsNamedBy(plan)));
+  const pagePlans: PlanDocument[] = [];
+  const plansBySlot = new Map<HTMLElement, PlanDocument[]>();
+  for (const { plan, script } of discovered) {
+    const slot = innermostSlot(script, slotIds);
+    if (slot === null) {
+      pagePlans.push(plan);
+      continue;
     }
+    const slotPlans = plansBySlot.get(slot);
+    if (slotPlans) slotPlans.push(plan);
+    else plansBySlot.set(slot, [plan]);
   }
+  const outerFirst = [...plansBySlot].sort(([one], [other]) => inDocumentOrder(one, other));
+  return [
+    { owner: Owner.page(), plans: pagePlans },
+    ...outerFirst.map(([slot, plans]) => ({ owner: slotOwner(slot.id), plans })),
+  ];
+}
 
-  return bootPlans;
+function slotsNamedBy(plan: PlanDocument): string[] {
+  return Object.values(plan.objects).flatMap(locator =>
+    locator.kind === "plugin" && locator.name === "alis.slot" ? [locator.key] : []);
+}
+
+function innermostSlot(script: HTMLElement, slotIds: ReadonlySet<string>): HTMLElement | null {
+  for (let element = script.parentElement; element !== null; element = element.parentElement) {
+    if (slotIds.has(element.id)) return element;
+  }
+  return null;
+}
+
+function inDocumentOrder(one: HTMLElement, other: HTMLElement): number {
+  return one.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
 }

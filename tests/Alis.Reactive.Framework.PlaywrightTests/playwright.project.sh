@@ -1,0 +1,33 @@
+playwright_project=framework
+
+playwright_shards="framework"
+
+playwright_shard_filter() {
+  case "$1" in
+    framework) printf '' ;;
+    *) return 2 ;;
+  esac
+}
+
+playwright_check_assets() {
+  check_asset_output_is_fresh \
+    "framework components bundle" \
+    "tests/Alis.Reactive.Framework.App/wwwroot/js/framework-components.js" \
+    tests/Alis.Reactive.Framework.App/Components \
+    tests/Alis.Reactive.Framework.App/components.ts \
+    tests/Alis.Reactive.Framework.App/Plugins/Bundles \
+    tests/Alis.Reactive.Framework.App/esbuild.config.mjs \
+    tests/Alis.Reactive.Framework.App/tsconfig.json \
+    tests/Alis.Reactive.Framework.App/package.json
+
+  check_asset_output_is_fresh \
+    "framework app CSS" \
+    "tests/Alis.Reactive.Framework.App/wwwroot/css/framework.css" \
+    tests/Alis.Reactive.Framework.App/Styles \
+    tests/Alis.Reactive.Framework.App/package.json \
+    Alis.Reactive.DesignSystem/css/theme.css
+}
+
+playwright_sources() {
+  printf '%s\n' Alis.Reactive.DesignSystem tests/Alis.Reactive.Framework.App
+}

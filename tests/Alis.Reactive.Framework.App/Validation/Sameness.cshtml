@@ -1,0 +1,34 @@
+@using Alis.Reactive.Framework.App.Validation
+@model SamenessForm
+@{
+    ViewData["Title"] = "Sameness and order";
+    var plan = Html.ReactivePlan<SamenessForm>();
+}
+<h1>Sameness and order</h1>
+
+<div id="sameness-form">
+    @{ Html.InputField(plan, m => m.Rooms, o => o.Label("Rooms")).Entry(); }
+    @{ Html.InputField(plan, m => m.Visitors, o => o.Label("Visitors")).Entry(); }
+    @{ Html.InputField(plan, m => m.Beds, o => o.Label("Beds")).Entry(); }
+    @{ Html.InputField(plan, m => m.Escorted, o => o.Label("Escorted")).Entry(); }
+    @{ Html.InputField(plan, m => m.Arrives, o => o.Label("Arrives")).Entry(); }
+    @{ Html.InputField(plan, m => m.Called, o => o.Label("Called")).Entry(); }
+    @{ Html.InputField(plan, m => m.Consented, o => o.Label("Consented")).Entry(); }
+    @{ Html.InputField(plan, m => m.Wards, o => o.Label("Wards")).Entry(); }
+    @{ Html.InputField(plan, m => m.Surname, o => o.Label("Surname")).Entry(); }
+    @{ Html.InputField(plan, m => m.Initial, o => o.Label("Initial")).Entry(); }
+    @{ Html.InputField(plan, m => m.Wings, o => o.Label("Wings")).Entry(); }
+    @{ Html.InputField(plan, m => m.FormerWings, o => o.Label("Former wings")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@(plan.Button("save", "Save")
+    .Reactive(button => button.Click, p => p.Post("/Validation/Sameness")
+        .Gather(g => g.Form())
+        .Validate<SamenessRules>("sameness-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("sameness-form")))))
+
+@Html.RenderPlan(plan)

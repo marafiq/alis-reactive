@@ -33,7 +33,7 @@ echo "[run] ensuring npm dependencies"
 [ -d node_modules ] || npm ci
 
 echo "[run] building browser assets"
-npm run build:all
+npm run build:packages
 
 echo "Starting sandbox -> http://localhost:5220 (Ctrl+C to stop)"
 dotnet run --project Alis.Reactive.SandboxApp

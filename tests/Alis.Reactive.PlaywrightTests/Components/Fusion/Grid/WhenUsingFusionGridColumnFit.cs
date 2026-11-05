@@ -4,60 +4,82 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 public class WhenUsingFusionGridColumnFit : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/ColumnFit";
+    private const string GridId = "med-pass-sheet";
 
-    // residentId is a hidden column whose headercell stays in the DOM (display:none),
-    // so index against visible headercells only.
-    private ILocator NameHeader => Page.Locator("#column-fit-grid .e-headercell:visible").Nth(0);
-    private ILocator RiskHeader => Page.Locator("#column-fit-grid .e-headercell:visible").Nth(1);
+    private const int RoomCell = 1;
+    private const int ResidentCell = 2;
+    private const int MedicationCell = 3;
+    private const int DueCell = 5;
 
-    private static async Task<double> WidthAsync(ILocator locator)
+    private ILocator Rows => Page.Locator($"#{GridId} .e-row");
+    private ILocator Cell(int row, int cell) => Rows.Nth(row).Locator(".e-rowcell").Nth(cell);
+    private ILocator FullName => Page.Locator(".e-tooltip-wrap.e-popup-open");
+    private ILocator ShowFullMedicationNames => Page.Locator("#fit-medication");
+    private ILocator FitEveryColumn => Page.Locator("#fit-every-column");
+
+    private async Task NavigateAndBoot()
     {
-        var box = await locator.BoundingBoxAsync();
-        return box?.Width ?? 0;
-    }
-
-    private static async Task AssertWidthBelowAsync(ILocator locator, double max)
-    {
-        for (var i = 0; i < 30; i++)
-        {
-            if (await WidthAsync(locator) is var w && w > 0 && w < max) return;
-            await Task.Delay(100);
-        }
-        Assert.That(await WidthAsync(locator), Is.LessThan(max));
-    }
-
-    private async Task NavigateFit()
-    {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(Page.Locator("#fit-status"))
-            .ToHaveTextAsync("loaded", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#column-fit-grid .e-row").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(Rows).ToHaveCountAsync(4, new() { Timeout = 10000 });
     }
 
     [Test]
-    public async Task auto_fitting_one_column_then_all_columns_shrinks_them_to_content()
+    public async Task the_sheet_lists_tonights_doses_by_room()
     {
-        await NavigateFit();
+        await NavigateAndBoot();
 
-        // Both columns start wide (400px).
-        Assert.That(await WidthAsync(RiskHeader), Is.GreaterThan(300));
-        Assert.That(await WidthAsync(NameHeader), Is.GreaterThan(300));
+        await Expect(Cell(0, RoomCell)).ToHaveTextAsync("214");
+        await Expect(Cell(0, MedicationCell)).ToHaveTextAsync("Donepezil hydrochloride 10 mg tablet");
+        await Expect(Cell(3, ResidentCell)).ToHaveTextAsync("Walter Grant");
+        await Expect(Cell(3, DueCell)).ToHaveTextAsync("9:00 PM");
+        AssertNoConsoleErrors();
+    }
 
-        // AutoFitColumn(risk): risk shrinks to content, name stays wide.
-        await ClickWhenStable(Page.Locator("#fit-risk"));
-        await Expect(Page.Locator("#fit-status"))
-            .ToHaveTextAsync("autoFitColumn called", new() { Timeout = 10000 });
-        await AssertWidthBelowAsync(RiskHeader, 300);
-        Assert.That(await WidthAsync(NameHeader), Is.GreaterThan(300));
+    [Test]
+    public async Task a_medication_name_cut_short_shows_in_full_when_hovered()
+    {
+        await NavigateAndBoot();
 
-        // AutoFitColumns(): name shrinks too.
-        await ClickWhenStable(Page.Locator("#fit-all"));
-        await Expect(Page.Locator("#fit-status"))
-            .ToHaveTextAsync("autoFitColumns called", new() { Timeout = 10000 });
-        await AssertWidthBelowAsync(NameHeader, 300);
+        await Cell(0, MedicationCell).HoverAsync();
 
+        await Expect(FullName).ToHaveTextAsync("Donepezil hydrochloride 10 mg tablet", new() { Timeout = 10000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task showing_full_medication_names_widens_only_the_medication_column()
+    {
+        await NavigateAndBoot();
+        var cutShort = await Cell(0, MedicationCell).BoundingBoxAsync();
+
+        await ClickWhenStable(ShowFullMedicationNames);
+
+        var fitted = await Cell(0, MedicationCell).BoundingBoxAsync();
+        Assert.That(fitted!.Width, Is.GreaterThan(cutShort!.Width), "the medication column is wider");
+        await Cell(0, ResidentCell).HoverAsync();
+        await Expect(FullName).ToHaveTextAsync("Margaret Abernathy-Whitfield", new() { Timeout = 10000 });
+        await Cell(0, MedicationCell).HoverAsync();
+        await Expect(FullName).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task fitting_every_column_shows_every_name_in_full()
+    {
+        await NavigateAndBoot();
+        var residentCutShort = await Cell(0, ResidentCell).BoundingBoxAsync();
+        var medicationCutShort = await Cell(0, MedicationCell).BoundingBoxAsync();
+
+        await ClickWhenStable(FitEveryColumn);
+
+        Assert.That((await Cell(0, ResidentCell).BoundingBoxAsync())!.Width, Is.GreaterThan(residentCutShort!.Width),
+            "the resident column is wider");
+        Assert.That((await Cell(0, MedicationCell).BoundingBoxAsync())!.Width, Is.GreaterThan(medicationCutShort!.Width),
+            "the medication column is wider");
+        await Cell(0, ResidentCell).HoverAsync();
+        await Expect(FullName).ToHaveCountAsync(0);
+        await Cell(0, MedicationCell).HoverAsync();
+        await Expect(FullName).ToHaveCountAsync(0);
         AssertNoConsoleErrors();
     }
 }

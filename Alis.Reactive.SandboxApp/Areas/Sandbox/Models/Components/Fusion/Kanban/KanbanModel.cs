@@ -1,191 +1,125 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Kanban
 {
-    public sealed class KanbanModel
+    public sealed class MaintenanceBoardModel
     {
-        public string SelectedFacilityId { get; set; } = "AL";
+        public bool ShowFinishedWork { get; set; } = true;
     }
 
-    public sealed class KanbanFacility
+    public static class WorkOrderStatus
     {
-        public string Id { get; init; } = "";
-        public string Name { get; init; } = "";
+        public const string Open = "Open";
+        public const string InProgress = "InProgress";
+        public const string Done = "Done";
+
+        public const string Blocked = "Blocked";
     }
 
-    public sealed class KanbanTaskCard
+    public static class WorkOrderPriority
     {
-        public int Id { get; init; }
-        public int CardId => Id;
-        public string Status { get; init; } = "";
+        public const string Urgent = "Urgent";
+        public const string Routine = "Routine";
+    }
+
+    public static class MaintenanceWing
+    {
+        public const string Maple = "Maple";
+        public const string Birch = "Birch";
+    }
+
+    public static class BoardRequestType
+    {
+        public const string Added = "cardCreated";
+        public const string Changing = "cardChange";
+        public const string Changed = "cardChanged";
+        public const string Removing = "cardRemove";
+        public const string Removed = "cardRemoved";
+        public const string AddDialog = "Add";
+        public const string EditDialog = "Edit";
+        public const string DeleteDialog = "Delete";
+        public const string HeaderRow = "headerRow";
+    }
+
+    public sealed record WorkOrder
+    {
+        public int Number { get; init; }
+        public string Status { get; init; } = WorkOrderStatus.Open;
         public string Summary { get; init; } = "";
-        public string Priority { get; init; } = "";
-        public string Assignee { get; init; } = "";
-        public string FacilityId { get; init; } = "";
-        public string FacilityName { get; init; } = "";
-        public string Resident { get; init; } = "";
-        public string Due { get; init; } = "";
-        public string Tags { get; init; } = "";
-        public string CardColor { get; init; } = "";
-        public bool IsEscalated { get; init; }
+        public string Room { get; init; } = "";
+        public string Wing { get; init; } = "";
+        public string WingName { get; init; } = "";
+        public string Priority { get; init; } = WorkOrderPriority.Routine;
+        public string Technician { get; init; } = "";
+
+        public int Queue { get; init; }
+
+        public bool SignedOff { get; init; }
+
+        public bool FinishedToday { get; init; }
     }
 
-    public sealed class KanbanBoardResponse
+    public sealed class MaintenanceBoard
     {
+        public WorkOrder[] WorkOrders { get; init; } = [];
         public string Message { get; init; } = "";
-        public IReadOnlyList<KanbanTaskCard> Cards { get; init; } = Array.Empty<KanbanTaskCard>();
-        public int OpenCount { get; init; }
-        public int ReviewCount { get; init; }
-        public int AssistedLivingCount { get; init; }
+
+        public bool BackOrdered { get; init; }
     }
 
-    public sealed class KanbanAuditRequest
-    {
-        public List<KanbanTaskCard> Cards { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> OpenCards { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> AssistedLivingCards { get; init; } = new List<KanbanTaskCard>();
-    }
-
-    public sealed class KanbanAuditResponse
-    {
-        public string Summary { get; init; } = "";
-        public int TotalCards { get; init; }
-        public int OpenCards { get; init; }
-        public int AssistedLivingCards { get; init; }
-    }
-
-    public sealed class KanbanCardMutationResponse
-    {
-        public string Message { get; init; } = "";
-        public KanbanTaskCard Card { get; init; } = new KanbanTaskCard();
-        public int CardId { get; init; }
-    }
-
-    public sealed class KanbanCommitRequest
+    public sealed class WorkOrderChange
     {
         public string RequestType { get; init; } = "";
-        public List<KanbanTaskCard> AddedRecords { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> ChangedRecords { get; init; } = new List<KanbanTaskCard>();
-        public List<KanbanTaskCard> DeletedRecords { get; init; } = new List<KanbanTaskCard>();
+        public List<WorkOrder> AddedRecords { get; init; } = new();
+        public List<WorkOrder> ChangedRecords { get; init; } = new();
+        public List<WorkOrder> DeletedRecords { get; init; } = new();
+
+        public int? Index { get; init; }
     }
 
-    public sealed class KanbanCommitResponse
+    public sealed class WorkOrderRefusal
     {
         public string Message { get; init; } = "";
-        public int TotalChanged { get; init; }
     }
 
-    public sealed class KanbanMoveRequest
+    public sealed class WorkOrderLookup
     {
-        public List<KanbanTaskCard> Cards { get; init; } = new List<KanbanTaskCard>();
-        public int DropIndex { get; init; }
+        public int WorkOrderNumber { get; init; }
     }
 
-    public sealed class KanbanMoveResponse
+    public sealed class WorkOrderHistory
+    {
+        public string History { get; init; } = "";
+    }
+
+    public sealed class WorkOrderHold
+    {
+        public string HeldBy { get; init; } = "";
+        public string Message { get; init; } = "";
+    }
+
+    public sealed class WorkOrderDraft
+    {
+        public WorkOrder WorkOrder { get; init; } = new();
+    }
+
+    public sealed class FrontDeskCalls
+    {
+        public WorkOrder WorkOrder { get; init; } = new();
+        public string Message { get; init; } = "";
+    }
+
+    public sealed class PartArrival
+    {
+        public WorkOrder WorkOrder { get; init; } = new();
+    }
+
+    public sealed class WorkLists
+    {
+        public List<WorkOrder> InProgress { get; init; } = new();
+        public List<WorkOrder> MapleWing { get; init; } = new();
+    }
+
+    public sealed class WorkListsSent
     {
         public string Message { get; init; } = "";
-        public KanbanTaskCard Card { get; init; } = new KanbanTaskCard();
-        public int DropIndex { get; init; }
-    }
-
-    public sealed class KanbanCardSummaryResponse
-    {
-        public string Summary { get; init; } = "";
-    }
-
-    public static class KanbanSeedData
-    {
-        public static IReadOnlyList<KanbanFacility> Facilities { get; } =
-            new List<KanbanFacility>
-            {
-                new KanbanFacility { Id = "AL", Name = "Assisted Living" },
-                new KanbanFacility { Id = "MC", Name = "Memory Care" },
-                new KanbanFacility { Id = "SNF", Name = "Skilled Nursing" }
-            };
-
-        public static IReadOnlyList<KanbanTaskCard> Cards { get; } =
-            new List<KanbanTaskCard>
-            {
-                Card(101, "Open", "Assess fall risk", "High", "Ava Stone", "AL", "Assisted Living", "Eleanor Reed", "Today 10:00", "fall,assessment", "#ef4444", true),
-                Card(102, "InProgress", "Medication reconciliation", "High", "Mateo Cruz", "AL", "Assisted Living", "Harold Lane", "Today 13:00", "meds", "#f97316", true),
-                Card(103, "Review", "Care plan review", "Normal", "Nora Gray", "MC", "Memory Care", "Lena Brooks", "Tomorrow", "care-plan", "#3b82f6", false),
-                Card(104, "Done", "Hydration follow-up", "Low", "Leah Kim", "SNF", "Skilled Nursing", "Walter Finch", "Yesterday", "hydration", "#22c55e", false),
-                Card(105, "Open", "Room transfer checklist", "Normal", "Ira Bell", "MC", "Memory Care", "Miriam Chen", "Friday", "move-in", "#8b5cf6", false),
-                Card(106, "Review", "Therapy handoff", "High", "Dana Fox", "SNF", "Skilled Nursing", "Oscar Hale", "Today 16:00", "therapy", "#06b6d4", true)
-            };
-
-        public static IReadOnlyList<KanbanTaskCard> ForFacility(string? facilityId)
-        {
-            if (string.IsNullOrWhiteSpace(facilityId) || facilityId == "ALL")
-                return Cards;
-
-            return Cards
-                .Where(card => string.Equals(card.FacilityId, facilityId, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-
-        public static KanbanTaskCard NewCard(int id, string facilityId)
-        {
-            var facility = Facilities.FirstOrDefault(x => x.Id == facilityId) ?? Facilities[0];
-            return Card(
-                id,
-                "Open",
-                "Remote wound consult",
-                "High",
-                "Rina Patel",
-                facility.Id,
-                facility.Name,
-                "Grace Taylor",
-                "Today 15:30",
-                "wound,remote",
-                "#dc2626",
-                true);
-        }
-
-        public static KanbanTaskCard UpdatedCard()
-        {
-            return Card(
-                102,
-                "Review",
-                "Medication reconciliation updated",
-                "High",
-                "Mateo Cruz",
-                "AL",
-                "Assisted Living",
-                "Harold Lane",
-                "Today 13:30",
-                "meds,updated",
-                "#2563eb",
-                true);
-        }
-
-        private static KanbanTaskCard Card(
-            int id,
-            string status,
-            string summary,
-            string priority,
-            string assignee,
-            string facilityId,
-            string facilityName,
-            string resident,
-            string due,
-            string tags,
-            string color,
-            bool escalated)
-        {
-            return new KanbanTaskCard
-            {
-                Id = id,
-                Status = status,
-                Summary = summary,
-                Priority = priority,
-                Assignee = assignee,
-                FacilityId = facilityId,
-                FacilityName = facilityName,
-                Resident = resident,
-                Due = due,
-                Tags = tags,
-                CardColor = color,
-                IsEscalated = escalated
-            };
-        }
     }
 }

@@ -1,0 +1,7 @@
+@using Alis.Reactive.Framework.App.Rendering
+@model VitalsCard
+<section id="vitals" aria-label="Vitals">
+    <h2>Vitals</h2>
+    <p>The vitals are <span id="vitals-state">not recorded</span>.</p>
+    @Html.RecordButton("record-vitals", "Record the vitals", "vitals-state")
+</section>

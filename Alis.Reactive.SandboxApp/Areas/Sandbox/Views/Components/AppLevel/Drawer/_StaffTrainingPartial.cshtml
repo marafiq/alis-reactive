@@ -1,11 +1,14 @@
 @model StaffTrainingRecordModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.AppLevel
-@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native
+@using Alis.Reactive.Fusion
 @using Syncfusion.EJ2.DropDowns
 @{
-    var plan = Html.ResolvePlan<StaffTrainingRecordModel>();
+    var plan = Html.ReactivePlan<StaffTrainingRecordModel>();
+
+    plan.Component<NativeDrawer>().Reactive(evt => evt.BeforeClose, (args, p) =>
+        p.When(args.ClosedBy).Eq(DrawerClosedBy.Escape).Then(_ => args.Cancel.Set(true))
+         .ElseIf(args.ClosedBy).Eq(DrawerClosedBy.CloseButton)
+         .Then(discarded => discarded.Element("training-status").Text.Set("Training not recorded.")));
 }
 
 <form id="staff-training-form" class="flex flex-col gap-4">
@@ -33,10 +36,10 @@
         .CssClass("self-start rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90")
         .Reactive(plan, evt => evt.Click, (args, p) =>
         {
-            p.Post(Url.SandboxRoute("RecordStaffTraining", "Drawer"), g => g.IncludeAll())
+            p.Post(Url.SandboxRoute("RecordStaffTraining", "Drawer")).Gather(g => g.Form("staff-training-form"))
              .Response(r => r.OnSuccess<StaffTrainingRecorded>((json, s) =>
              {
-                 s.Element("training-status").SetText(json, x => x.Confirmation);
+                 s.Element("training-status").Text.Set(json.Get(x => x.Confirmation));
                  s.Component<NativeDrawer>().Close();
              }));
         }))

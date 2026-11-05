@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// Configures and renders a native HTML <c>&lt;input type="checkbox"&gt;</c> bound to a model property.
@@ -23,7 +23,7 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type represented by the checked state, typically <see cref="bool"/>.</typeparam>
-    public class NativeCheckBoxBuilder<TModel, TProp> :
+    public sealed class NativeCheckBoxBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
 #else
@@ -38,11 +38,9 @@ namespace Alis.Reactive.Native.Components
 #endif
         private readonly Expression<Func<TModel, bool>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
 
         private string? _cssClass;
 
-        // Internal because the factory also registers this input component in the Reactive Plan.
         internal NativeCheckBoxBuilder(
 #if NET48
             HtmlHelper<TModel> html,
@@ -50,18 +48,12 @@ namespace Alis.Reactive.Native.Components
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, bool>> expression,
-            InputComponentRenderTarget target)
+            string elementId)
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
         }
-
-        internal string ElementId => _elementId;
-
-        internal string BindingPath => _bindingPath;
 
         /// <summary>
         /// Replaces the CSS classes on the checkbox element.

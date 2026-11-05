@@ -1,7 +1,8 @@
 using System;
-using Alis.Reactive.PlanModel;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Requests;
 
-namespace Alis.Reactive.Builders.Requests
+namespace Alis.Reactive
 {
     /// <summary>
     /// Configures request branches that start concurrently in the Reactive Plan.
@@ -12,24 +13,22 @@ namespace Alis.Reactive.Builders.Requests
     /// or failed.
     /// </remarks>
     /// <typeparam name="TModel">View model that owns model-bound component IDs.</typeparam>
-    public class ParallelBuilder<TModel> where TModel : class
+    public sealed class ParallelBuilder<TModel> where TModel : class
     {
         private readonly PlanBuildContext _context;
-        private readonly ParallelDraft _draft = new ParallelDraft();
 
         internal ParallelBuilder(PlanBuildContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        internal void AddBranch(Action<HttpRequestBuilder<TModel>> request)
+        internal void AddBranch(Func<RequestStart<TModel>, HttpRequestBuilder<TModel>> request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-
-            var builder = new HttpRequestBuilder<TModel>(_context);
-            request(builder);
-            _draft.AddBranch(builder.BuildRequest());
+            request(new RequestStart<TModel>(_context, Step.Add));
         }
+
+        internal ParallelStep Step { get; } = new ParallelStep();
 
         /// <summary>
         /// Runs a reaction after every parallel request branch has settled.
@@ -39,16 +38,8 @@ namespace Alis.Reactive.Builders.Requests
         {
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
-            var reactionPipeline = new PipelineBuilder<TModel>(_context);
-            pipeline(reactionPipeline);
-            var reaction = reactionPipeline.BuildReaction();
-            _draft.RunWhenAllSettled(reaction);
+            Step.OnAllSettled(PipelineBuilder<TModel>.Build(_context, pipeline));
             return this;
-        }
-
-        internal ReactionGraph BuildReaction()
-        {
-            return _draft.ToReaction();
         }
     }
 }

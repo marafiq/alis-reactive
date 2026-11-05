@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native
 {
     /// <summary>
     /// Configures and renders a native HTML checkbox list bound to a model property.
@@ -29,7 +29,7 @@ namespace Alis.Reactive.Native.Components
     /// </remarks>
     /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
     /// <typeparam name="TProp">Model value type represented by the checked option values.</typeparam>
-    public class NativeCheckListBuilder<TModel, TProp> :
+    public sealed class NativeCheckListBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
     {
@@ -42,42 +42,36 @@ namespace Alis.Reactive.Native.Components
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
         private readonly string _bindingPath;
-        private readonly List<RadioButtonItem> _options = new List<RadioButtonItem>();
-        private string _cssClass = "flex flex-col gap-2";
-        private string _optionCssClass = "flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-surface-secondary has-[:checked]:border-accent has-[:checked]:bg-accent/5";
+        private readonly List<CheckListItem> _options = new List<CheckListItem>();
+        private string _cssClass = "alis-check-list";
+        private string _optionCssClass = "alis-check-list__option";
 
-        // Internal because the factory also registers this input component in the Reactive Plan.
 #if NET48
         internal NativeCheckListBuilder(
             HtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #else
         internal NativeCheckListBuilder(
             IHtmlHelper<TModel> html,
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId,
+            string bindingPath)
 #endif
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
+            _bindingPath = bindingPath;
         }
-
-        internal string ElementId => _elementId;
-
-        internal string BindingPath => _bindingPath;
-
-        internal IReadOnlyList<RadioButtonItem> Options => _options;
 
         /// <summary>
         /// Adds checkbox options supplied outside the fluent builder, such as
         /// controller or view-model option lists.
         /// </summary>
         /// <param name="items">Checkbox items to display.</param>
-        public NativeCheckListBuilder<TModel, TProp> Items(IEnumerable<RadioButtonItem> items)
+        public NativeCheckListBuilder<TModel, TProp> Items(IEnumerable<CheckListItem> items)
         {
             foreach (var item in items)
                 _options.Add(item);
@@ -90,7 +84,7 @@ namespace Alis.Reactive.Native.Components
         /// <param name="value">Option value and display text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value)
         {
-            _options.Add(new RadioButtonItem(value, value));
+            _options.Add(new CheckListItem(value, value));
             return this;
         }
 
@@ -101,7 +95,7 @@ namespace Alis.Reactive.Native.Components
         /// <param name="text">Checkbox display text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value, string text)
         {
-            _options.Add(new RadioButtonItem(value, text));
+            _options.Add(new CheckListItem(value, text));
             return this;
         }
 
@@ -113,7 +107,7 @@ namespace Alis.Reactive.Native.Components
         /// <param name="description">Secondary description shown below the text.</param>
         public NativeCheckListBuilder<TModel, TProp> Option(string value, string text, string description)
         {
-            _options.Add(new RadioButtonItem(value, text, description));
+            _options.Add(new CheckListItem(value, text, description));
             return this;
         }
 
@@ -151,7 +145,6 @@ namespace Alis.Reactive.Native.Components
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
 #if NET48
-            // System.Web.Mvc NameFor honors the active HtmlFieldPrefix; ExpressionHelper.GetExpressionText drops it.
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression).ToHtmlString());
 #else
             var rawValue = _html.ViewData.Eval(_html.NameFor(_expression));
@@ -162,13 +155,11 @@ namespace Alis.Reactive.Native.Components
 
             var encodedId = encoder.Encode(_elementId);
 
-            // Container is the Reactive Plan component target and exposes string[] value semantics.
-            writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\">");
+            writer.Write($"<div id=\"{encodedId}\" class=\"{encoder.Encode(_cssClass)}\" data-alis-check-list>");
 
-            // Hidden input keeps MVC form submission as CSV; it is not the component target.
             writer.Write($"<input type=\"hidden\" name=\"{encoder.Encode(_bindingPath)}\" value=\"{encoder.Encode(modelValue)}\" />");
 
-            for (int i = 0; i < _options.Count; i++)
+            for (var i = 0; i < _options.Count; i++)
             {
                 var option = _options[i];
                 var checkboxId = $"{_elementId}_c{i}";
@@ -181,11 +172,11 @@ namespace Alis.Reactive.Native.Components
                 if (isChecked) writer.Write(" checked");
                 writer.Write(" />");
 
-                writer.Write("<div class=\"flex flex-col\">");
-                writer.Write($"<span class=\"text-sm font-medium leading-none\">{encoder.Encode(option.Text)}</span>");
+                writer.Write("<div class=\"alis-check-list__text\">");
+                writer.Write($"<span class=\"alis-check-list__label\">{encoder.Encode(option.Text)}</span>");
                 if (option.Description != null)
                 {
-                    writer.Write($"<span class=\"text-xs text-content-secondary mt-1\">{encoder.Encode(option.Description)}</span>");
+                    writer.Write($"<span class=\"alis-check-list__description\">{encoder.Encode(option.Description)}</span>");
                 }
                 writer.Write("</div>");
 
@@ -194,21 +185,17 @@ namespace Alis.Reactive.Native.Components
             }
 
             writer.Write("</div>");
-
-            // Inline initialization works on page load and partial injection without DOM scanning.
-            // It keeps the container string[] value and hidden input CSV in sync.
-            writer.Write($@"<script>(function(){{var c=document.getElementById(""{encodedId}"");var h=c.querySelector(""input[type=hidden]"");var init=h.value.split("","").filter(Boolean);c.value=init;c.isInteracted=false;c.addEventListener(""change"",function(e){{if(e.target.type!==""checkbox"")return;var v=[];var cbs=c.querySelectorAll(""input[type=checkbox]"");for(var i=0;i<cbs.length;i++)if(cbs[i].checked)v.push(cbs[i].value);c.value=v;h.value=v.join("","");c.isInteracted=true;}});}})();</script>");
         }
 
-        // The property holds the checked values as a collection (string[], List<string>, ...) or, for a
-        // string property, as CSV text. Empty items check nothing, as the component's value drops them.
         private static string[] SelectedValues(object? rawValue)
         {
             if (rawValue is IEnumerable values && rawValue is not string)
+            {
                 return values.Cast<object?>()
                     .Select(value => FormattableString.Invariant($"{value}"))
                     .Where(value => value.Length > 0)
                     .ToArray();
+            }
 
             return (rawValue?.ToString() ?? "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }

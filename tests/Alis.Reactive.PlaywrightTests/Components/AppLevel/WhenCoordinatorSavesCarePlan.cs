@@ -1,9 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
-/// <summary>
-/// As a coordinator, I want the loader to stay up until my care plan is saved, even right after
-/// a quick census refresh, so that I never act on a page that is still saving.
-/// </summary>
 [TestFixture]
 public class WhenCoordinatorSavesCarePlan : PlaywrightTestBase
 {
@@ -20,8 +16,6 @@ public class WhenCoordinatorSavesCarePlan : PlaywrightTestBase
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
-        // Page time is paused and moved only by the test, so the census loader's 3 s safety
-        // timeout elapses while the save is still in flight, and never on its own.
         await Page.Clock.PauseAtAsync(DateTime.UtcNow.AddSeconds(1));
 
         await ClickWhenStable(RefreshCensus);
@@ -32,8 +26,6 @@ public class WhenCoordinatorSavesCarePlan : PlaywrightTestBase
         await Expect(Loader).ToBeVisibleAsync();
         await Page.Clock.RunForAsync(3500);
 
-        // Hiding sets aria-hidden at once, while the fade keeps the overlay painted for 0.2 s,
-        // so the loader's hidden state is read from aria-hidden rather than from paint.
         await Expect(Loader).Not.ToHaveAttributeAsync("aria-hidden", "true");
         await Expect(CarePlanStatus).ToHaveTextAsync("Care plan saved.");
         await Expect(Loader).ToBeHiddenAsync();

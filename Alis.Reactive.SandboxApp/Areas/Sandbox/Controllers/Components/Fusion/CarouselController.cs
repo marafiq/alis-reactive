@@ -40,7 +40,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             });
         }
 
-        private static string SectionName(int index) =>
-            index >= 0 && index < SectionNames.Length ? SectionNames[index] : "an unknown section";
+        private static string SectionName(int index)
+            => index >= 0 && index < SectionNames.Length ? SectionNames[index] : "an unknown section";
     }
 }

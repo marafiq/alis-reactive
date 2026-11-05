@@ -1,0 +1,36 @@
+@using Alis.Reactive.Framework.App.Vendors
+@model VendorRefusalsPage
+@{
+    ViewData["Title"] = "A refused vendor";
+    var plan = Html.ReactivePlan<VendorRefusalsPage>();
+}
+<h1>A refused vendor</h1>
+
+@plan.Slate("slate", title: "Round")
+
+@switch (Model.Mistake)
+{
+    case VendorMistake.NameAVendorStartingWithADigit:
+        @(plan.Button("clear", "Clear").Reactive(button => button.Click, p => p.Component<DigitNamedSlate>("slate").Clear()))
+        break;
+    case VendorMistake.PathAnObjectWithAStrayDot:
+        @(plan.Button("clear", "Clear").Reactive(button => button.Click, p => p.Component<StrayDotSlate>("slate").Clear()))
+        break;
+    case VendorMistake.NameTwoVendorsAlike:
+        <div id="board"></div>
+        @(plan.Button("clear", "Clear").Reactive(button => button.Click, p =>
+        {
+            p.Component<Slate>("slate").Clear();
+            p.Component<Board>("board").Clear();
+        }))
+        break;
+    case VendorMistake.ReadTheSlateAsAMeter:
+        @(plan.Button("clear", "Clear").Reactive(button => button.Click, p =>
+        {
+            p.Component<Slate>("slate").Clear();
+            p.Component<Meter>("slate").Level.Set(1);
+        }))
+        break;
+}
+
+@Html.RenderPlan(plan)

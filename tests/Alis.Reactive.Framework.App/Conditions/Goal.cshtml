@@ -1,0 +1,46 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model GoalPage
+@{
+    ViewData["Title"] = "Comfort goal";
+    var plan = Html.ReactivePlan<GoalPage>();
+}
+<h1>Comfort goal</h1>
+
+<h2>Pain</h2>
+@plan.Meter("pain", level: 3, max: 5)
+<h2>Goal</h2>
+@plan.Meter("goal", level: 3, max: 5)
+
+<p>On the goal: <span id="on-goal"></span></p>
+<p>Off the goal: <span id="off-goal"></span></p>
+<p>Over the goal: <span id="over-goal"></span></p>
+<p>At or over the goal: <span id="goal-or-over"></span></p>
+<p>Under the goal: <span id="under-goal"></span></p>
+<p>At or under the goal: <span id="goal-or-under"></span></p>
+
+@(plan.Button("compare", "Compare with the goal")
+    .Reactive(button => button.Click, p =>
+    {
+        var pain = p.Component<Meter>("pain").Level;
+        var goal = p.Component<Meter>("goal").Level;
+        p.When(pain).Eq(goal)
+            .Then(t => t.Element("on-goal").Text.Set("on the goal"))
+            .Else(e => e.Element("on-goal").Text.Set("not on the goal"));
+        p.When(pain).NotEq(goal)
+            .Then(t => t.Element("off-goal").Text.Set("off the goal"))
+            .Else(e => e.Element("off-goal").Text.Set("not off the goal"));
+        p.When(pain).Gt(goal)
+            .Then(t => t.Element("over-goal").Text.Set("over the goal"))
+            .Else(e => e.Element("over-goal").Text.Set("not over the goal"));
+        p.When(pain).Gte(goal)
+            .Then(t => t.Element("goal-or-over").Text.Set("at or over the goal"))
+            .Else(e => e.Element("goal-or-over").Text.Set("under the goal"));
+        p.When(pain).Lt(goal)
+            .Then(t => t.Element("under-goal").Text.Set("under the goal"))
+            .Else(e => e.Element("under-goal").Text.Set("not under the goal"));
+        p.When(pain).Lte(goal)
+            .Then(t => t.Element("goal-or-under").Text.Set("at or under the goal"))
+            .Else(e => e.Element("goal-or-under").Text.Set("over the goal"));
+    }))
+
+@Html.RenderPlan(plan)

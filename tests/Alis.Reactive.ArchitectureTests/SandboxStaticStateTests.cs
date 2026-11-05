@@ -5,51 +5,14 @@ using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
 
-/// <summary>
-/// Isolation clause 3 made mechanical (memory/bdd-principles.md, Nested
-/// Vertical Slices): a journey's data is unreachable from other journeys and
-/// other worlds. A static store in the sandbox is process-global — every
-/// browser world sees the same instance, so parallel tests collide.
-/// Readonly seed lists are fine; stores are not.
-/// </summary>
 [TestFixture]
 public class SandboxStaticStateTests
 {
-    // The only registry of exceptions. Two categories: keyed stores whose key
-    // already isolates (per flow id or per world), and process-global debt with
-    // a named removal trigger. New statics get a per-world mechanism (the Grid
-    // Billing session store is the exemplar), not an allowlist entry.
     private static readonly string[] Allowlist =
     [
-        // -- Keyed per flow id or per world: each wizard run / drill world reads
-        //    its own key, so worlds do not collide. Migrate to session stores as
-        //    touched.
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step1Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step2Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step3Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.AdmissionWizardController.Step4Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step1Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step2Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step3Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Conditions.AdmissionAssessmentController.Step4Drafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.IntakeDrafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.CareDrafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.ContactDrafts",
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.StepperController.ReviewDrafts",
         "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.RealTimeController.DrillWorlds",
-
-        // -- Process-global debt: shared across browser worlds, real collision
-        //    surface. Each names its removal trigger.
-        // Schedule pre-pattern store, keyed by facility id, not by world —
-        // remove with the Schedule journey-slice refactor (recorded in
-        // docs/superpowers/plans/claude-setup-experiments-rc3.md).
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Models.FakeScheduleData.Store",
-        // Deleted-row set shared across worlds — remove when the ActionLink
-        // slice gets a per-world store.
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline.HttpController._deletedNativeActionLinkRows",
-        // Kanban board shared across worlds — remove when the Kanban slice
-        // gets a per-world store.
-        "Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion.KanbanController.BoardCards",
+        "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.DrillConnections",
+        "Alis.Reactive.SandboxApp.Hubs.ResidentStatusHub.BrokenDrills",
     ];
 
     [Test]
@@ -87,8 +50,6 @@ public class SandboxStaticStateTests
 
         foreach (var type in assembly.GetTypes())
         {
-            if (type.Namespace?.Contains("Areas.Sandbox") != true)
-                continue;
             if (type.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false))
                 continue;
 
@@ -99,26 +60,30 @@ public class SandboxStaticStateTests
             {
                 if (field.IsLiteral)
                     continue;
-                if (field.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false))
+                var name = AutoPropertyName(field) ?? field.Name;
+                if (name == field.Name && field.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false))
                     continue;
 
-                yield return (field, $"{type.FullName}.{field.Name}");
+                yield return (field, $"{type.FullName}.{name}");
             }
         }
     }
 
-    // Keyed lookups are stores: their content mutates per key across worlds,
-    // readonly or not.
-    private static bool IsStoreShaped(Type type) =>
-        typeof(IDictionary).IsAssignableFrom(type)
+    private static string? AutoPropertyName(FieldInfo field)
+        => field.Name.StartsWith('<') && field.Name.EndsWith(">k__BackingField", StringComparison.Ordinal)
+            ? field.Name[1..field.Name.IndexOf('>')]
+            : null;
+
+    private static bool IsStoreShaped(Type type)
+        => typeof(IDictionary).IsAssignableFrom(type)
         || type.Namespace == "System.Collections.Concurrent"
         || ImplementsGenericInterface(type, typeof(IDictionary<,>))
         || ImplementsGenericInterface(type, typeof(ISet<>));
 
-    private static bool IsCollection(Type type) =>
-        type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
+    private static bool IsCollection(Type type)
+        => type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
 
-    private static bool ImplementsGenericInterface(Type type, Type genericInterface) =>
-        type.GetInterfaces().Append(type).Any(i =>
+    private static bool ImplementsGenericInterface(Type type, Type genericInterface)
+        => type.GetInterfaces().Append(type).Any(i =>
             i.IsGenericType && i.GetGenericTypeDefinition() == genericInterface);
 }

@@ -1,13 +1,13 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.VitalsAlert;
 
 public class VitalsAlertModel
 {
     public decimal HeartRate { get; set; }
 }
 
-public class AlertResponse
+public sealed class HeartRateReading
 {
-    public string Message { get; set; } = "";
-    public string Timestamp { get; set; } = "";
-    public string Level { get; set; } = "";
+    public decimal HeartRate { get; set; }
 }
+
+public sealed record HeartRateAlert(string Status, string Message);

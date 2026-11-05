@@ -5,12 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Respite-stay booking: the coordinator picks a community, enters the daily rate and,
-    /// when known, the expected number of nights and whether the community drives the resident
-    /// in. The confirmation repeats what the server received, so a blank field that reached the
-    /// server as zero or "no" shows up on the page.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/RespiteBooking")]
     public class RespiteBookingController : Controller
@@ -39,13 +33,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 
             var result = new RespiteBookingValidator().Validate(booking);
             if (!result.IsValid)
-            {
-                return FieldErrors(result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray()));
-            }
+                return FieldErrors(result.ErrorsByField);
 
-            // The validator requires the community and the daily rate.
             var communityId = booking.CommunityId!.Value;
             var dailyRate = booking.DailyRate!.Value;
             if (!Communities.TryGetValue(communityId, out var community))
@@ -57,7 +46,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
             return Ok(new RespiteBookingConfirmation(ConfirmationFor(booking, community, dailyRate)));
         }
 
-        private BadRequestObjectResult FieldErrors(Dictionary<string, string[]> errors) => BadRequest(new { errors });
+        private BadRequestObjectResult FieldErrors(IReadOnlyDictionary<string, string[]> errors) => BadRequest(new { errors });
 
         private static string ConfirmationFor(RespiteBookingModel booking, string community, decimal dailyRate)
         {

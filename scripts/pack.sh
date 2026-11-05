@@ -12,9 +12,9 @@ Example:
 
 Builds delivery artifacts in order:
   1. install npm dependencies if node_modules is missing
-  2. build all browser assets
+  2. build the packages' browser assets
   3. run dotnet build --configuration Release
-  4. pack the six shipped NuGet packages into ./nupkgs
+  4. pack the five shipped NuGet packages into ./nupkgs
 
 The script clears old .nupkg/.snupkg files from ./nupkgs first so the output
 list only contains packages from this run. dotnet pack never runs npm.
@@ -45,19 +45,18 @@ OUTPUT_DIR="nupkgs"
 echo "[pack] ensuring npm dependencies"
 [ -d node_modules ] || npm ci
 
-echo "[pack] building browser assets"
-npm run build:all
+echo "[pack] building the packages' browser assets"
+npm run build:packages
 
 echo "[pack] compiling Release projects"
 dotnet build --configuration Release
 
 PACKAGES=(
-  Alis.Reactive                 # core plan model, builders, serialization, runtime JS bundle
-  Alis.Reactive.Native          # native HTML components
-  Alis.Reactive.Fusion          # Syncfusion EJ2 integration + syncfusion CSS bundle
-  Alis.Reactive.FluentValidator # FluentValidation client-metadata adapter
-  Alis.Reactive.DesignSystem    # design-system tokens + layout helpers + CSS bundle
-  Alis.Reactive.NativeTagHelpers # ASP.NET Core tag helpers (net10.0 only)
+  Alis.Reactive
+  Alis.Reactive.Native
+  Alis.Reactive.Fusion
+  Alis.Reactive.DesignSystem
+  Alis.Reactive.NativeTagHelpers
 )
 
 mkdir -p "$OUTPUT_DIR"

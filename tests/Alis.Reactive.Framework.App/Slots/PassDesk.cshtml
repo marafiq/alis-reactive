@@ -1,0 +1,41 @@
+@using Alis.Reactive.Framework.App.Slots
+@model PassDeskPage
+@{
+    ViewData["Title"] = "The pass desk";
+    var plan = Html.ReactivePlan<PassDeskPage>();
+}
+<h1>The pass desk</h1>
+
+<div id="pass-slot"></div>
+<p>The pass: <span id="pass-status">not printed</span></p>
+
+@switch (Model.Step)
+{
+    case PassDeskStep.WriteBesideTheSlot:
+        @(plan.Button("print-pass", "Print the pass")
+            .Reactive(button => button.Click, p => p.Get("/Slots/VisitorCard").Response(r => r.OnSuccess(s => s.Into("pass-slot")))))
+        @(plan.Button("mark-printed", "Mark the pass printed")
+            .Reactive(button => button.Click, p => p.Element("pass-status").Text.Set("printed")))
+        break;
+    case PassDeskStep.ClearTheSlotsHtml:
+        @(plan.Button("print-pass", "Print the pass")
+            .Reactive(button => button.Click, p => p.Get("/Slots/VisitorCard").Response(r => r.OnSuccess(s => s.Into("pass-slot")))))
+        @(plan.Button("void-pass", "Void the pass")
+            .Reactive(button => button.Click, p => p.Element("pass-slot").Html.Set("")))
+        break;
+    case PassDeskStep.WriteTheSlotsTextFromAPartial:
+        @await Html.PartialAsync("PassNotice", new PassNotice())
+        @(plan.Button("print-pass", "Print the pass")
+            .Reactive(button => button.Click, p => p.Get("/Slots/VisitorCard").Response(r => r.OnSuccess(s => s.Into("pass-slot")))))
+        break;
+    case PassDeskStep.WriteTheTextOfTheSlotItUnloads:
+        @(plan.Button("void-pass", "Void the pass")
+            .Reactive(button => button.Click, p =>
+            {
+                p.Unload("pass-slot");
+                p.Element("pass-slot").Text.Set("The pass is void.");
+            }))
+        break;
+}
+
+@Html.RenderPlan(plan)

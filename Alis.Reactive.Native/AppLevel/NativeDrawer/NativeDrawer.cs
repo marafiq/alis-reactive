@@ -1,22 +1,122 @@
-namespace Alis.Reactive.Native.AppLevel
+using System.Text.Json.Serialization;
+#if NET48
+using System.Web;
+using System.Web.Mvc;
+#else
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+#endif
+
+namespace Alis.Reactive.Native
 {
     /// <summary>
-    /// App-level slide-out drawer panel that can be referenced without an explicit ID.
+    /// The page's slide-out drawer, declared by the members its element carries.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// One drawer exists per page and can be referenced without an explicit ID:
-    /// </para>
-    /// <code>p.Component&lt;NativeDrawer&gt;().Open()</code>
+    /// One drawer exists per page, rendered by <c>@Html.NativeDrawer()</c> in the layout, and is
+    /// referenced without an ID:
+    /// <code>
+    /// var drawer = p.Component&lt;NativeDrawer&gt;();
+    /// drawer.Size.Set(DrawerSize.Md);
+    /// drawer.Open();
+    /// </code>
+    /// Load its content into <c>alis-drawer-content</c> and its heading into <c>alis-drawer-title</c>.
+    /// Escape, the close button and <see cref="Close"/> close the drawer. A partial view whose content closing
+    /// would lose keeps the drawer open by handling <see cref="BeforeClose"/>, and its handler lasts while the
+    /// partial view is in the drawer:
+    /// <code>
+    /// plan.Component&lt;NativeDrawer&gt;().Reactive(evt =&gt; evt.BeforeClose, (args, p) =&gt;
+    ///     p.When(args.ClosedBy).Eq(DrawerClosedBy.Escape).Then(_ =&gt; args.Cancel.Set(true)));
+    /// </code>
     /// </remarks>
     public sealed class NativeDrawer : NativeComponent, IAppLevelComponent
     {
-        /// <summary>
-        /// Well-known layout element ID for the drawer.
-        /// </summary>
+        /// <summary>Well-known layout element ID for the drawer.</summary>
         public const string ElementId = "alis-drawer";
 
         /// <inheritdoc />
         public string DefaultId => ElementId;
+
+        /// <summary>The panel width; closing the drawer resets it.</summary>
+        public Property<DrawerSize> Size => Property<DrawerSize>();
+
+        /// <summary>Slides the drawer in.</summary>
+        public void Open() => Method();
+
+        /// <summary>Slides the drawer out; its content and heading clear when it has closed.</summary>
+        public void Close() => Method();
+
+        /// <summary>Raised before the open drawer closes, by Escape, its close button or <see cref="Close"/>.</summary>
+        /// <remarks>Set <c>args.Cancel</c> in the handler to keep the drawer open.</remarks>
+        public Event<NativeDrawerBeforeCloseArgs> BeforeClose => Event<NativeDrawerBeforeCloseArgs>();
+    }
+
+    /// <summary>Payload of <see cref="NativeDrawer.BeforeClose"/>.</summary>
+    public sealed class NativeDrawerBeforeCloseArgs : JsObject
+    {
+        /// <summary>Gets what is closing the drawer.</summary>
+        public ReadOnly<DrawerClosedBy> ClosedBy => ReadOnly<DrawerClosedBy>();
+
+        /// <summary>Set to <see langword="true"/> with <c>args.Cancel.Set(true)</c> to keep the drawer open.</summary>
+        public Property<bool> Cancel => Property<bool>();
+    }
+
+    /// <summary>What closes a <see cref="NativeDrawer"/>.</summary>
+    public enum DrawerClosedBy
+    {
+        /// <summary>The user pressed Escape.</summary>
+        [JsonStringEnumMemberName("escape")]
+        Escape,
+
+        /// <summary>The user clicked the drawer's close button.</summary>
+        [JsonStringEnumMemberName("closeButton")]
+        CloseButton,
+
+        /// <summary>A pipeline called <see cref="NativeDrawer.Close"/>.</summary>
+        [JsonStringEnumMemberName("close")]
+        Close
+    }
+
+    /// <summary>The width of the <see cref="NativeDrawer"/> panel.</summary>
+    public enum DrawerSize
+    {
+        /// <summary>Small width.</summary>
+        [JsonStringEnumMemberName("sm")]
+        Sm,
+
+        /// <summary>Medium width.</summary>
+        [JsonStringEnumMemberName("md")]
+        Md,
+
+        /// <summary>Large width.</summary>
+        [JsonStringEnumMemberName("lg")]
+        Lg
+    }
+
+    /// <summary>Renders the page's <see cref="NativeDrawer"/>.</summary>
+    public static class NativeDrawerHtmlExtensions
+    {
+        /// <summary>Renders the drawer, hidden; call it once in the layout.</summary>
+#if NET48
+        public static IHtmlString NativeDrawer(this HtmlHelper html)
+        {
+            return new MvcHtmlString(
+#else
+        public static IHtmlContent NativeDrawer(this IHtmlHelper html)
+        {
+            return new HtmlString(
+#endif
+                "<aside id=\"" + Alis.Reactive.Native.NativeDrawer.ElementId + "\" class=\"alis-drawer\" aria-hidden=\"true\">\n" +
+                "  <div class=\"alis-drawer__panel\">\n" +
+                "    <div class=\"alis-drawer__header\">\n" +
+                "      <h2 id=\"alis-drawer-title\" class=\"alis-drawer__title\"></h2>\n" +
+                "      <button id=\"alis-drawer-close\" type=\"button\" class=\"alis-drawer__close\" aria-label=\"Close\">\n" +
+                "        <svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path d=\"M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z\"/></svg>\n" +
+                "      </button>\n" +
+                "    </div>\n" +
+                "    <div id=\"alis-drawer-content\" class=\"alis-drawer__content\"></div>\n" +
+                "  </div>\n" +
+                "</aside>\n");
+        }
     }
 }

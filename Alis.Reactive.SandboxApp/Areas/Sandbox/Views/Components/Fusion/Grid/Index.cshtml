@@ -1,82 +1,64 @@
-@model Alis.Reactive.SandboxApp.Areas.Sandbox.Models.GridModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Fusion.Components
-@using Syncfusion.EJ2.Grids
 @{
     ViewData["Title"] = "FusionGrid";
-
-    var plan = Html.ReactivePlan<GridModel>();
 
     var demoGroups = new (string Group, (string Action, string Label, string Description)[] Links)[]
     {
         ("Boards", new[]
         {
-            ("Directory", "Resident directory", "Server-driven paging, sorting, filtering, search, grouping, and virtual scrolling with typed row events and public method calls"),
-            ("Operations", "Operations board", "Column show/hide/reorder, keyed cell and row updates, view and selection queries, and typed template actions"),
-            ("Billing", "Billing board", "Server-side paging, sorting, batch rate edits, multi-select bulk increases, validated dialog admits, custom toolbar, and exports"),
-            ("CareOps", "Care-ops board", "Batch cell editing with dropdown, date, and numeric editors, checkbox bulk selection, chip filters, and validation-backed care updates"),
+            ("Directory", "Resident directory", "Find residents by name, wing, care level, risk or nurse; open their card and step through tonight's rounds"),
+            ("Operations", "Clinical updates", "Apply the pharmacy's and therapy's updates to a resident's row, and record the clinical review team's decision for the resident picked on the board"),
+            ("Billing", "Billing board", "Month-end billing: page, sort and filter the month's charges on the server, correct a rate in the grid, raise or bill selected residents, and email statements"),
+            ("CareOps", "Care-ops board", "Care operations: narrow the census with chips, edit nurse and open tasks in the grid, reassign, flag or discharge ticked residents, and work a high-risk watch list"),
         }),
         ("Inline & dialog editing", new[]
         {
-            ("Editing", "Editing workflows", "Inline, batch, and dialog-template editing with typed method calls, cancelable events, gathered batch changes, and validation-backed grid updates"),
-            ("BeginEditNormal", "BeginEdit (normal + dialog)", "Inline and dialog edit modes with typed startEdit, selectRow, closeEdit calls and a beginEdit event that cancels locked rows"),
-            ("InlineEdit", "Inline edit", "Open, cancel, and commit a row's inline editor via typed startEdit, closeEdit, and endEdit method calls"),
-            ("LockedResidentEdit", "Locked resident edit", "Programmatic row selection and edit start, with a BeginEdit handler that cancels editing for a locked resident"),
-            ("ResidentEditForm", "Edit form templates", "Inline cell editors and a labeled dialog admission form, each typed edit template rendering its own dropdown, date, or number editor"),
-            ("ResidentAdmissionAudit", "Admission audit (add/delete)", "Adding and deleting rows via typed methods, with edit-action payloads audited and a blocked admission cancelled before persisting"),
-            ("ActionCompleteSaveEdit", "ActionComplete proof", "Normal-mode inline editing with Edit/Update/Cancel toolbar, typed select and edit commands, and ActionComplete surfacing save request details"),
+            ("Editing", "Maple wing roster", "Inline roster corrections: open a resident due for review, save or discard, admit from the waiting list, move out, and apply a validated handoff correction; a move into memory care is refused as a roster edit"),
+            ("BeginEditNormal", "Care reviews", "A dialog review form for each resident; opening a review checks the record out, and a record on hold for a hospital transfer stays closed"),
+            ("InlineEdit", "Care-plan reviews", "Move a resident's next review inline; the calendar books a weekday and refuses a weekend, which goes back to the day on file"),
+            ("LockedResidentEdit", "Resident records", "Update a family's phone on a resident's record; a discharged resident's record stays closed and the page says why"),
+            ("ResidentEditForm", "Admissions desk", "Correct a resident's care level, nurse and next review inline, and admit the next referral on its labelled admission form"),
+            ("ResidentAdmissionAudit", "Move-in day", "Move arrivals onto the roster and departures off it; an unsigned residency agreement refuses the move-in"),
+            ("ActionCompleteSaveEdit", "Pharmacy name corrections", "Inline corrections on the roster; a saved change of name goes to the pharmacy with the old and new name, and other changes send nothing"),
         }),
         ("Batch editing", new[]
         {
-            ("BatchTaskUpdate", "Batch task update", "Batch-editing a numeric task-count cell via typed editCell, updateCell, and saveCell method calls on loaded rows"),
-            ("BatchCellEdit", "Batch cell edit", "Batch-mode cell editing via typed editCell/updateCell/saveCell calls, with cellSave and beforeBatchSave validation cancels and gathered batch changes"),
-            ("BatchRiskReview", "Batch risk review", "Batch-mode grid flagging a resident's risk via UpdateCell, then gathering pending batch changes for a posted review summary"),
-            ("BatchRosterChange", "Batch roster change", "Staging an admit and discharge as one batch, then reviewing added and deleted records before commit"),
-            ("BatchChangeReview", "Batch change review", "Batch-editing task counts, then binding a review grid from the beforeBatchSave event payload's changed records"),
+            ("BatchTaskUpdate", "Day task board", "Keep the wing's open-task counts current, mark a resident's tasks all done, and hand the board to the evening shift"),
+            ("BatchCellEdit", "Evening task count", "Count open tasks and missed doses, bring in the task board, and hold the save while a resident has eight open tasks"),
+            ("BatchRiskReview", "Falls huddle", "Raise the fall risk of residents who fell overnight, change other risks in the cell, and send the changes to care planning"),
+            ("BatchRosterChange", "Suite turnover", "Record a move-out and a move-in as one batch, held until housekeeping signs off the suite"),
+            ("BatchChangeReview", "Night safety checks", "Correct the aides' checks, review the changes in a second grid, reopen one, and save them to the night log"),
+            ("FamilyContacts", "Family contacts", "Batch cell editing whose cells check the contact validator's rules: name, phone pattern, email, portal link and visit bounds"),
+            ("ShiftTaskTally", "Shift task tally", "Batch counts at shift change: impossible counts are refused in the cell, an eMAR sync updates a count, and the tally waits for the supervisor when a resident carries ten or more tasks"),
         }),
         ("Rows, selection & review", new[]
         {
-            ("RosterCrud", "Roster CRUD", "Add, replace, select, and delete grid rows via typed AddRecord, UpdateRow, and DeleteSelectedRecord method calls"),
-            ("KeyedUpdate", "Keyed update", "Update a resident's cell or replace an entire row by primary key using typed grid method calls"),
-            ("RosterSelection", "Roster selection", "Multiple-row selection via typed SelectRow, SelectRowsByRange, and ClearSelection method calls, with status updates and fetched roster data"),
-            ("CareReview", "Care review", "Multi-row selection with typed grid method calls gathering current-view, row-index, and selected-record summaries from the server"),
-            ("CareStaffColumns", "Care staff columns", "Hiding, restoring, and reordering grid columns via typed method calls, with reorderable headers and DomReady-loaded data"),
+            ("RosterCrud", "Cedar wing front desk", "Admit into a free suite in suite order, move a resident to another suite, and record today's move-outs as the server answers"),
+            ("KeyedUpdate", "Evening rounds", "Record a task done or a fall for the resident picked on the board, or bring in their chart; the answer changes that row by key"),
+            ("RosterSelection", "Botanical garden outing", "Seat the first four to sign up or the resident turned away last time, clear the bus, and book it; the server names who goes"),
+            ("CareReview", "Wing care reviews", "Go through the wing a page at a time, put the residents you pick on the care conference agenda, and start a resident's review from their row"),
+            ("CareStaffColumns", "Huddle sheet", "Arrange the morning huddle sheet before it prints: leave columns off or put them back, lead with risk, and name the wing column"),
         }),
         ("Columns, tooling & print", new[]
         {
-            ("ColumnFit", "Column fit", "Auto-fitting a single wide column or all columns to their content via typed grid method calls"),
-            ("GridTooling", "Grid tooling", "Paged resident grid with column chooser, navigated and toggled by buttons calling typed grid methods"),
-            ("RosterExport", "Roster export", "CSV, Excel, and PDF roster export triggered by typed grid method calls with status feedback"),
+            ("ColumnFit", "Evening med pass", "A compact sheet that cuts long names short; widen the medication column or every column to read names in full"),
+            ("GridTooling", "Shift schedule", "A day to a page; the grid's toolbar jumps to the weekend and opens the column chooser"),
+            ("RosterExport", "Monthly census", "Download a closed month's census as Excel, CSV or PDF; an open month is refused"),
             ("PrintableRoster", "Printable roster", "Printing the resident roster grid via a typed Print method call that opens the browser print view"),
         }),
         ("Data source binding", new[]
         {
-            ("ServerRoster", "Server-backed roster", "Server-backed roster binding with server-driven admit, keyed row update, patch, and nested data-source loads from typed responses"),
+            ("ServerRoster", "Resident roster", "Bring today's changes from the record onto the roster: an arrival placed by suite, a new care level, an approved suite move, and wing tabs"),
             ("BuilderRoster", "Builder-owned roster", "Server-rendered fixed roster bound directly through the grid builder's own data source with selectable rows, no fetch"),
             ("RemoteAdaptorRoster", "Remote DataManager adaptor", "Remote DataManager URL-adaptor binding that fetches the paged {result, count} roster itself, with paging and row selection"),
+            ("Census", "Census by age", "List the residents at or over an age, sort by any column and page through the census, with the server answering every page"),
         }),
     };
-
-    Html.On(plan, t => t.DomReady(p =>
-    {
-        p.Post(Url.SandboxRoute("Data", "Grid"))
-         .Gather(g => g
-             .Static("skip", 0)
-             .Static("take", 10))
-         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-         {
-             s.Component<FusionGrid>("residents-grid")
-                 .SetDataSource(json);
-             s.Element("load-status").SetText("initial data loaded");
-         }));
-    }));
 }
 
 <native-vstack gap="Lg">
     <native-heading level="H1">FusionGrid</native-heading>
     <native-text color="Secondary">
-        A data grid is a complex vertical slice, so each behavior is its own isolated demo below.
-        The live server-driven grid (sort, paging, and an external filter) runs at the bottom of the page.
+        A data grid is a complex vertical slice, so each behavior is its own journey below.
     </native-text>
 
     @foreach (var group in demoGroups)
@@ -105,116 +87,4 @@
             </div>
         </section>
     }
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">1. Grid with Server-Side Sort, Paging &amp; External Filter</h2>
-        <p class="text-sm text-text-secondary mb-4">
-            Every sort or page action fires <code>dataStateChange</code> which POSTs the full grid state
-            + current filter value to the server. Response is <code>{result, count}</code>.
-        </p>
-
-        <div class="mb-4 p-4 rounded-md bg-slate-50 border border-border/50">
-            <native-grid cols="C3" gap="Base">
-                @{ Html.InputField(plan, m => m.MinAge, o => o.Label("Min Age Filter"))
-                    .FusionNumericTextBox(b => b
-                        .Format("n0")
-                        .Min(0).Max(100)
-                        .Placeholder("e.g. 80")
-                        .Reactive(plan, evt => evt.Changed, (args, p) =>
-                        {
-                            p.Element("filter-status").SetText("filtering...");
-                            p.Post(Url.SandboxRoute("Data", "Grid"))
-                             .Gather(g => g
-                                 .Static("skip", 0)
-                                 .Static("take", 10)
-                                 .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
-                             .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-                             {
-                                 s.Component<FusionGrid>("residents-grid")
-                                     .SetDataSource(json);
-                                 s.Element("filter-status").SetText("filtered");
-                             }));
-                        })); }
-            </native-grid>
-        </div>
-
-        @(Html.FusionGrid<GridModel, ResidentGridItem>(plan, "residents-grid", b => b
-            .AllowSorting(true)
-            .AllowPaging(true)
-            .PageSettings(new GridPageSettings { PageSize = 10 })
-            .Columns(new List<GridColumn>
-            {
-                new GridColumn { Field = "name", HeaderText = "Name", Width = "180" },
-                new GridColumn { Field = "age", HeaderText = "Age", Width = "80" },
-                new GridColumn { Field = "careLevel", HeaderText = "Care Level", Width = "150" },
-                new GridColumn { Field = "wing", HeaderText = "Wing", Width = "100" },
-            }))
-            .Reactive(evt => evt.DataStateChange, (args, p) =>
-            {
-                p.When(args, x => x.Action.RequestType).NotEq(FusionGridAction.Refresh)
-                    .Then(t =>
-                    {
-                        t.Element("evt-name").SetText(args, x => x.Name);
-                        t.Element("evt-skip").SetText(args, x => x.Skip);
-                        t.Element("evt-take").SetText(args, x => x.Take);
-                        t.Element("evt-requires-counts").SetText(args, x => x.RequiresCounts);
-                        t.Element("evt-action-name").SetText(args, x => x.Action.Name);
-                        t.Element("evt-action-event-type").SetText(args, x => x.Action.Type);
-                        t.Element("evt-action-cancel").SetText(args, x => x.Action.Cancel);
-                        t.Element("evt-action-type").SetText(args, x => x.Action.RequestType);
-                        t.Element("evt-action-column").SetText(args, x => x.Action.ColumnName);
-                        t.Element("evt-action-direction").SetText(args, x => x.Action.Direction);
-                        t.Element("evt-action-page").SetText(args, x => x.Action.CurrentPage);
-                        t.Element("evt-action-previous-page").SetText(args, x => x.Action.PreviousPage);
-                        t.Element("evt-action-page-size").SetText(args, x => x.Action.PageSize);
-                        t.Post(Url.SandboxRoute("Data", "Grid"))
-                         .Gather(g => g
-                             .FromEvent(args, x => x.Name, "eventName")
-                             .FromEvent(args, x => x.Skip, "skip")
-                             .FromEvent(args, x => x.Take, "take")
-                             .FromEvent(args, x => x.RequiresCounts, "requiresCounts")
-                             .FromEvent(args, x => x.Action.Name, "actionName")
-                             .FromEvent(args, x => x.Action.Type, "actionType")
-                             .FromEvent(args, x => x.Action.Cancel, "actionCancel")
-                             .FromEvent(args, x => x.Action.RequestType, "actionRequestType")
-                             .FromEvent(args, x => x.Action.CurrentPage, "actionCurrentPage")
-                             .FromEvent(args, x => x.Action.PreviousPage, "actionPreviousPage")
-                             .FromEvent(args, x => x.Action.PageSize, "actionPageSize")
-                             .FromEvent(args, x => x.Sorted, "sorted")
-                             .Include<FusionNumericTextBox, GridModel>(m => m.MinAge))
-                         .Response(r => r.OnSuccess<ResidentGridResponse>((json, s) =>
-                         {
-                             s.Component<FusionGrid>("residents-grid")
-                                 .SetDataSource(json);
-                             s.Element("action-status").SetText("data refreshed");
-                         }));
-                    });
-            }))
-
-        <native-vstack gap="Xs" class="font-mono text-sm mt-4">
-            <p>Load status: <span id="load-status" class="text-text-muted">&mdash;</span></p>
-            <p>Filter status: <span id="filter-status" class="text-text-muted">&mdash;</span></p>
-            <p>Action status: <span id="action-status" class="text-text-muted">&mdash;</span></p>
-            <p>Event name: <span id="evt-name" class="text-text-muted">&mdash;</span></p>
-            <p>Event skip: <span id="evt-skip" class="text-text-muted">&mdash;</span></p>
-            <p>Event take: <span id="evt-take" class="text-text-muted">&mdash;</span></p>
-            <p>Event requiresCounts: <span id="evt-requires-counts" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.name: <span id="evt-action-name" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.type: <span id="evt-action-event-type" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.cancel: <span id="evt-action-cancel" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.requestType: <span id="evt-action-type" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.columnName: <span id="evt-action-column" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.direction: <span id="evt-action-direction" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.currentPage: <span id="evt-action-page" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.previousPage: <span id="evt-action-previous-page" class="text-text-muted">&mdash;</span></p>
-            <p>Event action.pageSize: <span id="evt-action-page-size" class="text-text-muted">&mdash;</span></p>
-        </native-vstack>
-    </section>
-
-    <section class="rounded-lg border border-border bg-white p-6 shadow-sm">
-        <h2 class="text-base font-semibold mb-4">Plan JSON</h2>
-        <pre class="rounded-md bg-slate-900 text-emerald-400 p-4 font-mono text-xs overflow-x-auto max-h-96"><code id="plan-json">@Html.Raw(plan.RenderFormatted())</code></pre>
-    </section>
 </native-vstack>
-
-@Html.RenderPlan(plan)

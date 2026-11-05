@@ -1,7 +1,5 @@
 @model ResidentRosterPageModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Native.Components
-@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Native
 @{
     ViewData["Title"] = "Morning Roster";
     var plan = Html.ReactivePlan<ResidentRosterPageModel>();
@@ -21,12 +19,17 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Post(Url.SandboxRoute("RosterCheckIn", "Loader", new { residentId = 1 }))
-                         .WhileLoading(l => l.Component<NativeLoader>().SetTarget("roster-resident-1").Show())
+                         .WhileLoading(l =>
+                         {
+                             var loader = l.Component<NativeLoader>();
+                             loader.Target.Set("roster-resident-1");
+                             loader.Show();
+                         })
                          .Response(r => r.OnSuccess(s =>
                          {
                              s.Into("morning-roster");
                              s.Component<NativeLoader>().Hide();
-                             s.Element("roster-status").SetText("Margaret Hill checked in.");
+                             s.Element("roster-status").Text.Set("Margaret Hill checked in.");
                          }));
                     }))
                 @(Html.NativeButton("refresh-roster-btn", "Refresh Roster")
@@ -34,16 +37,26 @@
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
                         p.Get(Url.SandboxRoute("RosterRows", "Loader"))
-                         .WhileLoading(l => l.Component<NativeLoader>().SetTarget("roster-resident-1").Show())
+                         .WhileLoading(l =>
+                         {
+                             var loader = l.Component<NativeLoader>();
+                             loader.Target.Set("roster-resident-1");
+                             loader.Show();
+                         })
                          .Response(r => r.OnSuccess(s =>
                          {
                              s.Into("morning-roster");
                              s.Get(Url.SandboxRoute("RosterCareSummary", "Loader"))
-                              .WhileLoading(l => l.Component<NativeLoader>().SetTarget("roster-care-summary").Show())
+                              .WhileLoading(l =>
+                              {
+                                  var loader = l.Component<NativeLoader>();
+                                  loader.Target.Set("roster-care-summary");
+                                  loader.Show();
+                              })
                               .Response(summary => summary.OnSuccess<RosterCareSummary>((json, c) =>
                               {
                                   c.Component<NativeLoader>().Hide();
-                                  c.Element("roster-care-summary-text").SetText(json, x => x.Summary);
+                                  c.Element("roster-care-summary-text").Text.Set(json.Get(x => x.Summary));
                               }));
                          }));
                     }))

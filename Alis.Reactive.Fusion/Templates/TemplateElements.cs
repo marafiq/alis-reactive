@@ -1,8 +1,9 @@
+using System;
+using System.Linq.Expressions;
+using System.Text;
+
 namespace Alis.Reactive.Fusion.Templates
 {
-    /// <summary>
-    /// Internal element rendering shared by root and conditional Syncfusion template builders.
-    /// </summary>
     internal static class TemplateElements
     {
         internal static string Span(string content, TemplateCss css)
@@ -30,23 +31,40 @@ namespace Alis.Reactive.Fusion.Templates
             return $"<a href=\"{href}\"{css.ClassAttribute}>{text}</a>";
         }
 
-        /// <summary>
-        /// Injects <paramref name="onClick"/> directly into the <c>onclick</c> attribute; callers must ensure it is safe.
-        /// </summary>
-        internal static string Button(string text, string onClick, TemplateCss css)
+        internal static string EventButton(string text, string eventName, string detailAttribute, string valueBinding, TemplateCss css)
+            => $"<button class=\"{css.AppendTo("e-btn")}\" data-alis-raise=\"{eventName}\" " +
+            $"{detailAttribute}=\"{valueBinding}\">{text}</button>";
+
+        internal static string DetailAttribute<TPayload, TProperty>(string text, Expression<Func<TPayload, TProperty>> member)
         {
-            return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClick}\">{text}</button>";
+            var path = FusionTemplateExpression.ToPropertyPath(member);
+            if (path.IndexOf('.') >= 0)
+                throw new ArgumentException($"A template button fills a direct payload member; '{path}' is nested.", nameof(member));
+
+            var held = Nullable.GetUnderlyingType(typeof(TProperty));
+            if (held != null)
+            {
+                var memberName = ((MemberExpression)(member.Body is UnaryExpression convert ? convert.Operand : member.Body)).Member.Name;
+                throw new ArgumentException(
+                    $"Template button '{text}' fills '{typeof(TPayload).Name}.{memberName}' of type {held.Name}?, and the template " +
+                    "engine writes a missing value as the text \"null\", which the listener would read as that text. Fill it from " +
+                    $"a member of type {held.Name}, which always holds a value.",
+                    nameof(member));
+            }
+
+            return DatasetAttribute(path);
         }
 
-        /// <summary>
-        /// Renders a button that dispatches a CustomEvent with the bound <c>detail.id</c> value.
-        /// Uses <c>&amp;quot;</c> for event name quoting to survive Syncfusion template engine
-        /// single-to-double quote conversion.
-        /// </summary>
-        internal static string EventButton(string text, string eventName, string idBinding, TemplateCss css)
+        private static string DatasetAttribute(string member)
         {
-            var onClick = $"document.dispatchEvent(new CustomEvent(&quot;{eventName}&quot;,{{detail:{{id:{idBinding}}}}}))";
-            return $"<button class=\"{css.AppendTo("e-btn")}\" onclick=\"{onClick}\">{text}</button>";
+            var key = "alisDetail" + char.ToUpperInvariant(member[0]) + member.Substring(1);
+            var attribute = new StringBuilder("data-");
+            foreach (var letter in key)
+            {
+                if (letter >= 'A' && letter <= 'Z') attribute.Append('-').Append(char.ToLowerInvariant(letter));
+                else attribute.Append(letter);
+            }
+            return attribute.ToString();
         }
     }
 
@@ -76,14 +94,14 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal TemplateCssClass(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        internal override string ClassAttribute =>
-            string.IsNullOrEmpty(_value) ? "" : $" class=\"{_value}\"";
+        internal override string ClassAttribute
+            => string.IsNullOrEmpty(_value) ? "" : $" class=\"{_value}\"";
 
-        internal override string AppendTo(string baseClass) =>
-            string.IsNullOrEmpty(_value) ? baseClass : $"{baseClass} {_value}";
+        internal override string AppendTo(string baseClass)
+            => string.IsNullOrEmpty(_value) ? baseClass : $"{baseClass} {_value}";
     }
 
     internal abstract class TemplateAltText
@@ -108,7 +126,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal PresentTemplateAltText(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string Attribute => $" alt=\"{_value}\"";
@@ -136,7 +154,7 @@ namespace Alis.Reactive.Fusion.Templates
 
         internal PresentTemplateElementId(string value)
         {
-            _value = value ?? throw new System.ArgumentNullException(nameof(value));
+            _value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         internal override string Attribute => $" id=\"{_value}\"";

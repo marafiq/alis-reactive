@@ -4,45 +4,101 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Grid;
 public class WhenUsingFusionGridInlineEdit : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Grid/InlineEdit";
+    private const string GridId = "care-plan-reviews";
 
-    private ILocator EditInputs => Page.Locator("#inline-edit-grid .e-gridcontent input");
+    private const int NextReviewColumn = 5;
 
-    private async Task NavigateInline()
+    private ILocator Rows => Page.Locator($"#{GridId} .e-row");
+    private ILocator NextReview(string resident)
+        => Rows.Filter(new() { HasText = resident }).Locator($"td[aria-colindex='{NextReviewColumn}']");
+    private ILocator RowBeingEdited => Page.Locator($"#{GridId} .e-editedrow");
+    private ILocator ResidentBeingEdited => Page.Locator($"#{GridId}residentName");
+    private ILocator DayEditor => RowBeingEdited.Locator("input[name='nextReview']");
+    private ILocator HenryDueThisWeek => Page.Locator("#review-due-6302");
+    private ILocator Save => Page.Locator("#review-save");
+    private ILocator Cancel => Page.Locator("#review-cancel");
+    private ILocator Status => Page.Locator("#review-status");
+
+    private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await Expect(Page.Locator("#inline-status"))
-            .ToHaveTextAsync("loaded", new() { Timeout = 10000 });
-        await Expect(Page.Locator("#inline-edit-grid .e-row").First)
-            .ToBeVisibleAsync(new() { Timeout = 10000 });
+        await NavigateToAndWaitForBoot(Path);
+        await Expect(Rows).ToHaveCountAsync(5, new() { Timeout = 10000 });
+    }
+
+    private async Task OpenHenrysReview()
+    {
+        await ClickWhenStable(HenryDueThisWeek);
+        await Expect(DayEditor).ToHaveValueAsync("2026-10-16", new() { Timeout = 10000 });
     }
 
     [Test]
-    public async Task starting_canceling_and_committing_an_inline_edit_toggles_the_row_editor()
+    public async Task the_review_list_shows_each_residents_next_review()
     {
-        await NavigateInline();
+        await NavigateAndBoot();
 
-        // StartEdit opens the inline row editor.
-        await ClickWhenStable(Page.Locator("#inline-start-edit"));
-        await Expect(Page.Locator("#inline-status"))
-            .ToHaveTextAsync("startEdit called", new() { Timeout = 10000 });
-        await Expect(EditInputs.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await Expect(Rows.First).ToContainTextAsync("Amina Patel");
+        await Expect(NextReview("Henry Liu")).ToHaveTextAsync("2026-10-16");
+        await Expect(NextReview("Rosa Diaz")).ToHaveTextAsync("2027-01-14");
+        AssertNoConsoleErrors();
+    }
 
-        // CloseEdit cancels and closes the editor.
-        await ClickWhenStable(Page.Locator("#inline-close-edit"));
-        await Expect(Page.Locator("#inline-status"))
-            .ToHaveTextAsync("closeEdit called", new() { Timeout = 10000 });
-        await Expect(EditInputs).ToHaveCountAsync(0, new() { Timeout = 10000 });
+    [Test]
+    public async Task choosing_a_review_due_this_week_opens_that_residents_review_day()
+    {
+        await NavigateAndBoot();
 
-        // StartEdit again, then EndEdit commits and closes the editor.
-        await ClickWhenStable(Page.Locator("#inline-start-edit"));
-        await Expect(EditInputs.First).ToBeVisibleAsync(new() { Timeout = 10000 });
+        await ClickWhenStable(HenryDueThisWeek);
 
-        await ClickWhenStable(Page.Locator("#inline-end-edit"));
-        await Expect(Page.Locator("#inline-status"))
-            .ToHaveTextAsync("endEdit called", new() { Timeout = 10000 });
-        await Expect(EditInputs).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Expect(ResidentBeingEdited).ToHaveValueAsync("Henry Liu", new() { Timeout = 10000 });
+        await Expect(DayEditor).ToHaveValueAsync("2026-10-16");
+        await Expect(RowBeingEdited).ToHaveCountAsync(1);
+        AssertNoConsoleErrors();
+    }
 
+    [Test]
+    public async Task a_review_moved_to_a_weekday_is_booked_by_the_care_team_calendar()
+    {
+        await NavigateAndBoot();
+        await OpenHenrysReview();
+        await DayEditor.FillAsync("2026-11-03");
+
+        await ClickWhenStable(Save);
+
+        await Expect(Status).ToHaveTextAsync(
+            "Henry Liu's care-plan review is booked for Tuesday, November 3.", new() { Timeout = 10000 });
+        await Expect(NextReview("Henry Liu")).ToHaveTextAsync("2026-11-03");
+        await Expect(RowBeingEdited).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_review_moved_to_a_weekend_is_refused_and_goes_back_to_its_booked_day()
+    {
+        await NavigateAndBoot();
+        await OpenHenrysReview();
+        await DayEditor.FillAsync("2026-11-07");
+
+        await ClickWhenStable(Save);
+
+        await Expect(Status).ToHaveTextAsync(
+            "The care team does not meet on Saturdays. Henry Liu's review stays on Friday, October 16.",
+            new() { Timeout = 10000 });
+        await Expect(NextReview("Henry Liu")).ToHaveTextAsync("2026-10-16");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 400");
+    }
+
+    [Test]
+    public async Task cancelling_a_move_keeps_the_booked_day_and_books_nothing()
+    {
+        await NavigateAndBoot();
+        await OpenHenrysReview();
+        await DayEditor.FillAsync("2026-11-03");
+
+        await ClickWhenStable(Cancel);
+
+        await Expect(RowBeingEdited).ToHaveCountAsync(0, new() { Timeout = 10000 });
+        await Expect(NextReview("Henry Liu")).ToHaveTextAsync("2026-10-16");
+        await Expect(Status).ToHaveTextAsync("No reviews moved yet.");
         AssertNoConsoleErrors();
     }
 }

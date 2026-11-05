@@ -1,17 +1,7 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.TrainingSessions;
 
-/// <summary>
-/// As a care coordinator, I want the server to read each training time as the clock I picked, so that a
-/// session I book for 9:00 AM is booked, checked and validated at 9:00 AM, whatever zone my device is in and
-/// however the request carries it: query, JSON body, header, path or form data, alone or in a list.
-/// </summary>
-/// <remarks>
-/// The week holds Dementia care on Monday, January 11, 2027 at 9:00 AM and Fall prevention on Wednesday at
-/// 2:00 PM. Sessions start between 7:00 AM and 7:00 PM.
-/// </remarks>
 [TestFixture("America/Los_Angeles", "UTC-08:00", "UTC-07:00")]
 [TestFixture("Asia/Kolkata", "UTC+05:30", "UTC+05:30")]
 public class WhenCoordinatorSchedulesTrainingSessions : PlaywrightTestBase
@@ -21,6 +11,7 @@ public class WhenCoordinatorSchedulesTrainingSessions : PlaywrightTestBase
     private readonly string _timeZone;
     private readonly string _januaryOffset;
     private readonly string _julyOffset;
+    private PagePlan<TrainingSessionModel> _plan = null!;
 
     public WhenCoordinatorSchedulesTrainingSessions(string timeZone, string januaryOffset, string julyOffset)
     {
@@ -29,8 +20,6 @@ public class WhenCoordinatorSchedulesTrainingSessions : PlaywrightTestBase
         _julyOffset = julyOffset;
     }
 
-    // One zone west of UTC that keeps daylight saving, one east of it on the half hour; neither is the zone of a
-    // machine the suite runs on, so a time sent as UTC reads another clock.
     public override BrowserNewContextOptions ContextOptions()
     {
         var options = base.ContextOptions() ?? new BrowserNewContextOptions();
@@ -39,29 +28,30 @@ public class WhenCoordinatorSchedulesTrainingSessions : PlaywrightTestBase
     }
 
     private DateTimePickerLocator StartsAt => new(Page, IdGenerator.For<TrainingSessionModel>(m => m.StartsAt));
-    private ILocator StartsAtError => Page.Locator("[data-valmsg-for='StartsAt']");
+    private DateRangePickerLocator HallDays => new(Page, IdGenerator.For<TrainingSessionModel>(m => m.HallDays));
+    private ILocator StartsAtError => _plan.ErrorFor(m => m.StartsAt);
     private ILocator CheckRoom => Page.Locator("#check-room-btn");
     private ILocator BookSession => Page.Locator("#book-session-btn");
-    private ILocator ConfirmWeek => Page.Locator("#confirm-week-btn");
-    private ILocator Room => Page.Locator("#training-room");
-    private ILocator Booking => Page.Locator("#training-booking");
-    private ILocator WeekStatus => Page.Locator("#training-week-status");
     private ILocator CheckTrainer => Page.Locator("#check-trainer-btn");
     private ILocator PlanDay => Page.Locator("#plan-day-btn");
     private ILocator ReserveProjector => Page.Locator("#reserve-projector-btn");
+    private ILocator CheckHall => Page.Locator("#check-hall-btn");
+    private ILocator HoldHall => Page.Locator("#hold-hall-btn");
+    private ILocator ConfirmWeek => Page.Locator("#confirm-week-btn");
+    private ILocator Room => Page.Locator("#training-room");
+    private ILocator Booking => Page.Locator("#training-booking");
     private ILocator Trainer => Page.Locator("#training-trainer");
     private ILocator Day => Page.Locator("#training-day");
     private ILocator Projector => Page.Locator("#training-projector");
-    private DateRangePickerLocator HallDays => new(Page, IdGenerator.For<TrainingSessionModel>(m => m.HallDays));
-    private ILocator CheckHall => Page.Locator("#check-hall-btn");
-    private ILocator HoldHall => Page.Locator("#hold-hall-btn");
     private ILocator Hall => Page.Locator("#training-hall");
+    private ILocator WeekStatus => Page.Locator("#training-week-status");
     private ILocator DementiaCare => Page.Locator(".e-appointment").Filter(new() { HasText = "Dementia care" });
 
     private async Task OpenTrainingSessions()
     {
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
+        _plan = await PagePlan<TrainingSessionModel>.FromPage(Page);
     }
 
     [Test]

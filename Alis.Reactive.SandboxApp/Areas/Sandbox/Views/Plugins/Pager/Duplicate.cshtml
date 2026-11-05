@@ -1,0 +1,18 @@
+@model WingPagerModel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Plugins.Pager
+@{
+    ViewData["Title"] = "Wing Pager — registered twice";
+
+    // A plan takes each plugin once. Registering the pager a second time is refused here, as the view
+    // renders, with the plugin's name: the page never reaches the browser.
+    var plan = Html.ReactivePlan<WingPagerModel>();
+    plan.RegisterPlugin<PagerPlugin>();
+    plan.RegisterPlugin<PagerPlugin>();
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Wing Pager</native-heading>
+    <native-text color="Secondary">This page registers the pager twice, so it never renders.</native-text>
+</native-vstack>
+
+@Html.RenderPlan(plan)

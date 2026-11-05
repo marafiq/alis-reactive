@@ -1,20 +1,15 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Switch;
 
-// Journey: a resident manages their Care Alert Preferences. A master "receive care alerts"
-// switch decides whether any alerts go out; two channel switches (email, text message) decide
-// how. The resident toggles the master, pauses everything with a button, reviews each channel,
-// and saves — the server confirms which channels will be used.
 [TestFixture]
 public class WhenSwitchToggles : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/Switch";
 
-    private const string GeneratedTypeScope = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_SwitchModel";
-    private const string ReceiveCareAlertsId = GeneratedTypeScope + "__ReceiveCareAlerts";
-    private const string EmailRemindersId = GeneratedTypeScope + "__EmailReminders";
-    private const string TextMessageAlertsId = GeneratedTypeScope + "__TextMessageAlerts";
+    private static readonly string ReceiveCareAlertsId = IdGenerator.For<SwitchModel>(m => m.ReceiveCareAlerts);
+    private static readonly string EmailRemindersId = IdGenerator.For<SwitchModel>(m => m.EmailReminders);
+    private static readonly string TextMessageAlertsId = IdGenerator.For<SwitchModel>(m => m.TextMessageAlerts);
 
     private SwitchLocator ReceiveCareAlerts => new(Page, ReceiveCareAlertsId);
     private SwitchLocator EmailReminders => new(Page, EmailRemindersId);
@@ -35,8 +30,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         await Expect(ReceiveCareAlerts.Wrapper).ToBeVisibleAsync(new() { Timeout = 10000 });
     }
 
-    // RENDERS — the FusionSwitch builder renders each toggle bound to the resident's saved
-    // preference: care alerts on, email reminders on, text-message alerts off.
     [Test]
     public async Task preferences_open_showing_the_resident_saved_toggles()
     {
@@ -49,8 +42,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // INTERACTS + Checked — toggling the master switch off fires Changed through the .Reactive
-    // wiring; the FusionSwitchChangeArgs.Checked payload (false) routes the "paused" message.
     [Test]
     public async Task turning_care_alerts_off_tells_the_resident_alerts_are_paused()
     {
@@ -64,8 +55,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Checked carrying true — toggling the master back on routes the other branch over
-    // FusionSwitchChangeArgs.Checked, proving the payload carries the state in both directions.
     [Test]
     public async Task turning_care_alerts_back_on_tells_the_resident_to_pick_channels()
     {
@@ -83,8 +72,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SetChecked — the "Pause all alerts" button writes checked=false onto the master switch;
-    // the switch visibly turns off without the resident touching it.
     [Test]
     public async Task pausing_all_alerts_turns_the_master_switch_off()
     {
@@ -101,8 +88,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Value() as a component-read condition — the review button reads the email switch's live
-    // checked state. Email reminders start on, so the resident sees "on".
     [Test]
     public async Task reviewing_email_reminders_reports_them_on_when_the_switch_is_on()
     {
@@ -115,8 +100,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Value() reads the toggled-off state — after the resident turns email reminders off,
-    // the review button reads checked=false and reports "off", proving Value() reads live state.
     [Test]
     public async Task reviewing_email_reminders_reports_them_off_after_the_resident_turns_them_off()
     {
@@ -130,8 +113,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // Value() reads a second switch independently — the text-message switch starts off, so its
-    // review reports "off"; after the resident turns it on, the review reports "on".
     [Test]
     public async Task reviewing_text_alerts_follows_the_text_switch_the_resident_sets()
     {
@@ -148,8 +129,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // SUBMITS — the three Value() sources feed the gather body; the server confirmation the
-    // resident sees names the channels that were saved.
     [Test]
     public async Task saving_confirms_the_channels_the_resident_chose()
     {
@@ -165,8 +144,6 @@ public class WhenSwitchToggles : PlaywrightTestBase
         AssertNoConsoleErrors();
     }
 
-    // GATHERS — the framework gather pipeline carries all three switch Value() sources into the
-    // POST body under their declared keys. (Framework gather test: asserts request.PostData.)
     [Test]
     public async Task saving_posts_each_switch_value_to_the_server()
     {
@@ -183,11 +160,11 @@ public class WhenSwitchToggles : PlaywrightTestBase
         var request = await requestTask;
         var body = request.PostData ?? "";
 
-        Assert.That(body, Does.Contain("\"receiveCareAlerts\":true"),
+        Assert.That(body, Does.Contain("\"ReceiveCareAlerts\":true"),
             "the gather pipeline must carry the master switch Value() under its declared key");
-        Assert.That(body, Does.Contain("\"emailReminders\":false"),
+        Assert.That(body, Does.Contain("\"EmailReminders\":false"),
             "the gather pipeline must carry the email switch Value() (toggled off) under its declared key");
-        Assert.That(body, Does.Contain("\"textMessageAlerts\":false"),
+        Assert.That(body, Does.Contain("\"TextMessageAlerts\":false"),
             "the gather pipeline must carry the text switch Value() under its declared key");
 
         AssertNoConsoleErrors();

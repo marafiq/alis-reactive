@@ -1,0 +1,13 @@
+@using Alis.Reactive.Framework.App.Requests
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@model EscortPage
+@{
+    ViewData["Title"] = "An escorted visit";
+
+    // The escort card is rendered for the visit's Escort member, so its inputs bind as Escort.Name.
+    var card = new ViewDataDictionary(ViewData);
+    card.TemplateInfo.HtmlFieldPrefix = nameof(EscortPage.Escort);
+}
+<h1>An escorted visit</h1>
+
+@await Html.PartialAsync("EscortCard", Model.Escort, card)

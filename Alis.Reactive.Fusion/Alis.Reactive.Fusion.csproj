@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
@@ -10,21 +10,14 @@
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
 
-    <!-- Syncfusion must match the npm browser assets exactly on both target frameworks. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
       <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="[33.1.47]" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <!-- net48 binds to ASP.NET MVC5 (System.Web.Mvc): same Syncfusion EJ2 builder API
-         via the MVC5 package, different ASP.NET host types. Mirrors the net48 group in
-         Alis.Reactive.csproj; PolySharp + ReferenceAssemblies enable C# 14 on net48. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
       <PackageReference Include="Syncfusion.EJ2.MVC5" Version="[33.1.47]" />
       <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
-      <!-- AddReactiveFusion() extends IServiceCollection on both TFMs; net10 gets it from the
-           ASP.NET Core framework reference. Accept the same minimum as AlisReactive.FluentValidator
-           and allow newer DI versions. -->
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[9.0.0,)" />
       <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
       <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
@@ -33,31 +26,17 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
-      <!-- Run the typed-DSL analyzer (ALIS009) on this slice's own source so untyped
-           public component API fails the build here, not ships to consumers. -->
       <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-      <!-- Fusion components emit design-system classes and the Syncfusion theme
-           consumes design-system brand tokens: the design system is a real
-           dependency, and this flows its CSS package to Fusion consumers. -->
-      <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
+      <AdditionalFiles Include="SliceTree.txt" />
+      <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
+      <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+      <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
 
-    <!-- Ship Syncfusion EJ2 CSS (built by vite.fusion.config.ts from
-         @syncfusion/ej2/tailwind3.css + our syncfusion.overrides.css) as a
-         NuGet content file. Packed under BOTH build\ and buildTransitive\ so
-         direct PackageReference consumers and transitive PackageReference flows both
-         pick up the asset. The copy mechanism is the shared
-         build\AlisReactiveAssets.targets, packed under this package's id name. -->
     <ItemGroup>
-        <None Include="$(AlisAssetsDist)\css\syncfusion.dev.css" Pack="true" PackagePath="build\assets\css\syncfusion.css" />
-        <None Include="$(AlisAssetsDist)\css\syncfusion.dev.css" Pack="true" PackagePath="buildTransitive\assets\css\syncfusion.css" />
-        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.Fusion.targets" />
-        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.Fusion.targets" />
+        <AlisReactiveStaticWebAsset Include="css\fusion.css" RelativePath="css/fusion.css" />
     </ItemGroup>
 
-    <Target Name="VerifyFusionBundleExistsBeforePack" BeforeTargets="GenerateNuspec">
-        <Error Condition="!Exists('$(AlisAssetsDist)\css\syncfusion.dev.css')"
-               Text="syncfusion.dev.css bundle not found. Run 'npm run build:all' from the repo root before packing." />
-    </Target>
+    <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />
 
 </Project>

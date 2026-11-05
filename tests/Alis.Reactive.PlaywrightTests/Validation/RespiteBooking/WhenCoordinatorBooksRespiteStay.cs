@@ -1,13 +1,7 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Validation.RespiteBooking;
 
-/// <summary>
-/// As an admissions coordinator, I want a blank community, rate, length of stay, or transport
-/// answer to mean "not entered" so that a respite stay is never booked at $0 a day, for zero
-/// nights, or without transport nobody decided against.
-/// </summary>
 [TestFixture]
 public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
 {
@@ -37,6 +31,7 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await ClickWhenStable(BookStay);
 
         await Expect(_plan.ErrorFor(m => m.DailyRate)).ToHaveTextAsync("Daily rate is required.");
+        await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
         AssertNoConsoleErrors();
     }
 
@@ -50,6 +45,7 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await ClickWhenStable(BookStay);
 
         await Expect(_plan.ErrorFor(m => m.CommunityId)).ToHaveTextAsync("Choose a community.");
+        await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
         AssertNoConsoleErrors();
     }
 
@@ -60,6 +56,7 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await _plan.TextBox(m => m.ResidentName).Fill("Helen Park");
         await Community.Select("Maple Grove");
         await _plan.TextBox(m => m.DailyRate).Fill("185");
+        await _plan.TextBox(m => m.EndOfStayPlan).Fill("Ends when her daughter returns from travel");
         await Transport.Choose("No");
 
         await ClickWhenStable(BookStay);
@@ -77,6 +74,7 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await Community.Select("Maple Grove");
         await _plan.TextBox(m => m.DailyRate).Fill("185");
         await _plan.TextBox(m => m.ExpectedNights).Fill("7");
+        await _plan.TextBox(m => m.LastDayPickupTime).Fill("10:00 AM");
 
         await ClickWhenStable(BookStay);
 
@@ -93,12 +91,81 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await Community.Select("Maple Grove");
         await _plan.TextBox(m => m.DailyRate).Fill("185");
         await _plan.TextBox(m => m.ExpectedNights).Fill("7");
+        await _plan.TextBox(m => m.LastDayPickupTime).Fill("10:00 AM");
         await Transport.Choose("No");
 
         await ClickWhenStable(BookStay);
 
         await Expect(BookingStatus).ToHaveTextAsync(
             "Respite stay booked for Helen Park at Maple Grove: $185.00 per day, 7 nights, no transport.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task an_open_ended_stay_needs_a_plan_for_how_it_ends()
+    {
+        await NavigateAndBoot();
+        await _plan.TextBox(m => m.ResidentName).Fill("Helen Park");
+        await Community.Select("Maple Grove");
+        await _plan.TextBox(m => m.DailyRate).Fill("185");
+        await Transport.Choose("No");
+
+        await ClickWhenStable(BookStay);
+
+        await Expect(_plan.ErrorFor(m => m.EndOfStayPlan)).ToHaveTextAsync("An open-ended stay needs a plan for how it ends.");
+        await Expect(_plan.ErrorFor(m => m.LastDayPickupTime)).ToHaveTextAsync("");
+        await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
+
+        await _plan.TextBox(m => m.EndOfStayPlan).Fill("Ends when her daughter returns from travel");
+        await ClickWhenStable(BookStay);
+        await Expect(BookingStatus).ToHaveTextAsync(
+            "Respite stay booked for Helen Park at Maple Grove: $185.00 per day, open-ended, no transport.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_planned_stay_needs_the_pickup_time_on_its_last_day()
+    {
+        await NavigateAndBoot();
+        await _plan.TextBox(m => m.ResidentName).Fill("Helen Park");
+        await Community.Select("Maple Grove");
+        await _plan.TextBox(m => m.DailyRate).Fill("185");
+        await _plan.TextBox(m => m.ExpectedNights).Fill("7");
+        await Transport.Choose("No");
+
+        await ClickWhenStable(BookStay);
+
+        await Expect(_plan.ErrorFor(m => m.LastDayPickupTime)).ToHaveTextAsync("A planned stay needs the pickup time on its last day.");
+        await Expect(_plan.ErrorFor(m => m.EndOfStayPlan)).ToHaveTextAsync("");
+        await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
+
+        await _plan.TextBox(m => m.LastDayPickupTime).Fill("10:00 AM");
+        await ClickWhenStable(BookStay);
+        await Expect(BookingStatus).ToHaveTextAsync(
+            "Respite stay booked for Helen Park at Maple Grove: $185.00 per day, 7 nights, no transport.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_community_without_a_transport_desk_needs_the_transport_answer_now()
+    {
+        await NavigateAndBoot();
+        await _plan.TextBox(m => m.ResidentName).Fill("Helen Park");
+        await Community.Select("Cedar Ridge");
+        await _plan.TextBox(m => m.DailyRate).Fill("212.50");
+        await _plan.TextBox(m => m.ExpectedNights).Fill("14");
+        await _plan.TextBox(m => m.LastDayPickupTime).Fill("10:00 AM");
+
+        await ClickWhenStable(BookStay);
+
+        await Expect(_plan.ErrorFor(m => m.NeedsTransport))
+            .ToHaveTextAsync("This community has no transport desk: answer whether it drives the resident in.");
+        await Expect(BookingStatus).ToHaveTextAsync("No stay booked yet.");
+
+        await Transport.Choose("Yes");
+        await ClickWhenStable(BookStay);
+        await Expect(BookingStatus).ToHaveTextAsync(
+            "Respite stay booked for Helen Park at Cedar Ridge: $212.50 per day, 14 nights, transport arranged.");
         AssertNoConsoleErrors();
     }
 
@@ -110,6 +177,7 @@ public class WhenCoordinatorBooksRespiteStay : PlaywrightTestBase
         await Community.Select("Cedar Ridge");
         await _plan.TextBox(m => m.DailyRate).Fill("212.50");
         await _plan.TextBox(m => m.ExpectedNights).Fill("14");
+        await _plan.TextBox(m => m.LastDayPickupTime).Fill("10:00 AM");
         await Transport.Choose("Yes");
 
         await ClickWhenStable(BookStay);

@@ -1,0 +1,39 @@
+@model MoveInContactsModel
+@using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Patterns.MoveInContacts
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@{
+    ViewData["Title"] = "Move-in Contacts — Alternate";
+
+    // The same contact card twice, under two prefixes: the server binds the next of kin and the
+    // alternate contact apart, by the names each card's inputs carry.
+    const string ContactCard = "~/Areas/Sandbox/Views/Patterns/MoveInContacts/_ContactCard.cshtml";
+
+    var nextOfKinView = new ViewDataDictionary(ViewData) { { "Heading", "Next of kin" } };
+    nextOfKinView.TemplateInfo.HtmlFieldPrefix = nameof(MoveInContactsModel.NextOfKin);
+
+    var alternateView = new ViewDataDictionary(ViewData) { { "Heading", "Alternate contact" } };
+    alternateView.TemplateInfo.HtmlFieldPrefix = nameof(MoveInContactsModel.Alternate);
+}
+
+<native-vstack gap="Lg">
+    <div>
+        <native-heading level="H1">Next of kin and alternate contact</native-heading>
+        <native-text color="Secondary">
+            The next of kin and an alternate contact for the move-in packet, each recorded on a card of its own.
+        </native-text>
+    </div>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Next of kin</native-heading>
+            @await Html.PartialAsync(ContactCard, Model.NextOfKin, nextOfKinView)
+        </native-vstack>
+    </native-card-body></native-card>
+
+    <native-card><native-card-body>
+        <native-vstack gap="Base">
+            <native-heading level="H2">Alternate contact</native-heading>
+            @await Html.PartialAsync(ContactCard, Model.Alternate, alternateView)
+        </native-vstack>
+    </native-card-body></native-card>
+</native-vstack>

@@ -1,0 +1,20 @@
+@using Alis.Reactive.Framework.App.Slots
+@model VisitorCard
+@{
+    var plan = Html.ReactivePlan<VisitorCard>();
+}
+@{ Html.On(plan, t => t.CustomEvent(LoungeEvents.LoungeBellRang, (rang, p) => p.Element("card-heard").Text.Set(rang.Get(x => x.Times)))); }
+
+<section id="visitor-card">
+    <h2>The visitor card</h2>
+
+    @(plan.Bell("visitor-bell")
+        .Reactive(bell => bell.OnRung, (ring, p) => p.Element("visitor-bell-heard").Text.Set(ring.Times)))
+    <p>The card's own bell rang: <span id="visitor-bell-heard"></span></p>
+
+    @(plan.MeterWithoutRelease("visitor-meter")
+        .Reactive(meter => meter.LevelChanged, (changed, p) => p.Element("visitor-meter-heard").Text.Set(changed.Level)))
+    <p>The card's meter reads: <span id="visitor-meter-heard"></span></p>
+</section>
+
+@Html.RenderPlan(plan)

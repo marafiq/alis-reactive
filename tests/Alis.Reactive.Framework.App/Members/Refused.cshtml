@@ -1,0 +1,40 @@
+@using Alis.Reactive.Framework.App.Members
+@model MemberRefusalsPage
+@{
+    ViewData["Title"] = "A refused member";
+    var plan = Html.ReactivePlan<MemberRefusalsPage>();
+}
+<h1>A refused member</h1>
+
+@plan.Slate("slate", title: "Round", "Ada", "Ben")
+
+@switch (Model.Mistake)
+{
+    case MemberMistake.DeclareAnEventOnAReturnedObject:
+        @(plan.Button("listen", "Listen").Reactive(button => button.Click, p =>
+        {
+            var rung = p.Component<RingingRowSlate>("slate").RowAt(0).Rung;
+        }))
+        break;
+    case MemberMistake.DeclareAnObjectForAMemberTheDeclarationLacks:
+        @(plan.Button("caption", "Caption").Reactive(button => button.Click, p =>
+            p.Component<MisnamedHeaderSlate>("slate").Header.Caption.Set("Late round")))
+        break;
+    case MemberMistake.DeclareAMethodForNoMember:
+        @(plan.Button("clear", "Clear").Reactive(button => button.Click, p => p.Component<UnnamedClearSlate>("slate").Clear()))
+        break;
+    case MemberMistake.SelectNoMemberOfTheRow:
+        @(plan.Button("sort", "Sort").Reactive(button => button.Click, p =>
+            p.Component<Slate>("slate").SortCards(Field.Of((SlateCard card) => card))))
+        break;
+    case MemberMistake.SelectACallOnAMember:
+        @(plan.Button("sort", "Sort").Reactive(button => button.Click, p =>
+            p.Component<Slate>("slate").SortCards(Field.Of((SlateCard card) => card.Name.ToUpper()))))
+        break;
+    case MemberMistake.SelectAPositionBeforeTheFirst:
+        @(plan.Button("sort", "Sort").Reactive(button => button.Click, p =>
+            p.Component<Slate>("slate").SortCards(Field.Of((Shift shift) => shift.Beds[-1]))))
+        break;
+}
+
+@Html.RenderPlan(plan)

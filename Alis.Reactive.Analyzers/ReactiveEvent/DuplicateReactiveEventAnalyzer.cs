@@ -6,10 +6,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Alis.Reactive.Analyzers.ReactiveEvent
 {
-    /// <summary>
-    /// Reports duplicate <c>.Reactive()</c> calls for the same event on one builder chain.
-    /// Different events and separate component builders are valid independent wiring.
-    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public sealed class DuplicateReactiveEventAnalyzer : DiagnosticAnalyzer
     {
@@ -25,8 +21,8 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
             description: "Each component event should have exactly one .Reactive() call per builder chain. Multiple calls for the same event create redundant Reactive Plan behaviors.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -82,14 +78,13 @@ namespace Alis.Reactive.Analyzers.ReactiveEvent
 
         private static string? ExtractEventName(InvocationExpressionSyntax invocation)
         {
-            var args = invocation.ArgumentList.Arguments;
-            if (args.Count < 2)
-                return null;
-
-            if (args[1].Expression is SimpleLambdaExpressionSyntax lambda
-                && lambda.Body is MemberAccessExpressionSyntax memberAccess)
+            foreach (var argument in invocation.ArgumentList.Arguments)
             {
-                return memberAccess.Name.Identifier.Text;
+                if (argument.Expression is SimpleLambdaExpressionSyntax lambda
+                    && lambda.Body is MemberAccessExpressionSyntax memberAccess)
+                {
+                    return memberAccess.Name.Identifier.Text;
+                }
             }
 
             return null;

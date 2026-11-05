@@ -23,12 +23,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Patterns.Workflows
             var result = validator.Validate(model);
 
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(e => e.PropertyName)
-                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             return Ok(new { message = "Todo saved!" });
         }

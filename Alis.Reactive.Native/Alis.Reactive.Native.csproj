@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
@@ -23,11 +23,17 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
-        <!-- Run the typed-DSL analyzer (ALIS009) on this slice's own source. -->
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <!-- Native components emit design-system classes; this flows the
-             design-system CSS package to Native consumers. -->
-        <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
+        <AdditionalFiles Include="SliceTree.txt" />
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
+
+    <ItemGroup>
+        <AlisReactiveStaticWebAsset Include="css\native.css" RelativePath="css/native.css" />
+    </ItemGroup>
+
+    <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />
 
 </Project>

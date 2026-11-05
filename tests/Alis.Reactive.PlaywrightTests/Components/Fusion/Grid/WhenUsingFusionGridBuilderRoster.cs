@@ -11,7 +11,6 @@ public class WhenUsingFusionGridBuilderRoster : PlaywrightTestBase
         await NavigateTo(Path);
         await WaitForTraceMessage("booted", 10000);
 
-        // The roster rows come from the grid builder's own dataSource (no HTTP request).
         await Expect(Page.Locator("#builder-roster-grid .e-row").First)
             .ToBeVisibleAsync(new() { Timeout = 10000 });
         await Expect(Page.Locator("#builder-roster-grid")).ToContainTextAsync("Amina Patel", new() { Timeout = 10000 });

@@ -1,0 +1,11 @@
+@using Alis.Reactive.Framework.App.Partials
+@model AdmissionPage
+@{
+    // A partial of the admission's own model: it renders the room, and carries no rule of its own.
+    var plan = Html.ReactivePlan<AdmissionPage>();
+}
+<section id="room-line">
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+</section>
+
+@Html.RenderPlan(plan)

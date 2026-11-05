@@ -1,4 +1,4 @@
-namespace Alis.Reactive.NativeTagHelpers.Divider;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// Visual treatment for a <c>native-divider</c> rule.

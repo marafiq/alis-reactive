@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ListBox;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -10,25 +10,18 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         [HttpGet("")]
         public IActionResult Index()
         {
-            ViewBag.Residents = new List<ListBoxResidentItem>
-            {
-                new() { Value = "alice", Text = "Alice", Unit = "A Wing" },
-                new() { Value = "bennett", Text = "Bennett", Unit = "A Wing" },
-                new() { Value = "carey", Text = "Carey", Unit = "B Wing" },
-                new() { Value = "dawson", Text = "Dawson", Unit = "B Wing" }
-            };
-
             return View("~/Areas/Sandbox/Views/Components/Fusion/ListBox/Index.cshtml", new FusionListBoxModel());
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] FusionListBoxEchoRequest request)
+        [HttpPost("SaveGroups")]
+        public IActionResult SaveGroups([FromBody] OutingGroupsRequest request)
         {
-            var values = request.Value ?? [];
-            return Ok(new FusionListBoxEchoResponse
+            var morning = OutingDay.SignedUp.Where(resident => request.Morning.Contains(resident.Id)).ToList();
+            var afternoon = OutingDay.SignedUp.Count - morning.Count;
+            return Ok(new OutingGroupsSaved
             {
-                ValueSummary = string.Join(",", values),
-                CountSummary = values.Length.ToString()
+                Message = $"Saved. Morning bus: {string.Join(", ", morning.Select(resident => resident.Name))}. " +
+                          $"The other {afternoon} ride in the afternoon."
             });
         }
     }

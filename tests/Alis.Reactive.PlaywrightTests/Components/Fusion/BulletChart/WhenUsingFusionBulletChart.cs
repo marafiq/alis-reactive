@@ -1,4 +1,4 @@
-using Alis.Reactive.Playwright.Extensions;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.BulletChart;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Fusion.BulletChart;
 
@@ -6,83 +6,115 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.BulletChart;
 public class WhenUsingFusionBulletChart : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/FusionBulletChart";
+    private const int Birch = 1;
 
-    private FusionBulletChartLocator BulletChart => new(Page, "resident-bullet-chart");
+    private PagePlan<FusionBulletChartModel> _plan = null!;
+
+    private FusionBulletChartLocator NursingHours => new(Page, "nursing-hours-chart");
+    private FusionBulletChartLocator AgencyHours => new(Page, "agency-hours-chart");
+    private ILocator NursingReadout => Page.Locator("#nursing-hours-readout");
+    private ILocator AgencyReadout => Page.Locator("#agency-hours-readout");
+    private ILocator ShiftsPanel => Page.Locator("#wing-shifts");
+    private ILocator ShiftsHint => Page.Locator("#wing-shifts-hint");
+    private ILocator UpNext => Page.Locator("#huddle-next");
+    private ILocator Reviewed(string wing)
+        => _plan.Element(_plan.FindComponent(m => m.ReviewedWings)!.ElementId)
+            .GetByRole(AriaRole.Checkbox, new() { Name = wing, Exact = true });
 
     private async Task NavigateAndBoot()
     {
         await NavigateToAndWaitForBoot(Path);
-        await Expect(Page.Locator("#resident-bullet-chart svg")).ToHaveCountAsync(1, new() { Timeout = 5000 });
+        _plan = await PagePlan<FusionBulletChartModel>.FromPage(Page);
+        await Expect(NursingHours.Bar(Birch)).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(AgencyHours.Bar(Birch)).ToBeVisibleAsync(new() { Timeout = 5000 });
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task pointing_at_a_wing_shows_the_hours_it_worked_against_its_budget()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("FusionBulletChart — Alis.Reactive Sandbox");
+
+        await NursingHours.Bar(Birch).HoverAsync();
+
+        await Expect(NursingReadout).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NursingReadout).ToHaveTextAsync("Worked 868 of 840 budgeted hours.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task plan_json_contains_typed_bullet_chart_members()
+    public async Task a_wings_tooltip_says_a_click_opens_its_shifts()
     {
         await NavigateAndBoot();
 
-        var planJson = await Page.Locator("#plan-json").TextContentAsync();
+        await NursingHours.Bar(Birch).HoverAsync();
 
-        Assert.That(planJson, Does.Contain("\"vendor\": \"fusion\""));
-        Assert.That(planJson, Does.Contain("resident-bullet-chart"));
-        Assert.That(planJson, Does.Contain("\"tooltipRender\""));
-        Assert.That(planJson, Does.Contain("\"bulletChartMouseClick\""));
-        Assert.That(planJson, Does.Contain("\"getActualIndex\""));
+        await Expect(NursingHours.Tooltip).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(NursingHours.Tooltip).ToHaveTextAsync("Click the bar for this wing's shifts");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task load_and_method_reads_are_proven()
+    public async Task clicking_a_wings_bar_opens_its_shifts_for_the_week()
     {
         await NavigateAndBoot();
 
-        await Expect(Page.Locator("#actual-index-negative")).ToHaveTextAsync("2", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#actual-index-overflow")).ToHaveTextAsync("0", new() { Timeout = 5000 });
+        await NursingHours.Bar(Birch).ClickAsync(new() { Force = true });
 
+        await Expect(ShiftsPanel).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(Page.Locator("#wing-shifts-wing")).ToHaveTextAsync("Birch");
+        await Expect(Page.Locator("#wing-shifts-summary"))
+            .ToHaveTextAsync("868 of 840 budgeted hours. Three night shifts ran long while a resident was on fall watch.");
+        await Expect(ShiftsHint).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task click_payload_exposes_target_and_mouse_coordinates()
+    public async Task clicking_the_chart_away_from_the_bars_says_where_to_click_and_opens_no_wing()
     {
         await NavigateAndBoot();
 
-        await BulletChart.FeatureMeasure.ClickAsync(new() { Force = true });
+        await NursingHours.Root.ClickAsync(new() { Position = new() { X = 4, Y = 4 } });
 
-        await Expect(Page.Locator("#mouse-click-state")).ToHaveTextAsync("clicked", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#mouse-click-target")).ToContainTextAsync("FeatureMeasure", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#mouse-click-x")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#mouse-click-y")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#click-audit-message")).ToHaveTextAsync("Opened readiness drilldown for North Wing", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#click-audit-wing")).ToHaveTextAsync("North Wing", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#click-audit-coordinates")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
-
+        await Expect(ShiftsHint).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(ShiftsPanel).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task tooltip_render_is_mutated_and_reports_target_payload()
+    public async Task pointing_at_a_wings_agency_hours_repeats_them_under_the_chart()
     {
         await NavigateAndBoot();
 
-        await BulletChart.FeatureMeasure.HoverAsync();
+        await AgencyHours.Bar(Birch).HoverAsync();
 
-        await Expect(BulletChart.Tooltip).ToBeVisibleAsync(new() { Timeout = 5000 });
-        await Expect(BulletChart.Tooltip).ToContainTextAsync("Bullet tooltip rewritten", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#tooltip-state")).ToHaveTextAsync("rendered", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#tooltip-value")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#tooltip-target")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#tooltip-name")).Not.ToHaveTextAsync("pending", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#tooltip-template")).ToHaveTextAsync("none", new() { Timeout = 5000 });
-        await Expect(Page.Locator("#tooltip-text")).ToHaveTextAsync("Bullet tooltip rewritten", new() { Timeout = 5000 });
+        await Expect(AgencyReadout).ToHaveTextAsync("96 h used of the 120 h cap", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
 
+    [Test]
+    public async Task the_huddle_names_the_wing_after_the_ones_reviewed()
+    {
+        await NavigateAndBoot();
+
+        await Reviewed("Maple").CheckAsync();
+        await Reviewed("Birch").CheckAsync();
+
+        await Expect(UpNext).ToHaveTextAsync("Cedar", new() { Timeout = 5000 });
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task once_every_wing_is_reviewed_the_round_starts_over_at_maple()
+    {
+        await NavigateAndBoot();
+        await Reviewed("Maple").CheckAsync();
+        await Reviewed("Birch").CheckAsync();
+        await Reviewed("Cedar").CheckAsync();
+        await Expect(UpNext).ToHaveTextAsync("Memory Care", new() { Timeout = 5000 });
+
+        await Reviewed("Memory Care").CheckAsync();
+
+        await Expect(UpNext).ToHaveTextAsync("Maple", new() { Timeout = 5000 });
         AssertNoConsoleErrors();
     }
 }

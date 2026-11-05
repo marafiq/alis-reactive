@@ -9,3 +9,8 @@ public class CommandOrderingPayload
 {
     public string Level { get; set; } = "";
 }
+
+public static class CommandOrderingEvents
+{
+    public static readonly AppEvent<CommandOrderingPayload> OrderingTest = AppEvent.Declare<CommandOrderingPayload>();
+}

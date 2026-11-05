@@ -4,11 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Medication refill order: the nurse enters one SKU and quantity per line and saves the
-    /// order as JSON. The confirmation lists the lines the server received, so a line lost
-    /// between the page and the server shows up on the page.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/MedicationOrder")]
     public class MedicationOrderController : Controller

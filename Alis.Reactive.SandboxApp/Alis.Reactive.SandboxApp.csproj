@@ -5,18 +5,18 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>alis-sandbox-secrets</UserSecretsId>
-        <NoWarn>$(NoWarn);CS8603;CS8618;MVC1000</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <ProjectReference Include="..\Alis.Reactive.FluentValidator\Alis.Reactive.FluentValidator.csproj" />
+        <ProjectReference Include="..\Alis.Reactive.DesignSystem\Alis.Reactive.DesignSystem.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
         <ProjectReference Include="..\Alis.Reactive.NativeTagHelpers\Alis.Reactive.NativeTagHelpers.csproj" />
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
     </ItemGroup>
 
+    <Import Project="..\Alis.Reactive.DesignSystem\build\AlisReactive.DesignSystem.targets" />
     <Import Project="..\build\AlisReactiveBrowserAssets.targets" />
 
 </Project>

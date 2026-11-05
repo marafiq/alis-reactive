@@ -1,0 +1,61 @@
+@using Alis.Reactive.Framework.App.Validation
+@model RoomMove
+@{
+    ViewData["Title"] = "A room move the room book decides";
+    var plan = Html.ReactivePlan<RoomMove>();
+    var dependents = (RoomMoveDependents)ViewData["Dependents"]!;
+}
+<h1>A room move the room book decides</h1>
+
+<div id="move-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    @{ Html.InputField(plan, m => m.Room, o => o.Label("Room")).Entry(); }
+    @{ Html.InputField(plan, m => m.Bed, o => o.Label("Bed")).Entry(); }
+    @{ Html.InputField(plan, m => m.Escort.Badge, o => o.Label("Escort's badge")).Entry(); }
+    @{ Html.InputField(plan, m => m.Boxes[0], o => o.Label("First box")).Entry(); }
+    @{ Html.InputField(plan, m => m.Boxes[1], o => o.Label("Second box")).Entry(); }
+</div>
+
+<p>Saved: <span id="saved"></span></p>
+
+@switch (dependents)
+{
+    case RoomMoveDependents.None:
+        @(plan.Button("save", "Save")
+            .Reactive(button => button.Click, p => p.Post("/Validation/RoomMove")
+                .Gather(g => g.Form())
+                .Validate<RoomMoveRules>("move-form")
+                .Response(r => r
+                    .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+                    .OnError(400, e => e.ValidationErrors("move-form")))))
+        break;
+    case RoomMoveDependents.AfterMustAsync:
+        @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/RoomMove")
+            .Gather(g => g.Form())
+            .Validate<RoomMoveAfterMustAsyncRules>("move-form")))
+        break;
+    case RoomMoveDependents.AfterCustomAsync:
+        @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/RoomMove")
+            .Gather(g => g.Form())
+            .Validate<RoomMoveAfterCustomAsyncRules>("move-form")))
+        break;
+    case RoomMoveDependents.UnderWhenAsync:
+        @(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/RoomMove")
+            .Gather(g => g.Form())
+            .Validate<RoomMoveUnderWhenAsyncRules>("move-form")))
+        break;
+}
+@(plan.Button("call-off", "Call off the room book")
+    .Reactive(button => button.Click, p => p.Post("/Validation/RoomMoveCalledOff")
+        .Gather(g => g.Form("move-form"))
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+@(plan.Button("save-escort-without-waiting", "Save the escort without waiting")
+    .Reactive(button => button.Click, p => p.Post("/Validation/EscortWithoutWaiting")
+        .Gather(g => g.Form("move-form"))
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+@(plan.Button("save-without-waiting", "Save without waiting")
+    .Reactive(button => button.Click, p => p.Post("/Validation/RoomMoveWithoutWaiting")
+        .Gather(g => g.Form("move-form"))
+        .Response(r => r.OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

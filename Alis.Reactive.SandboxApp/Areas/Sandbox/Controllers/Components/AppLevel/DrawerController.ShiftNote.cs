@@ -3,21 +3,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.AppLevel
 {
-    /// <summary>
-    /// Shift notes: a resident opens in the drawer, where the nurse writes a shift note or
-    /// starts a discharge that must be confirmed first.
-    /// </summary>
     public partial class DrawerController
     {
         private const int MargaretHillId = 2107;
 
         [HttpGet("ShiftNote")]
-        public IActionResult ShiftNote() =>
-            View("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/ShiftNote.cshtml", new ShiftNotePageModel());
+        public IActionResult ShiftNote()
+            => View("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/ShiftNote.cshtml", new ShiftNotePageModel());
 
         [HttpGet("ShiftNote/Form")]
-        public IActionResult ShiftNoteForm() =>
-            PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_ShiftNotePartial.cshtml",
+        public IActionResult ShiftNoteForm()
+            => PartialView("~/Areas/Sandbox/Views/Components/AppLevel/Drawer/_ShiftNotePartial.cshtml",
                 new ShiftNoteModel { ResidentId = MargaretHillId });
 
         [HttpPost("ShiftNote/Save")]

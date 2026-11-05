@@ -1,23 +1,30 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// Resident charts: the coordinator opens a resident's chart summary, and can flag the chart the
-    /// server offers for the care team's review.
-    /// </summary>
     public class ResidentChartPageModel
     {
         public string? ReviewChartMrn { get; set; }
+
+        public string? ChartByRecordNumber { get; set; }
     }
 
-    /// <summary>
-    /// A resident's chart summary. MRN, the medical record number, is an all-capitals member: the server
-    /// writes it as "mrn", as ASP.NET Core writes every member name.
-    /// </summary>
+    public sealed record ChartLink(string MRN, string Name, string Resident);
+
+    public sealed class ChartQuery
+    {
+        public string? Resident { get; set; }
+    }
+
     public sealed record ResidentChart(string Name, string? MRN);
 
-    /// <summary>A chart flagged for the care team's review, named by its medical record number.</summary>
+    public sealed record FloorCharts(ResidentChart[] Charts);
+
     public sealed class ChartFlagged
     {
         public string? MRN { get; set; }
+    }
+
+    public static class ResidentChartEvents
+    {
+        public static readonly AppEvent<ChartFlagged> ChartFlagged = AppEvent.Declare<ChartFlagged>();
     }
 }

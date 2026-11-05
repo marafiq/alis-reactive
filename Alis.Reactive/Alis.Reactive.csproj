@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
@@ -7,7 +7,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive</PackageId>
         <IsPackable>true</IsPackable>
-        <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized Reactive Plans.</PackageDescription>
+        <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized Reactive Plans, with validation rules written once in FluentValidation's grammar for the server and the browser.</PackageDescription>
         <PackageTags>reactive;aspnetcore;mvc;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
 
@@ -15,9 +15,6 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <!-- net48 ships the same DSL: plan domain (builders, plan model, JSON serialization,
-         validation metadata) AND the Razor/Html authoring layer. The authoring layer
-         binds to ASP.NET MVC5 (System.Web.Mvc) on net48 instead of ASP.NET Core. -->
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="System.Text.Json" Version="10.0.12" />
@@ -27,37 +24,13 @@
         <Reference Include="System.Web" />
     </ItemGroup>
 
-    <!-- Ship the runtime JS bundle (built by npm in the sibling
-         Alis.Reactive.Assets tree). The design-system CSS is shipped separately
-         by the AlisReactive.DesignSystem package. The asset is packed under
-         BOTH build\ and buildTransitive\:
-           build\          : required when this package is referenced directly.
-           buildTransitive\: required so PackageReference consumers flow the
-                             targets + assets through transitive dependencies.
-         The copy mechanism is the shared build\AlisReactiveAssets.targets,
-         packed under this package's id name so NuGet auto-imports it. -->
     <ItemGroup>
-        <!-- npm emits the bundle under dist\ with a literal "dev" version token so
-             the sandbox serves it at the same URL pattern a net10 consumer uses
-             (~/scripts/alis-reactive.{version}.js). PackagePath strips the "dev"
-             token so the NuGet ships the unversioned name; the shared targets
-             then writes the consumer's real version on copy-to-wwwroot. -->
-        <None Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="build\assets\js\alis-reactive.js" />
-        <None Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js"   Pack="true" PackagePath="buildTransitive\assets\js\alis-reactive.js" />
-        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="build\AlisReactive.targets" />
-        <None Include="..\build\AlisReactiveAssets.targets" Pack="true" PackagePath="buildTransitive\AlisReactive.targets" />
+        <AlisReactiveStaticWebAsset Include="$(AlisAssetsDist)\scripts\alis-reactive.dev.js" RelativePath="js/alis-reactive.js" />
+        <AlisReactiveStaticWebAsset Include="css\alis-reactive.css" RelativePath="css/alis-reactive.css" />
     </ItemGroup>
 
-    <!-- Verify the JS bundle exists before Pack. The bundle is produced by
-         'npm run build:all' from the repo root. Pack does NOT invoke npm;
-         consumers do not need Node.js for `dotnet pack`. CI orchestrates
-         npm + dotnet as separate steps. -->
-    <Target Name="VerifyBundlesExistBeforePack" BeforeTargets="GenerateNuspec">
-        <Error Condition="!Exists('$(AlisAssetsDist)\scripts\alis-reactive.dev.js')"
-               Text="alis-reactive.dev.js bundle not found. Run 'npm run build:all' from the repo root before packing." />
-    </Target>
+    <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />
 
-    <!-- Bundle Roslyn analyzers so consumers get compile-time DSL checks (ALIS001-ALIS008) -->
     <ItemGroup>
         <None Include="..\Alis.Reactive.Analyzers\bin\$(Configuration)\netstandard2.0\Alis.Reactive.Analyzers.dll"
               Pack="true"
@@ -66,10 +39,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Alis.Reactive.Fusion" />
-        <InternalsVisibleTo Include="Alis.Reactive.Native" />
-        <InternalsVisibleTo Include="Alis.Reactive.FluentValidator" />
-        <InternalsVisibleTo Include="Alis.Reactive.PlanContractGenerator" />
+        <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <AdditionalFiles Include="SliceTree.txt" />
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
 
 </Project>

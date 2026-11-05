@@ -1,6 +1,5 @@
 @model Step4ReviewModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native
 @{
     var plan = Html.ReactivePlan<Step4ReviewModel>();
     var loadStepUrl = Url.Action("LoadStep", "AdmissionWizard", new { area = "Sandbox" })
@@ -12,10 +11,10 @@
 <native-card><native-card-body id="screening-form">
     <native-heading level="H2">Step 4: Review &amp; Submit</native-heading>
 
-    @Html.HiddenFieldFor(plan, m => m.ScreeningId)
-    @Html.HiddenFieldFor(plan, m => m.RiskTier)
-    @Html.HiddenFieldFor(plan, m => m.CareUnit)
-    @Html.HiddenFieldFor(plan, m => m.MonitoringLevel)
+    @Html.NativeHiddenField(plan, m => m.ScreeningId)
+    @Html.NativeHiddenField(plan, m => m.RiskTier)
+    @Html.NativeHiddenField(plan, m => m.CareUnit)
+    @Html.NativeHiddenField(plan, m => m.MonitoringLevel)
 
     <native-grid cols="C2" gap="Base" class="mb-4">
         @{ Html.InputField(plan, m => m.EmergencyContact, o => o.Required().Label("Emergency Contact"))
@@ -65,22 +64,23 @@
             .CssClass("rounded-md border border-border px-6 py-2 text-sm font-medium text-text-primary hover:bg-slate-50 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(loadStepUrl,
-                    g => g.Include<NativeHiddenField, Step4ReviewModel>(m => m.ScreeningId)
-                          .Static("step", 3))
+                p.Post(loadStepUrl)
+                 .Gather<LoadStepRequest>(g => g
+                    .Form(m => m.ScreeningId)
+                    .Set(x => x.Step, 3))
                  .Response(r => r.OnSuccess(s => s.Into("step-container")));
             }))
         @(Html.NativeButton("submit-btn", "Submit Assessment")
             .CssClass("rounded-md bg-accent px-6 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors")
             .Reactive(plan, evt => evt.Click, (args, p) =>
             {
-                p.Post(submitUrl,
-                    g => g.IncludeAll())
+                p.Post(submitUrl)
+                 .Gather(g => g.Form())
                  .Validate<Step4Validator>("screening-form")
                  .Response(r => r
                     .OnSuccess<SubmitScreeningResponse>((json, s) =>
                     {
-                        s.Element("submit-result").SetText(json, x => x.Message);
+                        s.Element("submit-result").Text.Set(json.Get(x => x.Message));
                         s.Element("submit-result").Show();
                     })
                     .OnError(400, e => e.ValidationErrors("screening-form")));

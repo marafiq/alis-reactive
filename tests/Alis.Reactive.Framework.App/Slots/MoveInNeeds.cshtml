@@ -1,0 +1,14 @@
+@using Alis.Reactive.Framework.App.Slots
+@model MoveInNeeds
+@{
+    var plan = Html.ReactivePlan<MoveInNeeds>();
+}
+<section id="needs">
+    <h3>Special needs</h3>
+    <p>Ask about mobility, diet and hearing.</p>
+</section>
+
+@{ Html.On(plan, t => t.DomReady(p => p.Element("needs-status").Text.Set("being asked"))); }
+@{ Html.On(plan, t => t.CustomEvent(MoveInEvents.BellRang, (rang, p) => p.Element("needs-heard").Text.Set(rang.Get(x => x.Times)))); }
+
+@Html.RenderPlan(plan)

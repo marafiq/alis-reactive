@@ -1,0 +1,31 @@
+@using Alis.Reactive.Framework.App.Vendors
+@model SharedCallbackPage
+@{
+    ViewData["Title"] = "One callback property, several listeners";
+    var plan = Html.ReactivePlan<SharedCallbackPage>();
+}
+<h1>One callback property, several listeners</h1>
+
+@(plan.Bell("bell")
+    .Reactive(bell => bell.OnRung, (ring, p) =>
+    {
+        p.Element("page-heard").Text.Set(ring.Times);
+        p.Element("last-handler").Text.Set("the page");
+    }))
+
+<p>The page heard ring: <span id="page-heard"></span> · the last to hear it: <span id="last-handler"></span></p>
+<p>The north wing heard ring: <span id="north-heard"></span> · the south wing heard ring: <span id="south-heard"></span></p>
+
+<div id="north-slot"></div>
+<div id="south-slot"></div>
+
+@(plan.Button("open-north", "Listen from the north wing")
+    .Reactive(button => button.Click, p => p.Get("/Vendors/WingListener?wing=north").Response(r => r.OnSuccess(s => s.Into("north-slot")))))
+@(plan.Button("close-north", "Stop the north wing listening")
+    .Reactive(button => button.Click, p => p.Unload("north-slot")))
+@(plan.Button("open-south", "Listen from the south wing")
+    .Reactive(button => button.Click, p => p.Get("/Vendors/WingListener?wing=south").Response(r => r.OnSuccess(s => s.Into("south-slot")))))
+@(plan.Button("close-south", "Stop the south wing listening")
+    .Reactive(button => button.Click, p => p.Unload("south-slot")))
+
+@Html.RenderPlan(plan)

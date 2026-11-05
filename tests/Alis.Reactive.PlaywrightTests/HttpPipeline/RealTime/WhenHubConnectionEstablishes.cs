@@ -9,6 +9,17 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
     private ILocator PushStatusBtn => Page.Locator("#btn-push-status");
     private ILocator PanelResidentName => Page.Locator("#panel-resident-name");
     private ILocator PanelResidentStatus => Page.Locator("#panel-resident-status");
+    private ILocator PanelConnections => Page.Locator("#panel-connections");
+    private ILocator PanelSummary => Page.Locator("#panel-summary");
+    private ILocator ClosePanelBtn => Page.Locator("#close-panel");
+    private ILocator ResidentName => Page.Locator("#resident-name");
+
+    private async Task NavigateAndConnect()
+    {
+        await NavigateTo(Path);
+        await WaitForTraceMessage("booted", 10000);
+        await WaitForTraceMessage("connected {\"hubUrl\":\"/hubs/resident-status", 10000);
+    }
 
     [Test]
     public async Task partial_receives_hub_updates_after_loading()
@@ -53,23 +64,33 @@ public class WhenHubConnectionEstablishes : PlaywrightTestBase
     }
 
     [Test]
-    public async Task partial_reuses_existing_hub_connection()
+    public async Task the_resident_panel_shares_the_pages_live_connection()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 10000);
-        await WaitForTraceMessage("[alis:signalr] connected", 10000);
+        await NavigateAndConnect();
 
         await LoadPanelBtn.ClickAsync();
-        await Expect(PanelResidentName).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(PanelSummary).ToHaveTextAsync("Resident panel open.", new() { Timeout = 10000 });
+        await PushStatusBtn.ClickAsync();
 
-        var residentStatusConnectTraces = _consoleMessages
-            .Where(m => m.Contains("[alis:signalr] connected")
-                        && m.Contains("resident-status"))
-            .ToList();
+        await Expect(PanelResidentName).ToContainTextAsync("Helen Martinez", new() { Timeout = 10000 });
+        await Expect(PanelConnections).ToHaveTextAsync("1");
+        AssertNoConsoleErrors();
+    }
 
-        Assert.That(residentStatusConnectTraces, Has.Count.EqualTo(1),
-            "Expected partial to reuse parent's hub connection, not create a second one");
+    [Test]
+    public async Task a_closed_resident_panel_takes_no_more_live_updates()
+    {
+        await NavigateAndConnect();
+        await LoadPanelBtn.ClickAsync();
+        await Expect(PanelSummary).ToHaveTextAsync("Resident panel open.", new() { Timeout = 10000 });
 
+        await ClosePanelBtn.ClickAsync();
+        await Expect(PanelSummary).ToHaveTextAsync("Resident panel closed.", new() { Timeout = 10000 });
+        await Expect(PanelResidentName).ToHaveCountAsync(0);
+        await PushStatusBtn.ClickAsync();
+
+        await Expect(ResidentName).ToContainTextAsync("Helen Martinez (Manual)", new() { Timeout = 10000 });
+        await Expect(PanelSummary).ToHaveTextAsync("Resident panel closed.");
         AssertNoConsoleErrors();
     }
 }

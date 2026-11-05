@@ -1,13 +1,7 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ResidentChart;
 
-/// <summary>
-/// As a coordinator, I want a resident's chart to show the medical record number the server sent, so
-/// that I do not request a record the resident already has.
-/// </summary>
-/// <remarks>
-/// The chart's MRN member is named in capitals; the server writes it as "mrn". The page shows it, tests
-/// it in a condition, and names a flagged chart by it in an event the page dispatches.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorOpensResidentChart : PlaywrightTestBase
 {
@@ -51,6 +45,37 @@ public class WhenCoordinatorOpensResidentChart : PlaywrightTestBase
         await Expect(ChartRecord).ToHaveTextAsync("No medical record yet: request one from admissions.");
         await Expect(ChartName).ToHaveTextAsync("Arthur Bell");
         await Expect(ChartMrn).ToHaveTextAsync("");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_record_number_list_shows_each_charts_number_and_opens_the_chosen_chart()
+    {
+        await NavigateAndBoot();
+        var plan = await PagePlan<ResidentChartPageModel>.FromPage(Page);
+        var byRecordNumber = plan.DropDownList(m => m.ChartByRecordNumber);
+
+        await byRecordNumber.Open();
+
+        await Expect(byRecordNumber.Popup.GetByText("MRN-20417", new() { Exact = true })).ToBeVisibleAsync(new() { Timeout = 5000 });
+        await Expect(byRecordNumber.Popup.GetByText("MRN-20533", new() { Exact = true })).ToBeVisibleAsync();
+        await Expect(byRecordNumber.Popup.GetByText("Rosa Diaz", new() { Exact = true })).ToBeVisibleAsync();
+
+        await byRecordNumber.Popup.GetByText("MRN-20533", new() { Exact = true }).ClickAsync();
+
+        await Expect(byRecordNumber.Input).ToHaveValueAsync("MRN-20533", new() { Timeout = 5000 });
+        await Expect(ChartName).ToHaveTextAsync("Rosa Diaz", new() { Timeout = 5000 });
+        await Expect(ChartMrn).ToHaveTextAsync("MRN-20533");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task the_floor_counts_the_charts_linked_to_a_medical_record()
+    {
+        await NavigateAndBoot();
+
+        await Expect(Page.Locator("#linked-charts")).ToHaveTextAsync("2", new() { Timeout = 5000 });
+        await Expect(Page.Locator("#floor-charts")).ToHaveTextAsync("3");
         AssertNoConsoleErrors();
     }
 

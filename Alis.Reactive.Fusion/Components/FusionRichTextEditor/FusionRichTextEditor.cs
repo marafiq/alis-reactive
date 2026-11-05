@@ -1,18 +1,83 @@
-namespace Alis.Reactive.Fusion.Components
+using System;
+using System.Collections.Generic;
+using Syncfusion.EJ2;
+using Syncfusion.EJ2.RichTextEditor;
+
+namespace Alis.Reactive.Fusion
 {
     /// <summary>
-    /// Fusion rich text editor component for editing HTML content.
+    /// The Syncfusion Rich Text Editor, declared by the names its JavaScript API uses.
     /// </summary>
     /// <remarks>
-    /// Use as a type parameter in <c>p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.CarePlan)</c>
-    /// to access FusionRichTextEditor-specific component operations and value reads.
+    /// Reach it with <c>var carePlan = p.Component&lt;FusionRichTextEditor&gt;(m =&gt; m.CarePlan);</c> and use its
+    /// members directly: <c>carePlan.Value.Set("&lt;p&gt;Daily review&lt;/p&gt;");</c> or
+    /// <c>p.When(carePlan.Value).NotEmpty()</c>.
     /// </remarks>
     public sealed class FusionRichTextEditor : FusionComponent, IInputComponent
     {
-        internal static InputComponentRegistrationProfile Registration { get; } =
-            InputComponentRegistrationProfile.For(new FusionRichTextEditor(), "richtexteditor");
+        /// <summary>The content as HTML; <see langword="null"/> when empty.</summary>
+        public Property<string> Value => Property<string>();
 
-        /// <inheritdoc />
-        public string ValueMember => "value";
+        /// <summary>Moves focus into the editor.</summary>
+        public void FocusIn() => Method();
+
+        /// <summary>
+        /// Raised when the content changed: when focus leaves the editor (IsInteracted true), and while the
+        /// person types, at the editor's save interval (IsInteracted false).
+        /// </summary>
+        public Event<FusionRichTextEditorChangeArgs> Change
+            => Event<FusionRichTextEditorChangeArgs>();
+
+        ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
+    }
+
+    /// <summary>Payload of <see cref="FusionRichTextEditor.Change"/>.</summary>
+    /// <remarks>Read in conditions: <c>p.When(args.Value).NotNull()</c>.</remarks>
+    public sealed class FusionRichTextEditorChangeArgs : JsObject
+    {
+        /// <summary>Content after the change, as HTML.</summary>
+        public ReadOnly<string> Value => ReadOnly<string>();
+
+        /// <summary>Whether user interaction triggered the change.</summary>
+        public ReadOnly<bool> IsInteracted => ReadOnly<bool>();
+    }
+
+    /// <summary>Renders a <see cref="Alis.Reactive.Fusion.FusionRichTextEditor"/> for a model-bound field.</summary>
+    public static class FusionRichTextEditorHtmlExtensions
+    {
+        /// <summary>Renders a FusionRichTextEditor with Syncfusion's defaults; see the overload that takes <c>build</c>.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionRichTextEditor, TModel> FusionRichTextEditor<TModel, TProp>(
+            this InputBoundField<TModel, TProp> field)
+            where TModel : class
+            => field.FusionRichTextEditor(_ => { });
+
+        /// <summary>
+        /// Renders a FusionRichTextEditor bound to the field's model property, with the framework's element ID and
+        /// binding name.
+        /// </summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <typeparam name="TProp">The bound model property's type.</typeparam>
+        /// <param name="field">The model-bound field from <c>Html.InputField(...)</c>.</param>
+        /// <param name="build">Configures the Syncfusion builder before rendering.</param>
+        /// <returns>The rendered component; wire its events with <c>.Reactive(evt =&gt; evt.Change, ...)</c>.</returns>
+        public static RenderedComponent<global::Alis.Reactive.Fusion.FusionRichTextEditor, TModel> FusionRichTextEditor<TModel, TProp>(
+            this InputBoundField<TModel, TProp> field,
+            Action<RichTextEditorBuilder> build)
+            where TModel : class
+        {
+            var builder = field.Helper.EJS().RichTextEditorFor(field.Expression)
+                .HtmlAttributes(new Dictionary<string, object> { ["name"] = field.BindingPath });
+
+            builder.model.Id = field.ElementId;
+            build(builder);
+
+            return field.Render<global::Alis.Reactive.Fusion.FusionRichTextEditor>(writer =>
+            {
+                builder.Output = writer;
+                builder.Render();
+            });
+        }
     }
 }

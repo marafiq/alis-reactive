@@ -1,0 +1,34 @@
+@layer theme, base, alis, components, utilities;
+
+@layer alis {
+  .alis-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .alis-field:has(> .alis-field__message:not([hidden])) {
+    padding-bottom: 0;
+  }
+
+  .alis-field__required,
+  .alis-field__message,
+  [data-reactive-validation-summary] {
+    color: #b91c1c;
+  }
+
+  .alis-field__message {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  #alis-realtime-connection-retry-container {
+    cursor: pointer;
+  }
+}
+
+.alis-has-error {
+  border-color: #b91c1c;
+  outline-color: #b91c1c;
+}

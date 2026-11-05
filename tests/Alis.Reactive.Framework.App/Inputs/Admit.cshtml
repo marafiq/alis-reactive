@@ -1,0 +1,25 @@
+@using Alis.Reactive.Framework.App.Inputs
+@model AdmitPage
+@{
+    ViewData["Title"] = "Admit a resident";
+    var plan = Html.ReactivePlan<AdmitPage>();
+}
+<h1>Admit a resident</h1>
+
+<div id="admit-form">
+    @{ Html.InputField(plan, m => m.Name, o => o.Required().Label("Name")).Entry(); }
+    @{ Html.InputField(plan, m => m.Age, o => o.Required().Label("Age")).Entry(); }
+    @{ Html.InputField(plan, m => m.Weight, o => o.Label("Weight")).Entry(); }
+    @{ Html.InputField(plan, m => m.Admitted, o => o.Label("Admitted on")).Entry(); }
+    @{ Html.InputField(plan, m => m.Arrives, o => o.Label("Arrives at")).Entry(); }
+</div>
+
+<p>The endpoint bound: <span id="bound"></span></p>
+
+@(plan.Button("admit", "Admit")
+    .Reactive(button => button.Click, p => p.Post("/Inputs/Admit")
+        .Gather(g => g.Form())
+        .Validate<AdmitRules>("admit-form")
+        .Response(r => r.OnSuccess<AdmitEcho>((echo, s) => s.Element("bound").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

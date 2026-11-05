@@ -1,102 +1,107 @@
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
 [TestFixture]
 public class WhenMultilineTextEntered : PlaywrightTestBase
 {
     private const string Path = "/Sandbox/Components/NativeTextArea";
-    private const string ModelIdPrefix = "Alis_Reactive_SandboxApp_Areas_Sandbox_Models_NativeTextAreaModel__";
+
+    private PagePlan<NativeTextAreaModel> _plan = null!;
+
+    private NativeTextBoxLocator Handover => _plan.TextBox(m => m.HandoverNote);
+    private NativeTextBoxLocator Incident => _plan.TextBox(m => m.Incident);
+    private ILocator StartFromTemplate => Page.Locator("#handover-template-btn");
+    private ILocator SendHandover => Page.Locator("#send-handover-btn");
+    private ILocator Status => Page.Locator("#handover-status");
+    private ILocator NoIncident => Page.Locator("#incident-none");
+    private ILocator IncidentFlag => Page.Locator("#incident-flag");
 
     private async Task NavigateAndBoot()
     {
-        await NavigateTo(Path);
-        await WaitForTraceMessage("booted", 5000);
+        await NavigateToAndWaitForBoot(Path);
+        _plan = await PagePlan<NativeTextAreaModel>.FromPage(Page);
+    }
+
+    private async Task WriteTheIncident(string incident)
+    {
+        await Incident.Fill(incident);
+        await Incident.Input.PressAsync("Tab");
     }
 
     [Test]
-    public async Task page_loads_without_errors()
+    public async Task starting_from_the_template_puts_its_headings_in_the_handover()
     {
         await NavigateAndBoot();
-        await Expect(Page).ToHaveTitleAsync("NativeTextArea — Alis.Reactive Sandbox");
+
+        await ClickWhenStable(StartFromTemplate);
+
+        await Expect(Handover.Input).ToHaveValueAsync("Vitals:\nMeals:\nMedications:\nFalls or incidents:\nFamily calls:");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task domready_sets_initial_care_notes()
+    public async Task starting_from_the_template_leaves_the_cursor_in_the_handover()
     {
         await NavigateAndBoot();
 
-        var textarea = Page.Locator($"#{ModelIdPrefix}CareNotes");
-        await Expect(textarea).ToHaveValueAsync("Resident stable. Vitals within normal range.");
+        await ClickWhenStable(StartFromTemplate);
+
+        await Expect(Handover.Input).ToBeFocusedAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task value_echoed_from_component_read()
+    public async Task sending_an_empty_handover_asks_for_it_and_puts_the_cursor_in_it()
     {
         await NavigateAndBoot();
 
-        var echo = Page.Locator("#value-echo");
-        await Expect(echo).ToHaveTextAsync("Resident stable. Vitals within normal range.", new() { Timeout = 3000 });
+        await ClickWhenStable(SendHandover);
+
+        await Expect(Status).ToHaveTextAsync("Write the handover before sending it.");
+        await Expect(Handover.Input).ToBeFocusedAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task changed_event_with_condition_shows_incident_status()
+    public async Task the_sent_handover_reaches_the_night_nurse_line_by_line_with_its_incident()
     {
         await NavigateAndBoot();
+        await Handover.Fill("Mrs. Hale: vitals stable.\nMr. Benson ate all his meals.\nMrs. Coleman refused the 9 PM Tylenol.");
+        await WriteTheIncident("Mr. Benson slipped in the hallway at 7 PM; no injury.");
 
-        var textarea = Page.Locator($"#{ModelIdPrefix}IncidentDescription");
+        await ClickWhenStable(SendHandover);
 
-        await textarea.FillAsync("Resident fell in hallway at 2pm.");
-        // FillAsync dispatches input, but this test needs the change event.
-        await textarea.BlurAsync();
-
-        var status = Page.Locator("#incident-status");
-        await Expect(status).ToHaveTextAsync("incident logged", new() { Timeout = 3000 });
+        await Expect(Status).ToHaveTextAsync("Handover sent to the night nurse: 3 lines, and an incident to read first.");
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task changed_event_with_condition_shows_warning_when_cleared()
+    public async Task an_incident_written_down_is_flagged_for_the_night_nurse_to_read_first()
     {
         await NavigateAndBoot();
+        await Expect(IncidentFlag).ToBeHiddenAsync();
 
-        var textarea = Page.Locator($"#{ModelIdPrefix}IncidentDescription");
+        await WriteTheIncident("Mr. Benson slipped in the hallway at 7 PM; no injury.");
 
-        await textarea.FillAsync("Resident fell in hallway at 2pm.");
-        await textarea.BlurAsync();
-        await textarea.ClearAsync();
-        await textarea.BlurAsync();
-
-        var status = Page.Locator("#incident-status");
-        await Expect(status).ToHaveTextAsync("no incident", new() { Timeout = 3000 });
+        await Expect(IncidentFlag).ToBeVisibleAsync();
+        await Expect(IncidentFlag).ToHaveTextAsync("The night nurse reads this first: Mr. Benson slipped in the hallway at 7 PM; no injury.");
+        await Expect(NoIncident).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 
     [Test]
-    public async Task component_value_condition_warns_when_empty()
+    public async Task clearing_the_incident_says_there_was_none()
     {
         await NavigateAndBoot();
+        await WriteTheIncident("Mr. Benson slipped in the hallway at 7 PM; no injury.");
+        await Expect(IncidentFlag).ToBeVisibleAsync();
 
-        var textarea = Page.Locator($"#{ModelIdPrefix}CareNotes");
-        await textarea.ClearAsync();
+        await WriteTheIncident("");
 
-        await Page.Locator("#check-notes-btn").ClickAsync();
-
-        var warning = Page.Locator("#notes-warning");
-        await Expect(warning).ToHaveTextAsync("notes required", new() { Timeout = 3000 });
-        AssertNoConsoleErrors();
-    }
-
-    [Test]
-    public async Task component_value_condition_confirms_when_filled()
-    {
-        await NavigateAndBoot();
-
-        await Page.Locator("#check-notes-btn").ClickAsync();
-
-        var warning = Page.Locator("#notes-warning");
-        await Expect(warning).ToHaveTextAsync("notes recorded", new() { Timeout = 3000 });
+        await Expect(NoIncident).ToHaveTextAsync("No incidents this shift.");
+        await Expect(NoIncident).ToBeVisibleAsync();
+        await Expect(IncidentFlag).ToBeHiddenAsync();
         AssertNoConsoleErrors();
     }
 }

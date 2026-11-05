@@ -1,6 +1,6 @@
 using System;
 
-namespace Alis.Reactive.PlanModel
+namespace Alis.Reactive.PlanModel.Conditions
 {
     internal sealed class MinimumTextLength
     {
@@ -15,10 +15,12 @@ namespace Alis.Reactive.PlanModel
         {
             if (parameterName == null) throw new ArgumentNullException(nameof(parameterName));
             if (length < 0)
+            {
                 throw new ArgumentOutOfRangeException(
                     parameterName,
                     length,
                     "Condition minimum text length must be zero or greater.");
+            }
 
             return new MinimumTextLength(length);
         }

@@ -12,18 +12,9 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Native.Components
+namespace Alis.Reactive.Native.Components.NativeHiddenField
 {
-    /// <summary>
-    /// Renders a native HTML <c>&lt;input type="hidden"&gt;</c> bound to a model property.
-    /// </summary>
-    /// <remarks>
-    /// Uses the Reactive Plan-owned render target for element ID and MVC binding name.
-    /// No label or validation slot is rendered.
-    /// </remarks>
-    /// <typeparam name="TModel">View model that owns the bound property.</typeparam>
-    /// <typeparam name="TProp">Model value type rendered through the hidden input.</typeparam>
-    public class NativeHiddenFieldBuilder<TModel, TProp> :
+    internal sealed class NativeHiddenFieldBuilder<TModel, TProp> :
 #if NET48
         IHtmlString
     {
@@ -35,7 +26,6 @@ namespace Alis.Reactive.Native.Components
 #endif
         private readonly Expression<Func<TModel, TProp>> _expression;
         private readonly string _elementId;
-        private readonly string _bindingPath;
 
         internal NativeHiddenFieldBuilder(
 #if NET48
@@ -44,20 +34,14 @@ namespace Alis.Reactive.Native.Components
             IHtmlHelper<TModel> html,
 #endif
             Expression<Func<TModel, TProp>> expression,
-            InputComponentRenderTarget target)
+            string elementId)
         {
             _html = html;
             _expression = expression;
-            if (target == null) throw new ArgumentNullException(nameof(target));
-            _elementId = target.ElementId;
-            _bindingPath = target.BindingName;
+            _elementId = elementId;
         }
 
-        internal string ElementId => _elementId;
-        internal string BindingPath => _bindingPath;
-
 #if NET48
-        /// <inheritdoc />
         public string ToHtmlString()
         {
             var sw = new StringWriter();
@@ -66,12 +50,12 @@ namespace Alis.Reactive.Native.Components
         }
 #endif
 
-        /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
             var hiddenInputAttributes = new Dictionary<string, object>
             {
-                ["id"] = _elementId
+                ["id"] = _elementId,
+                ["data-alis-hidden-field"] = ""
             };
 
             var hiddenInputHtml = _html.HiddenFor(_expression, hiddenInputAttributes);

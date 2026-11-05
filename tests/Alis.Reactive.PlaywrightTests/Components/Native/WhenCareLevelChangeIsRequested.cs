@@ -2,10 +2,6 @@ using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
 
 namespace Alis.Reactive.PlaywrightTests.Components.Native;
 
-/// <summary>
-/// As a nurse, I want a care level change to carry the resident's physician sign-off decision as
-/// the server made it, so that no resident is routed for a sign-off they do not need, or misses one.
-/// </summary>
 [TestFixture]
 public class WhenCareLevelChangeIsRequested : PlaywrightTestBase
 {

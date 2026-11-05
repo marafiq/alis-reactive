@@ -1,6 +1,3 @@
-using Alis.Reactive.FluentValidator;
-using FluentValidation;
-
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
     public class RoomHoldValidator : ReactiveValidator<RoomHoldModel>
@@ -9,12 +6,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 
         public RoomHoldValidator()
         {
-            ClientRule(x => x.ProspectName).Required("Enter the prospective resident's name.");
+            RuleFor(x => x.RoomCode).NotEmpty().WithMessage("Choose a room to hold.");
 
-            // Only the server knows which rooms are held, so this rule has no browser half.
+            RuleFor(x => x.ProspectName).NotEmpty().WithMessage("Enter the prospective resident's name.");
+
+            RuleFor(x => x.FamilyAgreedToHoldTerms)
+                .Equal(true).WithMessage("The family must agree that the hold lapses after 48 hours.");
+
             RuleFor(x => x.RoomCode)
-                .Must(room => room != HeldRoom)
+                .MustAsync(async (room, _) => !await IsHeldForAnotherFamilyAsync(room))
                 .WithMessage($"{HeldRoom} is already held for another family. Choose another room.");
         }
+
+        private static Task<bool> IsHeldForAnotherFamilyAsync(string? room)
+            => Task.FromResult(room == HeldRoom);
     }
 }

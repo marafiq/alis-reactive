@@ -1,0 +1,53 @@
+@using Alis.Reactive.Framework.App.Requests
+@model SignInPage
+@{
+    ViewData["Title"] = "Sign in";
+    var plan = Html.ReactivePlan<SignInPage>();
+}
+<h1>Sign in</h1>
+
+@{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+<div id="party-shelf">@{ Html.InputField(plan, m => m.Party, o => o.Label("Party")).Entry(); }</div>
+@{ Html.InputField(plan, m => m.Note, o => o.Label("Note")).Entry(); }
+@{ Html.InputField(plan, m => m.PassId, o => o.Label("Pass")).Entry(); }
+@{ Html.InputField(plan, m => m.Lines[0].Note, o => o.Label("First line")).Entry(); }
+@{ Html.InputField(plan, m => m.Doses[1042], o => o.Label("Dose for 1042")).Entry(); }
+@{ Html.InputField(plan, m => m.Guide.Name, o => o.Label("Guide")).Entry(); }
+
+<dl>
+    <dt>Signed in</dt><dd id="signed-in"></dd>
+    <dt>Pass</dt><dd id="pass"></dd>
+    <dt>Party</dt><dd id="party"></dd>
+    <dt>First line</dt><dd id="line"></dd>
+    <dt>Dose</dt><dd id="dose"></dd>
+    <dt>Extras</dt><dd id="extras"></dd>
+</dl>
+
+@(plan.Button("sign-in", "Sign in")
+    .Reactive(button => button.Click, p => p.Post("/Requests/SignIns")
+        .Gather<SignInRequest>(g => g.Form(m => m.Visitor, m => m.Party))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("signed-in").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("show-pass", "Show the pass")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Passes")
+        .Gather<PassRequest>(g => g.Form(m => m.PassId))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("pass").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("count-party", "Count the party")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Parties")
+        .Gather<PartyRequest>(g => g.Form(m => m.Party))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("party").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("put-party-away", "Put the party's field away")
+    .Reactive(button => button.Click, p => p.Unload("party-shelf")))
+@(plan.Button("note-line", "Note the first line")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Lines")
+        .Gather<LineNotes>(g => g.Form(m => m.Lines[0].Note))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("line").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("record-dose", "Record the dose")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Doses")
+        .Gather<DoseRecord>(g => g.Form(m => m.Doses[1042]))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("dose").Text.Set(echo.Get(x => x.Summary))))))
+@(plan.Button("keep-guide", "Keep the guide")
+    .Reactive(button => button.Click, p => p.Post("/Requests/Extras")
+        .Gather<GuideExtras>(g => g.Form(m => m.Guide.Name))
+        .Response(r => r.OnSuccess<Echo>((echo, s) => s.Element("extras").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

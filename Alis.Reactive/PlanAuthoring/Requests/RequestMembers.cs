@@ -1,0 +1,88 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Alis.Reactive.Members;
+using Alis.Reactive.WireTerms;
+
+namespace Alis.Reactive.PlanAuthoring.Requests
+{
+    internal static class RequestMembers
+    {
+        internal static void Require(Type request, BindingPath binding, Type inputType)
+        {
+            var member = MemberType(request, binding);
+            if (member == null || Binds(inputType, member)) return;
+
+            throw new InvalidOperationException(
+                $"Form sends the input '{binding.Value}' as {CSharpTypeName.Of(inputType)}, but {CSharpTypeName.Of(request)}.{binding.Value}, which " +
+                $"the endpoint binds, is {CSharpTypeName.Of(member)}. Give the request member the input's type.");
+        }
+
+        private static Type? MemberType(Type request, BindingPath binding)
+        {
+            var current = request;
+            foreach (var segment in binding.Path.Segments)
+            {
+                if (segment.IsIndex || segment.IsEachItem)
+                {
+                    current = ItemType(current);
+                }
+                else
+                {
+                    var name = segment.ToPathText();
+                    var property = current.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+                        ?? throw new InvalidOperationException(
+                            $"Form sends the input '{binding.Value}', but {CSharpTypeName.Of(request)}, the request the endpoint binds, " +
+                            $"has no member '{name}'{(current == request ? "" : " on " + CSharpTypeName.Of(current))}.");
+                    current = property.PropertyType;
+                }
+
+                if (IsOpen(current)) return null;
+            }
+
+            return current;
+        }
+
+        private static bool Binds(Type input, Type member)
+        {
+            var missingIntoRequired = Nullable.GetUnderlyingType(input) != null && Nullable.GetUnderlyingType(member) == null;
+            if (missingIntoRequired) return false;
+
+            var inputCore = Nullable.GetUnderlyingType(input) ?? input;
+            var memberCore = Nullable.GetUnderlyingType(member) ?? member;
+            if (memberCore.IsAssignableFrom(inputCore)) return true;
+
+            var bothCollections = IsCollection(inputCore) && IsCollection(memberCore);
+            return bothCollections && ItemType(inputCore) == ItemType(memberCore);
+        }
+
+        private static bool IsCollection(Type type)
+            => type != typeof(string) && (type.IsArray || SequenceOf(type) != null);
+
+        private static bool IsOpen(Type type)
+            => type == typeof(object) || DictionaryValueType(type) != null;
+
+        private static Type ItemType(Type collection)
+        {
+            if (collection.IsArray) return collection.GetElementType()!;
+            var dictionaryValue = DictionaryValueType(collection);
+            if (dictionaryValue != null) return dictionaryValue;
+
+            return SequenceOf(collection)?.GetGenericArguments()[0] ?? typeof(object);
+        }
+
+        private static Type? SequenceOf(Type type)
+            => new[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(candidate =>
+                candidate.IsGenericType && candidate.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+
+        private static Type? DictionaryValueType(Type type)
+        {
+            var dictionary = new[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(candidate =>
+                candidate.IsGenericType
+                && (candidate.GetGenericTypeDefinition() == typeof(IDictionary<,>)
+                    || candidate.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>)));
+            return dictionary?.GetGenericArguments()[1];
+        }
+    }
+}

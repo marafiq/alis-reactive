@@ -1,0 +1,30 @@
+@using Alis.Reactive.Framework.App.Validation
+@model ResidentReturn
+@{
+    ViewData["Title"] = "A late return";
+    var plan = Html.ReactivePlan<ResidentReturn>();
+}
+<h1>Sign a resident back in late</h1>
+
+<div id="return-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry()
+        .Reactive(entry => entry.Committed, (committed, p) => p.Element("desk-told").Text.Set("the desk knows who is back")); }
+    <div id="reason-section" hidden>
+        @{ Html.InputField(plan, m => m.Reason, o => o.Label("Reason")).Entry(); }
+    </div>
+</div>
+
+<p>Return: <span id="return-status"></span></p>
+<p>Desk: <span id="desk-told"></span></p>
+
+@(plan.Button("add-reason", "Add the reason")
+    .Reactive(button => button.Click, p => p.Element("reason-section").Show()))
+@(plan.Button("sign-in", "Sign the resident back in")
+    .Reactive(button => button.Click, p => p.Post("/Validation/LateReturn")
+        .Gather(g => g.Form("return-form"))
+        .Validate<ResidentReturnRules>("return-form")
+        .Response(r => r
+            .OnSuccess<Booked>((signed, s) => s.Element("return-status").Text.Set(signed.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("return-form")))))
+
+@Html.RenderPlan(plan)

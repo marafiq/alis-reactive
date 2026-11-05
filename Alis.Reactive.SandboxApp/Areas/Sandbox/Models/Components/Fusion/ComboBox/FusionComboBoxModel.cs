@@ -1,36 +1,42 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ComboBox
 {
     public sealed class FusionComboBoxModel
     {
+        public string? Wristband { get; set; }
+
         public string? Resident { get; set; }
+
+        public IReadOnlyList<RoundResident> Round { get; init; } = [];
     }
 
-    public sealed class ComboBoxResidentItem
+    public sealed class RoundResident
     {
-        public string Value { get; set; } = string.Empty;
+        public string Id { get; init; } = "";
 
-        public string Text { get; set; } = string.Empty;
-
-        public string Unit { get; set; } = string.Empty;
+        public string Name { get; init; } = "";
     }
 
-    public sealed class FusionComboBoxEchoRequest
+    public sealed class DoseCheckQuery
     {
-        public string? Value { get; set; }
-
-        public string? Text { get; set; }
-
-        public int Index { get; set; }
+        public string? ResidentId { get; set; }
     }
 
-    public sealed class FusionComboBoxEchoResponse
+    public sealed class DoseCheck
     {
-        public string? Value { get; set; }
+        public string Room { get; init; } = "";
 
-        public string? Text { get; set; }
+        public string Allergies { get; init; } = "";
+    }
 
-        public int Index { get; set; }
+    public sealed class MedicationPassRecord
+    {
+        public string? Resident { get; set; }
 
-        public string Summary { get; set; } = string.Empty;
+        public int? RoundPosition { get; set; }
+    }
+
+    public sealed class MedicationPassStatus
+    {
+        public string Message { get; init; } = "";
     }
 }

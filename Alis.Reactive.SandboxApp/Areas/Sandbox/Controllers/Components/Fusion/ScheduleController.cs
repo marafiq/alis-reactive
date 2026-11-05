@@ -1,70 +1,68 @@
-using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
-    /// <summary>
-    /// Point-in-Time Schedule sandbox — server-driven shift schedule.
-    /// Mutations persist in-memory so POST changes are visible on GET refresh.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Components/Schedule")]
     public partial class ScheduleController : Controller
     {
+        private const string DefaultFacilityId = "maple-grove";
+
+        private ScheduleWorld World => new(HttpContext.Session);
+
         [HttpGet("")]
         public IActionResult Index()
         {
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Schedule/Index.cshtml",
-                new PointInTimeScheduleModel { SelectedFacilityId = "mystery-manor" });
+                new PointInTimeScheduleModel { SelectedFacilityId = DefaultFacilityId });
         }
 
-        /// <summary>
-        /// Loads the Schedule data source for the selected facility and visible range.
-        /// Parameter names match the model property and event arg names used by
-        /// Include and FromEvent gather in the Reactive Plan.
-        /// </summary>
-        [HttpGet("~/api/schedule/assignments")]
-        public IActionResult GetAssignments(string? selectedFacilityId, string? currentDate, string? currentView)
+        [HttpGet("Shifts/{currentView}")]
+        public IActionResult Shifts(string currentView, string? selectedFacilityId, DateTime? currentDate)
         {
-            var facilityId = selectedFacilityId ?? "mystery-manor";
-            DateTime anchor;
-            if (!string.IsNullOrEmpty(currentDate) && DateTime.TryParse(currentDate, out var parsed))
-                anchor = parsed;
-            else
-                anchor = DateTime.Today;
+            var facility = FakeScheduleData.Facilities.FirstOrDefault(f => f.Id == selectedFacilityId);
+            if (facility == null || currentDate == null)
+                return BadRequest(new { error = "Say which facility and which date the schedule shows." });
 
-            var (rangeStart, rangeEnd) = CalculateDateRange(anchor, currentView ?? "Week");
-            var data = FakeScheduleData.GetAssignments(facilityId, rangeStart, rangeEnd);
-            return Ok(data);
+            var (rangeStart, rangeEnd) = CalculateDateRange(currentDate.Value, currentView);
+            return Ok(World.GetAssignments(facility, rangeStart, rangeEnd));
         }
 
-        [HttpGet("~/api/schedule/view/{currentView}/echo")]
-        public IActionResult EchoView(string currentView)
+        [HttpPost("AgencyRequest")]
+        public IActionResult AgencyRequest([FromBody] AgencyCoverRequest request)
         {
-            return Ok(new ScheduleViewRouteResponse
-            {
-                CurrentView = currentView
-            });
+            var open = request.Shifts.Count(s => s.IsUnassigned && !s.IsInService);
+            var summary = open == 0
+                ? "Every shift on the schedule is covered; nothing was sent to Staffing Plus."
+                : string.Format(CultureInfo.InvariantCulture, "Asked Staffing Plus to cover {0} open {1}.", open, open == 1 ? "shift" : "shifts");
+            return Ok(new AgencyCoverAnswer { Summary = summary });
         }
 
-        [HttpGet("~/api/schedule/view/{currentView}/summary")]
-        public IActionResult ViewSummary(string currentView)
+        [HttpPost("InServiceClaim")]
+        public IActionResult InServiceClaim([FromBody] InServiceClaimRequest request)
         {
-            return Ok(new ScheduleViewRouteResponse
-            {
-                CurrentView = currentView,
-                Summary = $"summary:{currentView}"
-            });
+            var claim = World.ClaimInService(request.InServiceId);
+            if (claim == null) return NotFound(new { error = "In-service not found." });
+
+            var (refused, answer) = claim.Value;
+            return refused ? Conflict(answer) : Ok(answer);
         }
 
-        [HttpPost("~/api/schedule/events/audit")]
-        public IActionResult AuditEvents([FromBody] ScheduleEventsAuditRequest request)
+        [HttpPost("SaveInService")]
+        public IActionResult SaveInService([FromBody] InServiceChange change)
         {
-            return Ok(new ScheduleEventsAuditResponse
-            {
-                Count = request.Events.Count
-            });
+            var answer = World.SaveInService(change.InServiceId, change.Subject, change.Description);
+            return answer == null ? NotFound(new { error = "In-service not found." }) : Ok(answer);
+        }
+
+        [HttpPost("RemoveInService")]
+        public IActionResult RemoveInService([FromBody] InServiceRemoval removal)
+        {
+            var answer = World.RemoveInService(removal.InServiceId);
+            return answer == null ? NotFound(new { error = "In-service not found." }) : Ok(answer);
         }
 
         private static (DateTime start, DateTime end) CalculateDateRange(DateTime anchor, string view)
@@ -74,8 +72,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 "Day" => (anchor.Date, anchor.Date.AddDays(1)),
                 "WorkWeek" => WorkWeekRange(anchor),
                 "Month" => MonthRange(anchor),
-                "Agenda" => (anchor.Date, anchor.Date.AddDays(30)),
-                _ => WeekRange(anchor), // "Week" and default
+                "Agenda" => (anchor.Date, anchor.Date.AddDays(7)),
+                _ => WeekRange(anchor),
             };
         }
 
@@ -96,60 +94,35 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             var firstOfMonth = new DateTime(anchor.Year, anchor.Month, 1);
             var lastOfMonth = firstOfMonth.AddMonths(1).AddDays(-1);
-            // Syncfusion Month view shows full weeks — pad to surrounding Sundays
             var rangeStart = firstOfMonth.AddDays(-(int)firstOfMonth.DayOfWeek);
             var rangeEnd = lastOfMonth.AddDays(6 - (int)lastOfMonth.DayOfWeek + 1);
             return (rangeStart, rangeEnd);
         }
 
-        /// <summary>
-        /// Assigns staff to a shift slot in the in-memory schedule store.
-        /// Subsequent data-source loads return the updated assignment.
-        /// </summary>
         [HttpPost("~/api/schedule/assign")]
         public IActionResult AssignStaff([FromBody] AssignStaffRequest request)
         {
             if (request.StaffId == null)
                 return BadRequest(new { error = "Staff member is required." });
 
-            var updated = FakeScheduleData.AssignStaff(request.AssignmentId, request.StaffId.Value);
+            var updated = World.AssignStaff(request.AssignmentId, request.StaffId.Value);
             if (updated == null)
                 return NotFound(new { error = "Assignment or staff not found." });
 
-            return Ok(new
-            {
-                success = true,
-                message = $"{updated.StaffName} ({updated.StaffRole}) assigned.",
-                assignment = updated,
-            });
+            return Ok(updated);
         }
 
-        /// <summary>
-        /// Clears the staff assignment for a shift slot in the in-memory schedule store.
-        /// </summary>
-        [HttpPost("~/api/schedule/unassign")]
-        public IActionResult UnassignStaff([FromBody] AssignStaffRequest request)
+        [HttpPost("~/api/schedule/cancel-shift")]
+        public IActionResult CancelShift([FromBody] CancelShiftRequest request)
         {
-            var updated = FakeScheduleData.UnassignStaff(request.AssignmentId);
-            if (updated == null)
-                return NotFound(new { error = "Assignment not found." });
-
-            return Ok(new
-            {
-                success = true,
-                message = $"Slot unassigned. Needs coverage.",
-                assignment = updated,
-            });
+            var cancelled = World.CancelAssignment(request.AssignmentId);
+            return cancelled == null ? NotFound(new { error = "Assignment not found." }) : Ok(cancelled);
         }
 
-        /// <summary>
-        /// Loads the event-edit partial into the NativeDrawer after a schedule event click.
-        /// Partial has its own Reactive Plan that merges into the page's Active Plan.
-        /// </summary>
         [HttpGet("EditForm")]
         public IActionResult EditForm(int assignmentId)
         {
-            var assignment = FakeScheduleData.FindAssignment(assignmentId);
+            var assignment = World.FindAssignment(assignmentId);
             var currentStaffId = assignment?.StaffName != null
                 ? FakeScheduleData.Staff.FirstOrDefault(s => s.Name == assignment.StaffName)?.Id
                 : null;
@@ -165,28 +138,21 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
                 model);
         }
 
-        /// <summary>
-        /// Loads the empty-cell assignment partial into the FusionDialog.
-        /// GroupIndex (0-based) is mapped to ShiftId (1-based).
-        /// </summary>
         [HttpGet("NewAssignmentForm")]
-        public IActionResult NewAssignmentForm(string startTime, string endTime, int shiftId, string? selectedFacilityId)
+        public IActionResult NewAssignmentForm([FromQuery] NewAssignmentQuery query)
         {
             var model = new NewAssignmentModel
             {
-                StartTime = startTime,
-                EndTime = endTime,
-                ShiftId = shiftId + 1, // GroupIndex 0-based → ShiftId 1-based
-                FacilityId = selectedFacilityId ?? "mystery-manor",
+                StartTime = query.StartTime.ToString("s", CultureInfo.InvariantCulture),
+                EndTime = query.EndTime.ToString("s", CultureInfo.InvariantCulture),
+                ShiftId = query.GroupIndex + 1,
+                FacilityId = query.SelectedFacilityId ?? DefaultFacilityId,
             };
             return PartialView(
                 "~/Areas/Sandbox/Views/Components/Fusion/Schedule/_NewAssignmentForm.cshtml",
                 model);
         }
 
-        /// <summary>
-        /// Creates a shift assignment from the new-assignment dialog payload.
-        /// </summary>
         [HttpPost("~/api/schedule/create-assignment")]
         public IActionResult CreateAssignment([FromBody] NewAssignmentModel? model)
         {
@@ -196,8 +162,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (string.IsNullOrEmpty(model.StartTime) || string.IsNullOrEmpty(model.EndTime))
                 return BadRequest(new { error = "Start and end time are required." });
 
-            var assignment = FakeScheduleData.CreateAssignment(
-                model.FacilityId ?? "mystery-manor",
+            var assignment = World.CreateAssignment(
+                model.FacilityId ?? DefaultFacilityId,
                 DateTime.Parse(model.StartTime),
                 DateTime.Parse(model.EndTime),
                 model.ShiftId,
@@ -206,30 +172,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
             if (assignment == null)
                 return BadRequest(new { error = "Could not create assignment. Staff not found." });
 
-            return Ok(new
-            {
-                success = true,
-                message = $"{assignment.StaffName} ({assignment.StaffRole}) assigned.",
-                assignment,
-            });
-        }
-
-        /// <summary>
-        /// Loads staff options for assignment dialog dropdowns.
-        /// </summary>
-        [HttpGet("~/api/schedule/staff")]
-        public IActionResult GetStaff()
-        {
-            return Ok(FakeScheduleData.Staff);
-        }
-
-        /// <summary>
-        /// Loads facility options for the Schedule filter dropdown.
-        /// </summary>
-        [HttpGet("~/api/schedule/facilities")]
-        public IActionResult GetFacilities()
-        {
-            return Ok(FakeScheduleData.Facilities);
+            return Ok(assignment);
         }
     }
 }

@@ -1,0 +1,26 @@
+
+namespace Alis.Reactive
+{
+    /// <summary>
+    /// Base for a component declaration: the typed face of a JavaScript object that already
+    /// works in the browser. Declare its properties, methods and events with the names the
+    /// component's own JavaScript API uses; every framework feature then works with it.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// public sealed class FusionNumericTextBox : FusionComponent, IInputComponent
+    /// {
+    ///     public Property&lt;decimal&gt; Value =&gt; Property&lt;decimal&gt;();
+    ///     public Property&lt;decimal&gt; Min =&gt; Property&lt;decimal&gt;();
+    ///     public void Increment() =&gt; Method();
+    ///     public Event&lt;FusionNumericTextBoxChangeArgs&gt; Change =&gt; Event&lt;FusionNumericTextBoxChangeArgs&gt;();
+    ///     ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Value, committedBy: Change);
+    /// }
+    /// </code>
+    /// </example>
+    public abstract class Component : JsObject, IComponent
+    {
+        /// <inheritdoc />
+        public abstract ComponentVendor Vendor { get; }
+    }
+}

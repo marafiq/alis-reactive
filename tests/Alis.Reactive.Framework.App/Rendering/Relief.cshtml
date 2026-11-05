@@ -1,0 +1,23 @@
+@using Alis.Reactive.Framework.App.Rendering
+@model ReliefNurse
+@{
+    ViewData["Title"] = "The relief nurse";
+    // The view renders the shift's Relief member. Set after the plan starts, the prefix is what MVC 5 does to a view
+    // when a ViewDataDictionary copied from its ViewData is given a prefix: the copy shares the view's TemplateInfo.
+    if (Model.Prefix == ReliefPrefix.BeforeThePlanStarts)
+        ViewData.TemplateInfo.HtmlFieldPrefix = nameof(ReliefShift.Relief);
+    var plan = Html.ReactivePlan<ReliefNurse>();
+    if (Model.Prefix == ReliefPrefix.AfterThePlanStarts)
+        ViewData.TemplateInfo.HtmlFieldPrefix = nameof(ReliefShift.Relief);
+}
+<h1>The relief nurse</h1>
+
+@{ Html.InputField(plan, m => m.Name, o => o.Label("Relief nurse")).Entry(); }
+<p>The shift's endpoint bound: <span id="relieved"></span></p>
+
+@(plan.Button("take-over", "Take over the shift")
+    .Reactive(button => button.Click, p => p.Post("/Rendering/Reliefs")
+        .Gather(g => g.Form(m => m.Name))
+        .Response(r => r.OnSuccess<HandoverEcho>((echo, s) => s.Element("relieved").Text.Set(echo.Get(x => x.Summary))))))
+
+@Html.RenderPlan(plan)

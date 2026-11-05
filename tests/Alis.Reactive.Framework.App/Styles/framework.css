@@ -1,0 +1,4 @@
+@import "tailwindcss" source(none);
+@import "./AlisReactive.DesignSystem/theme.css";
+
+@source "../**/*.cshtml";

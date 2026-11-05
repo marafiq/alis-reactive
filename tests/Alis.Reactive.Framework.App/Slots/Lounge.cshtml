@@ -1,0 +1,25 @@
+@using Alis.Reactive.Framework.App.Slots
+@model LoungePage
+@{
+    ViewData["Title"] = "The lounge";
+    var plan = Html.ReactivePlan<LoungePage>();
+}
+<h1>The lounge</h1>
+
+@(plan.Bell("lounge-bell")
+    .Reactive(bell => bell.OnRung, (ring, p) =>
+    {
+        p.Element("page-heard").Text.Set(ring.Times);
+        p.Dispatch(LoungeEvents.LoungeBellRang, rang => rang.Set(x => x.Times, ring.Times));
+    }))
+
+<p>The page heard ring: <span id="page-heard"></span> · the visitor card heard ring: <span id="card-heard"></span></p>
+
+<div id="visitor-slot"></div>
+
+@(plan.Button("open-visitor-card", "Open the visitor card")
+    .Reactive(button => button.Click, p => p.Get("/Slots/VisitorCard").Response(r => r.OnSuccess(s => s.Into("visitor-slot")))))
+@(plan.Button("close-visitor-card", "Close the visitor card")
+    .Reactive(button => button.Click, p => p.Unload("visitor-slot")))
+
+@Html.RenderPlan(plan)

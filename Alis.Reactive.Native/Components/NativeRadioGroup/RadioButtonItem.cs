@@ -1,89 +1,45 @@
-namespace Alis.Reactive.Native.Components
+using System;
+
+namespace Alis.Reactive.Native
 {
     /// <summary>
-    /// Shared option item for native radio groups and checkbox lists.
+    /// An option of a native radio group: the value a form post carries, the text beside the radio
+    /// button and, when the option has one, a description under the text.
     /// </summary>
     /// <remarks>
-    /// Created in the controller and passed to the builder via <c>.Items()</c>.
-    /// Used by both <see cref="NativeRadioGroupBuilder{TModel,TProp}"/> and
-    /// <see cref="NativeCheckListBuilder{TModel,TProp}"/>.
+    /// Created in the controller and passed to <see cref="NativeRadioGroupBuilder{TModel,TProp}.Items"/>.
     /// </remarks>
-    public class RadioButtonItem
+    public sealed class RadioButtonItem
     {
-        private readonly OptionDescription _description;
-
-        /// <summary>
-        /// Option value written to form posts and component reads.
-        /// </summary>
+        /// <summary>Option value written to form posts and component reads.</summary>
         public string Value { get; }
 
-        /// <summary>
-        /// Display text shown next to the radio button or checkbox.
-        /// </summary>
+        /// <summary>Display text shown next to the radio button.</summary>
         public string Text { get; }
 
         /// <summary>
-        /// Optional secondary description shown below the display text.
+        /// Secondary text shown below the display text. Null when the option has none; the group then
+        /// renders no description element for it.
         /// </summary>
-        public string? Description => _description.ValueForRender;
+        public string? Description { get; }
 
-        /// <summary>
-        /// Creates a new option without secondary description text.
-        /// </summary>
+        /// <summary>Creates an option without secondary text.</summary>
         /// <param name="value">Submitted option value.</param>
         /// <param name="text">Display text.</param>
         public RadioButtonItem(string value, string text)
-            : this(value, text, OptionDescription.None)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new option with secondary description text.
-        /// </summary>
-        /// <param name="value">Submitted option value.</param>
-        /// <param name="text">Display text.</param>
-        /// <param name="description">Secondary description text.</param>
-        public RadioButtonItem(string value, string text, string description)
-            : this(value, text, OptionDescription.Text(description))
-        {
-        }
-
-        private RadioButtonItem(string value, string text, OptionDescription description)
         {
             Value = value;
             Text = text;
-            _description = description;
         }
-    }
 
-    internal abstract class OptionDescription
-    {
-        private protected OptionDescription() { }
-
-        internal static OptionDescription None { get; } =
-            new MissingOptionDescription();
-
-        internal static OptionDescription Text(string value) =>
-            new TextOptionDescription(value);
-
-        internal abstract string? ValueForRender { get; }
-    }
-
-    internal sealed class MissingOptionDescription : OptionDescription
-    {
-        internal override string? ValueForRender => null;
-    }
-
-    internal sealed class TextOptionDescription : OptionDescription
-    {
-        private readonly string _value;
-
-        internal TextOptionDescription(string value)
+        /// <summary>Creates an option with secondary text.</summary>
+        /// <param name="value">Submitted option value.</param>
+        /// <param name="text">Display text.</param>
+        /// <param name="description">Secondary text.</param>
+        public RadioButtonItem(string value, string text, string description)
+            : this(value, text)
         {
-            if (value == null) throw new System.ArgumentNullException(nameof(value));
-            _value = value;
+            Description = description ?? throw new ArgumentNullException(nameof(description));
         }
-
-        internal override string ValueForRender => _value;
     }
 }

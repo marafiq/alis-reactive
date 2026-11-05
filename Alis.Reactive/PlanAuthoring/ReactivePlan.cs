@@ -1,7 +1,14 @@
 using System;
 using System.Collections.Generic;
-using Alis.Reactive.PlanModel;
-using Alis.Reactive.Validation;
+using System.Linq;
+using Alis.Reactive.Components;
+using Alis.Reactive.Grammar;
+using Alis.Reactive.Inputs;
+using Alis.Reactive.Members;
+using Alis.Reactive.PlanModel.Document;
+using Alis.Reactive.PlanModel.Validation;
+using Alis.Reactive.PlanModel.Values;
+using Alis.Reactive.WireTerms;
 
 namespace Alis.Reactive
 {
@@ -9,209 +16,177 @@ namespace Alis.Reactive
     /// Collects reactive behavior for a view: triggers, reactions, and component registrations.
     /// Renders the collected behavior as generated Reactive Plan JSON.
     /// </summary>
+    /// <typeparam name="TModel">The view's model, whose members name the plan's inputs.</typeparam>
     public sealed class ReactivePlan<TModel> where TModel : class
     {
-        private readonly RegisteredInputComponents _registeredInputComponents =
-            new RegisteredInputComponents();
+        private readonly RenderedInputs _renderedInputs = new RenderedInputs();
 
-        private readonly PlanId _planId = Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel));
         private readonly PlanBuildContext _context;
         private readonly IServiceProvider? _services;
 
-        private readonly ReactivePlanScope _scope;
-
-        internal ReactivePlan()
-            : this(ReactivePlanScope.RootView, services: null)
+        internal ReactivePlan(IServiceProvider? services, string fieldPrefix, string view)
         {
-        }
-
-        internal ReactivePlan(ReactivePlanScope scope)
-            : this(scope, services: null)
-        {
-        }
-
-        internal ReactivePlan(ReactivePlanScope scope, IServiceProvider? services)
-        {
-            if (scope == null) throw new ArgumentNullException(nameof(scope));
-
-            _scope = scope;
             _services = services;
-            var planIdentity = _scope.CreateIdentity(_planId);
-            _context = new PlanBuildContext(planIdentity, _registeredInputComponents);
+            ClassNames = ResolveClassNames(services);
+            _context = new PlanBuildContext(PlanId.ForModel(typeof(TModel)).Value, _renderedInputs, fieldPrefix, view, ClassNames);
         }
 
-        /// <summary>Unique plan identifier derived from the model type's full name.</summary>
-        public string PlanId => _planId.Value;
-        /// <summary>Whether this plan is rendered by a partial view and merges into the owning view's Active Plan.</summary>
-        public bool IsPartial => _scope.IsPartial;
-        internal bool RendersValidationSummary => _scope.RendersValidationSummary;
-        internal IReadOnlyDictionary<string, ComponentRegistration> RegisteredInputComponents =>
-            _registeredInputComponents.Snapshot();
+        internal IReadOnlyList<string> Forms => _context.Forms;
         internal PlanBuildContext Context => _context;
 
-        /// <summary>Registers a plugin contract in the plan before pipelines reference it.</summary>
-        /// <param name="pluginName">Plugin registration name used by <c>p.Plugin(...)</c>.</param>
-        /// <param name="configure">Declares the functions, properties, and commands the plan can reference.</param>
-        public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)
-        {
-            if (string.IsNullOrWhiteSpace(pluginName))
-                throw new ArgumentException("Plugin name required.", nameof(pluginName));
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
-            var builder = new Builders.PluginTypeBuilder(pluginName);
-            configure(builder);
-            _context.RegisterPlugin(builder.Build());
-        }
+        internal ReactiveClassNames ClassNames { get; }
 
-        /// <summary>Registers a typed plugin contract in the plan.</summary>
-        /// <param name="plugin">Plugin instance whose name and members define the contract.</param>
-        public void RegisterPlugin(Plugin plugin)
-        {
-            if (plugin == null) throw new ArgumentNullException(nameof(plugin));
-            _context.RegisterPlugin(plugin.ToContract());
-        }
-
-        /// <summary>Creates and registers a typed plugin contract in the plan.</summary>
-        /// <typeparam name="TPlugin">Plugin type to instantiate and register.</typeparam>
-        /// <returns>Registered plugin instance for use in pipeline calls.</returns>
+        /// <summary>Registers a plugin with the plan; the returned plugin's members are used directly.</summary>
+        /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>
+        /// <returns>The plugin: <c>slugify.Slug(planner.Wing)</c>.</returns>
         public TPlugin RegisterPlugin<TPlugin>()
             where TPlugin : Plugin, new()
         {
             var plugin = new TPlugin();
-            RegisterPlugin(plugin);
+            _context.RegisterPlugin(plugin.Name);
+            plugin.BindTo(new ModuleBinding(Target.Plugin(plugin.Name), _context));
             return plugin;
         }
 
-        internal void RegisterInputComponent(ComponentRegistration registration)
+        /// <summary>
+        /// Joins the markup a component helper rendered for <paramref name="elementId"/> to this plan,
+        /// so behavior can hang off it with <c>.Reactive(...)</c>; the view writes the returned
+        /// component where the markup belongs. Inputs render into their field instead:
+        /// <c>field.Render&lt;TComponent&gt;(markup)</c>.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var builder = html.EJS().Dialog(elementId);
+        /// build(builder);
+        /// return plan.Render&lt;FusionDialog&gt;(elementId, builder.Render());
+        /// </code>
+        /// </example>
+        /// <typeparam name="TComponent">The component declaration the markup renders.</typeparam>
+        /// <param name="elementId">The ID the markup gives the component's element.</param>
+        /// <param name="markup">The component's markup.</param>
+        /// <returns>The rendered component, ready for <c>.Reactive(...)</c>.</returns>
+        public RenderedComponent<TComponent, TModel> Render<TComponent>(
+            string elementId,
+#if NET48
+            System.Web.IHtmlString markup)
+#else
+            Microsoft.AspNetCore.Html.IHtmlContent markup)
+#endif
+            where TComponent : IComponent, new()
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            _registeredInputComponents.Add(registration.RegisteredBindingPath, registration);
+            if (string.IsNullOrWhiteSpace(elementId))
+                throw new ArgumentException("Element ID required.", nameof(elementId));
+            if (markup == null) throw new ArgumentNullException(nameof(markup));
+            return new RenderedComponent<TComponent, TModel>(this, elementId, markup);
         }
 
-        internal bool HasRegisteredInputComponent(BindingPath bindingPath) =>
-            _registeredInputComponents.Contains(bindingPath);
+        /// <summary>
+        /// Joins an app object the layout renders once (NativeDrawer, NativeLoader, FusionToast) to this plan, so
+        /// the view handles its events with <c>.Reactive(...)</c>.
+        /// </summary>
+        /// <remarks>A partial view's handler lasts while the partial view is on the page.</remarks>
+        /// <example>
+        /// <code>
+        /// plan.Component&lt;NativeDrawer&gt;().Reactive(evt =&gt; evt.BeforeClose, (args, p) =&gt;
+        ///     p.When(args.ClosedBy).Eq(DrawerClosedBy.Escape).Then(_ =&gt; args.Cancel.Set(true)));
+        /// </code>
+        /// </example>
+        /// <typeparam name="TComponent">The app object's declaration.</typeparam>
+        /// <returns>The app object, ready for <c>.Reactive(...)</c>.</returns>
+        public RenderedComponent<TComponent, TModel> Component<TComponent>()
+            where TComponent : IAppLevelComponent, new()
+            => new RenderedComponent<TComponent, TModel>(this, new TComponent().DefaultId);
 
-        /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as compact JSON.</summary>
-        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
-        public string Render()
+        internal void AddRenderedInput(RenderedInput input)
         {
-            ResolveAll(_services);
-            return PlanSerializer.Serialize(_context.BuildPlan());
+            if (input == null) throw new ArgumentNullException(nameof(input));
+            _context.AddInput(input);
         }
 
-        /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as compact JSON.</summary>
-        /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
-        /// <returns>Compact Reactive Plan JSON ready for a <c>data-reactive-plan</c> script.</returns>
-        public string Render(IServiceProvider services)
+        /// <summary>
+        /// The browser rules <typeparamref name="TValidator"/> declares, resolved from the services the plan
+        /// renders with, for a component whose own JavaScript validates: a grid's cell editor.
+        /// </summary>
+        /// <example><c>FusionGridValidation.From&lt;ResidentCareItem&gt;(plan.BrowserRules&lt;ResidentCareItemValidator&gt;())</c></example>
+        /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
+        /// <returns>Each field the validator names, with the rules the browser can evaluate.</returns>
+        public IReadOnlyList<BrowserField> BrowserRules<TValidator>() where TValidator : class
+            => RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
+                .GetBrowserRules<TValidator>();
+
+        /// <summary>The browser rules <typeparamref name="TValidator"/> declares in one set (<c>RuleSet("Issue", ..)</c>).</summary>
+        /// <typeparam name="TValidator">The validator registered with <c>AddReactiveFluentValidation</c>.</typeparam>
+        /// <param name="ruleSet">The set, as the validator's <c>RuleSet</c> named it; a set it does not declare is refused.</param>
+        /// <returns>Each field the set names, with the rules the browser can evaluate.</returns>
+        public IReadOnlyList<BrowserField> BrowserRules<TValidator>(string ruleSet) where TValidator : class
+            => RequireBrowserRuleSource(_services, CSharpTypeName.Of(typeof(TValidator)), "This view")
+                .GetBrowserRules<TValidator>(ruleSet);
+
+        internal string Serialize()
         {
-            ResolveAll(services);
-            return PlanSerializer.Serialize(_context.BuildPlan());
+            _context.Seal();
+            ResolveAll();
+            return GrammarSerializer.Serialize(_context.Write());
         }
 
-        /// <summary>Registers components, resolves validation, and serializes the Reactive Plan as indented JSON for debugging.</summary>
-        /// <returns>Indented Reactive Plan JSON for diagnostics or sandbox display.</returns>
-        public string RenderFormatted()
+        private void ResolveAll()
         {
-            ResolveAll(_services);
-            return PlanSerializer.SerializeFormatted(_context.BuildPlan());
+            _context.DeclareRenderedInputs();
+
+            var oneByForm = _context.Validations
+                .GroupBy(validation => validation.Form, StringComparer.Ordinal)
+                .Select(sameForm => sameForm.First())
+                .ToList();
+            if (oneByForm.Count > 0)
+            {
+                var first = oneByForm[0];
+                var ruleSource = RequireBrowserRuleSource(_services, CSharpTypeName.Of(first.Validator), $"Form '{first.Form}'");
+                foreach (var validation in oneByForm)
+                {
+                    var fields = validation.Rules(ruleSource);
+                    _context.Check(validation.Form, CheckedField.Bind(validation.Form, fields, _context.FieldPrefix).ToList());
+                }
+            }
         }
 
-        /// <summary>Registers components, resolves validation with the supplied services, and serializes the Reactive Plan as indented JSON.</summary>
-        /// <param name="services">Services used to resolve validation rule sources required by queued validation rules.</param>
-        /// <returns>Indented Reactive Plan JSON for diagnostics or sandbox display.</returns>
-        public string RenderFormatted(IServiceProvider services)
+        private static ReactiveClassNames ResolveClassNames(IServiceProvider? services)
         {
-            ResolveAll(services);
-            return PlanSerializer.SerializeFormatted(_context.BuildPlan());
-        }
-
-        private void ResolveAll(IServiceProvider? services)
-        {
-            _context.RegisterInputComponents();
-
-            if (_context.ValidationJobs.Count == 0)
-                return;
-
-            new ClientValidationRuleBinder(
-                    _context,
-                    _registeredInputComponents.Snapshot(),
-                    typeof(TModel),
-                    RequireClientValidationRuleSource(services, _context.ValidationJobs[0]))
-                .BindQueuedJobs();
-        }
-
-        private static IClientValidationRuleSource RequireClientValidationRuleSource(
-            IServiceProvider? services,
-            ValidationJob job)
-        {
-            if (job == null) throw new ArgumentNullException(nameof(job));
-
-            // ASP.NET Core flows the source through the per-request IServiceProvider.
-            var source = services?.GetService(typeof(IClientValidationRuleSource)) as IClientValidationRuleSource;
+            var names = services?.GetService(typeof(ReactiveClassNames)) as ReactiveClassNames;
 
 #if NET48
-            // net48 / System.Web has no per-request IServiceProvider. MVC5's idiomatic
-            // service locator is DependencyResolver, bridged at startup via SetResolver.
-            source ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(IClientValidationRuleSource))
-                as IClientValidationRuleSource;
+            names ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(ReactiveClassNames)) as ReactiveClassNames;
+#endif
+
+            return names ?? new ReactiveClassNames();
+        }
+
+        private static IBrowserRuleSource RequireBrowserRuleSource(
+            IServiceProvider? services,
+            string validatorName,
+            string requiredBy)
+        {
+            var source = services?.GetService(typeof(IBrowserRuleSource)) as IBrowserRuleSource;
+
+#if NET48
+            source ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(IBrowserRuleSource))
+                as IBrowserRuleSource;
 #endif
 
             if (source != null) return source;
 
 #if NET48
             throw new InvalidOperationException(
-                $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}', " +
-                "but no IClientValidationRuleSource could be resolved. " +
-                "Register the FluentValidation integration with AddReactiveFluentValidation(...) and bridge it to " +
+                $"{requiredBy} specifies validation source '{validatorName}', " +
+                "but no IBrowserRuleSource could be resolved. " +
+                "Register the validators with AddReactiveFluentValidation(...) and bridge it to " +
                 "MVC5 by calling DependencyResolver.SetResolver(...) in Application_Start.");
 #else
             throw new InvalidOperationException(
-                $"Request at '{job.RequestUrl}' specifies validation source '{job.ValidationSourceType.Name}', " +
-                "but no IClientValidationRuleSource is registered in DI. " +
-                "Register the FluentValidation integration with services.AddReactiveFluentValidation(...), " +
-                "or register your own IClientValidationRuleSource.");
+                $"{requiredBy} specifies validation source '{validatorName}', " +
+                "but no IBrowserRuleSource is registered in DI. " +
+                "Register the validators with services.AddReactiveFluentValidation(...), " +
+                "or register your own IBrowserRuleSource.");
 #endif
-        }
-    }
-
-    internal abstract class ReactivePlanScope
-    {
-        internal static ReactivePlanScope RootView { get; } =
-            new RootViewPlanScope();
-
-        internal static ReactivePlanScope PartialView { get; } =
-            new PartialViewPlanScope();
-
-        internal abstract bool IsPartial { get; }
-
-        internal abstract bool RendersValidationSummary { get; }
-
-        internal abstract PlanIdentity CreateIdentity(PlanId planId);
-    }
-
-    internal sealed class RootViewPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => false;
-
-        internal override bool RendersValidationSummary => true;
-
-        internal override PlanIdentity CreateIdentity(PlanId planId)
-        {
-            if (planId == null) throw new ArgumentNullException(nameof(planId));
-            return PlanIdentity.Root(planId);
-        }
-    }
-
-    internal sealed class PartialViewPlanScope : ReactivePlanScope
-    {
-        internal override bool IsPartial => true;
-
-        internal override bool RendersValidationSummary => false;
-
-        internal override PlanIdentity CreateIdentity(PlanId planId)
-        {
-            if (planId == null) throw new ArgumentNullException(nameof(planId));
-            return PlanIdentity.Partial(planId);
         }
     }
 }

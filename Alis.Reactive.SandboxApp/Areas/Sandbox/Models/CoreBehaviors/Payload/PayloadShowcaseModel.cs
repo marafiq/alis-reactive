@@ -16,4 +16,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? City { get; set; }
         public string? Zip { get; set; }
     }
+
+    public static class PayloadShowcaseEvents
+    {
+        public static readonly AppEvent<PayloadShowcaseModel> PayloadTest = AppEvent.Declare<PayloadShowcaseModel>();
+    }
 }

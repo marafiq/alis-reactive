@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Training sessions for the week of January 11, 2027: Dementia care on Monday at 9:00 AM and Fall
-    /// prevention on Wednesday at 2:00 PM. Each answer reads a time as the clock the coordinator picked.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/TrainingSessions")]
     public class TrainingSessionsController : Controller
@@ -15,8 +11,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         private static readonly DateTime WeekOf = new(2027, 1, 11);
 
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/TrainingSessions/Index.cshtml", new TrainingSessionModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/TrainingSessions/Index.cshtml", new TrainingSessionModel());
 
         [HttpGet("Week")]
         public IActionResult Week() => Ok(new TrainingWeek(
@@ -57,19 +53,19 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
         }
 
         [HttpGet("Hall")]
-        public IActionResult HallFree([FromQuery] DateTimeOffset[]? days)
+        public IActionResult HallFree([FromQuery] DateTimeOffset[]? hallDays)
         {
-            if (days is not { Length: 2 }) return BadRequest();
+            if (hallDays is not { Length: 2 }) return BadRequest();
 
-            return Ok(new TrainingHallAnswer($"The hall is free from {DayWithOffset(days[0])} to {DayWithOffset(days[1])}."));
+            return Ok(new TrainingHallAnswer($"The hall is free from {DayWithOffset(hallDays[0])} to {DayWithOffset(hallDays[1])}."));
         }
 
         [HttpPost("Hall")]
-        public IActionResult HoldHall([FromForm] DateTimeOffset[]? days)
+        public IActionResult HoldHall([FromForm] DateTimeOffset[]? hallDays)
         {
-            if (days is not { Length: 2 }) return BadRequest();
+            if (hallDays is not { Length: 2 }) return BadRequest();
 
-            return Ok(new TrainingHallAnswer($"The hall is held from {DayWithOffset(days[0])} to {DayWithOffset(days[1])}."));
+            return Ok(new TrainingHallAnswer($"The hall is held from {DayWithOffset(hallDays[0])} to {DayWithOffset(hallDays[1])}."));
         }
 
         [HttpPost("Book")]
@@ -78,13 +74,7 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
             if (session == null) return BadRequest();
 
             var result = new TrainingSessionValidator().Validate(session);
-            if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+            if (!result.IsValid) return BadRequest(new { errors = result.ErrorsByField });
 
             var startsAt = session.StartsAt!.Value;
             var day = startsAt.ToString("dddd, MMMM d, yyyy", CultureInfo.InvariantCulture);
@@ -105,10 +95,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 
         private static string Clock(DateTimeOffset time) => time.ToString("h:mm tt", CultureInfo.InvariantCulture);
 
-        private static string DayWithOffset(DateTimeOffset day) =>
-            $"{day.ToString("dddd, MMMM d", CultureInfo.InvariantCulture)} (UTC{day.ToString("zzz", CultureInfo.InvariantCulture)})";
+        private static string DayWithOffset(DateTimeOffset day)
+            => $"{day.ToString("dddd, MMMM d", CultureInfo.InvariantCulture)} (UTC{day.ToString("zzz", CultureInfo.InvariantCulture)})";
 
-        private static string ClockWithOffset(DateTimeOffset time) =>
-            $"{Clock(time)} (UTC{time.ToString("zzz", CultureInfo.InvariantCulture)})";
+        private static string ClockWithOffset(DateTimeOffset time)
+            => $"{Clock(time)} (UTC{time.ToString("zzz", CultureInfo.InvariantCulture)})";
     }
 }

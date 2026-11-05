@@ -1,0 +1,31 @@
+@using Alis.Reactive.Framework.App.Rows
+@model ContactSheet
+@{
+    // The sheet's list of contacts, one partial for the whole list. The desk adds or removes a contact by posting
+    // the list; the server renders it again, its rows numbered from 0 with no gap. It carries no rule of its own:
+    // the page's rules check every row it renders.
+    var plan = Html.ReactivePlan<ContactSheet>();
+}
+<ol id="contact-list" aria-label="Contacts">
+    @for (var index = 0; index < Model.Contacts.Count; index++)
+    {
+        var row = index;
+        var number = index + 1;
+        <li>
+            @{ Html.InputField(plan, m => m.Contacts[row].Name, o => o.Label($"Contact {number}")).Entry(); }
+            @{ Html.InputField(plan, m => m.Contacts[row].Relationship, o => o.Label($"Contact {number}'s relationship")).Entry(); }
+            @{ Html.InputField(plan, m => m.Contacts[row].Phone, o => o.Label($"Contact {number}'s phone")).Entry(); }
+            @(plan.Button($"remove-contact-{number}", $"Remove contact {number}")
+                .Reactive(button => button.Click, p => p.Post("/Rows/RemoveContact")
+                    .Gather<ContactRemoval>(g => g.Form("contacts-form").Set(x => x.Remove, row))
+                    .Response(r => r.OnSuccess(s => s.Into("contact-rows")))))
+        </li>
+    }
+</ol>
+
+@(plan.Button("add-contact", "Add a contact")
+    .Reactive(button => button.Click, p => p.Post("/Rows/AddContact")
+        .Gather(g => g.Form("contacts-form"))
+        .Response(r => r.OnSuccess(s => s.Into("contact-rows")))))
+
+@Html.RenderPlan(plan)

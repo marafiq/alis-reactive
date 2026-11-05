@@ -1,19 +1,21 @@
 @model ShiftCardPageModel
-@using Alis.Reactive.Native.Extensions
-@using Alis.Reactive.Native.Components
-@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Native
+@using Alis.Reactive.Fusion
 @using Syncfusion.EJ2.Schedule
 @{
     ViewData["Title"] = "Shift Cards";
+    const string ScheduleId = "shift-card-schedule";
     var plan = Html.ReactivePlan<ShiftCardPageModel>();
 
     Html.On(plan, t => t.DomReady(p =>
     {
         p.Get(Url.SandboxRoute("ShiftCardShifts", "Schedule"))
-         .Response(r => r.OnSuccess<ShiftCardDay>((json, s) =>
+         .Response(r => r.OnSuccess<ShiftCardDay>((day, s) =>
          {
-             s.Component<FusionSchedule>("shift-card-schedule").SetDataSource(json, j => j.Shifts);
-             s.Element("shift-card-day-status").SetText(json, j => j.Summary);
+             var schedule = s.Component<FusionSchedule>(ScheduleId);
+             schedule.EventSettings.Events<ShiftCardShift>().Set(day.Get(d => d.Shifts));
+             schedule.DataBind();
+             s.Element("shift-card-day-status").Text.Set(day.Get(d => d.Summary));
          }));
     }));
 }
@@ -24,9 +26,10 @@
         Today's floor schedule. Open a shift to see its handover card and acknowledge the handover.
     </native-text>
     <p id="shift-card-day-status" class="text-sm text-text-muted">Loading today's shifts...</p>
+    <p id="shift-card-signoffs" class="text-sm text-text-muted">No handover signed off yet today.</p>
 
     <section class="rounded-lg border border-border bg-white shadow-sm" style="height: 640px;">
-        @(Html.FusionSchedule(plan, "shift-card-schedule", b =>
+        @(Html.FusionSchedule(plan, ScheduleId, b =>
             {
                 b.Width("100%"); b.Height("100%");
                 b.CurrentView(View.Day); b.SelectedDate(DateTime.Today);
@@ -47,17 +50,17 @@
                     Content = "<div id='shift-card-content'></div>",
                 });
             })
-            .Reactive(evt => evt.PopupOpen, (args, p) =>
+            .Reactive(evt => evt.PopupOpen<ShiftCardShift>(), (args, p) =>
             {
-                p.When(args, x => x.Type).Eq("QuickInfo")
-                 .And(args, x => x.Data.Id).Gt(0)
+                var opened = args.Data.Get(x => x.Id);
+                p.When(args.Type).Eq("QuickInfo").And(opened).Truthy()
                  .Then(t =>
                  {
                      t.Get(Url.SandboxRoute("ShiftCardDetails", "Schedule"))
-                      .Gather(g => g.FromEvent(args, x => x.Data.Id, "shiftId"))
+                      .Gather<ShiftCardQuery>(g => g.Set(x => x.ShiftId, opened))
                       .Response(r => r.OnSuccess(s => s.Into("shift-card-content")));
                  })
-                 .Else(e => { args.PreventDefault(e); });
+                 .Else(e => { args.Cancel.Set(true); });
             }))
     </section>
 </native-vstack>

@@ -1,0 +1,56 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model AvailabilityPage
+@{
+    ViewData["Title"] = "Book a visit when the day is free";
+    var plan = Html.ReactivePlan<AvailabilityPage>();
+    var days = new[] { new DateTime(2026, 10, 27), new DateTime(2026, 10, 28) };
+    var booked = new[] { new DateTime(2026, 10, 28) };
+}
+<h1>Book a visit when the day is free</h1>
+
+@plan.DayPicker("visit", days, booked)
+<h2>Pain</h2>
+@plan.Meter("pain", level: 2, max: 5)
+
+<p>Free: <span id="free"></span></p>
+<p>Booking: <span id="booking"></span></p>
+<p>Transport, when pain is under 4 and the day is free: <span id="transport"></span></p>
+<p>Go ahead, when pain is 4 or more, or the day is free: <span id="go-ahead"></span></p>
+<p>Taken: <span id="taken"></span></p>
+
+@(plan.Button("ask-free", "Is the day free?")
+    .Reactive(button => button.Click, p => p.When(p.Component<DayPicker>("visit").IsFree()).Truthy()
+        .Then(t => t.Element("free").Text.Set("free to book"))
+        .Else(e => e.Element("free").Text.Set("already booked"))))
+@(plan.Button("book", "Book the visit")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        p.When(visit.Day).IsNull()
+            .Then(t => t.Element("booking").Text.Set("pick a day first"))
+            .ElseIf(visit.IsFree()).Truthy()
+            .Then(t => t.Element("booking").Text.Set("visit booked"))
+            .Else(e => e.Element("booking").Text.Set("that day is taken"));
+    }))
+@(plan.Button("book-transport", "Book transport")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        p.When(p.Component<Meter>("pain").Level).Lt(4).And(visit.IsFree()).Truthy()
+            .Then(t => t.Element("transport").Text.Set("transport booked"))
+            .Else(e => e.Element("transport").Text.Set("no transport"));
+    }))
+@(plan.Button("ask-go-ahead", "Go ahead with the visit")
+    .Reactive(button => button.Click, p =>
+    {
+        var visit = p.Component<DayPicker>("visit");
+        p.When(p.Component<Meter>("pain").Level).Gte(4).Or(visit.IsFree()).Truthy()
+            .Then(t => t.Element("go-ahead").Text.Set("the visit goes ahead"))
+            .Else(e => e.Element("go-ahead").Text.Set("find another day"));
+    }))
+@(plan.Button("ask-taken", "Is the day taken?")
+    .Reactive(button => button.Click, p => p.When(p.Component<DayPicker>("visit").IsFree()).Truthy().Not()
+        .Then(t => t.Element("taken").Text.Set("that day is taken"))
+        .Else(e => e.Element("taken").Text.Set("that day is open"))))
+
+@Html.RenderPlan(plan)

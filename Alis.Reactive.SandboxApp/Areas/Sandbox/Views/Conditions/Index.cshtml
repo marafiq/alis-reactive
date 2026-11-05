@@ -14,16 +14,42 @@
             <native-heading level="H2">Syntax &amp; Routing</native-heading>
         </div>
         <native-grid cols="C2" gap="Base">
-            <a asp-area="Sandbox" asp-controller="Guards" asp-action="Index"
+            <a asp-area="Sandbox" asp-controller="MedicationRound" asp-action="Index"
                class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
                 <native-hstack justify="Between" align="Start">
                     <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                        Guards
+                        Medication Round
                     </h3>
                     <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
                 </native-hstack>
                 <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Interactive operator showcase for all guard types, compound logic, and Confirm without any custom JavaScript.
+                    A morning medication round: each dose is checked against where the resident is, pulse, temperature, the order, allergies and the last dose before it is given; the label is scanned and the dose recorded.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="RespiteScreening" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+                <native-hstack justify="Between" align="Start">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                        Respite Screening
+                    </h3>
+                    <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+                </native-hstack>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    An applicant's intake sheet, a widget the sandbox wrote itself, screened fact by fact: every comparison over text, numbers, dates, yes/no, options and the facts not yet known, and each fact against the wing's policy.
+                </p>
+            </a>
+
+            <a asp-area="Sandbox" asp-controller="AdmissionDecision" asp-action="Index"
+               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+                <native-hstack justify="Between" align="Start">
+                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
+                        Admission Decision
+                    </h3>
+                    <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
+                </native-hstack>
+                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
+                    The director decides a respite stay: rules that combine and nest, a negated group, the first reason that fits, and terms that wait for the waiting list or for the director's answer.
                 </p>
             </a>
 
@@ -53,29 +79,16 @@
                 </p>
             </a>
 
-            <a asp-area="Sandbox" asp-controller="HttpMixing" asp-action="Index"
+            <a asp-area="Sandbox" asp-controller="PharmacyReview" asp-action="Index"
                class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
                 <native-hstack justify="Between" align="Start">
                     <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                        HTTP Mixing
+                        Pharmacy Review
                     </h3>
                     <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
                 </native-hstack>
                 <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Conditions interleaved with HTTP across one page and two fixtures: trigger flows and real component reactive flows.
-                </p>
-            </a>
-
-            <a asp-area="Sandbox" asp-controller="ResponseConditions" asp-action="Index"
-               class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
-                <native-hstack justify="Between" align="Start">
-                    <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                        Response Conditions
-                    </h3>
-                    <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
-                </native-hstack>
-                <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Branch on HTTP response status codes — approve, deny, pending, fail — with status-driven DOM updates.
+                    A charge nurse checks a new medication order with the pharmacy: its answer holds, stops or clears the order and decides whether the physician is paged.
                 </p>
             </a>
         </native-grid>
@@ -91,12 +104,12 @@
                class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
                 <native-hstack justify="Between" align="Start">
                     <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                        Numeric Conditions
+                        Vital Signs
                     </h3>
                     <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
                 </native-hstack>
                 <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Numeric thresholds, severity ladders, AND compounds, and source-vs-source conditions driven by real components.
+                    A resident's morning vital signs: heart-rate zones and tachycardia, the systolic range, and the reading against her care-plan limit.
                 </p>
             </a>
 
@@ -109,7 +122,7 @@
                     <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
                 </native-hstack>
                 <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Condition-gated HTTP from component reads, including before/after reaction paths and tiered severity branches.
+                    A nurse checks a heart rate: 180 bpm or more pages the rapid response team, 140 or more alerts the charge nurse, a lower one no one
                 </p>
             </a>
 
@@ -117,12 +130,12 @@
                class="group relative block rounded-2xl border border-border/60 bg-white p-6 shadow-sm ring-1 ring-black/[0.03] hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
                 <native-hstack justify="Between" align="Start">
                     <h3 class="text-[15px] font-semibold text-text-primary group-hover:text-primary transition-colors">
-                        Care Level Cascade
+                        Care Level Review
                     </h3>
                     <span class="text-text-muted group-hover:text-primary transition-colors text-sm">&rarr;</span>
                 </native-hstack>
                 <p class="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Cross-component value reactions driven by care-level selection, component updates, and membership-based branching.
+                    A coordinator changes a resident's care level: the care protocol follows it and the escort policy is applied on request
                 </p>
             </a>
         </native-grid>

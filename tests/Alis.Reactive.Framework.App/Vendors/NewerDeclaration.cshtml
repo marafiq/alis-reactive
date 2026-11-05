@@ -1,0 +1,132 @@
+@using Alis.Reactive.Framework.App.Vendors
+@model NewerDeclarationPage
+@{
+    ViewData["Title"] = "A declaration newer than its component";
+    var plan = Html.ReactivePlan<NewerDeclarationPage>();
+}
+<h1>A declaration newer than its component</h1>
+
+@(plan.NewerSlate("slate", title: "Round", "Monday")
+    .Reactive(slate => slate.RowAdded, (added, p) =>
+    {
+        p.Element("added-count").Text.Set(added.Count);
+        p.Element("added-row").Text.Set(added.Row.Label);
+        p.Element("added-read").Text.Set("read");
+        p.Element("highlight-tried").Text.Set("highlighting the row");
+        added.Highlight();
+        p.Element("highlight-finished").Text.Set("highlighted the row");
+    })
+    .Reactive(slate => slate.Cleared, (cleared, p) =>
+    {
+        p.Element("cleared-by").Text.Set(cleared.By);
+        p.Element("cleared-read").Text.Set("read");
+        p.Element("note-tried").Text.Set("noting who cleared it");
+        cleared.Note.Set("cleared at handover");
+        p.Element("note-finished").Text.Set("noted who cleared it");
+    }))
+
+@(plan.NewerSlate("standby", title: "Standby", "Tuesday")
+    .Reactive(slate => slate.Cleared, (cleared, p) =>
+    {
+        p.Element("acknowledge-tried").Text.Set("acknowledging the clear");
+        cleared.Acknowledge();
+        p.Element("acknowledge-finished").Text.Set("acknowledged the clear");
+    }))
+
+<p>Rows now: <span id="added-count"></span> · the row passed: <span id="added-row">not read yet</span> · the payload was <span id="added-read"></span></p>
+<p>Tried: <span id="tried"></span> · finished: <span id="finished"></span> · read: <span id="read">nothing yet</span></p>
+<p>Title read: <span id="title-read"></span></p>
+<p>Highlight tried: <span id="highlight-tried"></span> · finished: <span id="highlight-finished"></span></p>
+<p>Cleared by: <span id="cleared-by">not read yet</span> · the payload was <span id="cleared-read"></span></p>
+<p>Note tried: <span id="note-tried"></span> · finished: <span id="note-finished"></span></p>
+<p>Acknowledge tried: <span id="acknowledge-tried"></span> · finished: <span id="acknowledge-finished"></span></p>
+
+@(plan.Button("read-pins", "Read the pins")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<NewerSlate>("slate");
+        p.Element("tried").Text.Set("reading the pins");
+        p.Element("read").Text.Set(slate.Pins);
+        p.Element("finished").Text.Set("reading the pins");
+    }))
+@(plan.Button("pin", "Mark the slate pinned")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("marking it pinned");
+        p.Component<NewerSlate>("slate").Pinned.Set(true);
+        p.Element("finished").Text.Set("marking it pinned");
+    }))
+@(plan.Button("call-pin", "Pin the slate")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("pinning it");
+        p.Component<NewerSlate>("slate").Pin();
+        p.Element("finished").Text.Set("pinning it");
+    }))
+@(plan.Button("read-last-card", "Read the last card's name")
+    .Reactive(button => button.Click, p =>
+    {
+        var slate = p.Component<NewerSlate>("slate");
+        p.Element("tried").Text.Set("reading the last card");
+        p.Element("read").Text.Set(slate.LastCard.Name);
+        p.Element("finished").Text.Set("reading the last card");
+    }))
+@(plan.Button("clear", "Clear the slate")
+    .Reactive(button => button.Click, p => p.Component<NewerSlate>("slate").Clear()))
+@(plan.Button("clear-standby", "Clear the standby slate")
+    .Reactive(button => button.Click, p => p.Component<NewerSlate>("standby").Clear()))
+@(plan.Button("pin-first-row", "Pin the first row")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("pinning the first row");
+        p.Component<NewerSlate>("slate").RowAt(0).Pin();
+        p.Element("finished").Text.Set("pinning the first row");
+    }))
+@(plan.Button("mark-monday", "Mark Monday's row")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("marking Monday's row");
+        p.Component<NewerSlate>("slate").FindRow("Monday").Mark();
+        p.Element("finished").Text.Set("marking Monday's row");
+    }))
+@(plan.Button("mark-nobody", "Mark the row of a resident not on the slate")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("marking a row not on the slate");
+        p.Component<NewerSlate>("slate").FindRow("Nobody").Mark();
+        p.Element("finished").Text.Set("marking a row not on the slate");
+    }))
+@(plan.Button("note-monday", "Note Monday's row")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("noting Monday's row");
+        var slate = p.Component<NewerSlate>("slate");
+        slate.FindRow("Monday").Note.Set("seen at handover");
+        p.Element("read").Text.Set(slate.FindRow("Monday").Note);
+        p.Element("finished").Text.Set("noting Monday's row");
+    }))
+@(plan.Button("note-nobody", "Note the row of a resident not on the slate")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("noting a row not on the slate");
+        p.Component<NewerSlate>("slate").FindRow("Nobody").Note.Set("seen at handover");
+        p.Element("finished").Text.Set("noting a row not on the slate");
+    }))
+@(plan.Button("read-nobody", "Read the label of a row not on the slate")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("reading a row not on the slate");
+        p.Element("read").Text.Set(p.Component<NewerSlate>("slate").FindRow("Nobody").Label);
+        p.Element("finished").Text.Set("reading a row not on the slate");
+    }))
+@(plan.Button("count-saved", "Count the rows saved")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("tried").Text.Set("counting the rows saved");
+        p.Element("read").Text.Set(p.Component<NewerSlate>("slate").RowsSaved());
+        p.Element("finished").Text.Set("counting the rows saved");
+    }))
+@(plan.Button("read-title", "Read the title")
+    .Reactive(button => button.Click, p => p.Element("title-read").Text.Set(p.Component<NewerSlate>("slate").Title)))
+
+@Html.RenderPlan(plan)

@@ -1,0 +1,71 @@
+@using Alis.Reactive.Framework.App.Realtime
+@model WardPage
+@{
+    ViewData["Title"] = "The ward";
+    var plan = Html.ReactivePlan<WardPage>();
+    var line = SignalRHub.At<WardLine>($"/hubs/line?world={Model.World}");
+    var board = ServerPushStream.At<WardBoard>($"/Realtime/Board?world={Model.World}");
+    var switchboard = ServerPushStream.At<Switchboard>($"/Realtime/Switchboard?world={Model.World}");
+}
+<h1>The ward</h1>
+
+<div id="alis-realtime-connection-retry-container" hidden>
+    <p>The connection dropped.</p>
+    <button type="button">Retry</button>
+</div>
+
+<p>The server holds <span id="hub-lines"></span> line and <span id="board-lines"></span> board connections open.</p>
+<p>The page heard: call <span id="page-call"></span> · <span id="page-dropped"></span> · note <span id="page-note"></span> · news <span id="page-news"></span></p>
+<p>The bed heard: call <span id="bed-call"></span> · <span id="bed-dropped"></span> · note <span id="bed-note"></span> · board call <span id="bed-board-call"></span> · news <span id="bed-news"></span></p>
+<p>Board state: <span id="board-state"></span></p>
+
+<div id="bed-slot"></div>
+<div id="call-point-slot"></div>
+
+@{ Html.On(plan, t => t.ServerPush(switchboard, s => s.Lines, (lines, p) =>
+    {
+        p.Element("hub-lines").Text.Set(lines.Hub);
+        p.Element("board-lines").Text.Set(lines.Board);
+    })); }
+@if (Model.PageListens)
+{
+    Html.On(plan, t => t
+        .SignalR(line, h => h.Welcomed, (welcome, p) => p.Element("page-call").Text.Set(welcome.Call))
+        .SignalR(line, h => h.Reconnecting, p => p.Element("page-dropped").Text.Set("dropped"))
+        .SignalR(line, h => h.Noted, (note, p) => p.Element("page-note").Text.Set(note.Text))
+        .ServerPush(board, s => s.News, (news, p) => p.Element("page-news").Text.Set(news.Text)));
+}
+
+@(plan.Button("open-bed", "Open the bed")
+    .Reactive(button => button.Click, p => p.Get($"/Realtime/Bed?world={Model.World}").Response(r => r.OnSuccess(s => s.Into("bed-slot")))))
+@(plan.Button("close-bed", "Close the bed")
+    .Reactive(button => button.Click, p => p.Unload("bed-slot")))
+@(plan.Button("open-call-point", "Open the call point")
+    .Reactive(button => button.Click, p => p.Get($"/Realtime/CallPoint?world={Model.World}").Response(r => r.OnSuccess(s => s.Into("call-point-slot")))))
+@(plan.Button("close-call-point", "Close the call point")
+    .Reactive(button => button.Click, p => p.Unload("call-point-slot")))
+@if (Model.PageListens)
+{
+    @(plan.Button("drop-line", "Drop the line")
+        .Reactive(button => button.Click, p => p.Hub(line).Drop()))
+    @(plan.Button("note-first", "Note first")
+        .Reactive(button => button.Click, p => p.Hub(line).Note("first")))
+    @(plan.Button("note-second", "Note second")
+        .Reactive(button => button.Click, p => p.Hub(line).Note("second")))
+}
+@(plan.Button("push-first-news", "Push the first news")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/News?world={Model.World}&text=first")))
+@(plan.Button("push-second-news", "Push the second news")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/News?world={Model.World}&text=second")))
+@(plan.Button("close-board", "Close the board for good")
+    .Reactive(button => button.Click, p => p.Post($"/Realtime/Board/Close?world={Model.World}")))
+@(plan.Button("clear-heard", "Clear what was heard")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Element("page-dropped").Text.Set("");
+        p.Element("bed-dropped").Text.Set("");
+    }))
+@(plan.Button("read-board-state", "Read the board's state")
+    .Reactive(button => button.Click, p => p.Element("board-state").Text.Set(p.Stream(board).ReadyState)))
+
+@Html.RenderPlan(plan)

@@ -10,10 +10,16 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 #endif
 
-namespace Alis.Reactive.Fusion.Components
+namespace Alis.Reactive.Fusion
 {
+    /// <summary>Renders a <see cref="FusionSmartPasteButton"/>.</summary>
     public static class FusionSmartPasteButtonHtmlExtensions
     {
+        /// <summary>Renders a Syncfusion SmartPasteButton with the element ID the view chooses.</summary>
+        /// <typeparam name="TModel">The view's model type.</typeparam>
+        /// <param name="html">The view's HTML helper.</param>
+        /// <param name="elementId">The button's element ID, chosen by the view.</param>
+        /// <param name="configure">Sets the button's text, look and assist endpoint.</param>
 #if NET48
         public static IHtmlString FusionSmartPasteButton<TModel>(
             this HtmlHelper<TModel> html,
@@ -28,7 +34,7 @@ namespace Alis.Reactive.Fusion.Components
             var options = new FusionSmartPasteButtonOptions();
             configure(options);
 
-            return new HtmlString(RenderButton(elementId, options) + RenderInitializer(elementId, options));
+            return new HtmlString(RenderButton(elementId, options));
         }
 
         private static string RenderButton(string elementId, FusionSmartPasteButtonOptions options)
@@ -43,6 +49,8 @@ namespace Alis.Reactive.Fusion.Components
             {
                 attributes["class"] = options.CssClass;
             }
+
+            attributes["data-alis-smart-paste-button"] = ConstructionOptions(options);
 
             var writer = new System.Text.StringBuilder("<button");
             foreach (var attribute in attributes)
@@ -61,7 +69,7 @@ namespace Alis.Reactive.Fusion.Components
             return writer.ToString();
         }
 
-        private static string RenderInitializer(string elementId, FusionSmartPasteButtonOptions options)
+        private static string ConstructionOptions(FusionSmartPasteButtonOptions options)
         {
             var payload = new
             {
@@ -70,17 +78,7 @@ namespace Alis.Reactive.Fusion.Components
                 aiAssistEndpoint = options.AiAssistEndpoint
             };
 
-            var json = JsonSerializer.Serialize(payload);
-            var encodedId = JavaScriptEncoder.Default.Encode(elementId);
-
-            return "<script>(function(){document.addEventListener('DOMContentLoaded',function(){"
-                + "var options=" + json + ";"
-                + "var endpoint=options.aiAssistEndpoint;delete options.aiAssistEndpoint;"
-                + "if(endpoint){options.aiAssistHandler=async function(settings){"
-                + "var response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});"
-                + "return await response.text();};}"
-                + "new ej.buttons.SmartPasteButton(options).appendTo('#" + encodedId + "');"
-                + "});})();</script>";
+            return JsonSerializer.Serialize(payload);
         }
     }
 }

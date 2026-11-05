@@ -1,0 +1,29 @@
+@using Alis.Reactive.Framework.App.Validation
+@model FallReport
+@{
+    ViewData["Title"] = "A fall report";
+    var plan = Html.ReactivePlan<FallReport>();
+}
+<h1>A fall report</h1>
+
+<form id="fall-form">
+    @{ Html.InputField(plan, m => m.Resident, o => o.Label("Resident")).Entry(); }
+    <fieldset id="nurse-section">
+        <legend>For the nurse</legend>
+        @{ Html.InputField(plan, m => m.Location, o => o.Label("Where it happened")).Entry(); }
+        @{ Html.InputField(plan, m => m.Injury, o => o.Label("Injury")).Entry(); }
+    </fieldset>
+</form>
+
+<p>Report: <span id="fall-status">not checked yet</span></p>
+
+@(plan.Button("check-report", "Check the report")
+    .Reactive(button => button.Click, p =>
+    {
+        p.Validate<FallReportRules>("fall-form");
+        p.Element("fall-status").Text.Set("checked at the desk");
+    }))
+@(plan.Button("check-for-nurse", "Check it for the nurse")
+    .Reactive(button => button.Click, p => p.Validate<FallReportRules>("nurse-section", "Nurse")))
+
+@Html.RenderPlan(plan)

@@ -1,4 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.EscalationRouting;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.EscalationRouting;
@@ -36,42 +35,6 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
         _plan = await PagePlan<EscalationRoutingModel>.FromPage(Page);
     }
 
-    private async Task AssertTriggerRouteAsync(string expectedAudit, string expectedResult, string? expectedBadge)
-    {
-        await Expect(TriggerPrecheck).ToHaveTextAsync("Escalation reviewed");
-        await Expect(TriggerAudit).ToHaveTextAsync(expectedAudit);
-        await Expect(TriggerResult).ToHaveTextAsync(expectedResult);
-        if (expectedBadge is null)
-        {
-            await Expect(TriggerBadge).ToBeHiddenAsync();
-        }
-        else
-        {
-            await Expect(TriggerBadge).ToBeVisibleAsync();
-            await Expect(TriggerBadge).ToHaveTextAsync(expectedBadge);
-        }
-
-        await Expect(TriggerSummary).ToHaveTextAsync("Escalation complete");
-    }
-
-    private async Task AssertComponentRouteAsync(string expectedAudit, string expectedResult, string? expectedBadge)
-    {
-        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
-        await Expect(ComponentAudit).ToHaveTextAsync(expectedAudit, new() { Timeout = 5000 });
-        await Expect(ComponentResult).ToHaveTextAsync(expectedResult, new() { Timeout = 5000 });
-        if (expectedBadge is null)
-        {
-            await Expect(ComponentBadge).ToBeHiddenAsync();
-        }
-        else
-        {
-            await Expect(ComponentBadge).ToBeVisibleAsync();
-            await Expect(ComponentBadge).ToHaveTextAsync(expectedBadge);
-        }
-
-        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
-    }
-
     [Test]
     public async Task trigger_branch_dispatches_the_isolation_route()
     {
@@ -79,7 +42,12 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
 
         await ClickWhenStable(IsolationReviewButton);
 
-        await AssertTriggerRouteAsync("Isolation route dispatched", "Isolation review", "Isolation");
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Escalation reviewed");
+        await Expect(TriggerAudit).ToHaveTextAsync("Isolation route dispatched");
+        await Expect(TriggerResult).ToHaveTextAsync("Isolation review");
+        await Expect(TriggerBadge).ToBeVisibleAsync();
+        await Expect(TriggerBadge).ToHaveTextAsync("Isolation");
+        await Expect(TriggerSummary).ToHaveTextAsync("Escalation complete");
         AssertNoConsoleErrors();
     }
 
@@ -90,7 +58,12 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
 
         await ClickWhenStable(OverrideReviewButton);
 
-        await AssertTriggerRouteAsync("Expedited route dispatched", "Expedited review", "Expedited");
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Escalation reviewed");
+        await Expect(TriggerAudit).ToHaveTextAsync("Expedited route dispatched");
+        await Expect(TriggerResult).ToHaveTextAsync("Expedited review");
+        await Expect(TriggerBadge).ToBeVisibleAsync();
+        await Expect(TriggerBadge).ToHaveTextAsync("Expedited");
+        await Expect(TriggerSummary).ToHaveTextAsync("Escalation complete");
         AssertNoConsoleErrors();
     }
 
@@ -100,10 +73,19 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
         await NavigateAndBoot();
 
         await ClickWhenStable(IsolationReviewButton);
-        await AssertTriggerRouteAsync("Isolation route dispatched", "Isolation review", "Isolation");
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Escalation reviewed");
+        await Expect(TriggerAudit).ToHaveTextAsync("Isolation route dispatched");
+        await Expect(TriggerResult).ToHaveTextAsync("Isolation review");
+        await Expect(TriggerBadge).ToBeVisibleAsync();
+        await Expect(TriggerBadge).ToHaveTextAsync("Isolation");
+        await Expect(TriggerSummary).ToHaveTextAsync("Escalation complete");
 
         await ClickWhenStable(RoutineReviewButton);
-        await AssertTriggerRouteAsync("Routine route dispatched", "Routine review", null);
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Escalation reviewed");
+        await Expect(TriggerAudit).ToHaveTextAsync("Routine route dispatched");
+        await Expect(TriggerResult).ToHaveTextAsync("Routine review");
+        await Expect(TriggerBadge).ToBeHiddenAsync();
+        await Expect(TriggerSummary).ToHaveTextAsync("Escalation complete");
         AssertNoConsoleErrors();
     }
 
@@ -113,11 +95,21 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
         await NavigateAndBoot();
 
         await AssessmentScore.FillAndBlur("95");
-        await AssertComponentRouteAsync("Monitor route dispatched", "Monitor closely", "Monitor");
+        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
+        await Expect(ComponentAudit).ToHaveTextAsync("Monitor route dispatched", new() { Timeout = 5000 });
+        await Expect(ComponentResult).ToHaveTextAsync("Monitor closely", new() { Timeout = 5000 });
+        await Expect(ComponentBadge).ToBeVisibleAsync();
+        await Expect(ComponentBadge).ToHaveTextAsync("Monitor");
+        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
 
         await SupervisorOverride.Toggle();
 
-        await AssertComponentRouteAsync("Isolation route dispatched", "Escalate now", "Escalate");
+        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
+        await Expect(ComponentAudit).ToHaveTextAsync("Isolation route dispatched", new() { Timeout = 5000 });
+        await Expect(ComponentResult).ToHaveTextAsync("Escalate now", new() { Timeout = 5000 });
+        await Expect(ComponentBadge).ToBeVisibleAsync();
+        await Expect(ComponentBadge).ToHaveTextAsync("Escalate");
+        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
         AssertNoConsoleErrors();
     }
 
@@ -127,11 +119,21 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
         await NavigateAndBoot();
 
         await AssessmentScore.FillAndBlur("95");
-        await AssertComponentRouteAsync("Monitor route dispatched", "Monitor closely", "Monitor");
+        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
+        await Expect(ComponentAudit).ToHaveTextAsync("Monitor route dispatched", new() { Timeout = 5000 });
+        await Expect(ComponentResult).ToHaveTextAsync("Monitor closely", new() { Timeout = 5000 });
+        await Expect(ComponentBadge).ToBeVisibleAsync();
+        await Expect(ComponentBadge).ToHaveTextAsync("Monitor");
+        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
 
         await CareTrack.Select("Memory Care");
 
-        await AssertComponentRouteAsync("Isolation route dispatched", "Escalate now", "Escalate");
+        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
+        await Expect(ComponentAudit).ToHaveTextAsync("Isolation route dispatched", new() { Timeout = 5000 });
+        await Expect(ComponentResult).ToHaveTextAsync("Escalate now", new() { Timeout = 5000 });
+        await Expect(ComponentBadge).ToBeVisibleAsync();
+        await Expect(ComponentBadge).ToHaveTextAsync("Escalate");
+        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
         AssertNoConsoleErrors();
     }
 
@@ -141,11 +143,20 @@ public class WhenEscalationRoutingDispatchesInsideBranches : PlaywrightTestBase
         await NavigateAndBoot();
 
         await AssessmentScore.FillAndBlur("70");
-        await AssertComponentRouteAsync("Monitor route dispatched", "Monitor closely", "Monitor");
+        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
+        await Expect(ComponentAudit).ToHaveTextAsync("Monitor route dispatched", new() { Timeout = 5000 });
+        await Expect(ComponentResult).ToHaveTextAsync("Monitor closely", new() { Timeout = 5000 });
+        await Expect(ComponentBadge).ToBeVisibleAsync();
+        await Expect(ComponentBadge).ToHaveTextAsync("Monitor");
+        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
 
         await AssessmentScore.FillAndBlur("40");
 
-        await AssertComponentRouteAsync("Routine route dispatched", "Routine follow-up", null);
+        await Expect(ComponentPrecheck).ToHaveTextAsync("Escalation evaluated", new() { Timeout = 5000 });
+        await Expect(ComponentAudit).ToHaveTextAsync("Routine route dispatched", new() { Timeout = 5000 });
+        await Expect(ComponentResult).ToHaveTextAsync("Routine follow-up", new() { Timeout = 5000 });
+        await Expect(ComponentBadge).ToBeHiddenAsync();
+        await Expect(ComponentSummary).ToHaveTextAsync("Escalation decision complete");
         AssertNoConsoleErrors();
     }
 }

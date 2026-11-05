@@ -1,26 +1,29 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.SplitButton
 {
     public sealed class FusionSplitButtonModel
     {
+        public string? Kind { get; set; }
+
+        public string? Note { get; set; }
+
+        public bool Signed { get; set; }
     }
 
-    public sealed class FusionSplitButtonEchoRequest
+    public sealed class CareNoteSave
     {
-        public string Content { get; set; } = string.Empty;
+        public string? Kind { get; set; }
 
-        public bool Disabled { get; set; }
+        public string? Note { get; set; }
 
-        public string CssClass { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
     }
 
-    public sealed class FusionSplitButtonEchoResponse
+    public sealed class CareNoteSaved
     {
-        public string Content { get; set; } = string.Empty;
+        public bool Saved { get; set; }
 
-        public bool Disabled { get; set; }
+        public string Message { get; set; } = string.Empty;
 
-        public string CssClass { get; set; } = string.Empty;
-
-        public string Summary { get; set; } = string.Empty;
+        public string[] FinishedActions { get; set; } = [];
     }
 }

@@ -1,8 +1,19 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.RichTextEditor
 {
-    public class RichTextEditorModel
+    public sealed class RichTextEditorModel
     {
-        public string? CarePlan { get; set; }
-        public string? DischargeSummary { get; set; }
+        public string? Paragraph { get; set; }
+
+        public string LastMonthParagraph { get; set; } = string.Empty;
+    }
+
+    public sealed class NewsletterParagraphSave
+    {
+        public string Paragraph { get; set; } = string.Empty;
+    }
+
+    public sealed class NewsletterParagraphSaved
+    {
+        public string Message { get; set; } = string.Empty;
     }
 }

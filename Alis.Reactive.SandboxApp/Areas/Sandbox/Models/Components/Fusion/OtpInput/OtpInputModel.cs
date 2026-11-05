@@ -1,21 +1,24 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.OtpInput
 {
-    public class OtpInputModel
+    public sealed class OtpInputModel
     {
-        public string? Passcode { get; set; }
-
-        public string? AutoBlurCode { get; set; }
+        public string? VisitCode { get; set; }
     }
 
-    public sealed class OtpInputEchoRequest
+    public sealed class VisitCodeCheck
     {
-        public string? Passcode { get; set; }
+        public string Code { get; set; } = string.Empty;
+
+        public string PreviousCode { get; set; } = string.Empty;
     }
 
-    public sealed class OtpInputEchoResponse
+    public sealed class VisitCodeChecked
     {
-        public string? Passcode { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
 
-        public string Summary { get; set; } = string.Empty;
+    public sealed class WalkInCodeIssued
+    {
+        public string Code { get; set; } = string.Empty;
     }
 }

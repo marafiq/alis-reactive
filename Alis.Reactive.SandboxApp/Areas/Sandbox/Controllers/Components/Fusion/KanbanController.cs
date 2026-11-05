@@ -1,4 +1,5 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using System.Text.Json;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Kanban;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -7,9 +8,17 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     [Route("Sandbox/Components/Kanban")]
     public class KanbanController : Controller
     {
-        private static readonly object BoardLock = new object();
-        private static List<KanbanTaskCard> BoardCards = KanbanSeedData.Cards.ToList();
-        private static int NextCardId = 900;
+        private const string BoardKey = "maintenanceBoard";
+        private const string NextNumberKey = "maintenanceNextWorkOrderNumber";
+        private const string FrontDeskCallTakenKey = "maintenanceFrontDeskCallTaken";
+        private const string BrakeCableArrivedKey = "maintenanceBrakeCableArrived";
+        private const int FirstNewWorkOrderNumber = 110;
+
+        private const int WheelchairWorkOrder = 101;
+
+        private const int HeldWorkOrder = 102;
+
+        private const int WithdrawnWorkOrder = 105;
 
         [HttpGet("")]
         [HttpGet("Index")]
@@ -17,171 +26,266 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             return View(
                 "~/Areas/Sandbox/Views/Components/Fusion/Kanban/Index.cshtml",
-                new KanbanModel());
+                new MaintenanceBoardModel());
         }
 
-        [HttpGet("~/api/kanban/board")]
-        public IActionResult Board(string? selectedFacilityId)
+        [HttpGet("Board")]
+        public IActionResult Board()
         {
-            var cards = CardsForFacility(selectedFacilityId);
-            return Ok(new KanbanBoardResponse
+            return Ok(new MaintenanceBoard { WorkOrders = [.. LoadBoard()] });
+        }
+
+        [HttpPost("Commit")]
+        public IActionResult Commit([FromBody] WorkOrderChange change)
+        {
+            return change.RequestType switch
             {
-                Message = $"loaded:{(string.IsNullOrWhiteSpace(selectedFacilityId) ? "ALL" : selectedFacilityId)}:{cards.Count}",
-                Cards = cards,
-                OpenCount = cards.Count(card => card.Status == "Open"),
-                ReviewCount = cards.Count(card => card.Status == "Review"),
-                AssistedLivingCount = cards.Count(card => card.FacilityId == "AL")
+                BoardRequestType.Added => Add(change),
+                BoardRequestType.Changed => Change(change),
+                BoardRequestType.Removed => FileAway(change),
+                _ => BadRequest(new WorkOrderRefusal { Message = $"The work-order system does not know the change '{change.RequestType}'." })
+            };
+        }
+
+        [HttpGet("History/{workOrderNumber:int}")]
+        public IActionResult History(int workOrderNumber)
+        {
+            return Ok(new WorkOrderHistory { History = HistoryOf(workOrderNumber) });
+        }
+
+        [HttpGet("Hold/{workOrderNumber:int}")]
+        public IActionResult Hold(int workOrderNumber)
+        {
+            return Ok(workOrderNumber == HeldWorkOrder
+                ? new WorkOrderHold { HeldBy = "Ana Ruiz", Message = "Ana Ruiz is updating this work order; try again when she is done." }
+                : new WorkOrderHold());
+        }
+
+        [HttpPost("Draft")]
+        public IActionResult Draft()
+        {
+            return Ok(new WorkOrderDraft
+            {
+                WorkOrder = new WorkOrder
+                {
+                    Number = TakeNextNumber(),
+                    Status = WorkOrderStatus.Open,
+                    Wing = MaintenanceWing.Maple,
+                    WingName = WingNameOf(MaintenanceWing.Maple)
+                }
             });
         }
 
-        [HttpPost("~/api/kanban/reset")]
-        public IActionResult Reset()
+        [HttpGet("FrontDeskCall")]
+        public IActionResult FrontDeskCall()
         {
-            lock (BoardLock)
+            if (HttpContext.Session.GetString(FrontDeskCallTakenKey) != null)
+                return NotFound(new FrontDeskCalls { Message = "No new calls from the front desk." });
+
+            HttpContext.Session.SetString(FrontDeskCallTakenKey, "taken");
+            return Ok(new FrontDeskCalls
             {
-                BoardCards = KanbanSeedData.Cards.ToList();
-                NextCardId = 900;
+                WorkOrder = new WorkOrder
+                {
+                    Number = TakeNextNumber(),
+                    Status = WorkOrderStatus.Open,
+                    Summary = "Toilet running nonstop",
+                    Room = "Birch 110",
+                    Wing = MaintenanceWing.Birch,
+                    WingName = WingNameOf(MaintenanceWing.Birch),
+                    Priority = WorkOrderPriority.Urgent,
+                    Technician = "Ana Ruiz"
+                }
+            });
+        }
+
+        [HttpPost("PartArrived")]
+        public IActionResult PartArrived()
+        {
+            HttpContext.Session.SetString(BrakeCableArrivedKey, "arrived");
+            var wheelchair = LoadBoard().Single(workOrder => workOrder.Number == WheelchairWorkOrder);
+            return Ok(new PartArrival { WorkOrder = wheelchair with { Status = WorkOrderStatus.InProgress } });
+        }
+
+        [HttpPost("WorkLists")]
+        public IActionResult WorkLists([FromBody] WorkLists lists)
+        {
+            return Ok(new WorkListsSent
+            {
+                Message = $"Sent the night technician {Count(lists.InProgress.Count)} in progress and the Maple wing's list of {lists.MapleWing.Count}."
+            });
+        }
+
+        private IActionResult Add(WorkOrderChange change)
+        {
+            if (change.AddedRecords.Count == 0)
+                return BadRequest(new WorkOrderRefusal { Message = "The board added no work order." });
+
+            var board = LoadBoard();
+            foreach (var added in change.AddedRecords)
+                board = PlaceInLine(board, added with { WingName = WingNameOf(added.Wing) }, change.Index);
+            SaveBoard(board);
+
+            var first = change.AddedRecords[0];
+            return Ok(new MaintenanceBoard
+            {
+                WorkOrders = [.. board],
+                Message = $"Added work order {first.Number}, {first.Summary}, to {ColumnName(first.Status)}."
+            });
+        }
+
+        private IActionResult Change(WorkOrderChange change)
+        {
+            if (change.ChangedRecords.Count == 0)
+                return BadRequest(new WorkOrderRefusal { Message = "The board changed no work order." });
+
+            var board = LoadBoard();
+            var changed = change.ChangedRecords[0];
+            var existing = board.SingleOrDefault(workOrder => workOrder.Number == changed.Number);
+            if (existing == null)
+                return Conflict(new WorkOrderRefusal { Message = $"Work order {changed.Number} is no longer on the board." });
+
+            if (existing.Number == WithdrawnWorkOrder)
+            {
+                return Conflict(new WorkOrderRefusal
+                {
+                    Message = "The family in Birch 106 withdrew the faucet request this morning, so the work order stays where it was."
+                });
             }
 
-            return Ok(new { message = "reset" });
-        }
-
-        [HttpPost("~/api/kanban/audit")]
-        public IActionResult Audit([FromBody] KanbanAuditRequest request)
-        {
-            return Ok(new KanbanAuditResponse
+            if (WaitsForItsPart(existing, changed))
             {
-                TotalCards = request.Cards.Count,
-                OpenCards = request.OpenCards.Count,
-                AssistedLivingCards = request.AssistedLivingCards.Count,
-                Summary = $"audit:{request.Cards.Count}:{request.OpenCards.Count}:{request.AssistedLivingCards.Count}"
-            });
-        }
-
-        [HttpPost("~/api/kanban/cards")]
-        public IActionResult Add()
-        {
-            KanbanTaskCard card;
-            lock (BoardLock)
-            {
-                card = KanbanSeedData.NewCard(NextCardId++, "AL");
-                BoardCards.Add(card);
+                board = PlaceInLine(board, existing with { Status = WorkOrderStatus.Blocked }, null);
+                SaveBoard(board);
+                return Ok(new MaintenanceBoard
+                {
+                    WorkOrders = [.. board],
+                    BackOrdered = true,
+                    Message = "The brake cable for Maple 118's wheelchair is back-ordered until Friday, so its work order waits for the part."
+                });
             }
 
-            return Ok(new KanbanCardMutationResponse
+            var moved = existing.Status != changed.Status;
+            var finishedNow = moved && changed.Status == WorkOrderStatus.Done;
+            var updated = changed with
             {
-                Message = $"post:{card.Id}",
-                Card = card,
-                CardId = card.Id
+                WingName = WingNameOf(changed.Wing),
+                SignedOff = !finishedNow && existing.SignedOff,
+                FinishedToday = finishedNow || existing.FinishedToday
+            };
+            var place = finishedNow ? null : change.Index ?? (moved ? null : (int?)existing.Queue);
+            board = PlaceInLine(board, updated, place);
+            SaveBoard(board);
+
+            return Ok(new MaintenanceBoard
+            {
+                WorkOrders = [.. board],
+                Message = moved
+                    ? $"Moved work order {updated.Number}, {updated.Summary}, to {ColumnName(updated.Status)}."
+                    : $"Saved work order {updated.Number}: {updated.Summary}."
             });
         }
 
-        [HttpPut("~/api/kanban/cards/{cardId:int}")]
-        public IActionResult Update(int cardId)
+        private IActionResult FileAway(WorkOrderChange change)
         {
-            var card = KanbanSeedData.UpdatedCard();
-            lock (BoardLock)
-            {
-                BoardCards = BoardCards
-                    .Select(existing => existing.Id == cardId ? card : existing)
-                    .ToList();
-            }
+            if (change.DeletedRecords.Count == 0)
+                return BadRequest(new WorkOrderRefusal { Message = "The board filed away no work order." });
 
-            return Ok(new KanbanCardMutationResponse
+            var unsigned = change.DeletedRecords.FirstOrDefault(workOrder => !workOrder.SignedOff);
+            if (unsigned != null)
+                return Conflict(new WorkOrderRefusal { Message = $"Work order {unsigned.Number} has no sign-off yet, so nothing was filed away." });
+
+            var filed = change.DeletedRecords.Select(workOrder => workOrder.Number).ToHashSet();
+            var board = LoadBoard().Where(workOrder => !filed.Contains(workOrder.Number)).ToList();
+            SaveBoard(board);
+
+            return Ok(new MaintenanceBoard
             {
-                Message = $"put:{card.Id}:{card.Status}",
-                Card = card,
-                CardId = card.Id
+                WorkOrders = [.. board],
+                Message = $"Filed away {Count(filed.Count)} of finished work."
             });
         }
 
-        [HttpDelete("~/api/kanban/cards/{cardId:int}")]
-        public IActionResult Delete(int cardId)
-        {
-            lock (BoardLock)
-            {
-                BoardCards = BoardCards
-                    .Where(card => card.Id != cardId)
-                    .ToList();
-            }
+        private bool WaitsForItsPart(WorkOrder existing, WorkOrder changed)
+            => existing.Number == WheelchairWorkOrder
+            && existing.Status == WorkOrderStatus.Open
+            && changed.Status == WorkOrderStatus.InProgress
+            && HttpContext.Session.GetString(BrakeCableArrivedKey) == null;
 
-            return Ok(new KanbanCardMutationResponse
-            {
-                Message = $"delete:{cardId}",
-                CardId = cardId
-            });
+        private static List<WorkOrder> PlaceInLine(List<WorkOrder> board, WorkOrder workOrder, int? place)
+        {
+            var others = board.Where(other => other.Number != workOrder.Number).ToList();
+            bool InLine(WorkOrder other) => other.Status == workOrder.Status && other.Wing == workOrder.Wing;
+
+            var line = others.Where(InLine).OrderBy(other => other.Queue).ToList();
+            line.Insert(Math.Clamp(place ?? line.Count, 0, line.Count), workOrder);
+
+            return others.Where(other => !InLine(other))
+                .Concat(line.Select((inLine, queue) => inLine with { Queue = queue }))
+                .ToList();
         }
 
-        [HttpPost("~/api/kanban/cards/commit")]
-        public IActionResult Commit([FromBody] KanbanCommitRequest request)
+        private static string Count(int workOrders) => workOrders == 1 ? "1 work order" : $"{workOrders} work orders";
+
+        private static string ColumnName(string status) => status switch
         {
-            var changed = request.AddedRecords.Count + request.ChangedRecords.Count + request.DeletedRecords.Count;
-            lock (BoardLock)
-            {
-                foreach (var deleted in request.DeletedRecords)
-                    BoardCards.RemoveAll(card => card.Id == deleted.Id);
+            WorkOrderStatus.InProgress => "In Progress",
+            WorkOrderStatus.Blocked => "Waiting on parts",
+            _ => status
+        };
 
-                foreach (var changedCard in request.ChangedRecords)
-                    UpsertCard(changedCard);
+        private static string WingNameOf(string wing) => $"{wing} wing";
 
-                foreach (var added in request.AddedRecords)
-                    UpsertCard(added);
-            }
+        private static string HistoryOf(int workOrderNumber) => workOrderNumber switch
+        {
+            101 => "Walter Finch's daughter reported it Monday; Dev Patel took it Monday afternoon.",
+            102 => "The night nurse reported it at 2 a.m.; Dev Patel took it at the morning huddle.",
+            103 => "Physical therapy asked for it Tuesday; Ana Ruiz started it this morning.",
+            108 => "The front desk reported it yesterday; no technician has taken it yet.",
+            _ => "Reported this week."
+        };
 
-            return Ok(new KanbanCommitResponse
-            {
-                Message = $"commit:{request.RequestType}:{changed}",
-                TotalChanged = changed
-            });
+        private List<WorkOrder> LoadBoard()
+        {
+            var json = HttpContext.Session.GetString(BoardKey);
+            return json == null ? SeededBoard() : JsonSerializer.Deserialize<List<WorkOrder>>(json)!;
         }
 
-        [HttpPut("~/api/kanban/cards/move")]
-        public IActionResult Move([FromBody] KanbanMoveRequest request)
-        {
-            var moved = request.Cards[0];
-            lock (BoardLock)
-            {
-                BoardCards = BoardCards
-                    .Select(card => card.Id == moved.Id ? moved : card)
-                    .ToList();
-            }
+        private void SaveBoard(List<WorkOrder> board)
+            => HttpContext.Session.SetString(BoardKey, JsonSerializer.Serialize(board));
 
-            return Ok(new KanbanMoveResponse
-            {
-                Message = $"move:{moved.Id}:{moved.Status}:{request.DropIndex}",
-                Card = moved,
-                DropIndex = request.DropIndex
-            });
+        private int TakeNextNumber()
+        {
+            var next = HttpContext.Session.GetInt32(NextNumberKey) ?? FirstNewWorkOrderNumber;
+            HttpContext.Session.SetInt32(NextNumberKey, next + 1);
+            return next;
         }
 
-        [HttpGet("~/api/kanban/card/{cardId}/summary")]
-        public IActionResult Summary(int cardId)
-        {
-            return Ok(new KanbanCardSummaryResponse
+        private static List<WorkOrder> SeededBoard()
+        => [
+            Seed(101, WorkOrderStatus.Open, 0, "Wheelchair brakes slipping", "Maple 118", MaintenanceWing.Maple, WorkOrderPriority.Routine, "Dev Patel"),
+            Seed(102, WorkOrderStatus.Open, 1, "Call light not working", "Maple 214", MaintenanceWing.Maple, WorkOrderPriority.Urgent, "Dev Patel"),
+            Seed(104, WorkOrderStatus.Done, 0, "Window sticks when opened", "Maple 210", MaintenanceWing.Maple, WorkOrderPriority.Routine, "Dev Patel") with { SignedOff = true, FinishedToday = true },
+            Seed(103, WorkOrderStatus.InProgress, 0, "Replace bathroom grab bar", "Birch 205", MaintenanceWing.Birch, WorkOrderPriority.Urgent, "Ana Ruiz"),
+            Seed(105, WorkOrderStatus.Open, 0, "Faucet drips in the kitchenette", "Birch 106", MaintenanceWing.Birch, WorkOrderPriority.Routine, "Ana Ruiz"),
+            Seed(108, WorkOrderStatus.Open, 1, "Door closer squeaks", "Birch 104", MaintenanceWing.Birch, WorkOrderPriority.Routine, ""),
+            Seed(109, WorkOrderStatus.Open, 2, "Shower drain backed up", "Birch 112", MaintenanceWing.Birch, WorkOrderPriority.Urgent, "Ana Ruiz"),
+            Seed(106, WorkOrderStatus.Done, 0, "Replace TV remote batteries", "Birch 112", MaintenanceWing.Birch, WorkOrderPriority.Routine, "Ana Ruiz") with { SignedOff = true },
+            Seed(107, WorkOrderStatus.Done, 1, "Hang new curtains", "Birch 101", MaintenanceWing.Birch, WorkOrderPriority.Routine, "Ana Ruiz") with { SignedOff = true, FinishedToday = true }
+        ];
+
+        private static WorkOrder Seed(int number, string status, int queue, string summary, string room, string wing, string priority, string technician)
+            => new()
             {
-                Summary = $"card:{cardId}:summary"
-            });
-        }
-
-        private static List<KanbanTaskCard> CardsForFacility(string? facilityId)
-        {
-            lock (BoardLock)
-            {
-                var cards = BoardCards.AsEnumerable();
-                if (!string.IsNullOrWhiteSpace(facilityId) && facilityId != "ALL")
-                    cards = cards.Where(card => card.FacilityId == facilityId);
-
-                return cards.ToList();
-            }
-        }
-
-        private static void UpsertCard(KanbanTaskCard card)
-        {
-            var index = BoardCards.FindIndex(existing => existing.Id == card.Id);
-            if (index >= 0)
-                BoardCards[index] = card;
-            else
-                BoardCards.Add(card);
-        }
+                Number = number,
+                Status = status,
+                Queue = queue,
+                Summary = summary,
+                Room = room,
+                Wing = wing,
+                WingName = WingNameOf(wing),
+                Priority = priority,
+                Technician = technician
+            };
     }
 }

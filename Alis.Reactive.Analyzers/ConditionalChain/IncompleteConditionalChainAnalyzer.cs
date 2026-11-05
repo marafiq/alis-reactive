@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -22,8 +23,14 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
                          "The condition will not be included in the plan.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        private static readonly ImmutableArray<string> IncompleteChainTypes = ImmutableArray.Create(
+            "Alis.Reactive.ConditionSourceBuilder`3",
+            "Alis.Reactive.GuardBuilder`1",
+            "Alis.Reactive.AllGuard`1",
+            "Alis.Reactive.AnyGuard`1");
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -33,24 +40,23 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
 
             context.RegisterCompilationStartAction(compilationCtx =>
             {
-                var guardBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.Conditions.GuardBuilder`1");
-                var conditionSourceBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.Conditions.ConditionSourceBuilder`2");
+                var incompleteChainTypes = IncompleteChainTypes
+                    .Select(compilationCtx.Compilation.GetTypeByMetadataName)
+                    .OfType<INamedTypeSymbol>()
+                    .ToImmutableArray();
 
-                if (guardBuilderType == null && conditionSourceBuilderType == null)
+                if (incompleteChainTypes.IsEmpty)
                     return;
 
                 compilationCtx.RegisterSyntaxNodeAction(
-                    nodeCtx => AnalyzeExpressionStatement(nodeCtx, guardBuilderType, conditionSourceBuilderType),
+                    nodeCtx => AnalyzeExpressionStatement(nodeCtx, incompleteChainTypes),
                     SyntaxKind.ExpressionStatement);
             });
         }
 
         private static void AnalyzeExpressionStatement(
             SyntaxNodeAnalysisContext context,
-            INamedTypeSymbol? guardBuilderType,
-            INamedTypeSymbol? conditionSourceBuilderType)
+            ImmutableArray<INamedTypeSymbol> incompleteChainTypes)
         {
             var statement = (ExpressionStatementSyntax)context.Node;
             if (!AnalyzerHelpers.IsRazorGeneratedFile(statement.SyntaxTree))
@@ -60,8 +66,7 @@ namespace Alis.Reactive.Analyzers.ConditionalChain
             if (type == null)
                 return;
 
-            if (AnalyzerHelpers.IsClosedGenericOf(type, guardBuilderType)
-                || AnalyzerHelpers.IsClosedGenericOf(type, conditionSourceBuilderType))
+            if (incompleteChainTypes.Any(chainType => AnalyzerHelpers.IsClosedGenericOf(type, chainType)))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, statement.Expression.GetLocation()));
             }

@@ -1,4 +1,3 @@
-using Alis.Reactive.Playwright.Extensions;
 using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.SupportedSyntax;
 
 namespace Alis.Reactive.PlaywrightTests.Conditions.SupportedSyntax;
@@ -34,42 +33,6 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
         _plan = await PagePlan<SupportedSyntaxModel>.FromPage(Page);
     }
 
-    private async Task AssertTriggerPathAsync(string expectedResult, string? expectedBadge)
-    {
-        await Expect(TriggerPrecheck).ToHaveTextAsync("Review started");
-        await Expect(TriggerAudit).ToHaveTextAsync("Audit logged");
-        await Expect(TriggerResult).ToHaveTextAsync(expectedResult);
-        if (expectedBadge is null)
-        {
-            await Expect(TriggerBadge).ToBeHiddenAsync();
-        }
-        else
-        {
-            await Expect(TriggerBadge).ToBeVisibleAsync();
-            await Expect(TriggerBadge).ToHaveTextAsync(expectedBadge);
-        }
-
-        await Expect(TriggerSummary).ToHaveTextAsync("Workflow complete");
-    }
-
-    private async Task AssertReactivePathAsync(string expectedResult, string? expectedBadge)
-    {
-        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
-        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
-        await Expect(ReactiveResult).ToHaveTextAsync(expectedResult, new() { Timeout = 5000 });
-        if (expectedBadge is null)
-        {
-            await Expect(ReactiveBadge).ToBeHiddenAsync();
-        }
-        else
-        {
-            await Expect(ReactiveBadge).ToBeVisibleAsync();
-            await Expect(ReactiveBadge).ToHaveTextAsync(expectedBadge);
-        }
-
-        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
-    }
-
     [Test]
     public async Task priority_review_takes_the_first_branch_of_the_trigger_ladder()
     {
@@ -77,7 +40,12 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
 
         await ClickWhenStable(PriorityReviewButton);
 
-        await AssertTriggerPathAsync("Priority review", "Priority");
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Review started");
+        await Expect(TriggerAudit).ToHaveTextAsync("Audit logged");
+        await Expect(TriggerResult).ToHaveTextAsync("Priority review");
+        await Expect(TriggerBadge).ToBeVisibleAsync();
+        await Expect(TriggerBadge).ToHaveTextAsync("Priority");
+        await Expect(TriggerSummary).ToHaveTextAsync("Workflow complete");
         AssertNoConsoleErrors();
     }
 
@@ -88,7 +56,12 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
 
         await ClickWhenStable(StandardReviewButton);
 
-        await AssertTriggerPathAsync("Standard review", "Standard");
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Review started");
+        await Expect(TriggerAudit).ToHaveTextAsync("Audit logged");
+        await Expect(TriggerResult).ToHaveTextAsync("Standard review");
+        await Expect(TriggerBadge).ToBeVisibleAsync();
+        await Expect(TriggerBadge).ToHaveTextAsync("Standard");
+        await Expect(TriggerSummary).ToHaveTextAsync("Workflow complete");
         AssertNoConsoleErrors();
     }
 
@@ -99,7 +72,11 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
 
         await ClickWhenStable(DeferredReviewButton);
 
-        await AssertTriggerPathAsync("Deferred review", null);
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Review started");
+        await Expect(TriggerAudit).ToHaveTextAsync("Audit logged");
+        await Expect(TriggerResult).ToHaveTextAsync("Deferred review");
+        await Expect(TriggerBadge).ToBeHiddenAsync();
+        await Expect(TriggerSummary).ToHaveTextAsync("Workflow complete");
         AssertNoConsoleErrors();
     }
 
@@ -109,10 +86,19 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
         await NavigateAndBoot();
 
         await ClickWhenStable(PriorityReviewButton);
-        await AssertTriggerPathAsync("Priority review", "Priority");
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Review started");
+        await Expect(TriggerAudit).ToHaveTextAsync("Audit logged");
+        await Expect(TriggerResult).ToHaveTextAsync("Priority review");
+        await Expect(TriggerBadge).ToBeVisibleAsync();
+        await Expect(TriggerBadge).ToHaveTextAsync("Priority");
+        await Expect(TriggerSummary).ToHaveTextAsync("Workflow complete");
 
         await ClickWhenStable(DeferredReviewButton);
-        await AssertTriggerPathAsync("Deferred review", null);
+        await Expect(TriggerPrecheck).ToHaveTextAsync("Review started");
+        await Expect(TriggerAudit).ToHaveTextAsync("Audit logged");
+        await Expect(TriggerResult).ToHaveTextAsync("Deferred review");
+        await Expect(TriggerBadge).ToBeHiddenAsync();
+        await Expect(TriggerSummary).ToHaveTextAsync("Workflow complete");
         AssertNoConsoleErrors();
     }
 
@@ -123,7 +109,12 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
 
         await RiskScore.FillAndBlur("95");
 
-        await AssertReactivePathAsync("Urgent follow-up", "Urgent");
+        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
+        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
+        await Expect(ReactiveResult).ToHaveTextAsync("Urgent follow-up", new() { Timeout = 5000 });
+        await Expect(ReactiveBadge).ToBeVisibleAsync();
+        await Expect(ReactiveBadge).ToHaveTextAsync("Urgent");
+        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
         AssertNoConsoleErrors();
     }
 
@@ -134,7 +125,12 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
 
         await RiskScore.FillAndBlur("75");
 
-        await AssertReactivePathAsync("Standard follow-up", "Standard");
+        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
+        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
+        await Expect(ReactiveResult).ToHaveTextAsync("Standard follow-up", new() { Timeout = 5000 });
+        await Expect(ReactiveBadge).ToBeVisibleAsync();
+        await Expect(ReactiveBadge).ToHaveTextAsync("Standard");
+        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
         AssertNoConsoleErrors();
     }
 
@@ -145,7 +141,11 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
 
         await RiskScore.FillAndBlur("40");
 
-        await AssertReactivePathAsync("Routine follow-up", null);
+        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
+        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
+        await Expect(ReactiveResult).ToHaveTextAsync("Routine follow-up", new() { Timeout = 5000 });
+        await Expect(ReactiveBadge).ToBeHiddenAsync();
+        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
         AssertNoConsoleErrors();
     }
 
@@ -155,13 +155,27 @@ public class WhenSupportedConditionSyntaxRoutesReviewWorkflows : PlaywrightTestB
         await NavigateAndBoot();
 
         await RiskScore.FillAndBlur("95");
-        await AssertReactivePathAsync("Urgent follow-up", "Urgent");
+        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
+        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
+        await Expect(ReactiveResult).ToHaveTextAsync("Urgent follow-up", new() { Timeout = 5000 });
+        await Expect(ReactiveBadge).ToBeVisibleAsync();
+        await Expect(ReactiveBadge).ToHaveTextAsync("Urgent");
+        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
 
         await RiskScore.FillAndBlur("40");
-        await AssertReactivePathAsync("Routine follow-up", null);
+        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
+        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
+        await Expect(ReactiveResult).ToHaveTextAsync("Routine follow-up", new() { Timeout = 5000 });
+        await Expect(ReactiveBadge).ToBeHiddenAsync();
+        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
 
         await RiskScore.FillAndBlur("95");
-        await AssertReactivePathAsync("Urgent follow-up", "Urgent");
+        await Expect(ReactivePrecheck).ToHaveTextAsync("Risk evaluated", new() { Timeout = 5000 });
+        await Expect(ReactiveAudit).ToHaveTextAsync("Audit logged", new() { Timeout = 5000 });
+        await Expect(ReactiveResult).ToHaveTextAsync("Urgent follow-up", new() { Timeout = 5000 });
+        await Expect(ReactiveBadge).ToBeVisibleAsync();
+        await Expect(ReactiveBadge).ToHaveTextAsync("Urgent");
+        await Expect(ReactiveSummary).ToHaveTextAsync("Assessment complete");
         AssertNoConsoleErrors();
     }
 }

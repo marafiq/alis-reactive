@@ -1,0 +1,17 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model NamesPage
+@{
+    ViewData["Title"] = "A negative minimum length";
+    var plan = Html.ReactivePlan<NamesPage>();
+}
+<h1>A negative minimum length</h1>
+
+@{ Html.InputField(plan, m => m.Name, o => o.Label("Name")).Entry(); }
+<p>Long enough to search: <span id="long-enough"></span></p>
+
+@(plan.Button("check", "Check")
+    .Reactive(button => button.Click, p => p.When(p.Component<Entry>(m => m.Name).Value).MinLength(-1)
+        .Then(t => t.Element("long-enough").Text.Set("long enough"))
+        .Else(e => e.Element("long-enough").Text.Set("too short"))))
+
+@Html.RenderPlan(plan)

@@ -1,4 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -15,6 +16,17 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj" />
+    <ProjectReference Include="../Alis.Reactive/Alis.Reactive.csproj" />
+    <ProjectReference Include="../Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <AdditionalFiles Include="SliceTree.txt" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AlisReactiveStaticWebAsset Include="css/native-tag-helpers.css" RelativePath="css/native-tag-helpers.css" />
+  </ItemGroup>
+
+  <Import Project="../build/AlisReactiveStaticWebAssets.targets" />
 </Project>

@@ -1,4 +1,4 @@
-using Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+using Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ComboBox;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
@@ -7,30 +7,46 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     [Route("Sandbox/Components/FusionComboBox")]
     public sealed class ComboBoxController : Controller
     {
+        private static readonly IReadOnlyList<ChartedResident> Round =
+        [
+            new("R-1031", "Bell, Arthur", "Maple 202", "No known allergies"),
+            new("R-1042", "Hale, Margaret", "Maple 214", "Penicillin (hives)"),
+            new("R-1057", "Okafor, Grace", "Maple 221", "Sulfa drugs (rash)"),
+            new("R-1063", "Russo, Dominic", "Maple 230", "Latex")
+        ];
+
         [HttpGet("")]
         public IActionResult Index()
-        {
-            ViewBag.Residents = new List<ComboBoxResidentItem>
+            => View("~/Areas/Sandbox/Views/Components/Fusion/ComboBox/Index.cshtml", new FusionComboBoxModel
             {
-                new() { Value = "alice", Text = "Alice", Unit = "A" },
-                new() { Value = "bennett", Text = "Bennett", Unit = "A" },
-                new() { Value = "carey", Text = "Carey", Unit = "B" },
-                new() { Value = "dawson", Text = "Dawson", Unit = "B" }
-            };
+                Round = Round.Select(resident => new RoundResident { Id = resident.Id, Name = resident.Name }).ToList()
+            });
 
-            return View("~/Areas/Sandbox/Views/Components/Fusion/ComboBox/Index.cshtml", new FusionComboBoxModel());
+        [HttpGet("Chart")]
+        public IActionResult Chart([FromQuery] DoseCheckQuery query)
+        {
+            var resident = Find(query.ResidentId);
+            return resident is null
+                ? NotFound()
+                : Ok(new DoseCheck { Room = resident.Room, Allergies = resident.Allergies });
         }
 
-        [HttpPost("Echo")]
-        public IActionResult Echo([FromBody] FusionComboBoxEchoRequest request)
+        [HttpPost("Record")]
+        public IActionResult Record([FromBody] MedicationPassRecord? record)
         {
-            return Ok(new FusionComboBoxEchoResponse
+            var resident = Find(record?.Resident);
+            if (resident is null)
+                return BadRequest(new MedicationPassStatus { Message = "Choose a resident before recording medications." });
+
+            return Ok(new MedicationPassStatus
             {
-                Value = request.Value,
-                Text = request.Text,
-                Index = request.Index,
-                Summary = request.Value + ":" + request.Text + ":" + request.Index
+                Message = $"Recorded the 08:00 medications for {resident.Name}, resident {record!.RoundPosition + 1} of {Round.Count} on the round."
             });
         }
+
+        private static ChartedResident? Find(string? residentId)
+            => Round.FirstOrDefault(resident => resident.Id == residentId);
+
+        private sealed record ChartedResident(string Id, string Name, string Room, string Allergies);
     }
 }

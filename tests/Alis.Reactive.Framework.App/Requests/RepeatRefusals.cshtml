@@ -1,0 +1,51 @@
+@using Microsoft.AspNetCore.Html
+@using Alis.Reactive.Framework.App.Requests
+@model RepeatRefusalsPage
+@{
+    ViewData["Title"] = "A part given twice";
+    var plan = Html.ReactivePlan<RepeatRefusalsPage>();
+
+    IHtmlContent Send(Func<HttpRequestBuilder<RepeatRefusalsPage>, HttpRequestBuilder<RepeatRefusalsPage>> request) =>
+        plan.Button("send", "Send").Reactive(button => button.Click, p => request(p.Post("/Requests/SignIns")));
+}
+<h1>A part given twice</h1>
+
+@switch (Model.Part)
+{
+    case RepeatedPart.Gather:
+        @Send(request => request.Gather(g => g.Set(m => m.Visitor, "Ada")).Gather(g => g.Set(m => m.Party, 2)))
+        break;
+    case RepeatedPart.Response:
+        @Send(request => request
+            .Response(r => r.OnSuccess(s => s.Element("answer").Text.Set("signed in")))
+            .Response(r => r.OnError(e => e.Element("answer").Text.Set("refused"))))
+        break;
+    case RepeatedPart.WhileLoading:
+        @Send(request => request
+            .WhileLoading(w => w.Element("answer").Text.Set("signing in"))
+            .WhileLoading(w => w.Element("answer").Text.Set("still signing in")))
+        break;
+    case RepeatedPart.Finally:
+        @Send(request => request
+            .Finally(f => f.Element("answer").Text.Set("done"))
+            .Finally(f => f.Element("answer").Text.Set("done again")))
+        break;
+    case RepeatedPart.Validate:
+        @Send(request => request.Validate<RepeatRules>("visit-form").Validate<RepeatRules>("party-form"))
+        break;
+    case RepeatedPart.BodyFormat:
+        @Send(request => request.Gather(g => g.Set(m => m.Visitor, "Ada")).AsFormData().AsJson())
+        break;
+    case RepeatedPart.OnAllSettled:
+        @(plan.Button("send", "Send").Reactive(button => button.Click, p => p
+            .Parallel(first => first.Get("/Requests/First"))
+            .OnAllSettled(s => s.Element("answer").Text.Set("settled"))
+            .OnAllSettled(s => s.Element("answer").Text.Set("settled again"))))
+        break;
+}
+
+<form id="visit-form" aria-label="The visit"></form>
+<form id="party-form" aria-label="The party"></form>
+<p id="answer"></p>
+
+@Html.RenderPlan(plan)

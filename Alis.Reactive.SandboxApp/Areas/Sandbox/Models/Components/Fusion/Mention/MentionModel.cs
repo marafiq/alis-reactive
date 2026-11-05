@@ -1,13 +1,22 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.Mention
 {
     public sealed class MentionModel
     {
+        public string? ShiftNote { get; set; }
+
+        public string? NextNurse { get; set; }
+
+        public IReadOnlyList<CareTeamMember> CareTeam { get; set; } = [];
+
+        public IReadOnlyList<CareTeamMember> DayShift { get; set; } = [];
     }
 
-    public sealed class MentionPerson
+    public sealed class CareTeamMember
     {
-        public string Id { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string Role { get; set; } = "";
+        public string Id { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Role { get; set; } = string.Empty;
     }
 }

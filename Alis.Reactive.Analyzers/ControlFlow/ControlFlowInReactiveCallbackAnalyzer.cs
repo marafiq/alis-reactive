@@ -13,8 +13,14 @@ namespace Alis.Reactive.Analyzers.ControlFlow
     {
         private static readonly ImmutableHashSet<SyntaxKind> AllowedStatementKinds =
             ImmutableHashSet.Create(
+                SyntaxKind.Block,
                 SyntaxKind.ExpressionStatement,
-                SyntaxKind.LocalDeclarationStatement
+                SyntaxKind.LocalDeclarationStatement,
+                SyntaxKind.LocalFunctionStatement,
+                SyntaxKind.ForEachStatement,
+                SyntaxKind.ForStatement,
+                SyntaxKind.WhileStatement,
+                SyntaxKind.DoStatement
             );
 
         private static readonly ImmutableHashSet<SyntaxKind> FlaggedExpressionKinds =
@@ -28,10 +34,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             {
                 [SyntaxKind.IfStatement] = "if/else",
                 [SyntaxKind.SwitchStatement] = "switch",
-                [SyntaxKind.ForStatement] = "for loop",
-                [SyntaxKind.ForEachStatement] = "foreach loop",
-                [SyntaxKind.WhileStatement] = "while loop",
-                [SyntaxKind.DoStatement] = "do-while loop",
                 [SyntaxKind.GotoStatement] = "goto",
                 [SyntaxKind.LabeledStatement] = "goto label",
                 [SyntaxKind.TryStatement] = "try/catch",
@@ -39,7 +41,6 @@ namespace Alis.Reactive.Analyzers.ControlFlow
                 [SyntaxKind.LockStatement] = "lock",
                 [SyntaxKind.UsingStatement] = "using",
                 [SyntaxKind.ReturnStatement] = "return",
-                [SyntaxKind.LocalFunctionStatement] = "local function",
                 [SyntaxKind.ConditionalExpression] = "ternary ?:",
                 [SyntaxKind.SwitchExpression] = "switch expression",
             }.ToImmutableDictionary();
@@ -52,16 +53,17 @@ namespace Alis.Reactive.Analyzers.ControlFlow
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
             DiagnosticId,
             title: "Imperative C# in reactive callback",
-            messageFormat: "'{0}' is not allowed inside a reactive callback \u2014 only DSL method calls and variable declarations are permitted",
+            messageFormat: "'{0}' is not allowed inside a reactive callback \u2014 a callback declares plan entries at render time; a condition is p.When(...).Then(...).Else(...)",
             category: "Alis.Reactive",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Reactive callbacks build Reactive Plan entries at render time \u2014 they do not execute at runtime. " +
-                         "Use p.When(...).Then(...).Else(...) for conditions.",
+                         "Use p.When(...).Then(...).Else(...) for conditions. A loop over render-time data and a local " +
+                         "function declare entries too, so they are allowed.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -72,9 +74,9 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             context.RegisterCompilationStartAction(compilationCtx =>
             {
                 var pipelineBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.PipelineBuilder`1");
+                    "Alis.Reactive.PipelineBuilder`1");
                 var triggerBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.TriggerBuilder`1");
+                    "Alis.Reactive.TriggerBuilder`1");
 
                 if (pipelineBuilderType == null && triggerBuilderType == null)
                     return;
@@ -98,35 +100,18 @@ namespace Alis.Reactive.Analyzers.ControlFlow
 
             if (!HasAnalyzedParameter(lambda, context.SemanticModel,
                 pipelineBuilderType, triggerBuilderType, context.CancellationToken))
+            {
                 return;
+            }
 
-            if (lambda.Body is BlockSyntax block)
+            foreach (var node in lambda.Body.DescendantNodesAndSelf(IsTheCallbacksOwnCode))
             {
-                foreach (var statement in block.Statements)
+                if (node is StatementSyntax statement && !AllowedStatementKinds.Contains(statement.Kind()))
                 {
-                    if (!AllowedStatementKinds.Contains(statement.Kind()))
-                    {
-                        context.ReportDiagnostic(
-                            Diagnostic.Create(Rule, statement.GetLocation(), GetLabel(statement.Kind())));
-                    }
-                    else
-                    {
-                        ScanForFlaggedExpressions(statement, context);
-                    }
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(Rule, statement.GetLocation(), GetLabel(statement.Kind())));
                 }
-            }
-            else
-            {
-                ScanForFlaggedExpressions(lambda.Body, context);
-            }
-        }
-
-        private static void ScanForFlaggedExpressions(
-            SyntaxNode root, SyntaxNodeAnalysisContext context)
-        {
-            foreach (var node in root.DescendantNodesAndSelf(ShouldDescendInto))
-            {
-                if (FlaggedExpressionKinds.Contains(node.Kind()))
+                else if (FlaggedExpressionKinds.Contains(node.Kind()))
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(Rule, node.GetLocation(), GetLabel(node.Kind())));
@@ -134,10 +119,12 @@ namespace Alis.Reactive.Analyzers.ControlFlow
             }
         }
 
-        private static bool ShouldDescendInto(SyntaxNode node)
+        private static bool IsTheCallbacksOwnCode(SyntaxNode node)
         {
-            return !(node is LambdaExpressionSyntax)
-                && !(node is AnonymousMethodExpressionSyntax);
+            if (node is LambdaExpressionSyntax || node is AnonymousMethodExpressionSyntax || node is LocalFunctionStatementSyntax)
+                return false;
+
+            return !(node is StatementSyntax statement) || AllowedStatementKinds.Contains(statement.Kind());
         }
 
         private static bool HasAnalyzedParameter(

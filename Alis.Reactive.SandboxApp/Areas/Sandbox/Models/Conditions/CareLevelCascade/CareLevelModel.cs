@@ -1,4 +1,4 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models;
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Conditions.CareLevelCascade;
 
 public class CareLevelModel
 {

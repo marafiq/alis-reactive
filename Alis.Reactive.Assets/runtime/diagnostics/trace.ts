@@ -4,10 +4,17 @@ const LEVELS: Record<TraceLevel, number> = {
   off: 0, error: 1, warn: 2, info: 3, debug: 4, trace: 5,
 };
 
-let active = LEVELS.off;
+let active = LEVELS.warn;
 
 export function setLevel(level: TraceLevel): void {
   active = LEVELS[level];
+}
+
+export function levelOf(root: HTMLElement): TraceLevel {
+  const named = root.dataset["alisTrace"];
+  if (named === undefined) return "warn";
+  if (!(named in LEVELS)) throw new Error(`[alis] data-alis-trace="${named}" names no level; one of ${Object.keys(LEVELS).join(", ")}`);
+  return named as TraceLevel;
 }
 
 export interface Logger {
@@ -18,7 +25,7 @@ export interface Logger {
   trace(msg: string, details?: unknown): void;
 }
 
-export function scope(name: string): Logger {
+export function logger(name: string): Logger {
   const tag = `[alis:${name}]`;
   return {
     error: (msg, details) => emit(LEVELS.error, tag, msg, details),
@@ -35,7 +42,6 @@ function emit(level: number, tag: string, msg: string, details?: unknown): void 
                       : level <= LEVELS.warn  ? console.warn
                       : level <= LEVELS.info  ? console.info
                       : console.log;
-  // Emit searchable JSON text and the live object DevTools can expand.
   if (details !== undefined) {
     consoleMethod(`${tag} ${msg} ${safeStringify(details)}`, details);
     return;
@@ -48,7 +54,6 @@ function safeStringify(details: unknown): string {
   try {
     return JSON.stringify(details);
   } catch {
-    // Circular references and BigInt values still get a text marker.
     return "[unserializable]";
   }
 }

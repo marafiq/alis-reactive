@@ -1,15 +1,13 @@
-using Alis.Reactive.DesignSystem.Layout;
-using Alis.Reactive.DesignSystem.Tokens;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace Alis.Reactive.NativeTagHelpers.VStack;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// Renders a <c>native-vstack</c> element as a vertical flex column that stacks its
 /// children top to bottom.
 /// </summary>
 [HtmlTargetElement("native-vstack")]
-public class NativeVStackTagHelper : TagHelper
+public sealed class NativeVStackTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the spacing between children. Defaults to <see cref="SpacingScale.Base"/>.
@@ -32,6 +30,10 @@ public class NativeVStackTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", VStackCss.Classes(Gap, DivideY, CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join(
+            "alis-vstack",
+            LayoutClasses.Gap(Gap),
+            DivideY ? "alis-vstack--divided" : "",
+            CssClass));
     }
 }

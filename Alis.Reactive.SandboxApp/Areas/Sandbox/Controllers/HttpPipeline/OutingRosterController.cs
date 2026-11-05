@@ -3,20 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
 {
-    /// <summary>
-    /// Garden outing: four residents, three of whom use a mobility aid; nobody uses a mobility scooter. No
-    /// aid chosen means every resident. The bus has two boarding-help spaces and books only aids it knows.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/HttpPipeline/OutingRoster")]
     public class OutingRosterController : Controller
     {
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/HttpPipeline/OutingRoster/Index.cshtml", new OutingRosterModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/HttpPipeline/OutingRoster/Index.cshtml", new OutingRosterModel());
 
         [HttpGet("Residents")]
-        public IActionResult Residents([FromQuery] string[]? mobilityAids)
+        public IActionResult Residents([FromQuery] OutingRosterModel roster)
         {
             var residents = new[]
             {
@@ -25,8 +21,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.HttpPipeline
                 (Name: "Rosa Diaz", Aid: (string?)null),
                 (Name: "Frank Moore", Aid: (string?)"CANE"),
             };
-            var aidChosen = mobilityAids is { Length: > 0 };
-            var joining = residents.Where(r => !aidChosen || mobilityAids!.Contains(r.Aid)).Select(r => r.Name).ToList();
+            var aidChosen = roster.MobilityAids is { Length: > 0 };
+            var joining = residents.Where(r => !aidChosen || roster.MobilityAids!.Contains(r.Aid)).Select(r => r.Name).ToList();
             var listed = joining.Count == 0 ? "No resident uses the chosen aids." : string.Join(", ", joining);
             return Ok(new OutingRosterAnswer(listed));
         }

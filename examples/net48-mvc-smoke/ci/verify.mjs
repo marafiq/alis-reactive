@@ -1,5 +1,4 @@
-// Proves the classic MVC5 .NET Framework 4.8 app boots the AlisReactive runtime in a real browser
-// and executes a reactive interaction. Fails (non-zero exit) if the reactive behavior does not occur.
+import { createHash } from 'node:crypto';
 import { chromium } from 'playwright';
 
 const url = process.env.SMOKE_URL || 'http://localhost:5000/';
@@ -13,23 +12,43 @@ page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
 
 await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
 
-// 1. The page rendered the plan and the runtime asset loaded.
+for (const [selector, attribute] of [
+  ['script[src*="/Content/AlisReactive/js/alis-reactive.js"]', 'src'],
+  ['link[href*="/Content/AlisReactive/css/alis-reactive.css"]', 'href'],
+  ['link[href*="/Content/AlisReactive.DesignSystem/css/design-system.css"]', 'href'],
+  ['link[href*="/Content/AlisReactive.Native/css/native.css"]', 'href'],
+]) {
+  const linked = await page.locator(selector).getAttribute(attribute);
+  if (!linked) throw new Error(`${selector} is not on the page.`);
+  const served = await (await page.request.get(new URL(linked, url).toString())).body();
+  const version = createHash('sha256').update(served).digest('base64url');
+  if (!linked.endsWith(`?v=${version}`)) throw new Error(`${linked} is not versioned by its content (expected ?v=${version}).`);
+}
+
 const planScript = page.locator('script[type="application/json"][data-reactive-plan]');
 if ((await planScript.count()) === 0) throw new Error('No [data-reactive-plan] script — RenderPlan did not emit the plan.');
 
-// 2. The proof block starts hidden, becomes visible only when the runtime executes the reaction.
 const proof = page.locator('#reactive-proof');
 if (await proof.isVisible()) throw new Error('#reactive-proof is visible before interaction — initial hidden state wrong.');
 
 await page.locator('input[type=checkbox]').first().check();
 await proof.waitFor({ state: 'visible', timeout: 10000 });
 
+const save = page.getByRole('button', { name: 'Save the name' });
+const refusal = page.getByText('Enter your name.', { exact: true });
+const saved = page.getByText('The server saved the name.', { exact: true });
+await save.click();
+await refusal.waitFor({ state: 'visible', timeout: 10000 });
+if (await saved.isVisible()) throw new Error('The empty name reached the server: the rules of the validator registered through DependencyResolver did not run in the browser.');
+await page.getByLabel('Name', { exact: true }).fill('Ada Lovelace');
+await save.click();
+await saved.waitFor({ state: 'visible', timeout: 10000 });
+if (await refusal.isVisible()) throw new Error('The refusal stayed after a valid name was saved.');
+
 await page.screenshot({ path: shot, fullPage: true });
-console.log('PASS: net48 runtime booted and the reactive reaction ran (#reactive-proof shown after checkbox toggle).');
+console.log('PASS: net48 runtime booted, the reactive reaction ran, the browser refused an empty name with the rule of a validator registered through DependencyResolver, and the server saved a valid one.');
 if (consoleErrors.length) console.log('Browser console errors (non-fatal):\n  ' + consoleErrors.join('\n  '));
 
-// 3. A date in the query reaches an MVC 5 action as the session's clock and offset, in a zone west of UTC
-//    and one east of it on the half hour. IIS refuses a date with its time in a path segment (404.0, 404.11).
 const dayPlans = [
   { timeZone: 'America/Los_Angeles', plan: 'Wednesday plan starts at 9:00 AM (UTC-08:00).' },
   { timeZone: 'Asia/Kolkata', plan: 'Wednesday plan starts at 10:30 PM (UTC+05:30).' },

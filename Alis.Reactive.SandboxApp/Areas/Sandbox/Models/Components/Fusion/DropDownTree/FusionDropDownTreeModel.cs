@@ -1,36 +1,74 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.DropDownTree
 {
     public sealed class FusionDropDownTreeModel
     {
-        public string[]? ResidentIds { get; set; }
+        public string? Resident { get; set; }
+
+        public string? RoomNumber { get; set; }
+
+        public string[]? Room { get; set; }
+
+        public IReadOnlyList<MovingInResident> MovingIn { get; init; } = [];
+
+        public IReadOnlyList<BuildingPlanNode> BuildingPlan { get; init; } = [];
     }
 
-    public sealed class DropDownTreeResidentNode
+    public sealed class MovingInResident
     {
-        public string Value { get; set; } = string.Empty;
+        public string Id { get; init; } = "";
 
-        public string Text { get; set; } = string.Empty;
-
-        public string? ParentValue { get; set; }
-
-        public bool HasChildren { get; set; }
-
-        public bool Expanded { get; set; }
+        public string Name { get; init; } = "";
     }
 
-    public sealed class FusionDropDownTreeEchoRequest
+    public sealed class BuildingPlanNode
     {
-        public string[]? Value { get; set; }
+        public string Value { get; init; } = "";
 
-        public string? Text { get; set; }
+        public string Text { get; init; } = "";
+
+        public string? ParentValue { get; init; }
+
+        public bool HasChildren { get; init; }
+
+        public bool Expanded { get; init; }
     }
 
-    public sealed class FusionDropDownTreeEchoResponse
+    public sealed class DepositQuery
     {
-        public string ValueSummary { get; set; } = string.Empty;
+        public string? Resident { get; set; }
+    }
 
-        public string? Text { get; set; }
+    public sealed class DepositHold
+    {
+        public string[] Room { get; init; } = [];
+    }
 
-        public string Summary { get; set; } = string.Empty;
+    public sealed class RoomHoldRequest
+    {
+        public string? Resident { get; set; }
+
+        public string[]? From { get; set; }
+
+        public string[]? To { get; set; }
+    }
+
+    public sealed class RoomHoldNote
+    {
+        public string Message { get; init; } = "";
+    }
+
+    public sealed class RoomAssignmentBooked
+    {
+        public string Message { get; init; } = "";
+    }
+
+    public sealed class RoomAssignmentValidator : ReactiveValidator<FusionDropDownTreeModel>
+    {
+        public RoomAssignmentValidator()
+        {
+            RuleFor(x => x.Resident).NotEmpty().WithMessage("Choose who is moving in.");
+            RuleFor(x => x.Room).NotEmpty().WithMessage("Choose a room on the building plan.");
+        }
     }
 }

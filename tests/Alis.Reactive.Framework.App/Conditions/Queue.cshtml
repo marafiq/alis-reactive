@@ -1,0 +1,31 @@
+@using Alis.Reactive.Framework.App.Conditions
+@model QueuePage
+@{
+    ViewData["Title"] = "Take a number at reception";
+    var plan = Html.ReactivePlan<QueuePage>();
+}
+<h1>Take a number at reception</h1>
+
+@plan.Dispenser("dispenser")
+
+<p>Your number: <span id="your-number"></span></p>
+<p>Your number from the desk: <span id="desk-number"></span></p>
+
+@(plan.Button("take", "Take a number")
+    .Reactive(button => button.Click, p =>
+    {
+        var number = p.Component<Dispenser>("dispenser").Take();
+        p.When(number).Gt(0)
+            .Then(t => t.Element("your-number").Text.Set(number))
+            .Else(e => e.Element("your-number").Text.Set("no number"));
+    }))
+@(plan.Button("ask-desk", "Ask the desk for a number")
+    .Reactive(button => button.Click, p =>
+    {
+        var number = p.Component<Dispenser>("dispenser").TakeFromTheDesk();
+        p.When(number).Gt(0)
+            .Then(t => t.Element("desk-number").Text.Set(number))
+            .Else(e => e.Element("desk-number").Text.Set("no number"));
+    }))
+
+@Html.RenderPlan(plan)

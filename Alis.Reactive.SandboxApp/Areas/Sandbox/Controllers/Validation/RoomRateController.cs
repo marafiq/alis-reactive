@@ -4,34 +4,31 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
 {
-    /// <summary>
-    /// Room rate sheet: the administrator names a room and sets its monthly rate. The confirmation
-    /// repeats what the server received, so a room only reaches the sheet named and priced.
-    /// </summary>
     [Area("Sandbox")]
     [Route("Sandbox/Validation/RoomRate")]
     public class RoomRateController : Controller
     {
+        private readonly RoomRateValidator _validator;
+
+        public RoomRateController(RoomRateValidator validator)
+        {
+            _validator = validator;
+        }
+
         [HttpGet("")]
-        public IActionResult Index() =>
-            View("~/Areas/Sandbox/Views/Validation/RoomRate/Index.cshtml", new RoomRateModel());
+        public IActionResult Index()
+            => View("~/Areas/Sandbox/Views/Validation/RoomRate/Index.cshtml", new RoomRateModel());
 
         [HttpPost("Add")]
         public IActionResult Add([FromBody] RoomRateModel? room)
         {
             if (room == null) return BadRequest();
 
-            var result = new RoomRateValidator().Validate(room);
+            var result = _validator.Validate(room);
             if (!result.IsValid)
-            {
-                var errors = result.Errors
-                    .GroupBy(error => error.PropertyName)
-                    .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-                return BadRequest(new { errors });
-            }
+                return BadRequest(new { errors = result.ErrorsByField });
 
             var rate = room.MonthlyRate.ToString("#,##0.00", CultureInfo.InvariantCulture);
-            // The validator requires the community fee.
             var communityFee = room.CommunityFee!.Value;
             var fee = communityFee == 0m
                 ? "community fee waived"

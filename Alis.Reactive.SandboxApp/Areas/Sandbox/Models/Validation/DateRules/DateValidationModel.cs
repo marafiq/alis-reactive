@@ -4,5 +4,11 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     {
         public DateTime? AdmissionDate { get; set; }
         public DateTime? DischargeDate { get; set; }
+
+        public DateTime? CarePlanReviewDate { get; set; }
+
+        public DateTime? FollowUpVisitDate { get; set; }
+
+        public DateTime? MoveOutInspectionDate { get; set; }
     }
 }

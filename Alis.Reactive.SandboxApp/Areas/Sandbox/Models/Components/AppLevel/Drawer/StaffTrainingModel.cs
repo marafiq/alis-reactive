@@ -1,15 +1,9 @@
 namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
 {
-    /// <summary>
-    /// Staff training: the coordinator records a caregiver's training in the drawer, picking courses,
-    /// a date and a trainer from lists and a calendar that open over the form, and reads the training
-    /// the caregiver completed before.
-    /// </summary>
     public class StaffTrainingPageModel
     {
     }
 
-    /// <summary>The training record the coordinator fills in the drawer.</summary>
     public class StaffTrainingRecordModel
     {
         public string? Notes { get; set; }
@@ -18,16 +12,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? TrainerId { get; set; }
     }
 
-    /// <summary>A course a caregiver can complete.</summary>
     public sealed record TrainingCourse(string Value, string Text);
 
-    /// <summary>A trainer who runs courses.</summary>
     public sealed record TrainingTrainer(string Id, string Name);
 
-    /// <summary>A course the caregiver completed, as the training history lists it.</summary>
     public sealed record CompletedTraining(string Course, string CompletedOn, string Trainer);
 
-    /// <summary>The courses and trainers the training form offers, and the training already completed.</summary>
     public static class StaffTrainingOptions
     {
         public static readonly IReadOnlyList<TrainingCourse> Courses =
@@ -51,6 +41,5 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         ];
     }
 
-    /// <summary>The confirmation the server returns once the training is recorded.</summary>
     public sealed record StaffTrainingRecorded(string Confirmation);
 }

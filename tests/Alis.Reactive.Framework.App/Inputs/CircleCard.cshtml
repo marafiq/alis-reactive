@@ -1,0 +1,21 @@
+@using Alis.Reactive.Framework.App.Inputs
+@model ContactCard
+@{
+    // A card rendered for one item of the circle's list: its inputs bind under the item's prefix, and its own
+    // plan's save sends the card's inputs as a JSON body.
+    var heading = (string)ViewData["Heading"]!;
+    var slug = (string)ViewData["Slug"]!;
+    var plan = Html.ReactivePlan<ContactCard>();
+}
+<section id="card-@slug">
+    <h2>@heading</h2>
+
+    @{ Html.InputField(plan, m => m.Name, o => o.Label($"{heading} name")).Entry(); }
+
+    @(plan.Button($"save-{slug}", $"Save the {heading.ToLowerInvariant()}")
+        .Reactive(button => button.Click, p => p.Post("/Inputs/Circle")
+            .Gather(g => g.Form($"card-{slug}"))
+            .Response(r => r.OnSuccess<CircleEcho>((echo, s) => s.Element("circle-bound").Text.Set(echo.Get(x => x.Summary))))))
+</section>
+
+@Html.RenderPlan(plan)

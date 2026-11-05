@@ -6,6 +6,11 @@ public class LoadStepRequest
     public int Step { get; set; }
 }
 
+public sealed class PhysicianSearchQuery
+{
+    public string? Q { get; set; }
+}
+
 public class AlertElopementRequest
 {
     public string ResidentName { get; set; } = "";

@@ -1,0 +1,302 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+
+namespace Alis.Reactive.ContractGeneration
+{
+    internal static class GrammarContract
+    {
+        private const string Grammar = "Alis.Reactive.Grammar";
+        private const string Root = Grammar + ".PlanDocument";
+        private const string Discriminator = Grammar + ".PlanNodeDiscriminator`1";
+        private const string ScalarName = Grammar + ".Scalar";
+        private const string BodyStepName = Grammar + ".BodyStep";
+
+        internal static Contract Read(Assembly assembly)
+        {
+            var walk = new Walk();
+            walk.Visit(assembly.GetType(Root, throwOnError: true)!);
+            return new Contract(walk.Declarations);
+        }
+
+        internal sealed class Contract
+        {
+            private readonly IReadOnlyList<Declaration> _declarations;
+
+            internal Contract(IReadOnlyList<Declaration> declarations)
+            {
+                _declarations = declarations;
+            }
+
+            internal string TypeScript()
+                => string.Join("\n\n", _declarations.Select(declaration => declaration.TypeScript())) + "\n";
+
+            internal string Schema()
+            {
+                var definitions = new JsonObject();
+                foreach (var declaration in _declarations) definitions[declaration.Name] = declaration.Schema();
+                var schema = new JsonObject
+                {
+                    ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+                    ["$ref"] = "#/$defs/" + _declarations[0].Name,
+                    ["$defs"] = definitions,
+                };
+                return schema.ToJsonString(new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                }) + "\n";
+            }
+        }
+
+        private sealed class Walk
+        {
+            private readonly HashSet<Type> _visited = new HashSet<Type>();
+
+            internal List<Declaration> Declarations { get; } = new List<Declaration>();
+
+            internal void Visit(Type type)
+            {
+                if (!_visited.Add(type)) return;
+
+                if (type.IsEnum)
+                {
+                    Declarations.Add(new Names(type.Name, Enum.GetNames(type).Select(JsonNamingPolicy.CamelCase.ConvertName).ToList()));
+                    return;
+                }
+                if (type.FullName == ScalarName)
+                {
+                    Declarations.Add(new Builtin(type.Name, new[] { "string", "number", "boolean", "null" }, new[] { "string", "number", "boolean", "null" }));
+                    return;
+                }
+                if (type.FullName == BodyStepName)
+                {
+                    Declarations.Add(new Builtin(type.Name, new[] { "string", "number" }, new[] { "string", "integer" }));
+                    return;
+                }
+                if (IsFamily(type))
+                {
+                    var variants = Variants(type);
+                    Declarations.Add(new Family(type.Name, variants.Select(variant => variant.Name).ToList()));
+                    foreach (var variant in variants) Visit(variant);
+                    return;
+                }
+
+                if (!type.IsSealed)
+                    throw new InvalidOperationException($"{type.Name} is a node of the grammar and is not sealed.");
+                var members = Members(type);
+                Declarations.Add(new Node(type.Name, members));
+                foreach (var member in members)
+                    if (member.Reference.Referenced != null) Visit(member.Reference.Referenced);
+            }
+        }
+
+        private static bool IsFamily(Type type)
+        {
+            var converter = type.GetCustomAttribute<JsonConverterAttribute>()?.ConverterType;
+            return type.IsAbstract
+                && converter != null
+                && converter.IsGenericType
+                && converter.GetGenericTypeDefinition().FullName == Discriminator;
+        }
+
+        private static List<Type> Variants(Type family)
+        {
+            var variants = family.Assembly.GetTypes()
+                .Where(type => !type.IsAbstract && family.IsAssignableFrom(type))
+                .OrderBy(type => type.Name, StringComparer.Ordinal)
+                .ToList();
+            foreach (var variant in variants)
+            {
+                var kind = (string)ConstantOf(variant, variant.GetProperty("Kind")
+                    ?? throw new InvalidOperationException($"{variant.Name} is a variant of {family.Name} and declares no Kind."));
+                var expected = char.ToUpperInvariant(kind[0]) + kind.Substring(1) + family.Name;
+                if (variant.Name != expected)
+                {
+                    throw new InvalidOperationException(
+                        $"{variant.Name} writes kind \"{kind}\" of {family.Name}; the class is named {expected}.");
+                }
+            }
+            return variants;
+        }
+
+        private static List<Member> Members(Type node)
+        {
+            var nullability = new NullabilityInfoContext();
+            var members = new List<Member>();
+            foreach (var property in node.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                         .Where(p => p.GetMethod != null && p.GetMethod.IsPublic)
+                         .Where(p => p.GetCustomAttribute<JsonIgnoreAttribute>() == null)
+                         .OrderBy(p => p.MetadataToken))
+            {
+                if (nullability.Create(property).ReadState == NullabilityState.Nullable)
+                    throw new InvalidOperationException($"{node.Name}.{property.Name} is nullable; every member of a node is written.");
+                var name = property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name
+                    ?? JsonNamingPolicy.CamelCase.ConvertName(property.Name);
+                var reference = property.Name is "Kind" or "Version"
+                    ? Reference.Constant(ConstantOf(node, property))
+                    : Reference.Of(property.PropertyType, node.Name + "." + property.Name);
+                members.Add(new Member(name, reference));
+            }
+            return members;
+        }
+
+        private static object ConstantOf(Type node, PropertyInfo property)
+            => property.GetValue(RuntimeHelpers.GetUninitializedObject(node))!;
+
+        private sealed class Reference
+        {
+            private Reference(string typeScript, JsonNode schema, Type? referenced)
+            {
+                TypeScript = typeScript;
+                Schema = schema;
+                Referenced = referenced;
+            }
+
+            internal string TypeScript { get; }
+            internal JsonNode Schema { get; }
+            internal Type? Referenced { get; }
+
+            internal static Reference Constant(object value)
+                => new Reference(JsonSerializer.Serialize(value), new JsonObject { ["const"] = JsonValue.Create(value) }, null);
+
+            internal static Reference Of(Type type, string member)
+            {
+                if (type == typeof(string)) return new Reference("string", Typed("string"), null);
+                if (type == typeof(bool)) return new Reference("boolean", Typed("boolean"), null);
+                if (type == typeof(int) || type == typeof(long)) return new Reference("number", Typed("integer"), null);
+                if (type == typeof(double) || type == typeof(decimal)) return new Reference("number", Typed("number"), null);
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
+                {
+                    var item = Of(type.GetGenericArguments()[0], member);
+                    return new Reference(item.TypeScript + "[]", new JsonObject { ["type"] = "array", ["items"] = item.Schema }, item.Referenced);
+                }
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>)
+                    && type.GetGenericArguments()[0] == typeof(string))
+                {
+                    var value = Of(type.GetGenericArguments()[1], member);
+                    return new Reference("Record<string, " + value.TypeScript + ">",
+                        new JsonObject { ["type"] = "object", ["additionalProperties"] = value.Schema }, value.Referenced);
+                }
+                if (type.IsEnum || type.FullName == ScalarName || type.FullName == BodyStepName || (type.IsClass && type.Namespace == Grammar))
+                    return new Reference(type.Name, new JsonObject { ["$ref"] = "#/$defs/" + type.Name }, type);
+                throw new InvalidOperationException($"{member} is a {type.FullName}; the grammar's type table has no row for it.");
+            }
+
+            private static JsonObject Typed(string type) => new JsonObject { ["type"] = type };
+        }
+
+        private sealed class Member
+        {
+            internal Member(string name, Reference reference)
+            {
+                Name = name;
+                Reference = reference;
+            }
+
+            internal string Name { get; }
+            internal Reference Reference { get; }
+        }
+
+        internal abstract class Declaration
+        {
+            private protected Declaration(string name)
+            {
+                Name = name;
+            }
+
+            internal string Name { get; }
+
+            internal abstract string TypeScript();
+
+            internal abstract JsonNode Schema();
+
+            private protected string Union(IEnumerable<string> alternatives)
+                => "export type " + Name + " =\n" + string.Join("\n", alternatives.Select(alternative => "  | " + alternative)) + ";";
+        }
+
+        private sealed class Node : Declaration
+        {
+            private readonly IReadOnlyList<Member> _members;
+
+            internal Node(string name, IReadOnlyList<Member> members) : base(name)
+            {
+                _members = members;
+            }
+
+            internal override string TypeScript()
+            {
+                var text = new StringBuilder("export interface ").Append(Name).Append(" {\n");
+                foreach (var member in _members)
+                    text.Append("  ").Append(member.Name).Append(": ").Append(member.Reference.TypeScript).Append(";\n");
+                return text.Append('}').ToString();
+            }
+
+            internal override JsonNode Schema()
+            {
+                var properties = new JsonObject();
+                foreach (var member in _members) properties[member.Name] = member.Reference.Schema.DeepClone();
+                return new JsonObject
+                {
+                    ["type"] = "object",
+                    ["properties"] = properties,
+                    ["required"] = new JsonArray(_members.Select(member => (JsonNode)member.Name).ToArray()),
+                    ["additionalProperties"] = false,
+                };
+            }
+        }
+
+        private sealed class Family : Declaration
+        {
+            private readonly IReadOnlyList<string> _variants;
+
+            internal Family(string name, IReadOnlyList<string> variants) : base(name)
+            {
+                _variants = variants;
+            }
+
+            internal override string TypeScript() => Union(_variants);
+
+            internal override JsonNode Schema()
+                => new JsonObject { ["oneOf"] = new JsonArray(_variants.Select(variant => (JsonNode)new JsonObject { ["$ref"] = "#/$defs/" + variant }).ToArray()) };
+        }
+
+        private sealed class Names : Declaration
+        {
+            private readonly IReadOnlyList<string> _values;
+
+            internal Names(string name, IReadOnlyList<string> values) : base(name)
+            {
+                _values = values;
+            }
+
+            internal override string TypeScript() => Union(_values.Select(value => JsonSerializer.Serialize(value)));
+
+            internal override JsonNode Schema()
+                => new JsonObject { ["enum"] = new JsonArray(_values.Select(value => (JsonNode)value).ToArray()) };
+        }
+
+        private sealed class Builtin : Declaration
+        {
+            private readonly IReadOnlyList<string> _typeScript;
+            private readonly IReadOnlyList<string> _schemaTypes;
+
+            internal Builtin(string name, IReadOnlyList<string> typeScript, IReadOnlyList<string> schemaTypes) : base(name)
+            {
+                _typeScript = typeScript;
+                _schemaTypes = schemaTypes;
+            }
+
+            internal override string TypeScript() => Union(_typeScript);
+
+            internal override JsonNode Schema()
+                => new JsonObject { ["type"] = new JsonArray(_schemaTypes.Select(type => (JsonNode)type).ToArray()) };
+        }
+    }
+}

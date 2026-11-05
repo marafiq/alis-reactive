@@ -1,0 +1,9 @@
+@using Alis.Reactive.Framework.App.Partials
+@model INamedVisitor
+@{
+    // A partial typed to an interface: no class declares the visitor it binds.
+    var plan = Html.ReactivePlan<INamedVisitor>();
+}
+@{ Html.InputField(plan, m => m.Visitor, o => o.Label("Visitor")).Entry(); }
+
+@Html.RenderPlan(plan)

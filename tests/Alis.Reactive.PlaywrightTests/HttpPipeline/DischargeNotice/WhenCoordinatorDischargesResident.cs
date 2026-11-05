@@ -1,15 +1,7 @@
+using System.Collections.Concurrent;
+
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.DischargeNotice;
 
-/// <summary>
-/// As a coordinator, I want a family notice that failed to show only what the notice service said,
-/// so that I never read the discharge confirmation as the reason the family was not told.
-/// </summary>
-/// <remarks>
-/// The family notice is a request chained after the discharge, and both notice services are down:
-/// Margaret Hill's family is reached by text message, whose service answers 503 with no body; Arthur
-/// Bell's by email, whose service answers 503 with its reason. Each failure writes the reason line
-/// before the status line, so once the status line shows the failure the reason line is final.
-/// </remarks>
 [TestFixture]
 public class WhenCoordinatorDischargesResident : PlaywrightTestBase
 {
@@ -51,5 +43,27 @@ public class WhenCoordinatorDischargesResident : PlaywrightTestBase
         await Expect(FamilyReason("arthur")).ToHaveTextAsync("The email service is down for maintenance.");
         await Expect(DischargeStatus("arthur")).ToHaveTextAsync("Arthur Bell is discharged.");
         AssertNoConsoleErrorsExcept(NoticeServiceDown);
+    }
+
+    [Test]
+    public async Task a_discharge_the_office_refuses_sends_the_family_no_notice()
+    {
+        await NavigateAndBoot();
+        var phoneNotices = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Url.Contains("/DischargeNotice/NotifyFamily") && (request.PostData ?? "").Contains("phone"))
+                phoneNotices.Enqueue(request.Url);
+        };
+
+        await ClickWhenStable(Discharge("rosa"));
+        await Expect(DischargeStatus("rosa")).ToHaveTextAsync("Rosa Diaz cannot be discharged until her physician signs the discharge order.");
+
+        await ClickWhenStable(Discharge("margaret"));
+        await Expect(FamilyStatus("margaret")).ToHaveTextAsync("The family was not notified.");
+
+        await Expect(FamilyStatus("rosa")).ToHaveTextAsync("Family not contacted yet.");
+        Assert.That(phoneNotices, Is.Empty, "A refused discharge sends no family notice.");
+        AssertNoConsoleErrorsExcept("the server responded with a status of 409", NoticeServiceDown);
     }
 }

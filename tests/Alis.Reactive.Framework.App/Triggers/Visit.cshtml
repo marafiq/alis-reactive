@@ -1,0 +1,13 @@
+@using Alis.Reactive.Framework.App.Triggers
+@model VisitCard
+@{
+    var plan = Html.ReactivePlan<VisitCard>();
+    var tally = plan.RegisterPlugin<Tally>();
+}
+<section>
+    <h2>A visit</h2>
+</section>
+
+@{ Html.On(plan, t => t.DomReady(p => tally.Add(10))); }
+
+@Html.RenderPlan(plan)

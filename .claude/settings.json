@@ -1,21 +1,42 @@
 {
+  "permissions": {
+    "deny": [
+      "Bash(git stash)",
+      "Bash(git stash *)",
+      "Bash(git -C * stash)",
+      "Bash(git -C * stash *)",
+      "Bash(dotnet user-secrets list)",
+      "Bash(dotnet user-secrets list *)",
+      "Bash(dotnet user-secrets * list)",
+      "Bash(dotnet user-secrets * list *)",
+      "Read(~/.microsoft/usersecrets/**)",
+      "Read(//**/AppData/Roaming/Microsoft/UserSecrets/**)",
+      "Bash(dotnet test)",
+      "Bash(dotnet test .)",
+      "Bash(dotnet test -*)",
+      "Bash(dotnet test *.sln*)",
+      "Bash(dotnet test *PlaywrightTests*)",
+      "Bash(dotnet vstest *)"
+    ]
+  },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/install-git-hooks.sh\" >/dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-generated.mjs\""
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-playwright-wrapper.mjs\""
           }
         ]
       }

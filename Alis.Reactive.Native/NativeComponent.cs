@@ -1,16 +1,30 @@
 namespace Alis.Reactive.Native
 {
     /// <summary>
-    /// Base class for framework-owned native HTML components such as text inputs and checkboxes.
+    /// Base for native HTML elements declared as components: the element itself is the JavaScript
+    /// object, so its members are the element's own properties, methods and DOM events.
     /// </summary>
     /// <remarks>
-    /// Sealed subclasses constrain which extension methods are available at compile time.
-    /// For example, <c>SetChecked</c> only appears on <see cref="ComponentRef{TComponent,TModel}"/>
-    /// when <c>TComponent</c> is <c>NativeCheckBox</c>.
+    /// <para>Declare each member by the element's own name; the C# name, camel-cased, is the JavaScript name:</para>
+    /// <code>
+    /// public sealed class NativeCheckBox : NativeComponent, IInputComponent
+    /// {
+    ///     public Property&lt;bool&gt; Checked =&gt; Property&lt;bool&gt;();
+    ///     public void Focus() =&gt; Method();
+    ///     public Event&lt;NativeCheckBoxChangeArgs&gt; Change =&gt; Event&lt;NativeCheckBoxChangeArgs&gt;();
+    ///     ComponentInput IInputComponent.Input =&gt; ComponentInput.Of(Checked, committedBy: Change);
+    /// }
+    /// </code>
+    /// <para>A page reaches the element and uses its members directly, one statement each:</para>
+    /// <code>
+    /// var ambulatory = p.Component&lt;NativeCheckBox&gt;(m =&gt; m.Ambulatory);
+    /// ambulatory.Checked.Set(true);
+    /// ambulatory.Focus();
+    /// </code>
     /// </remarks>
-    public abstract class NativeComponent : IComponent
+    public abstract class NativeComponent : Component
     {
         /// <inheritdoc />
-        public string Vendor => "native";
+        public sealed override ComponentVendor Vendor => ComponentVendor.Native;
     }
 }

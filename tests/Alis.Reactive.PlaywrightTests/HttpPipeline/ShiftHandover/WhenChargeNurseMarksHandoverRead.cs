@@ -1,14 +1,8 @@
+using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
+
 namespace Alis.Reactive.PlaywrightTests.HttpPipeline.ShiftHandover;
 
-/// <summary>
-/// As the night charge nurse, I want marking a handover note read from its link to record my shift and
-/// to give me the page back afterwards, so that I can move straight on to the next note.
-/// </summary>
-/// <remarks>
-/// Each "Mark Read" link sends its request with an X-Shift header, covers the page with the loader while
-/// it is sent, and lifts the loader once the request ends, whatever the answer and even with none. Arthur
-/// Lee's note was already marked read by the day shift, so the server refuses it.
-/// </remarks>
 [TestFixture]
 public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
 {
@@ -17,7 +11,7 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
 
     private SemaphoreSlim _markReadReleased = null!;
 
-    private ILocator MarkRead(string resident) => Page.GetByTestId($"mark-read-{resident}");
+    private ILocator MarkRead(string resident) => Page.Locator($"#mark-read-{resident}");
     private ILocator HandoverStatus => Page.Locator("#handover-status");
     private ILocator Loader => Page.Locator("#alis-loader");
 
@@ -27,8 +21,6 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
         await WaitForTraceMessage("booted", 10000);
     }
 
-    // The request is held at the browser until the test releases it, then sent on unchanged, so the
-    // loader can be seen covering the page before any answer arrives.
     private async Task HoldMarkReadUntilReleased()
     {
         _markReadReleased = new SemaphoreSlim(0);
@@ -37,6 +29,28 @@ public class WhenChargeNurseMarksHandoverRead : PlaywrightTestBase
             await _markReadReleased.WaitAsync();
             await route.ContinueAsync();
         });
+    }
+
+    [Test]
+    public async Task a_ctrl_click_opens_the_note_in_a_new_tab_and_marks_nothing_read()
+    {
+        await NavigateAndBoot();
+        var markReads = new ConcurrentQueue<string>();
+        Page.Request += (_, request) =>
+        {
+            if (request.Method == "POST" && request.Url.Contains("/ShiftHandover/MarkRead/")) markReads.Enqueue(request.Url);
+        };
+
+        var noteTab = await Context.RunAndWaitForPageAsync(async () =>
+        {
+            await MarkRead("helen").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.ControlOrMeta } });
+        });
+
+        await Expect(noteTab).ToHaveURLAsync(new Regex("/Sandbox/HttpPipeline/ShiftHandover/MarkRead/helen$"), new() { Timeout = 10000 });
+        await Expect(noteTab.Locator("body")).ToContainTextAsync("Helen Park's handover note is open.", new() { Timeout = 10000 });
+        await Expect(HandoverStatus).ToHaveTextAsync("No note marked read yet.");
+        Assert.That(markReads, Is.Empty, "A Ctrl or Cmd click sends no request from the page.");
+        AssertNoConsoleErrors();
     }
 
     [Test]

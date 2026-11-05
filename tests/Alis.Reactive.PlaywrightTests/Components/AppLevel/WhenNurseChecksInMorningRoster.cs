@@ -1,15 +1,5 @@
 namespace Alis.Reactive.PlaywrightTests.Components.AppLevel;
 
-/// <summary>
-/// As a nurse, I want the roster to redraw from the server while the loader covers the resident it is
-/// working on, so that once the roster redraws the page goes on: the loader hides, or moves to the
-/// next panel the server is loading.
-/// </summary>
-/// <remarks>
-/// The redrawn roster replaces the row the loader covers, and the next step of the same answer hides
-/// or shows the loader. Each request is held at the browser until the test releases it, so where the
-/// loader sits while the server works is checked before the answer arrives.
-/// </remarks>
 [TestFixture]
 public class WhenNurseChecksInMorningRoster : PlaywrightTestBase
 {
@@ -29,7 +19,7 @@ public class WhenNurseChecksInMorningRoster : PlaywrightTestBase
 
     private async Task NavigateAndBoot()
     {
-        _checkInReleased = await HoldRequests("**/Sandbox/Components/Loader/Roster/CheckIn**");
+        _checkInReleased = await HoldRequests("**/Sandbox/Components/Loader/Roster/CheckIn/**");
         _rowsReleased = await HoldRequests("**/Sandbox/Components/Loader/Roster/Rows");
         _careSummaryReleased = await HoldRequests("**/Sandbox/Components/Loader/Roster/CareSummary");
         await NavigateTo(Path);
@@ -47,7 +37,6 @@ public class WhenNurseChecksInMorningRoster : PlaywrightTestBase
         return released;
     }
 
-    // A loader taken off the page also counts as hidden, so it must be attached as well.
     private async Task ExpectTheLoaderOnThePageAndHidden()
     {
         await Expect(Loader).ToBeAttachedAsync();

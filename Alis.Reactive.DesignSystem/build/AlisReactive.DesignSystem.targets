@@ -1,0 +1,17 @@
+<Project>
+
+  <PropertyGroup>
+    <AlisReactiveThemeFolder Condition="'$(AlisReactiveThemeFolder)' == ''">$(MSBuildProjectDirectory)\Styles\AlisReactive.DesignSystem\</AlisReactiveThemeFolder>
+    <_AlisReactiveThemeSource Condition="Exists('$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css')">$(MSBuildThisFileDirectory)..\staticwebassets\css\theme.css</_AlisReactiveThemeSource>
+    <_AlisReactiveThemeSource Condition="'$(_AlisReactiveThemeSource)' == ''">$(MSBuildThisFileDirectory)..\css\theme.css</_AlisReactiveThemeSource>
+  </PropertyGroup>
+
+  <Target Name="CopyAlisReactiveTheme" BeforeTargets="BeforeBuild" Condition="'$(AlisReactiveThemeFolder)' != 'none'">
+    <Copy SourceFiles="$(_AlisReactiveThemeSource)" DestinationFolder="$(AlisReactiveThemeFolder)" SkipUnchangedFiles="true" />
+    <WriteLinesToFile File="$([MSBuild]::EnsureTrailingSlash('$(AlisReactiveThemeFolder)')).gitignore"
+                      Lines="# Written by AlisReactive.DesignSystem on every build: the theme it ships, for this project's stylesheet to import. Build output, so git ignores this folder.;*"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
+  </Target>
+
+</Project>

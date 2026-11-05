@@ -28,4 +28,9 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public string? City { get; set; }
         public string? ZipCode { get; set; }
     }
+
+    public static class ResidentEvents
+    {
+        public static readonly AppEvent ZipcodeValidated = AppEvent.Declare();
+    }
 }

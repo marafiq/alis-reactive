@@ -23,8 +23,8 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
                          "Use Parallel(...) for concurrent requests or separate triggers for independent requests.",
             helpLinkUri: null);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Rule);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+            => ImmutableArray.Create(Rule);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -35,13 +35,15 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             context.RegisterCompilationStartAction(compilationCtx =>
             {
                 var pipelineBuilderType = compilationCtx.Compilation.GetTypeByMetadataName(
-                    "Alis.Reactive.Builders.PipelineBuilder`1");
+                    "Alis.Reactive.PipelineBuilder`1");
+                var requestExtensionsType = compilationCtx.Compilation.GetTypeByMetadataName(
+                    "Alis.Reactive.RequestExtensions");
 
-                if (pipelineBuilderType == null)
+                if (pipelineBuilderType == null || requestExtensionsType == null)
                     return;
 
                 compilationCtx.RegisterSyntaxNodeAction(
-                    nodeCtx => AnalyzeLambda(nodeCtx, pipelineBuilderType),
+                    nodeCtx => AnalyzeLambda(nodeCtx, pipelineBuilderType, requestExtensionsType),
                     SyntaxKind.SimpleLambdaExpression,
                     SyntaxKind.ParenthesizedLambdaExpression);
             });
@@ -49,7 +51,8 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
 
         private static void AnalyzeLambda(
             SyntaxNodeAnalysisContext context,
-            INamedTypeSymbol pipelineBuilderType)
+            INamedTypeSymbol pipelineBuilderType,
+            INamedTypeSymbol requestExtensionsType)
         {
             var lambda = (LambdaExpressionSyntax)context.Node;
 
@@ -72,8 +75,10 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
                     continue;
 
                 if (!StartsHttpChainOnParameter(exprStatement.Expression, pipelineParamName,
-                    context.SemanticModel, pipelineBuilderType, context.CancellationToken))
+                    context.SemanticModel, requestExtensionsType, context.CancellationToken))
+                {
                     continue;
+                }
 
                 httpStatementCount++;
                 if (httpStatementCount >= 2)
@@ -83,12 +88,11 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
             }
         }
 
-        /// <summary>Checks whether a fluent chain starts with an HTTP call on the pipeline parameter.</summary>
         private static bool StartsHttpChainOnParameter(
             ExpressionSyntax expression,
             string parameterName,
             SemanticModel semanticModel,
-            INamedTypeSymbol pipelineBuilderType,
+            INamedTypeSymbol requestExtensionsType,
             System.Threading.CancellationToken cancellationToken)
         {
             var current = expression;
@@ -103,7 +107,7 @@ namespace Alis.Reactive.Analyzers.HttpPipeline
                     var symbol = semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol;
                     return symbol is IMethodSymbol methodSymbol
                         && SymbolEqualityComparer.Default.Equals(
-                            methodSymbol.ContainingType.OriginalDefinition, pipelineBuilderType);
+                            (methodSymbol.ReducedFrom ?? methodSymbol).ContainingType, requestExtensionsType);
                 }
 
                 current = memberAccess.Expression;

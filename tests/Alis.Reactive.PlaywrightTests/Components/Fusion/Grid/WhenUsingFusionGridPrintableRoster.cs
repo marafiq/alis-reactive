@@ -13,7 +13,6 @@ public class WhenUsingFusionGridPrintableRoster : PlaywrightTestBase
         await Expect(Page.Locator("#printable-roster-grid .e-row").First)
             .ToBeVisibleAsync(new() { Timeout = 10000 });
 
-        // grid.Print() opens the browser print view in a popup window populated with the rows.
         var printView = await Page.RunAndWaitForPopupAsync(async () =>
         {
             await ClickWhenStable(Page.Locator("#roster-print"));

@@ -1,30 +1,21 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.ProgressButton
 {
     public sealed class FusionProgressButtonModel
     {
+        public bool PassChecked { get; set; }
+
+        public string Pharmacy { get; set; } = "Lakeside";
     }
 
-    public sealed class FusionProgressButtonEchoRequest
+    public sealed class MedicationPassSendRequest
     {
-        public string Content { get; set; } = string.Empty;
-
-        public bool Disabled { get; set; }
-
-        public string CssClass { get; set; } = string.Empty;
-
-        public bool ProgressEnabled { get; set; }
+        public string Pharmacy { get; set; } = string.Empty;
     }
 
-    public sealed class FusionProgressButtonEchoResponse
+    public sealed class MedicationPassSendReply
     {
-        public string Content { get; set; } = string.Empty;
+        public bool ConfirmedOnReceipt { get; init; }
 
-        public bool Disabled { get; set; }
-
-        public string CssClass { get; set; } = string.Empty;
-
-        public bool ProgressEnabled { get; set; }
-
-        public string Summary { get; set; } = string.Empty;
+        public string Reply { get; init; } = string.Empty;
     }
 }

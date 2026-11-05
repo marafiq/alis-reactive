@@ -1,0 +1,28 @@
+@layer theme, base, alis, components, utilities;
+
+@layer alis {
+  .alis-grid-dialog-form {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    line-height: calc(1.25 / 0.875);
+  }
+
+  .alis-grid-dialog-form__field {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .alis-grid-dialog-form__label {
+    font-weight: 500;
+  }
+}
+
+.e-input-group:has(.alis-has-error),
+.e-input-group.alis-has-error {
+  --color-sf-border: var(--color-sf-border-error, #dc2626);
+  --color-sf-border-hover: var(--color-sf-border-error, #dc2626);
+  --color-sf-border-focus: var(--color-sf-border-error, #dc2626);
+}

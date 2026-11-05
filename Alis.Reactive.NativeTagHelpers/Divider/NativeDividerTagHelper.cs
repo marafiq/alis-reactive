@@ -1,15 +1,14 @@
 using System.Text.Encodings.Web;
-using Alis.Reactive.DesignSystem.Layout;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace Alis.Reactive.NativeTagHelpers.Divider;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// Renders a <c>native-divider</c> element as a horizontal rule, optionally with a
 /// centered label.
 /// </summary>
 [HtmlTargetElement("native-divider")]
-public class NativeDividerTagHelper : TagHelper
+public sealed class NativeDividerTagHelper : TagHelper
 {
     /// <summary>
     /// Controls the visual treatment of the rule. Defaults to <see cref="DividerStyle.Plain"/>.
@@ -36,19 +35,19 @@ public class NativeDividerTagHelper : TagHelper
         {
             output.TagName = "div";
             output.TagMode = TagMode.StartTagAndEndTag;
-            output.Attributes.SetAttribute("class", DividerCss.LabeledWrapperClasses(CssClass));
+            output.Attributes.SetAttribute("class", LayoutClasses.Join("alis-divider-labeled", CssClass));
             output.Content.SetHtmlContent(
-                $"<div class=\"{DividerCss.LabeledLineOuterClasses()}\">" +
-                $"<div class=\"{DividerCss.LabeledLineInnerClasses()}\"></div></div>" +
-                $"<div class=\"{DividerCss.LabeledTextWrapperClasses()}\">" +
-                $"<span class=\"{DividerCss.LabeledTextClasses()}\">{HtmlEncoder.Default.Encode(label)}</span></div>");
+                "<div class=\"alis-divider-labeled__line\"><div class=\"alis-divider-labeled__rule\"></div></div>" +
+                "<div class=\"alis-divider-labeled__text-row\">" +
+                $"<span class=\"alis-divider-labeled__text\">{HtmlEncoder.Default.Encode(label)}</span></div>");
             return;
         }
 
         output.TagName = "hr";
         output.TagMode = TagMode.SelfClosing;
-        output.Attributes.SetAttribute("class", Style == DividerStyle.Dashed
-            ? DividerCss.DashedClasses(CssClass)
-            : DividerCss.PlainClasses(CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join(
+            "alis-divider",
+            Style == DividerStyle.Dashed ? "alis-divider--dashed" : "",
+            CssClass));
     }
 }

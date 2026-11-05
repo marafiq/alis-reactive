@@ -1,0 +1,17 @@
+@layer alis {
+  .alis-root .alis-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .alis-root .alis-field:has(> .alis-field__message:not([hidden])) {
+    padding-bottom: 0;
+  }
+
+  .alis-root .alis-field__label {
+    line-height: 1rem;
+    margin-bottom: 0;
+  }
+}

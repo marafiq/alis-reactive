@@ -1,26 +1,40 @@
-namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
+namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models.Components.Fusion.DropDownButton
 {
     public sealed class FusionDropDownButtonModel
     {
+        public string? Wing { get; set; }
     }
 
-    public sealed class FusionDropDownButtonEchoRequest
+    public sealed record ShiftReport(string Id, string Name, bool AfterMidnightCount = false);
+
+    public static class ShiftReports
     {
-        public string Content { get; set; } = string.Empty;
+        public const string IncidentSummary = "incidents";
 
-        public bool Disabled { get; set; }
-
-        public string CssClass { get; set; } = string.Empty;
+        public static readonly IReadOnlyList<ShiftReport> All = new[]
+        {
+            new ShiftReport("handoff", "Shift handoff"),
+            new ShiftReport("medications", "Medication pass"),
+            new ShiftReport(IncidentSummary, "Incident summary"),
+            new ShiftReport("census", "Midnight census", AfterMidnightCount: true)
+        };
     }
 
-    public sealed class FusionDropDownButtonEchoResponse
+    public sealed class ShiftReportRequest
     {
-        public string Content { get; set; } = string.Empty;
+        public string Wing { get; set; } = string.Empty;
 
-        public bool Disabled { get; set; }
+        public string Report { get; set; } = string.Empty;
+    }
 
-        public string CssClass { get; set; } = string.Empty;
+    public sealed class ShiftReportAnswer
+    {
+        public bool Printed { get; set; }
 
-        public string Summary { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+
+        public string[] PrintedReportIds { get; set; } = [];
+
+        public string[] EmptyReportNames { get; set; } = [];
     }
 }

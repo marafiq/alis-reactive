@@ -1,5 +1,4 @@
 @model Step1DemographicsModel
-@using Alis.Reactive.Native.Extensions
 @{
     ViewData["Title"] = "Admission Wizard";
     var screeningId = (string?)ViewBag.ScreeningId ?? "";
@@ -11,9 +10,10 @@
 
     Html.On(plan, t => t.DomReady(p =>
     {
-        p.Post(loadStepUrl,
-            g => g.Static("screeningId", screeningId)
-                  .Static("step", 1))
+        p.Post(loadStepUrl)
+         .Gather<LoadStepRequest>(g => g
+            .Set(x => x.ScreeningId, screeningId)
+            .Set(x => x.Step, 1))
          .Response(r => r.OnSuccess(s => s.Into("step-container")));
     }));
 }

@@ -1,14 +1,13 @@
-using Alis.Reactive.DesignSystem.Layout;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace Alis.Reactive.NativeTagHelpers.Container;
+namespace Alis.Reactive.NativeTagHelpers;
 
 /// <summary>
 /// Renders a <c>native-container</c> element as a page-width container that centers
 /// its content and caps its maximum width.
 /// </summary>
 [HtmlTargetElement("native-container")]
-public class NativeContainerTagHelper : TagHelper
+public sealed class NativeContainerTagHelper : TagHelper
 {
     /// <summary>
     /// Additional HTML classes merged with the generated container classes.
@@ -21,6 +20,6 @@ public class NativeContainerTagHelper : TagHelper
     {
         output.TagName = "div";
         output.TagMode = TagMode.StartTagAndEndTag;
-        output.Attributes.SetAttribute("class", ContainerCss.Classes(CssClass));
+        output.Attributes.SetAttribute("class", LayoutClasses.Join("alis-container", CssClass));
     }
 }

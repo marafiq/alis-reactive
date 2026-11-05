@@ -11,22 +11,24 @@
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\package-lock.json" />
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\package.json" />
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\*.mjs" />
-    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\*.config.ts" />
+    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\*.ts" />
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\runtime\**\*.*" />
-    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\design-system\**\*.*" />
-    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\fusion\**\*.*" />
-    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive\PlanModel\**\*.cs" />
-    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\tools\PlanTypeGenerator\**\*.*" />
+    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\components\**\*.*" />
+    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.DesignSystem\css\**\*.*" />
+    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.DesignSystem\package.json" />
+    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive\Grammar\**\*.cs" />
+    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\tools\PlanContractGenerator\*.cs" />
+    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\tools\PlanContractGenerator\*.csproj" />
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\package.json" />
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\*.mjs" />
-    <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\*.config.ts" />
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\Scripts\**\*.*" />
     <ReactiveBrowserAssetInput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\Styles\**\*.*" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\dist\scripts\alis-reactive.dev.js" />
-    <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\dist\css\design-system.dev.css" />
-    <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.Assets\dist\css\syncfusion.dev.css" />
+    <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.DesignSystem\dist\css\design-system.css" />
+    <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\wwwroot\vendor\syncfusion\ej2.min.js" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\wwwroot\css\sandbox.css" />
     <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\wwwroot\js\sandbox-plugins.js" />
+    <ReactiveBrowserAssetOutput Include="$(AlisReactiveRepositoryRoot)\Alis.Reactive.SandboxApp\wwwroot\js\sandbox-components.js" />
   </ItemGroup>
 
   <Target Name="BuildReactiveBrowserAssetsForCurrentProject"
@@ -39,6 +41,7 @@
         WorkingDirectory="$(AlisReactiveRepositoryRoot)"
         Command="npm run build:all"
         EnvironmentVariables="MSBUILDDISABLENODEREUSE=1" />
+    <Touch Files="@(ReactiveBrowserAssetOutput)" />
   </Target>
 
 </Project>

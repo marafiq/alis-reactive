@@ -7,7 +7,6 @@ public class WhenNotificationPushArrives : PlaywrightTestBase
 
     private ILocator PushBtn => Page.Locator("#btn-push-notification");
     private ILocator NotifCount => Page.Locator("#notif-count");
-    private ILocator NotifMessage => Page.Locator("#notif-message");
     private ILocator NotifPriority => Page.Locator("#notif-priority");
 
     [Test]

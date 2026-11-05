@@ -2,7 +2,6 @@ name: Set up the Alis.Reactive toolchain
 description: >-
   One definition of the build toolchain for every workflow: the .NET SDK pinned by global.json,
   Node with the npm cache, and a NuGet package cache. Change a version here, never in a workflow.
-  Rationale and the caching decisions: docs/CI.md.
 
 inputs:
   node-version:
@@ -26,9 +25,6 @@ runs:
         cache-dependency-path: package-lock.json
 
     - name: Cache the NuGet package folder
-      # actions/setup-dotnet's own cache needs committed packages.lock.json files, which this repo
-      # does not have (docs/CI.md, "Caching"). Keying on the project files gives the same effect:
-      # a hit while no PackageReference changed, a fresh restore when one did.
       uses: actions/cache@v6
       with:
         path: ~/.nuget/packages
