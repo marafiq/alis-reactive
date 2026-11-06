@@ -1,0 +1,99 @@
+@using Alis.Reactive.Components
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Stations
+@model CensusPage
+@{
+    ViewData["Title"] = "Census";
+    var plan = Html.ReactivePlan<CensusPage>();
+}
+<h1>Census</h1>
+
+@plan.NurseStation("north-station", StationBuild.Current,
+    [new BedSeed("Ama Owusu", ["Fall risk"]), new BedSeed("", []), new BedSeed("Kwame Mensah", ["Wound check", "Low fluids"])],
+    new StationSchedule([new CareRound("08:00", true, new Carer("Ruth")), new CareRound("10:00", false, new Carer("Kofi")), new CareRound("12:00", true, new Carer("Abena"))]))
+
+@plan.NurseStation("south-station", StationBuild.Older,
+    [new BedSeed("Esi Boateng", []), new BedSeed("", [])],
+    new StationSchedule([new CareRound("08:00", true, new Carer("Yaw"))]))
+
+@plan.NurseStation("west-station", StationBuild.Current,
+    [new BedSeed("Adjoa Asante", [])],
+    new StationSchedule([new CareRound("08:00", true, new Carer("Yaw")), new CareRound("10:00", true, null), new CareRound("12:00", true, new Carer("Esi"))]))
+
+@plan.NurseStation("east-station", StationBuild.Current, [new BedSeed("Kojo Appiah", [])], null)
+
+@plan.StationCensus("census")
+
+<p>Census: <span id="census-status"></span></p>
+
+@(plan.Button("mark-bed-two", "Mark bed 2 for cleaning")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<NurseStation>("north-station").Beds.At(1).Status.Set("Cleaning")))
+
+@(plan.Button("list-residents", "List residents")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<NurseStation>("north-station").Beds.Select(bed => bed.Resident))))
+
+@(plan.Button("list-occupied-beds", "List occupied beds")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<NurseStation>("north-station").Beds.Where(bed => bed.Occupied).Select(bed => bed.Resident))))
+
+@(plan.Button("count-beds", "Count north beds")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(pipeline.Component<NurseStation>("north-station").Beds.Count())))
+
+@(plan.Button("count-alerts", "Count alerts per bed")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Counts.Set(
+            pipeline.Component<NurseStation>("north-station").Beds.Select(bed => bed.Alerts.Count()))))
+
+@(plan.Button("list-south-occupied-beds", "List south occupied beds")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Listing south");
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<NurseStation>("south-station").Beds.Where(bed => bed.Occupied).Select(bed => bed.Resident));
+        pipeline.Element("census-status").Text.Set("Listed south");
+    }))
+
+@(plan.Button("list-due-carers", "List carers on due rounds")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<NurseStation>("north-station").Schedule.Read(schedule => schedule.Rounds)
+                .Where(round => round.Due)
+                .Select(round => round.Carer!.Name))))
+
+@(plan.Button("list-west-carers", "List carers on west rounds")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<NurseStation>("west-station").Schedule.Read(schedule => schedule.Rounds).Select(round => round.Carer!.Name));
+        pipeline.Element("census-status").Text.Set("Listed west");
+    }))
+
+@(plan.Button("count-north-rounds", "Count north rounds")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<NurseStation>("north-station").Schedule.Read(schedule => schedule.Rounds).Count())))
+
+@(plan.Button("count-east-rounds", "Count east rounds")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Counting east");
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<NurseStation>("east-station").Schedule.Read(schedule => schedule.Rounds).Count());
+        pipeline.Element("census-status").Text.Set("Counted east");
+    }))
+
+@(plan.Button("count-south-rounds", "Count south rounds")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Counting south");
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<NurseStation>("south-station").Schedule.Read(schedule => schedule.Rounds).Count());
+        pipeline.Element("census-status").Text.Set("Counted south");
+    }))
+
+@Html.RenderPlan(plan)

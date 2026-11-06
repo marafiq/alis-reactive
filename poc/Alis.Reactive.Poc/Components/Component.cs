@@ -39,7 +39,7 @@ public sealed class ComponentVendor
         var steps = PathSteps(objectPath);
         var body = steps.Count == 0
             ? (Expression)new RefExpression(Element)
-            : new GetExpression(new RefExpression(Element), steps, Presence.Required);
+            : new GetExpression(new RefExpression(Element), steps, ReadPresence.Required);
         return new FnExpression([Element], body);
     }
 

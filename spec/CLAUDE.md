@@ -108,6 +108,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   owner chose the declaring class: "I'm good with the declaring type... Use caution really, really good so we
   don't trip over." Every read of type information in the core is on the owner's list in `WhenTheCoreIsCompiled`,
   which fails on any other.
+- The owner, 2026-11-06: "capturing the model value is important to keep our framework handle dynamic cases,
+  otherwise it will become pointless. ... I would allow that" (reflection, over refusing captured values). An array
+  lambda reads a value the view holds (`r => r.Ward == Model.Ward`, or a local it captures) when the view renders,
+  by reading each field and property of its member chain: 0.02 µs for a local and 0.04 µs for `Model.Ward` on
+  net10, against 32 to 39 µs to compile the expression for each value (the redesign's way) and 0.4 µs for a cache
+  of compiled accessors keyed by the chain. A view value that calls a method or computes is refused and names its
+  door: compute it into a local before the lambda (D6.7). The two reads are on the owner's list.
 - The owner, 2026-11-06: branches that nest to any depth (D8.7, D8.8) are "golden".
 - The owner, 2026-11-06: the slices are vertical in an app as in the framework (the owner's words are in
   `spec/NOTES.md`). An action that needs a model has a model of its own, plain, shared with no other view; an app

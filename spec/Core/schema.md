@@ -203,9 +203,9 @@ and in the blocks inside it, and nowhere else.
 | `lit` | `value`: a JSON scalar or null | | itself |
 | `obj` | `id`: an object id of `objects` | | the located object (Q5) |
 | `ref` | `name` | | the binding of that name in scope (D8.8) |
-| `get` | `path`; `members`: `required` or `optional` | `target`: an expression | the one read (Q2): a required step the holder lacks stops the pipeline, an optional one reads nothing (D4.1, D4.2) |
+| `get` | `path`; `members`: `required`, `optional` or `builtin` | `target`: an expression | the one read (Q2): a required step the holder lacks stops the pipeline, an optional one reads nothing (D4.1, D4.2), and a builtin one, a member JavaScript defines on the value (an array's `length`), reads nothing on a holder that reads nothing and stops on a holder that lacks it (D6.3, D6.4) |
 | `as` | | `expr`: an expression; `shape`: a shape that converts | the one conversion by `spec/Core/conversions.md` (D3.2, D3.4); a value the shape cannot hold reads nothing (D3.3) |
-| `call` | `path`; `members` | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3) |
+| `call` | `path`; `members`: `required`, `optional` or `builtin`, as `get` reads them | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3) |
 | `fn` | `params`: names | `body`: an expression | a function whose parameters are bound in its body; as a value set or passed, the function a vendor calls, which answers its body's value (D17.12) |
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
 | `list` | | `items`: expressions | a list built from sources (N7.2) |

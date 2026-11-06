@@ -47,7 +47,11 @@ public abstract class JsObject
 
     protected TObject LiveObject<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], Presence.Required), Binding.Build));
+        => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], ReadPresence.Required), Binding.Build));
+
+    protected LiveObjects<TItem> LiveObjects<TItem>(string? name = null, [CallerMemberName] string declaredBy = "")
+        where TItem : JsObject, new()
+        => new(new GetExpression(Binding.Target, [Member(name, declaredBy)], ReadPresence.Required), Binding.Build);
 
     protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "")
         => new(JavaScriptName(name, declaredBy));

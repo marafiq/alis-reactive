@@ -32,6 +32,12 @@ Terms used throughout:
   where the view renders.
 - D1.5 `each` appears only in a form's registration paths (Q16, Q19). No read, write, call or subscription carries
   `each`; a projection over a list is `map` (Q6).
+- D1.9 On a read, a write or a call, an index step and a member step of the same digits reach the same item:
+  JavaScript reads `a[1]` and `a["1"]` alike. POC 4 planted the position of `LiveObjects<T>.At(1)` as the member
+  `"1"`, and the test that writes through it passed. The index step has its meaning where a body is built: an
+  input's body path writes the body a form sends, and a position there makes an array where a member makes an
+  object (`Alis.Reactive.Assets/runtime/plugins/model.ts:156-162`, `assignAt`). POC 10, inputs, proves it in the
+  browser. If POC 10 builds the body with no path, the index step leaves the grammar and a position is a member step.
 - D1.6 The MVC binding name is one function of a CLR member path, `BindingName`: member names joined by
   `.`, and an index written `[n]` directly after the step before it, as MVC's own
   `CreateSubPropertyName` and `CreateSubIndexName` write them. It is computed only in C#.
@@ -454,12 +460,30 @@ Terms used throughout:
   `int`, `decimal` and `double`, `Find(predicate)` and `Find(predicate, field)`. The property `Count` and the
   method `Each` on a declared list (`LiveObjects<T>`) leave, renamed to `Count()` and `Select`.
 - D6.3 An operation over a list that reads nothing reads nothing; `Any()` and `All()` over nothing read nothing,
-  so a condition on them does not hold.
+  so a condition on them does not hold. An operation over a value that is not a list stops the pipeline: a paged
+  result (`{ result, count }`) where the declaration says a list has no `length` and no `filter`. The plan writes
+  the operation's JavaScript member with `members` `builtin` (schema.md), which reads nothing on a holder that
+  reads nothing and stops on a holder that lacks the member. A `set` never carries `builtin`: its C# type is
+  `Presence`, which has no such value, and only `get` and `call` take `ReadPresence`.
 - D6.4 In an array lambda, a member .NET defines on the value's type (`Trim`, `Length`, `Year`, a `DayOfWeek`
-  compared) reads nothing on a missing value and stops the pipeline on a value that lacks it.
+  compared) reads nothing on a missing value and stops the pipeline on a value that lacks it, written `builtin`
+  as D6.3 writes a list's operation.
 - D6.5 The .NET members an array lambda translates are the closed table `spec/Core/translated-members.md`,
   keyed by the `MethodInfo` and `MemberInfo` the expression tree carries and built from typed lambdas; no
   attribute is scanned.
+- D6.7 A value the view holds inside an array lambda (`r => r.Ward == Model.Ward`, a local the lambda captures,
+  a `const`, an enum member) is read when the view renders and written as a literal. A constant is read from the
+  tree; a captured local or a member of the view is read by walking its chain of fields and properties with
+  `FieldInfo.GetValue` and `PropertyInfo.GetValue`, the owner's exception of 2026-11-06 ("capturing the model value
+  is important"). No expression is compiled at render and no accessor is cached. A view value that calls a method,
+  indexes or computes (`Model.Ward.ToUpper()`, `ward + "x"`) is refused, naming its door: compute it into a local
+  before the lambda.
+- D6.8 A list's lambda takes one of two forms, by what an item is. An item of `LiveObjects<T>` is a live object:
+  its lambda is a delegate over the item's declaration, `bed => bed.Resident`, run once when the view renders with
+  the item bound to the `fn`'s parameter, and its members are required (D4.1). An item of a list of data is a C#
+  value: its lambda is an expression tree, `round => round.Carer.Name`, its members named as Q2 names them and
+  optional (D4.2). A lambda reads; a step written inside one is refused where the view renders (X6.8). Each `fn`
+  parameter has a name of its own in the plan, so an inner lambda never hides the item of the lambda around it.
 - D6.6 The JavaScript array methods the plan calls (`map`, `filter`, `some`, `every`, `find`, `includes`,
   `length`) are named at the vendor boundary of the built-in array; the browser adds no array function.
 
@@ -471,7 +495,12 @@ Terms used throughout:
 
 **Doors.**
 - existing: `ReactiveArray` (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:44`, `Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:93`).
-- `N6.1` new: `Objects<TItem>.Count()` and `Objects<TItem>.Select(..)`, replacing `Count` and `Each`.
+- `N6.1` new: `LiveObjects<TItem>.Count()` and `LiveObjects<TItem>.Select(..)`, replacing `Count` and `Each`, beside
+  `At(n)` and `Where(..)`; the same operations over a list of data are extension methods on
+  `TypedSource<IReadOnlyList<TItem>>` (`DataLists`, POC 4).
+- `N6.3` new: a `DiagnosticSuppressor` that suppresses CS8602 inside the lambda of `Read`, `Where` and `Select`,
+  where a member that holds null reads nothing (D4.2). An expression tree refuses `?.` (CS8072), so without it a
+  view writes `round.Carer!.Name`, a `!` that claims what the plan does not need. Built with the analyzers in POC 13.
 - `N6.2` new: `internal static class TranslatedMembers`, the closed table of D6.5.
 
 **Evidence.**
@@ -487,6 +516,14 @@ Terms used throughout:
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name` reads that item's test
   as nothing, so the item is not kept.
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
+- `X6.8` refusal: a step written inside a list's lambda: "A step is written inside a list's lambda, which reads
+  each item and writes nothing. Write the step in the pipeline."
+- `X6.5` behavior: `Where(r => r.Ward == Model.Ward)` keeps the items of the ward the view's model names, and a
+  local the lambda captures is read the same way.
+- `X6.6` refusal: a view value that calls a method or computes inside an array lambda: "'{value}' computes a value
+  inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();."
+- `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
+  the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 
 ## Q7. Every value position takes every source
 

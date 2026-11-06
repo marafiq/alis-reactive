@@ -4,13 +4,21 @@ export interface AssignmentListening {
   readonly kind: "assignment";
 }
 
+export interface CallExpression {
+  readonly kind: "call";
+  readonly target: Expression;
+  readonly path: readonly PathStep[];
+  readonly members: ReadPresence;
+  readonly args: readonly Expression[];
+}
+
 export interface ElementLocator {
   readonly kind: "element";
   readonly id: string;
   readonly vendor: string;
 }
 
-export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | FnExpression;
+export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | CallExpression | FnExpression;
 
 export interface FnExpression {
   readonly kind: "fn";
@@ -22,7 +30,7 @@ export interface GetExpression {
   readonly kind: "get";
   readonly target: Expression;
   readonly path: readonly PathStep[];
-  readonly members: Presence;
+  readonly members: ReadPresence;
 }
 
 export interface Handler {
@@ -67,6 +75,8 @@ export interface PlanDocument {
 export type Policy = "overlap" | "replace" | "skip";
 
 export type Presence = "required" | "optional";
+
+export type ReadPresence = "required" | "optional" | "builtin";
 
 export interface RefExpression {
   readonly kind: "ref";

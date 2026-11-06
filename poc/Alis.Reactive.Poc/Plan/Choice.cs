@@ -33,6 +33,21 @@ internal sealed class Presence : IChoice
     public string Text { get; }
 }
 
+[JsonConverter(typeof(ChoiceConverter<ReadPresence>))]
+internal sealed class ReadPresence : IChoice
+{
+    internal static readonly ReadPresence Required = new("required");
+    internal static readonly ReadPresence Optional = new("optional");
+    internal static readonly ReadPresence BuiltIn = new("builtin");
+
+    private ReadPresence(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
 [JsonConverter(typeof(ChoiceConverter<Policy>))]
 internal sealed class Policy : IChoice
 {

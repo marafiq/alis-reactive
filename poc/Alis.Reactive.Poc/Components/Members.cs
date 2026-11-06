@@ -2,6 +2,7 @@ using System;
 using Alis.Reactive.Plan;
 using Alis.Reactive.Types;
 using Alis.Reactive.Values;
+using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Components;
 
@@ -17,10 +18,12 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
     internal PathStep Member { get; }
 
-    internal override Expression Expression => new GetExpression(Owner.Binding.Target, [Member], Presence.Required);
+    internal override Expression Expression => new GetExpression(Owner.Binding.Target, [Member], ReadPresence.Required);
+
+    internal override PlanBuild Build => Owner.Binding.Build;
 
     public TypedSource<TResult> Read<TResult>(System.Linq.Expressions.Expression<Func<TValue, TResult>> path)
-        => new DataRead<TResult>(new GetExpression(Expression, JsonPath.Of(path, Owner.Binding.Build.Values), Presence.Optional));
+        => new DataRead<TResult>(new GetExpression(Expression, JsonPath.Of(path, Build.Values), ReadPresence.Optional), Build);
 }
 
 public sealed class Property<TValue> : ReadOnly<TValue>

@@ -12,6 +12,8 @@ internal sealed class PlanBuild
     private readonly Dictionary<string, string> _vendorOfElement = new(StringComparer.Ordinal);
     private readonly List<Handler> _handlers = [];
     private readonly Stack<List<Statement>> _open = new();
+    private int _items;
+    private int _readingItems;
 
     internal PlanBuild(string planId, JsonSerializerOptions values)
     {
@@ -26,6 +28,12 @@ internal sealed class PlanBuild
 
     internal void Write(Statement statement)
     {
+        if (_readingItems > 0)
+        {
+            throw new InvalidOperationException(
+                "A step is written inside a list's lambda, which reads each item and writes nothing. Write the step in the pipeline.");
+        }
+
         if (_open.Count == 0)
         {
             throw new InvalidOperationException(
@@ -49,6 +57,21 @@ internal sealed class PlanBuild
         }
 
         return block;
+    }
+
+    internal string ItemName() => "item" + (++_items).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    internal TRead ReadingItems<TRead>(Func<TRead> read)
+    {
+        _readingItems++;
+        try
+        {
+            return read();
+        }
+        finally
+        {
+            _readingItems--;
+        }
     }
 
     internal string Element(string elementId, string vendorName, Vendor vendor)

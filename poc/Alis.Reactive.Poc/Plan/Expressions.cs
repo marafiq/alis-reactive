@@ -9,6 +9,7 @@ namespace Alis.Reactive.Plan;
 [JsonDerivedType(typeof(ObjectExpression), "obj")]
 [JsonDerivedType(typeof(RefExpression), "ref")]
 [JsonDerivedType(typeof(GetExpression), "get")]
+[JsonDerivedType(typeof(CallExpression), "call")]
 [JsonDerivedType(typeof(FnExpression), "fn")]
 internal abstract class Expression
 {
@@ -49,7 +50,7 @@ internal sealed class RefExpression : Expression
 
 internal sealed class GetExpression : Expression
 {
-    internal GetExpression(Expression target, IReadOnlyList<PathStep> path, Presence members)
+    internal GetExpression(Expression target, IReadOnlyList<PathStep> path, ReadPresence members)
     {
         Target = target;
         Path = path;
@@ -60,7 +61,26 @@ internal sealed class GetExpression : Expression
 
     public IReadOnlyList<PathStep> Path { get; }
 
-    public Presence Members { get; }
+    public ReadPresence Members { get; }
+}
+
+internal sealed class CallExpression : Expression
+{
+    internal CallExpression(Expression target, IReadOnlyList<PathStep> path, ReadPresence members, IReadOnlyList<Expression> args)
+    {
+        Target = target;
+        Path = path;
+        Members = members;
+        Args = args;
+    }
+
+    public Expression Target { get; }
+
+    public IReadOnlyList<PathStep> Path { get; }
+
+    public ReadPresence Members { get; }
+
+    public IReadOnlyList<Expression> Args { get; }
 }
 
 internal sealed class FnExpression : Expression
