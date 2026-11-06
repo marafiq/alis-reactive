@@ -13,13 +13,20 @@ namespace Alis.Reactive.Conditions;
 [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's choice, 2026-11-06: the .NET members a list's lambda translates are one closed table keyed by the member the expression tree carries, built from typed lambdas (D6.5, D18.1).")]
 internal static class TranslatedMembers
 {
-    internal delegate PlanExpression Reader(LinqExpression operand);
+    internal interface ITranslator
+    {
+        PlanExpression Read(LinqExpression operand);
 
-    private delegate PlanExpression Translation(LinqExpression term, IReadOnlyList<LinqExpression> operands, Reader read, string argument);
+        FnExpression Lambda(LambdaExpression inner);
+
+        FnExpression EveryItem();
+    }
+
+    private delegate PlanExpression Translation(LinqExpression term, IReadOnlyList<LinqExpression> operands, ITranslator read, string argument);
 
     private static readonly Dictionary<MemberInfo, Translation> Table = new()
     {
-        [Property((string text) => text.Length)] = (_, operands, read, _) => new GetExpression(read(operands[0]), [PathStep.Member("length")], ReadPresence.RequiredIfHeld),
+        [Property((string text) => text.Length)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
         [Method((string text) => text.Trim())] = Unary(Operator.Trim),
         [Method((string text) => text.TrimStart())] = Unary(Operator.TrimStart),
         [Method((string text) => text.TrimEnd())] = Unary(Operator.TrimEnd),
@@ -34,11 +41,16 @@ internal static class TranslatedMembers
         [Method((string text) => text.EndsWith(""))] = ByCulture,
         [Static(() => string.IsNullOrEmpty(""))] = Unary(Operator.NullOrEmpty),
         [Static(() => string.IsNullOrWhiteSpace(""))] = (term, operands, read, argument) => Op(Operator.NullOrEmpty, Unary(Operator.Trim)(term, operands, read, argument)),
+        [Definition((IEnumerable<int> items) => items.Any())] = (_, operands, read, _) => ListForms.Some(read.Read(operands[0]), read.EveryItem()),
+        [Definition((IEnumerable<int> items) => items.Any(item => true))] = (_, operands, read, _) => ListForms.Some(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1])),
+        [Definition((IEnumerable<int> items) => items.All(item => true))] = (_, operands, read, _) => ListForms.Every(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1])),
+        [Definition((IEnumerable<int> items) => items.Count())] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
+        [Definition((IEnumerable<int> items) => items.Count(item => true))] = (_, operands, read, _) => ListForms.Length(ListForms.Filter(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1]))),
     };
 
-    internal static PlanExpression? Of(LinqExpression term, Reader read, string argument) => term switch
+    internal static PlanExpression? Of(LinqExpression term, ITranslator read, string argument) => term switch
     {
-        MethodCallExpression call when Table.TryGetValue(call.Method, out var translate) => translate(call, Operands(call), read, argument),
+        MethodCallExpression call when Table.TryGetValue(Key(call.Method), out var translate) => translate(call, Operands(call), read, argument),
         MemberExpression { Expression: { } holder } member when Table.TryGetValue(member.Member, out var translate) => translate(member, [holder], read, argument),
         _ => null,
     };
@@ -50,20 +62,20 @@ internal static class TranslatedMembers
     {
         var paramsArrayIsEmpty = operands.Skip(1).All(operand => operand is NewArrayExpression { Expressions.Count: 0 });
         if (!paramsArrayIsEmpty) throw NoBrowserForm(term, argument);
-        return Op(op, read(operands[0]));
+        return Op(op, read.Read(operands[0]));
     };
 
-    private static Translation Binary(Operator op) => (_, operands, read, _) => Op(op, read(operands[0]), read(operands[1]));
+    private static Translation Binary(Operator op) => (_, operands, read, _) => Op(op, read.Read(operands[0]), read.Read(operands[1]));
 
     private static Translation Ordinal(Operator op) => (term, operands, read, argument) =>
     {
         var comparison = ViewValues.Of(operands[2], argument);
         if (comparison is not StringComparison.Ordinal)
             throw new ArgumentException($"'{ViewValues.Printed(term)}' compares text by {comparison}; a list's lambda compares text by StringComparison.Ordinal.", argument);
-        return Op(op, read(operands[0]), read(operands[1]));
+        return Op(op, read.Read(operands[0]), read.Read(operands[1]));
     };
 
-    private static PlanExpression ByCulture(LinqExpression term, IReadOnlyList<LinqExpression> operands, Reader read, string argument)
+    private static PlanExpression ByCulture(LinqExpression term, IReadOnlyList<LinqExpression> operands, ITranslator read, string argument)
         => throw new ArgumentException($"'{ViewValues.Printed(term)}' compares by the culture in .NET, which the browser cannot match; pass StringComparison.Ordinal, such as d.Ward.StartsWith(\"N\", StringComparison.Ordinal).", argument);
 
     private static LinqExpression[] Operands(MethodCallExpression call)
@@ -72,6 +84,10 @@ internal static class TranslatedMembers
     private static OperatorExpression Op(Operator op, params PlanExpression[] args) => new(op, args);
 
     private static MethodInfo Method<T, TResult>(Expression<Func<T, TResult>> call) => ((MethodCallExpression)call.Body).Method;
+
+    private static MethodInfo Key(MethodInfo method) => method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
+
+    private static MethodInfo Definition<T, TResult>(Expression<Func<T, TResult>> call) => Method(call).GetGenericMethodDefinition();
 
     private static MethodInfo Static<TResult>(Expression<Func<TResult>> call) => ((MethodCallExpression)call.Body).Method;
 

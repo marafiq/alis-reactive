@@ -26,7 +26,7 @@ public static class DataLists
         => Over<TItem, IReadOnlyList<TResult>>(list, (items, build) => ListForms.Map(items, ItemRead(build, field, nameof(field))));
 
     public static TypedSource<bool> Any<TItem>(this ITypedSource<IEnumerable<TItem>> list)
-        => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ListForms.EveryItem(build)));
+        => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ListForms.EveryItem(build.ItemName())));
 
     public static TypedSource<bool> Any<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
         => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ItemRead(build, predicate, nameof(predicate))));
@@ -76,6 +76,6 @@ public static class DataLists
     private static FnExpression ItemRead(PlanBuild build, LambdaExpression read, string argument)
     {
         var item = build.ItemName();
-        return new FnExpression([item], LambdaCondition.Of(read, new RefExpression(item), build.Values, argument));
+        return new FnExpression([item], LambdaCondition.Of(read, new RefExpression(item), build.Values, argument, build.ItemName));
     }
 }

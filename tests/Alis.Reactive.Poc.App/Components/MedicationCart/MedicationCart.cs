@@ -37,7 +37,8 @@ public sealed record MedicationDose(
     Carer? Witness,
     string Label,
     string Prescriber,
-    string? Note);
+    string? Note,
+    IReadOnlyList<Carer> Checks);
 
 public static class MedicationCartJson
 {

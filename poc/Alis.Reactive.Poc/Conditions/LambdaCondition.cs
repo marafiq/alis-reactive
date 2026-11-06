@@ -9,7 +9,7 @@ using PlanExpression = Alis.Reactive.Plan.Expression;
 
 namespace Alis.Reactive.Conditions;
 
-internal sealed class LambdaCondition
+internal sealed class LambdaCondition : TranslatedMembers.ITranslator
 {
     private static readonly Dictionary<ExpressionType, (Operator Op, bool Orders)> Comparisons = new()
     {
@@ -59,20 +59,49 @@ internal sealed class LambdaCondition
     ];
 
     private readonly LambdaExpression _lambda;
-    private readonly PlanExpression _item;
+    private readonly IReadOnlyDictionary<ParameterExpression, PlanExpression> _scope;
     private readonly JsonSerializerOptions _values;
     private readonly string _argument;
+    private readonly Func<string> _itemName;
 
-    private LambdaCondition(LambdaExpression lambda, PlanExpression item, JsonSerializerOptions values, string argument)
+    private LambdaCondition(LambdaExpression lambda, IReadOnlyDictionary<ParameterExpression, PlanExpression> scope, JsonSerializerOptions values, string argument, Func<string> itemName)
     {
         _lambda = lambda;
-        _item = item;
+        _scope = scope;
         _values = values;
         _argument = argument;
+        _itemName = itemName;
     }
 
-    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, JsonSerializerOptions values, string argument)
-        => new LambdaCondition(lambda, item, values, argument).Term(lambda.Body);
+    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, JsonSerializerOptions values, string argument, Func<string> itemName)
+    {
+        var scope = new Dictionary<ParameterExpression, PlanExpression> { [lambda.Parameters[0]] = item };
+        return new LambdaCondition(lambda, scope, values, argument, itemName).Term(lambda.Body);
+    }
+
+    public PlanExpression Read(LinqExpression operand)
+    {
+        var read = Unconverted(operand);
+        if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
+        if (read is ParameterExpression parameter && _scope.TryGetValue(parameter, out var bound)) return bound;
+        var translated = TranslatedMembers.Of(read, this, _argument);
+        if (translated is not null) return translated;
+        var root = RootOf(read);
+        if (root is null || !_scope.TryGetValue(root, out var holder)) throw TranslatedMembers.NoBrowserForm(read, _argument);
+        var steps = JsonPath.Steps(read, root, _values, _lambda) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
+        return new GetExpression(holder, steps, ReadPresence.Optional);
+    }
+
+    public FnExpression Lambda(LambdaExpression inner)
+    {
+        var item = _itemName();
+        var scope = new Dictionary<ParameterExpression, PlanExpression>(_scope.Count + 1);
+        foreach (var bound in _scope) scope[bound.Key] = bound.Value;
+        scope[inner.Parameters[0]] = new RefExpression(item);
+        return new FnExpression([item], new LambdaCondition(inner, scope, _values, _argument, _itemName).Term(inner.Body));
+    }
+
+    public FnExpression EveryItem() => ListForms.EveryItem(_itemName());
 
     private PlanExpression Term(LinqExpression node) => node switch
     {
@@ -82,16 +111,6 @@ internal sealed class LambdaCondition
         UnaryExpression { NodeType: ExpressionType.Not } negation when negation.Type == typeof(bool) => Op(Operator.Not, Term(negation.Operand)),
         _ => Read(node),
     };
-
-    private PlanExpression Read(LinqExpression node)
-    {
-        var read = Unconverted(node);
-        if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
-        var translated = TranslatedMembers.Of(read, Read, _argument);
-        if (translated is not null) return translated;
-        var steps = JsonPath.Steps(read, _lambda.Parameters[0], _values, _lambda) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
-        return new GetExpression(_item, steps, ReadPresence.Optional);
-    }
 
     private OperatorExpression Compared(BinaryExpression comparison, Operator op, bool orders)
     {
@@ -159,7 +178,7 @@ internal sealed class LambdaCondition
 
     private bool ReadsTheItem(LinqExpression node)
     {
-        var finder = new ItemFinder(_lambda.Parameters[0]);
+        var finder = new ItemFinder(_scope);
         finder.Visit(node);
         return finder.Found;
     }
@@ -186,13 +205,19 @@ internal sealed class LambdaCondition
 
     private static OperatorExpression Op(Operator op, params PlanExpression[] args) => new(op, args);
 
-    private sealed class ItemFinder(ParameterExpression item) : ExpressionVisitor
+    private static ParameterExpression? RootOf(LinqExpression node)
+    {
+        while (node is MemberExpression { Expression: { } holder }) node = holder;
+        return node as ParameterExpression;
+    }
+
+    private sealed class ItemFinder(IReadOnlyDictionary<ParameterExpression, PlanExpression> scope) : ExpressionVisitor
     {
         internal bool Found { get; private set; }
 
         protected override LinqExpression VisitParameter(ParameterExpression node)
         {
-            Found |= node == item;
+            Found |= scope.ContainsKey(node);
             return node;
         }
     }

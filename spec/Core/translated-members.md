@@ -32,6 +32,20 @@ The probe behind the rows (`spec/NOTES.md`, 2026-11-06) maps every code point in
 operators above agree with .NET on all 1,112,064, and JavaScript's own methods disagree on 103 in upper case, 1 in
 lower case and 2 in white space.
 
+## Lists inside a lambda
+
+A list an item holds is read with LINQ's own operations, keyed by their generic definitions, as the list
+operations of D6.2 write them. The inner lambda's parameter has a `fn` name of its own, so it reads its own item
+and the outer item side by side (D6.8).
+
+| .NET member | Browser meaning |
+|-------------|-----------------|
+| `Enumerable.Any(items)` | `some` over a `fn` whose body is `true` |
+| `Enumerable.Any(items, predicate)` | `some` over the predicate's `fn` |
+| `Enumerable.All(items, predicate)` | `every` over the predicate's `fn`; an empty list holds, as in .NET |
+| `Enumerable.Count(items)` | `length` |
+| `Enumerable.Count(items, predicate)` | the `length` of `filter` over the predicate's `fn` |
+
 ## Dates
 
 For `DateTime` and `DateTimeOffset`, read on the browser's clock.

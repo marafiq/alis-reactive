@@ -38,7 +38,7 @@ public sealed class LiveObjects<TItem>
     public TypedSource<int> Count(Func<TItem, TypedSource<bool>> predicate)
         => new DataRead<int>(ListForms.Length(ListForms.Filter(_list, ItemRead(predicate))), _build);
 
-    public TypedSource<bool> Any() => new DataRead<bool>(ListForms.Some(_list, ListForms.EveryItem(_build)), _build);
+    public TypedSource<bool> Any() => new DataRead<bool>(ListForms.Some(_list, ListForms.EveryItem(_build.ItemName())), _build);
 
     public TypedSource<bool> Any(Func<TItem, TypedSource<bool>> predicate)
         => new DataRead<bool>(ListForms.Some(_list, ItemRead(predicate)), _build);

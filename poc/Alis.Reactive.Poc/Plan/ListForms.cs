@@ -1,8 +1,6 @@
-using Alis.Reactive.Plan;
-using Alis.Reactive.Values;
-using Alis.Reactive.Writing;
+using System.Text.Json;
 
-namespace Alis.Reactive.Lists;
+namespace Alis.Reactive.Plan;
 
 internal static class ListForms
 {
@@ -19,7 +17,7 @@ internal static class ListForms
 
     internal static Expression Find(Expression list, FnExpression keep) => ArrayMethod(list, "find", keep);
 
-    internal static FnExpression EveryItem(PlanBuild build) => new([build.ItemName()], Literal.Of(true, build));
+    internal static FnExpression EveryItem(string item) => new([item], new LiteralExpression(JsonSerializer.SerializeToElement(true)));
 
     private static CallExpression ArrayMethod(Expression list, string method, FnExpression item)
         => new(list, [PathStep.Member(method)], ReadPresence.RequiredIfHeld, [item]);
