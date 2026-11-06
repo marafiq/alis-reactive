@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import hashlib
+import io
 import json
+import tokenize
 import re
 import subprocess
 import sys
@@ -41,7 +43,7 @@ TLC_SPECS = {
     "Ownership": {"question": "Q12", "step": 4, "expect": "green"},
     "DateWire": {"question": "date wire form", "step": 4, "expect": "green"},
     "Schema": {"question": "Q19", "step": 5, "expect": "green"},
-    "ValidationToday": {"question": "Q16 at bff9eb6c0", "step": 5, "expect": "four counterexamples"},
+    "ValidationToday": {"question": "Q16 at bff9eb6c0", "step": 5, "expect": "counterexamples", "gaps": 4},
     "Validation": {"question": "Q16", "step": 5, "expect": "green"},
 }
 HEDGES = [
@@ -176,7 +178,7 @@ def check_inventory():
             if source != rows:
                 problems.append(f"main {package} {tfm}: {source} doors, {rows} rows")
     for row in doors:
-        expected = "both" if row["redesign_line"] and row["main_line"] else "redesign-only" if row["redesign_line"] else "main-only"
+        expected = ("both" if row["package"] == row["main_package"] else "moved") if row["redesign_line"] and row["main_line"] else "redesign-only" if row["redesign_line"] else "main-only"
         if row["status"] != expected or not row["declaring_type"]:
             problems.append(f"door row {row['door'][:60]}: status {row['status']}, declaring type '{row['declaring_type']}'")
     tests = table("tests.tsv")
@@ -195,8 +197,35 @@ def check_inventory():
     for row in doors:
         status[row["status"]] = status.get(row["status"], 0) + 1
     return result(not problems, "; ".join(problems[:8]) or "every door, test and kind reconciles with its source",
-                  doors=len(doors), both=status.get("both", 0), main_only=status.get("main-only", 0), redesign_only=status.get("redesign-only", 0),
+                  doors=len(doors), both=status.get("both", 0), moved=status.get("moved", 0), main_only=status.get("main-only", 0), redesign_only=status.get("redesign-only", 0),
                   tests=len(tests), kinds=len(schema), analyzers=len(table("analyzers.tsv")), cases=len(table("cases.tsv")))
+
+
+RUNGS = {"type", "analyzer", "refusal", "behavior"}
+CITE = re.compile(r"([A-Za-z0-9_.\-/]+\.(?:cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|cshtml|js|sh|yml)):(\d+)(?:-(\d+))?")
+CHECKER = re.compile(r"`(?:([A-Za-z]+)\.tla:(\w+)|probe:([\w.\-]+))`")
+DEFECT = re.compile(r"^- `?(X\d+\.\d+)`? (type|analyzer|refusal|behavior): (.+)$")
+NEW_DOOR = re.compile(r"`?(N\d+\.\d+)`?")
+EVIDENCE_IDS = [f"G{n}" for n in range(1, 11)] + [f"B{n}" for n in range(1, 17)] + [f"P{n}" for n in range(1, 6)]
+_line_counts = {}
+
+
+def line_count(sha, path):
+    key = (sha, path)
+    if key not in _line_counts:
+        if sha is None:
+            target = REPO / path
+            _line_counts[key] = len(target.read_text().splitlines()) if target.is_file() else -1
+        else:
+            completed = subprocess.run(["git", "-C", str(REPO), "show", f"{sha}:{path}"], capture_output=True, text=True)
+            _line_counts[key] = len(completed.stdout.splitlines()) if completed.returncode == 0 else -1
+    return _line_counts[key]
+
+
+def cite_resolves(path, first, last):
+    needed = max(first, last or first)
+    sources = [None] if path.startswith("spec/") else [BASE_SHA, MAIN_SHA]
+    return any(line_count(sha, path) >= needed for sha in sources)
 
 
 def design_sections():
@@ -206,13 +235,99 @@ def design_sections():
     sections = {}
     current = None
     for line in path.read_text().splitlines():
-        heading = re.match(r"^## (Q\d+)\b", line)
+        heading = re.match(r"^## (Q\d+)\.", line)
         if heading:
             current = heading.group(1)
             sections[current] = []
+        elif line.startswith("## "):
+            current = None
         elif current:
             sections[current].append(line)
     return sections
+
+
+def section_parts(lines):
+    parts = {}
+    current = None
+    for line in lines:
+        label = re.match(r"^\*\*(" + "|".join(re.escape(part) for part in DESIGN_PARTS) + r")\.\*\*\s*(.*)$", line)
+        if label:
+            current = label.group(1)
+            parts[current] = [label.group(2)] if label.group(2) else []
+        elif current:
+            parts[current].append(line)
+    return {name: "\n".join(body).strip() for name, body in parts.items()}
+
+
+def tla_invariants(spec):
+    tla = SPEC / "Core" / f"{spec}.tla"
+    cfg = SPEC / "Core" / f"{spec}.cfg"
+    if not tla.exists():
+        return None, set()
+    defined = set(re.findall(r"^(\w+)\s*==", tla.read_text(), re.MULTILINE))
+    listed = set()
+    if cfg.exists():
+        listed = set(re.findall(r"\b(\w+)\b", " ".join(re.findall(r"(?:INVARIANTS?|PROPERTY|PROPERTIES)\s+([\w\s]+?)(?=\n[A-Z]+\b|\Z)", cfg.read_text()))))
+    return defined, listed
+
+
+def probe_ids():
+    path = SPEC / "probes" / "facts.json"
+    return {fact["id"] for fact in json.loads(path.read_text())["facts"]} if path.exists() else set()
+
+
+def all_new_doors(sections):
+    doors = set()
+    for lines in sections.values():
+        doors |= set(NEW_DOOR.findall(section_parts(lines).get("Doors", "")))
+    return doors
+
+
+def judge_section(question, lines, new_doors, analyzer_ids, probes):
+    parts = section_parts(lines)
+    problems = []
+    for part in DESIGN_PARTS:
+        if not parts.get(part):
+            problems.append(f"no {part}")
+    if problems:
+        return problems, []
+    if not re.search(r"^- ", parts["Decision"], re.MULTILINE):
+        problems.append("Decision has no closed statement")
+    cites = CITE.findall(parts["Evidence"])
+    if not cites:
+        problems.append("Evidence cites no file:line")
+    for path, first, last in cites:
+        if not cite_resolves(path, int(first), int(last) if last else None):
+            problems.append(f"Evidence cite {path}:{first} resolves at neither SHA")
+    checkers = CHECKER.findall(parts["Checker"])
+    if not checkers:
+        problems.append("Checker names no invariant or probe")
+    for spec, invariant, probe in checkers:
+        if probe:
+            if probe not in probes:
+                problems.append(f"Checker probe:{probe} is not in spec/probes/facts.json")
+            continue
+        defined, listed = tla_invariants(spec)
+        if defined is None or invariant not in defined:
+            problems.append(f"Checker {spec}.tla:{invariant} is not defined")
+        elif invariant not in listed:
+            problems.append(f"Checker {spec}.tla:{invariant} is not checked by {spec}.cfg")
+    defects = []
+    for line in parts["Defects"].splitlines():
+        match = DEFECT.match(line.strip())
+        if not match:
+            continue
+        identifier, rung, text = match.groups()
+        defects.append(identifier)
+        if rung == "type" and not (CITE.search(text) and all(cite_resolves(p, int(f), int(l) if l else None) for p, f, l in CITE.findall(text))) and not any(door in new_doors for door in re.findall(r"new:(N\d+\.\d+)", text)):
+            problems.append(f"{identifier} type cites no resolving file:line and no new:N door")
+        if rung == "analyzer" and not (set(re.findall(r"\bALIS\d{3}\b", text)) & analyzer_ids or any(door in new_doors for door in re.findall(r"new:(N\d+\.\d+)", text))):
+            problems.append(f"{identifier} analyzer names no existing ALIS id and no new:N door")
+        if rung == "refusal" and not re.search(r"\"[^\"]{8,}\"", text):
+            problems.append(f"{identifier} refusal quotes no message")
+    if not defects:
+        problems.append("Defects lists no defect with a rung")
+    return problems, defects
 
 
 def check_questions(questions):
@@ -223,30 +338,61 @@ def answered_questions(questions):
     sections = design_sections()
     if sections is None:
         return not_started(SPEC / "Core" / "DESIGN.md")
-    answered = []
-    unanswered = []
+    analyzer_ids = {row["id"] for row in table("analyzers.tsv")}
+    probes = probe_ids()
+    new_doors = all_new_doors(sections)
+    answered, problems, seen = [], [], {}
     for question in questions:
-        body = "\n".join(sections.get(question, []))
-        missing = [part for part in DESIGN_PARTS if not re.search(r"^\*\*" + re.escape(part) + r"\.\*\*", body, re.MULTILINE)]
-        (unanswered if question not in sections or missing else answered).append(question if not missing else f"{question} lacks {', '.join(missing)}")
-    return result(len(answered) == len(questions), "; ".join(unanswered) or "every question answered", answered=len(answered), total=len(questions))
+        if question not in sections:
+            problems.append(f"{question} absent")
+            continue
+        found, defects = judge_section(question, sections[question], new_doors, analyzer_ids, probes)
+        for identifier in defects:
+            if identifier in seen:
+                found.append(f"defect {identifier} also in {seen[identifier]}")
+            seen[identifier] = question
+        if found:
+            problems.append(f"{question}: " + ", ".join(found[:3]))
+        else:
+            answered.append(question)
+    return result(len(answered) == len(questions), "; ".join(problems[:6]) or "every question answered with resolving evidence, checker and rungs",
+                  answered=len(answered), total=len(questions), defects=len(seen))
+
+
+def check_evidence():
+    sections = design_sections()
+    if sections is None:
+        return not_started(SPEC / "Core" / "DESIGN.md")
+    text = "\n".join(section_parts(lines).get("Evidence", "") for lines in sections.values())
+    missing = [identifier for identifier in EVIDENCE_IDS if not re.search(rf"\b{identifier}\b", text)]
+    return result(not missing, "unplaced: " + ", ".join(missing) if missing else "every G, B and P item has a home",
+                  placed=len(EVIDENCE_IDS) - len(missing), total=len(EVIDENCE_IDS))
 
 
 def spec_hash(tla, cfg):
     return hashlib.sha256(tla.read_bytes() + b"\0" + cfg.read_bytes()).hexdigest()
 
 
-def run_tlc(name, tla, cfg):
+def run_tlc(tla, cfg):
     with tempfile.TemporaryDirectory() as meta:
         completed = subprocess.run(
-            [JAVA, "-cp", str(TLA_JAR), "tlc2.TLC", "-deadlock", "-metadir", meta, "-config", cfg.name, tla.name],
+            [JAVA, "-cp", str(TLA_JAR), "tlc2.TLC", "-deadlock", "-workers", "auto", "-metadir", meta, "-config", cfg.name, tla.name],
             cwd=tla.parent, capture_output=True, text=True,
         )
     lines = (completed.stdout + completed.stderr).splitlines()
     green = any(TLC_GREEN in line for line in lines)
     violated = sorted({match.group(1) for line in lines for match in [re.search(r"Invariant (\w+) is violated", line)] if match})
     states = next((line.strip() for line in reversed(lines) if "distinct states found" in line), "")
-    return {"green": green, "violated": violated, "line": TLC_GREEN if green else ("violated: " + ", ".join(violated) if violated else lines[-1] if lines else "no output"), "states": states}
+    errors = [line.strip() for line in lines if line.startswith("Error") or "error" in line.lower() and "No error" not in line][:2]
+    line = TLC_GREEN if green else ("violated: " + ", ".join(violated) if violated else "; ".join(errors) or (lines[-1] if lines else "no output"))
+    return {"green": green, "violated": violated, "line": line, "states": states}
+
+
+def tlc_configs(name):
+    folder = SPEC / "Core"
+    main = folder / f"{name}.cfg"
+    violating = {match.group(1): path for path in sorted(folder.glob(f"{name}.violates.*.cfg")) for match in [re.match(rf"{name}\.violates\.(\w+)\.cfg$", path.name)] if match}
+    return main, violating
 
 
 def check_tlc(brief, previous, step):
@@ -254,41 +400,128 @@ def check_tlc(brief, previous, step):
     runs = {}
     problems = []
     specs = {name: expectation for name, expectation in TLC_SPECS.items() if expectation["step"] <= step}
+    met = 0
     for name, expectation in specs.items():
         tla = SPEC / "Core" / f"{name}.tla"
-        cfg = SPEC / "Core" / f"{name}.cfg"
-        if not tla.exists() or not cfg.exists():
+        main, violating = tlc_configs(name)
+        if not tla.exists():
             problems.append(f"{name} not started")
             continue
-        digest = spec_hash(tla, cfg)
-        run = cached.get(name)
-        if not run or run.get("hash") != digest:
-            if brief:
-                problems.append(f"{name} changed since its last run")
+        planned = ([main] if expectation["expect"] == "green" else []) + list(violating.values())
+        spec_runs = {}
+        stale = False
+        for cfg in planned:
+            if not cfg.exists():
                 continue
-            run = {"hash": digest, **run_tlc(name, tla, cfg)}
-        runs[name] = run
-        if expectation["expect"] == "green" and not run["green"]:
-            problems.append(f"{name}: {run['line']}")
-        if expectation["expect"] == "four counterexamples" and len(run["violated"]) != 4:
-            problems.append(f"{name}: expected four violated invariants, saw {run['violated']}")
-    outcome = result(not problems, "; ".join(problems) or "every spec meets its expectation", specs=len(specs), met=len(specs) - len(problems))
+            digest = spec_hash(tla, cfg)
+            run = cached.get(name, {}).get(cfg.name)
+            if not run or run.get("hash") != digest:
+                if brief:
+                    stale = True
+                    continue
+                run = {"hash": digest, **run_tlc(tla, cfg)}
+            spec_runs[cfg.name] = run
+        runs[name] = spec_runs
+        if stale:
+            problems.append(f"{name} changed since its last run")
+            continue
+        own = []
+        if expectation["expect"] == "green":
+            if not main.exists():
+                own.append("no main cfg")
+            elif not spec_runs[main.name]["green"]:
+                own.append(spec_runs[main.name]["line"])
+            _, listed = tla_invariants(name)
+            unmutated = sorted(invariant for invariant in listed if invariant not in violating)
+            if unmutated:
+                own.append("no violating cfg for " + ", ".join(unmutated))
+            if not any(invariant.startswith("Reach") for invariant in violating):
+                own.append("no Reach witness")
+        elif len(violating) != expectation["gaps"]:
+            own.append(f"{len(violating)} gap cfgs, expected {expectation['gaps']}")
+        for invariant, cfg in violating.items():
+            if spec_runs[cfg.name]["violated"] != [invariant]:
+                own.append(f"{cfg.name}: expected {invariant} violated, saw {spec_runs[cfg.name]['line']}")
+        if own:
+            problems.append(f"{name}: " + "; ".join(own[:3]))
+        else:
+            met += 1
+    outcome = result(not problems, "; ".join(problems[:6]) or "every spec green, every invariant killed by its mutant, every witness reached", specs=len(specs), met=met)
     outcome["runs"] = runs
     return outcome
 
 
 def check_probes():
-    folder = SPEC / "probes"
-    if not folder.exists():
-        return not_started(folder)
-    return not_built("the probes")
+    path = SPEC / "probes" / "facts.json"
+    if not path.exists():
+        return not_started(path)
+    facts = json.loads(path.read_text())["facts"]
+    outputs = {}
+    problems = []
+    for fact in facts:
+        if fact["host"] == "net48":
+            source, _, number = fact["source"].rpartition(":")
+            lines = (REPO / source).read_text().splitlines() if (REPO / source).is_file() else []
+            if not source.startswith("spec/probes/") or int(number) > len(lines) or fact["expect"] not in lines[int(number) - 1]:
+                problems.append(f"{fact['id']}: \"{fact['expect']}\" is not at {fact['source']}")
+            continue
+        probe = SPEC / "probes" / fact["probe"]
+        if probe not in outputs:
+            completed = subprocess.run(["dotnet", "run", "--project", str(probe)], capture_output=True, text=True, cwd=probe)
+            outputs[probe] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
+        if fact["expect"] not in outputs[probe]:
+            problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
+    return result(not problems, "; ".join(problems[:6]) or "every fact printed by its probe or found at its source line",
+                  facts=len(facts), net10=sum(1 for fact in facts if fact["host"] == "net10"), net48=sum(1 for fact in facts if fact["host"] == "net48"))
+
+
+def regression_shas():
+    brief = (SPEC / "BRIEF.md").read_text()
+    start = brief.index("**What partials cost: the regression list (P).**")
+    end = brief.index("## 7.", start)
+    return sorted(set(re.findall(r"\b[0-9a-f]{9}\b", brief[start:end])))
+
+
+def spec_line_resolves(line):
+    sections = design_sections() or {}
+    if re.fullmatch(r"DESIGN\.md#Q\d+", line):
+        return line.split("#")[1] in sections
+    match = re.fullmatch(r"(\w+)\.tla:(\w+)", line)
+    if match:
+        defined, _ = tla_invariants(match.group(1))
+        return defined is not None and match.group(2) in defined
+    match = re.fullmatch(r"probe:([\w.\-]+)", line)
+    if match:
+        return match.group(1) in probe_ids()
+    return False
+
+
+def on_branch(sha, tip):
+    return subprocess.run(["git", "-C", str(REPO), "merge-base", "--is-ancestor", sha, tip]).returncode == 0
 
 
 def check_history():
     path = SPEC / "history.tsv"
     if not path.exists():
         return not_started(path)
-    return not_built("the regression history")
+    rows = [dict(zip(["sha", "branch", "group", "spec_line"], line.split("\t"))) for line in path.read_text().splitlines()[1:]]
+    problems = []
+    listed = {row["sha"][:9] for row in rows}
+    missing = [sha for sha in regression_shas() if sha not in listed]
+    if missing:
+        problems.append("missing " + ", ".join(missing))
+    for row in rows:
+        full = git("rev-parse", "--verify", "-q", row["sha"] + "^{commit}")
+        if not full:
+            problems.append(f"{row['sha']} is no commit")
+            continue
+        branch = "both" if on_branch(full, MAIN_SHA) and on_branch(full, BASE_SHA) else "redesign" if on_branch(full, BASE_SHA) else "main" if on_branch(full, MAIN_SHA) else "neither"
+        if branch != row["branch"]:
+            problems.append(f"{row['sha']} is on {branch}, the row says {row['branch']}")
+        if not spec_line_resolves(row["spec_line"]):
+            problems.append(f"{row['sha']} spec line {row['spec_line']} resolves to nothing")
+    return result(not problems, "; ".join(problems[:6]) or "every regression SHA on its branch and tied to a spec line",
+                  rows=len(rows), required=len(regression_shas()))
 
 
 def check_kinds():
@@ -363,22 +596,29 @@ def check_hedges():
     return result(not hits, "; ".join(hits[:10]) or "no hedge word in the spec's prose", hedges=len(hits), files=len(files) + len(json_files))
 
 
+def python_comments(path):
+    hits = []
+    tokens = tokenize.generate_tokens(io.StringIO(path.read_text()).readline)
+    previous = None
+    for token in tokens:
+        if token.type == tokenize.COMMENT and not (token.start[0] == 1 and token.string.startswith("#!")):
+            hits.append(f"{path.relative_to(REPO)}:{token.start[0]}")
+        if token.type == tokenize.STRING and previous in (None, tokenize.NEWLINE, tokenize.INDENT, tokenize.DEDENT, tokenize.NL) and token.string.lstrip("rbuRBU").startswith(('"""', "\'\'\'")):
+            hits.append(f"{path.relative_to(REPO)}:{token.start[0]} docstring")
+        if token.type not in (tokenize.COMMENT, tokenize.NL):
+            previous = token.type
+    return hits
+
+
 def check_no_comments():
     hits = []
     for path in sorted(SPEC.glob("**/*.py")):
-        for number, line in enumerate(path.read_text().splitlines(), 1):
-            stripped = line.strip()
-            if number == 1 and stripped.startswith("#!"):
-                continue
-            if stripped.startswith("#") or re.search(r"\s#\s", line) and not re.search(r"(['\"]).*#.*\1", line):
-                hits.append(f"{path.relative_to(REPO)}:{number}")
-            if stripped.startswith(('"""', "'''")):
-                hits.append(f"{path.relative_to(REPO)}:{number} docstring")
-    for path in sorted(SPEC.glob("**/*.tla")):
+        hits += python_comments(path)
+    for path in sorted(SPEC.glob("**/*.tla")) + sorted(SPEC.glob("**/*.cfg")):
         for number, line in enumerate(path.read_text().splitlines(), 1):
             if "\\*" in line or "(*" in line:
                 hits.append(f"{path.relative_to(REPO)}:{number}")
-    return result(not hits, "; ".join(hits[:10]) or "no comment in the spec's code", comments=len(hits))
+    return result(not hits, "; ".join(hits[:10]) or "no comment in the spec's Python or TLA+", comments=len(hits))
 
 
 CHECKS = [
@@ -388,6 +628,7 @@ CHECKS = [
     ("core_questions", "Q1 to Q18 answered", check_questions(QUESTIONS[:18])),
     ("core_tlc", "the TLC specs of Q4, Q9 with Q10, Q11, Q12 and the date wire form green", None),
     ("questions", "every core design question answered", check_questions(QUESTIONS)),
+    ("evidence", "every G, B and P evidence item placed in a section's Evidence", check_evidence),
     ("tlc", "every TLC spec meets its expectation", None),
     ("probes", "every server fact a spec assumes is pinned by a probe", check_probes),
     ("history", "every regression SHA tied to a spec line", check_history),
@@ -413,7 +654,7 @@ STEPS = [
     (2, "B", "Main's surface as text", ["main_surface"], "Wire PublicApiAnalyzers into main-read, run RS0016 one target framework at a time, copy to spec/inventory/main."),
     (3, "B", "Inventory", ["inventory"], "Write spec/tools/inventory.py and the TSVs."),
     (4, "C", "Q1 to Q18, TLA+ specs, probes, history", ["core_questions", "core_tlc", "probes", "history"], "Answer Q1 to Q18 in spec/Core/DESIGN.md with their TLA+ specs and probes; write spec/history.tsv."),
-    (5, "C", "Q19, the schema, the validation spec, gate 1", ["questions", "tlc", "kinds", "gate1"], "Write Schema.tla, schema.md and the validation specs; present gate 1."),
+    (5, "C", "Q19, the schema, the validation spec, gate 1", ["questions", "evidence", "tlc", "kinds", "gate1"], "Write Schema.tla, schema.md and the validation specs; present gate 1."),
     (6, "D", "Feature rows", ["doors_mapped", "verdicts", "features_core", "features_lost"], "Write spec/<Module>/features.json and module.md for each module."),
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),

@@ -170,7 +170,7 @@ def match_doors(redesign, main):
             rows.append(("", main_package, tfm, door, "", main_raw))
     table = []
     for package, main_package, tfm, door, raw, main_raw in rows:
-        status = "both" if raw and main_raw else "redesign-only" if raw else "main-only"
+        status = ("both" if package == main_package else "moved") if raw and main_raw else "redesign-only" if raw else "main-only"
         owner = package or main_package
         scope = "carried" if owner in CARRIED else "spec"
         table.append((owner, main_package, scope, tfm, declaring_type(door), status, door, raw, main_raw))
