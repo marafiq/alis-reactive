@@ -105,7 +105,7 @@ public class WhenARuleNamesTheCode
 
     private static IReadOnlyList<RuleFile> ReadRules()
         => Repository.TrackedFiles
-            .Where(path => Path.GetFileName(path) == "CLAUDE.md" || Regex.IsMatch(path, @"^\.claude/(rules|agents)/[^/]+\.md$"))
+            .Where(path => Path.GetFileName(path) == "CLAUDE.md" || Regex.IsMatch(path, @"^\.claude/((rules|agents)/[^/]+|skills/[^/]+/SKILL)\.md$"))
             .Select(ReadRule)
             .ToList();
 

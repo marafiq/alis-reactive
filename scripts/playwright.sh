@@ -27,7 +27,7 @@ descriptors() {
 }
 
 load_project() {
-  unset -f playwright_shard_filter playwright_check_assets playwright_sources
+  unset -f playwright_shard_filter playwright_check_assets playwright_build_assets playwright_sources
   playwright_project=""
   playwright_shards=""
   playwright_runtime="framework"

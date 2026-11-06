@@ -27,6 +27,10 @@ playwright_check_assets() {
     poc/runtime/build.mjs
 }
 
+playwright_build_assets() {
+  node poc/runtime/build.mjs
+}
+
 playwright_sources() {
   printf '%s\n' poc/Alis.Reactive.Poc tests/Alis.Reactive.Poc.App
 }

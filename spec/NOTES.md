@@ -129,3 +129,13 @@
   - pin forced to "4321" failed only the wrong-code test;
   - required members that do not stop failed only the missing-member test.
 - 2026-11-06 finding: a TypeScript `private` field is a plain property at run time, so the `in` check on a declared member passes for it. CareBoardV2's private `title` let v1's declaration write through. The component's fix is `#private`. The guard that holds a declaration to a component's typed API is the build-time vendor contract check (D17.5, POC 13), which reads the .d.ts where `private` shows. The run-time check sees only what the object holds.
+- 2026-11-06 decision: the prove-behavior skill (.claude/skills/prove-behavior/SKILL.md) holds the judgment: which defect, what its verdict means, what the report carries. The mechanics are scripts/plant-defect.sh:
+  - it plants one text found once and runs the filtered tests under a unique stamp, so the verdict reads a fresh TRX;
+  - its verdict keys on the named test (caught, with the failure message and what else failed, or ESCAPED), and it refuses a run where that test did not run once;
+  - it restores the file by copy and touch on every exit, rebuilding the assets;
+  - it refuses a defect in the test project.
+  A project gives the tool its asset build in its descriptor (playwright_build_assets). Only poc declares one; the tool refuses the other three projects by that name. WhenARuleNamesTheCode now reads a skill's SKILL.md, so a script, option or name the skill cites is held. Proof:
+  - caught, ESCAPED and both refusals were seen on the poc project;
+  - a run killed with TERM mid-test restored the file (git diff clean, mtime moved), with no test process or listener left;
+  - a planted --name in the skill failed WhenARuleNamesTheCode ("scripts/plant-defect.sh reads no option --name"), and the restored skill passed it, 8 of 8.
+- 2026-11-06 deferral: two memory files are held by the skill and the tool, feedback-mutant-restore-mtime.md (restore by copy and touch) and feedback-results-from-the-log-line.md (the tool's own line from a fresh artifact; a 0-test run proves nothing). They stay while the skill is only on feature/spec-first, since every worktree shares that memory, and they are removed when it lands on main.

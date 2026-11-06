@@ -88,7 +88,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   framework processes a request from start to end, helps while developing, and is optional, never always on.
 - The owner, 2026-11-06: null and undefined are never a state, in C#, in TypeScript, anywhere; a value that can be absent is a closed
   union, and null is only a value the data holds. The nuance, the owner's words: "That is about the framework, not about the
-  value." A contract whose field is nullable (`birthCountry: string | null`) is valid, and its declaration says so (`string?`).
+  value." A contract whose field is nullable (a birth country typed as a string or null) is valid, and its declaration says so (`string?`).
 - The owner, 2026-11-06: "when we onboard a component, we onboard the typed API exactly what that component has. So if the typed
   API is not available, then how would you even call via framework?" A declaration mirrors the typed API member for member, on
   every live object whatever holds it, a payload included: presence and nullability come from that API (D5.3).
