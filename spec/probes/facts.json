@@ -557,6 +557,51 @@
       "probe": "spec/probes/aspnetwebstack/WebPageBase.cs.txt",
       "expect": "if (_body != null)",
       "source": "spec/probes/aspnetwebstack/WebPageBase.cs.txt:443"
+    },
+    {
+      "id": "ej2-template-unencoded",
+      "statement": "EJ2's string template engine writes a data value into the HTML unencoded, so markup in data becomes live elements.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, its compile run under jsdom",
+      "probe": "ej2-template.mjs",
+      "expect": "ej2-template-unencoded: <b><img src=\"x\" onerror=\"alert(1)\"></b>",
+      "source": "spec/probes/ej2-template.mjs"
+    },
+    {
+      "id": "ej2-template-condition",
+      "statement": "EJ2's string template engine evaluates its own conditions, written as JavaScript in ${if(..)}.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, its compile run under jsdom",
+      "probe": "ej2-template.mjs",
+      "expect": "ej2-template-condition: count 3 shows many; count 1 shows few",
+      "source": "spec/probes/ej2-template.mjs"
+    },
+    {
+      "id": "ej2-template-missing-holder",
+      "statement": "EJ2's string template engine throws on a member past a missing holder.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, its compile run under jsdom",
+      "probe": "ej2-template.mjs",
+      "expect": "ej2-template-missing-holder: a member past a missing holder gives TypeError",
+      "source": "spec/probes/ej2-template.mjs"
+    },
+    {
+      "id": "ej2-template-function-text-node",
+      "statement": "EJ2's template compile renders the text node a function template returns as text, so markup in it stays text.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, its compile run under jsdom",
+      "probe": "ej2-template.mjs",
+      "expect": "ej2-template-function-text-node: a function returning a text node renders <img src=x onerror=alert(1)> as text",
+      "source": "spec/probes/ej2-template.mjs"
+    },
+    {
+      "id": "ej2-template-function-elements",
+      "statement": "EJ2's template compile renders the elements a function template returns as they are.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, its compile run under jsdom",
+      "probe": "ej2-template.mjs",
+      "expect": "ej2-template-function-elements: a function returning elements renders <em></em>",
+      "source": "spec/probes/ej2-template.mjs"
     }
   ]
 }

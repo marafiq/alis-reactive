@@ -7,11 +7,11 @@
     },
     "core_questions": {
       "counts": {
-        "answered": 13,
-        "defects": 86,
+        "answered": 15,
+        "defects": 102,
         "total": 18
       },
-      "detail": "Q14 absent; Q15 absent; Q16 absent; Q17 absent; Q18 absent",
+      "detail": "Q16 absent; Q17 absent; Q18 absent",
       "pass": false
     },
     "core_tlc": {
@@ -630,10 +630,10 @@
     },
     "evidence": {
       "counts": {
-        "placed": 23,
+        "placed": 24,
         "total": 31
       },
-      "detail": "unplaced: G1, G2, G5, G10, B13, B16, P4, P5",
+      "detail": "unplaced: G1, G2, G5, G10, B13, B16, P5",
       "pass": false
     },
     "features_core": {
@@ -725,10 +725,10 @@
     },
     "probes": {
       "counts": {
-        "facts": 62,
+        "facts": 67,
         "net10": 27,
         "net48": 26,
-        "node": 9
+        "node": 14
       },
       "detail": "every fact printed by its probe or found at its source line",
       "pass": true
@@ -740,11 +740,11 @@
     },
     "questions": {
       "counts": {
-        "answered": 13,
-        "defects": 86,
+        "answered": 15,
+        "defects": 102,
         "total": 19
       },
-      "detail": "Q14 absent; Q15 absent; Q16 absent; Q17 absent; Q18 absent; Q19 absent",
+      "detail": "Q16 absent; Q17 absent; Q18 absent; Q19 absent",
       "pass": false
     },
     "rewrite_units": {
@@ -1370,7 +1370,7 @@
     }
   },
   "passed": 6,
-  "read_at_head": "dd5ec3c05104f04ede8469c0af2651411c26a3d9",
+  "read_at_head": "0b24ccc2d3a7d0fa9a248a7c82030493727e7afe",
   "step": {
     "failing": [
       "core_questions",

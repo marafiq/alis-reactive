@@ -1305,3 +1305,73 @@ and `request` state, which the schema does not hold: a request's state is its ru
 - `X14.10` behavior: a list-item partial under `Members[1]` sends its inputs at position 1 in a JSON body.
 - `X14.11` behavior: on net48 a partial rendered by `PartialFor` leaves the page's own inputs posting under their
   names; the `verify-net48` run proves it.
+
+## Q15. Templates
+
+**Decision.**
+- D15.1 A template is plan data, never vendor template text. C# writes it as a typed tree, and the framework's
+  template plugin turns the tree into a function from an item to DOM nodes, which the component's property
+  takes.
+  - EJ2 takes such a function. The text nodes it returns stay text and its elements render as they are
+    (`probe:ej2-template-function-text-node`, `probe:ej2-template-function-elements`).
+  - So one template form serves every vendor that takes a function template, and the native reference
+    renders its cells with the same plugin.
+- D15.2 Syncfusion's string engine is refused as the framework's template form, for what it does:
+  - it writes a data value into the HTML unencoded, so markup in data becomes live elements
+    (`probe:ej2-template-unencoded`);
+  - it throws on a member past a missing holder (`probe:ej2-template-missing-holder`), where Q4 reads nothing;
+  - it evaluates its conditions as JavaScript compiled with `new Function` (`probe:ej2-template-condition`).
+- D15.3 A template's tree is closed. Its nodes are elements of a closed set (text, span, div, badge, icon,
+  image, link, event button), each with classes and attributes; text and attribute values read from the
+  item; and a condition with a then and an else branch.
+  - A value is read from the item with the one read (Q2), its members optional, so a member past a missing
+    holder reads nothing and shows nothing (Q4).
+  - Text is written with `textContent` and attributes with `setAttribute`, so data is never markup. A link's
+    address is read as a URL and refused, reading nothing, when its scheme is not `http`, `https`, `mailto` or
+    `tel`.
+  - Member names are the data's JSON names under the app's options (D2.9). The camel case the template writer
+    hard-codes today is refused.
+- D15.4 A template's condition is the one condition core (Q8) over the item, written with the one syntax
+  (D8.6), with a branch that is a block (D8.7). The template's second condition syntax, a lambda of the item,
+  and its third translator are refused.
+- D15.5 An event button raises a declared app event with a payload read from the item. The payload is data,
+  and the event's handlers are plan handlers like any other (Q11).
+- D15.6 Developer-written markup stays: `Raw(html)` takes static HTML the developer writes, never a read from
+  the item.
+
+**Schema nodes.** `fn` (the item to the tree), `record`, `list`, `get`, `as`, `op`, the plugin `alis.template`, and the
+template tree as a typed plugin argument (Q19), so the grammar gains no node.
+
+**Checker.**
+- `probe:ej2-template-unencoded`
+- `probe:ej2-template-condition`
+- `probe:ej2-template-missing-holder`
+- `probe:ej2-template-function-text-node`
+- `probe:ej2-template-function-elements`
+- `Absence.tla:DataAbsentReadsNothing`
+
+**Doors.**
+- kept: `FusionTemplate.Create<T>()` and its element doors (`Text`, `Span`, `Div`, `Badge`, `Icon`, `Img`, `Link`,
+  `EventButton`, `Raw`), the template properties of each component.
+- `N15.1` new: the template tree, a typed plugin argument of `alis.template`, and the plugin that renders it.
+- `N15.2` new: the template's condition, written with the one condition syntax over the item; its form goes to
+  gate 2. It carries `When(Expression<Func<TModel, bool>>)` and `FusionConditionalBuilder`, whose lambda form is
+  refused.
+
+**Evidence.**
+- The template writer names every member in camel case (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:44`)
+  and compiles a captured value with `Compile().DynamicInvoke()` (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:85-90`).
+- The template's condition is a lambda of the item (`Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:322-337`),
+  translated to the engine's text by a third translator (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:22-25`).
+
+**Defects.**
+- `X15.1` behavior: a grid row whose name holds `<img src=x onerror=alert(1)>` shows that text in its template
+  cell, and no image element renders.
+- `X15.2` behavior: a row with no address shows an empty cell where the template reads the address's city, and
+  the grid's other rows render.
+- `X15.3` behavior: a template condition on the item's status shows the badge for an active row and the other
+  branch for an inactive one.
+- `X15.4` behavior: a template's event button raises its app event with the row's id, and the page's handler of
+  that event runs.
+- `X15.5` behavior: with the app's JSON options naming members in Pascal case, a template reads `Name` from a
+  row the server sent.
