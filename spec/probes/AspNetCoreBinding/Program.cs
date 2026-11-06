@@ -79,6 +79,10 @@ try
     {
         Console.WriteLine("core-api-controller-implicit-required: Name= answers " + (int)api.StatusCode + " " + api.Content.Headers.ContentType?.MediaType + (await api.Content.ReadAsStringAsync()).Contains("reached the action") switch { true => " from the action", false => " before the action" });
     }
+#line 42 "Views/Residents/Intake.cshtml"
+    var builderCall = CallSite();
+#line default
+    Console.WriteLine("core-caller-line-follows-line-directive: a call under #line 42 of Intake.cshtml reads " + builderCall);
     Console.WriteLine("core-form-empty-field: Count= binds " + await Form(client, "/counts", "Count=&Maybe=") + "; nothing sent binds " + await Form(client, "/counts", ""));
     Console.WriteLine("core-json-null-member: {\"count\":null} binds " + await Json(client, "/counts-json", "{\"count\":null}") + "; {} binds " + await Json(client, "/counts-json", "{}"));
     using (var strict = await client.PostAsync("/strict-json", null))
@@ -91,6 +95,9 @@ finally
 {
     await app.StopAsync();
 }
+
+static string CallSite([System.Runtime.CompilerServices.CallerFilePath] string file = "", [System.Runtime.CompilerServices.CallerLineNumber] int line = 0)
+    => Path.GetFileName(file) + ":" + line;
 
 static bool Turkish(Func<bool> test)
 {

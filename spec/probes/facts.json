@@ -935,6 +935,15 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-api-controller-implicit-required: Name= answers 400 application/problem+json before the action",
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-caller-line-follows-line-directive",
+      "statement": "CallerFilePath and CallerLineNumber read the file and line a #line directive sets, so a builder call in generated view code reads the view's own line when the generator writes the directive.",
+      "host": "net10",
+      "oracle": "the C# compiler of the .NET 10 SDK",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-caller-line-follows-line-directive: a call under #line 42 of Intake.cshtml reads Intake.cshtml:42",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
     }
   ]
 }

@@ -131,7 +131,7 @@ Alis.Reactive.Assets.
 | 22 | Fusion templates | built on the core | the Syncfusion template engine and its conditionals | Q15 |
 | 23 | Fusion app-level objects | built on the core | FusionConfirm and FusionToast | Q11 |
 | 24 | Native components | built on the core | the plain-DOM components, with the native reference | Q17 |
-| 25 | Native app-level objects | built on the core | NativeDrawer, NativeLoader and the action link | Q11 |
+| 25 | Native app-level objects | built on the core | NativeDrawer, NativeLoader, NativeConfirm, NativeToast and the action link, the framework's own, styled by the app | Q11, Q17 |
 | 26 | Tracing | view author and operator | the diagnostics port, the plan's trace context, spans and events by a closed vocabulary, propagation to the server, the server's activity source, the OpenTelemetry adapter built on the port | Q20 |
 
 ## Files

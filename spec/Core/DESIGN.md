@@ -1024,8 +1024,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `probe:ej2-methods-returning-promise`
 
 **Doors.**
-- kept: `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Confirm`, `Parallel`, the hub's `invoke` and
-  `send`.
+- kept: `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Parallel`, the hub's `invoke` and `send`; `Confirm`
+  is carried by N17.3 over a component's `MethodAsync<bool>` (D17.9).
 - `N11.1` new: a handler's policy, `overlap`, `replace` or `skip` (D11.7); its door's form goes to gate 2.
 - `N11.2` new: the refusal at render of a write to the trigger's payload after an awaited step (D11.4).
 
@@ -1739,6 +1739,26 @@ grammar gains no node (G2).
   expression (D16.10).
 - D17.8 Two reference components prove the vendor contract on paper in step 8, FusionMultiSelect and a native
   reference, each declaration against the schema, and later in the browser.
+- D17.9 The core's C# names no plugin and no component a consumer provides. At 65fdf118d it does: the `Confirm` doors
+  write a call to `alis.confirm`, which only Fusion's browser code provides, so a page without Fusion cannot confirm.
+  Those doors leave the core. A user's decision is a component's declared `MethodAsync<bool>`, read in a condition as
+  any source is (D8.6), and C# writes the awaited read before the branch, where its term is reached (D4.7).
+- D17.10 The framework shapes its own app-level components (the owner, 2026-11-06: control them fully, leave the
+  styling to the app), built only on the core's public surface, as an app's component is, so the core names none of
+  them and they prove that surface. They live in Alis.Reactive.Native beside NativeDrawer and NativeLoader, and render
+  semantic markup with stable `alis-` class names and no visual styling:
+  - NativeConfirm is the platform's modal `<dialog>`, opened by `showModal`: the top layer, the page inert behind it,
+    focus kept inside. `Ask` is `MethodAsync<bool>`. Escape is the dialog's `cancel`: it answers false and goes no
+    further, so a drawer behind stays open. Asks take their turn in order, as today's do. Its title and button texts
+    are the app's, configured once, where today's are fixed English. A run that ends while its ask is open closes it
+    (D17.11).
+  - NativeToast is one region per page in the top layer (`popover="manual"`): a status region for success and
+    information, an alert for warnings and errors. Its text is set by `textContent`. A toast leaves after the app's
+    time, paused while it is hovered or focused, and an error stays until it is dismissed.
+  - FusionConfirm and FusionToast stay, as the Fusion module's.
+- D17.11 A declared method receives the run's abort signal only where its declaration names an argument of that kind,
+  so no vendor's method receives an argument it does not declare. The plan writes it as the expression `signal`,
+  which reads the run's own signal (Q11, Q19).
 
 **Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
 `handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
@@ -1758,6 +1778,10 @@ plans (Q19).
   `MethodAsync`, properties, events).
 - `N17.1` new: the payload kind of an event, declared with the event (D17.4); its form goes to gate 2.
 - `N17.2` new: the vendor contract file and the analyzer that checks declarations against it (D17.5).
+- `N17.3` new: a condition over an awaited `MethodAsync<bool>` source, replacing `ConditionStart<TModel>.Confirm` and
+  `ConditionExtensions.Confirm`; its form goes to gate 2.
+- `N17.4` new: `NativeConfirm` and `NativeToast` in Alis.Reactive.Native, each a declaration and a render helper.
+- `N17.5` new: the declaration's argument kind that carries the run's abort signal (D17.11).
 
 **Evidence.**
 - G5: the driver switches only on the listening kind (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:28-33`),
@@ -1770,6 +1794,12 @@ plans (Q19).
   ranges (`package-lock.json:1717-1726`), so `ej2-base` resolves to 33.1.45 under 33.1.47.
 - A regular expression checks a vendor's name (`Alis.Reactive/Vendors/ComponentVendor.cs:10-11`).
 
+- The core writes a call to a plugin only Fusion provides: `Alis.Reactive/PlanModel/Conditions/Condition.cs:504`,
+  `Alis.Reactive/PlanModel/Writing/Scope.cs:209`, `Alis.Reactive.Assets/components/fusion/confirm.ts:94`.
+- Today's confirm queues its asks (`Alis.Reactive.Assets/components/fusion/confirm.ts:88`), keeps Escape inside
+  (`Alis.Reactive.Assets/components/fusion/confirm.ts:67`) and writes fixed English
+  (`Alis.Reactive.Assets/components/fusion/confirm.ts:50`, `Alis.Reactive.Assets/components/fusion/confirm.ts:55`).
+
 **Defects.**
 - `X17.1` analyzer: a method declared with `Method` whose vendor contract returns a promise: new:N17.2.
 - `X17.2` analyzer: a declared member the vendor contract does not list as public: new:N17.2.
@@ -1779,6 +1809,13 @@ plans (Q19).
   step kind (a read, a write, a call, an event) with no change to the framework.
 - `X17.5` refusal: a vendor name outside its characters: "Vendor name '{name}' must start with a letter and contain
   only ASCII letters, digits, underscore, or hyphen."
+- `X17.6` behavior: a page that loads no Fusion asset asks NativeConfirm in a `When`; the branch runs on OK and
+  not on Cancel.
+- `X17.7` behavior: Escape in a confirm opened over a drawer answers false, and the drawer stays open.
+- `X17.8` behavior: a save replaced while its confirm is open closes that dialog, and only the second save's
+  confirm shows.
+- `X17.9` behavior: an error toast stays until it is dismissed, and an information toast leaves after its time
+  unless it is hovered.
 
 ## Q18. Type knowledge without reflection
 
@@ -1877,8 +1914,8 @@ shapes, starts and the payload kind of each event.
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
   `spec/NOTES.md`).
-- D19.2 The set is closed at 40 kinds: today's 33, and `stop`, `file`, `each`, `clock`, `zone`, `off` and `on`. No
-  kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+- D19.2 The set is closed at 41 kinds: today's 33, and `stop`, `file`, `each`, `signal`, `clock`, `zone`, `off` and
+  `on`. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case.
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).
@@ -1976,9 +2013,11 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   or disposed (D12.4). A sink's error is the one error the port catches: it logs it once as an error and the run goes
   on, since telemetry observes the page and never decides what it does.
 - D20.7 Under `on`, C# writes each handler's source: the view, as MVC names it, and the line of the builder call, read by
-  `CallerFilePath` and `CallerLineNumber` at the builder door. That those follow the `#line` directives each host's view
-  compiler writes is not yet observed: the unit's first proof is a probe on both hosts. Under `off` no source is written,
-  so a page carries no view path unless its render was traced.
+  `CallerFilePath` and `CallerLineNumber` at the builder door, which read the line a `#line` directive sets
+  (`probe:core-caller-line-follows-line-directive`). That each host's view compiler writes that directive at a builder
+  call is not yet observed, and the unit's first proof is that probe on both hosts. If a host writes none, `line`
+  carries the handler's position among the handlers its view writes: the same integer, so the grammar does not change.
+  Under `off` no source is written, so a page carries no view path unless its render was traced.
 - D20.8 On the server the framework has one `ActivitySource`, named "Alis.Reactive", from `System.Diagnostics`, with an
   activity for rendering a plan, the validation door (validator, rule set, failure count) and the error door. The app
   adds its own OpenTelemetry SDK and listens to that source. On net48 the source comes from the
@@ -2000,6 +2039,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - `Tracing.tla:AttemptsJoinTheTrace`
 - `Tracing.tla:TraceHeadersStayHome`
 - `Tracing.tla:SinkFailureChangesNothing`
+- `probe:core-caller-line-follows-line-directive`
 
 **Doors.**
 - `N20.1` new: the browser's diagnostics port, internal, with its closed span and event vocabulary (D20.4).

@@ -98,14 +98,15 @@ listening: `method` or `assignment`. `Vendor.payload` of 65fdf118d leaves: it mo
 | `element` | `id`: an element id; `vendor`: a vendor name of `vendors` | | the component on that element at the vendor's object path. An element the page lacks, or one that holds no object at that path, stops the pipeline that reads it (D4.1). |
 | `plugin` | `name`: the plugin's name; `key`: text the plugin reads | `data`: plugin data | the plugin's object for that key |
 
-The plugins the core's C# names are `alis.http`, `alis.form`, `alis.model`, `alis.slot`, `alis.hub`,
-`alis.stream`, `alis.document` and `alis.confirm`. Any other name is a plugin an app or a component brings.
+The plugins the core's C# names are `alis.http`, `alis.form`, `alis.model`, `alis.slot`, `alis.hub`, `alis.stream`
+and `alis.document`, each provided by the core's own browser code. Any other name is a plugin an app or a component
+brings. `alis.confirm` of 65fdf118d is Fusion's, so the core no longer names it (D17.9).
 
 ## Plugin data
 
 | Kind | Carries | Holds | Meaning |
 |------|---------|-------|---------|
-| `none` | nothing | | the plugin contributes nothing to the owner: http, document, confirm, slot (its key is the container id, D12.1), stream, an app's plugin |
+| `none` | nothing | | the plugin contributes nothing to the owner: http, document, slot (its key is the container id, D12.1), stream, an app's plugin |
 | `hub` | nothing | | the owner holds the hub's connection while it lives (D12.6) |
 | `model` | `inputs`: a map from input id to `InputBinding` | | the inputs this plan renders, by id (D13.2, D14.3) |
 | `form` | `summary`: the summary element's id | `live`: `Live`; `registrations`: a list of `Registration` | this plan's rules for the form whose element id is the key (Q16) |
@@ -204,6 +205,7 @@ and in the blocks inside it, and nowhere else.
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
 | `list` | | `items`: expressions | a list built from sources (N7.2) |
 | `op` | `op`: an operator | `args`: expressions | the operator over its arguments; `and`, `or` and `cond` evaluate a term only when it is reached (D4.7) |
+| `signal` | nothing | | the run's abort signal, passed only to a method whose declaration names that argument (D17.11) |
 
 `RecordField` carries `name`, a wire name, and `value`, an expression.
 
@@ -229,7 +231,9 @@ D16.11).
 
 ## Plugin arguments
 
-These are typed contracts, not node kinds (G2). C# writes each as a `record` whose evaluated value is the contract;
+These are typed contracts, not node kinds (G2). S2 and S8 hold for them as for the grammar: every part is required, a
+part that can be absent is a closed union (`retry` is none or the standard policy, `body` is none, JSON or form data),
+and a closed choice (`method`, `outcome`) is a sealed class. C# writes each as a `record` whose evaluated value is the contract;
 the contract's C# classes are generated into the plan's TypeScript beside the grammar, so the browser declares
 no argument type of its own (D9.1).
 
@@ -273,6 +277,7 @@ proposed column says `added`.
 | expression | record | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:34` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D7.4 |
 | expression | list | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:35` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | N7.2 |
 | expression | op | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:36` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q8 |
+| expression | signal | absent | added | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D17.11 |
 | shape | string | `Alis.Reactive.Assets/runtime/grammar/shape.ts:17`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:34` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.6 |
 | shape | number | `Alis.Reactive.Assets/runtime/grammar/shape.ts:18`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:36` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.11 |
 | shape | boolean | `Alis.Reactive.Assets/runtime/grammar/shape.ts:19`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:37` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.6 |
@@ -297,7 +302,7 @@ proposed column says `added`.
 | trace | off | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 | trace | on | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 
-Today 33 kinds, proposed 40: seven added, none removed.
+Today 33 kinds, proposed 41: eight added, none removed.
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses
