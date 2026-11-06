@@ -106,6 +106,8 @@ Terms used throughout:
 - `probe:core-frombody-binds-json-name`
 - `probe:core-frombody-ignores-clr-name`
 - `probe:core-form-ignores-json-name`
+- `probe:core-form-binds-clr-name`
+- `probe:core-json-result-names`
 - `probe:mvc5-json-value-provider-case`
 - `probe:mvc5-json-result-clr-names`
 
@@ -275,8 +277,9 @@ Terms used throughout:
   are the object and the list a property holds; `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` are what
   a method returns. No door infers the kind from the C# member that declares it.
 - D5.9 Every method kind (`Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `ReturnedObject<T>`,
-  `ReturnedObjects<T>`) takes the same arities, from none to the largest arity of a documented-public method
-  in EJ2 33.1.47's declarations (`probe:ej2-max-public-method-arity`).
+  `ReturnedObjects<T>`) takes its arguments as one list of typed `Arg`s, written as a collection expression,
+  `Method([position, icons])`, so a declaration expresses a vendor method of any arity. The declaration's own
+  C# signature keeps each argument typed (`Arg<string> position`).
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
@@ -284,6 +287,7 @@ Terms used throughout:
 - `Absence.tla:RequiredAbsentStops`
 - `Absence.tla:DataAbsentReadsNothing`
 - `probe:ej2-max-public-method-arity`
+- `probe:ej2-methods-past-four-arguments`
 
 **Doors.**
 - kept, public for the component author: `JsObject`'s `Property`, `ReadOnly`, `WriteOnly`, `Method`,
@@ -291,7 +295,8 @@ Terms used throughout:
   `Pass` (`Alis.Reactive/Components/JsObject.cs:74-260`).
 - `N5.2` new: `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` on `JsObject`, replacing `Object<T>(Arg..)`
   and the method form of `Object<T>()` and `Objects<T>()`.
-- `N5.3` new: the arities of D5.9 on every method kind.
+- `N5.3` new: one door per method kind taking `IReadOnlyList<Arg>`, beside the door with no arguments,
+  replacing the overloads of one to four arguments (`Alis.Reactive/Components/JsObject.cs:116-269`).
 - refused: the `GetMembers` scan in `JsObject.DeclaresMethod` (`Alis.Reactive/Components/JsObject.cs:366-368`),
   which reads non-public members to tell a property from a method; N5.2 carries the capability.
 - `N5.1` new: `ServerPushStream` and `SignalRHub` message triggers typed `Data<TMessage>`, replacing the
@@ -313,7 +318,7 @@ Terms used throughout:
 - `X5.3` behavior: a returned object that lacks a declared method stops the pipeline at the call.
 - `X5.5` type: a property's object cannot be mistaken for a method's returned object, and no member scan
   decides it: new:N5.2.
-- `X5.6` type: a vendor method a declaration cannot express for its arity: new:N5.3.
+- `X5.6` type: a vendor method with more arguments than a declaration door takes: new:N5.3 takes any number.
 - `X5.4` behavior: a field of the object a property holds reads nothing when the object lacks it.
 
 ## Q6. Arrays

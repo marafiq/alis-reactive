@@ -1,0 +1,157 @@
+{
+  "facts": [
+    {
+      "id": "mvc5-sub-index-name",
+      "statement": "MVC 5 names a list item of a member by the member's name and the index in brackets, with no dot.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "String.Format(CultureInfo.InvariantCulture, \"{0}[{1}]\", prefix, index)",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:417"
+    },
+    {
+      "id": "mvc5-sub-property-name",
+      "statement": "MVC 5 names a member of a member by joining the two names with a dot.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "return prefix + \".\" + propertyName;",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:437"
+    },
+    {
+      "id": "mvc5-json-value-provider-case",
+      "statement": "MVC 5 matches the keys of a JSON body to members ignoring case.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/JsonValueProviderFactory.cs.txt",
+      "expect": "StringComparer.OrdinalIgnoreCase",
+      "source": "spec/probes/aspnetwebstack/JsonValueProviderFactory.cs.txt:77"
+    },
+    {
+      "id": "mvc5-json-value-provider-serializer",
+      "statement": "MVC 5 reads a JSON body through JavaScriptSerializer, which knows no JsonPropertyName.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/JsonValueProviderFactory.cs.txt",
+      "expect": "JavaScriptSerializer serializer = new JavaScriptSerializer();",
+      "source": "spec/probes/aspnetwebstack/JsonValueProviderFactory.cs.txt:59"
+    },
+    {
+      "id": "mvc5-json-result-clr-names",
+      "statement": "MVC 5's JsonResult writes a response body through JavaScriptSerializer, which names each member by its CLR name.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/JsonResult.cs.txt",
+      "expect": "JavaScriptSerializer serializer = new JavaScriptSerializer();",
+      "source": "spec/probes/aspnetwebstack/JsonResult.cs.txt:63"
+    },
+    {
+      "id": "mvc5-form-current-culture",
+      "statement": "MVC 5 binds form values under the request's current culture.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/FormValueProvider.cs.txt",
+      "expect": "CultureInfo.CurrentCulture",
+      "source": "spec/probes/aspnetwebstack/FormValueProvider.cs.txt:18"
+    },
+    {
+      "id": "mvc5-query-invariant-culture",
+      "statement": "MVC 5 binds query values under the invariant culture.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/QueryStringValueProvider.cs.txt",
+      "expect": "CultureInfo.InvariantCulture",
+      "source": "spec/probes/aspnetwebstack/QueryStringValueProvider.cs.txt:20"
+    },
+    {
+      "id": "core-frombody-binds-json-name",
+      "statement": "A [FromBody] member declared [JsonPropertyName(\"given\")] binds from the JSON key given.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-binds-json-name: Ann",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-frombody-ignores-clr-name",
+      "statement": "A [FromBody] member declared [JsonPropertyName(\"given\")] does not bind from its CLR name.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-ignores-clr-name: <null>",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-binds-clr-name",
+      "statement": "A [FromForm] member binds from its CLR name.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-binds-clr-name: Ann",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-ignores-json-name",
+      "statement": "A [FromForm] member declared [JsonPropertyName(\"given\")] does not bind from given.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-ignores-json-name: <null>",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-binds-indexed-name",
+      "statement": "Form keys Members[1].Name and Members[0].Name bind the list in index order.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-binds-indexed-name: A,B",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-decimal-culture",
+      "statement": "Under the de-DE request culture a form decimal binds 1,5 as 1.5 and binds 1.5 as 15, silently.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-decimal-culture: 1,5 binds 1.5; 1.5 binds 15",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-decimal-invariant",
+      "statement": "Under the de-DE request culture a query decimal binds 1.5 as 1.5 and binds 1,5 as 15, silently.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-decimal-invariant: 1.5 binds 1.5; 1,5 binds 15",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-result-names",
+      "statement": "An MVC action's JSON result names a member by its JsonPropertyName, else its name in camel case.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-result-names: {\"given\":\"Ann\",\"familyName\":\"Lee\"}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "ej2-max-public-method-arity",
+      "statement": "The largest number of parameters of a documented-public EJ2 method is 16 (ImageEditor.drawText).",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion",
+      "probe": "ej2-method-arity.mjs",
+      "expect": "ej2-max-public-method-arity: 16",
+      "source": "spec/probes/ej2-method-arity.mjs"
+    },
+    {
+      "id": "ej2-methods-past-four-arguments",
+      "statement": "285 documented-public EJ2 methods take more than four parameters.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion",
+      "probe": "ej2-method-arity.mjs",
+      "expect": "ej2-methods-past-four-arguments: 285",
+      "source": "spec/probes/ej2-method-arity.mjs"
+    }
+  ]
+}

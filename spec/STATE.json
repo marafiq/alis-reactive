@@ -7,11 +7,11 @@
     },
     "core_questions": {
       "counts": {
-        "answered": 2,
+        "answered": 5,
         "defects": 30,
         "total": 18
       },
-      "detail": "Q1: Checker probe:mvc5-sub-index-name is not in spec/probes/facts.json, Checker probe:mvc5-sub-property-name is not in spec/probes/facts.json, Checker probe:core-form-binds-indexed-name is not in spec/probes/facts.json; Q2: Checker probe:core-frombody-binds-json-name is not in spec/probes/facts.json, Checker probe:core-frombody-ignores-clr-name is not in spec/probes/facts.json, Checker probe:core-form-ignores-json-name is not in spec/probes/facts.json; Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q5: Checker probe:ej2-max-public-method-arity is not in spec/probes/facts.json; Q7 absent; Q8 absent",
+      "detail": "Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q7 absent; Q8 absent; Q9 absent; Q10 absent; Q11 absent",
       "pass": false
     },
     "core_tlc": {
@@ -195,7 +195,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 2,
+        "files": 13,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -256,9 +256,14 @@
       "pass": true
     },
     "probes": {
-      "counts": {},
-      "detail": "not started: spec/probes/facts.json absent",
-      "pass": false
+      "counts": {
+        "facts": 17,
+        "net10": 8,
+        "net48": 7,
+        "node": 2
+      },
+      "detail": "every fact printed by its probe or found at its source line",
+      "pass": true
     },
     "promises": {
       "counts": {},
@@ -267,11 +272,11 @@
     },
     "questions": {
       "counts": {
-        "answered": 2,
+        "answered": 5,
         "defects": 30,
         "total": 19
       },
-      "detail": "Q1: Checker probe:mvc5-sub-index-name is not in spec/probes/facts.json, Checker probe:mvc5-sub-property-name is not in spec/probes/facts.json, Checker probe:core-form-binds-indexed-name is not in spec/probes/facts.json; Q2: Checker probe:core-frombody-binds-json-name is not in spec/probes/facts.json, Checker probe:core-frombody-ignores-clr-name is not in spec/probes/facts.json, Checker probe:core-form-ignores-json-name is not in spec/probes/facts.json; Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q5: Checker probe:ej2-max-public-method-arity is not in spec/probes/facts.json; Q7 absent; Q8 absent",
+      "detail": "Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q7 absent; Q8 absent; Q9 absent; Q10 absent; Q11 absent",
       "pass": false
     },
     "rewrite_units": {
@@ -428,13 +433,12 @@
       "pass": false
     }
   },
-  "passed": 5,
-  "read_at_head": "242092934a83573d94486b2dc94e96080f7f18d4",
+  "passed": 6,
+  "read_at_head": "bff599bee36bb33bb164a0f934f6e9193147b231",
   "step": {
     "failing": [
       "core_questions",
       "core_tlc",
-      "probes",
       "history"
     ],
     "name": "Q1 to Q18, TLA+ specs, probes, history",
