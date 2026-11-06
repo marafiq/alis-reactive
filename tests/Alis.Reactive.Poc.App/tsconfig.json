@@ -1,0 +1,4 @@
+{
+  "extends": "../../poc/runtime/tsconfig.json",
+  "include": ["Components"]
+}

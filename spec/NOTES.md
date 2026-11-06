@@ -123,3 +123,9 @@
 - 2026-11-06 finding: AppServer passes --alis-test-host <pid> and no app of the redesign reads it, so an interrupted run leaves its app listening. The POC app stops itself when that process exits (TestHostWatch).
 - 2026-11-06 decision: CA1716 (VB keywords) is off for the POC: the framework is authored from C# views, and Property, ReadOnly, WriteOnly and Event are the vocabulary. scripts/playwright.sh gains playwright_runtime=own for a project that does not run the redesign's bundle, reset per project.
 - 2026-11-06 not yet: the two real views rewritten in the POC syntax for naming land once conditions exist (CarePlan uses When/ElseIf); culture, time zone and trace are not in the POC's document.
+- 2026-11-06 POC 2, properties, landed. A vendor is found by a path on its element: ComponentVendor.Define(name, objectPath, subscribe, unsubscribe) writes a fn that the one evaluator reads. The declarations proven are Property<T> (read and write), ReadOnly<T>, WriteOnly<T> (a setter with no getter), and one member set from another. Proof: scripts/playwright.sh --project poc "Total tests: 6, Passed: 6". Each new test was red first on its planted defect:
+  - a set written to the wrong key failed the title, unlock and wrong-code tests;
+  - a write-only set that always writes "0000" failed only the unlock test;
+  - pin forced to "4321" failed only the wrong-code test;
+  - required members that do not stop failed only the missing-member test.
+- 2026-11-06 finding: a TypeScript `private` field is a plain property at run time, so the `in` check on a declared member passes for it. CareBoardV2's private `title` let v1's declaration write through. The component's fix is `#private`. The guard that holds a declaration to a component's typed API is the build-time vendor contract check (D17.5, POC 13), which reads the .d.ts where `private` shows. The run-time check sees only what the object holds.

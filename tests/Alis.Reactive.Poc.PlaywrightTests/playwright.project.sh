@@ -18,6 +18,13 @@ playwright_check_assets() {
     poc/runtime/src \
     poc/runtime/build.mjs \
     poc/runtime/tsconfig.json
+
+  check_asset_output_is_fresh \
+    "POC components bundle" \
+    "tests/Alis.Reactive.Poc.App/wwwroot/js/poc-components.js" \
+    tests/Alis.Reactive.Poc.App/Components \
+    tests/Alis.Reactive.Poc.App/tsconfig.json \
+    poc/runtime/build.mjs
 }
 
 playwright_sources() {

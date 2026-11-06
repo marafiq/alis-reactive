@@ -15,3 +15,15 @@ await build({
   logLevel: "warning",
 });
 console.log("alis-poc: built " + output);
+
+const components = join(here, "..", "..", "tests", "Alis.Reactive.Poc.App", "wwwroot", "js", "poc-components.js");
+await build({
+  entryPoints: [join(here, "..", "..", "tests", "Alis.Reactive.Poc.App", "Components", "components.ts")],
+  bundle: true,
+  format: "iife",
+  target: "es2022",
+  outfile: components,
+  sourcemap: "linked",
+  logLevel: "warning",
+});
+console.log("alis-poc: built " + components);
