@@ -1338,7 +1338,7 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - The framework controls every input's id (the owner, 2026-11-06): without it the browser guesses which
     input a rule, a message or a read means, and views of different partials that share an id conflict.
   - Reading the declaring class of the member the expression tree names is a type's identity, within the
-    no-reflection rule (D18.1).
+    no-reflection rule, and the same read D18.3 names a member by (D18.1).
 - D14.4 A partial is rendered for a member by one typed door, `Html.PartialFor(m => m.Member, view)` (N14.1), on
   both hosts.
   - The member's value is the partial's model, and a new `TemplateInfo` carries the member's full binding
@@ -1941,9 +1941,12 @@ plans (Q19).
 
   The reflection the framework refuses is run-time discovery and use of members (the owner, 2026-11-06: "a list of
   methods and properties and all kind of stuff. That is bad."): listing members, reading attributes, reading,
-  writing or invoking a member through reflection, and `Activator`. A type's identity is not: its base types
-  (`Type.BaseType`, the walk that finds the contract of the class declaring an overridden member, D18.3) and the
-  declaring class of the member a typed lambda names (D14.3) are within the rule.
+  writing or invoking a member through reflection, and `Activator`. A type's identity is not: its name, and the
+  class that declares the member a typed lambda names (D14.3, D18.3), are within the rule. Each such read is the
+  owner's, listed by file and member in `tests/Alis.Reactive.Poc.ArchitectureTests/WhenTheCoreIsCompiled.cs`,
+  which fails on any other read of `System.Reflection`, of a member of `System.Type`, `Activator`, `Delegate` or
+  `TypeDescriptor` (the owner, 2026-11-06: "Use caution really, really good so we don't trip over"). The namespace
+  ban of D18.4 misses the members of `Type`, so `typeof(T).GetProperties()` builds; that list refuses it.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):
@@ -1964,9 +1967,10 @@ plans (Q19).
   - `Expression.Compile` in validation (Q16) and in the template writer (Q15): gate 1 decides each.
   - an overridden member that a view's expression names (the owner, 2026-11-06: "Override cannot change it"). The
     expression carries the declaration (`d => d.Room` names `Person.Room`), and the derived class's contract holds
-    the override. The member is named as the contract of the class that declares it names it, found up the class's
-    base types (`Type.BaseType`, D18.1), and the class the read starts from must write that name, or the read is
-    refused as unwritten. No `MemberInfo.Name` is read.
+    the override. The member is named as the contract of the class that declares it names it, found up the member's
+    declaring class (`MemberInfo.DeclaringType`, D18.1), and the class the read starts from must write that name,
+    or the read is refused as unwritten. No `MemberInfo.Name` is read. The owner chose the declaring class over a
+    walk up `Type.BaseType`; a probe of eight member kinds on both resolvers found the same contract by both.
   - System.Text.Json's contracts for an override (probe, net10, the reflection resolver): an override that keeps
     its declaration's name is one member of the derived contract; one that renames is written twice, under both
     names; one marked `JsonIgnore` leaves the name unwritten; a second member that takes the declaration's name is
@@ -1977,7 +1981,8 @@ plans (Q19).
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
   lists at gate 1 (N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
   attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`. A type's identity stays open to the
-  framework (D18.1). The POC bans the whole `System.Reflection` namespace until N18.1 replaces that ban.
+  framework (D18.1). The POC bans the whole `System.Reflection` namespace; its one owner-listed read of it is a
+  one-line method that carries `SuppressMessage` for RS0030, and the list of D18.1 holds every read.
 - D18.5 Every door on the public surface is typed (ALIS009). The three strings of B13 become typed doors:
   - a button's type is HTML's closed set, `button`, `submit` or `reset`;
   - a text box's type is HTML's closed set of text input types;

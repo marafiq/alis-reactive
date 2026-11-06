@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Plan;
@@ -38,7 +39,7 @@ internal static class JsonPath
 
     private static string DeclaredName(MemberExpression access, Type holder, JsonSerializerOptions options, LambdaExpression path)
     {
-        for (var declaring = holder; declaring is not null; declaring = declaring.BaseType)
+        if (DeclaringClass(access) is { } declaring)
         {
             foreach (var property in options.GetTypeInfo(declaring).Properties)
             {
@@ -48,6 +49,9 @@ internal static class JsonPath
 
         throw NotWritten(path, holder);
     }
+
+    [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's exception, 2026-11-06: the class that declares a lambda's member is a type's identity, not a discovery of members (D18.1).")]
+    private static Type? DeclaringClass(MemberExpression access) => access.Member.DeclaringType;
 
     private static ArgumentException NotWritten(LambdaExpression path, Type holder)
         => new($"'{path}' reads a member of '{holder.FullName}' that the app's JSON options do not write, so the browser never holds it.", nameof(path));

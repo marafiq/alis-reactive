@@ -104,7 +104,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's
-  identity, its base types and the declaring class of a lambda's member are within the rule (D18.1, D18.4).
+  identity and the declaring class of a lambda's member are within the rule (D18.1, D18.4). Of the alternates the
+  owner chose the declaring class: "I'm good with the declaring type... Use caution really, really good so we
+  don't trip over." Every read of type information in the core is on the owner's list in `WhenTheCoreIsCompiled`,
+  which fails on any other.
 - The owner, 2026-11-06: branches that nest to any depth (D8.7, D8.8) are "golden".
 - The owner, 2026-11-06: the slices are vertical in an app as in the framework (the owner's words are in
   `spec/NOTES.md`). An action that needs a model has a model of its own, plain, shared with no other view; an app

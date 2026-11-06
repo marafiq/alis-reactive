@@ -23,6 +23,22 @@ public sealed class WhenTheCoreIsCompiled
         ["Hosting"] = ["Plan", "Writing", "Values", "Components", "Pipelines"],
     };
 
+    private static readonly string[] TypeReadsTheOwnerLists =
+    [
+        "Components/JsObject.cs System.Type.FullName",
+        "Hosting/ReactivePlan.cs System.Type.FullName",
+        "Types/JsonPath.cs System.Reflection.MemberInfo.DeclaringType",
+        "Types/JsonPath.cs System.Type.FullName",
+    ];
+
+    private static readonly string[] HoldersOfTypeInformation =
+    [
+        "System.Type",
+        "System.Activator",
+        "System.Delegate",
+        "System.ComponentModel.TypeDescriptor",
+    ];
+
     [Test]
     public void each_module_reads_only_the_modules_its_row_names()
     {
@@ -46,6 +62,46 @@ public sealed class WhenTheCoreIsCompiled
 
         Assert.That(crossings, Is.Empty, "A module reads only the modules its row names.");
     }
+
+    [Test]
+    public void the_core_reads_type_information_only_where_the_owner_lists_it()
+    {
+        var compilation = CoreCompilation();
+        var reads = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (var tree in compilation.SyntaxTrees)
+        {
+            var model = compilation.GetSemanticModel(tree);
+            foreach (var name in tree.GetRoot().DescendantNodes().OfType<SimpleNameSyntax>())
+            {
+                if (TypeRead(model.GetSymbolInfo(name).Symbol) is { } read)
+                    reads.Add($"{CorePath(tree)} {read}");
+            }
+        }
+
+        Assert.That(reads, Is.EqualTo(TypeReadsTheOwnerLists), "The core reads a type's information only where the owner lists it: a type's identity, never its members (spec/Core/DESIGN.md D18.1).");
+    }
+
+    private static string? TypeRead(ISymbol? symbol)
+    {
+        switch (symbol)
+        {
+            case INamedTypeSymbol type when InReflection(type):
+                return type.ToDisplayString();
+            case IMethodSymbol or IPropertySymbol or IFieldSymbol or IEventSymbol when symbol.ContainingType is { } holder && (InReflection(holder) || HoldersOfTypeInformation.Contains(holder.OriginalDefinition.ToDisplayString())):
+                return $"{holder.ToDisplayString()}.{symbol.Name}";
+            default:
+                return null;
+        }
+    }
+
+    private static bool InReflection(INamedTypeSymbol type)
+    {
+        var space = type.ContainingNamespace.ToDisplayString();
+        return space == "System.Reflection" || space.StartsWith("System.Reflection.", StringComparison.Ordinal);
+    }
+
+    private static string CorePath(SyntaxTree tree)
+        => Path.GetRelativePath(Path.Combine(RepositoryRoot(), "poc", "Alis.Reactive.Poc"), tree.FilePath).Replace(Path.DirectorySeparatorChar, '/');
 
     private static string ModuleOf(SyntaxTree tree)
     {
