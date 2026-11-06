@@ -1,0 +1,53 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose lookups";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+    var wards = new[] { "North", "West" };
+    DoseStatus[] given = [DoseStatus.Given];
+    var southern = new List<string> { "South" };
+    IEnumerable<int?> urgent = new int?[] { 1, 3 };
+}
+<h1>Dose lookups</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-in-listed-wards", "Count doses in the listed wards")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => wards.Contains(d.Ward!)))))
+
+@(plan.Button("count-given", "Count doses with a listed status")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => given.Contains(d.Status)))))
+
+@(plan.Button("count-in-southern-wards", "Count doses in the southern wards")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => southern.Contains(d.Ward!)))))
+
+@(plan.Button("count-urgent", "Count doses at an urgent priority")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => urgent.Contains(d.Priority)))))
+
+@(plan.Button("count-medicines-with-o", "Count medicines with the letter o")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Medicine.Contains('o')))))
+
+@(plan.Button("count-checked-more-than-once", "Count doses checked more than once")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Checks.Count > 1))))
+
+@(plan.Button("count-given-more-than-once-a-day", "Count doses given more than once a day")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Hours.Length > 1))))
+
+@Html.RenderPlan(plan)

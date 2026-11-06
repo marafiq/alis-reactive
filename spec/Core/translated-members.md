@@ -23,6 +23,7 @@ browser and .NET agree.
 | `ToUpperInvariant()`, `ToLowerInvariant()` | the `upperInvariant` and `lowerInvariant` operators, one code point at a time, so a final `Σ` lowers to `σ` as in .NET. A code point JavaScript maps to more than one keeps .NET's mapping: itself (`ß` stays `ß`), except the 27 Greek letters with a subscript iota (U+1F80 to U+1F87, U+1F90 to U+1F97, U+1FA0 to U+1FA7, U+1FB3, U+1FC3, U+1FF3), which map to the letter .NET gives (U+1FB3 to U+1FBC). `ı` stays `ı` in upper case |
 | `ToUpper()`, `ToLower()` | the same rule with `toLocaleUpperCase` and `toLocaleLowerCase` and the view's culture name, built with the plan's culture in POC 4 unit 3c |
 | `Contains(text)` | the `contains` operator, ordinal, as .NET's `Contains(string)` and JavaScript's `includes` compare |
+| `Contains(char)` | the same operator with the `char` written as a one-letter text; net10's own overload, and `Enumerable.Contains<char>` over the text on net48 |
 | `StartsWith(text, StringComparison.Ordinal)`, `EndsWith(text, StringComparison.Ordinal)` | the `startsWith` and `endsWith` operators, ordinal. `StartsWith(text)` and `EndsWith(text)` compare by the culture in .NET (`"\u00ADward".StartsWith("ward")` holds, an ordinal test does not) and are refused, naming the `Ordinal` overload; a `StringComparison` other than `Ordinal` is refused |
 | `string.IsNullOrEmpty(text)` | the `nullOrEmpty` operator: holds on nothing, null and `""` |
 | `string.IsNullOrWhiteSpace(text)` | `nullOrEmpty` of `trim`: blank, as `spec/Core/conversions.md` defines it |
@@ -45,6 +46,7 @@ and the outer item side by side (D6.8).
 | `Enumerable.All(items, predicate)` | `every` over the predicate's `fn`; an empty list holds, as in .NET |
 | `Enumerable.Count(items)` | `length` |
 | `Enumerable.Count(items, predicate)` | the `length` of `filter` over the predicate's `fn` |
+| `List<T>.Count`, `IReadOnlyCollection<T>.Count`, `ICollection<T>.Count`, an array's `Length` | `length` |
 
 ## Dates
 
@@ -67,6 +69,17 @@ For `DateTime` and `DateTimeOffset`, read on the browser's clock.
 
 ## Lists of fixed values
 
+A list the view supplies is read when the view renders, written through the app's JSON options as a `lit`, and
+the item is looked for with the `includes` operator, which reads nothing when the item reads nothing and compares
+as JavaScript's `includes` does (NaN equal to NaN, as .NET's default equality).
+
 | .NET member | Browser meaning |
 |-------------|-----------------|
-| `Enumerable.Contains(values, item)` with values the view supplies | membership of the item in those values as literals |
+| `MemoryExtensions.Contains(values, item)`, with or without a null comparer | the form C# 14 binds for an array on net10: `includes` over the array |
+| `Enumerable.Contains(values, item)` | `includes` over the values, which are an array; any other collection is refused, since it can compare by its own rules (a `HashSet`'s comparer), naming `ToArray()` |
+| `List<T>.Contains(item)` | `includes` over the list |
+
+A list that is null when the view renders is refused, so is a list of objects (the browser compares objects by
+reference) and a comparer passed to `Contains`. A list the item holds is refused, naming `Any`
+(`d.Hours.Any(hour => hour == 8)`). On net48 `text.Contains(c)` binds `Enumerable.Contains<char>` over the text,
+translated as the text test `contains`.

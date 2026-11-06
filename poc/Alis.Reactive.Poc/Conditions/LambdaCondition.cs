@@ -84,6 +84,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         var read = Unconverted(operand);
         if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
         if (read is ParameterExpression parameter && _scope.TryGetValue(parameter, out var bound)) return bound;
+        if (read is UnaryExpression { NodeType: ExpressionType.ArrayLength } length) return ListForms.Length(Read(length.Operand));
         var translated = TranslatedMembers.Of(read, this, _argument);
         if (translated is not null) return translated;
         var root = RootOf(read);
@@ -102,6 +103,10 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
     }
 
     public FnExpression EveryItem() => ListForms.EveryItem(_itemName());
+
+    public object? ViewValue(LinqExpression node) => ViewValues.Of(Unconverted(node), _argument);
+
+    public LiteralExpression Literal(object? value, Type type) => new(Written(value, type));
 
     private PlanExpression Term(LinqExpression node) => node switch
     {
@@ -176,7 +181,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         return node;
     }
 
-    private bool ReadsTheItem(LinqExpression node)
+    public bool ReadsTheItem(LinqExpression node)
     {
         var finder = new ItemFinder(_scope);
         finder.Visit(node);

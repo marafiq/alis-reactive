@@ -610,6 +610,20 @@ Terms used throughout:
 - `X6.20` behavior (D6.5, D6.8): `d => d.Carer != null && d.Checks.Any(c => c.Name == d.Carer.Name)` keeps the doses
   their carer also checked, the inner lambda reading its own item and the outer one; `Any()`, `All`, `Count()` and
   `Count(predicate)` over a list an item holds count as .NET counts them, `All` holding on an empty list.
+- `X6.21` refusal (D6.5): `Enumerable.Contains` over a collection that is not an array: "'{term}' looks in a
+  collection that can compare by its own rules, as a HashSet's comparer does; copy it into an array before the
+  lambda, such as var wards = Model.Wards.ToArray();."
+- `X6.22` refusal (D6.5): `Contains` over a list the item holds: "'{term}' looks for a value in a list the item
+  holds; use Any, such as d.Hours.Any(hour => hour == 8)."
+- `X6.23` refusal (D6.5): `Contains` of an object: "'{term}' looks for an object, and the browser compares objects
+  by reference; look for a member, such as names.Contains(d.Carer.Name)."
+- `X6.24` refusal (D6.5): `Contains` over a list that is null when the view renders: "'{term}' looks in a list that
+  is null when the view renders."
+- `X6.25` refusal (D6.5): `Contains` with an equality comparer: "'{term}' passes an equality comparer, which the
+  browser does not have; look up without it, or move the work to the server."
+- `X6.26` behavior (D6.5): `wards.Contains(d.Ward)` over an array, an enum array written by name, a `List<T>` and
+  an array typed as a sequence keeps the items the view lists; `d.Medicine.Contains('o')` finds a letter; a list's
+  `Count` and an array's `Length` count their items.
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 

@@ -45,6 +45,8 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate): Rea
       return tested(evaluate(first(args)), evaluate(second(args)), (held, sought) => held.endsWith(sought));
     case "nullOrEmpty":
       return nullOrEmpty(evaluate(first(args)));
+    case "includes":
+      return included(evaluate(first(args)), evaluate(second(args)));
     default:
       return assertNever(expression.op);
   }
@@ -83,6 +85,11 @@ function either(args: readonly Expression[], evaluate: Evaluate): Read {
   const right = evaluate(second(args));
   if (isTrue(right)) return value(true);
   return left.kind === "nothing" || right.kind === "nothing" ? nothing : value(false);
+}
+
+function included(list: Read, item: Read): Read {
+  if (list.kind === "nothing" || item.kind === "nothing") return nothing;
+  return value((list.value as readonly unknown[]).includes(item.value));
 }
 
 function isTrue(term: Read): boolean {

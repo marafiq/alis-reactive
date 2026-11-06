@@ -84,6 +84,7 @@ internal sealed class Operator : IChoice
     internal static readonly Operator StartsWith = new("startsWith");
     internal static readonly Operator EndsWith = new("endsWith");
     internal static readonly Operator NullOrEmpty = new("nullOrEmpty");
+    internal static readonly Operator Includes = new("includes");
 
     private Operator(string text)
     {

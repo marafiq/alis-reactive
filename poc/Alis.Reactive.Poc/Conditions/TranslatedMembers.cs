@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.Json;
 using Alis.Reactive.Plan;
 using LinqExpression = System.Linq.Expressions.Expression;
 using PlanExpression = Alis.Reactive.Plan.Expression;
@@ -20,6 +21,12 @@ internal static class TranslatedMembers
         FnExpression Lambda(LambdaExpression inner);
 
         FnExpression EveryItem();
+
+        bool ReadsTheItem(LinqExpression node);
+
+        object? ViewValue(LinqExpression node);
+
+        LiteralExpression Literal(object? value, Type type);
     }
 
     private delegate PlanExpression Translation(LinqExpression term, IReadOnlyList<LinqExpression> operands, ITranslator read, string argument);
@@ -46,7 +53,21 @@ internal static class TranslatedMembers
         [Method((IEnumerable<int> items) => items.All(item => true))] = (_, operands, read, _) => ListForms.Every(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1])),
         [Method((IEnumerable<int> items) => items.Count())] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
         [Method((IEnumerable<int> items) => items.Count(item => true))] = (_, operands, read, _) => ListForms.Length(ListForms.Filter(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1]))),
+        [Property((List<int> items) => items.Count)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
+        [Property((IReadOnlyCollection<int> items) => items.Count)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
+        [Property((ICollection<int> items) => items.Count)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
+        [Method((IEnumerable<int> values) => values.Contains(0))] = FixedValues(arrayOnly: true),
+        [Method((List<int> values) => values.Contains(0))] = FixedValues(arrayOnly: false),
+#if NET
+        [Method((string text) => text.Contains('a'))] = Binary(Operator.Contains),
+        [Method((string[] values) => values.Contains(""))] = FixedValues(arrayOnly: true),
+        [Method((DayOfWeek[] values) => values.Contains(DayOfWeek.Monday))] = FixedValues(arrayOnly: true),
+#endif
     };
+
+#if NET
+    private static readonly (Module Module, int Token) SpanConversion = Key(((MethodCallExpression)((MethodCallExpression)((Expression<Func<string[], bool>>)(values => values.Contains(""))).Body).Arguments[0]).Method);
+#endif
 
     internal static PlanExpression? Of(LinqExpression term, ITranslator read, string argument) => term switch
     {
@@ -77,6 +98,37 @@ internal static class TranslatedMembers
 
     private static PlanExpression ByCulture(LinqExpression term, IReadOnlyList<LinqExpression> operands, ITranslator read, string argument)
         => throw new ArgumentException($"'{ViewValues.Printed(term)}' compares by the culture in .NET, which the browser cannot match; pass StringComparison.Ordinal, such as d.Ward.StartsWith(\"N\", StringComparison.Ordinal).", argument);
+
+    private static Translation FixedValues(bool arrayOnly) => (term, operands, read, argument) =>
+    {
+        var values = Unspanned(operands[0]);
+        var item = operands[1];
+        var printed = $"{ViewValues.Printed(values)}.Contains({ViewValues.Printed(item)})";
+        var comparerIsDefault = operands.Count < 3 || operands[2] is ConstantExpression { Value: null };
+        if (!comparerIsDefault)
+            throw new ArgumentException($"'{printed}' passes an equality comparer, which the browser does not have; look up without it, or move the work to the server.", argument);
+        if (values.Type == typeof(string)) return Op(Operator.Contains, read.Read(values), read.Read(item));
+        if (read.ReadsTheItem(values))
+            throw new ArgumentException($"'{printed}' looks for a value in a list the item holds; use Any, such as d.Hours.Any(hour => hour == 8).", argument);
+        var held = read.ViewValue(values);
+        if (held is null) throw new ArgumentException($"'{printed}' looks in a list that is null when the view renders.", argument);
+        if (arrayOnly && held is not Array)
+            throw new ArgumentException($"'{printed}' looks in a collection that can compare by its own rules, as a HashSet's comparer does; copy it into an array before the lambda, such as var wards = Model.Wards.ToArray();.", argument);
+        var list = read.Literal(held, values.Type);
+        var holdsAnObject = list.Value.EnumerateArray().Any(value => value.ValueKind is JsonValueKind.Object or JsonValueKind.Array);
+        if (holdsAnObject)
+            throw new ArgumentException($"'{printed}' looks for an object, and the browser compares objects by reference; look for a member, such as names.Contains(d.Carer.Name).", argument);
+        return Op(Operator.Includes, list, read.Read(item));
+    };
+
+    private static LinqExpression Unspanned(LinqExpression values)
+    {
+#if NET
+        if (values is MethodCallExpression { Arguments.Count: 1 } span && Key(span.Method) == SpanConversion) values = span.Arguments[0];
+#endif
+        while (values is UnaryExpression { NodeType: ExpressionType.Convert } cast) values = cast.Operand;
+        return values;
+    }
 
     private static LinqExpression[] Operands(MethodCallExpression call)
         => call.Object is null ? [.. call.Arguments] : [call.Object, .. call.Arguments];

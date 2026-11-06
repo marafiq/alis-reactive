@@ -216,11 +216,13 @@ and in the blocks inside it, and nowhere else.
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
 `neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `order`, `merge`, `trim`, `trimStart`,
-`trimEnd`, `upperInvariant`, `lowerInvariant`, `contains`, `startsWith`, `endsWith` and `nullOrEmpty`. `toNumber`,
+`trimEnd`, `upperInvariant`, `lowerInvariant`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty` and `includes`.
+`toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,
 D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.md`) where JavaScript's own methods
 differ: `trim` removes another set of characters, `toUpperCase` turns `ß` into two letters, and `includes` reads an
-argument that is nothing as the text "null".
+argument that is nothing as the text "null". `includes` looks for an item in a list the view supplies, written as a
+`lit`, and reads nothing when the item reads nothing, where a `call` of JavaScript's `includes` would pass null.
 
 ## Shapes
 
