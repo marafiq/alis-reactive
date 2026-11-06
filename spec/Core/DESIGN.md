@@ -382,6 +382,8 @@ Terms used throughout:
   `ReturnedObjects<T>`) takes its arguments as one list of typed `Arg`s, written as a collection expression,
   `Method([position, icons])`, so a declaration expresses a vendor method of any arity. The declaration's own
   C# signature keeps each argument typed (`Arg<string> position`).
+- D5.10 A read of data past a declared member, and of a member of `Data<T>`, is `Read(x => x.Pager.Number)`. `Get`
+  names only the HTTP verb, which a view writes beside it, so one word never carries two concepts.
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
@@ -396,6 +398,9 @@ Terms used throughout:
 - kept, public for the component author: `JsObject`'s `Property`, `ReadOnly`, `WriteOnly`, `Method`,
   `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Event`, `Event<T>`, `Fixed` and `Pass`
   (`Alis.Reactive/Components/JsObject.cs:74-260`).
+- `N5.6` new: `Read(..)` on a property's read and on `Data<T>`, replacing `Get(..)`
+  (`Alis.Reactive/Components/JsMembers.cs:37`, `Alis.Reactive/PlanAuthoring/Events/Data.cs:40`), since `Get` is
+  the HTTP verb in the same views (D5.10).
 - `N5.5` new: `LiveObject<T>()` and `LiveObjects<T>()`, the live object and the list a property holds, replacing
   `Object<T>()` and `Objects<T>()` (the owner, 2026-11-06: "Object which collide with the built-in C# object"). A
   member named `Object` on `JsObject` shadows `System.Object` in every declaration, and the build refuses it
@@ -1950,6 +1955,10 @@ plans (Q19).
   - the method scan for `PureMethodAttribute` and the `FlagsAttribute` read of `IsInEnum`: gate 1 decides each,
     as an owner-listed exception or a typed door;
   - `Expression.Compile` in validation (Q16) and in the template writer (Q15): gate 1 decides each.
+  - an overridden member that a view's expression names: the expression carries the base declaration and the
+    app's contract carries the override (probe in POC 3: `d => d.Room` names `Person.Room`, the contract holds
+    `Resident.Room`), so matching them needs the member's name, `MemberInfo.Name`. Gate 1 decides between an
+    owner-listed exception and refusing such a read.
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
   lists at gate 1 (N18.1): the members of `System.Reflection`, `Activator`, `Type.GetType` by name and
   `Expression.Compile`.

@@ -16,6 +16,7 @@ internal sealed class PlanBuild
     internal PlanBuild(string planId, JsonSerializerOptions values)
     {
         PlanId = planId;
+        values.MakeReadOnly(populateMissingResolver: true);
         Values = values;
     }
 

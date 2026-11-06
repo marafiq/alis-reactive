@@ -94,7 +94,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   every live object whatever holds it, a payload included: presence and nullability come from that API (D5.3).
 - The owner, 2026-11-06: "Object which collide with the built-in C# object." No door takes the name of a .NET type:
   `LiveObject<T>()` and its list form replace `Object<T>()` and `Objects<T>()` (N5.5), since a member named
-  `Object` on `JsObject` shadows `System.Object` in every declaration. CA1720 refuses such a name in the build.
+  `Object` on `JsObject` shadows `System.Object` in every declaration. CA1720 refused it in the POC's build
+  (latest-recommended analysis, warnings as errors).
 - The owner, 2026-11-06: no defensive code where a type or a check stops the bug; no closest match; fail loudly, so a
   bug surfaces and challenges the design. Tests are Playwright in a real browser, never jsdom, which is brittle.
   The reference components are built around JavaScript object complexity (dot notation, properties, callbacks,

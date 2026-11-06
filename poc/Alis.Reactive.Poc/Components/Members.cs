@@ -19,7 +19,7 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
     internal override Expression Expression => new GetExpression(Owner.Binding.Target, [Member], Presence.Required);
 
-    public TypedSource<TResult> Get<TResult>(System.Linq.Expressions.Expression<Func<TValue, TResult>> path)
+    public TypedSource<TResult> Read<TResult>(System.Linq.Expressions.Expression<Func<TValue, TResult>> path)
         => new DataRead<TResult>(new GetExpression(Expression, JsonPath.Of(path, Owner.Binding.Build.Values), Presence.Optional));
 }
 

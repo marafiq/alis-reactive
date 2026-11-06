@@ -25,7 +25,7 @@
     .Reactive(button => button.Click, pipeline =>
     {
         var roster = pipeline.Component<DutyRoster>("night-roster");
-        pipeline.Element("night-pager").Text.Set(roster.OnCall.Get(nurse => nurse.Pager.Number));
+        pipeline.Element("night-pager").Text.Set(roster.OnCall.Read(nurse => nurse.Pager.Number));
         pipeline.Element("page-status").Text.Set("Paged night");
     }))
 
@@ -33,7 +33,7 @@
     .Reactive(button => button.Click, pipeline =>
     {
         var roster = pipeline.Component<DutyRoster>("day-roster");
-        pipeline.Element("day-pager").Text.Set(roster.OnCall.Get(nurse => nurse.Pager.Number));
+        pipeline.Element("day-pager").Text.Set(roster.OnCall.Read(nurse => nurse.Pager.Number));
         pipeline.Element("page-status").Text.Set("Paged day");
     }))
 
@@ -42,7 +42,7 @@
     {
         var roster = pipeline.Component<DutyRoster>("relief-roster");
         pipeline.Element("page-status").Text.Set("Paging relief");
-        pipeline.Element("relief-pager").Text.Set(roster.OnCall.Get(nurse => nurse.Pager.Number));
+        pipeline.Element("relief-pager").Text.Set(roster.OnCall.Read(nurse => nurse.Pager.Number));
         pipeline.Element("page-status").Text.Set("Paged relief");
     }))
 
