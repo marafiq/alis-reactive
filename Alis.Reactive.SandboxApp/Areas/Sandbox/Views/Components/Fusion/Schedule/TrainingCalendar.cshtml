@@ -1,0 +1,117 @@
+@model TrainingCalendarPageModel
+@using Alis.Reactive.Native.Extensions
+@using Alis.Reactive.Native.Components
+@using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Fusion.AppLevel
+@using Alis.Reactive.Fusion.Components
+@using Alis.Reactive.Fusion.Templates
+@using Syncfusion.EJ2.Schedule
+@{
+    ViewData["Title"] = "Training Calendar";
+    var plan = Html.ReactivePlan<TrainingCalendarPageModel>();
+
+    var sessionCard = FusionTemplate.Create<TrainingCalendarSession>()
+        .Class("p-3 space-y-1")
+        .Div(d => d.Class("text-sm text-gray-600").Text(m => m.Trainer))
+        .When(m => m.RegisteredCount > 0 && m.IncompleteCount == 0,
+            done => done.Badge("All complete", "px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-700"))
+        .When(m => !(m.IncompleteCount == 0),
+            open => open.Badge("Follow-up needed", "px-2 py-1 rounded text-xs font-bold bg-amber-100 text-amber-700"))
+        .When(m => m.IncompleteCount > 0 && !(m.IncompleteCount == m.RegisteredCount),
+            started => started.Badge("In progress", "px-2 py-1 rounded text-xs font-bold bg-blue-100 text-blue-700"))
+        .Render();
+
+    var sessionCardActions = FusionTemplate.Create<TrainingCalendarSession>()
+        .Class("flex gap-2 p-2 border-t")
+        .EventButton("Details", "training:details", m => m.Id, "e-primary e-small")
+        .EventButton("Send reminder", "training:remind", m => m.Id, "e-small")
+        .Render();
+
+    Html.On(plan, t => t.DomReady(p =>
+    {
+        p.Get(Url.SandboxRoute("TrainingCalendarSessions", "Schedule"))
+         .Response(r => r.OnSuccess<TrainingCalendarSessions>((json, s) =>
+         {
+             s.Component<FusionSchedule>("training-calendar").SetDataSource(json, j => j.Sessions);
+             s.Element("training-calendar-status").SetText(json, j => j.Summary);
+         }));
+    }));
+
+    Html.On(plan, t => t.CustomEvent<TrainingCalendarSessionPicked>("training:details", (session, p) =>
+    {
+        p.Element("alis-drawer-title").SetText("Training session");
+        p.Component<NativeDrawer>().SetSize(DrawerSize.Md);
+        p.Get(Url.SandboxRoute("TrainingCalendarDetails", "Schedule"))
+         .Gather(g => g.FromEvent(session, x => x.Id, "sessionId"))
+         .Response(r => r.OnSuccess(s => s.Into("alis-drawer-content")));
+        p.Component<NativeDrawer>().Open();
+        p.Component<FusionSchedule>("training-calendar").CloseQuickInfoPopup().CloseTooltip();
+    }));
+
+    Html.On(plan, t => t.CustomEvent<TrainingCalendarSessionPicked>("training:remind", (session, p) =>
+    {
+        p.Post(Url.SandboxRoute("TrainingCalendarReminders", "Schedule"))
+         .Gather(g => g.FromEvent(session, x => x.Id, "sessionId"))
+         .Response(r => r.OnSuccess<TrainingCalendarReminderSent>((json, s) =>
+         {
+             s.Component<FusionToast>()
+                 .SetTitle(json, x => x.Title)
+                 .SetContent(json, x => x.Message)
+                 .Success()
+                 .Show();
+             s.DispatchWith<TrainingCalendarReminded>("training:reminded", d => d
+                 .Set(x => x.SessionId, json.Read(r => r.SessionId))
+                 .Set(x => x.Message, json.Read(r => r.Message)));
+         }));
+    }));
+}
+
+<native-vstack gap="Lg">
+    <native-heading level="H1">Training Calendar</native-heading>
+    <native-text color="Secondary">
+        November staff training. A session's card shows who still has to complete it, opens its details and reminds
+        those staff, and open details say when a reminder went out; Agenda lists the sessions of the week on screen.
+    </native-text>
+    <p id="training-calendar-status" class="text-sm text-text-muted">Loading training sessions...</p>
+
+    <section class="rounded-lg border border-border bg-white shadow-sm" style="height: 640px;">
+        @(Html.FusionSchedule(plan, "training-calendar", b =>
+            {
+                b.Width("100%"); b.Height("100%");
+                b.CurrentView(View.Week); b.SelectedDate(new DateTime(2026, 11, 5));
+                b.Views(new List<ScheduleView>
+                {
+                    new ScheduleView { Option = View.Week },
+                    new ScheduleView { Option = View.Agenda },
+                });
+                b.AgendaDaysCount(30);
+                b.StartHour("08:00"); b.EndHour("18:00");
+                b.EventSettings(new ScheduleEventSettings
+                {
+                    EnableTooltip = true,
+                    Fields = new ScheduleField
+                    {
+                        Id = "id",
+                        Subject = new ScheduleFieldOptions { Name = "subject" },
+                        StartTime = new ScheduleFieldOptions { Name = "startTime" },
+                        EndTime = new ScheduleFieldOptions { Name = "endTime" },
+                    },
+                });
+                b.QuickInfoTemplates(new ScheduleQuickInfoTemplates
+                {
+                    Content = sessionCard,
+                    Footer = sessionCardActions,
+                });
+            })
+            .Reactive(evt => evt.Navigating, (args, p) =>
+            {
+                var calendar = p.Component<FusionSchedule>("training-calendar");
+                p.When(args, x => x.CurrentView).Eq("Agenda")
+                 .And(args, x => x.PreviousView).Eq("Week")
+                 .Then(t => t.Component<FusionSchedule>("training-calendar")
+                     .SetSelectedDate(t.From(calendar.GetCurrentViewDates()).Find(d => true)));
+            }))
+    </section>
+</native-vstack>
+
+@Html.RenderPlan(plan)

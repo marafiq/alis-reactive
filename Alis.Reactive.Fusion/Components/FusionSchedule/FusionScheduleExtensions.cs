@@ -67,6 +67,15 @@ namespace Alis.Reactive.Fusion.Components
         private static readonly ComponentMethod GetEventsMethod =
             ComponentMethod.Named("getEvents");
 
+        private static readonly ComponentMethod GetCurrentViewDatesMethod =
+            ComponentMethod.Named("getCurrentViewDates");
+
+        private static readonly ComponentMethod CloseQuickInfoPopupMethod =
+            ComponentMethod.Named("closeQuickInfoPopup");
+
+        private static readonly ComponentMethod CloseTooltipMethod =
+            ComponentMethod.Named("closeTooltip");
+
         private static readonly ComponentMethod AddEventMethod =
             ComponentMethod.Named("addEvent").WithArgs<object>();
 
@@ -106,6 +115,28 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
             => self.Read(SelectedDateProperty);
+
+        /// <summary>
+        /// Moves the schedule to a date: the active view shows the period around it, and Agenda starts on it.
+        /// </summary>
+        /// <param name="self">The schedule to move.</param>
+        /// <param name="date">The date to select, such as the first date of the active view.</param>
+        public static ComponentRef<FusionSchedule, TModel> SetSelectedDate<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self, TypedSource<DateTime> date)
+            where TModel : class
+            => self.EmitSet(SelectedDateProperty, date.ToValueExpression());
+
+        /// <summary>
+        /// Reads the dates of the active view, in order: the seven days a week view shows, for example.
+        /// </summary>
+        /// <remarks>
+        /// Read it before a view changes (in <c>Navigating</c>) to keep the dates that were on screen,
+        /// and pick one with <c>p.From(dates)</c>, as in <c>p.From(dates).Find(d =&gt; true)</c> for the first.
+        /// </remarks>
+        public static TypedComponentSource<DateTime[]> GetCurrentViewDates<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self)
+            where TModel : class
+            => self.Read<DateTime[]>(GetCurrentViewDatesMethod);
 
         /// <summary>
         /// Exposes the rendered schedule events as a typed source.
@@ -214,6 +245,31 @@ namespace Alis.Reactive.Fusion.Components
             this ComponentRef<FusionSchedule, TModel> self)
             where TModel : class
             => self.EmitCall(CloseEditorMethod);
+
+        /// <summary>
+        /// Closes the event's quick info popup, the card that opens when an event is clicked.
+        /// </summary>
+        /// <remarks>
+        /// Call it when a button on the card opens a drawer or dialog, so the card does not stay open behind it.
+        /// Closing the card focuses its event, which opens the event tooltip: follow it with
+        /// <see cref="CloseTooltip{TModel}"/> in the same reaction.
+        /// </remarks>
+        public static ComponentRef<FusionSchedule, TModel> CloseQuickInfoPopup<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self)
+            where TModel : class
+            => self.EmitCall(CloseQuickInfoPopupMethod);
+
+        /// <summary>
+        /// Closes the event tooltip.
+        /// </summary>
+        /// <remarks>
+        /// A tooltip opened by focus closes only on blur, so it can stay over a drawer that opens on top of the
+        /// schedule. Close it in the reaction that opens the drawer.
+        /// </remarks>
+        public static ComponentRef<FusionSchedule, TModel> CloseTooltip<TModel>(
+            this ComponentRef<FusionSchedule, TModel> self)
+            where TModel : class
+            => self.EmitCall(CloseTooltipMethod);
 
         /// <summary>
         /// Re-renders schedule events.

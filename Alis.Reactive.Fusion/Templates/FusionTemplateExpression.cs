@@ -10,7 +10,7 @@ namespace Alis.Reactive.Fusion.Templates
     /// </summary>
     /// <remarks>
     /// Examples include <c>m =&gt; m.PropertyName</c> becoming <c>${propertyName}</c>
-    /// and <c>m =&gt; m.Status == "Active"</c> becoming <c>status === 'Active'</c>.
+    /// and <c>m =&gt; m.Status == "Active"</c> becoming <c>status==='Active'</c>.
     /// Unsupported expression nodes throw <see cref="ArgumentException"/>.
     /// </remarks>
     public static class FusionTemplateExpression
@@ -45,7 +45,7 @@ namespace Alis.Reactive.Fusion.Templates
         /// </summary>
         /// <typeparam name="TModel">Syncfusion template item contract.</typeparam>
         /// <param name="predicate">Predicate expression to convert.</param>
-        /// <returns>Syncfusion condition expression such as <c>status === 'Active'</c>.</returns>
+        /// <returns>Syncfusion condition expression such as <c>status==='Active'</c>.</returns>
         public static string ToCondition<TModel>(Expression<Func<TModel, bool>> predicate)
         {
             return ConvertToCondition(predicate.Body);
@@ -82,19 +82,30 @@ namespace Alis.Reactive.Fusion.Templates
             {
                 BinaryExpression binary => ConvertBinaryExpression(binary),
                 MemberExpression member => GetMemberPath(member),
-                UnaryExpression unary when unary.NodeType == ExpressionType.Not => $"!{ConvertToCondition(unary.Operand)}",
+                UnaryExpression unary when unary.NodeType == ExpressionType.Not => $"!{ConvertNegated(unary.Operand)}",
                 ConstantExpression constant => ConvertConstant(constant.Value),
                 _ => throw new ArgumentException($"Expression type {expression.NodeType} is not supported in conditions")
             };
         }
 
+        // "!" binds tighter than a comparison: !(status === 'A') is not !status === 'A'.
+        private static string ConvertNegated(Expression operand)
+        {
+            return operand is BinaryExpression binary
+                ? $"({ConvertBinaryExpression(binary)})"
+                : ConvertToCondition(operand);
+        }
+
+        // No space around an operator. Syncfusion's template engine prefixes every run of word characters
+        // and spaces in an if condition with "data."; a run of spaces alone, as between ")" and "&&",
+        // becomes a bare "data." and the template does not compile.
         private static string ConvertBinaryExpression(BinaryExpression binary)
         {
             var left = ConvertOperand(binary.Left);
             var right = ConvertOperand(binary.Right);
             var op = ConvertOperator(binary.NodeType);
 
-            return $"{left} {op} {right}";
+            return $"{left}{op}{right}";
         }
 
         private static string ConvertOperand(Expression expression)
@@ -105,6 +116,7 @@ namespace Alis.Reactive.Fusion.Templates
                 MemberExpression member => GetMemberPath(member),
                 ConstantExpression constant => ConvertConstant(constant.Value),
                 UnaryExpression unary when unary.Operand is ConstantExpression constant => ConvertConstant(constant.Value),
+                UnaryExpression unary when unary.NodeType == ExpressionType.Not => $"!{ConvertNegated(unary.Operand)}",
                 BinaryExpression binary => $"({ConvertBinaryExpression(binary)})",
                 _ => throw new ArgumentException($"Operand type {expression.NodeType} is not supported")
             };
