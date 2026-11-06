@@ -13,6 +13,15 @@ public sealed class WhenADoseLookupIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_hash_sets_own_contains_is_refused_with_the_array_door()
+    {
+        await Page.GotoAsync(BaseUrl + "/Doses/LookedUpInAHashSet");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: 'wardSet.Contains(d.Ward)' looks in a collection that can compare by its own rules, as a HashSet's comparer does; copy it into an array before the lambda, such as var wards = Model.Wards.ToArray();. (Parameter 'predicate')");
+    }
+
+    [Test]
     public async Task contains_over_a_list_the_item_holds_is_refused_with_the_any_door()
     {
         await Page.GotoAsync(BaseUrl + "/Doses/LookedUpInADosesHours");

@@ -79,6 +79,7 @@ as JavaScript's `includes` does (NaN equal to NaN, as .NET's default equality).
 | `MemoryExtensions.Contains(values, item)`, with or without a null comparer | the form C# 14 binds for an array on net10: `includes` over the array |
 | `Enumerable.Contains(values, item)` | `includes` over the values, which are an array; any other collection is refused, since it can compare by its own rules (a `HashSet`'s comparer), naming `ToArray()` |
 | `List<T>.Contains(item)` | `includes` over the list |
+| `HashSet<T>.Contains(item)` | refused, as `Enumerable.Contains` over a set is: the set compares by its comparer, which the plan never sees, naming `ToArray()` |
 
 A list that is null when the view renders is refused, so is a list of objects (the browser compares objects by
 reference) and a comparer passed to `Contains`. A list the item holds is refused, naming `Any`

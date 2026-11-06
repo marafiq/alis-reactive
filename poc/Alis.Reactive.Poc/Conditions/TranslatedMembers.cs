@@ -63,6 +63,7 @@ internal static class TranslatedMembers
         [Property((ICollection<int> items) => items.Count)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
         [Method((IEnumerable<int> values) => values.Contains(0))] = FixedValues(arrayOnly: true),
         [Method((List<int> values) => values.Contains(0))] = FixedValues(arrayOnly: false),
+        [Method((HashSet<int> values) => values.Contains(0))] = FixedValues(arrayOnly: true),
 #if NET
         [Method((string text) => text.Contains('a'))] = Binary(Operator.Contains),
         [Method((string[] values) => values.Contains(""))] = FixedValues(arrayOnly: true),

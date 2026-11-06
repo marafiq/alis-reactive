@@ -31,6 +31,8 @@ public sealed class DosesController : Controller
 
     public IActionResult LookedUpInACaseBlindSet() => View(DoseRound.Page());
 
+    public IActionResult LookedUpInAHashSet() => View(DoseRound.Page());
+
     public IActionResult LookedUpInADosesHours() => View(DoseRound.Page());
 
     public IActionResult LookedUpAnObject() => View(DoseRound.Page());
