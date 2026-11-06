@@ -445,6 +445,19 @@ Terms used throughout:
   data, and Q15 states what that engine evaluates.
 - D8.5 Every term reads by Q4: a term over a source that reads nothing does not hold, and a term with a
   method call runs only when it is reached.
+- D8.6 A pipeline condition has one syntax: `When(source)`, `ElseIf(source)`, `And(source)` and `Or(source)`,
+  where the source is any typed source of Q7, an event payload's member included (`When(args.ClosedBy)`).
+  Main's second form, a payload and a path lambda (`When(args, x => x.IsExpanded)`), is refused, and
+  `When(source)` carries it: the payload's member is a typed source (the owner, 2026-11-06).
+- D8.7 A branch (`Then`, `Else`) is a block: it holds any number of steps, written in one lambda, as a chain
+  or as statements in a `{}` body, and runs them in authored order.
+- D8.8 A block is a lexical scope, as a C# `{}` block is. A value a block binds is readable in that block and
+  in the blocks inside it, and nowhere else. The values a block binds: its handler's event payload, a
+  route's response body, an array operation's item, a method's result read in it, and a `Confirm`'s answer.
+  A read of a bound value outside its block is refused where the view renders, naming the value and the
+  block that binds it. That one rule covers today's two refusals of this kind, an array item and a response
+  read outside their blocks. The browser runs each block in a child scope, so a value bound inside a branch
+  never reaches the steps after it.
 
 **Schema nodes.** `op` (the comparison, text, membership and value tests, `and`, `or`, `not`); `if`.
 
@@ -466,6 +479,13 @@ Terms used throughout:
   `BrowserCondition` returns no condition for one (`Alis.Reactive/Validation/BrowserCondition.cs:53`).
 - A third translator writes template text (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9`).
 - B9: the pipeline door's operators (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:106`).
+- Two syntaxes on main: `git grep` over its views at 623dd4a27 finds 201 conditions of the form
+  `When(payload, x => ..)` and 119 of `When(source)`; at 65fdf118d it finds none of the first and 714 of the second.
+  The redesign has 239 branches with a `{}` body, main 178.
+- Block scope today: the C# gives each block its own frame of results (`Alis.Reactive/PlanModel/Writing/Scope.cs:29`) and refuses
+  an array item read outside an array operation (`Alis.Reactive/PlanModel/Writing/Scope.cs:38`) and a response read outside its
+  request's routes (`Alis.Reactive/PlanModel/Writing/Scope.cs:78-79`); the browser runs each branch in a child environment
+  (`Alis.Reactive.Assets/runtime/grammar/execute.ts:60-65`, `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:17-19`).
 
 **Defects.**
 - `X8.1` type: a condition on an operand of the wrong type does not compile: the operator is generic over
@@ -475,6 +495,11 @@ Terms used throughout:
 - `X8.3` behavior: a validator condition with a term the lambda door cannot translate gates its rules on the
   server only; the browser sends the form and shows the server's message.
 - `X8.4` behavior: `When(a).ElseIf(b).Else()` runs the first branch whose condition holds and no other.
+- `X8.5` refusal: a response body captured in a C# variable inside `OnSuccess` and read after the request is
+  refused with "The response body of the request to {url} is read outside the block that binds it: read it
+  inside that request's routes or the blocks they hold."
+- `X8.6` behavior: a branch with three steps in a `{}` body runs all three, in order, and none when its
+  condition does not hold.
 
 ## Q9. The request
 

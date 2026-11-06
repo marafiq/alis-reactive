@@ -29,6 +29,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   complicated, and a more condensed typed syntax that loses no feature is welcome (step 7, gate 2).
 - The owner, 2026-11-06: a request runs in any event or callback; conditions work uniformly in every block
   of a request.
+- The owner, 2026-11-06: conditions have had two syntaxes in views; there is one uniform syntax, a branch
+  holds several statements, and a branch is a simple lexical scope, as a C# `{}` block is.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
