@@ -96,6 +96,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   its assertion are each crucial, and their absence has cost months.
 - The owner, 2026-11-06: "Let's drop real time from .NET 4.8." Realtime is net10's alone: its doors are on net10's
   surface only, the net48 realtime rows of the inventory stay, marked out, and no check counts them as lost.
+- The owner, 2026-11-06: strict quality is enforced by tools, in the browser's TypeScript by lint rules and in C# by
+  analyzers, and the analyzers are written so rigorously that they never become another surface that drifts: a
+  harness, not extra work. The tests and the custom components are what proves the framework's coverage. Each lint
+  rule and each analyzer enforces one line of this spec, the line names its rule, and a rule with no line leaves.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
