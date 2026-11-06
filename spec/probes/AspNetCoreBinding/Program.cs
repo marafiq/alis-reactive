@@ -72,6 +72,13 @@ try
     Console.WriteLine("core-uri-absolute: " + string.Join("; ", new[] { "http://a.com/b c", "http://a b.com", "http://", "http://a", "https://exa_mple.com", "http://a.com:99999", "HTTP://A.COM" }.Select(text => text + " " + (Uri.TryCreate(text, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)))));
     Console.WriteLine("core-route-segment-decoding: a%2Fb%20c%2Bd%3F%C3%A9 reaches the action as " + await client.GetStringAsync("/route/a%2Fb%20c%2Bd%3F%C3%A9"));
     Console.WriteLine("core-query-decoding: q=a+b%2Bc%26d binds " + await client.GetStringAsync("/query?q=a+b%2Bc%26d"));
+    var populate = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web) { PreferredObjectCreationHandling = System.Text.Json.Serialization.JsonObjectCreationHandling.Populate };
+    var populated = System.Text.Json.JsonSerializer.Deserialize<Ward>("{\"lead\":{\"phone\":\"1\"},\"leads\":[{\"phone\":\"3\"}]}", populate)!;
+    Console.WriteLine("core-stj-populate-start: under Populate Lead.Name=" + populated.Lead.Name + "; Leads=" + string.Join(",", populated.Leads.Select(lead => lead.Name)));
+    using (var api = await client.PostAsync("/api-named", new StringContent("Name=", Encoding.UTF8, "application/x-www-form-urlencoded")))
+    {
+        Console.WriteLine("core-api-controller-implicit-required: Name= answers " + (int)api.StatusCode + " " + api.Content.Headers.ContentType?.MediaType + (await api.Content.ReadAsStringAsync()).Contains("reached the action") switch { true => " from the action", false => " before the action" });
+    }
     Console.WriteLine("core-form-empty-field: Count= binds " + await Form(client, "/counts", "Count=&Maybe=") + "; nothing sent binds " + await Form(client, "/counts", ""));
     Console.WriteLine("core-json-null-member: {\"count\":null} binds " + await Json(client, "/counts-json", "{\"count\":null}") + "; {} binds " + await Json(client, "/counts-json", "{}"));
     using (var strict = await client.PostAsync("/strict-json", null))
@@ -179,6 +186,13 @@ public sealed class Ward
     public Lead? Deputy { get; set; }
 
     public List<Lead> Leads { get; set; } = [new() { Name = "seed" }];
+}
+
+[ApiController]
+public sealed class ApiProbeController : ControllerBase
+{
+    [HttpPost("/api-named")]
+    public string Named([FromForm] Named named) => "reached the action";
 }
 
 public sealed class PageController : Controller

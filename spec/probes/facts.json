@@ -917,6 +917,24 @@
       "probe": "spec/probes/referencesource/HttpEncoder.cs.txt",
       "expect": "if (ch == '+') {",
       "source": "spec/probes/referencesource/HttpEncoder.cs.txt:566"
+    },
+    {
+      "id": "core-stj-populate-start",
+      "statement": "Under PreferredObjectCreationHandling.Populate, System.Text.Json fills the object a member starts with and adds sent items after a list's starting items.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-populate-start: under Populate Lead.Name=outer; Leads=seed,inner",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-api-controller-implicit-required",
+      "statement": "Under [ApiController], net10's implicit required error answers 400 problem+json before the action runs.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-api-controller-implicit-required: Name= answers 400 application/problem+json before the action",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
     }
   ]
 }

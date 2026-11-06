@@ -1461,7 +1461,11 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - It adds the binder's refusal of a text a member's type cannot hold, under the member's binding name with the
     message of D16.7, and runs no rule of that member.
   - MVC's own validation adds nothing to it: neither data annotations nor the required error net10 adds for a
-    non-nullable text posted empty (`probe:core-form-implicit-required`).
+    non-nullable text posted empty (`probe:core-form-implicit-required`). Under `[ApiController]` that error answers
+    400 before the action runs (`probe:core-api-controller-implicit-required`), so on net10 the framework's
+    registration marks each type a registered `ReactiveValidator` validates as one MVC does not validate, through a
+    metadata provider, and the binder's own errors stay. The mechanism is a gate-1 line. On net48 the framework's
+    bodies never meet MVC 5's implicit required: a value type that reads nothing is left out (D9.10).
   - The sandbox's endpoints call `Validate` and write `ErrorsByField` themselves, and read no binder refusal
     (`Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/AppLevel/DrawerController.cs:48-51`).
 - D16.5 The browser decides on the body its request sends, and its verdict equals the door's on the model the
@@ -1477,12 +1481,16 @@ and `request` state, which the schema does not hold: a request's state is its ru
   format. A member the body lacks reads from its nearest holder the body sends, at any depth, and that holder
   starts as this table says:
 
-  | The nearest holder the body sends | form data, and JSON on net48 | JSON on net10 |
-  |-----------------------------------|------------------------------|---------------|
-  | none: the model itself | the model's start | the model's start |
-  | an object the member starts with | that object, as the holder above starts it | a new object of its type |
-  | an object that starts null | a new object of its type | a new object of its type |
-  | a list item | a new item of its type | a new item of its type |
+  | The nearest holder the body sends | form data, and JSON on net48 | JSON on net10, the member replaced | JSON on net10, the member populated |
+  |-----------------------------------|------------------------------|-------------------------------------|-------------------------------------|
+  | none: the model itself | the model's start | the model's start | the model's start |
+  | an object the member starts with | that object, as the holder above starts it | a new object of its type | that object, as the holder above starts it |
+  | an object that starts null | a new object of its type | a new object of its type | a new object of its type |
+  | a list item | a new item of its type | a new item of its type | a new item of its type, after the items the list starts with |
+
+  - On net10 each JSON member is replaced or populated as the app's contract says for it, by its own attribute or
+    the options' `PreferredObjectCreationHandling` (`probe:core-stj-populate-start`); replaced is the default
+    (`probe:core-json-nested-start`). A populated list keeps the items it starts with and adds the sent ones.
 
   - Facts: `probe:core-form-nested-start`, `probe:core-json-nested-start`, `probe:core-form-unsent-keeps-start`,
     `probe:mvc5-nested-fills-start`, `probe:mvc5-list-item-new`, `probe:mvc5-list-replaced`, and MVC 5 binds JSON
@@ -1535,10 +1543,12 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - The framework rewrites no pattern. A pattern that holds one of those constructs, an option other than
     `IgnoreCase` with `CultureInvariant`, or .NET-only syntax is refused where the view renders, naming the construct
     and the text that means the same in both engines (`[0-9]` for `\d`), unless the rule is `.ServerOnly()`.
-  - `$` has no form both engines read the same, so a pattern that anchors its end is refused the same way unless its
-    input holds one line: a single-line input's value holds no line break, so .NET's match before a final newline
-    never arises there (`probe:html-input-line-breaks`). The input's kind is the declaration's, so C# decides it where the view renders.
-  - The u-flag forms that read as .NET does (`probe:js-regex-translated`) stay a fact, not a mechanism.
+  - `$` is the one construct with no spelling a developer writes the same for both engines, so the framework writes
+    the browser's copy of an unescaped `$` outside a character class as `(?=\n?$)`, the form that reads as .NET's
+    (`probe:js-regex-translated`). Every other construct is refused with its common spelling. A `$` under
+    `Multiline` is refused like any other option.
+  - A single-line input's value holds no line break (`probe:html-input-line-breaks`), so that copy matters for a
+    text area and for a member no input holds.
 - D16.12 The validation spec of step 5 checks that the two sides give one verdict on every body of its domain, for
   each check of D16.10 and each condition of D16.8.
 - D16.13 A message's place is carried in the plan, never read from the page (B5).
@@ -1573,6 +1583,8 @@ grammar gains no node (G2).
 - `probe:core-stj-empty-object-start`
 - `probe:mvc5-create-model-parameterless`
 - `probe:core-form-implicit-required`
+- `probe:core-api-controller-implicit-required`
+- `probe:core-stj-populate-start`
 - `probe:mvc5-empty-text-null`
 - `probe:core-form-value-messages`
 - `probe:mvc5-value-invalid-message`
