@@ -99,7 +99,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: "In the model, in the CSHTML, let's have a rule that both has to be same. Override cannot
   change it." An override keeps the JSON name and the write of the member it overrides. A read names the member as
   the class that declares it names it, and the class the read starts from must write that name. An override that
-  changes either is the analyzer's to refuse at build (N18.5, built in POC 13; not built yet) (D18.3).
+  changes either is the analyzer's to refuse at build (N18.5, built in POC 13; not built yet) (D18.3). The owner
+  approved the solution the same day.
+- The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
+  reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
+  and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's
+  identity, its base types and the declaring class of a lambda's member are within the rule (D18.1, D18.4).
+- The owner, 2026-11-06: branches that nest to any depth (D8.7, D8.8) are "golden".
 - The owner, 2026-11-06: the slices are vertical in an app as in the framework (the owner's words are in
   `spec/NOTES.md`). An action that needs a model has a model of its own, plain, shared with no other view; an app
   shares a base class only for abstract members it enforces. The docs and the component onboarding skill teach

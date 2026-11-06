@@ -1337,7 +1337,8 @@ and `request` state, which the schema does not hold: a request's state is its ru
     `IdGenerator.For`.
   - The framework controls every input's id (the owner, 2026-11-06): without it the browser guesses which
     input a rule, a message or a read means, and views of different partials that share an id conflict.
-  - Reading the declaring class from the expression tree goes to gate 1's list of reflection exceptions.
+  - Reading the declaring class of the member the expression tree names is a type's identity, within the
+    no-reflection rule (D18.1).
 - D14.4 A partial is rendered for a member by one typed door, `Html.PartialFor(m => m.Member, view)` (N14.1), on
   both hosts.
   - The member's value is the partial's model, and a new `TemplateInfo` carries the member's full binding
@@ -1938,10 +1939,11 @@ plans (Q19).
   The contract is the app's options' `JsonTypeInfo`, from a source-generated context or from System.Text.Json's
   own resolver, so whatever reflection exists is System.Text.Json's, not the framework's.
 
-  One read beside the three: the walk up a class's base types (`Type.BaseType`) that finds the contract of the
-  class declaring an overridden member (D18.3). `System.Type` derives from `MemberInfo`; the ban of D18.4 misses
-  `BaseType` only because `Type` is declared in `System`. The walk lists no member and reads no attribute. Gate 1
-  asks the owner whether it is within the no-reflection rule or goes on the exception list.
+  The reflection the framework refuses is run-time discovery and use of members (the owner, 2026-11-06: "a list of
+  methods and properties and all kind of stuff. That is bad."): listing members, reading attributes, reading,
+  writing or invoking a member through reflection, and `Activator`. A type's identity is not: its base types
+  (`Type.BaseType`, the walk that finds the contract of the class declaring an overridden member, D18.3) and the
+  declaring class of the member a typed lambda names (D14.3) are within the rule.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):
@@ -1973,8 +1975,9 @@ plans (Q19).
     app's model at build time (N18.5). A model is a `.cs` file the build compiles on both hosts, so the analyzer
     sees it on net48 too.
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
-  lists at gate 1 (N18.1): the members of `System.Reflection`, `Activator`, `Type.GetType` by name and
-  `Expression.Compile`.
+  lists at gate 1 (N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
+  attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`. A type's identity stays open to the
+  framework (D18.1). The POC bans the whole `System.Reflection` namespace until N18.1 replaces that ban.
 - D18.5 Every door on the public surface is typed (ALIS009). The three strings of B13 become typed doors:
   - a button's type is HTML's closed set, `button`, `submit` or `reset`;
   - a text box's type is HTML's closed set of text input types;
