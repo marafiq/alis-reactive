@@ -172,10 +172,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   culture are approved, and so is the list of fifteen POCs in `spec/NOTES.md`.
 - The owner, 2026-11-06, confirming the scope of Decision 1: "that observation is correct", then "so having some sort of
   good explicit solution is needed". Every typed data read, not only a list's lambda, reads an absent member's start,
-  and the plan states it: each step of a `data` read carries `start`, `nothing` or `unbound` (D4.2). A data read follows
-  the contract that wrote the data, System.Text.Json under the app's options on both hosts; a form's check follows the
-  endpoint that binds its body (D16.6). The root CLAUDE.md's "Data reads as nothing when absent" describes main and the
-  redesign, and changes when the rewrite lands.
+  and the plan states it: each step of a `data` read carries `start`, `nothing` or `unbound` (D4.2). The root CLAUDE.md's
+  "Data reads as nothing when absent" describes main and the redesign, and changes when the rewrite lands.
+- Chosen within the owner's yes, 2026-11-06: a data read's start is System.Text.Json's binding under the app's options,
+  on both hosts, the contract that wrote and names the data (D2.9). The owner's words were "as the endpoint binds it";
+  on net48 the endpoint is MVC 5's binder, which fills the nested objects a model starts with and cannot create a type
+  with no public parameterless constructor (a positional record), so on net48 the browser reads a start that endpoint
+  would not bind. One meaning on both hosts is the framework absorbing the host difference; a form's check still
+  follows the endpoint that binds its body, by host (D16.6). The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

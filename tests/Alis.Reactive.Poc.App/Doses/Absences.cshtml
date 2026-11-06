@@ -20,6 +20,16 @@
         pipeline.Component<StationCensus>("census").Count.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Refills == 0))))
 
+@(plan.Button("sum-refills", "Sum the refills left")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Refills))))
+
+@(plan.Button("list-by-refills", "List doses by refills left")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => d.Refills).Select(d => d.Medicine))))
+
 @(plan.Button("count-in-mg", "Count doses measured in mg")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(

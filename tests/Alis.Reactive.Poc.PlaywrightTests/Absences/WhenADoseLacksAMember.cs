@@ -14,6 +14,26 @@ public sealed class WhenADoseLacksAMember : AppPageTest
     }
 
     [Test]
+    public async Task a_sum_adds_the_start_of_a_term_the_dose_lacks()
+    {
+        await Open("/Doses/Absences");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Sum the refills left", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("6");
+    }
+
+    [Test]
+    public async Task an_order_sorts_by_the_start_of_a_key_the_dose_lacks()
+    {
+        await Open("/Doses/Absences");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "List doses by refills left", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census .census-names li")).ToHaveTextAsync(["Digoxin", "Heparin", "Insulin", "Aspirin", "Paracetamol"]);
+    }
+
+    [Test]
     public async Task a_text_the_app_omits_when_null_reads_the_value_its_initializer_starts_it_with()
     {
         await Open("/Doses/Absences");

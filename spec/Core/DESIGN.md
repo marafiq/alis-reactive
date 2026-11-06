@@ -533,8 +533,8 @@ Terms used throughout:
   sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. A `decimal` term is a JSON number or the
   decimal text the app writes for it (`JsonNumberHandling.WriteAsString` writes 0.10m as "0.10"), added the same way.
   Any other term, null among them, stops the pipeline, as these three types have no null to add; a term that reads
-  nothing is null in the `map`, so it stops too, and the owner's answer on absent members decides whether an absent member reads its
-  starting value first (`spec/NOTES.md`).
+  nothing, past a holder that holds null, is null in the `map`, so it stops too. A term member the item lacks reads
+  its start first (D4.2), so `Sum(d => d.Refills)` adds 0 for a dose the app omitted at 0.
 - D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted` and
   `length`, named at the vendor boundary of the built-in array and read `requiredIfHeld` (D6.3). The browser adds no
   array function, and no operation changes the vendor's own array: a sort is `toSorted`, never `sort`. The redesign
@@ -583,8 +583,9 @@ Terms used throughout:
   Text orders only through `OrderBy(key, StringComparer.Ordinal)`, by UTF-16 code unit as .NET's ordinal comparer
   does. Text by the culture is refused (X6.27) until the owner decides: .NET's culture order differs between net48
   (NLS word sort, `co-op` beside `coop`) and net10 (ICU), and between ICU builds on Han ideographs (`spec/NOTES.md`,
-  2026-11-06, Decision 3). A key that reads nothing, or holds a value its comparison does not compare, stops the
-  pipeline; whether an absent member reads its starting value first is the owner's answer on absent members.
+  2026-11-06, Decision 3). A key member the item lacks reads its start first (D4.2), so `OrderBy(d => d.Refills)` sorts a dose the app
+  omitted at 0 as 0. A key that reads nothing, past a holder that holds null, or holds a value its comparison does not
+  compare, stops the pipeline.
 
 **Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`).
 
