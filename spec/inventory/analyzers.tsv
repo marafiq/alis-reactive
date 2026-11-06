@@ -1,0 +1,14 @@
+id	status	redesign	main
+ALIS001	both	Alis.Reactive.Analyzers/ConditionalChain/IncompleteConditionalChainAnalyzer.cs#DiagnosticId	Alis.Reactive.Analyzers/ConditionalChain/IncompleteConditionalChainAnalyzer.cs#DiagnosticId
+ALIS002	main-only		Alis.Reactive.Analyzers/NativeActionLink/NativeActionLinkSingleRequestAnalyzer.cs#DiagnosticId
+ALIS003	both	Alis.Reactive.Analyzers/ReactiveEvent/DuplicateReactiveEventAnalyzer.cs#DiagnosticId	Alis.Reactive.Analyzers/ReactiveEvent/DuplicateReactiveEventAnalyzer.cs#DiagnosticId
+ALIS004	both	Alis.Reactive.Analyzers/ControlFlow/ControlFlowInReactiveCallbackAnalyzer.cs#DiagnosticId	Alis.Reactive.Analyzers/ControlFlow/ControlFlowInReactiveCallbackAnalyzer.cs#DiagnosticId
+ALIS005	both	Alis.Reactive.Analyzers/Validation/ServerOnlyValidationRuleAnalyzer.cs#DiagnosticId	Alis.Reactive.Analyzers/Validation/ServerOnlyValidationRuleAnalyzer.cs#DiagnosticId
+ALIS006	main-only		Alis.Reactive.Analyzers/Validation/ServerOnlyConditionAnalyzer.cs#DiagnosticId
+ALIS007	both	Alis.Reactive.Analyzers/HttpPipeline/DuplicateChainedRequestAnalyzer.cs#DiagnosticId	Alis.Reactive.Analyzers/HttpPipeline/DuplicateChainedRequestAnalyzer.cs#DiagnosticId
+ALIS008	both	Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs#DiagnosticId	Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs#DiagnosticId
+ALIS009	both	Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs#DiagnosticId	Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs#DiagnosticId
+ALIS010	redesign-only	Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs#EdgeId	
+ALIS011	redesign-only	Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs#NamespaceId	
+ALIS012	redesign-only	Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs#SealedId	
+ALIS013	redesign-only	Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs#TableId	

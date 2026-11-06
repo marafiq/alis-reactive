@@ -68,9 +68,18 @@
       "pass": false
     },
     "inventory": {
-      "counts": {},
-      "detail": "not started: spec/inventory/doors.tsv, spec/inventory/kinds.tsv, spec/inventory/cases.tsv, spec/inventory/analyzers.tsv, spec/inventory/tests.tsv, spec/inventory/plugins.tsv, spec/inventory/browser.tsv, spec/inventory/runtime.tsv absent",
-      "pass": false
+      "counts": {
+        "analyzers": 13,
+        "both": 1972,
+        "cases": 268,
+        "doors": 9347,
+        "kinds": 33,
+        "main_only": 4344,
+        "redesign_only": 3031,
+        "tests": 4153
+      },
+      "detail": "every door, test and kind reconciles with its source",
+      "pass": true
     },
     "kinds": {
       "counts": {},
@@ -148,16 +157,19 @@
       "pass": false
     }
   },
-  "passed": 3,
-  "read_at_head": "be14632a736cdbc34c34fa2fe919cf927cf5ba01",
+  "passed": 4,
+  "read_at_head": "a5b752e40a53b26fd6f4703dcea3e2c7ba34c78b",
   "step": {
     "failing": [
-      "inventory"
+      "core_questions",
+      "core_tlc",
+      "probes",
+      "history"
     ],
-    "name": "Inventory",
-    "next": "Write spec/tools/inventory.py and the TSVs.",
-    "number": 3,
-    "phase": "B"
+    "name": "Q1 to Q18, TLA+ specs, probes, history",
+    "next": "Answer Q1 to Q18 in spec/Core/DESIGN.md with their TLA+ specs and probes; write spec/history.tsv.",
+    "number": 4,
+    "phase": "C"
   },
   "total": 24
 }

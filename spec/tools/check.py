@@ -138,11 +138,65 @@ def check_main_surface():
     return result(passed, detail or "main's surface written for every package and target framework", **counts)
 
 
+REDESIGN_PACKAGES = {
+    "Alis.Reactive": ["net48", "net10.0"],
+    "Alis.Reactive.Fusion": ["net48", "net10.0"],
+    "Alis.Reactive.Native": ["net48", "net10.0"],
+    "Alis.Reactive.NativeTagHelpers": ["net10.0"],
+}
+TEST_ATTRIBUTE = re.compile(r"\[\s*(Test|TestCase|TestCaseSource)(?!\w)")
+
+
+def table(name):
+    lines = (SPEC / "inventory" / name).read_text().splitlines()
+    header = lines[0].split("\t")
+    return [dict(zip(header, line.split("\t"))) for line in lines[1:]]
+
+
+def door_lines(text):
+    return [line for line in text.splitlines() if line.strip() and line.strip() != "#nullable enable"]
+
+
 def check_inventory():
     paths = [SPEC / "inventory" / name for name in INVENTORY_FILES]
     if any(not path.exists() for path in paths):
         return not_started(*paths)
-    return not_built("the inventory")
+    problems = []
+    doors = table("doors.tsv")
+    for package, tfms in REDESIGN_PACKAGES.items():
+        for tfm in tfms:
+            source = sum(len(door_lines(git("show", f"{BASE_SHA}:{package}/PublicAPI/{tfm}/{name}"))) for name in ["PublicAPI.Unshipped.txt", "PublicAPI.Shipped.txt"])
+            rows = sum(1 for row in doors if row["package"] == package and row["tfm"] == tfm and row["redesign_line"])
+            if source != rows:
+                problems.append(f"redesign {package} {tfm}: {source} doors, {rows} rows")
+    for package, tfms in MAIN_PACKAGES.items():
+        for tfm in tfms:
+            source = len(door_lines((SPEC / "inventory" / "main" / package / tfm / "PublicAPI.Unshipped.txt").read_text()))
+            rows = sum(1 for row in doors if row["main_package"] == package and row["tfm"] == tfm and row["main_line"])
+            if source != rows:
+                problems.append(f"main {package} {tfm}: {source} doors, {rows} rows")
+    for row in doors:
+        expected = "both" if row["redesign_line"] and row["main_line"] else "redesign-only" if row["redesign_line"] else "main-only"
+        if row["status"] != expected or not row["declaring_type"]:
+            problems.append(f"door row {row['door'][:60]}: status {row['status']}, declaring type '{row['declaring_type']}'")
+    tests = table("tests.tsv")
+    for line, sha in {"redesign": BASE_SHA, "main": MAIN_SHA}.items():
+        files = [path for path in git("ls-tree", "-r", "--name-only", sha, "--", "tests").splitlines() if path.endswith(".cs") and "PlaywrightTests/" in path]
+        attributes = sum(len(TEST_ATTRIBUTE.findall(git("show", f"{sha}:{path}"))) for path in files)
+        cases = sum(int(row["cases"]) for row in tests if row["line"] == line)
+        if attributes != cases:
+            problems.append(f"{line} tests: {attributes} test attributes, {cases} cases in rows")
+    kinds = table("kinds.tsv")
+    grammar = {row["kind"] for row in kinds if row["source"] == "grammar"}
+    schema = {row["kind"] for row in kinds if row["source"] == "plan.schema.json"}
+    if grammar != schema:
+        problems.append(f"grammar and schema kinds differ: {sorted(grammar ^ schema)}")
+    status = {}
+    for row in doors:
+        status[row["status"]] = status.get(row["status"], 0) + 1
+    return result(not problems, "; ".join(problems[:8]) or "every door, test and kind reconciles with its source",
+                  doors=len(doors), both=status.get("both", 0), main_only=status.get("main-only", 0), redesign_only=status.get("redesign-only", 0),
+                  tests=len(tests), kinds=len(schema), analyzers=len(table("analyzers.tsv")), cases=len(table("cases.tsv")))
 
 
 def design_sections():
