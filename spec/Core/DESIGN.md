@@ -475,3 +475,239 @@ Terms used throughout:
 - `X8.3` behavior: a validator condition with a term the lambda door cannot translate gates its rules on the
   server only; the browser sends the form and shows the server's message.
 - `X8.4` behavior: `When(a).ElseIf(b).Else()` runs the first branch whose condition holds and no other.
+
+## Q9. The request
+
+**Decision.**
+- D9.1 A request is one step, `let res = await $http.send(arg)`, and `arg` is the typed plugin argument
+  `HttpSend`, a contract generated into the plan's TypeScript beside the grammar. The browser declares no
+  request type of its own. The grammar gains no node (G2).
+- D9.2 The builder is staged: each part is written at most once, a GET has no body format, and `Form()` exists
+  only on a request that checks a form.
+- D9.3 The method is GET, POST, PUT or DELETE. A GET sends no body; POST, PUT and DELETE send one.
+- D9.4 The URL is parsed once, in C#, into text parts and placeholders. A URL that holds `#`, a brace without
+  its pair, or a placeholder no member fills is refused where the view renders. A placeholder is filled by
+  the top-level member of the same name of the request or of its query, compared ignoring case. A list, an object, a file, a date
+  or an instant in a placeholder is refused, on both hosts, because IIS refuses a time in a path segment on
+  net48 (#237). A route value is sent as its invariant text, encoded as one path segment.
+- D9.5 A route value that reads nothing or reads empty text stops its request before it is sent (D4.6).
+- D9.6 Every method sends a query. A GET sends there every member of its request that fills no placeholder;
+  POST, PUT and DELETE send there the members of a typed query, `Query<TQuery>(q => q.Set(..))`, beside the body.
+  A member is static (a literal) or read from a source. The URL's own query text is kept, and C# appends the
+  members after it with `?` or `&`. A key is the binding name, a list sends one key per item, a number is its
+  invariant text and a date is the wire form of `spec/Core/DateWire.tla`.
+- D9.7 A JSON body is one object. Its member names are Q2's, its nesting follows Q1's steps, and a dictionary
+  entry is a member named by its key. A JSON request that sets nothing sends `{}`, because on net10 a request
+  with no body answers 415 or binds null by the endpoint parameter's nullability (`probe:core-frombody-no-body`).
+- D9.8 Form data is multipart, written by the browser. A field is named by its binding name, a list sends one
+  field per item, a number carries the decimal separator of the view's culture (D3.7) and a file is sent as
+  the file.
+- D9.9 DELETE sends its body as POST and PUT do. A member that fills a placeholder is also sent in the body of a
+  POST, PUT or DELETE.
+- D9.10 A member that reads nothing is sent by this closed table, which C# writes into the plan:
+
+  | The member's type | JSON body | Query or form data |
+  |-------------------|-----------|--------------------|
+  | a non-nullable value type | left out | left out |
+  | a list | left out | left out |
+  | a nullable value type, text or a class | `null` | an empty field, `name=` |
+
+  A member left out keeps its starting value; a JSON `null` for a non-nullable value type binds no instance
+  at all, and an empty field for one is a model error (`probe:core-json-null-member`, `probe:core-form-empty-field`).
+- D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
+  header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, and `Content-Type` is
+  refused because the body format owns it.
+- D9.12 The headers every request sends are configured once in C#, and C# writes them into each request's
+  `HttpSend` where the view renders; a request's own header of the same name, compared ignoring case, replaces
+  the configured one. An app that sends `X-Requested-With: XMLHttpRequest` on every request configures it there.
+  The browser adds no header.
+- D9.13 A literal member, `Set(member, value)`, is written where the view renders, encoded as the endpoint
+  binds it: an enum by the System.Text.Json contract under the endpoint's options on net10 and by its name on
+  net48 (Q18).
+- D9.14 A hidden input is an input: it binds by its binding name and shape, and a form sends it when the sent
+  element holds it.
+- D9.15 What a request sends is closed: members it sets from sources (`Set`), the inputs of the form it checks
+  (`Form()`), the inputs of one element (`Form(formId)`), and named inputs, each typed by its own lambda. When
+  an input and a set member send the same binding name, the input's value is sent, as the body the check reads
+  (Q16). An element `Form(formId)` names that the page lacks stops the request.
+- D9.16 A file is the shape `file`, sent only in form data. A set member of file shape in a GET or a JSON body
+  is refused by an analyzer; a file input a form sends in a GET or a JSON body stops the request when it is sent.
+- D9.17 Requests in one pipeline run one after another, each after the one before it settles. ALIS008 keeps
+  refusing a second request in one pipeline, with its reason corrected: `Chained` runs a request after another
+  succeeds, and `Parallel` sends them at once.
+- D9.18 `p.Url<TQuery>()` reads the page's own URL. It is a source (Q7), not a part of the request.
+
+**Schema nodes.** `let` with `await`, `call` on the plugin `http`, `record`, `list`, `lit`, `get`, `as`, `op`; the
+shape `file`; the contract `HttpSend`, which is no node kind.
+
+**Checker.**
+- `Request.tla:EveryPlaceholderFilled`
+- `Request.tla:RouteHoldsScalarText`
+- `Request.tla:FileOnlyInFormData`
+- `Request.tla:NothingBindsAsDeclared`
+- `probe:core-json-null-member`
+- `probe:core-form-empty-field`
+- `probe:core-frombody-no-body`
+- `probe:core-frombody-binds-json-name`
+
+**Doors.**
+- kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:58-62`), `Gather` and
+  `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`, `Form()`,
+  `Form(formId)`, `AsJson`, `AsFormData`.
+- `N9.1` new: `internal sealed class HttpSend` in `Alis.Reactive/PluginArguments`, with its parts `PathPart`,
+  `SentField`, `SentBody` and `SentHeader`, generated into the plan's TypeScript; it replaces the hand-typed
+  `HttpRequest` (`Alis.Reactive.Assets/runtime/plugins/http.ts:10-18`).
+- `N9.2` new: the staged builder: a GET builder with no body format, and `Form()` only on a request that checks.
+- `N9.3` new: named inputs typed one by one, `Field(m => m.Member)`, replacing
+  `Form(params Expression<Func<TModel, object?>>[])` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`).
+- `N9.4` new: analyzer ALIS016, a file-shaped set member in a GET or a JSON body.
+- `N9.5` new: ALIS008's corrected message
+  (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`).
+- `N9.6` new: the request defaults of D9.12 and D10.12, configured once in C#; their door's form goes to gate 2.
+- `N9.7` new: `Query<TQuery>(q => q.Set(x => x.Member, value or source))` on POST, PUT and DELETE.
+
+**Evidence.**
+- B6: the request is a record of string-named fields (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:101`) typed by
+  hand in the browser (`Alis.Reactive.Assets/runtime/plugins/http.ts:10-18`).
+- B10: a named input's type is erased (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`).
+- B12: a missing route value throws inside the plugin (`Alis.Reactive.Assets/runtime/plugins/http.ts:83`).
+- B14: a request member is written with its CLR name (`Alis.Reactive/Members/ExpressionPathHelper.cs:105`), and a net10
+  `[FromBody]` endpoint does not bind a `[JsonPropertyName]` member by its CLR name (`probe:core-frombody-ignores-clr-name`).
+  ALIS008 says "only the last request survives" (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`),
+  while each request is appended as its own step (`Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:109`), read and not run.
+- G8: a set member takes any source of its type (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`).
+- P1: 8046bc4c5 checked a request for the unprefixed name; b24c65775 left a number-keyed dictionary unsent in JSON.
+
+**Defects.**
+- `X9.1` type: a body format on a GET does not compile: new:N9.2.
+- `X9.2` type: `Form()` on a request that checks no form does not compile: new:N9.2.
+- `X9.3` type: a named input whose type the request member does not hold does not compile: new:N9.3.
+- `X9.4` analyzer: a file-shaped set member in a GET or a JSON body: new:N9.4.
+- `X9.5` refusal: a placeholder no member fills: "The URL '{url}' has the placeholder {name}, and the request has no
+  member named {name}; add the member, or take the placeholder out of the URL."
+- `X9.6` refusal: a date in a placeholder: "{member} is a date, and a date cannot fill the placeholder {name}: IIS
+  refuses a time in a path segment. Name the member so it goes in the query."
+- `X9.7` refusal: `Content-Type` as a header: "Content-Type is set by the body format; use AsJson() or AsFormData()."
+- `X9.8` behavior: a non-nullable member that reads nothing is left out of the JSON body, and the endpoint binds
+  its starting value with no model error.
+- `X9.9` behavior: a route value that reads nothing sends no request, runs its `Finally`, and runs no step after it.
+
+## Q10. The request's flow and its response
+
+**Decision.**
+- D10.1 A request runs in this closed order: its check, then `WhileLoading`, then, inside a `try` whose
+  `finally` is the request's `Finally`, its guards (route values, the element `Form(formId)` names), the send
+  and one response route; then `Chained`; then the steps after the request.
+- D10.2 A form check that fails shows its messages, sends nothing, runs neither `WhileLoading` nor `Finally`,
+  and stops its pipeline: no step after the request runs.
+- D10.3 A `WhileLoading` that stops sends nothing, runs no `Finally` and stops its pipeline. `Finally` runs
+  exactly when `WhileLoading` ran, after every outcome, a stop inside a route included.
+- D10.4 A request follows a redirect that ends on the page's own origin, and the response it ends at is the
+  request's answer: its status and body pick the route (`probe:fetch-follows-relative-redirect`). A redirect
+  that ends on another origin is refused.
+- D10.5 The outcomes are closed, and exactly one route runs for each, by D10.13:
+
+  | Outcome | Route |
+  |---------|-------|
+  | a 2xx status and a body of the declared kind | `OnSuccess` |
+  | a status that is not 2xx | the route for that status, else the catch-all |
+  | the network failed | the catch-all |
+  | a redirect that ended on another origin | the catch-all |
+  | a 2xx status and a body not of the declared kind | the catch-all |
+
+  The last three each log one error naming the request and the outcome, and their data reads nothing. A
+  request with no route for its outcome runs none.
+- D10.6 The plan declares each route's body kind: JSON for `OnSuccess<T>` and `OnError<T>`, HTML for `Into`, and
+  none for a route with no data, whose body is not read. JSON is a body whose media type is `application/json`
+  or ends in `+json`; an empty JSON body is data that reads nothing. A JSON body that does not parse is a body
+  not of the declared kind. An error route reads its body as data: a body not of its kind reads nothing, and
+  the route runs.
+- D10.7 On net48 the plan carries that a response's `X-Responded-JSON` status replaces its own, so Katana's
+  answer to a request that sends `X-Requested-With` runs the route of the status it withheld.
+- D10.8 A server's validation errors have one body on both hosts, `{"errors": {"<binding name>": ["message"]}}`,
+  status 400, written by a framework door: on net10 MVC's `ValidationProblemDetails`
+  (`probe:core-validation-problem-shape`), on net48 the same JSON with `TrySkipIisCustomErrors` set, the switch
+  System.Web gives a response that keeps its own error body under IIS (`probe:systemweb-try-skip-iis-custom-errors`).
+  The browser reads that body only: a message shows at the input whose binding name is its key, else in the
+  form's summary.
+- D10.9 `Chained` runs after the first request's success route and its `Finally`, only on success, and reads the
+  first response's data.
+- D10.10 `Parallel` sends its requests at once. Each runs its own route as its response arrives, a stop in one
+  ends that one only, and `OnAllSettled` runs once, after every request settled, whatever each outcome. The
+  steps after `Parallel` run after `OnAllSettled`.
+- D10.11 `Into(element)` loads the success body's HTML into the element as a slot (Q12): what the element held
+  unloads first.
+- D10.12 Request defaults are configured once in C# and hold headers (D9.12), `WhileLoading` steps, `Finally`
+  steps, error routes by status, a catch-all error route and a retry policy. C# composes them into every
+  request where the view renders; the browser holds no defaults. A request's `WhileLoading` runs after the
+  defaults', and its `Finally` before the defaults'. A request's retry policy replaces the defaults'. Success
+  has no default: `OnSuccess` is the request's own. A request takes no defaults when it says so, whole.
+- D10.13 For an outcome that is not success, the route is the request's route for its status, else the
+  defaults' route for its status, else the request's catch-all, else the defaults' catch-all, else none. So a
+  request routes only the statuses it cares about.
+- D10.14 Retry is a policy, the defaults' or the request's, and no request retries without one. It retries a
+  network failure and the statuses it names, from 408, 429, 502, 503 and 504, and no other outcome. It retries
+  GET, PUT and DELETE, which HTTP defines as idempotent (RFC 9110, section 9.2.2), and a POST only when its policy
+  says the POST is repeatable. It makes at most the attempts it states, waits the delay it states between
+  attempts, and waits what a 429 or 503 response's `Retry-After` states, up to its longest wait; a longer wait
+  ends the retries.
+- D10.15 Across attempts, the request's check, guards and argument run once, and every attempt sends the same
+  argument. `WhileLoading` runs once before the first attempt, the route once for the last attempt's outcome,
+  and `Finally` once after it. An owner disposed between attempts ends the retries (Q11).
+
+**Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
+`HttpSend` and its result, `HttpResponse`.
+
+**Checker.**
+- `Request.tla:FailedCheckSendsNothing`
+- `Request.tla:FinallyRunsWhenLoadingRan`
+- `Request.tla:OneRouteRuns`
+- `Request.tla:FailureRunsTheCatchAll`
+- `Request.tla:ChainedOnlyAfterSuccess`
+- `Request.tla:StepsAfterRunUnlessStopped`
+- `Request.tla:RetriesOnlyWhatIsRetryable`
+- `Request.tla:RetryStopsAtItsAttempts`
+- `Request.tla:OneLifecycleAcrossAttempts`
+- `Lanes.tla:AllSettledAfterEveryRequest`
+- `probe:fetch-follows-relative-redirect`
+- `probe:core-cookie-auth-ajax`
+- `probe:katana-ajax-redirect-is-200`
+- `probe:core-validation-problem-shape`
+
+**Doors.**
+- kept: `Response`, `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)` and their typed forms, `Chained`,
+  `Parallel` with `OnAllSettled`, `WhileLoading`, `Finally`, `Into`, `Validate` and `ValidationErrors(formId)`.
+- `N10.1` new: the error door on each host, `ValidationResult.ToErrorResponse()`: net10 a `ValidationProblemDetails`
+  result, net48 a JSON result with status 400 and `TrySkipIisCustomErrors`, replacing the body each app builds by hand.
+- `N10.2` new: `HttpResponse`, the contract of what `send` returns (`ok`, `status`, `outcome`, `body`).
+- `N10.3` new: the retry policy of D10.14, on the defaults and on a request; its door's form goes to gate 2.
+
+**Evidence.**
+- The flow today: the check guards the sentence (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:85`), the exchange
+  sits in a `try` with `Finally` (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:108`), and `Chained` runs on `ok` after it
+  (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:111`); the routes split on `ok` (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:220`).
+- A network failure and an unreadable body both read status 0 and run the error route
+  (`Alis.Reactive.Assets/runtime/plugins/http.ts:37`, `Alis.Reactive.Assets/runtime/plugins/http.ts:53`).
+- The body's kind is decided by its media type in the browser (`Alis.Reactive.Assets/runtime/plugins/http.ts:168`), so a
+  login page that answers 200 after a redirect reaches `OnSuccess` as text; fetch follows the redirect
+  (`Alis.Reactive.Assets/runtime/plugins/http.ts:35`).
+- B12: the error body's shape is guessed, a list, else text, else `""` (`Alis.Reactive.Assets/runtime/plugins/form/form.ts:180`),
+  and each app writes it by hand (`Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/AppLevel/DrawerController.cs:51`).
+- `Finally` is stated only in its XML doc (`Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:69-73`).
+
+**Defects.**
+- `X10.1` type: a route's data is typed by the route that declares it, `Data<TResponse>` and `Data<TError>`
+  (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:220`).
+- `X10.2` behavior: with `X-Requested-With` among the configured headers, a request whose cookie session expired
+  runs the route for 401 on net10 (`probe:core-cookie-auth-ajax`) and on net48 under Katana
+  (`probe:katana-ajax-redirect-is-200`). Without it the server redirects to its login page, and the request
+  ends there: a route that declares JSON runs the catch-all, and a route with no body runs `OnSuccess`.
+- `X10.3` behavior: a network failure runs `OnError()` and its `Finally` hides the loader.
+- `X10.4` behavior: a form check that fails sends nothing and runs no step after the request.
+- `X10.5` behavior: a server's validation errors show at the inputs whose binding names they key, on both hosts.
+- `X10.6` behavior: `OnAllSettled` runs once, after the slower of two parallel requests answers.
+- `X10.8` behavior: a GET whose policy retries 503 answers the second attempt's success, shows its loader once
+  and runs its `Finally` once.
+- `X10.9` type: a POST's retry policy that does not say the POST is repeatable retries nothing: new:N10.3.
+- `X10.7` behavior: on net48 under IIS, a 400 with validation errors shows each message at its input; the
+  `verify-net48` run proves it.

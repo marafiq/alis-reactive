@@ -251,6 +251,24 @@
       "probe": "spec/probes/referencesource/HttpResponse.cs.txt",
       "expect": "public bool SuppressFormsAuthenticationRedirect {",
       "source": "spec/probes/referencesource/HttpResponse.cs.txt:1588"
+    },
+    {
+      "id": "fetch-follows-relative-redirect",
+      "statement": "fetch follows a relative redirect of a POST, reports it as redirected, and answers with the response it ended at.",
+      "host": "node",
+      "oracle": "the Fetch standard as Node 24's fetch implements it",
+      "probe": "fetch-redirect.mjs",
+      "expect": "fetch-follows-relative-redirect: status 200, redirected true, ended at /list, <ul><li>saved</li></ul>",
+      "source": "spec/probes/fetch-redirect.mjs"
+    },
+    {
+      "id": "fetch-redirect-error-mode",
+      "statement": "fetch with redirect: \"error\" rejects a redirected response with a TypeError.",
+      "host": "node",
+      "oracle": "the Fetch standard as Node 24's fetch implements it",
+      "probe": "fetch-redirect.mjs",
+      "expect": "fetch-redirect-error-mode: TypeError",
+      "source": "spec/probes/fetch-redirect.mjs"
     }
   ]
 }

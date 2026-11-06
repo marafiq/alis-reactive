@@ -8,10 +8,10 @@
     "core_questions": {
       "counts": {
         "answered": 8,
-        "defects": 39,
+        "defects": 57,
         "total": 18
       },
-      "detail": "Q9 absent; Q10 absent; Q11 absent; Q12 absent; Q13 absent; Q14 absent",
+      "detail": "Q9: Checker Request.tla:EveryPlaceholderFilled is not defined, Checker Request.tla:RouteHoldsScalarText is not defined, Checker Request.tla:FileOnlyInFormData is not defined; Q10: Checker Request.tla:FailedCheckSendsNothing is not defined, Checker Request.tla:FinallyRunsWhenLoadingRan is not defined, Checker Request.tla:OneRouteRuns is not defined; Q11 absent; Q12 absent; Q13 absent; Q14 absent",
       "pass": false
     },
     "core_tlc": {
@@ -225,10 +225,10 @@
     },
     "evidence": {
       "counts": {
-        "placed": 18,
+        "placed": 19,
         "total": 31
       },
-      "detail": "unplaced: G1, G2, G5, G9, G10, B6, B13, B15, B16, P2, P3, P4, P5",
+      "detail": "unplaced: G1, G2, G5, G9, G10, B13, B15, B16, P2, P3, P4, P5",
       "pass": false
     },
     "features_core": {
@@ -320,10 +320,10 @@
     },
     "probes": {
       "counts": {
-        "facts": 28,
+        "facts": 30,
         "net10": 13,
         "net48": 13,
-        "node": 2
+        "node": 4
       },
       "detail": "every fact printed by its probe or found at its source line",
       "pass": true
@@ -336,10 +336,10 @@
     "questions": {
       "counts": {
         "answered": 8,
-        "defects": 39,
+        "defects": 57,
         "total": 19
       },
-      "detail": "Q9 absent; Q10 absent; Q11 absent; Q12 absent; Q13 absent; Q14 absent",
+      "detail": "Q9: Checker Request.tla:EveryPlaceholderFilled is not defined, Checker Request.tla:RouteHoldsScalarText is not defined, Checker Request.tla:FileOnlyInFormData is not defined; Q10: Checker Request.tla:FailedCheckSendsNothing is not defined, Checker Request.tla:FinallyRunsWhenLoadingRan is not defined, Checker Request.tla:OneRouteRuns is not defined; Q11 absent; Q12 absent; Q13 absent; Q14 absent",
       "pass": false
     },
     "rewrite_units": {
@@ -560,7 +560,7 @@
     }
   },
   "passed": 6,
-  "read_at_head": "8b585735a0158cf33ed600853c9916a10e630285",
+  "read_at_head": "7dae8c54bf9dc519b57d4b92c4213f16211e893d",
   "step": {
     "failing": [
       "core_questions",
