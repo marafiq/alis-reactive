@@ -670,9 +670,12 @@
       "pass": true
     },
     "history": {
-      "counts": {},
-      "detail": "not started: spec/history.tsv absent",
-      "pass": false
+      "counts": {
+        "required": 40,
+        "rows": 41
+      },
+      "detail": "every regression SHA on its branch and tied to a spec line",
+      "pass": true
     },
     "inventory": {
       "counts": {
@@ -1369,15 +1372,18 @@
       "pass": false
     }
   },
-  "passed": 9,
-  "read_at_head": "08825ab13eed36c0dd26f1747cea9f4d0c0339d7",
+  "passed": 10,
+  "read_at_head": "b883b2b989c9a855ffecf86cc3b2b6e369e2aac3",
   "step": {
     "failing": [
-      "history"
+      "questions",
+      "tlc",
+      "kinds",
+      "gate1"
     ],
-    "name": "Q1 to Q18, TLA+ specs, probes, history",
-    "next": "Answer Q1 to Q18 in spec/Core/DESIGN.md with their TLA+ specs and probes; write spec/history.tsv.",
-    "number": 4,
+    "name": "Q19, the schema, the validation spec, gate 1",
+    "next": "Write Schema.tla, schema.md and the validation specs; present gate 1.",
+    "number": 5,
     "phase": "C"
   },
   "total": 25
