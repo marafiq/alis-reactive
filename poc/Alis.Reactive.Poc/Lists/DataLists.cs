@@ -37,7 +37,7 @@ public static class DataLists
         => Over<TItem, TItem>(list, (items, build) => ListForms.Find(items, ItemRead(build, predicate)));
 
     public static TypedSource<TResult> Find<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate, Expression<Func<TItem, TResult>> field)
-        => Over<TItem, TResult>(list, (items, build) => ListForms.First(ListForms.Map(ListForms.Filter(items, ItemRead(build, predicate)), ItemRead(build, field))));
+        => Over<TItem, TResult>(list, (items, build) => new GetExpression(ListForms.Find(items, ItemRead(build, predicate)), JsonPath.Of(field, build.Values), ReadPresence.Optional));
 
     [Obsolete(TextIsNoList, error: true)]
     public static TypedSource<int> Count(this ITypedSource<string> text) => throw new NotSupportedException(TextIsNoList);

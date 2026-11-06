@@ -95,6 +95,28 @@ public sealed class WhenANurseStationIsAsked : AppPageTest
     }
 
     [Test]
+    public async Task a_read_through_a_find_that_keeps_no_bed_stops_the_steps_after_it()
+    {
+        await Open("/Stations/Questions");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Read first occupied quiet bed" }).ClickAsync();
+
+        await Expect(Page.Locator("#station-status")).ToHaveTextAsync("Reading quiet");
+        await Expect(Page.Locator("#census .census-lead")).ToHaveTextAsync("unknown");
+    }
+
+    [Test]
+    public async Task a_find_with_a_field_whose_kept_bed_lacks_the_field_the_declaration_names_stops_the_steps_after_it()
+    {
+        await Open("/Stations/Questions");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Ask whether the south bed with an alert is occupied" }).ClickAsync();
+
+        await Expect(Page.Locator("#station-status")).ToHaveTextAsync("Asking south");
+        await Expect(Page.Locator("#census .census-answer")).ToHaveTextAsync("unknown");
+    }
+
+    [Test]
     public async Task a_find_with_a_field_reads_the_field_of_the_first_bed_it_keeps()
     {
         await Open("/Stations/Questions");

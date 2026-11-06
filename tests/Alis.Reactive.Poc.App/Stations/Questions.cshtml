@@ -24,6 +24,8 @@
 
 @plan.NurseStation("east-station", StationBuild.Current, [new BedSeed("Kojo Appiah", [])], null)
 
+@plan.NurseStation("south-station", StationBuild.Older, [new BedSeed("", []), new BedSeed("Esi Boateng", ["Fall risk"])], null)
+
 @plan.StationCensus("census")
 
 <p>Station: <span id="station-status"></span></p>
@@ -71,6 +73,24 @@
         pipeline.Element("station-status").Text.Set("Checking quiet");
         pipeline.Component<NurseStation>("quiet-station").Beds.Find(bed => bed.Occupied).Status.Set("Checked");
         pipeline.Element("station-status").Text.Set("Checked quiet");
+    }))
+
+@(plan.Button("read-quiet-first-occupied", "Read first occupied quiet bed")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("station-status").Text.Set("Reading quiet");
+        pipeline.Component<StationCensus>("census").Lead.Set(
+            pipeline.Component<NurseStation>("quiet-station").Beds.Find(bed => bed.Occupied).Resident);
+        pipeline.Element("station-status").Text.Set("Read quiet");
+    }))
+
+@(plan.Button("ask-south-alerted-bed", "Ask whether the south bed with an alert is occupied")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("station-status").Text.Set("Asking south");
+        pipeline.Component<StationCensus>("census").Answer.Set(
+            pipeline.Component<NurseStation>("south-station").Beds.Find(bed => bed.Alerts.Any(), bed => bed.Occupied));
+        pipeline.Element("station-status").Text.Set("Asked south");
     }))
 
 @(plan.Button("name-north-first-occupied", "Name first occupied north bed")

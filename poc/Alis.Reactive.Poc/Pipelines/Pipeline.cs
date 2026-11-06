@@ -20,7 +20,7 @@ public sealed class Pipeline
         if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("A component is reached by the id of its element.", nameof(id));
         var declaration = new TComponent();
         var objectId = Build.Element(id, declaration.Vendor.Name, declaration.Vendor.Grammar);
-        declaration.Bind(new Binding(new ObjectExpression(objectId), Build));
+        declaration.Bind(new Binding(new ObjectExpression(objectId), Build, ReadPresence.Required));
         return declaration;
     }
 }
@@ -34,7 +34,7 @@ internal static class Trigger
         var declaration = new TComponent();
         var raised = select(declaration);
         var objectId = build.Element(elementId, declaration.Vendor.Name, declaration.Vendor.Grammar);
-        var args = JsObject.Bound<TArgs>(new Binding(new RefExpression("e"), build));
+        var args = JsObject.Bound<TArgs>(new Binding(new RefExpression("e"), build, ReadPresence.Required));
         var pipeline = new Pipeline(build);
         var body = build.Block(() => run(args, pipeline));
         build.Add(new Handler(objectId, [], raised.Name, [PathStep.Index(0)], Policy.Overlap, body));

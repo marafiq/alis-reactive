@@ -38,7 +38,7 @@ internal sealed class ReadPresence : IChoice
 {
     internal static readonly ReadPresence Required = new("required");
     internal static readonly ReadPresence Optional = new("optional");
-    internal static readonly ReadPresence BuiltIn = new("builtin");
+    internal static readonly ReadPresence RequiredIfHeld = new("requiredIfHeld");
 
     private ReadPresence(string text)
     {

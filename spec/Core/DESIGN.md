@@ -467,11 +467,11 @@ Terms used throughout:
   stops the pipeline: a paged result (`{ result, count }`) where the declaration says a list has no `length` and
   no `filter`. A value that has the member is read as JavaScript reads it, as every value is: a text where a list
   is declared counts its characters, since the plan checks presence, never a value's type (D5.3). The plan writes
-  the operation's JavaScript member with `members` `builtin` (schema.md), which reads nothing on a holder that
-  reads nothing and stops on a holder that lacks the member. A `set` never carries `builtin`: its C# type is
+  the operation's JavaScript member with `members` `requiredIfHeld` (schema.md), which reads nothing on a holder
+  that reads nothing and stops on a holder that lacks the member. A `set` never carries `requiredIfHeld`: its C# type is
   `Presence`, which has no such value, and only `get` and `call` take `ReadPresence`.
 - D6.4 In an array lambda, a member .NET defines on the value's type (`Trim`, `Length`, `Year`, a `DayOfWeek`
-  compared) reads nothing on a missing value and stops the pipeline on a value that lacks it, written `builtin`
+  compared) reads nothing on a missing value and stops the pipeline on a value that lacks it, written `requiredIfHeld`
   as D6.3 writes a list's operation.
 - D6.5 The .NET members an array lambda translates are the closed table `spec/Core/translated-members.md`,
   keyed by the `MethodInfo` and `MemberInfo` the expression tree carries and built from typed lambdas; no
@@ -501,17 +501,18 @@ Terms used throughout:
   and the same addition holds. Over `int` a total past the range of `int` stops the pipeline, as .NET's checked
   `Sum` throws `OverflowException` (the owner, 2026-11-06).
 - D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted`,
-  `reduce`, `includes` and `length`, named at the vendor boundary of the built-in array and read `builtin` (D6.3).
+  `reduce`, `includes` and `length`, named at the vendor boundary of the built-in array and read `requiredIfHeld` (D6.3).
   The browser adds no array function, and no operation changes the vendor's own array: a sort is `toSorted`, never
   `sort`. The redesign already calls `toSorted` and `reduce` (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs`).
   `Any()` is `some` over a `fn` whose body is the literal `true`, so it needs no operator; `Count(predicate)` is the
   `length` of `filter`.
 - D6.9 `Find(predicate)` over a list of live objects is the first item the predicate keeps, a live object.
   Reading, writing or calling its member when no item matched stops the pipeline, as a member of a null object
-  fails in .NET. `Find(predicate, field)` is the door that reads nothing when no item matched: the field of the
-  first item kept, written `get(map(filter(list, predicate), field), [0], optional)`, so a match that lacks a
-  declared member still stops (D4.1). Over a list of data, `Find(predicate)` is the first item kept, or nothing,
-  and `Find(predicate, field)` takes the same form as over live objects.
+  fails in .NET. `Find(predicate, field)` is the door that reads nothing when no item matched: `find` stops at the
+  first item kept, as .NET's `FirstOrDefault` does, and the field is read once, from that item, with
+  `requiredIfHeld`, so no match reads nothing and a match that lacks a declared member still stops (D4.1). Over a
+  list of data, `Find(predicate)` is the first item kept, or nothing, and `Find(predicate, field)` reads the field's
+  path from it, optional as data is.
 - D6.10 The operations over a list of data take every list a model declares: `List<T>`, `T[]`, `IList<T>`,
   `IReadOnlyList<T>`, `IEnumerable<T>` and every other `IEnumerable<T>`. They are extension methods on
   `ITypedSource<IEnumerable<TItem>>`, the covariant view `TypedSource<T>` implements, and each returns a

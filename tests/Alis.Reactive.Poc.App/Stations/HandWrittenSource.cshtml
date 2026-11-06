@@ -1,0 +1,16 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Stations
+@model CensusPage
+@{
+    ViewData["Title"] = "Census";
+    var plan = Html.ReactivePlan<CensusPage>();
+}
+<h1>Census</h1>
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-rounds", "Count rounds")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(new HandWrittenRounds().Count())))
+
+@Html.RenderPlan(plan)

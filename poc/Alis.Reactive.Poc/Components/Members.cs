@@ -18,7 +18,7 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
     internal PathStep Member { get; }
 
-    internal override Expression Expression => new GetExpression(Owner.Binding.Target, [Member], ReadPresence.Required);
+    internal override Expression Expression => new GetExpression(Owner.Binding.Target, [Member], Owner.Binding.Members);
 
     internal override PlanBuild Build => Owner.Binding.Build;
 

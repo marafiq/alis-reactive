@@ -12,23 +12,25 @@ public sealed class LiveObjects<TItem>
 {
     private readonly Expression _list;
     private readonly PlanBuild _build;
+    private readonly ReadPresence _members;
 
-    internal LiveObjects(Expression list, PlanBuild build)
+    internal LiveObjects(Expression list, PlanBuild build, ReadPresence members)
     {
         _list = list;
         _build = build;
+        _members = members;
     }
 
     public TItem At(int position)
     {
         if (position < 0) throw new ArgumentOutOfRangeException(nameof(position), position, "An item's position is zero or more.");
-        return JsObject.Bound<TItem>(new Binding(new GetExpression(_list, [PathStep.Index(position)], ReadPresence.Required), _build));
+        return JsObject.Bound<TItem>(new Binding(new GetExpression(_list, [PathStep.Index(position)], _members), _build, _members));
     }
 
     public TypedSource<int> Count() => new DataRead<int>(ListForms.Length(_list), _build);
 
     public LiveObjects<TItem> Where(Func<TItem, TypedSource<bool>> keep)
-        => new(ListForms.Filter(_list, ItemRead(keep)), _build);
+        => new(ListForms.Filter(_list, ItemRead(keep)), _build, _members);
 
     public TypedSource<IReadOnlyList<TResult>> Select<TResult>(Func<TItem, TypedSource<TResult>> field)
         => new DataRead<IReadOnlyList<TResult>>(ListForms.Map(_list, ItemRead(field)), _build);
@@ -45,15 +47,20 @@ public sealed class LiveObjects<TItem>
         => new DataRead<bool>(ListForms.Every(_list, ItemRead(predicate)), _build);
 
     public TItem Find(Func<TItem, TypedSource<bool>> predicate)
-        => JsObject.Bound<TItem>(new Binding(ListForms.Find(_list, ItemRead(predicate)), _build));
+        => JsObject.Bound<TItem>(new Binding(ListForms.Find(_list, ItemRead(predicate)), _build, ReadPresence.Required));
 
     public TypedSource<TResult> Find<TResult>(Func<TItem, TypedSource<bool>> predicate, Func<TItem, TypedSource<TResult>> field)
-        => new DataRead<TResult>(ListForms.First(ListForms.Map(ListForms.Filter(_list, ItemRead(predicate)), ItemRead(field))), _build);
+    {
+        var found = JsObject.Bound<TItem>(new Binding(ListForms.Find(_list, ItemRead(predicate)), _build, ReadPresence.RequiredIfHeld));
+        var source = _build.ReadingItems(() => field(found))
+            ?? throw new ArgumentException("A list's lambda reads a member of its item, such as bed => bed.Resident.", nameof(field));
+        return new DataRead<TResult>(source.Expression, _build);
+    }
 
     private FnExpression ItemRead<TResult>(Func<TItem, TypedSource<TResult>> read)
     {
         var name = _build.ItemName();
-        var item = JsObject.Bound<TItem>(new Binding(new RefExpression(name), _build));
+        var item = JsObject.Bound<TItem>(new Binding(new RefExpression(name), _build, ReadPresence.Required));
         var source = _build.ReadingItems(() => read(item))
             ?? throw new ArgumentException("A list's lambda reads a member of its item, such as bed => bed.Resident.", nameof(read));
         return new FnExpression([name], source.Expression);

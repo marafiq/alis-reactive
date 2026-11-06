@@ -8,15 +8,18 @@ namespace Alis.Reactive.Components;
 
 internal sealed class Binding
 {
-    internal Binding(Expression target, PlanBuild build)
+    internal Binding(Expression target, PlanBuild build, ReadPresence members)
     {
         Target = target;
         Build = build;
+        Members = members;
     }
 
     internal Expression Target { get; }
 
     internal PlanBuild Build { get; }
+
+    internal ReadPresence Members { get; }
 }
 
 public abstract class JsObject
@@ -47,11 +50,11 @@ public abstract class JsObject
 
     protected TObject LiveObject<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], ReadPresence.Required), Binding.Build));
+        => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Members), Binding.Build, Binding.Members));
 
     protected LiveObjects<TItem> LiveObjects<TItem>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
-        => new(new GetExpression(Binding.Target, [Member(name, declaredBy)], ReadPresence.Required), Binding.Build);
+        => new(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Members), Binding.Build, Binding.Members);
 
     protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "")
         => new(JavaScriptName(name, declaredBy));

@@ -7,7 +7,7 @@ namespace Alis.Reactive.Lists;
 internal static class ListForms
 {
     internal static Expression Length(Expression list)
-        => new GetExpression(list, [PathStep.Member("length")], ReadPresence.BuiltIn);
+        => new GetExpression(list, [PathStep.Member("length")], ReadPresence.RequiredIfHeld);
 
     internal static Expression Map(Expression list, FnExpression read) => ArrayMethod(list, "map", read);
 
@@ -19,10 +19,8 @@ internal static class ListForms
 
     internal static Expression Find(Expression list, FnExpression keep) => ArrayMethod(list, "find", keep);
 
-    internal static Expression First(Expression list) => new GetExpression(list, [PathStep.Index(0)], ReadPresence.Optional);
-
     internal static FnExpression EveryItem(PlanBuild build) => new([build.ItemName()], Literal.Of(true, build));
 
     private static CallExpression ArrayMethod(Expression list, string method, FnExpression item)
-        => new(list, [PathStep.Member(method)], ReadPresence.BuiltIn, [item]);
+        => new(list, [PathStep.Member(method)], ReadPresence.RequiredIfHeld, [item]);
 }
