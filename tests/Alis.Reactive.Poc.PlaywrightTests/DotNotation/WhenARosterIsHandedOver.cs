@@ -27,6 +27,16 @@ public sealed class WhenARosterIsHandedOver : AppPageTest
     }
 
     [Test]
+    public async Task a_member_an_override_implements_reads_by_the_name_the_member_it_overrides_has()
+    {
+        await Open("/Rosters/ReadThroughAnOverride");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Show night on-call role" }).ClickAsync();
+
+        await Expect(Page.Locator("#night-role")).ToHaveTextAsync("Charge nurse");
+    }
+
+    [Test]
     public async Task a_member_the_data_lacks_reads_nothing_and_the_pipeline_goes_on()
     {
         await Open("/Rosters/Handover");

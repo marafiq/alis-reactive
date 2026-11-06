@@ -4,6 +4,7 @@ export interface DutyRosterHost extends HTMLElement {
 
 export interface OnCallNurse {
   readonly name: string;
+  readonly role: string;
   readonly pager_line?: { readonly number: string };
 }
 
@@ -103,6 +104,7 @@ export class DutyRosterV2 {
 
 function onCallOf(host: HTMLElement): OnCallNurse {
   const name = host.dataset["onCallName"] ?? "";
+  const role = host.dataset["onCallRole"] ?? "";
   const pager = host.dataset["onCallPager"];
-  return pager === undefined ? { name } : { name, pager_line: { number: pager } };
+  return pager === undefined ? { name, role } : { name, role, pager_line: { number: pager } };
 }

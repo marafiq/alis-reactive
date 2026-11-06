@@ -6,7 +6,7 @@
 }
 <h1>Handover</h1>
 
-@plan.DutyRoster("night-roster", nursesRequired: 4, shift: "Night shift", onCallName: "Ruth Mensah", onCallPager: "4471")
+@plan.DutyRoster("night-roster", nursesRequired: 4, shift: "Night shift", onCallName: "Ruth Mensah", onCallRole: "Charge nurse", onCallPager: "4471")
 
 @(plan.Button("page-night-on-call", "Page night on-call")
     .Reactive(button => button.Click, pipeline =>

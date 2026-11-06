@@ -96,6 +96,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `LiveObject<T>()` and its list form replace `Object<T>()` and `Objects<T>()` (N5.5), since a member named
   `Object` on `JsObject` shadows `System.Object` in every declaration. CA1720 refused it in the POC's build
   (latest-recommended analysis, warnings as errors).
+- The owner, 2026-11-06: "In the model, in the CSHTML, let's have a rule that both has to be same. Override cannot
+  change it." An override keeps the JSON name and the write of the member it overrides. A read names the member as
+  the class that declares it names it, and the class the read starts from must write that name. An override that
+  changes either is the analyzer's to refuse at build (N18.5, built in POC 13; not built yet) (D18.3).
+- The owner, 2026-11-06: the slices are vertical in an app as in the framework (the owner's words are in
+  `spec/NOTES.md`). An action that needs a model has a model of its own, plain, shared with no other view; an app
+  shares a base class only for abstract members it enforces. The docs and the component onboarding skill teach
+  it as the app's standard; the framework refuses nothing for it.
 - The owner, 2026-11-06: no defensive code where a type or a check stops the bug; no closest match; fail loudly, so a
   bug surfaces and challenges the design. Tests are Playwright in a real browser, never jsdom, which is brittle.
   The reference components are built around JavaScript object complexity (dot notation, properties, callbacks,

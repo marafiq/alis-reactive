@@ -26,19 +26,32 @@ public sealed class RosterShift : JsObject
     public Property<string> Label => Property<string>();
 }
 
-public sealed record OnCallNurse(string Name, [property: JsonPropertyName("pager_line")] PagerLine Pager, [property: JsonIgnore] string Ward);
+public abstract record OnCallStaff
+{
+    public abstract string Role { get; init; }
+
+    public abstract string Station { get; init; }
+}
+
+public sealed record OnCallNurse(string Name, [property: JsonPropertyName("pager_line")] PagerLine Pager, [property: JsonIgnore] string Ward) : OnCallStaff
+{
+    public override string Role { get; init; } = "";
+
+    [JsonIgnore]
+    public override string Station { get; init; } = "";
+}
 
 public sealed record PagerLine(string Number);
 
 public static class DutyRosterHtml
 {
-    public static Rendered<DutyRoster> DutyRoster<TModel>(this ReactivePlan<TModel> plan, string id, int nursesRequired, string shift, string onCallName, string? onCallPager)
-        => plan.Render<DutyRoster>(id, Roster(id, "1", nursesRequired, shift, onCallName, onCallPager));
+    public static Rendered<DutyRoster> DutyRoster<TModel>(this ReactivePlan<TModel> plan, string id, int nursesRequired, string shift, string onCallName, string onCallRole, string? onCallPager)
+        => plan.Render<DutyRoster>(id, Roster(id, "1", nursesRequired, shift, onCallName, onCallRole, onCallPager));
 
     public static Rendered<DutyRoster> DutyRosterVersion2<TModel>(this ReactivePlan<TModel> plan, string id)
-        => plan.Render<DutyRoster>(id, Roster(id, "2", 0, "", "", null));
+        => plan.Render<DutyRoster>(id, Roster(id, "2", 0, "", "", "", null));
 
-    private static TagBuilder Roster(string id, string version, int nursesRequired, string shift, string onCallName, string? onCallPager)
+    private static TagBuilder Roster(string id, string version, int nursesRequired, string shift, string onCallName, string onCallRole, string? onCallPager)
     {
         var roster = new TagBuilder("section");
         roster.Attributes["id"] = id;
@@ -46,6 +59,7 @@ public static class DutyRosterHtml
         roster.Attributes["data-nurses-required"] = nursesRequired.ToString(CultureInfo.InvariantCulture);
         roster.Attributes["data-shift"] = shift;
         roster.Attributes["data-on-call-name"] = onCallName;
+        roster.Attributes["data-on-call-role"] = onCallRole;
         if (onCallPager is not null) roster.Attributes["data-on-call-pager"] = onCallPager;
         return roster;
     }

@@ -6,8 +6,8 @@
 }
 <h1>Handover</h1>
 
-@plan.DutyRoster("night-roster", nursesRequired: 4, shift: "Night shift", onCallName: "Ruth Mensah", onCallPager: "4471")
-@plan.DutyRoster("day-roster", nursesRequired: 5, shift: "Day shift", onCallName: "Kofi Boateng", onCallPager: null)
+@plan.DutyRoster("night-roster", nursesRequired: 4, shift: "Night shift", onCallName: "Ruth Mensah", onCallRole: "Charge nurse", onCallPager: "4471")
+@plan.DutyRoster("day-roster", nursesRequired: 5, shift: "Day shift", onCallName: "Kofi Boateng", onCallRole: "Staff nurse", onCallPager: null)
 @plan.DutyRosterVersion2("relief-roster")
 
 @plan.TextBox("shift-name", "Shift name", "")

@@ -1955,10 +1955,18 @@ plans (Q19).
   - the method scan for `PureMethodAttribute` and the `FlagsAttribute` read of `IsInEnum`: gate 1 decides each,
     as an owner-listed exception or a typed door;
   - `Expression.Compile` in validation (Q16) and in the template writer (Q15): gate 1 decides each.
-  - an overridden member that a view's expression names: the expression carries the base declaration and the
-    app's contract carries the override (probe in POC 3: `d => d.Room` names `Person.Room`, the contract holds
-    `Resident.Room`), so matching them needs the member's name, `MemberInfo.Name`. Gate 1 decides between an
-    owner-listed exception and refusing such a read.
+  - an overridden member that a view's expression names (the owner, 2026-11-06: "Override cannot change it"). The
+    expression carries the declaration (`d => d.Room` names `Person.Room`), and the derived class's contract holds
+    the override. The member is named as the contract of the class that declares it names it, found up the class's
+    base types (`Type.BaseType`, which reads no member and no attribute), and the class the read starts from must
+    write that name, or the read is refused as unwritten. No `MemberInfo.Name` and no exception to D18.4.
+  - System.Text.Json's contracts for an override (probe, net10, the reflection resolver): an override that keeps
+    its declaration's name is one member of the derived contract; one that renames is written twice, under both
+    names; one marked `JsonIgnore` leaves the name unwritten; a second member that takes the declaration's name is
+    refused by System.Text.Json itself. A renamed override, and one that writes a member its declaration ignores,
+    read correctly by the declaration's name but break the owner's rule, so the core's analyzer refuses both in the
+    app's model at build time (N18.5). A model is a `.cs` file the build compiles on both hosts, so the analyzer
+    sees it on net48 too.
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
   lists at gate 1 (N18.1): the members of `System.Reflection`, `Activator`, `Type.GetType` by name and
   `Expression.Compile`.
@@ -1986,6 +1994,8 @@ shapes, starts and the payload kind of each event.
 - `N18.2` new: the declaration analyzer of D18.3, which replaces `JsObject`'s run-time member scan.
 - `N18.3` new: a form typed by its model, and a request's `Form` that takes only a form of the request's model.
 - `N18.4` new: the typed doors of D18.5 for the button type, the text box type and the action link's attributes.
+- `N18.5` new: the override analyzer of D18.3: an override in an app's model carries the JSON name and the
+  `JsonIgnore` of the member it overrides. Built in POC 13, the contract analyzer.
 
 **Evidence.**
 - Three item-type finders (`Alis.Reactive/Inputs/FieldReference.cs:50-58`, `Alis.Reactive/Members/ClrShape.cs:82-90`,
@@ -2015,6 +2025,11 @@ shapes, starts and the payload kind of each event.
   `given_name`, and the endpoint binds it.
 - `X18.6` behavior: a member the app's JSON options ignore is not in a JSON body, and the form's check reads its
   start.
+- `X18.7` behavior: a read of a member an override implements reads it by its declaration's JSON name
+  (`WhenARosterIsHandedOver`, POC 3).
+- `X18.8` refusal: a read of an override the app's JSON options ignore is refused with "'{lambda}' reads a member
+  of '{type}' that the app's JSON options do not write, so the browser never holds it." (`WhenARosterReadIsRefused`).
+- `X18.9` analyzer: an override that renames, ignores or writes what its declaration does not: new:N18.5.
 
 ## Q19. The schema
 

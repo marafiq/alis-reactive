@@ -11,6 +11,10 @@ public sealed class RostersController : Controller
     public IActionResult ReadOfACall() => View(new HandoverPage());
 
     public IActionResult ReadOfAnUnwrittenMember() => View(new HandoverPage());
+
+    public IActionResult ReadThroughAnOverride() => View(new HandoverPage());
+
+    public IActionResult ReadOfAnIgnoredOverride() => View(new HandoverPage());
 }
 
 public sealed record ShiftRosterPage;

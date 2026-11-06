@@ -26,12 +26,29 @@ internal static class JsonPath
 
     private static string JsonName(MemberExpression access, Type holder, JsonSerializerOptions options, LambdaExpression path)
     {
+        var declared = DeclaredName(access, holder, options, path);
         foreach (var property in options.GetTypeInfo(holder).Properties)
         {
             var written = property.Get is not null;
-            if (written && Equals(property.AttributeProvider, access.Member)) return property.Name;
+            if (written && property.Name == declared) return declared;
         }
 
-        throw new ArgumentException($"'{path}' reads a member of '{holder.FullName}' that the app's JSON options do not write, so the browser never holds it.", nameof(path));
+        throw NotWritten(path, holder);
     }
+
+    private static string DeclaredName(MemberExpression access, Type holder, JsonSerializerOptions options, LambdaExpression path)
+    {
+        for (var declaring = holder; declaring is not null; declaring = declaring.BaseType)
+        {
+            foreach (var property in options.GetTypeInfo(declaring).Properties)
+            {
+                if (Equals(property.AttributeProvider, access.Member)) return property.Name;
+            }
+        }
+
+        throw NotWritten(path, holder);
+    }
+
+    private static ArgumentException NotWritten(LambdaExpression path, Type holder)
+        => new($"'{path}' reads a member of '{holder.FullName}' that the app's JSON options do not write, so the browser never holds it.", nameof(path));
 }
