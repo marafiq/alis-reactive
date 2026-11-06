@@ -1,0 +1,151 @@
+{
+  "checks": {
+    "claude_md": {
+      "counts": {},
+      "detail": "not started: step 12 replaces the five lines and adds the spec-first order",
+      "pass": false
+    },
+    "core_questions": {
+      "counts": {},
+      "detail": "not started: spec/Core/DESIGN.md absent",
+      "pass": false
+    },
+    "core_tlc": {
+      "counts": {
+        "met": 0,
+        "specs": 5
+      },
+      "detail": "Absence not started; Request not started; Lanes not started; Ownership not started; DateWire not started",
+      "pass": false,
+      "runs": {}
+    },
+    "defects": {
+      "counts": {},
+      "detail": "not started: no spec/<Module>/features.json",
+      "pass": false
+    },
+    "doors_mapped": {
+      "counts": {},
+      "detail": "not started: no spec/<Module>/features.json",
+      "pass": false
+    },
+    "features_core": {
+      "counts": {},
+      "detail": "not started: no spec/<Module>/features.json",
+      "pass": false
+    },
+    "features_lost": {
+      "counts": {},
+      "detail": "not started: no spec/<Module>/features.json",
+      "pass": false
+    },
+    "fluent": {
+      "counts": {},
+      "detail": "not started: spec/Fluent/sentences.json absent",
+      "pass": false
+    },
+    "gate1": {
+      "counts": {},
+      "detail": "gate 1 not answered",
+      "pass": false
+    },
+    "gate2": {
+      "counts": {},
+      "detail": "gate 2 not answered",
+      "pass": false
+    },
+    "hedges": {
+      "counts": {
+        "files": 1,
+        "hedges": 0
+      },
+      "detail": "0 hedge words; not started: spec/Core/DESIGN.md absent",
+      "pass": false
+    },
+    "history": {
+      "counts": {},
+      "detail": "not started: spec/history.tsv absent",
+      "pass": false
+    },
+    "inventory": {
+      "counts": {},
+      "detail": "not started: spec/inventory/doors.tsv, spec/inventory/kinds.tsv, spec/inventory/cases.tsv, spec/inventory/analyzers.tsv, spec/inventory/tests.tsv absent",
+      "pass": false
+    },
+    "kinds": {
+      "counts": {},
+      "detail": "not started: spec/Core/schema.md absent",
+      "pass": false
+    },
+    "main_surface": {
+      "counts": {},
+      "detail": "not started: spec/inventory/main absent",
+      "pass": false
+    },
+    "matrix": {
+      "counts": {},
+      "detail": "not started: spec/Reference/matrix.json, spec/Reference/syncfusion.json, spec/Reference/native.json absent",
+      "pass": false
+    },
+    "no_comments": {
+      "counts": {
+        "comments": 0
+      },
+      "detail": "no comment in the spec's code",
+      "pass": true
+    },
+    "probes": {
+      "counts": {},
+      "detail": "not started: spec/probes absent",
+      "pass": false
+    },
+    "promises": {
+      "counts": {},
+      "detail": "not started: no spec/<Module>/features.json",
+      "pass": false
+    },
+    "questions": {
+      "counts": {},
+      "detail": "not started: spec/Core/DESIGN.md absent",
+      "pass": false
+    },
+    "rewrite_units": {
+      "counts": {},
+      "detail": "not started: spec/REWRITE.md absent",
+      "pass": false
+    },
+    "survival": {
+      "counts": {
+        "files": 4
+      },
+      "detail": "origin/feature/spec-first is not pushed; untracked: spec/BRIEF.md, spec/NOTES.md, spec/CLAUDE.md, spec/tools/check.py",
+      "pass": false
+    },
+    "tlc": {
+      "counts": {
+        "met": 0,
+        "specs": 8
+      },
+      "detail": "Absence not started; Request not started; Lanes not started; Ownership not started; DateWire not started; Schema not started; ValidationToday not started; Validation not started",
+      "pass": false,
+      "runs": {}
+    },
+    "verdicts": {
+      "counts": {},
+      "detail": "not started: no spec/<Module>/features.json",
+      "pass": false
+    }
+  },
+  "passed": 1,
+  "read_at_head": "65fdf118d1498a8285db84a43c4da81dfaa0ea3e",
+  "step": {
+    "failing": [
+      "survival"
+    ],
+    "name": "Branches and survival",
+    "next": "Install the compact hook, commit by path, push, open .worktrees/main-read at 623dd4a27.",
+    "number": 1,
+    "phase": "A"
+  },
+  "total": 24
+}
