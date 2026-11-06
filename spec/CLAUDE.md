@@ -51,6 +51,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: "follows the server" means the framework allows the server to decide. Example to
   think through, never a framework concept: a company has many communities, each with its own configured
   time zone. The framework offers the time zone a view renders under as the app's choice, as culture is.
+- The owner, 2026-11-06: we design a framework, not a one-off case. A host difference is the framework's to
+  absorb behind one door on both hosts; the net48 time zone maps its Windows id to IANA by a table made once.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does

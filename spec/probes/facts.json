@@ -512,6 +512,15 @@
       "probe": "spec/probes/referencesource/TimeZoneInfo.cs.txt",
       "expect": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones",
       "source": "spec/probes/referencesource/TimeZoneInfo.cs.txt:81"
+    },
+    {
+      "id": "cldr-windows-zone-default",
+      "statement": "CLDR release-48 maps each Windows time zone id to its default IANA zone, territory 001, 139 zones; the net48 table is generated once from it.",
+      "host": "net48",
+      "oracle": "Unicode CLDR release-48, common/supplemental/windowsZones.xml",
+      "probe": "spec/probes/cldr/windowsZones.xml.txt",
+      "expect": "<mapZone other=\"Eastern Standard Time\" territory=\"001\" type=\"America/New_York\"/>",
+      "source": "spec/probes/cldr/windowsZones.xml.txt:130"
     }
   ]
 }

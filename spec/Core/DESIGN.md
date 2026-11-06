@@ -200,11 +200,15 @@ Terms used throughout:
   reason for the choice: a community's configured zone, a user's or a facility's are the app's.
   - When the app makes no choice, an instant uses the browser's clock, the decision of 2026-11-05; gate 1
     confirms that default.
-  - The plan carries the zone as an IANA id. The browser computes a zone's offsets only from an IANA id
-    (`probe:intl-iana-zone-offsets`) and refuses a Windows id (`probe:intl-windows-zone-id`). On net10 the
-    app gives a `TimeZoneInfo` and C# writes its IANA id (`probe:core-windows-zone-to-iana`). On net48,
-    `TimeZoneInfo` knows only the Windows registry's ids (`probe:net48-time-zones-from-registry`), so the app
-    gives the IANA id itself, as a typed value (N3.5).
+  - The app gives a `TimeZoneInfo` on both hosts, and the plan carries the zone as an IANA id. The browser
+    computes a zone's offsets only from an IANA id (`probe:intl-iana-zone-offsets`) and refuses a Windows id
+    (`probe:intl-windows-zone-id`).
+    - On net10, C# writes the IANA id .NET converts the zone to (`probe:core-windows-zone-to-iana`).
+    - On net48, `TimeZoneInfo` knows only the Windows registry's ids (`probe:net48-time-zones-from-registry`).
+      So the framework maps the Windows id to IANA through a table generated once from CLDR's
+      `windowsZones.xml` at a pinned release (`probe:cldr-windows-zone-default`). That is the same mapping
+      net10 gives: `India Standard Time` becomes `Asia/Calcutta` in both.
+    - A Windows id the table does not hold is refused where the view renders, naming the id.
   - Every conversion of an instant uses the view's zone. An instant shows as its wall time and offset in
     that zone for its own day, and a wall time a user picks becomes an instant at that zone's offset for
     that day. DateWire's offset per day is the zone's.
@@ -236,6 +240,7 @@ Terms used throughout:
 - `probe:intl-windows-zone-id`
 - `probe:core-windows-zone-to-iana`
 - `probe:net48-time-zones-from-registry`
+- `probe:cldr-windows-zone-default`
 
 **Doors.**
 - `N3.1` new: the grammar's `Operator` without `ToNumber`, `ToDate`, `ToBoolean` and `ToText`.
@@ -244,8 +249,9 @@ Terms used throughout:
   `value`, `shape` and `list`.
 - `N3.4` new: the view's culture in the plan, its name, decimal separator and group separator, written once
   by C# where the view renders, with the endpoint host's number styles per .NET type.
-- `N3.5` new: the view's time zone, the app's choice per request (D3.12): a `TimeZoneInfo` on net10, an IANA id
-  as a typed value on net48; C# writes its IANA id into the plan. Its door's form goes to gate 2.
+- `N3.5` new: the view's time zone, the app's choice per request (D3.12), one door on both hosts that takes a
+  `TimeZoneInfo`; C# writes its IANA id into the plan, through .NET on net10 and through the CLDR table
+  generated once on net48. Its door's form goes to gate 2.
 
 **Evidence.**
 - B4: two conversions, `Alis.Reactive/Grammar/Operator.cs:27-30` and `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:112-115`;
@@ -1089,3 +1095,76 @@ owner is where its script is, and an owner's holds are what its plans name.
   listens.
 - `X12.8` behavior: content the server rendered inside a slot's container stops listening at the slot's first
   load.
+
+## Q13. Where state lives
+
+**Decision.**
+- D13.1 Browser state lives in exactly one of four places, and each concept has one:
+
+  | Concept | Lives in |
+  |---------|----------|
+  | the table of inputs by element id, each entry under the owner that contributed it | the page |
+  | a hub's or a stream's connection, by URL, with its holders (Q12) | the page |
+  | the app-level objects (loader, toast, confirm, drawer), by fixed id | the page |
+  | the one live-validation listener (D12.7) | the page |
+  | the form's field registrations, by binding name, item fields by `[*]` | the form |
+  | the inputs the form sends or checks: those inside its element at that moment | the form |
+  | the server's messages, each at the input inside the form that binds its key, else the summary | the form |
+  | the summary, `{formId}_validation_summary`, one per form | the form |
+  | listeners, holds, registrations and runs | the owner (Q12) |
+  | a plan's culture and time zone, written by C# for the view (D3.11, D3.12) | the owner, by its plan |
+  | the argument, the attempts, the response and the route of one request | the request, until it settles |
+
+- D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page may share it.
+- D13.3 A read of a member by its binding name belongs to a form. It reads the input inside the form's element
+  that binds the name, as the form sends it. A page-wide read by binding name is refused: two views may bind
+  one name, so on a page a name names no single input. That ends the chain of guesses that read the last
+  contributed input, then the plan's own. A read of a member's input outside a form is the component read
+  by its element id, which Q14 derives the same way in every view that renders the member.
+- D13.4 Two inputs inside one form that bind one scalar binding name stop the request or the check that reads
+  them, with one logged error that names both element ids. Form data binds the first value and JSON the last
+  on both hosts (`probe:core-form-duplicate-name`, `probe:core-json-duplicate-name`,
+  `probe:mvc5-form-duplicate-first`, `probe:mvc5-json-duplicate-last`), so the browser cannot know which one
+  the endpoint binds. A list's inputs carry indexed names and are not duplicates.
+- D13.5 A form's rule for each item is written once, by binding name with `[*]`. It checks every item row inside
+  the form when the form checks, whoever rendered the row: the page, a list partial, or a slot's content.
+- D13.6 No plan renders a summary of its own. The summary is rendered once per form by the door that renders
+  the form (Q14), and a form's messages outlive a slot that joined the form and left.
+
+**Schema nodes.** The plugin data `form` (its field registrations and summary id) and `model` (the inputs table),
+and `request` state, which the schema does not hold: a request's state is its run's.
+
+**Checker.**
+- `Ownership.tla:RulesLeaveWithTheirOwner`
+- `Ownership.tla:RegistrationsDoNotAccumulate`
+- `probe:core-form-duplicate-name`
+- `probe:core-json-duplicate-name`
+- `probe:mvc5-form-duplicate-first`
+- `probe:mvc5-json-duplicate-last`
+
+**Doors.**
+- kept: `Form()`, `Form(formId)`, `Form(fields)`, `Validate<TValidator>(formId)`, `ValidationErrors(formId)`.
+- `N13.1` new: a form's typed read of a member as the form sends it, the one read by binding name (D13.3); its
+  form goes to gate 2. It carries `p.Bound(m => ..)`, whose page-wide read by name is refused.
+
+**Evidence.**
+- P2, each row with the meaning that answers it:
+  - 053b50d84 made one page-wide table of inputs by id, each entry under its owner: D13.1.
+  - 34c99d608 checks every row of an item rule, whoever rendered it: D13.5.
+  - 01d00553a places a server message at the input inside the form that binds its name: D13.1.
+  - a893ca7aa, 0d32aa743 and f38d0d278 on main rendered and found a summary per plan, and 76ca89036 and
+    532de0002 replaced it with one per form, the plan id keying nothing: D13.2, D13.6.
+  - 92dce45ba read a member page-wide by its input's id, a019367c5 by name, taking the input contributed last,
+    and fda82e5b4 the plan's own input when it rendered exactly one, else as before: D13.3.
+- The read takes the last matching input (`Alis.Reactive.Assets/runtime/plugins/model.ts:95-100`).
+- Each entry of a form's registrations leaves with its owner (`Alis.Reactive.Assets/runtime/plugins/form/form.ts:232-245`).
+
+**Defects.**
+- `X13.1` behavior: two partials of different models each render an input that binds `Value`, each in its own
+  form; each card's save sends its own value.
+- `X13.2` behavior: a form holding two inputs that bind one name sends nothing on save, and the console names
+  both element ids.
+- `X13.3` behavior: a row a slot loads into the form is checked by the page's item rule when the form saves.
+- `X13.4` behavior: a server message for a member an editor template rendered shows beside that input.
+- `X13.5` behavior: two forms on one page keep their own summaries, and a form's summary stays after a slot that
+  joined it unloads.

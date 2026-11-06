@@ -7,11 +7,11 @@
     },
     "core_questions": {
       "counts": {
-        "answered": 12,
-        "defects": 81,
+        "answered": 13,
+        "defects": 86,
         "total": 18
       },
-      "detail": "Q13 absent; Q14 absent; Q15 absent; Q16 absent; Q17 absent; Q18 absent",
+      "detail": "Q14 absent; Q15 absent; Q16 absent; Q17 absent; Q18 absent",
       "pass": false
     },
     "core_tlc": {
@@ -630,10 +630,10 @@
     },
     "evidence": {
       "counts": {
-        "placed": 22,
+        "placed": 23,
         "total": 31
       },
-      "detail": "unplaced: G1, G2, G5, G10, B13, B16, P2, P4, P5",
+      "detail": "unplaced: G1, G2, G5, G10, B13, B16, P4, P5",
       "pass": false
     },
     "features_core": {
@@ -664,10 +664,10 @@
     "hedges": {
       "counts": {
         "files": 13,
-        "hedges": 0
+        "hedges": 2
       },
-      "detail": "no hedge word in the spec's prose",
-      "pass": true
+      "detail": "spec/Core/DESIGN.md:1118 may; spec/Core/DESIGN.md:1120 may",
+      "pass": false
     },
     "history": {
       "counts": {},
@@ -725,9 +725,9 @@
     },
     "probes": {
       "counts": {
-        "facts": 57,
+        "facts": 58,
         "net10": 25,
-        "net48": 23,
+        "net48": 24,
         "node": 9
       },
       "detail": "every fact printed by its probe or found at its source line",
@@ -740,11 +740,11 @@
     },
     "questions": {
       "counts": {
-        "answered": 12,
-        "defects": 81,
+        "answered": 13,
+        "defects": 86,
         "total": 19
       },
-      "detail": "Q13 absent; Q14 absent; Q15 absent; Q16 absent; Q17 absent; Q18 absent",
+      "detail": "Q14 absent; Q15 absent; Q16 absent; Q17 absent; Q18 absent; Q19 absent",
       "pass": false
     },
     "rewrite_units": {
@@ -1369,8 +1369,8 @@
       "pass": false
     }
   },
-  "passed": 7,
-  "read_at_head": "e900a01e3a9be914e5630b0501fb4be7bf0789ad",
+  "passed": 6,
+  "read_at_head": "e3a7ca3634b335e4fac32fdf31f98e1e7c035dee",
   "step": {
     "failing": [
       "core_questions",
