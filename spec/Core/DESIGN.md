@@ -2093,15 +2093,14 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   - SignalR, by ASP.NET Core SignalR's protocol through `@microsoft/signalr`, pinned, the one realtime dependency. Its
     module is its own asset, which the view links only when a plan names a hub, so a page with no hub ships no
     SignalR client.
-- D21.2 Hosts:
-  - Server-sent events work on both hosts from the app's own endpoint: ASP.NET Core 10's
-    `TypedResults.ServerSentEvents` on net10, and on net48 an MVC 5 action that writes the same stream unbuffered
-    through `System.Net.ServerSentEvents`, a pinned package and a gate-1 line.
-  - `@microsoft/signalr` speaks only ASP.NET Core SignalR, which is compatible with no client or server of ASP.NET
-    SignalR and runs only on ASP.NET Core (learn.microsoft.com/aspnet/core/signalr/version-differences). An MVC 5 app
-    on net48 therefore reaches a hub that an ASP.NET Core app beside it serves, at an absolute URL, with the page's
-    cookies, and its own server push is server-sent events. A hub inside an MVC 5 app is refused, since no client the
-    framework ships speaks to it.
+- D21.2 Realtime is net10's alone (the owner, 2026-11-06: "Let's drop real time from .NET 4.8"). Its doors are on
+  net10's public surface only, so a net48 view that writes a stream, a hub or a message trigger does not compile.
+  - Server-sent events come from the app's own endpoint through ASP.NET Core 10's `TypedResults.ServerSentEvents`.
+  - A hub is an ASP.NET Core SignalR hub; `@microsoft/signalr` speaks only its protocol, which is compatible with no
+    client or server of ASP.NET SignalR (learn.microsoft.com/aspnet/core/signalr/version-differences).
+  - The cut is the owner's, and it holds by what System.Web is: an open stream holds its request for its whole life,
+    IIS buffering and compression break `text/event-stream`, and a hub would need an ASP.NET Core app beside the MVC 5
+    app. A net48 page has no server push in 1.0.
 - D21.3 A server event is declared once, its name and its message type, and the endpoint that writes it and the view
   that listens to it share that declaration, as an app event's dispatcher and listener do (G9). A hub's methods are
   declared once the same way, for the calls a view makes and the pushes it receives.
@@ -2129,8 +2128,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   context, a fact the unit probes before it claims it.
 - D21.9 Proof:
   - Playwright on net10 covers both transports, every lifecycle trigger and the holds.
-  - The verify-net48 run covers an MVC 5 action's server-sent events reaching a view's trigger.
-  - A hub that an MVC 5 page reaches is covered only with the ASP.NET Core hub beside it, which the unit adds to that run.
+  - The verify-net48 run covers that a net48 view writing a realtime door does not compile.
 
 **Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, `handler` for
 message and lifecycle triggers, and `call` for a hub's invoke and send.
@@ -2145,8 +2143,8 @@ message and lifecycle triggers, and `call` for a hub's invoke and send.
 - kept: N5.1's message triggers typed `Data<TMessage>`, and the hub's `invoke` and `send` (Q11).
 - `N21.1` new: a server event and a hub's methods declared once and shared by the endpoint and the view (D21.3); their
   form goes to gate 2.
-- `N21.2` new: the endpoint's typed event writer: over `TypedResults.ServerSentEvents` on net10, over
-  `System.Net.ServerSentEvents` on net48.
+- `N21.2` new: the endpoint's typed event writer over `TypedResults.ServerSentEvents`, net10 only.
+- `N21.6` new: every realtime door under net10's PublicAPI text only, behind the host split, none on net48's.
 - `N21.3` new: the plugin data `stream` (D21.6).
 - `N21.4` new: the lifecycle triggers `reconnecting`, `reconnected` and `closed` on a stream and a hub (D21.5).
 - `N21.5` new: the hub's module as its own asset, linked when a plan names a hub (D21.1).
@@ -2174,4 +2172,4 @@ message and lifecycle triggers, and `call` for a hub's invoke and send.
 - `X21.5` behavior: a page whose plans name no hub requests no SignalR asset.
 - `X21.6` type: an endpoint and a view that name one server event differently, or give it two message types, do not
   compile: new:N21.1.
-- `X21.7` behavior: on net48, an MVC 5 action's server-sent events reach a view's trigger in the order it wrote them.
+- `X21.7` type: a net48 view that writes a stream, a hub or a message trigger does not compile: new:N21.6.

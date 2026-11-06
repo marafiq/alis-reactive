@@ -302,7 +302,7 @@ This is the spine. Answer each question in `spec/Core/DESIGN.md`, one section pe
     - How the framework records a request from start to end, in the browser and on the server, by OpenTelemetry.
     - It is optional and never always on, and it helps while developing as it does in production.
 21. **Q21. Realtime** (the owner, 2026-11-06: "don't forget servers and events, SSE, and real-time signal. Those are mandatory too").
-    - Server-sent events and SignalR on both hosts: their standards, holds, lifecycle, messages, authentication and proof.
+    - Server-sent events and SignalR on net10 (the owner, 2026-11-06: "Let's drop real time from .NET 4.8"): their standards, holds, lifecycle, messages, authentication and proof.
 
 ## 6. Evidence: verified at the State SHA on 2026-11-05
 Every file:line below was read at HEAD. Use these as calibration: G is what good looks like, B is what the design ends.
