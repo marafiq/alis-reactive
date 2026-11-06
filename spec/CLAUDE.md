@@ -100,6 +100,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   analyzers, and the analyzers are written so rigorously that they never become another surface that drifts: a
   harness, not extra work. The tests and the custom components are what proves the framework's coverage. Each lint
   rule and each analyzer enforces one line of this spec, the line names its rule, and a rule with no line leaves.
+- The owner, 2026-11-06: before implementation, a proved plan. The core's modules with their coupling and cohesion
+  found early; tools chosen so they are no burden; the spec's own work reviewed so it does not become another layer
+  that breeds; a greenfield plan proven by POCs. The domain model that captures intent is sound, and onboarding is
+  proven for a writable property, a readable one, dot notation, complex arrays, an event, a callback and the vendor's
+  way of finding its JavaScript object. The fluent builder's naming is close and is improved. Gate 1 waits for the POCs.
+- The owner, 2026-11-06: the TLA+ work must be good in code, not hypothetical. A model invariant that restates its
+  own action proves nothing; a model earns its place only over interleavings, and each of its invariants is a named
+  Playwright test on the code it models.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
