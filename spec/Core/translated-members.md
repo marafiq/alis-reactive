@@ -11,8 +11,9 @@ A text operator reads nothing when its text reads nothing or holds null, and sto
 a value that is not text. A text it takes as an argument reads nothing when it reads nothing, and stops the pipeline
 when it holds null, as .NET throws `ArgumentNullException`.
 
-Where .NET's meaning depends on the culture, the plan carries the culture the view renders under, so the
-browser and .NET agree.
+Where .NET's meaning depends on the culture, C# reads the culture the view renders under when the view renders
+and writes the rule .NET takes under it, so the browser and .NET agree without a locale of the browser's; a
+culture rule the browser cannot follow is refused, as `StartsWith(text)` is.
 
 ## Text
 
@@ -21,7 +22,7 @@ browser and .NET agree.
 | `Length` | the count of UTF-16 code units, as JavaScript's `length` |
 | `Trim()`, `TrimStart()`, `TrimEnd()` | the `trim`, `trimStart` and `trimEnd` operators, which remove the 25 characters `char.IsWhiteSpace` accepts: U+0085 is removed and U+FEFF kept, where JavaScript's `trim` does the reverse. net48 has no `TrimStart()` or `TrimEnd()`: the call binds to `TrimStart(params char[])`, translated only with an empty array. net10 keys the same overload: `TrimStart(new char[] { })` removes white space, as .NET does, and `TrimStart('A', 's')` is refused (X6.2) |
 | `ToUpperInvariant()`, `ToLowerInvariant()` | the `upperInvariant` and `lowerInvariant` operators, one code point at a time, so a final `Σ` lowers to `σ` as in .NET. A code point JavaScript maps to more than one keeps .NET's mapping: itself (`ß` stays `ß`), except the 27 Greek letters with a subscript iota (U+1F80 to U+1F87, U+1F90 to U+1F97, U+1FA0 to U+1FA7, U+1FB3, U+1FC3, U+1FF3), which map to the letter .NET gives (U+1FB3 to U+1FBC). `ı` stays `ı` in upper case |
-| `ToUpper()`, `ToLower()` | the same rule with `toLocaleUpperCase` and `toLocaleLowerCase` and the view's culture name, built with the plan's culture in POC 4 unit 3c |
+| `ToUpper()`, `ToLower()` | one of three rules, the one .NET's casing takes under the view's culture, which C# asks .NET for when the view renders: `ı` kept in upper case and `İ` in lower case is the invariant rule, the `upperInvariant` and `lowerInvariant` operators; `i` upper as `İ` and `I` lower as `ı` is the Turkic rule, `upperTurkic` and `lowerTurkic`; any other culture takes `upper` and `lower`, the invariant mapping with `ı` upper as `I` and `İ` lower as `i`. Every culture .NET 10 has on ICU takes one of the three: the invariant culture, 1,064 cultures the third, and az, az-Cyrl, az-Cyrl-AZ, az-Latn, az-Latn-AZ, tr, tr-CY and tr-TR the Turkic one (`spec/NOTES.md`, 2026-11-06) |
 | `Contains(text)` | the `contains` operator, ordinal, as .NET's `Contains(string)` and JavaScript's `includes` compare |
 | `Contains(char)` | the same operator with the `char` written as a one-letter text; net10's own overload, and `Enumerable.Contains<char>` over the text on net48 |
 | `StartsWith(text, StringComparison.Ordinal)`, `EndsWith(text, StringComparison.Ordinal)` | the `startsWith` and `endsWith` operators, ordinal. `StartsWith(text)` and `EndsWith(text)` compare by the culture in .NET (`"\u00ADward".StartsWith("ward")` holds, an ordinal test does not) and are refused, naming the `Ordinal` overload; a `StringComparison` other than `Ordinal` is refused |

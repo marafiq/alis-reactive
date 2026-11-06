@@ -216,7 +216,7 @@ and in the blocks inside it, and nowhere else.
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
 `neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `order`, `merge`, `trim`, `trimStart`,
-`trimEnd`, `upperInvariant`, `lowerInvariant`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
+`trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
 `sumDouble` and `sumDecimal`.
 `toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,

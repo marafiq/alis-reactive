@@ -48,6 +48,8 @@ public sealed class DosesController : Controller
     public IActionResult StartsWithIgnoringCase() => View(DoseRound.Page());
 
     public IActionResult Sums() => View(DoseRound.Page());
+
+    public IActionResult Casing() => View(DoseRound.Page());
 }
 
 public sealed record DoseRoundPage(string Ward, Carer Lead, Carer? Cover, DateTime Since);

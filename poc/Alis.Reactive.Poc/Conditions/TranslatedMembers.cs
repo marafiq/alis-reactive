@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -31,6 +32,8 @@ internal static class TranslatedMembers
 
     private delegate PlanExpression Translation(LinqExpression term, IReadOnlyList<LinqExpression> operands, ITranslator read, string argument);
 
+    [SuppressMessage("Globalization", "CA1304:Specify CultureInfo", Justification = "The table names the members a lambda translates by typed lambdas it never runs; ToUpper() and ToLower() are keyed as the view writes them.")]
+    [SuppressMessage("Globalization", "CA1311:Specify a culture or use an invariant version", Justification = "The table names the members a lambda translates by typed lambdas it never runs; ToUpper() and ToLower() are keyed as the view writes them.")]
     private static readonly Dictionary<(Module Module, int Token), Translation> Table = new()
     {
         [Property((string text) => text.Length)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
@@ -41,6 +44,8 @@ internal static class TranslatedMembers
         [Method((string text) => text.TrimEnd('a', 'b'))] = Unary(Operator.TrimEnd),
         [Method((string text) => text.ToUpperInvariant())] = Unary(Operator.UpperInvariant),
         [Method((string text) => text.ToLowerInvariant())] = Unary(Operator.LowerInvariant),
+        [Method((string text) => text.ToUpper())] = (_, operands, read, _) => Op(UpperUnder(CultureInfo.CurrentCulture), read.Read(operands[0])),
+        [Method((string text) => text.ToLower())] = (_, operands, read, _) => Op(LowerUnder(CultureInfo.CurrentCulture), read.Read(operands[0])),
         [Method((string text) => text.Contains(""))] = Binary(Operator.Contains),
         [Method((string text) => text.StartsWith("", StringComparison.Ordinal))] = Ordinal(Operator.StartsWith),
         [Method((string text) => text.EndsWith("", StringComparison.Ordinal))] = Ordinal(Operator.EndsWith),
@@ -120,6 +125,22 @@ internal static class TranslatedMembers
             throw new ArgumentException($"'{printed}' looks for an object, and the browser compares objects by reference; look for a member, such as names.Contains(d.Carer.Name).", argument);
         return Op(Operator.Includes, list, read.Read(item));
     };
+
+    private static Operator UpperUnder(CultureInfo culture)
+    {
+        var keepsTheDotlessI = string.Equals("\u0131".ToUpper(culture), "\u0131", StringComparison.Ordinal);
+        if (keepsTheDotlessI) return Operator.UpperInvariant;
+        var dotsTheI = string.Equals("i".ToUpper(culture), "\u0130", StringComparison.Ordinal);
+        return dotsTheI ? Operator.UpperTurkic : Operator.Upper;
+    }
+
+    private static Operator LowerUnder(CultureInfo culture)
+    {
+        var keepsTheDottedI = string.Equals("\u0130".ToLower(culture), "\u0130", StringComparison.Ordinal);
+        if (keepsTheDottedI) return Operator.LowerInvariant;
+        var undotsTheI = string.Equals("I".ToLower(culture), "\u0131", StringComparison.Ordinal);
+        return undotsTheI ? Operator.LowerTurkic : Operator.Lower;
+    }
 
     private static LinqExpression Unspanned(LinqExpression values)
     {

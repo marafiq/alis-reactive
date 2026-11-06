@@ -18,6 +18,22 @@ const upperWhereJavaScriptWritesTwo: ReadonlyMap<string, string> = new Map([
 
 const dotlessI = "\u0131";
 
+const dottedI = "\u0130";
+
+export type Casing = "invariant" | "linguistic" | "turkic";
+
+const upperCasing: Readonly<Record<Casing, ReadonlyMap<string, string>>> = {
+  invariant: new Map([[dotlessI, dotlessI]]),
+  linguistic: new Map([[dotlessI, "I"]]),
+  turkic: new Map([["i", dottedI], [dotlessI, "I"]]),
+};
+
+const lowerCasing: Readonly<Record<Casing, ReadonlyMap<string, string>>> = {
+  invariant: new Map(),
+  linguistic: new Map([[dottedI, "i"]]),
+  turkic: new Map([["I", dotlessI], [dottedI, "i"]]),
+};
+
 export type Trimmed = "both" | "start" | "end";
 
 export function trimmed(term: Read, sides: Trimmed): Read {
@@ -30,16 +46,18 @@ export function trimmed(term: Read, sides: Trimmed): Read {
   return value(held.slice(start, end));
 }
 
-export function upperInvariant(term: Read): Read {
+export function upper(term: Read, casing: Casing): Read {
   const held = text(term);
   if (held === undefined) return nothing;
-  return value(Array.from(held, (point) => (point === dotlessI ? point : single(point.toUpperCase(), upperWhereJavaScriptWritesTwo.get(point) ?? point))).join(""));
+  const rule = upperCasing[casing];
+  return value(Array.from(held, (point) => rule.get(point) ?? single(point.toUpperCase(), upperWhereJavaScriptWritesTwo.get(point) ?? point)).join(""));
 }
 
-export function lowerInvariant(term: Read): Read {
+export function lower(term: Read, casing: Casing): Read {
   const held = text(term);
   if (held === undefined) return nothing;
-  return value(Array.from(held, (point) => single(point.toLowerCase(), point)).join(""));
+  const rule = lowerCasing[casing];
+  return value(Array.from(held, (point) => rule.get(point) ?? single(point.toLowerCase(), point)).join(""));
 }
 
 export function tested(term: Read, part: Read, test: (held: string, sought: string) => boolean): Read {

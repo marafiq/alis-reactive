@@ -80,6 +80,10 @@ internal sealed class Operator : IChoice
     internal static readonly Operator TrimEnd = new("trimEnd");
     internal static readonly Operator UpperInvariant = new("upperInvariant");
     internal static readonly Operator LowerInvariant = new("lowerInvariant");
+    internal static readonly Operator Upper = new("upper");
+    internal static readonly Operator Lower = new("lower");
+    internal static readonly Operator UpperTurkic = new("upperTurkic");
+    internal static readonly Operator LowerTurkic = new("lowerTurkic");
     internal static readonly Operator Contains = new("contains");
     internal static readonly Operator StartsWith = new("startsWith");
     internal static readonly Operator EndsWith = new("endsWith");

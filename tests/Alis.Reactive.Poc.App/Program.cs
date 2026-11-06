@@ -1,6 +1,8 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,14 @@ var app = builder.Build();
 
 RequireBuilt(Path.Combine(app.Environment.ContentRootPath, "wwwroot", "js", "alis-poc.js"));
 
+CultureInfo[] cultures = [CultureInfo.InvariantCulture, CultureInfo.GetCultureInfo("en-US"), CultureInfo.GetCultureInfo("tr-TR")];
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture),
+    SupportedCultures = cultures,
+    SupportedUICultures = cultures,
+    RequestCultureProviders = [new QueryStringRequestCultureProvider()],
+});
 app.UseStaticFiles();
 app.UseRouting();
 app.MapControllerRoute("pages", "{controller=Home}/{action=Index}");

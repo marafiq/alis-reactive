@@ -1,7 +1,7 @@
 import type { Expression, OperatorExpression } from "./plan";
 import { assertNever, nothing, value, type Read } from "./read";
 import { decimalSum, doubleSum, intSum } from "./sums";
-import { lowerInvariant, nullOrEmpty, tested, trimmed, upperInvariant } from "./text";
+import { lower, nullOrEmpty, tested, trimmed, upper } from "./text";
 
 type Evaluate = (argument: Expression) => Read;
 
@@ -35,9 +35,17 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate): Rea
     case "trimEnd":
       return trimmed(evaluate(first(args)), "end");
     case "upperInvariant":
-      return upperInvariant(evaluate(first(args)));
+      return upper(evaluate(first(args)), "invariant");
     case "lowerInvariant":
-      return lowerInvariant(evaluate(first(args)));
+      return lower(evaluate(first(args)), "invariant");
+    case "upper":
+      return upper(evaluate(first(args)), "linguistic");
+    case "lower":
+      return lower(evaluate(first(args)), "linguistic");
+    case "upperTurkic":
+      return upper(evaluate(first(args)), "turkic");
+    case "lowerTurkic":
+      return lower(evaluate(first(args)), "turkic");
     case "contains":
       return tested(evaluate(first(args)), evaluate(second(args)), (held, sought) => held.includes(sought));
     case "startsWith":
