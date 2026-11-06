@@ -11,9 +11,10 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
     {
         private static readonly IReadOnlyList<TrainingCalendarSession> TrainingSessions =
         [
-            new(1, "Fire safety drill", "Dana Whitfield", new DateTime(2026, 11, 5, 14, 0, 0), new DateTime(2026, 11, 5, 15, 0, 0)),
-            new(2, "Medication safety refresher", "Priya Raman", new DateTime(2026, 11, 9, 10, 0, 0), new DateTime(2026, 11, 9, 11, 0, 0)),
-            new(3, "Dementia care workshop", "Luis Ortega", new DateTime(2026, 11, 13, 13, 0, 0), new DateTime(2026, 11, 13, 15, 0, 0)),
+            new(1, "Fire safety drill", "Dana Whitfield", new DateTime(2026, 11, 5, 14, 0, 0), new DateTime(2026, 11, 5, 15, 0, 0), 12, 0),
+            new(2, "Medication safety refresher", "Priya Raman", new DateTime(2026, 11, 9, 10, 0, 0), new DateTime(2026, 11, 9, 11, 0, 0), 10, 10),
+            new(3, "Dementia care workshop", "Luis Ortega", new DateTime(2026, 11, 13, 13, 0, 0), new DateTime(2026, 11, 13, 15, 0, 0), 6, 2),
+            new(4, "Hand hygiene audit", "Grace Kim", new DateTime(2026, 11, 3, 10, 0, 0), new DateTime(2026, 11, 3, 11, 0, 0), 8, 3),
         ];
 
         [HttpGet("TrainingCalendar")]
@@ -28,5 +29,14 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         public IActionResult TrainingCalendarDetails(int sessionId) =>
             PartialView("~/Areas/Sandbox/Views/Components/Fusion/Schedule/_TrainingSessionDetails.cshtml",
                 TrainingSessions.Single(session => session.Id == sessionId));
+
+        [HttpPost("TrainingCalendar/Reminders")]
+        public IActionResult TrainingCalendarReminders([FromBody] TrainingCalendarReminderRequest request)
+        {
+            var session = TrainingSessions.Single(candidate => candidate.Id == request.SessionId);
+            return Ok(session.IncompleteCount == 0
+                ? new TrainingCalendarReminderSent("Nothing to send", $"Everyone has completed {session.Subject}.")
+                : new TrainingCalendarReminderSent("Reminder sent", $"Reminded {session.IncompleteCount} staff to complete {session.Subject}."));
+        }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Linq.Expressions;
 using Alis.Reactive.PlanModel;
 #if NET48
 using System.Web;
@@ -52,12 +54,41 @@ namespace Alis.Reactive.Fusion.AppLevel
             => self.EmitSet(TitleProperty, ValueExpression.Literal(title));
 
         /// <summary>
+        /// Sets the toast title from the response, such as the name of what the server just changed.
+        /// </summary>
+        /// <param name="self">The page's toast.</param>
+        /// <param name="source">The response body of <c>OnSuccess</c> or <c>OnError</c>.</param>
+        /// <param name="title">The response member that holds the title, such as <c>r =&gt; r.Title</c>.</param>
+        public static ComponentRef<FusionToast, TModel> SetTitle<TModel, TResponse>(
+            this ComponentRef<FusionToast, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)
+            where TModel : class
+            where TResponse : class
+            => self.EmitSet(TitleProperty, source.Read(title).ToValueExpression());
+
+        /// <summary>
         /// Writes the Syncfusion Toast content through the component contract.
         /// </summary>
         public static ComponentRef<FusionToast, TModel> SetContent<TModel>(
             this ComponentRef<FusionToast, TModel> self, string content)
             where TModel : class
             => self.EmitSet(ContentProperty, ValueExpression.Literal(content));
+
+        /// <summary>
+        /// Sets the toast content from the response, so the toast says what the server reports.
+        /// </summary>
+        /// <param name="self">The page's toast.</param>
+        /// <param name="source">The response body of <c>OnSuccess</c> or <c>OnError</c>.</param>
+        /// <param name="content">The response member that holds the message, such as <c>r =&gt; r.Message</c>.</param>
+        /// <remarks>
+        /// <code>s.Component&lt;FusionToast&gt;().SetContent(json, r =&gt; r.Message).Success().Show();</code>
+        /// </remarks>
+        public static ComponentRef<FusionToast, TModel> SetContent<TModel, TResponse>(
+            this ComponentRef<FusionToast, TModel> self,
+            ResponseBody<TResponse> source, Expression<Func<TResponse, string>> content)
+            where TModel : class
+            where TResponse : class
+            => self.EmitSet(ContentProperty, source.Read(content).ToValueExpression());
 
         /// <summary>
         /// Sets the Syncfusion Toast display duration in milliseconds.

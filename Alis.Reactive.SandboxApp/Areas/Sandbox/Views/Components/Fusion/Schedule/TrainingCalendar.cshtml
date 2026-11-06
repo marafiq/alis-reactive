@@ -2,6 +2,7 @@
 @using Alis.Reactive.Native.Extensions
 @using Alis.Reactive.Native.Components
 @using Alis.Reactive.Native.AppLevel
+@using Alis.Reactive.Fusion.AppLevel
 @using Alis.Reactive.Fusion.Components
 @using Alis.Reactive.Fusion.Templates
 @using Syncfusion.EJ2.Schedule
@@ -12,11 +13,16 @@
     var sessionCard = FusionTemplate.Create<TrainingCalendarSession>()
         .Class("p-3 space-y-1")
         .Div(d => d.Class("text-sm text-gray-600").Text(m => m.Trainer))
+        .When(m => m.RegisteredCount > 0 && m.IncompleteCount == 0,
+            done => done.Badge("All complete", "px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-700"))
+        .When(m => !(m.IncompleteCount == 0),
+            open => open.Badge("Follow-up needed", "px-2 py-1 rounded text-xs font-bold bg-amber-100 text-amber-700"))
         .Render();
 
     var sessionCardActions = FusionTemplate.Create<TrainingCalendarSession>()
         .Class("flex gap-2 p-2 border-t")
         .EventButton("Details", "training:details", m => m.Id, "e-primary e-small")
+        .EventButton("Send reminder", "training:remind", m => m.Id, "e-small")
         .Render();
 
     Html.On(plan, t => t.DomReady(p =>
@@ -39,12 +45,27 @@
         p.Component<NativeDrawer>().Open();
         p.Component<FusionSchedule>("training-calendar").CloseQuickInfoPopup().CloseTooltip();
     }));
+
+    Html.On(plan, t => t.CustomEvent<TrainingCalendarSessionPicked>("training:remind", (session, p) =>
+    {
+        p.Post(Url.SandboxRoute("TrainingCalendarReminders", "Schedule"))
+         .Gather(g => g.FromEvent(session, x => x.Id, "sessionId"))
+         .Response(r => r.OnSuccess<TrainingCalendarReminderSent>((json, s) =>
+         {
+             s.Component<FusionToast>()
+                 .SetTitle(json, x => x.Title)
+                 .SetContent(json, x => x.Message)
+                 .Success()
+                 .Show();
+         }));
+    }));
 }
 
 <native-vstack gap="Lg">
     <native-heading level="H1">Training Calendar</native-heading>
     <native-text color="Secondary">
-        November staff training. Open a session's card for its details; Agenda lists the sessions of the week on screen.
+        November staff training. A session's card shows who still has to complete it, opens its details and reminds
+        those staff; Agenda lists the sessions of the week on screen.
     </native-text>
     <p id="training-calendar-status" class="text-sm text-text-muted">Loading training sessions...</p>
 
