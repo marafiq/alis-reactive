@@ -55,6 +55,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   absorb behind one door on both hosts; the net48 time zone maps its Windows id to IANA by a table made once.
 - The owner, 2026-11-06: the framework's views are `.cshtml` MVC views, on MVC 5 and ASP.NET Core MVC, never
   Razor Pages; the spec says "view" or "MVC view", and "Razor" only inside a code path.
+- The owner, 2026-11-06: the framework controls every input's id. Without it the browser starts guessing,
+  validation does not find its inputs, and views of different partials that share an id conflict; the
+  declaring-class id is that decision.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does

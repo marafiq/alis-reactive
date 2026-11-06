@@ -1168,3 +1168,140 @@ and `request` state, which the schema does not hold: a request's state is its ru
 - `X13.4` behavior: a server message for a member an editor template rendered shows beside that input.
 - `X13.5` behavior: two forms on one page keep their own summaries, and a form's summary stays after a slot that
   joined it unloads.
+
+## Q14. MVC partials and ids
+
+**Decision.**
+- D14.1 Each view's plan is its own. It is started in the view with the view's model, in a root view, a
+  partial, an editor template or a slot's content.
+  - Nothing carries plan state between views on the server: no `HttpContext.Items`, no `ViewData`, no
+    static. ResolvePlan and the plan primitives were designed to stop poisoning the HTTP request (the owner,
+    2026-11-06).
+  - The redesign's per-request record (`Alis.Reactive/Razor/RenderedPage.cs:29`) is refused for that
+    reason, and each of its uses moves to D14.6 to D14.8.
+- D14.2 Plans compose in the browser without merging. Each plan belongs to its owner (Q12), and it reaches
+  what another view rendered through the page's input table by element id, or through the form by binding
+  name (Q13).
+  - Main merged the plans of one plan id: components replaced by key, behaviors appended in order.
+  - The rewrite carries each part. A component another view renders is located by its element id, with
+    the vendor data of the reading plan's own typed declaration. Behaviors stay their own plan's. Rules and
+    messages are the form's.
+  - So the plan id keys nothing (D13.2).
+- D14.3 A member has one binding name and one element id in every view that renders it:
+  - The binding name is MVC's full field name under the view's `TemplateInfo` prefix (`probe:core-template-prefix-name`,
+    `probe:mvc5-template-full-id`).
+  - The element id is the class that declares the member, then MVC's id of the full name: `{Namespace_Class}__{Path}`
+    (`probe:core-sanitized-id`). The declaring class is the one the expression tree's member names.
+  - So the page, a validator, an `EditorFor` template, a list-item partial and a partial for a member reach
+    one id without knowing each other, and two views of different models that bind one name keep two ids.
+  - A lambda that names no member (`m => m`), and a member an interface declares, are refused.
+  - No view on either line pairs MVC's `LabelFor` or `IdFor` with a framework input (`git grep` finds none at
+    623dd4a27 or 65fdf118d), so the framework's id needs no agreement with them, and a view names the id by
+    `IdGenerator.For`.
+  - The framework controls every input's id (the owner, 2026-11-06): without it the browser guesses which
+    input a rule, a message or a read means, and views of different partials that share an id conflict.
+  - Reading the declaring class from the expression tree goes to gate 1's list of reflection exceptions.
+- D14.4 A partial is rendered for a member by one typed door, `Html.PartialFor(m => m.Member, view)` (N14.1), on
+  both hosts.
+  - The member's value is the partial's model, and a new `TemplateInfo` carries the member's full binding
+    name as the prefix.
+  - A list item, `m => m.Members[i]`, takes `Members[i]`, a position (Q1). A dictionary entry,
+    `m => m.Doses[key]`, takes `Doses[key]`.
+  - It replaces the idiom of copying `ViewData` and setting `TemplateInfo.HtmlFieldPrefix` (16 view lines at
+    65fdf118d). On net48 that idiom moves the view's own prefix, since a copy shares `TemplateInfo`
+    (`probe:mvc5-viewdata-copy-shares-template-info`); on net10 a copy has its own
+    (`probe:core-viewdata-copy-template-info`).
+- D14.5 A dictionary entry keyed by a number has no JSON form, since JSON reads a number in the prefix as a list
+  position. A JSON request whose body carries a member under such a prefix is refused where the view renders,
+  and form data sends it.
+- D14.6 The refusals of partials and ids are closed. Within one plan they are refused where the view renders.
+  Across plans, the page meets them where it composes the plans, and each is one error there.
+  - Composition is a real boundary: the plans were rendered apart, no plan can state what another holds,
+    and no server object sees every view of a page (D14.1).
+  - That moves two refusals from render time to the browser, a gate-1 line of its own.
+  - At render, within one plan:
+    - R14.1 an input whose lambda names no member, or a member an interface declares;
+    - R14.2 an input under a prefix its view took after its plan started;
+    - R14.3 an element id the plan renders twice;
+    - R14.4 a step that sets the text or HTML of an element the same plan loads or unloads as a slot;
+    - R14.5 a JSON request over a number-keyed dictionary entry (D14.5).
+  - At composition, in the browser:
+    - R14.6 a plan holding an input id a live plan already holds is not started. One error names the id and
+      both plans' views. A slot's content that renders an id the page holds is the same case.
+    - R14.7 a step that sets the text or HTML of an element a live plan holds as a slot stops, with one error
+      naming the slot.
+- D14.7 A plan is a block in its view: the plan door opens the block and the block's end writes the plan
+  (N14.2).
+  - The plan is a variable of the block, so an input outside the block cannot name it, and a plan that is
+    never rendered cannot be written.
+  - A block written whole inside a partial's `@section` renders nothing, inputs included, since MVC drops a
+    partial's sections on both hosts (`probe:core-partial-section-dropped`,
+    `probe:mvc5-sections-checked-in-layouts-only`). The page shows that defect.
+  - A refusal by render order is refused: three commits guessed it, narrowed it and removed it.
+- D14.8 A form is a block in its view as well (N14.3). It renders the form's element and the form's one
+  summary, so no record of summaries rendered is needed (D13.6).
+
+**Schema nodes.** None new: the plan's object locators by element id, the plugin data `model` (inputs by id) and
+`slot` (container ids).
+
+**Checker.**
+- `probe:core-template-prefix-name`
+- `probe:mvc5-template-full-id`
+- `probe:core-sanitized-id`
+- `probe:core-viewdata-copy-template-info`
+- `probe:mvc5-viewdata-copy-shares-template-info`
+- `probe:core-partial-section-dropped`
+- `probe:mvc5-sections-checked-in-layouts-only`
+- `Ownership.tla:BootContentBelongsToItsSlot`
+
+**Doors.**
+- kept: `Html.ReactivePlan`, `Html.InputField`, `IdGenerator.For`, and MVC's own `Html.EditorFor`.
+- `N14.1` new: `Html.PartialFor(m => m.Member, view)`, the typed partial for a member, on both hosts.
+- `N14.2` new: the plan as a block of its view, whose end renders it; its form goes to gate 2.
+- `N14.3` new: the form as a block of its view, which renders the form's element and its summary; its form goes
+  to gate 2.
+
+**Evidence.**
+- P1, each row with the meaning that answers it:
+  - 31aacf71e fell back to an id with no prefix for a rule on a partial's field: D14.3.
+  - 0090a6adc gave the plan its view's prefix, which only `Html.InputField` knew: D14.3.
+  - aba543d9c gave two cards of one partial one id: D14.3, D14.4.
+  - a82264ab8 scoped the id by the declaring class, so a page reaches its member's template: D14.3
+    (`Alis.Reactive/Inputs/IdGenerator.cs:50-58`).
+  - 45259f0eb refused `m => m`: R14.1.
+  - a0a95e0bd and 8046bc4c5 named a partial's fields and sends without the prefix: D14.3.
+  - 57f173f58 read `Members[1]` as one member: D14.4, Q1.
+  - b24c65775 documented a number-keyed dictionary entry: D14.5, R14.5.
+- P4, each row with its home:
+  - c5421ac4b refused a slot's content set by a step: R14.4 within a plan, R14.7 across plans.
+  - 58c12947c refused an element id rendered twice on a page: R14.3 within a plan, R14.6 across plans.
+  - eecfb7336 refused a prefix taken late: R14.2, and N14.1 takes the idiom away
+    (`Alis.Reactive/Razor/InputFieldExtensions.cs:87`).
+  - f3c2a6e10, a0bd5f0d2 and 2227c4eb5 refused, narrowed and removed a plan that never renders: D14.7.
+- Main's partial plan is a new plan in partial scope (`Alis.Reactive/Razor/Extensions/PlanExtensions.cs:58-62`),
+  merged in the browser by plan id (`Alis.Reactive.Assets/runtime/lifecycle/merge-policy.ts:2-31`).
+- The redesign keeps a per-request record of ids, summaries, slots and contents set
+  (`Alis.Reactive/Razor/RenderedPage.cs:29`).
+
+**Defects.**
+- `X14.1` type: an input outside its plan's block does not compile: new:N14.2.
+- `X14.2` type: a partial for a member takes the member as a typed lambda, so no prefix is written as text:
+  new:N14.1.
+- `X14.3` refusal: an input bound to `m => m` is refused with "Input 'm => m' names no member of {model}: bind
+  a member of the view's model, or render the member with Html.EditorFor from the view that holds it."
+- `X14.4` refusal: an input after the view's prefix moved is refused with "The field prefix of {view} changed
+  from {old} to {new} after its plan started, so input '{name}' would post under a name its plan does not send
+  or check."
+- `X14.5` refusal: an id rendered twice by one plan is refused with "Input '{name}' renders element id '{id}' a
+  second time in this plan: render the field once, or each copy for its own member with Html.PartialFor."
+- `X14.6` refusal: a JSON request over a number-keyed dictionary entry is refused with "{member} sits under
+  '{prefix}', a dictionary entry keyed by a number, which JSON reads as a list position: send this request
+  with AsFormData()."
+- `X14.7` behavior: a slot's content that renders an input id the page holds runs none of its handlers, and the
+  console names the id and both views.
+- `X14.8` behavior: an `EditorFor` template's input of `NextOfKin.Name` shows the page's server message for
+  `NextOfKin.Name` beside it, and the page's rule checks it.
+- `X14.9` behavior: one partial rendered by `PartialFor` for two members posts each card's own values.
+- `X14.10` behavior: a list-item partial under `Members[1]` sends its inputs at position 1 in a JSON body.
+- `X14.11` behavior: on net48 a partial rendered by `PartialFor` leaves the page's own inputs posting under their
+  names; the `verify-net48` run proves it.
