@@ -862,6 +862,12 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - Dispose runs the owner's disposers and ends no run in flight (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40`);
   `grep -rn AbortController Alis.Reactive.Assets/runtime` prints nothing at 65fdf118d.
 - A slot announces its unmount before its content is replaced (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38`).
+- B15: a declaration drifts from its vendor's return type today: `FusionGrid` declares its exports with `Method()`
+  (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:207-213`), while the grid's `.d.ts` declares
+  `excelExport` and `pdfExport` returning a Promise. Under D11.3 each such call stops its pipeline until the
+  declaration says `MethodAsync`.
+- G9: an app event is declared once and shared by its dispatcher and its listener
+  (`Alis.Reactive/PlanAuthoring/Events/AppEvent.cs:41-43`), so a dispatch is a trigger like any other (D11.6).
 
 **Defects.**
 - `X11.1` refusal: a handler that writes `Cancel` after a `Confirm` is refused where the view renders with
@@ -878,3 +884,98 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `X11.6` behavior: under `replace`, a cascade whose first answer arrives after the second shows the
   second's items.
 - `X11.7` behavior: under `skip`, a save clicked twice while its request is in flight sends one request.
+
+## Q12. Ownership
+
+**Decision.**
+- D12.1 The owners are closed: the page and a slot. A slot is an element some plan loads into, named in the
+  plan by its container id (the `alis.slot` key), never guessed from the page. A plan is not an owner. Each
+  plan belongs to one owner: the slot whose container is the innermost around the plan's script, else the
+  page. The page is never released.
+- D12.2 What a plan asks for belongs to its plan's owner:
+  - its handlers' listeners, on any element or object, the page's included;
+  - its holds on a hub or a stream;
+  - its forms' field registrations, with their rules;
+  - its runs (Q11).
+- D12.3 What HTML carries belongs to the owner of the innermost slot around it, else the page:
+  - the components mounted in it, which construct on `alis:mount` and destroy themselves on `alis:unmount`;
+  - the slots whose containers it holds;
+  - the plans whose scripts it holds, content the server rendered inside a slot's container included. Such
+    content belongs to that slot from boot, so the slot's first load or unload releases it.
+- D12.4 A slot's load replaces its content, and its unload empties it. Before either, the slot releases every
+  owner whose container is inside its content, innermost first, then itself. An owner's release runs in a
+  closed order:
+  1. it ends its runs, and each `Finally` runs (Q11, D11.8);
+  2. it announces the unmount of its content;
+  3. it removes its listeners;
+  4. it releases its holds;
+  5. it drops its field registrations.
+
+  Then the content is replaced. A slot's next load starts a new owner, which subscribes once, so no listener
+  piles up across loads.
+- D12.5 Release removes exactly what the owner holds, and nothing another owner holds. A listener is removed
+  only while its element still holds, at the vendor's object path, the object the listener was added to. A
+  component its host destroyed took its listeners with it, and the owner calls nothing on it. EJ2's destroy
+  takes the component off its element (`probe:ej2-destroy-removes-instance`), so the rule names no vendor.
+  Main's check of Syncfusion's `isDestroyed` in the runtime is refused for that reason.
+- D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
+  and closes at the last release, and its retry offer goes with it. A step reaches only a held connection.
+- D12.7 Live validation is one capture-phase listener per page. An input an event reaches is checked by the
+  field registrations of the live plans that name it. Nothing is wired per element, so nothing per element
+  is released. A field registration leaves with its plan's owner, so a slot's required field no longer holds
+  the page's save once the slot unloads. What a check reads for a member whose input is gone is Q16's.
+
+**Schema nodes.** The plugin data `form`, `hub` and `slot`, and `handler`. Ownership is not a node: a plan's
+owner is where its script is, and an owner's holds are what its plans name.
+
+**Checker.**
+- `Ownership.tla:NoSlotOutlivesItsContainer`
+- `Ownership.tla:ListenersDoNotAccumulate`
+- `Ownership.tla:BootContentBelongsToItsSlot`
+- `Ownership.tla:RegistrationsDoNotAccumulate`
+- `Ownership.tla:EveryLoadedFieldRegistered`
+- `Ownership.tla:RulesLeaveWithTheirOwner`
+- `Ownership.tla:HubKeptWhileHeld`
+- `Ownership.tla:OfferOnlyWhileHeld`
+- `Ownership.tla:NoUnsubscribeOnDestroyed`
+- `Lanes.tla:FinallyRunsBeforeRelease`
+- `probe:ej2-destroy-removes-instance`
+- `probe:ej2-destroy-sets-is-destroyed`
+
+**Doors.**
+- kept: `Into(element)` and the slot's load and unload, `Html.RenderPlan`, and the hub's and stream's triggers.
+- No door names an owner: a developer chooses where a plan renders, and ownership follows.
+
+**Evidence.**
+- P3, each row with the meaning that answers it:
+  - 885652213 guessed a slot from `container.id.length > 0`, and 527138248 declared slots in the plan: D12.1
+    (`Alis.Reactive/PlanModel/Writing/Scope.cs:234`).
+  - 0b47eafd7 let one listener's abort stop a shared hub, and d07a89928 made holds plan data: D12.6
+    (`Alis.Reactive.Assets/runtime/realtime/hub.ts:95-107`).
+  - bc45c3b9e left a retry offer after unload: D12.6 (`Alis.Reactive.Assets/runtime/realtime/hub.ts:101-107`).
+  - 6478b4a4a, e02294ae4 and a168e014d left rules and wiring behind after a reload, with e02294ae4's "orphaned
+    rules are not removed" reversed by a168e014d: D12.2, D12.7
+    (`Alis.Reactive.Assets/runtime/plugins/form/form.ts:232-245`).
+  - d6251825e found listeners added on every slot load: D12.4, D12.7
+    (`Alis.Reactive.Assets/runtime/plugins/form/form.ts:206-221`).
+  - f26146b8f released the slots nested in replaced content, innermost first: D12.4
+    (`Alis.Reactive.Assets/runtime/plugins/slot.ts:56-63`).
+  - e83040182 gave server-rendered content its slot's owner at boot: D12.1, D12.3
+    (`Alis.Reactive.Assets/runtime/root.ts:58-77`, `Alis.Reactive.Assets/runtime/root.ts:84-89`).
+  - 893ed624a on main checks `isDestroyed`, and acd5f47fe answers it with `stillHolds`: D12.5
+    (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:16-18`).
+- An owner runs its disposers in reverse and knows nothing of runs (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40`).
+- A slot announces the unmount of its content before replacing it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38`).
+
+**Defects.**
+- `X12.1` behavior: after the outer slot unloads, a click on a page button that an inner slot's plan listened to
+  runs nothing.
+- `X12.2` behavior: after a slot loads three times, a click on its button runs its handler once.
+- `X12.3` behavior: a field a reloaded slot renders shows its message on blur.
+- `X12.4` behavior: after a slot with a required field unloads, the page's form saves.
+- `X12.5` behavior: two slots listen to one hub; after one unloads, the other still shows the server's pushes.
+- `X12.6` behavior: unloading the slot whose hub the server hung up on hides the retry offer.
+- `X12.7` behavior: a slot whose component its host destroyed unloads with no console error, and the next load
+  listens.
+- `X12.8` behavior: content the server rendered inside a slot's container stops listening at the slot's first
+  load.

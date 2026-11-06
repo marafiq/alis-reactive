@@ -278,6 +278,24 @@
       "probe": "ej2-method-arity.mjs",
       "expect": "ej2-methods-returning-promise: 120",
       "source": "spec/probes/ej2-method-arity.mjs"
+    },
+    {
+      "id": "ej2-destroy-removes-instance",
+      "statement": "EJ2's Base.destroy removes the destroyed component from its element's ej2_instances, so the object at the vendor's path is no longer the one a listener was added to.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, run with the real Base",
+      "probe": "ej2-destroy.mjs",
+      "expect": "ej2-destroy-removes-instance: removed",
+      "source": "spec/probes/ej2-destroy.mjs"
+    },
+    {
+      "id": "ej2-destroy-sets-is-destroyed",
+      "statement": "EJ2's Base.destroy sets the component's public isDestroyed to true.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, run with the real Base",
+      "probe": "ej2-destroy.mjs",
+      "expect": "ej2-destroy-sets-is-destroyed: true",
+      "source": "spec/probes/ej2-destroy.mjs"
     }
   ]
 }
