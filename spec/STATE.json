@@ -69,7 +69,7 @@
     },
     "inventory": {
       "counts": {},
-      "detail": "not started: spec/inventory/doors.tsv, spec/inventory/kinds.tsv, spec/inventory/cases.tsv, spec/inventory/analyzers.tsv, spec/inventory/tests.tsv absent",
+      "detail": "not started: spec/inventory/doors.tsv, spec/inventory/kinds.tsv, spec/inventory/cases.tsv, spec/inventory/analyzers.tsv, spec/inventory/tests.tsv, spec/inventory/plugins.tsv, spec/inventory/browser.tsv, spec/inventory/runtime.tsv absent",
       "pass": false
     },
     "kinds": {
@@ -78,9 +78,21 @@
       "pass": false
     },
     "main_surface": {
-      "counts": {},
-      "detail": "not started: spec/inventory/main absent",
-      "pass": false
+      "counts": {
+        "Alis.Reactive net10.0": 372,
+        "Alis.Reactive net48": 372,
+        "Alis.Reactive.DesignSystem net10.0": 131,
+        "Alis.Reactive.DesignSystem net48": 131,
+        "Alis.Reactive.FluentValidator net10.0": 113,
+        "Alis.Reactive.FluentValidator net48": 113,
+        "Alis.Reactive.Fusion net10.0": 2249,
+        "Alis.Reactive.Fusion net48": 2249,
+        "Alis.Reactive.Native net10.0": 225,
+        "Alis.Reactive.Native net48": 234,
+        "Alis.Reactive.NativeTagHelpers net10.0": 127
+      },
+      "detail": "main's surface written for every package and target framework",
+      "pass": true
     },
     "matrix": {
       "counts": {},
@@ -118,8 +130,8 @@
       "counts": {
         "files": 4
       },
-      "detail": "origin/feature/spec-first is not pushed; untracked: spec/BRIEF.md, spec/NOTES.md, spec/CLAUDE.md, spec/tools/check.py",
-      "pass": false
+      "detail": "brief, notes, map, check, hook and branch in place",
+      "pass": true
     },
     "tlc": {
       "counts": {
@@ -136,16 +148,16 @@
       "pass": false
     }
   },
-  "passed": 1,
-  "read_at_head": "65fdf118d1498a8285db84a43c4da81dfaa0ea3e",
+  "passed": 3,
+  "read_at_head": "be14632a736cdbc34c34fa2fe919cf927cf5ba01",
   "step": {
     "failing": [
-      "survival"
+      "inventory"
     ],
-    "name": "Branches and survival",
-    "next": "Install the compact hook, commit by path, push, open .worktrees/main-read at 623dd4a27.",
-    "number": 1,
-    "phase": "A"
+    "name": "Inventory",
+    "next": "Write spec/tools/inventory.py and the TSVs.",
+    "number": 3,
+    "phase": "B"
   },
   "total": 24
 }

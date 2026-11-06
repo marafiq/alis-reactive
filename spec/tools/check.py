@@ -28,8 +28,10 @@ MAIN_PACKAGES = {
     "Alis.Reactive.Fusion": ["net48", "net10.0"],
     "Alis.Reactive.Native": ["net48", "net10.0"],
     "Alis.Reactive.FluentValidator": ["net48", "net10.0"],
+    "Alis.Reactive.NativeTagHelpers": ["net10.0"],
+    "Alis.Reactive.DesignSystem": ["net48", "net10.0"],
 }
-INVENTORY_FILES = ["doors.tsv", "kinds.tsv", "cases.tsv", "analyzers.tsv", "tests.tsv"]
+INVENTORY_FILES = ["doors.tsv", "kinds.tsv", "cases.tsv", "analyzers.tsv", "tests.tsv", "plugins.tsv", "browser.tsv", "runtime.tsv"]
 QUESTIONS = [f"Q{n}" for n in range(1, 20)]
 DESIGN_PARTS = ["Decision", "Schema nodes", "Checker", "Doors", "Evidence", "Defects"]
 TLC_SPECS = {
