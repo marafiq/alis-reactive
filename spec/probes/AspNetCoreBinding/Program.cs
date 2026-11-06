@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -59,6 +60,11 @@ try
     {
         Console.WriteLine("core-validation-problem-shape: " + (int)problem.StatusCode + " " + problem.Content.Headers.ContentType?.MediaType + " errors " + ErrorsOf(await problem.Content.ReadAsStringAsync()));
     }
+    Console.WriteLine("core-form-nested-start: " + await Form(client, "/ward", "Lead.Phone=1&Deputy.Phone=2&Leads%5B0%5D.Phone=3"));
+    Console.WriteLine("core-json-nested-start: " + await Json(client, "/ward-json", "{\"lead\":{\"phone\":\"1\"},\"deputy\":{\"phone\":\"2\"},\"leads\":[{\"phone\":\"3\"}]}"));
+    Console.WriteLine("core-form-unsent-keeps-start: " + await Form(client, "/ward", "") + " | json {} " + await Json(client, "/ward-json", "{}"));
+    Console.WriteLine("core-form-value-messages: Count=12a says " + await Form(client, "/counts-message", "Count=12a") + "; Count= says " + await Form(client, "/counts-message", "Count="));
+    Console.WriteLine("core-regex-dotnet: \\d on Arabic-Indic digits " + Regex.IsMatch("\u0661\u0662\u0663", @"^\d+$") + "; $ before a final newline " + Regex.IsMatch("123\n", @"^\d+$") + "; . on a carriage return " + Regex.IsMatch("a\rb", "^a.b$") + "; \\w on e-acute " + Regex.IsMatch("\u00e9", @"^\w$") + "; \\d under ECMAScript " + Regex.IsMatch("\u0661\u0662\u0663", @"^\d+$", RegexOptions.ECMAScript));
     Console.WriteLine("core-form-empty-field: Count= binds " + await Form(client, "/counts", "Count=&Maybe=") + "; nothing sent binds " + await Form(client, "/counts", ""));
     Console.WriteLine("core-json-null-member: {\"count\":null} binds " + await Json(client, "/counts-json", "{\"count\":null}") + "; {} binds " + await Json(client, "/counts-json", "{}"));
     using (var strict = await client.PostAsync("/strict-json", null))
@@ -133,6 +139,22 @@ public sealed class Counts
     public int? Maybe { get; set; } = 7;
 }
 
+public sealed class Lead
+{
+    public string? Name { get; set; } = "inner";
+
+    public string? Phone { get; set; }
+}
+
+public sealed class Ward
+{
+    public Lead Lead { get; set; } = new() { Name = "outer" };
+
+    public Lead? Deputy { get; set; }
+
+    public List<Lead> Leads { get; set; } = [new() { Name = "seed" }];
+}
+
 public sealed class PageController : Controller
 {
     [HttpGet("/page")]
@@ -172,6 +194,19 @@ public sealed class ProbeController : ControllerBase
         ModelState.AddModelError("Kin.Name", "Name the next of kin.");
         return ValidationProblem(ModelState);
     }
+
+    [HttpPost("/ward")]
+    public string FormWard([FromForm] Ward ward) => WardText(ward);
+
+    [HttpPost("/ward-json")]
+    public string JsonWard([FromBody] Ward ward) => WardText(ward);
+
+    [HttpPost("/counts-message")]
+    public string CountsMessage([FromForm] Counts counts)
+        => string.Join(" | ", ModelState.Where(entry => entry.Value!.Errors.Count > 0).Select(entry => entry.Key + ": " + entry.Value!.Errors[0].ErrorMessage));
+
+    private static string WardText(Ward ward)
+        => "Lead.Name=" + ward.Lead.Name + "; Deputy.Name=" + (ward.Deputy?.Name ?? "null") + "; Leads=" + string.Join(",", ward.Leads.Select(lead => lead.Name));
 
     [HttpPost("/counts")]
     public string FormCounts([FromForm] Counts counts) => CountsText(counts);

@@ -602,6 +602,114 @@
       "probe": "ej2-template.mjs",
       "expect": "ej2-template-function-elements: a function returning elements renders <em></em>",
       "source": "spec/probes/ej2-template.mjs"
+    },
+    {
+      "id": "core-form-nested-start",
+      "statement": "The form binder fills the object a member starts with, makes a new object for a member that starts null, and makes each sent list item new.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-nested-start: Lead.Name=outer; Deputy.Name=inner; Leads=inner",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-nested-start",
+      "statement": "System.Text.Json makes a new object for every object the body sends, whatever the member starts with.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-nested-start: Lead.Name=inner; Deputy.Name=inner; Leads=inner",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-unsent-keeps-start",
+      "statement": "An object or list the body does not send keeps the value the member starts with, in form data and in JSON.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-unsent-keeps-start: Lead.Name=outer; Deputy.Name=null; Leads=seed | json {} Lead.Name=outer; Deputy.Name=null; Leads=seed",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-value-messages",
+      "statement": "The form binder's message for a text an int cannot hold names the value and the member; an empty one is invalid.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-value-messages: Count=12a says Count: The value '12a' is not valid for Count.; Count= says Count: The value '' is invalid.",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-regex-dotnet",
+      "statement": ".NET reads \\d as any Unicode decimal digit, $ as before a final newline too, . as any character but a newline, and \\w as Unicode letters; ECMAScript makes \\d ASCII.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-regex-dotnet: \\d on Arabic-Indic digits True; $ before a final newline True; . on a carriage return True; \\w on e-acute True; \\d under ECMAScript False",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "mvc5-nested-fills-start",
+      "statement": "MVC 5 binds a sent object into the object its member starts with.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "object originalPropertyValue = propertyDescriptor.GetValue(bindingContext.Model);",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:224"
+    },
+    {
+      "id": "mvc5-list-item-new",
+      "statement": "MVC 5 binds each sent list item as a new object of the item type.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(null, elementType),",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:698"
+    },
+    {
+      "id": "mvc5-list-replaced",
+      "statement": "MVC 5 replaces the contents of a list the body sends.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "CollectionHelpers.ReplaceCollection(elementType, collection, modelList);",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:719"
+    },
+    {
+      "id": "mvc5-value-invalid-message",
+      "statement": "MVC 5's message for a text a member cannot hold names the value and the member.",
+      "host": "net48",
+      "oracle": "AspNetWebStack main, src/System.Web.Mvc/Properties/MvcResources.resx",
+      "probe": "spec/probes/aspnetwebstack/MvcResources.resx.txt",
+      "expect": "<value>The value '{0}' is not valid for {1}.</value>",
+      "source": "spec/probes/aspnetwebstack/MvcResources.resx.txt:271"
+    },
+    {
+      "id": "net48-regex-digit-unicode",
+      "statement": ".NET Framework reads \\d as the Unicode decimal digit category.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/RegexCharClass.cs.txt",
+      "expect": "DigitClass      = \"\\x00\\x00\\x01\" + (char) ((int) UnicodeCategory.DecimalDigitNumber + 1);",
+      "source": "spec/probes/referencesource/RegexCharClass.cs.txt:490"
+    },
+    {
+      "id": "js-regex-raw",
+      "statement": "JavaScript reads \\d as ASCII digits, $ as the end only, . as no line terminator, and \\w as ASCII word characters.",
+      "host": "node",
+      "oracle": "node's RegExp",
+      "probe": "js-regex.mjs",
+      "expect": "js-regex-raw: \\d on Arabic-Indic digits false; $ before a final newline false; . on a carriage return false; \\w on e-acute false",
+      "source": "spec/probes/js-regex.mjs"
+    },
+    {
+      "id": "js-regex-translated",
+      "statement": "With the u flag, \\p{Nd}, (?=\\n?$), [^\\n] and [\\p{L}\\p{Mn}\\p{Nd}\\p{Pc}] read those texts as .NET does.",
+      "host": "node",
+      "oracle": "node's RegExp",
+      "probe": "js-regex.mjs",
+      "expect": "js-regex-translated: \\d as \\p{Nd} true; $ as (?=\\n?$) true; . as [^\\n] true; \\w as [\\p{L}\\p{Mn}\\p{Nd}\\p{Pc}] true",
+      "source": "spec/probes/js-regex.mjs"
     }
   ]
 }
