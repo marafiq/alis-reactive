@@ -259,6 +259,19 @@ def section_parts(lines):
     return {name: "\n".join(body).strip() for name, body in parts.items()}
 
 
+def bullets(text):
+    items = []
+    for line in text.splitlines():
+        if line.startswith("- "):
+            items.append(line)
+        elif items and line.startswith("  "):
+            items[-1] += " " + line.strip()
+    return items
+
+
+SPEC_PATH = re.compile(r"\bspec/[\w/.\-]+\.(?:md|tla|cfg|json|tsv|txt|py)\b")
+
+
 def tla_invariants(spec):
     tla = SPEC / "Core" / f"{spec}.tla"
     cfg = SPEC / "Core" / f"{spec}.cfg"
@@ -293,6 +306,9 @@ def judge_section(question, lines, new_doors, analyzer_ids, probes):
         return problems, []
     if not re.search(r"^- ", parts["Decision"], re.MULTILINE):
         problems.append("Decision has no closed statement")
+    for named in sorted(set(SPEC_PATH.findall(parts["Decision"]))):
+        if not (REPO / named).is_file():
+            problems.append(f"Decision names {named}, which does not exist")
     cites = CITE.findall(parts["Evidence"])
     if not cites:
         problems.append("Evidence cites no file:line")
@@ -317,8 +333,8 @@ def judge_section(question, lines, new_doors, analyzer_ids, probes):
         elif invariant not in listed:
             problems.append(f"Checker {spec}.tla:{invariant} is not checked by {spec}.cfg")
     defects = []
-    for line in parts["Defects"].splitlines():
-        match = DEFECT.match(line.strip())
+    for line in bullets(parts["Defects"]):
+        match = DEFECT.match(line)
         if not match:
             continue
         identifier, rung, text = match.groups()

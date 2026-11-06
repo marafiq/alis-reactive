@@ -6,18 +6,149 @@
       "pass": false
     },
     "core_questions": {
-      "counts": {},
-      "detail": "not started: spec/Core/DESIGN.md absent",
+      "counts": {
+        "answered": 2,
+        "defects": 30,
+        "total": 18
+      },
+      "detail": "Q1: Checker probe:mvc5-sub-index-name is not in spec/probes/facts.json, Checker probe:mvc5-sub-property-name is not in spec/probes/facts.json, Checker probe:core-form-binds-indexed-name is not in spec/probes/facts.json; Q2: Checker probe:core-frombody-binds-json-name is not in spec/probes/facts.json, Checker probe:core-frombody-ignores-clr-name is not in spec/probes/facts.json, Checker probe:core-form-ignores-json-name is not in spec/probes/facts.json; Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q5: Checker probe:ej2-max-public-method-arity is not in spec/probes/facts.json; Q7 absent; Q8 absent",
       "pass": false
     },
     "core_tlc": {
       "counts": {
-        "met": 0,
+        "met": 1,
         "specs": 5
       },
-      "detail": "Absence not started; Request not started; Lanes not started; Ownership not started; DateWire not started",
+      "detail": "Request not started; Lanes not started; Ownership not started; DateWire not started",
       "pass": false,
-      "runs": {}
+      "runs": {
+        "Absence": {
+          "Absence.cfg": {
+            "green": true,
+            "hash": "9e07e403eff094c047cef20330db2f86c867d9dbd27d7f1e1080441f2c6afec9",
+            "line": "Model checking completed. No error has been found.",
+            "states": "148608 states generated, 108288 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "Absence.violates.ConditionTermsLazy.cfg": {
+            "green": false,
+            "hash": "e264946723795f75ba0b8a8c249663a3ba7bda059ea93b37c1a6341a366932d5",
+            "line": "violated: ConditionTermsLazy",
+            "states": "114139 states generated, 86470 distinct states found, 6901 states left on queue.",
+            "violated": [
+              "ConditionTermsLazy"
+            ]
+          },
+          "Absence.violates.DataAbsentReadsNothing.cfg": {
+            "green": false,
+            "hash": "c536dff96292363a318ebc559714e27be1fc314c75d3b11cc3d77e1da2c775e8",
+            "line": "violated: DataAbsentReadsNothing",
+            "states": "46664 states generated, 44942 distinct states found, 27639 states left on queue.",
+            "violated": [
+              "DataAbsentReadsNothing"
+            ]
+          },
+          "Absence.violates.FailedConversionReadsNothing.cfg": {
+            "green": false,
+            "hash": "0e2348a6fa4f9fa2c227908a90ec84b118b0ceb81c0ea02f25db5a792c621ff0",
+            "line": "violated: FailedConversionReadsNothing",
+            "states": "123320 states generated, 92211 distinct states found, 5751 states left on queue.",
+            "violated": [
+              "FailedConversionReadsNothing"
+            ]
+          },
+          "Absence.violates.MissingClassChangesNothing.cfg": {
+            "green": false,
+            "hash": "b18dbe3f11acf48774bedfa53eeadc125a8e43cba589e3c8ad78e1cb7c337dc0",
+            "line": "violated: MissingClassChangesNothing",
+            "states": "93336 states generated, 72600 distinct states found, 6900 states left on queue.",
+            "violated": [
+              "MissingClassChangesNothing"
+            ]
+          },
+          "Absence.violates.MissingListReadsNothing.cfg": {
+            "green": false,
+            "hash": "654d9fd78824b1047699301a7d55e7c4d14295f043bd4c744c1d1ca3e4638d6c",
+            "line": "violated: MissingListReadsNothing",
+            "states": "130276 states generated, 96845 distinct states found, 4596 states left on queue.",
+            "violated": [
+              "MissingListReadsNothing"
+            ]
+          },
+          "Absence.violates.MissingRouteStopsAndFinallyRuns.cfg": {
+            "green": false,
+            "hash": "3ce1b8ff4935026452b172403125ed99ffde303b6b5a4701f3e178114c5e482b",
+            "line": "violated: MissingRouteStopsAndFinallyRuns",
+            "states": "137152 states generated, 101431 distinct states found, 4596 states left on queue.",
+            "violated": [
+              "MissingRouteStopsAndFinallyRuns"
+            ]
+          },
+          "Absence.violates.MissingTextShowsNothing.cfg": {
+            "green": false,
+            "hash": "2375a32732bdd80e3794abeecb675e936c140e6ba7740b8b12deb557b60155e4",
+            "line": "violated: MissingTextShowsNothing",
+            "states": "82971 states generated, 65691 distinct states found, 6900 states left on queue.",
+            "violated": [
+              "MissingTextShowsNothing"
+            ]
+          },
+          "Absence.violates.PromiseWhereValueStops.cfg": {
+            "green": false,
+            "hash": "8cd5dc312d2916d4ef733865c4cdb34ea7244b5e7c5057ead6c442fa7b616edf",
+            "line": "violated: PromiseWhereValueStops",
+            "states": "20748 states generated, 20748 distinct states found, 17268 states left on queue.",
+            "violated": [
+              "PromiseWhereValueStops"
+            ]
+          },
+          "Absence.violates.ReachCompleted.cfg": {
+            "green": false,
+            "hash": "cf3cef1f178f0827da4323c7217df8878e492ae5d2f2d932e5826c285453e558",
+            "line": "violated: ReachCompleted",
+            "states": "144021 states generated, 106005 distinct states found, 4596 states left on queue.",
+            "violated": [
+              "ReachCompleted"
+            ]
+          },
+          "Absence.violates.ReachRouteStopRunsFinally.cfg": {
+            "green": false,
+            "hash": "825f62e8d91e829e9601465944fcd93f29f2a2769e7531efd75bbe434d969865",
+            "line": "violated: ReachRouteStopRunsFinally",
+            "states": "144032 states generated, 106013 distinct states found, 4593 states left on queue.",
+            "violated": [
+              "ReachRouteStopRunsFinally"
+            ]
+          },
+          "Absence.violates.RequiredAbsentStops.cfg": {
+            "green": false,
+            "hash": "afe5c5169cf24e33ab0910978dd4923a8f1eba68b9054a76f1fa1f90b50de2ab",
+            "line": "violated: RequiredAbsentStops",
+            "states": "27660 states generated, 27660 distinct states found, 20724 states left on queue.",
+            "violated": [
+              "RequiredAbsentStops"
+            ]
+          },
+          "Absence.violates.StopEndsOnlyItsHandler.cfg": {
+            "green": false,
+            "hash": "f3e3534df2b17c3c1156d0b8771434900d3cd0e0c4755033319408eb55470c8d",
+            "line": "violated: StopEndsOnlyItsHandler",
+            "states": "20748 states generated, 20748 distinct states found, 17268 states left on queue.",
+            "violated": [
+              "StopEndsOnlyItsHandler"
+            ]
+          },
+          "Absence.violates.UnawaitedPromiseStops.cfg": {
+            "green": false,
+            "hash": "9766ab279d8710a27f28305e4f21a1ea35b5441707f7932ad9e6ba7154ad08d4",
+            "line": "violated: UnawaitedPromiseStops",
+            "states": "103847 states generated, 79607 distinct states found, 6900 states left on queue.",
+            "violated": [
+              "UnawaitedPromiseStops"
+            ]
+          }
+        }
+      }
     },
     "defects": {
       "counts": {},
@@ -30,8 +161,11 @@
       "pass": false
     },
     "evidence": {
-      "counts": {},
-      "detail": "not started: spec/Core/DESIGN.md absent",
+      "counts": {
+        "placed": 15,
+        "total": 31
+      },
+      "detail": "unplaced: G1, G2, G5, G8, G9, G10, B6, B9, B10, B13, B15, B16, P2, P3, P4, P5",
       "pass": false
     },
     "features_core": {
@@ -61,11 +195,11 @@
     },
     "hedges": {
       "counts": {
-        "files": 1,
+        "files": 2,
         "hedges": 0
       },
-      "detail": "0 hedge words; not started: spec/Core/DESIGN.md absent",
-      "pass": false
+      "detail": "no hedge word in the spec's prose",
+      "pass": true
     },
     "history": {
       "counts": {},
@@ -132,8 +266,12 @@
       "pass": false
     },
     "questions": {
-      "counts": {},
-      "detail": "not started: spec/Core/DESIGN.md absent",
+      "counts": {
+        "answered": 2,
+        "defects": 30,
+        "total": 19
+      },
+      "detail": "Q1: Checker probe:mvc5-sub-index-name is not in spec/probes/facts.json, Checker probe:mvc5-sub-property-name is not in spec/probes/facts.json, Checker probe:core-form-binds-indexed-name is not in spec/probes/facts.json; Q2: Checker probe:core-frombody-binds-json-name is not in spec/probes/facts.json, Checker probe:core-frombody-ignores-clr-name is not in spec/probes/facts.json, Checker probe:core-form-ignores-json-name is not in spec/probes/facts.json; Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q5: Checker probe:ej2-max-public-method-arity is not in spec/probes/facts.json; Q7 absent; Q8 absent",
       "pass": false
     },
     "rewrite_units": {
@@ -150,12 +288,139 @@
     },
     "tlc": {
       "counts": {
-        "met": 0,
+        "met": 1,
         "specs": 8
       },
-      "detail": "Absence not started; Request not started; Lanes not started; Ownership not started; DateWire not started; Schema not started",
+      "detail": "Request not started; Lanes not started; Ownership not started; DateWire not started; Schema not started; ValidationToday not started",
       "pass": false,
-      "runs": {}
+      "runs": {
+        "Absence": {
+          "Absence.cfg": {
+            "green": true,
+            "hash": "9e07e403eff094c047cef20330db2f86c867d9dbd27d7f1e1080441f2c6afec9",
+            "line": "Model checking completed. No error has been found.",
+            "states": "148608 states generated, 108288 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "Absence.violates.ConditionTermsLazy.cfg": {
+            "green": false,
+            "hash": "e264946723795f75ba0b8a8c249663a3ba7bda059ea93b37c1a6341a366932d5",
+            "line": "violated: ConditionTermsLazy",
+            "states": "114139 states generated, 86470 distinct states found, 6901 states left on queue.",
+            "violated": [
+              "ConditionTermsLazy"
+            ]
+          },
+          "Absence.violates.DataAbsentReadsNothing.cfg": {
+            "green": false,
+            "hash": "c536dff96292363a318ebc559714e27be1fc314c75d3b11cc3d77e1da2c775e8",
+            "line": "violated: DataAbsentReadsNothing",
+            "states": "46664 states generated, 44942 distinct states found, 27639 states left on queue.",
+            "violated": [
+              "DataAbsentReadsNothing"
+            ]
+          },
+          "Absence.violates.FailedConversionReadsNothing.cfg": {
+            "green": false,
+            "hash": "0e2348a6fa4f9fa2c227908a90ec84b118b0ceb81c0ea02f25db5a792c621ff0",
+            "line": "violated: FailedConversionReadsNothing",
+            "states": "123320 states generated, 92211 distinct states found, 5751 states left on queue.",
+            "violated": [
+              "FailedConversionReadsNothing"
+            ]
+          },
+          "Absence.violates.MissingClassChangesNothing.cfg": {
+            "green": false,
+            "hash": "b18dbe3f11acf48774bedfa53eeadc125a8e43cba589e3c8ad78e1cb7c337dc0",
+            "line": "violated: MissingClassChangesNothing",
+            "states": "93336 states generated, 72600 distinct states found, 6900 states left on queue.",
+            "violated": [
+              "MissingClassChangesNothing"
+            ]
+          },
+          "Absence.violates.MissingListReadsNothing.cfg": {
+            "green": false,
+            "hash": "654d9fd78824b1047699301a7d55e7c4d14295f043bd4c744c1d1ca3e4638d6c",
+            "line": "violated: MissingListReadsNothing",
+            "states": "130276 states generated, 96845 distinct states found, 4596 states left on queue.",
+            "violated": [
+              "MissingListReadsNothing"
+            ]
+          },
+          "Absence.violates.MissingRouteStopsAndFinallyRuns.cfg": {
+            "green": false,
+            "hash": "3ce1b8ff4935026452b172403125ed99ffde303b6b5a4701f3e178114c5e482b",
+            "line": "violated: MissingRouteStopsAndFinallyRuns",
+            "states": "137152 states generated, 101431 distinct states found, 4596 states left on queue.",
+            "violated": [
+              "MissingRouteStopsAndFinallyRuns"
+            ]
+          },
+          "Absence.violates.MissingTextShowsNothing.cfg": {
+            "green": false,
+            "hash": "2375a32732bdd80e3794abeecb675e936c140e6ba7740b8b12deb557b60155e4",
+            "line": "violated: MissingTextShowsNothing",
+            "states": "82971 states generated, 65691 distinct states found, 6900 states left on queue.",
+            "violated": [
+              "MissingTextShowsNothing"
+            ]
+          },
+          "Absence.violates.PromiseWhereValueStops.cfg": {
+            "green": false,
+            "hash": "8cd5dc312d2916d4ef733865c4cdb34ea7244b5e7c5057ead6c442fa7b616edf",
+            "line": "violated: PromiseWhereValueStops",
+            "states": "20748 states generated, 20748 distinct states found, 17268 states left on queue.",
+            "violated": [
+              "PromiseWhereValueStops"
+            ]
+          },
+          "Absence.violates.ReachCompleted.cfg": {
+            "green": false,
+            "hash": "cf3cef1f178f0827da4323c7217df8878e492ae5d2f2d932e5826c285453e558",
+            "line": "violated: ReachCompleted",
+            "states": "144021 states generated, 106005 distinct states found, 4596 states left on queue.",
+            "violated": [
+              "ReachCompleted"
+            ]
+          },
+          "Absence.violates.ReachRouteStopRunsFinally.cfg": {
+            "green": false,
+            "hash": "825f62e8d91e829e9601465944fcd93f29f2a2769e7531efd75bbe434d969865",
+            "line": "violated: ReachRouteStopRunsFinally",
+            "states": "144032 states generated, 106013 distinct states found, 4593 states left on queue.",
+            "violated": [
+              "ReachRouteStopRunsFinally"
+            ]
+          },
+          "Absence.violates.RequiredAbsentStops.cfg": {
+            "green": false,
+            "hash": "afe5c5169cf24e33ab0910978dd4923a8f1eba68b9054a76f1fa1f90b50de2ab",
+            "line": "violated: RequiredAbsentStops",
+            "states": "27660 states generated, 27660 distinct states found, 20724 states left on queue.",
+            "violated": [
+              "RequiredAbsentStops"
+            ]
+          },
+          "Absence.violates.StopEndsOnlyItsHandler.cfg": {
+            "green": false,
+            "hash": "f3e3534df2b17c3c1156d0b8771434900d3cd0e0c4755033319408eb55470c8d",
+            "line": "violated: StopEndsOnlyItsHandler",
+            "states": "20748 states generated, 20748 distinct states found, 17268 states left on queue.",
+            "violated": [
+              "StopEndsOnlyItsHandler"
+            ]
+          },
+          "Absence.violates.UnawaitedPromiseStops.cfg": {
+            "green": false,
+            "hash": "9766ab279d8710a27f28305e4f21a1ea35b5441707f7932ad9e6ba7154ad08d4",
+            "line": "violated: UnawaitedPromiseStops",
+            "states": "103847 states generated, 79607 distinct states found, 6900 states left on queue.",
+            "violated": [
+              "UnawaitedPromiseStops"
+            ]
+          }
+        }
+      }
     },
     "verdicts": {
       "counts": {},
@@ -163,8 +428,8 @@
       "pass": false
     }
   },
-  "passed": 4,
-  "read_at_head": "5d2efafac076463bc81388bc378cd848a4edfb7d",
+  "passed": 5,
+  "read_at_head": "242092934a83573d94486b2dc94e96080f7f18d4",
   "step": {
     "failing": [
       "core_questions",

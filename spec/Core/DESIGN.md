@@ -44,7 +44,6 @@ Terms used throughout:
 `Vendor.objectPath`, `InputBinding.path`, `FormField.path` and the request argument's member paths (Q9).
 
 **Checker.**
-- `Absence.tla:IndexReadsPosition`
 - `probe:mvc5-sub-index-name`
 - `probe:mvc5-sub-property-name`
 - `probe:core-form-binds-indexed-name`
@@ -54,8 +53,8 @@ Terms used throughout:
   `At` and `Each` and a private constructor, serialized as D1.2. It replaces every `IReadOnlyList<string>`
   path of the grammar.
 - `N1.2` new: `internal static class BindingName` with `Of(Path clrPath)`, the one function of D1.6.
-- existing: `Alis.Reactive.WireTerms.Path` keeps its typed segments and loses `Text`, `Parse` and the `[]`
-  text form.
+- internal at the State SHA, and internal in the rewrite: `Alis.Reactive.WireTerms.Path`, on no PublicAPI text.
+  N1.1 replaces its segments; its `Text`, `Parse` and `[]` text form leave.
 
 **Evidence.**
 - B1: each item is spelled three ways: `Alis.Reactive/WireTerms/Path.cs:31`, `Alis.Reactive.Assets/runtime/grammar/paths.ts:5`,
@@ -98,6 +97,8 @@ Terms used throughout:
   `JsonResult` writes through `JavaScriptSerializer` on net48.
 - D2.7 A component's member is named by its JavaScript name in its declaration; that name is the vendor
   boundary and is not translated.
+- D2.8 D2.4 to D2.6 replace the root CLAUDE.md meaning "A member is named as System.Text.Json names it: its
+  JsonPropertyName, else camel case", which holds for a net10 JSON body only. Gate 1 carries the change.
 
 **Schema nodes.** `get`, `call` (Q1 paths, `members`); the request argument's members (Q9).
 
@@ -148,9 +149,10 @@ Terms used throughout:
 - D3.6 What a blank input binds as is a literal C# writes into the input's binding: the member's value in a
   new instance of the item or model that holds it, encoded as the endpoint encodes it (Q18). The browser
   chooses no default by shape.
-- D3.7 A number goes into JSON as a JSON number; a number goes into form data and query as its shortest
-  round-trip text with the decimal separator the request argument carries, which C# writes from the
-  culture the view renders under (`NumberFormatInfo.NumberDecimalSeparator`).
+- D3.7 A number goes into JSON as a JSON number. Into form data it goes as its text with the decimal
+  separator of the culture the view renders under, which C# writes into the request argument, because both
+  hosts bind form values under the request's culture. Into the query and the route it goes as its invariant
+  text, because both hosts bind those under the invariant culture.
 - D3.8 A date and an instant are shown and sent as `spec/Core/DateWire.tla` states (`yyyy-MM-dd`, the time
   when not midnight, an instant's clock offset, `0001-01-01T00:00:00Z` for an instant that reads nothing).
 
@@ -161,6 +163,9 @@ Terms used throughout:
 - `DateWire.tla:DateTimeCarriesNoOffset`
 - `DateWire.tla:InstantCarriesItsClockOffset`
 - `probe:core-form-decimal-culture`
+- `probe:core-query-decimal-invariant`
+- `probe:mvc5-form-current-culture`
+- `probe:mvc5-query-invariant-culture`
 
 **Doors.**
 - `N3.1` new: the grammar's `Operator` without `ToNumber`, `ToDate`, `ToBoolean` and `ToText`.
@@ -266,16 +271,29 @@ Terms used throughout:
 - D5.6 An event payload that carries a method is declared as a `JsObject` payload; its declared methods are
   required, and its data fields are optional.
 - D5.7 A server-pushed message is `Data<T>`, the same as a custom event's payload and a response body.
+- D5.8 The declaration door names the kind of JavaScript member it declares. `Object<T>()` and `Objects<T>()`
+  are the object and the list a property holds; `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` are what
+  a method returns. No door infers the kind from the C# member that declares it.
+- D5.9 Every method kind (`Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `ReturnedObject<T>`,
+  `ReturnedObjects<T>`) takes the same arities, from none to the largest arity of a documented-public method
+  in EJ2 33.1.47's declarations (`probe:ej2-max-public-method-arity`).
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
 **Checker.**
-- `Absence.tla:LiveMemberRequired`
-- `Absence.tla:DataMemberOptional`
-- `Absence.tla:PastDeclaredOptional`
+- `Absence.tla:RequiredAbsentStops`
+- `Absence.tla:DataAbsentReadsNothing`
+- `probe:ej2-max-public-method-arity`
 
 **Doors.**
-- existing: the declaration vocabulary on `JsObject` (`Alis.Reactive/Components/JsObject.cs:74-260`).
+- kept, public for the component author: `JsObject`'s `Property`, `ReadOnly`, `WriteOnly`, `Method`,
+  `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Object<T>()`, `Objects<T>()`, `Event`, `Event<T>`, `Fixed` and
+  `Pass` (`Alis.Reactive/Components/JsObject.cs:74-260`).
+- `N5.2` new: `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` on `JsObject`, replacing `Object<T>(Arg..)`
+  and the method form of `Object<T>()` and `Objects<T>()`.
+- `N5.3` new: the arities of D5.9 on every method kind.
+- refused: the `GetMembers` scan in `JsObject.DeclaresMethod` (`Alis.Reactive/Components/JsObject.cs:366-368`),
+  which reads non-public members to tell a property from a method; N5.2 carries the capability.
 - `N5.1` new: `ServerPushStream` and `SignalRHub` message triggers typed `Data<TMessage>`, replacing the
   `JsObject` with `ReadOnly<T>` members.
 
@@ -293,21 +311,26 @@ Terms used throughout:
 - `X5.2` type: a method cannot be called on data with no declared methods; `Data<T>` exposes reads only
   (`Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:50`).
 - `X5.3` behavior: a returned object that lacks a declared method stops the pipeline at the call.
+- `X5.5` type: a property's object cannot be mistaken for a method's returned object, and no member scan
+  decides it: new:N5.2.
+- `X5.6` type: a vendor method a declaration cannot express for its arity: new:N5.3.
 - `X5.4` behavior: a field of the object a property holds reads nothing when the object lacks it.
 
 ## Q6. Arrays
 
 **Decision.**
 - D6.1 One plan form per operation. A projection is `call(list, ["map"], [fn])`; `each` in a read leaves (D1.5).
-- D6.2 One name per operation, the LINQ name: `Where`, `Select`, `Any`, `All`, `Count()`, `FirstOrDefault`,
-  `Contains`, `Sum`, `Min`, `Max`, `OrderBy`, `OrderByDescending`. The property `Count` and the method `Each`
-  on a declared list leave, renamed to `Count()` and `Select`.
+- D6.2 One name per operation, the names `ReactiveArray` has on both lines: `Where`, `Select`, `OrderBy`,
+  `OrderByDescending`, `Count()`, `Count(predicate)`, `Any()`, `Any(predicate)`, `All(predicate)`, `Sum` over
+  `int`, `decimal` and `double`, `Find(predicate)` and `Find(predicate, field)`. The property `Count` and the
+  method `Each` on a declared list (`Objects<T>`) leave, renamed to `Count()` and `Select`.
 - D6.3 An operation over a list that reads nothing reads nothing; `Any()` and `All()` over nothing read nothing,
   so a condition on them does not hold.
 - D6.4 In an array lambda, a member .NET defines on the value's type (`Trim`, `Length`, `Year`, a `DayOfWeek`
   compared) reads nothing on a missing value and stops the pipeline on a value that lacks it.
-- D6.5 The .NET members an array lambda translates are a closed table keyed by the `MethodInfo` and
-  `MemberInfo` the expression tree carries, built from typed lambdas; no attribute is scanned.
+- D6.5 The .NET members an array lambda translates are the closed table `spec/Core/translated-members.md`,
+  keyed by the `MethodInfo` and `MemberInfo` the expression tree carries and built from typed lambdas; no
+  attribute is scanned.
 - D6.6 The JavaScript array methods the plan calls (`map`, `filter`, `some`, `every`, `find`, `includes`,
   `length`) are named at the vendor boundary of the built-in array; the browser adds no array function.
 
@@ -330,8 +353,8 @@ Terms used throughout:
 
 **Defects.**
 - `X6.1` type: a list cannot be counted two ways: new:N6.1 leaves one `Count()`.
-- `X6.2` refusal: an array lambda that calls a member outside the table: "{member} has no browser form; an array
-  lambda uses the members of spec/Core/translated-members.md, or the work moves to the server."
+- `X6.2` refusal: an array lambda that calls a member outside the table: "{member} has no browser form in an
+  array lambda; use a member the framework translates, or move the work to the server."
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name` reads that item's test
   as nothing, so the item is not kept.
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
