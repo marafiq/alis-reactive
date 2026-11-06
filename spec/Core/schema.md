@@ -1,6 +1,6 @@
 # The schema
 
-The plan grammar the rewrite writes and executes: Q19 of `spec/Core/DESIGN.md`, derived from Q1 to Q18 and Q20.
+The plan grammar the rewrite writes and executes: Q19 of `spec/Core/DESIGN.md`, derived from Q1 to Q18, Q20 and Q21.
 C# writes these nodes and nothing else; the browser executes these nodes and nothing else. Both sides work
 from this file in parallel: the C# side by the nodes each builder writes, the browser side by each node's
 meaning, and `spec/Core/Schema.tla` checks that what C# accepts is what the browser runs.
@@ -106,8 +106,9 @@ brings. `alis.confirm` of 65fdf118d is Fusion's, so the core no longer names it 
 
 | Kind | Carries | Holds | Meaning |
 |------|---------|-------|---------|
-| `none` | nothing | | the plugin contributes nothing to the owner: http, document, slot (its key is the container id, D12.1), stream, an app's plugin |
+| `none` | nothing | | the plugin contributes nothing to the owner: http, document, slot (its key is the container id, D12.1), an app's plugin |
 | `hub` | nothing | | the owner holds the hub's connection while it lives (D12.6) |
+| `stream` | nothing | | the owner holds the stream's connection while it lives, as a hub's (D21.6) |
 | `model` | `inputs`: a map from input id to `InputBinding` | | the inputs this plan renders, by id (D13.2, D14.3) |
 | `form` | `summary`: the summary element's id | `live`: `Live`; `registrations`: a list of `Registration` | this plan's rules for the form whose element id is the key (Q16) |
 
@@ -297,12 +298,13 @@ proposed column says `added`.
 | plugin data | hub | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.hub` | D12.6 |
 | plugin data | model | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.model` | D13.2 |
 | plugin data | form | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.form` | N16.2 |
+| plugin data | stream | absent | added | the plugin the plan names, `alis.stream` | N21.3 |
 | time zone | clock | absent | added | the zone switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.12 |
 | time zone | zone | absent | added | the zone switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | N3.5 |
 | trace | off | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 | trace | on | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 
-Today 33 kinds, proposed 41: eight added, none removed.
+Today 33 kinds, proposed 42: nine added, none removed.
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses

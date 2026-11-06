@@ -4,7 +4,7 @@ EXTENDS Naturals, FiniteSets
 CONSTANT Mutant
 
 Mutants == {"none", "RecordsWhenOff", "ReplacedRunLeftOpen", "DisposeEndsRunFirst", "AttemptHeaderFromRun",
-            "HeaderToEveryOrigin", "SinkErrorStopsRun"}
+            "HeaderToEveryOrigin", "SinkErrorStopsRun", "RetryUntracedWhenOff", "ResendCountMissing"}
 
 ASSUME Mutant \in Mutants
 
@@ -40,11 +40,13 @@ Ended(s) == IF spans[s] = "open" THEN [spans EXCEPT ![s] = "ended"] ELSE spans
 
 EndAll == [s \in SpanNames |-> IF spans[s] = "open" THEN "ended" ELSE spans[s]]
 
-Header(attempt) ==
-    IF ~Recording THEN "none"
-    ELSE IF origin = "other" /\ Mutant # "HeaderToEveryOrigin" THEN "none"
-    ELSE IF Mutant = "AttemptHeaderFromRun" THEN "run"
-    ELSE attempt
+Header(n) ==
+    IF origin = "other" /\ Mutant # "HeaderToEveryOrigin" THEN "none"
+    ELSE IF Recording THEN (IF Mutant = "AttemptHeaderFromRun" THEN "run" ELSE AttemptName(n))
+    ELSE IF n >= 2 /\ Mutant # "RetryUntracedWhenOff" THEN "minted"
+    ELSE "none"
+
+Resend(n) == IF Mutant = "ResendCountMissing" THEN 0 ELSE n - 1
 
 Trigger ==
     /\ phase = "idle"
@@ -65,7 +67,7 @@ Attempt ==
     /\ LET n == attempts + 1 IN
         /\ attempts' = n
         /\ spans' = Started(AttemptName(n))
-        /\ sent' = sent \cup {[n |-> n, to |-> origin, parent |-> Header(AttemptName(n))]}
+        /\ sent' = sent \cup {[n |-> n, to |-> origin, parent |-> Header(n), resend |-> Resend(n)]}
     /\ phase' = "awaiting"
     /\ UNCHANGED <<traceOn, origin, sinkFails, outcome>>
 
@@ -107,7 +109,7 @@ Next == Trigger \/ Send \/ Attempt \/ Respond \/ Route \/ Abort \/ Finish
 
 Spec == Init /\ [][Next]_vars
 
-NothingRecordedWhenOff == ~traceOn => ((\A s \in SpanNames : spans[s] = "unstarted") /\ (\A r \in sent : r.parent = "none"))
+NothingRecordedWhenOff == ~traceOn => ((\A s \in SpanNames : spans[s] = "unstarted") /\ (\A r \in sent : r.n = 1 => r.parent = "none"))
 
 EveryStartedSpanEnds == phase = "over" => \A s \in SpanNames : spans[s] # "open"
 
@@ -119,8 +121,14 @@ TraceHeadersStayHome == \A r \in sent : r.to = "other" => r.parent = "none"
 
 SinkFailureChangesNothing == outcome # "sinkError"
 
+RetriesAlwaysTraced == \A r \in sent : (r.n >= 2 /\ r.to = "own") => r.parent # "none"
+
+ResendCountSent == \A r \in sent : r.parent # "none" => r.resend = r.n - 1
+
 ReachRetriedAttemptTraced == ~(traceOn /\ ~sinkFails /\ spans["attempt2"] = "ended" /\ outcome = "completed")
 
 ReachDisposedInFlight == ~(traceOn /\ ~sinkFails /\ outcome = "disposed" /\ spans["attempt1"] = "ended" /\ phase = "over")
+
+ReachRetryTracedWhileOff == ~(~traceOn /\ \E r \in sent : r.n = 2 /\ r.parent = "minted" /\ r.resend = 1)
 
 ====

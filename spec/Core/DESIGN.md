@@ -632,8 +632,8 @@ Terms used throughout:
 - D9.12 The headers every request sends are configured once in C#, and C# writes them into each request's
   `HttpSend` where the view renders; a request's own header of the same name, compared ignoring case, replaces
   the configured one. An app that sends `X-Requested-With: XMLHttpRequest` on every request configures it there.
-  The browser adds no header but W3C Trace Context's `traceparent` and `tracestate`, to the page's own origin,
-  while the plan's trace is on (D20.3).
+  The browser adds no header but W3C Trace Context's `traceparent` and `tracestate` while the plan's trace is on
+  (D20.3), and `traceparent` and `baggage` on a retry (D20.11), each to the page's own origin only.
 - D9.13 A literal member, `Set(member, value)`, is written where the view renders, encoded as the endpoint
   binds it: an enum by the System.Text.Json contract under the endpoint's options on net10 and by its name on
   net48 (Q18).
@@ -807,6 +807,12 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   jitter from 2 seconds, a 429's or 503's `Retry-After` in place of the wait, and 30 seconds in all, past which the
   retries end. The app sets the attempts and the first wait once, in the defaults. Another policy is a later
   extension, the owner's.
+  - `Retry-After` is the server's word when it sends one (RFC 9110, section 10.2.3): its seconds, or its HTTP date
+    taken against the response's own `Date`, so the browser's clock does not enter. A wait that would pass the
+    30 seconds ends the retries at once, and the error route runs. A value in neither form is the server's
+    defect: it is logged once as an error, and the standard wait runs.
+  - Retrying only when `Retry-After` is sent is refused: a network failure has no response, and a gateway's 502 or
+    504 comes from no app server, so neither carries the header, and those are the failures a retry exists for.
 - D10.15 Across attempts, the request's check, guards and argument run once, and every attempt sends the same
   argument. `WhileLoading` runs once before the first attempt, the route once for the last attempt's outcome,
   and `Finally` once after it. An owner disposed between attempts ends the retries (Q11).
@@ -1910,12 +1916,12 @@ shapes, starts and the payload kind of each event.
 
 **Decision.**
 - D19.1 The schema is `spec/Core/schema.md`: every node, what it carries, the nodes it holds and its meaning in the
-  browser, derived from Q1 to Q18 and Q20. C# writes those nodes and nothing else, and the browser runs those nodes
+  browser, derived from Q1 to Q18, Q20 and Q21. C# writes those nodes and nothing else, and the browser runs those nodes
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
   `spec/NOTES.md`).
-- D19.2 The set is closed at 41 kinds: today's 33, and `stop`, `file`, `each`, `signal`, `clock`, `zone`, `off` and
-  `on`. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+- D19.2 The set is closed at 42 kinds: today's 33, and `stop`, `file`, `each`, `signal`, `stream`, `clock`, `zone`,
+  `off` and `on`. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case.
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).
@@ -1987,8 +1993,8 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 **Decision.**
 - D20.1 Tracing is off unless the server recorded the render. C# writes the plan's `trace` as `on` only when the
   activity of the request that renders the view is recorded, W3C Trace Context's sampled flag, and as `off` otherwise.
-  The browser decides nothing: no attribute, no query text, no storage, so the level read from `data-alis-trace`
-  leaves. In development the app's sampler records every request; in production the app sets its own ratio (the
+  The browser decides nothing but D20.11's: no attribute, no query text, no storage, so the level read from
+  `data-alis-trace` leaves. In development the app's sampler records every request; in production the app sets its own ratio (the
   owner, 2026-11-06: optional, never always on).
 - D20.2 The core takes no telemetry library. The browser has one diagnostics port, called at the dispatch of each
   union, which Q19 makes one place per kind, and two sinks:
@@ -2025,6 +2031,13 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   app's ASP.NET instrumentation module, a fact the unit probes.
 - D20.9 Tracing changes nothing a plan does: on and off run the same statements in the same order with the same
   results, and the port returns nothing the runtime reads.
+- D20.11 A retry is always traced (the owner, 2026-11-06: downstream services act on it, by standard headers). Every
+  attempt after a send's first sends `traceparent` with the sampled flag set, so the server's parent-based sampler
+  records the endpoint and what it calls, and W3C `baggage` with `http.request.resend_count`, OpenTelemetry's name
+  for the attempt count, so the server copies it into its span. With the trace on, the context is the attempt's own
+  span (D20.3); with it off, the send mints one trace id for its retries, and the first attempt carries nothing, since
+  no one knows it will fail. Both headers go to the page's own origin only; the services behind the endpoint receive
+  them from the server's own propagation.
 - D20.10 Its proof is Playwright on the sandbox, whose endpoint echoes the `traceparent` it received into the page and
   whose collector page lists the spans it received: with the trace off nothing is listed and no header is echoed; with
   it on, the closed span names of a handler with a check, a retried GET and a chained request are listed under the
@@ -2039,6 +2052,8 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - `Tracing.tla:AttemptsJoinTheTrace`
 - `Tracing.tla:TraceHeadersStayHome`
 - `Tracing.tla:SinkFailureChangesNothing`
+- `Tracing.tla:RetriesAlwaysTraced`
+- `Tracing.tla:ResendCountSent`
 - `probe:core-caller-line-follows-line-directive`
 
 **Doors.**
@@ -2061,5 +2076,102 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - `X20.3` behavior: a handler replaced while its request is in flight lists its run span ended with the outcome replaced.
 - `X20.4` behavior: with the trace on, a request to another origin carries no `traceparent`, which that endpoint echoes.
 - `X20.5` behavior: with an exporter that throws on every span, a save succeeds and the console shows one error.
+- `X20.7` behavior: with the trace off, a GET retried after a 503 reaches the endpoint the second time with a sampled
+  `traceparent` and `baggage` holding `http.request.resend_count=1`, which the endpoint echoes, and the first time with
+  neither.
 - `X20.6` refusal: a request header named `traceparent` is refused where the view renders with "The traceparent header
   belongs to tracing: remove it from this request's headers."
+
+## Q21. Realtime: server-sent events and SignalR
+
+**Decision.**
+- D21.1 Two transports, each by its own standard, each its own module of the browser's code (the owner, 2026-11-06:
+  both are mandatory, and SignalR is a known dependency, kept modular):
+  - server-sent events, by the HTML standard's `EventSource` over `text/event-stream`, with no library. A message is
+    named by its `event:` field and its `data:` is JSON. The browser reconnects by itself after the server's `retry:`,
+    sending `Last-Event-ID` with the last `id:` it saw.
+  - SignalR, by ASP.NET Core SignalR's protocol through `@microsoft/signalr`, pinned, the one realtime dependency. Its
+    module is its own asset, which the view links only when a plan names a hub, so a page with no hub ships no
+    SignalR client.
+- D21.2 Hosts:
+  - Server-sent events work on both hosts from the app's own endpoint: ASP.NET Core 10's
+    `TypedResults.ServerSentEvents` on net10, and on net48 an MVC 5 action that writes the same stream unbuffered
+    through `System.Net.ServerSentEvents`, a pinned package and a gate-1 line.
+  - `@microsoft/signalr` speaks only ASP.NET Core SignalR, which is compatible with no client or server of ASP.NET
+    SignalR and runs only on ASP.NET Core (learn.microsoft.com/aspnet/core/signalr/version-differences). An MVC 5 app
+    on net48 therefore reaches a hub that an ASP.NET Core app beside it serves, at an absolute URL, with the page's
+    cookies, and its own server push is server-sent events. A hub inside an MVC 5 app is refused, since no client the
+    framework ships speaks to it.
+- D21.3 A server event is declared once, its name and its message type, and the endpoint that writes it and the view
+  that listens to it share that declaration, as an app event's dispatcher and listener do (G9). A hub's methods are
+  declared once the same way, for the calls a view makes and the pushes it receives.
+- D21.4 A message is data (D5.7): a member it lacks reads nothing.
+  - A server-sent event whose data is not JSON, and a hub push that holds more than one argument, or one that is not
+    an object, is a message the framework did not produce. It is logged once as an error, no handler runs, and the
+    next message runs.
+  - Each message starts a run under its handler's policy (D11.7), in the order the messages arrive.
+- D21.5 A connection's lifecycle is one closed set of triggers on both transports: `reconnecting`, `reconnected` and
+  `closed`.
+  - For server-sent events, the browser's own reconnection is `reconnecting`, the next open is `reconnected`, and a
+    source the browser gave up on is `closed`. For SignalR they are the client's own events.
+  - After `closed`, the retry offer shows until a retry connects or the last holder releases (D12.6).
+  - The framework replays no message the page missed. An endpoint replays from the `Last-Event-ID` it receives, and a
+    page that must not miss a hub push reloads its state on `reconnected`.
+- D21.6 A stream is held as a hub is, by every owner whose plans name it (D12.6), so a stream's plugin data is
+  `stream` as a hub's is `hub`. Today a stream is held only through its subscriptions, so a plan that only reads its
+  state reads it closed.
+- D21.7 Authentication is the page's own: a stream and a hub send the page's cookies, and the server authorizes each
+  connection and each hub method. A bearer token is not sent: `EventSource` sends no header, and SignalR puts a
+  token in the URL for WebSockets and server-sent events. A token door is a gate-1 line.
+- D21.8 Tracing (Q20): a run a message starts is a child of the plan's trace context and records its transport and
+  event. The server span that sent the message is not linked, since neither wire carries a trace context per
+  message. Whether a hub invoke joins the server's hub activity depends on `@microsoft/signalr` carrying trace
+  context, a fact the unit probes before it claims it.
+- D21.9 Proof:
+  - Playwright on net10 covers both transports, every lifecycle trigger and the holds.
+  - The verify-net48 run covers an MVC 5 action's server-sent events reaching a view's trigger.
+  - A hub that an MVC 5 page reaches is covered only with the ASP.NET Core hub beside it, which the unit adds to that run.
+
+**Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, `handler` for
+message and lifecycle triggers, and `call` for a hub's invoke and send.
+
+**Checker.**
+- `Ownership.tla:HubKeptWhileHeld`
+- `Ownership.tla:OfferOnlyWhileHeld`
+- `Lanes.tla:SkippedTriggerStartsNothing`
+- `Lanes.tla:ReplacedRunRunsNoRoute`
+
+**Doors.**
+- kept: N5.1's message triggers typed `Data<TMessage>`, and the hub's `invoke` and `send` (Q11).
+- `N21.1` new: a server event and a hub's methods declared once and shared by the endpoint and the view (D21.3); their
+  form goes to gate 2.
+- `N21.2` new: the endpoint's typed event writer: over `TypedResults.ServerSentEvents` on net10, over
+  `System.Net.ServerSentEvents` on net48.
+- `N21.3` new: the plugin data `stream` (D21.6).
+- `N21.4` new: the lifecycle triggers `reconnecting`, `reconnected` and `closed` on a stream and a hub (D21.5).
+- `N21.5` new: the hub's module as its own asset, linked when a plan names a hub (D21.1).
+
+**Evidence.**
+- The core's browser code imports the SignalR client: `Alis.Reactive.Assets/runtime/realtime/hub.ts:1`, pinned at
+  `Alis.Reactive.Assets/package.json:23`; it connects with the page's cookies and reconnects by itself
+  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:54-55`).
+- A hub's lifecycle triggers exist and a stream's do not: `Alis.Reactive.Assets/runtime/realtime/hub.ts:116`.
+- A hub push of another shape is logged and dropped: `Alis.Reactive.Assets/runtime/realtime/hub.ts:158`; so is a stream
+  message that is not JSON: `Alis.Reactive.Assets/runtime/realtime/stream.ts:87`.
+- A stream uses the browser's `EventSource`: `Alis.Reactive.Assets/runtime/realtime/stream.ts:23`; it is held through
+  its subscriptions only (`Alis.Reactive.Assets/runtime/realtime/stream.ts:95`), and reads closed when none holds it
+  (`Alis.Reactive.Assets/runtime/realtime/stream.ts:75`).
+- Realtime is proven on net10 alone: `Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj:4`,
+  `tests/Alis.Reactive.Framework.App/Alis.Reactive.Framework.App.csproj:4`.
+
+**Defects.**
+- `X21.1` behavior: a stream message whose data is not JSON runs no handler and logs one error, and the next message
+  runs its handler.
+- `X21.2` behavior: a slot that only reads a stream's state reads it open while the slot is loaded.
+- `X21.3` behavior: when the server restarts, a page runs its `reconnecting` steps, then its `reconnected` steps, and the
+  next message runs its handler.
+- `X21.4` behavior: a hub push with two arguments runs no handler and logs one error.
+- `X21.5` behavior: a page whose plans name no hub requests no SignalR asset.
+- `X21.6` type: an endpoint and a view that name one server event differently, or give it two message types, do not
+  compile: new:N21.1.
+- `X21.7` behavior: on net48, an MVC 5 action's server-sent events reach a view's trigger in the order it wrote them.

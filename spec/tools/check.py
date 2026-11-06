@@ -34,7 +34,7 @@ MAIN_PACKAGES = {
     "Alis.Reactive.DesignSystem": ["net48", "net10.0"],
 }
 INVENTORY_FILES = ["doors.tsv", "kinds.tsv", "cases.tsv", "analyzers.tsv", "tests.tsv", "plugins.tsv", "browser.tsv", "runtime.tsv"]
-QUESTIONS = [f"Q{n}" for n in range(1, 21)]
+QUESTIONS = [f"Q{n}" for n in range(1, 22)]
 DESIGN_PARTS = ["Decision", "Schema nodes", "Checker", "Doors", "Evidence", "Defects"]
 TLC_SPECS = {
     "Absence": {"question": "Q4", "step": 4, "expect": "green"},
@@ -782,7 +782,7 @@ STEPS = [
     (2, "B", "Main's surface as text", ["main_surface"], "Wire PublicApiAnalyzers into main-read, run RS0016 one target framework at a time, copy to spec/inventory/main."),
     (3, "B", "Inventory", ["inventory"], "Write spec/tools/inventory.py and the TSVs."),
     (4, "C", "Q1 to Q18, TLA+ specs, probes, history", ["core_questions", "core_tlc", "probes", "history"], "Answer Q1 to Q18 in spec/Core/DESIGN.md with their TLA+ specs and probes; write spec/history.tsv."),
-    (5, "C", "Q19, the schema, Q20, tracing, the validation spec, gate 1", ["questions", "evidence", "tlc", "kinds", "gate1"], "Write Schema.tla, schema.md and the validation specs; present gate 1."),
+    (5, "C", "Q19, the schema, Q20, tracing, Q21, realtime, the validation spec, gate 1", ["questions", "evidence", "tlc", "kinds", "gate1"], "Write Schema.tla, schema.md and the validation specs; present gate 1."),
     (6, "D", "Feature rows", ["doors_mapped", "verdicts", "features_core", "features_lost"], "Write spec/<Module>/features.json and module.md for each module."),
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),

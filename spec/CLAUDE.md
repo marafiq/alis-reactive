@@ -116,7 +116,7 @@ Alis.Reactive.Assets.
 | 7 | Inputs and ids | view author | an input bound to a member under MVC partials, and the refusals at render | Q14 |
 | 8 | Validation | validator author | a rule written once, the server's verdict and the browser's rule in agreement, registration through dependency injection | Q16 |
 | 9 | Partials and slots | view author | plan composition by plan id, slot load and unload | Q12, Q14 |
-| 10 | Realtime | view author | server push and hub triggers, whose messages are data | Q5, Q11 |
+| 10 | Realtime | view author | server-sent events and SignalR on both hosts: holds, lifecycle triggers, typed messages, the hub's own asset | Q5, Q11, Q21 |
 | 11 | Declarations | component author | the live-object and data vocabulary, and which members are required | Q5 |
 | 12 | Vendors | component author | vendor data, the one driver, mount and unmount, the bridge to a component's browser code | Q17 |
 | 13 | Plugins | component author | the escape hatch: a plugin by name with typed members | Q7 |

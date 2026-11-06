@@ -301,6 +301,8 @@ This is the spine. Answer each question in `spec/Core/DESIGN.md`, one section pe
 20. **Q20. Tracing** (the owner's correction, 2026-11-06: "Let's bake OpenTelemetry in the design. It's in scope now").
     - How the framework records a request from start to end, in the browser and on the server, by OpenTelemetry.
     - It is optional and never always on, and it helps while developing as it does in production.
+21. **Q21. Realtime** (the owner, 2026-11-06: "don't forget servers and events, SSE, and real-time signal. Those are mandatory too").
+    - Server-sent events and SignalR on both hosts: their standards, holds, lifecycle, messages, authentication and proof.
 
 ## 6. Evidence: verified at the State SHA on 2026-11-05
 Every file:line below was read at HEAD. Use these as calibration: G is what good looks like, B is what the design ends.
@@ -757,7 +759,7 @@ The schema kinds, `case` labels and analyzer IDs go to their own TSVs. The tests
     - a list rule inside an item whose list is not sent.
   - Then model the decided design (the sent-body read, with B and C), which must pass TLC.
 - **Owner gate 1:** present the core design as one decision:
-  - the 20 answers in one line each;
+  - the 21 answers in one line each;
   - the schema diff;
   - the TLC result lines.
 
@@ -820,7 +822,7 @@ Wait for the owner's yes.
 **Phase E: check and plan**
 
 **10. `check.py`, complete.** It prints:
-- Q1 to Q20 answered, as 20 of 20;
+- Q1 to Q21 answered, as 21 of 21;
 - each TLC spec green, with its result line;
 - the kind sets and their handlers;
 - doors: mapped, unmapped 0, doubled 0;
