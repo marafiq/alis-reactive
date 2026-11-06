@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://127.0.0.1:0");
 builder.Logging.ClearProviders();
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddAuthorization();
 var app = builder.Build();
@@ -43,6 +43,13 @@ try
     Console.WriteLine("core-number-text-culture: decimal 1234.5 shows " + 1234.5m.ToString(german) + "; double 0.1+0.2 shows " + (0.1 + 0.2).ToString(german) + "; double 1e21 shows " + 1e21.ToString(german) + "; double 1e15 shows " + 1e15.ToString(german));
     Console.WriteLine("core-number-text-exponent: 1e16 " + 1e16.ToString(german) + "; 1e20 " + 1e20.ToString(german) + "; 1e17 " + 1e17.ToString(german) + "; 1e-4 " + 1e-4.ToString(german) + "; 1e-5 " + 1e-5.ToString(german) + "; 123456.5e12 " + 123456.5e12.ToString(german) + "; 1e-7 " + 1e-7.ToString(german));
     Console.WriteLine("core-windows-zone-to-iana: Eastern Standard Time converts " + (TimeZoneInfo.TryConvertWindowsIdToIanaId("Eastern Standard Time", out var iana) ? iana : "to nothing") + "; India Standard Time converts " + (TimeZoneInfo.TryConvertWindowsIdToIanaId("India Standard Time", out var india) ? india : "to nothing"));
+    var page = await client.GetStringAsync("/page");
+    Console.WriteLine("core-partial-section-dropped: the card renders " + (page.Contains("card body") ? "its body" : "nothing") + " and " + (page.Contains("from-partial-section") ? "its section" : "not its section"));
+    var original = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(new Microsoft.AspNetCore.Mvc.ModelBinding.EmptyModelMetadataProvider(), new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary());
+    original.TemplateInfo.HtmlFieldPrefix = "Page";
+    var copy = new Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary(original);
+    copy.TemplateInfo.HtmlFieldPrefix = "Card";
+    Console.WriteLine("core-viewdata-copy-template-info: after the copy takes Card, the original's prefix is " + original.TemplateInfo.HtmlFieldPrefix);
     Console.WriteLine("core-stj-date-forms: DateTime " + System.Text.Json.JsonSerializer.Serialize(new DateTime(1990, 5, 1)) + "; DateTimeOffset " + System.Text.Json.JsonSerializer.Serialize(new DateTimeOffset(2026, 11, 6, 10, 0, 0, TimeSpan.FromHours(-8))) + "; UTC " + System.Text.Json.JsonSerializer.Serialize(new DateTime(2026, 11, 6, 18, 0, 0, DateTimeKind.Utc)));
     Console.WriteLine("core-stj-offset-into-datetime: reads as kind " + System.Text.Json.JsonSerializer.Deserialize<DateTime>("\"2026-11-06T10:00:00-08:00\"").Kind);
     Console.WriteLine("core-query-decimal-invariant: 1.5 binds " + await client.GetStringAsync("/amount?Value=1.5") + "; 1,5 binds " + await client.GetStringAsync("/amount?Value=1%2C5"));
@@ -124,6 +131,12 @@ public sealed class Counts
     public int Count { get; set; } = 5;
 
     public int? Maybe { get; set; } = 7;
+}
+
+public sealed class PageController : Controller
+{
+    [HttpGet("/page")]
+    public IActionResult Page() => View("~/Views/Probe/Page.cshtml");
 }
 
 public sealed class ProbeController : ControllerBase

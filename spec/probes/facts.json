@@ -521,6 +521,42 @@
       "probe": "spec/probes/cldr/windowsZones.xml.txt",
       "expect": "<mapZone other=\"Eastern Standard Time\" territory=\"001\" type=\"America/New_York\"/>",
       "source": "spec/probes/cldr/windowsZones.xml.txt:130"
+    },
+    {
+      "id": "core-partial-section-dropped",
+      "statement": "On net10 a partial's @section never renders and nothing says so; its body renders.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC views (.cshtml), spec/probes/AspNetCoreBinding/Views",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-partial-section-dropped: the card renders its body and not its section",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-viewdata-copy-template-info",
+      "statement": "On net10 a ViewDataDictionary copied from another has its own TemplateInfo, so a prefix set on the copy leaves the original's.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 ViewFeatures, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-viewdata-copy-template-info: after the copy takes Card, the original's prefix is Page",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "mvc5-viewdata-copy-shares-template-info",
+      "statement": "On net48 a ViewDataDictionary copied from another shares its TemplateInfo, so a prefix set on the copy moves the original's.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ViewDataDictionary.cs.txt",
+      "expect": "TemplateInfo = dictionary.TemplateInfo;",
+      "source": "spec/probes/aspnetwebstack/ViewDataDictionary.cs.txt:48"
+    },
+    {
+      "id": "mvc5-sections-checked-in-layouts-only",
+      "statement": "MVC 5 checks that defined sections render only in a layout page, so a partial's section is dropped without a word.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/WebPageBase.cs.txt",
+      "expect": "if (_body != null)",
+      "source": "spec/probes/aspnetwebstack/WebPageBase.cs.txt:443"
     }
   ]
 }

@@ -25,7 +25,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-05: work survives compaction. A correction is written here and in `spec/NOTES.md` the
   turn it is given, and the compact hook prints this section.
 - The owner, 2026-11-06: the request lifecycle keeps every feature and has a condensed default shape that
-  covers most requests; a developer overrides any part. Razor made parameters and conditions in views
+  covers most requests; a developer overrides any part. `.cshtml` MVC views made parameters and conditions
   complicated, and a more condensed typed syntax that loses no feature is welcome (step 7, gate 2).
 - The owner, 2026-11-06: a request runs in any event or callback; conditions work uniformly in every block
   of a request.
@@ -53,6 +53,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   time zone. The framework offers the time zone a view renders under as the app's choice, as culture is.
 - The owner, 2026-11-06: we design a framework, not a one-off case. A host difference is the framework's to
   absorb behind one door on both hosts; the net48 time zone maps its Windows id to IANA by a table made once.
+- The owner, 2026-11-06: the framework's views are `.cshtml` MVC views, on MVC 5 and ASP.NET Core MVC, never
+  Razor Pages; the spec says "view" or "MVC view", and "Razor" only inside a code path.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does

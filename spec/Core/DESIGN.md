@@ -800,7 +800,7 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   the form it checks and the form it sends. So a default route for 400 shows the errors at the request's own
   form. A part the request writes replaces or adds to its default, as D10.12 and D10.13 state. The condensed
   form and the full form write the same plan. The condensed form's syntax goes to gate 2 (step 7), with what
-  Razor makes hard in a view's lambdas as its input.
+  what a `.cshtml` MVC view makes hard in its lambdas as its input.
 
 **Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
 `HttpSend` and its result, `HttpResponse`.
