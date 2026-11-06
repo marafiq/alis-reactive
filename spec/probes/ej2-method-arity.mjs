@@ -28,6 +28,8 @@ function restricted(node) {
 let largest = { arity: -1, where: "" };
 let methods = 0;
 let pastFour = 0;
+let promising = 0;
+let promisingExample = "";
 for (const name of readdirSync(scope)) {
   const source = join(scope, name, "src");
   if (!name.startsWith("ej2") || !statSync(join(scope, name)).isDirectory()) continue;
@@ -42,6 +44,10 @@ for (const name of readdirSync(scope)) {
           methods += 1;
           const arity = member.parameters.length;
           if (arity > 4) pastFour += 1;
+          if (member.type && /^Promise\b/.test(member.type.getText(tree))) {
+            promising += 1;
+            if (!promisingExample) promisingExample = `${name} ${node.name.text}.${member.name.getText(tree)}: ${member.type.getText(tree)}`;
+          }
           if (arity > largest.arity) largest = { arity, where: `${name} ${node.name.text}.${member.name.getText(tree)}` };
         }
       }
@@ -55,3 +61,5 @@ console.log(`ej2 documented-public methods: ${methods}`);
 console.log(`ej2-max-public-method-arity: ${largest.arity}`);
 console.log(`ej2 method at the largest arity: ${largest.where}`);
 console.log(`ej2-methods-past-four-arguments: ${pastFour}`);
+console.log(`ej2-methods-returning-promise: ${promising}`);
+console.log(`ej2 first method returning a promise: ${promisingExample}`);

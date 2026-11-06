@@ -1,21 +1,26 @@
 ---- MODULE Lanes ----
-EXTENDS Naturals
+EXTENDS Naturals, Sequences
 
 CONSTANT Mutant
 
 Mutants == {"none", "DisposeLeavesRunsGoing", "AbortSkipsFinally", "ReplaceKeepsOld", "SkipStartsAnyway",
-            "AllSettledEarly", "BranchStopStopsOthers", "FinallyRunsTwice"}
+            "AllSettledEarly", "BranchStopStopsOthers", "FinallyRunsTwice",
+            "PayloadWriteAfterAwait", "ReleaseBeforeFinally"}
 
 ASSUME Mutant \in Mutants
 
 Runs == {"first", "second"}
 Branches == {"one", "two"}
+Steps == {"write", "await", "read"}
+Handlers == [1..3 -> Steps]
 
 VARIABLES policy, owner, pc, aborted, routeRan, finallyRan, afterRan, replaced, skipped,
-          ranWhileDisposed, branch, stoppedItself, allSettled, parallelDone
+          ranWhileDisposed, branch, stoppedItself, allSettled, parallelDone, released, finallyAfterRelease,
+          handler
 
 vars == <<policy, owner, pc, aborted, routeRan, finallyRan, afterRan, replaced, skipped,
-          ranWhileDisposed, branch, stoppedItself, allSettled, parallelDone>>
+          ranWhileDisposed, branch, stoppedItself, allSettled, parallelDone, released, finallyAfterRelease,
+          handler>>
 
 trigger == <<policy, owner, pc, aborted, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed>>
 parallel == <<branch, stoppedItself, allSettled, parallelDone>>
@@ -35,6 +40,9 @@ Init ==
     /\ stoppedItself = [b \in Branches |-> FALSE]
     /\ allSettled = 0
     /\ parallelDone = FALSE
+    /\ released = FALSE
+    /\ finallyAfterRelease = FALSE
+    /\ handler \in Handlers
 
 InFlight(r) == pc[r] = "inflight"
 
@@ -42,7 +50,7 @@ FireFirst ==
     /\ pc["first"] = "idle"
     /\ owner = "live"
     /\ pc' = [pc EXCEPT !["first"] = "inflight"]
-    /\ UNCHANGED <<policy, owner, aborted, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed, parallel>>
+    /\ UNCHANGED <<policy, owner, aborted, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed, parallel, released, finallyAfterRelease, handler>>
 
 FireSecond ==
     /\ pc["second"] = "idle"
@@ -63,13 +71,13 @@ FireSecond ==
               /\ pc' = [pc EXCEPT !["second"] = "inflight"]
               /\ skipped' = (policy = "skip" /\ InFlight("first"))
               /\ UNCHANGED <<aborted, replaced>>
-    /\ UNCHANGED <<policy, owner, routeRan, finallyRan, afterRan, ranWhileDisposed, parallel>>
+    /\ UNCHANGED <<policy, owner, routeRan, finallyRan, afterRan, ranWhileDisposed, parallel, released, finallyAfterRelease, handler>>
 
 Respond(r) ==
     /\ InFlight(r)
     /\ owner = "live" \/ Mutant = "DisposeLeavesRunsGoing"
     /\ pc' = [pc EXCEPT ![r] = "route"]
-    /\ UNCHANGED <<policy, owner, aborted, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed, parallel>>
+    /\ UNCHANGED <<policy, owner, aborted, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed, parallel, released, finallyAfterRelease, handler>>
 
 Route(r) ==
     /\ pc[r] = "route"
@@ -77,14 +85,15 @@ Route(r) ==
     /\ routeRan' = [routeRan EXCEPT ![r] = TRUE]
     /\ ranWhileDisposed' = (ranWhileDisposed \/ owner = "disposed")
     /\ pc' = [pc EXCEPT ![r] = "finally"]
-    /\ UNCHANGED <<policy, owner, aborted, finallyRan, afterRan, replaced, skipped, parallel>>
+    /\ UNCHANGED <<policy, owner, aborted, finallyRan, afterRan, replaced, skipped, parallel, released, finallyAfterRelease, handler>>
 
 Finally(r) ==
     /\ pc[r] = "finally"
     /\ finallyRan' = [finallyRan EXCEPT ![r] = @ + 1]
+    /\ finallyAfterRelease' = (finallyAfterRelease \/ released)
     /\ pc' = [pc EXCEPT ![r] = IF Mutant = "FinallyRunsTwice" /\ finallyRan[r] = 0 THEN "finally"
                                ELSE IF aborted[r] \/ owner = "disposed" THEN "ended" ELSE "after"]
-    /\ UNCHANGED <<policy, owner, aborted, routeRan, afterRan, replaced, skipped, ranWhileDisposed, parallel>>
+    /\ UNCHANGED <<policy, owner, aborted, routeRan, afterRan, replaced, skipped, ranWhileDisposed, parallel, released, handler>>
 
 After(r) ==
     /\ pc[r] = "after"
@@ -92,7 +101,7 @@ After(r) ==
     /\ afterRan' = [afterRan EXCEPT ![r] = TRUE]
     /\ ranWhileDisposed' = (ranWhileDisposed \/ owner = "disposed")
     /\ pc' = [pc EXCEPT ![r] = "done"]
-    /\ UNCHANGED <<policy, owner, aborted, routeRan, finallyRan, replaced, skipped, parallel>>
+    /\ UNCHANGED <<policy, owner, aborted, routeRan, finallyRan, replaced, skipped, parallel, released, finallyAfterRelease, handler>>
 
 EndOnDispose(s) ==
     CASE s \in {"inflight", "route"} -> IF Mutant = "AbortSkipsFinally" THEN "ended" ELSE "finally"
@@ -106,7 +115,7 @@ Dispose ==
          THEN UNCHANGED <<pc, aborted>>
          ELSE /\ pc' = [r \in Runs |-> EndOnDispose(pc[r])]
               /\ aborted' = [r \in Runs |-> aborted[r] \/ pc[r] \in {"inflight", "route"}]
-    /\ UNCHANGED <<policy, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed, parallel>>
+    /\ UNCHANGED <<policy, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed, parallel, released, finallyAfterRelease, handler>>
 
 Settle(b) ==
     /\ branch[b] = "inflight"
@@ -115,7 +124,15 @@ Settle(b) ==
                         THEN [c \in Branches |-> IF c = b \/ branch[c] = "inflight" THEN "stopped" ELSE branch[c]]
                         ELSE [branch EXCEPT ![b] = outcome]
          /\ stoppedItself' = [stoppedItself EXCEPT ![b] = (outcome = "stopped")]
-    /\ UNCHANGED <<trigger, allSettled, parallelDone>>
+    /\ UNCHANGED <<trigger, released, finallyAfterRelease, handler, allSettled, parallelDone>>
+
+Release ==
+    /\ owner = "disposed"
+    /\ ~released
+    /\ \A r \in Runs : pc[r] # "finally" \/ Mutant = "ReleaseBeforeFinally"
+    /\ released' = TRUE
+    /\ UNCHANGED <<policy, owner, pc, aborted, routeRan, finallyRan, afterRan, replaced, skipped, ranWhileDisposed,
+                   parallel, finallyAfterRelease, handler>>
 
 AllSettled ==
     /\ ~parallelDone
@@ -124,14 +141,26 @@ AllSettled ==
          ELSE \A b \in Branches : branch[b] # "inflight"
     /\ allSettled' = allSettled + 1
     /\ parallelDone' = TRUE
-    /\ UNCHANGED <<trigger, branch, stoppedItself>>
+    /\ UNCHANGED <<trigger, released, finallyAfterRelease, handler, branch, stoppedItself>>
 
 Next ==
-    \/ FireFirst \/ FireSecond \/ Dispose \/ AllSettled
+    \/ FireFirst \/ FireSecond \/ Dispose \/ Release \/ AllSettled
     \/ \E r \in Runs : Respond(r) \/ Route(r) \/ Finally(r) \/ After(r)
     \/ \E b \in Branches : Settle(b)
 
 Spec == Init /\ [][Next]_vars
+
+FirstAwait(h) == IF \E i \in 1..3 : h[i] = "await" THEN CHOOSE i \in 1..3 : h[i] = "await" /\ \A j \in 1..(i - 1) : h[j] # "await" ELSE 4
+
+Refused(h) == (\E i \in 1..3 : h[i] = "write" /\ i > FirstAwait(h)) /\ Mutant # "PayloadWriteAfterAwait"
+
+VendorSees(h) == {i \in 1..3 : h[i] = "write" /\ i < FirstAwait(h)}
+
+Writes(h) == {i \in 1..3 : h[i] = "write"}
+
+PayloadWritesInTheVendorsTurn == ~Refused(handler) => Writes(handler) = VendorSees(handler)
+
+FinallyRunsBeforeRelease == ~finallyAfterRelease
 
 DisposedRunsNothingMore == ~ranWhileDisposed
 

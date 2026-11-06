@@ -637,8 +637,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - D10.9 `Chained` runs after the first request's success route and its `Finally`, only on success, and reads the
   first response's data.
 - D10.10 `Parallel` sends its requests at once. Each runs its own route as its response arrives, a stop in one
-  ends that one only, and `OnAllSettled` runs once, after every request settled, whatever each outcome. The
-  steps after `Parallel` run after `OnAllSettled`.
+  ends that one only, and the steps after `Parallel` run once, after every request settled, whatever each
+  outcome. `OnAllSettled` writes the same plan as those steps, after the `all` statement in the same block
+  (`Alis.Reactive/PlanModel/Requests/ParallelStep.cs:28-35`): one meaning behind two doors, whose verdict goes
+  to gate 2.
 - D10.11 `Into(element)` loads the success body's HTML into the element as a slot (Q12): what the element held
   unloads first.
 - D10.12 Request defaults are configured once in C# and hold headers (D9.12), `WhileLoading` steps, `Finally`
@@ -658,6 +660,35 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - D10.15 Across attempts, the request's check, guards and argument run once, and every attempt sends the same
   argument. `WhileLoading` runs once before the first attempt, the route once for the last attempt's outcome,
   and `Finally` once after it. An owner disposed between attempts ends the retries (Q11).
+- D10.16 Conditions work in every block of a request, through the one condition core (Q8), and mean one thing
+  in each:
+  - A block that holds steps is a pipeline and takes `p.When` as every pipeline does: `WhileLoading`,
+    `Finally`, `OnSuccess`, each `OnError`, the block `Chained` runs and each `Parallel` branch. Today a
+    `Chained` request and a `Parallel` branch are one request each, with no pipeline around them
+    (`Alis.Reactive/PlanAuthoring/Requests/ResponseBuilder.cs:116`,
+    `Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:42`).
+  - A part the request sends takes a condition: a member `Set`, a form's inputs, a named field and a header.
+    When the condition fails, the part is left out, as if it were never gathered. The endpoint binds the
+    member's starting value (D9.10), and the form's check reads the member as the endpoint binds it (Q16).
+    A part whose condition fails is never sent as nothing, which a nullable member would bind as null.
+  - A chained request whose condition fails is not sent, and the steps after the first request run. A
+    parallel branch whose condition fails sends nothing and settles at once.
+  - The check takes no condition. The server checks by the same validator on every request, so a browser
+    check a condition skipped would disagree with the server's verdict. A check that depends on the model
+    is the validator's own `When` or `Unless` (Q8, Q16).
+  - The method, the URL and the body format take no condition: a request that differs in them is a second
+    request under a pipeline's `When`. The routes take none: the outcome picks the route (D10.13), and the
+    steps inside it take `p.When`.
+  - A part's condition is evaluated by the one evaluator before the check reads the body, once per request,
+    across every attempt (D10.15).
+- D10.17 A request has one lifecycle with every part, and a condensed form for the common request. A request
+  that writes only its method, its URL, what it sends and its success takes every other part from its
+  defaults (D10.12): the loading steps, `Finally`, the error routes and the retry policy. A default part is
+  written for each request where the view renders and reads that request's own parts: its method, its URL,
+  the form it checks and the form it sends. So a default route for 400 shows the errors at the request's own
+  form. A part the request writes replaces or adds to its default, as D10.12 and D10.13 state. The condensed
+  form and the full form write the same plan. The condensed form's syntax goes to gate 2 (step 7), with what
+  Razor makes hard in a view's lambdas as its input.
 
 **Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
 `HttpSend` and its result, `HttpResponse`.
@@ -672,6 +703,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `Request.tla:RetriesOnlyWhatIsRetryable`
 - `Request.tla:RetryStopsAtItsAttempts`
 - `Request.tla:OneLifecycleAcrossAttempts`
+- `Request.tla:FailedConditionLeavesThePartOut`
+- `Request.tla:ChainedOnlyWhenItsConditionHolds`
 - `Lanes.tla:AllSettledAfterEveryRequest`
 - `probe:fetch-follows-relative-redirect`
 - `probe:core-cookie-auth-ajax`
@@ -685,6 +718,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   result, net48 a JSON result with status 400 and `TrySkipIisCustomErrors`, replacing the body each app builds by hand.
 - `N10.2` new: `HttpResponse`, the contract of what `send` returns (`ok`, `status`, `outcome`, `body`).
 - `N10.3` new: the retry policy of D10.14, on the defaults and on a request; its door's form goes to gate 2.
+- `N10.4` new: a condition on a part a request sends, on a chained request and on a parallel branch (D10.16),
+  through the one condition core; its door's form goes to gate 2.
+- `N10.5` new: the condensed request of D10.17, whose default parts read the request's own parts; its form goes
+  to gate 2.
 
 **Evidence.**
 - The flow today: the check guards the sentence (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:85`), the exchange
@@ -715,3 +752,129 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `X10.9` type: a POST's retry policy that does not say the POST is repeatable retries nothing: new:N10.3.
 - `X10.7` behavior: on net48 under IIS, a 400 with validation errors shows each message at its input; the
   `verify-net48` run proves it.
+- `X10.10` behavior: a nullable member whose condition fails is not in the body the request sends, and the
+  endpoint answers with the member's starting value, not null.
+- `X10.11` behavior: a chained request whose condition fails is not sent, and the first request's success
+  steps and the steps after it ran.
+- `X10.12` behavior: a request that writes only its method, URL, form and success shows a 400's errors at its
+  own form, through the defaults' route.
+
+## Q11. Lanes and time
+
+**Decision.**
+- D11.1 Sync is the default. A pipeline runs its steps in authored order in the turn its trigger fires, and
+  waits only at an awaited step. A pipeline with no awaited step finishes in that turn.
+- D11.2 The awaited steps are closed, and the C# marks each as awaited where it writes it:
+  - an HTTP send, each `Parallel` branch's included, and the send whose HTML `Into` loads (the HTTP,
+    parallel HTTP and partial-injection lanes);
+  - a user decision, `Confirm`;
+  - a hub's `invoke` and `send`, the hub's async methods (the remote-trigger lane; a server push or a hub
+    message starts a run as a trigger, D11.6);
+  - a method declared with `MethodAsync`, called as a step or read as a source, on a component, a plugin, an
+    event payload or a returned object.
+- D11.3 Sync and async are decided by the declaration, never by what the browser finds (the owner,
+  2026-11-06). Any JavaScript API can return a promise: 120 documented-public EJ2 methods declare one
+  (`probe:ej2-methods-returning-promise`).
+  - A property, a data member and a method declared with `Method` are sync. A promise where one of them
+    was declared stops the pipeline with one logged error (Q4).
+  - A method declared with `MethodAsync` is awaited every time it runs. A rejection stops the pipeline,
+    logs one error and runs the enclosing request's `Finally`. The value it resolves to is read as data
+    (Q4).
+  - Today a call that was not awaited and gets a promise continues and logs only the rejection; the
+    rewrite refuses that meaning.
+  - A component declaration's `Method` and `MethodAsync` agree with the vendor's declared return type,
+    checked by the vendor-drift rule (Q17, Q20).
+- D11.4 The steps before a handler's first awaited step run inside the vendor's callback, so the vendor
+  sees what they write to the event's payload. A write to the trigger's payload after an awaited step is
+  refused where the view renders: the vendor read the payload when its callback returned. To keep a
+  drawer open while the user decides, the handler writes `Cancel` first, then asks, then calls the
+  drawer's close method on yes. Reading the payload after an awaited step stays allowed.
+- D11.5 The order is closed:
+  - The steps after an awaited step run after it settles.
+  - Two handlers of one event run in the order the plan subscribed them, each up to its first awaited
+    step before the next starts. After that, their runs go on as their awaits settle, and a stop ends
+    only its own handler (Q4).
+  - `Parallel` starts its branches in authored order in one turn, each up to its first awaited step. The
+    steps after `Parallel` run once, after every branch settled, and a stop in a branch ends only that
+    branch (D10.10).
+- D11.6 A request is a step, so it runs wherever a step runs:
+  - in a handler of any trigger: on load, an element's or a component's event, a declared app event, a
+    dispatch, a server push, a hub message;
+  - in a route, a `Confirm` branch, the block `Chained` runs, a `Parallel` branch, `WhileLoading` and
+    `Finally`.
+
+  A run belongs to the owner of the handler that started it: the page, or the slot whose plan holds the
+  handler (Q12).
+- D11.7 A handler's policy decides what a trigger does while that handler's previous run is in flight. The
+  policy belongs to the handler, not to a request.
+  - `overlap`, the default, as today, starts another run.
+  - `replace` aborts the run in flight and starts the new one, so a cascade's or a search's late answer
+    never overwrites a newer one. The aborted request runs no route, and its `Finally` runs once.
+  - `skip` starts nothing while a run is in flight, so a save clicked twice sends once.
+- D11.8 Dispose ends its owner's runs first, then releases what the owner holds.
+  - A request in flight is aborted through its fetch's abort signal and runs no route. Its `Finally` runs
+    once. A retry's wait ends (D10.15).
+  - An await the browser cannot abort (a `MethodAsync` promise, `Confirm`, a hub's `invoke`) settles
+    later, and its settling runs nothing.
+  - No route and no step after runs for a disposed owner.
+  - Every `Finally` runs before the owner releases its listeners, components and content, while its
+    elements are still on the page. So a `Finally` that hides the page's loader, or re-enables a button in
+    the slot, finds what it names. A `Finally`'s steps after its own first awaited step do not run for a
+    disposed owner.
+- D11.9 No step waits for time. The only waits the core owns are a retry's delay and a `Retry-After`
+  (D10.14). A component's own timers, such as a toast's or a loader's timeout, are its properties.
+
+**Schema nodes.** `do` and `let` with `await`, `all`, `try`, and the handler's policy, a field of `handler`
+(Q19). The abort signal is the run's, not the plan's: `HttpSend` carries none.
+
+**Checker.**
+- `Lanes.tla:DisposedRunsNothingMore`
+- `Lanes.tla:FinallyRunsWhenAborted`
+- `Lanes.tla:FinallyRunsOnce`
+- `Lanes.tla:FinallyRunsBeforeRelease`
+- `Lanes.tla:ReplacedRunRunsNoRoute`
+- `Lanes.tla:SkippedTriggerStartsNothing`
+- `Lanes.tla:AllSettledAfterEveryRequest`
+- `Lanes.tla:BranchStopEndsOnlyItself`
+- `Lanes.tla:PayloadWritesInTheVendorsTurn`
+- `Absence.tla:UnawaitedPromiseStops`
+- `Absence.tla:PromiseWhereValueStops`
+- `Absence.tla:StopEndsOnlyItsHandler`
+- `probe:ej2-methods-returning-promise`
+
+**Doors.**
+- kept: `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Confirm`, `Parallel`, the hub's `invoke` and
+  `send`.
+- `N11.1` new: a handler's policy, `overlap`, `replace` or `skip` (D11.7); its door's form goes to gate 2.
+- `N11.2` new: the refusal at render of a write to the trigger's payload after an awaited step (D11.4).
+
+**Evidence.**
+- A block runs sync until a statement returns a promise (`Alis.Reactive.Assets/runtime/grammar/execute.ts:16-21`).
+- A call that was not awaited and gets a promise continues and logs the rejection
+  (`Alis.Reactive.Assets/runtime/grammar/execute.ts:41-47`).
+- `all` waits for every block with `Promise.allSettled` (`Alis.Reactive.Assets/runtime/grammar/execute.ts:66-81`).
+- Handlers subscribe in plan order, and a handler's completion is never returned to the vendor
+  (`Alis.Reactive.Assets/runtime/plans/start.ts:43-66`).
+- The awaited steps today: the send (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:101`), `Confirm`
+  (`Alis.Reactive/PlanModel/Conditions/Condition.cs:504`), `MethodAsync` (`Alis.Reactive/Components/JsObject.cs:188`,
+  `Alis.Reactive/Components/JsObject.cs:252`), and the hub's `invoke` and `send` (`Alis.Reactive.Assets/runtime/realtime/hub.ts:128-135`).
+- A payload a vendor reads in its turn: `Cancel` on the drawer's close event (`Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:61`).
+- Dispose runs the owner's disposers and ends no run in flight (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40`);
+  `grep -rn AbortController Alis.Reactive.Assets/runtime` prints nothing at 65fdf118d.
+- A slot announces its unmount before its content is replaced (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38`).
+
+**Defects.**
+- `X11.1` refusal: a handler that writes `Cancel` after a `Confirm` is refused where the view renders with
+  "A write to the event's payload after an awaited step reaches no vendor: write it before the first
+  request, Confirm or async method."
+- `X11.2` behavior: a drawer whose close handler writes `Cancel` and then asks stays open while the dialog
+  asks, and closes on yes.
+- `X11.3` behavior: a method declared with `Method` whose vendor returns a promise stops its pipeline with
+  one logged error, and the step after it does not run.
+- `X11.4` behavior: a `MethodAsync` that rejects stops its pipeline, and its request's `Finally` hides the
+  loader.
+- `X11.5` behavior: a slot unloaded while its request is in flight runs no route of that request, and the
+  page's loader its `WhileLoading` showed is hidden.
+- `X11.6` behavior: under `replace`, a cascade whose first answer arrives after the second shows the
+  second's items.
+- `X11.7` behavior: under `skip`, a save clicked twice while its request is in flight sends one request.

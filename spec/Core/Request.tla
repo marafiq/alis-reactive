@@ -5,7 +5,8 @@ CONSTANT Mutant
 
 Mutants == {"none", "PlaceholderUnchecked", "DateInPath", "FileInJson", "NullForValueType",
             "FailedCheckSends", "FinallyWithoutLoading", "CatchAllBeatsStatus", "FailureRunsSuccess",
-            "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt"}
+            "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt",
+            "FailedConditionSendsNothing", "ChainedIgnoresCondition"}
 
 ASSUME Mutant \in Mutants
 
@@ -22,11 +23,11 @@ Bodies == {"json", "form"}
 
 VARIABLES part, config,
           checkPasses, loadingStops, guardOk, method, repeatable, policy, outcomes, reqRoutes, defRoutes,
-          routeStops, chained,
+          routeStops, chained, chainedWhen,
           pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan
 
 scenario == <<checkPasses, loadingStops, guardOk, method, repeatable, policy, outcomes, reqRoutes, defRoutes,
-              routeStops, chained>>
+              routeStops, chained, chainedWhen>>
 run == <<pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan>>
 vars == <<part, config, scenario, run>>
 
@@ -52,7 +53,7 @@ PlacementInit ==
     /\ config \in Configs
     /\ checkPasses = TRUE /\ loadingStops = FALSE /\ guardOk = TRUE /\ method = "GET" /\ repeatable = FALSE
     /\ policy = FALSE /\ outcomes = [i \in 1..MaxAttempts |-> "ok"] /\ reqRoutes = {} /\ defRoutes = {}
-    /\ routeStops = FALSE /\ chained = FALSE
+    /\ routeStops = FALSE /\ chained = FALSE /\ chainedWhen = TRUE
     /\ pc = "idle"
     /\ IdleRun
 
@@ -70,6 +71,7 @@ FlowInit ==
     /\ defRoutes \in SUBSET {"s503", "catchAll"}
     /\ routeStops \in BOOLEAN
     /\ chained \in BOOLEAN
+    /\ chainedWhen \in BOOLEAN
     /\ pc = "check"
     /\ IdleRun
 
@@ -92,6 +94,9 @@ Bound(kind, body, sent) ==
       [] kind = "valueType" /\ sent = "null" -> "noInstance"
       [] kind = "valueType" /\ sent = "emptyField" -> "modelError"
       [] OTHER -> "null"
+
+SentWhenItsConditionFails(kind, body) ==
+    IF Mutant = "FailedConditionSendsNothing" THEN Sent(kind, body) ELSE "leftOut"
 
 Expected(kind) == IF kind = "nullable" THEN "null" ELSE "start"
 
@@ -169,7 +174,8 @@ Finally ==
     /\ pc = "finally"
     /\ finallies' = finallies + 1
     /\ pc' = IF stopped /\ Mutant # "StepsAfterStop" THEN "done"
-             ELSE IF chained /\ ~stopped /\ (final = "ok" \/ Mutant = "ChainedAfterError") THEN "chained"
+             ELSE IF chained /\ ~stopped /\ (final = "ok" \/ Mutant = "ChainedAfterError")
+                     /\ (chainedWhen \/ Mutant = "ChainedIgnoresCondition") THEN "chained"
              ELSE "after"
     /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, routes, entered, stopped, final, routeRan, chainedRan, afterRan>>
 
@@ -199,6 +205,11 @@ RouteHoldsScalarText == (Placement /\ Built(config) /\ config.placeholder = "fil
 FileOnlyInFormData == (Placement /\ Built(config) /\ config.file = "set") => (config.method # "GET" /\ config.format = "form")
 
 NothingBindsAsDeclared == Placement => \A kind \in Kinds, body \in Bodies : Bound(kind, body, Sent(kind, body)) = Expected(kind)
+
+FailedConditionLeavesThePartOut ==
+    Placement => \A kind \in Kinds, body \in Bodies : Bound(kind, body, SentWhenItsConditionFails(kind, body)) = "start"
+
+ChainedOnlyWhenItsConditionHolds == chainedRan => chainedWhen
 
 FailedCheckSendsNothing == (Flow /\ ~checkPasses) => (sends = 0 /\ loadings = 0 /\ finallies = 0 /\ ~afterRan)
 

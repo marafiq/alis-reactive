@@ -269,6 +269,15 @@
       "probe": "fetch-redirect.mjs",
       "expect": "fetch-redirect-error-mode: TypeError",
       "source": "spec/probes/fetch-redirect.mjs"
+    },
+    {
+      "id": "ej2-methods-returning-promise",
+      "statement": "120 documented-public EJ2 methods declare a Promise return type; the first found is BarcodeGenerator.exportAsBase64Image: Promise<string>.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion",
+      "probe": "ej2-method-arity.mjs",
+      "expect": "ej2-methods-returning-promise: 120",
+      "source": "spec/probes/ej2-method-arity.mjs"
     }
   ]
 }
