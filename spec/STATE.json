@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 16,
-        "defects": 119,
+        "defects": 123,
         "total": 18
       },
       "detail": "Q17 absent; Q18 absent",
@@ -725,10 +725,10 @@
     },
     "probes": {
       "counts": {
-        "facts": 95,
-        "net10": 36,
-        "net48": 34,
-        "node": 25
+        "facts": 102,
+        "net10": 38,
+        "net48": 35,
+        "node": 29
       },
       "detail": "every fact printed by its probe or found at its source line",
       "pass": true
@@ -741,7 +741,7 @@
     "questions": {
       "counts": {
         "answered": 16,
-        "defects": 119,
+        "defects": 123,
         "total": 19
       },
       "detail": "Q17 absent; Q18 absent; Q19 absent",
@@ -1370,7 +1370,7 @@
     }
   },
   "passed": 7,
-  "read_at_head": "aded872c9ca3e274570973c9fd803476130276fa",
+  "read_at_head": "feb1f4046be87dcb0d690e6a156240098970e348",
   "step": {
     "failing": [
       "core_questions",

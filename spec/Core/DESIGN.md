@@ -653,6 +653,22 @@ Terms used throughout:
   (`probe:core-form-binds-indexed-name`); in a JSON body it is nested (D9.7). A component's member, a method's
   result, a page URL member, a hidden input and a literal fill a member the same way (Q7).
 
+- D9.13 A request's URL, query and headers follow their standards, and C# writes each part where the view renders.
+  - The URL is an RFC 3986 URI reference: a path on the page's origin, or an absolute `http` or `https` URI, split
+    into the parts of RFC 3986, section 3. Its path is segments, its query is the query, and a fragment is refused
+    (D9.4).
+  - A route value fills one path segment, percent-encoded as UTF-8 outside RFC 3986's unreserved characters
+    (`probe:js-route-segment-encoding`). A route value whose text holds `/` stops its request, as one that reads
+    nothing does (D9.5): net10 hands the action `%2F` still encoded (`probe:core-route-segment-decoding`), so the
+    value cannot reach the endpoint as it was.
+  - The query is `application/x-www-form-urlencoded` by the URL Standard, written by the browser's
+    `URLSearchParams`, so `+` is a space and a `+` in a value is `%2B` (`probe:js-query-encoding`). Both hosts read
+    it back as written (`probe:core-query-decoding`, `probe:net48-query-plus-space`).
+  - A header field value is RFC 9110's (section 5.5): visible US-ASCII, spaces and tabs, and the white space
+    around it is not part of it, as fetch sends it (`probe:js-header-trim`). A fixed value outside that set is
+    refused where the view renders, and a value read outside it, a line break or a character past US-ASCII, stops
+    its request before it is sent; fetch itself refuses a line break and a character past Latin-1
+    (`probe:js-header-values`).
 **Schema nodes.** `let` with `await`, `call` on the plugin `http`, `record`, `list`, `lit`, `get`, `as`, `op`; the
 shape `file`; the contract `HttpSend`, which is no node kind.
 
@@ -666,6 +682,13 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `probe:core-frombody-no-body`
 - `probe:core-frombody-binds-json-name`
 
+- `probe:js-route-segment-encoding`
+- `probe:core-route-segment-decoding`
+- `probe:js-query-encoding`
+- `probe:core-query-decoding`
+- `probe:net48-query-plus-space`
+- `probe:js-header-values`
+- `probe:js-header-trim`
 **Doors.**
 - kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:58-62`), `Gather` and
   `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`, `Form()`,
@@ -707,6 +730,11 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `X9.8` behavior: a non-nullable member that reads nothing is left out of the JSON body, and the endpoint binds
   its starting value with no model error.
 - `X9.9` behavior: a route value that reads nothing sends no request, runs its `Finally`, and runs no step after it.
+- `X9.10` behavior: a route value read as "a/b" sends no request and runs its `Finally`.
+- `X9.11` behavior: a query member read as "a b+c&d" reaches the endpoint as "a b+c&d".
+- `X9.12` refusal: a fixed header value with a line break: "The header {name} holds a line break, which HTTP does
+  not carry in a field value; send it in the body."
+- `X9.13` behavior: a header read as text past US-ASCII sends no request, and the console names the header.
 
 ## Q10. The request's flow and its response
 

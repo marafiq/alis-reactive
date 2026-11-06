@@ -854,6 +854,69 @@
       "probe": "ej2-template.mjs",
       "expect": "ej2-template-guarded-holder: a read inside the engine's condition on its holder renders <b></b> for no holder and <b>Ann</b> for one",
       "source": "spec/probes/ej2-template.mjs"
+    },
+    {
+      "id": "js-route-segment-encoding",
+      "statement": "encodeURIComponent percent-encodes a slash, a space, a plus, a question mark and non-ASCII as UTF-8.",
+      "host": "node",
+      "oracle": "node's encodeURIComponent, URLSearchParams and Headers",
+      "probe": "js-url-parts.mjs",
+      "expect": "js-route-segment-encoding: encodeURIComponent writes \"a/b c+d?é\" as a%2Fb%20c%2Bd%3F%C3%A9",
+      "source": "spec/probes/js-url-parts.mjs"
+    },
+    {
+      "id": "js-query-encoding",
+      "statement": "URLSearchParams writes a space as + and a + as %2B.",
+      "host": "node",
+      "oracle": "node's encodeURIComponent, URLSearchParams and Headers",
+      "probe": "js-url-parts.mjs",
+      "expect": "js-query-encoding: URLSearchParams writes q=\"a b+c&d\" as q=a+b%2Bc%26d",
+      "source": "spec/probes/js-url-parts.mjs"
+    },
+    {
+      "id": "js-header-values",
+      "statement": "fetch's Headers refuses a line break and a character past Latin-1.",
+      "host": "node",
+      "oracle": "node's encodeURIComponent, URLSearchParams and Headers",
+      "probe": "js-url-parts.mjs",
+      "expect": "js-header-values: \"a\\nb\" TypeError; \" padded \" taken; \"é\" taken; \"€\" TypeError",
+      "source": "spec/probes/js-url-parts.mjs"
+    },
+    {
+      "id": "js-header-trim",
+      "statement": "fetch's Headers drops the white space around a value.",
+      "host": "node",
+      "oracle": "node's encodeURIComponent, URLSearchParams and Headers",
+      "probe": "js-url-parts.mjs",
+      "expect": "js-header-trim: a value with outer spaces is sent as \"padded\"",
+      "source": "spec/probes/js-url-parts.mjs"
+    },
+    {
+      "id": "core-route-segment-decoding",
+      "statement": "net10 decodes a route value's percent-encoding except %2F, which reaches the action still encoded.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-route-segment-decoding: a%2Fb%20c%2Bd%3F%C3%A9 reaches the action as \"a%2Fb c\\u002Bd?\\u00E9\"",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-decoding",
+      "statement": "net10 reads + in the query as a space and %2B as a plus.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-decoding: q=a+b%2Bc%26d binds \"a b\\u002Bc\\u0026d\"",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "net48-query-plus-space",
+      "statement": "System.Web decodes a + in the query as a space.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/HttpEncoder.cs.txt",
+      "expect": "if (ch == '+') {",
+      "source": "spec/probes/referencesource/HttpEncoder.cs.txt:566"
     }
   ]
 }
