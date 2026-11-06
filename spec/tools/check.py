@@ -203,7 +203,7 @@ def check_inventory():
 
 RUNGS = {"type", "analyzer", "refusal", "behavior"}
 CITE = re.compile(r"([A-Za-z0-9_.\-/]+\.(?:cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|cshtml|js|sh|yml)):(\d+)(?:-(\d+))?")
-CHECKER = re.compile(r"`(?:([A-Za-z]+)\.tla:(\w+)|probe:([\w.\-]+))`")
+CHECKER = re.compile(r"`(?:([A-Za-z]+)\.tla:(\w+)|probe:([\w.\-]+)|check:(\w+))`")
 DEFECT = re.compile(r"^- `?(X\d+\.\d+)`? (type|analyzer|refusal|behavior): (.+)$")
 NEW_DOOR = re.compile(r"`?(N\d+\.\d+)`?")
 EVIDENCE_IDS = [f"G{n}" for n in range(1, 11)] + [f"B{n}" for n in range(1, 17)] + [f"P{n}" for n in range(1, 6)]
@@ -302,7 +302,11 @@ def judge_section(question, lines, new_doors, analyzer_ids, probes):
     checkers = CHECKER.findall(parts["Checker"])
     if not checkers:
         problems.append("Checker names no invariant or probe")
-    for spec, invariant, probe in checkers:
+    for spec, invariant, probe, check in checkers:
+        if check:
+            if check not in {identifier for identifier, _, _ in CHECKS}:
+                problems.append(f"Checker check:{check} is no check.py check")
+            continue
         if probe:
             if probe not in probes:
                 problems.append(f"Checker probe:{probe} is not in spec/probes/facts.json")
@@ -459,6 +463,14 @@ def check_probes():
     outputs = {}
     problems = []
     for fact in facts:
+        if fact["host"] == "node":
+            script = SPEC / "probes" / fact["probe"]
+            if script not in outputs:
+                completed = subprocess.run(["node", str(script)], capture_output=True, text=True, cwd=REPO)
+                outputs[script] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
+            if fact["expect"] not in outputs[script]:
+                problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
+            continue
         if fact["host"] == "net48":
             source, _, number = fact["source"].rpartition(":")
             lines = (REPO / source).read_text().splitlines() if (REPO / source).is_file() else []
@@ -472,7 +484,7 @@ def check_probes():
         if fact["expect"] not in outputs[probe]:
             problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
     return result(not problems, "; ".join(problems[:6]) or "every fact printed by its probe or found at its source line",
-                  facts=len(facts), net10=sum(1 for fact in facts if fact["host"] == "net10"), net48=sum(1 for fact in facts if fact["host"] == "net48"))
+                  facts=len(facts), net10=sum(1 for fact in facts if fact["host"] == "net10"), net48=sum(1 for fact in facts if fact["host"] == "net48"), node=sum(1 for fact in facts if fact["host"] == "node"))
 
 
 def regression_shas():
