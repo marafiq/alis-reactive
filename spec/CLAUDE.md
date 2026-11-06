@@ -58,6 +58,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: the framework controls every input's id. Without it the browser starts guessing,
   validation does not find its inputs, and views of different partials that share an id conflict; the
   declaring-class id is that decision.
+- The owner, 2026-11-06: templates have a typed way to write HTML, with much room to grow; keep it. What
+  changes is what it compiles to: today it relies on Syncfusion's compile.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does

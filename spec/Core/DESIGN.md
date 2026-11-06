@@ -1338,6 +1338,11 @@ and `request` state, which the schema does not hold: a request's state is its ru
   and the event's handlers are plan handlers like any other (Q11).
 - D15.6 Developer-written markup stays: `Raw(html)` takes static HTML the developer writes, never a read from
   the item.
+- D15.7 The typed HTML builder is the template's door, kept whole and grown (the owner, 2026-11-06): its
+  element doors, typed member reads and nesting stay as a developer writes them today, and only what it
+  compiles to changes, from Syncfusion's engine text to the typed tree of D15.3. Since the tree serves any
+  component that takes a function template, the builder belongs to the core, and Fusion and Native use it
+  as an app does.
 
 **Schema nodes.** `fn` (the item to the tree), `record`, `list`, `get`, `as`, `op`, the plugin `alis.template`, and the
 template tree as a typed plugin argument (Q19), so the grammar gains no node.
@@ -1354,6 +1359,7 @@ template tree as a typed plugin argument (Q19), so the grammar gains no node.
 - kept: `FusionTemplate.Create<T>()` and its element doors (`Text`, `Span`, `Div`, `Badge`, `Icon`, `Img`, `Link`,
   `EventButton`, `Raw`), the template properties of each component.
 - `N15.1` new: the template tree, a typed plugin argument of `alis.template`, and the plugin that renders it.
+- `N15.3` new: the typed HTML builder in the core, the one template door for every component (D15.7).
 - `N15.2` new: the template's condition, written with the one condition syntax over the item; its form goes to
   gate 2. It carries `When(Expression<Func<TModel, bool>>)` and `FusionConditionalBuilder`, whose lambda form is
   refused.
