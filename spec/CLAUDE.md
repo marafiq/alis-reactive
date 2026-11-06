@@ -60,6 +60,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   declaring-class id is that decision.
 - The owner, 2026-11-06: templates have a typed way to write HTML, with much room to grow; keep it. What
   changes is what it compiles to: today it relies on Syncfusion's compile.
+- The owner, 2026-11-06: bad patterns start small and spiral, so each mechanism stays limited to its exact use
+  case. Browser and server validation work from one fact, a rule written once and never twice.
+- The owner, 2026-11-06: MVC partials are a great feature for dynamic UI: a partial loads where a condition
+  holds and leaves when it changes (a state whose form needs 10 fields, another whose form needs 20). Each
+  partial has its own tight model, and validation rules are written for that model; more models, decoupled,
+  and the plan stays tight, never carried on the HTTP request or by weak typing. The request lifecycle with all
+  its features and its condensed default form is the game changer.
+- The owner, 2026-11-06: a partial is attached to its parent's plan (one model with several associations) or
+  independent (loaded where a condition holds, its own thing), and both work. Partials nest: inside a plan a
+  view renders another, entirely different view with its own plan and its own children. Main merged plans by
+  an algorithm on purpose; the rewrite improves on it from the framework's core.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
