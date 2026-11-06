@@ -5,7 +5,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
 {
     /// <summary>
     /// Training calendar: November 2026 staff training, opened on Thursday the 5th. A session's card opens its
-    /// details in the drawer, and Agenda lists the sessions of the week that was on screen.
+    /// details in the drawer, which show a reminder sent for the session, and Agenda lists the sessions of the
+    /// week that was on screen.
     /// </summary>
     public partial class ScheduleController
     {
@@ -35,8 +36,8 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Components.Fusion
         {
             var session = TrainingSessions.Single(candidate => candidate.Id == request.SessionId);
             return Ok(session.IncompleteCount == 0
-                ? new TrainingCalendarReminderSent("Nothing to send", $"Everyone has completed {session.Subject}.")
-                : new TrainingCalendarReminderSent("Reminder sent", $"Reminded {session.IncompleteCount} staff to complete {session.Subject}."));
+                ? new TrainingCalendarReminderSent(session.Id, "Nothing to send", $"Everyone has completed {session.Subject}.")
+                : new TrainingCalendarReminderSent(session.Id, "Reminder sent", $"Reminded {session.IncompleteCount} staff to complete {session.Subject}."));
         }
     }
 }

@@ -57,6 +57,9 @@
                  .SetContent(json, x => x.Message)
                  .Success()
                  .Show();
+             s.DispatchWith<TrainingCalendarReminded>("training:reminded", d => d
+                 .Set(x => x.SessionId, json.Read(r => r.SessionId))
+                 .Set(x => x.Message, json.Read(r => r.Message)));
          }));
     }));
 }
@@ -65,7 +68,7 @@
     <native-heading level="H1">Training Calendar</native-heading>
     <native-text color="Secondary">
         November staff training. A session's card shows who still has to complete it, opens its details and reminds
-        those staff; Agenda lists the sessions of the week on screen.
+        those staff, and open details say when a reminder went out; Agenda lists the sessions of the week on screen.
     </native-text>
     <p id="training-calendar-status" class="text-sm text-text-muted">Loading training sessions...</p>
 

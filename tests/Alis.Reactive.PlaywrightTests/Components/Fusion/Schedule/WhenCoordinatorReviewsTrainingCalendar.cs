@@ -2,8 +2,9 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 
 /// <summary>
 /// As a training coordinator, I want each session's card to tell me whether everyone completed it, to open its
-/// details with nothing of the calendar left over them, and to remind the staff who have not, and I want Agenda
-/// to list the sessions of the week I was looking at, so that I never miss a session.
+/// details with nothing of the calendar left over them, and to remind the staff who have not, with the details
+/// saying so while they are open, and I want Agenda to list the sessions of the week I was looking at, so that I
+/// never miss a session.
 /// </summary>
 /// <remarks>
 /// The calendar opens on Thursday, November 5, 2026. Week view shows November 1 to 7: the Hand hygiene audit on
@@ -22,6 +23,8 @@ public class WhenCoordinatorReviewsTrainingCalendar : PlaywrightTestBase
     private ILocator SessionTooltip => Page.GetByRole(AriaRole.Tooltip);
     private ILocator DrawerContent => Page.Locator("#alis-drawer-content");
     private ILocator Toast => Page.Locator("#alisFusionToast");
+    private ILocator DetailsReminder => Page.Locator("#training-session-reminder");
+    private ILocator CloseDrawer => Page.Locator("#alis-drawer-close");
 
     private async Task NavigateAndLoadTheMonth()
     {
@@ -42,6 +45,13 @@ public class WhenCoordinatorReviewsTrainingCalendar : PlaywrightTestBase
         await OpenTheCard(FireSafetyDrill, "Dana Whitfield");
         await ClickWhenStable(SessionCard.GetByRole(AriaRole.Button, new() { Name = "Details", Exact = true }));
         await Expect(DrawerContent.GetByText("Trainer: Dana Whitfield", new() { Exact = true })).ToBeVisibleAsync();
+    }
+
+    private async Task OpenTheHandHygieneAuditDetails()
+    {
+        await OpenTheCard(HandHygieneAudit, "Grace Kim");
+        await ClickWhenStable(SessionCard.GetByRole(AriaRole.Button, new() { Name = "Details", Exact = true }));
+        await Expect(DrawerContent.GetByText("Trainer: Grace Kim", new() { Exact = true })).ToBeVisibleAsync();
     }
 
     private async Task RemindTheHandHygieneAuditStaff()
@@ -143,6 +153,60 @@ public class WhenCoordinatorReviewsTrainingCalendar : PlaywrightTestBase
     public async Task a_reminder_toast_says_the_servers_message()
     {
         await NavigateAndLoadTheMonth();
+
+        await RemindTheHandHygieneAuditStaff();
+
+        await Expect(Toast.Locator(".e-toast-content")).ToHaveTextAsync("Reminded 3 staff to complete Hand hygiene audit.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_reminder_sent_from_a_sessions_details_shows_in_them()
+    {
+        await NavigateAndLoadTheMonth();
+        await OpenTheHandHygieneAuditDetails();
+
+        await ClickWhenStable(DrawerContent.GetByRole(AriaRole.Button, new() { Name = "Send reminder", Exact = true }));
+
+        await Expect(DetailsReminder).ToHaveTextAsync("Reminded 3 staff to complete Hand hygiene audit.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task details_closed_by_their_close_button_no_longer_react_to_a_reminder()
+    {
+        await NavigateAndLoadTheMonth();
+        await OpenTheHandHygieneAuditDetails();
+        await ClickWhenStable(CloseDrawer);
+        await Expect(DrawerContent).ToBeEmptyAsync();
+
+        await RemindTheHandHygieneAuditStaff();
+
+        await Expect(Toast.Locator(".e-toast-content")).ToHaveTextAsync("Reminded 3 staff to complete Hand hygiene audit.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task details_closed_by_escape_no_longer_react_to_a_reminder()
+    {
+        await NavigateAndLoadTheMonth();
+        await OpenTheHandHygieneAuditDetails();
+        await Page.Keyboard.PressAsync("Escape");
+        await Expect(DrawerContent).ToBeEmptyAsync();
+
+        await RemindTheHandHygieneAuditStaff();
+
+        await Expect(Toast.Locator(".e-toast-content")).ToHaveTextAsync("Reminded 3 staff to complete Hand hygiene audit.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task details_closed_by_their_done_button_no_longer_react_to_a_reminder()
+    {
+        await NavigateAndLoadTheMonth();
+        await OpenTheHandHygieneAuditDetails();
+        await ClickWhenStable(DrawerContent.GetByRole(AriaRole.Button, new() { Name = "Done", Exact = true }));
+        await Expect(DrawerContent).ToBeEmptyAsync();
 
         await RemindTheHandHygieneAuditStaff();
 

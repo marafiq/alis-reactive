@@ -28,5 +28,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
     }
 
     /// <summary>What the server reports after a reminder, in the words the toast shows.</summary>
-    public sealed record TrainingCalendarReminderSent(string Title, string Message);
+    public sealed record TrainingCalendarReminderSent(int SessionId, string Title, string Message);
+
+    /// <summary>The reminder the page announces, so the open session details can say it was sent.</summary>
+    public class TrainingCalendarReminded
+    {
+        public int SessionId { get; set; }
+        public string Message { get; set; } = "";
+    }
 }
