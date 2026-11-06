@@ -1937,6 +1937,11 @@ plans (Q19).
 
   The contract is the app's options' `JsonTypeInfo`, from a source-generated context or from System.Text.Json's
   own resolver, so whatever reflection exists is System.Text.Json's, not the framework's.
+
+  One read beside the three: the walk up a class's base types (`Type.BaseType`) that finds the contract of the
+  class declaring an overridden member (D18.3). `System.Type` derives from `MemberInfo`; the ban of D18.4 misses
+  `BaseType` only because `Type` is declared in `System`. The walk lists no member and reads no attribute. Gate 1
+  asks the owner whether it is within the no-reflection rule or goes on the exception list.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):
@@ -1958,8 +1963,8 @@ plans (Q19).
   - an overridden member that a view's expression names (the owner, 2026-11-06: "Override cannot change it"). The
     expression carries the declaration (`d => d.Room` names `Person.Room`), and the derived class's contract holds
     the override. The member is named as the contract of the class that declares it names it, found up the class's
-    base types (`Type.BaseType`, which reads no member and no attribute), and the class the read starts from must
-    write that name, or the read is refused as unwritten. No `MemberInfo.Name` and no exception to D18.4.
+    base types (`Type.BaseType`, D18.1), and the class the read starts from must write that name, or the read is
+    refused as unwritten. No `MemberInfo.Name` is read.
   - System.Text.Json's contracts for an override (probe, net10, the reflection resolver): an override that keeps
     its declaration's name is one member of the derived contract; one that renames is written twice, under both
     names; one marked `JsonIgnore` leaves the name unwritten; a second member that takes the declaration's name is

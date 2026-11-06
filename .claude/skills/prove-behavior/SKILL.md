@@ -32,6 +32,9 @@ scripts/plant-defect.sh --project poc --filter "FullyQualifiedName~Properties" -
 - **caught**: read the failure message the tool prints. It must be the test's own assertion missing the outcome the
   promise names, such as expected 'Fully staffed' but was 'Short staffed'. A timeout waiting for the page, a
   missing element or every test red means the defect broke the page, not the promise: choose a narrower one.
+  One case is a catch with a timeout: the promise is that a view renders a read, and the only way to break it is
+  to refuse the view. Then the page never boots; the evidence is the refusal's own text in the screenshot the test
+  host keeps on failure, with every other test passing.
 - **ESCAPED**: the test does not fail for its defect. Either the assertion is one the defect also satisfies, so the
   test gets a positive control or an exact value, or the defect changes nothing anyone can observe. Then the planted
   code is not a behavior: record the finding in `spec/NOTES.md`, and the code either gains a meaning a real case
