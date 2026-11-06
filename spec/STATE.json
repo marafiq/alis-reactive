@@ -7,12 +7,12 @@
     },
     "core_questions": {
       "counts": {
-        "answered": 16,
-        "defects": 123,
+        "answered": 18,
+        "defects": 134,
         "total": 18
       },
-      "detail": "Q17 absent; Q18 absent",
-      "pass": false
+      "detail": "every question answered with resolving evidence, checker and rungs",
+      "pass": true
     },
     "core_tlc": {
       "counts": {
@@ -630,11 +630,11 @@
     },
     "evidence": {
       "counts": {
-        "placed": 26,
+        "placed": 31,
         "total": 31
       },
-      "detail": "unplaced: G1, G2, G5, B13, B16",
-      "pass": false
+      "detail": "every G, B and P item has a home",
+      "pass": true
     },
     "features_core": {
       "counts": {},
@@ -740,11 +740,11 @@
     },
     "questions": {
       "counts": {
-        "answered": 16,
-        "defects": 123,
+        "answered": 18,
+        "defects": 134,
         "total": 19
       },
-      "detail": "Q17 absent; Q18 absent; Q19 absent",
+      "detail": "Q19 absent",
       "pass": false
     },
     "rewrite_units": {
@@ -1369,11 +1369,10 @@
       "pass": false
     }
   },
-  "passed": 7,
-  "read_at_head": "feb1f4046be87dcb0d690e6a156240098970e348",
+  "passed": 9,
+  "read_at_head": "08825ab13eed36c0dd26f1747cea9f4d0c0339d7",
   "step": {
     "failing": [
-      "core_questions",
       "history"
     ],
     "name": "Q1 to Q18, TLA+ specs, probes, history",

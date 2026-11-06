@@ -1637,6 +1637,8 @@ grammar gains no node (G2).
   and the rest pass to the browser with .NET's flags (`Alis.Reactive/Validation/Checks.cs:156-159`).
 - The browser's Url pattern (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:152`) against the server's
   `Uri.TryCreate` (`Alis.Reactive/Validation/Checks.cs:206-207`).
+- G2: validation adds no grammar node; a check is `$form.validate` over plugin data, and the body it checks is a
+  `fn` the plan writes (`Alis.Reactive/PlanModel/Validation/FormWriter.cs:19-30`).
 
 **Defects.**
 - `X16.1` type: a request checked by a validator of another model does not compile: new:N16.2.
@@ -1669,3 +1671,172 @@ grammar gains no node (G2).
   WhenOnServer or UnlessOnServer."
 - `X16.14` refusal: on net48, a start the binder cannot create: "{Type} has no public parameterless constructor, so
   the endpoint cannot bind it; give {Type} a public parameterless constructor."
+
+## Q17. Vendors and inversion
+
+**Decision.**
+- D17.1 The dependency is inverted (the owner, 2026-11-06). The core depends on no consumer, and no consumer is
+  special:
+  - Syncfusion's components, the native components and every component an app brings are consumers, built on the
+    core's public surface. Fusion and Native get nothing an app does not.
+  - The core exposes only what onboarding a component needs, and it takes no vendor library: the framework's own
+    typed request lifecycle feeds components, and no vendor's data layer is the core's.
+  - The framework onboards no component itself; any developer onboards one.
+- D17.2 A component, shipped or brought, is one declaration class and a render helper. The declaration names the
+  component's members and events by their JavaScript names, and the render helper renders its element. Every
+  component reaches the browser through the core, with no TypeScript change: a component that seems to need one
+  means the plan is missing information, and C# carries it.
+- D17.3 A vendor is data that a declaration carries (G5), in a closed set the one driver follows:
+  - where the object lives on the element, a path (Q1);
+  - how a listener subscribes, a subscribe and unsubscribe method pair or a callback property the driver assigns;
+  - what a listener receives.
+
+  The runtime names no vendor. The core knows the DOM's `EventTarget` as the platform's own vendor, and no
+  library's.
+- D17.4 What a listener receives is declared per event in C#, from a closed set: the callback's first argument, the
+  DOM `Event`, or a `CustomEvent`'s `detail`. The driver follows the declaration, and the runtime's `instanceof`
+  reading of the payload leaves (B12).
+- D17.5 A declaration follows its vendor's public contract, and the build checks it:
+  - A member is declared only when the vendor's type declarations make it public. A `@private` member is a gap to
+    name, and public members compose what it would do.
+  - A method whose declared return is a `Promise` is declared with `MethodAsync`, and every other method with
+    `Method` (Q4, Q11). FusionGrid's three exports drift today (B15).
+  - The check is an analyzer over a contract file. The TypeScript compiler reads the vendor's type declarations at
+    the pinned version and writes each public member, with its kind and whether it returns a promise, into a JSON
+    contract kept in the repo. The analyzer reads that contract as an additional file and fails a declaration that
+    differs from it. A developer who brings a component runs the same script on their vendor.
+- D17.6 Every vendor package is pinned to one exact version, its sub-packages included, and its npm and NuGet
+  versions move together (B16). The contract file of D17.5 is written again at every upgrade, so a vendor's drift
+  fails the build at the upgrade.
+- D17.7 A vendor's name is checked by its characters, a letter and then letters, digits, `_` or `-`, with no regular
+  expression (D16.10).
+- D17.8 Two reference components prove the vendor contract on paper in step 8, FusionMultiSelect and a native
+  reference, each declaration against the schema, and later in the browser.
+
+**Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path, its listening kind and
+the payload kind of each event; `handler`, which names its event and vendor.
+
+**Checker.**
+- `Ownership.tla:NoUnsubscribeOnDestroyed`
+- `Ownership.tla:ListenersDoNotAccumulate`
+- `Lanes.tla:PayloadWritesInTheVendorsTurn`
+- `probe:ej2-methods-returning-promise`
+- `probe:ej2-destroy-removes-instance`
+- `probe:ej2-max-public-method-arity`
+
+**Doors.**
+- kept: `ComponentVendor.Define`, `ComponentVendor.DefineCallbackProperties`, `ComponentVendor.Native`,
+  `ComponentVendor.Name`, `VendorEventPayload`, and the declaration vocabulary of `JsObject` (`Method`,
+  `MethodAsync`, properties, events).
+- `N17.1` new: the payload kind of an event, declared with the event (D17.4); its form goes to gate 2.
+- `N17.2` new: the vendor contract file and the analyzer that checks declarations against it (D17.5).
+
+**Evidence.**
+- G5: the driver switches only on the listening kind (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:28-33`),
+  and a vendor is the data `ComponentVendor` carries (`Alis.Reactive/Vendors/ComponentVendor.cs:38-52`).
+- B12: what a listener receives is read by `instanceof` (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:89-92`).
+- B15: FusionGrid declares its three exports with `Method()` (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:207-213`),
+  while EJ2's grid declaration returns a `Promise` from `excelExport` at line 3849 of its `grid.d.ts`, and 120 EJ2
+  public methods declare one (`probe:ej2-methods-returning-promise`).
+- B16: only the meta-package is exact (`Alis.Reactive.SandboxApp/package.json:25`); its sub-packages follow tilde
+  ranges (`package-lock.json:1717-1726`), so `ej2-base` resolves to 33.1.45 under 33.1.47.
+- A regular expression checks a vendor's name (`Alis.Reactive/Vendors/ComponentVendor.cs:10-11`).
+
+**Defects.**
+- `X17.1` analyzer: a method declared with `Method` whose vendor contract returns a promise: new:N17.2.
+- `X17.2` analyzer: a declared member the vendor contract does not list as public: new:N17.2.
+- `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
+  dispatch.
+- `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every
+  step kind (a read, a write, a call, an event) with no change to the framework.
+- `X17.5` refusal: a vendor name outside its characters: "Vendor name '{name}' must start with a letter and contain
+  only ASCII letters, digits, underscore, or hyphen."
+
+## Q18. Type knowledge without reflection
+
+**Decision.**
+- D18.1 The framework knows a model from three sources and runs no reflection of its own:
+  - expression trees, for the member a view, a validator or a request names, its declaring class (D14.3) and its
+    static type;
+  - generics, for the types a door is written over: a validator's `T`, `RuleForEach`'s `TElement`, a request's
+    `TRequest`, a literal's `T`, a payload's `TPayload`;
+  - the app's System.Text.Json contract, for what a type holds on the wire: its members, their JSON names under
+    the app's options (D2.9), the members the options ignore, a collection's item type, and a type's starting
+    values (D16.6).
+
+  The contract is the app's options' `JsonTypeInfo`, from a source-generated context or from System.Text.Json's
+  own resolver, so whatever reflection exists is System.Text.Json's, not the framework's.
+- D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
+  dictionary. The three finders of today leave.
+- D18.3 Each reflection site of today gets its verdict (B11):
+  - a new model built by `Activator` and constructors: System.Text.Json's object read from `{}` (D16.6);
+  - object and enum literals read member by member: the literal is written by System.Text.Json under the app's
+    options, through the literal's `T`;
+  - a markup payload read by `GetValue`: the payload is written by System.Text.Json through its `TPayload`;
+  - a request member found by name, ignoring case: a request sends a form typed by the request's model, so the
+    compiler matches the form's inputs to the request's members (N18.3), and a placeholder is filled by a member
+    the request sets, named by its expression (D9.4);
+  - members listed with `GetProperties` and `JsonIgnore` read: the contract's members;
+  - `JsonPropertyName` read from a member: the contract's JSON name, which also follows the app's naming policy;
+  - the assembly scan of validator registration: refused (Q16), `Add<TValidator>()` per validator;
+  - the member scan that confirms a declaration's caller (`JsObject`): an analyzer checks at build time that a
+    `Method`, `MethodAsync` or property declaration is called from the member it declares (N18.2);
+  - the method scan for `PureMethodAttribute` and the `FlagsAttribute` read of `IsInEnum`: gate 1 decides each,
+    as an owner-listed exception or a typed door;
+  - `Expression.Compile` in validation (Q16) and in the template writer (Q15): gate 1 decides each.
+- D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
+  lists at gate 1 (N18.1): the members of `System.Reflection`, `Activator`, `Type.GetType` by name and
+  `Expression.Compile`.
+- D18.5 Every door on the public surface is typed (ALIS009). The three strings of B13 become typed doors:
+  - a button's type is HTML's closed set, `button`, `submit` or `reset`;
+  - a text box's type is HTML's closed set of text input types;
+  - an action link's attribute is a typed name, with `data-` and `aria-` attributes by their own doors.
+
+  Their forms go to gate 2.
+
+**Schema nodes.** None: type knowledge lives in C#, and the plan carries only what it decides: JSON names,
+shapes, starts and the payload kind of each event.
+
+**Checker.**
+- `probe:core-stj-empty-object-start`
+- `probe:core-json-result-names`
+- `probe:core-frombody-binds-json-name`
+- `probe:core-frombody-ignores-clr-name`
+- `probe:core-form-binds-clr-name`
+
+**Doors.**
+- kept: `Object<T>()`, `Objects<T>()`, `Method`, `MethodAsync` and the property declarations of `JsObject`; every
+  door written over a generic type.
+- `N18.1` new: the reflection analyzer of D18.4, with the owner's exception list.
+- `N18.2` new: the declaration analyzer of D18.3, which replaces `JsObject`'s run-time member scan.
+- `N18.3` new: a form typed by its model, and a request's `Form` that takes only a form of the request's model.
+- `N18.4` new: the typed doors of D18.5 for the button type, the text box type and the action link's attributes.
+
+**Evidence.**
+- Three item-type finders (`Alis.Reactive/Inputs/FieldReference.cs:50-58`, `Alis.Reactive/Members/ClrShape.cs:82-90`,
+  `Alis.Reactive/PlanAuthoring/Requests/RequestMembers.cs:66-72`).
+- B11, read at HEAD:
+  - `Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:76-154`;
+  - `Alis.Reactive/PlanModel/Values/ValueExpression.cs:76-104`;
+  - `Alis.Reactive/Razor/MarkupRaise.cs:27`;
+  - `Alis.Reactive/PlanAuthoring/Requests/RequestMembers.cs:34`;
+  - `Alis.Reactive/Members/ClrShape.cs:40-43`;
+  - `Alis.Reactive/Members/JsonMemberName.cs:11`, which also hard-codes camel case;
+  - `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:51-55`;
+  - `Alis.Reactive/Validation/ReactiveFluentValidationServiceCollectionExtensions.cs:66`;
+  - `Alis.Reactive/Components/JsObject.cs:366-369`;
+  - `Alis.Reactive/Validation/Checks.cs:420`.
+- B13: `Alis.Reactive.Native/PublicAPI/net48/PublicAPI.Unshipped.txt:20`, `:52` and `:176` take a string for an
+  attribute name and two input types, with no exemption.
+- G1: one switch per union, ending in `assertNever` (`Alis.Reactive.Assets/runtime/grammar/evaluate.ts:25-37`), so a
+  node C# adds fails typecheck; the generated contract is the TypeScript side of the same type knowledge.
+
+**Defects.**
+- `X18.1` analyzer: a `GetProperties` call in a shipped package outside the owner's list: new:N18.1.
+- `X18.2` analyzer: `Method()` called from a member other than the one it declares: new:N18.2.
+- `X18.3` type: a request that sends a form of another model does not compile: new:N18.3.
+- `X18.4` type: a button's type written as text does not compile: new:N18.4.
+- `X18.5` behavior: with the app's JSON options naming members in snake case, a request's JSON body sends
+  `given_name`, and the endpoint binds it.
+- `X18.6` behavior: a member the app's JSON options ignore is not in a JSON body, and the form's check reads its
+  start.
