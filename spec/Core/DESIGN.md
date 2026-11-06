@@ -195,6 +195,20 @@ Terms used throughout:
     .NET's exponent form, `E`, a sign and at least two digits (`probe:core-number-text-culture`,
     `probe:core-number-text-exponent`).
   - A number goes into form data as D3.7 states.
+- D3.12 The time zone a view renders under is the app's choice, made per request where the view renders, as
+  culture is (the owner, 2026-11-06: the framework allows the server to decide). The framework knows no
+  reason for the choice: a community's configured zone, a user's or a facility's are the app's.
+  - When the app makes no choice, an instant uses the browser's clock, the decision of 2026-11-05; gate 1
+    confirms that default.
+  - The plan carries the zone as an IANA id. The browser computes a zone's offsets only from an IANA id
+    (`probe:intl-iana-zone-offsets`) and refuses a Windows id (`probe:intl-windows-zone-id`). On net10 the
+    app gives a `TimeZoneInfo` and C# writes its IANA id (`probe:core-windows-zone-to-iana`). On net48,
+    `TimeZoneInfo` knows only the Windows registry's ids (`probe:net48-time-zones-from-registry`), so the app
+    gives the IANA id itself, as a typed value (N3.5).
+  - Every conversion of an instant uses the view's zone. An instant shows as its wall time and offset in
+    that zone for its own day, and a wall time a user picks becomes an instant at that zone's offset for
+    that day. DateWire's offset per day is the zone's.
+  - A `DateTime` is a wall time with no zone, so it is shown and sent as it is under any zone (D3.9).
 
 **Schema nodes.** `as`, the shapes of D3.1, `InputBinding.value`.
 
@@ -218,6 +232,10 @@ Terms used throughout:
 - `probe:mvc5-int-integer-style`
 - `probe:core-number-text-culture`
 - `probe:core-number-text-exponent`
+- `probe:intl-iana-zone-offsets`
+- `probe:intl-windows-zone-id`
+- `probe:core-windows-zone-to-iana`
+- `probe:net48-time-zones-from-registry`
 
 **Doors.**
 - `N3.1` new: the grammar's `Operator` without `ToNumber`, `ToDate`, `ToBoolean` and `ToText`.
@@ -226,6 +244,8 @@ Terms used throughout:
   `value`, `shape` and `list`.
 - `N3.4` new: the view's culture in the plan, its name, decimal separator and group separator, written once
   by C# where the view renders, with the endpoint host's number styles per .NET type.
+- `N3.5` new: the view's time zone, the app's choice per request (D3.12): a `TimeZoneInfo` on net10, an IANA id
+  as a typed value on net48; C# writes its IANA id into the plan. Its door's form goes to gate 2.
 
 **Evidence.**
 - B4: two conversions, `Alis.Reactive/Grammar/Operator.cs:27-30` and `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:112-115`;
@@ -248,6 +268,9 @@ Terms used throughout:
   clock is behind the server's.
 - `X3.8` behavior: a decimal set as an element's text under `de-DE` shows `1234,5`, as the server's view shows
   it.
+- `X3.9` behavior: a view rendered under the zone `America/New_York` shows a visit's `DateTimeOffset` at its New
+  York wall time and offset in a browser whose clock is in another zone, and sends a picked time back with
+  New York's offset for that day.
 
 ## Q4. Absence and promises
 

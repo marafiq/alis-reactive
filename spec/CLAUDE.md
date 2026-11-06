@@ -48,6 +48,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: plugins are an integral part of the design, where customization is needed and a
   better developer experience can be offered; the request lifecycle calls into a plugin in a typed way,
   as every block does.
+- The owner, 2026-11-06: "follows the server" means the framework allows the server to decide. Example to
+  think through, never a framework concept: a company has many communities, each with its own configured
+  time zone. The framework offers the time zone a view renders under as the app's choice, as culture is.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does

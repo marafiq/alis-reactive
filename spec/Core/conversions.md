@@ -22,7 +22,7 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | number, finite | its text as .NET writes it under the view's culture (D3.11): the shortest digits, the culture's decimal separator, no group separator, and below 1E-04 or from 1E+17 up the form `1,234565E+17` |
 | boolean | `"true"` or `"false"` |
 | date | its local day `"yyyy-MM-dd"`, with `"THH:mm:ss"` and `".fff"` when not midnight (`spec/Core/DateWire.tla`) |
-| instant | the browser's clock with that clock's offset, `"yyyy-MM-ddTHH:mm:ss-08:00"`, `"Z"` at zero |
+| instant | its wall time in the view's time zone with that zone's offset for its own day (D3.12), `"yyyy-MM-ddTHH:mm:ss-08:00"`, `"Z"` at zero |
 | list | each item converted to string, joined by `","` |
 
 ## number
@@ -58,8 +58,8 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | Source | Result |
 |--------|--------|
 | instant | itself |
-| date | that moment, at the browser clock's offset for its own day |
-| text a date converts from | that moment, at the offset the text gives, else the browser clock's offset for its own day |
+| date | that moment, at the view's time zone's offset for its own day (D3.12) |
+| text a date converts from | that moment, at the offset the text gives, else the view's time zone's offset for its own day (D3.12) |
 
 ## file
 

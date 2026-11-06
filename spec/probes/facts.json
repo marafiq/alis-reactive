@@ -476,6 +476,42 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-number-text-exponent: 1e16 10000000000000000; 1e20 1E+20; 1e17 1E+17; 1e-4 0,0001; 1e-5 1E-05; 123456.5e12 1,234565E+17; 1e-7 1E-07",
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "intl-iana-zone-offsets",
+      "statement": "The browser's Intl API computes an IANA time zone's offset for a given moment, daylight saving included.",
+      "host": "node",
+      "oracle": "ECMA-402 Intl.DateTimeFormat in Node",
+      "probe": "intl-time-zone.mjs",
+      "expect": "intl-iana-zone-offsets: America/New_York -300 in January, -240 in July; Asia/Kolkata 330",
+      "source": "spec/probes/intl-time-zone.mjs"
+    },
+    {
+      "id": "intl-windows-zone-id",
+      "statement": "The browser's Intl API refuses a Windows time zone id.",
+      "host": "node",
+      "oracle": "ECMA-402 Intl.DateTimeFormat in Node",
+      "probe": "intl-time-zone.mjs",
+      "expect": "intl-windows-zone-id: Eastern Standard Time is RangeError",
+      "source": "spec/probes/intl-time-zone.mjs"
+    },
+    {
+      "id": "core-windows-zone-to-iana",
+      "statement": ".NET 10 converts a Windows time zone id to its IANA id.",
+      "host": "net10",
+      "oracle": ".NET 10 TimeZoneInfo, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-windows-zone-to-iana: Eastern Standard Time converts America/New_York; India Standard Time converts Asia/Calcutta",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "net48-time-zones-from-registry",
+      "statement": ".NET Framework's TimeZoneInfo reads its zones from the Windows registry, by Windows id, and names no IANA id.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/TimeZoneInfo.cs.txt",
+      "expect": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones",
+      "source": "spec/probes/referencesource/TimeZoneInfo.cs.txt:81"
     }
   ]
 }
