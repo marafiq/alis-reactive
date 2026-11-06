@@ -1359,12 +1359,15 @@ template tree as a typed plugin argument (Q19), so the grammar gains no node.
 - kept: `FusionTemplate.Create<T>()` and its element doors (`Text`, `Span`, `Div`, `Badge`, `Icon`, `Img`, `Link`,
   `EventButton`, `Raw`), the template properties of each component.
 - `N15.1` new: the template tree, a typed plugin argument of `alis.template`, and the plugin that renders it.
-- `N15.3` new: the typed HTML builder in the core, the one template door for every component (D15.7).
 - `N15.2` new: the template's condition, written with the one condition syntax over the item; its form goes to
   gate 2. It carries `When(Expression<Func<TModel, bool>>)` and `FusionConditionalBuilder`, whose lambda form is
   refused.
+- `N15.3` new: the typed HTML builder in the core, the one template door for every component (D15.7).
 
 **Evidence.**
+- The builder renders a string that Syncfusion's template engine compiles
+  (`Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:25`), and each element door adds one more piece of that text
+  (`Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:78-310`).
 - The template writer names every member in camel case (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:44`)
   and compiles a captured value with `Compile().DynamicInvoke()` (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:85-90`).
 - The template's condition is a lambda of the item (`Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:322-337`),
