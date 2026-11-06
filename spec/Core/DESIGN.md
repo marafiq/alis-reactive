@@ -1599,8 +1599,21 @@ grammar gains no node (G2).
 - `probe:whatwg-url-http`
 - `probe:js-regex-translated`
 - `Ownership.tla:RulesLeaveWithTheirOwner`
-- Step 5 adds the agreement spec: the browser's verdict equals the door's over host, body format, holder start
-  and list item, with the counterexamples of the code at bff9eb6c0 and 65fdf118d.
+- `Validation.tla:Agreement`, the browser's failures equal the door's over host, body format, creation handling,
+  holder start, list item, decision C, the validator's scope and a typed text, with one invariant per aspect, each
+  broken by a mutant that is today's reading at 65fdf118d:
+  - `Validation.tla:ConditionAgrees`
+  - `Validation.tla:ObjectStartAgrees`
+  - `Validation.tla:NewHolderAgrees`
+  - `Validation.tla:ChildSkipAgrees`
+  - `Validation.tla:ListStartAgrees`
+  - `Validation.tla:EmptyTextAgrees`
+  - `Validation.tla:UnsentInputsUnread`
+  - `Validation.tla:OnlyTheNamedValidator`
+  - `Validation.tla:NoTypedValueLost`
+- The four gaps the code had at bff9eb6c0 are ValidationToday's invariants, each a counterexample TLC prints from
+  its own cfg: AnUnrenderedMemberRendersItsView, AListNotSentReadsItsStart, AConditionReadsTheObjectsStart and
+  AnItemsListNotSentReadsTheItemsStart.
 
 **Doors.**
 - kept: the validator grammar of `ReactiveValidator<T>`:

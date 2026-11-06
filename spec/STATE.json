@@ -764,10 +764,10 @@
     },
     "tlc": {
       "counts": {
-        "met": 5,
+        "met": 7,
         "specs": 8
       },
-      "detail": "Schema not started; ValidationToday not started; Validation not started",
+      "detail": "Schema not started",
       "pass": false,
       "runs": {
         "Absence": {
@@ -1363,6 +1363,161 @@
               "StepsAfterRunUnlessStopped"
             ]
           }
+        },
+        "Validation": {
+          "Validation.cfg": {
+            "green": true,
+            "hash": "a2be1ea760fd8141abf0ecd0571b34166409169be8f7f29b801ddb11dd3660dd",
+            "line": "Model checking completed. No error has been found.",
+            "states": "1769472 states generated, 884736 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "Validation.violates.Agreement.cfg": {
+            "green": false,
+            "hash": "2ea92d1679763979d62c8927485f65a5ba8710d80485d615f6bb3a2eb130b4b0",
+            "line": "violated: Agreement",
+            "states": "",
+            "violated": [
+              "Agreement"
+            ]
+          },
+          "Validation.violates.ChildSkipAgrees.cfg": {
+            "green": false,
+            "hash": "b5e33bb81e52cddd54a3ea54bb2de78d7f9d12f51758289160fc4b0ff482c6b1",
+            "line": "violated: ChildSkipAgrees",
+            "states": "",
+            "violated": [
+              "ChildSkipAgrees"
+            ]
+          },
+          "Validation.violates.ConditionAgrees.cfg": {
+            "green": false,
+            "hash": "35048b970d4371a8d1fb9acd3170af280ad5c7b46956f16ccbbf0b4817c5ea06",
+            "line": "violated: ConditionAgrees",
+            "states": "",
+            "violated": [
+              "ConditionAgrees"
+            ]
+          },
+          "Validation.violates.EmptyTextAgrees.cfg": {
+            "green": false,
+            "hash": "6040a41382ea34599e49925b9eca23fae407a1e15c52215c98494bc3ebf5854c",
+            "line": "violated: EmptyTextAgrees",
+            "states": "",
+            "violated": [
+              "EmptyTextAgrees"
+            ]
+          },
+          "Validation.violates.ListStartAgrees.cfg": {
+            "green": false,
+            "hash": "bcbd91ae3ca370fbc9eaa8b3d61a46e10e949c261970846bf286626cb9eb2915",
+            "line": "violated: ListStartAgrees",
+            "states": "",
+            "violated": [
+              "ListStartAgrees"
+            ]
+          },
+          "Validation.violates.NewHolderAgrees.cfg": {
+            "green": false,
+            "hash": "046e7fc819188298e2c405cfdcafdf1dcb7b7ad4d694dae7ae304c2e1ea7c20d",
+            "line": "violated: NewHolderAgrees",
+            "states": "",
+            "violated": [
+              "NewHolderAgrees"
+            ]
+          },
+          "Validation.violates.NoTypedValueLost.cfg": {
+            "green": false,
+            "hash": "4e912e63d750a2f65680052655cdc5ce950ce2573a0c58bbfd909e521ecdc48b",
+            "line": "violated: NoTypedValueLost",
+            "states": "",
+            "violated": [
+              "NoTypedValueLost"
+            ]
+          },
+          "Validation.violates.ObjectStartAgrees.cfg": {
+            "green": false,
+            "hash": "eb14671649487574888bc34c7a52f5b6ae3f137b3b823456502675ef96f71f8d",
+            "line": "violated: ObjectStartAgrees",
+            "states": "",
+            "violated": [
+              "ObjectStartAgrees"
+            ]
+          },
+          "Validation.violates.OnlyTheNamedValidator.cfg": {
+            "green": false,
+            "hash": "913e08c2b326f0aeb29bbcc688f3970c03ee9f61d94b89b9fabafc316eea39ce",
+            "line": "violated: OnlyTheNamedValidator",
+            "states": "",
+            "violated": [
+              "OnlyTheNamedValidator"
+            ]
+          },
+          "Validation.violates.ReachConditionOnStart.cfg": {
+            "green": false,
+            "hash": "a2377549f5d800ba4d9e11ec2066b983e2bc1f057f5915497f0688a12aa8a0d2",
+            "line": "violated: ReachConditionOnStart",
+            "states": "",
+            "violated": [
+              "ReachConditionOnStart"
+            ]
+          },
+          "Validation.violates.ReachPopulatedList.cfg": {
+            "green": false,
+            "hash": "cb0b6b5aee50b591b8b9cff784ef666dd361d223828db9925c89334eccc5500a",
+            "line": "violated: ReachPopulatedList",
+            "states": "",
+            "violated": [
+              "ReachPopulatedList"
+            ]
+          },
+          "Validation.violates.UnsentInputsUnread.cfg": {
+            "green": false,
+            "hash": "348f51827fa4d41fe80f0f9456c2e5765988eae6752649b8ea3ef8b89dee18de",
+            "line": "violated: UnsentInputsUnread",
+            "states": "",
+            "violated": [
+              "UnsentInputsUnread"
+            ]
+          }
+        },
+        "ValidationToday": {
+          "ValidationToday.violates.AConditionReadsTheObjectsStart.cfg": {
+            "green": false,
+            "hash": "64820c8f35b2727bc672246124ad3674990b0008fa35cb54c5c5d1da183a3c85",
+            "line": "violated: AConditionReadsTheObjectsStart",
+            "states": "",
+            "violated": [
+              "AConditionReadsTheObjectsStart"
+            ]
+          },
+          "ValidationToday.violates.AListNotSentReadsItsStart.cfg": {
+            "green": false,
+            "hash": "658b1a0a47e0c85513445cb573b60c94eacf43a7ce5e661988c5bf79e0969773",
+            "line": "violated: AListNotSentReadsItsStart",
+            "states": "",
+            "violated": [
+              "AListNotSentReadsItsStart"
+            ]
+          },
+          "ValidationToday.violates.AnItemsListNotSentReadsTheItemsStart.cfg": {
+            "green": false,
+            "hash": "5c6b80598de681be9f320e16d092324f25406ab663ace306179b99207c42bad2",
+            "line": "violated: AnItemsListNotSentReadsTheItemsStart",
+            "states": "",
+            "violated": [
+              "AnItemsListNotSentReadsTheItemsStart"
+            ]
+          },
+          "ValidationToday.violates.AnUnrenderedMemberRendersItsView.cfg": {
+            "green": false,
+            "hash": "a7294f0929dbace5a70d3ef871452bddf6769df0b17514ab3492f093490508bb",
+            "line": "violated: AnUnrenderedMemberRendersItsView",
+            "states": "",
+            "violated": [
+              "AnUnrenderedMemberRendersItsView"
+            ]
+          }
         }
       }
     },
@@ -1373,7 +1528,7 @@
     }
   },
   "passed": 10,
-  "read_at_head": "0d7f16b1e408bfcdb48551529e14fd1448a2c575",
+  "read_at_head": "a7889d139b0f1e63081d67da9229900a106b7442",
   "step": {
     "failing": [
       "questions",
