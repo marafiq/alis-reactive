@@ -9,7 +9,8 @@ Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARea
 ASSUME Mutant \in Mutants
 
 StatementKinds == {"set", "do", "let", "if", "all", "try", "stop", "listen"}
-ExpressionKinds == {"lit", "obj", "ref", "get", "as", "call", "fn", "record", "list", "op", "signal"}
+ExpressionKinds == {"lit", "obj", "ref", "get", "data", "as", "call", "fn", "record", "list", "op", "signal"}
+AbsenceKinds == {"start", "nothing", "unbound"}
 ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", "array", "nullable", "object"}
 PathStepKinds == {"each"}
 LocatorKinds == {"element", "plugin"}
@@ -18,7 +19,7 @@ PluginDataKinds == {"none", "hub", "model", "form", "stream"}
 TimeZoneKinds == {"clock", "zone"}
 TraceKinds == {"off", "on"}
 
-Kinds == StatementKinds \cup ExpressionKinds \cup ShapeKinds \cup PathStepKinds \cup LocatorKinds \cup ListeningKinds
+Kinds == StatementKinds \cup ExpressionKinds \cup AbsenceKinds \cup ShapeKinds \cup PathStepKinds \cup LocatorKinds \cup ListeningKinds
          \cup PluginDataKinds \cup TimeZoneKinds \cup TraceKinds
 
 Handlers == [k \in Kinds |->
@@ -31,6 +32,7 @@ Handlers == [k \in Kinds |->
     ELSE IF k \in LocatorKinds THEN {"driverOf"}
     ELSE IF k \in ListeningKinds THEN {"listen"}
     ELSE IF k \in PluginDataKinds THEN {"namedPlugin"}
+    ELSE IF k \in AbsenceKinds THEN {"absent"}
     ELSE IF k \in TimeZoneKinds THEN {"zone"}
     ELSE {"trace"}]
 

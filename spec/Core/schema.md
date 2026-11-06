@@ -203,7 +203,8 @@ and in the blocks inside it, and nowhere else.
 | `lit` | `value`: a JSON scalar or null | | itself |
 | `obj` | `id`: an object id of `objects` | | the located object (Q5) |
 | `ref` | `name` | | the binding of that name in scope (D8.8) |
-| `get` | `path`; `members`: `required`, `optional` or `requiredIfHeld` | `target`: an expression | the one read (Q2): a required step the holder lacks stops the pipeline, an optional one reads nothing (D4.1, D4.2), and a `requiredIfHeld` one reads nothing on a holder that reads nothing and stops on a holder that lacks it: an array's `length` and methods (D6.3, D6.4), and the members of the live item a find returns, which is nothing when no item matched (D6.9) |
+| `get` | `path`; `members`: `required`, `optional` or `requiredIfHeld` | `target`: an expression | the one read (Q2): a required step the holder lacks stops the pipeline, an optional one reads nothing (D4.1), and a `requiredIfHeld` one reads nothing on a holder that reads nothing and stops on a holder that lacks it: an array's `length` and methods (D6.3, D6.4), and the members of the live item a find returns, which is nothing when no item matched (D6.9) |
+| `data` | `path`: a list of `DataStep` | `target`: an expression | a typed read of data (D4.2): at each step a holder that holds null or reads nothing reads nothing; a holder that is not an object, or that lacks a name of the step's `requires`, stops the pipeline; a member the holder lacks reads the step's `absent`; a member it holds reads on, and a promise stops the pipeline (D4.3) |
 | `as` | | `expr`: an expression; `shape`: a shape that converts | the one conversion by `spec/Core/conversions.md` (D3.2, D3.4); a value the shape cannot hold reads nothing (D3.3) |
 | `call` | `path`; `members`: `required`, `optional` or `requiredIfHeld`, as `get` reads them | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3) |
 | `fn` | `params`: names | `body`: an expression | a function whose parameters are bound in its body; as a value set or passed, the function a vendor calls, which answers its body's value (D17.12) |
@@ -213,6 +214,16 @@ and in the blocks inside it, and nowhere else.
 | `signal` | nothing | | the run's abort signal, passed only to a method whose declaration names that argument (D17.11) |
 
 `RecordField` carries `name`, a wire name, and `value`, an expression.
+
+`DataStep` carries `name`, the member's wire name (S6); `requires`, the wire names the holder's type requires
+(`[JsonRequired]`, `required`, a constructor parameter under `RespectRequiredConstructorParameters`); and `absent`, an
+`Absence`, what the read is when the holder lacks the member (D4.2):
+
+| Kind | Carries | Meaning |
+|------|---------|---------|
+| `start` | `value`: the JSON of a start | the read is this value: the rest of the path read on the binding of the path down to the holder, the member absent |
+| `nothing` | nothing | the read is nothing: a holder on the rest of the path starts null |
+| `unbound` | nothing | the pipeline stops: the binding cannot create a holder on the path, or a holder on it is polymorphic |
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
 `neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `merge`, `trim`, `trimStart`,
@@ -294,6 +305,10 @@ proposed column says `added`.
 | expression | record | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:34` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D7.4 |
 | expression | list | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:35` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | N7.2 |
 | expression | op | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:36` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q8 |
+| expression | data | absent | added | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D4.2 |
+| absence | start | absent | added | the absence switch of the data read in `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D4.2 |
+| absence | nothing | absent | added | the absence switch of the data read in `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D4.2 |
+| absence | unbound | absent | added | the absence switch of the data read in `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D4.2 |
 | expression | signal | absent | added | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D17.11 |
 | shape | string | `Alis.Reactive.Assets/runtime/grammar/shape.ts:17`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:34` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.6 |
 | shape | number | `Alis.Reactive.Assets/runtime/grammar/shape.ts:18`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:36` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.11 |

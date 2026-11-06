@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Types;
 
 namespace Alis.Reactive.Writing;
 
@@ -20,11 +21,14 @@ internal sealed class PlanBuild
         PlanId = planId;
         values.MakeReadOnly(populateMissingResolver: true);
         Values = values;
+        Starts = new DataStarts(values);
     }
 
     internal string PlanId { get; }
 
     internal JsonSerializerOptions Values { get; }
+
+    internal DataStarts Starts { get; }
 
     internal void Write(Statement statement)
     {

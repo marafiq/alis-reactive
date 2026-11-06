@@ -39,6 +39,8 @@ public sealed record OnCallNurse(string Name, [property: JsonPropertyName("pager
 
     [JsonIgnore]
     public override string Station { get; init; } = "";
+
+    public string Callback { get; init; } = "switchboard";
 }
 
 public sealed record PagerLine(string Number);

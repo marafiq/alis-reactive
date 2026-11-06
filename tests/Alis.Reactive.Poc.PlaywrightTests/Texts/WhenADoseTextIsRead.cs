@@ -8,9 +8,9 @@ public sealed class WhenADoseTextIsRead : AppPageTest
     {
         await Open("/Doses/Texts");
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses whose ward name is not five letters long", Exact = true }).ClickAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses whose carer's name is not four letters long", Exact = true }).ClickAsync();
 
-        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("1");
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
     }
 
     [Test]
@@ -84,7 +84,7 @@ public sealed class WhenADoseTextIsRead : AppPageTest
     }
 
     [Test]
-    public async Task not_of_contains_does_not_hold_when_the_text_reads_nothing()
+    public async Task not_of_contains_does_not_hold_when_the_text_is_the_null_start_of_a_member_the_dose_lacks()
     {
         await Open("/Doses/Texts");
 
@@ -128,7 +128,7 @@ public sealed class WhenADoseTextIsRead : AppPageTest
     {
         await Open("/Doses/Texts");
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses whose ward is null or empty", Exact = true }).ClickAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses whose carer's name is null or empty", Exact = true }).ClickAsync();
 
         await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("1");
     }

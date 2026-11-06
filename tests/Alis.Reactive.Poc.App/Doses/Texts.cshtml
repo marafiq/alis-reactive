@@ -13,10 +13,10 @@
 
 <p>Census: <span id="census-status"></span></p>
 
-@(plan.Button("count-ward-names-not-five-long", "Count doses whose ward name is not five letters long")
+@(plan.Button("count-carer-names-not-four-long", "Count doses whose carer's name is not four letters long")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Ward!.Length != 5))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Carer!.Name.Length != 4))))
 
 @(plan.Button("count-labels-trimmed", "Count labels that trim to the medicine")
     .Reactive(button => button.Click, pipeline =>
@@ -73,10 +73,10 @@
         pipeline.Component<StationCensus>("census").Count.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Count(d => string.IsNullOrEmpty(d.Note)))))
 
-@(plan.Button("count-wards-null-or-empty", "Count doses whose ward is null or empty")
+@(plan.Button("count-carer-names-null-or-empty", "Count doses whose carer's name is null or empty")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => string.IsNullOrEmpty(d.Ward)))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => string.IsNullOrEmpty(d.Carer!.Name)))))
 
 @(plan.Button("count-notes-blank", "Count doses whose note is blank")
     .Reactive(button => button.Click, pipeline =>

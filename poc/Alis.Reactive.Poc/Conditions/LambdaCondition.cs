@@ -60,23 +60,25 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
 
     private readonly LambdaExpression _lambda;
     private readonly IReadOnlyDictionary<ParameterExpression, PlanExpression> _scope;
+    private readonly DataStarts _starts;
     private readonly JsonSerializerOptions _values;
     private readonly string _argument;
     private readonly Func<string> _itemName;
 
-    private LambdaCondition(LambdaExpression lambda, IReadOnlyDictionary<ParameterExpression, PlanExpression> scope, JsonSerializerOptions values, string argument, Func<string> itemName)
+    private LambdaCondition(LambdaExpression lambda, IReadOnlyDictionary<ParameterExpression, PlanExpression> scope, DataStarts starts, string argument, Func<string> itemName)
     {
         _lambda = lambda;
         _scope = scope;
-        _values = values;
+        _starts = starts;
+        _values = starts.Values;
         _argument = argument;
         _itemName = itemName;
     }
 
-    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, JsonSerializerOptions values, string argument, Func<string> itemName)
+    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, DataStarts starts, string argument, Func<string> itemName)
     {
         var scope = new Dictionary<ParameterExpression, PlanExpression> { [lambda.Parameters[0]] = item };
-        return new LambdaCondition(lambda, scope, values, argument, itemName).Term(lambda.Body);
+        return new LambdaCondition(lambda, scope, starts, argument, itemName).Term(lambda.Body);
     }
 
     public PlanExpression Read(LinqExpression operand)
@@ -89,8 +91,8 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         if (translated is not null) return translated;
         var root = RootOf(read);
         if (root is null || !_scope.TryGetValue(root, out var holder)) throw TranslatedMembers.NoBrowserForm(read, _argument);
-        var steps = JsonPath.Steps(read, root, _values, _lambda) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
-        return new GetExpression(holder, steps, ReadPresence.Optional);
+        var steps = JsonPath.Steps(read, root, _starts, _lambda) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
+        return new DataExpression(holder, steps);
     }
 
     public FnExpression Lambda(LambdaExpression inner)
@@ -99,7 +101,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         var scope = new Dictionary<ParameterExpression, PlanExpression>(_scope.Count + 1);
         foreach (var bound in _scope) scope[bound.Key] = bound.Value;
         scope[inner.Parameters[0]] = new RefExpression(item);
-        return new FnExpression([item], new LambdaCondition(inner, scope, _values, _argument, _itemName).Term(inner.Body));
+        return new FnExpression([item], new LambdaCondition(inner, scope, _starts, _argument, _itemName).Term(inner.Body));
     }
 
     public FnExpression EveryItem() => ListForms.EveryItem(_itemName());

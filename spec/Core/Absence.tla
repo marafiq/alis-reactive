@@ -3,7 +3,8 @@ EXTENDS Naturals, Sequences
 
 CONSTANT Mutant
 
-Mutants == {"none", "RequiredAbsentContinues", "PromiseHeldContinues", "DataAbsentStops",
+Mutants == {"none", "RequiredAbsentContinues", "PromiseHeldContinues", "DataAbsentReadsNothing",
+            "NullHolderReadsStart", "RequiredLackingReads",
             "MissingTextShowsUndefined", "MissingClassAddsUndefined", "UnawaitedPromiseContinues",
             "EagerTerms", "ConversionPassesRaw", "AnyOverNothingIsFalse", "StopSkipsFinally",
             "StopEndsEveryHandler", "MissingValueWritesUndefined"}
@@ -15,11 +16,11 @@ Pos(s) == CHOOSE i \in 1..Len(Program) : Program[i] = s
 Last == Len(Program) + 1
 Reads == {"live", "data", "past", "as", "any"}
 
-VARIABLES liveMember, readKind, dataMember, holder, textValue, className, methodReturns, op, term1,
+VARIABLES liveMember, readKind, dataMember, absence, required, holder, textValue, className, methodReturns, op, term1,
           convertible, list, route, propertyValue,
           pcA, stoppedA, stopAt, result, shown, classes, written, called, sent, finallyRan, pcB, stoppedB
 
-page == <<liveMember, readKind, dataMember, holder, textValue, className, methodReturns, op, term1,
+page == <<liveMember, readKind, dataMember, absence, required, holder, textValue, className, methodReturns, op, term1,
           convertible, list, route, propertyValue>>
 outcome == <<result, shown, classes, written, called, sent, finallyRan>>
 vars == <<page, outcome, pcA, stoppedA, stopAt, pcB, stoppedB>>
@@ -28,6 +29,8 @@ Init ==
     /\ liveMember \in {"present", "absent"}
     /\ readKind \in {"value", "promise"}
     /\ dataMember \in {"present", "absent"}
+    /\ absence \in {"start", "nothing", "unbound"}
+    /\ required \in {"held", "lacking"}
     /\ holder \in {"holdsField", "lacksField", "nothing"}
     /\ textValue \in {"text", "nothing"}
     /\ className \in {"cls", "nothing"}
@@ -72,17 +75,32 @@ ReadLive ==
        ELSE Advance /\ result' = [result EXCEPT !["live"] = IF liveMember = "absent" THEN "nothing" ELSE "value"]
     /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
+AbsentRead == CASE absence = "start" -> "start"
+                [] absence = "nothing" -> "nothing"
+                [] absence = "unbound" -> "stop"
+
+ReadOf(member) ==
+    IF required = "lacking" /\ Mutant # "RequiredLackingReads" THEN "stop"
+    ELSE IF member = "present" THEN "value"
+    ELSE IF absence = "start" /\ Mutant = "DataAbsentReadsNothing" THEN "nothing"
+    ELSE AbsentRead
+
+PastMember == IF holder = "holdsField" THEN "present" ELSE "absent"
+
+PastRead == IF holder = "nothing" /\ Mutant # "NullHolderReadsStart" THEN "nothing" ELSE ReadOf(PastMember)
+
+ReadInto(step, slot, read) ==
+    IF read = "stop" THEN Stop(step) /\ UNCHANGED result
+    ELSE Advance /\ result' = [result EXCEPT ![slot] = read]
+
 ReadData ==
     /\ At("ReadData")
-    /\ IF dataMember = "absent" /\ Mutant = "DataAbsentStops"
-         THEN Stop("ReadData") /\ UNCHANGED result
-       ELSE Advance /\ result' = [result EXCEPT !["data"] = IF dataMember = "absent" THEN "nothing" ELSE "value"]
+    /\ ReadInto("ReadData", "data", ReadOf(dataMember))
     /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
 ReadPast ==
     /\ At("ReadPast")
-    /\ Advance
-    /\ result' = [result EXCEPT !["past"] = IF holder = "holdsField" THEN "value" ELSE "nothing"]
+    /\ ReadInto("ReadPast", "past", PastRead)
     /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
 SetText ==
@@ -170,10 +188,20 @@ RequiredAbsentStops == liveMember = "absent" => pcA <= Pos("ReadLive")
 
 PromiseWhereValueStops == (liveMember = "present" /\ readKind = "promise") => pcA <= Pos("ReadLive")
 
-DataAbsentReadsNothing ==
-    /\ stopAt \notin {"ReadData", "ReadPast"}
-    /\ Ran("ReadData") => result["data"] = IF dataMember = "absent" THEN "nothing" ELSE "value"
-    /\ Ran("ReadPast") => result["past"] = IF holder = "holdsField" THEN "value" ELSE "nothing"
+ExpectedRead(member) == IF member = "present" THEN "value" ELSE AbsentRead
+
+DataAbsentReadsItsStart ==
+    required = "held" =>
+        /\ StoppedAt("ReadData") => ExpectedRead(dataMember) = "stop"
+        /\ Ran("ReadData") => result["data"] = ExpectedRead(dataMember)
+        /\ (StoppedAt("ReadPast") /\ holder # "nothing") => ExpectedRead(PastMember) = "stop"
+        /\ (Ran("ReadPast") /\ holder # "nothing") => result["past"] = ExpectedRead(PastMember)
+
+NullHolderReadsNothing ==
+    /\ holder = "nothing" => ~StoppedAt("ReadPast")
+    /\ (Ran("ReadPast") /\ holder = "nothing") => result["past"] = "nothing"
+
+LackingRequiredStops == required = "lacking" => pcA <= Pos("ReadData")
 
 MissingTextShowsNothing == (Ran("SetText") /\ textValue = "nothing") => shown = ""
 

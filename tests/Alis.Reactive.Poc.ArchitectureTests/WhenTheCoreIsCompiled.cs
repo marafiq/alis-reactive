@@ -14,7 +14,7 @@ public sealed class WhenTheCoreIsCompiled
     private static readonly IReadOnlyDictionary<string, string[]> Reads = new Dictionary<string, string[]>
     {
         ["Plan"] = [],
-        ["Writing"] = ["Plan"],
+        ["Writing"] = ["Plan", "Types"],
         ["Values"] = ["Plan", "Writing"],
         ["Types"] = ["Plan"],
         ["Conditions"] = ["Plan", "Types"],

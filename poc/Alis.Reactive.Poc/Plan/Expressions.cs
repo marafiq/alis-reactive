@@ -9,6 +9,7 @@ namespace Alis.Reactive.Plan;
 [JsonDerivedType(typeof(ObjectExpression), "obj")]
 [JsonDerivedType(typeof(RefExpression), "ref")]
 [JsonDerivedType(typeof(GetExpression), "get")]
+[JsonDerivedType(typeof(DataExpression), "data")]
 [JsonDerivedType(typeof(CallExpression), "call")]
 [JsonDerivedType(typeof(FnExpression), "fn")]
 [JsonDerivedType(typeof(OperatorExpression), "op")]
@@ -63,6 +64,19 @@ internal sealed class GetExpression : Expression
     public IReadOnlyList<PathStep> Path { get; }
 
     public ReadPresence Members { get; }
+}
+
+internal sealed class DataExpression : Expression
+{
+    internal DataExpression(Expression target, IReadOnlyList<DataStep> path)
+    {
+        Target = target;
+        Path = path;
+    }
+
+    public Expression Target { get; }
+
+    public IReadOnlyList<DataStep> Path { get; }
 }
 
 internal sealed class CallExpression : Expression

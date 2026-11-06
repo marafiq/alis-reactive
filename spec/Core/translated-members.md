@@ -5,7 +5,8 @@ The .NET members an array lambda translates, keyed by the definition of the memb
 builds them today, without the `PureMethodAttribute` scan (`Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:51-55`).
 That table maps `Trim` to JavaScript's `trim` and `ToUpperInvariant` to `toUpperCase`, and both disagree with .NET
 (`spec/NOTES.md`, the probe of 2026-11-06). A member not listed is refused where the view renders. Every row reads
-nothing on a missing value and stops its pipeline on a present value that lacks the member.
+nothing on a missing value, one that reads nothing or holds null, and stops its pipeline on a present value that lacks
+the member. A data member the item lacks reads its start first (D4.2), so a text that starts null is a missing value.
 
 A text operator reads nothing when its text reads nothing or holds null, and stops its pipeline when its text holds
 a value that is not text. A text it takes as an argument reads nothing when it reads nothing, and stops the pipeline

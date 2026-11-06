@@ -38,7 +38,7 @@ public static class DataLists
         => Over<TItem, TItem>(list, (items, build) => ListForms.Find(items, ItemRead(build, predicate, nameof(predicate))));
 
     public static TypedSource<TResult> Find<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate, Expression<Func<TItem, TResult>> field)
-        => Over<TItem, TResult>(list, (items, build) => new GetExpression(ListForms.Find(items, ItemRead(build, predicate, nameof(predicate))), JsonPath.Of(field, build.Values), ReadPresence.Optional));
+        => Over<TItem, TResult>(list, (items, build) => new DataExpression(ListForms.Find(items, ItemRead(build, predicate, nameof(predicate))), JsonPath.Of(field, build.Starts)));
 
     public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key)
         => Ordered(list, key, default(TKey), descending: false);
@@ -120,6 +120,6 @@ public static class DataLists
     private static FnExpression ItemRead(PlanBuild build, LambdaExpression read, string argument)
     {
         var item = build.ItemName();
-        return new FnExpression([item], LambdaCondition.Of(read, new RefExpression(item), build.Values, argument, build.ItemName));
+        return new FnExpression([item], LambdaCondition.Of(read, new RefExpression(item), build.Starts, argument, build.ItemName));
     }
 }

@@ -1,5 +1,7 @@
 export type JsonValue = string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 
+export type Absence = StartAbsence | NothingAbsence | UnboundAbsence;
+
 export interface AssignmentListening {
   readonly kind: "assignment";
 }
@@ -12,13 +14,25 @@ export interface CallExpression {
   readonly args: readonly Expression[];
 }
 
+export interface DataExpression {
+  readonly kind: "data";
+  readonly target: Expression;
+  readonly path: readonly DataStep[];
+}
+
+export interface DataStep {
+  readonly name: string;
+  readonly requires: readonly string[];
+  readonly absent: Absence;
+}
+
 export interface ElementLocator {
   readonly kind: "element";
   readonly id: string;
   readonly vendor: string;
 }
 
-export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | CallExpression | FnExpression | OperatorExpression;
+export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | DataExpression | CallExpression | FnExpression | OperatorExpression;
 
 export interface FnExpression {
   readonly kind: "fn";
@@ -55,6 +69,10 @@ export interface MethodListening {
   readonly kind: "method";
   readonly subscribe: string;
   readonly unsubscribe: string;
+}
+
+export interface NothingAbsence {
+  readonly kind: "nothing";
 }
 
 export interface ObjectExpression {
@@ -104,7 +122,16 @@ export interface SetStatement {
   readonly value: Expression;
 }
 
+export interface StartAbsence {
+  readonly kind: "start";
+  readonly value: JsonValue;
+}
+
 export type Statement = SetStatement;
+
+export interface UnboundAbsence {
+  readonly kind: "unbound";
+}
 
 export interface Vendor {
   readonly locate: Expression;

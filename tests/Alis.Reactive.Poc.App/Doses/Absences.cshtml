@@ -1,0 +1,80 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose absences";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Dose absences</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+<p>Census: <span id="census-status"></span></p>
+<p>Heparin's unit: <span id="heparin-unit"></span></p>
+<p>Aspirin's batch expiry: <span id="aspirin-expiry"></span></p>
+
+@(plan.Button("count-no-refills", "Count doses with no refills left")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Refills == 0))))
+
+@(plan.Button("count-in-mg", "Count doses measured in mg")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Unit == "mg"))))
+
+@(plan.Button("show-heparin-unit", "Show Heparin's unit")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("heparin-unit").Text.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Find(d => d.Medicine == "Heparin", d => d.Unit!))))
+
+@(plan.Button("count-fridge-shelf", "Count doses kept on the fridge shelf")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Store!.Shelf.Name == "fridge"))))
+
+@(plan.Button("count-cupboard-spare", "Count doses whose spare is in the cupboard")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Store!.Spare.Name == "cupboard"))))
+
+@(plan.Button("count-no-maker", "Count doses with no maker")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Maker == null))))
+
+@(plan.Button("list-batch-expiries", "List batch expiries")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Listing expiries");
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Select(d => d.Batch!.Expiry));
+        pipeline.Element("census-status").Text.Set("Listed expiries");
+    }))
+
+@(plan.Button("show-aspirin-expiry", "Show Aspirin's batch expiry")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("aspirin-expiry").Text.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Find(d => d.Medicine == "Aspirin", d => d.Batch!.Expiry))))
+
+@(plan.Button("list-seal-breakers", "List seal breakers")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Listing breakers");
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Select(d => d.Seal!.Breaker!));
+        pipeline.Element("census-status").Text.Set("Listed breakers");
+    }))
+
+@(plan.Button("list-delivery-sites", "List delivery sites")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Listing sites");
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Select(d => d.Delivery!.Site!));
+        pipeline.Element("census-status").Text.Set("Listed sites");
+    }))
+
+@Html.RenderPlan(plan)

@@ -1,6 +1,7 @@
 import type { CallExpression, Expression, PathStep, PlanDocument, ReadPresence } from "./plan";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 import { operate } from "./operators";
+import { readData } from "./data";
 
 export interface Context {
   readonly plan: PlanDocument;
@@ -18,6 +19,8 @@ export function evaluate(expression: Expression, context: Context): Read {
       return bound(expression.name, context);
     case "get":
       return walk(evaluate(expression.target, context), expression.path, expression.members);
+    case "data":
+      return readData(evaluate(expression.target, context), expression.path);
     case "call":
       return invoke(expression, context);
     case "fn":

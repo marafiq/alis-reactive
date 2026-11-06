@@ -37,6 +37,12 @@
         pipeline.Element("page-status").Text.Set("Paged day");
     }))
 
+@(plan.Button("show-day-callback", "Show day callback")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("day-callback").Text.Set(pipeline.Component<DutyRoster>("day-roster").OnCall.Read(nurse => nurse.Callback))))
+
+<p>Day callback: <span id="day-callback"></span></p>
+
 @(plan.Button("page-relief-on-call", "Page relief on-call")
     .Reactive(button => button.Click, pipeline =>
     {

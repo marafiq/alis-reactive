@@ -114,23 +114,23 @@ public sealed class WhenDosesAreCompared : AppPageTest
     }
 
     [Test]
-    public async Task an_inequality_with_a_member_the_dose_lacks_does_not_hold()
+    public async Task an_inequality_holds_on_a_member_the_dose_lacks_whose_start_is_null()
     {
         await Open("/Doses/Round");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses off the north ward", Exact = true }).ClickAsync();
 
-        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("3");
     }
 
     [Test]
-    public async Task not_of_an_equality_with_a_member_the_dose_lacks_does_not_hold()
+    public async Task not_of_an_equality_holds_on_a_member_the_dose_lacks_whose_start_is_null()
     {
         await Open("/Doses/Round");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses not on the north ward", Exact = true }).ClickAsync();
 
-        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("3");
     }
 
     [Test]
@@ -138,7 +138,7 @@ public sealed class WhenDosesAreCompared : AppPageTest
     {
         await Open("/Doses/Round");
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Count east or missed doses", Exact = true }).ClickAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses witnessed by Ruth or missed", Exact = true }).ClickAsync();
 
         await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("1");
     }
@@ -148,9 +148,9 @@ public sealed class WhenDosesAreCompared : AppPageTest
     {
         await Open("/Doses/Round");
 
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses not both east and given", Exact = true }).ClickAsync();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses not both witnessed by Ruth and given", Exact = true }).ClickAsync();
 
-        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("5");
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("3");
     }
 
     [Test]

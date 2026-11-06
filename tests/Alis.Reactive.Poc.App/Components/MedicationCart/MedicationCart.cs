@@ -45,7 +45,81 @@ public sealed record MedicationDose(
     int StockChange,
     decimal Claim,
     bool Controlled,
-    [property: JsonNumberHandling(JsonNumberHandling.WriteAsString)] decimal Copay);
+    [property: JsonNumberHandling(JsonNumberHandling.WriteAsString)] decimal Copay)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int Refills { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Unit { get; init; } = "mg";
+
+    [JsonPropertyName("constructor")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Maker { get; init; }
+
+    public DoseStore? Store { get; init; }
+
+    public DoseBatch? Batch { get; init; }
+
+    public DoseSeal? Seal { get; init; }
+
+    public DoseDelivery? Delivery { get; init; }
+}
+
+public sealed class DoseStore
+{
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+    public DoseShelf Shelf { get; set; } = new() { Name = "fridge" };
+
+    public DoseShelf Spare { get; set; } = new() { Name = "fridge" };
+}
+
+public sealed class DoseShelf
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Name { get; set; } = "cupboard";
+}
+
+public sealed class DoseBatch
+{
+    [JsonRequired]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Lot { get; init; }
+
+    public string Expiry { get; init; } = "";
+}
+
+public sealed class DoseSeal
+{
+    private DoseSeal(string tag, string? breaker)
+    {
+        Tag = tag;
+        Breaker = breaker;
+    }
+
+    public string Tag { get; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Breaker { get; }
+
+    public static DoseSeal Of(string tag, string? breaker) => new(tag, breaker);
+}
+
+[JsonPolymorphic]
+[JsonDerivedType(typeof(DoseInfusion), "infusion")]
+public class DoseDelivery
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Site { get; init; }
+}
+
+public sealed class DoseInfusion : DoseDelivery
+{
+    public DoseInfusion()
+    {
+        Site = "cannula";
+    }
+}
 
 public static class MedicationCartJson
 {

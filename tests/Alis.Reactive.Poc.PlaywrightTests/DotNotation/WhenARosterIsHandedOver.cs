@@ -37,7 +37,7 @@ public sealed class WhenARosterIsHandedOver : AppPageTest
     }
 
     [Test]
-    public async Task a_member_the_data_lacks_reads_nothing_and_the_pipeline_goes_on()
+    public async Task a_member_past_one_the_data_lacks_whose_start_is_null_reads_nothing_and_the_pipeline_goes_on()
     {
         await Open("/Rosters/Handover");
 
@@ -45,6 +45,16 @@ public sealed class WhenARosterIsHandedOver : AppPageTest
 
         await Expect(Page.Locator("#day-pager")).ToHaveTextAsync("");
         await Expect(Page.Locator("#page-status")).ToHaveTextAsync("Paged day");
+    }
+
+    [Test]
+    public async Task a_member_the_data_lacks_reads_the_start_the_endpoint_binds_for_it()
+    {
+        await Open("/Rosters/Handover");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Show day callback" }).ClickAsync();
+
+        await Expect(Page.Locator("#day-callback")).ToHaveTextAsync("switchboard");
     }
 
     [Test]

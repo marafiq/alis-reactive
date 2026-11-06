@@ -289,8 +289,21 @@ Terms used throughout:
 **Decision.**
 - D4.1 Reading, writing or calling a member a declaration names on a live object, when the object lacks the
   member, stops the pipeline.
-- D4.2 Data reads as nothing when absent: a member of data, a holder of data that is nothing, and data past a
-  declared member (a field of the value a property holds, of each item of a list it holds).
+- D4.2 Data reads its start when absent (Decision 1, the owner, 2026-11-06): a member a present holder lacks reads the
+  value System.Text.Json binds for it under the app's options, on both hosts: the contract that wrote the data and
+  names its members (D2.9). C# binds the path down to the member with the member absent and reads the rest of the
+  path on that object, so a populated member reads its holder's own start and a replaced one a new object of its
+  type (`spec/NOTES.md`, the second start probe). A holder that holds null or reads nothing reads nothing, and so does
+  every member past it. A data read is the `data` node (schema.md): each step carries what it reads when its member is
+  absent, `start` (the value), `nothing` (a holder on the rest of the path starts null) or `unbound`, which stops the
+  pipeline: the binding cannot create a holder on the path (a private constructor, an abstract type, an interface),
+  or a holder on it is polymorphic, whose start hangs on the discriminator the data holds. A present holder that lacks
+  a member its type requires (`[JsonRequired]`, `required`, a constructor parameter under
+  `RespectRequiredConstructorParameters`) stops every read through it; a holder that is not an object stops. A
+  member is present when the value holds it, other than what every object inherits (`constructor`), with a value
+  other than `undefined`. This covers a member of data, data past a declared member (a field of the value a property
+  holds, of each item of a list it holds) and the field a find returns. A form's check reads the starts the endpoint
+  that binds its body leaves, by host and format (D16.6); a data read follows the contract of the data.
 - D4.3 A read that yields a promise where a value is declared stops the pipeline. A method declared
   `MethodAsync` is awaited, and its settled value is its result. A rejected promise stops the pipeline.
 - D4.4 A call of a method declared to return nothing that returns a promise stops the pipeline after the call,
@@ -305,12 +318,14 @@ Terms used throughout:
   nothing writes null (D4.5).
 - D4.8 A stop ends its own handler only. Other handlers, and the other blocks of a `Parallel`, run on (Q10).
 
-**Schema nodes.** `get`, `call`, `set` with `members`; `do` and `let` with `await`; `try`; `op` (`and`, `or`,
-`cond`, `coalesce`); the new statement `stop`.
+**Schema nodes.** `get`, `call`, `set` with `members`; `data` with its steps; `do` and `let` with `await`; `try`; `op`
+(`and`, `or`, `cond`, `coalesce`); the new statement `stop`.
 
 **Checker.**
 - `Absence.tla:RequiredAbsentStops`
-- `Absence.tla:DataAbsentReadsNothing`
+- `Absence.tla:DataAbsentReadsItsStart`
+- `Absence.tla:NullHolderReadsNothing`
+- `Absence.tla:LackingRequiredStops`
 - `Absence.tla:PromiseWhereValueStops`
 - `Absence.tla:UnawaitedPromiseStops`
 - `Absence.tla:MissingTextShowsNothing`
@@ -341,9 +356,20 @@ Terms used throughout:
   `MethodAsync<T>` returns a different source type than `Method<T>` (`Alis.Reactive/Components/JsObject.cs:252`).
 - `X4.2` behavior: a component that lacks a declared property stops the pipeline at the read, and the steps after
   it do not run.
-- `X4.3` behavior: an event payload that lacks a field reads nothing, and the text it sets shows nothing.
+- `X4.3` behavior: an event payload that lacks a member its declaration names stops the pipeline (D4.1, D5.3), and a
+  field of data the payload holds that the data lacks reads its start (D4.2).
 - `X4.4` behavior: a route value that reads nothing sends no request, and the `Finally` hides the loader.
 - `X4.5` behavior: a `Method()` that returns a promise stops its pipeline after the call and names `MethodAsync`.
+- `X4.6` behavior: a dose that lacks `refills`, which the app omits at its default, reads 0; one that lacks `unit`,
+  omitted when null, reads its initializer's "mg", and so does a find's field; an on-call nurse a component holds that
+  lacks `callback` reads "switchboard" (D4.2).
+- `X4.7` behavior: a populated member a dose's store lacks reads the store's own start, "fridge", and a replaced one
+  reads a new object's, "cupboard" (D4.2).
+- `X4.8` behavior: a dose that lacks the member named `constructor` reads its start, null, never what every object
+  inherits (D4.2).
+- `X4.9` behavior: a read through a batch that lacks its required `lot` stops the pipeline, and one through a batch
+  that holds it reads on; a member a seal (no constructor the binding can use) or a polymorphic delivery lacks stops
+  the pipeline (D4.2).
 
 ## Q5. The object model
 
@@ -398,7 +424,7 @@ Terms used throughout:
 
 **Checker.**
 - `Absence.tla:RequiredAbsentStops`
-- `Absence.tla:DataAbsentReadsNothing`
+- `Absence.tla:DataAbsentReadsItsStart`
 - `probe:ej2-max-public-method-arity`
 - `probe:ej2-methods-past-four-arguments`
 - `probe:ej2-event-args-presence-marks`
@@ -488,7 +514,7 @@ Terms used throughout:
   its lambda is a delegate over the item's declaration, `bed => bed.Resident`, run once when the view renders with
   the item bound to the `fn`'s parameter, and its members are required (D4.1). An item of a list of data is a C#
   value: its lambda is an expression tree, `round => round.Carer.Name`, its members named as Q2 names them and
-  optional (D4.2). A lambda reads; a step written inside one is refused where the view renders (X6.8). Each `fn`
+  read as D4.2 reads data. A lambda reads; a step written inside one is refused where the view renders (X6.8). Each `fn`
   parameter has a name of its own in the plan, so an inner lambda never hides the item of the lambda around it.
 - D6.11 `Sum` agrees with .NET for each number type. Over `double` it is JavaScript's addition, the same IEEE 754
   addition .NET does, left to right. Over `decimal` it is decimal arithmetic, the owner's finance standard
@@ -575,7 +601,7 @@ Terms used throughout:
   framework does; the list operations over data extend it (D6.10). A source the framework did not make is refused
   where the view renders, and the analyzers of POC 13 refuse a class that implements it.
 - `N6.3` new: a `DiagnosticSuppressor` that suppresses CS8602 inside the lambda of `Read`, `Where` and `Select`,
-  where a member that holds null reads nothing (D4.2). An expression tree refuses `?.` (CS8072), so without it a
+  where a member read past a holder that holds null reads nothing (D4.2). An expression tree refuses `?.` (CS8072), so without it a
   view writes `round.Carer!.Name`, a `!` that claims what the plan does not need. Built with the analyzers in POC 13.
 - `N6.2` new: `internal static class TranslatedMembers`, the closed table of D6.5.
 
@@ -589,8 +615,8 @@ Terms used throughout:
 - `X6.1` type: a list cannot be counted two ways: new:N6.1 leaves one `Count()`.
 - `X6.2` refusal: a list's lambda that calls a member outside the table: "'{term}' has no browser form in a
   list's lambda; use a member the framework translates, or move the work to the server."
-- `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name` reads that item's test
-  as nothing, so the item is not kept.
+- `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name`, whose start is null,
+  reads that item's test as nothing, so the item is not kept (D4.2, D6.4).
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
 - `X6.9` behavior: `Sum` over `decimal` terms 0.1 and 0.2 reads 0.3, equal in value to .NET's 0.30 (how a decimal
   shows as text is Q3's); over `double` it reads 0.30000000000000004, as .NET's `double` does; over `int` a running
@@ -816,7 +842,8 @@ Terms used throughout:
   inside that request's routes or the blocks they hold."
 - `X8.6` behavior: a branch with three steps in a `{}` body runs all three, in order, and none when its
   condition does not hold.
-- `X8.7` behavior: over a dose that lacks `ward`, `d.Ward != "North"` and `!(d.Ward == "North")` both leave it out;
+- `X8.7` behavior: over a dose that lacks `ward`, whose start is null, `d.Ward != "North"` and `!(d.Ward == "North")`
+  both keep it (D4.2);
   a dose whose `priority` holds null is kept by `d.Priority != 2` and left out by `d.Priority <= 2` and
   `d.Priority < 2`, as .NET's lifted operators decide (D8.9).
 - `X8.8` behavior: `or` keeps an item whose left term reads nothing when its right term holds, and `and` whose left
@@ -1767,9 +1794,10 @@ and `request` state, which the schema does not hold: a request's state is its ru
     `probe:mvc5-nested-fills-start`, `probe:mvc5-list-item-new`, `probe:mvc5-list-replaced`, and MVC 5 binds JSON
     through the same binder (`probe:mvc5-json-binds-through-binder`).
   - A new object's start is the JSON System.Text.Json writes, under the app's options (D2.9), for the object it
-    reads from `{}` (`probe:core-stj-empty-object-start`). C# writes one start per type a check reads, where the
-    view renders: the model's from the validator's `T`, an item's from `RuleForEach`'s `TElement`, an object's
-    from its member's type in the expression tree. The plan carries each once, in the form's data.
+    reads from `{}` (`probe:core-stj-empty-object-start`). C# writes the start of each member a check reads, where the
+    view renders, from the binding of the path down to it, as D4.2 reads data: a populated member's start hangs on
+    its holder's, so one start per type cannot hold it (`spec/NOTES.md`, the second start probe). The model's path
+    starts at the validator's `T`, an item's at `RuleForEach`'s `TElement`. The plan carries each in the form's data.
   - No hand reflection builds a start: the `Activator`, `GetConstructors` and `GetValue` reads of
     `ModelDefaults` leave (B11).
   - A type the endpoint's binder cannot create is refused where the view renders: on net48, a type with no

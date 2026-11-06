@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.Plan;
 
 namespace Alis.Reactive.Types;
 
 internal static class JsonPath
 {
-    internal static IReadOnlyList<PathStep> Of(LambdaExpression path, JsonSerializerOptions options)
-        => Steps(path.Body, path.Parameters[0], options, path)
+    internal static IReadOnlyList<DataStep> Of(LambdaExpression path, DataStarts starts)
+        => Steps(path.Body, path.Parameters[0], starts, path)
             ?? throw new ArgumentException($"'{path}' is not a path of members of its value, such as n => n.Pager.Number.", nameof(path));
 
-    internal static IReadOnlyList<PathStep>? Steps(System.Linq.Expressions.Expression node, ParameterExpression value, JsonSerializerOptions options, LambdaExpression path)
+    internal static IReadOnlyList<DataStep>? Steps(System.Linq.Expressions.Expression node, ParameterExpression value, DataStarts starts, LambdaExpression path)
     {
         var accesses = new List<(MemberExpression Access, Type Holder)>();
         while (node is MemberExpression { Expression: { } holder } access)
@@ -25,16 +26,16 @@ internal static class JsonPath
         var readsTheValue = node == value && accesses.Count > 0;
         if (!readsTheValue) return null;
         accesses.Reverse();
-        return accesses.ConvertAll(step => PathStep.Member(JsonName(step.Access, step.Holder, options, path)));
+        return starts.Steps(accesses.ConvertAll(step => new DataLink(step.Holder, Written(step.Access, step.Holder, starts.Values, path))));
     }
 
-    private static string JsonName(MemberExpression access, Type holder, JsonSerializerOptions options, LambdaExpression path)
+    private static JsonPropertyInfo Written(MemberExpression access, Type holder, JsonSerializerOptions options, LambdaExpression path)
     {
         var declared = DeclaredName(access, holder, options, path);
         foreach (var property in options.GetTypeInfo(holder).Properties)
         {
             var written = property.Get is not null;
-            if (written && property.Name == declared) return declared;
+            if (written && property.Name == declared) return property;
         }
 
         throw NotWritten(path, holder);
