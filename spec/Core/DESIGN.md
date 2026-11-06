@@ -536,6 +536,10 @@ Terms used throughout:
   refusing a second request in one pipeline, with its reason corrected: `Chained` runs a request after another
   succeeds, and `Parallel` sends them at once.
 - D9.18 `p.Url<TQuery>()` reads the page's own URL. It is a source (Q7), not a part of the request.
+- D9.19 A member whose source holds an object or a list of objects is sent in a query or in form data as its
+  fields, each by its binding name (`Address.City`, `Lines[0].Name`), as the binder reads them
+  (`probe:core-form-binds-indexed-name`); in a JSON body it is nested (D9.7). A component's member, a method's
+  result, a page URL member, a hidden input and a literal fill a member the same way (Q7).
 
 **Schema nodes.** `let` with `await`, `call` on the plugin `http`, `record`, `list`, `lit`, `get`, `as`, `op`; the
 shape `file`; the contract `HttpSend`, which is no node kind.
