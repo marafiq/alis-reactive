@@ -189,6 +189,9 @@
         "summary": {
           "type": "string"
         },
+        "live": {
+          "$ref": "#/$defs/Expr"
+        },
         "fields": {
           "type": "array",
           "items": {
@@ -199,69 +202,8 @@
       "required": [
         "kind",
         "summary",
+        "live",
         "fields"
-      ],
-      "additionalProperties": false
-    },
-    "FormField": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "tests": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/FormTest"
-          }
-        }
-      },
-      "required": [
-        "name",
-        "tests"
-      ],
-      "additionalProperties": false
-    },
-    "FormTest": {
-      "type": "object",
-      "properties": {
-        "check": {
-          "$ref": "#/$defs/FnExpr"
-        },
-        "when": {
-          "$ref": "#/$defs/FnExpr"
-        },
-        "message": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "check",
-        "when",
-        "message"
-      ],
-      "additionalProperties": false
-    },
-    "FnExpr": {
-      "type": "object",
-      "properties": {
-        "kind": {
-          "const": "fn"
-        },
-        "params": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "body": {
-          "$ref": "#/$defs/Expr"
-        }
-      },
-      "required": [
-        "kind",
-        "params",
-        "body"
       ],
       "additionalProperties": false
     },
@@ -513,6 +455,29 @@
         "optional"
       ]
     },
+    "FnExpr": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "fn"
+        },
+        "params": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "body": {
+          "$ref": "#/$defs/Expr"
+        }
+      },
+      "required": [
+        "kind",
+        "params",
+        "body"
+      ],
+      "additionalProperties": false
+    },
     "GetExpr": {
       "type": "object",
       "properties": {
@@ -701,6 +666,53 @@
       "required": [
         "kind",
         "name"
+      ],
+      "additionalProperties": false
+    },
+    "FormField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "items": {
+          "$ref": "#/$defs/FnExpr"
+        },
+        "value": {
+          "$ref": "#/$defs/FnExpr"
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FormTest"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "items",
+        "value",
+        "tests"
+      ],
+      "additionalProperties": false
+    },
+    "FormTest": {
+      "type": "object",
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/FnExpr"
+        },
+        "when": {
+          "$ref": "#/$defs/FnExpr"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "check",
+        "when",
+        "message"
       ],
       "additionalProperties": false
     },

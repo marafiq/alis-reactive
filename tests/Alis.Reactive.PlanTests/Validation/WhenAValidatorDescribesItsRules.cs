@@ -119,11 +119,6 @@ public class WhenAValidatorDescribesItsRules
 
         var rendered = html.Rendered(plan);
 
-        var fields = rendered.Objects()["$form:admission"]!["data"]!["fields"]!.AsArray();
-        var age = fields.Single(each => each!["name"]!.GetValue<string>() == "Age")!["tests"]!.AsArray().Single()!;
-        Assert.That(age["when"]!.ToJsonString(), Does.Contain("""{"kind":"call","target":{"kind":"obj","id":"$inputs:admission"},"path":["valueOf"],"args":[{"kind":"lit","value":"Name"},{"kind":"ref","name":"i"}],"members":"required"}"""), "the age's test reads the name as the form binds it");
-        var name = fields.Single(each => each!["name"]!.GetValue<string>() == "Name")!["tests"]!.AsArray().Single()!;
-        Assert.That(name["when"]!.ToJsonString(), Is.EqualTo("""{"kind":"fn","params":["i"],"body":{"kind":"lit","value":true}}"""), "the name's own test applies always");
         Golden.Matches(rendered, "Validation", nameof(a_dependent_rule_applies_in_the_browser_only_while_the_rule_before_it_passes));
     }
 

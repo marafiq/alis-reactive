@@ -7,6 +7,12 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         public List<EmergencyContact> Contacts { get; set; } = new();
     }
 
+    public class EmergencyContactsSave
+    {
+        public bool HasContacts { get; set; }
+        public List<EmergencyContact> Contacts { get; set; } = new();
+    }
+
     public class EmergencyContact
     {
         public string? Name { get; set; }

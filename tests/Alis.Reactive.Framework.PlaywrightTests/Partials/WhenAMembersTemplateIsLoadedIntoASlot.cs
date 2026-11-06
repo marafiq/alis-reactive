@@ -37,6 +37,18 @@ public sealed class WhenAMembersTemplateIsLoadedIntoASlot : AppPageTest
     }
 
     [Test]
+    public async Task the_pages_rule_on_a_member_the_template_has_not_yet_loaded_shows_its_message_in_the_summary()
+    {
+        await Open("/Partials/Reception");
+
+        await Button("Save the visit").ClickAsync();
+
+        await Expect(Page.Locator("#reception-form_validation_summary").GetByText("Name the next of kin.", new() { Exact = true })).ToBeVisibleAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+    }
+
+    [Test]
     public async Task the_pages_save_sends_what_the_loaded_template_holds()
     {
         await Open("/Partials/Reception");

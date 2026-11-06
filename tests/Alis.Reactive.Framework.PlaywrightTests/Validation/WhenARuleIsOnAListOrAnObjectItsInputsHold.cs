@@ -15,6 +15,7 @@ public sealed class WhenARuleIsOnAListOrAnObjectItsInputsHold : AppPageTest
     private const string Helper = "A round with needs takes a helper.";
     private const string Checklist = "A round with no needs signs the checklist.";
     private const string Lift = "Two needs or more call for the lift.";
+    private const string Signoff = "Sign the round off.";
 
     private readonly List<string> _saves = new();
 
@@ -39,6 +40,8 @@ public sealed class WhenARuleIsOnAListOrAnObjectItsInputsHold : AppPageTest
     private Task Pick(string button) => Page.GetByRole(AriaRole.Button, new() { Name = button, Exact = true }).ClickAsync();
 
     private Task Save() => Page.GetByRole(AriaRole.Button, new() { Name = "Save", Exact = true }).ClickAsync();
+
+    private Task SaveWithTheWing() => Page.GetByRole(AriaRole.Button, new() { Name = "Save with the wing", Exact = true }).ClickAsync();
 
     [Test]
     public async Task a_rule_on_a_list_its_item_inputs_hold_reads_the_items_they_hold()
@@ -82,19 +85,61 @@ public sealed class WhenARuleIsOnAListOrAnObjectItsInputsHold : AppPageTest
     }
 
     [Test]
-    public async Task a_list_beside_the_form_reads_the_item_inputs_the_page_renders_for_it()
+    public async Task a_condition_on_an_object_the_page_renders_no_input_for_reads_it_as_a_new_round_holds_it()
+    {
+        await Open("/Validation/RoomRound?lead=false");
+        await Write("Steward", "");
+        await Write("Deputy", "");
+
+        await Save();
+        await Expect(Field("Deputy").GetByText(Deputy)).ToBeVisibleAsync();
+        await Expect(Field("Steward").GetByText(Steward)).ToBeHiddenAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
+
+        await Write("Deputy", "Jo");
+        await Save();
+        await Expect(Saved).ToHaveTextAsync("saved");
+    }
+
+    [Test]
+    public async Task a_member_the_page_renders_no_input_for_reads_as_a_new_round_leaves_it()
+    {
+        await Open("/Validation/RoomRound");
+
+        await Save();
+
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Page.GetByText(Signoff)).ToBeHiddenAsync();
+    }
+
+    [Test]
+    public async Task a_list_the_request_does_not_send_reads_as_a_new_round_leaves_it()
+    {
+        await Open("/Validation/RoomRound");
+        await Write("Badge", "");
+        await Write("Wing", "North");
+
+        await Save();
+
+        await Expect(Saved).ToHaveTextAsync("saved");
+        await Expect(Field("Badge").GetByText(Badge)).ToBeHiddenAsync();
+    }
+
+    [Test]
+    public async Task a_list_the_request_sends_beside_the_form_reads_the_items_it_sends()
     {
         await Open("/Validation/RoomRound");
         await Write("Badge", "");
 
         await Write("Wing", "North");
-        await Save();
+        await SaveWithTheWing();
         await Expect(Field("Badge").GetByText(Badge)).ToBeVisibleAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
         lock (_saves) Assert.That(_saves, Is.Empty, "the browser held the request");
 
         await Write("Wing", "East");
-        await Save();
+        await SaveWithTheWing();
         await Expect(Saved).ToHaveTextAsync("saved");
         await Expect(Field("Badge").GetByText(Badge)).ToBeHiddenAsync();
     }

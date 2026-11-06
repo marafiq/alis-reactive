@@ -224,7 +224,7 @@ namespace Alis.Reactive.PlanModel.Reactions
         }
 
         internal override void WriteTo(List<Statement> block, Scope scope)
-            => block.Add(G.Do(G.Call(G.Obj(scope.Objects.Form(_form)), PathMembers.Required, "validate")));
+            => block.Add(G.Do(G.Call(G.Obj(scope.Objects.Form(_form)), PathMembers.Required, "validate", G.Fn(FormBody.Live(scope, _form)))));
     }
 
     internal sealed class BranchStep : Step

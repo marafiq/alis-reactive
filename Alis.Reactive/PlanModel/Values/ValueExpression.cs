@@ -125,17 +125,7 @@ namespace Alis.Reactive.PlanModel.Values
 
         internal static ValueExpression ReadUrl(string key, Shape shape) => new UrlRead(key, shape);
 
-        internal static ValueExpression ReadBound(string name, Shape shape)
-            => new BoundRead(name, shape, BoundRead.Page, G.List(Array.Empty<Expr>()));
-
-        internal static ValueExpression ReadBound(string name, Shape shape, string formId, string itemIndexes)
-            => new BoundRead(name, shape, formId, G.Ref(itemIndexes));
-
-        internal static ValueExpression ReadBoundItemIndexes(string itemName, string formId, string indexes, int ownerDepth)
-            => new BoundItemIndexesRead(itemName, formId, G.Call(G.Ref(indexes), PathMembers.Optional, "slice", G.Lit(0), G.Lit(ownerDepth)));
-
-        internal static ValueExpression ReadSent(string name, Shape shape, string formId, string itemIndexes)
-            => new SentRead(name, shape, formId, G.Ref(itemIndexes));
+        internal static ValueExpression ReadBound(string name, Shape shape) => new BoundRead(name, shape);
 
         internal static ValueExpression Record(IReadOnlyList<(string Name, ValueExpression Value)> fields)
         {
@@ -312,73 +302,26 @@ namespace Alis.Reactive.PlanModel.Values
 
     internal sealed class BoundRead : ValueExpression
     {
-        internal const string Page = "";
-
         private readonly string _name;
         private readonly Shape _shape;
-        private readonly string _containerId;
-        private readonly Expr _indexes;
 
-        internal BoundRead(string name, Shape shape, string containerId, Expr indexes)
+        internal BoundRead(string name, Shape shape)
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-            _containerId = containerId ?? throw new ArgumentNullException(nameof(containerId));
-            _indexes = indexes ?? throw new ArgumentNullException(nameof(indexes));
         }
+
+        internal string Name => _name;
 
         internal override Shape OutputShape => _shape;
 
         internal override Expr Write(Scope scope)
         {
-            if (_containerId != Page)
-                return G.Call(G.Obj(scope.Objects.Inputs(_containerId)), new[] { "valueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any, PathMembers.Required);
-
             var args = scope.Objects.TryFindOnlyInputItRendered(_name, out var own)
-                ? new[] { G.Lit(_name), _indexes, G.Lit(own) }
-                : new[] { G.Lit(_name), _indexes };
+                ? new[] { G.Lit(_name), G.List(Array.Empty<Expr>()), G.Lit(own) }
+                : new[] { G.Lit(_name), G.List(Array.Empty<Expr>()) };
             return G.Call(G.Obj(scope.Objects.Model()), new[] { "valueOf" }, args, Shape.Any, PathMembers.Required);
         }
-    }
-
-    internal sealed class BoundItemIndexesRead : ValueExpression
-    {
-        private readonly string _itemName;
-        private readonly string _formId;
-        private readonly Expr _ownerIndexes;
-
-        internal BoundItemIndexesRead(string itemName, string formId, Expr ownerIndexes)
-        {
-            _itemName = itemName ?? throw new ArgumentNullException(nameof(itemName));
-            _formId = formId ?? throw new ArgumentNullException(nameof(formId));
-            _ownerIndexes = ownerIndexes ?? throw new ArgumentNullException(nameof(ownerIndexes));
-        }
-
-        internal override Shape OutputShape => Shape.Any;
-
-        internal override Expr Write(Scope scope)
-            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "indexesOf" }, new[] { G.Lit(_itemName), _ownerIndexes }, Shape.Any, PathMembers.Required);
-    }
-
-    internal sealed class SentRead : ValueExpression
-    {
-        private readonly string _name;
-        private readonly Shape _shape;
-        private readonly string _formId;
-        private readonly Expr _indexes;
-
-        internal SentRead(string name, Shape shape, string formId, Expr indexes)
-        {
-            _name = name ?? throw new ArgumentNullException(nameof(name));
-            _shape = shape ?? throw new ArgumentNullException(nameof(shape));
-            _formId = formId ?? throw new ArgumentNullException(nameof(formId));
-            _indexes = indexes ?? throw new ArgumentNullException(nameof(indexes));
-        }
-
-        internal override Shape OutputShape => _shape;
-
-        internal override Expr Write(Scope scope)
-            => G.Call(G.Obj(scope.Objects.Inputs(_formId)), new[] { "sentValueOf" }, new[] { G.Lit(_name), _indexes }, Shape.Any, PathMembers.Required);
     }
 
     internal sealed class RecordExpression : ValueExpression

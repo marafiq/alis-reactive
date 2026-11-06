@@ -27,20 +27,16 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Controllers.Validation
         }
 
         [HttpPost("SaveContacts")]
-        public IActionResult SaveContacts([FromBody] EmergencyContactsModel? intake)
+        public IActionResult SaveContacts([FromBody] EmergencyContactsSave? save)
         {
-            if (intake == null) return BadRequest();
+            if (save == null) return BadRequest();
 
-            var contacts = intake.HasContacts ? intake.Contacts : new List<EmergencyContact>();
-            var contactValidator = new EmergencyContactValidator();
-            var errors = contacts
-                .SelectMany((contact, index) => contactValidator.Validate(contact).Errors
-                    .Select(error => (Name: $"Contacts[{index}].{error.PropertyName}", error.ErrorMessage)))
-                .GroupBy(error => error.Name)
-                .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage).ToArray());
-            if (errors.Count > 0) return BadRequest(new { errors });
+            var result = new EmergencyContactsSaveValidator().Validate(save);
+            if (!result.IsValid)
+                return BadRequest(new { errors = result.ErrorsByField });
 
-            return Ok(new EmergencyContactsConfirmation($"Emergency contacts saved: {contacts.Count}."));
+            var saved = save.HasContacts ? save.Contacts.Count : 0;
+            return Ok(new EmergencyContactsConfirmation($"Emergency contacts saved: {saved}."));
         }
 
         private static string ConfirmationFor(EmergencyContactsModel intake)

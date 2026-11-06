@@ -14,6 +14,15 @@ namespace Alis.Reactive.SandboxApp.Areas.Sandbox.Models
         }
     }
 
+    public class EmergencyContactsSaveValidator : ReactiveValidator<EmergencyContactsSave>
+    {
+        public EmergencyContactsSaveValidator()
+        {
+            When(x => x.HasContacts, () =>
+                RuleForEach(x => x.Contacts).SetValidator(new EmergencyContactValidator()));
+        }
+    }
+
     public class EmergencyContactsValidator : ReactiveValidator<EmergencyContactsModel>
     {
         public EmergencyContactsValidator()

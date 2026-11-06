@@ -47,7 +47,7 @@ namespace Alis.Reactive.Inputs
             : Path.Length == 0 ? new FieldReference(prefix, Type, Shape)
             : new FieldReference(prefix + "." + Path, Type, Shape);
 
-        private static Type? ItemTypeOf(Type type)
+        internal static Type? ItemTypeOf(Type type)
         {
             if (type.IsArray) return type.GetElementType();
             foreach (var candidate in new[] { type }.Concat(type.GetInterfaces()))

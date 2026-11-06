@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "A room round";
     var plan = Html.ReactivePlan<RoomRound>();
+    var lead = (bool)ViewData["Lead"]!;
 }
 <h1>A room round</h1>
 
@@ -16,7 +17,10 @@
     @{ Html.InputField(plan, m => m.Helper, o => o.Label("Helper")).Entry(); }
     @{ Html.InputField(plan, m => m.Checklist, o => o.Label("Checklist")).Entry(); }
     @{ Html.InputField(plan, m => m.Lift, o => o.Label("Lift")).Entry(); }
-    @{ Html.InputField(plan, m => m.Lead.Name, o => o.Label("Lead")).Entry(); }
+    @if (lead)
+    {
+        Html.InputField(plan, m => m.Lead.Name, o => o.Label("Lead")).Entry();
+    }
     @{ Html.InputField(plan, m => m.Badge, o => o.Label("Badge")).Entry(); }
     @{ Html.InputField(plan, m => m.Steward, o => o.Label("Steward")).Entry(); }
     @{ Html.InputField(plan, m => m.Deputy, o => o.Label("Deputy")).Entry(); }
@@ -31,6 +35,13 @@
 @(plan.Button("save", "Save")
     .Reactive(button => button.Click, p => p.Post("/Validation/RoomRound")
         .Gather(g => g.Form())
+        .Validate<RoomRoundRules>("round-form")
+        .Response(r => r
+            .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))
+            .OnError(400, e => e.ValidationErrors("round-form")))))
+@(plan.Button("save-with-wing", "Save with the wing")
+    .Reactive(button => button.Click, p => p.Post("/Validation/RoomRound")
+        .Gather(g => g.Form().Form(m => m.Wings[0]))
         .Validate<RoomRoundRules>("round-form")
         .Response(r => r
             .OnSuccess<Booked>((saved, s) => s.Element("saved").Text.Set(saved.Get(x => x.Summary)))

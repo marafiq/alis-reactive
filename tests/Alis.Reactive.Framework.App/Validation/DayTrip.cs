@@ -74,6 +74,8 @@ public sealed class DayTripRules : ReactiveValidator<DayTrip>
             guest.RuleFor(x => x.Name).NotEmpty().WithMessage("Name each guest.").DependentRules(() =>
                 guest.RuleFor(x => x.Relation).NotEmpty().WithMessage("Say how each guest is related.")));
         RuleForEach(x => x.Guests).ChildRules(guest =>
+            guest.RuleFor(x => x.Bags).NotEmpty().WithMessage("Bring each guest's bag."));
+        RuleForEach(x => x.Guests).ChildRules(guest =>
             guest.RuleForEach(x => x.Bags).NotEmpty().WithMessage("Tag each bag.").DependentRules(() =>
                 guest.RuleFor(x => x.Porter).NotEmpty().WithMessage("Name each guest's porter.")));
         RuleForEach(x => x.Companions).ChildRules(companion =>

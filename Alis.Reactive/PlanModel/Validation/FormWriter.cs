@@ -17,20 +17,22 @@ namespace Alis.Reactive.PlanModel.Validation
         }
 
         internal FormPluginData Form(string formId, IReadOnlyList<CheckedField> fields)
-            => new FormPluginData(FormSummaries.IdOf(formId), fields.Select(Field).ToList());
+            => new FormPluginData(FormSummaries.IdOf(formId), FormBody.Live(_scope, formId), fields.Select(Field).ToList());
 
         private FormField Field(CheckedField field)
         {
             var tests = field.Rules
                 .Select(rule => new FormTest(Check(rule, field), When(rule, field.Values), rule.Message))
                 .ToList();
-            return new FormField(field.Name, tests);
+            var value = G.Fn(field.Values.Value(field.Reference).Write(_scope), FormFieldValues.Indexes, FormFieldValues.Sent);
+            var items = G.Fn(field.Values.Items(field.Reference, _scope), FormFieldValues.Sent);
+            return new FormField(field.Name, items, value, tests);
         }
 
         private FnExpr When(BrowserRule rule, FormFieldValues values)
-            => G.Fn(rule.Condition.Bound(values).Write(_scope), FormFieldValues.Indexes);
+            => G.Fn(rule.Condition.Bound(values).Write(_scope), FormFieldValues.Indexes, FormFieldValues.Sent);
 
         private FnExpr Check(BrowserRule rule, CheckedField field)
-            => G.Fn(rule.Check(field.Values.Checked(field.Reference, G.Ref(Value), _scope), field.Shape, field.Values, _scope), Value, FormFieldValues.Indexes);
+            => G.Fn(rule.Check(G.Ref(Value), field.Shape, field.Values, _scope), Value, FormFieldValues.Indexes, FormFieldValues.Sent);
     }
 }

@@ -36,8 +36,8 @@
                     .CssClass("rounded-md border border-border bg-white px-4 py-2 text-sm font-medium text-text hover:bg-surface-subtle")
                     .Reactive(plan, evt => evt.Click, (args, p) =>
                     {
-                        p.Post(Url.SandboxRoute("SaveContacts", "EmergencyContacts")).Gather(g => g.Form().Form(m => m.HasContacts))
-                         .Validate<EmergencyContactsValidator>("contacts-section")
+                        p.Post(Url.SandboxRoute("SaveContacts", "EmergencyContacts")).Gather<EmergencyContactsSave>(g => g.Form().Form(m => m.HasContacts))
+                         .Validate<EmergencyContactsSaveValidator>("contacts-section")
                          .Response(r => r
                             .OnSuccess<EmergencyContactsConfirmation>((json, s) =>
                             {

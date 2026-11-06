@@ -12,9 +12,15 @@ public sealed class ValidationController : Controller
 
     public IActionResult Escort() => View(new EscortRequest());
 
-    public IActionResult RoomRound() => View(new RoomRound());
+    public IActionResult RoomRound(bool lead = true)
+    {
+        ViewData["Lead"] = lead;
+        return View(new RoomRound());
+    }
 
     public IActionResult CareNote() => View(new CareNote());
+
+    public IActionResult LedgerRefused() => View(new Ledger());
 
     public IActionResult EscortRefused(EscortUnreadable unreadable = EscortUnreadable.TrimmedText)
     {
@@ -339,9 +345,10 @@ public sealed class ValidationController : Controller
         return Json(new Booked { Summary = "saved" });
     }
 
-    public IActionResult DayTrip(bool seats = true)
+    public IActionResult DayTrip(bool seats = true, bool bothBags = true)
     {
         ViewData["Seats"] = seats;
+        ViewData["BothBags"] = bothBags;
         return View(new DayTrip());
     }
 

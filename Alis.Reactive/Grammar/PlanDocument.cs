@@ -181,9 +181,10 @@ namespace Alis.Reactive.Grammar
 
     internal sealed class FormPluginData : PluginData
     {
-        internal FormPluginData(string summary, IReadOnlyList<FormField> fields)
+        internal FormPluginData(string summary, Expr live, IReadOnlyList<FormField> fields)
         {
             Summary = summary ?? throw new ArgumentNullException(nameof(summary));
+            Live = live ?? throw new ArgumentNullException(nameof(live));
             Fields = fields ?? throw new ArgumentNullException(nameof(fields));
         }
 
@@ -191,19 +192,25 @@ namespace Alis.Reactive.Grammar
 
         public string Summary { get; }
 
+        public Expr Live { get; }
+
         public IReadOnlyList<FormField> Fields { get; }
     }
 
     internal sealed class FormField
     {
-        internal FormField(string name, IReadOnlyList<FormTest> tests)
+        internal FormField(string name, FnExpr items, FnExpr value, IReadOnlyList<FormTest> tests)
         {
             if (string.IsNullOrEmpty(name)) throw new ArgumentException("Field name required.", nameof(name));
             Name = name;
+            Items = items ?? throw new ArgumentNullException(nameof(items));
+            Value = value ?? throw new ArgumentNullException(nameof(value));
             Tests = tests ?? throw new ArgumentNullException(nameof(tests));
         }
 
         public string Name { get; }
+        public FnExpr Items { get; }
+        public FnExpr Value { get; }
         public IReadOnlyList<FormTest> Tests { get; }
     }
 

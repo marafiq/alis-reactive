@@ -27,6 +27,8 @@ public sealed class RoomRound
     public string? Steward { get; set; } = "yes";
 
     public string? Deputy { get; set; } = "yes";
+
+    public string? Signoff { get; set; } = "yes";
 }
 
 public sealed class RoundLead
@@ -50,5 +52,6 @@ public sealed class RoomRoundRules : ReactiveValidator<RoomRound>
         RuleFor(x => x.Helper).NotEmpty().When(x => x.Needs != null && x.Needs.Any()).WithMessage("A round with needs takes a helper.");
         RuleFor(x => x.Checklist).NotEmpty().When(x => x.Needs == null || !x.Needs.Any()).WithMessage("A round with no needs signs the checklist.");
         RuleFor(x => x.Lift).NotEmpty().When(x => x.Needs != null && x.Needs.Count > 1).WithMessage("Two needs or more call for the lift.");
+        RuleFor(x => x.Signoff).NotEmpty().WithMessage("Sign the round off.");
     }
 }

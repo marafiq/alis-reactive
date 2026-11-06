@@ -1,0 +1,17 @@
+@using Alis.Reactive.Framework.App.Validation
+@model Ledger
+@{
+    ViewData["Title"] = "A ledger whose lines cannot be made new";
+    var plan = Html.ReactivePlan<Ledger>();
+}
+<h1>A ledger whose lines cannot be made new</h1>
+
+<div id="ledger-form">
+    @{ Html.InputField(plan, m => m.Lines[0].Count, o => o.Label("Count")).Entry(); }
+</div>
+
+@(plan.Button("save", "Save").Reactive(button => button.Click, p => p.Post("/Validation/Ledger")
+    .Gather(g => g.Form())
+    .Validate<LedgerRules>("ledger-form")))
+
+@Html.RenderPlan(plan)

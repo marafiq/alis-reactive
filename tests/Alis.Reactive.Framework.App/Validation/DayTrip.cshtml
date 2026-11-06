@@ -4,6 +4,7 @@
     ViewData["Title"] = "A day trip";
     var plan = Html.ReactivePlan<DayTrip>();
     var seats = (bool)ViewData["Seats"]!;
+    var bothBags = (bool)ViewData["BothBags"]!;
 }
 <h1>A day trip</h1>
 
@@ -14,7 +15,10 @@
     @{ Html.InputField(plan, m => m.Guests[1].Relation, o => o.Label("Second guest's relation")).Entry(); }
     @{ Html.InputField(plan, m => m.Guests[0].Bags[0], o => o.Label("First guest's bag")).Entry(); }
     @{ Html.InputField(plan, m => m.Guests[0].Porter, o => o.Label("First guest's porter")).Entry(); }
-    @{ Html.InputField(plan, m => m.Guests[1].Bags[0], o => o.Label("Second guest's bag")).Entry(); }
+    @if (bothBags)
+    {
+        Html.InputField(plan, m => m.Guests[1].Bags[0], o => o.Label("Second guest's bag")).Entry();
+    }
     @{ Html.InputField(plan, m => m.Guests[1].Porter, o => o.Label("Second guest's porter")).Entry(); }
     @{ Html.InputField(plan, m => m.Companions[0].Badge, o => o.Label("First badge")).Entry(); }
     @{ Html.InputField(plan, m => m.Companions[0].Phone, o => o.Label("First badge holder's phone")).Entry(); }

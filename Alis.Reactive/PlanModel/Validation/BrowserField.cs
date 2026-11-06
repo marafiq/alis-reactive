@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.Inputs;
+using Alis.Reactive.Members;
 
 namespace Alis.Reactive
 {
@@ -26,12 +27,14 @@ namespace Alis.Reactive
             FieldReference field,
             IEnumerable<BrowserRule> rules,
             IEnumerable<BrowserField> itemFields,
-            Condition ownerCondition)
+            Condition ownerCondition,
+            Type? model = null)
         {
             Reference = field;
             Rules = rules.ToArray();
             ItemFields = itemFields.ToArray();
             _ownerCondition = ownerCondition;
+            Model = model;
         }
 
         /// <summary>The member's path in the validator's model, for example <c>"Address.City"</c>.</summary>
@@ -43,6 +46,10 @@ namespace Alis.Reactive
         internal IReadOnlyList<BrowserField> ItemFields { get; }
 
         internal FieldReference Reference { get; }
+
+        internal Type? Model { get; }
+
+        internal BrowserField Of(Type? model) => new BrowserField(Reference, Rules, ItemFields, _ownerCondition, model);
 
         internal BrowserField PrefixedBy(string prefix, Condition outer)
             => new BrowserField(
@@ -78,6 +85,7 @@ namespace Alis.Reactive
     {
         private readonly Dictionary<string, Entry> _fields = new Dictionary<string, Entry>(StringComparer.Ordinal);
         private readonly List<Entry> _order = new List<Entry>();
+        private Type? _model;
 
         /// <summary>Adds a rule on a member.</summary>
         /// <param name="member">The member, as a path from the validator's model: <c>x =&gt; x.Address.City</c>.</param>
@@ -85,6 +93,7 @@ namespace Alis.Reactive
         public void Add(LambdaExpression member, BrowserRule rule)
         {
             if (rule == null) throw new ArgumentNullException(nameof(rule));
+            RootedAt(member);
             var reference = FieldReference.Of(member);
             if (!rule.TryFor(reference, out var resolved)) return;
             Ensure(resolved.Condition.Fields);
@@ -101,6 +110,7 @@ namespace Alis.Reactive
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             if (when == null) throw new ArgumentNullException(nameof(when));
             Ensure(when.Fields);
+            RootedAt(collection);
             var member = FieldReference.Of(collection);
             var item = FieldReference.ItemOf(member);
             var itemRules = new List<BrowserRule>();
@@ -119,6 +129,7 @@ namespace Alis.Reactive
             if (itemFields == null) throw new ArgumentNullException(nameof(itemFields));
             if (when == null) throw new ArgumentNullException(nameof(when));
             Ensure(when.Fields);
+            RootedAt(collection);
             var entry = Ensure(FieldReference.Of(collection));
             foreach (var itemField in itemFields)
                 entry.ItemFields.Add(itemField.ScopedBy(when));
@@ -134,7 +145,10 @@ namespace Alis.Reactive
         /// <param name="fields">The child validator's members and rules.</param>
         /// <param name="when">The condition the child's rule is declared under.</param>
         public void Add(LambdaExpression owner, IEnumerable<BrowserField> fields, Condition when)
-            => AddUnder(FieldReference.Of(owner).Path, fields, when);
+        {
+            RootedAt(owner);
+            AddUnder(FieldReference.Of(owner).Path, fields, when);
+        }
 
         private void AddUnder(string prefix, IEnumerable<BrowserField> fields, Condition when)
         {
@@ -143,6 +157,7 @@ namespace Alis.Reactive
             Ensure(when.Fields);
             foreach (var field in fields)
             {
+                if (prefix.Length == 0 && field.Model != null) RootedAt(field.Model);
                 var target = field.PrefixedBy(prefix, when);
                 var entry = Ensure(target.Reference);
                 foreach (var rule in target.Rules)
@@ -153,7 +168,25 @@ namespace Alis.Reactive
 
         /// <summary>Every member the validator names, with its rules, where it first named it.</summary>
         public IReadOnlyList<BrowserField> Fields
-            => _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields)).ToArray();
+            => _order.Select(entry => new BrowserField(entry.Field, entry.Rules, entry.ItemFields).Of(_model)).ToArray();
+
+        private void RootedAt(LambdaExpression member)
+        {
+            if (member == null) throw new ArgumentNullException(nameof(member));
+            RootedAt(member.Parameters[0].Type);
+        }
+
+        private void RootedAt(Type root)
+        {
+            var unrelated = _model != null && !_model.IsAssignableFrom(root) && !root.IsAssignableFrom(_model);
+            if (unrelated)
+            {
+                throw new InvalidOperationException(
+                    $"A validator's browser rules read one model; they name both {CSharpTypeName.Of(_model!)} and {CSharpTypeName.Of(root)}.");
+            }
+
+            if (_model == null || _model.IsAssignableFrom(root)) _model = root;
+        }
 
         private void AddRule(FieldReference field, BrowserRule rule)
         {

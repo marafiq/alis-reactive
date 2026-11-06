@@ -1,4 +1,4 @@
-import type { FormField, FormPluginData, FormTest, PluginData } from "../../types/index";
+import type { Expr, FormField, FormPluginData, PluginData } from "../../types/index";
 import type { Contribution, Plugin } from "../../objects/plugins";
 import type { PlanObjects } from "../../objects/plan-objects";
 import { evaluate, rootScope } from "../../grammar/evaluate";
@@ -6,7 +6,7 @@ import { asText } from "../../grammar/shape";
 import { isRecord } from "../../shared/record";
 import { logger } from "../../diagnostics/trace";
 import { COMMIT_EVENT } from "../../plans/mount-events";
-import { boundNameOf, containedInputs, isMountedInput, namedInputs, type NamedInput } from "../model";
+import { boundNameOf, containedInputs, isMountedInput, nameAt, namedInputs, type NamedInput } from "../model";
 import {
   addToSummary, canRenderInline, clearInline, clearSummary, hideSummaryDiv, removeSummaryEntry,
   showInline, showServerInline, showsServerMessage, showSummaryDiv, summaryHasEntries,
@@ -16,6 +16,7 @@ const log = logger("validation");
 
 interface Entry {
   readonly field: FormField;
+  readonly live: Expr;
   readonly objects: PlanObjects;
 }
 
@@ -25,7 +26,7 @@ interface Form {
 }
 
 export interface FormObject {
-  validate(): boolean;
+  validate(sent: () => unknown): boolean;
   showErrors(problem: unknown): void;
 }
 
@@ -60,67 +61,56 @@ function clearAndHide(summary: HTMLElement | null): void {
   hideSummaryDiv(summary);
 }
 
-function evaluateWhen(entry: Entry, test: FormTest, indexes: readonly number[]): boolean {
-  const when = evaluate(test.when, rootScope(entry.objects)) as (indexes: readonly number[]) => unknown;
-  return !!when(indexes);
+type Indexes = readonly number[];
+
+function failedMessage(entry: Entry, indexes: Indexes, sent: unknown): string | undefined {
+  const scope = rootScope(entry.objects);
+  const value = (evaluate(entry.field.value, scope) as (indexes: Indexes, sent: unknown) => unknown)(indexes, sent);
+  for (const test of entry.field.tests) {
+    const when = evaluate(test.when, scope) as (indexes: Indexes, sent: unknown) => unknown;
+    if (!when(indexes, sent)) continue;
+    const check = evaluate(test.check, scope) as (value: unknown, indexes: Indexes, sent: unknown) => unknown;
+    if (check(value, indexes, sent)) continue;
+
+    log.trace("test.failed", { field: nameAt(entry.field.name, indexes), value, message: test.message });
+    return test.message;
+  }
+  return undefined;
 }
 
-function checkPasses(entry: Entry, test: FormTest, value: unknown, indexes: readonly number[]): boolean {
-  const check = evaluate(test.check, rootScope(entry.objects)) as (value: unknown, indexes: readonly number[]) => unknown;
-  return !!check(value, indexes);
-}
-
-function namesItems(field: FormField): boolean {
-  return field.name.includes("[*]");
-}
-
-function evaluateField(entry: Entry, container: HTMLElement, summary: HTMLElement | null): boolean {
-  const inputs = namedInputs(entry.field.name);
-  if (inputs.length === 0) return namesItems(entry.field) || unmountedField(entry, summary);
-
+function evaluateField(entry: Entry, container: HTMLElement, summary: HTMLElement | null, sent: unknown): boolean {
+  const held = namedInputs(entry.field.name).filter(input => container.contains(input.element));
   let valid = true;
-  for (const input of inputs) {
-    if (!container.contains(input.element)) {
-      log.trace("field.out-of-scope", { field: input.name });
-      continue;
-    }
-    if (!evaluateInput(entry, input, summary)) valid = false;
+  for (const indexes of itemsOf(entry, sent)) {
+    const message = failedMessage(entry, indexes, sent);
+    if (message === undefined) continue;
+
+    valid = false;
+    const inputs = held.filter(input => sameIndexes(input.indexes, indexes));
+    if (inputs.length === 0) addSummaryError(summary, nameAt(entry.field.name, indexes), message);
+    for (const input of inputs) show(input, summary, message);
   }
   return valid;
 }
 
-function evaluateInput(entry: Entry, input: NamedInput, summary: HTMLElement | null): boolean {
-  const inlineHidden = !canRenderInline(input.id);
-  const value = input.value;
-  for (const test of entry.field.tests) {
-    if (!evaluateWhen(entry, test, input.indexes)) continue;
-    if (checkPasses(entry, test, value, input.indexes)) continue;
-
-    log.trace("test.failed", { field: input.name, value, message: test.message });
-    if (inlineHidden) {
-      addSummaryError(summary, input.name, test.message);
-    } else {
-      showInline(input.id, test.message);
-      removeSummaryError(summary, input.name);
-    }
-    return false;
-  }
-  return true;
+function itemsOf(entry: Entry, sent: unknown): readonly Indexes[] {
+  return (evaluate(entry.field.items, rootScope(entry.objects)) as (sent: unknown) => readonly Indexes[])(sent);
 }
 
-function unmountedField(entry: Entry, summary: HTMLElement | null): boolean {
-  const { field } = entry;
-  log.trace("validation-field.unmounted", { field: field.name });
-  for (const test of field.tests) {
-    if (!evaluateWhen(entry, test, [])) continue;
-    if (checkPasses(entry, test, undefined, [])) continue;
-    addSummaryError(summary, field.name, test.message);
-    return false;
-  }
-  return true;
+function sameIndexes(held: Indexes, indexes: Indexes): boolean {
+  return held.length === indexes.length && held.every((index, position) => index === indexes[position]);
 }
 
-function validate(containerId: string, summaryId: string): boolean {
+function show(input: NamedInput, summary: HTMLElement | null, message: string): void {
+  if (!canRenderInline(input.id)) {
+    addSummaryError(summary, input.name, message);
+    return;
+  }
+  showInline(input.id, message);
+  removeSummaryError(summary, input.name);
+}
+
+function validate(containerId: string, summaryId: string, sentBody: () => unknown): boolean {
   const { entries } = formOf(containerId, summaryId);
   const container = document.getElementById(containerId);
   if (container === null) {
@@ -129,13 +119,14 @@ function validate(containerId: string, summaryId: string): boolean {
     return false;
   }
 
+  const sent = sentBody();
   const summary = document.getElementById(summaryId);
   clearInlineMessages(containedInputs(containerId).ids);
   clearAndHide(summary);
 
   let valid = true;
   for (const entry of entries) {
-    if (!evaluateField(entry, container, summary)) valid = false;
+    if (!evaluateField(entry, container, summary, sent)) valid = false;
   }
   log.debug("validated", { id: containerId, valid });
   return valid;
@@ -165,7 +156,10 @@ function revalidate(element: HTMLElement): void {
   for (const { summary } of holders) removeSummaryError(summary, name);
   for (const { summary, checks } of holders) {
     for (const { entry, input } of checks) {
-      if (!evaluateInput(entry, input, summary)) return;
+      const message = failedMessage(entry, input.indexes, evaluate(entry.live, rootScope(entry.objects)));
+      if (message === undefined) continue;
+      show(input, summary, message);
+      return;
     }
   }
 }
@@ -232,13 +226,13 @@ function summaryOf(data: PluginData): string {
 
 export const formPlugin: Plugin = {
   object: (containerId, data): FormObject => ({
-    validate: () => validate(containerId, summaryOf(data)),
+    validate: sent => validate(containerId, summaryOf(data), sent),
     showErrors: problem => showErrors(containerId, summaryOf(data), problem),
   }),
   contribute({ key, data: contributed, owner, objects }: Contribution) {
     const data = contributed as FormPluginData;
     const form = formOf(key, data.summary);
-    const added = data.fields.map(field => ({ field, objects }));
+    const added = data.fields.map(field => ({ field, live: data.live, objects }));
     form.entries.push(...added);
     if (owner.isSlot) clearAndHide(document.getElementById(data.summary));
     listenToInputs();

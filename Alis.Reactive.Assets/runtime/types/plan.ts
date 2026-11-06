@@ -56,24 +56,8 @@ export type PluginData =
 export interface FormPluginData {
   kind: "form";
   summary: string;
+  live: Expr;
   fields: FormField[];
-}
-
-export interface FormField {
-  name: string;
-  tests: FormTest[];
-}
-
-export interface FormTest {
-  check: FnExpr;
-  when: FnExpr;
-  message: string;
-}
-
-export interface FnExpr {
-  kind: "fn";
-  params: string[];
-  body: Expr;
 }
 
 export type Expr =
@@ -156,6 +140,12 @@ export type PathMembers =
   | "required"
   | "optional";
 
+export interface FnExpr {
+  kind: "fn";
+  params: string[];
+  body: Expr;
+}
+
 export interface GetExpr {
   kind: "get";
   target: Expr;
@@ -232,6 +222,19 @@ export interface RecordField {
 export interface RefExpr {
   kind: "ref";
   name: string;
+}
+
+export interface FormField {
+  name: string;
+  items: FnExpr;
+  value: FnExpr;
+  tests: FormTest[];
+}
+
+export interface FormTest {
+  check: FnExpr;
+  when: FnExpr;
+  message: string;
 }
 
 export interface HubPluginData {

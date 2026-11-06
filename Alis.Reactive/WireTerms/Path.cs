@@ -126,8 +126,8 @@ namespace Alis.Reactive.WireTerms
                         nameof(text));
                 }
 
-                segments.Add(int.TryParse(step, NumberStyles.None, CultureInfo.InvariantCulture, out var position)
-                    ? PathSegment.AtIndex(position)
+                segments.Add(step == "*" ? PathSegment.EachItem
+                    : int.TryParse(step, NumberStyles.None, CultureInfo.InvariantCulture, out var position) ? PathSegment.AtIndex(position)
                     : PathSegment.Property(step));
             }
 

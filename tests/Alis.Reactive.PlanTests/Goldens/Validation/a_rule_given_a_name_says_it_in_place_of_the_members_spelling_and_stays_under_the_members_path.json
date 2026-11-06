@@ -62,6 +62,14 @@
         }
       }
     },
+    "$inputs:admission": {
+      "kind": "plugin",
+      "name": "alis.model",
+      "key": "admission",
+      "data": {
+        "kind": "none"
+      }
+    },
     "$form:admission": {
       "kind": "plugin",
       "name": "alis.form",
@@ -69,16 +77,85 @@
       "data": {
         "kind": "form",
         "summary": "admission_validation_summary",
+        "live": {
+          "kind": "call",
+          "target": {
+            "kind": "obj",
+            "id": "$inputs:admission"
+          },
+          "path": [
+            "fill"
+          ],
+          "args": [
+            {
+              "kind": "record",
+              "fields": []
+            }
+          ],
+          "members": "required"
+        },
         "fields": [
           {
             "name": "Deposit",
+            "items": {
+              "kind": "fn",
+              "params": [
+                "sent"
+              ],
+              "body": {
+                "kind": "list",
+                "items": [
+                  {
+                    "kind": "list",
+                    "items": []
+                  }
+                ]
+              }
+            },
+            "value": {
+              "kind": "fn",
+              "params": [
+                "i",
+                "sent"
+              ],
+              "body": {
+                "kind": "call",
+                "target": {
+                  "kind": "obj",
+                  "id": "$model"
+                },
+                "path": [
+                  "sentValueOf"
+                ],
+                "args": [
+                  {
+                    "kind": "ref",
+                    "name": "sent"
+                  },
+                  {
+                    "kind": "lit",
+                    "value": "Deposit"
+                  },
+                  {
+                    "kind": "ref",
+                    "name": "i"
+                  },
+                  {
+                    "kind": "lit",
+                    "value": 0
+                  }
+                ],
+                "members": "required"
+              }
+            },
             "tests": [
               {
                 "check": {
                   "kind": "fn",
                   "params": [
                     "v",
-                    "i"
+                    "i",
+                    "sent"
                   ],
                   "body": {
                     "kind": "op",
@@ -122,7 +199,8 @@
                 "when": {
                   "kind": "fn",
                   "params": [
-                    "i"
+                    "i",
+                    "sent"
                   ],
                   "body": {
                     "kind": "lit",
@@ -140,14 +218,6 @@
       "kind": "plugin",
       "name": "alis.http",
       "key": "",
-      "data": {
-        "kind": "none"
-      }
-    },
-    "$inputs:admission": {
-      "kind": "plugin",
-      "name": "alis.model",
-      "key": "admission",
       "data": {
         "kind": "none"
       }
@@ -180,7 +250,29 @@
                 "path": [
                   "validate"
                 ],
-                "args": [],
+                "args": [
+                  {
+                    "kind": "fn",
+                    "params": [],
+                    "body": {
+                      "kind": "call",
+                      "target": {
+                        "kind": "obj",
+                        "id": "$inputs:admission"
+                      },
+                      "path": [
+                        "fill"
+                      ],
+                      "args": [
+                        {
+                          "kind": "record",
+                          "fields": []
+                        }
+                      ],
+                      "members": "required"
+                    }
+                  }
+                ],
                 "members": "required"
               },
               "then": [

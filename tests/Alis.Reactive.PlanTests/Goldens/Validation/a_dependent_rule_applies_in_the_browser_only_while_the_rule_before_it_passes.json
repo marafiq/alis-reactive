@@ -111,16 +111,85 @@
       "data": {
         "kind": "form",
         "summary": "admission_validation_summary",
+        "live": {
+          "kind": "call",
+          "target": {
+            "kind": "obj",
+            "id": "$inputs:admission"
+          },
+          "path": [
+            "fill"
+          ],
+          "args": [
+            {
+              "kind": "record",
+              "fields": []
+            }
+          ],
+          "members": "required"
+        },
         "fields": [
           {
             "name": "Name",
+            "items": {
+              "kind": "fn",
+              "params": [
+                "sent"
+              ],
+              "body": {
+                "kind": "list",
+                "items": [
+                  {
+                    "kind": "list",
+                    "items": []
+                  }
+                ]
+              }
+            },
+            "value": {
+              "kind": "fn",
+              "params": [
+                "i",
+                "sent"
+              ],
+              "body": {
+                "kind": "call",
+                "target": {
+                  "kind": "obj",
+                  "id": "$model"
+                },
+                "path": [
+                  "sentValueOf"
+                ],
+                "args": [
+                  {
+                    "kind": "ref",
+                    "name": "sent"
+                  },
+                  {
+                    "kind": "lit",
+                    "value": "Name"
+                  },
+                  {
+                    "kind": "ref",
+                    "name": "i"
+                  },
+                  {
+                    "kind": "lit",
+                    "value": null
+                  }
+                ],
+                "members": "required"
+              }
+            },
             "tests": [
               {
                 "check": {
                   "kind": "fn",
                   "params": [
                     "v",
-                    "i"
+                    "i",
+                    "sent"
                   ],
                   "body": {
                     "kind": "op",
@@ -156,7 +225,8 @@
                 "when": {
                   "kind": "fn",
                   "params": [
-                    "i"
+                    "i",
+                    "sent"
                   ],
                   "body": {
                     "kind": "lit",
@@ -169,13 +239,65 @@
           },
           {
             "name": "Age",
+            "items": {
+              "kind": "fn",
+              "params": [
+                "sent"
+              ],
+              "body": {
+                "kind": "list",
+                "items": [
+                  {
+                    "kind": "list",
+                    "items": []
+                  }
+                ]
+              }
+            },
+            "value": {
+              "kind": "fn",
+              "params": [
+                "i",
+                "sent"
+              ],
+              "body": {
+                "kind": "call",
+                "target": {
+                  "kind": "obj",
+                  "id": "$model"
+                },
+                "path": [
+                  "sentValueOf"
+                ],
+                "args": [
+                  {
+                    "kind": "ref",
+                    "name": "sent"
+                  },
+                  {
+                    "kind": "lit",
+                    "value": "Age"
+                  },
+                  {
+                    "kind": "ref",
+                    "name": "i"
+                  },
+                  {
+                    "kind": "lit",
+                    "value": 0
+                  }
+                ],
+                "members": "required"
+              }
+            },
             "tests": [
               {
                 "check": {
                   "kind": "fn",
                   "params": [
                     "v",
-                    "i"
+                    "i",
+                    "sent"
                   ],
                   "body": {
                     "kind": "op",
@@ -343,7 +465,8 @@
                 "when": {
                   "kind": "fn",
                   "params": [
-                    "i"
+                    "i",
+                    "sent"
                   ],
                   "body": {
                     "kind": "op",
@@ -361,12 +484,16 @@
                                 "kind": "call",
                                 "target": {
                                   "kind": "obj",
-                                  "id": "$inputs:admission"
+                                  "id": "$model"
                                 },
                                 "path": [
-                                  "valueOf"
+                                  "sentValueOf"
                                 ],
                                 "args": [
+                                  {
+                                    "kind": "ref",
+                                    "name": "sent"
+                                  },
                                   {
                                     "kind": "lit",
                                     "value": "Name"
@@ -374,6 +501,10 @@
                                   {
                                     "kind": "ref",
                                     "name": "i"
+                                  },
+                                  {
+                                    "kind": "lit",
+                                    "value": null
                                   }
                                 ],
                                 "members": "required"
@@ -436,7 +567,29 @@
                 "path": [
                   "validate"
                 ],
-                "args": [],
+                "args": [
+                  {
+                    "kind": "fn",
+                    "params": [],
+                    "body": {
+                      "kind": "call",
+                      "target": {
+                        "kind": "obj",
+                        "id": "$inputs:admission"
+                      },
+                      "path": [
+                        "fill"
+                      ],
+                      "args": [
+                        {
+                          "kind": "record",
+                          "fields": []
+                        }
+                      ],
+                      "members": "required"
+                    }
+                  }
+                ],
                 "members": "required"
               },
               "then": [

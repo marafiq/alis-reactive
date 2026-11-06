@@ -144,7 +144,8 @@ namespace Alis.Reactive
                 foreach (var validation in oneByForm)
                 {
                     var fields = validation.Rules(ruleSource);
-                    _context.Check(validation.Form, CheckedField.Bind(validation.Form, fields, _context.FieldPrefix).ToList());
+                    var model = fields.Select(field => field.Model).FirstOrDefault(found => found != null);
+                    _context.Check(validation.Form, CheckedField.Bind(fields, _context.FieldPrefix, model).ToList());
                 }
             }
         }

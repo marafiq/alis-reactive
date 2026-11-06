@@ -20,6 +20,8 @@ namespace Alis.Reactive.PlanModel.Requests
             _members.Add((member, value));
         }
 
+        internal IReadOnlyList<(BindingPath Member, ValueExpression Value)> Members => _members;
+
         internal void AddHeader(string name, ValueExpression value)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Header name required.", nameof(name));
