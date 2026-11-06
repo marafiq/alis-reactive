@@ -33,6 +33,23 @@ public sealed class LiveObjects<TItem>
     public TypedSource<IReadOnlyList<TResult>> Select<TResult>(Func<TItem, TypedSource<TResult>> field)
         => new DataRead<IReadOnlyList<TResult>>(ListForms.Map(_list, ItemRead(field)), _build);
 
+    public TypedSource<int> Count(Func<TItem, TypedSource<bool>> predicate)
+        => new DataRead<int>(ListForms.Length(ListForms.Filter(_list, ItemRead(predicate))), _build);
+
+    public TypedSource<bool> Any() => new DataRead<bool>(ListForms.Some(_list, ListForms.EveryItem(_build)), _build);
+
+    public TypedSource<bool> Any(Func<TItem, TypedSource<bool>> predicate)
+        => new DataRead<bool>(ListForms.Some(_list, ItemRead(predicate)), _build);
+
+    public TypedSource<bool> All(Func<TItem, TypedSource<bool>> predicate)
+        => new DataRead<bool>(ListForms.Every(_list, ItemRead(predicate)), _build);
+
+    public TItem Find(Func<TItem, TypedSource<bool>> predicate)
+        => JsObject.Bound<TItem>(new Binding(ListForms.Find(_list, ItemRead(predicate)), _build));
+
+    public TypedSource<TResult> Find<TResult>(Func<TItem, TypedSource<bool>> predicate, Func<TItem, TypedSource<TResult>> field)
+        => new DataRead<TResult>(ListForms.First(ListForms.Map(ListForms.Filter(_list, ItemRead(predicate)), ItemRead(field))), _build);
+
     private FnExpression ItemRead<TResult>(Func<TItem, TypedSource<TResult>> read)
     {
         var name = _build.ItemName();

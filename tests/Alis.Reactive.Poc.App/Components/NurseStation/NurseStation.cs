@@ -34,7 +34,7 @@ public sealed class BedAlert : JsObject
     public ReadOnly<string> Reason => ReadOnly<string>();
 }
 
-public sealed record StationSchedule(IReadOnlyList<CareRound> Rounds);
+public sealed record StationSchedule(List<CareRound> Rounds);
 
 public sealed record CareRound(string Time, bool Due, [property: JsonPropertyName("carer_on_round")] Carer? Carer);
 

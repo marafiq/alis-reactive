@@ -80,10 +80,20 @@ export class NurseStation {
   }
 }
 
+interface RoundSeed {
+  readonly time: string;
+}
+
 export class StationCensus {
   readonly #countLine: HTMLParagraphElement;
   readonly #nameList: HTMLUListElement;
   readonly #countList: HTMLUListElement;
+  readonly #answerLine: HTMLParagraphElement;
+  readonly #leadLine: HTMLParagraphElement;
+  readonly #roundLine: HTMLParagraphElement;
+  #answer: boolean | null = null;
+  #lead: string | null = null;
+  #nextRound: RoundSeed | null = null;
   #count: number | null = null;
   #names: readonly (string | null)[] = [];
   #counts: readonly (number | null)[] = [];
@@ -96,7 +106,37 @@ export class StationCensus {
     this.#nameList.className = "census-names";
     this.#countList = document.createElement("ul");
     this.#countList.className = "census-counts";
-    host.replaceChildren(this.#countLine, this.#nameList, this.#countList);
+    this.#answerLine = lineOf("census-answer");
+    this.#leadLine = lineOf("census-lead");
+    this.#roundLine = lineOf("census-next-round");
+    host.replaceChildren(this.#countLine, this.#nameList, this.#countList, this.#answerLine, this.#leadLine, this.#roundLine);
+  }
+
+  get answer(): boolean | null {
+    return this.#answer;
+  }
+
+  set answer(answer: boolean | null) {
+    this.#answer = answer;
+    this.#answerLine.textContent = answer === null ? "" : answer ? "yes" : "no";
+  }
+
+  get lead(): string | null {
+    return this.#lead;
+  }
+
+  set lead(name: string | null) {
+    this.#lead = name;
+    this.#leadLine.textContent = name ?? "";
+  }
+
+  get nextRound(): RoundSeed | null {
+    return this.#nextRound;
+  }
+
+  set nextRound(round: RoundSeed | null) {
+    this.#nextRound = round;
+    this.#roundLine.textContent = round === null ? "" : round.time;
   }
 
   get count(): number | null {
@@ -131,6 +171,13 @@ function scheduleOf(json: string | undefined, older: boolean): { readonly rounds
   if (json === undefined) return {};
   const schedule = JSON.parse(json) as { readonly rounds: readonly unknown[] };
   return older ? { rounds: { result: schedule.rounds, count: schedule.rounds.length } } : schedule;
+}
+
+function lineOf(className: string): HTMLParagraphElement {
+  const line = document.createElement("p");
+  line.className = className;
+  line.textContent = "unknown";
+  return line;
 }
 
 function listInto(list: HTMLUListElement, items: readonly (string | number | null)[]): void {

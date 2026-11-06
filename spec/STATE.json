@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 157,
+        "defects": 158,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -663,7 +663,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 14,
+        "files": 15,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -750,7 +750,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 175,
+        "defects": 176,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1750,7 +1750,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "c76a8485544d21ce6f9ad11cd4ef7d9e89a11eb1",
+  "read_at_head": "7fd1306b2c1c4d7aba3f4c5204cf95f8d9663330",
   "step": {
     "failing": [
       "gate1"

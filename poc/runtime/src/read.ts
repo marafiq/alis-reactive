@@ -5,7 +5,7 @@ export type Read =
 export const nothing: Read = { kind: "nothing" };
 
 export function value(held: unknown): Read {
-  return { kind: "value", value: held };
+  return held === undefined ? nothing : { kind: "value", value: held };
 }
 
 export class Stop extends Error {

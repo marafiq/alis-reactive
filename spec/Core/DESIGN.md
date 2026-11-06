@@ -300,6 +300,9 @@ Terms used throughout:
   this as a guard before the send and the statement `stop(reason)` (Q19).
 - D4.7 A method called inside a condition runs only when its term is reached: `and`, `or` and `cond` evaluate
   their terms in order and stop at the first that decides.
+- D4.9 A value JavaScript holds as `undefined` reads as nothing wherever it is read: a member that holds it, a
+  method that returns it (`find` when no item matched). It never reaches a write as `undefined`; a write of
+  nothing writes null (D4.5).
 - D4.8 A stop ends its own handler only. Other handlers, and the other blocks of a `Parallel`, run on (Q10).
 
 **Schema nodes.** `get`, `call`, `set` with `members`; `do` and `let` with `await`; `try`; `op` (`and`, `or`,
@@ -487,8 +490,33 @@ Terms used throughout:
   value: its lambda is an expression tree, `round => round.Carer.Name`, its members named as Q2 names them and
   optional (D4.2). A lambda reads; a step written inside one is refused where the view renders (X6.8). Each `fn`
   parameter has a name of its own in the plan, so an inner lambda never hides the item of the lambda around it.
-- D6.6 The JavaScript array methods the plan calls (`map`, `filter`, `some`, `every`, `find`, `includes`,
-  `length`) are named at the vendor boundary of the built-in array; the browser adds no array function.
+- D6.11 `Sum` agrees with .NET for each number type. Over `double` it is JavaScript's addition, the same IEEE 754
+  addition .NET does, left to right. Over `decimal` it is decimal arithmetic, the owner's finance standard
+  (2026-11-06): each term's places are read from its shortest text, the terms are added as `BigInt` whole numbers
+  at the largest scale among them, and the point is placed once, so 0.1 + 0.2 is 0.3 as in .NET. An exact sum
+  rounds nothing. The owner set two app-wide knobs, places (2) and rounding (`MidpointRounding.ToEven` unless the
+  app chooses `AwayFromZero`). They apply only where an operation must round: a division, an average, a value
+  fitted to its places. Sums and comparisons stay exact, so a dose of 0.125 mg stays 0.125 (spec/CLAUDE.md). A decimal the app sends as a JSON number keeps
+  about 15 significant digits when the browser parses it; an app whose amounts need more sends decimals as text,
+  and the same addition holds. Over `int` the browser's total is exact to 2^53, where .NET's checked `Sum` throws
+  past 2^31; the plan carries `int` sums as whole numbers and the difference is X6.9.
+- D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted`,
+  `reduce`, `includes` and `length`, named at the vendor boundary of the built-in array and read `builtin` (D6.3).
+  The browser adds no array function, and no operation changes the vendor's own array: a sort is `toSorted`, never
+  `sort`. The redesign already calls `toSorted` and `reduce` (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs`).
+  `Any()` is `some` over a `fn` whose body is the literal `true`, so it needs no operator; `Count(predicate)` is the
+  `length` of `filter`.
+- D6.9 `Find(predicate)` over a list of live objects is the first item the predicate keeps, a live object.
+  Reading, writing or calling its member when no item matched stops the pipeline, as a member of a null object
+  fails in .NET. `Find(predicate, field)` is the door that reads nothing when no item matched: the field of the
+  first item kept, written `get(map(filter(list, predicate), field), [0], optional)`, so a match that lacks a
+  declared member still stops (D4.1). Over a list of data, `Find(predicate)` is the first item kept, or nothing,
+  and `Find(predicate, field)` takes the same form as over live objects.
+- D6.10 The operations over a list of data take every list a model declares: `List<T>`, `T[]`, `IList<T>`,
+  `IReadOnlyList<T>`, `IEnumerable<T>` and every other `IEnumerable<T>`. They are extension methods on
+  `ITypedSource<IEnumerable<TItem>>`, the covariant view `TypedSource<T>` implements, and each returns a
+  `TypedSource<T>`, so the sources stay the closed class D7.2 names. A text is no list in the browser: each
+  operation over a `string` is refused at compile time by an `[Obsolete(error: true)]` overload (CS0619).
 
 **Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`).
 
@@ -500,7 +528,10 @@ Terms used throughout:
 - existing: `ReactiveArray` (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:44`, `Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:93`).
 - `N6.1` new: `LiveObjects<TItem>.Count()` and `LiveObjects<TItem>.Select(..)`, replacing `Count` and `Each`, beside
   `At(n)` and `Where(..)`; the same operations over a list of data are extension methods on
-  `TypedSource<IReadOnlyList<TItem>>` (`DataLists`, POC 4).
+  `ITypedSource<IEnumerable<TItem>>` (`DataLists`, POC 4, D6.10).
+- `N6.4` new: `public interface ITypedSource<out T>`, which `TypedSource<T>` implements and nothing else in the
+  framework does; the list operations over data extend it (D6.10). A source the framework did not make is refused
+  where the view renders, and the analyzers of POC 13 refuse a class that implements it.
 - `N6.3` new: a `DiagnosticSuppressor` that suppresses CS8602 inside the lambda of `Read`, `Where` and `Select`,
   where a member that holds null reads nothing (D4.2). An expression tree refuses `?.` (CS8072), so without it a
   view writes `round.Carer!.Name`, a `!` that claims what the plan does not need. Built with the analyzers in POC 13.
@@ -519,6 +550,9 @@ Terms used throughout:
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name` reads that item's test
   as nothing, so the item is not kept.
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
+- `X6.9` behavior: `Sum` over `decimal` terms 0.1 and 0.2 reads 0.3; over `double` it reads 0.30000000000000004, as
+  .NET's `double` does. An `int` total past 2^31, which .NET's checked `Sum` refuses with an `OverflowException`,
+  is the case POC 4 unit 3 decides with the owner.
 - `X6.8` refusal: a step written inside a list's lambda: "A step is written inside a list's lambda, which reads
   each item and writes nothing. Write the step in the pipeline."
 - `X6.5` behavior: `Where(r => r.Ward == Model.Ward)` keeps the items of the ward the view's model names, and a

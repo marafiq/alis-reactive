@@ -118,6 +118,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   a value in 0.02 µs (a local) to 0.04 µs (`Model.Ward`) on net10, against 32 to 39 µs to compile per value (the
   redesign's way). A view value that calls a method or computes (`Model.Ward.ToUpper()`) waits on the owner: the
   redesign compiles it today, so refusing it is a new limit.
+- The owner, 2026-11-06: "for decimal use normal finance standard bascially what banks use or have it configured
+  at global level". A `decimal` is summed in the browser as decimal arithmetic, never binary floating point: the
+  terms are added as whole numbers at the largest scale among them and the point is placed once, exact as .NET's
+  `decimal` addition is (D6.11). Then: "imo its 2 digits after decimal point enough for this framework with knob on
+  how to roudn". Two app-wide knobs, places (2) and rounding (.NET's banker's rounding, half to even, unless the
+  app chooses half away from zero). They apply only where an operation must round (a division, an average, a value fitted to its
+  places); sums and comparisons stay exact, because doses in this domain carry three places (digoxin 0.125 mg) and
+  a browser that rounds them to 0.12 disagrees with .NET. The owner: "ah i see", "good point".
 - The owner, 2026-11-06: branches that nest to any depth (D8.7, D8.8) are "golden".
 - The owner, 2026-11-06: the slices are vertical in an app as in the framework (the owner's words are in
   `spec/NOTES.md`). An action that needs a model has a model of its own, plain, shared with no other view; an app

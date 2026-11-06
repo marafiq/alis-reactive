@@ -16,6 +16,12 @@ public sealed class StationCensus : Component
     public Property<IReadOnlyList<string>> Names => Property<IReadOnlyList<string>>();
 
     public Property<IReadOnlyList<int>> Counts => Property<IReadOnlyList<int>>();
+
+    public Property<bool> Answer => Property<bool>();
+
+    public Property<string> Lead => Property<string>();
+
+    public Property<CareRound> NextRound => Property<CareRound>();
 }
 
 public static class StationCensusHtml

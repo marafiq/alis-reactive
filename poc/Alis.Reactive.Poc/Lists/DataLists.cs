@@ -10,14 +10,67 @@ namespace Alis.Reactive.Lists;
 
 public static class DataLists
 {
-    public static TypedSource<int> Count<TItem>(this TypedSource<IReadOnlyList<TItem>> list)
-        => new DataRead<int>(ListForms.Length(list.Expression), list.Build);
+    private const string TextIsNoList = "A text is not a list in the browser. A list's operations take a list, such as a List<T> or an array.";
 
-    public static TypedSource<IReadOnlyList<TItem>> Where<TItem>(this TypedSource<IReadOnlyList<TItem>> list, Expression<Func<TItem, bool>> keep)
-        => new DataRead<IReadOnlyList<TItem>>(ListForms.Filter(list.Expression, ItemRead(list.Build, keep)), list.Build);
+    public static TypedSource<int> Count<TItem>(this ITypedSource<IEnumerable<TItem>> list)
+        => Over<TItem, int>(list, (items, _) => ListForms.Length(items));
 
-    public static TypedSource<IReadOnlyList<TResult>> Select<TItem, TResult>(this TypedSource<IReadOnlyList<TItem>> list, Expression<Func<TItem, TResult>> field)
-        => new DataRead<IReadOnlyList<TResult>>(ListForms.Map(list.Expression, ItemRead(list.Build, field)), list.Build);
+    public static TypedSource<int> Count<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
+        => Over<TItem, int>(list, (items, build) => ListForms.Length(ListForms.Filter(items, ItemRead(build, predicate))));
+
+    public static TypedSource<IReadOnlyList<TItem>> Where<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> keep)
+        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListForms.Filter(items, ItemRead(build, keep)));
+
+    public static TypedSource<IReadOnlyList<TResult>> Select<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TResult>> field)
+        => Over<TItem, IReadOnlyList<TResult>>(list, (items, build) => ListForms.Map(items, ItemRead(build, field)));
+
+    public static TypedSource<bool> Any<TItem>(this ITypedSource<IEnumerable<TItem>> list)
+        => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ListForms.EveryItem(build)));
+
+    public static TypedSource<bool> Any<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
+        => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ItemRead(build, predicate)));
+
+    public static TypedSource<bool> All<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
+        => Over<TItem, bool>(list, (items, build) => ListForms.Every(items, ItemRead(build, predicate)));
+
+    public static TypedSource<TItem> Find<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
+        => Over<TItem, TItem>(list, (items, build) => ListForms.Find(items, ItemRead(build, predicate)));
+
+    public static TypedSource<TResult> Find<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate, Expression<Func<TItem, TResult>> field)
+        => Over<TItem, TResult>(list, (items, build) => ListForms.First(ListForms.Map(ListForms.Filter(items, ItemRead(build, predicate)), ItemRead(build, field))));
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<int> Count(this ITypedSource<string> text) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<int> Count(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<IReadOnlyList<char>> Where(this ITypedSource<string> text, Expression<Func<char, bool>> keep) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<IReadOnlyList<TResult>> Select<TResult>(this ITypedSource<string> text, Expression<Func<char, TResult>> field) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<bool> Any(this ITypedSource<string> text) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<bool> Any(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<bool> All(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<char> Find(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<TResult> Find<TResult>(this ITypedSource<string> text, Expression<Func<char, bool>> predicate, Expression<Func<char, TResult>> field) => throw new NotSupportedException(TextIsNoList);
+
+    private static TypedSource<TResult> Over<TItem, TResult>(ITypedSource<IEnumerable<TItem>> list, Func<Plan.Expression, PlanBuild, Plan.Expression> operation)
+    {
+        var source = Sources.Of(list);
+        return new DataRead<TResult>(operation(source.Expression, source.Build), source.Build);
+    }
 
     private static FnExpression ItemRead(PlanBuild build, LambdaExpression read)
     {
