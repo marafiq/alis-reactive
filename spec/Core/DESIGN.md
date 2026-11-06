@@ -30,7 +30,7 @@ Terms used throughout:
 - D1.4 A dictionary entry is a member step whose name is the key's text as System.Text.Json writes the key
   as a property name. A dictionary whose key type System.Text.Json writes no property name for is refused
   where the view renders.
-- D1.5 `each` appears only in a form field's path (Q16). No read, write, call or subscription carries
+- D1.5 `each` appears only in a form's registration paths (Q16, Q19). No read, write, call or subscription carries
   `each`; a projection over a list is `map` (Q6).
 - D1.6 The MVC binding name is one function of a CLR member path, `BindingName`: member names joined by
   `.`, and an index written `[n]` directly after the step before it, as MVC's own
@@ -632,7 +632,8 @@ Terms used throughout:
 - D9.12 The headers every request sends are configured once in C#, and C# writes them into each request's
   `HttpSend` where the view renders; a request's own header of the same name, compared ignoring case, replaces
   the configured one. An app that sends `X-Requested-With: XMLHttpRequest` on every request configures it there.
-  The browser adds no header.
+  The browser adds no header but W3C Trace Context's `traceparent` and `tracestate`, to the page's own origin,
+  while the plan's trace is on (D20.3).
 - D9.13 A literal member, `Set(member, value)`, is written where the view renders, encoded as the endpoint
   binds it: an enum by the System.Text.Json contract under the endpoint's options on net10 and by its name on
   net48 (Q18).
@@ -1105,8 +1106,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   is released. A field registration leaves with its plan's owner, so a slot's required field no longer holds
   the page's save once the slot unloads. What a check reads for a member whose input is gone is Q16's.
 
-**Schema nodes.** The plugin data `form`, `hub` and `slot`, and `handler`. Ownership is not a node: a plan's
-owner is where its script is, and an owner's holds are what its plans name.
+**Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
+and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
+plans name.
 
 **Checker.**
 - `Ownership.tla:NoSlotOutlivesItsContainer`
@@ -1190,7 +1192,7 @@ owner is where its script is, and an owner's holds are what its plans name.
   on both hosts (`probe:core-form-duplicate-name`, `probe:core-json-duplicate-name`,
   `probe:mvc5-form-duplicate-first`, `probe:mvc5-json-duplicate-last`), so the browser cannot know which one
   the endpoint binds. A list's inputs carry indexed names and are not duplicates.
-- D13.5 A form's rule for each item is written once, by binding name with `[*]`. It checks every item row inside
+- D13.5 A form's rule for each item is written once, by a path with `each` (D1.5). It checks every item row inside
   the form when the form checks, whoever rendered the row: the page, a list partial, or a slot's content.
 - D13.6 No plan renders a summary of its own. The summary is rendered once per form by the door that renders
   the form (Q14), and a form's messages outlive a slot that joined the form and left.
@@ -1559,7 +1561,7 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - No DOM visibility is read, so a message inside a hidden panel is still in the summary. The form of the
     summary goes to gate 2.
 - D16.14 `FormField` is designed once (P5):
-  - its binding name as Q1's steps, item steps as `[*]` (D13.5);
+  - its path as Q1's steps, every item as `each` (D13.5);
   - its value, the one read (Q2) of the checked body;
   - its tests, each a condition (Q8), a check and a message.
 
@@ -1738,8 +1740,9 @@ grammar gains no node (G2).
 - D17.8 Two reference components prove the vendor contract on paper in step 8, FusionMultiSelect and a native
   reference, each declaration against the schema, and later in the browser.
 
-**Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path, its listening kind and
-the payload kind of each event; `handler`, which names its event and vendor.
+**Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
+`handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
+plans (Q19).
 
 **Checker.**
 - `Ownership.tla:NoUnsubscribeOnDestroyed`
@@ -1865,3 +1868,158 @@ shapes, starts and the payload kind of each event.
   `given_name`, and the endpoint binds it.
 - `X18.6` behavior: a member the app's JSON options ignore is not in a JSON body, and the form's check reads its
   start.
+
+## Q19. The schema
+
+**Decision.**
+- D19.1 The schema is `spec/Core/schema.md`: every node, what it carries, the nodes it holds and its meaning in the
+  browser, derived from Q1 to Q18 and Q20. C# writes those nodes and nothing else, and the browser runs those nodes
+  and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
+  write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
+  `spec/NOTES.md`).
+- D19.2 The set is closed at 40 kinds: today's 33, and `stop`, `file`, `each`, `clock`, `zone`, `off` and `on`. No
+  kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+  to the owner with its use case.
+- D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
+  is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).
+- D19.4 C# declares no enum (schema.md S8). A closed choice with no data is a sealed class with a private constructor
+  and one static instance per case, written as its text; a choice whose cases carry data is a kind. `Operator`,
+  `PathMembers` and the public `VendorEventPayload` become such classes.
+- D19.5 Every kind has exactly one handler. The switch that picks a default by shape leaves, since C# writes each
+  input's blank (D3.6, N3.3), and the object locator's two switches become one switch that returns the locator's
+  driver (G1).
+- D19.6 A handler carries its payload kind (D17.4), and the vendor does not: the vendors map is shared by name across
+  plans, so two plans that listen to different events of one component, read differently, agree on the vendor.
+- D19.7 A form's data is a list of registrations, each one validator under one rule set, holding the model's start,
+  the bound scalars, objects and lists of D16.6 and D16.7, and a rule tree whose groups follow the validator's child
+  validators (D16.3). The brief's item raised after the fact is decided: `FormField`'s `items` and `value` functions
+  leave for paths with `each`, and `live` stays, as `Live`, naming the check it runs.
+- D19.8 A number shape carries what a text converts under: `of`, an integer or a fraction, which picks the culture's
+  number text for the host, and `text`, the view's culture or the invariant one (D3.11).
+- D19.9 `HttpSend`, `HttpResponse` and `FormCheck` are typed contracts generated beside the grammar, not kinds (G2).
+- D19.10 The plan's version is 7. A plan of another version is JSON the framework did not produce, refused at boot with
+  one error.
+
+**Schema nodes.** Every node of `spec/Core/schema.md`.
+
+**Checker.**
+- `Schema.tla:KindsHandledOnce`
+- `Schema.tla:OperatorsClosed`
+- `Schema.tla:ReadsTakeNoEach`
+- `Schema.tla:ConversionsConvert`
+- `Schema.tla:PatternsAreLiterals`
+- `Schema.tla:NullableWrapsOnce`
+- `Schema.tla:SetsWriteAMember`
+- `Schema.tla:IfsHaveAnArm`
+- `Schema.tla:RefsReadTheirBlock`
+- `check:kinds`, which reads the grammar and `plan.schema.json` at 65fdf118d, schema.md's kinds table and Schema.tla's
+  node set, and checks each today line holds its case.
+
+Each Schema.tla invariant is the browser's need, and each mutant drops the one refusal of the C# writer that serves it.
+
+**Doors.**
+- `N19.1` new: the sealed choice classes of D19.4 in `Alis.Reactive/Grammar`, replacing `Operator`, `PathMembers` and
+  `VendorEventPayload`; the public payload class has the cases `Argument`, `Event` and `Detail` of D17.4.
+- `N19.2` new: `Registration`, `BoundScalar`, `BoundObject`, `BoundList`, `RuleGroup`, `RuleField` and `RuleTest` in
+  `Alis.Reactive/Grammar/PlanDocument.cs`, replacing `FormField` and `FormTest`; they carry N16.2.
+- `N19.3` new: `Culture`, `NumberText`, the time zone kinds and the trace kinds, as `PlanDocument`'s fields.
+
+**Evidence.**
+- Today's kinds are written once per node class: `Alis.Reactive/Grammar/Statements.cs:24`,
+  `Alis.Reactive/Grammar/Expressions.cs:20`, `Alis.Reactive/Grammar/Shape.cs:93`, `Alis.Reactive/Grammar/PlanDocument.cs:67`.
+- A shape has a second handler that picks a default by shape: `Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`.
+- An object locator has two switches: `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:14-18` and
+  `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:27-31`.
+- A vendor is merged across plans by its parts, its payload among them: `Alis.Reactive/Grammar/PlanDocument.cs:43`.
+- The payload kind is a public enum: `Alis.Reactive/Grammar/VendorEventPayload.cs:8`.
+- A slot's plugin data is `none`, its key the container id: `Alis.Reactive/PlanModel/Writing/Scope.cs:234`.
+- The form's fields raised after the fact: `Alis.Reactive/Grammar/PlanDocument.cs:202-206` and
+  `Alis.Reactive/Grammar/PlanDocument.cs:184-187`.
+
+**Defects.**
+- `X19.1` type: an operator, a path's members or a payload kind made from an integer does not compile: new:N19.1.
+- `X19.2` type: a grammar node built with a field left out does not compile, since each constructor takes every field
+  and none is nullable: new:N19.3.
+- `X19.3` refusal: a plan of version 6 is refused at boot with "This plan was written for plan version 6; this page
+  runs version 7."
+- `X19.4` behavior: two partials whose plans listen to different events of one component, one reading its argument
+  and one its event's detail, each run their steps with the payload they declare.
+
+## Q20. Tracing
+
+**Decision.**
+- D20.1 Tracing is off unless the server recorded the render. C# writes the plan's `trace` as `on` only when the
+  activity of the request that renders the view is recorded, W3C Trace Context's sampled flag, and as `off` otherwise.
+  The browser decides nothing: no attribute, no query text, no storage, so the level read from `data-alis-trace`
+  leaves. In development the app's sampler records every request; in production the app sets its own ratio (the
+  owner, 2026-11-06: optional, never always on).
+- D20.2 The core takes no telemetry library. The browser has one diagnostics port, called at the dispatch of each
+  union, which Q19 makes one place per kind, and two sinks:
+  - the console, which prints every boundary error, and each ended span when the trace is on and its `console` is set,
+    as C# writes it from the app's options for development;
+  - the OpenTelemetry adapter, a separate package built on the port, which pins `@opentelemetry/api`, the web SDK and
+    the OTLP HTTP exporter, and which the app configures. The core names it nowhere, as it names no consumer.
+- D20.3 One trace runs from start to end by W3C Trace Context. A handler run's span is a child of the plan's
+  `traceparent`. Each send attempt sends `traceparent` and `tracestate` naming its own span to the page's own origin,
+  and to no other origin. The endpoint's activities, the validation door's among them, join that trace. A slot's
+  content is rendered by a traced request, so its plan's trace context is the server's span, and nested partials nest
+  in the trace. The trace context is the run's, as its abort signal is (Q11), and `HttpSend` carries none.
+- D20.4 The spans are closed: a plan's boot, a handler run, a send and each of its attempts, a `MethodAsync`, a
+  `Confirm`, a hub invoke, each block of an `all`, and a slot's load and unload. A synchronous statement is no span: a
+  `stop` with its reason, a required member a holder lacks, a refused check and a boundary error are events on the span
+  that holds them. An attempt follows OpenTelemetry's HTTP client conventions: the method, the status, the resend count
+  and the URL as its route template.
+- D20.5 No value is recorded. A span records ids, kinds, member wire names, event names, the route template, the status,
+  the attempt and the outcome, never an input's text, a body, a payload, a query value or a route value, so the app's
+  data stays out of its telemetry.
+- D20.6 Every span ends exactly once and after its children, however its run ends: completed, stopped, replaced (D11.7)
+  or disposed (D12.4). A sink's error is the one error the port catches: it logs it once as an error and the run goes
+  on, since telemetry observes the page and never decides what it does.
+- D20.7 Under `on`, C# writes each handler's source: the view, as MVC names it, and the line of the builder call, read by
+  `CallerFilePath` and `CallerLineNumber` at the builder door. That those follow the `#line` directives each host's view
+  compiler writes is not yet observed: the unit's first proof is a probe on both hosts. Under `off` no source is written,
+  so a page carries no view path unless its render was traced.
+- D20.8 On the server the framework has one `ActivitySource`, named "Alis.Reactive", from `System.Diagnostics`, with an
+  activity for rendering a plan, the validation door (validator, rule set, failure count) and the error door. The app
+  adds its own OpenTelemetry SDK and listens to that source. On net48 the source comes from the
+  `System.Diagnostics.DiagnosticSource` package, pinned, a gate-1 line, and joining an inbound `traceparent` takes the
+  app's ASP.NET instrumentation module, a fact the unit probes.
+- D20.9 Tracing changes nothing a plan does: on and off run the same statements in the same order with the same
+  results, and the port returns nothing the runtime reads.
+- D20.10 Its proof is Playwright on the sandbox, whose endpoint echoes the `traceparent` it received into the page and
+  whose collector page lists the spans it received: with the trace off nothing is listed and no header is echoed; with
+  it on, the closed span names of a handler with a check, a retried GET and a chained request are listed under the
+  page's trace id.
+
+**Schema nodes.** `PlanDocument.trace`, the kinds `off` and `on`, and `Source` (Q19).
+
+**Checker.**
+- `Tracing.tla:NothingRecordedWhenOff`
+- `Tracing.tla:EveryStartedSpanEnds`
+- `Tracing.tla:ChildEndsBeforeParent`
+- `Tracing.tla:AttemptsJoinTheTrace`
+- `Tracing.tla:TraceHeadersStayHome`
+- `Tracing.tla:SinkFailureChangesNothing`
+
+**Doors.**
+- `N20.1` new: the browser's diagnostics port, internal, with its closed span and event vocabulary (D20.4).
+- `N20.2` new: the OpenTelemetry adapter package built on the port; its name and its configuration go to gate 2.
+- `N20.3` new: the `ActivitySource` "Alis.Reactive" and the app's tracing options (`console`) on both hosts; their form
+  goes to gate 2.
+
+**Evidence.**
+- Today the browser reads its log level from the page, undefined meaning warn:
+  `Alis.Reactive.Assets/runtime/diagnostics/trace.ts:13-18`.
+- Today a log line prints the values it is given: `Alis.Reactive.Assets/runtime/diagnostics/trace.ts:46`.
+- Neither line traces: `git grep` finds no `traceparent`, OpenTelemetry or `ActivitySource` at 65fdf118d or 623dd4a27.
+
+**Defects.**
+- `X20.1` behavior: with the trace off, a save lists no span on the collector page, and its endpoint echoes no
+  `traceparent`.
+- `X20.2` behavior: with the trace on, a GET retried once after a 503 lists two attempt spans under one send span,
+  under the page's trace id.
+- `X20.3` behavior: a handler replaced while its request is in flight lists its run span ended with the outcome replaced.
+- `X20.4` behavior: with the trace on, a request to another origin carries no `traceparent`, which that endpoint echoes.
+- `X20.5` behavior: with an exporter that throws on every span, a save succeeds and the console shows one error.
+- `X20.6` refusal: a request header named `traceparent` is refused where the view renders with "The traceparent header
+  belongs to tracing: remove it from this request's headers."

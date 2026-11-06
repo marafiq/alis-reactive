@@ -34,7 +34,7 @@ MAIN_PACKAGES = {
     "Alis.Reactive.DesignSystem": ["net48", "net10.0"],
 }
 INVENTORY_FILES = ["doors.tsv", "kinds.tsv", "cases.tsv", "analyzers.tsv", "tests.tsv", "plugins.tsv", "browser.tsv", "runtime.tsv"]
-QUESTIONS = [f"Q{n}" for n in range(1, 20)]
+QUESTIONS = [f"Q{n}" for n in range(1, 21)]
 DESIGN_PARTS = ["Decision", "Schema nodes", "Checker", "Doors", "Evidence", "Defects"]
 TLC_SPECS = {
     "Absence": {"question": "Q4", "step": 4, "expect": "green"},
@@ -45,7 +45,9 @@ TLC_SPECS = {
     "Schema": {"question": "Q19", "step": 5, "expect": "green"},
     "ValidationToday": {"question": "Q16 at bff9eb6c0", "step": 5, "expect": "counterexamples", "gaps": 4},
     "Validation": {"question": "Q16", "step": 5, "expect": "green"},
+    "Tracing": {"question": "Q20", "step": 5, "expect": "green"},
 }
+PLUGIN_DATA_DISPATCH = "pluginNamed(locator.name).contribute"
 HEDGES = [
     "rare", "rarely", "usually", "may", "might", "maybe", "perhaps", "possibly", "probably", "likely",
     "typically", "generally", "often", "sometimes", "ideally", "should", "etc", "tbd", "todo",
@@ -552,11 +554,109 @@ def check_history():
                   rows=len(rows), required=len(regression_shas()))
 
 
+def grammar_kinds(sha):
+    marker = 'Kind => "'
+    kinds = set()
+    for path in git("ls-tree", "-r", "--name-only", sha, "--", "Alis.Reactive/Grammar").splitlines():
+        if path.endswith(".cs"):
+            for line in git("show", f"{sha}:{path}").splitlines():
+                if marker in line:
+                    kinds.add(line.split(marker, 1)[1].split('"', 1)[0])
+    return kinds
+
+
+def schema_json_kinds(sha):
+    document = json.loads(git("show", f"{sha}:Alis.Reactive.Assets/runtime/types/plan.schema.json"))
+    return {definition["properties"]["kind"]["const"] for definition in document["$defs"].values()
+            if "const" in definition.get("properties", {}).get("kind", {})}
+
+
+def table_cells(line):
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def schema_kind_rows(text):
+    section = text.split("\n## Kinds\n", 1)[1].split("\n## ", 1)[0]
+    rows = [table_cells(line) for line in section.splitlines() if line.startswith("| ")]
+    header = rows[0]
+    return [dict(zip(header, cells)) for cells in rows[1:] if not set(cells[0]) <= {"-"}]
+
+
+def backticked(text):
+    return text.split("`")[1::2]
+
+
+def source_line(sha, cite):
+    path, number = cite.rsplit(":", 1)
+    lines = git("show", f"{sha}:{path}").splitlines()
+    return lines[int(number) - 1] if 0 < int(number) <= len(lines) else ""
+
+
+def spec_node_set():
+    text = (SPEC / "Core" / "Schema.tla").read_text()
+    kinds = set()
+    for line in text.splitlines():
+        if "Kinds ==" in line and line.split("==", 1)[0].strip().endswith("Kinds") and "{" in line:
+            kinds |= {item.strip().strip('"') for item in line.split("{", 1)[1].split("}", 1)[0].split(",")}
+    return kinds
+
+
 def check_kinds():
     path = SPEC / "Core" / "schema.md"
     if not path.exists():
         return not_started(path)
-    return not_built("the kind sets and their handlers")
+    problems = []
+    grammar = grammar_kinds(BASE_SHA)
+    schema_json = schema_json_kinds(BASE_SHA)
+    if grammar != schema_json:
+        problems.append(f"grammar and plan.schema.json differ at the State SHA: {sorted(grammar ^ schema_json)}")
+    rows = schema_kind_rows(path.read_text())
+    kinds = [row["Kind"] for row in rows]
+    repeated = sorted({kind for kind in kinds if kinds.count(kind) > 1})
+    if repeated:
+        problems.append(f"a kind named twice: {repeated}")
+    today = {row["Kind"] for row in rows if row["Today"] != "absent"}
+    if today != grammar:
+        problems.append(f"schema.md's today column differs from the grammar: {sorted(today ^ grammar)}")
+    designed = set((SPEC / "Core" / "DESIGN.md").read_text().split())
+    several_today = []
+    for row in rows:
+        kind, cites, handler = row["Kind"], backticked(row["Today"]), row["Handler"]
+        if row["Proposed"] not in {"kept", "added", "removed"}:
+            problems.append(f"{kind}: proposed '{row['Proposed']}'")
+        if (row["Proposed"] == "added") != (row["Today"] == "absent"):
+            problems.append(f"{kind}: proposed {row['Proposed']} beside today '{row['Today']}'")
+        if len(cites) > 1:
+            several_today.append(kind)
+        for cite in cites:
+            line = source_line(BASE_SHA, cite)
+            expected = ('"none"' if kind == "none" else PLUGIN_DATA_DISPATCH) if row["Union"] == "plugin data" else f'case "{kind}"'
+            if expected not in line:
+                problems.append(f"{kind}: {cite} holds no {expected} at the State SHA")
+        if row["Proposed"] == "removed":
+            continue
+        if kind == "none":
+            if handler != "none":
+                problems.append("none has a handler")
+        elif row["Union"] == "plugin data":
+            if not any(name.startswith("alis.") for name in backticked(handler)):
+                problems.append(f"{kind}: its handler names no plugin")
+        elif len(backticked(handler)) != 1 or not line_count(BASE_SHA, backticked(handler)[0]) > 0:
+            problems.append(f"{kind}: '{handler}' names not exactly one runtime file")
+        if row["Proposed"] == "added" and not any(token.strip("`.,;:()") == row["Why"] for token in designed):
+            problems.append(f"{kind}: added by {row['Why']}, which DESIGN.md does not state")
+    proposed = {row["Kind"] for row in rows if row["Proposed"] != "removed"}
+    spec_nodes = spec_node_set()
+    if proposed != spec_nodes:
+        problems.append(f"schema.md's proposed set differs from Schema.tla's Kinds: {sorted(proposed ^ spec_nodes)}")
+    added = sorted(row["Kind"] for row in rows if row["Proposed"] == "added")
+    removed = sorted(row["Kind"] for row in rows if row["Proposed"] == "removed")
+    detail = "; ".join(problems[:6]) or (
+        f"grammar, plan.schema.json and schema.md agree on today's {len(grammar)}; proposed {len(proposed)} equals Schema.tla's"
+        f" node set, one handler each; diff +{','.join(added)} -{','.join(removed) or 'none'};"
+        f" {len(several_today)} kinds have two handlers today")
+    return result(not problems, detail, today=len(grammar), proposed=len(proposed), added=len(added), removed=len(removed),
+                  several_handlers_today=len(several_today))
 
 
 def gate_answered(number):
@@ -682,7 +782,7 @@ STEPS = [
     (2, "B", "Main's surface as text", ["main_surface"], "Wire PublicApiAnalyzers into main-read, run RS0016 one target framework at a time, copy to spec/inventory/main."),
     (3, "B", "Inventory", ["inventory"], "Write spec/tools/inventory.py and the TSVs."),
     (4, "C", "Q1 to Q18, TLA+ specs, probes, history", ["core_questions", "core_tlc", "probes", "history"], "Answer Q1 to Q18 in spec/Core/DESIGN.md with their TLA+ specs and probes; write spec/history.tsv."),
-    (5, "C", "Q19, the schema, the validation spec, gate 1", ["questions", "evidence", "tlc", "kinds", "gate1"], "Write Schema.tla, schema.md and the validation specs; present gate 1."),
+    (5, "C", "Q19, the schema, Q20, tracing, the validation spec, gate 1", ["questions", "evidence", "tlc", "kinds", "gate1"], "Write Schema.tla, schema.md and the validation specs; present gate 1."),
     (6, "D", "Feature rows", ["doors_mapped", "verdicts", "features_core", "features_lost"], "Write spec/<Module>/features.json and module.md for each module."),
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),

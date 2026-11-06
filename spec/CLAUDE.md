@@ -84,6 +84,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   and the root vision, which the compact hook prints, so the design does not drift.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
+- The owner, 2026-11-06: OpenTelemetry tracing is in scope and baked into the design (Q20): it records how the
+  framework processes a request from start to end, helps while developing, and is optional, never always on.
+- The owner, 2026-11-06: null and undefined are never a state, in C#, in TypeScript, anywhere; a value that can be absent is a closed
+  union, and null is only a value the data holds.
+- The owner, 2026-11-06: no defensive code where a type or a check stops the bug; no closest match; fail loudly, so a
+  bug surfaces and challenges the design. Tests are Playwright in a real browser, never jsdom, which is brittle.
+  The reference components are built around JavaScript object complexity (dot notation, properties, callbacks,
+  events) in several versions, to match Syncfusion's complexity when it is onboarded as a consumer. Analyzers are a
+  harness written as .NET's open-source analyzers are, never another surface; a test's name, its arranged data and
+  its assertion are each crucial, and their absence has cost months.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
@@ -122,6 +132,7 @@ Alis.Reactive.Assets.
 | 23 | Fusion app-level objects | built on the core | FusionConfirm and FusionToast | Q11 |
 | 24 | Native components | built on the core | the plain-DOM components, with the native reference | Q17 |
 | 25 | Native app-level objects | built on the core | NativeDrawer, NativeLoader and the action link | Q11 |
+| 26 | Tracing | view author and operator | the diagnostics port, the plan's trace context, spans and events by a closed vocabulary, propagation to the server, the server's activity source, the OpenTelemetry adapter built on the port | Q20 |
 
 ## Files
 
