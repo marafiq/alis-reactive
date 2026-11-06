@@ -161,6 +161,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: "I am totally fine with one assembly, but namespacing is logical [modularization]." The core
   is one assembly; each module is one namespace and one folder of the same name, its public and internal types
   together, and the namespace is the module boundary.
+- The owner, 2026-11-06, on the POC 4 report: "i will with your recommondations - decide for quality". So: a data
+  member absent from a present item reads its starting value, as the endpoint binds it (Decision 1, A); a holder that
+  is null or absent still reads nothing (D4.2). Text ordered with no comparer orders by the view's culture with the
+  browser's collator, the invariant culture as `en`, invariant globalization mode as ordinal, and a culture the
+  browser lacks stops the pipeline (Decision 3, a). `Regex.IsMatch` in a list's lambda is keyed in the identity table
+  and its pattern passes D16.11's one reader, the rules `Matches` takes; the core runs no `Regex`, and the key is the
+  ban's one exception (Decision 2, decided for quality: the redesign has the member, and a second regex meaning is
+  worse than either option). The CA1304 and CA1311 suppressions on the identity table and the POC app's request
+  culture are approved, and so is the list of fifteen POCs in `spec/NOTES.md`.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
