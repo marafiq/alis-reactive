@@ -729,7 +729,14 @@ def report(outcomes, step, brief):
         failing = [check_id for check_id, _, _ in CHECKS if not outcomes[check_id]["pass"]]
         lines = lines[:3] + [f"failing: {', '.join(failing) or 'none'}"]
         lines += [f"  {check_id}: {outcomes[check_id]['detail']}" for check_id in step["failing"]]
+        lines += ["standing decisions, spec/CLAUDE.md:"] + standing_decisions()
     print("\n".join(lines))
+
+
+def standing_decisions():
+    text = (SPEC / "CLAUDE.md").read_text()
+    section = text.split("## Standing decisions", 1)[1].split("\n## ", 1)[0]
+    return [line for line in section.strip().splitlines() if line.strip()]
 
 
 def main():
