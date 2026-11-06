@@ -6,22 +6,22 @@ CONSTANT Mutant
 Mutants == {"none", "RequiredAbsentContinues", "PromiseHeldContinues", "DataAbsentStops",
             "MissingTextShowsUndefined", "MissingClassAddsUndefined", "UnawaitedPromiseContinues",
             "EagerTerms", "ConversionPassesRaw", "AnyOverNothingIsFalse", "StopSkipsFinally",
-            "StopEndsEveryHandler"}
+            "StopEndsEveryHandler", "MissingValueWritesUndefined"}
 
 ASSUME Mutant \in Mutants
 
-Program == <<"ReadLive", "ReadData", "ReadPast", "SetText", "SetClass", "Call", "Cond", "Convert", "Any", "Request">>
+Program == <<"ReadLive", "ReadData", "ReadPast", "SetText", "SetClass", "SetProperty", "Call", "Cond", "Convert", "Any", "Request">>
 Pos(s) == CHOOSE i \in 1..Len(Program) : Program[i] = s
 Last == Len(Program) + 1
 Reads == {"live", "data", "past", "as", "any"}
 
 VARIABLES liveMember, readKind, dataMember, holder, textValue, className, methodReturns, op, term1,
-          convertible, list, route,
-          pcA, stoppedA, stopAt, result, shown, classes, called, sent, finallyRan, pcB, stoppedB
+          convertible, list, route, propertyValue,
+          pcA, stoppedA, stopAt, result, shown, classes, written, called, sent, finallyRan, pcB, stoppedB
 
 page == <<liveMember, readKind, dataMember, holder, textValue, className, methodReturns, op, term1,
-          convertible, list, route>>
-outcome == <<result, shown, classes, called, sent, finallyRan>>
+          convertible, list, route, propertyValue>>
+outcome == <<result, shown, classes, written, called, sent, finallyRan>>
 vars == <<page, outcome, pcA, stoppedA, stopAt, pcB, stoppedB>>
 
 Init ==
@@ -37,12 +37,14 @@ Init ==
     /\ convertible \in BOOLEAN
     /\ list \in {"nothing", "empty", "items"}
     /\ route \in {"value", "nothing"}
+    /\ propertyValue \in {"value", "nothing"}
     /\ pcA = 1
     /\ stoppedA = FALSE
     /\ stopAt = "none"
     /\ result = [r \in Reads |-> "unread"]
     /\ shown = "unset"
     /\ classes = {}
+    /\ written = "unset"
     /\ called = {}
     /\ sent = FALSE
     /\ finallyRan = FALSE
@@ -68,34 +70,41 @@ ReadLive ==
        ELSE IF liveMember = "present" /\ readKind = "promise" /\ Mutant # "PromiseHeldContinues"
          THEN Stop("ReadLive") /\ UNCHANGED result
        ELSE Advance /\ result' = [result EXCEPT !["live"] = IF liveMember = "absent" THEN "nothing" ELSE "value"]
-    /\ UNCHANGED <<page, shown, classes, called, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
 ReadData ==
     /\ At("ReadData")
     /\ IF dataMember = "absent" /\ Mutant = "DataAbsentStops"
          THEN Stop("ReadData") /\ UNCHANGED result
        ELSE Advance /\ result' = [result EXCEPT !["data"] = IF dataMember = "absent" THEN "nothing" ELSE "value"]
-    /\ UNCHANGED <<page, shown, classes, called, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
 ReadPast ==
     /\ At("ReadPast")
     /\ Advance
     /\ result' = [result EXCEPT !["past"] = IF holder = "holdsField" THEN "value" ELSE "nothing"]
-    /\ UNCHANGED <<page, shown, classes, called, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
 SetText ==
     /\ At("SetText")
     /\ Advance
     /\ shown' = IF textValue = "text" THEN "text"
                 ELSE IF Mutant = "MissingTextShowsUndefined" THEN "undefined" ELSE ""
-    /\ UNCHANGED <<page, result, classes, called, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, result, classes, written, called, sent, finallyRan, pcB>>
 
 SetClass ==
     /\ At("SetClass")
     /\ Advance
     /\ classes' = IF className = "cls" THEN classes \cup {"cls"}
                   ELSE IF Mutant = "MissingClassAddsUndefined" THEN classes \cup {"undefined"} ELSE classes
-    /\ UNCHANGED <<page, result, shown, called, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, result, shown, written, called, sent, finallyRan, pcB>>
+
+SetProperty ==
+    /\ At("SetProperty")
+    /\ Advance
+    /\ written' = IF propertyValue = "value" THEN "value"
+                  ELSE IF Mutant = "MissingValueWritesUndefined" THEN "undefined" ELSE "null"
+    /\ UNCHANGED <<page, result, shown, classes, called, sent, finallyRan, pcB>>
 
 Call ==
     /\ At("Call")
@@ -103,7 +112,7 @@ Call ==
     /\ IF methodReturns = "promise" /\ Mutant # "UnawaitedPromiseContinues"
          THEN Stop("Call")
        ELSE Advance
-    /\ UNCHANGED <<page, result, shown, classes, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, result, shown, classes, written, sent, finallyRan, pcB>>
 
 SecondTermReached ==
     IF Mutant = "EagerTerms" THEN TRUE
@@ -113,14 +122,14 @@ Cond ==
     /\ At("Cond")
     /\ Advance
     /\ called' = IF SecondTermReached THEN called \cup {"m2"} ELSE called
-    /\ UNCHANGED <<page, result, shown, classes, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, result, shown, classes, written, sent, finallyRan, pcB>>
 
 Convert ==
     /\ At("Convert")
     /\ Advance
     /\ result' = [result EXCEPT !["as"] = IF convertible THEN "value"
                                           ELSE IF Mutant = "ConversionPassesRaw" THEN "raw" ELSE "nothing"]
-    /\ UNCHANGED <<page, shown, classes, called, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
 AnyOf ==
     CASE list = "items" -> "true"
@@ -131,7 +140,7 @@ Any ==
     /\ At("Any")
     /\ Advance
     /\ result' = [result EXCEPT !["any"] = AnyOf]
-    /\ UNCHANGED <<page, shown, classes, called, sent, finallyRan, pcB>>
+    /\ UNCHANGED <<page, shown, classes, written, called, sent, finallyRan, pcB>>
 
 Request ==
     /\ At("Request")
@@ -142,7 +151,7 @@ Request ==
        ELSE /\ Advance
             /\ sent' = TRUE
             /\ finallyRan' = TRUE
-    /\ UNCHANGED <<page, result, shown, classes, called, pcB>>
+    /\ UNCHANGED <<page, result, shown, classes, written, called, pcB>>
 
 OtherHandler ==
     /\ pcB = 1
@@ -150,7 +159,7 @@ OtherHandler ==
     /\ pcB' = 2
     /\ UNCHANGED <<page, outcome, pcA, stoppedA, stopAt, stoppedB>>
 
-Next == ReadLive \/ ReadData \/ ReadPast \/ SetText \/ SetClass \/ Call \/ Cond \/ Convert \/ Any \/ Request \/ OtherHandler
+Next == ReadLive \/ ReadData \/ ReadPast \/ SetText \/ SetClass \/ SetProperty \/ Call \/ Cond \/ Convert \/ Any \/ Request \/ OtherHandler
 
 Spec == Init /\ [][Next]_vars
 
@@ -184,6 +193,8 @@ MissingRouteStopsAndFinallyRuns ==
     /\ Ran("Request") => (sent /\ finallyRan)
 
 StopEndsOnlyItsHandler == ~stoppedB
+
+MissingValueWritesNull == Ran("SetProperty") => written = IF propertyValue = "value" THEN "value" ELSE "null"
 
 ReachCompleted == ~(pcA = Last /\ pcB = 2)
 

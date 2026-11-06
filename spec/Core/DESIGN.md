@@ -363,3 +363,115 @@ Terms used throughout:
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name` reads that item's test
   as nothing, so the item is not kept.
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
+
+## Q7. Every value position takes every source
+
+**Decision.**
+- D7.1 The positions are closed: a property or write-only property set, an element's text, HTML, class and
+  attribute, both operands of every condition operator, a request member (which Q9 places in the route, the
+  query, the body or a header), a header, a dispatch payload member, and a method's, plugin's or hub's argument.
+- D7.2 The sources are closed, each a `TypedSource<T>`: a component's or plugin's member, a method's result
+  (`Method<T>`, `MethodAsync<T>`, a hub's `Invoke<T>`), a page URL member (`p.Url<TQuery>()`), a field of an event
+  payload or a pushed message, a field of a response body, an input's bound value (`p.Bound`), the result of an
+  array operation, a literal, an object built from sources, and a list built from sources.
+- D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
+  `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position.
+- D7.4 One builder makes an object from sources, member by typed member, and the dispatch payload, a method
+  or plugin argument and a property write all use it. One door makes a list from sources.
+- D7.5 Every condition operator takes a source for each operand: the text tests, `MinLength`, `Between`,
+  membership and the comparisons. `Matches` takes a literal pattern only, because the pattern is checked
+  where the view renders for the constructs JavaScript reads differently from .NET; a pattern read in the
+  browser cannot be checked.
+- D7.6 A source that reads nothing writes `null` into a property, an argument and a payload member. At an
+  element's text and HTML it shows nothing, and at a class it changes nothing (D4.5). In a request it is
+  decided by Q9.
+
+**Schema nodes.** `lit`, `obj`, `list`, `get`, `call`, `set`, `op`; the request argument's members (Q9).
+
+**Checker.**
+- `Absence.tla:MissingValueWritesNull`
+- `check:matrix`
+- `check:fluent`
+
+**Doors.**
+- kept: `TypedSource<T>` (`Alis.Reactive/Components/TypedSource.cs:1`) and each position's literal and source
+  doors, as `GatherBuilder.Set` writes them (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`).
+- `N7.1` new: `p.Object<T>(o => o.Set(x => x.Member, source))`, a `TypedSource<T>` built member by member,
+  replacing `DispatchPayloadBuilder<TPayload, TModel>` as a builder of its own.
+- `N7.2` new: `p.List<T>([first, second])`, a `TypedSource<IReadOnlyList<T>>` built from sources.
+- `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between` and the
+  membership tests in `ConditionOperators`.
+
+**Evidence.**
+- G8: a source of an assignable type fills a request member (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`).
+- B9: the text, length, range and membership tests take literals only
+  (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:106`, `Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:126`,
+  `Alis.Reactive/PlanModel/Conditions/Condition.cs:331`, `Alis.Reactive/PlanModel/Conditions/Condition.cs:343`), while the
+  comparisons take both (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
+- B10: a gathered field's type is erased (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`) while
+  `p.Bound` keeps it (`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:142`); Q9 takes the gather side.
+- Two builders make an object from sources: `GatherBuilder` and `DispatchPayloadBuilder`
+  (`Alis.Reactive/PlanAuthoring/Pipelines/DispatchPayloadBuilder.cs:31`, `Alis.Reactive/PlanAuthoring/Pipelines/DispatchPayloadBuilder.cs:45`).
+- A write of a source that reads nothing writes whatever the browser read, `undefined` included
+  (`Alis.Reactive.Assets/runtime/grammar/execute.ts:35-40`); no C# states it.
+
+**Defects.**
+- `X7.1` type: a source of a type the position cannot hold does not compile: `where TSource : TValue`
+  (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`).
+- `X7.2` type: a text test against a source that is not text does not compile: new:N7.3.
+- `X7.3` type: an object argument built from sources is typed member by member, so a member of the wrong type
+  or a member the type lacks does not compile: new:N7.1.
+- `X7.4` type: a pattern read in the browser cannot reach `Matches`: new:N7.3 gives `Matches` no source overload.
+- `X7.5` behavior: a property set from a payload field the payload lacks writes `null`, and the component
+  shows its empty state.
+
+## Q8. Conditions: three kinds
+
+**Decision.**
+- D8.1 One condition core: the `Condition` nodes (comparison, text test, membership, value test, all, any,
+  not), the operators of Q7 and the sources of Q7. The browser evaluates every pipeline condition, array
+  predicate and validator condition with it.
+- D8.2 Two doors write it. The pipeline door is the typed builder (`p.When(source)`, `ElseIf`, `Else`, `And`,
+  `Or`, groups). The lambda door translates an expression tree with the one table
+  `spec/Core/translated-members.md`; array predicates and validator conditions use it.
+- D8.3 They differ in exactly these ways, by what each is:
+  - The operands. A pipeline condition reads any source. An array predicate reads the item and values the
+    view supplies. A validator condition reads the members of the body its form's request sends (Q16).
+  - A term the lambda door cannot translate. In an array predicate it is refused where the view renders.
+    In a validator condition it leaves the rule to the server, which decides it by what it is.
+  - Order. A pipeline's `When`, `ElseIf` and `Else` run in authored order, and the first that holds wins.
+    A validator condition gates its rules and has no branches.
+- D8.4 Template conditionals are not this core. Syncfusion's template engine evaluates them on its own
+  data, and Q15 states what that engine evaluates.
+- D8.5 Every term reads by Q4: a term over a source that reads nothing does not hold, and a term with a
+  method call runs only when it is reached.
+
+**Schema nodes.** `op` (the comparison, text, membership and value tests, `and`, `or`, `not`); `if`.
+
+**Checker.**
+- `Absence.tla:ConditionTermsLazy`
+- `check:fluent`
+
+**Doors.**
+- kept: the pipeline door, `ConditionSourceBuilder` and `ConditionOperators`
+  (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
+- `N8.1` new: `internal static class LambdaCondition`, the one translator from an expression tree to
+  `Condition` nodes, with a result that says which term it could not translate. It replaces
+  `ElementExpressionCompiler.CompilePredicate` (`Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:68`)
+  and `BrowserCondition` (`Alis.Reactive/Validation/BrowserCondition.cs:11`).
+
+**Evidence.**
+- Two translators of one lambda into one condition, each with its own member list: `ElementExpressionCompiler`
+  refuses a term it cannot translate (`Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:113`), and
+  `BrowserCondition` returns no condition for one (`Alis.Reactive/Validation/BrowserCondition.cs:53`).
+- A third translator writes template text (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9`).
+- B9: the pipeline door's operators (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:106`).
+
+**Defects.**
+- `X8.1` type: a condition on an operand of the wrong type does not compile: the operator is generic over
+  the source's type (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
+- `X8.2` refusal: an array predicate with a term the lambda door cannot translate: "{term} has no browser form
+  in an array predicate; use a member the framework translates, or move the test to the server."
+- `X8.3` behavior: a validator condition with a term the lambda door cannot translate gates its rules on the
+  server only; the browser sends the form and shows the server's message.
+- `X8.4` behavior: `When(a).ElseIf(b).Else()` runs the first branch whose condition holds and no other.
