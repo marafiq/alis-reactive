@@ -152,6 +152,105 @@
       "probe": "ej2-method-arity.mjs",
       "expect": "ej2-methods-past-four-arguments: 285",
       "source": "spec/probes/ej2-method-arity.mjs"
+    },
+    {
+      "id": "core-cookie-auth-ajax",
+      "statement": "Cookie authentication redirects a request from no session with 302, and answers 401 when the request sends X-Requested-With: XMLHttpRequest.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding, authentication and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-cookie-auth-ajax: without the header 302; with X-Requested-With 401",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-validation-problem-shape",
+      "statement": "ValidationProblem answers 400 as application/problem+json with errors keyed by binding name, each a list of messages.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding, authentication and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-validation-problem-shape: 400 application/problem+json errors {\"Kin.Name\":[\"Name the next of kin.\"]}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-empty-field",
+      "statement": "An empty form field for an int is a model error and keeps the starting value; for an int? it binds null; a field not sent keeps the starting value.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding, authentication and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-empty-field: Count= binds refused Count=5 Maybe=null; nothing sent binds valid Count=5 Maybe=7",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-null-member",
+      "statement": "A JSON null for a non-nullable int binds no instance at all; a member left out of the JSON keeps its starting value.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding, authentication and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-null-member: {\"count\":null} binds refused, no instance; {} binds valid Count=5 Maybe=7",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-frombody-no-body",
+      "statement": "A [FromBody] endpoint answers a request with no body 415 when its parameter is non-nullable, and binds null when it is nullable.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding, authentication and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-no-body: a required body answers 415; a nullable body answers 200 with refused, no instance",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "mvc5-is-ajax-request",
+      "statement": "MVC 5 counts a request as AJAX when it sends X-Requested-With: XMLHttpRequest.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/AjaxRequestExtensions.cs.txt",
+      "expect": "request.Headers[\"X-Requested-With\"] == \"XMLHttpRequest\"",
+      "source": "spec/probes/aspnetwebstack/AjaxRequestExtensions.cs.txt:15"
+    },
+    {
+      "id": "katana-ajax-redirect-is-200",
+      "statement": "Katana's cookie authentication answers an AJAX request from no session with status 200 and the real status in the X-Responded-JSON header.",
+      "host": "net48",
+      "oracle": "Katana 4.2.3 source, Microsoft.Owin.Security.Cookies",
+      "probe": "spec/probes/katana/DefaultBehavior.cs.txt",
+      "expect": "context.Response.StatusCode = 200;",
+      "source": "spec/probes/katana/DefaultBehavior.cs.txt:27"
+    },
+    {
+      "id": "katana-ajax-responded-json",
+      "statement": "Katana writes the status it withheld into X-Responded-JSON.",
+      "host": "net48",
+      "oracle": "Katana 4.2.3 source, Microsoft.Owin.Security.Cookies",
+      "probe": "spec/probes/katana/DefaultBehavior.cs.txt",
+      "expect": "context.Response.Headers.Append(\"X-Responded-JSON\", respondedJson.ToString());",
+      "source": "spec/probes/katana/DefaultBehavior.cs.txt:28"
+    },
+    {
+      "id": "katana-redirects-other-requests",
+      "statement": "Katana's cookie authentication redirects a request that does not send X-Requested-With.",
+      "host": "net48",
+      "oracle": "Katana 4.2.3 source, Microsoft.Owin.Security.Cookies",
+      "probe": "spec/probes/katana/DefaultBehavior.cs.txt",
+      "expect": "context.Response.Redirect(context.RedirectUri);",
+      "source": "spec/probes/katana/DefaultBehavior.cs.txt:32"
+    },
+    {
+      "id": "systemweb-try-skip-iis-custom-errors",
+      "statement": "System.Web lets a response ask IIS to keep its own error body instead of a custom error page.",
+      "host": "net48",
+      "oracle": "System.Web reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/HttpResponse.cs.txt",
+      "expect": "public bool TrySkipIisCustomErrors {",
+      "source": "spec/probes/referencesource/HttpResponse.cs.txt:1567"
+    },
+    {
+      "id": "systemweb-suppress-forms-redirect",
+      "statement": "System.Web lets a response stop forms authentication from turning its 401 into a redirect.",
+      "host": "net48",
+      "oracle": "System.Web reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/HttpResponse.cs.txt",
+      "expect": "public bool SuppressFormsAuthenticationRedirect {",
+      "source": "spec/probes/referencesource/HttpResponse.cs.txt:1588"
     }
   ]
 }

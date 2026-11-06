@@ -320,9 +320,9 @@
     },
     "probes": {
       "counts": {
-        "facts": 17,
-        "net10": 8,
-        "net48": 7,
+        "facts": 28,
+        "net10": 13,
+        "net48": 13,
         "node": 2
       },
       "detail": "every fact printed by its probe or found at its source line",
@@ -560,7 +560,7 @@
     }
   },
   "passed": 6,
-  "read_at_head": "6ae74a757c94a05b14f94bece91d35502a4b30d1",
+  "read_at_head": "8b585735a0158cf33ed600853c9916a10e630285",
   "step": {
     "failing": [
       "core_questions",
