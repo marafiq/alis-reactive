@@ -1,0 +1,77 @@
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace Alis.Reactive.Plan;
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+[JsonDerivedType(typeof(LiteralExpression), "lit")]
+[JsonDerivedType(typeof(ObjectExpression), "obj")]
+[JsonDerivedType(typeof(RefExpression), "ref")]
+[JsonDerivedType(typeof(GetExpression), "get")]
+[JsonDerivedType(typeof(FnExpression), "fn")]
+internal abstract class Expression
+{
+    private protected Expression()
+    {
+    }
+}
+
+internal sealed class LiteralExpression : Expression
+{
+    internal LiteralExpression(JsonElement value)
+    {
+        Value = value;
+    }
+
+    public JsonElement Value { get; }
+}
+
+internal sealed class ObjectExpression : Expression
+{
+    internal ObjectExpression(string id)
+    {
+        Id = id;
+    }
+
+    public string Id { get; }
+}
+
+internal sealed class RefExpression : Expression
+{
+    internal RefExpression(string name)
+    {
+        Name = name;
+    }
+
+    public string Name { get; }
+}
+
+internal sealed class GetExpression : Expression
+{
+    internal GetExpression(Expression target, IReadOnlyList<PathStep> path, Presence members)
+    {
+        Target = target;
+        Path = path;
+        Members = members;
+    }
+
+    public Expression Target { get; }
+
+    public IReadOnlyList<PathStep> Path { get; }
+
+    public Presence Members { get; }
+}
+
+internal sealed class FnExpression : Expression
+{
+    internal FnExpression(IReadOnlyList<string> parameters, Expression body)
+    {
+        Params = parameters;
+        Body = body;
+    }
+
+    public IReadOnlyList<string> Params { get; }
+
+    public Expression Body { get; }
+}

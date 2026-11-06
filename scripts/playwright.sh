@@ -30,6 +30,7 @@ load_project() {
   unset -f playwright_shard_filter playwright_check_assets playwright_sources
   playwright_project=""
   playwright_shards=""
+  playwright_runtime="framework"
   source "$1"
   project_dir="$(dirname "$1")"
   local name
@@ -119,6 +120,10 @@ check_asset_output_is_fresh() {
 }
 
 check_browser_assets_are_fresh() {
+  if [ "$playwright_runtime" = "own" ]; then
+    playwright_check_assets
+    return
+  fi
   check_asset_output_is_fresh \
     "runtime bundle" \
     "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js" \

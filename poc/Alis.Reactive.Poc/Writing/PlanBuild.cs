@@ -1,0 +1,75 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using Alis.Reactive.Plan;
+
+namespace Alis.Reactive.Writing;
+
+internal sealed class PlanBuild
+{
+    private readonly Dictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, Locator> _objects = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _vendorOfElement = new(StringComparer.Ordinal);
+    private readonly List<Handler> _handlers = [];
+    private readonly Stack<List<Statement>> _open = new();
+
+    internal PlanBuild(string planId, JsonSerializerOptions values)
+    {
+        PlanId = planId;
+        Values = values;
+    }
+
+    internal string PlanId { get; }
+
+    internal JsonSerializerOptions Values { get; }
+
+    internal void Write(Statement statement)
+    {
+        if (_open.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "A step is written inside a pipeline, the callback a trigger runs: .Reactive(c => c.Click, p => ...).");
+        }
+
+        _open.Peek().Add(statement);
+    }
+
+    internal IReadOnlyList<Statement> Block(Action body)
+    {
+        var block = new List<Statement>();
+        _open.Push(block);
+        try
+        {
+            body();
+        }
+        finally
+        {
+            _open.Pop();
+        }
+
+        return block;
+    }
+
+    internal string Element(string elementId, string vendorName, Vendor vendor)
+    {
+        if (_vendors.TryGetValue(vendorName, out var known) && !ReferenceEquals(known, vendor))
+        {
+            throw new InvalidOperationException($"Two vendors are named '{vendorName}' on one page. A vendor's name is unique among the page's vendors.");
+        }
+
+        if (_vendorOfElement.TryGetValue(elementId, out var holder) && holder != vendorName)
+        {
+            throw new InvalidOperationException(
+                $"The element '{elementId}' is declared with the vendor '{holder}' and with '{vendorName}'. An element holds one component.");
+        }
+
+        _vendors[vendorName] = vendor;
+        _vendorOfElement[elementId] = vendorName;
+        _objects[elementId] = new ElementLocator(elementId, vendorName);
+        return elementId;
+    }
+
+    internal void Add(Handler handler) => _handlers.Add(handler);
+
+    internal PlanDocument Document() => new(PlanId, _vendors, _objects, _handlers);
+}
