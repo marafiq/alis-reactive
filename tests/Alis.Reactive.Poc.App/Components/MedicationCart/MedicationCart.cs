@@ -34,7 +34,10 @@ public sealed record MedicationDose(
     char Route,
     DateTime Scheduled,
     Carer? Carer,
-    Carer? Witness);
+    Carer? Witness,
+    string Label,
+    string Prescriber,
+    string? Note);
 
 public static class MedicationCartJson
 {

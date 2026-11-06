@@ -215,9 +215,12 @@ and in the blocks inside it, and nowhere else.
 `RecordField` carries `name`, a wire name, and `value`, an expression.
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
-`neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `order` and `merge`. `toNumber`,
+`neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `order`, `merge`, `trim`, `trimStart`,
+`trimEnd`, `upperInvariant`, `lowerInvariant`, `contains`, `startsWith`, `endsWith` and `nullOrEmpty`. `toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,
-D16.11).
+D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.md`) where JavaScript's own methods
+differ: `trim` removes another set of characters, `toUpperCase` turns `ß` into two letters, and `includes` reads an
+argument that is nothing as the text "null".
 
 ## Shapes
 

@@ -28,6 +28,8 @@ public sealed class WhenTheCoreIsCompiled
     private static readonly string[] TypeReadsTheOwnerLists =
     [
         "Components/JsObject.cs System.Type.FullName",
+        "Conditions/TranslatedMembers.cs System.Reflection.MemberInfo",
+        "Conditions/TranslatedMembers.cs System.Reflection.MethodInfo",
         "Conditions/ViewValues.cs System.Reflection.FieldInfo",
         "Conditions/ViewValues.cs System.Reflection.FieldInfo.GetValue",
         "Conditions/ViewValues.cs System.Reflection.PropertyInfo",
@@ -135,8 +137,7 @@ public sealed class WhenTheCoreIsCompiled
             .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
             .Select(path => CSharpSyntaxTree.ParseText(File.ReadAllText(path), parse, path))
             .ToList();
-        var references = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!)
-            .Split(Path.PathSeparator)
+        var references = File.ReadAllLines(Path.Combine(AppContext.BaseDirectory, "core-references.txt"))
             .Select(path => MetadataReference.CreateFromFile(path))
             .ToImmutableArray();
         var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);

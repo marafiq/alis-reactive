@@ -597,6 +597,16 @@ Terms used throughout:
   `d.Route == 'I'` keeps the injected ones. `d.Status == d.Planned` keeps the doses whose two members hold one value,
   `d.Milligrams > d.Priority` orders two numbers and leaves out a dose whose priority is null, and `d.Route < 'L'`
   orders a `char` as .NET does.
+- `X6.17` refusal (D6.5): `StartsWith(text)` or `EndsWith(text)`, which compare by the culture in .NET: "'{term}'
+  compares by the culture in .NET, which the browser cannot match; pass StringComparison.Ordinal, such as
+  d.Ward.StartsWith(\"N\", StringComparison.Ordinal)."
+- `X6.18` refusal (D6.5): a `StringComparison` other than `Ordinal`: "'{term}' compares text by {comparison}; a
+  list's lambda compares text by StringComparison.Ordinal."
+- `X6.19` behavior (D6.5): the text members agree with .NET where JavaScript's own methods do not: `Trim()` removes
+  U+0085 and keeps U+FEFF, `ToUpperInvariant()` keeps `ß` and `ı` and maps U+1FB3 to U+1FBC, `ToLowerInvariant()`
+  lowers a final `Σ` to `σ` and keeps `İ`, `string.IsNullOrEmpty` holds on a text that reads nothing, and
+  `string.IsNullOrWhiteSpace` holds on U+0085. `TrimEnd(new char[] { })` removes white space as .NET does, and
+  `Contains` given null to look for stops the pipeline, as .NET throws `ArgumentNullException`.
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 
@@ -2083,7 +2093,8 @@ plans (Q19).
     `FieldInfo.GetValue` and `PropertyInfo.GetValue` (D6.7; the owner, 2026-11-06: "capturing the model value is
     important");
   - the identity of a .NET member an array lambda calls, compared with the closed table of D6.5, never listed
-    or invoked.
+    or invoked: `MemberInfo`, the table's key, and `MethodInfo`, the type a call's member has, both in
+    `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):

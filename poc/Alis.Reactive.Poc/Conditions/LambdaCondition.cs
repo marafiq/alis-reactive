@@ -87,10 +87,9 @@ internal sealed class LambdaCondition
     {
         var read = Unconverted(node);
         if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
-        var steps = JsonPath.Steps(read, _lambda.Parameters[0], _values, _lambda)
-            ?? throw new ArgumentException(
-                $"'{ViewValues.Printed(read)}' has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.",
-                _argument);
+        var translated = TranslatedMembers.Of(read, Read, _argument);
+        if (translated is not null) return translated;
+        var steps = JsonPath.Steps(read, _lambda.Parameters[0], _values, _lambda) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
         return new GetExpression(_item, steps, ReadPresence.Optional);
     }
 

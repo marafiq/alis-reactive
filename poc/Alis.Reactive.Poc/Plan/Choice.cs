@@ -75,6 +75,15 @@ internal sealed class Operator : IChoice
     internal static readonly Operator And = new("and");
     internal static readonly Operator Or = new("or");
     internal static readonly Operator Not = new("not");
+    internal static readonly Operator Trim = new("trim");
+    internal static readonly Operator TrimStart = new("trimStart");
+    internal static readonly Operator TrimEnd = new("trimEnd");
+    internal static readonly Operator UpperInvariant = new("upperInvariant");
+    internal static readonly Operator LowerInvariant = new("lowerInvariant");
+    internal static readonly Operator Contains = new("contains");
+    internal static readonly Operator StartsWith = new("startsWith");
+    internal static readonly Operator EndsWith = new("endsWith");
+    internal static readonly Operator NullOrEmpty = new("nullOrEmpty");
 
     private Operator(string text)
     {

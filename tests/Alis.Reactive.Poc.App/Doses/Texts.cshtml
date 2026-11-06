@@ -1,0 +1,95 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose texts";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Dose texts</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+<p>Census: <span id="census-status"></span></p>
+
+@(plan.Button("count-ward-names-not-five-long", "Count doses whose ward name is not five letters long")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Ward!.Length != 5))))
+
+@(plan.Button("count-labels-trimmed", "Count labels that trim to the medicine")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Label.Trim() == d.Medicine))))
+
+@(plan.Button("count-labels-trimmed-at-start", "Count labels that trim at the start to the medicine")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Label.TrimStart() == d.Medicine))))
+
+@(plan.Button("count-labels-trimmed-at-end", "Count labels that trim at the end to the medicine")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Label.TrimEnd() == d.Medicine))))
+
+@(plan.Button("count-labels-trimmed-at-end-of-no-characters", "Count labels that trim at the end of no characters to the medicine")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Label.TrimEnd(new char[] { }) == d.Medicine))))
+
+@(plan.Button("count-prescribers-in-capitals", "Count prescribers written in capitals as .NET writes them")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Prescriber.ToUpperInvariant() == "DR WEIß" || d.Prescriber.ToUpperInvariant() == "DR IŞıK" || d.Prescriber.ToUpperInvariant() == "DR ΘΡ\u1FBCΞ"))))
+
+@(plan.Button("count-prescribers-in-small-letters", "Count prescribers written in small letters as .NET writes them")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Prescriber.ToLowerInvariant() == "dr καρασ" || d.Prescriber.ToLowerInvariant() == "dr \u0130nce"))))
+
+@(plan.Button("count-medicines-with-ri", "Count medicines with ri in their name")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Medicine.Contains("ri")))))
+
+@(plan.Button("count-wards-without-th", "Count doses whose ward name has no th")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !d.Ward!.Contains("th")))))
+
+@(plan.Button("count-labels-starting-with-a-medicine", "Count labels that start with Heparin or Digoxin")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Label.StartsWith("Heparin", StringComparison.Ordinal) || d.Label.StartsWith("Digoxin", StringComparison.Ordinal)))))
+
+@(plan.Button("count-labels-ending-with-a-medicine", "Count labels that end with Aspirin or Insulin")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Label.EndsWith("Aspirin", StringComparison.Ordinal) || d.Label.EndsWith("Insulin", StringComparison.Ordinal)))))
+
+@(plan.Button("count-notes-null-or-empty", "Count doses whose note is null or empty")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => string.IsNullOrEmpty(d.Note)))))
+
+@(plan.Button("count-wards-null-or-empty", "Count doses whose ward is null or empty")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => string.IsNullOrEmpty(d.Ward)))))
+
+@(plan.Button("count-notes-blank", "Count doses whose note is blank")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => string.IsNullOrWhiteSpace(d.Note)))))
+
+@(plan.Button("count-medicines-with-their-note", "Count medicines that contain their note")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Counting notes");
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Medicine.Contains(d.Note!)));
+        pipeline.Element("census-status").Text.Set("Counted notes");
+    }))
+
+@Html.RenderPlan(plan)

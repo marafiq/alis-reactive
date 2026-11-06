@@ -16,4 +16,13 @@
     <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
   </ItemGroup>
 
+  <Target Name="WriteTheCoresReferences" AfterTargets="FindReferenceAssembliesForReferences">
+    <ItemGroup>
+      <CoreReference Include="@(ReferencePathWithRefAssemblies->WithMetadataValue('FrameworkReferenceName', 'Microsoft.NETCore.App'))" />
+      <CoreReference Include="@(ReferencePathWithRefAssemblies->WithMetadataValue('FrameworkReferenceName', 'Microsoft.AspNetCore.App'))" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutDir)" />
+    <WriteLinesToFile File="$(OutDir)core-references.txt" Lines="@(CoreReference)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
 </Project>

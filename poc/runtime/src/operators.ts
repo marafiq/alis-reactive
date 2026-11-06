@@ -1,5 +1,6 @@
 import type { Expression, OperatorExpression } from "./plan";
 import { assertNever, nothing, value, type Read } from "./read";
+import { lowerInvariant, nullOrEmpty, tested, trimmed, upperInvariant } from "./text";
 
 type Evaluate = (argument: Expression) => Read;
 
@@ -26,6 +27,24 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate): Rea
       return both(args, evaluate);
     case "or":
       return either(args, evaluate);
+    case "trim":
+      return trimmed(evaluate(first(args)), "both");
+    case "trimStart":
+      return trimmed(evaluate(first(args)), "start");
+    case "trimEnd":
+      return trimmed(evaluate(first(args)), "end");
+    case "upperInvariant":
+      return upperInvariant(evaluate(first(args)));
+    case "lowerInvariant":
+      return lowerInvariant(evaluate(first(args)));
+    case "contains":
+      return tested(evaluate(first(args)), evaluate(second(args)), (held, sought) => held.includes(sought));
+    case "startsWith":
+      return tested(evaluate(first(args)), evaluate(second(args)), (held, sought) => held.startsWith(sought));
+    case "endsWith":
+      return tested(evaluate(first(args)), evaluate(second(args)), (held, sought) => held.endsWith(sought));
+    case "nullOrEmpty":
+      return nullOrEmpty(evaluate(first(args)));
     default:
       return assertNever(expression.op);
   }
