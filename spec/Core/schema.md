@@ -75,21 +75,24 @@ the handler) (D20.7).
 - `on`: an object id of `objects`;
 - `path`: a path to the object that raises the event, below the located object;
 - `event`: the event's JavaScript name;
-- `payload`: what the listener receives, one of `argument`, `event` or `detail` (D17.4), carried per handler since
-  the vendors map is shared by name across plans;
+- `payload`: a path into the listener's arguments, `[0]` unless the event's declaration names another position,
+  `[0, "detail"]` for a `CustomEvent` (D17.4), carried per handler since the vendors map is shared by name across
+  plans;
 - `policy`: what a trigger does while this handler's previous run is in flight, one of `overlap`, `replace`
   or `skip` (D11.7, N11.1);
 - `do`: a list of statements, the handler's body block.
 
 The payload is bound as `e` in the body block.
 
-`Vendor` carries `objectPath`, a path from the element to the component's object, and `listen`, a vendor
-listening: `method` or `assignment`. `Vendor.payload` of 65fdf118d leaves: it moves to each handler.
+`Vendor` carries `locate`, a `fn` of the element that returns the component's object: a `get` of a path below
+the element, or a `call` of the plugin the vendor registers as its lookup (D17.3); and `listen`, a vendor
+listening: `method`, `assignment` or `returned`. `Vendor.payload` of 65fdf118d leaves: it moves to each handler.
 
 | Kind | Carries | Meaning |
 |------|---------|---------|
 | `method` | `subscribe`, `unsubscribe`: the object's method names | listen and unlisten by calling them with the event name and the listener |
-| `assignment` | nothing | listen by assigning the listener to the object's member named by the event |
+| `assignment` | nothing | listen by assigning the listener to the object's member named by the event, and put the member's previous value back at release |
+| `returned` | `subscribe`: the object's method name | listen by calling it with the event name and the listener; release calls the function it returned (D17.3) |
 
 ## Object locators
 
@@ -188,6 +191,7 @@ and in the blocks inside it, and nowhere else.
 | `if` | | `arms`: at least one `Arm`; `else`: a block | run the first arm whose `when` holds, else the else block (D8.6) |
 | `all` | | `blocks`: a list of blocks | run every block at once; the next statement runs after every block settled (D10.10) |
 | `try` | | `body`, `finally`: blocks | run the body; run `finally` once, however the body ends (D11.8) |
+| `listen` | `event`: the event's JavaScript name; `vendor`: a vendor name of `vendors`; `payload`: a path into the listener's arguments; `policy` | `object`: an expression; `do`: a block | listen to the event of the live object the expression reads, once per object and statement, for the owner of the plan; run the block on each raise (D12.8) |
 | `stop` | `reason`: text C# wrote | | stop the pipeline: run none of its later statements, log the reason, run the `finally` of every `try` it is inside (D4.6, N4.1) |
 
 `Arm` carries `when`, an expression, and `then`, a block.
@@ -202,7 +206,7 @@ and in the blocks inside it, and nowhere else.
 | `get` | `path`; `members`: `required` or `optional` | `target`: an expression | the one read (Q2): a required step the holder lacks stops the pipeline, an optional one reads nothing (D4.1, D4.2) |
 | `as` | | `expr`: an expression; `shape`: a shape that converts | the one conversion by `spec/Core/conversions.md` (D3.2, D3.4); a value the shape cannot hold reads nothing (D3.3) |
 | `call` | `path`; `members` | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3) |
-| `fn` | `params`: names | `body`: an expression | a function whose parameters are bound in its body |
+| `fn` | `params`: names | `body`: an expression | a function whose parameters are bound in its body; as a value set or passed, the function a vendor calls, which answers its body's value (D17.12) |
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
 | `list` | | `items`: expressions | a list built from sources (N7.2) |
 | `op` | `op`: an operator | `args`: expressions | the operator over its arguments; `and`, `or` and `cond` evaluate a term only when it is reached (D4.7) |
@@ -268,6 +272,7 @@ proposed column says `added`.
 | statement | all | `Alis.Reactive.Assets/runtime/grammar/execute.ts:29` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D10.10 |
 | statement | try | `Alis.Reactive.Assets/runtime/grammar/execute.ts:30` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D11.8 |
 | statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |
+| statement | listen | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D12.8 |
 | expression | lit | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:27` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q7 |
 | expression | obj | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:28` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q5 |
 | expression | ref | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:29` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D8.8 |
@@ -294,6 +299,7 @@ proposed column says `added`.
 | object locator | plugin | `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:15`, `Alis.Reactive.Assets/runtime/objects/plan-objects.ts:28` | kept | the one locator switch of `Alis.Reactive.Assets/runtime/objects/plan-objects.ts` | G1 |
 | vendor listening | method | `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:30` | kept | the listening switch of `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts` | Q17 |
 | vendor listening | assignment | `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:31` | kept | the listening switch of `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts` | Q17 |
+| vendor listening | returned | absent | added | the listening switch of `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts` | D17.3 |
 | plugin data | none | `Alis.Reactive.Assets/runtime/plans/start.ts:38` | kept | none | S4 |
 | plugin data | hub | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.hub` | D12.6 |
 | plugin data | model | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.model` | D13.2 |
@@ -304,7 +310,7 @@ proposed column says `added`.
 | trace | off | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 | trace | on | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 
-Today 33 kinds, proposed 42: nine added, none removed.
+Today 33 kinds, proposed 44: eleven added, none removed.
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses
@@ -319,7 +325,9 @@ subscription, so a locator kind is one handler (G1).
 The diff beyond the kinds, each with the decision that makes it:
 
 - every `IReadOnlyList<string>` path, and `InputBinding.body`'s `BodyStep`, become path steps (N1.1);
-- `Handler` gains `payload` (D17.4) and `policy` (N11.1);
+- `Handler` gains `payload`, a path into the listener's arguments (D17.4), and `policy` (N11.1);
+- `Vendor.objectPath` becomes `Vendor.locate`, a `fn` of the element (D17.3, N17.6);
+- `fn` is a value wherever a value goes, set into a property or passed as an argument (D17.12);
 - `Vendor.payload` leaves (D17.4);
 - `InputBinding` gains `message` (D16.13), and `shape` and `list` leave into `value` (N3.3);
 - `FormPluginData.fields` becomes `registrations`, and `FormField`'s `items` and `value` functions leave (D16.14);

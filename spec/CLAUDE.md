@@ -87,7 +87,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: OpenTelemetry tracing is in scope and baked into the design (Q20): it records how the
   framework processes a request from start to end, helps while developing, and is optional, never always on.
 - The owner, 2026-11-06: null and undefined are never a state, in C#, in TypeScript, anywhere; a value that can be absent is a closed
-  union, and null is only a value the data holds.
+  union, and null is only a value the data holds. The nuance, the owner's words: "That is about the framework, not about the
+  value." A contract whose field is nullable (`birthCountry: string | null`) is valid, and its declaration says so (`string?`).
+- The owner, 2026-11-06: "when we onboard a component, we onboard the typed API exactly what that component has. So if the typed
+  API is not available, then how would you even call via framework?" A declaration mirrors the typed API member for member, on
+  every live object whatever holds it, a payload included: presence and nullability come from that API (D5.3).
 - The owner, 2026-11-06: no defensive code where a type or a check stops the bug; no closest match; fail loudly, so a
   bug surfaces and challenges the design. Tests are Playwright in a real browser, never jsdom, which is brittle.
   The reference components are built around JavaScript object complexity (dot notation, properties, callbacks,

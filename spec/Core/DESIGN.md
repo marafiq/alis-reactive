@@ -340,25 +340,40 @@ Terms used throughout:
 
 **Decision.**
 - D5.1 A live object is a `JsObject`: an element's component, a plugin, the object an `Object<T>` member or
-  method returns, and each item of an `Objects<T>` list. Its members are `Property`, `ReadOnly`, `WriteOnly`,
+  method returns, each item of an `Objects<T>` list, an event's payload declared as one (D5.6), and every object
+  reached from them. Its members are `Property`, `ReadOnly`, `WriteOnly`,
   `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Object<T>`, `Objects<T>` and `Event<T>`.
-- D5.2 Data is `Data<T>`: event payloads that declare no method, response bodies, pushed messages, values a
+- D5.2 Data is `Data<T>`: event payloads declared as plain data, response bodies, pushed messages, values a
   method returns, and items of lists of data.
-- D5.3 Requiredness, closed:
-
-  | Holder | Member | Members |
-  |--------|--------|---------|
-  | live object | any declared member | required |
-  | a payload type that declares a method | that method | required |
-  | data | a field | optional |
-  | the value a declared property holds | anything past the property | optional |
+- D5.3 A declaration mirrors the typed API of the object it declares, member for member (the owner, 2026-11-06:
+  "when we onboard a component, we onboard the typed API exactly what that component has"). The build refuses a
+  member the API lacks (D17.5), so the framework never calls one. Two marks come from that API, the same on every
+  live object whatever holds it: a component, a plugin, a returned object, an item of a list, an event's payload,
+  and every object reached from them.
+  - Presence. A member is required unless the API marks it optional (`?` in a TypeScript declaration). Reading,
+    writing or calling an absent required member stops its pipeline. An absent optional member reads nothing, a
+    call of it runs nothing and its result reads nothing, and a write to it sets it.
+  - Value. The member's C# type is the API's value type, nullable where the API's value is: `string | null` is
+    `string?`, `number | null` is `decimal?`. Null is a value that data holds and a declaration states, never a
+    state of the framework (the owner, 2026-11-06: "That is about the framework, not about the value"). A payload
+    whose API is `{ name: string; dateOfBirth: Date; birthCountry: string | null }` declares `ReadOnly<string> Name`,
+    `ReadOnly<DateTime> DateOfBirth` and `ReadOnly<string?> BirthCountry`; a null country reads as null, and a text
+    set from it shows nothing.
+  - The vendor contract analyzer (D17.5) checks both marks against the API, a reference type's nullability by its
+    nullable annotation, so neither drifts from the vendor.
+  - Data the app types with its own C# type (a response body, a pushed message, the value past a declared member)
+    reads nothing where a field is absent, and null where the field holds null.
 
 - D5.4 A dotted member at any depth reads the declared steps as required and every step past the declared
   member as optional, as two nested `get`s split at the boundary.
 - D5.5 A returned live object (`Object<T>`) reads and calls its declared members as required. A returned value
   (`Method<T>`) is data.
-- D5.6 An event payload that carries a method is declared as a `JsObject` payload; its declared methods are
-  required, and its data fields are optional.
+- D5.6 An event's payload is declared as what its listener receives, with the whole vocabulary. A live payload is
+  a `JsObject` declaration: every door of D5.1 works on it and on every object it holds, at any depth (properties
+  read, written or write-only, `Object<T>`, `Objects<T>`, every method kind, returned objects and lists, the events
+  of an object it holds by `listen` (D12.8), and callbacks (D17.12)), with presence and value as D5.3 states. Plain
+  data is `Data<T>`. A pushed message is `Data<T>` only, since it arrives as JSON (D5.7). What a payload's reads,
+  writes and calls do before and after an awaited step is D11.4.
 - D5.7 A server-pushed message is `Data<T>`, the same as a custom event's payload and a response body.
 - D5.8 The declaration door names the kind of JavaScript member it declares. `Object<T>()` and `Objects<T>()`
   are the object and the list a property holds; `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` are what
@@ -375,6 +390,7 @@ Terms used throughout:
 - `Absence.tla:DataAbsentReadsNothing`
 - `probe:ej2-max-public-method-arity`
 - `probe:ej2-methods-past-four-arguments`
+- `probe:ej2-event-args-presence-marks`
 
 **Doors.**
 - kept, public for the component author: `JsObject`'s `Property`, `ReadOnly`, `WriteOnly`, `Method`,
@@ -388,6 +404,10 @@ Terms used throughout:
   which reads non-public members to tell a property from a method; N5.2 carries the capability.
 - `N5.1` new: `ServerPushStream` and `SignalRHub` message triggers typed `Data<TMessage>`, replacing the
   `JsObject` with `ReadOnly<T>` members.
+- `N5.4` new: a member's presence mark on every declaration door, optional where the typed API marks `?` (D5.3);
+  its form goes to gate 2.
+- kept on a new holder: the whole declaration vocabulary on an event's payload, at any depth (D5.6), where the
+  redesign's payload is already a `JsObject` (`Alis.Reactive/Components/Event.cs:14`).
 
 **Evidence.**
 - B7: a custom event or a response is `Data<T>` (`Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:50`) while
@@ -407,6 +427,14 @@ Terms used throughout:
   decides it: new:N5.2.
 - `X5.6` type: a vendor method with more arguments than a declaration door takes: new:N5.3 takes any number.
 - `X5.4` behavior: a field of the object a property holds reads nothing when the object lacks it.
+- `X5.7` behavior: a payload field its API marks optional, which the vendor leaves out, reads nothing and the text
+  it sets shows nothing; a required field the vendor leaves out stops its pipeline, and the step after it does not
+  run.
+- `X5.8` behavior: a payload's `string?` field holding null reads as null: the text it sets shows nothing, and the
+  pipeline goes on.
+- `X5.9` analyzer: a declaration whose presence or nullability differs from its vendor's typed API: new:N17.2.
+- `X5.10` behavior: a property of an object a live payload holds, written by the handler, changes that object as
+  the page shows, and its method, called, runs.
 
 ## Q6. Arrays
 
@@ -971,10 +999,15 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   - A component declaration's `Method` and `MethodAsync` agree with the vendor's declared return type,
     checked by the vendor-drift rule (Q17, Q20).
 - D11.4 The steps before a handler's first awaited step run inside the vendor's callback, so the vendor
-  sees what they write to the event's payload. A write to the trigger's payload after an awaited step is
-  refused where the view renders: the vendor read the payload when its callback returned. To keep a
-  drawer open while the user decides, the handler writes `Cancel` first, then asks, then calls the
-  drawer's close method on yes. Reading the payload after an awaited step stays allowed.
+  sees what they write to the event's payload and what they call on it. After an awaited step, each member
+  kind of the payload has one meaning:
+  - a read reads the payload as it is then;
+  - a call runs: a vendor that hands over a method expects it called later, as EJ2's filtering payload's
+    `updateData` once the page has fetched the matching items;
+  - a write to a property of the payload itself is refused where the view renders, since the vendor read it
+    when its callback returned (`cancel`, `preventDefaultAction`). To keep a drawer open while the user
+    decides, the handler writes `Cancel` first, then asks, then calls the drawer's close method on yes;
+  - a write to a property of an object the payload holds is a write on that object, and runs.
 - D11.5 The order is closed:
   - The steps after an awaited step run after it settles.
   - Two handlers of one event run in the order the plan subscribed them, each up to its first awaited
@@ -1033,7 +1066,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - kept: `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Parallel`, the hub's `invoke` and `send`; `Confirm`
   is carried by N17.3 over a component's `MethodAsync<bool>` (D17.9).
 - `N11.1` new: a handler's policy, `overlap`, `replace` or `skip` (D11.7); its door's form goes to gate 2.
-- `N11.2` new: the refusal at render of a write to the trigger's payload after an awaited step (D11.4).
+- `N11.2` new: the refusal at render of a write to a property of the trigger's payload itself after an awaited
+  step (D11.4).
 
 **Evidence.**
 - A block runs sync until a statement returns a promise (`Alis.Reactive.Assets/runtime/grammar/execute.ts:16-21`).
@@ -1071,6 +1105,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `X11.6` behavior: under `replace`, a cascade whose first answer arrives after the second shows the
   second's items.
 - `X11.7` behavior: under `skip`, a save clicked twice while its request is in flight sends one request.
+- `X11.8` behavior: a filtering handler writes `PreventDefaultAction`, fetches the matching items and calls
+  `UpdateData` with them, and the list shows the fetched items (`probe:ej2-filtering-args-members`).
+- `X11.9` behavior: after an awaited step, a write to a property of an object the payload holds changes that
+  object.
 
 ## Q12. Ownership
 
@@ -1111,9 +1149,19 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   field registrations of the live plans that name it. Nothing is wired per element, so nothing per element
   is released. A field registration leaves with its plan's owner, so a slot's required field no longer holds
   the page's save once the slot unloads. What a check reads for a member whose input is gone is Q16's.
+- D12.8 An event of a live object a pipeline reaches (an object an event's payload holds, an object a method
+  returns, an item of a list) is listened to by a step written in that pipeline, `listen`, with a vendor's
+  listening, a payload declaration and a policy, as a handler has. Its listener:
+  - belongs to the owner of the plan whose pipeline added it, and leaves at that owner's release (D12.5);
+  - is added once per object and step: the same object reached again adds no second listener, and another
+    object gets its own;
+  - holds its object weakly, so the object lives as long as its vendor keeps it: at release a living object's
+    listener is removed by its listening kind, and a collected object took its listener with it;
+  - runs its own pipeline, whose payload is its own listener's arguments.
+  Ownership.tla gains the step and its invariants with POC 14, and each becomes a Playwright test.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
-and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
+the statement `listen`, and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
 plans name.
 
 **Checker.**
@@ -1133,8 +1181,12 @@ plans name.
 **Doors.**
 - kept: `Into(element)` and the slot's load and unload, `Html.RenderPlan`, and the hub's and stream's triggers.
 - No door names an owner: a developer chooses where a plan renders, and ownership follows.
+- `N12.1` new: `listen`, the handler of an event of a live object a pipeline reaches (D12.8); its form goes to
+  gate 2. It replaces the refusal of an event declared on an object a method returns.
 
 **Evidence.**
+- The redesign refuses an event declared on an object a method returns and states nothing for an object a payload
+  holds (`Alis.Reactive/Components/JsObject.cs:334-341`); D12.8's `listen` carries both.
 - P3, each row with the meaning that answers it:
   - 885652213 guessed a slot from `container.id.length > 0`, and 527138248 declared slots in the plan: D12.1
     (`Alis.Reactive/PlanModel/Writing/Scope.cs:234`).
@@ -1167,6 +1219,10 @@ plans name.
   listens.
 - `X12.8` behavior: content the server rendered inside a slot's container stops listening at the slot's first
   load.
+- `X12.9` behavior: an object a payload hands over raises its own event, and the pipeline its `listen` step names
+  runs once per raise; handed over again, it still runs once per raise.
+- `X12.10` behavior: after the slot whose handler listened to a payload's object unloads, that object's event runs
+  nothing.
 
 ## Q13. Where state lives
 
@@ -1719,16 +1775,27 @@ grammar gains no node (G2).
   component's members and events by their JavaScript names, and the render helper renders its element. Every
   component reaches the browser through the core, with no TypeScript change: a component that seems to need one
   means the plan is missing information, and C# carries it.
-- D17.3 A vendor is data that a declaration carries (G5), in a closed set the one driver follows:
-  - where the object lives on the element, a path (Q1);
-  - how a listener subscribes, a subscribe and unsubscribe method pair or a callback property the driver assigns;
-  - what a listener receives.
+- D17.3 A vendor is data that a declaration carries (G5), in closed sets the one driver follows:
+  - where the object lives, one of two: a path from the element (Q1), empty for the element itself, a member
+    such as `tomselect`, an index such as `ej2_instances.0`; or a lookup the vendor's browser code registers as
+    a plugin, called with the element, for a library that keeps its objects off the element (`Chart.getChart(canvas)`,
+    `bootstrap.Modal.getInstance(element)`, a registry a component's own code keeps). The plan writes either as a
+    `fn` of the element, read by the one evaluator, so finding an object is no second resolver, and the plan
+    reads no global by name;
+  - how a listener subscribes, one of three: a subscribe and unsubscribe method pair; a property the driver
+    assigns the listener to, its previous value put back at release; a subscribe method that returns the
+    function that removes the listener (`const off = store.subscribe(listener)`), which release calls;
+  - what a listener receives (D17.4).
 
-  The runtime names no vendor. The core knows the DOM's `EventTarget` as the platform's own vendor, and no
+  An object is found when a step reaches it and when a handler subscribes; a component constructed on
+  `alis:mount` is subscribed once it is (Q12). The runtime names no vendor. The core knows the DOM's `EventTarget` as the platform's own vendor, and no
   library's.
-- D17.4 What a listener receives is declared per event in C#, from a closed set: the callback's first argument, the
-  DOM `Event`, or a `CustomEvent`'s `detail`. The driver follows the declaration, and the runtime's `instanceof`
-  reading of the payload leaves (B12).
+- D17.4 A listener receives its arguments, and the payload's declaration reads them (D5.6). The payload is the
+  first argument unless a member names its position, `Argument<T>(n)`. A function the vendor hands over as an
+  argument (Tom Select's `load(query, callback)`) is a method of the payload at its position, called as any method
+  is. A `CustomEvent`'s `detail` is a member of the first argument. The plan carries a handler's payload as a path
+  into its arguments, so the closed set of `argument`, `event` and `detail`, the `VendorEventPayload` enum (S8)
+  and the runtime's `instanceof` reading of the payload (B12) leave.
 - D17.5 A declaration follows its vendor's public contract, and the build checks it:
   - A member is declared only when the vendor's type declarations make it public. A `@private` member is a gap to
     name, and public members compose what it would do.
@@ -1765,6 +1832,13 @@ grammar gains no node (G2).
 - D17.11 A declared method receives the run's abort signal only where its declaration names an argument of that kind,
   so no vendor's method receives an argument it does not declare. The plan writes it as the expression `signal`,
   which reads the run's own signal (Q11, Q19).
+- D17.12 A callback the vendor calls for an answer (a label formatter, a comparer, a predicate) is declared as a
+  property or an argument whose value is a function, `Callback<TArgs, TResult>`, and a view writes the answer as an
+  expression over the callback's arguments: `chart.TickLabel.Set(tick => tick.Label)`. The plan writes a `fn` as
+  the value; the browser assigns or passes the function, and each call evaluates its body with the arguments bound
+  and returns the result to the vendor in its turn. A body is an expression with no steps, so it cannot wait: an
+  awaited read inside it is refused where the view renders. A callback that only reacts is an event, listened to by
+  a method pair, an assignment or a returned unsubscriber (D17.3), and runs a pipeline as any handler does.
 
 **Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
 `handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
@@ -1782,7 +1856,12 @@ plans (Q19).
 - kept: `ComponentVendor.Define`, `ComponentVendor.DefineCallbackProperties`, `ComponentVendor.Native`,
   `ComponentVendor.Name`, `VendorEventPayload`, and the declaration vocabulary of `JsObject` (`Method`,
   `MethodAsync`, properties, events).
-- `N17.1` new: the payload kind of an event, declared with the event (D17.4); its form goes to gate 2.
+- `N17.1` new: the payload's place in its listener's arguments, declared with the event (D17.4); its form goes to
+  gate 2.
+- `N17.6` new: a vendor's lookup, a plugin called with the element, beside the path from the element (D17.3).
+- `N17.7` new: the listening kind whose subscribe method returns the function that removes the listener (D17.3).
+- `N17.8` new: `Argument<T>(n)`, and a payload method at a position (D17.4).
+- `N17.9` new: `Callback<TArgs, TResult>` and its `Set` from an expression (D17.12).
 - `N17.2` new: the vendor contract file and the analyzer that checks declarations against it (D17.5).
 - `N17.3` new: a condition over an awaited `MethodAsync<bool>` source, replacing `ConditionStart<TModel>.Confirm` and
   `ConditionExtensions.Confirm`; its form goes to gate 2.
@@ -1790,6 +1869,9 @@ plans (Q19).
 - `N17.5` new: the declaration's argument kind that carries the run's abort signal (D17.11).
 
 **Evidence.**
+- A vendor's object is found by a path from the element alone (`Alis.Reactive/Vendors/ComponentVendor.cs:78-93`,
+  `Alis.Reactive/Vendors/ComponentVendor.cs:109-122`), so a library that keeps its objects off the element cannot be
+  declared today: N17.6.
 - G5: the driver switches only on the listening kind (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:28-33`),
   and a vendor is the data `ComponentVendor` carries (`Alis.Reactive/Vendors/ComponentVendor.cs:38-52`).
 - B12: what a listener receives is read by `instanceof` (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:89-92`).
@@ -1822,6 +1904,15 @@ plans (Q19).
   confirm shows.
 - `X17.9` behavior: an error toast stays until it is dismissed, and an information toast leaves after its time
   unless it is hovered.
+- `X17.10` behavior: a component found by a registered lookup, as `Chart.getChart(canvas)` finds a chart, is read,
+  written, called and listened to as one found by a path.
+- `X17.11` behavior: a listener added by a subscribe method that returns its unsubscriber is removed at release by
+  that function, and the event runs nothing after.
+- `X17.12` behavior: a listener of two arguments reads the first and calls the second, the vendor's continuation,
+  with the page's items, and the component shows them.
+- `X17.13` refusal: an awaited read inside a callback's answer is refused where the view renders with "A callback
+  answers its vendor at once, so its answer cannot wait for an async method or a request."
+- `X17.14` behavior: a vendor's label callback shows, for each label, the text the view's expression answers.
 
 ## Q18. Type knowledge without reflection
 

@@ -8,12 +8,12 @@ Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARea
 
 ASSUME Mutant \in Mutants
 
-StatementKinds == {"set", "do", "let", "if", "all", "try", "stop"}
+StatementKinds == {"set", "do", "let", "if", "all", "try", "stop", "listen"}
 ExpressionKinds == {"lit", "obj", "ref", "get", "as", "call", "fn", "record", "list", "op", "signal"}
 ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", "array", "nullable", "object"}
 PathStepKinds == {"each"}
 LocatorKinds == {"element", "plugin"}
-ListeningKinds == {"method", "assignment"}
+ListeningKinds == {"method", "assignment", "returned"}
 PluginDataKinds == {"none", "hub", "model", "form", "stream"}
 TimeZoneKinds == {"clock", "zone"}
 TraceKinds == {"off", "on"}

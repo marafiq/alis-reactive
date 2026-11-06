@@ -944,6 +944,24 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-caller-line-follows-line-directive: a call under #line 42 of Intake.cshtml reads Intake.cshtml:42",
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "ej2-event-args-presence-marks",
+      "statement": "EJ2 marks presence member by member in its event payloads: of the fields of the exported *EventArgs interfaces, ej2-grids marks 289 optional and 8 required, ej2-dropdowns 37 and 75, ej2-calendars 38 and 7, ej2-popups 6 and 38.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion, read by the TypeScript compiler",
+      "probe": "ej2-event-args.mjs",
+      "expect": "ej2-event-args-presence-marks: ej2-grids 289 optional 8 required",
+      "source": "spec/probes/ej2-event-args.mjs"
+    },
+    {
+      "id": "ej2-filtering-args-members",
+      "statement": "EJ2's FilteringEventArgs is a live payload: required preventDefaultAction, baseEventArgs, cancel and text, and the method updateData.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 drop-down-base.d.ts, read by the TypeScript compiler",
+      "probe": "ej2-event-args.mjs",
+      "expect": "ej2-filtering-args-members: preventDefaultAction, baseEventArgs, cancel, text, updateData()",
+      "source": "spec/probes/ej2-event-args.mjs"
     }
   ]
 }
