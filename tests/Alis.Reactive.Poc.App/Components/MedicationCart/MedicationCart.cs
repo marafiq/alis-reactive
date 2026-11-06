@@ -43,7 +43,8 @@ public sealed record MedicationDose(
     decimal Charge,
     double Volume,
     int StockChange,
-    decimal Claim);
+    decimal Claim,
+    bool Controlled);
 
 public static class MedicationCartJson
 {

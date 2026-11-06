@@ -1,5 +1,6 @@
 import type { Expression, OperatorExpression } from "./plan";
 import { assertNever, nothing, value, type Read } from "./read";
+import { sortOrder } from "./orders";
 import { decimalSum, doubleSum, intSum } from "./sums";
 import { lower, nullOrEmpty, tested, trimmed, upper } from "./text";
 
@@ -62,6 +63,12 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate): Rea
       return doubleSum(evaluate(first(args)));
     case "sumDecimal":
       return decimalSum(evaluate(first(args)));
+    case "compareNumbers":
+      return sortOrder(evaluate(first(args)), evaluate(second(args)), "numbers");
+    case "compareOrdinal":
+      return sortOrder(evaluate(first(args)), evaluate(second(args)), "ordinal");
+    case "compareBooleans":
+      return sortOrder(evaluate(first(args)), evaluate(second(args)), "booleans");
     default:
       return assertNever(expression.op);
   }

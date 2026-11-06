@@ -17,6 +17,8 @@ internal static class ListForms
 
     internal static Expression Find(Expression list, FnExpression keep) => ArrayMethod(list, "find", keep);
 
+    internal static Expression Sorted(Expression list, FnExpression compare) => ArrayMethod(list, "toSorted", compare);
+
     internal static Expression Sum(Operator total, Expression list, FnExpression term) => new OperatorExpression(total, [Map(list, term)]);
 
     internal static FnExpression EveryItem(string item) => new([item], new LiteralExpression(JsonSerializer.SerializeToElement(true)));

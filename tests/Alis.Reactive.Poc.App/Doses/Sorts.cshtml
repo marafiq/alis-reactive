@@ -1,0 +1,44 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose lists";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Dose lists</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("list-by-milligrams", "List doses by milligrams")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => d.Milligrams).Select(d => d.Medicine))))
+
+@(plan.Button("list-by-route-last-first", "List doses by route, last first")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderByDescending(d => d.Route).Select(d => d.Medicine))))
+
+@(plan.Button("list-by-priority", "List doses by priority")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => d.Priority).Select(d => d.Medicine))))
+
+@(plan.Button("list-by-priority-highest-first", "List doses by priority, highest first")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderByDescending(d => d.Priority).Select(d => d.Medicine))))
+
+@(plan.Button("list-by-prescriber-code", "List doses by prescriber, code by code")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => d.Prescriber, StringComparer.Ordinal).Select(d => d.Medicine))))
+
+@(plan.Button("list-controlled-last", "List doses, controlled last")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => d.Controlled).Select(d => d.Medicine))))
+
+@Html.RenderPlan(plan)

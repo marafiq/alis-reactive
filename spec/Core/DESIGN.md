@@ -547,6 +547,17 @@ Terms used throughout:
   - A member with a JSON converter or number handling of its own is the contract analyzer's (N18.5, POC 13), which
     refuses it in a comparison; until that analyzer is built, such a member compares as the app's options write its
     type.
+- D6.13 `OrderBy(key)` and `OrderByDescending(key)` write `call(list, ["toSorted"], [fn(a, b)])` whose body compares
+  the key read from each item, the two items swapped for descending, so items with equal keys keep their list order
+  as .NET's stable sort keeps it. C# picks the comparison from the key's type and how the app's JSON writes it, where
+  the view renders: a key written as a JSON number compares as numbers (`compareNumbers`), a `bool` puts false first
+  (`compareBooleans`), a `char` compares by its code unit (`compareOrdinal`), and null comes first, as
+  `Comparer<T>.Default` puts it. A nullable value key binds the overload whose sample is the underlying type's value.
+  Text orders only through `OrderBy(key, StringComparer.Ordinal)`, by UTF-16 code unit as .NET's ordinal comparer
+  does. Text by the culture is refused (X6.27) until the owner decides: .NET's culture order differs between net48
+  (NLS word sort, `co-op` beside `coop`) and net10 (ICU), and between ICU builds on Han ideographs (`spec/NOTES.md`,
+  2026-11-06, Decision 3). A key that reads nothing, or holds a value its comparison does not compare, stops the
+  pipeline; whether an absent member reads its starting value first is the owner's answer on absent members.
 
 **Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`).
 
@@ -636,6 +647,21 @@ Terms used throughout:
 - `X6.26` behavior (D6.5): `wards.Contains(d.Ward)` over an array, an enum array written by name, a `List<T>` and
   an array typed as a sequence keeps the items the view lists; `d.Medicine.Contains('o')` finds a letter; a list's
   `Count` and an array's `Length` count their items.
+- `X6.27` refusal (D6.13): a text key with no comparer: "'{key}' orders text by the culture in .NET, an order net48 and
+  net10 do not share; pass StringComparer.Ordinal, such as OrderBy(d => d.Prescriber, StringComparer.Ordinal), or
+  order on the server."
+- `X6.28` refusal (D6.13): a key the app's JSON writes as text (an enum by name, a number written as text, a `Guid`,
+  a `TimeSpan`): "'{key}' orders a value the app's JSON writes as text, which does not order as the value does in
+  .NET; order by a member the JSON writes as a number, or order on the server."
+- `X6.29` refusal (D6.13): a date or a time key: "'{key}' orders dates or times, whose text does not order as the
+  instant does; order them on the server."
+- `X6.30` refusal (D6.13): an object key: "'{key}' orders objects, which the browser does not order; order by a
+  member, such as OrderBy(d => d.Carer.Name, StringComparer.Ordinal)."
+- `X6.31` refusal (D6.13): a comparer other than `StringComparer.Ordinal`: "'{key}' orders text by a comparer the
+  browser does not have; pass StringComparer.Ordinal, or order on the server."
+- `X6.32` behavior (D6.13): `OrderBy` lists a number key smallest first, a nullable number with null first, a `bool`
+  false first and text by code unit with `StringComparer.Ordinal`; `OrderByDescending` lists null last and keeps the
+  list order of equal keys.
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 

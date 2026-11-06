@@ -40,6 +40,26 @@ public static class DataLists
     public static TypedSource<TResult> Find<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate, Expression<Func<TItem, TResult>> field)
         => Over<TItem, TResult>(list, (items, build) => new GetExpression(ListForms.Find(items, ItemRead(build, predicate, nameof(predicate))), JsonPath.Of(field, build.Values), ReadPresence.Optional));
 
+    public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key)
+        => Ordered(list, key, default(TKey), descending: false);
+
+    public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey?>> key)
+        where TKey : struct
+        => Ordered(list, key, default(TKey), descending: false);
+
+    public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, string?>> key, StringComparer comparer)
+        => OrderedText(list, key, comparer, descending: false);
+
+    public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key)
+        => Ordered(list, key, default(TKey), descending: true);
+
+    public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey?>> key)
+        where TKey : struct
+        => Ordered(list, key, default(TKey), descending: true);
+
+    public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, string?>> key, StringComparer comparer)
+        => OrderedText(list, key, comparer, descending: true);
+
     public static TypedSource<int> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, int>> term)
         => Over<TItem, int>(list, (items, build) => ListForms.Sum(Operator.SumInt, items, ItemRead(build, term, nameof(term))));
 
@@ -90,6 +110,12 @@ public static class DataLists
         var source = Sources.Of(list);
         return new DataRead<TResult>(operation(source.Expression, source.Build), source.Build);
     }
+
+    private static TypedSource<IReadOnlyList<TItem>> Ordered<TItem, TKey>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression key, TKey? sample, bool descending)
+        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListOrder.Sorted(items, build, key, ListOrder.ComparisonOf(key, sample, build.Values), descending));
+
+    private static TypedSource<IReadOnlyList<TItem>> OrderedText<TItem>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression key, StringComparer comparer, bool descending)
+        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListOrder.Sorted(items, build, key, ListOrder.OrdinalComparison(key, comparer), descending));
 
     private static FnExpression ItemRead(PlanBuild build, LambdaExpression read, string argument)
     {

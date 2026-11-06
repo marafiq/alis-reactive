@@ -92,6 +92,9 @@ internal sealed class Operator : IChoice
     internal static readonly Operator SumInt = new("sumInt");
     internal static readonly Operator SumDouble = new("sumDouble");
     internal static readonly Operator SumDecimal = new("sumDecimal");
+    internal static readonly Operator CompareNumbers = new("compareNumbers");
+    internal static readonly Operator CompareOrdinal = new("compareOrdinal");
+    internal static readonly Operator CompareBooleans = new("compareBooleans");
 
     private Operator(string text)
     {

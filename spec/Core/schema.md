@@ -215,7 +215,7 @@ and in the blocks inside it, and nowhere else.
 `RecordField` carries `name`, a wire name, and `value`, an expression.
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
-`neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `order`, `merge`, `trim`, `trimStart`,
+`neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
 `sumDouble` and `sumDecimal`.
 `toNumber`,
@@ -227,6 +227,8 @@ argument that is nothing as the text "null". `includes` looks for an item in a l
 `sumInt`, `sumDouble` and `sumDecimal` take the list a `map` of the term reads and add it as .NET adds that number
 type (D6.11): one operator over the whole list, where JavaScript's `reduce` would add a decimal as a double and
 carry no range.
+`compareNumbers`, `compareOrdinal` and `compareBooleans` compare two sort keys to -1, 0 or 1, null first, by the
+comparison C# picks from the key's type (D6.13); the redesign's `order` compared whatever came by its JavaScript type.
 
 ## Shapes
 
