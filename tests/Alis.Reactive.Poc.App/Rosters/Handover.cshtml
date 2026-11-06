@@ -1,0 +1,54 @@
+@using Alis.Reactive.Poc.App.Rosters
+@model HandoverPage
+@{
+    ViewData["Title"] = "Handover";
+    var plan = Html.ReactivePlan<HandoverPage>();
+}
+<h1>Handover</h1>
+
+@plan.DutyRoster("night-roster", nursesRequired: 4, shift: "Night shift", onCallName: "Ruth Mensah", onCallPager: "4471")
+@plan.DutyRoster("day-roster", nursesRequired: 5, shift: "Day shift", onCallName: "Kofi Boateng", onCallPager: null)
+@plan.DutyRosterVersion2("relief-roster")
+
+@plan.TextBox("shift-name", "Shift name", "")
+
+@(plan.Button("rename-night-shift", "Rename night shift")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Component<DutyRoster>("night-roster").Shift.Label.Set(pipeline.Component<NativeTextBox>("shift-name").Value);
+        pipeline.Element("shift-status").Text.Set("Renamed");
+    }))
+
+<p>Shift: <span id="shift-status"></span></p>
+
+@(plan.Button("page-night-on-call", "Page night on-call")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var roster = pipeline.Component<DutyRoster>("night-roster");
+        pipeline.Element("night-pager").Text.Set(roster.OnCall.Get(nurse => nurse.Pager.Number));
+        pipeline.Element("page-status").Text.Set("Paged night");
+    }))
+
+@(plan.Button("page-day-on-call", "Page day on-call")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var roster = pipeline.Component<DutyRoster>("day-roster");
+        pipeline.Element("day-pager").Text.Set(roster.OnCall.Get(nurse => nurse.Pager.Number));
+        pipeline.Element("page-status").Text.Set("Paged day");
+    }))
+
+@(plan.Button("page-relief-on-call", "Page relief on-call")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var roster = pipeline.Component<DutyRoster>("relief-roster");
+        pipeline.Element("page-status").Text.Set("Paging relief");
+        pipeline.Element("relief-pager").Text.Set(roster.OnCall.Get(nurse => nurse.Pager.Number));
+        pipeline.Element("page-status").Text.Set("Paged relief");
+    }))
+
+<p>Night pager: <span id="night-pager">unknown</span></p>
+<p>Day pager: <span id="day-pager">unknown</span></p>
+<p>Relief pager: <span id="relief-pager">unknown</span></p>
+<p>Paging: <span id="page-status"></span></p>
+
+@Html.RenderPlan(plan)

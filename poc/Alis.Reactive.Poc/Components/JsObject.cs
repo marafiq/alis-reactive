@@ -45,6 +45,10 @@ public abstract class JsObject
     protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "")
         => new(this, Member(name, declaredBy));
 
+    protected TObject LiveObject<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
+        where TObject : JsObject, new()
+        => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], Presence.Required), Binding.Build));
+
     protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "")
         => new(JavaScriptName(name, declaredBy));
 

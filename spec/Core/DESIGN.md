@@ -339,10 +339,10 @@ Terms used throughout:
 ## Q5. The object model
 
 **Decision.**
-- D5.1 A live object is a `JsObject`: an element's component, a plugin, the object an `Object<T>` member or
-  method returns, each item of an `Objects<T>` list, an event's payload declared as one (D5.6), and every object
-  reached from them. Its members are `Property`, `ReadOnly`, `WriteOnly`,
-  `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Object<T>`, `Objects<T>` and `Event<T>`.
+- D5.1 A live object is a `JsObject`: an element's component, a plugin, the object a `LiveObject<T>` member holds
+  or a `ReturnedObject<T>` method returns, each item of a `LiveObjects<T>` list, an event's payload declared as one
+  (D5.6), and every object reached from them. Its members are `Property`, `ReadOnly`, `WriteOnly`,
+  `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `LiveObject<T>`, `LiveObjects<T>` and `Event<T>`.
 - D5.2 Data is `Data<T>`: event payloads declared as plain data, response bodies, pushed messages, values a
   method returns, and items of lists of data.
 - D5.3 A declaration mirrors the typed API of the object it declares, member for member (the owner, 2026-11-06:
@@ -366,16 +366,16 @@ Terms used throughout:
 
 - D5.4 A dotted member at any depth reads the declared steps as required and every step past the declared
   member as optional, as two nested `get`s split at the boundary.
-- D5.5 A returned live object (`Object<T>`) reads and calls its declared members as required. A returned value
+- D5.5 A returned live object (`ReturnedObject<T>`) reads and calls its declared members as required. A returned value
   (`Method<T>`) is data.
 - D5.6 An event's payload is declared as what its listener receives, with the whole vocabulary. A live payload is
   a `JsObject` declaration: every door of D5.1 works on it and on every object it holds, at any depth (properties
-  read, written or write-only, `Object<T>`, `Objects<T>`, every method kind, returned objects and lists, the events
+  read, written or write-only, `LiveObject<T>`, `LiveObjects<T>`, every method kind, returned objects and lists, the events
   of an object it holds by `listen` (D12.8), and callbacks (D17.12)), with presence and value as D5.3 states. Plain
   data is `Data<T>`. A pushed message is `Data<T>` only, since it arrives as JSON (D5.7). What a payload's reads,
   writes and calls do before and after an awaited step is D11.4.
 - D5.7 A server-pushed message is `Data<T>`, the same as a custom event's payload and a response body.
-- D5.8 The declaration door names the kind of JavaScript member it declares. `Object<T>()` and `Objects<T>()`
+- D5.8 The declaration door names the kind of JavaScript member it declares. `LiveObject<T>()` and `LiveObjects<T>()`
   are the object and the list a property holds; `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` are what
   a method returns. No door infers the kind from the C# member that declares it.
 - D5.9 Every method kind (`Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `ReturnedObject<T>`,
@@ -394,8 +394,12 @@ Terms used throughout:
 
 **Doors.**
 - kept, public for the component author: `JsObject`'s `Property`, `ReadOnly`, `WriteOnly`, `Method`,
-  `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Object<T>()`, `Objects<T>()`, `Event`, `Event<T>`, `Fixed` and
-  `Pass` (`Alis.Reactive/Components/JsObject.cs:74-260`).
+  `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Event`, `Event<T>`, `Fixed` and `Pass`
+  (`Alis.Reactive/Components/JsObject.cs:74-260`).
+- `N5.5` new: `LiveObject<T>()` and `LiveObjects<T>()`, the live object and the list a property holds, replacing
+  `Object<T>()` and `Objects<T>()` (the owner, 2026-11-06: "Object which collide with the built-in C# object"). A
+  member named `Object` on `JsObject` shadows `System.Object` in every declaration, and the build refuses it
+  (CA1720, seen in the POC).
 - `N5.2` new: `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` on `JsObject`, replacing `Object<T>(Arg..)`
   and the method form of `Object<T>()` and `Objects<T>()`.
 - `N5.3` new: one door per method kind taking `IReadOnlyList<Arg>`, beside the door with no arguments,
@@ -443,7 +447,7 @@ Terms used throughout:
 - D6.2 One name per operation, the names `ReactiveArray` has on both lines: `Where`, `Select`, `OrderBy`,
   `OrderByDescending`, `Count()`, `Count(predicate)`, `Any()`, `Any(predicate)`, `All(predicate)`, `Sum` over
   `int`, `decimal` and `double`, `Find(predicate)` and `Find(predicate, field)`. The property `Count` and the
-  method `Each` on a declared list (`Objects<T>`) leave, renamed to `Count()` and `Select`.
+  method `Each` on a declared list (`LiveObjects<T>`) leave, renamed to `Count()` and `Select`.
 - D6.3 An operation over a list that reads nothing reads nothing; `Any()` and `All()` over nothing read nothing,
   so a condition on them does not hold.
 - D6.4 In an array lambda, a member .NET defines on the value's type (`Trim`, `Length`, `Year`, a `DayOfWeek`
@@ -1967,8 +1971,8 @@ shapes, starts and the payload kind of each event.
 - `probe:core-form-binds-clr-name`
 
 **Doors.**
-- kept: `Object<T>()`, `Objects<T>()`, `Method`, `MethodAsync` and the property declarations of `JsObject`; every
-  door written over a generic type.
+- kept: `LiveObject<T>()` and `LiveObjects<T>()` (renamed by N5.5), `Method`, `MethodAsync` and the property
+  declarations of `JsObject`; every door written over a generic type.
 - `N18.1` new: the reflection analyzer of D18.4, with the owner's exception list.
 - `N18.2` new: the declaration analyzer of D18.3, which replaces `JsObject`'s run-time member scan.
 - `N18.3` new: a form typed by its model, and a request's `Form` that takes only a form of the request's model.

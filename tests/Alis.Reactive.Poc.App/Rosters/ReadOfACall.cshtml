@@ -1,0 +1,17 @@
+@using Alis.Reactive.Poc.App.Rosters
+@model HandoverPage
+@{
+    ViewData["Title"] = "Handover";
+    var plan = Html.ReactivePlan<HandoverPage>();
+}
+<h1>Handover</h1>
+
+@plan.DutyRoster("night-roster", nursesRequired: 4, shift: "Night shift", onCallName: "Ruth Mensah", onCallPager: "4471")
+
+@(plan.Button("page-night-on-call", "Page night on-call")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("night-pager").Text.Set(pipeline.Component<DutyRoster>("night-roster").OnCall.Get(nurse => nurse.Name.ToUpper()))))
+
+<p>Night pager: <span id="night-pager">unknown</span></p>
+
+@Html.RenderPlan(plan)

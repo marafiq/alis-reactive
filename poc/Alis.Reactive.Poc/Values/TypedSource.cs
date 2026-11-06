@@ -13,6 +13,16 @@ public abstract class TypedSource<T>
     internal abstract Expression Expression { get; }
 }
 
+internal sealed class DataRead<T> : TypedSource<T>
+{
+    internal DataRead(Expression expression)
+    {
+        Expression = expression;
+    }
+
+    internal override Expression Expression { get; }
+}
+
 internal static class Literal
 {
     internal static Expression Of<T>(T value, PlanBuild build)

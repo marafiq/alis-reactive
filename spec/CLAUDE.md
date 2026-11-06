@@ -92,6 +92,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: "when we onboard a component, we onboard the typed API exactly what that component has. So if the typed
   API is not available, then how would you even call via framework?" A declaration mirrors the typed API member for member, on
   every live object whatever holds it, a payload included: presence and nullability come from that API (D5.3).
+- The owner, 2026-11-06: "Object which collide with the built-in C# object." No door takes the name of a .NET type:
+  `LiveObject<T>()` and its list form replace `Object<T>()` and `Objects<T>()` (N5.5), since a member named
+  `Object` on `JsObject` shadows `System.Object` in every declaration. CA1720 refuses such a name in the build.
 - The owner, 2026-11-06: no defensive code where a type or a check stops the bug; no closest match; fail loudly, so a
   bug surfaces and challenges the design. Tests are Playwright in a real browser, never jsdom, which is brittle.
   The reference components are built around JavaScript object complexity (dot notation, properties, callbacks,
