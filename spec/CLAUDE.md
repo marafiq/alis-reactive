@@ -108,6 +108,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: the TLA+ work must be good in code, not hypothetical. A model invariant that restates its
   own action proves nothing; a model earns its place only over interleavings, and each of its invariants is a named
   Playwright test on the code it models.
+- The owner, 2026-11-06: "I am totally fine with one assembly, but namespacing is logical [modularization]." The core
+  is one assembly; each module is one namespace and one folder of the same name, its public and internal types
+  together, and the namespace is the module boundary.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
