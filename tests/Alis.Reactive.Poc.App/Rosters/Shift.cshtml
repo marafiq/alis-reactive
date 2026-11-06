@@ -1,0 +1,21 @@
+@using Alis.Reactive.Poc.App.Rosters
+@model ShiftRosterPage
+@{
+    ViewData["Title"] = "Shift roster";
+    var plan = Html.ReactivePlan<ShiftRosterPage>();
+}
+<h1>Shift roster</h1>
+
+@plan.DutyRoster("night-roster", nursesRequired: 4)
+
+@plan.TextBox("shift-lead", "Shift lead", "")
+
+@(plan.Button("set-lead", "Set lead")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<DutyRoster>("night-roster").Lead.Set(pipeline.Component<NativeTextBox>("shift-lead").Value)))
+
+@(plan.Button("staff-four", "Staff four nurses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<DutyRoster>("night-roster").Nurses.Set(4)))
+
+@Html.RenderPlan(plan)
