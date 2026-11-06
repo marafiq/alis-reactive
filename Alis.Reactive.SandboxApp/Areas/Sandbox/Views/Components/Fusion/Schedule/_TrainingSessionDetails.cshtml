@@ -1,0 +1,7 @@
+@model TrainingCalendarSession
+
+<div class="flex flex-col gap-2 p-4">
+    <p class="text-base font-semibold">@Model.Subject</p>
+    <p class="text-sm text-text-secondary">Trainer: @Model.Trainer</p>
+    <p class="text-sm text-text-secondary">@Model.StartTime.ToString("dddd, MMMM d, h:mm tt") to @Model.EndTime.ToString("h:mm tt")</p>
+</div>
