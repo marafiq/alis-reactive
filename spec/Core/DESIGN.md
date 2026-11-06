@@ -481,9 +481,9 @@ Terms used throughout:
   tree; a captured local or a member of the view is read by walking its chain of fields and properties with
   `FieldInfo.GetValue` and `PropertyInfo.GetValue`, the owner's exception of 2026-11-06 ("capturing the model value
   is important"). No expression is compiled at render and no accessor is cached. A view value that calls a method,
-  indexes or computes (`Model.Ward.ToUpper()`, `ward + "x"`) waits on the owner's answer: the redesign compiles
-  it today (`Alis.Reactive/Members/Expressions.cs:28`); the proposal refuses it, naming its door, a local computed
-  before the lambda.
+  indexes or computes (`Model.Ward.ToUpper()`, `ward + "x"`) is refused, naming its door, a local computed before
+  the lambda (the owner, 2026-11-06: "if var works i do not see any downside"). The redesign compiles such a value
+  today (`Alis.Reactive/Members/Expressions.cs:28`); the local keeps the capability.
 - D6.8 A list's lambda takes one of two forms, by what an item is. An item of `LiveObjects<T>` is a live object:
   its lambda is a delegate over the item's declaration, `bed => bed.Resident`, run once when the view renders with
   the item bound to the `fn`'s parameter, and its members are required (D4.1). An item of a list of data is a C#
@@ -498,8 +498,8 @@ Terms used throughout:
   app chooses `AwayFromZero`). They apply only where an operation must round: a division, an average, a value
   fitted to its places. Sums and comparisons stay exact, so a dose of 0.125 mg stays 0.125 (spec/CLAUDE.md). A decimal the app sends as a JSON number keeps
   about 15 significant digits when the browser parses it; an app whose amounts need more sends decimals as text,
-  and the same addition holds. Over `int` the browser's total is exact to 2^53, where .NET's checked `Sum` throws
-  past 2^31; the plan carries `int` sums as whole numbers and the difference is X6.9.
+  and the same addition holds. Over `int` a total past the range of `int` stops the pipeline, as .NET's checked
+  `Sum` throws `OverflowException` (the owner, 2026-11-06).
 - D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted`,
   `reduce`, `includes` and `length`, named at the vendor boundary of the built-in array and read `builtin` (D6.3).
   The browser adds no array function, and no operation changes the vendor's own array: a sort is `toSorted`, never
@@ -550,14 +550,14 @@ Terms used throughout:
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name` reads that item's test
   as nothing, so the item is not kept.
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
-- `X6.9` behavior: `Sum` over `decimal` terms 0.1 and 0.2 reads 0.3; over `double` it reads 0.30000000000000004, as
-  .NET's `double` does. An `int` total past 2^31, which .NET's checked `Sum` refuses with an `OverflowException`,
-  is the case POC 4 unit 3 decides with the owner.
+- `X6.9` behavior: `Sum` over `decimal` terms 0.1 and 0.2 reads 0.3, equal in value to .NET's 0.30 (how a decimal
+  shows as text is Q3's); over `double` it reads 0.30000000000000004, as .NET's `double` does; over `int` a total
+  past 2,147,483,647 stops the pipeline and the step after it does not run.
 - `X6.8` refusal: a step written inside a list's lambda: "A step is written inside a list's lambda, which reads
   each item and writes nothing. Write the step in the pipeline."
 - `X6.5` behavior: `Where(r => r.Ward == Model.Ward)` keeps the items of the ward the view's model names, and a
   local the lambda captures is read the same way.
-- `X6.6` refusal, proposed and waiting on the owner (D6.7): a view value that calls a method or computes inside an
+- `X6.6` refusal (D6.7): a view value that calls a method or computes inside an
   array lambda: "'{value}' computes a value
   inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();."
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
@@ -2022,6 +2022,13 @@ plans (Q19).
   which fails on any other read of `System.Reflection`, of a member of `System.Type`, `Activator`, `Delegate` or
   `TypeDescriptor` (the owner, 2026-11-06: "Use caution really, really good so we don't trip over"). The namespace
   ban of D18.4 misses the members of `Type`, so `typeof(T).GetProperties()` builds; that list refuses it.
+  The owner's exceptions, each in one file and on that list by name:
+  - the class that declares a lambda's member, `MemberInfo.DeclaringType` (D18.3);
+  - a value the view holds inside an array lambda, read along its chain of fields and properties with
+    `FieldInfo.GetValue` and `PropertyInfo.GetValue` (D6.7; the owner, 2026-11-06: "capturing the model value is
+    important");
+  - the identity of a .NET member an array lambda calls, compared with the closed table of D6.5, never listed
+    or invoked.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):
@@ -2055,9 +2062,10 @@ plans (Q19).
     sees it on net48 too.
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
   lists at gate 1 (N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
-  attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`. A type's identity stays open to the
-  framework (D18.1). The POC bans the whole `System.Reflection` namespace; its one owner-listed read of it is a
-  one-line method that carries `SuppressMessage` for RS0030, and the list of D18.1 holds every read.
+  attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`, except the owner's exceptions D18.1
+  lists. A type's identity stays open to the framework (D18.1). The POC bans the whole `System.Reflection`
+  namespace; each owner-listed read of it sits in a method that carries `SuppressMessage` for RS0030, and the list
+  of D18.1 holds every read.
 - D18.5 Every door on the public surface is typed (ALIS009). The three strings of B13 become typed doors:
   - a button's type is HTML's closed set, `button`, `submit` or `reset`;
   - a text box's type is HTML's closed set of text input types;

@@ -116,8 +116,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - Chosen within the owner's yes, 2026-11-06: the member-chain read over compiling or caching compiled accessors,
   because it generates no code, holds no cache, needs no warm-up and is the same API on net48 and net10; it reads
   a value in 0.02 µs (a local) to 0.04 µs (`Model.Ward`) on net10, against 32 to 39 µs to compile per value (the
-  redesign's way). A view value that calls a method or computes (`Model.Ward.ToUpper()`) waits on the owner: the
-  redesign compiles it today, so refusing it is a new limit.
+  redesign's way). A view value that calls a method or computes (`Model.Ward.ToUpper()`) is refused, naming its
+  door, a local computed before the lambda. The owner, 2026-11-06: "I am totally fine as long as its captured as
+  view render so dynmic stuff.. but if var works i do not see any downside. I am always hestiant reaching to
+  reflection, or even compile" (D6.7).
+- The owner, 2026-11-06, chose the identity table for the .NET members an array lambda calls (`Trim`, `Length`,
+  `Year`, LINQ's own operations inside a lambda): one closed table keyed by the identity the expression tree carries,
+  built from typed lambdas, one file and one entry on the owner's list (D6.5, D18.1).
+- The owner, 2026-11-06, chose that an `int` total past the range of `int` stops its pipeline, as .NET's checked
+  `Sum` refuses it (D6.11).
 - The owner, 2026-11-06: "for decimal use normal finance standard bascially what banks use or have it configured
   at global level". A `decimal` is summed in the browser as decimal arithmetic, never binary floating point: the
   terms are added as whole numbers at the largest scale among them and the point is placed once, exact as .NET's
