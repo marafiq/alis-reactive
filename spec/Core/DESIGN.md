@@ -474,8 +474,8 @@ Terms used throughout:
   compared) reads nothing on a missing value and stops the pipeline on a value that lacks it, written `requiredIfHeld`
   as D6.3 writes a list's operation.
 - D6.5 The .NET members an array lambda translates are the closed table `spec/Core/translated-members.md`,
-  keyed by the `MethodInfo` and `MemberInfo` the expression tree carries and built from typed lambdas; no
-  attribute is scanned.
+  keyed by the definition of the member the expression tree carries, its module and metadata token, which every
+  instantiation of a generic member shares, and built from typed lambdas; no attribute is scanned.
 - D6.7 A value the view holds inside an array lambda (`r => r.Ward == Model.Ward`, a local the lambda captures,
   a `const`, an enum member) is read when the view renders and written as a literal. A constant is read from the
   tree; a captured local or a member of the view is read by walking its chain of fields and properties with
@@ -2096,9 +2096,8 @@ plans (Q19).
     `FieldInfo.GetValue` and `PropertyInfo.GetValue` (D6.7; the owner, 2026-11-06: "capturing the model value is
     important");
   - the identity of a .NET member an array lambda calls, compared with the closed table of D6.5, never listed
-    or invoked: `MemberInfo`, the table's key, `MethodInfo`, the type a call's member has, and
-    `MethodBase.IsGenericMethod` with `MethodInfo.GetGenericMethodDefinition`, which key LINQ's generic operations
-    by their definition, all in `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
+    or invoked: `MemberInfo.Module` and `MemberInfo.MetadataToken`, which name a member's definition for every
+    instantiation of a generic member, in `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):

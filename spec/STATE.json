@@ -1750,7 +1750,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "1d208bb8f37d4fe8d19429802c55f5828116ee42",
+  "read_at_head": "99a42929e19d5c684d856e8696000248ae6e1ce5",
   "step": {
     "failing": [
       "gate1"

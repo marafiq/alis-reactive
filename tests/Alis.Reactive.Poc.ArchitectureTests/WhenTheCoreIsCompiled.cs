@@ -29,9 +29,9 @@ public sealed class WhenTheCoreIsCompiled
     [
         "Components/JsObject.cs System.Type.FullName",
         "Conditions/TranslatedMembers.cs System.Reflection.MemberInfo",
-        "Conditions/TranslatedMembers.cs System.Reflection.MethodBase.IsGenericMethod",
-        "Conditions/TranslatedMembers.cs System.Reflection.MethodInfo",
-        "Conditions/TranslatedMembers.cs System.Reflection.MethodInfo.GetGenericMethodDefinition",
+        "Conditions/TranslatedMembers.cs System.Reflection.MemberInfo.MetadataToken",
+        "Conditions/TranslatedMembers.cs System.Reflection.MemberInfo.Module",
+        "Conditions/TranslatedMembers.cs System.Reflection.Module",
         "Conditions/ViewValues.cs System.Reflection.FieldInfo",
         "Conditions/ViewValues.cs System.Reflection.FieldInfo.GetValue",
         "Conditions/ViewValues.cs System.Reflection.PropertyInfo",

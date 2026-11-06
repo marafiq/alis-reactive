@@ -1,7 +1,7 @@
 # Translated members
 
-The .NET members an array lambda translates, keyed by the `MethodInfo` or `MemberInfo` the expression tree
-carries and built from typed lambdas, as `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:18-41`
+The .NET members an array lambda translates, keyed by the definition of the member the expression tree carries
+(its module and metadata token, shared by every instantiation of a generic member) and built from typed lambdas, as `Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:18-41`
 builds them today, without the `PureMethodAttribute` scan (`Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:51-55`).
 That table maps `Trim` to JavaScript's `trim` and `ToUpperInvariant` to `toUpperCase`, and both disagree with .NET
 (`spec/NOTES.md`, the probe of 2026-11-06). A member not listed is refused where the view renders. Every row reads

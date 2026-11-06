@@ -24,7 +24,7 @@ internal static class TranslatedMembers
 
     private delegate PlanExpression Translation(LinqExpression term, IReadOnlyList<LinqExpression> operands, ITranslator read, string argument);
 
-    private static readonly Dictionary<MemberInfo, Translation> Table = new()
+    private static readonly Dictionary<(Module Module, int Token), Translation> Table = new()
     {
         [Property((string text) => text.Length)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
         [Method((string text) => text.Trim())] = Unary(Operator.Trim),
@@ -41,17 +41,17 @@ internal static class TranslatedMembers
         [Method((string text) => text.EndsWith(""))] = ByCulture,
         [Static(() => string.IsNullOrEmpty(""))] = Unary(Operator.NullOrEmpty),
         [Static(() => string.IsNullOrWhiteSpace(""))] = (term, operands, read, argument) => Op(Operator.NullOrEmpty, Unary(Operator.Trim)(term, operands, read, argument)),
-        [Definition((IEnumerable<int> items) => items.Any())] = (_, operands, read, _) => ListForms.Some(read.Read(operands[0]), read.EveryItem()),
-        [Definition((IEnumerable<int> items) => items.Any(item => true))] = (_, operands, read, _) => ListForms.Some(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1])),
-        [Definition((IEnumerable<int> items) => items.All(item => true))] = (_, operands, read, _) => ListForms.Every(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1])),
-        [Definition((IEnumerable<int> items) => items.Count())] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
-        [Definition((IEnumerable<int> items) => items.Count(item => true))] = (_, operands, read, _) => ListForms.Length(ListForms.Filter(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1]))),
+        [Method((IEnumerable<int> items) => items.Any())] = (_, operands, read, _) => ListForms.Some(read.Read(operands[0]), read.EveryItem()),
+        [Method((IEnumerable<int> items) => items.Any(item => true))] = (_, operands, read, _) => ListForms.Some(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1])),
+        [Method((IEnumerable<int> items) => items.All(item => true))] = (_, operands, read, _) => ListForms.Every(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1])),
+        [Method((IEnumerable<int> items) => items.Count())] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
+        [Method((IEnumerable<int> items) => items.Count(item => true))] = (_, operands, read, _) => ListForms.Length(ListForms.Filter(read.Read(operands[0]), read.Lambda((LambdaExpression)operands[1]))),
     };
 
     internal static PlanExpression? Of(LinqExpression term, ITranslator read, string argument) => term switch
     {
         MethodCallExpression call when Table.TryGetValue(Key(call.Method), out var translate) => translate(call, Operands(call), read, argument),
-        MemberExpression { Expression: { } holder } member when Table.TryGetValue(member.Member, out var translate) => translate(member, [holder], read, argument),
+        MemberExpression { Expression: { } holder } member when Table.TryGetValue(Key(member.Member), out var translate) => translate(member, [holder], read, argument),
         _ => null,
     };
 
@@ -83,13 +83,11 @@ internal static class TranslatedMembers
 
     private static OperatorExpression Op(Operator op, params PlanExpression[] args) => new(op, args);
 
-    private static MethodInfo Method<T, TResult>(Expression<Func<T, TResult>> call) => ((MethodCallExpression)call.Body).Method;
+    private static (Module Module, int Token) Key(MemberInfo member) => (member.Module, member.MetadataToken);
 
-    private static MethodInfo Key(MethodInfo method) => method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
+    private static (Module Module, int Token) Method<T, TResult>(Expression<Func<T, TResult>> call) => Key(((MethodCallExpression)call.Body).Method);
 
-    private static MethodInfo Definition<T, TResult>(Expression<Func<T, TResult>> call) => Method(call).GetGenericMethodDefinition();
+    private static (Module Module, int Token) Static<TResult>(Expression<Func<TResult>> call) => Key(((MethodCallExpression)call.Body).Method);
 
-    private static MethodInfo Static<TResult>(Expression<Func<TResult>> call) => ((MethodCallExpression)call.Body).Method;
-
-    private static MemberInfo Property<T, TResult>(Expression<Func<T, TResult>> read) => ((MemberExpression)read.Body).Member;
+    private static (Module Module, int Token) Property<T, TResult>(Expression<Func<T, TResult>> read) => Key(((MemberExpression)read.Body).Member);
 }
