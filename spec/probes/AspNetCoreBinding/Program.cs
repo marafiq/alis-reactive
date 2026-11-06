@@ -64,7 +64,12 @@ try
     Console.WriteLine("core-json-nested-start: " + await Json(client, "/ward-json", "{\"lead\":{\"phone\":\"1\"},\"deputy\":{\"phone\":\"2\"},\"leads\":[{\"phone\":\"3\"}]}"));
     Console.WriteLine("core-form-unsent-keeps-start: " + await Form(client, "/ward", "") + " | json {} " + await Json(client, "/ward-json", "{}"));
     Console.WriteLine("core-form-value-messages: Count=12a says " + await Form(client, "/counts-message", "Count=12a") + "; Count= says " + await Form(client, "/counts-message", "Count="));
+    Console.WriteLine("core-form-implicit-required: Name= says " + await Form(client, "/named", "Name=") + "; nothing sent says " + await Form(client, "/named", ""));
+    var web = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web);
+    Console.WriteLine("core-stj-empty-object-start: a Lead read from {} writes " + System.Text.Json.JsonSerializer.Serialize(System.Text.Json.JsonSerializer.Deserialize<Lead>("{}", web), web));
     Console.WriteLine("core-regex-dotnet: \\d on Arabic-Indic digits " + Regex.IsMatch("\u0661\u0662\u0663", @"^\d+$") + "; $ before a final newline " + Regex.IsMatch("123\n", @"^\d+$") + "; . on a carriage return " + Regex.IsMatch("a\rb", "^a.b$") + "; \\w on e-acute " + Regex.IsMatch("\u00e9", @"^\w$") + "; \\d under ECMAScript " + Regex.IsMatch("\u0661\u0662\u0663", @"^\d+$", RegexOptions.ECMAScript));
+    Console.WriteLine("core-regex-space-and-case: \\s on NEL " + Regex.IsMatch("\u0085", @"^\s$") + "; \\s on BOM " + Regex.IsMatch("\ufeff", @"^\s$") + "; IgnoreCase I against i under de-DE " + Regex.IsMatch("I", "^i$", RegexOptions.IgnoreCase) + "; under tr-TR " + Turkish(() => Regex.IsMatch("I", "^i$", RegexOptions.IgnoreCase)) + "; under tr-TR invariant " + Turkish(() => Regex.IsMatch("I", "^i$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)) + "; Kelvin sign against k invariant " + Regex.IsMatch("\u212A", "^k$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant));
+    Console.WriteLine("core-uri-absolute: " + string.Join("; ", new[] { "http://a.com/b c", "http://a b.com", "http://", "http://a", "https://exa_mple.com", "http://a.com:99999", "HTTP://A.COM" }.Select(text => text + " " + (Uri.TryCreate(text, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)))));
     Console.WriteLine("core-form-empty-field: Count= binds " + await Form(client, "/counts", "Count=&Maybe=") + "; nothing sent binds " + await Form(client, "/counts", ""));
     Console.WriteLine("core-json-null-member: {\"count\":null} binds " + await Json(client, "/counts-json", "{\"count\":null}") + "; {} binds " + await Json(client, "/counts-json", "{}"));
     using (var strict = await client.PostAsync("/strict-json", null))
@@ -76,6 +81,20 @@ try
 finally
 {
     await app.StopAsync();
+}
+
+static bool Turkish(Func<bool> test)
+{
+    var before = CultureInfo.CurrentCulture;
+    CultureInfo.CurrentCulture = new CultureInfo("tr-TR");
+    try
+    {
+        return test();
+    }
+    finally
+    {
+        CultureInfo.CurrentCulture = before;
+    }
 }
 
 static async Task<string> Json(HttpClient client, string path, string body)
@@ -146,6 +165,11 @@ public sealed class Lead
     public string? Phone { get; set; }
 }
 
+public sealed class Named
+{
+    public string Name { get; set; } = "start";
+}
+
 public sealed class Ward
 {
     public Lead Lead { get; set; } = new() { Name = "outer" };
@@ -204,6 +228,10 @@ public sealed class ProbeController : ControllerBase
     [HttpPost("/counts-message")]
     public string CountsMessage([FromForm] Counts counts)
         => string.Join(" | ", ModelState.Where(entry => entry.Value!.Errors.Count > 0).Select(entry => entry.Key + ": " + entry.Value!.Errors[0].ErrorMessage));
+
+    [HttpPost("/named")]
+    public string FormNamed([FromForm] Named named)
+        => (ModelState.IsValid ? "valid" : string.Join(" | ", ModelState.Where(entry => entry.Value!.Errors.Count > 0).Select(entry => entry.Key + ": " + entry.Value!.Errors[0].ErrorMessage))) + " Name=" + (named.Name ?? "null");
 
     private static string WardText(Ward ward)
         => "Lead.Name=" + ward.Lead.Name + "; Deputy.Name=" + (ward.Deputy?.Name ?? "null") + "; Leads=" + string.Join(",", ward.Leads.Select(lead => lead.Name));

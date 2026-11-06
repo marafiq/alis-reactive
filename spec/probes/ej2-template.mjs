@@ -30,3 +30,9 @@ console.log(`ej2-template-function-elements: a function returning elements rende
 console.log(`ej2-template-unencoded: ${shown}`);
 console.log(`ej2-template-condition: count 3 shows ${html(conditional({ count: 3 }))}; count 1 shows ${html(conditional({ count: 1 }))}`);
 console.log(`ej2-template-missing-holder: a member past a missing holder gives ${missingHolder}`);
+const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" };
+globalThis.alisFusionText = value => value == null ? "" : Array.from(String(value), character => entities[character] ?? character).join("");
+const encoded = html(compile("<b>${alisFusionText(name)}</b>")({ name: "<img src=x onerror=alert(1)>" }));
+console.log(`ej2-template-helper-encodes: a read through a global helper renders ${encoded}`);
+const guarded = compile("<b>${if(resident)}${resident.name}${/if}</b>");
+console.log(`ej2-template-guarded-holder: a read inside the engine's condition on its holder renders ${html(guarded({}))} for no holder and ${html(guarded({ resident: { name: "Ann" } }))} for one`);

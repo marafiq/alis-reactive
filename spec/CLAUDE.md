@@ -58,8 +58,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: the framework controls every input's id. Without it the browser starts guessing,
   validation does not find its inputs, and views of different partials that share an id conflict; the
   declaring-class id is that decision.
-- The owner, 2026-11-06: templates have a typed way to write HTML, with much room to grow; keep it. What
-  changes is what it compiles to: today it relies on Syncfusion's compile.
+- The owner, 2026-11-06: templates have a typed way to write HTML, with much room to grow; keep it. It relies on
+  Syncfusion's compile, and it stays the Fusion module's, not rewritten: it brings a JavaScript dependency the
+  bundle always holds and no server dependency.
+- The owner, 2026-11-06, to be made unmistakable: the framework depends on no consumer. The dependency is
+  inverted: Fusion and Native are consumers built on the core's public surface, and the core names none of them.
 - The owner, 2026-11-06: bad patterns start small and spiral, so each mechanism stays limited to its exact use
   case. Browser and server validation work from one fact, a rule written once and never twice.
 - The owner, 2026-11-06: MVC partials are a great feature for dynamic UI: a partial loads where a condition
@@ -71,6 +74,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   independent (loaded where a condition holds, its own thing), and both work. Partials nest: inside a plan a
   view renders another, entirely different view with its own plan and its own children. Main merged plans by
   an algorithm on purpose; the rewrite improves on it from the framework's core.
+- The owner, 2026-11-06, said several times: never just agree. An example the owner gives is an example, not the
+  rule ("my 500 was an example"). Think each piece of advice and each gap through against the evidence, and
+  disagree with the reason where it does not hold: that is the job. This feedback is never lost.
+- The owner, 2026-11-06: Syncfusion and the native components are consumers of the framework, the dependency
+  inverted. The core exposes only what onboarding a component needs, takes no vendor library (Syncfusion's
+  DataManager is named: the framework's own typed request lifecycle feeds components), and onboards no new
+  component itself: any developer onboards one. After each compaction, reread these decisions, `spec/NOTES.md`
+  and the root vision, which the compact hook prints, so the design does not drift.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does

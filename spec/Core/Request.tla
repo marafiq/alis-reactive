@@ -22,11 +22,11 @@ Kinds == {"valueType", "list", "nullable"}
 Bodies == {"json", "form"}
 
 VARIABLES part, config,
-          checkPasses, loadingStops, guardOk, method, repeatable, policy, outcomes, reqRoutes, defRoutes,
+          checkPasses, loadingStops, guardOk, method, policy, outcomes, reqRoutes, defRoutes,
           routeStops, chained, chainedWhen,
           pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan
 
-scenario == <<checkPasses, loadingStops, guardOk, method, repeatable, policy, outcomes, reqRoutes, defRoutes,
+scenario == <<checkPasses, loadingStops, guardOk, method, policy, outcomes, reqRoutes, defRoutes,
               routeStops, chained, chainedWhen>>
 run == <<pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan>>
 vars == <<part, config, scenario, run>>
@@ -51,7 +51,7 @@ IdleRun ==
 PlacementInit ==
     /\ part = "placement"
     /\ config \in Configs
-    /\ checkPasses = TRUE /\ loadingStops = FALSE /\ guardOk = TRUE /\ method = "GET" /\ repeatable = FALSE
+    /\ checkPasses = TRUE /\ loadingStops = FALSE /\ guardOk = TRUE /\ method = "GET"
     /\ policy = FALSE /\ outcomes = [i \in 1..MaxAttempts |-> "ok"] /\ reqRoutes = {} /\ defRoutes = {}
     /\ routeStops = FALSE /\ chained = FALSE /\ chainedWhen = TRUE
     /\ pc = "idle"
@@ -64,7 +64,6 @@ FlowInit ==
     /\ loadingStops \in BOOLEAN
     /\ guardOk \in BOOLEAN
     /\ method \in {"GET", "POST"}
-    /\ repeatable \in BOOLEAN
     /\ policy \in BOOLEAN
     /\ outcomes \in [1..MaxAttempts -> Outcomes]
     /\ reqRoutes \in SUBSET {"s404", "s503", "catchAll"}
@@ -122,7 +121,7 @@ RouteFor(o) ==
 
 Index(i) == ((i - 1) % MaxAttempts) + 1
 
-CanRetry == policy /\ (method = "GET" \/ repeatable \/ Mutant = "RetryAnyPost")
+CanRetry == policy /\ (method = "GET" \/ Mutant = "RetryAnyPost")
 
 Limit == MaxAttempts + (IF Mutant = "RetryPastAttempts" THEN 1 ELSE 0)
 
@@ -225,7 +224,7 @@ ChainedOnlyAfterSuccess == chainedRan => (final = "ok" /\ routeRan = Success /\ 
 StepsAfterRunUnlessStopped == (Flow /\ pc = "done") => (afterRan <=> ~stopped)
 
 RetriesOnlyWhatIsRetryable ==
-    sends > 1 => (policy /\ (method = "GET" \/ repeatable) /\ \A i \in 1..(sends - 1) : outcomes[Index(i)] \in Retryable)
+    sends > 1 => (policy /\ method = "GET" /\ \A i \in 1..(sends - 1) : outcomes[Index(i)] \in Retryable)
 
 RetryStopsAtItsAttempts == sends <= MaxAttempts
 

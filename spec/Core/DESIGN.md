@@ -763,12 +763,21 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - D10.13 For an outcome that is not success, the route is the request's route for its status, else the
   defaults' route for its status, else the request's catch-all, else the defaults' catch-all, else none. So a
   request routes only the statuses it cares about.
-- D10.14 Retry is a policy, the defaults' or the request's, and no request retries without one. It retries a
-  network failure and the statuses it names, from 408, 429, 502, 503 and 504, and no other outcome. It retries
-  GET, PUT and DELETE, which HTTP defines as idempotent (RFC 9110, section 9.2.2), and a POST only when its policy
-  says the POST is repeatable. It makes at most the attempts it states, waits the delay it states between
-  attempts, and waits what a 429 or 503 response's `Retry-After` states, up to its longest wait; a longer wait
-  ends the retries.
+- D10.14 Retry is one standard policy, carried by the request defaults and taken by every request that does not opt
+  out. It retries what a second attempt can answer differently, and nothing else:
+  - a network failure, and the statuses 408 and 429, which ask the client to try again (RFC 9110, section 15.5.9;
+    RFC 6585, section 4), and 502, 503 and 504, a gateway or an overloaded server (RFC 9110, section 15.6);
+  - never another client error: 400, 401, 403, 404, 409 and 422 say the request is wrong, and a second attempt
+    gets the same answer;
+  - never 500, 501 or 505: in an MVC app the server is the app, its 500 is its own exception, and the same request
+    meets it again, after a wait the user spends behind the loader;
+  - only GET, PUT and DELETE, which HTTP defines as idempotent (RFC 9110, section 9.2.2). A POST is never retried:
+    a failed POST's effect can stand on the server, and a second attempt would repeat it.
+
+  Its numbers are .NET's standard resilience handler's: 3 retries after the first attempt, an exponential wait with
+  jitter from 2 seconds, a 429's or 503's `Retry-After` in place of the wait, and 30 seconds in all, past which the
+  retries end. The app sets the attempts and the first wait once, in the defaults. Another policy is a later
+  extension, the owner's.
 - D10.15 Across attempts, the request's check, guards and argument run once, and every attempt sends the same
   argument. `WhileLoading` runs once before the first attempt, the route once for the last attempt's outcome,
   and `Finally` once after it. An owner disposed between attempts ends the retries (Q11).
@@ -802,6 +811,26 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   form and the full form write the same plan. The condensed form's syntax goes to gate 2 (step 7), with what
   what a `.cshtml` MVC view makes hard in its lambdas as its input.
 
+- D10.18 What each step reads is stated by when it reads, and nothing is frozen.
+  - A request's argument is read once, in the turn the request starts, and serialized as it is sent, so the body is
+    a snapshot by construction. A `Parallel`'s requests start in one turn and send what the page held then.
+  - A response's data belongs to its run. The plan has no door that writes into it, and the generated contract types
+    it read-only, so the runtime's own code cannot write into it either. A step that hands it, or any data value, to a
+    vendor or a plugin (a `set` or a call argument) hands a structured copy (`probe:js-structured-clone-separate`).
+    What a component does with what it is given is its own: one that edits it edits its copy, and a `Chained`
+    request's gather, a `Finally` and the steps after a `Parallel` read the response as the server sent it. Evidence
+    that a consumer edits what it is given: `probe:ej2-data-manager-edits-source`, a fact only; the core takes no
+    vendor library.
+  - Freezing is refused: a write into a frozen record throws (`probe:js-frozen-write-throws`), so a frozen value
+    breaks any component that edits what it is given.
+  - The page is shared and live. A step reads a component or an element when it runs. `Parallel`'s routes run in
+    the order their responses arrive, which the server decides, and each reads the page as the routes before it left
+    it; a developer who needs an order writes `Chained`. The steps after `Parallel` read the page once every branch
+    settled.
+  - A `let` binds once, in its block (D8.8). After an awaited step, the binding holds what was bound, and a read of
+    the page holds the page now.
+  - An event's payload is the vendor's object, written in the vendor's turn (D11.4) and copied like any data when
+    handed on.
 **Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
 `HttpSend` and its result, `HttpResponse`.
 
@@ -829,7 +858,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `N10.1` new: the error door on each host, `ValidationResult.ToErrorResponse()`: net10 a `ValidationProblemDetails`
   result, net48 a JSON result with status 400 and `TrySkipIisCustomErrors`, replacing the body each app builds by hand.
 - `N10.2` new: `HttpResponse`, the contract of what `send` returns (`ok`, `status`, `outcome`, `body`).
-- `N10.3` new: the retry policy of D10.14, on the defaults and on a request; its door's form goes to gate 2.
+- `N10.3` new: the standard retry policy of D10.14 in the defaults, its attempts and first wait, and a request's
+  opting out; the door's form goes to gate 2.
 - `N10.4` new: a condition on a part a request sends, on a chained request and on a parallel branch (D10.16),
   through the one condition core; its door's form goes to gate 2.
 - `N10.5` new: the condensed request of D10.17, whose default parts read the request's own parts; its form goes
@@ -864,7 +894,7 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `X10.6` behavior: `OnAllSettled` runs once, after the slower of two parallel requests answers.
 - `X10.8` behavior: a GET whose policy retries 503 answers the second attempt's success, shows its loader once
   and runs its `Finally` once.
-- `X10.9` type: a POST's retry policy that does not say the POST is repeatable retries nothing: new:N10.3.
+- `X10.9` type: a policy that retries a POST cannot be written: new:N10.3.
 - `X10.7` behavior: on net48 under IIS, a 400 with validation errors shows each message at its input; the
   `verify-net48` run proves it.
 - `X10.10` behavior: a nullable member whose condition fails is not in the body the request sends, and the
@@ -873,6 +903,12 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   steps and the steps after it ran.
 - `X10.12` behavior: a request that writes only its method, URL, form and success shows a 400's errors at its
   own form, through the defaults' route.
+- `X10.13` behavior: a component that edits a row it was given from a response leaves the response as sent, and
+  a `Chained` request that reads the response's rows sends the server's rows, not the component's.
+- `X10.14` behavior: two `Parallel` requests whose routes write one text: the page shows the text of the route whose
+  response the test app sends last.
+- `X10.15` behavior: a GET answered 500 runs its error route once, with no second attempt; a GET answered 503 and
+  then 200 runs its success route.
 
 ## Q11. Lanes and time
 
@@ -1115,9 +1151,9 @@ owner is where its script is, and an owner's holds are what its plans name.
   | a plan's culture and time zone, written by C# for the view (D3.11, D3.12) | the owner, by its plan |
   | the argument, the attempts, the response and the route of one request | the request, until it settles |
 
-- D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page may share it.
+- D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page share one id freely.
 - D13.3 A read of a member by its binding name belongs to a form. It reads the input inside the form's element
-  that binds the name, as the form sends it. A page-wide read by binding name is refused: two views may bind
+  that binds the name, as the form sends it. A page-wide read by binding name is refused: two views can bind
   one name, so on a page a name names no single input. That ends the chain of guesses that read the last
   contributed input, then the plan's own. A read of a member's input outside a form is the component read
   by its element id, which Q14 derives the same way in every view that renders the member.
@@ -1309,60 +1345,40 @@ and `request` state, which the schema does not hold: a request's state is its ru
 ## Q15. Templates
 
 **Decision.**
-- D15.1 A template is plan data, never vendor template text. C# writes it as a typed tree, and the framework's
-  template plugin turns the tree into a function from an item to DOM nodes, which the component's property
-  takes.
-  - EJ2 takes such a function. The text nodes it returns stay text and its elements render as they are
-    (`probe:ej2-template-function-text-node`, `probe:ej2-template-function-elements`).
-  - So one template form serves every vendor that takes a function template, and the native reference
-    renders its cells with the same plugin.
-- D15.2 Syncfusion's string engine is refused as the framework's template form, for what it does:
-  - it writes a data value into the HTML unencoded, so markup in data becomes live elements
-    (`probe:ej2-template-unencoded`);
-  - it throws on a member past a missing holder (`probe:ej2-template-missing-holder`), where Q4 reads nothing;
-  - it evaluates its conditions as JavaScript compiled with `new Function` (`probe:ej2-template-condition`).
-- D15.3 A template's tree is closed. Its nodes are elements of a closed set (text, span, div, badge, icon,
-  image, link, event button), each with classes and attributes; text and attribute values read from the
-  item; and a condition with a then and an else branch.
-  - A value is read from the item with the one read (Q2), its members optional, so a member past a missing
-    holder reads nothing and shows nothing (Q4).
-  - Text is written with `textContent` and attributes with `setAttribute`, so data is never markup. A link's
-    address is read as a URL and refused, reading nothing, when its scheme is not `http`, `https`, `mailto` or
-    `tel`.
-  - Member names are the data's JSON names under the app's options (D2.9). The camel case the template writer
-    hard-codes today is refused.
-- D15.4 A template's condition is the one condition core (Q8) over the item, written with the one syntax
-  (D8.6), with a branch that is a block (D8.7). The template's second condition syntax, a lambda of the item,
-  and its third translator are refused.
-- D15.5 An event button raises a declared app event with a payload read from the item. The payload is data,
-  and the event's handlers are plan handlers like any other (Q11).
-- D15.6 Developer-written markup stays: `Raw(html)` takes static HTML the developer writes, never a read from
-  the item.
-- D15.7 The typed HTML builder is the template's door, kept whole and grown (the owner, 2026-11-06): its
-  element doors, typed member reads and nesting stay as a developer writes them today, and only what it
-  compiles to changes, from Syncfusion's engine text to the typed tree of D15.3. Since the tree serves any
-  component that takes a function template, the builder belongs to the core, and Fusion and Native use it
-  as an app does.
+- D15.1 The core depends on no consumer. Syncfusion's components, the native components and every component an app
+  brings are consumers, built on the core's public surface with the dependency inverted (the owner, 2026-11-06).
+  The core has no template node, no template plugin and no vendor's name, and it exposes nothing past what
+  onboarding a component needs.
+- D15.2 Templates are the Fusion module's, and it stays as it is, not rewritten (the owner, 2026-11-06): the typed
+  HTML builder `FusionTemplate.Create<T>()`, its element doors and its conditions, rendered to text that
+  Syncfusion's engine compiles (`Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:25`). The engine is a
+  JavaScript dependency that the bundle always holds, and the server takes none. D8.4 stands: template conditions
+  are the engine's, not the core's.
+- D15.3 What the engine does is pinned, so the module's three fixes are exact:
+  - It writes a read into the HTML unencoded, so markup in data becomes live elements
+    (`probe:ej2-template-unencoded`). The builder writes each read through a text helper that the Fusion module's
+    browser code supplies, which the engine calls by name (`probe:ej2-template-helper-encodes`). Data is then text.
+  - It throws on a member past a missing holder (`probe:ej2-template-missing-holder`), so one row stops the grid's
+    rendering. The builder writes a read past a holder the model declares nullable inside the engine's condition on
+    that holder (`probe:ej2-template-guarded-holder`), so the row shows nothing there and the others render.
+  - Member names are the data's JSON names under the app's options (D2.9), not the camel case the writer
+    hard-codes today.
+- D15.4 Each of the three fixes lands in the Fusion module, and none reaches the core.
 
-**Schema nodes.** `fn` (the item to the tree), `record`, `list`, `get`, `as`, `op`, the plugin `alis.template`, and the
-template tree as a typed plugin argument (Q19), so the grammar gains no node.
+**Schema nodes.** None: a template is a component property's text value, written by a consumer.
 
 **Checker.**
 - `probe:ej2-template-unencoded`
-- `probe:ej2-template-condition`
+- `probe:ej2-template-helper-encodes`
 - `probe:ej2-template-missing-holder`
-- `probe:ej2-template-function-text-node`
-- `probe:ej2-template-function-elements`
-- `Absence.tla:DataAbsentReadsNothing`
+- `probe:ej2-template-guarded-holder`
+- `probe:ej2-template-condition`
+- `probe:core-json-result-names`
 
 **Doors.**
 - kept: `FusionTemplate.Create<T>()` and its element doors (`Text`, `Span`, `Div`, `Badge`, `Icon`, `Img`, `Link`,
-  `EventButton`, `Raw`), the template properties of each component.
-- `N15.1` new: the template tree, a typed plugin argument of `alis.template`, and the plugin that renders it.
-- `N15.2` new: the template's condition, written with the one condition syntax over the item; its form goes to
-  gate 2. It carries `When(Expression<Func<TModel, bool>>)` and `FusionConditionalBuilder`, whose lambda form is
-  refused.
-- `N15.3` new: the typed HTML builder in the core, the one template door for every component (D15.7).
+  `EventButton`, `Raw`), its conditions, and the template properties of each component, all in
+  Alis.Reactive.Fusion.
 
 **Evidence.**
 - The builder renders a string that Syncfusion's template engine compiles
@@ -1384,3 +1400,244 @@ template tree as a typed plugin argument (Q19), so the grammar gains no node.
   that event runs.
 - `X15.5` behavior: with the app's JSON options naming members in Pascal case, a template reads `Name` from a
   row the server sent.
+
+## Q16. Validation
+
+**Decision.**
+- D16.1 One fact. A rule is written once, on a `ReactiveValidator<T>` in FluentValidation's grammar. The server
+  runs it, and C# derives the browser's rules from it where the view renders; nothing else writes a browser rule.
+  Every mechanism below serves the cases it names and no other (the owner, 2026-11-06).
+- D16.2 A check is one validator under one rule set, and that validator is the request's model's.
+  - The request's model is the type its endpoint binds. A part of a model saved alone is its own model with its
+    own validator (the owner, at 65fdf118d). `Validate<TValidator>` takes only `TValidator : ReactiveValidator<TRequest>`.
+  - For a check, the browser runs that validator's and rule set's registrations on the form, from every live plan,
+    each under its plan's prefix. A registration of another validator on the same form takes no part in the check.
+    The registrations are keyed by form, validator and rule set, so composing plans needs no merge by plan id (D14.2).
+  - The condensed default (D10.17): a request whose model has a registered validator is checked by it under the
+    default rule set, with its messages in the form it sends. Naming a rule set, or no check, overrides it; the
+    form of the sentence goes to gate 2.
+- D16.3 A partial is attached or independent, and both nest (the owner, 2026-11-06).
+  - Attached: a partial rendered for a member (`Html.PartialFor`, D14.4) has its own model and its own validator,
+    and the parent's validator holds it with `SetValidator` or `ChildRules` on that member. One model has as many
+    associations as its members, at any depth, and each partial's rules are written once and read by both sides.
+  - Independent: a partial loaded into a slot where a condition holds (a state whose form needs 10 fields,
+    another's 20) is its own model, plan, validator and requests. Its checks run its own validator over what its
+    requests send, and its registrations leave with its slot (D12.4), whatever the page's validator holds.
+  - A partial inside a partial takes the full prefix chain as its binding names (D14.3), and the release order
+    of nested owners is Q12's.
+  - A member a partial no longer sends binds null. `SetValidator` skips a null member on the server
+    (`Alis.Reactive/Validation/Rules.cs:547`), so the browser's rules of a child validator hold only while the
+    member is present in the checked body.
+- D16.4 The server's verdict is one framework door on the endpoint, on both hosts (N16.1). It binds the request's
+  model, runs the request's validator under the check's rule set on the bound model, and answers D10.8's body.
+  - It adds the binder's refusal of a text a member's type cannot hold, under the member's binding name with the
+    message of D16.7, and runs no rule of that member.
+  - MVC's own validation adds nothing to it: neither data annotations nor the required error net10 adds for a
+    non-nullable text posted empty (`probe:core-form-implicit-required`).
+  - The sandbox's endpoints call `Validate` and write `ErrorsByField` themselves, and read no binder refusal
+    (`Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/AppLevel/DrawerController.cs:48-51`).
+- D16.5 The browser decides on the body its request sends, and its verdict equals the door's on the model the
+  endpoint binds from that body.
+  - The checked body is the endpoint's binding of the sent body. A sent member reads as the endpoint binds it:
+    in form data an empty text binds null on both hosts (`probe:core-form-implicit-required`,
+    `probe:mvc5-empty-text-null`). A member the body lacks reads its starting value (D16.6).
+  - Decision C: a request that sends no form element is checked on the members it sends beside it and on the
+    starting values of the rest, and the form's inputs it does not send are not read. This replaces 65fdf118d,
+    which read the validated form's inputs for such a request.
+  - A check with no request (`Validate`) and live validation read the form's inputs, as the form sends them.
+- D16.6 Decision B: a starting value is the one the endpoint's binder leaves, for the request's host and body
+  format. A member the body lacks reads from its nearest holder the body sends, at any depth, and that holder
+  starts as this table says:
+
+  | The nearest holder the body sends | form data, and JSON on net48 | JSON on net10 |
+  |-----------------------------------|------------------------------|---------------|
+  | none: the model itself | the model's start | the model's start |
+  | an object the member starts with | that object, as the holder above starts it | a new object of its type |
+  | an object that starts null | a new object of its type | a new object of its type |
+  | a list item | a new item of its type | a new item of its type |
+
+  - Facts: `probe:core-form-nested-start`, `probe:core-json-nested-start`, `probe:core-form-unsent-keeps-start`,
+    `probe:mvc5-nested-fills-start`, `probe:mvc5-list-item-new`, `probe:mvc5-list-replaced`, and MVC 5 binds JSON
+    through the same binder (`probe:mvc5-json-binds-through-binder`).
+  - A new object's start is the JSON System.Text.Json writes, under the app's options (D2.9), for the object it
+    reads from `{}` (`probe:core-stj-empty-object-start`). C# writes one start per type a check reads, where the
+    view renders: the model's from the validator's `T`, an item's from `RuleForEach`'s `TElement`, an object's
+    from its member's type in the expression tree. The plan carries each once, in the form's data.
+  - No hand reflection builds a start: the `Activator`, `GetConstructors` and `GetValue` reads of
+    `ModelDefaults` leave (B11).
+  - A type the endpoint's binder cannot create is refused where the view renders: on net48, a type with no
+    public parameterless constructor (`probe:mvc5-create-model-parameterless`).
+- D16.7 A text an input holds that its member's type cannot hold fails that member before its rules, with the
+  binder's message, "The value '{text}' is not valid for {name}." (`probe:core-form-value-messages`,
+  `probe:mvc5-value-invalid-message`), and the request is not sent.
+  - {name} is the member's name as the validator names it, and the door writes the same text.
+  - The member's other readers read its start, as the endpoint binds it.
+  - This is the one binder behavior the browser repeats. It closes the silent save: today such a text reads
+    nothing (D3.3), is left out of the body (D9.10), and the endpoint saves the start.
+- D16.8 Conditions are Q8's. A validator's `When`, `Unless` and `Otherwise` and a rule's `When` and `Unless`
+  write the one condition core over the checked body.
+  - What reaches the browser is the closed list the translator reads today (`Alis.Reactive/Validation/Rules.cs:76-80`).
+    A comparison of two members joins it, since the core takes a source on both sides (B9).
+  - A condition outside the list is refused where the view renders unless `WhenOnServer` or `UnlessOnServer`
+    declares it the server's. A rule under a server's condition stays whole on the server.
+- D16.9 What stays on the server by what it is, decided by the door alone, with no browser rule:
+  - `Must`, `MustAsync`, `Custom` and `CustomAsync`;
+  - `WhenAsync`, `UnlessAsync`, `WhenOnServer` and `UnlessOnServer`;
+  - a message built from the model;
+  - `.ServerOnly()`;
+  - a child validator that is not a `ReactiveValidator`.
+- D16.10 The framework writes no regular expression (the owner, 2026-11-06: regexes are never a good choice and
+  are used sparingly). Each check the framework writes on both sides is one algorithm in C# and in the browser, or
+  the platform's standard parser on each side, and its probe rows give one verdict on both:
+  - `EmailAddress`: one `@`, neither first nor last, as the server counts it today
+    (`Alis.Reactive/Validation/Checks.cs:166-170`);
+  - `CreditCard`: the Luhn sum over the digits once spaces and dashes are taken out (`Alis.Reactive/Validation/Checks.cs:180-193`);
+  - `PrecisionScale`: the digits and decimals of the number;
+  - `IsInEnum`: membership in the enum's names and numbers;
+  - `Url()`: an http or https URL by the standards, parsed by `System.Uri` on the server and by the URL Standard's
+    `URL` in the browser, scheme `http` or `https`. The two parsers agree on every probe row, where today's browser
+    pattern disagrees with the server on two (`probe:core-uri-absolute`, `probe:whatwg-url-http`, `probe:js-url-pattern`).
+
+  The browser patterns of today's checks leave (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:150-152`), and so
+  does the expression that reads a developer's pattern for .NET-only syntax (`Alis.Reactive/Validation/Checks.cs:149-151`).
+- D16.11 A regular expression reaches the browser only where a developer writes `Matches`, and only as one that both
+  engines read the same. .NET and JavaScript read `\d`, `\w`, `\s`, `.` and `$` differently, and `IgnoreCase` follows
+  the view's culture on .NET (`probe:core-regex-dotnet`, `probe:net48-regex-digit-unicode`, `probe:js-regex-raw`,
+  `probe:core-regex-space-and-case`, `probe:js-regex-space-and-case`).
+  - The framework rewrites no pattern. A pattern that holds one of those constructs, an option other than
+    `IgnoreCase` with `CultureInvariant`, or .NET-only syntax is refused where the view renders, naming the construct
+    and the text that means the same in both engines (`[0-9]` for `\d`), unless the rule is `.ServerOnly()`.
+  - `$` has no form both engines read the same, so a pattern that anchors its end is refused the same way unless its
+    input holds one line: a single-line input's value holds no line break, so .NET's match before a final newline
+    never arises there (`probe:html-input-line-breaks`). The input's kind is the declaration's, so C# decides it where the view renders.
+  - The u-flag forms that read as .NET does (`probe:js-regex-translated`) stay a fact, not a mechanism.
+- D16.12 The validation spec of step 5 checks that the two sides give one verdict on every body of its domain, for
+  each check of D16.10 and each condition of D16.8.
+- D16.13 A message's place is carried in the plan, never read from the page (B5).
+  - C# writes each input's message element id beside the input's id, so the `_error` id convention leaves.
+  - The form's summary lists every failure of the check, and each failure also shows at its input's message
+    element when the checked body's member has an input in the form. Both are MVC's own pattern: a validation
+    summary that holds property errors, and a message for each field.
+  - No DOM visibility is read, so a message inside a hidden panel is still in the summary. The form of the
+    summary goes to gate 2.
+- D16.14 `FormField` is designed once (P5):
+  - its binding name as Q1's steps, item steps as `[*]` (D13.5);
+  - its value, the one read (Q2) of the checked body;
+  - its tests, each a condition (Q8), a check and a message.
+
+  The form's data carries the starts of D16.6 once. `$model.sentValueOf` and `$model.sends` leave, since every
+  read is a `get` over one checked body (B3), and the form's plugin argument is a typed contract (D9.1).
+- D16.15 Live validation is D12.7's: typing clears an input's message, and blur and the input's commit check it
+  against the check with no request.
+
+**Schema nodes.** `fn`, `get`, `as`, `op`, `if`, `record`, `list`, `lit`; the plugin data `form`, with its
+registrations and starts as a typed contract (Q19); `$form.validate` and `$form.showErrors` as plugin calls. The
+grammar gains no node (G2).
+
+**Checker.**
+- `probe:core-form-nested-start`
+- `probe:core-json-nested-start`
+- `probe:core-form-unsent-keeps-start`
+- `probe:mvc5-nested-fills-start`
+- `probe:mvc5-list-item-new`
+- `probe:mvc5-list-replaced`
+- `probe:mvc5-json-binds-through-binder`
+- `probe:core-stj-empty-object-start`
+- `probe:mvc5-create-model-parameterless`
+- `probe:core-form-implicit-required`
+- `probe:mvc5-empty-text-null`
+- `probe:core-form-value-messages`
+- `probe:mvc5-value-invalid-message`
+- `probe:core-regex-dotnet`
+- `probe:net48-regex-digit-unicode`
+- `probe:js-regex-raw`
+- `probe:js-regex-translated`
+- `probe:core-regex-space-and-case`
+- `probe:js-regex-space-and-case`
+- `probe:core-uri-absolute`
+- `probe:js-url-pattern`
+- `probe:whatwg-url-http`
+- `probe:js-regex-translated`
+- `Ownership.tla:RulesLeaveWithTheirOwner`
+- Step 5 adds the agreement spec: the browser's verdict equals the door's over host, body format, holder start
+  and list item, with the counterexamples of the code at bff9eb6c0 and 65fdf118d.
+
+**Doors.**
+- kept: the validator grammar of `ReactiveValidator<T>`:
+  - `RuleFor`, `RuleForEach`, `Include`, `RuleSet`, `When`, `Unless`, `WhenOnServer`, `UnlessOnServer`,
+    `WhenAsync`, `UnlessAsync`, `Otherwise`, `Validate`, `ValidateAsync`, `InlineValidator<T>`;
+  - the checks `NotNull`, `NotEmpty`, `Empty`, `Equal`, `NotEqual`, `GreaterThan`, `GreaterThanOrEqualTo`,
+    `LessThan`, `LessThanOrEqualTo`, `InclusiveBetween`, `ExclusiveBetween`, `Length`, `MinimumLength`,
+    `MaximumLength`, `Matches`, `EmailAddress`, `CreditCard`, `Url`, `PrecisionScale`, `IsInEnum`, `Must`,
+    `MustAsync`, `Custom`, `CustomAsync`, `Add`;
+  - the options `WithMessage`, `WithName`, `When`, `Unless`, `WhenOnServer`, `UnlessOnServer`, `ServerOnly`,
+    `Cascade`, `DependentRules`, `SetValidator`, `ChildRules`;
+  - `AddReactiveFluentValidation`, `ReactiveFluentValidationBuilder.Add<TValidator>()`, `ValidationResult`.
+- refused: `AddFromAssembly` and `AddFromAssemblyContaining<T>`, an assembly scan by reflection (B11). Their
+  capability is carried by `Add<TValidator>()` per validator; an exception is gate 1's.
+- refused as public: `BrowserRuleSet`, `BrowserRule`, `BrowserField` and `IBrowserRuleSource`, the plan writer's
+  inside, which no view, validator or component author writes; the browser rules are carried by the validator
+  grammar.
+- `N16.1` new: the endpoint's validation door on both hosts. It binds, checks under the same validator and rule
+  set, and answers D10.8's body or the bound model; its form goes to gate 2. It carries the endpoints' own
+  `Validate` with `ErrorsByField`.
+- `N16.2` new: the form's typed plugin data, its registrations keyed by validator and rule set, and the starts of
+  D16.6.
+
+**Evidence.**
+- G10: a rule written once reaches both sides. `NotEmpty` reaches the browser, and `Must` stays on the server
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/EmergencyContacts/EmergencyContactsValidator.cs:9-13`),
+  and one item validator serves two request validators by `SetValidator` (`:17-34`).
+- P5: `FormField` took three shapes in a week: with an id and a value; by binding name only (34c99d608); with
+  `items` and `value` functions (65fdf118d), written at `Alis.Reactive/PlanModel/Validation/FormWriter.cs:29`.
+- The unsent read starts a level only at an item step (`Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:32-44`),
+  and reads a holder a new model leaves null as null (`:61`). So a member of an object that starts null, and the
+  JSON body on net10, read starts the endpoint does not bind.
+- Starts are built by reflection (`Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:115-155`).
+- A child validator's browser rules carry the rule's scope and no holder condition
+  (`Alis.Reactive/PlanModel/Validation/BrowserField.cs:131-143`), while the server skips a null member
+  (`Alis.Reactive/Validation/Rules.cs:547`).
+- The browser runs every registration on the form, whichever validator the check names
+  (`Alis.Reactive.Assets/runtime/plugins/form/form.ts:128-130`).
+- B5: inline or summary is read from DOM visibility (`Alis.Reactive.Assets/runtime/plugins/form/display.ts:64-71`),
+  and the message element by the `_error` id (`:73-75`).
+- The server runs a condition, a member read and a fixed operand by `Expression.Compile`
+  (`Alis.Reactive/Validation/Rules.cs:52`, `Alis.Reactive/Validation/Rules.cs:61`,
+  `Alis.Reactive/Validation/ModelMember.cs:62`, `Alis.Reactive/Members/Expressions.cs:28`); the four go to gate 1's
+  list of reflection exceptions.
+- A pattern with no JavaScript form stays on the server unannounced (`Alis.Reactive/Validation/Checks.cs:128-129`),
+  and the rest pass to the browser with .NET's flags (`Alis.Reactive/Validation/Checks.cs:156-159`).
+- The browser's Url pattern (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:152`) against the server's
+  `Uri.TryCreate` (`Alis.Reactive/Validation/Checks.cs:206-207`).
+
+**Defects.**
+- `X16.1` type: a request checked by a validator of another model does not compile: new:N16.2.
+- `X16.2` behavior: on net10, a JSON save whose model starts its lead with a name, and whose lead type starts the
+  name empty, sends only the lead's phone; the browser shows "Lead name is required." before sending, as the
+  endpoint answers.
+- `X16.3` behavior: a form-data save sends one member of a deputy that starts null, whose type starts its name with
+  text; the browser lets the save through, and the endpoint saves it.
+- `X16.4` behavior: typing "12a" in a count bound to an int shows "The value '12a' is not valid for Count." and
+  sends nothing.
+- `X16.5` behavior: with the Texas partial loaded the save is checked by the Texas rules; after the page loads
+  the Massachusetts partial instead, the save is checked by the Massachusetts rules only, and the endpoint agrees
+  on each.
+- `X16.6` behavior: a request that sends only the status beside the form is checked on the status and the starts,
+  and the name typed in the form is not read.
+- `X16.7` behavior: a failure whose message element sits in a hidden tab shows in the summary.
+- `X16.8` behavior: on net10, a non-nullable text posted empty with no rule on it saves, and the door adds no
+  "The Name field is required.".
+- `X16.9` behavior: "http://a.com/b c" passes `Url()` in the browser and on the server, and "http://a.com:99999"
+  fails both.
+- `X16.10` behavior: a `Matches(@"^[0-9]+$")` on a single-line input refuses Arabic-Indic digits in the browser and on
+  the server alike.
+- `X16.11` refusal: a pattern with `IgnoreCase` and no `CultureInvariant`: "The pattern '{pattern}' ignores case by
+  the view's culture, which the browser cannot follow; add RegexOptions.CultureInvariant, or mark the rule
+  .ServerOnly()."
+- `X16.12` refusal: a pattern with a construct the engines read differently: "The pattern '{pattern}' uses
+  {construct}, which .NET and the browser read differently; write {same} instead, or mark the rule .ServerOnly()."
+- `X16.13` refusal: a condition with no browser form: "The condition '{condition}' has no browser form. Write it as
+  tests of model members against fixed values or other members, or declare that the server alone decides it:
+  WhenOnServer or UnlessOnServer."
+- `X16.14` refusal: on net48, a start the binder cannot create: "{Type} has no public parameterless constructor, so
+  the endpoint cannot bind it; give {Type} a public parameterless constructor."

@@ -710,6 +710,150 @@
       "probe": "js-regex.mjs",
       "expect": "js-regex-translated: \\d as \\p{Nd} true; $ as (?=\\n?$) true; . as [^\\n] true; \\w as [\\p{L}\\p{Mn}\\p{Nd}\\p{Pc}] true",
       "source": "spec/probes/js-regex.mjs"
+    },
+    {
+      "id": "core-form-implicit-required",
+      "statement": "net10 adds a required error for a non-nullable text posted empty and binds it null; a text not sent keeps its start.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-implicit-required: Name= says Name: The Name field is required. Name=null; nothing sent says valid Name=start",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-empty-object-start",
+      "statement": "The object System.Text.Json reads from {} holds the type's starting values, and writes them back under the options.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-empty-object-start: a Lead read from {} writes {\"name\":\"inner\",\"phone\":null}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-regex-space-and-case",
+      "statement": ".NET reads \\s as NEL and not BOM; IgnoreCase follows the culture, so tr-TR does not match I against i, and CultureInvariant does; it matches the Kelvin sign against k.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-regex-space-and-case: \\s on NEL True; \\s on BOM False; IgnoreCase I against i under de-DE True; under tr-TR False; under tr-TR invariant True; Kelvin sign against k invariant True",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-uri-absolute",
+      "statement": "Uri.TryCreate takes a path with a space and refuses a port past 65535.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-uri-absolute: http://a.com/b c True; http://a b.com False; http:// False; http://a True; https://exa_mple.com True; http://a.com:99999 False; HTTP://A.COM True",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "js-regex-space-and-case",
+      "statement": "JavaScript reads \\s as BOM and not NEL, the .NET class [\\f\\n\\r\\t\\v\\x85\\p{Z}] reads them as .NET does, and the u-flag i matches I against i and the Kelvin sign against k.",
+      "host": "node",
+      "oracle": "node's RegExp",
+      "probe": "js-regex.mjs",
+      "expect": "js-regex-space-and-case: \\s on NEL false; \\s on BOM true; \\s as [\\f\\n\\r\\t\\v\\x85\\p{Z}] on NEL true; on BOM false; i flag I against i true; Kelvin sign against k true",
+      "source": "spec/probes/js-regex.mjs"
+    },
+    {
+      "id": "js-url-pattern",
+      "statement": "The browser's Url pattern refuses a path with a space and takes a port past 65535.",
+      "host": "node",
+      "oracle": "node's RegExp",
+      "probe": "js-regex.mjs",
+      "expect": "js-url-pattern: http://a.com/b c false; http://a b.com false; http:// false; http://a true; https://exa_mple.com true; http://a.com:99999 true; HTTP://A.COM true",
+      "source": "spec/probes/js-regex.mjs"
+    },
+    {
+      "id": "mvc5-json-binds-through-binder",
+      "statement": "MVC 5 binds a JSON body through a value provider, so the model binder that binds form data binds it.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/JsonValueProviderFactory.cs.txt",
+      "expect": "return new DictionaryValueProvider<object>(backingStore, CultureInfo.CurrentCulture);",
+      "source": "spec/probes/aspnetwebstack/JsonValueProviderFactory.cs.txt:80"
+    },
+    {
+      "id": "mvc5-empty-text-null",
+      "statement": "MVC 5 binds an empty text as null.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "if (bindingContext.ModelMetadata.ConvertEmptyStringToNull && Equals(value, String.Empty))",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:483"
+    },
+    {
+      "id": "mvc5-create-model-parameterless",
+      "statement": "MVC 5 creates a model through its parameterless constructor.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "return Activator.CreateInstance(typeToCreate);",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:399"
+    },
+    {
+      "id": "whatwg-url-http",
+      "statement": "The URL Standard's parser in the browser takes a path with a space and refuses a port past 65535, as System.Uri does.",
+      "host": "node",
+      "oracle": "node's URL, the WHATWG URL Standard",
+      "probe": "whatwg-url.mjs",
+      "expect": "whatwg-url-http: http://a.com/b c true; http://a b.com false; http:// false; http://a true; https://exa_mple.com true; http://a.com:99999 false; HTTP://A.COM true",
+      "source": "spec/probes/whatwg-url.mjs"
+    },
+    {
+      "id": "js-frozen-write-throws",
+      "statement": "In a module, a write into a frozen record throws, and the record keeps its value.",
+      "host": "node",
+      "oracle": "node's ECMAScript modules, which run in strict mode",
+      "probe": "js-frozen.mjs",
+      "expect": "js-frozen-write-throws: a module's write into a frozen record gives TypeError, and the record keeps Ann",
+      "source": "spec/probes/js-frozen.mjs"
+    },
+    {
+      "id": "html-input-line-breaks",
+      "statement": "A single-line text input strips line breaks from its value; a textarea keeps them.",
+      "host": "node",
+      "oracle": "jsdom's HTML value sanitization",
+      "probe": "html-input-line.mjs",
+      "expect": "html-input-line-breaks: a text input holds \"123\"; a textarea holds \"12\\n3\\n\"",
+      "source": "spec/probes/html-input-line.mjs"
+    },
+    {
+      "id": "ej2-data-manager-edits-source",
+      "statement": "EJ2's DataManager inserts into and updates the array it was given.",
+      "host": "node",
+      "oracle": "ej2-data 33.1.45 under node_modules/@syncfusion, run under jsdom",
+      "probe": "ej2-data-source.mjs",
+      "expect": "ej2-data-manager-edits-source: ej2-data 33.1.45 leaves the array it was given holding 2 rows, the first named Ana",
+      "source": "spec/probes/ej2-data-source.mjs"
+    },
+    {
+      "id": "js-structured-clone-separate",
+      "statement": "A structured copy is separate: editing it leaves the original as it was.",
+      "host": "node",
+      "oracle": "node's structuredClone, the HTML Standard's structured clone",
+      "probe": "ej2-data-source.mjs",
+      "expect": "js-structured-clone-separate: after the copy is edited, the original holds 1 row named Ann",
+      "source": "spec/probes/ej2-data-source.mjs"
+    },
+    {
+      "id": "ej2-template-helper-encodes",
+      "statement": "EJ2's engine calls a global helper named in ${...}, so a text helper writes data as text.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, its compile run under jsdom",
+      "probe": "ej2-template.mjs",
+      "expect": "ej2-template-helper-encodes: a read through a global helper renders <b>&lt;img src=x onerror=alert(1)&gt;</b>",
+      "source": "spec/probes/ej2-template.mjs"
+    },
+    {
+      "id": "ej2-template-guarded-holder",
+      "statement": "EJ2's engine renders nothing for a read inside its condition on a missing holder.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, its compile run under jsdom",
+      "probe": "ej2-template.mjs",
+      "expect": "ej2-template-guarded-holder: a read inside the engine's condition on its holder renders <b></b> for no holder and <b>Ann</b> for one",
+      "source": "spec/probes/ej2-template.mjs"
     }
   ]
 }
