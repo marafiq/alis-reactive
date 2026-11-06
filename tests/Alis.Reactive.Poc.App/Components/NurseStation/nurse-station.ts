@@ -86,6 +86,8 @@ interface RoundSeed {
 
 export class StationCensus {
   readonly #countLine: HTMLParagraphElement;
+  readonly #chargesLine: HTMLParagraphElement;
+  readonly #volumeLine: HTMLParagraphElement;
   readonly #nameList: HTMLUListElement;
   readonly #countList: HTMLUListElement;
   readonly #answerLine: HTMLParagraphElement;
@@ -95,6 +97,8 @@ export class StationCensus {
   #lead: string | null = null;
   #nextRound: RoundSeed | null = null;
   #count: number | null = null;
+  #charges: number | null = null;
+  #volume: number | null = null;
   #names: readonly (string | null)[] = [];
   #counts: readonly (number | null)[] = [];
 
@@ -109,7 +113,9 @@ export class StationCensus {
     this.#answerLine = lineOf("census-answer");
     this.#leadLine = lineOf("census-lead");
     this.#roundLine = lineOf("census-next-round");
-    host.replaceChildren(this.#countLine, this.#nameList, this.#countList, this.#answerLine, this.#leadLine, this.#roundLine);
+    this.#chargesLine = lineOf("census-charges");
+    this.#volumeLine = lineOf("census-volume");
+    host.replaceChildren(this.#countLine, this.#chargesLine, this.#volumeLine, this.#nameList, this.#countList, this.#answerLine, this.#leadLine, this.#roundLine);
   }
 
   get answer(): boolean | null {
@@ -146,6 +152,24 @@ export class StationCensus {
   set count(count: number | null) {
     this.#count = count;
     this.#countLine.textContent = count === null ? "" : String(count);
+  }
+
+  get charges(): number | null {
+    return this.#charges;
+  }
+
+  set charges(charges: number | null) {
+    this.#charges = charges;
+    this.#chargesLine.textContent = charges === null ? "" : String(charges);
+  }
+
+  get volume(): number | null {
+    return this.#volume;
+  }
+
+  set volume(volume: number | null) {
+    this.#volume = volume;
+    this.#volumeLine.textContent = volume === null ? "" : String(volume);
   }
 
   get names(): readonly (string | null)[] {

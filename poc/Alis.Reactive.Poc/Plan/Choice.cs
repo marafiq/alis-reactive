@@ -85,6 +85,9 @@ internal sealed class Operator : IChoice
     internal static readonly Operator EndsWith = new("endsWith");
     internal static readonly Operator NullOrEmpty = new("nullOrEmpty");
     internal static readonly Operator Includes = new("includes");
+    internal static readonly Operator SumInt = new("sumInt");
+    internal static readonly Operator SumDouble = new("sumDouble");
+    internal static readonly Operator SumDecimal = new("sumDecimal");
 
     private Operator(string text)
     {

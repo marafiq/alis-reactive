@@ -1,5 +1,6 @@
 import type { Expression, OperatorExpression } from "./plan";
 import { assertNever, nothing, value, type Read } from "./read";
+import { decimalSum, doubleSum, intSum } from "./sums";
 import { lowerInvariant, nullOrEmpty, tested, trimmed, upperInvariant } from "./text";
 
 type Evaluate = (argument: Expression) => Read;
@@ -47,6 +48,12 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate): Rea
       return nullOrEmpty(evaluate(first(args)));
     case "includes":
       return included(evaluate(first(args)), evaluate(second(args)));
+    case "sumInt":
+      return intSum(evaluate(first(args)));
+    case "sumDouble":
+      return doubleSum(evaluate(first(args)));
+    case "sumDecimal":
+      return decimalSum(evaluate(first(args)));
     default:
       return assertNever(expression.op);
   }

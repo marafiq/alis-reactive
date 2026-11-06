@@ -13,6 +13,10 @@ public sealed class StationCensus : Component
 
     public Property<int> Count => Property<int>();
 
+    public Property<decimal> Charges => Property<decimal>();
+
+    public Property<double> Volume => Property<double>();
+
     public Property<IReadOnlyList<string>> Names => Property<IReadOnlyList<string>>();
 
     public Property<IReadOnlyList<int>> Counts => Property<IReadOnlyList<int>>();

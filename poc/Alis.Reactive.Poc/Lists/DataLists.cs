@@ -40,6 +40,15 @@ public static class DataLists
     public static TypedSource<TResult> Find<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate, Expression<Func<TItem, TResult>> field)
         => Over<TItem, TResult>(list, (items, build) => new GetExpression(ListForms.Find(items, ItemRead(build, predicate, nameof(predicate))), JsonPath.Of(field, build.Values), ReadPresence.Optional));
 
+    public static TypedSource<int> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, int>> term)
+        => Over<TItem, int>(list, (items, build) => ListForms.Sum(Operator.SumInt, items, ItemRead(build, term, nameof(term))));
+
+    public static TypedSource<double> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, double>> term)
+        => Over<TItem, double>(list, (items, build) => ListForms.Sum(Operator.SumDouble, items, ItemRead(build, term, nameof(term))));
+
+    public static TypedSource<decimal> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, decimal>> term)
+        => Over<TItem, decimal>(list, (items, build) => ListForms.Sum(Operator.SumDecimal, items, ItemRead(build, term, nameof(term))));
+
     [Obsolete(TextIsNoList, error: true)]
     public static TypedSource<int> Count(this ITypedSource<string> text) => throw new NotSupportedException(TextIsNoList);
 
@@ -66,6 +75,15 @@ public static class DataLists
 
     [Obsolete(TextIsNoList, error: true)]
     public static TypedSource<TResult> Find<TResult>(this ITypedSource<string> text, Expression<Func<char, bool>> predicate, Expression<Func<char, TResult>> field) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<int> Sum(this ITypedSource<string> text, Expression<Func<char, int>> term) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<double> Sum(this ITypedSource<string> text, Expression<Func<char, double>> term) => throw new NotSupportedException(TextIsNoList);
+
+    [Obsolete(TextIsNoList, error: true)]
+    public static TypedSource<decimal> Sum(this ITypedSource<string> text, Expression<Func<char, decimal>> term) => throw new NotSupportedException(TextIsNoList);
 
     private static TypedSource<TResult> Over<TItem, TResult>(ITypedSource<IEnumerable<TItem>> list, Func<Plan.Expression, PlanBuild, Plan.Expression> operation)
     {

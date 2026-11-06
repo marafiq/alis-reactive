@@ -62,7 +62,7 @@ export interface ObjectExpression {
   readonly id: string;
 }
 
-export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not" | "trim" | "trimStart" | "trimEnd" | "upperInvariant" | "lowerInvariant" | "contains" | "startsWith" | "endsWith" | "nullOrEmpty" | "includes";
+export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not" | "trim" | "trimStart" | "trimEnd" | "upperInvariant" | "lowerInvariant" | "contains" | "startsWith" | "endsWith" | "nullOrEmpty" | "includes" | "sumInt" | "sumDouble" | "sumDecimal";
 
 export interface OperatorExpression {
   readonly kind: "op";

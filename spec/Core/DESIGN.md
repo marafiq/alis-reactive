@@ -498,12 +498,22 @@ Terms used throughout:
   app chooses `AwayFromZero`). They apply only where an operation must round: a division, an average, a value
   fitted to its places. Sums and comparisons stay exact, so a dose of 0.125 mg stays 0.125 (spec/CLAUDE.md). A decimal the app sends as a JSON number keeps
   about 15 significant digits when the browser parses it; an app whose amounts need more sends decimals as text,
-  and the same addition holds. Over `int` a total past the range of `int` stops the pipeline, as .NET's checked
-  `Sum` throws `OverflowException` (the owner, 2026-11-06).
-- D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted`,
-  `reduce`, `includes` and `length`, named at the vendor boundary of the built-in array and read `requiredIfHeld` (D6.3).
-  The browser adds no array function, and no operation changes the vendor's own array: a sort is `toSorted`, never
-  `sort`. The redesign already calls `toSorted` and `reduce` (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs`).
+  and the same addition holds. Over `int` the running total, added left to right, stops the pipeline once it passes
+  the range of `int`, as .NET's checked `Sum` throws `OverflowException` (the owner, 2026-11-06): .NET throws on
+  2,147,483,000, 1,000 and -1,000, whose total fits, and on a list of 64 (`spec/NOTES.md`, the probe of 2026-11-06).
+  A `decimal` total past `decimal.MaxValue` stops the pipeline, as .NET throws `OverflowException`. The plan writes
+  `Sum` as the operator `sumInt`, `sumDouble` or `sumDecimal` over the `map` of its term, one operator over the whole
+  list, so a decimal's point is placed once and an int's range is checked at each term. A list that reads nothing
+  sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. A term that holds no number, null among
+  them, stops the pipeline, as these three types have no null to add; a term that reads nothing is null in the
+  `map`, so it stops too, and the owner's answer on absent members decides whether an absent member reads its
+  starting value first (`spec/NOTES.md`).
+- D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted` and
+  `length`, named at the vendor boundary of the built-in array and read `requiredIfHeld` (D6.3). The browser adds no
+  array function, and no operation changes the vendor's own array: a sort is `toSorted`, never `sort`. The redesign
+  calls `toSorted` and `reduce` (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs`); `reduce` leaves, because a
+  sum is an operator over the `map` of its terms (D6.11), and a list the view supplies is looked in by the
+  `includes` operator (schema.md).
   `Any()` is `some` over a `fn` whose body is the literal `true`, so it needs no operator; `Count(predicate)` is the
   `length` of `filter`.
 - D6.9 `Find(predicate)` over a list of live objects is the first item the predicate keeps, a live object.
@@ -571,8 +581,10 @@ Terms used throughout:
   as nothing, so the item is not kept.
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
 - `X6.9` behavior: `Sum` over `decimal` terms 0.1 and 0.2 reads 0.3, equal in value to .NET's 0.30 (how a decimal
-  shows as text is Q3's); over `double` it reads 0.30000000000000004, as .NET's `double` does; over `int` a total
-  past 2,147,483,647 stops the pipeline and the step after it does not run.
+  shows as text is Q3's); over `double` it reads 0.30000000000000004, as .NET's `double` does; over `int` a running
+  total past 2,147,483,647 stops the pipeline and the step after it does not run, though the terms after it bring the
+  total back into range; over `decimal` a total past `decimal.MaxValue` stops the same way; over a list with no item
+  it reads 0.
 - `X6.8` refusal: a step written inside a list's lambda: "A step is written inside a list's lambda, which reads
   each item and writes nothing. Write the step in the pipeline."
 - `X6.5` behavior: `Where(r => r.Ward == Model.Ward)` keeps the items of the ward the view's model names, and a

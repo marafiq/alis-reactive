@@ -1,0 +1,54 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose sums";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Dose sums</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+<p>Census: <span id="census-status"></span></p>
+
+@(plan.Button("sum-daily-hours", "Sum the hours of the day doses are given")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Hours.Length))))
+
+@(plan.Button("sum-stock-changes", "Sum the stock changes")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Summing stock");
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.StockChange));
+        pipeline.Element("census-status").Text.Set("Summed stock");
+    }))
+
+@(plan.Button("sum-charges", "Sum the charges")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Charges.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Charge))))
+
+@(plan.Button("sum-east-charges", "Sum the charges in the east ward")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Charges.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Where(d => d.Ward == "East").Sum(d => d.Charge))))
+
+@(plan.Button("sum-claims", "Sum the claims")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Summing claims");
+        pipeline.Component<StationCensus>("census").Charges.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Claim));
+        pipeline.Element("census-status").Text.Set("Summed claims");
+    }))
+
+@(plan.Button("sum-volumes", "Sum the volumes")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Volume.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Volume))))
+
+@Html.RenderPlan(plan)

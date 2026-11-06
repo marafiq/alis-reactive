@@ -39,7 +39,11 @@ public sealed record MedicationDose(
     string Prescriber,
     string? Note,
     IReadOnlyList<Carer> Checks,
-    int[] Hours);
+    int[] Hours,
+    decimal Charge,
+    double Volume,
+    int StockChange,
+    decimal Claim);
 
 public static class MedicationCartJson
 {
