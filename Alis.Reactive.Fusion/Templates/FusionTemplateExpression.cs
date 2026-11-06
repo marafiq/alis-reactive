@@ -116,6 +116,7 @@ namespace Alis.Reactive.Fusion.Templates
                 MemberExpression member => GetMemberPath(member),
                 ConstantExpression constant => ConvertConstant(constant.Value),
                 UnaryExpression unary when unary.Operand is ConstantExpression constant => ConvertConstant(constant.Value),
+                UnaryExpression unary when unary.NodeType == ExpressionType.Not => $"!{ConvertNegated(unary.Operand)}",
                 BinaryExpression binary => $"({ConvertBinaryExpression(binary)})",
                 _ => throw new ArgumentException($"Operand type {expression.NodeType} is not supported")
             };

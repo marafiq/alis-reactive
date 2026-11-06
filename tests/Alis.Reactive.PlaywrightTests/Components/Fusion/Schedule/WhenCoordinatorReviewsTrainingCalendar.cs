@@ -9,7 +9,8 @@ namespace Alis.Reactive.PlaywrightTests.Components.Fusion.Schedule;
 /// <remarks>
 /// The calendar opens on Thursday, November 5, 2026. Week view shows November 1 to 7: the Hand hygiene audit on
 /// Tuesday (3 of 8 staff still to complete) and the Fire safety drill on Thursday (all 12 complete). Next shows
-/// November 8 to 14 and keeps Thursday the 12th selected, so Agenda would start on the 12th unless the page moves it.
+/// November 8 to 14 and keeps Thursday the 12th selected, so Agenda would start on the 12th unless the page moves it;
+/// that week holds the Medication safety refresher on Monday the 9th, which none of its 10 staff has completed yet.
 /// </remarks>
 [TestFixture]
 public class WhenCoordinatorReviewsTrainingCalendar : PlaywrightTestBase
@@ -19,6 +20,7 @@ public class WhenCoordinatorReviewsTrainingCalendar : PlaywrightTestBase
     private ILocator MonthStatus => Page.Locator("#training-calendar-status");
     private ILocator FireSafetyDrill => Page.Locator(".e-appointment", new() { HasText = "Fire safety drill" });
     private ILocator HandHygieneAudit => Page.Locator(".e-appointment", new() { HasText = "Hand hygiene audit" });
+    private ILocator MedicationSafetyRefresher => Page.Locator(".e-appointment", new() { HasText = "Medication safety refresher" });
     private ILocator SessionCard => Page.Locator(".e-quick-popup-wrapper");
     private ILocator SessionTooltip => Page.GetByRole(AriaRole.Tooltip);
     private ILocator DrawerContent => Page.Locator("#alis-drawer-content");
@@ -105,6 +107,30 @@ public class WhenCoordinatorReviewsTrainingCalendar : PlaywrightTestBase
     }
 
     [Test]
+    public async Task a_session_some_staff_completed_is_marked_in_progress_on_its_card()
+    {
+        await NavigateAndLoadTheMonth();
+
+        await OpenTheCard(HandHygieneAudit, "Grace Kim");
+
+        await Expect(SessionCard.GetByText("In progress", new() { Exact = true })).ToBeVisibleAsync();
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task a_session_no_staff_completed_is_not_marked_in_progress()
+    {
+        await NavigateAndLoadTheMonth();
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Next", Exact = true }).ClickAsync();
+        await Expect(Page.GetByText("November 08 - 14, 2026", new() { Exact = true })).ToBeVisibleAsync();
+
+        await OpenTheCard(MedicationSafetyRefresher, "Priya Raman");
+
+        await Expect(SessionCard.GetByText("In progress", new() { Exact = true })).ToHaveCountAsync(0);
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
     public async Task a_sessions_details_close_its_card()
     {
         await NavigateAndLoadTheMonth();
@@ -164,6 +190,21 @@ public class WhenCoordinatorReviewsTrainingCalendar : PlaywrightTestBase
     public async Task a_reminder_sent_from_a_sessions_details_shows_in_them()
     {
         await NavigateAndLoadTheMonth();
+        await OpenTheHandHygieneAuditDetails();
+
+        await ClickWhenStable(DrawerContent.GetByRole(AriaRole.Button, new() { Name = "Send reminder", Exact = true }));
+
+        await Expect(DetailsReminder).ToHaveTextAsync("Reminded 3 staff to complete Hand hygiene audit.");
+        AssertNoConsoleErrors();
+    }
+
+    [Test]
+    public async Task details_opened_again_after_closing_show_a_reminder_sent_from_them()
+    {
+        await NavigateAndLoadTheMonth();
+        await OpenTheHandHygieneAuditDetails();
+        await ClickWhenStable(CloseDrawer);
+        await Expect(DrawerContent).ToBeEmptyAsync();
         await OpenTheHandHygieneAuditDetails();
 
         await ClickWhenStable(DrawerContent.GetByRole(AriaRole.Button, new() { Name = "Send reminder", Exact = true }));
