@@ -460,8 +460,10 @@ Terms used throughout:
   `int`, `decimal` and `double`, `Find(predicate)` and `Find(predicate, field)`. The property `Count` and the
   method `Each` on a declared list (`LiveObjects<T>`) leave, renamed to `Count()` and `Select`.
 - D6.3 An operation over a list that reads nothing reads nothing; `Any()` and `All()` over nothing read nothing,
-  so a condition on them does not hold. An operation over a value that is not a list stops the pipeline: a paged
-  result (`{ result, count }`) where the declaration says a list has no `length` and no `filter`. The plan writes
+  so a condition on them does not hold. An operation over a value that lacks the operation's JavaScript member
+  stops the pipeline: a paged result (`{ result, count }`) where the declaration says a list has no `length` and
+  no `filter`. A value that has the member is read as JavaScript reads it, as every value is: a text where a list
+  is declared counts its characters, since the plan checks presence, never a value's type (D5.3). The plan writes
   the operation's JavaScript member with `members` `builtin` (schema.md), which reads nothing on a holder that
   reads nothing and stops on a holder that lacks the member. A `set` never carries `builtin`: its C# type is
   `Presence`, which has no such value, and only `get` and `call` take `ReadPresence`.
@@ -476,7 +478,8 @@ Terms used throughout:
   tree; a captured local or a member of the view is read by walking its chain of fields and properties with
   `FieldInfo.GetValue` and `PropertyInfo.GetValue`, the owner's exception of 2026-11-06 ("capturing the model value
   is important"). No expression is compiled at render and no accessor is cached. A view value that calls a method,
-  indexes or computes (`Model.Ward.ToUpper()`, `ward + "x"`) is refused, naming its door: compute it into a local
+  indexes or computes (`Model.Ward.ToUpper()`, `ward + "x"`) waits on the owner's answer: the redesign compiles
+  it today (`Alis.Reactive/Members/Expressions.cs:28`); the proposal refuses it, naming its door, a local computed
   before the lambda.
 - D6.8 A list's lambda takes one of two forms, by what an item is. An item of `LiveObjects<T>` is a live object:
   its lambda is a delegate over the item's declaration, `bed => bed.Resident`, run once when the view renders with
@@ -520,7 +523,8 @@ Terms used throughout:
   each item and writes nothing. Write the step in the pipeline."
 - `X6.5` behavior: `Where(r => r.Ward == Model.Ward)` keeps the items of the ward the view's model names, and a
   local the lambda captures is read the same way.
-- `X6.6` refusal: a view value that calls a method or computes inside an array lambda: "'{value}' computes a value
+- `X6.6` refusal, proposed and waiting on the owner (D6.7): a view value that calls a method or computes inside an
+  array lambda: "'{value}' computes a value
   inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();."
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
