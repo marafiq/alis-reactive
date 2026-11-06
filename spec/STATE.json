@@ -7,19 +7,19 @@
     },
     "core_questions": {
       "counts": {
-        "answered": 5,
+        "answered": 6,
         "defects": 30,
         "total": 18
       },
-      "detail": "Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q7 absent; Q8 absent; Q9 absent; Q10 absent; Q11 absent",
+      "detail": "Q7 absent; Q8 absent; Q9 absent; Q10 absent; Q11 absent; Q12 absent",
       "pass": false
     },
     "core_tlc": {
       "counts": {
-        "met": 1,
+        "met": 2,
         "specs": 5
       },
-      "detail": "Request not started; Lanes not started; Ownership not started; DateWire not started",
+      "detail": "Request not started; Lanes not started; Ownership not started",
       "pass": false,
       "runs": {
         "Absence": {
@@ -145,6 +145,60 @@
             "states": "103847 states generated, 79607 distinct states found, 6900 states left on queue.",
             "violated": [
               "UnawaitedPromiseStops"
+            ]
+          }
+        },
+        "DateWire": {
+          "DateWire.cfg": {
+            "green": true,
+            "hash": "424e2bdb28a88cb90859afe456185f4642dcb174ba0677f2a29e869c7708c36f",
+            "line": "Model checking completed. No error has been found.",
+            "states": "432 states generated, 216 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "DateWire.violates.DateShowsItsDayAtMidnight.cfg": {
+            "green": false,
+            "hash": "3b634db2f1d7703c3fb7aa26b5685a60f9ac62924ff4528ecbcbdbaf9342a84c",
+            "line": "violated: DateShowsItsDayAtMidnight",
+            "states": "",
+            "violated": [
+              "DateShowsItsDayAtMidnight"
+            ]
+          },
+          "DateWire.violates.DateTimeCarriesNoOffset.cfg": {
+            "green": false,
+            "hash": "79d70db08c4682c0abc6eed737cb832fc97916276a0d174f2794554083357ad1",
+            "line": "violated: DateTimeCarriesNoOffset",
+            "states": "",
+            "violated": [
+              "DateTimeCarriesNoOffset"
+            ]
+          },
+          "DateWire.violates.InstantCarriesItsClockOffset.cfg": {
+            "green": false,
+            "hash": "b176a7b7f75f59efe800e74deb9d66b8249fdd836acd099427475813682796f6",
+            "line": "violated: InstantCarriesItsClockOffset",
+            "states": "",
+            "violated": [
+              "InstantCarriesItsClockOffset"
+            ]
+          },
+          "DateWire.violates.InstantNothingSentAsEarliest.cfg": {
+            "green": false,
+            "hash": "aea7bf17be49dff22000196830a140f0a252cc7efaa3b8c83745b0b0f27d7edc",
+            "line": "violated: InstantNothingSentAsEarliest",
+            "states": "",
+            "violated": [
+              "InstantNothingSentAsEarliest"
+            ]
+          },
+          "DateWire.violates.ReachOffsetChangesBetweenDays.cfg": {
+            "green": false,
+            "hash": "8cd29c6d661fbe9a4310e3d784f43fa7c567958074530d4f8c535d466cd3f2f7",
+            "line": "violated: ReachOffsetChangesBetweenDays",
+            "states": "",
+            "violated": [
+              "ReachOffsetChangesBetweenDays"
             ]
           }
         }
@@ -272,11 +326,11 @@
     },
     "questions": {
       "counts": {
-        "answered": 5,
+        "answered": 6,
         "defects": 30,
         "total": 19
       },
-      "detail": "Q3: Decision names spec/Core/DateWire.tla, which does not exist, Checker DateWire.tla:DateTimeCarriesNoOffset is not defined, Checker DateWire.tla:InstantCarriesItsClockOffset is not defined; Q7 absent; Q8 absent; Q9 absent; Q10 absent; Q11 absent",
+      "detail": "Q7 absent; Q8 absent; Q9 absent; Q10 absent; Q11 absent; Q12 absent",
       "pass": false
     },
     "rewrite_units": {
@@ -293,10 +347,10 @@
     },
     "tlc": {
       "counts": {
-        "met": 1,
+        "met": 2,
         "specs": 8
       },
-      "detail": "Request not started; Lanes not started; Ownership not started; DateWire not started; Schema not started; ValidationToday not started",
+      "detail": "Request not started; Lanes not started; Ownership not started; Schema not started; ValidationToday not started; Validation not started",
       "pass": false,
       "runs": {
         "Absence": {
@@ -424,6 +478,60 @@
               "UnawaitedPromiseStops"
             ]
           }
+        },
+        "DateWire": {
+          "DateWire.cfg": {
+            "green": true,
+            "hash": "424e2bdb28a88cb90859afe456185f4642dcb174ba0677f2a29e869c7708c36f",
+            "line": "Model checking completed. No error has been found.",
+            "states": "432 states generated, 216 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "DateWire.violates.DateShowsItsDayAtMidnight.cfg": {
+            "green": false,
+            "hash": "3b634db2f1d7703c3fb7aa26b5685a60f9ac62924ff4528ecbcbdbaf9342a84c",
+            "line": "violated: DateShowsItsDayAtMidnight",
+            "states": "",
+            "violated": [
+              "DateShowsItsDayAtMidnight"
+            ]
+          },
+          "DateWire.violates.DateTimeCarriesNoOffset.cfg": {
+            "green": false,
+            "hash": "79d70db08c4682c0abc6eed737cb832fc97916276a0d174f2794554083357ad1",
+            "line": "violated: DateTimeCarriesNoOffset",
+            "states": "",
+            "violated": [
+              "DateTimeCarriesNoOffset"
+            ]
+          },
+          "DateWire.violates.InstantCarriesItsClockOffset.cfg": {
+            "green": false,
+            "hash": "b176a7b7f75f59efe800e74deb9d66b8249fdd836acd099427475813682796f6",
+            "line": "violated: InstantCarriesItsClockOffset",
+            "states": "",
+            "violated": [
+              "InstantCarriesItsClockOffset"
+            ]
+          },
+          "DateWire.violates.InstantNothingSentAsEarliest.cfg": {
+            "green": false,
+            "hash": "aea7bf17be49dff22000196830a140f0a252cc7efaa3b8c83745b0b0f27d7edc",
+            "line": "violated: InstantNothingSentAsEarliest",
+            "states": "",
+            "violated": [
+              "InstantNothingSentAsEarliest"
+            ]
+          },
+          "DateWire.violates.ReachOffsetChangesBetweenDays.cfg": {
+            "green": false,
+            "hash": "8cd29c6d661fbe9a4310e3d784f43fa7c567958074530d4f8c535d466cd3f2f7",
+            "line": "violated: ReachOffsetChangesBetweenDays",
+            "states": "",
+            "violated": [
+              "ReachOffsetChangesBetweenDays"
+            ]
+          }
         }
       }
     },
@@ -434,7 +542,7 @@
     }
   },
   "passed": 6,
-  "read_at_head": "bff599bee36bb33bb164a0f934f6e9193147b231",
+  "read_at_head": "883fa495199cd368c07b97479604abd7ff4af8a8",
   "step": {
     "failing": [
       "core_questions",
