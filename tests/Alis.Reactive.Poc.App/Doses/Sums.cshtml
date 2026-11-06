@@ -32,6 +32,11 @@
         pipeline.Component<StationCensus>("census").Charges.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Charge))))
 
+@(plan.Button("sum-copays", "Sum the copays")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Charges.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Copay))))
+
 @(plan.Button("sum-east-charges", "Sum the charges in the east ward")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Charges.Set(

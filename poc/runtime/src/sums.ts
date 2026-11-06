@@ -4,6 +4,8 @@ const intMax = 2147483647;
 const intMin = -2147483648;
 const decimalMax = 79228162514264337593543950335n;
 
+const decimalText = /^-?\d+(\.\d+)?$/;
+
 interface Decimal {
   readonly digits: bigint;
   readonly scale: number;
@@ -29,9 +31,8 @@ export function doubleSum(list: Read): Read {
 }
 
 export function decimalSum(list: Read): Read {
-  const terms = termsOf(list);
-  if (terms === undefined) return nothing;
-  const exact = terms.map(decimalOf);
+  if (list.kind === "nothing") return nothing;
+  const exact = (list.value as readonly unknown[]).map(decimalTerm);
   const scale = exact.reduce((largest, term) => Math.max(largest, term.scale), 0);
   let total = 0n;
   for (const term of exact) total += term.digits * 10n ** BigInt(scale - term.scale);
@@ -49,8 +50,14 @@ function termsOf(list: Read): readonly number[] | undefined {
   return terms as readonly number[];
 }
 
-function decimalOf(term: number): Decimal {
-  const [mantissa = "", exponent = "0"] = String(term).split("e");
+function decimalTerm(term: unknown): Decimal {
+  if (typeof term === "number") return decimalOf(String(term));
+  if (typeof term === "string" && decimalText.test(term)) return decimalOf(term);
+  throw new Stop("A sum's term is not a number.");
+}
+
+function decimalOf(text: string): Decimal {
+  const [mantissa = "", exponent = "0"] = text.split("e");
   const negative = mantissa.startsWith("-");
   const [whole = "", fraction = ""] = (negative ? mantissa.slice(1) : mantissa).split(".");
   const scale = fraction.length - Number(exponent);

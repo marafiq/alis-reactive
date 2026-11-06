@@ -44,7 +44,8 @@ public sealed record MedicationDose(
     double Volume,
     int StockChange,
     decimal Claim,
-    bool Controlled);
+    bool Controlled,
+    [property: JsonNumberHandling(JsonNumberHandling.WriteAsString)] decimal Copay);
 
 public static class MedicationCartJson
 {

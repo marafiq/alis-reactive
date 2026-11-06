@@ -504,9 +504,10 @@ Terms used throughout:
   A `decimal` total past `decimal.MaxValue` stops the pipeline, as .NET throws `OverflowException`. The plan writes
   `Sum` as the operator `sumInt`, `sumDouble` or `sumDecimal` over the `map` of its term, one operator over the whole
   list, so a decimal's point is placed once and an int's range is checked at each term. A list that reads nothing
-  sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. A term that holds no number, null among
-  them, stops the pipeline, as these three types have no null to add; a term that reads nothing is null in the
-  `map`, so it stops too, and the owner's answer on absent members decides whether an absent member reads its
+  sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. A `decimal` term is a JSON number or the
+  decimal text the app writes for it (`JsonNumberHandling.WriteAsString` writes 0.10m as "0.10"), added the same way.
+  Any other term, null among them, stops the pipeline, as these three types have no null to add; a term that reads
+  nothing is null in the `map`, so it stops too, and the owner's answer on absent members decides whether an absent member reads its
   starting value first (`spec/NOTES.md`).
 - D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted` and
   `length`, named at the vendor boundary of the built-in array and read `requiredIfHeld` (D6.3). The browser adds no

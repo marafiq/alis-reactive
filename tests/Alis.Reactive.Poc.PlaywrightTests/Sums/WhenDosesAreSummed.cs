@@ -35,6 +35,16 @@ public sealed class WhenDosesAreSummed : AppPageTest
     }
 
     [Test]
+    public async Task a_decimal_sum_adds_terms_the_app_writes_as_text_as_decimal_arithmetic_does()
+    {
+        await Open("/Doses/Sums");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Sum the copays", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census .census-charges")).ToHaveTextAsync("0.3");
+    }
+
+    [Test]
     public async Task a_sum_over_no_items_is_zero()
     {
         await Open("/Doses/Sums");
