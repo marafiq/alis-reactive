@@ -9,6 +9,8 @@
 @plan.DutyRoster("night-roster", nursesRequired: 4, shift: "Night shift", onCallName: "Ruth Mensah", onCallRole: "Charge nurse", onCallPager: "4471")
 @plan.DutyRoster("day-roster", nursesRequired: 5, shift: "Day shift", onCallName: "Kofi Boateng", onCallRole: "Staff nurse", onCallPager: null)
 @plan.DutyRosterVersion2("relief-roster")
+@plan.DutyRosterAwaitingCallback("awaiting-roster", onCallName: "Esi Owusu")
+@plan.DutyRosterWithPagerLines("lined-roster", onCallName: "Abena Ofori", onCallPager: "5502")
 
 @plan.TextBox("shift-name", "Shift name", "")
 
@@ -52,6 +54,25 @@
         pipeline.Element("page-status").Text.Set("Paged relief");
     }))
 
+@(plan.Button("show-awaited-callback", "Show awaited callback")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("page-status").Text.Set("Reading callback");
+        pipeline.Element("awaited-callback").Text.Set(pipeline.Component<DutyRoster>("awaiting-roster").OnCall.Read(nurse => nurse.Callback));
+        pipeline.Element("page-status").Text.Set("Read callback");
+    }))
+
+<p>Awaited callback: <span id="awaited-callback">unknown</span></p>
+
+@(plan.Button("page-lined-on-call", "Page lined on-call")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("page-status").Text.Set("Paging lined");
+        pipeline.Element("lined-pager").Text.Set(pipeline.Component<DutyRoster>("lined-roster").OnCall.Read(nurse => nurse.Pager.Number));
+        pipeline.Element("page-status").Text.Set("Paged lined");
+    }))
+
+<p>Lined pager: <span id="lined-pager">unknown</span></p>
 <p>Night pager: <span id="night-pager">unknown</span></p>
 <p>Day pager: <span id="day-pager">unknown</span></p>
 <p>Relief pager: <span id="relief-pager">unknown</span></p>

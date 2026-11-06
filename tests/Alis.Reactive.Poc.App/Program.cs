@@ -5,9 +5,14 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
+var requiresConstructorParameters = builder.Configuration.GetValue<bool>("Json:RespectRequiredConstructorParameters");
 
 builder.Services.AddControllersWithViews()
-    .AddJsonOptions(json => json.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
+    .AddJsonOptions(json =>
+    {
+        json.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        json.JsonSerializerOptions.RespectRequiredConstructorParameters = requiresConstructorParameters;
+    })
     .AddRazorOptions(razor =>
     {
         razor.ViewLocationFormats.Clear();

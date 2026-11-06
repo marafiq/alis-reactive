@@ -74,6 +74,16 @@ public sealed class WhenADoseLacksAMember : AppPageTest
     }
 
     [Test]
+    public async Task a_member_its_holder_only_reads_keeps_the_start_of_the_holders_own_object()
+    {
+        await Open("/Doses/Absences");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses whose locker is the fridge", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
+    }
+
+    [Test]
     public async Task a_member_named_as_one_every_object_inherits_reads_its_start_when_the_dose_lacks_it()
     {
         await Open("/Doses/Absences");

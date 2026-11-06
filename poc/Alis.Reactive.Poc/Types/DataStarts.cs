@@ -74,7 +74,7 @@ internal sealed class DataStarts
 
     private static JsonSerializerOptions BindingOf(JsonSerializerOptions values)
     {
-        var binding = new JsonSerializerOptions(values) { RespectRequiredConstructorParameters = false };
+        var binding = new JsonSerializerOptions(values);
         binding.TypeInfoResolver = values.TypeInfoResolver!.WithAddedModifier(EveryMemberOptional);
         binding.MakeReadOnly();
         return binding;

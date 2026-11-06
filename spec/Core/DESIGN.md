@@ -363,13 +363,18 @@ Terms used throughout:
 - `X4.6` behavior: a dose that lacks `refills`, which the app omits at its default, reads 0; one that lacks `unit`,
   omitted when null, reads its initializer's "mg", and so does a find's field; an on-call nurse a component holds that
   lacks `callback` reads "switchboard" (D4.2).
-- `X4.7` behavior: a populated member a dose's store lacks reads the store's own start, "fridge", and a replaced one
-  reads a new object's, "cupboard" (D4.2).
+- `X4.7` behavior: a populated member a dose's store lacks reads the store's own start, "fridge", a member the store
+  only reads (getter-only) keeps the store's own object, "fridge", and a replaced one reads a new object's,
+  "cupboard" (D4.2).
 - `X4.8` behavior: a dose that lacks the member named `constructor` reads its start, null, never what every object
   inherits (D4.2).
 - `X4.9` behavior: a read through a batch that lacks its required `lot` stops the pipeline, and one through a batch
   that holds it reads on; a member a seal (no constructor the binding can use) or a polymorphic delivery lacks stops
-  the pipeline (D4.2).
+  the pipeline; an on-call nurse whose pager line is a list where the declaration names an object stops a read of
+  its number; a data member that holds a promise stops the pipeline (D4.2, D4.3).
+- `X4.10` behavior: in an app whose options set `RespectRequiredConstructorParameters`, a dose that lacks a
+  constructor parameter (Heparin's omitted `ward`) stops a read through it, and a dose that holds every parameter
+  reads the start of a member it lacks, 0 (D4.2).
 
 ## Q5. The object model
 

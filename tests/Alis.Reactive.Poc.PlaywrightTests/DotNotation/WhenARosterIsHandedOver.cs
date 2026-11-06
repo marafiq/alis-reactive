@@ -58,6 +58,28 @@ public sealed class WhenARosterIsHandedOver : AppPageTest
     }
 
     [Test]
+    public async Task a_data_member_that_holds_a_promise_stops_the_read_and_the_steps_after_it()
+    {
+        await Open("/Rosters/Handover");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Show awaited callback" }).ClickAsync();
+
+        await Expect(Page.Locator("#page-status")).ToHaveTextAsync("Reading callback");
+        await Expect(Page.Locator("#awaited-callback")).ToHaveTextAsync("unknown");
+    }
+
+    [Test]
+    public async Task a_list_where_the_data_declares_an_object_stops_a_read_of_a_member_of_it_and_the_steps_after_it()
+    {
+        await Open("/Rosters/Handover");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Page lined on-call" }).ClickAsync();
+
+        await Expect(Page.Locator("#page-status")).ToHaveTextAsync("Paging lined");
+        await Expect(Page.Locator("#lined-pager")).ToHaveTextAsync("unknown");
+    }
+
+    [Test]
     public async Task a_declared_member_the_roster_lacks_stops_a_read_of_data_past_it()
     {
         await Open("/Rosters/Handover");

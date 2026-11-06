@@ -50,6 +50,11 @@
         pipeline.Component<StationCensus>("census").Count.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Store!.Spare.Name == "cupboard"))))
 
+@(plan.Button("count-fridge-locker", "Count doses whose locker is the fridge")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Store!.Locker.Name == "fridge"))))
+
 @(plan.Button("count-no-maker", "Count doses with no maker")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(

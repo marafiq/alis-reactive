@@ -50,6 +50,20 @@ public static class DutyRosterHtml
     public static Rendered<DutyRoster> DutyRoster<TModel>(this ReactivePlan<TModel> plan, string id, int nursesRequired, string shift, string onCallName, string onCallRole, string? onCallPager)
         => plan.Render<DutyRoster>(id, Roster(id, "1", nursesRequired, shift, onCallName, onCallRole, onCallPager));
 
+    public static Rendered<DutyRoster> DutyRosterAwaitingCallback<TModel>(this ReactivePlan<TModel> plan, string id, string onCallName)
+    {
+        var roster = Roster(id, "1", 0, "", onCallName, "", null);
+        roster.Attributes["data-on-call-callback"] = "awaited";
+        return plan.Render<DutyRoster>(id, roster);
+    }
+
+    public static Rendered<DutyRoster> DutyRosterWithPagerLines<TModel>(this ReactivePlan<TModel> plan, string id, string onCallName, string onCallPager)
+    {
+        var roster = Roster(id, "1", 0, "", onCallName, "", null);
+        roster.Attributes["data-on-call-pager-lines"] = onCallPager;
+        return plan.Render<DutyRoster>(id, roster);
+    }
+
     public static Rendered<DutyRoster> DutyRosterVersion2<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<DutyRoster>(id, Roster(id, "2", 0, "", "", "", null));
 

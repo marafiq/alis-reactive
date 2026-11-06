@@ -2,10 +2,15 @@ export interface DutyRosterHost extends HTMLElement {
   instances?: (DutyRoster | DutyRosterV2)[];
 }
 
+export interface PagerLine {
+  readonly number: string;
+}
+
 export interface OnCallNurse {
   readonly name: string;
   readonly role: string;
-  readonly pager_line?: { readonly number: string };
+  readonly pager_line?: PagerLine | readonly PagerLine[];
+  readonly callback?: Promise<string>;
 }
 
 export class RosterShift {
@@ -106,5 +111,8 @@ function onCallOf(host: HTMLElement): OnCallNurse {
   const name = host.dataset["onCallName"] ?? "";
   const role = host.dataset["onCallRole"] ?? "";
   const pager = host.dataset["onCallPager"];
+  const pagerLines = host.dataset["onCallPagerLines"];
+  if (host.dataset["onCallCallback"] === "awaited") return { name, role, callback: Promise.resolve("ward phone") };
+  if (pagerLines !== undefined) return { name, role, pager_line: [{ number: pagerLines }] };
   return pager === undefined ? { name, role } : { name, role, pager_line: { number: pager } };
 }

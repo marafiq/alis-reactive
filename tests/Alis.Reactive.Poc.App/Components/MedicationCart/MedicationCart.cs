@@ -72,6 +72,8 @@ public sealed class DoseStore
     public DoseShelf Shelf { get; set; } = new() { Name = "fridge" };
 
     public DoseShelf Spare { get; set; } = new() { Name = "fridge" };
+
+    public DoseShelf Locker { get; } = new() { Name = "fridge" };
 }
 
 public sealed class DoseShelf
