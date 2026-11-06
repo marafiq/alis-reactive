@@ -296,6 +296,186 @@
       "probe": "ej2-destroy.mjs",
       "expect": "ej2-destroy-sets-is-destroyed: true",
       "source": "spec/probes/ej2-destroy.mjs"
+    },
+    {
+      "id": "core-form-duplicate-name",
+      "statement": "Form data that sends one scalar name twice binds the first value.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 under the de-DE request culture, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-duplicate-name: GivenName=Ann&GivenName=Bob binds Ann",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-duplicate-name",
+      "statement": "A JSON body that holds one member twice binds the last value.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 under the de-DE request culture, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-duplicate-name: {\"given\":\"Ann\",\"given\":\"Bob\"} binds Bob",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-sanitized-id",
+      "statement": "MVC derives an element id from a binding name by replacing each character an id cannot hold with an underscore.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 under the de-DE request culture, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-sanitized-id: NextOfKin.Name is NextOfKin_Name; Contacts[0].Name is Contacts_0__Name",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-template-prefix-name",
+      "statement": "Under a template's field prefix, MVC names a member by the prefix and the member.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 under the de-DE request culture, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-template-prefix-name: NextOfKin.Name",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-decimal-group",
+      "statement": "Under de-DE a form decimal accepts the group separator, an exponent and surrounding white space.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 under the de-DE request culture, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-decimal-group: 1.234,5 binds 1234.5; 1,5e3 binds 1500; ' 1,5 ' binds 1.5",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-int-culture",
+      "statement": "Under de-DE a form int refuses a group separator and a decimal separator.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 under the de-DE request culture, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-int-culture: Count=1.234 binds refused Count=5 Maybe=7; Count=1,0 binds refused Count=5 Maybe=7",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-form-date-kind",
+      "statement": "A form DateTime in ISO 8601 text without an offset binds as an Unspecified local date and time.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 under the de-DE request culture, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-date-kind: 2026-11-06T10:00:00 binds Unspecified 2026-11-06T10:00:00; 2026-11-06 binds Unspecified 2026-11-06T00:00:00",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-date-forms",
+      "statement": "System.Text.Json writes a DateTime without an offset, a DateTimeOffset with its offset, and a UTC DateTime with Z.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-date-forms: DateTime \"1990-05-01T00:00:00\"; DateTimeOffset \"2026-11-06T10:00:00-08:00\"; UTC \"2026-11-06T18:00:00Z\"",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-offset-into-datetime",
+      "statement": "System.Text.Json reads a text with an offset into a DateTime as the server's local time.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-offset-into-datetime: reads as kind Local",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "mvc5-json-result-date-form",
+      "statement": "JavaScriptSerializer writes a DateTime as the text \\/Date(ms)\\/, which is no ISO 8601 form.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/JavaScriptSerializer.cs.txt",
+      "expect": "sb.Append(@\"\"\"\\/Date(\");",
+      "source": "spec/probes/referencesource/JavaScriptSerializer.cs.txt:217"
+    },
+    {
+      "id": "mvc5-json-result-date-utc",
+      "statement": "JavaScriptSerializer converts a DateTime with ToUniversalTime before writing it, so an Unspecified date is read as the server's local time.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/JavaScriptSerializer.cs.txt",
+      "expect": "datetime.ToUniversalTime().Ticks - DatetimeMinTimeTicks",
+      "source": "spec/probes/referencesource/JavaScriptSerializer.cs.txt:218"
+    },
+    {
+      "id": "mvc5-json-duplicate-last",
+      "statement": "MVC 5's JSON reader keeps the last value of a member a body holds twice.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/JavaScriptObjectDeserializer.cs.txt",
+      "expect": "dictionary[memberName] = propVal;",
+      "source": "spec/probes/referencesource/JavaScriptObjectDeserializer.cs.txt:158"
+    },
+    {
+      "id": "mvc5-form-duplicate-first",
+      "statement": "MVC 5 binds a scalar from the first of the values a name sends.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt",
+      "expect": "value = valueAsArray.GetValue(0);",
+      "source": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:174"
+    },
+    {
+      "id": "mvc5-template-full-id",
+      "statement": "MVC 5 derives a template's element id from its full field name.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/TemplateInfo.cs.txt",
+      "expect": "return HtmlHelper.GenerateIdFromName(GetFullHtmlFieldName(partialFieldName));",
+      "source": "spec/probes/aspnetwebstack/TemplateInfo.cs.txt:47"
+    },
+    {
+      "id": "mvc5-decimal-float-style",
+      "statement": "MVC 5 binds a decimal with NumberStyles.Float under the culture, which refuses a group separator.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DecimalConverter.cs.txt",
+      "expect": "Decimal.Parse(value, NumberStyles.Float, formatInfo)",
+      "source": "spec/probes/referencesource/DecimalConverter.cs.txt:98"
+    },
+    {
+      "id": "mvc5-number-format-from-culture",
+      "statement": "A number converter parses with the culture's NumberFormatInfo.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/BaseNumberConverter.cs.txt",
+      "expect": "return FromString(text, formatInfo);",
+      "source": "spec/probes/referencesource/BaseNumberConverter.cs.txt:103"
+    },
+    {
+      "id": "mvc5-int-integer-style",
+      "statement": "MVC 5 binds an int with NumberStyles.Integer under the culture.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/Int32Converter.cs.txt",
+      "expect": "Int32.Parse(value, NumberStyles.Integer, formatInfo)",
+      "source": "spec/probes/referencesource/Int32Converter.cs.txt:45"
+    },
+    {
+      "id": "mvc5-datetime-parse",
+      "statement": "MVC 5 binds a DateTime with DateTime.Parse under the culture.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTimeConverter.cs.txt",
+      "expect": "return DateTime.Parse(text, formatInfo);",
+      "source": "spec/probes/referencesource/DateTimeConverter.cs.txt:72"
+    },
+    {
+      "id": "core-number-text-culture",
+      "statement": ".NET writes a number's text under de-DE with the culture's decimal separator, no group separator, and the same shortest digits JavaScript writes.",
+      "host": "net10",
+      "oracle": ".NET 10 number formatting, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-number-text-culture: decimal 1234.5 shows 1234,5; double 0.1+0.2 shows 0,30000000000000004; double 1e21 shows 1E+21; double 1e15 shows 1000000000000000",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-number-text-exponent",
+      "statement": ".NET writes a double in fixed point from 1E-04 to below 1E+17, and outside it as a mantissa, E, a sign and at least two digits.",
+      "host": "net10",
+      "oracle": ".NET 10 number formatting, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-number-text-exponent: 1e16 10000000000000000; 1e20 1E+20; 1e17 1E+17; 1e-4 0,0001; 1e-5 1E-05; 123456.5e12 1,234565E+17; 1e-7 1E-07",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
     }
   ]
 }

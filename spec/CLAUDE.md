@@ -31,6 +31,23 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   of a request.
 - The owner, 2026-11-06: conditions have had two syntaxes in views; there is one uniform syntax, a branch
   holds several statements, and a branch is a simple lexical scope, as a C# `{}` block is.
+- The owner, 2026-11-06: dates and time zones were not done right or to the standards; the spec states each
+  date form by the standard it follows and pins each host's reading and writing of it by a probe.
+- The owner, 2026-11-06: validation that agrees on the server and in the browser is a must, and much time was
+  lost on it. The module uses no reflection, has one uniform syntax, and supports conditional and complex
+  validation on both sides.
+- The owner, 2026-11-06: culture is the server's, never the browser's: the server is the truth, and every
+  culture-dependent read or write of a number or a date in the browser follows the culture the view rendered
+  under.
+- The owner, 2026-11-06: Syncfusion is one consumer of the framework, its dependency inverted. Syncfusion
+  works with camel-case JSON and with other naming, so the framework supports the JSON naming an app
+  configures, not camel case alone.
+- The owner, 2026-11-06: MVC partial semantics get special attention. No weakly typed passing (ViewData)
+  carries plan state. ResolvePlan and the plan primitives were designed to stop poisoning the HTTP request;
+  a design that stores plan state on the request is the easy route, and it is refused.
+- The owner, 2026-11-06: plugins are an integral part of the design, where customization is needed and a
+  better developer experience can be offered; the request lifecycle calls into a plugin in a typed way,
+  as every block does.
 - The owner, 2026-11-06: any JavaScript API can return a promise, so sync and async are decided by the
   declaration, never by what the browser finds.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does

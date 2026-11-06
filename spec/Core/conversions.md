@@ -19,7 +19,7 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | Source | Result |
 |--------|--------|
 | text | itself |
-| number, finite | JavaScript's `Number.prototype.toString` text |
+| number, finite | its text as .NET writes it under the view's culture (D3.11): the shortest digits, the culture's decimal separator, no group separator, and below 1E-04 or from 1E+17 up the form `1,234565E+17` |
 | boolean | `"true"` or `"false"` |
 | date | its local day `"yyyy-MM-dd"`, with `"THH:mm:ss"` and `".fff"` when not midnight (`spec/Core/DateWire.tla`) |
 | instant | the browser's clock with that clock's offset, `"yyyy-MM-ddTHH:mm:ss-08:00"`, `"Z"` at zero |
@@ -31,7 +31,8 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 |--------|--------|
 | number, finite | itself |
 | text, blank | nothing |
-| text that, with .NET white space trimmed, matches `^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$` | that number |
+| an input's text | that number, parsed as the endpoint's host binds the member's .NET type under the view's culture (D3.11); text that host refuses converts to nothing |
+| a URL parameter's text | that number, parsed under the invariant culture with `NumberStyles.Float` |
 | boolean | 1 or 0 |
 | date or instant | its milliseconds since 1970-01-01T00:00:00Z |
 

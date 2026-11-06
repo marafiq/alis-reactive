@@ -31,8 +31,19 @@ try
     Console.WriteLine("core-frombody-ignores-clr-name: " + await Json(client, "/body", "{\"GivenName\":\"Ann\"}"));
     Console.WriteLine("core-form-binds-clr-name: " + await Form(client, "/form", "GivenName=Ann"));
     Console.WriteLine("core-form-ignores-json-name: " + await Form(client, "/form", "given=Ann"));
+    Console.WriteLine("core-form-duplicate-name: GivenName=Ann&GivenName=Bob binds " + await Form(client, "/form", "GivenName=Ann&GivenName=Bob"));
+    Console.WriteLine("core-json-duplicate-name: {\"given\":\"Ann\",\"given\":\"Bob\"} binds " + await Json(client, "/body", "{\"given\":\"Ann\",\"given\":\"Bob\"}"));
+    Console.WriteLine("core-sanitized-id: NextOfKin.Name is " + Microsoft.AspNetCore.Mvc.Rendering.TagBuilder.CreateSanitizedId("NextOfKin.Name", "_") + "; Contacts[0].Name is " + Microsoft.AspNetCore.Mvc.Rendering.TagBuilder.CreateSanitizedId("Contacts[0].Name", "_"));
+    Console.WriteLine("core-template-prefix-name: " + new Microsoft.AspNetCore.Mvc.ViewFeatures.TemplateInfo { HtmlFieldPrefix = "NextOfKin" }.GetFullHtmlFieldName("Name"));
     Console.WriteLine("core-form-binds-indexed-name: " + await Form(client, "/roster", "Members%5B1%5D.Name=B&Members%5B0%5D.Name=A"));
     Console.WriteLine("core-form-decimal-culture: 1,5 binds " + await Form(client, "/amount", "Value=1%2C5") + "; 1.5 binds " + await Form(client, "/amount", "Value=1.5"));
+    Console.WriteLine("core-form-decimal-group: 1.234,5 binds " + await Form(client, "/amount", "Value=1.234%2C5") + "; 1,5e3 binds " + await Form(client, "/amount", "Value=1%2C5e3") + "; ' 1,5 ' binds " + await Form(client, "/amount", "Value=%201%2C5%20"));
+    Console.WriteLine("core-form-int-culture: Count=1.234 binds " + await Form(client, "/counts", "Count=1.234") + "; Count=1,0 binds " + await Form(client, "/counts", "Count=1%2C0"));
+    Console.WriteLine("core-form-date-kind: 2026-11-06T10:00:00 binds " + await Form(client, "/when", "When=2026-11-06T10%3A00%3A00") + "; 2026-11-06 binds " + await Form(client, "/when", "When=2026-11-06"));
+    Console.WriteLine("core-number-text-culture: decimal 1234.5 shows " + 1234.5m.ToString(german) + "; double 0.1+0.2 shows " + (0.1 + 0.2).ToString(german) + "; double 1e21 shows " + 1e21.ToString(german) + "; double 1e15 shows " + 1e15.ToString(german));
+    Console.WriteLine("core-number-text-exponent: 1e16 " + 1e16.ToString(german) + "; 1e20 " + 1e20.ToString(german) + "; 1e17 " + 1e17.ToString(german) + "; 1e-4 " + 1e-4.ToString(german) + "; 1e-5 " + 1e-5.ToString(german) + "; 123456.5e12 " + 123456.5e12.ToString(german) + "; 1e-7 " + 1e-7.ToString(german));
+    Console.WriteLine("core-stj-date-forms: DateTime " + System.Text.Json.JsonSerializer.Serialize(new DateTime(1990, 5, 1)) + "; DateTimeOffset " + System.Text.Json.JsonSerializer.Serialize(new DateTimeOffset(2026, 11, 6, 10, 0, 0, TimeSpan.FromHours(-8))) + "; UTC " + System.Text.Json.JsonSerializer.Serialize(new DateTime(2026, 11, 6, 18, 0, 0, DateTimeKind.Utc)));
+    Console.WriteLine("core-stj-offset-into-datetime: reads as kind " + System.Text.Json.JsonSerializer.Deserialize<DateTime>("\"2026-11-06T10:00:00-08:00\"").Kind);
     Console.WriteLine("core-query-decimal-invariant: 1.5 binds " + await client.GetStringAsync("/amount?Value=1.5") + "; 1,5 binds " + await client.GetStringAsync("/amount?Value=1%2C5"));
     Console.WriteLine("core-json-result-names: " + await client.GetStringAsync("/person"));
     Console.WriteLine("core-cookie-auth-ajax: without the header " + await Status(client, false) + "; with X-Requested-With " + await Status(client, true));
@@ -102,6 +113,11 @@ public sealed class Amount
     public decimal Value { get; set; }
 }
 
+public sealed class Visit
+{
+    public DateTime When { get; set; }
+}
+
 public sealed class Counts
 {
     public int Count { get; set; } = 5;
@@ -125,6 +141,9 @@ public sealed class ProbeController : ControllerBase
 
     [HttpGet("/amount")]
     public string QueryAmount([FromQuery] Amount amount) => Bound(amount.Value);
+
+    [HttpPost("/when")]
+    public string FormWhen([FromForm] Visit visit) => ModelState.IsValid ? visit.When.Kind + " " + visit.When.ToString("s", CultureInfo.InvariantCulture) : "refused";
 
     [HttpGet("/person")]
     public Person Person() => new() { GivenName = "Ann", FamilyName = "Lee" };

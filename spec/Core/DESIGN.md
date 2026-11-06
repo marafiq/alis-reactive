@@ -93,11 +93,17 @@ Terms used throughout:
 - D2.5 Form-data and query keys are binding names (CLR names) on both hosts, since MVC binds form and query
   values by property name and ignores `JsonPropertyName`.
 - D2.6 A data member read from a response body or a pushed message is named as the endpoint writes it: the
-  System.Text.Json contract name under the endpoint's `JsonOptions` on net10, and the CLR name MVC 5's
-  `JsonResult` writes through `JavaScriptSerializer` on net48.
+  System.Text.Json contract name under the app's JSON options. On net10 those are MVC's `JsonOptions`. On
+  net48 they are the options the app registers with the framework, which the framework's JSON door writes
+  with (N10.6). MVC 5's `JsonResult` writes CLR names and dates as `\/Date(ms)\/` through
+  `JavaScriptSerializer` (`probe:mvc5-json-result-clr-names`), so it is no framework response (D3.10).
+- D2.9 The JSON naming is the app's, not camel case alone (the owner, 2026-11-06: Syncfusion, one consumer of
+  the framework, works with camel case and with other naming). Any naming System.Text.Json supports, a
+  naming policy or none, with `JsonPropertyName` above it, is read from the one set of options D2.4 and D2.6
+  name. The plan's JSON names follow them, and no name is camel-cased by a rule of the framework's own.
 - D2.7 A component's member is named by its JavaScript name in its declaration; that name is the vendor
   boundary and is not translated.
-- D2.8 D2.4 to D2.6 replace the root CLAUDE.md meaning "A member is named as System.Text.Json names it: its
+- D2.8 D2.4 to D2.6 and D2.9 replace the root CLAUDE.md meaning "A member is named as System.Text.Json names it: its
   JsonPropertyName, else camel case", which holds for a net10 JSON body only. Gate 1 carries the change.
 
 **Schema nodes.** `get`, `call` (Q1 paths, `members`); the request argument's members (Q9).
@@ -157,6 +163,38 @@ Terms used throughout:
   text, because both hosts bind those under the invariant culture.
 - D3.8 A date and an instant are shown and sent as `spec/Core/DateWire.tla` states (`yyyy-MM-dd`, the time
   when not midnight, an instant's clock offset, `0001-01-01T00:00:00Z` for an instant that reads nothing).
+- D3.9 Every date text is ISO 8601-1:2019's extended format, and an instant's is the RFC 3339 profile of it
+  (the owner, 2026-11-06: dates to the standards).
+  - A `DateTime` is a local date and time with no offset. Both hosts bind that text as an Unspecified
+    `DateTime`, the same wall time on any server clock (`probe:core-form-date-kind`, `probe:mvc5-datetime-parse`).
+  - A `DateTimeOffset` is an RFC 3339 date-time with its offset, `Z` at zero.
+  - A `DateTime` is never sent with an offset: System.Text.Json reads an offset into a `DateTime` as the
+    server's local time (`probe:core-stj-offset-into-datetime`), which moves the wall time by the server's
+    clock.
+- D3.10 A JSON response is System.Text.Json's on both hosts, written by a framework door. That means a
+  `DateTime` with no offset, a UTC `DateTime` with `Z`, and a `DateTimeOffset` with its offset
+  (`probe:core-stj-date-forms`).
+  - On net48, MVC's `JsonResult` writes a `DateTime` as `\/Date(ms)\/` after `ToUniversalTime`
+    (`probe:mvc5-json-result-date-form`, `probe:mvc5-json-result-date-utc`). That reads an Unspecified date
+    as the server's local time, so a date of birth moves by the server's offset and can show the day
+    before.
+  - The net48 door N10.6 writes System.Text.Json instead. A text no row of `spec/Core/conversions.md`
+    converts to a date reads nothing.
+- D3.11 Culture is the server's, never the browser's (the owner, 2026-11-06). C# writes the view's culture
+  into the plan once: its name, its decimal separator and its group separator. Every culture-dependent
+  conversion in the browser uses it, and none reads the browser's locale:
+  - An input's text converts to a number as the endpoint's host binds that number's .NET type under the
+    view's culture. On net10, a decimal, double or float takes the group separator, an exponent and
+    surrounding white space (`probe:core-form-decimal-group`). On net48, it takes `NumberStyles.Float`, which
+    refuses a group separator (`probe:mvc5-decimal-float-style`, `probe:mvc5-number-format-from-culture`).
+    An integer refuses both separators on both hosts (`probe:core-form-int-culture`, `probe:mvc5-int-integer-style`).
+    So under de-DE, `1.5` reads 15 on net10 and nothing on net48, as each server binds it.
+  - A URL parameter's text converts to a number under the invariant culture, as both hosts bind the query.
+  - A number shows as text the way .NET writes it under the view's culture: JavaScript's shortest digits,
+    the culture's decimal separator, no group separator. A double below 1E-04 or from 1E+17 up is written in
+    .NET's exponent form, `E`, a sign and at least two digits (`probe:core-number-text-culture`,
+    `probe:core-number-text-exponent`).
+  - A number goes into form data as D3.7 states.
 
 **Schema nodes.** `as`, the shapes of D3.1, `InputBinding.value`.
 
@@ -168,12 +206,26 @@ Terms used throughout:
 - `probe:core-query-decimal-invariant`
 - `probe:mvc5-form-current-culture`
 - `probe:mvc5-query-invariant-culture`
+- `probe:core-form-date-kind`
+- `probe:mvc5-datetime-parse`
+- `probe:core-stj-offset-into-datetime`
+- `probe:core-stj-date-forms`
+- `probe:mvc5-json-result-date-form`
+- `probe:mvc5-json-result-date-utc`
+- `probe:core-form-decimal-group`
+- `probe:mvc5-decimal-float-style`
+- `probe:core-form-int-culture`
+- `probe:mvc5-int-integer-style`
+- `probe:core-number-text-culture`
+- `probe:core-number-text-exponent`
 
 **Doors.**
 - `N3.1` new: the grammar's `Operator` without `ToNumber`, `ToDate`, `ToBoolean` and `ToText`.
 - `N3.2` new: `internal sealed class FileShape` in `Alis.Reactive/Grammar/Shape.cs`, kind `file`.
 - `N3.3` new: `InputBinding.value`, one `Expr` C# writes as `coalesce(as(read, shape), blank)`, replacing
   `value`, `shape` and `list`.
+- `N3.4` new: the view's culture in the plan, its name, decimal separator and group separator, written once
+  by C# where the view renders, with the endpoint host's number styles per .NET type.
 
 **Evidence.**
 - B4: two conversions, `Alis.Reactive/Grammar/Operator.cs:27-30` and `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:112-115`;
@@ -190,6 +242,12 @@ Terms used throughout:
   browser as it fails on the server.
 - `X3.4` behavior: a blank input bound to an `int` member initialized to 5 sends 5 and validates as 5.
 - `X3.5` behavior: a decimal sent as form data from a view rendered under `de-DE` binds `1,5` on the endpoint.
+- `X3.6` behavior: under `de-DE`, `1,5` typed in a decimal input passes `GreaterThan(1)` in the browser, as the
+  server passes it, whatever the browser's own locale.
+- `X3.7` behavior: a date of birth a net48 endpoint answers through N10.6 shows its own day in a browser whose
+  clock is behind the server's.
+- `X3.8` behavior: a decimal set as an element's text under `de-DE` shows `1234,5`, as the server's view shows
+  it.
 
 ## Q4. Absence and promises
 
@@ -747,6 +805,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   through the one condition core; its door's form goes to gate 2.
 - `N10.5` new: the condensed request of D10.17, whose default parts read the request's own parts; its form goes
   to gate 2.
+- `N10.6` new: the net48 JSON response door, a result that writes its body through System.Text.Json under the
+  options the app registers with the framework (D2.6, D2.9), so dates are ISO 8601 (D3.10) and names follow
+  the app's naming on both hosts.
 
 **Evidence.**
 - The flow today: the check guards the sentence (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:85`), the exchange
@@ -829,7 +890,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     `Finally`.
 
   A run belongs to the owner of the handler that started it: the page, or the slot whose plan holds the
-  handler (Q12).
+  handler (Q12). A plugin's member is read, written and called in the same blocks, the request's included,
+  through its typed declaration (Q5), and its async methods are awaited steps (D11.2).
 - D11.7 A handler's policy decides what a trigger does while that handler's previous run is in flight. The
   policy belongs to the handler, not to a request.
   - `overlap`, the default, as today, starts another run.
