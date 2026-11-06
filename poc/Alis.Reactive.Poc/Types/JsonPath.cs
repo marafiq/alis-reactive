@@ -10,19 +10,22 @@ namespace Alis.Reactive.Types;
 internal static class JsonPath
 {
     internal static IReadOnlyList<PathStep> Of(LambdaExpression path, JsonSerializerOptions options)
+        => Steps(path.Body, path.Parameters[0], options, path)
+            ?? throw new ArgumentException($"'{path}' is not a path of members of its value, such as n => n.Pager.Number.", nameof(path));
+
+    internal static IReadOnlyList<PathStep>? Steps(System.Linq.Expressions.Expression node, ParameterExpression value, JsonSerializerOptions options, LambdaExpression path)
     {
-        var steps = new List<PathStep>();
-        var node = path.Body;
+        var accesses = new List<(MemberExpression Access, Type Holder)>();
         while (node is MemberExpression { Expression: { } holder } access)
         {
-            steps.Add(PathStep.Member(JsonName(access, holder.Type, options, path)));
+            accesses.Add((access, holder.Type));
             node = holder;
         }
 
-        var readsTheValue = node == path.Parameters[0] && steps.Count > 0;
-        if (!readsTheValue) throw new ArgumentException($"'{path}' is not a path of members of its value, such as n => n.Pager.Number.", nameof(path));
-        steps.Reverse();
-        return steps;
+        var readsTheValue = node == value && accesses.Count > 0;
+        if (!readsTheValue) return null;
+        accesses.Reverse();
+        return accesses.ConvertAll(step => PathStep.Member(JsonName(step.Access, step.Holder, options, path)));
     }
 
     private static string JsonName(MemberExpression access, Type holder, JsonSerializerOptions options, LambdaExpression path)

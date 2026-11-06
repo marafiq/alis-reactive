@@ -18,7 +18,7 @@ export interface ElementLocator {
   readonly vendor: string;
 }
 
-export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | CallExpression | FnExpression;
+export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | CallExpression | FnExpression | OperatorExpression;
 
 export interface FnExpression {
   readonly kind: "fn";
@@ -60,6 +60,14 @@ export interface MethodListening {
 export interface ObjectExpression {
   readonly kind: "obj";
   readonly id: string;
+}
+
+export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not";
+
+export interface OperatorExpression {
+  readonly kind: "op";
+  readonly op: Operator;
+  readonly args: readonly Expression[];
 }
 
 export type PathStep = string | number;

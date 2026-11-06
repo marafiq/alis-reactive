@@ -1,13 +1,17 @@
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews().AddRazorOptions(razor =>
-{
-    razor.ViewLocationFormats.Clear();
-    razor.ViewLocationFormats.Add("/{1}/{0}.cshtml");
-    razor.ViewLocationFormats.Add("/Shared/{0}.cshtml");
-});
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(json => json.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)))
+    .AddRazorOptions(razor =>
+    {
+        razor.ViewLocationFormats.Clear();
+        razor.ViewLocationFormats.Add("/{1}/{0}.cshtml");
+        razor.ViewLocationFormats.Add("/Shared/{0}.cshtml");
+    });
 builder.Services.AddHostedService<TestHostWatch>();
 
 var app = builder.Build();

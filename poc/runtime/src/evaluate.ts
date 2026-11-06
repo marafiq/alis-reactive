@@ -1,5 +1,6 @@
 import type { CallExpression, Expression, PathStep, PlanDocument, ReadPresence } from "./plan";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
+import { operate } from "./operators";
 
 export interface Context {
   readonly plan: PlanDocument;
@@ -21,6 +22,8 @@ export function evaluate(expression: Expression, context: Context): Read {
       return invoke(expression, context);
     case "fn":
       return value(callable(expression.params, expression.body, context));
+    case "op":
+      return operate(expression, (argument) => evaluate(argument, context));
     default:
       return assertNever(expression);
   }

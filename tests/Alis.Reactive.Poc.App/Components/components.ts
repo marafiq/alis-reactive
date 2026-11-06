@@ -1,5 +1,6 @@
 import { CareBoardV1, CareBoardV2, type CareBoardHost } from "./CareBoard/care-board";
 import { DutyRoster, DutyRosterV2, type DutyRosterHost } from "./DutyRoster/duty-roster";
+import { MedicationCart, type MedicationCartHost } from "./MedicationCart/medication-cart";
 import { NurseStation, StationCensus, type NurseStationHost, type StationCensusHost } from "./NurseStation/nurse-station";
 
 for (const host of document.querySelectorAll<CareBoardHost>("[data-careboard]")) {
@@ -16,4 +17,8 @@ for (const host of document.querySelectorAll<NurseStationHost>("[data-nurse-stat
 
 for (const host of document.querySelectorAll<StationCensusHost>("[data-station-census]")) {
   host.census = new StationCensus(host);
+}
+
+for (const host of document.querySelectorAll<MedicationCartHost>("[data-medication-cart]")) {
+  host.cart = new MedicationCart(host);
 }

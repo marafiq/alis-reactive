@@ -62,3 +62,24 @@ internal sealed class Policy : IChoice
 
     public string Text { get; }
 }
+
+[JsonConverter(typeof(ChoiceConverter<Operator>))]
+internal sealed class Operator : IChoice
+{
+    internal static readonly Operator Eq = new("eq");
+    internal static readonly Operator Neq = new("neq");
+    internal static readonly Operator Lt = new("lt");
+    internal static readonly Operator Lte = new("lte");
+    internal static readonly Operator Gt = new("gt");
+    internal static readonly Operator Gte = new("gte");
+    internal static readonly Operator And = new("and");
+    internal static readonly Operator Or = new("or");
+    internal static readonly Operator Not = new("not");
+
+    private Operator(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}

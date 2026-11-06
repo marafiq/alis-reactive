@@ -518,6 +518,25 @@ Terms used throughout:
   `ITypedSource<IEnumerable<TItem>>`, the covariant view `TypedSource<T>` implements, and each returns a
   `TypedSource<T>`, so the sources stay the closed class D7.2 names. A text is no list in the browser: each
   operation over a `string` is refused at compile time by an `[Obsolete(error: true)]` overload (CS0619).
+- D6.12 A comparison in a list's lambda over data compares the item's members with each other or with the values the
+  view holds (D6.7), by closed rules C# checks where the view renders:
+  - A value the view holds is written through the app's JSON options as the type of the member it is compared with,
+    taken under the conversion the compiler adds to compare an enum or a `char` as its number: `DoseStatus.Due` is
+    "due" when the app writes enums by name, and `'I'` is "I".
+  - Equality (`==`, `!=`) compares a member with a value written as a JSON scalar or null, or two members of one type
+    written as a scalar: a number, text, `bool`, `char`, `Guid` or an enum. A value written as an object or a list is
+    refused, and so are two members of a type that is not a scalar: the browser compares objects by reference.
+  - Ordering (`<`, `<=`, `>`, `>=`) compares a member with a value written as a JSON number or null, or a `char` with a
+    `char`. A value written as text is refused, which covers an enum the app writes by name and a number the app writes
+    as text. Between two members it compares number types and `char`, and refuses every other type.
+  - A date or a time (`DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan`) is refused in a comparison:
+    its text neither orders nor equals as the instant does. `as date` and `as instant` (D3.2) carry it, built with
+    Q3's conversions.
+  - A cast that narrows (`(int)d.Milligrams`) is refused: it changes the value as C# computes it, and the browser's
+    number does not.
+  - A member with a JSON converter or number handling of its own is the contract analyzer's (N18.5, POC 13), which
+    refuses it in a comparison; until that analyzer is built, such a member compares as the app's options write its
+    type.
 
 **Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`).
 
@@ -546,8 +565,8 @@ Terms used throughout:
 
 **Defects.**
 - `X6.1` type: a list cannot be counted two ways: new:N6.1 leaves one `Count()`.
-- `X6.2` refusal: an array lambda that calls a member outside the table: "{member} has no browser form in an
-  array lambda; use a member the framework translates, or move the work to the server."
+- `X6.2` refusal: a list's lambda that calls a member outside the table: "'{term}' has no browser form in a
+  list's lambda; use a member the framework translates, or move the work to the server."
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name` reads that item's test
   as nothing, so the item is not kept.
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
@@ -561,6 +580,23 @@ Terms used throughout:
 - `X6.6` refusal (D6.7): a view value that calls a method or computes inside an
   array lambda: "'{value}' computes a value
   inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();."
+- `X6.10` refusal (D6.12): a comparison of objects: "'{term}' compares objects, and the browser compares objects by
+  reference; compare a member of each, such as d => d.Carer.Name == lead."
+- `X6.11` refusal (D6.12): a date or a time in a comparison: "'{term}' compares dates or times, whose text neither
+  orders nor equals as the instant does; compare them on the server."
+- `X6.12` refusal (D6.12): an ordering against a value the app's JSON writes as text: "'{term}' orders a value the
+  app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on
+  the server."
+- `X6.13` refusal (D6.12): an ordering of two members outside numbers and `char`: "'{term}' orders values the browser
+  cannot order as .NET does; order numbers or a char, or order on the server."
+- `X6.14` refusal (D6.12): a cast that narrows: "'{term}' casts a number to a narrower one, which changes the value as
+  C# computes it and not as the browser does; compare the member itself."
+- `X6.15` refusal (D6.7): a view value read through a null: "'{value}' reads a member of a value that is null when the
+  view renders."
+- `X6.16` behavior (D6.12): `d.Status == DoseStatus.Due` keeps the due doses when the app writes enums by name, and
+  `d.Route == 'I'` keeps the injected ones. `d.Status == d.Planned` keeps the doses whose two members hold one value,
+  `d.Milligrams > d.Priority` orders two numbers and leaves out a dose whose priority is null, and `d.Route < 'L'`
+  orders a `char` as .NET does.
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 
@@ -658,6 +694,19 @@ Terms used throughout:
   block that binds it. That one rule covers today's two refusals of this kind, an array item and a response
   read outside their blocks. The browser runs each block in a child scope, so a value bound inside a branch
   never reaches the steps after it.
+- D8.9 One meaning of comparison and logic, which every condition reads (D8.1). A comparison (`eq`, `neq`, `lt`,
+  `lte`, `gt`, `gte`) whose operand reads nothing reads nothing, `neq` included: a member the browser lacks holds no
+  value, and no comparison with it holds (D8.5). Null is a value the data holds, compared as .NET's lifted operators
+  compare it: `eq` of null and null holds, `neq` of null and a value holds, and an ordering with null does not hold,
+  though JavaScript's `null <= 2` is true. Equality is JavaScript's `===`; an ordering is JavaScript's `<` over the
+  numbers and one-character texts D6.12 admits. `not`, `and` and `or` are SQL's three-valued logic with nothing as its
+  unknown: `not` of nothing is nothing; `and` is false when a term is false, true when both are true, and nothing
+  otherwise; `or` is true when a term is true, false when both are false, and nothing otherwise. A term runs only when
+  it is reached (D4.7): `and` reads its right term unless its left is false, `or` unless its left is true. A condition
+  holds only when it reads true: a branch, an array predicate (`filter`, `some`, `every`, `find`) and a validator
+  condition. So `d.Ward != "North"` and `!(d.Ward == "North")` agree over an item that lacks `ward`: neither holds.
+  .NET binds a missing member to its default; data reads as nothing when absent (the root rule), so the browser
+  decides nothing for it.
 
 **Schema nodes.** `op` (the comparison, text, membership and value tests, `and`, `or`, `not`); `if`.
 
@@ -700,6 +749,11 @@ Terms used throughout:
   inside that request's routes or the blocks they hold."
 - `X8.6` behavior: a branch with three steps in a `{}` body runs all three, in order, and none when its
   condition does not hold.
+- `X8.7` behavior: over a dose that lacks `ward`, `d.Ward != "North"` and `!(d.Ward == "North")` both leave it out;
+  a dose whose `priority` holds null is kept by `d.Priority != 2` and left out by `d.Priority <= 2` and
+  `d.Priority < 2`, as .NET's lifted operators decide (D8.9).
+- `X8.8` behavior: `or` keeps an item whose left term reads nothing when its right term holds, and `and` whose left
+  term reads nothing and right term is false reads false, so `not` of it holds (D8.9).
 
 ## Q9. The request
 

@@ -1,0 +1,200 @@
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Text.Json;
+using Alis.Reactive.Plan;
+using Alis.Reactive.Types;
+using LinqExpression = System.Linq.Expressions.Expression;
+using PlanExpression = Alis.Reactive.Plan.Expression;
+
+namespace Alis.Reactive.Conditions;
+
+internal sealed class LambdaCondition
+{
+    private static readonly Dictionary<ExpressionType, (Operator Op, bool Orders)> Comparisons = new()
+    {
+        [ExpressionType.Equal] = (Operator.Eq, false),
+        [ExpressionType.NotEqual] = (Operator.Neq, false),
+        [ExpressionType.LessThan] = (Operator.Lt, true),
+        [ExpressionType.LessThanOrEqual] = (Operator.Lte, true),
+        [ExpressionType.GreaterThan] = (Operator.Gt, true),
+        [ExpressionType.GreaterThanOrEqual] = (Operator.Gte, true),
+    };
+
+    private static readonly Dictionary<Type, (int Bytes, bool Signed)> WholeNumbers = new()
+    {
+        [typeof(sbyte)] = (1, true),
+        [typeof(sbyte?)] = (1, true),
+        [typeof(byte)] = (1, false),
+        [typeof(byte?)] = (1, false),
+        [typeof(short)] = (2, true),
+        [typeof(short?)] = (2, true),
+        [typeof(ushort)] = (2, false),
+        [typeof(ushort?)] = (2, false),
+        [typeof(int)] = (4, true),
+        [typeof(int?)] = (4, true),
+        [typeof(uint)] = (4, false),
+        [typeof(uint?)] = (4, false),
+        [typeof(long)] = (8, true),
+        [typeof(long?)] = (8, true),
+        [typeof(ulong)] = (8, false),
+        [typeof(ulong?)] = (8, false),
+    };
+
+    private static readonly HashSet<Type> Fractions =
+    [
+        typeof(float), typeof(float?), typeof(double), typeof(double?), typeof(decimal), typeof(decimal?),
+    ];
+
+    private static readonly HashSet<Type> Chars = [typeof(char), typeof(char?)];
+
+    private static readonly HashSet<Type> OtherScalars = [typeof(string), typeof(bool), typeof(bool?), typeof(Guid), typeof(Guid?)];
+
+    private static readonly HashSet<Type> DatesAndTimes =
+    [
+        typeof(DateTime), typeof(DateTime?), typeof(DateTimeOffset), typeof(DateTimeOffset?), typeof(TimeSpan), typeof(TimeSpan?),
+#if NET
+        typeof(DateOnly), typeof(DateOnly?), typeof(TimeOnly), typeof(TimeOnly?),
+#endif
+    ];
+
+    private readonly LambdaExpression _lambda;
+    private readonly PlanExpression _item;
+    private readonly JsonSerializerOptions _values;
+    private readonly string _argument;
+
+    private LambdaCondition(LambdaExpression lambda, PlanExpression item, JsonSerializerOptions values, string argument)
+    {
+        _lambda = lambda;
+        _item = item;
+        _values = values;
+        _argument = argument;
+    }
+
+    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, JsonSerializerOptions values, string argument)
+        => new LambdaCondition(lambda, item, values, argument).Term(lambda.Body);
+
+    private PlanExpression Term(LinqExpression node) => node switch
+    {
+        BinaryExpression { NodeType: ExpressionType.AndAlso } both => Op(Operator.And, Term(both.Left), Term(both.Right)),
+        BinaryExpression { NodeType: ExpressionType.OrElse } either => Op(Operator.Or, Term(either.Left), Term(either.Right)),
+        BinaryExpression comparison when Comparisons.TryGetValue(comparison.NodeType, out var compared) => Compared(comparison, compared.Op, compared.Orders),
+        UnaryExpression { NodeType: ExpressionType.Not } negation when negation.Type == typeof(bool) => Op(Operator.Not, Term(negation.Operand)),
+        _ => Read(node),
+    };
+
+    private PlanExpression Read(LinqExpression node)
+    {
+        var read = Unconverted(node);
+        if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
+        var steps = JsonPath.Steps(read, _lambda.Parameters[0], _values, _lambda)
+            ?? throw new ArgumentException(
+                $"'{ViewValues.Printed(read)}' has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.",
+                _argument);
+        return new GetExpression(_item, steps, ReadPresence.Optional);
+    }
+
+    private OperatorExpression Compared(BinaryExpression comparison, Operator op, bool orders)
+    {
+        var left = Unconverted(comparison.Left);
+        var right = Unconverted(comparison.Right);
+        var leftReadsTheItem = ReadsTheItem(left);
+        var rightReadsTheItem = ReadsTheItem(right);
+        if (!leftReadsTheItem && !rightReadsTheItem) throw ViewValues.Computed(comparison, _argument);
+        if (DatesAndTimes.Contains(left.Type) || DatesAndTimes.Contains(right.Type)) throw Refused(comparison, "compares dates or times, whose text neither orders nor equals as the instant does; compare them on the server.");
+        if (leftReadsTheItem && rightReadsTheItem)
+        {
+            RequireComparableMembers(comparison, left, right, orders);
+            return Op(op, Term(left), Term(right));
+        }
+
+        var member = leftReadsTheItem ? left : right;
+        var memberSide = leftReadsTheItem ? comparison.Left : comparison.Right;
+        var held = leftReadsTheItem ? right : left;
+        var heldSide = leftReadsTheItem ? comparison.Right : comparison.Left;
+        var compilerFoldedTheConstant = IsConverted(memberSide) && !IsConverted(heldSide);
+        var written = Written(ViewValues.Of(held, _argument), compilerFoldedTheConstant ? member.Type : held.Type);
+        RequireComparableValue(comparison, written, member.Type, orders);
+        var literal = new LiteralExpression(written);
+        return leftReadsTheItem ? Op(op, Term(member), literal) : Op(op, literal, Term(member));
+    }
+
+    private void RequireComparableMembers(BinaryExpression comparison, LinqExpression left, LinqExpression right, bool orders)
+    {
+        if (orders)
+        {
+            var orderable = (IsNumber(left.Type) && IsNumber(right.Type)) || (Chars.Contains(left.Type) && Chars.Contains(right.Type));
+            if (!orderable) throw Refused(comparison, "orders values the browser cannot order as .NET does; order numbers or a char, or order on the server.");
+            return;
+        }
+
+        var bothScalars = IsScalar(left.Type) && IsScalar(right.Type);
+        var enumsCompared = IsNumber(comparison.Left.Type) && IsConverted(comparison.Left) && IsConverted(comparison.Right) && left.Type == right.Type;
+        if (!bothScalars && !enumsCompared) throw ComparesObjects(comparison);
+    }
+
+    private void RequireComparableValue(BinaryExpression comparison, JsonElement written, Type member, bool orders)
+    {
+        if (written.ValueKind is JsonValueKind.Object or JsonValueKind.Array) throw ComparesObjects(comparison);
+        var orderedAsText = orders && written.ValueKind == JsonValueKind.String && !Chars.Contains(member);
+        if (orderedAsText) throw Refused(comparison, "orders a value the app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on the server.");
+    }
+
+    private JsonElement Written(object? value, Type type)
+    {
+        var held = value is int code && Chars.Contains(type) ? Convert.ToChar(code) : value;
+        return JsonSerializer.SerializeToElement(held, _values.GetTypeInfo(type));
+    }
+
+    private LinqExpression Unconverted(LinqExpression node)
+    {
+        while (node is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } conversion)
+        {
+            if (Narrows(conversion.Operand.Type, conversion.Type))
+                throw Refused(conversion, "casts a number to a narrower one, which changes the value as C# computes it and not as the browser does; compare the member itself.");
+            node = conversion.Operand;
+        }
+
+        return node;
+    }
+
+    private bool ReadsTheItem(LinqExpression node)
+    {
+        var finder = new ItemFinder(_lambda.Parameters[0]);
+        finder.Visit(node);
+        return finder.Found;
+    }
+
+    private ArgumentException ComparesObjects(BinaryExpression comparison)
+        => Refused(comparison, "compares objects, and the browser compares objects by reference; compare a member of each, such as d => d.Carer.Name == lead.");
+
+    private ArgumentException Refused(LinqExpression term, string reason) => new($"'{ViewValues.Printed(term)}' {reason}", _argument);
+
+    private static bool Narrows(Type from, Type to)
+    {
+        if (!WholeNumbers.TryGetValue(to, out var whole)) return false;
+        if (Fractions.Contains(from)) return true;
+        if (!WholeNumbers.TryGetValue(from, out var cast)) return false;
+        var holdsEvery = cast.Signed == whole.Signed ? whole.Bytes >= cast.Bytes : !cast.Signed && whole.Bytes > cast.Bytes;
+        return !holdsEvery;
+    }
+
+    private static bool IsConverted(LinqExpression side) => side is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked };
+
+    private static bool IsNumber(Type type) => WholeNumbers.ContainsKey(type) || Fractions.Contains(type);
+
+    private static bool IsScalar(Type type) => IsNumber(type) || Chars.Contains(type) || OtherScalars.Contains(type);
+
+    private static OperatorExpression Op(Operator op, params PlanExpression[] args) => new(op, args);
+
+    private sealed class ItemFinder(ParameterExpression item) : ExpressionVisitor
+    {
+        internal bool Found { get; private set; }
+
+        protected override LinqExpression VisitParameter(ParameterExpression node)
+        {
+            Found |= node == item;
+            return node;
+        }
+    }
+}

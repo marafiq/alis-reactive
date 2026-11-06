@@ -1,0 +1,130 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Dose round";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+    var ward = "South";
+}
+<h1>Dose round</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-priority-two", "Count priority 2 doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority == 2))))
+
+@(plan.Button("count-not-priority-two", "Count doses not at priority 2")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority != 2))))
+
+@(plan.Button("count-below-two", "Count doses below priority 2")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority < 2))))
+
+@(plan.Button("count-at-most-two", "Count doses at most priority 2")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority <= 2))))
+
+@(plan.Button("count-above-two", "Count doses above priority 2")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority > 2))))
+
+@(plan.Button("count-at-least-two", "Count doses at least priority 2")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority >= 2))))
+
+@(plan.Button("count-this-ward", "Count this ward's doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Ward == Model.Ward))))
+
+@(plan.Button("count-chosen-ward", "Count the chosen ward's doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Ward == ward))))
+
+@(plan.Button("count-above-routine", "Count doses above routine priority")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority > DoseLimits.Routine))))
+
+@(plan.Button("count-no-carer", "Count doses with no carer")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Carer == null))))
+
+@(plan.Button("count-with-carer", "Count doses with a carer")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Carer != null))))
+
+@(plan.Button("count-off-north", "Count doses off the north ward")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Ward != "North"))))
+
+@(plan.Button("count-not-north", "Count doses not on the north ward")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !(d.Ward == "North")))))
+
+@(plan.Button("count-east-or-missed", "Count east or missed doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Ward == "East" || d.Status == DoseStatus.Missed))))
+
+@(plan.Button("count-not-east-given", "Count doses not both east and given")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !(d.Ward == "East" && d.Status == DoseStatus.Given)))))
+
+@(plan.Button("count-due-urgent", "Count due urgent doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Status == DoseStatus.Due && d.Priority > 2))))
+
+@(plan.Button("count-missed-or-first", "Count missed or first priority doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Status == DoseStatus.Missed || d.Priority < 2))))
+
+@(plan.Button("count-not-given", "Count doses not given")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !(d.Status == DoseStatus.Given)))))
+
+@(plan.Button("count-due", "Count due doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Status == DoseStatus.Due))))
+
+@(plan.Button("count-injected", "Count injected doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Route == 'I'))))
+
+@(plan.Button("count-as-planned", "Count doses given as planned")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Status == d.Planned))))
+
+@(plan.Button("count-above-priority", "Count doses whose milligrams pass their priority")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Milligrams > d.Priority))))
+
+@(plan.Button("count-routes-before-l", "Count doses on a route before L")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Route < 'L'))))
+
+@Html.RenderPlan(plan)

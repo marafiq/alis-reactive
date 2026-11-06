@@ -17,7 +17,8 @@ public sealed class WhenTheCoreIsCompiled
         ["Writing"] = ["Plan"],
         ["Values"] = ["Plan", "Writing"],
         ["Types"] = ["Plan"],
-        ["Lists"] = ["Plan", "Writing", "Values", "Types"],
+        ["Conditions"] = ["Plan", "Types"],
+        ["Lists"] = ["Plan", "Writing", "Values", "Types", "Conditions"],
         ["Components"] = ["Plan", "Writing", "Values", "Types", "Lists"],
         ["Pipelines"] = ["Plan", "Writing", "Values", "Components"],
         ["Elements"] = ["Components", "Pipelines"],
@@ -27,6 +28,10 @@ public sealed class WhenTheCoreIsCompiled
     private static readonly string[] TypeReadsTheOwnerLists =
     [
         "Components/JsObject.cs System.Type.FullName",
+        "Conditions/ViewValues.cs System.Reflection.FieldInfo",
+        "Conditions/ViewValues.cs System.Reflection.FieldInfo.GetValue",
+        "Conditions/ViewValues.cs System.Reflection.PropertyInfo",
+        "Conditions/ViewValues.cs System.Reflection.PropertyInfo.GetValue",
         "Hosting/ReactivePlan.cs System.Type.FullName",
         "Types/JsonPath.cs System.Reflection.MemberInfo.DeclaringType",
         "Types/JsonPath.cs System.Type.FullName",
