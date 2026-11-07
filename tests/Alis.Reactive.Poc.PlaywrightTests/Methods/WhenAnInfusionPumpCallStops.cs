@@ -36,13 +36,24 @@ public sealed class WhenAnInfusionPumpCallStops : AppPageTest
     }
 
     [Test]
-    public async Task a_method_declared_to_return_a_value_that_returns_a_promise_stops_the_pipeline_before_its_next_step()
+    public async Task a_method_declared_to_return_nothing_that_returns_a_promise_stops_the_pipeline_before_its_next_step()
     {
         await Open("/Pumps/Infusion");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Calibrate the pump" }).ClickAsync();
 
         await Expect(Page.Locator("#pump-status")).ToHaveTextAsync("Calling");
+    }
+
+    [Test]
+    public async Task a_method_declared_to_return_a_value_that_returns_a_promise_stops_the_pipeline_before_it_writes_the_value()
+    {
+        await Open("/Pumps/Infusion");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Show the reading" }).ClickAsync();
+
+        await Expect(Page.Locator("#pump-status")).ToHaveTextAsync("Calling");
+        await Expect(Page.Locator("#census .census-charges")).ToHaveTextAsync("unknown");
     }
 
     [Test]

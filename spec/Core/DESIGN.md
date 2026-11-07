@@ -432,7 +432,9 @@ Terms used throughout:
   list's lambda the call is the lambda's own and runs once for each item the operation reads. A method called in a
   condition's term runs when its term is reached (D4.7). A method declared to return nothing is a `do` at its line;
   written inside a list's lambda, which writes nothing, it is refused where the view renders. Each argument is read
-  when its line runs, and one that reads nothing passes null (D7.6).
+  when its line runs, and one that reads nothing passes null (D7.6). A result is read in the block that called its
+  method and in the blocks inside it (D8.8); a C# variable that carries it into another pipeline, or out of its
+  block, is refused where the view renders (X5.14).
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
@@ -496,12 +498,15 @@ Terms used throughout:
 - `X5.11` behavior (D5.11): a pump's summary read twice calls `summary()` once, two calls of it run it twice, and a
   summary read before a step that changes the rate still holds the rate it returned; the running channels counted in
   a list's lambda call `isRunning()` on each channel as it is when the step runs.
-- `X5.12` behavior (D4.1, D4.3, D7.6): a method the older pump lacks, a member the pump holds as text and a method
-  declared to return a value that returns a promise each stop the pipeline at the call, and the step after it does
-  not run; a null literal, a null the returned data holds and a result that reads nothing each reach the method as
-  null.
+- `X5.12` behavior (D4.1, D4.3, D4.4, D7.6): a method the older pump lacks, a member the pump holds as text, a
+  method declared to return nothing and one declared to return a value, each of which returns a promise, stop the
+  pipeline at the call, and the step after it does not run; a null literal, a null the returned data holds and a
+  result that reads nothing each reach the method as null.
 - `X5.13` refusal (D5.11): a method declared to return nothing, called inside a list's lambda: "A step is written
   inside a list's lambda, which reads each item and writes nothing. Write the step in the pipeline."
+- `X5.14` refusal (D5.11): a result, a returned object or a returned list that a C# variable carries into another
+  pipeline: "A method's result is read outside the block that called the method. Call the method in the block that
+  reads its result, or in a block around it."
 
 ## Q6. Arrays
 

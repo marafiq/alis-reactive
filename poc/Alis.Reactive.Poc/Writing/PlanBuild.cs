@@ -14,6 +14,7 @@ internal sealed class PlanBuild
     private readonly Dictionary<string, string> _vendorOfElement = new(StringComparer.Ordinal);
     private readonly List<Handler> _handlers = [];
     private readonly Stack<List<Statement>> _open = new();
+    private readonly Dictionary<string, List<Statement>> _resultBlocks = new(StringComparer.Ordinal);
     private int _items;
     private int _results;
     private int _readingItems;
@@ -75,7 +76,16 @@ internal sealed class PlanBuild
         if (_readingItems > 0) return call;
         var name = "result" + (++_results).ToString(CultureInfo.InvariantCulture);
         Write(new LetStatement(name, call));
+        _resultBlocks[name] = _open.Peek();
         return new RefExpression(name);
+    }
+
+    internal Expression InScope(Expression read)
+    {
+        var readsAResult = read is RefExpression reference && _resultBlocks.TryGetValue(reference.Name, out var block) && !_open.Contains(block);
+        if (!readsAResult) return read;
+        throw new InvalidOperationException(
+            "A method's result is read outside the block that called the method. Call the method in the block that reads its result, or in a block around it.");
     }
 
     internal TRead ReadingItems<TRead>(Func<TRead> read)

@@ -122,6 +122,10 @@ export class InfusionPump {
     return Promise.resolve();
   }
 
+  reading(): Promise<number> {
+    return Promise.resolve(42);
+  }
+
   channel(position: number): OlderPumpChannel | undefined {
     return this.#channels[position];
   }

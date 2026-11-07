@@ -158,6 +158,14 @@
         pipeline.Element("pump-status").Text.Set("Calibrated");
     }))
 
+@(plan.Button("reading", "Show the reading")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-status").Text.Set("Calling");
+        pipeline.Component<StationCensus>("census").Charges.Set(pipeline.Component<InfusionPump>("pump").Reading());
+        pipeline.Element("pump-status").Text.Set("Reading shown");
+    }))
+
 @(plan.Button("pause-older-second", "Pause the older pump's second channel")
     .Reactive(button => button.Click, pipeline =>
     {

@@ -34,6 +34,8 @@ public sealed class InfusionPump : Component
 
     public MethodResult<decimal> RateFor(Arg<string> medicine) => Method<decimal>([medicine]);
 
+    public MethodResult<decimal> Reading() => Method<decimal>();
+
     public MethodResult<string?> LastAlarm() => Method<string?>();
 
     public MethodResult<PumpSettings> Settings() => Method<PumpSettings>();

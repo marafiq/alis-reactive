@@ -8,13 +8,15 @@ namespace Alis.Reactive.Components;
 
 public sealed class MethodResult<TResult> : TypedSource<TResult>
 {
+    private readonly Expression _read;
+
     internal MethodResult(Expression read, PlanBuild build)
     {
-        Expression = read;
+        _read = read;
         Build = build;
     }
 
-    internal override Expression Expression { get; }
+    internal override Expression Expression => Build.InScope(_read);
 
     internal override PlanBuild Build { get; }
 

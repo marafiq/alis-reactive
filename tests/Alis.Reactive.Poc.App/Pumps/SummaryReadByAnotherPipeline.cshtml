@@ -1,0 +1,25 @@
+@using Alis.Reactive.Components
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Summary read by another pipeline";
+    var plan = Html.ReactivePlan<InfusionPage>();
+    MethodResult<string>? captured = null;
+}
+<h1>Summary read by another pipeline</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+@plan.StationCensus("census")
+
+<p>Shown: <span id="shown"></span></p>
+
+@(plan.Button("read", "Read the summary")
+    .Reactive(button => button.Click, pipeline =>
+        captured = pipeline.Component<InfusionPump>("pump").Summary()))
+
+@(plan.Button("show", "Show what the other pipeline read")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("shown").Text.Set(captured!)))
+
+@Html.RenderPlan(plan)

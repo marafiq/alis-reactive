@@ -11,14 +11,16 @@ namespace Alis.Reactive.Components;
 
 internal sealed class Binding
 {
+    private readonly Expression _target;
+
     internal Binding(Expression target, PlanBuild build, ReadPresence members)
     {
-        Target = target;
+        _target = target;
         Build = build;
         Members = members;
     }
 
-    internal Expression Target { get; }
+    internal Expression Target => Build.InScope(_target);
 
     internal PlanBuild Build { get; }
 
