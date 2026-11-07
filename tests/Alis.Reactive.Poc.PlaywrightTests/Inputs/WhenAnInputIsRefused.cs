@@ -58,6 +58,24 @@ public sealed class WhenAnInputIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_read_under_a_prefix_its_view_took_after_its_plan_started_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Admissions/LatePrefixRead");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: The view's field prefix changed from none to 'Resident' after its plan started: MVC names input 'm => m.ResidentName' under the new prefix and the plan under the one it started with. Render the view for its member with Html.PartialFor, which gives it its prefix before its plan starts.");
+    }
+
+    [Test]
+    public async Task an_input_rendered_twice_in_one_plan_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Admissions/ResidentTwice");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: The plan renders the element 'Alis_Reactive_Poc_App_Admissions_AdmissionBase__ResidentName' twice, and a page holds one element for an id: render each component once, and an input once for its member.");
+    }
+
+    [Test]
     public async Task an_input_bound_to_a_member_a_generic_class_declares_is_refused_where_the_view_renders()
     {
         await Page.GotoAsync(BaseUrl + "/Admissions/TaggedBadge");

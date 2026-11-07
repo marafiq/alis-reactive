@@ -13,18 +13,22 @@ namespace Alis.Reactive.Inputs;
 
 internal sealed class InputNames
 {
+    private readonly ViewDataDictionary _view;
+
 #if NET48
-    internal InputNames(string prefix)
+    internal InputNames(ViewDataDictionary view)
     {
-        Prefix = prefix;
+        _view = view;
+        Prefix = view.TemplateInfo.HtmlFieldPrefix;
     }
 #else
     private readonly IHtmlHelper _html;
     private readonly ModelExpressionProvider _expressions;
 
-    internal InputNames(string prefix, IHtmlHelper html, ModelExpressionProvider expressions)
+    internal InputNames(ViewDataDictionary view, IHtmlHelper html, ModelExpressionProvider expressions)
     {
-        Prefix = prefix;
+        _view = view;
+        Prefix = view.TemplateInfo.HtmlFieldPrefix;
         _html = html;
         _expressions = expressions;
     }
@@ -34,6 +38,7 @@ internal sealed class InputNames
 
     internal InputName Of<TModel, TValue>(Expression<Func<TModel, TValue>> member)
     {
+        RefuseAPrefixTakenLate(member);
         var text = ExpressionText(member);
         var nearest = ModelChain.NamedByMvc(member, text) ? ModelChain.NearestMember(member) : null;
         var declaring = nearest is null ? null : JsonPath.DeclaringClassName(nearest);
@@ -43,8 +48,9 @@ internal sealed class InputNames
         return new InputName(name, Scope(declaring, member) + "__" + IdFromName(name));
     }
 
-    internal void RefuseAPrefixTakenLate<TModel, TValue>(string prefix, Expression<Func<TModel, TValue>> member)
+    private void RefuseAPrefixTakenLate(LambdaExpression member)
     {
+        var prefix = _view.TemplateInfo.HtmlFieldPrefix;
         if (prefix == Prefix) return;
         throw new InvalidOperationException(
             $"The view's field prefix changed from {Described(Prefix)} to {Described(prefix)} after its plan started: MVC names input '{member}' under the new prefix and the plan under the one it started with. Render the view for its member with Html.PartialFor, which gives it its prefix before its plan starts.");

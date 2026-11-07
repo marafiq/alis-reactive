@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model IntakeForm
+@{
+    ViewData["Title"] = "Resident intake";
+    var plan = Html.ReactivePlan<IntakeForm>();
+    ViewData.TemplateInfo.HtmlFieldPrefix = "Resident";
+}
+<h1>Resident intake</h1>
+
+@(plan.Button("preview-card", "Preview the door card")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("card-resident").Text.Set(pipeline.Input(m => m.ResidentName).Component<NativeTextBox>().Value)))
+
+<p>Resident: <strong id="card-resident">no preview</strong></p>
+
+@Html.RenderPlan(plan)

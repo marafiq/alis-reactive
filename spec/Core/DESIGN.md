@@ -1775,7 +1775,7 @@ and `request` state, which the schema does not hold: a request's state is its ru
     - R14.1 an input or a partial whose lambda MVC's name does not name step by step from the model (a call that
       is no indexer, a value the view holds), an input whose lambda names no member, or a member an interface
       declares;
-    - R14.2 an input under a prefix its view took after its plan started;
+    - R14.2 an input, or a pipeline's read of one, under a prefix its view took after its plan started;
     - R14.3 an element id the plan renders twice;
     - R14.4 a step that sets the text or HTML of an element the same plan loads or unloads as a slot;
     - R14.5 a JSON request over a number-keyed dictionary entry (D14.5).

@@ -38,6 +38,7 @@ public sealed class ReactivePlan<TModel>
         where TComponent : Component, new()
     {
         if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("A component's element has the id the developer chose.", nameof(id));
+        Build.Renders(id);
         return new Rendered<TComponent, TModel>(Build, id, html);
     }
 
@@ -97,7 +98,7 @@ public static class PlanHtml
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
     {
         if (html == null) throw new ArgumentNullException(nameof(html));
-        var names = new InputNames(html.ViewData.TemplateInfo.HtmlFieldPrefix);
+        var names = new InputNames(html.ViewData);
         return new ReactivePlan<TModel>(new PlanBuild(PlanId<TModel>(), new JsonSerializerOptions(JsonSerializerDefaults.Web), names));
     }
 
@@ -112,7 +113,7 @@ public static class PlanHtml
         ArgumentNullException.ThrowIfNull(html);
         var services = html.ViewContext.HttpContext.RequestServices;
         var values = services.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
-        var names = new InputNames(html.ViewData.TemplateInfo.HtmlFieldPrefix, html, services.GetRequiredService<ModelExpressionProvider>());
+        var names = new InputNames(html.ViewData, html, services.GetRequiredService<ModelExpressionProvider>());
         return new ReactivePlan<TModel>(new PlanBuild(PlanId<TModel>(), values, names));
     }
 

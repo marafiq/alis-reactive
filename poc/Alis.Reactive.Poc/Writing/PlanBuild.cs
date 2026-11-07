@@ -17,6 +17,7 @@ internal sealed class PlanBuild
     private readonly Dictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
     private readonly Dictionary<string, Locator> _objects = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _vendorOfElement = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _rendered = new(StringComparer.Ordinal);
     private readonly List<Handler> _handlers = [];
     private readonly Stack<List<Statement>> _open = new();
     private readonly Dictionary<string, List<Statement>> _resultBlocks = new(StringComparer.Ordinal);
@@ -269,6 +270,13 @@ internal sealed class PlanBuild
         {
             _readingItems--;
         }
+    }
+
+    internal void Renders(string elementId)
+    {
+        if (_rendered.Add(elementId)) return;
+        throw new InvalidOperationException(
+            $"The plan renders the element '{elementId}' twice, and a page holds one element for an id: render each component once, and an input once for its member.");
     }
 
     internal string Element(string elementId, string vendorName, Vendor vendor)

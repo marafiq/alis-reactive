@@ -15,6 +15,10 @@ public sealed class AdmissionsController : Controller
 
     public IActionResult LatePrefix() => View(new IntakeForm());
 
+    public IActionResult LatePrefixRead() => View(new IntakeForm());
+
+    public IActionResult ResidentTwice() => View(new IntakeForm());
+
     public IActionResult TaggedBadge() => View(new BadgeForm());
 
     public IActionResult Allergies() => View(new IntakeForm { Allergies = ["penicillin", "latex"] });

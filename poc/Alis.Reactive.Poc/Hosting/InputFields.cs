@@ -20,9 +20,7 @@ public static class InputFields
     public static InputField<TModel, TValue> InputField<TModel, TValue>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, Expression<Func<TModel, TValue>> member)
 #endif
     {
-        var names = plan.Build.Names;
-        names.RefuseAPrefixTakenLate(html.ViewData.TemplateInfo.HtmlFieldPrefix, member);
-        return new InputField<TModel, TValue>(plan, html, member, names.Of(member));
+        return new InputField<TModel, TValue>(plan, html, member, plan.Build.Names.Of(member));
     }
 }
 
