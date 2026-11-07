@@ -35,7 +35,7 @@ internal static class Trigger
         var declaration = new TComponent();
         var raised = select(declaration);
         var objectId = build.Element(elementId, declaration.Vendor.Name, declaration.Vendor.Grammar);
-        var args = JsObject.Bound<TArgs>(new Binding(new RefExpression(PlanBuild.PayloadName), build, ReadPresence.Required));
+        var args = JsObject.Bound<TArgs>(new Binding(new RefExpression(PlanBuild.PayloadName), build, ReadPresence.Required, new ArgumentsAt(new RefExpression(PlanBuild.ArgumentsName))));
         var pipeline = new Pipeline(build);
         var body = build.HandlerBlock(() => run(args, pipeline));
         build.Add(new Handler(objectId, [], raised.Name, payload, ReadPresence.Required, Policy.Overlap, body), declaration.Vendor.Grammar.Listen);

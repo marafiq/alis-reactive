@@ -2158,8 +2158,9 @@ grammar gains no node (G2).
   `[]`, so a vendor that raises it with no argument runs its handler. The handler carries both, the path and its
   presence, and the runtime writes neither. A payload declaration reads the argument at a position with
   `Argument<T>(n)` and calls the function the vendor hands over at a position with `MethodAt(n, [..])`, as
-  `arguments[n](..)` calls it in JavaScript; the handler binds the listener's arguments beside the payload. Either
-  door on a declaration that is not an event's payload is refused where the view renders (X17.18).
+  `arguments[n](..)` calls it in JavaScript; the handler binds the listener's arguments beside the payload. A
+  callback's arguments read the arguments the vendor calls it with the same way (D17.12). Either door on any other
+  declaration is refused where the view renders (X17.18).
 - D17.5 A declaration follows its vendor's public contract, and the build checks it:
   - A member is declared only when the vendor's type declarations make it public. A `@private` member is a gap to
     name, and public members compose what it would do.
@@ -2198,9 +2199,12 @@ grammar gains no node (G2).
   which reads the run's own signal (Q11, Q19).
 - D17.12 A callback the vendor calls for an answer (a label formatter, a comparer, a predicate) is declared as a
   property or an argument whose value is a function, `Callback<TArgs, TResult>`, and a view writes the answer as an
-  expression over the callback's arguments: `chart.TickLabel.Set(tick => tick.Label)`. The plan writes a `fn` as
-  the value; the browser assigns or passes the function, and each call evaluates its body with the arguments bound
-  and returns the result to the vendor in its turn. A method that takes a callback declares the argument with
+  expression over the callback's arguments: `chart.TickLabel.Set(tick => tick.Label)`. The arguments' declaration is
+  the first argument the vendor passes and reads the others by position with `Argument<T>(n)`, as an event's
+  payload does (D17.4): a value accessor called with a field and a row reads the row at position 1. The plan writes
+  an `answer` as the value, a function whose body reads the list of arguments it is called with by the name the plan
+  gives. The browser assigns or passes the function, and each call evaluates its body with that list bound and
+  returns the result to the vendor in its turn. A method that takes a callback declares the argument with
   `Answer(key)`, so `chart.SortTicks(tick => tick.Doses)` passes the function the same way. A body is an expression
   with no steps: a step written inside it is refused where the view renders, and so is an awaited read, since the
   body cannot wait. A method's result read in a body is its call, run on each call of the body (D5.11). A body
@@ -2287,8 +2291,9 @@ plans (Q19).
   which holds one listener, so a second handler would replace the first. Write both pipelines in one handler."
 - `X17.17` behavior (D17.3): a call bell whose event is a callback property runs its handler with the ring's room,
   and a ward feed whose subscribe method returns its unsubscriber runs its handler with the update's message.
-- `X17.18` refusal (D17.4): an argument at a position read on a declaration that is not an event's payload: "An
-  argument at a position is what an event's listener receives: declare it on the event's payload."
+- `X17.18` refusal (D17.4): an argument at a position read on a declaration that is neither an event's payload nor a
+  callback's arguments: "An argument at a position is what a listener or a callback receives: declare it on an
+  event's payload or a callback's arguments."
 - `X17.15` behavior (D4.8, D17.4): an event declared with a payload that its vendor raises with no argument stops
   before its first step, and the vendor goes on after its listeners; an event declared with none runs its handler.
 - `X17.14` behavior: a vendor's label callback shows, for each label, the text the view's expression answers.
@@ -2300,6 +2305,8 @@ plans (Q19).
   before its next step, and the vendor keeps what it drew before.
 - `X17.22` behavior (D17.12): an answer that stops when the vendor asks in its own turn fails the vendor's call,
   and the vendor keeps what it drew before.
+- `X17.23` behavior (D17.4, D17.12): a value accessor's answer reads the row its vendor passes at position 1, and the
+  chart shows each row's label as its value.
 
 ## Q18. Type knowledge without reflection
 
@@ -2438,8 +2445,8 @@ shapes, starts and the payload kind of each event.
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
   `spec/NOTES.md`).
-- D19.2 The set is closed at 42 kinds: today's 33, and `stop`, `file`, `each`, `signal`, `stream`, `clock`, `zone`,
-  `off` and `on`. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+- D19.2 The set is closed at 49 kinds: today's 33, and `stop`, `listen`, `data`, `start`, `nothing`, `unbound`,
+  `signal`, `answer`, `file`, `each`, `returned`, `stream`, `clock`, `zone`, `off` and `on`. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case.
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).

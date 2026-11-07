@@ -25,6 +25,8 @@ export function evaluate(expression: Expression, context: Context): Read {
       return invoke(expression, context);
     case "fn":
       return value(callable(expression.params, expression.body, context));
+    case "answer":
+      return value(answer(expression.arguments, expression.body, context));
     case "op":
       return operate(expression, (argument) => evaluate(argument, context), context.plan.culture);
     default:
@@ -105,6 +107,14 @@ function callable(params: readonly string[], body: Expression, context: Context)
     const scope = new Map(context.scope);
     params.forEach((name, position) => scope.set(name, position < args.length ? value(args[position]) : nothing));
     return heldOrNull(evaluate(body, { ...context, scope }));
+  };
+}
+
+function answer(argumentsName: string, body: Expression, context: Context): (...args: unknown[]) => unknown {
+  return (...args: unknown[]) => {
+    const called = new Map(context.scope);
+    called.set(argumentsName, value(args));
+    return heldOrNull(evaluate(body, { ...context, scope: called }));
   };
 }
 

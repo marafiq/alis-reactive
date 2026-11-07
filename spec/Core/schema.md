@@ -211,7 +211,8 @@ and in the blocks inside it, and nowhere else.
 | `data` | `path`: a list of `DataStep` | `target`: an expression | a typed read of data (D4.2): at each step a holder that holds null or reads nothing reads nothing; a holder that is not an object, or that lacks a name of the step's `requires`, stops the pipeline; a member the holder lacks reads the step's `absent`; a member it holds reads on, and a promise stops the pipeline (D4.3) |
 | `as` | | `expr`: an expression; `shape`: a shape that converts | the one conversion by `spec/Core/conversions.md` (D3.2, D3.4); a value the shape cannot hold reads nothing (D3.3) |
 | `call` | `path`; `members`: `required`, `optional` or `requiredIfHeld`, as `get` reads them | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3) |
-| `fn` | `params`: names | `body`: an expression | a function whose parameters are bound in its body; as a value set or passed, the function a vendor calls, which answers its body's value, and throws a stop its body raises to the vendor's call (D17.12) |
+| `fn` | `params`: names | `body`: an expression | a function the framework calls, whose parameters are bound in its body: a list operation's item read, a sort's comparison, a vendor's locate |
+| `answer` | `arguments`: a name | `body`: an expression | the function a vendor calls for an answer, set into a property or passed as an argument: each call binds the list of its arguments to the name and answers its body's value, and a stop its body raises is thrown to the vendor's call (D17.12) |
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
 | `list` | | `items`: expressions | a list built from sources (N7.2) |
 | `op` | `op`: an operator | `args`: expressions | the operator over its arguments; `and`, `or` and `cond` evaluate a term only when it is reached (D4.7); a comparison over an argument that reads nothing reads nothing, null compares as .NET's lifted operators compare it, and `not`, `and` and `or` are SQL's three-valued logic with nothing as its unknown (D8.9) |
@@ -321,6 +322,7 @@ proposed column says `added`.
 | absence | nothing | absent | added | the absence switch of the data read in `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D4.2 |
 | absence | unbound | absent | added | the absence switch of the data read in `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D4.2 |
 | expression | signal | absent | added | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D17.11 |
+| expression | answer | absent | added | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D17.12 |
 | shape | string | `Alis.Reactive.Assets/runtime/grammar/shape.ts:17`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:34` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.6 |
 | shape | number | `Alis.Reactive.Assets/runtime/grammar/shape.ts:18`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:36` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.11 |
 | shape | boolean | `Alis.Reactive.Assets/runtime/grammar/shape.ts:19`, `Alis.Reactive.Assets/runtime/grammar/shape.ts:37` | kept | the conversion switch of `Alis.Reactive.Assets/runtime/grammar/shape.ts` | D3.6 |
@@ -347,7 +349,7 @@ proposed column says `added`.
 | trace | off | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 | trace | on | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 
-Today 33 kinds, proposed 44: eleven added, none removed.
+Today 33 kinds, proposed 49: sixteen added, none removed.
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses
@@ -364,7 +366,8 @@ The diff beyond the kinds, each with the decision that makes it:
 - every `IReadOnlyList<string>` path, and `InputBinding.body`'s `BodyStep`, become path steps (N1.1);
 - `Handler` gains `payload`, a path into the listener's arguments (D17.4), and `policy` (N11.1);
 - `Vendor.objectPath` becomes `Vendor.locate`, a `fn` of the element (D17.3, N17.6);
-- `fn` is a value wherever a value goes, set into a property or passed as an argument (D17.12);
+- `answer` is the function a vendor calls for an answer, a value wherever a value goes, set into a property or
+  passed as an argument (D17.12);
 - `Vendor.payload` leaves (D17.4);
 - `InputBinding` gains `message` (D16.13), and `shape` and `list` leave into `value` (N3.3);
 - `FormPluginData.fields` becomes `registrations`, and `FormField`'s `items` and `value` functions leave (D16.14);

@@ -14,6 +14,8 @@ public sealed class DoseChart : Component
 
     public Callback<ChartTick, string> TickLabel => Callback<ChartTick, string>();
 
+    public Callback<TickValue, string> ValueAccessor => Callback<TickValue, string>();
+
     public void SortTicks(Func<ChartTick, TypedSource<int>> key) => Method([Answer(key)]);
 
     public MethodResult<string> Unit() => Method<string>();
@@ -27,6 +29,15 @@ public sealed class ChartTick : JsObject
 
     public ReadOnly<int> Doses => ReadOnly<int>();
 }
+
+public sealed class TickValue : JsObject
+{
+    public ReadOnly<string> Field => Argument<string>(0);
+
+    public ReadOnly<TickData> Tick => Argument<TickData>(1);
+}
+
+public sealed record TickData(string Label, int Doses);
 
 public static class DoseChartHtml
 {

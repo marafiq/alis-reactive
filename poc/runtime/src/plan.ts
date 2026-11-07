@@ -2,6 +2,12 @@ export type JsonValue = string | number | boolean | null | readonly JsonValue[] 
 
 export type Absence = StartAbsence | NothingAbsence | UnboundAbsence;
 
+export interface AnswerExpression {
+  readonly kind: "answer";
+  readonly arguments: string;
+  readonly body: Expression;
+}
+
 export interface AssignmentListening {
   readonly kind: "assignment";
 }
@@ -38,7 +44,7 @@ export interface ElementLocator {
   readonly vendor: string;
 }
 
-export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | DataExpression | CallExpression | FnExpression | OperatorExpression;
+export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | DataExpression | CallExpression | FnExpression | AnswerExpression | OperatorExpression;
 
 export interface FnExpression {
   readonly kind: "fn";

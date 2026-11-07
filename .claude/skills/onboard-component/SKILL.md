@@ -52,7 +52,7 @@ A vendor's name is unique on a page, and an element holds one component.
 | a method that returns an object with members | `ReturnedObject<T>`, `ReturnedObjects<T>` |
 | a method that returns a promise | `MethodAsync`, `MethodAsync<T>` |
 | an event | `Event`, or `Event<T>` when its listener receives a payload |
-| a listener's arguments by position | `Argument<T>` and `MethodAt`, on the payload's class |
+| a listener's or a callback's arguments by position | `Argument<T>` and `MethodAt`, on the payload's or the arguments' class |
 | a function it calls for a value | `Callback<TArgs, TResult>` as a property, `Answer` as a method's argument |
 
 A parameter is `Arg<T>`, so a view passes a literal or any source of `T`. `Fixed` passes a value the declaration
@@ -68,6 +68,7 @@ public AlarmPatient Patient => LiveObject<AlarmPatient>();
 public ReadOnly<string> Query => Argument<string>(0);
 public Callback<ChartTick, string> TickLabel => Callback<ChartTick, string>();
 public void SortTicks(Func<ChartTick, TypedSource<int>> key) => Method([Answer(key)]);
+public ReadOnly<TickData> Tick => Argument<TickData>(1);
 ```
 
 ## Decide what the API leaves open

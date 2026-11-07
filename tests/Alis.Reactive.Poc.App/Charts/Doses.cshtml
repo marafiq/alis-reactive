@@ -18,6 +18,10 @@
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<DoseChart>("chart").TickLabel.Set(tick => pipeline.Component<NativeTextBox>("unit").Value)))
 
+@(plan.Button("value-by-label", "Show each tick's label as its value")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<DoseChart>("chart").ValueAccessor.Set(value => value.Tick.Read(tick => tick.Label))))
+
 @(plan.Button("sort", "Sort the ticks by doses")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<DoseChart>("chart").SortTicks(tick => tick.Doses)))

@@ -9,15 +9,19 @@ interface Tick {
 
 type TickLabel = (tick: Tick, position: number) => unknown;
 
+type ValueAccessor = (field: "doses", tick: Tick) => unknown;
+
 export class DoseChart {
   readonly #count: HTMLParagraphElement;
   readonly #labels: HTMLParagraphElement;
+  readonly #values: HTMLParagraphElement;
   #ticks: readonly Tick[] = [
     { label: "Mon", doses: 8 },
     { label: "Tue", doses: 5 },
     { label: "Wed", doses: 6 },
   ];
   #tickLabel: TickLabel = (_tick, position) => position + 1;
+  #valueAccessor: ValueAccessor = (field, tick) => tick[field];
   #unit = "mg";
 
   constructor(host: HTMLElement) {
@@ -25,9 +29,12 @@ export class DoseChart {
     this.#count.className = "chart-count";
     this.#labels = document.createElement("p");
     this.#labels.className = "chart-labels";
+    this.#values = document.createElement("p");
+    this.#values.className = "chart-values";
     host.replaceChildren(
       this.#count,
       this.#labels,
+      this.#values,
       button("Redraw the chart", () => this.#draw()),
       button("Use millilitres", () => {
         this.#unit = "ml";
@@ -50,6 +57,15 @@ export class DoseChart {
     this.#draw();
   }
 
+  get valueAccessor(): ValueAccessor {
+    return this.#valueAccessor;
+  }
+
+  set valueAccessor(accessor: ValueAccessor) {
+    this.#valueAccessor = accessor;
+    this.#draw();
+  }
+
   sortTicks(key: (tick: Tick) => number): void {
     this.#ticks = [...this.#ticks].sort((first, second) => key(first) - key(second));
     this.#draw();
@@ -66,6 +82,7 @@ export class DoseChart {
   #draw(): void {
     this.#count.textContent = String(this.#ticks.length) + " ticks";
     this.#labels.textContent = this.#ticks.map((tick, position) => String(this.#tickLabel(tick, position))).join(", ");
+    this.#values.textContent = this.#ticks.map((tick) => String(this.#valueAccessor("doses", tick))).join(", ");
   }
 }
 

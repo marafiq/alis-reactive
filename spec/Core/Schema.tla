@@ -9,7 +9,7 @@ Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARea
 ASSUME Mutant \in Mutants
 
 StatementKinds == {"set", "do", "let", "if", "all", "try", "stop", "listen"}
-ExpressionKinds == {"lit", "obj", "ref", "get", "data", "as", "call", "fn", "record", "list", "op", "signal"}
+ExpressionKinds == {"lit", "obj", "ref", "get", "data", "as", "call", "fn", "answer", "record", "list", "op", "signal"}
 AbsenceKinds == {"start", "nothing", "unbound"}
 ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", "array", "nullable", "object"}
 PathStepKinds == {"each"}

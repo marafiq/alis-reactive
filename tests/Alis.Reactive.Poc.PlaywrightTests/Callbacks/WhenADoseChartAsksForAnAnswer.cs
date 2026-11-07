@@ -41,6 +41,17 @@ public sealed class WhenADoseChartAsksForAnAnswer : AppPageTest
     }
 
     [Test]
+    public async Task an_answer_reads_the_argument_its_vendor_passes_at_a_position()
+    {
+        await Open("/Charts/Doses");
+        await Expect(Page.Locator("#chart .chart-values")).ToHaveTextAsync("8, 5, 6");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Show each tick's label as its value" }).ClickAsync();
+
+        await Expect(Page.Locator("#chart .chart-values")).ToHaveTextAsync("Mon, Tue, Wed");
+    }
+
+    [Test]
     public async Task an_answer_passed_as_an_argument_is_the_key_the_chart_sorts_by()
     {
         await Open("/Charts/Doses");

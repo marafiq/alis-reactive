@@ -9,15 +9,47 @@ using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Components;
 
+internal abstract class Arguments
+{
+    private protected Arguments()
+    {
+    }
+}
+
+internal sealed class NoArguments : Arguments
+{
+    private NoArguments()
+    {
+    }
+
+    internal static NoArguments Instance { get; } = new();
+}
+
+internal sealed class ArgumentsAt : Arguments
+{
+    internal ArgumentsAt(Expression list)
+    {
+        List = list;
+    }
+
+    internal Expression List { get; }
+}
+
 internal sealed class Binding
 {
     private readonly Expression _target;
 
     internal Binding(Expression target, PlanBuild build, ReadPresence members)
+        : this(target, build, members, NoArguments.Instance)
+    {
+    }
+
+    internal Binding(Expression target, PlanBuild build, ReadPresence members, Arguments arguments)
     {
         _target = target;
         Build = build;
         Members = members;
+        Arguments = arguments;
     }
 
     internal Expression Target => Build.InScope(_target);
@@ -25,6 +57,8 @@ internal sealed class Binding
     internal PlanBuild Build { get; }
 
     internal ReadPresence Members { get; }
+
+    internal Arguments Arguments { get; }
 }
 
 internal sealed class ListenerArgumentsOf : JsObject
@@ -141,17 +175,12 @@ public abstract class JsObject
         where TArgs : JsObject, new()
         => new(JavaScriptName(name, declaredBy));
 
-    private ListenerArgumentsOf ListenerArguments()
+    private ListenerArgumentsOf ListenerArguments() => Binding.Arguments switch
     {
-        var declaresAPayload = Binding.Target is RefExpression { Name: PlanBuild.PayloadName };
-        if (!declaresAPayload)
-        {
-            throw new InvalidOperationException(
-                "An argument at a position is what an event's listener receives: declare it on the event's payload.");
-        }
-
-        return Bound<ListenerArgumentsOf>(new Binding(new RefExpression(PlanBuild.ArgumentsName), Binding.Build, ReadPresence.Required));
-    }
+        ArgumentsAt arguments => Bound<ListenerArgumentsOf>(new Binding(arguments.List, Binding.Build, ReadPresence.Required)),
+        _ => throw new InvalidOperationException(
+            "An argument at a position is what a listener or a callback receives: declare it on an event's payload or a callback's arguments."),
+    };
 
     private static PathStep ArgumentStep(int position)
     {

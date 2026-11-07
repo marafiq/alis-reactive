@@ -87,14 +87,15 @@ public sealed class Callback<TArgs, TResult>
 
 internal static class Answers
 {
-    internal static FnExpression Of<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer, PlanBuild build)
+    internal static AnswerExpression Of<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer, PlanBuild build)
         where TArgs : JsObject, new()
     {
-        var name = build.ItemName();
-        var args = JsObject.Bound<TArgs>(new Binding(new RefExpression(name), build, ReadPresence.Required));
+        var list = new RefExpression(build.AnswerArgumentsName());
+        var first = new GetExpression(list, [PathStep.Index(0)], ReadPresence.Required);
+        var args = JsObject.Bound<TArgs>(new Binding(first, build, ReadPresence.Required, new ArgumentsAt(list)));
         var body = build.Answering(() => answer(args))
             ?? throw new ArgumentException("A callback's answer reads its arguments, such as tick => tick.Label.", nameof(answer));
-        return new FnExpression([name], body.Expression);
+        return new AnswerExpression(list.Name, body.Expression);
     }
 }
 

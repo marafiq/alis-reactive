@@ -30,6 +30,6 @@ public sealed class WhenAMedicineIsSearched : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Signals/ArgumentOfAComponent");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: An argument at a position is what an event's listener receives: declare it on the event's payload.");
+            "InvalidOperationException: An argument at a position is what a listener or a callback receives: declare it on an event's payload or a callback's arguments.");
     }
 }

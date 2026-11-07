@@ -23,6 +23,7 @@ internal sealed class PlanBuild
     private int _results;
     private int _readingItems;
     private int _answering;
+    private int _answers;
     private bool _handlerAwaited;
 
     internal PlanBuild(string planId, JsonSerializerOptions values)
@@ -92,6 +93,8 @@ internal sealed class PlanBuild
     }
 
     internal string ItemName() => "item" + (++_items).ToString(CultureInfo.InvariantCulture);
+
+    internal string AnswerArgumentsName() => ArgumentsName + (++_answers).ToString(CultureInfo.InvariantCulture);
 
     internal Expression Result(CallExpression call)
     {

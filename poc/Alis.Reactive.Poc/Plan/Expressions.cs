@@ -12,6 +12,7 @@ namespace Alis.Reactive.Plan;
 [JsonDerivedType(typeof(DataExpression), "data")]
 [JsonDerivedType(typeof(CallExpression), "call")]
 [JsonDerivedType(typeof(FnExpression), "fn")]
+[JsonDerivedType(typeof(AnswerExpression), "answer")]
 [JsonDerivedType(typeof(OperatorExpression), "op")]
 internal abstract class Expression
 {
@@ -107,6 +108,19 @@ internal sealed class FnExpression : Expression
     }
 
     public IReadOnlyList<string> Params { get; }
+
+    public Expression Body { get; }
+}
+
+internal sealed class AnswerExpression : Expression
+{
+    internal AnswerExpression(string arguments, Expression body)
+    {
+        Arguments = arguments;
+        Body = body;
+    }
+
+    public string Arguments { get; }
 
     public Expression Body { get; }
 }
