@@ -3,6 +3,7 @@ import { DutyRoster, DutyRosterV2, type DutyRosterHost } from "./DutyRoster/duty
 import { CurrentInfusionPump, OlderInfusionPump, type InfusionPumpHost } from "./InfusionPump/infusion-pump";
 import { MedicationCart, type MedicationCartHost } from "./MedicationCart/medication-cart";
 import { VitalsMonitor, type VitalsMonitorHost } from "./VitalsMonitor/vitals-monitor";
+import { CallBell, WardFeed, mountBedBoard, type CallBellHost, type WardFeedHost } from "./WardSignals/ward-signals";
 import { NurseStation, StationCensus, type NurseStationHost, type StationCensusHost } from "./NurseStation/nurse-station";
 
 for (const host of document.querySelectorAll<CareBoardHost>("[data-careboard]")) {
@@ -31,4 +32,16 @@ for (const host of document.querySelectorAll<InfusionPumpHost>("[data-infusion-p
 
 for (const host of document.querySelectorAll<VitalsMonitorHost>("[data-vitals-monitor]")) {
   host.monitor = new VitalsMonitor(host, host.dataset["vitalsMonitor"] === "older");
+}
+
+for (const host of document.querySelectorAll<CallBellHost>("[data-call-bell]")) {
+  host.bell = new CallBell(host);
+}
+
+for (const host of document.querySelectorAll<WardFeedHost>("[data-ward-feed]")) {
+  host.feed = new WardFeed(host);
+}
+
+for (const host of document.querySelectorAll<HTMLElement>("[data-bed-board]")) {
+  mountBedBoard(host);
 }

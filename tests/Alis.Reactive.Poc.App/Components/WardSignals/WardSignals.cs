@@ -1,0 +1,67 @@
+using Alis.Reactive.Components;
+using Alis.Reactive.Hosting;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Alis.Reactive.Poc.App.Components;
+
+public sealed class CallBell : Component
+{
+    public static ComponentVendor BellVendor { get; } = ComponentVendor.DefineCallbackProperties("callbell", objectPath: "bell");
+
+    public override ComponentVendor Vendor => BellVendor;
+
+    public Event<BellRing> Ring => Event<BellRing>(name: "onring");
+}
+
+public sealed class BellRing : JsObject
+{
+    public ReadOnly<string> Room => ReadOnly<string>();
+}
+
+public sealed class WardFeed : Component
+{
+    public static ComponentVendor FeedVendor { get; } = ComponentVendor.DefineReturnedUnsubscriber("wardfeed", objectPath: "feed", subscribe: "subscribe");
+
+    public override ComponentVendor Vendor => FeedVendor;
+
+    public Event<FeedUpdate> Update => Event<FeedUpdate>();
+}
+
+public sealed class FeedUpdate : JsObject
+{
+    public ReadOnly<string> Message => ReadOnly<string>();
+}
+
+public sealed class BedBoard : Component
+{
+    public override ComponentVendor Vendor => ComponentVendor.Native;
+
+    public Event<BedAssigned> Assigned => Event<BedAssigned>(name: "bed-assigned");
+}
+
+public sealed class BedAssigned : JsObject
+{
+    public ReadOnly<BedDetail?> Detail => ReadOnly<BedDetail?>();
+}
+
+public sealed record BedDetail(string Bed);
+
+public static class WardSignalsHtml
+{
+    public static Rendered<CallBell> CallBell<TModel>(this ReactivePlan<TModel> plan, string id)
+        => plan.Render<CallBell>(id, Host(id, "data-call-bell"));
+
+    public static Rendered<WardFeed> WardFeed<TModel>(this ReactivePlan<TModel> plan, string id)
+        => plan.Render<WardFeed>(id, Host(id, "data-ward-feed"));
+
+    public static Rendered<BedBoard> BedBoard<TModel>(this ReactivePlan<TModel> plan, string id)
+        => plan.Render<BedBoard>(id, Host(id, "data-bed-board"));
+
+    private static TagBuilder Host(string id, string marker)
+    {
+        var host = new TagBuilder("section");
+        host.Attributes["id"] = id;
+        host.Attributes[marker] = "";
+        return host;
+    }
+}

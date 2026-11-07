@@ -149,7 +149,17 @@ internal sealed class PlanBuild
         return elementId;
     }
 
-    internal void Add(Handler handler) => _handlers.Add(handler);
+    internal void Add(Handler handler, Listening listening)
+    {
+        var heldByOneProperty = listening is AssignmentListening && _handlers.Exists(held => held.On == handler.On && held.Event == handler.Event);
+        if (heldByOneProperty)
+        {
+            throw new InvalidOperationException(
+                $"'{handler.Event}' is a callback property, which holds one listener, so a second handler would replace the first. Write both pipelines in one handler.");
+        }
+
+        _handlers.Add(handler);
+    }
 
     internal PlanDocument Document() => new(PlanId, new PlanCulture(CollationOf(Culture)), _vendors, _objects, _handlers);
 

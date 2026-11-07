@@ -1,0 +1,29 @@
+@using Alis.Reactive.Poc.App.Signals
+@model SignalsPage
+@{
+    ViewData["Title"] = "Ward signals";
+    var plan = Html.ReactivePlan<SignalsPage>();
+}
+<h1>Ward signals</h1>
+
+<p>Room: <span id="room">unread</span></p>
+<p>Update: <span id="update">unread</span></p>
+<p>Bed: <span id="bed">unread</span></p>
+<p>Assignment: <span id="assignment">waiting</span></p>
+
+@(plan.CallBell("bell")
+    .Reactive(bell => bell.Ring, (ring, pipeline) =>
+        pipeline.Element("room").Text.Set(ring.Room)))
+
+@(plan.WardFeed("feed")
+    .Reactive(feed => feed.Update, (update, pipeline) =>
+        pipeline.Element("update").Text.Set(update.Message)))
+
+@(plan.BedBoard("board")
+    .Reactive(board => board.Assigned, (assigned, pipeline) =>
+    {
+        pipeline.Element("bed").Text.Set(assigned.Detail.Read(detail => detail!.Bed));
+        pipeline.Element("assignment").Text.Set("Assigned");
+    }))
+
+@Html.RenderPlan(plan)

@@ -32,6 +32,12 @@ public sealed class ComponentVendor
     public static ComponentVendor Define(string name, string objectPath, string subscribe, string unsubscribe)
         => new(VendorName(name), new Vendor(AtPath(objectPath), new MethodListening(JavaScriptName(subscribe), JavaScriptName(unsubscribe))));
 
+    public static ComponentVendor DefineCallbackProperties(string name, string objectPath)
+        => new(VendorName(name), new Vendor(AtPath(objectPath), new AssignmentListening()));
+
+    public static ComponentVendor DefineReturnedUnsubscriber(string name, string objectPath, string subscribe)
+        => new(VendorName(name), new Vendor(AtPath(objectPath), new ReturnedListening(JavaScriptName(subscribe))));
+
     public override string ToString() => Name;
 
     private static FnExpression AtPath(string objectPath)

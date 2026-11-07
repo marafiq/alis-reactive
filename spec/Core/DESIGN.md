@@ -2137,7 +2137,11 @@ grammar gains no node (G2).
     reads no global by name;
   - how a listener subscribes, one of three: a subscribe and unsubscribe method pair; a property the driver
     assigns the listener to, its previous value put back at release; a subscribe method that returns the
-    function that removes the listener (`const off = store.subscribe(listener)`), which release calls;
+    function that removes the listener (`const off = store.subscribe(listener)`), which release calls. A property
+    holds one listener, so a second handler of the same object's callback property is refused where the view renders
+    (X17.16); the first would be replaced without a word. The doors are `ComponentVendor.Define(name, objectPath,
+    subscribe, unsubscribe)`, `ComponentVendor.DefineCallbackProperties(name, objectPath)` and
+    `ComponentVendor.DefineReturnedUnsubscriber(name, objectPath, subscribe)` (N17.7);
   - what a listener receives (D17.4).
 
   An object is found when a step reaches it and when a handler subscribes; a component constructed on
@@ -2268,6 +2272,10 @@ plans (Q19).
   with the page's items, and the component shows them.
 - `X17.13` refusal: an awaited read inside a callback's answer is refused where the view renders with "A callback
   answers its vendor at once, so its answer cannot wait for an async method or a request."
+- `X17.16` refusal (D17.3): a second handler of one object's callback property: "'{event}' is a callback property,
+  which holds one listener, so a second handler would replace the first. Write both pipelines in one handler."
+- `X17.17` behavior (D17.3): a call bell whose event is a callback property runs its handler with the ring's room,
+  and a ward feed whose subscribe method returns its unsubscriber runs its handler with the update's message.
 - `X17.15` behavior (D4.8, D17.4): an event declared with a payload that its vendor raises with no argument stops
   before its first step, and the vendor goes on after its listeners; an event declared with none runs its handler.
 - `X17.14` behavior: a vendor's label callback shows, for each label, the text the view's expression answers.
