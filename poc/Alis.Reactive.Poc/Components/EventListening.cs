@@ -15,6 +15,8 @@ public sealed class EventListening
 
     internal Listening Listen { get; }
 
+    internal static EventListening Of(Listening listen) => new(listen);
+
     public static EventListening Methods(string subscribe, string unsubscribe)
         => new(new MethodListening(JavaScriptNames.Checked(subscribe), JavaScriptNames.Checked(unsubscribe)));
 

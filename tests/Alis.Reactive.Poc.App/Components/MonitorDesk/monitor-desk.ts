@@ -13,7 +13,7 @@ interface DeskAlarm {
 type AlarmListener = (alarm: DeskAlarm) => void;
 
 export class DeskMonitor {
-  readonly element: DeskMonitorHost;
+  element: DeskMonitorHost | null;
   readonly resident: string;
   readonly #listeners = new Set<AlarmListener>();
   readonly #statusLine: HTMLParagraphElement;
@@ -66,18 +66,21 @@ export class DeskMonitor {
   }
 
   destroy(): void {
+    const host = this.element;
     this.#on = false;
-    this.#listeners.clear();
     this.#statusLine.textContent = this.resident + ": switched off";
-    if (this.element.monitor === this) delete this.element.monitor;
+    this.element = null;
+    if (host?.monitor === this) delete host.monitor;
   }
 
   #restart(): void {
+    const host = this.element;
     this.destroy();
-    new DeskMonitor(this.element, true);
+    if (host !== null) new DeskMonitor(host, true);
   }
 
   #sound(): void {
+    if (!this.#on) return;
     for (const listener of [...this.#listeners]) listener({ resident: this.resident });
   }
 }

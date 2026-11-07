@@ -1,4 +1,4 @@
-import type { Handler, Listening, ListenStatement, PathStep, PlanDocument, ReadPresence, Statement } from "./plan";
+import type { Handler, HeldRelease, Listening, ListenStatement, PathStep, PlanDocument, ReadPresence, Release, Statement } from "./plan";
 import { evaluate, walk, type Bound, type Context } from "./evaluate";
 import { execute } from "./execute";
 import { assertNever, Stop, value } from "./read";
@@ -121,6 +121,7 @@ export function listenTo(statement: ListenStatement, context: Context): void {
   const object = raiser.value;
   const heard = heardBy(statement);
   if (heard.has(object)) return;
+  const stillHeld = releaseOf(context, statement.release, object);
   let refused = false;
   const listener: Listener = (...args) => {
     if (!refused) run(context, statement, { payload: statement.payloadName, arguments: statement.argumentsName }, args);
@@ -132,13 +133,37 @@ export function listenTo(statement: ListenStatement, context: Context): void {
     context.owner.holds(() => {
       const living = heldObject.deref();
       const subscribed = heldListener.deref();
-      if (living !== undefined && subscribed !== undefined) unsubscribe(living, subscribed);
+      if (living !== undefined && subscribed !== undefined && stillHeld(living)) unsubscribe(living, subscribed);
     });
     heard.add(object);
   } catch (stopped) {
     refused = true;
     throw stopped;
   }
+}
+
+function releaseOf(context: Context, release: Release, object: object): (living: object) => boolean {
+  switch (release.kind) {
+    case "living":
+      return () => true;
+    case "held": {
+      const element = new WeakRef(elementHolding(object, release));
+      return (living) => {
+        const holder = element.deref();
+        return holder !== undefined && holdsStill(context, holder, release.vendor, living);
+      };
+    }
+    default:
+      return assertNever(release);
+  }
+}
+
+function elementHolding(object: object, release: HeldRelease): HTMLElement {
+  const read = walk(value(object), release.element, "required");
+  if (read.kind === "nothing" || !(read.value instanceof HTMLElement)) {
+    throw new Stop("The object of the vendor '" + release.vendor + "' holds no element where its vendor names it.");
+  }
+  return read.value;
 }
 
 function heardBy(statement: ListenStatement): WeakSet<object> {

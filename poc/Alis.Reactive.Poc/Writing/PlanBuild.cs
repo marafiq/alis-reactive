@@ -336,23 +336,28 @@ internal sealed class PlanBuild
             $"The plan renders the element '{elementId}' twice, and a page holds one element for an id: render each component once, and an input once for its member.");
     }
 
-    internal string Element(string elementId, string vendorName, Vendor vendor)
+    internal void Uses(string vendorName, Vendor vendor)
     {
         if (_vendors.TryGetValue(vendorName, out var known) && !ReferenceEquals(known, vendor))
         {
             throw new InvalidOperationException($"Two vendors are named '{vendorName}' on one page. A vendor's name is unique among the page's vendors.");
         }
 
+        _vendors[vendorName] = vendor;
+        foreach (var lookup in vendor.Lookups) _objects[PluginKey(lookup.Name)] = lookup;
+    }
+
+    internal string Element(string elementId, string vendorName, Vendor vendor)
+    {
+        Uses(vendorName, vendor);
         if (_vendorOfElement.TryGetValue(elementId, out var holder) && holder != vendorName)
         {
             throw new InvalidOperationException(
                 $"The element '{elementId}' is declared with the vendor '{holder}' and with '{vendorName}'. An element holds one component.");
         }
 
-        _vendors[vendorName] = vendor;
         _vendorOfElement[elementId] = vendorName;
         _objects[elementId] = new ElementLocator(elementId, vendorName);
-        foreach (var lookup in vendor.Lookups) _objects[PluginKey(lookup.Name)] = lookup;
         return elementId;
     }
 

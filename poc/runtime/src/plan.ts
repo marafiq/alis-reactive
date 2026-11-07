@@ -86,6 +86,12 @@ export interface Handler {
   readonly do: readonly Statement[];
 }
 
+export interface HeldRelease {
+  readonly kind: "held";
+  readonly vendor: string;
+  readonly element: readonly PathStep[];
+}
+
 export type HttpMethod = "GET";
 
 export type HttpOutcome = "success" | "status" | "network" | "redirect" | "kind";
@@ -129,6 +135,7 @@ export interface ListenStatement {
   readonly object: Expression;
   readonly event: string;
   readonly listen: Listening;
+  readonly release: Release;
   readonly payload: readonly PathStep[];
   readonly members: ReadPresence;
   readonly policy: Policy;
@@ -142,6 +149,10 @@ export type Listening = MethodListening | AssignmentListening | ReturnedListenin
 export interface LiteralExpression {
   readonly kind: "lit";
   readonly value: JsonValue;
+}
+
+export interface LivingRelease {
+  readonly kind: "living";
 }
 
 export type Locator = ElementLocator | PluginLocator;
@@ -211,6 +222,8 @@ export interface RefExpression {
   readonly kind: "ref";
   readonly name: string;
 }
+
+export type Release = LivingRelease | HeldRelease;
 
 export interface ReturnedListening {
   readonly kind: "returned";

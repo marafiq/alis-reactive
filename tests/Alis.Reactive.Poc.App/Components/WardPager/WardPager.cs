@@ -35,10 +35,7 @@ public sealed class PagerPaged : JsObject
 
 public sealed class PagerCall : EventedObject
 {
-    public PagerCall()
-        : base(EventListening.Methods("on", "off"))
-    {
-    }
+    protected override EventListening Listening { get; } = EventListening.Methods("on", "off");
 
     public Event<CallAnswered> Answered => Event<CallAnswered>();
 

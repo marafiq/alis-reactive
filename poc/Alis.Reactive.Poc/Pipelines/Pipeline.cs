@@ -114,13 +114,30 @@ internal static class Trigger
                 "Listen reaches an object its declaration says may hold nothing (optional or nullable). A listen needs its object when the step runs: listen to an object declared present.");
         }
 
+        var release = ReleaseOf(build, source);
         var target = binding.Target;
         var raised = select(source);
         var (payloadName, argumentsName) = build.ListenNames();
         var args = JsObject.Bound<TArgs>(new Binding(new RefExpression(payloadName), build, ReadPresence.Required, new ArgumentsAt(new RefExpression(argumentsName))));
         var pipeline = new Pipeline<TModel>(build);
         var body = build.ListenBlock(payloadName, () => run(args, pipeline));
-        build.Write(new ListenStatement(target, raised.Name, source.Listening.Listen, [PathStep.Index(0)], ReadPresence.Required, Policy.Overlap, payloadName, argumentsName, body));
+        build.Write(new ListenStatement(target, raised.Name, source.Listening.Listen, release, [PathStep.Index(0)], ReadPresence.Required, Policy.Overlap, payloadName, argumentsName, body));
+    }
+
+    private static Release ReleaseOf(PlanBuild build, EventedObject source)
+    {
+        if (source is not Component component) return LivingRelease.Instance;
+        if (source.Binding.Target is ObjectExpression reached)
+        {
+            throw new InvalidOperationException(
+                $"Listen reaches the component on the element '{reached.Id}' by its id. A component a plan renders is heard where it renders, with .Reactive; Listen hears a component an event's payload or a returned object hands over.");
+        }
+
+        var vendor = component.Vendor;
+        var element = vendor.ElementPath ?? throw new InvalidOperationException(
+            $"Listen reaches a component of the vendor '{vendor.Name}', which names no element path, so the listen cannot tell when its host destroys it. Declare where the vendor's object holds its element: ComponentVendor.Define(.., elementPath: \"element\").");
+        build.Uses(vendor.Name, vendor.Grammar);
+        return new HeldRelease(vendor.Name, element);
     }
 
     private static void Handle<TModel, TArgs>(PlanBuild build, string objectId, Listening listening, Event<TArgs> raised, IReadOnlyList<PathStep> payload, Action<TArgs, Pipeline<TModel>> run)

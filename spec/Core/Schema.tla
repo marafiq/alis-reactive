@@ -15,12 +15,13 @@ ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", 
 PathStepKinds == {"each"}
 LocatorKinds == {"element", "plugin"}
 ListeningKinds == {"method", "assignment", "returned"}
+ReleaseKinds == {"living", "held"}
 PluginDataKinds == {"none", "hub", "model", "form", "stream"}
 TimeZoneKinds == {"clock", "zone"}
 TraceKinds == {"off", "on"}
 
 Kinds == StatementKinds \cup ExpressionKinds \cup AbsenceKinds \cup ShapeKinds \cup PathStepKinds \cup LocatorKinds \cup ListeningKinds
-         \cup PluginDataKinds \cup TimeZoneKinds \cup TraceKinds
+         \cup ReleaseKinds \cup PluginDataKinds \cup TimeZoneKinds \cup TraceKinds
 
 Handlers == [k \in Kinds |->
     IF k = "none" THEN {}
@@ -31,6 +32,7 @@ Handlers == [k \in Kinds |->
     ELSE IF k \in PathStepKinds THEN {"formWalk"}
     ELSE IF k \in LocatorKinds THEN {"driverOf"}
     ELSE IF k \in ListeningKinds THEN {"listen"}
+    ELSE IF k \in ReleaseKinds THEN {"release"}
     ELSE IF k \in PluginDataKinds THEN {"namedPlugin"}
     ELSE IF k \in AbsenceKinds THEN {"absent"}
     ELSE IF k \in TimeZoneKinds THEN {"zone"}

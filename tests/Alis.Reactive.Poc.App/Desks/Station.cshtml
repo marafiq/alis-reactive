@@ -1,0 +1,35 @@
+@using Alis.Reactive.Poc.App.Desks
+@model MonitorDeskShift
+@{
+    ViewData["Title"] = "Monitor station";
+    var plan = Html.ReactivePlan<MonitorDeskShift>();
+}
+<h1>Monitor station</h1>
+
+@(plan.DeskMonitor("ada-monitor", "Ada")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note("The station heard an alarm")))
+@plan.DeskMonitor("ben-monitor", "Ben")
+
+<p>Watch: <span id="watch-state">not opened</span></p>
+<p>Last alarm: <span id="alarm-from">none</span></p>
+
+<section id="watch"></section>
+
+@plan.CallLog("calls")
+
+@(plan.Button("open-watch", "Open the watch")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Get("/Desks/Watch").Into("watch");
+        pipeline.Element("watch-state").Text.Set("Watch opened");
+    }))
+
+@(plan.Button("close-watch", "Close the watch")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Unload("watch");
+        pipeline.Element("watch-state").Text.Set("Watch closed");
+    }))
+
+@Html.RenderPlan(plan)

@@ -129,7 +129,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - Chosen within the owner's yes, 2026-11-07, POC 14d: a `listen` block reads the bindings of the blocks around it, and binds
   its payload and arguments under names of its own; a write to the payload of the event around it is refused where the
   view renders, and so is a listen on an object declared optional or nullable. An object whose events a pipeline listens
-  to is an `EventedObject`, which takes its `EventListening` (once named PluginEvents: one name for one concept with two
+  to is an `EventedObject`, which declares its `EventListening` (once named PluginEvents: one name for one concept with two
   holders), so a listen on an object that declares no listening does not compile. The forms are gate 2's.
 - Chosen within the owner's yes, 2026-11-07, POC 14e: D12.9 follows D14.6, since D14.1 refuses a record shared by the
   views of a response: a plan that sets the text or HTML of its own slot is refused where the view renders, and across
@@ -140,6 +140,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   setter takes a write whenever the step runs, so D11.4's refusals (after an awaited step, and inside a `listen`) do
   not apply to it. The meaning is keyed on the declaration, never on the expression's shape; every other payload is
   refused as before.
+- Chosen within the owner's yes, 2026-11-07, POC 15b-iii: a `Component` is an `EventedObject`, whose listening is its
+  vendor's; an `EventedObject` declares its `EventListening` by overriding its listening (14d took it in the
+  constructor), so neither holds a nullable. A listen on a component a payload hands over is removed at release only
+  while the element it held when it listened still holds it at the vendor's object path, the rule a handler's release
+  follows; the vendor names where its object holds its element with an element path. Refused where the view renders: a
+  listen on a component reached by its element's id, and on one whose vendor names no element path. Whether a listen on
+  a component reached by id becomes the door a slot's plan lacks for a page component (14a-i's gate 1 flag (3)) is
+  the owner's.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

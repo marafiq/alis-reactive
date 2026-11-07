@@ -101,5 +101,17 @@ public sealed class WhenADeskHandsOverAMonitor : AppPageTest
         await Expect(Page.Locator("#ada-monitor .desk-monitor-status")).ToHaveTextAsync("Ada: idle");
     }
 
+    [Test]
+    public async Task a_component_the_payload_is_takes_a_write_inside_a_listen()
+    {
+        await Open("/Desks/Alarms");
+        await Click("Pick ada-monitor");
+
+        await Click("Sound Ada's monitor");
+
+        await Expect(Page.Locator("#ada-monitor .desk-monitor-status")).ToHaveTextAsync("Ada: alarmed");
+        await Expect(Page.Locator("#ben-monitor .desk-monitor-status")).ToHaveTextAsync("Ben: idle");
+    }
+
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();
 }

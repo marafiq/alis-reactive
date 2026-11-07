@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Desks
+@model MonitorDeskShift
+@{
+    ViewData["Title"] = "Monitor alarms";
+    var plan = Html.ReactivePlan<MonitorDeskShift>();
+}
+<h1>Monitor alarms</h1>
+
+@plan.DeskMonitor("ada-monitor", "Ada")
+@plan.DeskMonitor("ben-monitor", "Ben")
+
+@(plan.MonitorDesk("desk", ["ada-monitor", "ben-monitor"])
+    .Reactive(desk => desk.Picked, (monitor, pipeline) =>
+        pipeline.Listen(monitor, picked => picked.Alarm, (alarm, heard) => monitor.Status.Set("alarmed"))))
+
+@Html.RenderPlan(plan)

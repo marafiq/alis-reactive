@@ -87,11 +87,12 @@ internal sealed class IfStatement : Statement
 
 internal sealed class ListenStatement : Statement
 {
-    internal ListenStatement(Expression target, string @event, Listening listen, IReadOnlyList<PathStep> payload, ReadPresence members, Policy policy, string payloadName, string argumentsName, IReadOnlyList<Statement> body)
+    internal ListenStatement(Expression target, string @event, Listening listen, Release release, IReadOnlyList<PathStep> payload, ReadPresence members, Policy policy, string payloadName, string argumentsName, IReadOnlyList<Statement> body)
     {
         Object = target;
         Event = @event;
         Listen = listen;
+        Release = release;
         Payload = payload;
         Members = members;
         Policy = policy;
@@ -105,6 +106,8 @@ internal sealed class ListenStatement : Statement
     public string Event { get; }
 
     public Listening Listen { get; }
+
+    public Release Release { get; }
 
     public IReadOnlyList<PathStep> Payload { get; }
 

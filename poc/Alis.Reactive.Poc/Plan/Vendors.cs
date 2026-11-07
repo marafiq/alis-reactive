@@ -57,6 +57,38 @@ internal sealed class AssignmentListening : Listening
     }
 }
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+[JsonDerivedType(typeof(LivingRelease), "living")]
+[JsonDerivedType(typeof(HeldRelease), "held")]
+internal abstract class Release
+{
+    private protected Release()
+    {
+    }
+}
+
+internal sealed class LivingRelease : Release
+{
+    private LivingRelease()
+    {
+    }
+
+    internal static LivingRelease Instance { get; } = new();
+}
+
+internal sealed class HeldRelease : Release
+{
+    internal HeldRelease(string vendor, IReadOnlyList<PathStep> element)
+    {
+        Vendor = vendor;
+        Element = element;
+    }
+
+    public string Vendor { get; }
+
+    public IReadOnlyList<PathStep> Element { get; }
+}
+
 internal sealed class ReturnedListening : Listening
 {
     internal ReturnedListening(string subscribe)

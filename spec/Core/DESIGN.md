@@ -1769,10 +1769,19 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     whatever the pipeline around it awaited;
   - is refused where the view renders on an object declared optional or nullable: a listen needs its object when
     the step runs;
+  - on a component an event's payload is or holds, is removed at release only while the element the component held
+    when the step listened still holds it at the vendor's object path, D12.5's rule: the vendor names where its object
+    holds its element (D17.3), the step reads that element when it listens and holds it weakly beside the object and
+    the listener, and a host that destroyed or restarted the component took the listener with it. A vendor whose
+    destroy clears the element (Chart.js nulls its canvas) changes nothing, since the release never reads it again;
+  - is refused where the view renders on a component reached by its element's id, whose events are heard where it
+    renders, with `.Reactive`; and on a component whose vendor names no element path, since its release could not
+    tell a destroyed component from a living one;
   - stops the pipeline the step is in when its object lacks a listening member (a subscribe or an unsubscribe, or a
     returned subscribe gives back no remover), as a member a declaration names must be there; the listener a
     returned subscribe added runs nothing, as a handler's does (D17.3).
-  The object's declaration carries its listening, a vendor's listening kind (D17.3), as a plugin's does.
+  The object's declaration carries its listening, a vendor's listening kind (D17.3), as a plugin's does: an
+  `EventedObject` declares its `EventListening`, and a component, an `EventedObject` too, has its vendor's.
   Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
   mutant: one listener per object, gone at its owner's release, and nothing called on a collected object. The
   first two are X12.9 and X12.10; the third is a garbage collector's timing, which no browser test arranges.
@@ -2461,7 +2470,11 @@ grammar gains no node (G2).
     (X17.16); the first would be replaced without a word. The doors are `ComponentVendor.Define(name, objectPath,
     subscribe, unsubscribe)`, `ComponentVendor.DefineCallbackProperties(name, objectPath)` and
     `ComponentVendor.DefineReturnedUnsubscriber(name, objectPath, subscribe)` (N17.7);
-  - what a listener receives (D17.4).
+  - what a listener receives (D17.4);
+  - where the object holds its element, a path from the object (`elementPath:` on each door, `element` for EJ2's
+    components, empty for the element itself), which a listen on a component a payload hands over reads to tell when
+    its host destroyed it (D12.8). A vendor that names none is a whole vendor: its components are reached by id and
+    heard with `.Reactive`, and only a `Listen` on one is refused.
 
   An object is found when a step reaches it and when a handler subscribes; a component constructed on
   `alis:mount` is subscribed once it is (Q12). The runtime names no vendor. The core knows the DOM's `EventTarget` as the platform's own vendor, and no

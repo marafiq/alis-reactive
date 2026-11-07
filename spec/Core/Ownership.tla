@@ -5,7 +5,7 @@ CONSTANT Mutant
 
 Mutants == {"none", "ReleaseOnlyLoadedSlot", "LoadKeepsOldListeners", "BootContentUnderPage", "RegistrationPerLoadOnPage",
             "ReloadSkipsRegistration", "ReleaseLeavesRules", "FirstReleaseStopsHub", "ReleaseKeepsOffer", "UnsubscribeDestroyed",
-            "ListenTwice", "ListenSurvivesRelease", "RemoveOnCollected"}
+            "ListenTwice", "ListenSurvivesRelease", "RemoveOnCollected", "RemoveOnDestroyed"}
 
 ASSUME Mutant \in Mutants
 
@@ -15,12 +15,12 @@ Owners == {"page"} \cup Slots
 MaxLoads == 2
 
 VARIABLES live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
-          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew
+          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone
 
 vars == <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
-          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew>>
+          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone>>
 
-listens == <<listenOn, listenGen, alive, listenThrew>>
+listens == <<listenOn, listenGen, alive, listenThrew, gone, listenOffGone>>
 
 HasField(content) == content \in {"boot", "card"}
 
@@ -48,6 +48,8 @@ Init ==
     /\ listenGen = [o \in Objects |-> 0]
     /\ alive = Objects
     /\ listenThrew = FALSE
+    /\ gone = {}
+    /\ listenOffGone = FALSE
 
 KeepsB == Mutant = "ReleaseOnlyLoadedSlot"
 
@@ -63,9 +65,10 @@ ReleaseA ==
     /\ threw' = (threw \/ (Mutant = "UnsubscribeDestroyed" /\ destroyed /\ live["a"]))
     /\ releasedDestroyed' = (releasedDestroyed \/ (destroyed /\ live["a"]))
     /\ listenThrew' = (listenThrew \/ (Mutant = "RemoveOnCollected" /\ \E o \in Objects : listenOn[o] > 0 /\ o \notin alive))
+    /\ listenOffGone' = (listenOffGone \/ (Mutant = "RemoveOnDestroyed" /\ \E o \in Objects : listenOn[o] > 0 /\ o \in alive /\ o \in gone))
     /\ listenOn' = IF Mutant = "ListenSurvivesRelease" THEN listenOn ELSE [o \in Objects |-> 0]
     /\ listenGen' = IF Mutant = "ListenSurvivesRelease" THEN listenGen ELSE [o \in Objects |-> 0]
-    /\ UNCHANGED alive
+    /\ UNCHANGED <<alive, gone>>
 
 LoadA ==
     /\ aLoads < MaxLoads
@@ -155,19 +158,27 @@ ListenA(o) ==
     /\ live["a"]
     /\ aContent # "empty"
     /\ o \in alive
+    /\ o \notin gone
     /\ IF Mutant = "ListenTwice" THEN listenOn[o] < 2 ELSE listenOn[o] = 0
     /\ listenOn' = [listenOn EXCEPT ![o] = @ + 1]
     /\ listenGen' = [listenGen EXCEPT ![o] = aGen]
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
-                   destroyed, threw, releasedDestroyed, alive, listenThrew>>
+                   destroyed, threw, releasedDestroyed, alive, listenThrew, gone, listenOffGone>>
 
 Collect(o) ==
     /\ o \in alive
     /\ alive' = alive \ {o}
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
-                   destroyed, threw, releasedDestroyed, listenOn, listenGen, listenThrew>>
+                   destroyed, threw, releasedDestroyed, listenOn, listenGen, listenThrew, gone, listenOffGone>>
 
-Next == LoadA \/ UnloadA \/ LoadB \/ UnloadB \/ HostDestroys \/ ServerHangsUp \/ Retry \/ \E o \in Objects : ListenA(o) \/ Collect(o)
+HostDestroysListened(o) ==
+    /\ o \in alive
+    /\ o \notin gone
+    /\ gone' = gone \cup {o}
+    /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
+                   destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, listenOffGone>>
+
+Next == LoadA \/ UnloadA \/ LoadB \/ UnloadB \/ HostDestroys \/ ServerHangsUp \/ Retry \/ \E o \in Objects : ListenA(o) \/ Collect(o) \/ HostDestroysListened(o)
 
 Spec == Init /\ [][Next]_vars
 
@@ -196,6 +207,8 @@ ListenLeavesWithItsOwner == \A o \in Objects : listenOn[o] > 0 => (live["a"] /\ 
 
 NoRemoveOnCollected == ~listenThrew
 
+NoRemoveOnDestroyedListened == ~listenOffGone
+
 ReachNestedReleased == ~(bLoads > 0 /\ ~live["b"] /\ aLoads = MaxLoads)
 
 ReachDestroyedThenReleased == ~(releasedDestroyed /\ live["a"])
@@ -205,5 +218,7 @@ ReachSharedHubOneReleased == ~(live["a"] /\ aContent = "card" /\ ~live["b"] /\ b
 ReachEachObjectListened == ~(\A o \in Objects : listenOn[o] = 1)
 
 ReachCollectedWhileListened == ~(\E o \in Objects : listenOn[o] = 1 /\ o \notin alive)
+
+ReachDestroyedWhileListened == ~(\E o \in Objects : listenOn[o] = 1 /\ o \in alive /\ o \in gone)
 
 ====
