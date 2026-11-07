@@ -19,6 +19,13 @@ public sealed class Request
     {
         _build = build;
         var (path, search) = RequestUrls.Split(url);
+        var placeholder = RequestUrls.Pieces(path, nameof(url)).FirstOrDefault(piece => piece.Placeholder);
+        if (placeholder is not null)
+        {
+            throw new ArgumentException(
+                $"The URL '{url}' has the placeholder {placeholder.Text}, which a request that sets no members cannot fill; take the placeholder out of the URL.", nameof(url));
+        }
+
         var send = new HttpSend(HttpMethod.Get, [new TextPart(path)], search, [], BodyKind.Html);
         var argument = new LiteralExpression(JsonSerializer.SerializeToElement(send, PlanJson.Options));
         _response = build.AwaitedResult(new CallExpression(new ObjectExpression(build.Http()), [PathStep.Member("send")], ReadPresence.Required, [argument]));
@@ -40,7 +47,7 @@ public sealed class Request
         _build.When(succeeded, () => _build.Write(load));
     }
 
-    private GetExpression Member(string name) => new(_response, [PathStep.Member(PlanJson.Options.PropertyNamingPolicy!.ConvertName(name))], ReadPresence.Required);
+    private GetExpression Member(string name) => new(_response, [PathStep.Member(PlanJson.Name(name))], ReadPresence.Required);
 }
 
 internal static class Slots
@@ -217,14 +224,17 @@ public sealed class SentRequest<TModel>
         var parts = pieces.Select(piece => piece.Placeholder ? ValuePart(piece.Text, set.Members, build) : TextPart(piece.Text, build)).ToList<Plan.Expression>();
         var query = set.Members
             .Where(member => !placeholders.Any(placeholder => string.Equals(placeholder.Text, member.Name, StringComparison.OrdinalIgnoreCase)))
-            .Select(member => Record(("name", Literal.Of(member.Name, build)), ("value", member.Value), ("whenNothing", Literal.Of(WhenNothing.Empty.Text, build))))
+            .Select(member => Record(
+                (nameof(QueryField.Name), Literal.Of(member.Name, build)),
+                (nameof(QueryField.Value), member.Value),
+                (nameof(QueryField.WhenNothing), Literal.Of(WhenNothing.Empty.Text, build))))
             .ToList<Plan.Expression>();
         var send = Record(
-            ("method", Literal.Of(HttpMethod.Get.Text, build)),
-            ("path", new ListExpression(parts)),
-            ("search", Literal.Of(search, build)),
-            ("query", new ListExpression(query)),
-            ("success", Literal.Of(BodyKind.Json.Text, build)));
+            (nameof(HttpSend.Method), Literal.Of(HttpMethod.Get.Text, build)),
+            (nameof(HttpSend.Path), new ListExpression(parts)),
+            (nameof(HttpSend.Search), Literal.Of(search, build)),
+            (nameof(HttpSend.Query), new ListExpression(query)),
+            (nameof(HttpSend.Success), Literal.Of(BodyKind.Json.Text, build)));
         var response = build.AwaitedResult(new CallExpression(new ObjectExpression(build.Http()), [PathStep.Member("send")], ReadPresence.Required, [send]));
         return new SentRequest<TModel>(build, response);
     }
@@ -232,14 +242,19 @@ public sealed class SentRequest<TModel>
     private static RecordExpression ValuePart(string placeholder, IReadOnlyList<SentMember> members, PlanBuild build)
     {
         var member = members.First(each => string.Equals(each.Name, placeholder, StringComparison.OrdinalIgnoreCase));
-        return Record(("kind", Literal.Of("value", build)), ("name", Literal.Of(member.Name, build)), ("value", member.Value));
+        return Kind(PathPart.ValueKind, (nameof(Plan.ValuePart.Name), Literal.Of(member.Name, build)), (nameof(Plan.ValuePart.Value), member.Value));
     }
 
     private static RecordExpression TextPart(string text, PlanBuild build)
-        => Record(("kind", Literal.Of("text", build)), ("text", Literal.Of(text, build)));
+        => Kind(PathPart.TextKind, (nameof(Plan.TextPart.Text), Literal.Of(text, build)));
 
-    private static RecordExpression Record(params (string Name, Plan.Expression Value)[] fields)
-        => new([.. fields.Select(field => new RecordField(field.Name, field.Value))]);
+    private static RecordExpression Kind(string kind, params (string Member, Plan.Expression Value)[] fields)
+        => new([new RecordField(PathPart.Discriminator, new LiteralExpression(JsonSerializer.SerializeToElement(kind))), .. Fields(fields)]);
+
+    private static RecordExpression Record(params (string Member, Plan.Expression Value)[] fields) => new(Fields(fields));
+
+    private static List<RecordField> Fields((string Member, Plan.Expression Value)[] fields)
+        => [.. fields.Select(field => new RecordField(PlanJson.Name(field.Member), field.Value))];
 }
 
 public sealed class Routes<TModel>
@@ -285,7 +300,7 @@ public sealed class Routes<TModel>
         if (_success is { } success) arms.Add((Outcome(HttpOutcome.Success), success));
         foreach (var (status, steps) in _errors)
         {
-            arms.Add((new OperatorExpression(Operator.And, [Outcome(HttpOutcome.Status), new OperatorExpression(Operator.Eq, [Member("status"), Literal.Of(status, _build)])]), steps));
+            arms.Add((new OperatorExpression(Operator.And, [Outcome(HttpOutcome.Status), new OperatorExpression(Operator.Eq, [Member(nameof(HttpResponse.Status)), Literal.Of(status, _build)])]), steps));
         }
 
         var successIsRouted = _success is not null;
@@ -296,14 +311,14 @@ public sealed class Routes<TModel>
         if (successIsRouted && _otherwise is { } otherwise) _build.Else(branching, otherwise);
     }
 
-    private ResponseBody<TBody> Body<TBody>() => new(Member("body"), _build);
+    private ResponseBody<TBody> Body<TBody>() => new(Member(nameof(HttpResponse.Body)), _build);
 
     private OperatorExpression Outcome(HttpOutcome outcome) => Outcome(Operator.Eq, outcome);
 
     private OperatorExpression Outcome(Operator compared, HttpOutcome outcome)
-        => new(compared, [Member("outcome"), Literal.Of(outcome.Text, _build)]);
+        => new(compared, [Member(nameof(HttpResponse.Outcome)), Literal.Of(outcome.Text, _build)]);
 
-    private GetExpression Member(string name) => new(_response, [PathStep.Member(name)], ReadPresence.Required);
+    private GetExpression Member(string name) => new(_response, [PathStep.Member(PlanJson.Name(name))], ReadPresence.Required);
 }
 
 public sealed class ResponseBody<TBody> : TypedSource<TBody>

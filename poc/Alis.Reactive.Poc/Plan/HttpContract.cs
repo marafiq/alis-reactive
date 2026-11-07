@@ -26,11 +26,15 @@ internal sealed class HttpSend
     public BodyKind Success { get; }
 }
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
-[JsonDerivedType(typeof(TextPart), "text")]
-[JsonDerivedType(typeof(ValuePart), "value")]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator)]
+[JsonDerivedType(typeof(TextPart), TextKind)]
+[JsonDerivedType(typeof(ValuePart), ValueKind)]
 internal abstract class PathPart
 {
+    internal const string Discriminator = "kind";
+    internal const string TextKind = "text";
+    internal const string ValueKind = "value";
+
     private protected PathPart()
     {
     }

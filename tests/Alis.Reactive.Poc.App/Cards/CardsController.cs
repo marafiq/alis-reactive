@@ -14,6 +14,12 @@ public sealed class CardsController : Controller
 
     public IActionResult RelativeUrl() => View(new CardsWard());
 
+    public IActionResult FragmentUrl() => View(new CardsWard());
+
+    public IActionResult PlaceholderUrl() => View(new CardsWard());
+
+    public IActionResult UnpairedBraceUrl() => View(new CardsWard());
+
     public IActionResult IntoAfterAStep() => View(new CardsWard());
 
     public IActionResult IntoTwice() => View(new CardsWard());

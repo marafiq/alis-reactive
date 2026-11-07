@@ -13,6 +13,33 @@ public sealed class WhenACardRequestIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_url_with_a_fragment_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Cards/FragmentUrl");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: The URL '/Cards/Card?resident=Ada%20Byron#notes' holds a fragment, which a request does not send. (Parameter 'url')");
+    }
+
+    [Test]
+    public async Task a_placeholder_in_the_url_of_a_request_that_sets_no_members_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Cards/PlaceholderUrl");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: The URL '/Cards/Card/{resident}' has the placeholder resident, which a request that sets no members cannot fill; take the placeholder out of the URL. (Parameter 'url')");
+    }
+
+    [Test]
+    public async Task a_brace_without_its_pair_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Cards/UnpairedBraceUrl");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: The URL '/Cards/Card/{resident' holds a brace without its pair; a placeholder is a member's name in braces, as {name}. (Parameter 'url')");
+    }
+
+    [Test]
     public async Task an_into_written_after_another_step_is_refused_where_the_view_renders()
     {
         await Page.GotoAsync(BaseUrl + "/Cards/IntoAfterAStep");

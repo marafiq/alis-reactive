@@ -18,9 +18,19 @@ public sealed class ResidentsController : Controller
         "Annex" => StatusCode(StatusCodes.Status500InternalServerError),
         "East" => Content("{\"name\": \"" + query.Name + "\", \"room\": \"12\"}", "text/plain"),
         "North" => Content("{\"name\": \"" + query.Name, "application/json"),
+        "Respite" => Content("", "application/json"),
+        "Basement" => Dropped(),
+        "Moved" => Redirect("http://" + OtherHost() + ":" + Request.Host.Port + "/Residents/Elsewhere/" + Uri.EscapeDataString(query.Name)),
         "West" => new ContentResult { StatusCode = StatusCodes.Status404NotFound, ContentType = "text/plain", Content = "{\"reason\": \"" + query.Name + " is not on the West register\"}" },
         _ => Answer(query),
     };
+
+    [HttpGet("/Residents/Elsewhere/{name}")]
+    public IActionResult Elsewhere(string name)
+    {
+        Response.Headers.AccessControlAllowOrigin = "*";
+        return Answer(new ResidentQuery { Name = name, Ward = "Moved" });
+    }
 
     [HttpGet("/Residents/Register/{ward}")]
     public IActionResult Register(WardQuery query)
@@ -47,6 +57,14 @@ public sealed class ResidentsController : Controller
     public IActionResult StatusNotAnError() => View(new ResidentLookup());
 
     public IActionResult CatchAllTwice() => View(new ResidentLookup());
+
+    private EmptyResult Dropped()
+    {
+        HttpContext.Abort();
+        return new EmptyResult();
+    }
+
+    private string OtherHost() => Request.Host.Host == "localhost" ? "127.0.0.1" : "localhost";
 
     private IActionResult Answer(ResidentQuery query)
     {

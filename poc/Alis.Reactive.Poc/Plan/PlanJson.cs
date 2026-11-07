@@ -12,4 +12,6 @@ internal static class PlanJson
     };
 
     internal static string Write(PlanDocument document) => JsonSerializer.Serialize(document, Options);
+
+    internal static string Name(string member) => Options.PropertyNamingPolicy!.ConvertName(member);
 }

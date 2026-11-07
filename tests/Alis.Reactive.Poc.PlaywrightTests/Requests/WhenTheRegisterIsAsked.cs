@@ -159,6 +159,40 @@ public sealed class WhenTheRegisterIsAsked : AppPageTest
     }
 
     [Test]
+    public async Task an_empty_answer_runs_the_success_route_reading_nothing()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Respite");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#lookup-route")).ToHaveTextAsync("On the register");
+        await Expect(Page.Locator("#room")).ToHaveTextAsync("");
+    }
+
+    [Test]
+    public async Task a_dropped_connection_runs_the_route_for_every_other_outcome()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Basement");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#lookup-status")).ToHaveTextAsync("The register could not answer");
+    }
+
+    [Test]
+    public async Task an_answer_redirected_to_another_origin_runs_the_route_for_every_other_outcome()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Moved");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#lookup-status")).ToHaveTextAsync("The register could not answer");
+    }
+
+    [Test]
     public async Task an_empty_name_sends_no_request()
     {
         await Open("/Residents/Lookup");
