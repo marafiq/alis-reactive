@@ -17,28 +17,28 @@ public static class DataLists
         => Over<TItem, int>(list, (items, _) => ListForms.Length(items));
 
     public static TypedSource<int> Count<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
-        => Over<TItem, int>(list, (items, build) => ListForms.Length(ListForms.Filter(items, ItemRead(build, predicate, nameof(predicate)))));
+        => Over<TItem, int>(list, (items, build) => ListForms.Length(ListForms.Filter(items, ItemRead(build, predicate, nameof(predicate), LambdaUse.Computes))));
 
     public static TypedSource<IReadOnlyList<TItem>> Where<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> keep)
-        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListForms.Filter(items, ItemRead(build, keep, nameof(keep))));
+        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListForms.Filter(items, ItemRead(build, keep, nameof(keep), LambdaUse.Computes)));
 
     public static TypedSource<IReadOnlyList<TResult>> Select<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TResult>> field)
-        => Over<TItem, IReadOnlyList<TResult>>(list, (items, build) => ListForms.Map(items, ItemRead(build, field, nameof(field))));
+        => Over<TItem, IReadOnlyList<TResult>>(list, (items, build) => ListForms.Map(items, ItemRead(build, field, nameof(field), LambdaUse.Takes)));
 
     public static TypedSource<bool> Any<TItem>(this ITypedSource<IEnumerable<TItem>> list)
         => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ListForms.EveryItem(build.ItemName())));
 
     public static TypedSource<bool> Any<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
-        => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ItemRead(build, predicate, nameof(predicate))));
+        => Over<TItem, bool>(list, (items, build) => ListForms.Some(items, ItemRead(build, predicate, nameof(predicate), LambdaUse.Computes)));
 
     public static TypedSource<bool> All<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
-        => Over<TItem, bool>(list, (items, build) => ListForms.Every(items, ItemRead(build, predicate, nameof(predicate))));
+        => Over<TItem, bool>(list, (items, build) => ListForms.Every(items, ItemRead(build, predicate, nameof(predicate), LambdaUse.Computes)));
 
     public static TypedSource<TItem> Find<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate)
-        => Over<TItem, TItem>(list, (items, build) => ListForms.Find(items, ItemRead(build, predicate, nameof(predicate))));
+        => Over<TItem, TItem>(list, (items, build) => ListForms.Find(items, ItemRead(build, predicate, nameof(predicate), LambdaUse.Computes)));
 
     public static TypedSource<TResult> Find<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, bool>> predicate, Expression<Func<TItem, TResult>> field)
-        => Over<TItem, TResult>(list, (items, build) => new DataExpression(ListForms.Find(items, ItemRead(build, predicate, nameof(predicate))), JsonPath.Of(field, build.Starts)));
+        => Over<TItem, TResult>(list, (items, build) => new DataExpression(ListForms.Find(items, ItemRead(build, predicate, nameof(predicate), LambdaUse.Computes)), JsonPath.Of(field, build.Starts, nameof(field))));
 
     public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key)
         => Ordered(list, key, default(TKey), descending: false);
@@ -61,13 +61,13 @@ public static class DataLists
         => OrderedText(list, key, comparer, descending: true);
 
     public static TypedSource<int> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, int>> term)
-        => Over<TItem, int>(list, (items, build) => ListForms.Sum(Operator.SumInt, items, ItemRead(build, term, nameof(term))));
+        => Over<TItem, int>(list, (items, build) => ListForms.Sum(Operator.SumInt, items, ItemRead(build, term, nameof(term), LambdaUse.Computes)));
 
     public static TypedSource<double> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, double>> term)
-        => Over<TItem, double>(list, (items, build) => ListForms.Sum(Operator.SumDouble, items, ItemRead(build, term, nameof(term))));
+        => Over<TItem, double>(list, (items, build) => ListForms.Sum(Operator.SumDouble, items, ItemRead(build, term, nameof(term), LambdaUse.Computes)));
 
     public static TypedSource<decimal> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, decimal>> term)
-        => Over<TItem, decimal>(list, (items, build) => ListForms.Sum(Operator.SumDecimal, items, ItemRead(build, term, nameof(term))));
+        => Over<TItem, decimal>(list, (items, build) => ListForms.Sum(Operator.SumDecimal, items, ItemRead(build, term, nameof(term), LambdaUse.SumsDecimal)));
 
     [Obsolete(TextIsNoList, error: true)]
     public static TypedSource<int> Count(this ITypedSource<string> text) => throw new NotSupportedException(TextIsNoList);
@@ -117,9 +117,9 @@ public static class DataLists
     private static TypedSource<IReadOnlyList<TItem>> OrderedText<TItem>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression key, StringComparer comparer, bool descending)
         => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListOrder.Sorted(items, build, key, ListOrder.TextComparison(key, comparer, build.Culture), descending));
 
-    private static FnExpression ItemRead(PlanBuild build, LambdaExpression read, string argument)
+    private static FnExpression ItemRead(PlanBuild build, LambdaExpression read, string argument, LambdaUse use)
     {
         var item = build.ItemName();
-        return new FnExpression([item], LambdaCondition.Of(read, new RefExpression(item), build.Starts, argument, build.ItemName));
+        return new FnExpression([item], LambdaCondition.Of(read, new RefExpression(item), build.Starts, argument, build.ItemName, use));
     }
 }

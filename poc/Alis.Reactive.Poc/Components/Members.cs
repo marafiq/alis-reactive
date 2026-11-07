@@ -26,7 +26,7 @@ public class ReadOnly<TValue> : TypedSource<TValue>
     internal override PlanBuild Build => Owner.Binding.Build;
 
     public TypedSource<TResult> Read<TResult>(System.Linq.Expressions.Expression<Func<TValue, TResult>> path)
-        => new DataRead<TResult>(new DataExpression(Expression, JsonPath.Of(path, Build.Starts)), Build);
+        => new DataRead<TResult>(new DataExpression(Expression, JsonPath.Of(path, Build.Starts, nameof(path))), Build);
 }
 
 public sealed class Property<TValue> : ReadOnly<TValue>

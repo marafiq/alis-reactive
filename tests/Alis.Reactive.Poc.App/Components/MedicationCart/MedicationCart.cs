@@ -62,11 +62,27 @@ public sealed record MedicationDose(
 
     public DoseBatch? Batch { get; init; }
 
+    public DoseSupply? Supply { get; init; }
+
     public DoseSeal? Seal { get; init; }
 
     public DoseDelivery? Delivery { get; init; }
 
     public string Instruction { get; init; } = "";
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public DoseStatus Charted { get; init; }
+
+    [JsonConverter(typeof(CarerNameConverter))]
+    public Carer? Charter { get; init; }
+}
+
+public sealed class CarerNameConverter : JsonConverter<Carer>
+{
+    public override Carer Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => new(reader.GetString()!);
+
+    public override void Write(Utf8JsonWriter writer, Carer value, JsonSerializerOptions options) => writer.WriteStringValue(value.Name);
 }
 
 public sealed class DoseStore
@@ -92,6 +108,14 @@ public sealed class DoseBatch
     public string? Lot { get; init; }
 
     public string Expiry { get; init; } = "";
+}
+
+[JsonNumberHandling(JsonNumberHandling.WriteAsString)]
+public sealed class DoseSupply
+{
+    public int Vials { get; init; }
+
+    public string Source { get; init; } = "";
 }
 
 public sealed class DoseSeal

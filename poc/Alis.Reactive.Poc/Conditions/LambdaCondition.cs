@@ -9,6 +9,13 @@ using PlanExpression = Alis.Reactive.Plan.Expression;
 
 namespace Alis.Reactive.Conditions;
 
+internal enum LambdaUse
+{
+    Computes,
+    Takes,
+    SumsDecimal,
+}
+
 internal sealed class LambdaCondition : TranslatedMembers.ITranslator
 {
     private static readonly Dictionary<ExpressionType, (Operator Op, bool Orders)> Comparisons = new()
@@ -25,6 +32,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
     private readonly IReadOnlyDictionary<ParameterExpression, PlanExpression> _scope;
     private readonly DataStarts _starts;
     private readonly JsonSerializerOptions _values;
+    private readonly HeldForm _optionsForm;
     private readonly string _argument;
     private readonly Func<string> _itemName;
 
@@ -34,17 +42,27 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         _scope = scope;
         _starts = starts;
         _values = starts.Values;
+        _optionsForm = HeldForm.OfTheOptions(starts.Values);
         _argument = argument;
         _itemName = itemName;
     }
 
-    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, DataStarts starts, string argument, Func<string> itemName)
+    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, DataStarts starts, string argument, Func<string> itemName, LambdaUse use)
     {
         var scope = new Dictionary<ParameterExpression, PlanExpression> { [lambda.Parameters[0]] = item };
-        return new LambdaCondition(lambda, scope, starts, argument, itemName).Term(lambda.Body);
+        var condition = new LambdaCondition(lambda, scope, starts, argument, itemName);
+        var bodyIsAMember = lambda.Body is MemberExpression;
+        return use switch
+        {
+            LambdaUse.Takes when bodyIsAMember => condition.Read(lambda.Body, TakesItsOwnForm),
+            LambdaUse.SumsDecimal when bodyIsAMember => condition.Read(lambda.Body, IsDecimalText),
+            _ => condition.Term(lambda.Body),
+        };
     }
 
-    public PlanExpression Read(LinqExpression operand)
+    public PlanExpression Read(LinqExpression operand) => Read(operand, TakesNoOwnForm);
+
+    private PlanExpression Read(LinqExpression operand, Func<HeldForm, bool> takesItsOwnForm)
     {
         var read = Unconverted(operand);
         if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
@@ -56,8 +74,10 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         if (translated is not null) return translated;
         var root = RootOf(read);
         if (root is null || !_scope.TryGetValue(root, out var holder)) throw TranslatedMembers.NoBrowserForm(read, _argument);
-        var steps = JsonPath.Steps(read, root, _starts, _lambda) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
-        return new DataExpression(holder, steps);
+        var links = JsonPath.Links(read, root, _starts, _lambda, _argument) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
+        var form = HeldForm.Of(links[links.Count - 1], _values);
+        if (form.IsOwn && !takesItsOwnForm(form)) throw ComputesWith(read, form);
+        return new DataExpression(holder, _starts.Steps(links));
     }
 
     public FnExpression Lambda(LambdaExpression inner)
@@ -100,6 +120,8 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         if (ComparedTypes.IsDateOrTime(left.Type) || ComparedTypes.IsDateOrTime(right.Type)) throw Refused(comparison, "compares dates or times, whose text neither orders nor equals as the instant does; compare them on the server.");
         if (leftReadsTheItem && rightReadsTheItem)
         {
+            RequireNoOwnForm(comparison, left);
+            RequireNoOwnForm(comparison, right);
             RequireComparableMembers(comparison, left, right, orders);
             return Op(op, Term(left), Term(right));
         }
@@ -109,10 +131,35 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         var held = leftReadsTheItem ? right : left;
         var heldSide = leftReadsTheItem ? comparison.Right : comparison.Left;
         var compilerFoldedTheConstant = IsConverted(memberSide) && !IsConverted(heldSide);
-        var written = Written(ViewValues.Of(held, _argument), compilerFoldedTheConstant ? member.Type : held.Type);
+        var writtenAs = compilerFoldedTheConstant ? member.Type : held.Type;
+        var form = FormOf(member);
+        if (form.IsOwn) RequireComparableInItsOwnForm(comparison, member, memberSide, form, orders);
+        var written = form.Write(Held(ViewValues.Of(held, _argument), writtenAs), writtenAs);
         RequireComparableValue(comparison, written, member.Type, orders);
         var literal = new LiteralExpression(written);
-        return leftReadsTheItem ? Op(op, Term(member), literal) : Op(op, literal, Term(member));
+        var memberRead = form.IsOwn ? Read(member, TakesItsOwnForm) : Term(member);
+        return leftReadsTheItem ? Op(op, memberRead, literal) : Op(op, literal, memberRead);
+    }
+
+    private HeldForm FormOf(LinqExpression read)
+    {
+        if (read is not MemberExpression member || TranslatedMembers.Translates(member)) return _optionsForm;
+        if (RootOf(read) is not { } root || !_scope.ContainsKey(root)) return _optionsForm;
+        var links = JsonPath.Links(read, root, _starts, _lambda, _argument);
+        return links is null ? _optionsForm : HeldForm.Of(links[links.Count - 1], _values);
+    }
+
+    private void RequireNoOwnForm(BinaryExpression comparison, LinqExpression member)
+    {
+        var form = FormOf(member);
+        if (!form.IsOwn) return;
+        throw Refused(comparison, $"compares two members, and {form.Cause} writes '{ViewValues.Printed(member)}' unlike the app's options, so the browser does not compare them as .NET does; compare them on the server.");
+    }
+
+    private void RequireComparableInItsOwnForm(BinaryExpression comparison, LinqExpression member, LinqExpression memberSide, HeldForm form, bool orders)
+    {
+        if (orders) throw Refused(comparison, $"orders '{ViewValues.Printed(member)}', which {form.Cause} writes unlike the app's options, so the browser does not order it as .NET does; order it on the server.");
+        if (!ComparedTypes.IsScalar(memberSide.Type)) throw Refused(comparison, $"compares '{ViewValues.Printed(member)}', which {form.Cause} writes unlike the app's options, and .NET compares the object it holds; compare it on the server.");
     }
 
     private void RequireComparableMembers(BinaryExpression comparison, LinqExpression left, LinqExpression right, bool orders)
@@ -132,15 +179,15 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
     private void RequireComparableValue(BinaryExpression comparison, JsonElement written, Type member, bool orders)
     {
         if (written.ValueKind is JsonValueKind.Object or JsonValueKind.Array) throw ComparesObjects(comparison);
+        var fractionAsText = written.ValueKind == JsonValueKind.String && ComparedTypes.IsFraction(member);
+        if (fractionAsText) throw Refused(comparison, "compares a fraction the JSON writes as text, whose text neither equals nor orders as the number does, as 0.10 and 0.1; compare it on the server.");
         var orderedAsText = orders && written.ValueKind == JsonValueKind.String && !ComparedTypes.IsChar(member);
         if (orderedAsText) throw Refused(comparison, "orders a value the app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on the server.");
     }
 
-    private JsonElement Written(object? value, Type type)
-    {
-        var held = value is int code && ComparedTypes.IsChar(type) ? Convert.ToChar(code) : value;
-        return JsonSerializer.SerializeToElement(held, _values.GetTypeInfo(type));
-    }
+    private JsonElement Written(object? value, Type type) => _optionsForm.Write(Held(value, type), type);
+
+    private static object? Held(object? value, Type type) => value is int code && ComparedTypes.IsChar(type) ? Convert.ToChar(code) : value;
 
     private LinqExpression Unconverted(LinqExpression node)
     {
@@ -161,10 +208,19 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         return finder.Found;
     }
 
+    private ArgumentException ComputesWith(LinqExpression member, HeldForm form)
+        => new($"'{ViewValues.Printed(member)}' is written by {form.Cause}, unlike the app's options, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.", _argument);
+
     private ArgumentException ComparesObjects(BinaryExpression comparison)
         => Refused(comparison, "compares objects, and the browser compares objects by reference; compare a member of each, such as d => d.Carer.Name == lead.");
 
     private ArgumentException Refused(LinqExpression term, string reason) => new($"'{ViewValues.Printed(term)}' {reason}", _argument);
+
+    private static bool TakesNoOwnForm(HeldForm _) => false;
+
+    private static bool TakesItsOwnForm(HeldForm _) => true;
+
+    private static bool IsDecimalText(HeldForm form) => form.By == HeldBy.ItsNumberHandling;
 
     private static bool IsConverted(LinqExpression side) => side is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked };
 

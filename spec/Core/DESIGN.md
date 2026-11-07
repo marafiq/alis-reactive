@@ -329,7 +329,12 @@ Terms used throughout:
   member is present when the value holds it, other than what every object inherits (`constructor`), with a value
   other than `undefined`. This covers a member of data, data past a declared member (a field of the value a property
   holds, of each item of a list it holds) and the field a find returns. A form's check reads the starts the endpoint
-  that binds its body leaves, by host and format (D16.6); a data read follows the contract of the data.
+  that binds its body leaves, by host and format (D16.6); a data read follows the contract of the data. A member
+  written by its own JSON converter (`[JsonConverter]` on the member) holds what the converter writes, not its
+  members, so a path that reads past it is refused where the view renders (X4.13), in a list's lambda, a `Find`'s
+  field and a member's `Read`; a converter on the member's type writes no members a read can name, and is refused as
+  a member the options do not write. A start is written as its member is written, in the member's own form (D6.12),
+  so a `Charted` omitted at `Due` starts "Due" where its own converter writes "Due" and the app's options "due".
 - D4.3 A read that yields a promise where a value is declared stops the pipeline. A method declared
   `MethodAsync` is awaited, and its settled value is its result. A rejected promise stops the pipeline. A
   `MethodAsync` whose vendor returns a value that is not a promise is awaited as that value, since the declaration
@@ -420,6 +425,9 @@ Terms used throughout:
 - `X4.12` refusal (D4.3, D5.11): an async method's result read inside a list's lambda: "An async method is called
   inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline
   and read its result in the lambda."
+- `X4.13` refusal (D4.2): a path past a member its own converter writes, in a list's lambda and in a `Find`'s field:
+  "'{path}' reads past '{member}', which its own JSON converter writes, so the browser holds what the converter
+  writes, not its members; read '{member}' itself, or read past it on the server."
 - `X4.10` behavior: in an app whose options set `RespectRequiredConstructorParameters`, a dose that lacks a
   constructor parameter (Heparin's omitted `ward`) stops a read through it, and a dose that holds every parameter
   reads the start of a member it lacks, 0 (D4.2).
@@ -617,8 +625,8 @@ Terms used throughout:
   `Sum` as the operator `sumInt`, `sumDouble` or `sumDecimal` over the `map` of its term, one operator over the whole
   list, so a decimal's point is placed once and an int's range is checked at each term. A list that reads nothing
   sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. A `decimal` term is a JSON number or the
-  decimal text the app writes for it (`JsonNumberHandling.WriteAsString` writes 0.10m as "0.10"), added the same way.
-  Any other term, null among them, stops the pipeline, as these three types have no null to add; a term that reads
+  decimal text the app writes for it (`JsonNumberHandling.WriteAsString` writes 0.10m as "0.10"), added the same way;
+  a term its own converter writes, or any other term written unlike the options, is refused (D6.12, X6.39). Any other term, null among them, stops the pipeline, as these three types have no null to add; a term that reads
   nothing, past a holder that holds null, is null in the `map`, so it stops too. A term member the item lacks reads
   its start first (D4.2), so `Sum(d => d.Refills)` adds 0 for a dose the app omitted at 0.
 - D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted` and
@@ -645,7 +653,8 @@ Terms used throughout:
   view holds (D6.7), by closed rules C# checks where the view renders:
   - A value the view holds is written through the app's JSON options as the type of the member it is compared with,
     taken under the conversion the compiler adds to compare an enum or a `char` as its number: `DoseStatus.Due` is
-    "due" when the app writes enums by name, and `'I'` is "I".
+    "due" when the app writes enums by name, and `'I'` is "I". A member written unlike the options is compared in its
+    own form (the last rule).
   - Equality (`==`, `!=`) compares a member with a value written as a JSON scalar or null, or two members of one type
     written as a scalar: a number, text, `bool`, `char`, `Guid` or an enum. A value written as an object or a list is
     refused, and so are two members of a type that is not a scalar: the browser compares objects by reference.
@@ -657,15 +666,32 @@ Terms used throughout:
     Q3's conversions.
   - A cast that narrows (`(int)d.Milligrams`) is refused: it changes the value as C# computes it, and the browser's
     number does not.
-  - A member with a JSON converter or number handling of its own is the contract analyzer's (N18.5, POC 13), which
-    refuses it in a comparison; until that analyzer is built, such a member compares as the app's options write its
-    type.
+  - A fraction (`float`, `double`, `decimal`) written as text is refused in equality as in ordering (X6.43): equal
+    fractions write unequal text (0.10m is "0.10" and 0.1m is "0.1"), and `double.NaN` written "NaN" equals its own
+    text where .NET's NaN equals nothing. A whole number written as text equals as its number does, and is ordered
+    by no rule.
+  - A member written unlike the app's options holds its own form: by its own JSON converter (`[JsonConverter]` on
+    the member, `JsonPropertyInfo.CustomConverter`), or by number handling whose writing bits (`WriteAsString`,
+    `AllowNamedFloatingPointLiterals`) differ from the options', set on the member or on its class, for a number or
+    a list or dictionary of numbers, the members it reaches (chosen within the owner's yes, 2026-11-07, built in
+    POC 13f-ii). C# reads the form from the options' contract where the view renders, with no reflection. A value
+    compared with such a member by `==` or `!=` is written in that form, the options copied with the member's
+    converter first or its number handling set, so `d.Charted == DoseStatus.Given` compares "Given" where the app's
+    options write "given". Equality takes the member only when the compared type is a scalar (X6.41), and the
+    fraction rule above holds for its form. Every other use refuses it, because the browser does not hold the value
+    .NET computes with: an ordering (X6.40), a comparison of two members (X6.42), and any other computation in the
+    lambda, a predicate's bool, a .NET member it is the receiver or the argument of (`charted.Contains(d.Charted)`),
+    `??`, `?:`, an order key (D6.13) and a `Sum` term (D6.11) (X6.39). Two reads take the member as the browser
+    holds it: the whole body of a `Select`, and a `decimal` `Sum`'s term written as decimal text by number handling
+    (D6.11). Outside a list's lambda, a source read from such a member (a member's `Read`, a `Find`'s field, a
+    `Select`'s list) carries no form: POC 13f-iii carries it to the comparisons, sets and gathers that use it.
 - D6.13 `OrderBy(key)` and `OrderByDescending(key)` write `call(list, ["toSorted"], [fn(a, b)])` whose body compares
   the key read from each item, the two items swapped for descending, so items with equal keys keep their list order
   as .NET's stable sort keeps it. C# picks the comparison from the key's type and how the app's JSON writes it, where
   the view renders: a key written as a JSON number compares as numbers (`compareNumbers`), a `bool` puts false first
   (`compareBooleans`), a `char` compares by its code unit (`compareOrdinal`), and null comes first, as
   `Comparer<T>.Default` puts it. A nullable value key binds the overload whose sample is the underlying type's value.
+  A key written unlike the app's options, by its own converter or number handling, is refused (D6.12, X6.39).
   Text with no comparer, or with the comparer of the view's culture (`StringComparer.CurrentCulture`), orders by
   the view's culture (Decision 3, a, the owner, 2026-11-06): `compareCulture`, the browser's `Intl.Collator` under
   the plan's collation (D3.11). It matches .NET 10 on ICU on every word and every BMP character probed outside the
@@ -829,6 +855,28 @@ Terms used throughout:
 - `X6.36` refusal (D6.13): text ordered by the culture under a culture with an alternate sort: "'{key}' orders text by
   the alternate sort '{sort}', which the browser has no tag for; pass StringComparer.Ordinal, or order on the
   server."
+- `X6.39` refusal (D6.12): a member written unlike the app's options, used in a computation of a list's lambda (a
+  sort key, a `Sum` term through a cast, a lookup in a list the view holds): "'{member}' is written by {its own JSON
+  converter, its own JSON number handling, its class's JSON number handling}, unlike the app's options, so the
+  browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."
+- `X6.40` refusal (D6.12): an ordering of a member written unlike the app's options, by its own converter or by its
+  class's number handling: "'{term}' orders '{member}', which {cause} writes unlike the app's options, so the
+  browser does not order it as .NET does; order it on the server."
+- `X6.41` refusal (D6.12): a member of a type that is not a scalar, written by its own converter, compared with a
+  value: "'{term}' compares '{member}', which {cause} writes unlike the app's options, and .NET compares the object
+  it holds; compare it on the server."
+- `X6.42` refusal (D6.12): two members compared where one is written unlike the app's options: "'{term}' compares
+  two members, and {cause} writes '{member}' unlike the app's options, so the browser does not compare them as .NET
+  does; compare them on the server."
+- `X6.43` refusal (D6.12): a fraction the JSON writes as text, compared: "'{term}' compares a fraction the JSON
+  writes as text, whose text neither equals nor orders as the number does, as 0.10 and 0.1; compare it on the
+  server."
+- `X6.44` behavior (D6.12): `d.Charted == DoseStatus.Given` keeps the three doses whose own `JsonStringEnumConverter`
+  writes "Given" where the app writes enums in camel case, and `!=` keeps the other two; `d.Supply.Vials == 2` keeps
+  the one dose whose supply's class writes its numbers as text; that class's text member computes as .NET does
+  (`StartsWith`); `d.Charted == DoseStatus.Due` keeps the two doses that omit `Charted` at its default, read at its
+  start in the converter's form; `Select(d => d.Copay).Sum(copay => copay)` adds the copays as the browser holds
+  them, "0.3".
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 

@@ -55,8 +55,8 @@ internal static class ListOrder
     {
         var left = build.ItemName();
         var right = build.ItemName();
-        var leftKey = LambdaCondition.Of(key, new RefExpression(left), build.Starts, nameof(key), build.ItemName);
-        var rightKey = LambdaCondition.Of(key, new RefExpression(right), build.Starts, nameof(key), build.ItemName);
+        var leftKey = LambdaCondition.Of(key, new RefExpression(left), build.Starts, nameof(key), build.ItemName, LambdaUse.Computes);
+        var rightKey = LambdaCondition.Of(key, new RefExpression(right), build.Starts, nameof(key), build.ItemName, LambdaUse.Computes);
         Plan.Expression[] keys = descending ? [rightKey, leftKey] : [leftKey, rightKey];
         return ListForms.Sorted(items, new FnExpression([left, right], new OperatorExpression(comparison, keys)));
     }

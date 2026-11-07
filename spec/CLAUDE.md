@@ -101,6 +101,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the class that declares it names it, and the class the read starts from must write that name. An override that
   changes either is the analyzer's to refuse at build (N18.5, built in POC 13f as ALIS025) (D18.3). The owner
   approved the solution the same day.
+- Chosen within the owner's yes, 2026-11-07: a member System.Text.Json writes unlike the app's options (its own
+  `[JsonConverter]`, or `[JsonNumberHandling]` on it or its class whose writing bits differ) is held in that form. In
+  a list's lambda, a value compared with it by `==` or `!=` is written in that form, so an enum with its own
+  `JsonStringEnumConverter` compares as it is written; every other computation with it is refused, and a path past
+  its own converter is refused on every data read (D4.2, D6.12, POC 13f-ii). This departs from D6.12's earlier
+  "refuses it in a comparison", because the probe wrote the compared value through the member's form with no
+  reflection. A fraction written as text is refused in equality too: 0.10m and 0.1m write "0.10" and "0.1".
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

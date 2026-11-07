@@ -87,6 +87,8 @@ internal static class TranslatedMembers
         _ => null,
     };
 
+    internal static bool Translates(MemberExpression member) => Table.ContainsKey(Key(member.Member));
+
     internal static ArgumentException NoBrowserForm(LinqExpression term, string argument)
         => new($"'{ViewValues.Printed(term)}' has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.", argument);
 

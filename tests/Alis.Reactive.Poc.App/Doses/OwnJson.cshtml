@@ -1,0 +1,44 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Doses as their own JSON writes them";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Doses as their own JSON writes them</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-charted-given", "Count the doses charted as given")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Charted == DoseStatus.Given))))
+
+@(plan.Button("count-charted-not-given", "Count the doses not charted as given")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Charted != DoseStatus.Given))))
+
+@(plan.Button("count-charted-due", "Count the doses charted as due")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Charted == DoseStatus.Due))))
+
+@(plan.Button("sum-copays-taken-whole", "Sum the copays taken whole")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Charges.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Select(d => d.Copay).Sum(copay => copay))))
+
+@(plan.Button("count-two-vial-supplies", "Count the doses supplied in two vials")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply!.Vials == 2))))
+
+@(plan.Button("count-pharmacy-supplies", "Count the doses the pharmacy supplies")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply!.Source.StartsWith("pharm", StringComparison.Ordinal)))))
+
+@Html.RenderPlan(plan)

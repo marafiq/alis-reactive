@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Alis.Reactive.Conditions;
+namespace Alis.Reactive.Types;
 
 internal static class ComparedTypes
 {
@@ -56,6 +56,8 @@ internal static class ComparedTypes
     }
 
     internal static bool IsNumber(Type type) => WholeNumbers.ContainsKey(type) || Fractions.Contains(type);
+
+    internal static bool IsFraction(Type type) => Fractions.Contains(type);
 
     internal static bool IsScalar(Type type) => IsNumber(type) || Chars.Contains(type) || OtherScalars.Contains(type);
 }

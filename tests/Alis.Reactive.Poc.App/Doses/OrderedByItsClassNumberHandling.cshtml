@@ -1,0 +1,19 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Doses
+@model DoseRoundPage
+@{
+    ViewData["Title"] = "Doses supplied in more than one vial";
+    var plan = Html.ReactivePlan<DoseRoundPage>();
+}
+<h1>Doses supplied in more than one vial</h1>
+
+@plan.MedicationCart("cart", DoseRound.Doses())
+
+@plan.StationCensus("census")
+
+@(plan.Button("count-doses", "Count doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply!.Vials > 1))))
+
+@Html.RenderPlan(plan)

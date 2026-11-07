@@ -68,8 +68,8 @@ internal sealed class DataStarts
             held = link.Member.Get!(held);
         }
 
-        var member = path[path.Count - 1].Member;
-        return new StartAbsence(JsonSerializer.SerializeToElement(held, Values.GetTypeInfo(member.PropertyType)));
+        var last = path[path.Count - 1];
+        return new StartAbsence(HeldForm.Of(last, Values).Write(held, last.Member.PropertyType));
     }
 
     private static JsonSerializerOptions BindingOf(JsonSerializerOptions values)
