@@ -190,6 +190,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   differ under "i", 100 under "iu", among them "s" against U+017F), and the "u" flag reads a negated class by code
   point. The door is both cases spelled ("[Aa]spirin"). The browser's copy carries no flag; its closed set of
   constructs, lookbehind among them, agreed in both engines on every probed input. The owner can overrule it.
+- The owner, 2026-11-07, after the MVC views POC: "go always remember, we are holding quality bar high, developer
+  experience matter". Each door is judged by what a developer types in a real MVC view and what they meet when it
+  goes wrong: a mistake surfaces where the view renders when the framework can see it, and otherwise the browser's
+  error names the member and the cure.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

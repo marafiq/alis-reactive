@@ -16,6 +16,16 @@ public sealed class AdmissionsController : Controller
     public IActionResult LatePrefix() => View(new IntakeForm());
 
     public IActionResult TaggedBadge() => View(new BadgeForm());
+
+    public IActionResult Allergies() => View(new IntakeForm { Allergies = ["penicillin", "latex"] });
+
+    public IActionResult Aids() => View(new IntakeForm { Aids = ["walking frame", "hearing aid"] });
+
+    public IActionResult FirstVisitor() => View(new IntakeForm { Visitors = [new IntakeForm.Kin { Name = "Ada Byron" }] });
+
+    public IActionResult VisitorsByForeach() => View(new IntakeForm { Visitors = [new IntakeForm.Kin { Name = "Ada Byron" }] });
+
+    public IActionResult ShortenedResident() => View(new IntakeForm());
 }
 
 public abstract class AdmissionBase
@@ -29,6 +39,12 @@ public sealed class IntakeForm : AdmissionBase
     public string? Ward { get; set; }
 
     public Kin NextOfKin { get; set; } = new();
+
+    public List<string> Allergies { get; set; } = [];
+
+    public string[] Aids { get; set; } = [];
+
+    public List<Kin> Visitors { get; set; } = [];
 
     public sealed class Kin
     {

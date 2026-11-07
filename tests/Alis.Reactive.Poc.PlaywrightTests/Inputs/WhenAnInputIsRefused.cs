@@ -9,7 +9,34 @@ public sealed class WhenAnInputIsRefused : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Admissions/WholeModel");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: 'm => m' binds no member. An input is bound to a member of the view's model, and its id is scoped by the class that declares it: m => m.Name.");
+            "InvalidOperationException: 'm => m' binds no member of the view's model. An input is bound to a member the model reaches through members, list positions and indexers, as m => m.Contacts[0].Phone.");
+    }
+
+    [Test]
+    public async Task an_input_bound_through_a_method_of_a_list_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Admissions/FirstVisitor");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: 'm => m.Visitors.First().Name' binds no member of the view's model. An input is bound to a member the model reaches through members, list positions and indexers, as m => m.Contacts[0].Phone.");
+    }
+
+    [Test]
+    public async Task an_input_bound_to_a_call_mvc_cannot_name_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Admissions/ShortenedResident");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: 'm => m.ResidentName.Substring(1)' binds no member of the view's model. An input is bound to a member the model reaches through members, list positions and indexers, as m => m.Contacts[0].Phone.");
+    }
+
+    [Test]
+    public async Task an_input_bound_to_a_foreach_item_instead_of_the_model_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Admissions/VisitorsByForeach");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: An input's lambda reads its member from a value the view holds, not from the view's model, as m => visitor.Name over a foreach's item does, so MVC names it by that value and the form posts it under no member: read the member through the model, as m => m.Visitors[i].Name in a for loop.");
     }
 
     [Test]

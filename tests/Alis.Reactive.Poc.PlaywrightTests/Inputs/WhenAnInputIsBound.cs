@@ -36,6 +36,22 @@ public sealed class WhenAnInputIsBound : AppPageTest
     }
 
     [Test]
+    public async Task a_list_item_takes_the_class_that_declares_its_list_and_its_position_in_its_id()
+    {
+        await Open("/Admissions/Allergies");
+
+        await Expect(Page.Locator("#Alis_Reactive_Poc_App_Admissions_IntakeForm__Allergies_0_")).ToHaveValueAsync("penicillin");
+    }
+
+    [Test]
+    public async Task an_array_item_takes_the_class_that_declares_its_array_and_its_position_in_its_id()
+    {
+        await Open("/Admissions/Aids");
+
+        await Expect(Page.Locator("#Alis_Reactive_Poc_App_Admissions_IntakeForm__Aids_1_")).ToHaveValueAsync("hearing aid");
+    }
+
+    [Test]
     public async Task a_saved_form_binds_a_component_under_its_members_name_not_its_json_name()
     {
         await Open("/Admissions/Intake");

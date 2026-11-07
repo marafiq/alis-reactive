@@ -34,10 +34,12 @@ internal sealed class InputNames
 
     internal InputName Of<TModel, TValue>(Expression<Func<TModel, TValue>> member)
     {
-        var declaring = JsonPath.DeclaringClassName(member)
-            ?? throw new InvalidOperationException(
-                $"'{member}' binds no member. An input is bound to a member of the view's model, and its id is scoped by the class that declares it: m => m.Name.");
-        var name = new TemplateInfo { HtmlFieldPrefix = Prefix }.GetFullHtmlFieldName(ExpressionText(member));
+        var text = ExpressionText(member);
+        var bound = MemberTheModelReaches(member);
+        var declaring = bound is null || text.Length == 0 ? null : JsonPath.DeclaringClassName(bound);
+        if (declaring is null) throw Unbound(member);
+
+        var name = new TemplateInfo { HtmlFieldPrefix = Prefix }.GetFullHtmlFieldName(text);
         return new InputName(name, Scope(declaring, member) + "__" + IdFromName(name));
     }
 
@@ -57,6 +59,46 @@ internal sealed class InputNames
 
     private string IdFromName(string name) => _html.GenerateIdFromName(name);
 #endif
+
+    private static InvalidOperationException Unbound(LambdaExpression member)
+    {
+        var parameterUse = new ParameterUse(member.Parameters[0]);
+        parameterUse.Visit(member.Body);
+        if (!parameterUse.Found)
+        {
+            return new InvalidOperationException(
+                "An input's lambda reads its member from a value the view holds, not from the view's model, as m => visitor.Name over a foreach's item does, so MVC names it by that value and the form posts it under no member: read the member through the model, as m => m.Visitors[i].Name in a for loop.");
+        }
+
+        return new InvalidOperationException(
+            $"'{member}' binds no member of the view's model. An input is bound to a member the model reaches through members, list positions and indexers, as m => m.Contacts[0].Phone.");
+    }
+
+    private static MemberExpression? MemberTheModelReaches(LambdaExpression member)
+    {
+        MemberExpression? bound = null;
+        var node = member.Body;
+        while (node != member.Parameters[0])
+        {
+            switch (node)
+            {
+                case MemberExpression { Expression: { } holder } access:
+                    bound ??= access;
+                    node = holder;
+                    break;
+                case MethodCallExpression { Object: { } holder, Arguments.Count: 1 }:
+                    node = holder;
+                    break;
+                case BinaryExpression { NodeType: ExpressionType.ArrayIndex } position:
+                    node = position.Left;
+                    break;
+                default:
+                    return null;
+            }
+        }
+
+        return bound;
+    }
 
     private static string Scope(string declaringClass, LambdaExpression member)
     {
@@ -80,6 +122,17 @@ internal sealed class InputNames
         => character is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9' or '_';
 
     private static string Described(string prefix) => prefix.Length == 0 ? "none" : $"'{prefix}'";
+}
+
+internal sealed class ParameterUse(ParameterExpression parameter) : ExpressionVisitor
+{
+    internal bool Found { get; private set; }
+
+    protected override Expression VisitParameter(ParameterExpression node)
+    {
+        Found |= node == parameter;
+        return node;
+    }
 }
 
 internal sealed class InputName
