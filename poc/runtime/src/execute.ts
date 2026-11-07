@@ -1,4 +1,4 @@
-import type { CallExpression, DoStatement, LetStatement, SetStatement, Statement } from "./plan";
+import type { CallExpression, DoStatement, IfStatement, LetStatement, SetStatement, Statement } from "./plan";
 import { called, evaluate, holderOf, methodName, walk, type Context } from "./evaluate";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 
@@ -7,6 +7,8 @@ export type Run = { readonly kind: "finished" } | { readonly kind: "awaiting"; r
 const finished: Run = { kind: "finished" };
 
 type Awaited = DoStatement | LetStatement;
+
+type Stepped = Exclude<Statement, IfStatement>;
 
 export function execute(statements: readonly Statement[], context: Context): Run {
   let current = context;
@@ -17,9 +19,25 @@ export function execute(statements: readonly Statement[], context: Context): Run
       const settled = settle(statement, before).then((read) => carried(execute(rest, after(statement, before, read))));
       return { kind: "awaiting", settled };
     }
+    if (statement.kind === "if") {
+      const branch = execute(chosen(statement, current), current);
+      if (branch.kind === "finished") continue;
+      const rest = statements.slice(position + 1);
+      const before = current;
+      return { kind: "awaiting", settled: branch.settled.then(() => carried(execute(rest, before))) };
+    }
     current = step(statement, current);
   }
   return finished;
+}
+
+function chosen(statement: IfStatement, context: Context): readonly Statement[] {
+  const arm = statement.arms.find((candidate) => holds(evaluate(candidate.when, context)));
+  return arm === undefined ? statement.else : arm.then;
+}
+
+function holds(read: Read): boolean {
+  return read.kind === "value" && read.value === true;
 }
 
 function awaits(statement: Statement): statement is Awaited {
@@ -48,7 +66,7 @@ function carried(run: Run): Promise<void> {
   return run.kind === "finished" ? Promise.resolve() : run.settled;
 }
 
-function step(statement: Statement, context: Context): Context {
+function step(statement: Stepped, context: Context): Context {
   switch (statement.kind) {
     case "set":
       set(statement, context);

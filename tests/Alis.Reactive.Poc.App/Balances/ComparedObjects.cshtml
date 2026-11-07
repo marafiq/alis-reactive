@@ -1,0 +1,16 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Compared objects";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Compared objects</h1>
+
+@plan.DutyRoster("roster", 2, "Day", "Ruth", "Nurse", null)
+
+@(plan.Button("assess", "Assess the on-call nurse")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.When(pipeline.Component<DutyRoster>("roster").OnCall.Eq(new OnCallNurse("Ruth", new PagerLine("4401"), "North")))
+            .Then(ruth => ruth.Element("assess").Text.Set("Ruth"))))
+
+@Html.RenderPlan(plan)

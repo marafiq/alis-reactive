@@ -1,0 +1,22 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Else after a step";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Else after a step</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict"></span></p>
+
+@(plan.Button("assess", "Assess the intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var branches = pipeline.When(pipeline.Component<FluidBalance>("balance").Intake.Gt(0))
+            .Then(taken => taken.Element("verdict").Text.Set("taken"));
+        pipeline.Element("verdict").Text.Set("assessed");
+        branches.Else(none => none.Element("verdict").Text.Set("none"));
+    }))
+
+@Html.RenderPlan(plan)

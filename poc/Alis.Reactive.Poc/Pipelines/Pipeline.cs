@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Alis.Reactive.Components;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Values;
 using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Pipelines;
@@ -24,6 +25,9 @@ public sealed class Pipeline
         declaration.Bind(new Binding(new ObjectExpression(objectId), Build, ReadPresence.Required));
         return declaration;
     }
+
+    public Guard When(TypedSource<bool> condition)
+        => new(Build, Sources.Of(condition).Expression, Build.When);
 }
 
 internal static class Trigger

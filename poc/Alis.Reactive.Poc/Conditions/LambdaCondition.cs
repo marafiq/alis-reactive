@@ -21,43 +21,6 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         [ExpressionType.GreaterThanOrEqual] = (Operator.Gte, true),
     };
 
-    private static readonly Dictionary<Type, (int Bytes, bool Signed)> WholeNumbers = new()
-    {
-        [typeof(sbyte)] = (1, true),
-        [typeof(sbyte?)] = (1, true),
-        [typeof(byte)] = (1, false),
-        [typeof(byte?)] = (1, false),
-        [typeof(short)] = (2, true),
-        [typeof(short?)] = (2, true),
-        [typeof(ushort)] = (2, false),
-        [typeof(ushort?)] = (2, false),
-        [typeof(int)] = (4, true),
-        [typeof(int?)] = (4, true),
-        [typeof(uint)] = (4, false),
-        [typeof(uint?)] = (4, false),
-        [typeof(long)] = (8, true),
-        [typeof(long?)] = (8, true),
-        [typeof(ulong)] = (8, false),
-        [typeof(ulong?)] = (8, false),
-    };
-
-    private static readonly HashSet<Type> Fractions =
-    [
-        typeof(float), typeof(float?), typeof(double), typeof(double?), typeof(decimal), typeof(decimal?),
-    ];
-
-    private static readonly HashSet<Type> Chars = [typeof(char), typeof(char?)];
-
-    private static readonly HashSet<Type> OtherScalars = [typeof(string), typeof(bool), typeof(bool?), typeof(Guid), typeof(Guid?)];
-
-    private static readonly HashSet<Type> DatesAndTimes =
-    [
-        typeof(DateTime), typeof(DateTime?), typeof(DateTimeOffset), typeof(DateTimeOffset?), typeof(TimeSpan), typeof(TimeSpan?),
-#if NET
-        typeof(DateOnly), typeof(DateOnly?), typeof(TimeOnly), typeof(TimeOnly?),
-#endif
-    ];
-
     private readonly LambdaExpression _lambda;
     private readonly IReadOnlyDictionary<ParameterExpression, PlanExpression> _scope;
     private readonly DataStarts _starts;
@@ -134,7 +97,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         var leftReadsTheItem = ReadsTheItem(left);
         var rightReadsTheItem = ReadsTheItem(right);
         if (!leftReadsTheItem && !rightReadsTheItem) throw ViewValues.Computed(comparison, _argument);
-        if (DatesAndTimes.Contains(left.Type) || DatesAndTimes.Contains(right.Type)) throw Refused(comparison, "compares dates or times, whose text neither orders nor equals as the instant does; compare them on the server.");
+        if (ComparedTypes.IsDateOrTime(left.Type) || ComparedTypes.IsDateOrTime(right.Type)) throw Refused(comparison, "compares dates or times, whose text neither orders nor equals as the instant does; compare them on the server.");
         if (leftReadsTheItem && rightReadsTheItem)
         {
             RequireComparableMembers(comparison, left, right, orders);
@@ -156,26 +119,26 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
     {
         if (orders)
         {
-            var orderable = (IsNumber(left.Type) && IsNumber(right.Type)) || (Chars.Contains(left.Type) && Chars.Contains(right.Type));
+            var orderable = (ComparedTypes.IsNumber(left.Type) && ComparedTypes.IsNumber(right.Type)) || (ComparedTypes.IsChar(left.Type) && ComparedTypes.IsChar(right.Type));
             if (!orderable) throw Refused(comparison, "orders values the browser cannot order as .NET does; order numbers or a char, or order on the server.");
             return;
         }
 
-        var bothScalars = IsScalar(left.Type) && IsScalar(right.Type);
-        var enumsCompared = IsNumber(comparison.Left.Type) && IsConverted(comparison.Left) && IsConverted(comparison.Right) && left.Type == right.Type;
+        var bothScalars = ComparedTypes.IsScalar(left.Type) && ComparedTypes.IsScalar(right.Type);
+        var enumsCompared = ComparedTypes.IsNumber(comparison.Left.Type) && IsConverted(comparison.Left) && IsConverted(comparison.Right) && left.Type == right.Type;
         if (!bothScalars && !enumsCompared) throw ComparesObjects(comparison);
     }
 
     private void RequireComparableValue(BinaryExpression comparison, JsonElement written, Type member, bool orders)
     {
         if (written.ValueKind is JsonValueKind.Object or JsonValueKind.Array) throw ComparesObjects(comparison);
-        var orderedAsText = orders && written.ValueKind == JsonValueKind.String && !Chars.Contains(member);
+        var orderedAsText = orders && written.ValueKind == JsonValueKind.String && !ComparedTypes.IsChar(member);
         if (orderedAsText) throw Refused(comparison, "orders a value the app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on the server.");
     }
 
     private JsonElement Written(object? value, Type type)
     {
-        var held = value is int code && Chars.Contains(type) ? Convert.ToChar(code) : value;
+        var held = value is int code && ComparedTypes.IsChar(type) ? Convert.ToChar(code) : value;
         return JsonSerializer.SerializeToElement(held, _values.GetTypeInfo(type));
     }
 
@@ -183,7 +146,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
     {
         while (node is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } conversion)
         {
-            if (Narrows(conversion.Operand.Type, conversion.Type))
+            if (ComparedTypes.Narrows(conversion.Operand.Type, conversion.Type))
                 throw Refused(conversion, "casts a number to a narrower one, which changes the value as C# computes it and not as the browser does; compare the member itself.");
             node = conversion.Operand;
         }
@@ -203,20 +166,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
 
     private ArgumentException Refused(LinqExpression term, string reason) => new($"'{ViewValues.Printed(term)}' {reason}", _argument);
 
-    private static bool Narrows(Type from, Type to)
-    {
-        if (!WholeNumbers.TryGetValue(to, out var whole)) return false;
-        if (Fractions.Contains(from)) return true;
-        if (!WholeNumbers.TryGetValue(from, out var cast)) return false;
-        var holdsEvery = cast.Signed == whole.Signed ? whole.Bytes >= cast.Bytes : !cast.Signed && whole.Bytes > cast.Bytes;
-        return !holdsEvery;
-    }
-
     private static bool IsConverted(LinqExpression side) => side is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked };
-
-    private static bool IsNumber(Type type) => WholeNumbers.ContainsKey(type) || Fractions.Contains(type);
-
-    private static bool IsScalar(Type type) => IsNumber(type) || Chars.Contains(type) || OtherScalars.Contains(type);
 
     private static OperatorExpression Op(Operator op, params PlanExpression[] args) => new(op, args);
 

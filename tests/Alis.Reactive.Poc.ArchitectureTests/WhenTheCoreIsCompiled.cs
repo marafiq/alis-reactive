@@ -17,7 +17,7 @@ public sealed class WhenTheCoreIsCompiled
         ["Writing"] = ["Plan", "Types"],
         ["Values"] = ["Plan", "Writing"],
         ["Types"] = ["Plan"],
-        ["Conditions"] = ["Plan", "Types"],
+        ["Conditions"] = ["Plan", "Writing", "Values", "Types"],
         ["Lists"] = ["Plan", "Writing", "Values", "Types", "Conditions"],
         ["Components"] = ["Plan", "Writing", "Values", "Types", "Lists"],
         ["Pipelines"] = ["Plan", "Writing", "Values", "Components"],

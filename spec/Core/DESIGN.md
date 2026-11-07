@@ -906,6 +906,11 @@ Terms used throughout:
 **Doors.**
 - kept: the pipeline door, `ConditionSourceBuilder` and `ConditionOperators`
   (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
+- `N8.2` new, its form gate 2's: the comparisons (`Eq`, `NotEq`, `Gt`, `Gte`, `Lt`, `Lte`) and `And`, `Or` and `Not`
+  are extension methods on a typed source that return a `TypedSource<bool>`, which `When` and `ElseIf` take and a live
+  list's predicate returns, so one comparison API serves both. Each refuses where the view renders what the lambda
+  door refuses for its type: dates and times, objects compared by reference, and an ordering of what the browser
+  cannot order as .NET does. A branch writes an `if` (POC 9a).
 - `N8.1` new: `internal static class LambdaCondition`, the one translator from an expression tree to
   `Condition` nodes, with a result that says which term it could not translate. It replaces
   `ElementExpressionCompiler.CompilePredicate` (`Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:68`)
@@ -944,6 +949,14 @@ Terms used throughout:
   `d.Priority < 2`, as .NET's lifted operators decide (D8.9).
 - `X8.8` behavior: `or` keeps an item whose left term reads nothing when its right term holds, and `and` whose left
   term reads nothing and right term is false reads false, so `not` of it holds (D8.9).
+- `X8.9` refusal (D8.7): an `ElseIf` or `Else` written after another step of its block: "An ElseIf or an Else
+  continues the When it follows, before any other step of its block: write it in the same sentence."
+- `X8.10` refusal (N8.2): a pipeline condition that orders dates, orders flags or compares objects, each with the
+  reason the lambda door gives for it.
+- `X8.11` behavior (D11.5): the steps after a branch that awaits run once its method settles, and at once when the
+  branch is not taken.
+- `X8.12` behavior (D8.9): a branch whose condition orders a null runs none of its steps, where JavaScript's
+  `null < 80` holds.
 
 ## Q9. The request
 
@@ -1338,7 +1351,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     decides, the handler writes `Cancel` first, then asks, then calls the drawer's close method on yes;
   - a write to a property of an object the payload holds is a write on that object, and runs.
 
-  The refusal is each handler's own: an await in one handler refuses no write in another.
+  The refusal is each handler's own: an await in one handler refuses no write in another. It follows the path
+  the handler runs: a branch reads the state before its `if`, so an `Else` writes the payload in the vendor's turn
+  when its sibling `Then` awaits, and a step after the `if` reads the payload as awaited when any of its arms awaits.
 - D11.5 The order is closed:
   - The steps after an awaited step run after it settles.
   - Two handlers of one event run in the order the plan subscribed them, each up to its first awaited
@@ -1447,6 +1462,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   sounds when the handler writes none; after the await, the patient the alarm holds is written, the alarm's own
   method runs and a read of the alarm reads the bed the monitor moved it to; a handler written after one that
   awaits writes its own alarm before its own await.
+- `X11.12` behavior (D11.4): an alarm's `Else` writes `cancel` in the monitor's turn while its sibling `Then` awaits;
+  a write after an `if` whose arm awaits is refused with X11.1's message.
 
 ## Q12. Ownership
 

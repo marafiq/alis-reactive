@@ -51,6 +51,6 @@ internal static class Sources
 
 internal static class Literal
 {
-    internal static Expression Of<T>(T value, PlanBuild build)
+    internal static LiteralExpression Of<T>(T value, PlanBuild build)
         => new LiteralExpression(JsonSerializer.SerializeToElement(value, build.Values));
 }

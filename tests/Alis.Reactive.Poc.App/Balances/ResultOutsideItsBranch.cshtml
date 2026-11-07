@@ -1,0 +1,23 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Result outside its branch";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Result outside its branch</h1>
+
+@plan.FluidBalance("balance")
+@plan.InfusionPump("pump", "Ward 4")
+
+<p>Summary: <span id="summary"></span></p>
+
+@(plan.Button("summarise", "Summarise a pump with intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var summaries = new List<Alis.Reactive.Components.MethodResult<string>>();
+        pipeline.When(pipeline.Component<FluidBalance>("balance").Intake.Gt(0))
+            .Then(taken => summaries.Add(taken.Component<InfusionPump>("pump").Summary()));
+        pipeline.Element("summary").Text.Set(summaries[0]);
+    }))
+
+@Html.RenderPlan(plan)

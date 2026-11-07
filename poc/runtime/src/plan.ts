@@ -8,6 +8,11 @@ export interface AnswerExpression {
   readonly body: Expression;
 }
 
+export interface Arm {
+  readonly when: Expression;
+  readonly then: readonly Statement[];
+}
+
 export interface AssignmentListening {
   readonly kind: "assignment";
 }
@@ -67,6 +72,12 @@ export interface Handler {
   readonly members: ReadPresence;
   readonly policy: Policy;
   readonly do: readonly Statement[];
+}
+
+export interface IfStatement {
+  readonly kind: "if";
+  readonly arms: readonly Arm[];
+  readonly else: readonly Statement[];
 }
 
 export interface LetStatement {
@@ -152,7 +163,7 @@ export interface StartAbsence {
   readonly value: JsonValue;
 }
 
-export type Statement = SetStatement | DoStatement | LetStatement;
+export type Statement = SetStatement | DoStatement | LetStatement | IfStatement;
 
 export interface UnboundAbsence {
   readonly kind: "unbound";

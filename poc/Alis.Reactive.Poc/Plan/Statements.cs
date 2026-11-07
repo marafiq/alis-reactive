@@ -7,6 +7,7 @@ namespace Alis.Reactive.Plan;
 [JsonDerivedType(typeof(SetStatement), "set")]
 [JsonDerivedType(typeof(DoStatement), "do")]
 [JsonDerivedType(typeof(LetStatement), "let")]
+[JsonDerivedType(typeof(IfStatement), "if")]
 internal abstract class Statement
 {
     private protected Statement()
@@ -60,4 +61,34 @@ internal sealed class LetStatement : Statement
     public Expression Expr { get; }
 
     public bool Await { get; }
+}
+
+internal sealed class IfStatement : Statement
+{
+    private readonly List<Arm> _arms;
+
+    internal IfStatement(Arm first)
+    {
+        _arms = [first];
+        Else = [];
+    }
+
+    public IReadOnlyList<Arm> Arms => _arms;
+
+    public IReadOnlyList<Statement> Else { get; internal set; }
+
+    internal void Add(Arm arm) => _arms.Add(arm);
+}
+
+internal sealed class Arm
+{
+    internal Arm(Expression when, IReadOnlyList<Statement> then)
+    {
+        When = when;
+        Then = then;
+    }
+
+    public Expression When { get; }
+
+    public IReadOnlyList<Statement> Then { get; }
 }

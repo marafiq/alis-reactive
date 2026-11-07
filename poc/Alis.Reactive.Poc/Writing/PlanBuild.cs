@@ -76,7 +76,7 @@ internal sealed class PlanBuild
         return Block(body);
     }
 
-    internal IReadOnlyList<Statement> Block(Action body)
+    internal List<Statement> Block(Action body)
     {
         var block = new List<Statement>();
         _open.Push(block);
@@ -133,6 +133,41 @@ internal sealed class PlanBuild
         if (!readsAResult) return read;
         throw new InvalidOperationException(
             "A method's result is read outside the block that called the method. Call the method in the block that reads its result, or in a block around it.");
+    }
+
+    internal Branching When(Expression condition, Action then)
+    {
+        var awaitedBefore = _handlerAwaited;
+        var block = Block(then);
+        var firstArmAwaited = _handlerAwaited;
+        var statement = new IfStatement(new Arm(condition, block));
+        _handlerAwaited = awaitedBefore;
+        Write(statement);
+        var branching = new Branching(statement, _open.Peek(), awaitedBefore, firstArmAwaited);
+        _handlerAwaited = branching.AwaitedAfter;
+        return branching;
+    }
+
+    internal void ElseIf(Branching branching, Expression condition, Action then)
+        => branching.Statement.Add(new Arm(condition, Alternative(branching, then)));
+
+    internal void Else(Branching branching, Action otherwise)
+        => branching.Statement.Else = Alternative(branching, otherwise);
+
+    private List<Statement> Alternative(Branching branching, Action body)
+    {
+        var continuesItsWhen = _open.Count > 0 && ReferenceEquals(_open.Peek(), branching.Block) && ReferenceEquals(branching.Block[^1], branching.Statement);
+        if (!continuesItsWhen)
+        {
+            throw new InvalidOperationException(
+                "An ElseIf or an Else continues the When it follows, before any other step of its block: write it in the same sentence.");
+        }
+
+        _handlerAwaited = branching.AwaitedBefore;
+        var block = Block(body);
+        branching.ArmAwaited(_handlerAwaited);
+        _handlerAwaited = branching.AwaitedAfter;
+        return block;
     }
 
     internal TRead Answering<TRead>(Func<TRead> answer)
@@ -199,4 +234,27 @@ internal sealed class PlanBuild
         var isTheInvariantCulture = culture.Name.Length == 0;
         return isTheInvariantCulture ? "en" : culture.Name;
     }
+}
+
+internal sealed class Branching
+{
+    private bool _anyArmAwaited;
+
+    internal Branching(IfStatement statement, List<Statement> block, bool awaitedBefore, bool firstArmAwaited)
+    {
+        Statement = statement;
+        Block = block;
+        AwaitedBefore = awaitedBefore;
+        _anyArmAwaited = firstArmAwaited;
+    }
+
+    internal IfStatement Statement { get; }
+
+    internal List<Statement> Block { get; }
+
+    internal bool AwaitedBefore { get; }
+
+    internal bool AwaitedAfter => AwaitedBefore || _anyArmAwaited;
+
+    internal void ArmAwaited(bool awaited) => _anyArmAwaited = _anyArmAwaited || awaited;
 }
