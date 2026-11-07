@@ -13,6 +13,7 @@ import { DoseCard, type DoseCardHost } from "./DoseCard/dose-card";
 import { BedStore, NightClock, ShiftLog, VisitorBook, initials } from "./ShiftPlugins/shift-plugins";
 import { OxygenGauges } from "./OxygenGauge/oxygen-gauge";
 import { VisitPlanner } from "./VisitPlanner/visit-planner";
+import { CallLog, type CallLogHost } from "./CallLog/call-log";
 import { onMount, providePlugin } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
@@ -77,6 +78,10 @@ onMount<WardPickerHost>("[data-ward-picker]", (host) => {
 
 onMount<DoseCardHost>("[data-dose-card]", (host) => {
   host.card = new DoseCard(host);
+});
+
+onMount<CallLogHost>("[data-call-log]", (host) => {
+  host.log = new CallLog(host);
 });
 
 providePlugin("shift-log", new ShiftLog());

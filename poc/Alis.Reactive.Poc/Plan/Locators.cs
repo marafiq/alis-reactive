@@ -27,13 +27,16 @@ internal sealed class ElementLocator : Locator
 
 internal sealed class PluginLocator : Locator
 {
-    internal PluginLocator(string name, Listening listen)
+    internal PluginLocator(string name, string key, Listening listen)
     {
         Name = name;
+        Key = key;
         Listen = listen;
     }
 
     public string Name { get; }
+
+    public string Key { get; }
 
     public Listening Listen { get; }
 }

@@ -33,6 +33,10 @@ public sealed class Pipeline<TModel>
 
     public Guard<TModel> When(TypedSource<bool> condition)
         => new(Build, Sources.Of(condition).Expression, Build.When);
+
+    public Request Get(string url) => new(Build, RequestUrls.Checked(url));
+
+    public void Unload(string elementId) => Slots.Unload(Build, elementId);
 }
 
 public sealed class BoundInput

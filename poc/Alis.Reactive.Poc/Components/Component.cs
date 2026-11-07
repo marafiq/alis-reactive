@@ -24,7 +24,7 @@ public sealed class ComponentVendor
         "native",
         new Vendor(
             new FnExpression([Element], new RefExpression(Element)),
-            new MethodListening("addEventListener", "removeEventListener")));
+            MethodListening.EventTarget));
 
     public string Name { get; }
 
@@ -114,7 +114,7 @@ public sealed class VendorLookup
     internal Vendor Vendor(Listening listen)
     {
         var found = new CallExpression(new ObjectExpression(PlanBuild.PluginKey(_plugin)), [], ReadPresence.Required, [new RefExpression(Element)]);
-        var lookup = new PluginLocator(_plugin, PluginEvents.EventTarget.Listen);
+        var lookup = new PluginLocator(_plugin, string.Empty, MethodListening.EventTarget);
         return new Vendor(new FnExpression([Element], found), listen, [lookup]);
     }
 }

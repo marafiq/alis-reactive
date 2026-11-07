@@ -37,6 +37,8 @@ internal abstract class Listening
 
 internal sealed class MethodListening : Listening
 {
+    internal static readonly MethodListening EventTarget = new("addEventListener", "removeEventListener");
+
     internal MethodListening(string subscribe, string unsubscribe)
     {
         Subscribe = subscribe;

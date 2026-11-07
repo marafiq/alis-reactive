@@ -1,0 +1,52 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    ViewData["Title"] = "Care cards";
+    var plan = Html.ReactivePlan<CardsWard>();
+    plan.Plugin<ShiftLog>().Reactive(log => log.Noted, (noted, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note("The ward heard the note"));
+}
+<h1>Care cards</h1>
+
+<section id="card"></section>
+
+<p>Asked: <span id="asked">nothing</span></p>
+
+@plan.CallLog("calls")
+
+@(plan.Button("open-ada", "Open Ada's card")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Get("/Cards/Card?resident=Ada%20Byron").Into("card")))
+
+@(plan.Button("open-ben", "Open Ben's card")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Get("/Cards/Card?resident=Ben%20Okafor").Into("card")))
+
+@(plan.Button("open-missing", "Open the missing card")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Get("/Cards/Missing").Into("card");
+        pipeline.Element("asked").Text.Set("Asked for the missing card");
+    }))
+
+@(plan.Button("open-listed", "Open the listed card")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Get("/Cards/Listed").Into("card");
+        pipeline.Element("asked").Text.Set("Asked for the listed card");
+    }))
+
+@(plan.Button("open-unreachable", "Open the unreachable card")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Get("http://127.0.0.1:9/Cards/Card").Into("card");
+        pipeline.Element("asked").Text.Set("Asked for the unreachable card");
+    }))
+
+@(plan.Button("close", "Close the card")
+    .Reactive(button => button.Click, pipeline => pipeline.Unload("card")))
+
+@(plan.Button("note", "Note a fall")
+    .Reactive(button => button.Click, pipeline => pipeline.Plugin<ShiftLog>().Add("A fall in room 12")))
+
+@Html.RenderPlan(plan)

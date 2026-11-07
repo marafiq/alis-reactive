@@ -25,6 +25,8 @@ var declarations = new SortedDictionary<string, string>(StringComparer.Ordinal);
 var visited = new HashSet<Type>();
 var contract = new Contract(options, choice, pathStep, declarations, visited);
 contract.Visit(root);
+contract.Visit(core.GetType("Alis.Reactive.Plan.HttpSend", throwOnError: true)!);
+contract.Visit(core.GetType("Alis.Reactive.Plan.HttpResponse", throwOnError: true)!);
 
 var text = new StringBuilder();
 text.Append("export type JsonValue = string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };\n");

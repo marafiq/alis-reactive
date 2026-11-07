@@ -39,7 +39,7 @@ public sealed class PluginEvents
         Listen = listen;
     }
 
-    public static PluginEvents EventTarget { get; } = new(new MethodListening("addEventListener", "removeEventListener"));
+    public static PluginEvents EventTarget { get; } = new(MethodListening.EventTarget);
 
     public static PluginEvents CallbackProperties { get; } = new(new AssignmentListening());
 

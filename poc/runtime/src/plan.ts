@@ -23,6 +23,8 @@ export interface AssignmentListening {
   readonly kind: "assignment";
 }
 
+export type BodyKind = "html";
+
 export interface CallExpression {
   readonly kind: "call";
   readonly target: Expression;
@@ -82,6 +84,23 @@ export interface Handler {
   readonly members: ReadPresence;
   readonly policy: Policy;
   readonly do: readonly Statement[];
+}
+
+export type HttpMethod = "GET";
+
+export type HttpOutcome = "success" | "status" | "network" | "redirect" | "kind";
+
+export interface HttpResponse {
+  readonly ok: boolean;
+  readonly status: number;
+  readonly outcome: HttpOutcome;
+  readonly body: JsonValue;
+}
+
+export interface HttpSend {
+  readonly method: HttpMethod;
+  readonly url: string;
+  readonly success: BodyKind;
 }
 
 export interface IfStatement {
@@ -165,6 +184,7 @@ export interface PlanDocument {
 export interface PluginLocator {
   readonly kind: "plugin";
   readonly name: string;
+  readonly key: string;
   readonly listen: Listening;
 }
 

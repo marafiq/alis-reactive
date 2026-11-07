@@ -128,7 +128,7 @@ internal sealed class PlanBuild
         return Let(call, awaits: false);
     }
 
-    internal Expression AwaitedResult(CallExpression call)
+    internal RefExpression AwaitedResult(CallExpression call)
     {
         if (_readingItems > 0)
         {
@@ -318,11 +318,29 @@ internal sealed class PlanBuild
     internal string Plugin(string name, Listening listen)
     {
         var key = PluginKey(name);
-        _objects[key] = new PluginLocator(name, listen);
+        _objects[key] = new PluginLocator(name, string.Empty, listen);
         return key;
     }
 
     internal static string PluginKey(string name) => "$plugin:" + name;
+
+    internal string Http()
+    {
+        _objects[HttpId] = new PluginLocator("alis.http", string.Empty, MethodListening.EventTarget);
+        return HttpId;
+    }
+
+    internal string Slot(string containerId)
+    {
+        var id = "$slot:" + containerId;
+        _objects[id] = new PluginLocator("alis.slot", containerId, MethodListening.EventTarget);
+        return id;
+    }
+
+    private const string HttpId = "$http";
+
+    internal bool Follows(RefExpression result)
+        => _open.Count > 0 && _open.Peek() is { Count: > 0 } block && block[^1] is LetStatement let && let.Name == result.Name;
 
     internal void Add(Handler handler, Listening listening)
     {

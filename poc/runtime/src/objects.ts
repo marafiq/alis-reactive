@@ -2,6 +2,7 @@ import type { Handler, Listening, PlanDocument } from "./plan";
 import { evaluate, walk, type Bound, type Context } from "./evaluate";
 import { execute } from "./execute";
 import { assertNever, Stop, value } from "./read";
+import type { Owner, Removal } from "./owners";
 import { plugin } from "./plugins";
 
 type Listener = (...args: unknown[]) => void;
@@ -18,7 +19,7 @@ function locate(context: Context, id: string): unknown {
     case "element":
       return onElement(context, locator.id, locator.vendor);
     case "plugin":
-      return plugin(locator.name);
+      return plugin(locator.name, locator.key);
     default:
       return assertNever(locator);
   }
@@ -38,12 +39,12 @@ function onElement(context: Context, id: string, vendorName: string): object {
   return found;
 }
 
-export function listen(context: Context, handler: Handler): void {
+export function listen(context: Context, handler: Handler, owner: Owner): void {
   const raiser = walk(value(context.locate(handler.on)), handler.path, "required");
   if (raiser.kind === "nothing" || raiser.value === null || typeof raiser.value !== "object") {
     throw new Stop("The object that raises '" + handler.event + "' is not on the page.");
   }
-  subscribe(raiser.value, listeningOf(context, handler.on), handler.event, (...args) => run(context, handler, args));
+  owner.holds(subscribe(raiser.value, listeningOf(context, handler.on), handler.event, (...args) => run(context, handler, args)));
 }
 
 function listeningOf(context: Context, id: string): Listening {
@@ -62,19 +63,30 @@ function listeningOf(context: Context, id: string): Listening {
   }
 }
 
-function subscribe(raiser: object, listening: Listening, event: string, listener: Listener): void {
+function subscribe(raiser: object, listening: Listening, event: string, listener: Listener): Removal {
   switch (listening.kind) {
-    case "method":
-      Reflect.apply(method(raiser, listening.subscribe), raiser, [event, listener]);
-      return;
-    case "assignment":
+    case "method": {
+      const add = method(raiser, listening.subscribe);
+      const remove = method(raiser, listening.unsubscribe);
+      Reflect.apply(add, raiser, [event, listener]);
+      return () => Reflect.apply(remove, raiser, [event, listener]);
+    }
+    case "assignment": {
+      const replaced: unknown = Reflect.get(raiser, event);
       Reflect.set(raiser, event, listener);
-      return;
-    case "returned":
-      Reflect.apply(method(raiser, listening.subscribe), raiser, [event, listener]);
-      return;
+      return () => {
+        if (Reflect.get(raiser, event) === listener) Reflect.set(raiser, event, replaced);
+      };
+    }
+    case "returned": {
+      const removal: unknown = Reflect.apply(method(raiser, listening.subscribe), raiser, [event, listener]);
+      if (typeof removal !== "function") {
+        throw new Stop("The method '" + listening.subscribe + "' returned no function that removes the listener it added.");
+      }
+      return () => Reflect.apply(removal, undefined, []);
+    }
     default:
-      assertNever(listening);
+      return assertNever(listening);
   }
 }
 
