@@ -19,7 +19,7 @@ public sealed class ReadsNothingSuppressor : DiagnosticSuppressor
 
     private static readonly SuppressionDescriptor PastANullHolder = new(PastANullHolderId, Dereference, "A data lambda reads its item in the browser, where a member read past a holder that holds null reads nothing, so the read needs no '!'");
 
-    private static readonly SuppressionDescriptor ValueOfANull = new(ValueOfANullId, "CS8629", "A data lambda reads its item in the browser, where the Value of a nullable that holds null reads nothing, so the read needs no '!'");
+    private static readonly SuppressionDescriptor ValueOfANull = new(ValueOfANullId, "CS8629", "A data lambda reads its item in the browser, where a nullable's Value, or a cast to it, reads nothing on a nullable that holds null, so the read needs no '!'");
 
     public override ImmutableArray<SuppressionDescriptor> SupportedSuppressions { get; } = [PastANullHolder, ValueOfANull];
 
@@ -40,7 +40,7 @@ public sealed class ReadsNothingSuppressor : DiagnosticSuppressor
         var root = tree.GetRoot(context.CancellationToken);
         if (root.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is not ExpressionSyntax held) return false;
         var readsAValue = held.Parent is MemberAccessExpressionSyntax { Name.Identifier.ValueText: "Value" } access && access.Expression == held;
-        if (!dereferences && !readsAValue) return false;
+        if (!dereferences && !readsAValue && held is not CastExpressionSyntax) return false;
         var model = context.GetSemanticModel(tree);
         var items = doors.ItemsAround(held, model, context.CancellationToken);
         return items.Count > 0 && ReadsAnItem(held, items, model, context.CancellationToken);

@@ -54,6 +54,17 @@ public sealed class WhenDosesAreSorted : AppPageTest
     }
 
     [Test]
+    public async Task order_by_a_cast_of_a_nullable_that_holds_null_stops_the_sort_and_the_steps_after_it()
+    {
+        await Open("/Doses/Sorts");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "List doses by priority cast to a number", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census-status")).ToHaveTextAsync("Listing by priority");
+        await Expect(Page.Locator("#census .census-names li")).ToHaveCountAsync(0);
+    }
+
+    [Test]
     public async Task order_by_a_bool_lists_false_first()
     {
         await Open("/Doses/Sorts");

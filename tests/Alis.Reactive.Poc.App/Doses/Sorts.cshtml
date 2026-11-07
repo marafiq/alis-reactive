@@ -11,6 +11,8 @@
 
 @plan.StationCensus("census")
 
+<p>Census: <span id="census-status"></span></p>
+
 @(plan.Button("list-by-milligrams", "List doses by milligrams")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Names.Set(
@@ -40,5 +42,14 @@
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Names.Set(
             pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => d.Controlled).Select(d => d.Medicine))))
+
+@(plan.Button("list-by-cast-priority", "List doses by priority cast to a number")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Listing by priority");
+        pipeline.Component<StationCensus>("census").Names.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.OrderBy(d => (int)d.Priority!).Select(d => d.Medicine));
+        pipeline.Element("census-status").Text.Set("Listed by priority");
+    }))
 
 @Html.RenderPlan(plan)

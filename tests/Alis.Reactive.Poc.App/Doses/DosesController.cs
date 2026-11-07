@@ -23,6 +23,8 @@ public sealed class DosesController : Controller
 
     public IActionResult NullViewValue() => View(DoseRound.Page());
 
+    public IActionResult CastNullViewValue() => View(DoseRound.Page());
+
     public IActionResult Texts() => View(DoseRound.Page());
 
     public IActionResult Checks() => View(DoseRound.Page());

@@ -68,7 +68,7 @@ public sealed class WhenADataLambdaReadsPastNull
 
         public static class View
         {
-            public static void Write(ITypedSource<IEnumerable<Dose>> doses, ReadOnly<Noted?> noted, MethodResult<Noted?> answered, Pipeline<Round> pipeline, Carer? cover, List<Dose> served, Ledger<Dose> ledger)
+            public static void Write(ITypedSource<IEnumerable<Dose>> doses, ReadOnly<Noted?> noted, MethodResult<Noted?> answered, Pipeline<Round> pipeline, Carer? cover, int? limit, List<Dose> served, Ledger<Dose> ledger)
             {
                 {{statement}}
             }
@@ -137,8 +137,16 @@ public sealed class WhenADataLambdaReadsPastNull
         => Fixture.Suppresses<ReadsNothingSuppressor>(NullableValue, ReadsNothingSuppressor.ValueOfANullId, Viewed("""doses.Count(d => [|d.Priority|].Value != 2);"""));
 
     [Test]
-    public Task a_cast_of_a_nullable_in_a_predicate_is_kept()
-        => Fixture.Keeps<ReadsNothingSuppressor>(NullableValue, Viewed("""doses.Count(d => [|(int)d.Priority|] == 2);"""));
+    public Task a_cast_of_a_nullable_in_a_predicate_is_suppressed()
+        => Fixture.Suppresses<ReadsNothingSuppressor>(NullableValue, ReadsNothingSuppressor.ValueOfANullId, Viewed("""doses.Count(d => [|(int)d.Priority|] == 2);"""));
+
+    [Test]
+    public Task a_cast_of_a_nullable_in_a_sum_term_is_kept()
+        => Fixture.Keeps<ReadsNothingSuppressor>(NullableValue, Viewed("""doses.Sum(d => [|(int)d.Priority|]);"""));
+
+    [Test]
+    public Task a_cast_of_a_nullable_the_view_holds_is_kept()
+        => Fixture.Keeps<ReadsNothingSuppressor>(NullableValue, Viewed("""doses.Count(d => d.Priority == [|(int)limit|]);"""));
 
     [Test]
     public Task the_value_of_a_nullable_in_a_sum_term_is_kept()

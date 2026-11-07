@@ -56,4 +56,13 @@
         pipeline.Component<StationCensus>("census").Volume.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Sum(d => d.Volume))))
 
+@(plan.Button("sum-cast-priorities", "Sum the priorities cast to numbers")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Summing priorities");
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => (int)d.Priority!));
+        pipeline.Element("census-status").Text.Set("Summed priorities");
+    }))
+
 @Html.RenderPlan(plan)

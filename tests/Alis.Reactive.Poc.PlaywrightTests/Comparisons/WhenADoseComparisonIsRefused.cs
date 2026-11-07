@@ -67,6 +67,15 @@ public sealed class WhenADoseComparisonIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_cast_of_a_view_value_that_is_null_is_refused()
+    {
+        await Page.GotoAsync(BaseUrl + "/Doses/CastNullViewValue");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: 'none' is null when the view renders, and the cast takes its value, which .NET refuses; compare the nullable itself, such as d => d.Priority == limit. (Parameter 'predicate')");
+    }
+
+    [Test]
     public async Task a_view_value_read_through_a_null_is_refused()
     {
         await Page.GotoAsync(BaseUrl + "/Doses/NullViewValue");

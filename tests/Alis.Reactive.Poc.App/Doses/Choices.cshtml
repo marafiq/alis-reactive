@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Dose choices";
     var plan = Html.ReactivePlan<DoseRoundPage>();
+    int? routine = 2;
 }
 <h1>Dose choices</h1>
 
@@ -25,6 +26,21 @@
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority.Value != 2))))
+
+@(plan.Button("count-cast-priority-not-two", "Count doses whose priority cast to a number is not 2")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (int)d.Priority != 2))))
+
+@(plan.Button("count-cast-priorities-not-two", "Count the priorities, cast to numbers, that are not 2")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Select(d => (int)d.Priority).Count(priority => priority != 2))))
+
+@(plan.Button("count-routine-priority", "Count doses of the routine priority")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority == (int)routine))))
 
 @(plan.Button("count-no-ward", "Count doses with no ward")
     .Reactive(button => button.Click, pipeline =>

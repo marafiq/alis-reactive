@@ -81,6 +81,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         }
 
         if (read is UnaryExpression { NodeType: ExpressionType.ArrayLength } length) return ListForms.Length(Read(length.Operand));
+        if (read is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } valueOf) return Op(Operator.NullableValue, Read(valueOf.Operand));
         if (read is BinaryExpression { NodeType: ExpressionType.Coalesce } coalesce) return Coalesced(coalesce);
         if (read is ConditionalExpression conditional) return Op(Operator.Cond, Term(conditional.Test), Term(conditional.IfTrue), Term(conditional.IfFalse));
         var translated = TranslatedMembers.Of(read, this, _argument);
@@ -212,6 +213,10 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         {
             if (ComparedTypes.Narrows(conversion.Operand.Type, conversion.Type))
                 throw Refused(conversion, "casts a number to a narrower one, which changes the value as C# computes it and not as the browser does; compare the member itself.");
+            var takesTheValue = conversion is { IsLifted: true, IsLiftedToNull: false, Method: null };
+            if (takesTheValue && ReadsTheItem(conversion.Operand)) return conversion;
+            if (takesTheValue && ViewValues.Of(conversion.Operand, _argument) is null)
+                throw new ArgumentException($"'{ViewValues.Printed(conversion.Operand)}' is null when the view renders, and the cast takes its value, which .NET refuses; compare the nullable itself, such as d => d.Priority == limit.", _argument);
             node = conversion.Operand;
         }
 

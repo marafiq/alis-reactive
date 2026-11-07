@@ -66,6 +66,17 @@ public sealed class WhenDosesAreSummed : AppPageTest
     }
 
     [Test]
+    public async Task a_sum_of_a_cast_of_a_nullable_that_holds_null_stops_the_steps_after_it()
+    {
+        await Open("/Doses/Sums");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Sum the priorities cast to numbers", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census-status")).ToHaveTextAsync("Summing priorities");
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("unknown");
+    }
+
+    [Test]
     public async Task a_double_sum_adds_as_binary_floating_point_does()
     {
         await Open("/Doses/Sums");

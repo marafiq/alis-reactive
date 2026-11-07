@@ -115,8 +115,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - Chosen within the owner's yes, 2026-11-07: a view reads past a nullable member in a data lambda with no `!` where
   the browser reads nothing past null. CS8602, and CS8629 on `.Value`, are suppressed on an expression that reads the
   item, in the predicate of `Count`, `Where`, `Any`, `All` and `Find`, the field of `Select` and `Find`, and the path of
-  `Read`. The warning stays where null stops the pipeline (a `Sum` term, an `OrderBy` key), on a value the view holds,
-  on a cast, and on an input's member path, which keeps the warning MVC's own helpers give (N6.3, POC 13g).
+  `Read`, and on a cast from a nullable there, which reads as its `Value` does (D6.14, POC 13g-ii). The warning stays
+  where null stops the pipeline (a `Sum` term, an `OrderBy` key), on a value the view holds, and on an input's member
+  path, which keeps the warning MVC's own helpers give (N6.3, POC 13g).
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

@@ -714,6 +714,9 @@ Terms used throughout:
   nothing, as a condition holds only on true (D8.9). A nullable's `HasValue` is `neq` of it and null, so it reads
   nothing past a holder that holds null (D8.9); its `Value` is `op(nullableValue, x)`, the value, or nothing where the
   nullable holds null and .NET throws, as a text operator reads nothing on null (`spec/Core/translated-members.md`).
+  A cast from a nullable to a type that holds no null, `(int)d.Priority`, is its `Value`, as the compiler writes it,
+  so `(int)d.Priority != 2` drops a dose whose priority is null (X6.47); a narrowing cast stays refused (X6.14). A
+  value the view holds, cast so and null when the view renders, is refused there, where .NET throws (X6.48).
   A `??` whose left side the compiler converts by a user-defined conversion is refused (X6.33): the browser has no
   conversion the app wrote. Outside a lambda, at any value position, `source.IfNull(fallback)` writes the same
   `coalesce` and `test.Choose(whenTrue, whenFalse)` the same `cond` (N7.4), each term read only when it is reached.
@@ -747,9 +750,10 @@ Terms used throughout:
   suppressed only on an expression that reads an item, the split `LambdaCondition` reads by: a value the view holds
   (`Model.Cover.Name`, a captured local) is read where the view renders and refused there when it is null (D6.7), so
   its warning stays. It stays where null stops the pipeline: a `Sum` term (D6.11) and an `OrderBy` or
-  `OrderByDescending` key (D6.13). It stays on a cast, `(int)d.Priority`, on an argument (CS8604, `Contains(null)`
-  stops, X6.19), on a lambda over a list the server holds, and on an input named by a member path (`InputField`,
-  `pipeline.Input`), where MVC's own `TextBoxFor` warns the same in the same view.
+  `OrderByDescending` key (D6.13). It stays on an argument (CS8604, `Contains(null)` stops, X6.19), on a lambda over a
+  list the server holds, and on an input named by a member path (`InputField`, `pipeline.Input`), where MVC's own
+  `TextBoxFor` warns the same in the same view. A cast from a nullable to its value, `(int)d.Priority`, reads as its
+  `Value` does (D6.14), so CS8629 on it is suppressed in the same doors (POC 13g-ii).
 - `N6.2` new: `internal static class TranslatedMembers`, the closed table of D6.5.
 
 **Evidence.**
@@ -892,10 +896,18 @@ Terms used throughout:
   (`StartsWith`); `d.Charted == DoseStatus.Due` keeps the two doses that omit `Charted` at its default, read at its
   start in the converter's form; `Select(d => d.Copay).Sum(copay => copay)` adds the copays as the browser holds
   them, "0.3".
+- `X6.47` behavior (D6.14): `(int)d.Priority != 2` counts the two doses whose priority is not 2 and drops the one
+  whose priority is null, as `d.Priority.Value != 2` does; `d.Priority == (int)routine`, a view's `int?` that holds 2,
+  counts the two doses of priority 2. `OrderBy(d => (int)d.Priority!)` and `Sum(d => (int)d.Priority!)` stop the
+  pipeline at the dose whose priority is null, where .NET throws; `Select(d => (int)d.Priority)` holds null for it in
+  its list, as `Select(d => d.Priority.Value)` does, so `Count(p => p != 2)` counts it.
+- `X6.48` refusal (D6.14): a value the view holds, null when the view renders, cast to its value: "'none' is null when
+  the view renders, and the cast takes its value, which .NET refuses; compare the nullable itself, such as d =>
+  d.Priority == limit."
 - `X6.46` analyzer: a read past a nullable member in the predicate, field or path of a door that reads nothing past
-  null builds with no `!` under warnings as errors, and the same read in a `Sum` term, an `OrderBy` key, a cast, a
-  value the view holds, a lambda over a list the server holds or an input's member path still warns: new:N6.3
-  (POC 13g).
+  null builds with no `!` under warnings as errors, and so does a cast of a nullable there; the same read in a `Sum`
+  term, an `OrderBy` key, a value the view holds, a lambda over a list the server holds or an input's member path
+  still warns: new:N6.3 (POC 13g, 13g-ii).
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 
