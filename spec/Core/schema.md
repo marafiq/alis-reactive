@@ -226,7 +226,7 @@ and in the blocks inside it, and nowhere else.
 | `unbound` | nothing | the pipeline stops: the binding cannot create a holder on the path, or a holder on it is polymorphic |
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
-`neg`, `coalesce`, `cond`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `merge`, `trim`, `trimStart`,
+`neg`, `coalesce`, `cond`, `nullableValue`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
 `sumDouble` and `sumDecimal`.
 `toNumber`,
@@ -240,6 +240,9 @@ type (D6.11): one operator over the whole list, where JavaScript's `reduce` woul
 carry no range.
 `compareNumbers`, `compareOrdinal` and `compareBooleans` compare two sort keys to -1, 0 or 1, null first, by the
 comparison C# picks from the key's type (D6.13); the redesign's `order` compared whatever came by its JavaScript type.
+`coalesce` reads its second argument only when its first holds null or reads nothing; `cond` reads its second
+argument when its first reads true and its third when it reads false or nothing; `nullableValue` reads its argument,
+and nothing where it holds null (D6.14).
 
 ## Shapes
 

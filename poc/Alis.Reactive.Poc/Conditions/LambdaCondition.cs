@@ -87,6 +87,8 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
         if (read is ParameterExpression parameter && _scope.TryGetValue(parameter, out var bound)) return bound;
         if (read is UnaryExpression { NodeType: ExpressionType.ArrayLength } length) return ListForms.Length(Read(length.Operand));
+        if (read is BinaryExpression { NodeType: ExpressionType.Coalesce } coalesce) return Coalesced(coalesce);
+        if (read is ConditionalExpression conditional) return Op(Operator.Cond, Term(conditional.Test), Term(conditional.IfTrue), Term(conditional.IfFalse));
         var translated = TranslatedMembers.Of(read, this, _argument);
         if (translated is not null) return translated;
         var root = RootOf(read);
@@ -118,6 +120,12 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         UnaryExpression { NodeType: ExpressionType.Not } negation when negation.Type == typeof(bool) => Op(Operator.Not, Term(negation.Operand)),
         _ => Read(node),
     };
+
+    private OperatorExpression Coalesced(BinaryExpression coalesce)
+    {
+        if (coalesce.Conversion is not null) throw Refused(coalesce, "converts its left side by a user-defined conversion, which the browser does not have; coalesce values of one type, or move the work to the server.");
+        return Op(Operator.Coalesce, Term(coalesce.Left), Term(coalesce.Right));
+    }
 
     private OperatorExpression Compared(BinaryExpression comparison, Operator op, bool orders)
     {

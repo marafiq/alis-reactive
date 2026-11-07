@@ -50,6 +50,13 @@ and the outer item side by side (D6.8).
 | `Enumerable.Count(items, predicate)` | the `length` of `filter` over the predicate's `fn` |
 | `List<T>.Count`, `IReadOnlyCollection<T>.Count`, `ICollection<T>.Count`, an array's `Length` | `length` |
 
+## Nullable values
+
+| .NET member | Browser meaning |
+|-------------|-----------------|
+| `Nullable<T>.HasValue` | `neq` of the value and null: false on null, nothing past a holder that holds null (D8.9) |
+| `Nullable<T>.Value` | the `nullableValue` operator: the value, and nothing on null, where .NET throws `InvalidOperationException` |
+
 ## Dates
 
 For `DateTime` and `DateTimeOffset`, read on the browser's clock.

@@ -8,6 +8,8 @@
     DoseStatus[] given = [DoseStatus.Given];
     var southern = new List<string> { "South" };
     IEnumerable<int?> urgent = new int?[] { 1, 3 };
+    var southOrNoWard = new[] { "South", null };
+    var ruthOrNoCarer = new[] { "Ruth", null };
 }
 <h1>Dose lookups</h1>
 
@@ -49,5 +51,15 @@
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Hours.Length > 1))))
+
+@(plan.Button("count-south-or-no-ward", "Count doses in the south or with no ward")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => southOrNoWard.Contains(d.Ward)))))
+
+@(plan.Button("count-ruth-or-no-carer", "Count doses given by Ruth or by no carer")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => ruthOrNoCarer.Contains(d.Carer!.Name)))))
 
 @Html.RenderPlan(plan)

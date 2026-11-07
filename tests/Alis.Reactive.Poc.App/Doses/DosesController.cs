@@ -57,6 +57,10 @@ public sealed class DosesController : Controller
 
     public IActionResult SortedByCulture() => View(DoseRound.Page());
 
+    public IActionResult Choices() => View(DoseRound.Page());
+
+    public IActionResult CoalescedByAConversion() => View(DoseRound.Page());
+
     public IActionResult SortedByStatus() => View(DoseRound.Page());
 
     public IActionResult SortedBySchedule() => View(DoseRound.Page());
@@ -85,7 +89,7 @@ public static class DoseRound
     {
         return
         [
-            new("Aspirin", "North", 1, DoseStatus.Given, DoseStatus.Given, 75, 'O', new DateTime(2026, 11, 6, 8, 0, 0), new Carer("Ruth"), null, "Aspirin\u0085", "Dr Weiß", "Crush", [new Carer("Ruth")], [8], 0.1m, 0.1, 2147483000, 50000000000000000000000000000m, false, 0.10m) { Refills = 2, Unit = "mg", Maker = "Bayer", Store = new DoseStore { Shelf = new DoseShelf { Name = "trolley" }, Spare = new DoseShelf { Name = "trolley" }, Locker = { Name = "trolley" } }, Batch = new DoseBatch { Lot = "A1", Expiry = "2027-01" } },
+            new("Aspirin", "North", 1, DoseStatus.Given, DoseStatus.Given, 75, 'O', new DateTime(2026, 11, 6, 8, 0, 0), new Carer("Ruth") { Grade = 3 }, null, "Aspirin\u0085", "Dr Weiß", "Crush", [new Carer("Ruth")], [8], 0.1m, 0.1, 2147483000, 50000000000000000000000000000m, false, 0.10m) { Refills = 2, Unit = "mg", Maker = "Bayer", Store = new DoseStore { Shelf = new DoseShelf { Name = "trolley" }, Spare = new DoseShelf { Name = "trolley" }, Locker = { Name = "trolley" } }, Batch = new DoseBatch { Lot = "A1", Expiry = "2027-01" } },
             new("Digoxin", "North", 2, DoseStatus.Due, DoseStatus.Due, 0.125, 'O', new DateTime(2026, 11, 6, 9, 0, 0), null, null, "Digoxin", "Dr Işık", "", [new Carer("Kofi"), new Carer("Ruth")], [9, 21], 0.2m, 0.2, 1000, 50000000000000000000000000000m, true, 0.20m) { Unit = "mcg", Store = new DoseStore { Shelf = new DoseShelf { Name = "fridge" }, Spare = new DoseShelf { Name = "cupboard" } }, Batch = new DoseBatch { Expiry = "2027-03" } },
             new("Insulin", "South", 3, DoseStatus.Due, DoseStatus.Due, 10, 'I', new DateTime(2026, 11, 6, 12, 0, 0), new Carer("Kofi"), null, "\u2003Insulin", "Dr Θρ\u1FB3ξ", null, [new Carer("Abena")], [12, 18, 22], 0m, 0, -1000, 0m, false, 0m) { Refills = 1, Unit = "units", Store = new DoseStore { Shelf = new DoseShelf { Name = null }, Spare = new DoseShelf { Name = null }, Locker = { Name = null } }, Delivery = new DoseInfusion { Site = null } },
             new("Heparin", null, null, DoseStatus.Missed, DoseStatus.Due, 5000, 'I', new DateTime(2026, 11, 6, 6, 0, 0), new Carer("Abena"), null, "\uFEFFHeparin", "DR ΚΑΡΑΣ", "  ", [new Carer("Kofi"), new Carer("Abena")], [6], 0m, 0, 0, 0m, true, 0m) { Unit = null, Seal = DoseSeal.Of("S4", breaker: null) },

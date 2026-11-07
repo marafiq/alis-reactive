@@ -69,6 +69,12 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate): Rea
       return sortOrder(evaluate(first(args)), evaluate(second(args)), "ordinal");
     case "compareBooleans":
       return sortOrder(evaluate(first(args)), evaluate(second(args)), "booleans");
+    case "coalesce":
+      return coalesced(args, evaluate);
+    case "cond":
+      return chosen(args, evaluate);
+    case "nullableValue":
+      return nullableValue(evaluate(first(args)));
     default:
       return assertNever(expression.op);
   }
@@ -109,6 +115,20 @@ function either(args: readonly Expression[], evaluate: Evaluate): Read {
   return left.kind === "nothing" || right.kind === "nothing" ? nothing : value(false);
 }
 
+function coalesced(args: readonly Expression[], evaluate: Evaluate): Read {
+  const left = evaluate(first(args));
+  const holdsAValue = left.kind === "value" && left.value !== null;
+  return holdsAValue ? left : evaluate(second(args));
+}
+
+function chosen(args: readonly Expression[], evaluate: Evaluate): Read {
+  return isTrue(evaluate(first(args))) ? evaluate(second(args)) : evaluate(third(args));
+}
+
+function nullableValue(held: Read): Read {
+  return held.kind === "value" && held.value === null ? nothing : held;
+}
+
 function included(list: Read, item: Read): Read {
   if (list.kind === "nothing" || item.kind === "nothing") return nothing;
   return value((list.value as readonly unknown[]).includes(item.value));
@@ -125,6 +145,12 @@ function isFalse(term: Read): boolean {
 function first(args: readonly Expression[]): Expression {
   const argument = args[0];
   if (argument === undefined) throw new Error("The plan writes an operator with no operand.");
+  return argument;
+}
+
+function third(args: readonly Expression[]): Expression {
+  const argument = args[2];
+  if (argument === undefined) throw new Error("The plan writes a choice with no second branch.");
   return argument;
 }
 

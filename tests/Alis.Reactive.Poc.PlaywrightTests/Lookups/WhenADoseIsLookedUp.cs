@@ -72,4 +72,24 @@ public sealed class WhenADoseIsLookedUp : AppPageTest
 
         await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
     }
+
+    [Test]
+    public async Task contains_finds_null_in_a_list_that_holds_null()
+    {
+        await Open("/Doses/Lookups");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses in the south or with no ward", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
+    }
+
+    [Test]
+    public async Task contains_of_an_item_that_reads_nothing_reads_nothing()
+    {
+        await Open("/Doses/Lookups");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count doses given by Ruth or by no carer", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("1");
+    }
 }

@@ -61,6 +61,8 @@ internal static class TranslatedMembers
         [Property((List<int> items) => items.Count)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
         [Property((IReadOnlyCollection<int> items) => items.Count)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
         [Property((ICollection<int> items) => items.Count)] = (_, operands, read, _) => ListForms.Length(read.Read(operands[0])),
+        [Property((int? value) => value.HasValue)] = (_, operands, read, _) => Op(Operator.Neq, read.Read(operands[0]), read.Literal(null, operands[0].Type)),
+        [Property((int? value) => value!.Value)] = (_, operands, read, _) => Op(Operator.NullableValue, read.Read(operands[0])),
         [Method((IEnumerable<int> values) => values.Contains(0))] = FixedValues(arrayOnly: true),
         [Method((List<int> values) => values.Contains(0))] = FixedValues(arrayOnly: false),
         [Method((HashSet<int> values) => values.Contains(0))] = FixedValues(arrayOnly: true),

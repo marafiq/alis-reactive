@@ -591,8 +591,17 @@ Terms used throughout:
   2026-11-06, Decision 3). A key member the item lacks reads its start first (D4.2), so `OrderBy(d => d.Refills)` sorts a dose the app
   omitted at 0 as 0. A key that reads nothing, past a holder that holds null, or holds a value its comparison does not
   compare, stops the pipeline.
+- D6.14 A list's lambda chooses between values as C# does, each term read only when it is reached (D4.7).
+  `a ?? b` writes `op(coalesce, a, b)`: it reads `a` when `a` holds a value, and `b` when `a` holds null or reads
+  nothing, so `d.Carer.Name ?? "unassigned"` is "unassigned" for a dose whose carer is null, where .NET throws.
+  `test ? a : b` writes `op(cond, test, a, b)`: it reads `a` when the test reads true, and `b` when it reads false or
+  nothing, as a condition holds only on true (D8.9). A nullable's `HasValue` is `neq` of it and null, so it reads
+  nothing past a holder that holds null (D8.9); its `Value` is `op(nullableValue, x)`, the value, or nothing where the
+  nullable holds null and .NET throws, as a text operator reads nothing on null (`spec/Core/translated-members.md`).
+  A `??` whose left side the compiler converts by a user-defined conversion is refused (X6.33): the browser has no
+  conversion the app wrote.
 
-**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`).
+**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`).
 
 **Checker.**
 - `Absence.tla:MissingListReadsNothing`
@@ -696,6 +705,16 @@ Terms used throughout:
 - `X6.32` behavior (D6.13): `OrderBy` lists a number key smallest first, a nullable number with null first, a `bool`
   false first and text by code unit with `StringComparer.Ordinal`; `OrderByDescending` lists null last and keeps the
   list order of equal keys.
+- `X6.33` refusal (D6.14): a `??` whose left side the compiler converts by a user-defined conversion: "'{term}'
+  converts its left side by a user-defined conversion, which the browser does not have; coalesce values of one
+  type, or move the work to the server."
+- `X6.34` behavior (D6.14): `HasValue` holds for a number and fails for null, and reads nothing past a carer that is
+  null; `Value` of a priority that holds null reads nothing, so `d.Priority.Value != 2` drops it where
+  `d.Priority != 2` keeps it; `??` reads its right side for a ward the dose omits at null, a priority that holds null
+  and a carer's name past a carer that is null, and never reads it when its left side holds a value; `?:` reads its first branch when its
+  test holds, its second when the test fails or reads nothing, and never reads the branch it does not take.
+- `X6.35` behavior (D6.5): `Contains` over a list the view holds finds null in it, and an item that reads nothing
+  reads nothing, so it is not found even in a list that holds null.
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 
@@ -794,8 +813,8 @@ Terms used throughout:
   read outside their blocks. The browser runs each block in a child scope, so a value bound inside a branch
   never reaches the steps after it.
 - D8.9 One meaning of comparison and logic, which every condition reads (D8.1). A comparison (`eq`, `neq`, `lt`,
-  `lte`, `gt`, `gte`) whose operand reads nothing reads nothing, `neq` included: a member the browser lacks holds no
-  value, and no comparison with it holds (D8.5). Null is a value the data holds, compared as .NET's lifted operators
+  `lte`, `gt`, `gte`) whose operand reads nothing reads nothing, `neq` included: a value past a holder that holds
+  null holds none, and no comparison with it holds (D8.5). Null is a value the data holds, compared as .NET's lifted operators
   compare it: `eq` of null and null holds, `neq` of null and a value holds, and an ordering with null does not hold,
   though JavaScript's `null <= 2` is true. Equality is JavaScript's `===`; an ordering is JavaScript's `<` over the
   numbers and one-character texts D6.12 admits. `not`, `and` and `or` are SQL's three-valued logic with nothing as its
@@ -803,9 +822,9 @@ Terms used throughout:
   otherwise; `or` is true when a term is true, false when both are false, and nothing otherwise. A term runs only when
   it is reached (D4.7): `and` reads its right term unless its left is false, `or` unless its left is true. A condition
   holds only when it reads true: a branch, an array predicate (`filter`, `some`, `every`, `find`) and a validator
-  condition. So `d.Ward != "North"` and `!(d.Ward == "North")` agree over an item that lacks `ward`: neither holds.
-  .NET binds a missing member to its default; data reads as nothing when absent (the root rule), so the browser
-  decides nothing for it.
+  condition. So `d.Carer.Name != "Ruth"` and `!(d.Carer.Name == "Ruth")` agree over a dose whose carer is null:
+  neither holds, where .NET throws. A member the item lacks reads its start first (D4.2): `d.Ward != "North"` holds
+  over a dose the app wrote with no `ward`, as it holds over the null the endpoint binds for it.
 
 **Schema nodes.** `op` (the comparison, text, membership and value tests, `and`, `or`, `not`); `if`.
 

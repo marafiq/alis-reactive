@@ -105,6 +105,8 @@ public sealed class DoseSeal
     public string? Breaker { get; }
 
     public static DoseSeal Of(string tag, string? breaker) => new(tag, breaker);
+
+    public static implicit operator string(DoseSeal seal) => seal.Tag;
 }
 
 [JsonPolymorphic]

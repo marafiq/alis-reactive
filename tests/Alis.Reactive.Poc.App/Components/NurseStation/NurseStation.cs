@@ -38,7 +38,10 @@ public sealed record StationSchedule(List<CareRound> Rounds);
 
 public sealed record CareRound(string Time, bool Due, [property: JsonPropertyName("carer_on_round")] Carer? Carer);
 
-public sealed record Carer(string Name);
+public sealed record Carer(string Name)
+{
+    public int? Grade { get; init; }
+}
 
 public sealed record BedSeed(string Resident, IReadOnlyList<string> Alerts);
 
