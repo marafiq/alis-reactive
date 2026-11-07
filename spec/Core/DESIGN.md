@@ -1808,6 +1808,9 @@ and `request` state, which the schema does not hold: a request's state is its ru
 - `N14.2` new: the plan as a block of its view, whose end renders it; its form goes to gate 2.
 - `N14.3` new: the form as a block of its view, which renders the form's element and its summary; its form goes
   to gate 2.
+- `N14.4` new: `pipeline.Input(m => m.Member)`, the input a member binds, reached by the id D14.3 gives it
+  (`.Component<T>()`). It replaces both lines' `Component<TComponent>(Expression<Func<TModel, object?>>)`, whose
+  object-typed lambda ALIS009 refuses; its form goes to gate 2.
 
 **Evidence.**
 - P1, each row with the meaning that answers it:

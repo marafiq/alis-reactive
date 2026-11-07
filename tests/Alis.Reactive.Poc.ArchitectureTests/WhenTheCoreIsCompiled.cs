@@ -14,15 +14,16 @@ public sealed class WhenTheCoreIsCompiled
     private static readonly IReadOnlyDictionary<string, string[]> Reads = new Dictionary<string, string[]>
     {
         ["Plan"] = [],
-        ["Writing"] = ["Plan", "Types"],
+        ["Writing"] = ["Plan", "Types", "Inputs"],
         ["Values"] = ["Plan", "Writing"],
         ["Types"] = ["Plan"],
+        ["Inputs"] = ["Types"],
         ["Conditions"] = ["Plan", "Writing", "Values", "Types"],
         ["Lists"] = ["Plan", "Writing", "Values", "Types", "Conditions"],
         ["Components"] = ["Plan", "Writing", "Values", "Types", "Lists"],
-        ["Pipelines"] = ["Plan", "Writing", "Values", "Components"],
+        ["Pipelines"] = ["Plan", "Writing", "Values", "Components", "Inputs"],
         ["Elements"] = ["Components", "Pipelines", "Values"],
-        ["Hosting"] = ["Plan", "Writing", "Values", "Components", "Pipelines"],
+        ["Hosting"] = ["Plan", "Writing", "Values", "Components", "Pipelines", "Inputs"],
     };
 
     private static readonly string[] TypeReadsTheOwnerLists =

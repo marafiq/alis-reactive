@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
+using Alis.Reactive.Inputs;
 using Alis.Reactive.Plan;
 using Alis.Reactive.Types;
 
@@ -29,9 +30,10 @@ internal sealed class PlanBuild
     private int _answers;
     private bool _handlerAwaited;
 
-    internal PlanBuild(string planId, JsonSerializerOptions values)
+    internal PlanBuild(string planId, JsonSerializerOptions values, InputNames names)
     {
         PlanId = planId;
+        Names = names;
         values.MakeReadOnly(populateMissingResolver: true);
         Values = values;
         Starts = new DataStarts(values);
@@ -39,6 +41,8 @@ internal sealed class PlanBuild
     }
 
     internal string PlanId { get; }
+
+    internal InputNames Names { get; }
 
     internal JsonSerializerOptions Values { get; }
 

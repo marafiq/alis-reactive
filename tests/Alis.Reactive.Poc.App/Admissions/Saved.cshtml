@@ -1,0 +1,10 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model IntakeForm
+@{
+    ViewData["Title"] = "Intake saved";
+}
+<h1>Intake saved</h1>
+
+<p>Resident: <strong id="saved-resident">@Model.ResidentName</strong></p>
+<p>Next of kin: <strong id="saved-kin">@Model.NextOfKin.Name</strong></p>
+<p>Ward: <strong id="saved-ward">@(Model.Ward ?? "none")</strong></p>

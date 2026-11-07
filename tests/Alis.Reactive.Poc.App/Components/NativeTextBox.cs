@@ -28,4 +28,13 @@ public static class NativeTextBoxHtml
         var html = new HtmlContentBuilder().AppendHtml(caption).AppendHtml(input);
         return plan.Render<NativeTextBox>(id, html);
     }
+
+    public static Rendered<NativeTextBox, TModel> TextBox<TModel, TValue>(this InputField<TModel, TValue> field, string label)
+    {
+        var caption = new TagBuilder("label");
+        caption.Attributes["for"] = field.Id;
+        caption.InnerHtml.Append(label);
+        var input = field.Html.TextBoxFor(field.Member, new Dictionary<string, object> { ["id"] = field.Id });
+        return field.Render<NativeTextBox>(new HtmlContentBuilder().AppendHtml(caption).AppendHtml(input));
+    }
 }

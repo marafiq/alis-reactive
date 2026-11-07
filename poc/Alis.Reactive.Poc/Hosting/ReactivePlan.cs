@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using Alis.Reactive.Components;
+using Alis.Reactive.Inputs;
 using Alis.Reactive.Pipelines;
 using Alis.Reactive.Plan;
 using Alis.Reactive.Writing;
@@ -13,6 +14,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 #endif
@@ -95,7 +97,8 @@ public static class PlanHtml
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
     {
         if (html == null) throw new ArgumentNullException(nameof(html));
-        return new ReactivePlan<TModel>(new PlanBuild(PlanId<TModel>(), new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+        var names = new InputNames(html.ViewData.TemplateInfo.HtmlFieldPrefix);
+        return new ReactivePlan<TModel>(new PlanBuild(PlanId<TModel>(), new JsonSerializerOptions(JsonSerializerDefaults.Web), names));
     }
 
     public static IHtmlString RenderPlan<TModel>(this HtmlHelper html, ReactivePlan<TModel> plan)
@@ -107,8 +110,10 @@ public static class PlanHtml
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
     {
         ArgumentNullException.ThrowIfNull(html);
-        var values = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
-        return new ReactivePlan<TModel>(new PlanBuild(PlanId<TModel>(), values));
+        var services = html.ViewContext.HttpContext.RequestServices;
+        var values = services.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions;
+        var names = new InputNames(html.ViewData.TemplateInfo.HtmlFieldPrefix, html, services.GetRequiredService<ModelExpressionProvider>());
+        return new ReactivePlan<TModel>(new PlanBuild(PlanId<TModel>(), values, names));
     }
 
     public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper html, ReactivePlan<TModel> plan)

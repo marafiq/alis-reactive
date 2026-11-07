@@ -7,6 +7,7 @@ import { MedicationCart, type MedicationCartHost } from "./MedicationCart/medica
 import { VitalsMonitor, type VitalsMonitorHost } from "./VitalsMonitor/vitals-monitor";
 import { CallBell, MedicineSearch, WardFeed, mountBedBoard, type CallBellHost, type MedicineSearchHost, type WardFeedHost } from "./WardSignals/ward-signals";
 import { NurseStation, StationCensus, type NurseStationHost, type StationCensusHost } from "./NurseStation/nurse-station";
+import { WardPicker, type WardPickerHost } from "./WardPicker/ward-picker";
 
 for (const host of document.querySelectorAll<CareBoardHost>("[data-careboard]")) {
   host.careBoard = host.dataset["careboard"] === "2" ? new CareBoardV2(host) : new CareBoardV1(host);
@@ -58,4 +59,8 @@ for (const host of document.querySelectorAll<DoseChartHost>("[data-dose-chart]")
 
 for (const host of document.querySelectorAll<FluidBalanceHost>("[data-fluid-balance]")) {
   host.balance = new FluidBalance(host);
+}
+
+for (const host of document.querySelectorAll<WardPickerHost>("[data-ward-picker]")) {
+  host.picker = new WardPicker(host);
 }

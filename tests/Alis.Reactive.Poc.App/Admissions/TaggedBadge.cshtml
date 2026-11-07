@@ -1,0 +1,11 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model BadgeForm
+@{
+    ViewData["Title"] = "Visitor badge";
+    var plan = Html.ReactivePlan<BadgeForm>();
+}
+<h1>Visitor badge</h1>
+
+@Html.InputField(plan, m => m.Badge.Value).TextBox("Badge")
+
+@Html.RenderPlan(plan)
