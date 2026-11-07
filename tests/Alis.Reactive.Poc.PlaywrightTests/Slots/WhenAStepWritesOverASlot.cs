@@ -60,5 +60,42 @@ public sealed class WhenAStepWritesOverASlot : AppPageTest
         await Expect(Page.Locator("#write-done")).ToHaveTextAsync("Wrote the ward notes");
     }
 
+    [Test]
+    public async Task ward_notes_a_closed_card_loaded_stop_a_step_that_writes_over_them()
+    {
+        await Open("/Cards/Ward");
+        await Click("Open Ada's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+        await Click("Load the ward notes");
+        await Expect(Page.Locator("#ward-notes")).ToHaveTextAsync("All quiet on the ward");
+        await Click("Close the card");
+        await Expect(Page.Locator("#card")).ToBeEmptyAsync();
+
+        await Click("Write the ward notes");
+
+        await Expect(Page.Locator("#write-asked")).ToHaveTextAsync("Asked to write the ward notes");
+        await Expect(Page.Locator("#ward-notes")).ToHaveTextAsync("All quiet on the ward");
+        await Expect(Page.Locator("#write-done")).ToHaveTextAsync("not done");
+    }
+
+    [Test]
+    public async Task ward_notes_a_card_cleared_before_it_closed_take_a_step_that_writes_over_them()
+    {
+        await Open("/Cards/Ward");
+        await Click("Open Ada's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+        await Click("Load the ward notes");
+        await Expect(Page.Locator("#ward-notes")).ToHaveTextAsync("All quiet on the ward");
+        await Click("Clear the ward notes");
+        await Expect(Page.Locator("#ward-notes")).ToBeEmptyAsync();
+        await Click("Close the card");
+        await Expect(Page.Locator("#card")).ToBeEmptyAsync();
+
+        await Click("Write the ward notes");
+
+        await Expect(Page.Locator("#ward-notes")).ToHaveTextAsync("Written by the ward");
+        await Expect(Page.Locator("#write-done")).ToHaveTextAsync("Wrote the ward notes");
+    }
+
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();
 }

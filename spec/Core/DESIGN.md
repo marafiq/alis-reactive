@@ -1776,7 +1776,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   with one error naming the slot (R14.7), on the slot's element or on an element that holds it, which only the
   browser sees. No server object sees every plan of a response (D14.1). `Unload(element)` empties a slot.
   - An element's `Text` and `Html` mark their `set` as a content write (`content`, schema.md).
-  - The browser holds each slot a live plan names, as its plan starts, and the hold leaves with the plan's owner.
+  - The browser holds each slot a live plan names, as its plan starts, and each slot whose content has a live owner
+    (what a load or the server put there); each hold leaves with its owner. So content a closed card loaded into a
+    slot outside it stays held until that slot unloads.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
 the statement `listen`, and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
@@ -1854,8 +1856,9 @@ plans name.
   write the text into an element beside it." The HTML's reads "the HTML" for "the text".
 - `X12.12` behavior (D12.9, R14.7): a card's step that writes over the slot the card was loaded into stops, and so
   does a page's step that writes over an element holding that slot, or over a slot an open card's plan unloads; the
-  steps before it ran and the steps after it run nothing. Once the only plan that named a slot leaves, a step writes
-  over it.
+  steps before it ran and the steps after it run nothing; so does one that writes over notes a closed card loaded
+  into a slot outside it. Once the only plan that named a slot leaves and the slot holds no loaded content, a step
+  writes over it.
 
 ## Q13. Where state lives
 

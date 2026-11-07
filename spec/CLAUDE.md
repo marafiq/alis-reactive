@@ -134,7 +134,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - Chosen within the owner's yes, 2026-11-07, POC 14e: D12.9 follows D14.6, since D14.1 refuses a record shared by the
   views of a response: a plan that sets the text or HTML of its own slot is refused where the view renders, and across
   plans the step stops in the browser, on a held slot's element or on an element that holds it. A slot is held while a
-  live plan names it. An element's text and HTML mark their `set` as a content write.
+  live plan names it and while content a load or the server put in it has a live owner. An element's text and HTML
+  mark their `set` as a content write.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

@@ -32,6 +32,8 @@ public sealed class CardsController : Controller
 
     public IActionResult TextBeforeItsSlot() => View(new CardsWard());
 
+    public IActionResult WardNotes() => PartialView();
+
     public IActionResult HtmlAfterItsUnload() => View(new CardsWard());
 
     public IActionResult Notes(string resident) => PartialView(new CareCard(resident, NotesTitle: "Latest notes"));

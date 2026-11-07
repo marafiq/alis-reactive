@@ -1,4 +1,5 @@
 import { Owner } from "./owners";
+import { holdSlots } from "./held-slots";
 import { startWithin } from "./plans";
 import { Stop } from "./read";
 
@@ -20,6 +21,7 @@ export function slotOwner(key: string): Owner {
   if (held !== undefined) return held;
   const owner = new Owner();
   owners.set(key, owner);
+  holdSlots([key], owner);
   return owner;
 }
 

@@ -31,6 +31,9 @@
     .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
         pipeline.Component<CallLog>("calls").Note(Model.Resident + "'s monitor alarmed")))
 
+@(plan.Button("load-ward-notes", "Load the ward notes")
+    .Reactive(button => button.Click, pipeline => pipeline.Get("/Cards/WardNotes").Into("ward-notes")))
+
 @(plan.Button("clear-ward-notes", "Clear the ward notes")
     .Reactive(button => button.Click, pipeline => pipeline.Unload("ward-notes")))
 
