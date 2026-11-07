@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Types;
 using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Values;
@@ -28,15 +29,17 @@ internal sealed class WrittenArg : Arg
 public sealed class Arg<T> : Arg
 {
     private readonly Func<PlanBuild, Expression> _expression;
+    private readonly Func<PlanBuild, HeldForm> _form;
 
-    private Arg(Func<PlanBuild, Expression> expression)
+    private Arg(Func<PlanBuild, Expression> expression, Func<PlanBuild, HeldForm> form)
     {
         _expression = expression;
+        _form = form;
     }
 
-    public static implicit operator Arg<T>(T value) => new(build => Literal.Of(value, build));
+    public static implicit operator Arg<T>(T value) => new(build => Literal.Of(value, build), build => build.OptionsForm);
 
-    public static implicit operator Arg<T>(TypedSource<T> source) => new(_ => source.Expression);
+    public static implicit operator Arg<T>(TypedSource<T> source) => new(_ => source.Expression, _ => source.Form);
 
-    internal override Expression ExpressionIn(PlanBuild build) => build.IntoLive<T>(_expression(build));
+    internal override Expression ExpressionIn(PlanBuild build) => build.IntoLive<T>(_expression(build), _form(build));
 }

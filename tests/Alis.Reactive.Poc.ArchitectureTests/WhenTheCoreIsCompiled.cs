@@ -15,7 +15,7 @@ public sealed class WhenTheCoreIsCompiled
     {
         ["Plan"] = [],
         ["Writing"] = ["Plan", "Types", "Inputs"],
-        ["Values"] = ["Plan", "Writing"],
+        ["Values"] = ["Plan", "Writing", "Types"],
         ["Types"] = ["Plan"],
         ["Inputs"] = ["Types"],
         ["Conditions"] = ["Plan", "Writing", "Values", "Types"],

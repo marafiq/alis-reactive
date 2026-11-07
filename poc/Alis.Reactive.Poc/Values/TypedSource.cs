@@ -1,6 +1,7 @@
 using System;
 using System.Text.Json;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Types;
 using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Values;
@@ -12,6 +13,8 @@ internal interface IPlanSource
     Expression Expression { get; }
 
     PlanBuild Build { get; }
+
+    HeldForm Form { get; }
 }
 
 public abstract class TypedSource<T> : ITypedSource<T>, IPlanSource
@@ -24,22 +27,34 @@ public abstract class TypedSource<T> : ITypedSource<T>, IPlanSource
 
     internal abstract PlanBuild Build { get; }
 
+    internal virtual HeldForm Form => Build.OptionsForm;
+
     Expression IPlanSource.Expression => Expression;
 
     PlanBuild IPlanSource.Build => Build;
+
+    HeldForm IPlanSource.Form => Form;
 }
 
 internal sealed class DataRead<T> : TypedSource<T>
 {
     internal DataRead(Expression expression, PlanBuild build)
+        : this(expression, build, build.OptionsForm)
+    {
+    }
+
+    internal DataRead(Expression expression, PlanBuild build, HeldForm form)
     {
         Expression = expression;
         Build = build;
+        Form = form;
     }
 
     internal override Expression Expression { get; }
 
     internal override PlanBuild Build { get; }
+
+    internal override HeldForm Form { get; }
 }
 
 internal static class Sources
@@ -53,4 +68,7 @@ internal static class Literal
 {
     internal static LiteralExpression Of<T>(T value, PlanBuild build)
         => new LiteralExpression(JsonSerializer.SerializeToElement(value, build.Values));
+
+    internal static LiteralExpression Of<T>(T value, HeldForm form)
+        => new LiteralExpression(form.Write(value, typeof(T)));
 }

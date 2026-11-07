@@ -8,13 +8,29 @@ using Alis.Reactive.Plan;
 
 namespace Alis.Reactive.Types;
 
+internal sealed class DataPath
+{
+    internal DataPath(IReadOnlyList<DataStep> steps, HeldForm form)
+    {
+        Steps = steps;
+        Form = form;
+    }
+
+    internal IReadOnlyList<DataStep> Steps { get; }
+
+    internal HeldForm Form { get; }
+}
+
 internal static class JsonPath
 {
-    internal static IReadOnlyList<DataStep> Of(LambdaExpression path, DataStarts starts, string argument)
-        => starts.Steps(Links(path.Body, path.Parameters[0], starts, path, argument)
-            ?? throw new ArgumentException($"'{path}' is not a path of members of its value, such as n => n.Pager.Number.", argument));
+    internal static DataPath Of(LambdaExpression path, HeldForm valueForm, DataStarts starts, string argument)
+    {
+        var links = Links(path.Body, path.Parameters[0], valueForm, starts, path, argument)
+            ?? throw new ArgumentException($"'{path}' is not a path of members of its value, such as n => n.Pager.Number.", argument);
+        return new DataPath(starts.Steps(links), HeldForm.Of(links[links.Count - 1], starts.Values).For(path.Body.ToString()));
+    }
 
-    internal static IReadOnlyList<DataLink>? Links(System.Linq.Expressions.Expression node, ParameterExpression value, DataStarts starts, LambdaExpression path, string argument)
+    internal static IReadOnlyList<DataLink>? Links(System.Linq.Expressions.Expression node, ParameterExpression value, HeldForm valueForm, DataStarts starts, LambdaExpression path, string argument)
     {
         var read = node;
         var accesses = new List<(MemberExpression Access, Type Holder)>();
@@ -26,6 +42,7 @@ internal static class JsonPath
 
         var readsTheValue = node == value && accesses.Count > 0;
         if (!readsTheValue) return null;
+        if (valueForm.By == HeldBy.ItsConverter) throw ReadsPast(read, value, argument);
         accesses.Reverse();
         var links = new List<DataLink>(accesses.Count);
         foreach (var (access, holder) in accesses)
@@ -68,7 +85,7 @@ internal static class JsonPath
     [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's exception, 2026-11-06: the class that declares a lambda's member is a type's identity, not a discovery of members (D18.1).")]
     private static Type? DeclaringClass(MemberExpression access) => access.Member.DeclaringType;
 
-    private static ArgumentException ReadsPast(System.Linq.Expressions.Expression read, MemberExpression member, string argument)
+    private static ArgumentException ReadsPast(System.Linq.Expressions.Expression read, System.Linq.Expressions.Expression member, string argument)
         => new($"'{read}' reads past '{member}', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read '{member}' itself, or read past it on the server.", argument);
 
     private static ArgumentException NotWritten(LambdaExpression path, Type holder, string argument)

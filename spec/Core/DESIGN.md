@@ -425,7 +425,8 @@ Terms used throughout:
 - `X4.12` refusal (D4.3, D5.11): an async method's result read inside a list's lambda: "An async method is called
   inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline
   and read its result in the lambda."
-- `X4.13` refusal (D4.2): a path past a member its own converter writes, in a list's lambda and in a `Find`'s field:
+- `X4.13` refusal (D4.2): a path past a member its own converter writes, or past a list's item its converter writes
+  (`Select(d => d.Charter).Count(c => c.Name == "Ruth")`), in a list's lambda and in a `Find`'s field:
   "'{path}' reads past '{member}', which its own JSON converter writes, so the browser holds what the converter
   writes, not its members; read '{member}' itself, or read past it on the server."
 - `X4.10` behavior: in an app whose options set `RespectRequiredConstructorParameters`, a dose that lacks a
@@ -683,8 +684,9 @@ Terms used throughout:
     lambda, a predicate's bool, a .NET member it is the receiver or the argument of (`charted.Contains(d.Charted)`),
     `??`, `?:`, an order key (D6.13) and a `Sum` term (D6.11) (X6.39). Two reads take the member as the browser
     holds it: the whole body of a `Select`, and a `decimal` `Sum`'s term written as decimal text by number handling
-    (D6.11). Outside a list's lambda, a source read from such a member (a member's `Read`, a `Find`'s field, a
-    `Select`'s list) carries no form: POC 13f-iii carries it to the comparisons, sets and gathers that use it.
+    (D6.11). A list's item is held in its list's form, so `Select(d => d.Charted).Count(s => s == DoseStatus.Given)`
+    compares each item in the converter's form, and a lambda reading past an item its converter writes is refused
+    (X4.13). Outside a list's lambda, a source carries its form (D7.7).
 - D6.13 `OrderBy(key)` and `OrderByDescending(key)` write `call(list, ["toSorted"], [fn(a, b)])` whose body compares
   the key read from each item, the two items swapped for descending, so items with equal keys keep their list order
   as .NET's stable sort keeps it. C# picks the comparison from the key's type and how the app's JSON writes it, where
@@ -871,6 +873,9 @@ Terms used throughout:
 - `X6.43` refusal (D6.12): a fraction the JSON writes as text, compared: "'{term}' compares a fraction the JSON
   writes as text, whose text neither equals nor orders as the number does, as 0.10 and 0.1; compare it on the
   server."
+- `X6.45` behavior (D6.12): `Select(d => d.Charted).Count(s => s == DoseStatus.Given)` counts the three charts the
+  converter writes "Given"; `Select(d => d.Supply.Vials).Sum(v => v)` is refused by X6.39's message, the item held as
+  text.
 - `X6.44` behavior (D6.12): `d.Charted == DoseStatus.Given` keeps the three doses whose own `JsonStringEnumConverter`
   writes "Given" where the app writes enums in camel case, and `!=` keeps the other two; `d.Supply.Vials == 2` keeps
   the one dose whose supply's class writes its numbers as text; that class's text member computes as .NET does
@@ -907,6 +912,18 @@ Terms used throughout:
   membership and the comparisons. `Matches` takes a literal pattern only, because the pattern is checked
   where the view renders for the constructs JavaScript reads differently from .NET; a pattern read in the
   browser cannot be checked.
+- D7.7 A source carries the form its value is held in (D6.12, built in POC 13f-iii, chosen within the owner's yes,
+  2026-11-07). A member's `Read`, a `Find`'s field and a `Select`'s list take the form of the member they read;
+  `OrNull`, `Where`, `OrderBy` and `Find` pass their source's form on; a computed value (a count, a sum, a
+  comparison) and a live object's member are in the app's options' form. A value written beside such a source is
+  written in its form: a condition's literal (D8.10), `IfNull`'s fallback and `Choose`'s literal arm (X7.12). A
+  choice between two sources where either is in its own form is refused (X7.11). A live object takes a value as the
+  app's options write its type, the form every literal set into it is written in, so a property set, a method's or
+  plugin's argument and a vendor's answer refuse a source in its own form (X7.10); an element's text and HTML are
+  property sets, so they refuse it too, and a value its own converter writes is shown by the server. A request sends a
+  source to a member its endpoint binds by its own contract: a member with the same converter or number handling reads
+  it back, so the request unit (Q9, the rewrite) compares the source's form with the target member's and refuses a
+  difference.
 - D7.6 A source that reads nothing writes `null` into a property, an argument and a payload member. At an
   element's text and HTML it shows nothing, and at a class it changes nothing (D4.5): a class name is bound by a
   `let`, and the element's `classList` method runs only where it holds a value, as the redesign's class change does
@@ -968,6 +985,15 @@ Terms used throughout:
   "undefined".
 - `X7.9` behavior (D7.3, N7.6): a census whose count is `int?`, as its TypeScript reads `number | null`, shows the
   count a step writes from an `int` sum or count.
+- `X7.10` refusal (D7.7): a source in its own form set into a property, passed as an argument or answered to a
+  vendor: "A live object takes a value as the app's options write its type, and '{read}' is written by {cause};
+  compare it with == or !=, or pass the value from the server."
+- `X7.11` refusal (D7.7): `IfNull` or `Choose` between two sources where either is in its own form: "A choice joins
+  '{read}', which {cause} writes unlike the app's options, with another value read from the page; choose between it
+  and a value the view writes, or choose on the server."
+- `X7.12` behavior (D7.7): `IfNull(DoseStatus.Given)` over a found chart that reads nothing compares equal to
+  `DoseStatus.Given`, its fallback written as the member's own converter writes it, and so does `Choose`'s literal arm
+  beside a found chart.
 - `X7.7` behavior (D7.3, N7.5): a fluid balance's intake widened to `int?` is written to its nullable target and
   ordered against it, over a 1000 ml target and within it, and an ordering with a null target does not hold, where
   JavaScript's `500 > null` does; a pump's summary widened to `string?` is passed as the caption's argument.
@@ -1027,6 +1053,9 @@ Terms used throughout:
   condition. So `d.Carer.Name != "Ruth"` and `!(d.Carer.Name == "Ruth")` agree over a dose whose carer is null:
   neither holds, where .NET throws. A member the item lacks reads its start first (D4.2): `d.Ward != "North"` holds
   over a dose the app wrote with no `ward`, as it holds over the null the endpoint binds for it.
+- D8.10 A pipeline condition over a source in its own form (D7.7) follows D6.12's rules (POC 13f-iii): a literal it is
+  compared with by `Eq` or `NotEq` is written in its form, and an ordering (X8.19), a type that is not a scalar (X8.20),
+  two sources where either is in its own form (X8.21) and a fraction written as text (X8.22) are refused.
 
 **Schema nodes.** `op` (the comparison, text, membership and value tests, `and`, `or`, `not`); `if`.
 
@@ -1106,6 +1135,19 @@ Terms used throughout:
   the method before the When to read its result after it."
 - `X8.18` refusal (D8.7): a second `Else`, or an `ElseIf` after the `Else`, of one `When`: "An Else ends its When:
   write each ElseIf before it, and every step of the remaining case in that one Else."
+- `X8.19` refusal (D8.10): an ordering of a source in its own form: "A condition orders '{read}', which {cause} writes
+  unlike the app's options, so the browser does not order it as .NET does; order it on the server."
+- `X8.20` refusal (D8.10): a source of a type that is not a scalar, in its own converter's form, compared with a
+  value: "A condition compares '{read}', which {cause} writes unlike the app's options, and .NET compares the object
+  it holds; compare it on the server."
+- `X8.21` refusal (D8.10): two sources compared where either is in its own form: "A condition compares two values,
+  and {cause} writes '{read}' unlike the app's options, so the browser does not compare them as .NET does; compare
+  them on the server."
+- `X8.22` refusal (D8.10): a fraction the JSON writes as text compared with a value: "A condition compares a
+  fraction the JSON writes as text, whose text neither equals nor orders as the number does, as 0.10 and 0.1;
+  compare it on the server."
+- `X8.23` behavior (D8.10): a found chart and a component's data read to `Charted` equal `DoseStatus.Given` as the
+  member's own converter writes it, "Given" where the app writes "given".
 
 ## Q9. The request
 

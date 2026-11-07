@@ -16,6 +16,8 @@ public sealed class MedicationCart : Component
     public override ComponentVendor Vendor => CartVendor;
 
     public ReadOnly<List<MedicationDose>> Doses => ReadOnly<List<MedicationDose>>();
+
+    public ReadOnly<MedicationDose> Featured => ReadOnly<MedicationDose>();
 }
 
 public enum DoseStatus
@@ -76,6 +78,16 @@ public sealed record MedicationDose(
 
     [JsonConverter(typeof(CarerNameConverter))]
     public Carer? Charter { get; init; }
+
+    [JsonConverter(typeof(UpperTextConverter))]
+    public string Code { get; init; } = "";
+}
+
+public sealed class UpperTextConverter : JsonConverter<string>
+{
+    public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => reader.GetString()!;
+
+    public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToUpperInvariant());
 }
 
 public sealed class CarerNameConverter : JsonConverter<Carer>
@@ -167,6 +179,15 @@ public static class MedicationCartHtml
         var cart = new TagBuilder("section");
         cart.Attributes["id"] = id;
         cart.Attributes["data-medication-cart"] = JsonSerializer.Serialize(doses, MedicationCartJson.Options);
+        return plan.Render<MedicationCart>(id, cart);
+    }
+
+    public static Rendered<MedicationCart, TModel> MedicationCartFeaturing<TModel>(this ReactivePlan<TModel> plan, string id, IReadOnlyList<MedicationDose> doses, MedicationDose featured)
+    {
+        var cart = new TagBuilder("section");
+        cart.Attributes["id"] = id;
+        cart.Attributes["data-medication-cart"] = JsonSerializer.Serialize(doses, MedicationCartJson.Options);
+        cart.Attributes["data-featured-dose"] = JsonSerializer.Serialize(featured, MedicationCartJson.Options);
         return plan.Render<MedicationCart>(id, cart);
     }
 }

@@ -108,6 +108,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   its own converter is refused on every data read (D4.2, D6.12, POC 13f-ii). This departs from D6.12's earlier
   "refuses it in a comparison", because the probe wrote the compared value through the member's form with no
   reflection. A fraction written as text is refused in equality too: 0.10m and 0.1m write "0.10" and "0.1".
+- Chosen within the owner's yes, 2026-11-07: a source carries the form its value is held in. A value written beside
+  it (a condition's literal, `IfNull`'s fallback, `Choose`'s literal arm) is written in that form. A live object (a
+  property set, an argument, a vendor's answer) refuses a source in its own form, because every literal set into a
+  live object is written as the app's options write its type (D7.7, D8.10, POC 13f-iii).
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

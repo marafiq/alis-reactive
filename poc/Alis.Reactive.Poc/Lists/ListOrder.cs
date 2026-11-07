@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Conditions;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Types;
 using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Lists;
@@ -51,12 +52,12 @@ internal static class ListOrder
         return Operator.CompareCulture;
     }
 
-    internal static Plan.Expression Sorted(Plan.Expression items, PlanBuild build, LambdaExpression key, Operator comparison, bool descending)
+    internal static Plan.Expression Sorted(Plan.Expression items, HeldForm itemForm, PlanBuild build, LambdaExpression key, Operator comparison, bool descending)
     {
         var left = build.ItemName();
         var right = build.ItemName();
-        var leftKey = LambdaCondition.Of(key, new RefExpression(left), build.Starts, nameof(key), build.ItemName, LambdaUse.Computes);
-        var rightKey = LambdaCondition.Of(key, new RefExpression(right), build.Starts, nameof(key), build.ItemName, LambdaUse.Computes);
+        var leftKey = LambdaCondition.Of(key, new RefExpression(left), itemForm, build.Starts, nameof(key), build.ItemName, LambdaUse.Computes);
+        var rightKey = LambdaCondition.Of(key, new RefExpression(right), itemForm, build.Starts, nameof(key), build.ItemName, LambdaUse.Computes);
         Plan.Expression[] keys = descending ? [rightKey, leftKey] : [leftKey, rightKey];
         return ListForms.Sorted(items, new FnExpression([left, right], new OperatorExpression(comparison, keys)));
     }

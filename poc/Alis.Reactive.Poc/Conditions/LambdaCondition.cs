@@ -30,16 +30,18 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
 
     private readonly LambdaExpression _lambda;
     private readonly IReadOnlyDictionary<ParameterExpression, PlanExpression> _scope;
+    private readonly IReadOnlyDictionary<ParameterExpression, HeldForm> _forms;
     private readonly DataStarts _starts;
     private readonly JsonSerializerOptions _values;
     private readonly HeldForm _optionsForm;
     private readonly string _argument;
     private readonly Func<string> _itemName;
 
-    private LambdaCondition(LambdaExpression lambda, IReadOnlyDictionary<ParameterExpression, PlanExpression> scope, DataStarts starts, string argument, Func<string> itemName)
+    private LambdaCondition(LambdaExpression lambda, IReadOnlyDictionary<ParameterExpression, PlanExpression> scope, IReadOnlyDictionary<ParameterExpression, HeldForm> forms, DataStarts starts, string argument, Func<string> itemName)
     {
         _lambda = lambda;
         _scope = scope;
+        _forms = forms;
         _starts = starts;
         _values = starts.Values;
         _optionsForm = HeldForm.OfTheOptions(starts.Values);
@@ -47,16 +49,21 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         _itemName = itemName;
     }
 
-    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, DataStarts starts, string argument, Func<string> itemName, LambdaUse use)
+    internal static PlanExpression Of(LambdaExpression lambda, PlanExpression item, HeldForm itemForm, DataStarts starts, string argument, Func<string> itemName, LambdaUse use)
+        => Taken(lambda, item, itemForm, starts, argument, itemName, use).Body;
+
+    internal static (PlanExpression Body, HeldForm Form) Taken(LambdaExpression lambda, PlanExpression item, HeldForm itemForm, DataStarts starts, string argument, Func<string> itemName, LambdaUse use)
     {
-        var scope = new Dictionary<ParameterExpression, PlanExpression> { [lambda.Parameters[0]] = item };
-        var condition = new LambdaCondition(lambda, scope, starts, argument, itemName);
-        var bodyIsAMember = lambda.Body is MemberExpression;
+        var parameter = lambda.Parameters[0];
+        var scope = new Dictionary<ParameterExpression, PlanExpression> { [parameter] = item };
+        var forms = new Dictionary<ParameterExpression, HeldForm> { [parameter] = itemForm };
+        var condition = new LambdaCondition(lambda, scope, forms, starts, argument, itemName);
+        var bodyIsARead = lambda.Body is MemberExpression or ParameterExpression;
         return use switch
         {
-            LambdaUse.Takes when bodyIsAMember => condition.Read(lambda.Body, TakesItsOwnForm),
-            LambdaUse.SumsDecimal when bodyIsAMember => condition.Read(lambda.Body, IsDecimalText),
-            _ => condition.Term(lambda.Body),
+            LambdaUse.Takes when bodyIsARead => (condition.Read(lambda.Body, TakesItsOwnForm), condition.FormOf(lambda.Body)),
+            LambdaUse.SumsDecimal when bodyIsARead => (condition.Read(lambda.Body, IsDecimalText), condition._optionsForm),
+            _ => (condition.Term(lambda.Body), condition._optionsForm),
         };
     }
 
@@ -66,7 +73,13 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
     {
         var read = Unconverted(operand);
         if (!ReadsTheItem(read)) return new LiteralExpression(Written(ViewValues.Of(read, _argument), read.Type));
-        if (read is ParameterExpression parameter && _scope.TryGetValue(parameter, out var bound)) return bound;
+        if (read is ParameterExpression parameter && _scope.TryGetValue(parameter, out var bound))
+        {
+            var held = _forms[parameter];
+            if (held.IsOwn && !takesItsOwnForm(held)) throw ComputesWith(held.Read, held);
+            return bound;
+        }
+
         if (read is UnaryExpression { NodeType: ExpressionType.ArrayLength } length) return ListForms.Length(Read(length.Operand));
         if (read is BinaryExpression { NodeType: ExpressionType.Coalesce } coalesce) return Coalesced(coalesce);
         if (read is ConditionalExpression conditional) return Op(Operator.Cond, Term(conditional.Test), Term(conditional.IfTrue), Term(conditional.IfFalse));
@@ -74,9 +87,9 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         if (translated is not null) return translated;
         var root = RootOf(read);
         if (root is null || !_scope.TryGetValue(root, out var holder)) throw TranslatedMembers.NoBrowserForm(read, _argument);
-        var links = JsonPath.Links(read, root, _starts, _lambda, _argument) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
+        var links = JsonPath.Links(read, root, _forms[root], _starts, _lambda, _argument) ?? throw TranslatedMembers.NoBrowserForm(read, _argument);
         var form = HeldForm.Of(links[links.Count - 1], _values);
-        if (form.IsOwn && !takesItsOwnForm(form)) throw ComputesWith(read, form);
+        if (form.IsOwn && !takesItsOwnForm(form)) throw ComputesWith(ViewValues.Printed(read), form);
         return new DataExpression(holder, _starts.Steps(links));
     }
 
@@ -86,7 +99,10 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         var scope = new Dictionary<ParameterExpression, PlanExpression>(_scope.Count + 1);
         foreach (var bound in _scope) scope[bound.Key] = bound.Value;
         scope[inner.Parameters[0]] = new RefExpression(item);
-        return new FnExpression([item], new LambdaCondition(inner, scope, _starts, _argument, _itemName).Term(inner.Body));
+        var forms = new Dictionary<ParameterExpression, HeldForm>(_forms.Count + 1);
+        foreach (var held in _forms) forms[held.Key] = held.Value;
+        forms[inner.Parameters[0]] = _optionsForm;
+        return new FnExpression([item], new LambdaCondition(inner, scope, forms, _starts, _argument, _itemName).Term(inner.Body));
     }
 
     public FnExpression EveryItem() => ListForms.EveryItem(_itemName());
@@ -143,10 +159,11 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
 
     private HeldForm FormOf(LinqExpression read)
     {
+        if (read is ParameterExpression parameter && _forms.TryGetValue(parameter, out var held)) return held;
         if (read is not MemberExpression member || TranslatedMembers.Translates(member)) return _optionsForm;
         if (RootOf(read) is not { } root || !_scope.ContainsKey(root)) return _optionsForm;
-        var links = JsonPath.Links(read, root, _starts, _lambda, _argument);
-        return links is null ? _optionsForm : HeldForm.Of(links[links.Count - 1], _values);
+        var links = JsonPath.Links(read, root, _forms[root], _starts, _lambda, _argument);
+        return links is null ? _optionsForm : HeldForm.Of(links[links.Count - 1], _values).For(ViewValues.Printed(read));
     }
 
     private void RequireNoOwnForm(BinaryExpression comparison, LinqExpression member)
@@ -208,8 +225,8 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         return finder.Found;
     }
 
-    private ArgumentException ComputesWith(LinqExpression member, HeldForm form)
-        => new($"'{ViewValues.Printed(member)}' is written by {form.Cause}, unlike the app's options, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.", _argument);
+    private ArgumentException ComputesWith(string member, HeldForm form)
+        => new($"'{member}' is written by {form.Cause}, unlike the app's options, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.", _argument);
 
     private ArgumentException ComparesObjects(BinaryExpression comparison)
         => Refused(comparison, "compares objects, and the browser compares objects by reference; compare a member of each, such as d => d.Carer.Name == lead.");

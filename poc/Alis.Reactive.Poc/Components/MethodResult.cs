@@ -21,5 +21,8 @@ public sealed class MethodResult<TResult> : TypedSource<TResult>
     internal override PlanBuild Build { get; }
 
     public TypedSource<TRead> Read<TRead>(System.Linq.Expressions.Expression<Func<TResult, TRead>> path)
-        => new DataRead<TRead>(new DataExpression(Expression, JsonPath.Of(path, Build.Starts, nameof(path))), Build);
+    {
+        var read = JsonPath.Of(path, Form, Build.Starts, nameof(path));
+        return new DataRead<TRead>(new DataExpression(Expression, read.Steps), Build, read.Form);
+    }
 }

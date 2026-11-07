@@ -16,13 +16,16 @@ internal sealed class HeldForm
 {
     private const JsonNumberHandling WritingBits = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowNamedFloatingPointLiterals;
 
+    private readonly JsonSerializerOptions _options;
     private readonly JsonSerializerOptions _writer;
 
-    private HeldForm(JsonSerializerOptions writer, HeldBy by, string cause)
+    private HeldForm(JsonSerializerOptions options, JsonSerializerOptions writer, HeldBy by, string cause, string read)
     {
+        _options = options;
         _writer = writer;
         By = by;
         Cause = cause;
+        Read = read;
     }
 
     internal HeldBy By { get; }
@@ -31,7 +34,9 @@ internal sealed class HeldForm
 
     internal string Cause { get; }
 
-    internal static HeldForm OfTheOptions(JsonSerializerOptions options) => new(options, HeldBy.TheOptions, "the app's options");
+    internal string Read { get; }
+
+    internal static HeldForm OfTheOptions(JsonSerializerOptions options) => new(options, options, HeldBy.TheOptions, "the app's options", "");
 
     internal static HeldForm Of(DataLink link, JsonSerializerOptions options)
     {
@@ -40,7 +45,7 @@ internal sealed class HeldForm
         {
             var written = new JsonSerializerOptions(options);
             written.Converters.Insert(0, converter);
-            return new HeldForm(written, HeldBy.ItsConverter, "its own JSON converter");
+            return new HeldForm(options, written, HeldBy.ItsConverter, "its own JSON converter", "");
         }
 
         var classHandling = options.GetTypeInfo(link.Holder).NumberHandling;
@@ -48,8 +53,12 @@ internal sealed class HeldForm
         var writesAsTheOptionsDo = (handling & WritingBits) == (options.NumberHandling & WritingBits) || !HoldsNumbers(member.PropertyType, options);
         if (writesAsTheOptionsDo) return OfTheOptions(options);
         var cause = member.NumberHandling is null ? "its class's JSON number handling" : "its own JSON number handling";
-        return new HeldForm(new JsonSerializerOptions(options) { NumberHandling = handling }, HeldBy.ItsNumberHandling, cause);
+        return new HeldForm(options, new JsonSerializerOptions(options) { NumberHandling = handling }, HeldBy.ItsNumberHandling, cause, "");
     }
+
+    internal HeldForm For(string read) => IsOwn ? new HeldForm(_options, _writer, By, Cause, read) : this;
+
+    internal bool HoldsAnObject(Type type) => _options.GetTypeInfo(type).Kind is not JsonTypeInfoKind.None;
 
     internal JsonElement Write(object? value, Type type) => JsonSerializer.SerializeToElement(value, _writer.GetTypeInfo(type));
 

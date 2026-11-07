@@ -38,6 +38,7 @@ internal sealed class PlanBuild
         values.MakeReadOnly(populateMissingResolver: true);
         Values = values;
         Starts = new DataStarts(values);
+        OptionsForm = HeldForm.OfTheOptions(values);
         Culture = CultureInfo.CurrentCulture;
     }
 
@@ -48,6 +49,8 @@ internal sealed class PlanBuild
     internal JsonSerializerOptions Values { get; }
 
     internal DataStarts Starts { get; }
+
+    internal HeldForm OptionsForm { get; }
 
     internal CultureInfo Culture { get; }
 
@@ -102,8 +105,18 @@ internal sealed class PlanBuild
         return block;
     }
 
-    internal Expression IntoLive<TValue>(Expression value)
-        => LiveShapes.Of(Values.GetTypeInfo(typeof(TValue)), Values) is ConvertedShape converted ? new AsExpression(value, converted.Shape) : value;
+    internal Expression IntoLive<TValue>(Expression value, HeldForm form)
+    {
+        RequireTheOptionsForm(form);
+        return LiveShapes.Of(Values.GetTypeInfo(typeof(TValue)), Values) is ConvertedShape converted ? new AsExpression(value, converted.Shape) : value;
+    }
+
+    internal static void RequireTheOptionsForm(HeldForm form)
+    {
+        if (!form.IsOwn) return;
+        throw new InvalidOperationException(
+            $"A live object takes a value as the app's options write its type, and '{form.Read}' is written by {form.Cause}; compare it with == or !=, or pass the value from the server.");
+    }
 
     internal string ItemName() => "item" + (++_items).ToString(CultureInfo.InvariantCulture);
 

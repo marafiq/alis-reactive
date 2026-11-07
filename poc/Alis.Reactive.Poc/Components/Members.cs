@@ -26,7 +26,10 @@ public class ReadOnly<TValue> : TypedSource<TValue>
     internal override PlanBuild Build => Owner.Binding.Build;
 
     public TypedSource<TResult> Read<TResult>(System.Linq.Expressions.Expression<Func<TValue, TResult>> path)
-        => new DataRead<TResult>(new DataExpression(Expression, JsonPath.Of(path, Build.Starts, nameof(path))), Build);
+    {
+        var read = JsonPath.Of(path, Form, Build.Starts, nameof(path));
+        return new DataRead<TResult>(new DataExpression(Expression, read.Steps), Build, read.Form);
+    }
 }
 
 public sealed class Property<TValue> : ReadOnly<TValue>
@@ -36,11 +39,11 @@ public sealed class Property<TValue> : ReadOnly<TValue>
     {
     }
 
-    public void Set(TValue value) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build)));
+    public void Set(TValue value) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build), Owner.Binding.Build.OptionsForm));
 
-    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Optional, Assign.Live<TValue>(Owner.Binding.Build, Sources.Of(source)));
 
-    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(Owner, Member, Optional, Assign.Live<TValue>(Owner.Binding.Build, Sources.Of(source)));
 }
 
 public sealed class WriteOnly<TValue>
@@ -56,11 +59,11 @@ public sealed class WriteOnly<TValue>
         _optional = optional;
     }
 
-    public void Set(TValue value) => Assign.Write(_owner, _member, _optional, _owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, _owner.Binding.Build)));
+    public void Set(TValue value) => Assign.Write(_owner, _member, _optional, _owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, _owner.Binding.Build), _owner.Binding.Build.OptionsForm));
 
-    public void Set(ITypedSource<TValue> source) => Assign.Write(_owner, _member, _optional, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    public void Set(ITypedSource<TValue> source) => Assign.Write(_owner, _member, _optional, Assign.Live<TValue>(_owner.Binding.Build, Sources.Of(source)));
 
-    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(_owner, _member, _optional, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(_owner, _member, _optional, Assign.Live<TValue>(_owner.Binding.Build, Sources.Of(source)));
 }
 
 public static class NullableWrites
@@ -76,6 +79,8 @@ public static class NullableWrites
 
 internal static class Assign
 {
+    internal static Expression Live<TValue>(PlanBuild build, IPlanSource source) => build.IntoLive<TValue>(source.Expression, source.Form);
+
     internal static void Write(JsObject owner, PathStep member, bool optional, Expression value)
     {
         var binding = owner.Binding;
@@ -117,6 +122,7 @@ internal static class Answers
         var args = JsObject.Bound<TArgs>(new Binding(first, build, ReadPresence.Required, new ArgumentsAt(list)));
         var body = build.Answering(() => answer(args))
             ?? throw new ArgumentException("A callback's answer reads its arguments, such as tick => tick.Label.", nameof(answer));
+        PlanBuild.RequireTheOptionsForm(body.Form);
         return new AnswerExpression(list.Name, body.Expression);
     }
 }
