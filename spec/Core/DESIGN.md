@@ -2312,7 +2312,8 @@ grammar gains no node (G2).
     type and its bases do not make public (ALIS016), `Method` against a promise and `MethodAsync` against none
     (ALIS017), a door of the wrong kind (ALIS018), and nullability by variance (ALIS019): what the member reads fits
     the C# type, so a read that admits null is `T?`, and what the C# type writes fits the member, so a `T?` write needs
-    a member that takes null. A live object's and a returned object's nullability wait for N5.4's presence mark (13c).
+    a member that takes null. A live object or a returned object the API can hold as null or undefined is checked at
+    the object it holds otherwise; when it holds nothing, a read through it stops its pipeline (D5.5).
   - A drift a browser test arranges on purpose carries `SuppressMessage` whose justification names the test, and
     `WhenAContractDriftIsSuppressed` fails on a name no Playwright test declares.
   - A declared event is one the type declares (ALIS020, POC 13b), read from the type alone: a property of the event's
@@ -2325,6 +2326,34 @@ grammar gains no node (G2).
     rather than expanded, which would add 33,725 lines. The C# vendor's listening is not read: a vendor a referenced
     package defines is metadata to an analyzer, so its subscribe method is checked where a handler starts (D17.3).
   - Every `vendor-contract.tsv` the build passes is read, and a type two of them list is listed twice (ALIS015).
+  - A declaration a component or plugin reaches is checked at the type its vendor's API gives what reaches it (POC
+    13c, D5.3): `LiveObject` at the member's read type and `LiveObjects` at its element, `ReturnedObject` at the
+    method's return and `ReturnedObjects` at its element, an event's payload at its listener's parameters (a callable
+    property's function, the listener of each signature that takes the event's literal, or an event map's member), and
+    a callback's arguments at its property's function's parameters. Null and undefined removed, a union is checked at
+    each type it holds, a polymorphic `this` at the type it is read on and a type parameter at its constraint; each
+    declaration at each type once, with ALIS016 to ALIS020 as on a root. A payload read by its members needs an object
+    at the first parameter. `Argument(n)` and `MethodAt(n)` are checked against the parameter list, a rest parameter
+    giving every later position: present (ALIS016), nullability by variance (ALIS019), a function for `MethodAt`
+    (ALIS018), one that returns a promise a gap to name (ALIS017). A positional door on a declaration no listener or
+    callback hands, a component's or one a member holds, is ALIS018, at the build rather than where the view renders.
+    A primitive, `unknown`, `any`, a tuple or a function where a live object is declared, one object where the API
+    holds a list and a list where it holds one object are ALIS021, the cure naming the vendor's TypeScript. A callback
+    answer declared `T?` where the function's result takes no null is ALIS019.
+  - The contract writes what each member holds as `holds` lines: a read's type, a method's return (a promise's
+    value), a callable's parameters and a listener's parameters for each event it takes, each part a named type, a
+    list's element, the object itself, a function, null, or another type by its text. A type the vendor does not name
+    (an instantiation such as `CustomEvent<Noted>`, a base such as `InfusionPump<PumpChannel>`, an object literal type)
+    is listed as its own type, members resolved and flattened, named `CustomEvent#210` with its text shown in messages.
+    A type that holds a free type parameter (a method's own generic) is written by its text only: C# never supplies a
+    vendor method's type arguments, and listing each instantiation never ends. A name two files of a package declare
+    is listed once for each declaration under its own name, so it can be reached, and mirroring it by name stays
+    ALIS015. A base is read from its heritage clause's type node, since the type at the clause carries the derived
+    class's `this`.
+  - A root's checks run as the code is typed. A reached declaration is checked at the end of the compilation, since
+    what reaches it can be anywhere in it, so the IDE shows those diagnostics on build (gate 1). An `Answer(..)` a
+    method takes reaches its arguments through that method's parameters and waits for argument agreement (gate 1);
+    a declaration a referenced assembly holds is checked by the build that compiles it.
 - D17.6 Every vendor package is pinned to one exact version, its sub-packages included, and its npm and NuGet
   versions move together (B16). The contract table of D17.5 is written by every build whose TypeScript inputs
   changed, so a vendor's drift fails the build at the upgrade.
@@ -2471,6 +2500,10 @@ plans (Q19).
 - `X17.1` analyzer: ALIS017 reports a method declared with `Method` whose vendor contract returns a promise: new:N17.2.
 - `X17.2` analyzer: ALIS016 reports a declared member the vendor contract does not list as public: new:N17.2.
 - `X17.28` analyzer: ALIS020 reports a declared event its vendor's typed API does not declare: new:N17.2.
+- `X17.29` analyzer: a declaration a component or plugin reaches is checked at the type the vendor's API gives what
+  reaches it, and ALIS021 reports a reach that type gives no object, no list or a list: new:N17.2.
+- `X17.30` analyzer: `Argument(n)` and `MethodAt(n)` are checked against the parameters a listener or callback is
+  handed, and ALIS018 reports one on a declaration handed none: new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every

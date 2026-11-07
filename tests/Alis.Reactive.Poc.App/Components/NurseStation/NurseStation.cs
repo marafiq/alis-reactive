@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Components;
@@ -23,6 +24,7 @@ public sealed class StationBed : JsObject
 {
     public ReadOnly<string> Resident => ReadOnly<string>();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS016", Justification = "Drift on purpose: a_bed_that_lacks_a_member_the_declaration_names_stops_the_list_and_the_steps_after_it proves the browser stops on it.")]
     public ReadOnly<bool> Occupied => ReadOnly<bool>();
 
     public Property<string> Status => Property<string>();

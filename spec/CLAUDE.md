@@ -210,6 +210,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `WriteOnly<T?>` takes a `T` source as C# assignment does (`NullableWrites`, N7.6), a door added to the public surface.
   Its cost: it is an extension in `Alis.Reactive.Components`, and a view that does not import it meets a bare CS1503.
   The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a declaration a root reaches is checked at the type the vendor's API gives
+  what reaches it, with no attribute of its own (D17.5, X17.29). A drift is cured where the vendor's types under-state
+  what it hands (the current pump typed `InfusionPump<PumpChannel>`), and suppressed naming its test only where a
+  browser test arranges it (an older build's bed or alarm). A positional door on a declaration no listener or callback
+  hands is refused at the build, not first where the view renders (X17.30). Root checks stay live and reached checks
+  run at the compilation's end. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

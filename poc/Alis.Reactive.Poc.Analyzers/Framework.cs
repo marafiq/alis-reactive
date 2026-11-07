@@ -43,6 +43,16 @@ internal sealed class Framework
         return false;
     }
 
+    public bool IsJsObject(INamedTypeSymbol type)
+    {
+        for (var basis = type.BaseType; basis is not null; basis = basis.BaseType)
+        {
+            if (SymbolEqualityComparer.Default.Equals(basis, JsObject)) return true;
+        }
+
+        return false;
+    }
+
     public AttributeData? MirrorsOf(INamedTypeSymbol type)
     {
         foreach (var attribute in type.GetAttributes())

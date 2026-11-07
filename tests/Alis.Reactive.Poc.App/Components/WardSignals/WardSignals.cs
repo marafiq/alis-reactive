@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Components;
 using Alis.Reactive.Hosting;
 using Alis.Reactive.Values;
@@ -60,6 +61,7 @@ public sealed class MedicineSearch : Component
 
     public Event<SearchLoad> Load => Event<SearchLoad>();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS018", Justification = "Drift on purpose: an_argument_at_a_position_read_on_a_component_is_refused_where_the_view_renders proves the view refuses it where it renders.")]
     public ReadOnly<string> FirstArgument => Argument<string>(0);
 }
 

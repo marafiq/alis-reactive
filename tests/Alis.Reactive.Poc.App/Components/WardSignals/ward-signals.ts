@@ -6,7 +6,17 @@ export interface WardFeedHost extends HTMLElement {
   feed?: WardFeed;
 }
 
-type Listener = (...args: unknown[]) => void;
+interface BellRing {
+  readonly room: string;
+}
+
+interface FeedUpdate {
+  readonly message: string;
+}
+
+type UpdateListener = (update: FeedUpdate) => void;
+
+type LoadListener = (query: string, answer: (items: readonly string[]) => void) => void;
 
 declare global {
   interface HTMLElementEventMap {
@@ -15,7 +25,7 @@ declare global {
 }
 
 export class CallBell {
-  onring: Listener | null = null;
+  onring: ((ring: BellRing) => void) | null = null;
 
   constructor(host: HTMLElement) {
     host.replaceChildren(buttonOf("Ring the bell", () => this.onring?.({ room: "12" })));
@@ -23,20 +33,20 @@ export class CallBell {
 }
 
 export class WardFeed {
-  readonly #listeners = new Map<string, Set<Listener>>();
+  readonly #listeners = new Map<string, Set<UpdateListener>>();
 
   constructor(host: HTMLElement) {
     host.replaceChildren(buttonOf("Post an update", () => this.#post("update", { message: "Bed 3 is free" })));
   }
 
-  subscribe(event: "update", listener: Listener): () => void {
-    const listening = this.#listeners.get(event) ?? new Set<Listener>();
+  subscribe(event: "update", listener: UpdateListener): () => void {
+    const listening = this.#listeners.get(event) ?? new Set<UpdateListener>();
     listening.add(listener);
     this.#listeners.set(event, listening);
     return () => listening.delete(listener);
   }
 
-  #post(event: string, update: object): void {
+  #post(event: string, update: FeedUpdate): void {
     for (const listener of this.#listeners.get(event) ?? []) listener(update);
   }
 }
@@ -46,7 +56,7 @@ export interface MedicineSearchHost extends HTMLElement {
 }
 
 export class MedicineSearch {
-  readonly #listeners = new Map<string, Set<Listener>>();
+  readonly #listeners = new Map<string, Set<LoadListener>>();
   readonly #results: HTMLParagraphElement;
 
   constructor(host: HTMLElement) {
@@ -56,13 +66,13 @@ export class MedicineSearch {
     host.replaceChildren(this.#results, buttonOf("Search for In", () => this.#load("In")));
   }
 
-  on(event: "load", listener: Listener): void {
-    const listening = this.#listeners.get(event) ?? new Set<Listener>();
+  on(event: "load", listener: LoadListener): void {
+    const listening = this.#listeners.get(event) ?? new Set<LoadListener>();
     listening.add(listener);
     this.#listeners.set(event, listening);
   }
 
-  off(event: "load", listener: Listener): void {
+  off(event: "load", listener: LoadListener): void {
     this.#listeners.get(event)?.delete(listener);
   }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
@@ -10,67 +11,11 @@ namespace Alis.Reactive.Poc.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
 {
-    public const string Category = "Alis.Reactive.Contract";
-    public const string UnnamedId = "ALIS014";
-    public const string UnlistedId = "ALIS015";
-    public const string NotPublicId = "ALIS016";
-    public const string PromiseId = "ALIS017";
-    public const string KindId = "ALIS018";
-    public const string NullId = "ALIS019";
-    public const string EventId = "ALIS020";
+    private static readonly Rules Live = new(ended: false);
 
-    private static readonly DiagnosticDescriptor Unnamed = Rule(
-        UnnamedId,
-        "A component or plugin names the TypeScript type it mirrors",
-        "'{0}' names no TypeScript type it mirrors: mark it [Mirrors(module, type)] with the type its vendor's declarations give it");
+    private static readonly Rules Ended = new(ended: true);
 
-    private static readonly DiagnosticDescriptor Unlisted = Rule(
-        UnlistedId,
-        "The type a declaration mirrors is in the vendor contract",
-        "'{0}' mirrors '{1}' of '{2}', {3}");
-
-    private static readonly DiagnosticDescriptor NotPublic = Rule(
-        NotPublicId,
-        "A declared member is public in the vendor's typed API",
-        "'{0}' declares '{1}', which '{2}' does not make public: declare only what the vendor's typed API makes public");
-
-    private static readonly DiagnosticDescriptor Promise = Rule(
-        PromiseId,
-        "A method that returns a promise is declared with MethodAsync",
-        "'{0}' is declared with {1}, and '{2}' {3}: declare it with {4}");
-
-    private static readonly DiagnosticDescriptor PromiseFromSome = Rule(
-        PromiseId,
-        "A method that returns a promise is declared with MethodAsync",
-        "'{0}' is declared with {1}, and '{2}' returns a promise from some of its signatures and not from others, which no declaration mirrors");
-
-    private static readonly DiagnosticDescriptor Kind = Rule(
-        KindId,
-        "A member is declared with the door its kind takes",
-        "'{0}' is declared with {1}, and '{2}' is {3}: declare it with {4}");
-
-    private static readonly DiagnosticDescriptor ReadsNull = Rule(
-        NullId,
-        "A declaration's nullability fits its vendor's typed API",
-        "'{0}' reads '{1}', and '{2}' can read null or undefined: declare '{1}?'");
-
-    private static readonly DiagnosticDescriptor ReturnsNull = Rule(
-        NullId,
-        "A declaration's nullability fits its vendor's typed API",
-        "'{0}' returns '{1}', and '{2}' can return null or undefined: declare '{1}?'");
-
-    private static readonly DiagnosticDescriptor WritesNull = Rule(
-        NullId,
-        "A declaration's nullability fits its vendor's typed API",
-        "'{0}' writes '{1}?', and '{2}' takes no null: declare '{1}'");
-
-    private static readonly DiagnosticDescriptor Undeclared = Rule(
-        EventId,
-        "A declared event is one its vendor's typed API declares",
-        "'{0}' declares the event '{1}', which '{2}' does not declare: a vendor types an event as a property of its name that holds a function, or as a literal its subscribe method takes, as lib.dom's addEventListener takes the keys of HTMLElementEventMap");
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(Unnamed, Unlisted, NotPublic, Promise, PromiseFromSome, Kind, ReadsNull, ReturnsNull, WritesNull, Undeclared);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = Live.All.AddRange(Ended.All);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -82,13 +27,117 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
             if (framework is null) return;
             var contract = VendorContract.Read(start.Options.AdditionalFiles, start.CancellationToken);
             var mirrored = new ConcurrentDictionary<INamedTypeSymbol, Mirrored?>(SymbolEqualityComparer.Default);
+            var uses = new ConcurrentDictionary<INamedTypeSymbol, ConcurrentBag<Use>>(SymbolEqualityComparer.Default);
             start.RegisterSymbolAction(symbol => CheckRoot(symbol, framework, contract), SymbolKind.NamedType);
-            start.RegisterOperationAction(operation => CheckDoor(operation, framework, contract, mirrored), OperationKind.Invocation);
+            start.RegisterOperationAction(operation => Collect(operation, framework, contract, mirrored, uses), OperationKind.Invocation);
+            if (contract is null) return;
+            start.RegisterCompilationEndAction(end => new ReachWalk(end, framework, contract, uses, Ended).Run());
         });
     }
 
-    private static DiagnosticDescriptor Rule(string id, string title, string message)
-        => new(id, title, message, Category, DiagnosticSeverity.Error, isEnabledByDefault: true);
+    internal static void CheckMember(Action<Diagnostic> report, Rules rules, VendorContract contract, Use use, ContractType type, string shown)
+    {
+        var door = use.Door;
+        if (door.Shape == DoorShape.Itself)
+        {
+            CheckItself(report, rules, use, type, shown);
+            return;
+        }
+
+        if (use.JavaScriptName is not { } javaScriptName) return;
+        if (door.Shape == DoorShape.Event)
+        {
+            if (!contract.DeclaresEvent(type, javaScriptName)) report(Diagnostic.Create(rules.Undeclared, use.Location, use.Declared, javaScriptName, shown));
+            return;
+        }
+
+        var found = contract.Member(type, javaScriptName);
+        var vendorMember = shown + "." + javaScriptName;
+        if (found is null)
+        {
+            report(Diagnostic.Create(rules.NotPublic, use.Location, use.Declared, javaScriptName, shown));
+            return;
+        }
+
+        if (KindMismatch(door, found) is { } cure)
+        {
+            report(Diagnostic.Create(rules.Kind, use.Location, use.Declared, door.Name, vendorMember, Describe(found), cure));
+            return;
+        }
+
+        if (door.Shape == DoorShape.Call)
+        {
+            if (found.PromiseFromSome)
+            {
+                report(Diagnostic.Create(rules.PromiseFromSome, use.Location, use.Declared, door.Name, vendorMember));
+                return;
+            }
+
+            if (door.Awaits != found.ReturnsPromise)
+            {
+                var says = found.ReturnsPromise ? "returns a promise" : "returns no promise";
+                report(Diagnostic.Create(rules.Promise, use.Location, use.Declared, door.Name, vendorMember, says, door.Other));
+                return;
+            }
+        }
+
+        if (door.Reach == Reach.Callback)
+        {
+            CheckAnswer(report, rules, use, found, vendorMember);
+            return;
+        }
+
+        CheckNull(report, rules, use, found, vendorMember);
+    }
+
+    internal static void CheckPosition(Action<Diagnostic> report, Rules rules, Use use, string declaration, Parameters? parameters, string handedBy)
+    {
+        if (use.Position is not { } position) return;
+        if (parameters is null)
+        {
+            report(Diagnostic.Create(rules.NotHanded, use.Location, use.Declared, use.Door.Name, position, declaration));
+            return;
+        }
+
+        if (parameters.At(position) is not { } held)
+        {
+            report(Diagnostic.Create(rules.NoArgument, use.Location, use.Declared, use.Door.Name, position, handedBy));
+            return;
+        }
+
+        if (use.Door.Reads)
+        {
+            if (held.Any(each => each.Shape == HeldShape.Null) && use.Value is { Nullable: false } value)
+            {
+                report(Diagnostic.Create(rules.ArgumentNull, use.Location, use.Declared, value.Shown, position, handedBy));
+            }
+
+            return;
+        }
+
+        foreach (var each in held)
+        {
+            if (each.Shape == HeldShape.PromiseFunction)
+            {
+                report(Diagnostic.Create(rules.ArgumentPromise, use.Location, use.Declared, position, handedBy));
+                return;
+            }
+
+            if (each.Shape is HeldShape.Null or HeldShape.Function) continue;
+            report(Diagnostic.Create(rules.NotAFunction, use.Location, use.Declared, position, handedBy, Showing(each)));
+            return;
+        }
+    }
+
+    internal static string Showing(Held held) => held.Shape switch
+    {
+        HeldShape.Function or HeldShape.PromiseFunction => "a function",
+        HeldShape.Null => "null or undefined",
+        HeldShape.Items => "a list of '" + held.Key.Name + "'",
+        HeldShape.Self => "the object itself",
+        HeldShape.Object => "'" + held.Key.Name + "'",
+        _ => "'" + held.Text + "'",
+    };
 
     private static void CheckRoot(SymbolAnalysisContext context, Framework framework, VendorContract? contract)
     {
@@ -97,7 +146,7 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
         var attribute = framework.MirrorsOf(type);
         if (attribute is null)
         {
-            context.ReportDiagnostic(Diagnostic.Create(Unnamed, type.Locations[0], type.Name));
+            context.ReportDiagnostic(Diagnostic.Create(Live.Unnamed, type.Locations[0], type.Name));
             return;
         }
 
@@ -109,110 +158,71 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
                 : found.IsDuplicate ? "which the vendor contract lists more than once" : null;
         if (problem is null) return;
         var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken).GetLocation() ?? type.Locations[0];
-        context.ReportDiagnostic(Diagnostic.Create(Unlisted, location, type.Name, name, module, problem));
+        context.ReportDiagnostic(Diagnostic.Create(Live.Unlisted, location, type.Name, name, module, problem));
     }
 
-    private static void CheckDoor(OperationAnalysisContext context, Framework framework, VendorContract? contract, ConcurrentDictionary<INamedTypeSymbol, Mirrored?> mirrored)
+    private static void Collect(OperationAnalysisContext context, Framework framework, VendorContract? contract, ConcurrentDictionary<INamedTypeSymbol, Mirrored?> mirrored, ConcurrentDictionary<INamedTypeSymbol, ConcurrentBag<Use>> uses)
     {
-        if (contract is null) return;
         var invocation = (IInvocationOperation)context.Operation;
         var door = Door.Of(invocation.TargetMethod, framework);
         if (door is null) return;
         var member = context.ContainingSymbol is IMethodSymbol { AssociatedSymbol: { } associated } ? associated : context.ContainingSymbol;
-        if (member.ContainingType is not { } holder || !framework.IsRoot(holder)) return;
+        if (member.ContainingType is not { } holder || !framework.IsJsObject(holder)) return;
+        var use = Use.Of(invocation, door, member, holder);
+        uses.GetOrAdd(holder, _ => []).Add(use);
+        if (contract is null || !framework.IsRoot(holder)) return;
         var mirror = mirrored.GetOrAdd(holder, root => Mirrored.Of(root, framework, contract));
         if (mirror is null) return;
-        var declared = holder.Name + "." + member.Name;
-        var location = member.Locations[0];
-
-        if (door.Shape == DoorShape.Itself)
+        if (door.Shape == DoorShape.Position)
         {
-            CheckItself(context, door, mirror, declared, location);
+            CheckPosition(context.ReportDiagnostic, Live, use, holder.Name, null, "");
             return;
         }
 
-        var javaScriptName = JavaScriptName(invocation, member.Name);
-        if (javaScriptName is null) return;
-        if (door.Shape == DoorShape.Event)
-        {
-            if (!contract.DeclaresEvent(mirror.Type, javaScriptName)) context.ReportDiagnostic(Diagnostic.Create(Undeclared, location, declared, javaScriptName, mirror.Name));
-            return;
-        }
-
-        var found = contract.Member(mirror.Type, javaScriptName);
-        var vendorMember = mirror.Name + "." + javaScriptName;
-        if (found is null)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(NotPublic, location, declared, javaScriptName, mirror.Name));
-            return;
-        }
-
-        if (KindMismatch(door, found) is { } cure)
-        {
-            context.ReportDiagnostic(Diagnostic.Create(Kind, location, declared, door.Name, vendorMember, Describe(found), cure));
-            return;
-        }
-
-        if (door.Shape == DoorShape.Call)
-        {
-            if (found.PromiseFromSome)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(PromiseFromSome, location, declared, door.Name, vendorMember));
-                return;
-            }
-
-            if (door.Awaits != found.ReturnsPromise)
-            {
-                var says = found.ReturnsPromise ? "returns a promise" : "returns no promise";
-                context.ReportDiagnostic(Diagnostic.Create(Promise, location, declared, door.Name, vendorMember, says, door.Other));
-                return;
-            }
-        }
-
-        CheckNull(context, invocation, door, found, declared, vendorMember, location);
+        CheckMember(context.ReportDiagnostic, Live, contract, use, mirror.Type, mirror.Name);
     }
 
-    private static void CheckItself(OperationAnalysisContext context, Door door, Mirrored mirror, string declared, Location location)
+    private static void CheckItself(Action<Diagnostic> report, Rules rules, Use use, ContractType type, string shown)
     {
-        if (!mirror.Type.IsCallable)
+        if (!type.IsCallable)
         {
-            context.ReportDiagnostic(Diagnostic.Create(Kind, location, declared, door.Name, mirror.Name, "not callable", "the members it has"));
+            report(Diagnostic.Create(rules.Kind, use.Location, use.Declared, use.Door.Name, shown, "not callable", "the members it has"));
             return;
         }
 
-        if (mirror.Type.ReturnsPromise)
+        if (type.ReturnsPromise)
         {
-            context.ReportDiagnostic(Diagnostic.Create(Promise, location, declared, door.Name, mirror.Name, "returns a promise", "a door that awaits a call of the object itself, a gap to name"));
+            report(Diagnostic.Create(rules.Promise, use.Location, use.Declared, use.Door.Name, shown, "returns a promise", "a door that awaits a call of the object itself, a gap to name"));
         }
     }
 
-    private static void CheckNull(OperationAnalysisContext context, IInvocationOperation invocation, Door door, ContractMember found, string declared, string vendorMember, Location location)
+    private static void CheckAnswer(Action<Diagnostic> report, Rules rules, Use use, ContractMember found, string vendorMember)
     {
-        if (!door.ChecksNull || invocation.TargetMethod.TypeArguments.Length != 1) return;
-        var value = invocation.TargetMethod.TypeArguments[0];
-        if (value is ITypeParameterSymbol) return;
-        var nullable = value.OriginalDefinition.SpecialType == SpecialType.System_Nullable_T
-            || invocation.TargetMethod.TypeArgumentNullableAnnotations[0] == NullableAnnotation.Annotated;
-        var bare = value is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } wrapped
-            ? wrapped.TypeArguments[0]
-            : value.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-        var shown = bare.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-        if (door.Shape == DoorShape.Call)
+        if (use.Answer is { Nullable: true } answer && !found.ReturnsNull)
         {
-            if (found.ReturnsNull && !nullable) context.ReportDiagnostic(Diagnostic.Create(ReturnsNull, location, declared, shown, vendorMember));
+            report(Diagnostic.Create(rules.AnswersNull, use.Location, use.Declared, answer.Shown, vendorMember));
+        }
+    }
+
+    private static void CheckNull(Action<Diagnostic> report, Rules rules, Use use, ContractMember found, string vendorMember)
+    {
+        if (!use.Door.ChecksNull || use.Value is not { } value) return;
+
+        if (use.Door.Shape == DoorShape.Call)
+        {
+            if (found.ReturnsNull && !value.Nullable) report(Diagnostic.Create(rules.ReturnsNull, use.Location, use.Declared, value.Shown, vendorMember));
             return;
         }
 
-        if (door.Reads && found.ReadsNull && !nullable)
+        if (use.Door.Reads && found.ReadsNull && !value.Nullable)
         {
-            context.ReportDiagnostic(Diagnostic.Create(ReadsNull, location, declared, shown, vendorMember));
+            report(Diagnostic.Create(rules.ReadsNull, use.Location, use.Declared, value.Shown, vendorMember));
             return;
         }
 
-        if (door.Writes && nullable && !found.WritesNull)
+        if (use.Door.Writes && value.Nullable && !found.WritesNull)
         {
-            context.ReportDiagnostic(Diagnostic.Create(WritesNull, location, declared, shown, vendorMember));
+            report(Diagnostic.Create(rules.WritesNull, use.Location, use.Declared, value.Shown, vendorMember));
         }
     }
 
@@ -240,14 +250,7 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
         _ => "a method",
     };
 
-    private static string? JavaScriptName(IInvocationOperation invocation, string memberName)
-    {
-        var argument = invocation.Arguments.FirstOrDefault(each => each.Parameter?.Name == "name");
-        if (argument is null || argument.ArgumentKind == ArgumentKind.DefaultValue) return CamelCase.Of(memberName);
-        return argument.Value.ConstantValue is { HasValue: true, Value: string name } ? name : null;
-    }
-
-    private sealed class Mirrored
+    internal sealed class Mirrored
     {
         private Mirrored(string name, ContractType type)
         {
@@ -264,7 +267,7 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
             var attribute = framework.MirrorsOf(root);
             if (attribute is null) return null;
             var (module, name) = Framework.Arguments(attribute);
-            return contract.Type(module, name) is { IsDuplicate: false } type ? new Mirrored(name, type) : null;
+            return contract.Type(module, name) is { IsDuplicate: false } type ? new Mirrored(type.Shown, type) : null;
         }
     }
 }

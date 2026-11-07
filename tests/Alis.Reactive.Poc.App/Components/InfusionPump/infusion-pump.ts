@@ -1,5 +1,5 @@
 export interface InfusionPumpHost extends HTMLElement {
-  pump?: InfusionPump;
+  pump?: InfusionPump<OlderPumpChannel>;
 }
 
 interface ChannelSeed {
@@ -26,7 +26,7 @@ export class OlderPumpChannel {
   readonly label: string;
   protected running: boolean;
   readonly #line: HTMLLIElement;
-  #partner: OlderPumpChannel = this;
+  #partner: this = this;
 
   constructor(seed: ChannelSeed, list: HTMLUListElement) {
     this.label = seed.label;
@@ -40,11 +40,11 @@ export class OlderPumpChannel {
     return this.running;
   }
 
-  partner(): OlderPumpChannel {
+  partner(): this {
     return this.#partner;
   }
 
-  pairWith(partner: OlderPumpChannel): void {
+  pairWith(partner: this): void {
     this.#partner = partner;
   }
 
@@ -58,9 +58,17 @@ export class PumpChannel extends OlderPumpChannel {
     this.running = false;
     this.show();
   }
+
+  selfCheck(): Promise<boolean> {
+    return Promise.resolve(this.running);
+  }
+
+  recalibrate(): Promise<void> {
+    return Promise.resolve();
+  }
 }
 
-export class InfusionPump {
+export class InfusionPump<TChannel extends OlderPumpChannel> {
   readonly alarm = "occlusion";
   readonly #state: HTMLParagraphElement;
   readonly #rate: HTMLParagraphElement;
@@ -71,11 +79,11 @@ export class InfusionPump {
   readonly #notes: HTMLParagraphElement;
   #pendingCheck: Check = idle;
   #noted: readonly string[] = [];
-  readonly #channels: readonly OlderPumpChannel[];
+  readonly #channels: readonly TChannel[];
   #rateText = "none";
   #summaries = 0;
 
-  constructor(host: HTMLElement, channelOf: (seed: ChannelSeed, list: HTMLUListElement) => OlderPumpChannel) {
+  constructor(host: HTMLElement, channelOf: (seed: ChannelSeed, list: HTMLUListElement) => TChannel) {
     this.#state = lineOf("pump-state", "idle");
     this.#rate = lineOf("pump-rate", this.#rateText);
     this.#summaryCalls = lineOf("pump-summary-calls", "0");
@@ -178,11 +186,11 @@ export class InfusionPump {
     return Promise.resolve(42);
   }
 
-  channel(position: number): OlderPumpChannel | undefined {
+  channel(position: number): TChannel | undefined {
     return this.#channels[position];
   }
 
-  channels(): readonly OlderPumpChannel[] {
+  channels(): readonly TChannel[] {
     return this.#channels;
   }
 
@@ -191,7 +199,7 @@ export class InfusionPump {
   }
 }
 
-export class CurrentInfusionPump extends InfusionPump {
+export class CurrentInfusionPump extends InfusionPump<PumpChannel> {
   constructor(host: HTMLElement) {
     super(host, (seed, list) => new PumpChannel(seed, list));
   }
@@ -205,7 +213,7 @@ export class CurrentInfusionPump extends InfusionPump {
   }
 }
 
-export class OlderInfusionPump extends InfusionPump {
+export class OlderInfusionPump extends InfusionPump<OlderPumpChannel> {
   constructor(host: HTMLElement) {
     super(host, (seed, list) => new OlderPumpChannel(seed, list));
   }

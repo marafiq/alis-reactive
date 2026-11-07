@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Components;
 using Alis.Reactive.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -20,6 +21,7 @@ public sealed class VitalsMonitor : Component
 
 public sealed class MonitorAlarm : JsObject
 {
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS016", Justification = "Drift on purpose: an_alarm_that_lacks_a_declared_member_stops_the_pipeline_before_its_next_step proves the browser stops on it.")]
     public ReadOnly<string> Bed => ReadOnly<string>();
 
     public Property<bool> Cancel => Property<bool>();

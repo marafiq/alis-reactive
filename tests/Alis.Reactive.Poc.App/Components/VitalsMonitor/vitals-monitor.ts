@@ -2,8 +2,6 @@ export interface VitalsMonitorHost extends HTMLElement {
   monitor?: VitalsMonitor;
 }
 
-type Listener = (...args: unknown[]) => void;
-
 type MonitorEvent = "alarm" | "silenced";
 
 interface Alarm {
@@ -14,6 +12,17 @@ interface Alarm {
   readonly patient: AlarmPatient;
   readonly silence: () => void;
 }
+
+interface OlderAlarm {
+  readonly bedNumber: string;
+  cancel: boolean;
+  readonly note: string | null;
+  readonly reading: { readonly rate: number };
+  readonly patient: AlarmPatient;
+  readonly silence: () => void;
+}
+
+type AlarmListener = (alarm?: Alarm | OlderAlarm) => void;
 
 class AlarmPatient {
   readonly #statusLine: HTMLParagraphElement;
@@ -40,7 +49,7 @@ class AlarmPatient {
 }
 
 export class VitalsMonitor {
-  readonly #listeners = new Map<string, Set<Listener>>();
+  readonly #listeners = new Map<string, Set<AlarmListener>>();
   readonly #raised: HTMLParagraphElement;
   readonly #silencedLine: HTMLParagraphElement;
   readonly #alarmLine: HTMLParagraphElement;
@@ -55,7 +64,7 @@ export class VitalsMonitor {
     const pagedLine = lineOf("monitor-paged", "unpaged");
     this.#patient = new AlarmPatient(statusLine, pagedLine);
     const buttons = older
-      ? [buttonOf("Raise an alarm", () => this.#raise("alarm", { bedNumber: "9", note: null, reading: { rate: 88 }, patient: this.#patient, silence: () => this.#silence() }))]
+      ? [buttonOf("Raise an alarm", () => this.#raise("alarm", { bedNumber: "9", cancel: false, note: null, reading: { rate: 88 }, patient: this.#patient, silence: () => this.#silence() }))]
       : [
           buttonOf("Raise a noted alarm", () => this.#sound(this.#alarm("after surgery"))),
           buttonOf("Raise an unnoted alarm", () => this.#sound(this.#alarm(null))),
@@ -66,13 +75,17 @@ export class VitalsMonitor {
     host.replaceChildren(this.#raised, this.#alarmLine, this.#silencedLine, statusLine, pagedLine, ...buttons);
   }
 
-  on(event: MonitorEvent, listener: Listener): void {
-    const listening = this.#listeners.get(event) ?? new Set<Listener>();
+  on(event: "alarm", listener: AlarmListener): void;
+  on(event: "silenced", listener: () => void): void;
+  on(event: MonitorEvent, listener: AlarmListener): void {
+    const listening = this.#listeners.get(event) ?? new Set<AlarmListener>();
     listening.add(listener);
     this.#listeners.set(event, listening);
   }
 
-  off(event: MonitorEvent, listener: Listener): void {
+  off(event: "alarm", listener: AlarmListener): void;
+  off(event: "silenced", listener: () => void): void;
+  off(event: MonitorEvent, listener: AlarmListener): void {
     this.#listeners.get(event)?.delete(listener);
   }
 
@@ -96,7 +109,7 @@ export class VitalsMonitor {
     this.#silencedLine.textContent = "silenced";
   }
 
-  #raise(event: MonitorEvent, ...args: unknown[]): void {
+  #raise(event: MonitorEvent, ...args: [alarm?: Alarm | OlderAlarm]): void {
     for (const listener of this.#listeners.get(event) ?? []) listener(...args);
     this.#raised.textContent = "raised " + event + (args.length === 0 ? " with nothing" : "");
   }
