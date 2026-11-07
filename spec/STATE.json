@@ -712,13 +712,13 @@
     },
     "kinds": {
       "counts": {
-        "added": 15,
-        "proposed": 48,
+        "added": 16,
+        "proposed": 49,
         "removed": 0,
         "several_handlers_today": 11,
         "today": 33
       },
-      "detail": "grammar, plan.schema.json and schema.md agree on today's 33; proposed 48 equals Schema.tla's node set, one handler each; diff +clock,data,each,file,listen,nothing,off,on,returned,signal,start,stop,stream,unbound,zone -none; 11 kinds have two handlers today",
+      "detail": "grammar, plan.schema.json and schema.md agree on today's 33; proposed 49 equals Schema.tla's node set, one handler each; diff +answer,clock,data,each,file,listen,nothing,off,on,returned,signal,start,stop,stream,unbound,zone -none; 11 kinds have two handlers today",
       "pass": true
     },
     "main_surface": {
@@ -1409,14 +1409,14 @@
         "Schema": {
           "Schema.cfg": {
             "green": true,
-            "hash": "cc3b29525d5e0ccc7ebead0f85a226fd95b413d6e89980e4227466badd281a58",
+            "hash": "56d712116cc852ed2a5d570f144ffac8f09b6427d767561de71aca0e1cd40be9",
             "line": "Model checking completed. No error has been found.",
             "states": "26587 states generated, 26297 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Schema.violates.ConversionsConvert.cfg": {
             "green": false,
-            "hash": "6a0a41b5962f6815663dbf46066fbd9be431273ed4df4b5ae06ed5a589d8c4e8",
+            "hash": "6d68c92b8920fed750ff99034e82ea19ab317e53b476cfbd052d974ab637b44f",
             "line": "violated: ConversionsConvert",
             "states": "",
             "violated": [
@@ -1425,16 +1425,16 @@
           },
           "Schema.violates.IfsHaveAnArm.cfg": {
             "green": false,
-            "hash": "ed0ca056eac053054f1b5c2b8a59649b87fae93c89488042d2ba512523b97cdd",
+            "hash": "2041deb215d9f6f7326e94947b978cf553882e16eefbe354cb4624aff975f526",
             "line": "violated: IfsHaveAnArm",
-            "states": "252 states generated, 246 distinct states found, 22 states left on queue.",
+            "states": "258 states generated, 247 distinct states found, 23 states left on queue.",
             "violated": [
               "IfsHaveAnArm"
             ]
           },
           "Schema.violates.KindsHandledOnce.cfg": {
             "green": false,
-            "hash": "8b88e5a32323d11efba64a13bded3379646a79d5ad2852a46f9f96e29d73d865",
+            "hash": "c2f4e2fe75736719687447d139932e8f39464e894a4c1035b7bf7437847794b9",
             "line": "violated: KindsHandledOnce",
             "states": "",
             "violated": [
@@ -1443,7 +1443,7 @@
           },
           "Schema.violates.NullableWrapsOnce.cfg": {
             "green": false,
-            "hash": "9a41bf26cab19ea40e896dd4d63ea77cc2ea9ba395a72be365503747c0234492",
+            "hash": "e65e542a51e88dde021bb0984243179419cbe74e4c97078a1f3cf0f46915c6bc",
             "line": "violated: NullableWrapsOnce",
             "states": "",
             "violated": [
@@ -1452,7 +1452,7 @@
           },
           "Schema.violates.OperatorsClosed.cfg": {
             "green": false,
-            "hash": "7eb96bb47ffd155459fb6916e8e3c012cbf8087eddcedc7ae8928aabe297bb2b",
+            "hash": "2c20a7d4cf054300ae2c0b6f8aa9ad28e820fb7a3f88d58a0c3b218ba3dc96cf",
             "line": "violated: OperatorsClosed",
             "states": "",
             "violated": [
@@ -1461,7 +1461,7 @@
           },
           "Schema.violates.PatternsAreLiterals.cfg": {
             "green": false,
-            "hash": "845c66c67f7823202075752f56ad6a5776a78098c03812f4d78b18e56f525704",
+            "hash": "cfb3fe88dc8e35e88df529a1b86128f09c34b9cfec9157b68f427a84f1871a76",
             "line": "violated: PatternsAreLiterals",
             "states": "",
             "violated": [
@@ -1470,7 +1470,7 @@
           },
           "Schema.violates.ReachDeepRead.cfg": {
             "green": false,
-            "hash": "eabb805de107f111af901c1b0d489731bc68a8377e1aa68f03c6e315d751c369",
+            "hash": "95d42411862d78a4f25dd4146778b222ec037d3a777e1b546a9267ace258a402",
             "line": "violated: ReachDeepRead",
             "states": "",
             "violated": [
@@ -1479,16 +1479,16 @@
           },
           "Schema.violates.ReachNestedRead.cfg": {
             "green": false,
-            "hash": "b30d89d08bebe05b90fe9f40ff308e8f3893adfa9066465b220cfef6f33972be",
+            "hash": "c2bd90c9d66d90b772acd552a82551f59212aea5a3bc3b02d905f50816e75456",
             "line": "violated: ReachNestedRead",
-            "states": "992 states generated, 942 distinct states found, 516 states left on queue.",
+            "states": "927 states generated, 858 distinct states found, 502 states left on queue.",
             "violated": [
               "ReachNestedRead"
             ]
           },
           "Schema.violates.ReadsTakeNoEach.cfg": {
             "green": false,
-            "hash": "bef2029c9c75e98eb541a1b306169417f7cb3f31e006860c35d117772283b8b0",
+            "hash": "a69abe8ddbf52f886dbe4fa3300ecd5d5e1fba0989219a5bbb06d47de58727ea",
             "line": "violated: ReadsTakeNoEach",
             "states": "",
             "violated": [
@@ -1497,18 +1497,18 @@
           },
           "Schema.violates.RefsReadTheirBlock.cfg": {
             "green": false,
-            "hash": "8972c976f332405189db6b982a571ab8e52c984c7556384ba61c9f45977589c1",
+            "hash": "488f2a193b62cb96d3d8bc05b7fd0f74e12c3aa2e26158d647b556a1f936b6a3",
             "line": "violated: RefsReadTheirBlock",
-            "states": "3175 states generated, 2526 distinct states found, 1571 states left on queue.",
+            "states": "2642 states generated, 2107 distinct states found, 1322 states left on queue.",
             "violated": [
               "RefsReadTheirBlock"
             ]
           },
           "Schema.violates.SetsWriteAMember.cfg": {
             "green": false,
-            "hash": "ecbab385ba7b9645d33b6d8d2237139c7bb4ff263009d9bfd1c577e8ea52fcca",
+            "hash": "ac689c9075221a3a6ddc34046224dbcbc77fc3ed7f83d9f7c7436f497dcd51d8",
             "line": "violated: SetsWriteAMember",
-            "states": "249 states generated, 236 distinct states found, 11 states left on queue.",
+            "states": "249 states generated, 236 distinct states found, 12 states left on queue.",
             "violated": [
               "SetsWriteAMember"
             ]
@@ -1786,7 +1786,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "7836283693b1dfe36b1a9329a136adef9e2eab98",
+  "read_at_head": "d039417185108c9f3966c36e845d5650b40880df",
   "step": {
     "failing": [
       "gate1"
