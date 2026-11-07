@@ -41,6 +41,57 @@ public sealed class WhenANullableValueIsCompared : AppPageTest
     }
 
     [Test]
+    public async Task an_intake_equal_to_its_target_reaches_it()
+    {
+        await Open("/Balances/IntakeTargets");
+        await Balance("Target 1000 ml").ClickAsync();
+        await Balance("Add 500 ml").ClickAsync();
+        await Balance("Add 500 ml").ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Check the target is reached" }).ClickAsync();
+
+        await Expect(Page.Locator("#verdict")).ToHaveTextAsync("reached");
+    }
+
+    [Test]
+    public async Task an_intake_under_its_target_is_under_it()
+    {
+        await Open("/Balances/IntakeTargets");
+        await Balance("Target 1000 ml").ClickAsync();
+        await Balance("Add 500 ml").ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Check the intake is under the target" }).ClickAsync();
+
+        await Expect(Page.Locator("#verdict")).ToHaveTextAsync("under");
+    }
+
+    [Test]
+    public async Task an_intake_equal_to_its_target_is_not_under_it()
+    {
+        await Open("/Balances/IntakeTargets");
+        await Balance("Target 1000 ml").ClickAsync();
+        await Balance("Add 500 ml").ClickAsync();
+        await Balance("Add 500 ml").ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Check the intake is under the target" }).ClickAsync();
+
+        await Expect(Page.Locator("#verdict")).ToHaveTextAsync("not under");
+    }
+
+    [Test]
+    public async Task an_intake_equal_to_its_target_is_capped_by_it()
+    {
+        await Open("/Balances/IntakeTargets");
+        await Balance("Target 1000 ml").ClickAsync();
+        await Balance("Add 500 ml").ClickAsync();
+        await Balance("Add 500 ml").ClickAsync();
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Check the intake is capped by the target" }).ClickAsync();
+
+        await Expect(Page.Locator("#verdict")).ToHaveTextAsync("capped");
+    }
+
+    [Test]
     public async Task a_number_widened_to_its_nullable_is_written_to_a_nullable_property()
     {
         await Open("/Balances/IntakeTargets");
