@@ -1,0 +1,38 @@
+@using Alis.Reactive.Poc.App.Families
+@model FamilyForm
+@{
+    ViewData["Title"] = "Family";
+    var plan = Html.ReactivePlan<FamilyForm>();
+}
+<h1>Family</h1>
+
+@await Html.PartialFor(m => m, "_FamilySummary")
+
+@using (Html.BeginForm("Family", "Families", FormMethod.Post))
+{
+    @Html.InputField(plan, m => m.ResidentName).TextBox("Resident name")
+    @await Html.PartialFor(m => m.NextOfKin, "_NextOfKin")
+    @for (var i = 0; i < Model.Contacts.Count; i++)
+    {
+        @await Html.PartialFor(m => m.Contacts[i], "_Contact")
+    }
+    @await Html.PartialFor(m => m.Guardian, "_Guardian")
+    <button type="submit">Save family</button>
+}
+
+@(plan.Button("preview-family", "Preview the family card")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("card-kin").Text.Set(pipeline.Input(m => m.NextOfKin.Name).Component<NativeTextBox>().Value);
+        pipeline.Element("card-mobile").Text.Set(pipeline.Input(m => m.Contacts[1].Phone).Component<NativeTextBox>().Value);
+    }))
+
+<section>
+    <h2>Family card</h2>
+    <p>Next of kin: <strong id="card-kin">no preview</strong></p>
+    <p>Mobile: <strong id="card-mobile">no preview</strong></p>
+</section>
+
+@Html.RenderPlan(plan)
+
+@await Html.PartialAsync("_VisitRequest", new VisitRequest { ResidentName = "Ada Byron" })

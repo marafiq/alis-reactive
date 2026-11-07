@@ -1742,6 +1742,10 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - So the page, a validator, an `EditorFor` template, a list-item partial and a partial for a member reach
     one id without knowing each other, and two views of different models that bind one name keep two ids.
   - A lambda that names no member (`m => m`), and a member an interface declares, are refused.
+  - A lambda is bound only when MVC's name names each step it takes from the model: a member, a single-argument
+    indexer, an array position. MVC stops its name at any other call (`Find(..)`, `Substring(1)`) and keeps what lies
+    outside it, so the form would post the input under a name that binds nothing; the framework counts the steps
+    MVC's name names against the lambda's and refuses a lambda they differ for, with no read of the call's method.
   - No view on either line pairs MVC's `LabelFor` or `IdFor` with a framework input (`git grep` finds none at
     623dd4a27 or 65fdf118d), so the framework's id needs no agreement with them, and a view names the id by
     `IdGenerator.For`.
@@ -1768,7 +1772,9 @@ and `request` state, which the schema does not hold: a request's state is its ru
     and no server object sees every view of a page (D14.1).
   - That moves two refusals from render time to the browser, a gate-1 line of its own.
   - At render, within one plan:
-    - R14.1 an input whose lambda names no member, or a member an interface declares;
+    - R14.1 an input or a partial whose lambda MVC's name does not name step by step from the model (a call that
+      is no indexer, a value the view holds), an input whose lambda names no member, or a member an interface
+      declares;
     - R14.2 an input under a prefix its view took after its plan started;
     - R14.3 an element id the plan renders twice;
     - R14.4 a step that sets the text or HTML of an element the same plan loads or unloads as a slot;

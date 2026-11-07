@@ -52,6 +52,17 @@ public sealed class WhenAnInputIsBound : AppPageTest
     }
 
     [Test]
+    public async Task a_dictionary_entry_posts_under_its_key()
+    {
+        await Open("/Admissions/Preferences");
+        await Page.GetByLabel("Visiting preference").FillAsync("mornings");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Save preferences" }).ClickAsync();
+
+        await Expect(Page.Locator("#saved-visiting")).ToHaveTextAsync("mornings");
+    }
+
+    [Test]
     public async Task a_saved_form_binds_a_component_under_its_members_name_not_its_json_name()
     {
         await Open("/Admissions/Intake");

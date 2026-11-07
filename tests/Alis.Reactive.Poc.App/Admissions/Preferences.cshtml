@@ -1,0 +1,15 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model IntakeForm
+@{
+    ViewData["Title"] = "Visiting preferences";
+    var plan = Html.ReactivePlan<IntakeForm>();
+}
+<h1>Visiting preferences</h1>
+
+@using (Html.BeginForm("Intake", "Admissions", FormMethod.Post))
+{
+    @Html.InputField(plan, m => m.Preferences["visiting"]).TextBox("Visiting preference")
+    <button type="submit">Save preferences</button>
+}
+
+@Html.RenderPlan(plan)

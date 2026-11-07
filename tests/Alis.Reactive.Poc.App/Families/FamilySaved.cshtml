@@ -1,0 +1,12 @@
+@using Alis.Reactive.Poc.App.Families
+@model FamilyForm
+@{
+    ViewData["Title"] = "Family saved";
+}
+<h1>Family saved</h1>
+
+<p>Resident: <strong id="saved-resident">@Model.ResidentName</strong></p>
+<p>Next of kin: <strong id="saved-kin">@Model.NextOfKin.Name</strong></p>
+<p>Next of kin's city: <strong id="saved-city">@Model.NextOfKin.Address.City</strong></p>
+<p>Mobile: <strong id="saved-mobile">@(Model.Contacts.Count > 1 ? Model.Contacts[1].Phone : "none")</strong></p>
+<p>Guardian: <strong id="saved-guardian">@(Model.Guardian?.Name ?? "none")</strong></p>

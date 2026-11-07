@@ -22,6 +22,15 @@ public sealed class WhenAnInputIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task an_input_bound_through_a_call_that_is_no_indexer_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Admissions/PrimaryVisitor");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: 'm => m.Visitors.Find(visitor => (visitor.Name == \"Ada Byron\")).Name' binds no member of the view's model. An input is bound to a member the model reaches through members, list positions and indexers, as m => m.Contacts[0].Phone.");
+    }
+
+    [Test]
     public async Task an_input_bound_to_a_call_mvc_cannot_name_is_refused_where_the_view_renders()
     {
         await Page.GotoAsync(BaseUrl + "/Admissions/ShortenedResident");
@@ -45,7 +54,7 @@ public sealed class WhenAnInputIsRefused : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Admissions/LatePrefix");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: The view's field prefix changed from none to 'Resident' after its plan started: MVC names input 'm => m.ResidentName' under the new prefix and the plan under the one it started with. Give the view its prefix before its plan starts.");
+            "InvalidOperationException: The view's field prefix changed from none to 'Resident' after its plan started: MVC names input 'm => m.ResidentName' under the new prefix and the plan under the one it started with. Render the view for its member with Html.PartialFor, which gives it its prefix before its plan starts.");
     }
 
     [Test]

@@ -1,0 +1,7 @@
+@using Alis.Reactive.Poc.App.Families
+@model Relative
+@{
+    var plan = Html.ReactivePlan<Relative>();
+}
+@Html.InputField(plan, m => m.Name).TextBox("Guardian")
+@Html.RenderPlan(plan)

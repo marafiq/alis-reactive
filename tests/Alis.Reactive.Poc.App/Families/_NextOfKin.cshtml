@@ -1,0 +1,8 @@
+@using Alis.Reactive.Poc.App.Families
+@model Relative
+@{
+    var plan = Html.ReactivePlan<Relative>();
+}
+@Html.InputField(plan, m => m.Name).TextBox("Next of kin")
+@await Html.PartialFor(m => m.Address, "_Address")
+@Html.RenderPlan(plan)

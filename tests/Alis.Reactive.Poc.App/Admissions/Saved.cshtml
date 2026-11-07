@@ -8,3 +8,4 @@
 <p>Resident: <strong id="saved-resident">@Model.ResidentName</strong></p>
 <p>Next of kin: <strong id="saved-kin">@Model.NextOfKin.Name</strong></p>
 <p>Ward: <strong id="saved-ward">@(Model.Ward ?? "none")</strong></p>
+<p>Visiting: <strong id="saved-visiting">@(Model.Preferences.TryGetValue("visiting", out var visiting) ? visiting : "none")</strong></p>

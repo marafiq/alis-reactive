@@ -26,6 +26,10 @@ public sealed class AdmissionsController : Controller
     public IActionResult VisitorsByForeach() => View(new IntakeForm { Visitors = [new IntakeForm.Kin { Name = "Ada Byron" }] });
 
     public IActionResult ShortenedResident() => View(new IntakeForm());
+
+    public IActionResult PrimaryVisitor() => View(new IntakeForm { Visitors = [new IntakeForm.Kin { Name = "Ada Byron" }] });
+
+    public IActionResult Preferences() => View(new IntakeForm { ResidentName = "Helen Park", Preferences = new() { ["visiting"] = "afternoons" } });
 }
 
 public abstract class AdmissionBase
@@ -45,6 +49,8 @@ public sealed class IntakeForm : AdmissionBase
     public string[] Aids { get; set; } = [];
 
     public List<Kin> Visitors { get; set; } = [];
+
+    public Dictionary<string, string> Preferences { get; set; } = new();
 
     public sealed class Kin
     {

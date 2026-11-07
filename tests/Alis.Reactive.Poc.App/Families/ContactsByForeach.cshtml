@@ -1,0 +1,11 @@
+@using Alis.Reactive.Poc.App.Families
+@model FamilyForm
+@{
+    ViewData["Title"] = "Family";
+}
+<h1>Family</h1>
+
+@foreach (var contact in Model.Contacts)
+{
+    @await Html.PartialFor(m => contact, "_Contact")
+}
