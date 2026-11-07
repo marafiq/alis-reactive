@@ -667,6 +667,13 @@ Terms used throughout:
     Q3's conversions.
   - A cast that narrows (`(int)d.Milligrams`) is refused: it changes the value as C# computes it, and the browser's
     number does not.
+  - A cast between `decimal` and `float` or `double` is refused (X6.50): .NET rounds `(decimal)0.30000000000000004` to
+    0.3 and `(double)1E-28m` to 1.0000000000000001E-28, where the browser keeps the number it parsed. A whole number
+    or a `char` converted to `decimal` keeps its value, and the lambda reads through it (X6.51).
+  - A conversion a type declares for itself, a user-defined conversion in C#'s terms (`d.Seal == "S4"` through
+    `DoseSeal`'s implicit operator to text), is refused at every position of a list's lambda (X6.49), as it is in `??`
+    (X6.33): the browser has no conversion the app wrote. `decimal`'s exact conversions are the closed set the lambda
+    reads through, keyed as `TranslatedMembers` keys its table.
   - A fraction (`float`, `double`, `decimal`) written as text is refused in equality as in ordering (X6.43): equal
     fractions write unequal text (0.10m is "0.10" and 0.1m is "0.1"), and `double.NaN` written "NaN" equals its own
     text where .NET's NaN equals nothing. A whole number written as text equals as its number does, and is ordered
@@ -904,6 +911,14 @@ Terms used throughout:
 - `X6.48` refusal (D6.14): a value the view holds, null when the view renders, cast to its value: "'none' is null when
   the view renders, and the cast takes its value, which .NET refuses; compare the nullable itself, such as d =>
   d.Priority == limit."
+- `X6.49` refusal (D6.12): a comparison through a user-defined conversion: "'d.Seal' is converted by a
+  user-defined conversion, which the browser does not have; compare a member it reads, such as d => d.Seal.Tag ==
+  "S4", or move the work to the server."
+- `X6.50` refusal (D6.12): a cast between `decimal` and a binary fraction: "'d.Volume' is cast to or from decimal,
+  which rounds as C# computes it and not as the browser does; keep the member's own type, or move the work to the
+  server."
+- `X6.51` behavior (D6.12): `d.Charge > freeCharge`, a `decimal` member and a view's `int`, counts the two charged
+  doses through `decimal`'s own conversion from `int`.
 - `X6.46` analyzer: a read past a nullable member in the predicate, field or path of a door that reads nothing past
   null builds with no `!` under warnings as errors, and so does a cast of a nullable there; the same read in a `Sum`
   term, an `OrderBy` key, a value the view holds, a lambda over a list the server holds or an input's member path

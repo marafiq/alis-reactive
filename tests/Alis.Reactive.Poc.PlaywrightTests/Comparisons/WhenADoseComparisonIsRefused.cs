@@ -67,6 +67,24 @@ public sealed class WhenADoseComparisonIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_comparison_through_a_conversion_the_app_wrote_is_refused()
+    {
+        await Page.GotoAsync(BaseUrl + "/Doses/ComparedThroughAConversion");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: 'd.Seal' is converted by a user-defined conversion, which the browser does not have; compare a member it reads, such as d => d.Seal.Tag == \"S4\", or move the work to the server. (Parameter 'predicate')");
+    }
+
+    [Test]
+    public async Task a_cast_between_decimal_and_a_binary_fraction_is_refused()
+    {
+        await Page.GotoAsync(BaseUrl + "/Doses/CastToDecimal");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: 'd.Volume' is cast to or from decimal, which rounds as C# computes it and not as the browser does; keep the member's own type, or move the work to the server. (Parameter 'predicate')");
+    }
+
+    [Test]
     public async Task a_cast_of_a_view_value_that_is_null_is_refused()
     {
         await Page.GotoAsync(BaseUrl + "/Doses/CastNullViewValue");

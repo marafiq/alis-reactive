@@ -76,6 +76,19 @@ internal static class TranslatedMembers
 #endif
     };
 
+    private static readonly HashSet<(Module Module, int Token)> ExactDecimalConversions =
+    [
+        Conversion((sbyte value) => (decimal)value),
+        Conversion((byte value) => (decimal)value),
+        Conversion((short value) => (decimal)value),
+        Conversion((ushort value) => (decimal)value),
+        Conversion((int value) => (decimal)value),
+        Conversion((uint value) => (decimal)value),
+        Conversion((long value) => (decimal)value),
+        Conversion((ulong value) => (decimal)value),
+        Conversion((char value) => (decimal)value),
+    ];
+
 #if NET
     private static readonly (Module Module, int Token) SpanConversion = Key(((MethodCallExpression)((MethodCallExpression)((Expression<Func<string[], bool>>)(values => values.Contains(""))).Body).Arguments[0]).Method);
 #endif
@@ -88,6 +101,8 @@ internal static class TranslatedMembers
     };
 
     internal static bool Translates(MemberExpression member) => Table.ContainsKey(Key(member.Member));
+
+    internal static bool IsAnExactDecimalConversion(MemberInfo conversion) => ExactDecimalConversions.Contains(Key(conversion));
 
     internal static ArgumentException NoBrowserForm(LinqExpression term, string argument)
         => new($"'{ViewValues.Printed(term)}' has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.", argument);
@@ -190,4 +205,6 @@ internal static class TranslatedMembers
     private static (Module Module, int Token) Static<TResult>(Expression<Func<TResult>> call) => Key(((MethodCallExpression)call.Body).Method);
 
     private static (Module Module, int Token) Property<T, TResult>(Expression<Func<T, TResult>> read) => Key(((MemberExpression)read.Body).Member);
+
+    private static (Module Module, int Token) Conversion<T, TResult>(Expression<Func<T, TResult>> cast) => Key(((UnaryExpression)cast.Body).Method!);
 }

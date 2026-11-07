@@ -14,6 +14,6 @@
 @(plan.Button("sum-copays", "Sum copays")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Volume.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => (double)d.Copay))))
+            pipeline.Component<MedicationCart>("cart").Doses.Sum(d => (double)d.Supply!.Vials))))
 
 @Html.RenderPlan(plan)

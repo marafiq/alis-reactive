@@ -76,12 +76,12 @@ public sealed class WhenAMemberWrittenByItsOwnJsonIsRefused : AppPageTest
     }
 
     [Test]
-    public async Task a_sum_term_that_casts_a_member_its_own_number_handling_writes_is_refused()
+    public async Task a_sum_term_that_casts_a_member_its_class_writes_as_text_is_refused()
     {
         await Page.GotoAsync(BaseUrl + "/Doses/SummedThroughACast");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "ArgumentException: 'd.Copay' is written by its own JSON number handling, unlike the app's options, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server. (Parameter 'term')");
+            "ArgumentException: 'd.Supply.Vials' is written by its class's JSON number handling, unlike the app's options, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server. (Parameter 'term')");
     }
 
     [Test]

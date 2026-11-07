@@ -5,6 +5,7 @@
     ViewData["Title"] = "Dose round";
     var plan = Html.ReactivePlan<DoseRoundPage>();
     var ward = "South";
+    var freeCharge = 0;
 }
 <h1>Dose round</h1>
 
@@ -126,5 +127,10 @@
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
             pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Route < 'L'))))
+
+@(plan.Button("count-charged", "Count charged doses")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Charge > freeCharge))))
 
 @Html.RenderPlan(plan)

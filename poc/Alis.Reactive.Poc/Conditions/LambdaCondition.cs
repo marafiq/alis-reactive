@@ -213,6 +213,7 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         {
             if (ComparedTypes.Narrows(conversion.Operand.Type, conversion.Type))
                 throw Refused(conversion, "casts a number to a narrower one, which changes the value as C# computes it and not as the browser does; compare the member itself.");
+            if (conversion.Method is { } method && !TranslatedMembers.IsAnExactDecimalConversion(method)) throw ConvertedUnlikeTheBrowser(conversion);
             var takesTheValue = conversion is { IsLifted: true, IsLiftedToNull: false, Method: null };
             if (takesTheValue && ReadsTheItem(conversion.Operand)) return conversion;
             if (takesTheValue && ViewValues.Of(conversion.Operand, _argument) is null)
@@ -237,6 +238,14 @@ internal sealed class LambdaCondition : TranslatedMembers.ITranslator
         => Refused(comparison, "compares objects, and the browser compares objects by reference; compare a member of each, such as d => d.Carer.Name == lead.");
 
     private ArgumentException Refused(LinqExpression term, string reason) => new($"'{ViewValues.Printed(term)}' {reason}", _argument);
+
+    private ArgumentException ConvertedUnlikeTheBrowser(UnaryExpression conversion)
+    {
+        var operand = ViewValues.Printed(conversion.Operand);
+        var castsADecimal = ComparedTypes.IsDecimal(conversion.Type) || ComparedTypes.IsDecimal(conversion.Operand.Type);
+        if (castsADecimal) return new ArgumentException($"'{operand}' is cast to or from decimal, which rounds as C# computes it and not as the browser does; keep the member's own type, or move the work to the server.", _argument);
+        return new ArgumentException($"'{operand}' is converted by a user-defined conversion, which the browser does not have; compare a member it reads, such as d => d.Seal.Tag == \"S4\", or move the work to the server.", _argument);
+    }
 
     private static bool TakesNoOwnForm(HeldForm _) => false;
 

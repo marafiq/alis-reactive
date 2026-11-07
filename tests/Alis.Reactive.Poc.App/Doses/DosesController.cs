@@ -133,6 +133,10 @@ public sealed class DosesController : Controller
 
     public IActionResult CoalescedByAConversion() => View(DoseRound.Page());
 
+    public IActionResult ComparedThroughAConversion() => View(DoseRound.Page());
+
+    public IActionResult CastToDecimal() => View(DoseRound.Page());
+
     public IActionResult SortedByStatus() => View(DoseRound.Page());
 
     public IActionResult SortedBySchedule() => View(DoseRound.Page());

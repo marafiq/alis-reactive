@@ -32,6 +32,8 @@ internal static class ComparedTypes
 
     private static readonly HashSet<Type> Chars = [typeof(char), typeof(char?)];
 
+    private static readonly HashSet<Type> Decimals = [typeof(decimal), typeof(decimal?)];
+
     private static readonly HashSet<Type> OtherScalars = [typeof(string), typeof(bool), typeof(bool?), typeof(Guid), typeof(Guid?)];
 
     private static readonly HashSet<Type> DatesAndTimes =
@@ -43,6 +45,8 @@ internal static class ComparedTypes
     ];
 
     internal static bool IsChar(Type type) => Chars.Contains(type);
+
+    internal static bool IsDecimal(Type type) => Decimals.Contains(type);
 
     internal static bool IsDateOrTime(Type type) => DatesAndTimes.Contains(type);
 

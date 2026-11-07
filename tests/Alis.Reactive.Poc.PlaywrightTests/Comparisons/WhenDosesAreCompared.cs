@@ -232,4 +232,14 @@ public sealed class WhenDosesAreCompared : AppPageTest
 
         await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
     }
+
+    [Test]
+    public async Task a_decimal_is_compared_with_a_whole_number_through_dotnets_own_conversion()
+    {
+        await Open("/Doses/Round");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Count charged doses", Exact = true }).ClickAsync();
+
+        await Expect(Page.Locator("#census .census-count")).ToHaveTextAsync("2");
+    }
 }
