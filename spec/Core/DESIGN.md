@@ -2225,7 +2225,12 @@ grammar gains no node (G2).
     a plugin, called with the element, for a library that keeps its objects off the element (`Chart.getChart(canvas)`,
     `bootstrap.Modal.getInstance(element)`, a registry a component's own code keeps). The plan writes either as a
     `fn` of the element, read by the one evaluator, so finding an object is no second resolver, and the plan
-    reads no global by name;
+    reads no global by name. A lookup is `VendorLookup.ByPlugin(name)` in place of the object path, and its `fn` is a
+    `call` of the plugin itself with the element (D17.14). Each plan that names the vendor also names the lookup's
+    plugin object, since the vendors map is shared by name across plans and the plugin is found in the plan's own
+    objects. An element whose lookup finds nothing stops the pipeline that reaches it, as one that holds no object at a
+    path does (D4.1). The runtime holds no code for a lookup: the reference oxygen gauge, whose library keeps its
+    gauges in a `WeakMap` of its own, needed none;
   - how a listener subscribes, one of three: a subscribe and unsubscribe method pair; a property the driver
     assigns the listener to, its previous value put back at release; a subscribe method that returns the
     function that removes the listener (`const off = store.subscribe(listener)`), which release calls. A property
@@ -2354,7 +2359,9 @@ plans (Q19).
   `MethodAsync`, properties, events).
 - `N17.1` new: the payload's place in its listener's arguments, declared with the event (D17.4); its form goes to
   gate 2.
-- `N17.6` new: a vendor's lookup, a plugin called with the element, beside the path from the element (D17.3).
+- `N17.6` new: a vendor's lookup, a plugin called with the element, beside the path from the element (D17.3):
+  `VendorLookup.ByPlugin(name)` and an overload of `ComponentVendor.Define`, `DefineCallbackProperties` and
+  `DefineReturnedUnsubscriber` that takes it; their forms go to gate 2.
 - `N17.7` new: the listening kind whose subscribe method returns the function that removes the listener (D17.3).
 - `N17.8` new: `Argument<T>(n)`, and a payload method at a position (D17.4).
 - `N17.9` new: `Callback<TArgs, TResult>` and its `Set` from an expression, and `Answer`, an answer passed as a
@@ -2413,7 +2420,9 @@ plans (Q19).
 - `X17.9` behavior: an error toast stays until it is dismissed, and an information toast leaves after its time
   unless it is hovered.
 - `X17.10` behavior: a component found by a registered lookup, as `Chart.getChart(canvas)` finds a chart, is read,
-  written, called and listened to as one found by a path.
+  written, called and listened to as one found by a path: an oxygen gauge its library keeps off the element shows its
+  reading, takes the threshold a step writes, lowers and raises its alarm; a step reaching a gauge its library never
+  made stops only its own pipeline.
 - `X17.11` behavior: a listener added by a subscribe method that returns its unsubscriber is removed at release by
   that function, and the event runs nothing after.
 - `X17.12` behavior: a listener of two arguments reads the first and calls the second, the vendor's continuation,

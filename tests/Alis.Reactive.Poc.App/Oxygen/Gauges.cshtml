@@ -1,0 +1,40 @@
+@using Alis.Reactive.Poc.App.Oxygen
+@model OxygenPage
+@{
+    ViewData["Title"] = "Oxygen gauges";
+    var plan = Html.ReactivePlan<OxygenPage>();
+}
+<h1>Oxygen gauges</h1>
+
+<p>Reading: <span id="reading">none read</span></p>
+<p>Alarm: <span id="alarm">quiet</span></p>
+<p>Spare reading: <span id="spare-tried">not tried</span> · <span id="spare-reading">none read</span></p>
+<p>Greeting: <span id="greeting">none</span></p>
+
+@(plan.OxygenGauge("gauge", 96)
+    .Reactive(gauge => gauge.Alarm, (alarm, pipeline) =>
+        pipeline.Element("alarm").Text.Set(alarm.Message)))
+
+@plan.UnmountedOxygenGauge("spare-gauge")
+
+@(plan.Button("read-gauge", "Read the gauge")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("reading").Text.Set(pipeline.Component<OxygenGauge>("gauge").Reading)))
+
+@(plan.Button("lower-gauge", "Lower the gauge by 4")
+    .Reactive(button => button.Click, pipeline => pipeline.Component<OxygenGauge>("gauge").Lower(4)))
+
+@(plan.Button("alarm-below-95", "Alarm below 95%")
+    .Reactive(button => button.Click, pipeline => pipeline.Component<OxygenGauge>("gauge").AlarmBelow.Set(95)))
+
+@(plan.Button("read-spare", "Read the spare gauge")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("spare-tried").Text.Set("tried");
+        pipeline.Element("spare-reading").Text.Set(pipeline.Component<OxygenGauge>("spare-gauge").Reading);
+    }))
+
+@(plan.Button("greet", "Greet the nurse")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("greeting").Text.Set("hello")))
+
+@Html.RenderPlan(plan)

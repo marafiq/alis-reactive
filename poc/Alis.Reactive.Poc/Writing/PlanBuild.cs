@@ -295,15 +295,18 @@ internal sealed class PlanBuild
         _vendors[vendorName] = vendor;
         _vendorOfElement[elementId] = vendorName;
         _objects[elementId] = new ElementLocator(elementId, vendorName);
+        foreach (var lookup in vendor.Lookups) _objects[PluginKey(lookup.Name)] = lookup;
         return elementId;
     }
 
     internal string Plugin(string name, Listening listen)
     {
-        var key = "$plugin:" + name;
+        var key = PluginKey(name);
         _objects[key] = new PluginLocator(name, listen);
         return key;
     }
+
+    internal static string PluginKey(string name) => "$plugin:" + name;
 
     internal void Add(Handler handler, Listening listening)
     {

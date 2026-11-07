@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Components;
 
@@ -37,6 +38,15 @@ public sealed class ComponentVendor
 
     public static ComponentVendor DefineReturnedUnsubscriber(string name, string objectPath, string subscribe)
         => new(VendorName(name), new Vendor(AtPath(objectPath), new ReturnedListening(JavaScriptName(subscribe))));
+
+    public static ComponentVendor Define(string name, VendorLookup lookup, string subscribe, string unsubscribe)
+        => new(VendorName(name), lookup.Vendor(new MethodListening(JavaScriptName(subscribe), JavaScriptName(unsubscribe))));
+
+    public static ComponentVendor DefineCallbackProperties(string name, VendorLookup lookup)
+        => new(VendorName(name), lookup.Vendor(new AssignmentListening()));
+
+    public static ComponentVendor DefineReturnedUnsubscriber(string name, VendorLookup lookup, string subscribe)
+        => new(VendorName(name), lookup.Vendor(new ReturnedListening(JavaScriptName(subscribe))));
 
     public override string ToString() => Name;
 
@@ -76,4 +86,35 @@ public sealed class ComponentVendor
     }
 
     private static string JavaScriptName(string name) => JavaScriptNames.Checked(name);
+}
+
+public sealed class VendorLookup
+{
+    private const string Element = "element";
+
+    private readonly string _plugin;
+
+    private VendorLookup(string plugin)
+    {
+        _plugin = plugin;
+    }
+
+    public static VendorLookup ByPlugin(string name)
+    {
+        if (!JavaScriptNames.IsRegistryName(name))
+        {
+            throw new ArgumentException(
+                $"Plugin name '{name}' must start with a letter and contain only ASCII letters, digits, underscore, or hyphen. A name with a dot is the framework's own.",
+                nameof(name));
+        }
+
+        return new VendorLookup(name);
+    }
+
+    internal Vendor Vendor(Listening listen)
+    {
+        var found = new CallExpression(new ObjectExpression(PlanBuild.PluginKey(_plugin)), [], ReadPresence.Required, [new RefExpression(Element)]);
+        var lookup = new PluginLocator(_plugin, PluginEvents.EventTarget.Listen);
+        return new Vendor(new FnExpression([Element], found), listen, [lookup]);
+    }
 }

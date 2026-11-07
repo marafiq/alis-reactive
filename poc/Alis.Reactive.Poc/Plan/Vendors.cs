@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Plan;
@@ -5,14 +6,22 @@ namespace Alis.Reactive.Plan;
 internal sealed class Vendor
 {
     internal Vendor(FnExpression locate, Listening listen)
+        : this(locate, listen, [])
+    {
+    }
+
+    internal Vendor(FnExpression locate, Listening listen, IReadOnlyList<PluginLocator> lookups)
     {
         Locate = locate;
         Listen = listen;
+        Lookups = lookups;
     }
 
     public Expression Locate { get; }
 
     public Listening Listen { get; }
+
+    internal IReadOnlyList<PluginLocator> Lookups { get; }
 }
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]

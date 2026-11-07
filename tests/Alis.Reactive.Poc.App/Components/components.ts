@@ -10,6 +10,7 @@ import { NurseStation, StationCensus, type NurseStationHost, type StationCensusH
 import { WardPicker, type WardPickerHost } from "./WardPicker/ward-picker";
 import { DoseCard, type DoseCardHost } from "./DoseCard/dose-card";
 import { BedStore, NightClock, ShiftLog, VisitorBook, initials } from "./ShiftPlugins/shift-plugins";
+import { OxygenGauges } from "./OxygenGauge/oxygen-gauge";
 import { onMount, providePlugin } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
@@ -80,3 +81,6 @@ providePlugin("bed-store", new BedStore());
 onMount<HTMLButtonElement>("[data-opens-visitor-book]", (button) => {
   button.addEventListener("click", () => providePlugin("visitor-book", new VisitorBook()), { once: true });
 });
+
+onMount("[data-oxygen-gauge]", (host) => OxygenGauges.mount(host));
+providePlugin("oxygen-gauges", (host: HTMLElement) => OxygenGauges.of(host));
