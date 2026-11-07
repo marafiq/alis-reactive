@@ -67,6 +67,20 @@ export function tested(term: Read, part: Read, test: (held: string, sought: stri
   return value(test(held, part.value));
 }
 
+const patterns = new Map<string, RegExp>();
+
+export function matched(term: Read, pattern: Read): Read {
+  return tested(term, pattern, (held, source) => patternOf(source).test(held));
+}
+
+function patternOf(source: string): RegExp {
+  const known = patterns.get(source);
+  if (known !== undefined) return known;
+  const pattern = new RegExp(source);
+  patterns.set(source, pattern);
+  return pattern;
+}
+
 export function nullOrEmpty(term: Read): Read {
   const held = text(term);
   return value(held === undefined || held.length === 0);

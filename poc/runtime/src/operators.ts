@@ -2,7 +2,7 @@ import type { Expression, OperatorExpression, PlanCulture } from "./plan";
 import { assertNever, nothing, value, type Read } from "./read";
 import { cultureOrder, sortOrder } from "./orders";
 import { decimalSum, doubleSum, intSum } from "./sums";
-import { lower, nullOrEmpty, tested, trimmed, upper } from "./text";
+import { lower, matched, nullOrEmpty, tested, trimmed, upper } from "./text";
 
 type Evaluate = (argument: Expression) => Read;
 
@@ -55,6 +55,8 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate, cult
       return tested(evaluate(first(args)), evaluate(second(args)), (held, sought) => held.endsWith(sought));
     case "nullOrEmpty":
       return nullOrEmpty(evaluate(first(args)));
+    case "matches":
+      return matched(evaluate(first(args)), evaluate(second(args)));
     case "includes":
       return included(evaluate(first(args)), evaluate(second(args)));
     case "sumInt":

@@ -6,13 +6,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Alis.Reactive.Plan;
 using LinqExpression = System.Linq.Expressions.Expression;
 using PlanExpression = Alis.Reactive.Plan.Expression;
 
 namespace Alis.Reactive.Conditions;
 
-[SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's choice, 2026-11-06: the .NET members a list's lambda translates are one closed table keyed by the member the expression tree carries, built from typed lambdas (D6.5, D18.1).")]
+[SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's choice, 2026-11-06: the .NET members a list's lambda translates are one closed table keyed by the member the expression tree carries, built from typed lambdas (D6.5, D18.1); Regex.IsMatch is named only as a key, the ban's one exception (Decision 2).")]
 internal static class TranslatedMembers
 {
     internal interface ITranslator
@@ -66,6 +67,8 @@ internal static class TranslatedMembers
         [Method((IEnumerable<int> values) => values.Contains(0))] = FixedValues(arrayOnly: true),
         [Method((List<int> values) => values.Contains(0))] = FixedValues(arrayOnly: false),
         [Method((HashSet<int> values) => values.Contains(0))] = FixedValues(arrayOnly: true),
+        [Static(() => Regex.IsMatch("", ""))] = Matched,
+        [Static(() => Regex.IsMatch("", "", RegexOptions.None))] = Matched,
 #if NET
         [Method((string text) => text.Contains('a'))] = Binary(Operator.Contains),
         [Method((string[] values) => values.Contains(""))] = FixedValues(arrayOnly: true),
@@ -128,6 +131,25 @@ internal static class TranslatedMembers
             throw new ArgumentException($"'{printed}' looks for an object, and the browser compares objects by reference; look for a member, such as names.Contains(d.Carer.Name).", argument);
         return Op(Operator.Includes, list, read.Read(item));
     };
+
+    private static OperatorExpression Matched(LinqExpression term, IReadOnlyList<LinqExpression> operands, ITranslator read, string argument)
+    {
+        if (operands.Count == 3) RefuseOptions(term, operands[2], argument);
+        var pattern = operands[1];
+        if (read.ReadsTheItem(pattern)) throw new ArgumentException($"'{ViewValues.Printed(term)}' reads its pattern from the item; pass a pattern the view holds, so it is checked where the view renders.", argument);
+        if (read.ViewValue(pattern) is not string held) throw new ArgumentException($"'{ViewValues.Printed(term)}' passes a pattern that is null when the view renders.", argument);
+        var copy = BrowserPattern.Of(held, reason => new ArgumentException($"'{ViewValues.Printed(term)}' {reason}", argument));
+        return Op(Operator.Matches, read.Read(operands[0]), read.Literal(copy, typeof(string)));
+    }
+
+    private static void RefuseOptions(LinqExpression term, LinqExpression options, string argument)
+    {
+        var passed = (RegexOptions)ViewValues.Of(options, argument)!;
+        var ignoresCase = (passed & RegexOptions.IgnoreCase) != 0;
+        if (ignoresCase) throw new ArgumentException($"'{ViewValues.Printed(term)}' compares case by RegexOptions.IgnoreCase, which .NET and the browser fold differently (s against \u017F); spell both cases, such as [Aa]spirin, or move the work to the server.", argument);
+        var unread = passed & ~RegexOptions.CultureInvariant;
+        if (unread != RegexOptions.None) throw new ArgumentException($"'{ViewValues.Printed(term)}' passes RegexOptions.{unread}, which the browser does not read as .NET does; drop it, or move the work to the server.", argument);
+    }
 
     private static Operator UpperUnder(CultureInfo culture)
     {

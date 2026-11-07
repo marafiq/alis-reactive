@@ -608,6 +608,11 @@ Terms used throughout:
   nullable holds null and .NET throws, as a text operator reads nothing on null (`spec/Core/translated-members.md`).
   A `??` whose left side the compiler converts by a user-defined conversion is refused (X6.33): the browser has no
   conversion the app wrote.
+- D6.15 `Regex.IsMatch(text, pattern)` and `Regex.IsMatch(text, pattern, options)` in a list's lambda write
+  `op(matches, text, lit)`, the pattern's browser copy, which D16.11's one reader writes where the view renders from a
+  pattern the view holds (Decision 2, the owner, 2026-11-06). A pattern read from the item, or null when the view
+  renders, is refused (X6.38). A text that reads nothing or holds null reads nothing, as every text operator does
+  (`spec/Core/translated-members.md`), where .NET throws `ArgumentNullException`.
 
 **Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`).
 
@@ -726,6 +731,20 @@ Terms used throughout:
   test holds, its second when the test fails or reads nothing, and never reads the branch it does not take.
 - `X6.35` behavior (D6.5): `Contains` over a list the view holds finds null in it, and an item that reads nothing
   reads nothing, so it is not found even in a list that holds null.
+- `X6.37` behavior (D6.15, D16.11): `Regex.IsMatch` keeps the doses whose text matches; `food$` keeps a text that
+  ends in a line break as .NET's `$` does, and not one that ends in two; `\$` matches the character; a pattern the
+  view holds in a local matches as one written in place; a lookbehind matches as .NET reads it; `CultureInvariant`
+  matches as no option does; a note that holds null reads nothing.
+- `X6.38` refusal (D6.15, D16.11): each construct outside D16.11's closed set, with its message: "'{term}' holds
+  '{construct}', which .NET and the browser read differently; write {spelling}." for `\d`, `\D`, `\w`, `\W`, `\s`,
+  `\S`, `\A`, `\Z` and `.`, and for `\d`, `\w` and `\s` inside a class; "'{term}' holds '{construct}', which the
+  browser does not read as .NET does; move the work to the server." for every other letter escape and every group
+  opener but `(?:`, `(?=`, `(?!`, `(?<=` and `(?<!`; an escape that needs none, a `\u` or `\x` short of its hex
+  digits, a trailing `\`, a `]` first in a class, a `[` inside one, a range that runs backwards, a `-` right after a
+  range, a class or a group left open, a `)` or a `]` that closes nothing, a quantifier or a count with nothing to
+  repeat, a `{` that is no count and a count whose least is above its most, each naming the escape that writes it;
+  `IgnoreCase`, naming the spelled cases; any other option but `CultureInvariant`; a pattern read from the item; a
+  pattern that is null when the view renders.
 - `X6.36` refusal (D6.13): text ordered by the culture under a culture with an alternate sort: "'{key}' orders text by
   the alternate sort '{sort}', which the browser has no tag for; pass StringComparer.Ordinal, or order on the
   server."
@@ -1874,13 +1893,27 @@ and `request` state, which the schema does not hold: a request's state is its ru
 
   The browser patterns of today's checks leave (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:150-152`), and so
   does the expression that reads a developer's pattern for .NET-only syntax (`Alis.Reactive/Validation/Checks.cs:149-151`).
-- D16.11 A regular expression reaches the browser only where a developer writes `Matches`, and only as one that both
-  engines read the same. .NET and JavaScript read `\d`, `\w`, `\s`, `.` and `$` differently, and `IgnoreCase` follows
+- D16.11 A regular expression reaches the browser only where a developer writes `Matches` or `Regex.IsMatch` in a
+  list's lambda (D6.15), and only as one that both engines read the same. One reader in C# reads every pattern where
+  the view renders. .NET and JavaScript read `\d`, `\w`, `\s`, `.` and `$` differently, and `IgnoreCase` follows
   the view's culture on .NET (`probe:core-regex-dotnet`, `probe:net48-regex-digit-unicode`, `probe:js-regex-raw`,
   `probe:core-regex-space-and-case`, `probe:js-regex-space-and-case`).
-  - The framework rewrites no pattern. A pattern that holds one of those constructs, an option other than
-    `IgnoreCase` with `CultureInvariant`, or .NET-only syntax is refused where the view renders, naming the construct
-    and the text that means the same in both engines (`[0-9]` for `\d`), unless the rule is `.ServerOnly()`.
+  - The browser's copy carries no flag, so JavaScript reads it by UTF-16 code unit, as .NET does. The constructs the
+    reader copies are closed: a character, an escaped metacharacter (`\^$.|?*+()[]{}/`, and `-` inside a class),
+    `\t`, `\n`, `\r`, `\f`, `\v`, `\uXXXX` and `\xXX`; a class and a negated class of those, with ranges; a group,
+    `(?:)`, lookahead and lookbehind; `|`, `^`, and the quantifiers `*`, `+`, `?`, `{n}`, `{n,}` and `{n,m}`, each
+    with its lazy form. Over 53 patterns and their inputs, .NET 10 and V8 agree on every pattern of that set
+    (`spec/NOTES.md`, 2026-11-06, the probes for unit 3d).
+  - The framework rewrites no pattern but `$`. A pattern that holds any other construct, or an option other than
+    `CultureInvariant`, is refused where the view renders, naming the construct and the text that means the same in
+    both engines (`[0-9]` for `\d`, `^` for `\A`, `$` for `\Z`, `[^\n]` for `.`), or the server when no text does,
+    unless the rule is `.ServerOnly()`.
+  - `IgnoreCase` is refused, naming the door, both cases spelled (`[Aa]spirin`): no JavaScript flag folds case as
+    .NET's `IgnoreCase` with `CultureInvariant` does. Over the 2,474 case pairs of the BMP the two engines' mappings
+    reach, .NET differs from JavaScript's `i` on 166 (the Kelvin sign against `k`) and from `iu` on 100 (`ſ` against
+    `s`, `µ` against `μ`, the Greek final sigma and symbol forms), and the `u` flag reads a negated class by code
+    point (`spec/NOTES.md`, 2026-11-06). The probe this decision first rested on checked the Kelvin sign and the
+    dotted I only.
   - `$` is the one construct with no spelling a developer writes the same for both engines, so the framework writes
     the browser's copy of an unescaped `$` outside a character class as `(?=\n?$)`, the form that reads as .NET's
     (`probe:js-regex-translated`). Every other construct is refused with its common spelling. A `$` under

@@ -95,11 +95,11 @@ internal sealed class Operator : IChoice
     internal static readonly Operator CompareNumbers = new("compareNumbers");
     internal static readonly Operator CompareOrdinal = new("compareOrdinal");
     internal static readonly Operator CompareBooleans = new("compareBooleans");
-
     internal static readonly Operator CompareCulture = new("compareCulture");
     internal static readonly Operator Coalesce = new("coalesce");
     internal static readonly Operator Cond = new("cond");
     internal static readonly Operator NullableValue = new("nullableValue");
+    internal static readonly Operator Matches = new("matches");
 
     private Operator(string text)
     {

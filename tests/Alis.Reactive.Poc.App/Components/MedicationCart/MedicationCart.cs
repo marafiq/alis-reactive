@@ -64,6 +64,8 @@ public sealed record MedicationDose(
     public DoseSeal? Seal { get; init; }
 
     public DoseDelivery? Delivery { get; init; }
+
+    public string Instruction { get; init; } = "";
 }
 
 public sealed class DoseStore

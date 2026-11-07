@@ -242,7 +242,9 @@ carry no range.
 `compareNumbers`, `compareOrdinal`, `compareBooleans` and `compareCulture` compare two sort keys to -1, 0 or 1, null
 first, by the comparison C# picks from the key's type (D6.13); the redesign's `order` compared whatever came by its
 JavaScript type. `compareCulture` compares two texts with the browser's `Intl.Collator` under the plan's
-`culture.collation`, and stops the pipeline when the browser has no collation for it.
+`culture.collation`, and stops the pipeline when the browser has no collation for it. `matches` tests its text against
+the pattern C# copied for the browser (D16.11), a `lit` with no flag, and reads nothing on a text that reads nothing
+or holds null.
 `coalesce` reads its second argument only when its first holds null or reads nothing; `cond` reads its second
 argument when its first reads true and its third when it reads false or nothing; `nullableValue` reads its argument,
 and nothing where it holds null (D6.14).

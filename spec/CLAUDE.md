@@ -185,6 +185,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   mode, ordered by code unit; a culture whose sort is an alternate one ("de-DE_phoneb") is refused, because .NET's
   order for it is not one order across hosts (on macOS .NET 10 orders it as "de-DE") and the browser's tag for it is
   not certain; `StringComparer.CurrentCulture` orders as no comparer does. The owner can overrule each.
+- Chosen within Decision 2, 2026-11-06, on a probe: D16.11's reader refuses `IgnoreCase`, which D16.11 admitted with
+  `CultureInvariant`. The sweep of the BMP's case pairs found no JavaScript flag that folds case as .NET does (166 pairs
+  differ under "i", 100 under "iu", among them "s" against U+017F), and the "u" flag reads a negated class by code
+  point. The door is both cases spelled ("[Aa]spirin"). The browser's copy carries no flag; its closed set of
+  constructs, lookbehind among them, agreed in both engines on every probed input. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
