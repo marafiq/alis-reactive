@@ -1770,9 +1770,13 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
   mutant: one listener per object, gone at its owner's release, and nothing called on a collected object. The
   first two are X12.9 and X12.10; the third is a garbage collector's timing, which no browser test arranges.
-- D12.9 A slot's content is what its loads put there. A plan that sets the text or the HTML of an element a plan
-  loads into or unloads, among the plans one response renders, is refused where the view renders: what the slot
-  loaded would keep running under content it no longer shows. `Unload(element)` empties a slot.
+- D12.9 A slot's content is what its loads put there. A step that sets the text or the HTML of an element a plan
+  loads into or unloads would leave what the slot loaded running under content it no longer shows, and D14.6's
+  split refuses it: within one plan where the view renders (R14.4), and across plans the step stops in the browser
+  with one error naming the slot (R14.7), on the slot's element or on an element that holds it, which only the
+  browser sees. No server object sees every plan of a response (D14.1). `Unload(element)` empties a slot.
+  - An element's `Text` and `Html` mark their `set` as a content write (`content`, schema.md).
+  - The browser holds each slot a live plan names, as its plan starts, and the hold leaves with the plan's owner.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
 the statement `listen`, and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
@@ -1844,10 +1848,14 @@ plans name.
   runs once per raise; handed over again, it still runs once per raise.
 - `X12.10` behavior: after the slot whose handler listened to a payload's object unloads, that object's event runs
   nothing.
-- `X12.11` refusal (D12.9): a plan that sets the text of the element another plan of the page loads into: "The plan
-  sets the text of element 'card', a slot a plan of this page loads or unloads, so what the slot loaded would keep
-  running under content it no longer shows. Empty the slot with Unload(\"card\"), and write the text into an element
-  beside it."
+- `X12.11` refusal (D12.9, R14.4): a plan that sets the text of an element it loads into, or the HTML of one it
+  unloads, in either order: "The plan sets the text of element 'card', a slot this plan loads or unloads, so what
+  the slot loaded would keep running under content it no longer shows. Empty the slot with Unload(\"card\"), and
+  write the text into an element beside it." The HTML's reads "the HTML" for "the text".
+- `X12.12` behavior (D12.9, R14.7): a card's step that writes over the slot the card was loaded into stops, and so
+  does a page's step that writes over an element holding that slot, or over a slot an open card's plan unloads; the
+  steps before it ran and the steps after it run nothing. Once the only plan that named a slot leaves, a step writes
+  over it.
 
 ## Q13. Where state lives
 
@@ -1988,8 +1996,8 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - At composition, in the browser:
     - R14.6 a plan holding an input id a live plan already holds is not started. One error names the id and
       both plans' views. A slot's content that renders an id the page holds is the same case.
-    - R14.7 a step that sets the text or HTML of an element a live plan holds as a slot stops, with one error
-      naming the slot.
+    - R14.7 a step that sets the text or HTML of an element a live plan holds as a slot, or of an element that holds
+      one, stops, with one error naming the slot (X12.12).
 - D14.7 A plan is a block in its view: the plan door opens the block and the block's end writes the plan
   (N14.2).
   - The plan is a variable of the block, so an input outside the block cannot name it, and a plan that is

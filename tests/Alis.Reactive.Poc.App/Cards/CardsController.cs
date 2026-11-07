@@ -30,6 +30,10 @@ public sealed class CardsController : Controller
 
     public IActionResult ListenOnNothing() => View(new CardsWard());
 
+    public IActionResult TextBeforeItsSlot() => View(new CardsWard());
+
+    public IActionResult HtmlAfterItsUnload() => View(new CardsWard());
+
     public IActionResult Notes(string resident) => PartialView(new CareCard(resident, NotesTitle: "Latest notes"));
 }
 

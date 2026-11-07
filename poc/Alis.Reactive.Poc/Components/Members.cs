@@ -34,16 +34,36 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
 public sealed class Property<TValue> : ReadOnly<TValue>
 {
-    internal Property(JsObject owner, PathStep member, bool optional)
+    private readonly Writes _writes;
+
+    internal Property(JsObject owner, PathStep member, bool optional, Writes writes)
         : base(owner, member, optional)
     {
+        _writes = writes;
     }
 
-    public void Set(TValue value) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build), Owner.Binding.Build.OptionsForm));
+    public void Set(TValue value) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build), Owner.Binding.Build.OptionsForm), _writes);
 
-    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Optional, Assign.Live<TValue>(Owner.Binding.Build, Sources.Of(source)));
+    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Optional, Assign.Live<TValue>(Owner.Binding.Build, Sources.Of(source)), _writes);
 
-    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(Owner, Member, Optional, Assign.Live<TValue>(Owner.Binding.Build, Sources.Of(source)));
+    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(Owner, Member, Optional, Assign.Live<TValue>(Owner.Binding.Build, Sources.Of(source)), _writes);
+}
+
+internal sealed class Writes
+{
+    private Writes(bool content, string noun)
+    {
+        Content = content;
+        Noun = noun;
+    }
+
+    internal static Writes Member { get; } = new(content: false, "member");
+
+    internal bool Content { get; }
+
+    internal string Noun { get; }
+
+    internal static Writes ContentAs(string noun) => new(content: true, noun);
 }
 
 public sealed class WriteOnly<TValue>
@@ -97,10 +117,15 @@ internal static class Assign
     internal static Expression Live<TValue>(PlanBuild build, IPlanSource source) => build.IntoLive<TValue>(source.Expression, source.Form);
 
     internal static void Write(JsObject owner, PathStep member, bool optional, Expression value)
+        => Write(owner, member, optional, value, Writes.Member);
+
+    internal static void Write(JsObject owner, PathStep member, bool optional, Expression value, Writes writes)
     {
         var binding = owner.Binding;
-        if (binding.Target is RefExpression reference && binding.Build.IsPayload(reference.Name)) RequireTheVendorsTurn(binding.Build, reference.Name);
-        binding.Build.Write(new SetStatement(binding.Target, [member], optional ? Presence.Optional : Presence.Required, value));
+        var target = binding.Target;
+        if (target is RefExpression reference && binding.Build.IsPayload(reference.Name)) RequireTheVendorsTurn(binding.Build, reference.Name);
+        if (writes.Content && target is ObjectExpression element) binding.Build.ReplacesContentOf(element.Id, writes.Noun);
+        binding.Build.Write(new SetStatement(target, [member], optional ? Presence.Optional : Presence.Required, value, writes.Content));
     }
 }
 

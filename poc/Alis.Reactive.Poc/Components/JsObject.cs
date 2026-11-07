@@ -90,7 +90,10 @@ public abstract class JsObject
         => new(this, Member(name, declaredBy), optional);
 
     protected Property<TValue> Property<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => new(this, Member(name, declaredBy), optional);
+        => new(this, Member(name, declaredBy), optional, Writes.Member);
+
+    private protected Property<TValue> Content<TValue>(string noun, string? name = null, [CallerMemberName] string declaredBy = "")
+        => new(this, Member(name, declaredBy), optional: false, Writes.ContentAs(noun));
 
     protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
         => new(this, Member(name, declaredBy), optional);

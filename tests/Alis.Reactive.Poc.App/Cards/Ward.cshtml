@@ -11,7 +11,28 @@
 }
 <h1>Care cards</h1>
 
-<section id="card"></section>
+<div id="cards">
+    <section id="card"></section>
+</div>
+
+<p>Ward notes: <span id="ward-notes">No ward notes</span></p>
+<p>Write: <span id="write-asked">not asked</span>, <span id="write-done">not done</span></p>
+
+@(plan.Button("write-ward-notes", "Write the ward notes")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("write-asked").Text.Set("Asked to write the ward notes");
+        pipeline.Element("ward-notes").Text.Set("Written by the ward");
+        pipeline.Element("write-done").Text.Set("Wrote the ward notes");
+    }))
+
+@(plan.Button("write-over-cards", "Write over the cards")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("write-asked").Text.Set("Asked to write over the cards");
+        pipeline.Element("cards").Text.Set("Written over");
+        pipeline.Element("write-done").Text.Set("Wrote over the cards");
+    }))
 
 <p>Asked: <span id="asked">nothing</span></p>
 

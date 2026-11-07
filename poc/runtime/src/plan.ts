@@ -223,6 +223,7 @@ export interface SetStatement {
   readonly path: readonly PathStep[];
   readonly members: Presence;
   readonly value: Expression;
+  readonly content: boolean;
 }
 
 export type Shape = DateShape | InstantShape | NullableShape | ArrayShape | ObjectShape;

@@ -57,6 +57,7 @@ internal sealed class Door
         {
             "ReadOnly" => new Door("ReadOnly", DoorShape.Value, reads: true, writes: false, awaits: false, checksNull: true, ""),
             "Property" => new Door("Property", DoorShape.Value, reads: true, writes: true, awaits: false, checksNull: true, ""),
+            "Content" => new Door("Content", DoorShape.Value, reads: true, writes: true, awaits: false, checksNull: true, ""),
             "WriteOnly" => new Door("WriteOnly", DoorShape.Value, reads: false, writes: true, awaits: false, checksNull: true, ""),
             "LiveObject" => new Door("LiveObject", DoorShape.Value, reads: true, writes: false, awaits: false, checksNull: false, "", Reach.One),
             "LiveObjects" => new Door("LiveObjects", DoorShape.Value, reads: true, writes: false, awaits: false, checksNull: false, "", Reach.Many),

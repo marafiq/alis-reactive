@@ -31,6 +31,17 @@
     .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
         pipeline.Component<CallLog>("calls").Note(Model.Resident + "'s monitor alarmed")))
 
+@(plan.Button("clear-ward-notes", "Clear the ward notes")
+    .Reactive(button => button.Click, pipeline => pipeline.Unload("ward-notes")))
+
+@(plan.Button("write-over-card", "Write over this card")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("write-asked").Text.Set("Asked to write over the card");
+        pipeline.Element("card").Text.Set("Written over");
+        pipeline.Element("write-done").Text.Set("Wrote over the card");
+    }))
+
 @(plan.Button("open-notes", "Open the notes")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Get("/Cards/Notes?resident=" + Uri.EscapeDataString(Model.Resident)).Into("card-notes")))

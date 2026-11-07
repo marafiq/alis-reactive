@@ -10,10 +10,10 @@ public sealed class Element : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;
 
-    public Property<string?> Text => Property<string?>(name: "textContent");
+    public Property<string?> Text => Content<string?>("text", name: "textContent");
 
     [SuppressMessage("Alis.Reactive.Contract", "ALIS019", Justification = "The HTML standard's innerHTML setter is [LegacyNullToEmptyString]: null writes the empty text, which lib.dom does not type.")]
-    public Property<string?> Html => Property<string?>(name: "innerHTML");
+    public Property<string?> Html => Content<string?>("HTML", name: "innerHTML");
 
     public ClassList Classes => LiveObject<ClassList>(name: "classList");
 }

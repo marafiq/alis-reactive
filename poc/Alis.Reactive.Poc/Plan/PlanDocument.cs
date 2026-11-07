@@ -13,7 +13,7 @@ internal sealed class PlanDocument
         Handlers = handlers;
     }
 
-    public int Version => 9;
+    public int Version => 10;
 
     public string PlanId { get; }
 

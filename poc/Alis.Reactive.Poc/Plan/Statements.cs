@@ -18,12 +18,13 @@ internal abstract class Statement
 
 internal sealed class SetStatement : Statement
 {
-    internal SetStatement(Expression target, IReadOnlyList<PathStep> path, Presence members, Expression value)
+    internal SetStatement(Expression target, IReadOnlyList<PathStep> path, Presence members, Expression value, bool content)
     {
         Target = target;
         Path = path;
         Members = members;
         Value = value;
+        Content = content;
     }
 
     public Expression Target { get; }
@@ -33,6 +34,8 @@ internal sealed class SetStatement : Statement
     public Presence Members { get; }
 
     public Expression Value { get; }
+
+    public bool Content { get; }
 }
 
 internal sealed class DoStatement : Statement

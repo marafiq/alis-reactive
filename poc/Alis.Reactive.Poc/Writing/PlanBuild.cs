@@ -18,6 +18,8 @@ internal sealed class PlanBuild
     private readonly Dictionary<string, Locator> _objects = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _vendorOfElement = new(StringComparer.Ordinal);
     private readonly HashSet<string> _rendered = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _slots = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _contents = new(StringComparer.Ordinal);
     private readonly List<Handler> _handlers = [];
     private readonly Stack<List<Statement>> _open = new();
     private readonly Stack<string> _payloads = new();
@@ -371,12 +373,23 @@ internal sealed class PlanBuild
 
     internal string Slot(string containerId)
     {
+        if (_contents.TryGetValue(containerId, out var noun)) throw ContentOfASlot(containerId, noun);
+        _slots.Add(containerId);
         var id = "$slot:" + containerId;
         _objects[id] = new PluginLocator("alis.slot", containerId, MethodListening.EventTarget);
         return id;
     }
 
     private const string HttpId = "$http";
+
+    internal void ReplacesContentOf(string elementId, string noun)
+    {
+        if (_slots.Contains(elementId)) throw ContentOfASlot(elementId, noun);
+        _contents[elementId] = noun;
+    }
+
+    private static InvalidOperationException ContentOfASlot(string elementId, string noun) => new(
+        $"The plan sets the {noun} of element '{elementId}', a slot this plan loads or unloads, so what the slot loaded would keep running under content it no longer shows. Empty the slot with Unload(\"{elementId}\"), and write the {noun} into an element beside it.");
 
     internal bool Follows(RefExpression result)
         => _open.Count > 0 && _open.Peek() is { Count: > 0 } block && block[^1] is LetStatement let && let.Name == result.Name;
