@@ -43,6 +43,10 @@ public sealed class ReactivePlan<TModel>
         return new Rendered<TComponent, TModel>(Build, id, html);
     }
 
+    public ReactivePlugin<TPlugin, TModel> Plugin<TPlugin>()
+        where TPlugin : Plugin, new()
+        => new(Build);
+
     public string Json<TValue>(TValue value) => Literal.Of(value, Build).Value.GetRawText();
 
     internal string Json() => PlanJson.Write(Build.Document());
@@ -90,6 +94,30 @@ public sealed class Rendered<TComponent, TModel> : IHtmlContent
 #else
     public void WriteTo(TextWriter writer, HtmlEncoder encoder) => _html.WriteTo(writer, encoder);
 #endif
+}
+
+public sealed class ReactivePlugin<TPlugin, TModel>
+    where TPlugin : Plugin, new()
+{
+    private readonly PlanBuild _build;
+
+    internal ReactivePlugin(PlanBuild build)
+    {
+        _build = build;
+    }
+
+    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, Action<Pipeline<TModel>> pipeline)
+    {
+        Trigger.OnPlugin<TModel, TPlugin, NoPayload>(_build, raised, [], (_, steps) => pipeline(steps));
+        return this;
+    }
+
+    public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TArgs : JsObject, new()
+    {
+        Trigger.OnPlugin(_build, raised, [PathStep.Index(0)], pipeline);
+        return this;
+    }
 }
 
 public static class PlanHtml

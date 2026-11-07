@@ -1,10 +1,12 @@
 import type { PlanDocument } from "./plan";
 import { contextOf, listen } from "./objects";
 import { Stop } from "./read";
+import { openRegistry } from "./plugins";
 
 const planVersion = 7;
 
 function boot(): void {
+  openRegistry();
   document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: document.body } }));
   for (const script of document.querySelectorAll<HTMLScriptElement>('script[type="application/json"][data-alis-plan]')) {
     start(JSON.parse(script.textContent) as PlanDocument);

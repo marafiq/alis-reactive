@@ -6,7 +6,7 @@ import { readData } from "./data";
 export interface Context {
   readonly plan: PlanDocument;
   readonly scope: ReadonlyMap<string, Bound>;
-  readonly locate: (id: string) => object;
+  readonly locate: (id: string) => unknown;
 }
 
 export type Bound = Read | Deferred;
@@ -79,6 +79,7 @@ export type Called = { readonly kind: "absent" } | { readonly kind: "returned"; 
 const notCalled: Called = { kind: "absent" };
 
 export function called(call: CallExpression, context: Context): Called {
+  if (call.path.length === 0) return calledItself(call, context);
   const last = methodName(call);
   const holder = holderOf(walk(evaluate(call.target, context), call.path.slice(0, -1), call.members), last, call.members);
   if (holder.kind === "absent") return notCalled;
@@ -86,6 +87,17 @@ export function called(call: CallExpression, context: Context): Called {
   if (typeof method !== "function") throw new Stop("The member '" + String(last) + "' is not a method.");
   const args = call.args.map((argument) => heldOrNull(evaluate(argument, context)));
   return { kind: "returned", held: Reflect.apply(method, holder.object, args) };
+}
+
+function calledItself(call: CallExpression, context: Context): Called {
+  const target = evaluate(call.target, context);
+  if (target.kind === "nothing" || typeof target.value !== "function") throw new Stop("The object called as a function is not a function.");
+  const args = call.args.map((argument) => heldOrNull(evaluate(argument, context)));
+  return { kind: "returned", held: Reflect.apply(target.value, undefined, args) };
+}
+
+export function callee(call: CallExpression): string {
+  return call.path.length === 0 ? "The object called as a function" : "The method '" + String(methodName(call)) + "'";
 }
 
 export function methodName(call: CallExpression): PathStep {
@@ -99,7 +111,7 @@ function invoke(call: CallExpression, context: Context): Read {
   if (result.kind === "absent") return nothing;
   if (isPromise(result.held)) {
     void result.held.catch(() => nothing);
-    throw new Stop("The method '" + String(methodName(call)) + "' returned a promise; a method that returns one is declared with MethodAsync.");
+    throw new Stop(callee(call) + " returned a promise; a method that returns one is declared with MethodAsync.");
   }
   return value(result.held);
 }

@@ -9,3 +9,21 @@ export function onMount<THost extends HTMLElement>(selector: string, construct: 
     for (const host of root.querySelectorAll<THost>(selector)) construct(host);
   });
 }
+
+interface ProvidedPlugin {
+  readonly name: string;
+  readonly instance: unknown;
+}
+
+interface ProvidedPlugins {
+  push(...provided: ProvidedPlugin[]): number;
+}
+
+interface PluginWindow extends Window {
+  __alisPlugins?: ProvidedPlugins;
+}
+
+export function providePlugin(name: string, instance: unknown): void {
+  const host = window as PluginWindow;
+  (host.__alisPlugins ??= []).push({ name, instance });
+}

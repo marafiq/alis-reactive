@@ -9,7 +9,8 @@ import { CallBell, MedicineSearch, WardFeed, mountBedBoard, type CallBellHost, t
 import { NurseStation, StationCensus, type NurseStationHost, type StationCensusHost } from "./NurseStation/nurse-station";
 import { WardPicker, type WardPickerHost } from "./WardPicker/ward-picker";
 import { DoseCard, type DoseCardHost } from "./DoseCard/dose-card";
-import { onMount } from "./mount";
+import { BedStore, NightClock, ShiftLog, VisitorBook, initials } from "./ShiftPlugins/shift-plugins";
+import { onMount, providePlugin } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
   host.careBoard = host.dataset["careboard"] === "2" ? new CareBoardV2(host) : new CareBoardV1(host);
@@ -69,4 +70,13 @@ onMount<WardPickerHost>("[data-ward-picker]", (host) => {
 
 onMount<DoseCardHost>("[data-dose-card]", (host) => {
   host.card = new DoseCard(host);
+});
+
+providePlugin("shift-log", new ShiftLog());
+providePlugin("initials", initials);
+providePlugin("night-clock", new NightClock());
+providePlugin("bed-store", new BedStore());
+
+onMount<HTMLButtonElement>("[data-opens-visitor-book]", (button) => {
+  button.addEventListener("click", () => providePlugin("visitor-book", new VisitorBook()), { once: true });
 });

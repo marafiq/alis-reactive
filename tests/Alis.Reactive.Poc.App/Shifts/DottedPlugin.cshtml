@@ -1,0 +1,15 @@
+@using Alis.Reactive.Poc.App.Shifts
+@model ShiftsPage
+@{
+    ViewData["Title"] = "A plugin named with a dot";
+    var plan = Html.ReactivePlan<ShiftsPage>();
+}
+<h1>A plugin named with a dot</h1>
+
+<p>Count: <span id="count">none read</span></p>
+
+@(plan.Button("read-count", "Read the count")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.When(pipeline.Plugin<DottedLog>().Count.Gt(0)).Then(some => some.Element("count").Text.Set("some"))))
+
+@Html.RenderPlan(plan)

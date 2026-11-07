@@ -1,0 +1,24 @@
+@using Alis.Reactive.Poc.App.Shifts
+@model ShiftsPage
+@{
+    ViewData["Title"] = "A ward lantern provided as a number";
+    Layout = "_WardLanternLayout";
+    var plan = Html.ReactivePlan<ShiftsPage>();
+}
+<h1>A ward lantern provided as a number</h1>
+
+<p>Reading: <span id="read-tried">not tried</span></p>
+<p>Colour: <span id="colour">none read</span></p>
+<p>Greeting: <span id="greeting">none</span></p>
+
+@(plan.Button("read-colour", "Read the lantern's colour")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("read-tried").Text.Set("tried");
+        pipeline.Element("colour").Text.Set(pipeline.Plugin<WardLantern>().Colour);
+    }))
+
+@(plan.Button("greet", "Greet the ward")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("greeting").Text.Set("hello")))
+
+@Html.RenderPlan(plan)

@@ -71,21 +71,9 @@ public sealed class ComponentVendor
 
     private static string VendorName(string name)
     {
-        var valid = name.Length > 0 && IsLetter(name[0]);
-        foreach (var character in name)
-            valid = valid && (IsLetter(character) || (character >= '0' && character <= '9') || character == '_' || character == '-');
-        if (!valid) throw new ArgumentException($"Vendor name '{name}' must start with a letter and contain only ASCII letters, digits, underscore, or hyphen.", nameof(name));
+        if (!JavaScriptNames.IsRegistryName(name)) throw new ArgumentException($"Vendor name '{name}' must start with a letter and contain only ASCII letters, digits, underscore, or hyphen.", nameof(name));
         return name;
     }
 
-    private static string JavaScriptName(string name)
-    {
-        var valid = name.Length > 0 && (IsLetter(name[0]) || name[0] == '_' || name[0] == '$');
-        foreach (var character in name)
-            valid = valid && (IsLetter(character) || (character >= '0' && character <= '9') || character == '_' || character == '$');
-        if (!valid) throw new ArgumentException($"'{name}' is not a JavaScript name: a letter, '_' or '$', then letters, digits, '_' or '$'.", nameof(name));
-        return name;
-    }
-
-    private static bool IsLetter(char character) => (character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z');
+    private static string JavaScriptName(string name) => JavaScriptNames.Checked(name);
 }

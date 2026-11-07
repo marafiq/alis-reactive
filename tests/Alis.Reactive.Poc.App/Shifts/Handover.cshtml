@@ -1,0 +1,62 @@
+@using Alis.Reactive.Poc.App.Shifts
+@model ShiftsPage
+@{
+    ViewData["Title"] = "Handover";
+    var plan = Html.ReactivePlan<ShiftsPage>();
+    plan.Plugin<ShiftLog>().Reactive(log => log.Noted, (noted, pipeline) =>
+        pipeline.Element("noted").Text.Set(noted.Detail.Read(detail => detail!.Note)));
+    plan.Plugin<NightClock>().Reactive(clock => clock.Struck, (struck, pipeline) =>
+        pipeline.Element("hour").Text.Set(struck.Hour));
+    plan.Plugin<BedStore>().Reactive(store => store.Assigned, (taken, pipeline) =>
+        pipeline.Element("assigned-bed").Text.Set(taken.Bed));
+}
+<h1>Handover</h1>
+
+<p>Last note: <span id="last-note">none read</span></p>
+<p>Noted: <span id="noted">nothing noted</span></p>
+<p>Closing note: <span id="closing-note">unchecked</span></p>
+<p>Initials: <span id="initials">none</span></p>
+<p>Hour: <span id="hour">not struck</span></p>
+<p>Assigned bed: <span id="assigned-bed">none</span></p>
+
+@plan.TextBox("note", "Note", "")
+
+@(plan.Button("add-note", "Add the note")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Plugin<ShiftLog>().Add(pipeline.Component<NativeTextBox>("note").Value)))
+
+@(plan.Button("read-last", "Read the last note")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("last-note").Text.Set(pipeline.Plugin<ShiftLog>().LastNote)))
+
+@(plan.Button("check-log", "Check the log")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var log = pipeline.Plugin<ShiftLog>();
+        pipeline.When(log.IsFull()).Then(full => full.Element("closing-note").Text.Set(full.Plugin<ShiftLog>().LastNote))
+            .ElseIf(log.Count.Gt(0)).Then(some => some.Element("closing-note").Text.Set("room left"))
+            .Else(empty => empty.Element("closing-note").Text.Set("empty"));
+    }))
+
+@(plan.Button("raise-limit", "Allow five notes")
+    .Reactive(button => button.Click, pipeline => pipeline.Plugin<ShiftLog>().Limit.Set(5)))
+
+@plan.TextBox("resident", "Resident", "")
+
+@(plan.Button("show-initials", "Show the resident's initials")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("initials").Text.Set(pipeline.Plugin<Initials>().Of(pipeline.Component<NativeTextBox>("resident").Value))))
+
+@plan.DoseChart("chart")
+
+@(plan.Button("initial-ticks", "Label the ticks by their initials")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<DoseChart>("chart").TickLabel.Set(tick => pipeline.Plugin<Initials>().Of(tick.Label))))
+
+@(plan.Button("strike", "Strike the hour")
+    .Reactive(button => button.Click, pipeline => pipeline.Plugin<NightClock>().Strike()))
+
+@(plan.Button("assign-bed", "Assign bed 12B")
+    .Reactive(button => button.Click, pipeline => pipeline.Plugin<BedStore>().Assign("12B")))
+
+@Html.RenderPlan(plan)

@@ -2,6 +2,7 @@ import type { Handler, Listening, PlanDocument } from "./plan";
 import { evaluate, walk, type Bound, type Context } from "./evaluate";
 import { execute } from "./execute";
 import { assertNever, Stop, value } from "./read";
+import { plugin } from "./plugins";
 
 type Listener = (...args: unknown[]) => void;
 
@@ -10,14 +11,16 @@ export function contextOf(plan: PlanDocument): Context {
   return context;
 }
 
-function locate(context: Context, id: string): object {
+function locate(context: Context, id: string): unknown {
   const locator = context.plan.objects[id];
   if (locator === undefined) throw new Error("The plan reads the object '" + id + "', which it does not declare.");
   switch (locator.kind) {
     case "element":
       return onElement(context, locator.id, locator.vendor);
+    case "plugin":
+      return plugin(locator.name);
     default:
-      return assertNever(locator.kind);
+      return assertNever(locator);
   }
 }
 
@@ -40,11 +43,23 @@ export function listen(context: Context, handler: Handler): void {
   if (raiser.kind === "nothing" || raiser.value === null || typeof raiser.value !== "object") {
     throw new Stop("The object that raises '" + handler.event + "' is not on the page.");
   }
-  const locator = context.plan.objects[handler.on];
-  if (locator === undefined) throw new Error("The plan listens on the object '" + handler.on + "', which it does not declare.");
-  const vendor = context.plan.vendors[locator.vendor];
-  if (vendor === undefined) throw new Error("The plan names the vendor '" + locator.vendor + "', which it does not declare.");
-  subscribe(raiser.value, vendor.listen, handler.event, (...args) => run(context, handler, args));
+  subscribe(raiser.value, listeningOf(context, handler.on), handler.event, (...args) => run(context, handler, args));
+}
+
+function listeningOf(context: Context, id: string): Listening {
+  const locator = context.plan.objects[id];
+  if (locator === undefined) throw new Error("The plan listens on the object '" + id + "', which it does not declare.");
+  switch (locator.kind) {
+    case "element": {
+      const vendor = context.plan.vendors[locator.vendor];
+      if (vendor === undefined) throw new Error("The plan names the vendor '" + locator.vendor + "', which it does not declare.");
+      return vendor.listen;
+    }
+    case "plugin":
+      return locator.listen;
+    default:
+      return assertNever(locator);
+  }
 }
 
 function subscribe(raiser: object, listening: Listening, event: string, listener: Listener): void {

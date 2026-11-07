@@ -139,6 +139,15 @@ public abstract class JsObject
         where TItem : JsObject, new()
         => new(Binding.Build.Result(Call(arguments, name, declaredBy)), Binding.Build, ReadPresence.Required);
 
+    protected void CallItself()
+        => CallItself([]);
+
+    protected void CallItself(IReadOnlyList<Arg> arguments)
+        => Binding.Build.Write(new DoStatement(Itself(arguments), awaits: false));
+
+    protected MethodResult<TResult> CallItself<TResult>(IReadOnlyList<Arg> arguments)
+        => new(Binding.Build.Result(Itself(arguments)), Binding.Build);
+
     protected ReadOnly<TValue> Argument<TValue>(int position)
         => new(ListenerArguments(), ArgumentStep(position));
 
@@ -196,6 +205,9 @@ public abstract class JsObject
         if (position < 0) throw new ArgumentOutOfRangeException(nameof(position), position, "An argument's position is zero or more.");
         return PathStep.Index(position);
     }
+
+    private CallExpression Itself(IReadOnlyList<Arg> arguments)
+        => new(Binding.Target, [], Binding.Members, [.. arguments.Select(argument => argument.ExpressionIn(Binding.Build))]);
 
     private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, string declaredBy)
         => new(Binding.Target, [Member(name, declaredBy)], Binding.Members, [.. arguments.Select(argument => argument.ExpressionIn(Binding.Build))]);

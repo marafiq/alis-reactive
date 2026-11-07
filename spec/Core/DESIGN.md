@@ -2313,6 +2313,28 @@ grammar gains no node (G2).
   read the owner's list lacks. A typed component shows what the server decided; a text box keeps MVC's attempted text. A
   component that posts through a hidden input writes a number in the view's culture, the decimal separator the
   helper gives it and no grouping, since the server binds the body under the culture the view rendered under (D3.11).
+- D17.14 A plugin is a live object the page's own code provides by name, with no element (D5.1).
+  - Its declaration is a `Plugin`, named once with a vendor's characters (D17.7), so a dot is refused and the `alis.`
+    names stay the framework's. The name is checked where the plan takes the plugin, outside the declaration's
+    constructor.
+  - A pipeline reaches it with `p.Plugin<TPlugin>()`, and a plan handles its events with
+    `plan.Plugin<TPlugin>().Reactive(..)`, in every block a component's member is used in: a handler, a condition's
+    term and its branches, and a callback's answer.
+  - Its events listen by a vendor's listening kinds (D17.3): `EventTarget`, `addEventListener` and
+    `removeEventListener`, unless the declaration names another with `PluginEvents`. The plan's locator carries the
+    plugin's name and its listening, and its object id is `$plugin:` and its name, so no element id meets it.
+  - A declaration calls the object itself with `CallItself`, a `call` with no path, applied with `this` undefined:
+    the doors of a plugin that is a function (main's `Command()` and `Function<T>()`, the redesign's `name: ""`).
+  - The page provides a plugin by pushing `{ name, instance }` onto `window.__alisPlugins`. Boot reads the queue before
+    `alis:mount`, and from then on the queue's push registers at once, so a plugin a script provides after the page
+    started is found by the next step that reaches it. The redesign drops such a push with no word: it deletes the
+    queue at boot (`Alis.Reactive.Assets/runtime/root.ts:44-45`).
+  - A step reaching a name no script provides stops its pipeline, naming the plugin. A name two scripts provide holds
+    no plugin, and each step that reaches it stops from then on, so a plugin provided again after steps used it
+    stops those steps from then on. The instance is any value, read as a required read reads any present value
+    (D4.1). The redesign stops the whole page for a name provided twice or a value that is no object
+    (`Alis.Reactive.Assets/runtime/objects/plugins.ts:23-36`); here a plugin's fault stops only the pipelines that
+    reach it, as an element's does (D4.1).
 
 **Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
 `handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
@@ -2344,6 +2366,15 @@ plans (Q19).
 - `N17.5` new: the declaration's argument kind that carries the run's abort signal (D17.11).
 - `N17.10` new: an input field's `ValueJson` and `Json(options)`, the starting value and options a render helper
   writes (D17.13); their names go to gate 2.
+- kept: `Plugin`, `Plugin.Name` and `Plugin(string name)` (both lines).
+- `N17.11` new: `Plugin(string name, PluginEvents events)` and `PluginEvents` (`EventTarget`, `CallbackProperties`,
+  `Methods`, `ReturnedUnsubscriber`), `p.Plugin<TPlugin>()`, `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`
+  (D17.14); their forms go to gate 2. They replace the redesign's `ReactivePlan.RegisterPlugin<TPlugin>()`, so a plugin
+  registered twice on one plan is no longer representable, and carry main's string doors by the declaration
+  vocabulary: `p.Plugin(name)` and `p.Plugin(name, member)` by a declaration's members, `Plugin.Command()` and
+  `Plugin.Function<T>()` by `CallItself`, `Plugin.Property<T>(member)` by `Property<T>`, and the `Arg` overloads from a
+  payload path or a response path by `Arg<T>` from any source. `GatherBuilder.Plugin` is the request's, which has no
+  POC (the gate 1 report).
 
 **Evidence.**
 - A vendor's object is found by a path from the element alone (`Alis.Reactive/Vendors/ComponentVendor.cs:78-93`,
@@ -2409,6 +2440,16 @@ plans (Q19).
   and the vendor keeps what it drew before.
 - `X17.23` behavior (D17.4, D17.12): a value accessor's answer reads the row its vendor passes at position 1, and the
   chart shows each row's label as its value.
+- `X17.24` behavior (D17.14): a shift log the page provides is read, written and called from a handler, a condition's
+  term and branch, and a dose chart's answer; it raises its events as an EventTarget, a night clock through a callback
+  property and a bed store to a subscriber whose unsubscribe it returns; a plugin that is a function answers the
+  resident's initials.
+- `X17.25` behavior (D17.14): a step reaching the visitor book before a script provides it stops its own pipeline and
+  the page's other pipelines run; once the page's code provides it, after the page started, the next step finds it.
+- `X17.26` behavior (D17.14): a shift log two scripts provide stops each step that reaches it, and a ward lantern
+  provided as a number stops each step that reads a colour a number lacks; the page's other pipelines run.
+- `X17.27` refusal (D17.14): a plugin named with a dot: "Plugin name 'alis.log' must start with a letter and contain
+  only ASCII letters, digits, underscore, or hyphen. A name with a dot is the framework's own."
 
 ## Q18. Type knowledge without reflection
 

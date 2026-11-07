@@ -298,6 +298,13 @@ internal sealed class PlanBuild
         return elementId;
     }
 
+    internal string Plugin(string name, Listening listen)
+    {
+        var key = "$plugin:" + name;
+        _objects[key] = new PluginLocator(name, listen);
+        return key;
+    }
+
     internal void Add(Handler handler, Listening listening)
     {
         var heldByOneProperty = listening is AssignmentListening && _handlers.Exists(held => held.On == handler.On && held.Event == handler.Event);

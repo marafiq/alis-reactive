@@ -1,0 +1,27 @@
+@using Alis.Reactive.Poc.App.Shifts
+@model ShiftsPage
+@{
+    ViewData["Title"] = "Visitor book";
+    var plan = Html.ReactivePlan<ShiftsPage>();
+}
+<h1>Visitor book</h1>
+
+<p>Signing: <span id="sign-tried">not tried</span></p>
+<p>Signed by: <span id="signed">nobody</span></p>
+<p>Greeting: <span id="greeting">none</span></p>
+
+<button type="button" data-opens-visitor-book>Open the visitor book</button>
+
+@(plan.Button("sign", "Sign the book")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var book = pipeline.Plugin<VisitorBook>();
+        pipeline.Element("sign-tried").Text.Set("tried");
+        book.Sign("Ada Byron");
+        pipeline.Element("signed").Text.Set(book.LastVisitor);
+    }))
+
+@(plan.Button("greet", "Greet the visitor")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("greeting").Text.Set("hello")))
+
+@Html.RenderPlan(plan)

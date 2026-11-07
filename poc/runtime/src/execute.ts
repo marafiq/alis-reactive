@@ -1,5 +1,5 @@
 import type { CallExpression, DoStatement, IfStatement, LetStatement, SetStatement, Statement } from "./plan";
-import { called, evaluate, holderOf, methodName, walk, type Bound, type Context } from "./evaluate";
+import { callee, called, evaluate, holderOf, walk, type Bound, type Context } from "./evaluate";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 
 export type Run = { readonly kind: "finished" } | { readonly kind: "awaiting"; readonly settled: Promise<void> };
@@ -49,7 +49,7 @@ function settle(statement: Awaited, context: Context): Promise<Read> {
 
 function rejected(call: CallExpression): (reason: unknown) => never {
   return (reason) => {
-    throw new Stop("The method '" + String(methodName(call)) + "' rejected: " + (reason instanceof Error ? reason.message : String(reason)));
+    throw new Stop(callee(call) + " rejected: " + (reason instanceof Error ? reason.message : String(reason)));
   };
 }
 

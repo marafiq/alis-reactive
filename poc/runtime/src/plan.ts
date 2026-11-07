@@ -93,7 +93,7 @@ export interface LiteralExpression {
   readonly value: JsonValue;
 }
 
-export type Locator = ElementLocator;
+export type Locator = ElementLocator | PluginLocator;
 
 export interface MethodListening {
   readonly kind: "method";
@@ -131,6 +131,12 @@ export interface PlanDocument {
   readonly vendors: { readonly [key: string]: Vendor };
   readonly objects: { readonly [key: string]: Locator };
   readonly handlers: readonly Handler[];
+}
+
+export interface PluginLocator {
+  readonly kind: "plugin";
+  readonly name: string;
+  readonly listen: Listening;
 }
 
 export type Policy = "overlap" | "replace" | "skip";

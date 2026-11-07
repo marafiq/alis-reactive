@@ -103,7 +103,7 @@ listening: `method`, `assignment` or `returned`. `Vendor.payload` of 65fdf118d l
 | Kind | Carries | Holds | Meaning |
 |------|---------|-------|---------|
 | `element` | `id`: an element id; `vendor`: a vendor name of `vendors` | | the component on that element at the vendor's object path. An element the page lacks, or one that holds no object at that path, stops the pipeline that reads it (D4.1). |
-| `plugin` | `name`: the plugin's name; `key`: text the plugin reads | `data`: plugin data | the plugin's object for that key |
+| `plugin` | `name`: the plugin's name; `key`: text the plugin reads; `listen`: a vendor listening, how its events are listened to (D17.14) | `data`: plugin data | the plugin's object for that key. Its object id is `$plugin:` and its name, so no element id meets it. A name no script provides, or two scripts provide, stops the pipeline that reads it (D17.14). |
 
 The plugins the core's C# names are `alis.http`, `alis.form`, `alis.model`, `alis.slot`, `alis.hub`, `alis.stream`
 and `alis.document`, each provided by the core's own browser code. Any other name is a plugin an app or a component
@@ -208,7 +208,7 @@ and in the blocks inside it, and nowhere else.
 | `get` | `path`; `members`: `required`, `optional` or `requiredIfHeld` | `target`: an expression | the one read (Q2): a required step the holder lacks stops the pipeline, an optional one reads nothing (D4.1), and a `requiredIfHeld` one reads nothing on a holder that reads nothing and stops on a holder that lacks it: an array's `length` and methods (D6.3, D6.4), and the members of the live item a find returns, which is nothing when no item matched (D6.9) |
 | `data` | `path`: a list of `DataStep` | `target`: an expression | a typed read of data (D4.2): at each step a holder that holds null or reads nothing reads nothing; a holder that is not an object, or that lacks a name of the step's `requires`, stops the pipeline; a member the holder lacks reads the step's `absent`; a member it holds reads on, and a promise stops the pipeline (D4.3) |
 | `as` | | `expr`: an expression; `shape`: a shape that converts | the one conversion by `spec/Core/conversions.md` (D3.2, D3.4); a value the shape cannot hold reads nothing (D3.3) |
-| `call` | `path`; `members`: `required`, `optional` or `requiredIfHeld`, as `get` reads them | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3) |
+| `call` | `path`; `members`: `required`, `optional` or `requiredIfHeld`, as `get` reads them | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3). An empty path calls the target itself, applied with `this` undefined, and a target that is no function stops the pipeline (D17.14) |
 | `fn` | `params`: names | `body`: an expression | a function the framework calls, whose parameters are bound in its body: a list operation's item read, a sort's comparison, a vendor's locate |
 | `answer` | `arguments`: a name | `body`: an expression | the function a vendor calls for an answer, set into a property or passed as an argument: each call binds the list of its arguments to the name and answers its body's value, and a stop its body raises is thrown to the vendor's call (D17.12) |
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
