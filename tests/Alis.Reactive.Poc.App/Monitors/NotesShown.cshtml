@@ -1,0 +1,17 @@
+@using Alis.Reactive.Poc.App.Monitors
+@model MonitorsPage
+@{
+    ViewData["Title"] = "Notes shown";
+    var plan = Html.ReactivePlan<MonitorsPage>();
+}
+<h1>Notes shown</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+<p>Note: <span id="note">unread</span></p>
+
+@(plan.VitalsMonitor("monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+        pipeline.Element("note").Text.Set(alarm.Note.IfNull(pipeline.Component<InfusionPump>("pump").Summary()))))
+
+@Html.RenderPlan(plan)

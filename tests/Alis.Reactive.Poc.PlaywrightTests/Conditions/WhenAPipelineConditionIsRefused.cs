@@ -54,7 +54,7 @@ public sealed class WhenAPipelineConditionIsRefused : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Balances/RecountInAnOr");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: An async method is called in a term of And or Or that runs only when it is reached, and the pipeline waits for an async method at its line: call it in a When of its own, in the branch where its term is reached.");
+            "InvalidOperationException: An async method is called in a term that runs only when it is reached (the right term of And, Or or IfNull, or a branch of Choose), and the pipeline waits for an async method at its line: call it in a When of its own, in the branch where its term is reached.");
     }
 
     [Test]
@@ -82,5 +82,14 @@ public sealed class WhenAPipelineConditionIsRefused : AppPageTest
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
             "InvalidOperationException: An Else ends its When: write each ElseIf before it, and every step of the remaining case in that one Else.");
+    }
+
+    [Test]
+    public async Task an_async_method_in_the_fallback_of_if_null_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Balances/RecountInAnIfNull");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: An async method is called in a term that runs only when it is reached (the right term of And, Or or IfNull, or a branch of Choose), and the pipeline waits for an async method at its line: call it in a When of its own, in the branch where its term is reached.");
     }
 }

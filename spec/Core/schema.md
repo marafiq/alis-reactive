@@ -191,7 +191,7 @@ and in the blocks inside it, and nowhere else.
 |------|---------|-------|---------|
 | `set` | `path`, at least one step; `members`: `required` or `optional` | `target`, `value`: expressions | write the value at the path below the target (Q2, Q4) |
 | `do` | `await`: a boolean | `expr`: an expression | evaluate it; with `await`, wait for its promise (D4.3, D11.1) |
-| `let` | `name`; `await`: a boolean; `binds`: `line` or `read` | `expr`: an expression | bind its value, or its awaited value, in the block (D8.8); at `line` the expression runs there, once, and every `ref` of the name reads the binding (D5.11); at `read` the expression runs where the name's one `ref` is read, a term of `and` or `or` reached later (D4.7) |
+| `let` | `name`; `await`: a boolean; `binds`: `line` or `read` | `expr`: an expression | bind its value, or its awaited value, in the block (D8.8); at `line` the expression runs there, once, and every `ref` of the name reads the binding (D5.11); at `read` the expression runs where the name's one `ref` is read, in a term reached later: the right term of `and`, `or` or `coalesce`, or a branch of `cond` (D4.7) |
 | `if` | | `when`: an expression; `then`, `else`: blocks | run `then` when `when` holds, else the `else` block; an `ElseIf` is an `else` block holding its condition's results and an `if` (D8.7) |
 | `all` | | `blocks`: a list of blocks | run every block at once; the next statement runs after every block settled (D10.10) |
 | `try` | | `body`, `finally`: blocks | run the body; run `finally` once, however the body ends (D11.8) |

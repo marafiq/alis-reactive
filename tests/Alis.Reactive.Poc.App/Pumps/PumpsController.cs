@@ -19,6 +19,8 @@ public sealed class PumpsController : Controller
     public IActionResult ChannelReadByAnotherPipeline() => View(new InfusionPage());
 
     public IActionResult ChannelsReadByAnotherPipeline() => View(new InfusionPage());
+
+    public IActionResult LastAlarmNoted() => View(new InfusionPage());
 }
 
 public sealed record InfusionPage;

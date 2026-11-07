@@ -52,7 +52,7 @@ internal sealed class ResultLines
         if (readOnceWhenReached && result.Await)
         {
             throw new InvalidOperationException(
-                "An async method is called in a term of And or Or that runs only when it is reached, and the pipeline waits for an async method at its line: call it in a When of its own, in the branch where its term is reached.");
+                "An async method is called in a term that runs only when it is reached (the right term of And, Or or IfNull, or a branch of Choose), and the pipeline waits for an async method at its line: call it in a When of its own, in the branch where its term is reached.");
         }
 
         if (readOnceWhenReached) result.Binds = LetBinding.Read;
@@ -175,10 +175,11 @@ internal static class References
 
     private static void Operands(OperatorExpression operation, bool whenReached, Action<string, bool> read)
     {
-        var decidedByItsFirstTerm = ReferenceEquals(operation.Op, Operator.And) || ReferenceEquals(operation.Op, Operator.Or);
+        var laterTermsRunWhenReached = ReferenceEquals(operation.Op, Operator.And) || ReferenceEquals(operation.Op, Operator.Or)
+            || ReferenceEquals(operation.Op, Operator.Coalesce) || ReferenceEquals(operation.Op, Operator.Cond);
         for (var position = 0; position < operation.Args.Count; position++)
         {
-            Of(operation.Args[position], whenReached || (decidedByItsFirstTerm && position > 0), read);
+            Of(operation.Args[position], whenReached || (laterTermsRunWhenReached && position > 0), read);
         }
     }
 }

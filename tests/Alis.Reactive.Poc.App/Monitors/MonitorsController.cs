@@ -17,6 +17,8 @@ public sealed class MonitorsController : Controller
     public IActionResult CancelledAfterAnElseIf() => View(new MonitorsPage());
 
     public IActionResult CancelledAfterAnElseIfThatAwaits() => View(new MonitorsPage());
+
+    public IActionResult NotesShown() => View(new MonitorsPage());
 }
 
 public sealed record MonitorsPage;

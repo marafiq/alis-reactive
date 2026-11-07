@@ -1,0 +1,19 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Light patients";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Light patients</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("light", "Check for a light patient")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.When(pipeline.Component<FluidBalance>("balance").Weight.IfNull(60).Lt(65))
+            .Then(light => light.Element("verdict").Text.Set("light"))
+            .Else(heavier => heavier.Element("verdict").Text.Set("not light"))))
+
+@Html.RenderPlan(plan)

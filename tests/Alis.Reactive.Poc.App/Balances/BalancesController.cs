@@ -39,6 +39,12 @@ public sealed class BalancesController : Controller
     public IActionResult ElseIfResultAfterItsWhen() => View(new BalancesPage());
 
     public IActionResult TwoElses() => View(new BalancesPage());
+
+    public IActionResult LightPatients() => View(new BalancesPage());
+
+    public IActionResult FluidTargets() => View(new BalancesPage());
+
+    public IActionResult RecountInAnIfNull() => View(new BalancesPage());
 }
 
 public sealed record BalancesPage;

@@ -319,11 +319,12 @@ Terms used throughout:
 - D4.7 A method called inside a condition runs only when its term is reached: `and`, `or` and `cond` evaluate
   their terms in order and stop at the first that decides, and an `ElseIf`'s condition runs only when no branch
   before it ran. C# writes a method's result as a `let` at its line (D5.11). A result called after the block's
-  previous step and read once by the next step, under the right term of `and` or `or`, is that term's own call: its
+  previous step and read once by the next step, under a term reached later (the right term of `and`, `or` or
+  `coalesce`, or a branch of `cond`), is that term's own call: its
   `let` binds with `binds: "read"`, and the call runs where its read is reached. An `ElseIf` is the `else` block of
   the `if` before it, holding its condition's results at their lines and an `if` of its own, so its calls, awaited
   ones included, run when it is reached (D8.6). An async method's result binds only at its line, so one called under
-  the right term of `and` or `or` is refused where the view renders (X8.16).
+  a term reached later is refused where the view renders (X8.16).
 - D4.9 A value JavaScript holds as `undefined` reads as nothing wherever it is read: a member that holds it, a
   method that returns it (`find` when no item matched). It never reaches a write as `undefined`; a write of
   nothing writes null (D4.5).
@@ -653,7 +654,8 @@ Terms used throughout:
   nothing past a holder that holds null (D8.9); its `Value` is `op(nullableValue, x)`, the value, or nothing where the
   nullable holds null and .NET throws, as a text operator reads nothing on null (`spec/Core/translated-members.md`).
   A `??` whose left side the compiler converts by a user-defined conversion is refused (X6.33): the browser has no
-  conversion the app wrote.
+  conversion the app wrote. Outside a lambda, at any value position, `source.IfNull(fallback)` writes the same
+  `coalesce` and `test.Choose(whenTrue, whenFalse)` the same `cond` (N7.4), each term read only when it is reached.
 - D6.15 `Regex.IsMatch(text, pattern)` and `Regex.IsMatch(text, pattern, options)` in a list's lambda write
   `op(matches, text, lit)`, the pattern's browser copy, which D16.11's one reader writes where the view renders from a
   pattern the view holds (Decision 2, the owner, 2026-11-06). A pattern read from the item, or null when the view
@@ -806,7 +808,8 @@ Terms used throughout:
 - D7.2 The sources are closed, each a `TypedSource<T>`: a component's or plugin's member, a method's result
   (`Method<T>`, `MethodAsync<T>`, a hub's `Invoke<T>`), a page URL member (`p.Url<TQuery>()`), a field of an event
   payload or a pushed message, a field of a response body, an input's bound value (`p.Bound`), the result of an
-  array operation, a literal, an object built from sources, and a list built from sources.
+  array operation, a literal, an object built from sources, a list built from sources, and a value chosen from
+  sources by `IfNull` or `Choose` (D6.14).
 - D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
   `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position.
 - D7.4 One builder makes an object from sources, member by typed member, and the dispatch payload, a method
@@ -834,6 +837,9 @@ Terms used throughout:
 - `N7.2` new: `p.List<T>([first, second])`, a `TypedSource<IReadOnlyList<T>>` built from sources.
 - `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between` and the
   membership tests in `ConditionOperators`.
+- `N7.4` new, its form gate 2's: `IfNull` on a source of a nullable type, taking a literal or a source of the type
+  without null and returning a source of it, and `Choose` on a `TypedSource<bool>`, taking a literal or a source for
+  each branch; extension methods beside the comparisons of N8.2.
 
 **Evidence.**
 - G8: a source of an assignable type fills a request member (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`).
@@ -857,6 +863,11 @@ Terms used throughout:
 - `X7.4` type: a pattern read in the browser cannot reach `Matches`: new:N7.3 gives `Matches` no source overload.
 - `X7.5` behavior: a property set from a payload field the payload lacks writes `null`, and the component
   shows its empty state.
+- `X7.6` behavior (N7.4): an alarm's note that holds null shows its fallback, a pump's summary, and one that holds
+  a value shows it with no summary taken; a pump's last alarm that reads nothing passes its fallback as a method's
+  argument; a condition compares a null weight's fallback and a held weight itself; a fluid target chooses its
+  first value when the test holds and its second, a measured intake, when the test reads nothing, and measures
+  nothing when the second is not chosen.
 
 ## Q8. Conditions: three kinds
 
@@ -978,9 +989,10 @@ Terms used throughout:
 - `X8.15` behavior (D5.11): a fluid balance measured, then set to 999 ml, and read in a term reached after the set,
   is the 100 ml measured at its line; a result a term and its branch both read is the call at its line, so a branch
   that sets 999 ml and then the result restores the 600 ml measured.
-- `X8.16` refusal (D4.7): an async method called under the right term of `And` or `Or`: "An async method is called in
-  a term of And or Or that runs only when it is reached, and the pipeline waits for an async method at its line:
-  call it in a When of its own, in the branch where its term is reached."
+- `X8.16` refusal (D4.7): an async method called under a term reached later, the right term of `Or` or the fallback
+  of `IfNull`: "An async method is called in a term that runs only when it is reached (the right term of And, Or or
+  IfNull, or a branch of Choose), and the pipeline waits for an async method at its line: call it in a When of its
+  own, in the branch where its term is reached."
 - `X8.17` refusal (D8.8): a result called in an `ElseIf`'s condition, read after its `When`: "A method's result
   called in an ElseIf's condition is read after its When, and the call runs only when the ElseIf is reached: call
   the method before the When to read its result after it."
