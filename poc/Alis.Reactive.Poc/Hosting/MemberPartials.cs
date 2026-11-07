@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.Extensions.DependencyInjection;
 #endif
 
 namespace Alis.Reactive.Hosting;
@@ -23,7 +22,7 @@ public static class MemberPartials
         var prefix = PartialPrefixes.Of(member, ExpressionHelper.GetExpressionText(member), html.ViewData.TemplateInfo.HtmlFieldPrefix);
         var viewData = new ViewDataDictionary(html.ViewData)
         {
-            Model = ModelMetadata.FromLambdaExpression(member, html.ViewData).Model,
+            Model = MemberValues.Of(html, member),
             TemplateInfo = new TemplateInfo { HtmlFieldPrefix = prefix },
         };
         return html.Partial(viewName, viewData);
@@ -32,9 +31,8 @@ public static class MemberPartials
     public static Task<IHtmlContent> PartialFor<TModel, TMember>(this IHtmlHelper<TModel> html, Expression<Func<TModel, TMember>> member, string viewName)
     {
         ArgumentNullException.ThrowIfNull(html);
-        var expressions = html.ViewContext.HttpContext.RequestServices.GetRequiredService<ModelExpressionProvider>();
-        var prefix = PartialPrefixes.Of(member, expressions.GetExpressionText(member), html.ViewData.TemplateInfo.HtmlFieldPrefix);
-        var model = expressions.CreateModelExpression(html.ViewData, member).Model;
+        var prefix = PartialPrefixes.Of(member, MemberValues.Expressions(html).GetExpressionText(member), html.ViewData.TemplateInfo.HtmlFieldPrefix);
+        var model = MemberValues.Of(html, member);
         var viewData = new ViewDataDictionary<TMember>(html.ViewData, model);
         viewData.TemplateInfo.HtmlFieldPrefix = prefix;
         return html.PartialAsync(viewName, model, viewData);

@@ -4,6 +4,7 @@ using Alis.Reactive.Components;
 using Alis.Reactive.Inputs;
 using Alis.Reactive.Pipelines;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Values;
 using Alis.Reactive.Writing;
 #if NET48
 using System.Web;
@@ -41,6 +42,8 @@ public sealed class ReactivePlan<TModel>
         Build.Renders(id);
         return new Rendered<TComponent, TModel>(Build, id, html);
     }
+
+    public string Json<TValue>(TValue value) => Literal.Of(value, Build).Value.GetRawText();
 
     internal string Json() => PlanJson.Write(Build.Document());
 }

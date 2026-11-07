@@ -2303,6 +2303,16 @@ grammar gains no node (G2).
   error its call throws. An event's listener owes its vendor nothing, so D4.8 keeps its stop from the vendor; an
   answer owes it the value, and no value is the plan's to invent. A callback that only reacts is an event, listened
   to by a method pair, an assignment or a returned unsubscriber (D17.3), and runs a pipeline as any handler does.
+- D17.13 A render helper starts its component in the state the model gives it, written as the plan writes a literal.
+  `field.ValueJson` is the member's value, read through MVC with no compile and written by the plan's one literal
+  writer under the app's JSON options, `"null"` when a holder on the way holds nothing; `field.Json(options)` writes
+  the helper's starting options the same way, so a date, an enum and a number reach the component's code in the
+  forms the plan's own values take. After a failed post the value is the model's, as the action leaves it, on both
+  hosts: net10 keeps no typed form of an attempted value (its converter is internal, and a value provider's result
+  converts nothing), and MVC 5 converts one only by a `System.Type` (`ValueProviderResult.ConvertTo(Type)`), a type
+  read the owner's list lacks. A typed component shows what the server decided; a text box keeps MVC's attempted text. A
+  component that posts through a hidden input writes a number in the view's culture, the decimal separator the
+  helper gives it and no grouping, since the server binds the body under the culture the view rendered under (D3.11).
 
 **Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
 `handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
@@ -2332,6 +2342,8 @@ plans (Q19).
   `ConditionExtensions.Confirm`; its form goes to gate 2.
 - `N17.4` new: `NativeConfirm` and `NativeToast` in Alis.Reactive.Native, each a declaration and a render helper.
 - `N17.5` new: the declaration's argument kind that carries the run's abort signal (D17.11).
+- `N17.10` new: an input field's `ValueJson` and `Json(options)`, the starting value and options a render helper
+  writes (D17.13); their names go to gate 2.
 
 **Evidence.**
 - A vendor's object is found by a path from the element alone (`Alis.Reactive/Vendors/ComponentVendor.cs:78-93`,

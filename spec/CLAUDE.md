@@ -194,6 +194,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   experience matter". Each door is judged by what a developer types in a real MVC view and what they meet when it
   goes wrong: a mistake surfaces where the view renders when the framework can see it, and otherwise the browser's
   error names the member and the cure.
+- Chosen within the owner's yes, 2026-11-07: after a failed post, a component's typed starting value is the model's
+  value as the action leaves it, not the text the browser sent, on both hosts: net10 keeps no typed form of an
+  attempted value, MVC 5 converts one only by a `System.Type`, and a typed component shows what the server decided;
+  a text box keeps MVC's attempted text (D17.13).
+  The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

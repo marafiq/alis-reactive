@@ -8,6 +8,7 @@ import { VitalsMonitor, type VitalsMonitorHost } from "./VitalsMonitor/vitals-mo
 import { CallBell, MedicineSearch, WardFeed, mountBedBoard, type CallBellHost, type MedicineSearchHost, type WardFeedHost } from "./WardSignals/ward-signals";
 import { NurseStation, StationCensus, type NurseStationHost, type StationCensusHost } from "./NurseStation/nurse-station";
 import { WardPicker, type WardPickerHost } from "./WardPicker/ward-picker";
+import { DoseCard, type DoseCardHost } from "./DoseCard/dose-card";
 import { onMount } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
@@ -64,4 +65,8 @@ onMount<FluidBalanceHost>("[data-fluid-balance]", (host) => {
 
 onMount<WardPickerHost>("[data-ward-picker]", (host) => {
   host.picker = new WardPicker(host);
+});
+
+onMount<DoseCardHost>("[data-dose-card]", (host) => {
+  host.card = new DoseCard(host);
 });

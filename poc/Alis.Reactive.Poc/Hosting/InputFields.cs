@@ -53,6 +53,10 @@ public sealed class InputField<TModel, TValue>
 
     public Expression<Func<TModel, TValue>> Member { get; }
 
+    public string ValueJson => MemberValues.Of(Html, Member) is TValue held ? _plan.Json(held) : "null";
+
+    public string Json<TOptions>(TOptions options) => _plan.Json(options);
+
 #if NET48
     public Rendered<TComponent, TModel> Render<TComponent>(IHtmlString html)
 #else
