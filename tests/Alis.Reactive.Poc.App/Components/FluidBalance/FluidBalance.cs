@@ -13,6 +13,8 @@ public sealed class FluidBalance : Component
 
     public Property<int> Intake => Property<int>();
 
+    public Property<int?> Target => Property<int?>();
+
     public ReadOnly<int?> Weight => ReadOnly<int?>();
 
     public ReadOnly<bool> Rechecking => ReadOnly<bool>();

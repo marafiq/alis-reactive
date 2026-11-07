@@ -27,6 +27,10 @@ public static class Comparisons
         where TValue : struct, IComparable<TValue>
         => Ordered<TValue>(Operator.Gt, left, Literal.Of(right, left.Build));
 
+    public static TypedSource<bool> Gt<TValue>(this TypedSource<TValue?> left, TypedSource<TValue?> right)
+        where TValue : struct, IComparable<TValue>
+        => Ordered<TValue>(Operator.Gt, left, right.Expression);
+
     public static TypedSource<bool> Gte<TValue>(this TypedSource<TValue> left, TValue right)
         where TValue : struct, IComparable<TValue>
         => Ordered<TValue>(Operator.Gte, left, Literal.Of(right, left.Build));
@@ -38,6 +42,10 @@ public static class Comparisons
     public static TypedSource<bool> Gte<TValue>(this TypedSource<TValue?> left, TValue right)
         where TValue : struct, IComparable<TValue>
         => Ordered<TValue>(Operator.Gte, left, Literal.Of(right, left.Build));
+
+    public static TypedSource<bool> Gte<TValue>(this TypedSource<TValue?> left, TypedSource<TValue?> right)
+        where TValue : struct, IComparable<TValue>
+        => Ordered<TValue>(Operator.Gte, left, right.Expression);
 
     public static TypedSource<bool> Lt<TValue>(this TypedSource<TValue> left, TValue right)
         where TValue : struct, IComparable<TValue>
@@ -51,6 +59,10 @@ public static class Comparisons
         where TValue : struct, IComparable<TValue>
         => Ordered<TValue>(Operator.Lt, left, Literal.Of(right, left.Build));
 
+    public static TypedSource<bool> Lt<TValue>(this TypedSource<TValue?> left, TypedSource<TValue?> right)
+        where TValue : struct, IComparable<TValue>
+        => Ordered<TValue>(Operator.Lt, left, right.Expression);
+
     public static TypedSource<bool> Lte<TValue>(this TypedSource<TValue> left, TValue right)
         where TValue : struct, IComparable<TValue>
         => Ordered<TValue>(Operator.Lte, left, Literal.Of(right, left.Build));
@@ -62,6 +74,10 @@ public static class Comparisons
     public static TypedSource<bool> Lte<TValue>(this TypedSource<TValue?> left, TValue right)
         where TValue : struct, IComparable<TValue>
         => Ordered<TValue>(Operator.Lte, left, Literal.Of(right, left.Build));
+
+    public static TypedSource<bool> Lte<TValue>(this TypedSource<TValue?> left, TypedSource<TValue?> right)
+        where TValue : struct, IComparable<TValue>
+        => Ordered<TValue>(Operator.Lte, left, right.Expression);
 
     public static TypedSource<bool> And(this TypedSource<bool> left, TypedSource<bool> right) => Combined(Operator.And, left, right.Expression);
 

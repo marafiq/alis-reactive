@@ -8,7 +8,9 @@ export class FluidBalance {
   readonly #recheckShown: HTMLParagraphElement;
   readonly #measuredShown: HTMLParagraphElement;
   readonly #recountShown: HTMLParagraphElement;
+  readonly #targetShown: HTMLParagraphElement;
   #intake = 0;
+  #target: number | null = null;
   #weight: number | null = null;
   #rechecking = false;
   #finishRecheck: () => void = () => undefined;
@@ -20,12 +22,14 @@ export class FluidBalance {
     this.#recheckShown = shown("balance-recheck");
     this.#measuredShown = shown("balance-measured");
     this.#recountShown = shown("balance-recount");
+    this.#targetShown = shown("balance-target");
     host.replaceChildren(
       this.#intakeShown,
       this.#weightShown,
       this.#recheckShown,
       this.#measuredShown,
       this.#recountShown,
+      this.#targetShown,
       button("Add 100 ml", () => {
         this.intake = this.#intake + 100;
       }),
@@ -42,6 +46,9 @@ export class FluidBalance {
       }),
       button("Finish the recheck", () => this.#finishRecheck()),
       button("Finish the recount", () => this.#finishRecount()),
+      button("Target 1000 ml", () => {
+        this.target = 1000;
+      }),
     );
     this.#recheckShown.textContent = "idle";
     this.#measuredShown.textContent = "not measured";
@@ -55,6 +62,15 @@ export class FluidBalance {
 
   set intake(millilitres: number) {
     this.#intake = millilitres;
+    this.#draw();
+  }
+
+  get target(): number | null {
+    return this.#target;
+  }
+
+  set target(millilitres: number | null) {
+    this.#target = millilitres;
     this.#draw();
   }
 
@@ -100,6 +116,7 @@ export class FluidBalance {
   #draw(): void {
     this.#intakeShown.textContent = String(this.#intake) + " ml";
     this.#weightShown.textContent = this.#weight === null ? "no weight" : String(this.#weight) + " kg";
+    this.#targetShown.textContent = this.#target === null ? "no target" : "target " + String(this.#target) + " ml";
   }
 }
 

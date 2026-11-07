@@ -811,7 +811,14 @@ Terms used throughout:
   array operation, a literal, an object built from sources, a list built from sources, and a value chosen from
   sources by `IfNull` or `Choose` (D6.14).
 - D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
-  `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position.
+  `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position. A set takes a source
+  as `ITypedSource<out T>`, so a narrower reference type and a text without null reach it as they are. C# converts a
+  method's `Arg<T>` only from a `TypedSource<T>`: it refuses a conversion from the covariant interface (CS0552), warns
+  where only nullability differs (CS8620), has no conversion from a struct's source to its nullable's (CS1503), takes no
+  conversion operator in an extension block (CS9282), and a second operator on `TypedSource<T>` makes the plain case
+  ambiguous (CS0457). So a source reaches its nullable, at an argument and at a struct's set or comparison, through
+  `OrNull()` (N7.5), which writes nothing of its own, and a narrower reference type reaches an argument through the
+  declaration's `Pass`, a door Q5 keeps for the component author.
 - D7.4 One builder makes an object from sources, member by typed member, and the dispatch payload, a method
   or plugin argument and a property write all use it. One door makes a list from sources.
 - D7.5 Every condition operator takes a source for each operand: the text tests, `MinLength`, `Between`,
@@ -837,6 +844,8 @@ Terms used throughout:
 - `N7.2` new: `p.List<T>([first, second])`, a `TypedSource<IReadOnlyList<T>>` built from sources.
 - `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between` and the
   membership tests in `ConditionOperators`.
+- `N7.5` new, its form gate 2's: `OrNull()` on a source of a struct or a reference type, returning the same read as
+  a source of its nullable type (D7.3).
 - `N7.4` new, its form gate 2's: `IfNull` on a source of a nullable type, taking a literal or a source of the type
   without null and returning a source of it, and `Choose` on a `TypedSource<bool>`, taking a literal or a source for
   each branch; extension methods beside the comparisons of N8.2.
@@ -863,6 +872,9 @@ Terms used throughout:
 - `X7.4` type: a pattern read in the browser cannot reach `Matches`: new:N7.3 gives `Matches` no source overload.
 - `X7.5` behavior: a property set from a payload field the payload lacks writes `null`, and the component
   shows its empty state.
+- `X7.7` behavior (D7.3, N7.5): a fluid balance's intake widened to `int?` is written to its nullable target and
+  ordered against it, over a 1000 ml target and within it, and an ordering with a null target does not hold, where
+  JavaScript's `500 > null` does; a pump's summary widened to `string?` is passed as the caption's argument.
 - `X7.6` behavior (N7.4): an alarm's note that holds null shows its fallback, a pump's summary, and one that holds
   a value shows it with no summary taken; a pump's last alarm that reads nothing passes its fallback as a method's
   argument; a condition compares a null weight's fallback and a held weight itself; a fluid target chooses its

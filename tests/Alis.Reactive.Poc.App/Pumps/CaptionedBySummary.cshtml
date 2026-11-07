@@ -1,0 +1,18 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Captioned by summary";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Captioned by summary</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+
+@(plan.Button("caption", "Caption the pump with its summary")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.Caption(pump.Summary().OrNull());
+    }))
+
+@Html.RenderPlan(plan)

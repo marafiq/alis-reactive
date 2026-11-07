@@ -45,6 +45,8 @@ public sealed class BalancesController : Controller
     public IActionResult FluidTargets() => View(new BalancesPage());
 
     public IActionResult RecountInAnIfNull() => View(new BalancesPage());
+
+    public IActionResult IntakeTargets() => View(new BalancesPage());
 }
 
 public sealed record BalancesPage;
