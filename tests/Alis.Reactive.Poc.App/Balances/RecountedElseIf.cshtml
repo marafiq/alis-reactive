@@ -1,0 +1,23 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Recounted when no other branch runs";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Recounted when no other branch runs</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("assess", "Assess the intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.Gt(500)).Then(high => high.Element("verdict").Text.Set("high"))
+            .ElseIf(balance.Measure().Gt(450)).Then(measured => measured.Element("verdict").Text.Set("measured high"))
+            .ElseIf(balance.Recount().Gt(50)).Then(recounted => recounted.Element("verdict").Text.Set("recounted"))
+            .Else(low => low.Element("verdict").Text.Set("low"));
+    }))
+
+@Html.RenderPlan(plan)

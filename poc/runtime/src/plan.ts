@@ -8,11 +8,6 @@ export interface AnswerExpression {
   readonly body: Expression;
 }
 
-export interface Arm {
-  readonly when: Expression;
-  readonly then: readonly Statement[];
-}
-
 export interface AssignmentListening {
   readonly kind: "assignment";
 }
@@ -76,15 +71,19 @@ export interface Handler {
 
 export interface IfStatement {
   readonly kind: "if";
-  readonly arms: readonly Arm[];
+  readonly when: Expression;
+  readonly then: readonly Statement[];
   readonly else: readonly Statement[];
 }
+
+export type LetBinding = "line" | "read";
 
 export interface LetStatement {
   readonly kind: "let";
   readonly name: string;
   readonly expr: Expression;
   readonly await: boolean;
+  readonly binds: LetBinding;
 }
 
 export type Listening = MethodListening | AssignmentListening | ReturnedListening;

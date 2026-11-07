@@ -31,4 +31,23 @@ public sealed class WhenAnAlarmBranches : AppPageTest
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
             "InvalidOperationException: A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.");
     }
+
+    [Test]
+    public async Task a_write_to_the_alarm_in_an_else_after_an_else_if_reaches_the_monitor()
+    {
+        await Open("/Monitors/CancelledAfterAnElseIf");
+
+        await Page.Locator("#monitor").GetByRole(AriaRole.Button, new() { Name = "Raise an unnoted alarm" }).ClickAsync();
+
+        await Expect(Page.Locator("#monitor .monitor-alarm")).ToHaveTextAsync("cancelled");
+    }
+
+    [Test]
+    public async Task a_write_to_the_alarm_in_an_else_after_an_else_if_that_awaits_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Monitors/CancelledAfterAnElseIfThatAwaits");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.");
+    }
 }

@@ -1,12 +1,12 @@
 import type { Handler, Listening, PlanDocument } from "./plan";
-import { evaluate, walk, type Context } from "./evaluate";
+import { evaluate, walk, type Bound, type Context } from "./evaluate";
 import { execute } from "./execute";
-import { assertNever, Stop, value, type Read } from "./read";
+import { assertNever, Stop, value } from "./read";
 
 type Listener = (...args: unknown[]) => void;
 
 export function contextOf(plan: PlanDocument): Context {
-  const context: Context = { plan, scope: new Map<string, Read>(), locate: (id) => locate(context, id) };
+  const context: Context = { plan, scope: new Map<string, Bound>(), locate: (id) => locate(context, id) };
   return context;
 }
 

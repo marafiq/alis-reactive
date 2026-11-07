@@ -191,14 +191,12 @@ and in the blocks inside it, and nowhere else.
 |------|---------|-------|---------|
 | `set` | `path`, at least one step; `members`: `required` or `optional` | `target`, `value`: expressions | write the value at the path below the target (Q2, Q4) |
 | `do` | `await`: a boolean | `expr`: an expression | evaluate it; with `await`, wait for its promise (D4.3, D11.1) |
-| `let` | `name`; `await`: a boolean | `expr`: an expression | bind its value, or its awaited value, in the block (D8.8); the expression runs once, and every `ref` of the name reads the binding (D5.11) |
-| `if` | | `arms`: at least one `Arm`; `else`: a block | run the first arm whose `when` holds, else the else block (D8.6) |
+| `let` | `name`; `await`: a boolean; `binds`: `line` or `read` | `expr`: an expression | bind its value, or its awaited value, in the block (D8.8); at `line` the expression runs there, once, and every `ref` of the name reads the binding (D5.11); at `read` the expression runs where the name's one `ref` is read, a term of `and` or `or` reached later (D4.7) |
+| `if` | | `when`: an expression; `then`, `else`: blocks | run `then` when `when` holds, else the `else` block; an `ElseIf` is an `else` block holding its condition's results and an `if` (D8.7) |
 | `all` | | `blocks`: a list of blocks | run every block at once; the next statement runs after every block settled (D10.10) |
 | `try` | | `body`, `finally`: blocks | run the body; run `finally` once, however the body ends (D11.8) |
 | `listen` | `event`: the event's JavaScript name; `vendor`: a vendor name of `vendors`; `payload`: a path into the listener's arguments; `policy` | `object`: an expression; `do`: a block | listen to the event of the live object the expression reads, once per object and statement, for the owner of the plan; run the block on each raise (D12.8) |
 | `stop` | `reason`: text C# wrote | | stop the pipeline: run none of its later statements, log the reason, run the `finally` of every `try` it is inside (D4.6, N4.1) |
-
-`Arm` carries `when`, an expression, and `then`, a block.
 
 ## Expressions
 
@@ -373,4 +371,7 @@ The diff beyond the kinds, each with the decision that makes it:
 - `FormPluginData.fields` becomes `registrations`, and `FormField`'s `items` and `value` functions leave (D16.14);
 - `PlanDocument` gains `culture` (N3.4), `timeZone` (N3.5) and `trace` (Q20), and `version` becomes 7;
 - `number` gains `of` and `text` (D3.11);
-- the operator set loses four conversions (N3.1).
+- the operator set loses four conversions (N3.1);
+- `let` gains `binds`, `line` or `read`, so a term's own method call runs where its read is reached (D4.7);
+- `if` holds one `when` and its `then` in place of `arms`, and an `ElseIf` nests in `else` with its condition's results
+  (D8.7), so `Arm` leaves.

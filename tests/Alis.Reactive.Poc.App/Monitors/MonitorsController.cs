@@ -13,6 +13,10 @@ public sealed class MonitorsController : Controller
     public IActionResult AwaitedInOneBranch() => View(new MonitorsPage());
 
     public IActionResult CancelledAfterABranchThatAwaits() => View(new MonitorsPage());
+
+    public IActionResult CancelledAfterAnElseIf() => View(new MonitorsPage());
+
+    public IActionResult CancelledAfterAnElseIfThatAwaits() => View(new MonitorsPage());
 }
 
 public sealed record MonitorsPage;

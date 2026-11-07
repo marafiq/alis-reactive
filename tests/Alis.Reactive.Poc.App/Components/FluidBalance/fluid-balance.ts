@@ -6,19 +6,26 @@ export class FluidBalance {
   readonly #intakeShown: HTMLParagraphElement;
   readonly #weightShown: HTMLParagraphElement;
   readonly #recheckShown: HTMLParagraphElement;
+  readonly #measuredShown: HTMLParagraphElement;
+  readonly #recountShown: HTMLParagraphElement;
   #intake = 0;
   #weight: number | null = null;
   #rechecking = false;
   #finishRecheck: () => void = () => undefined;
+  #finishRecount: () => void = () => undefined;
 
   constructor(host: HTMLElement) {
     this.#intakeShown = shown("balance-intake");
     this.#weightShown = shown("balance-weight");
     this.#recheckShown = shown("balance-recheck");
+    this.#measuredShown = shown("balance-measured");
+    this.#recountShown = shown("balance-recount");
     host.replaceChildren(
       this.#intakeShown,
       this.#weightShown,
       this.#recheckShown,
+      this.#measuredShown,
+      this.#recountShown,
       button("Add 100 ml", () => {
         this.intake = this.#intake + 100;
       }),
@@ -34,8 +41,11 @@ export class FluidBalance {
         this.#draw();
       }),
       button("Finish the recheck", () => this.#finishRecheck()),
+      button("Finish the recount", () => this.#finishRecount()),
     );
     this.#recheckShown.textContent = "idle";
+    this.#measuredShown.textContent = "not measured";
+    this.#recountShown.textContent = "not recounted";
     this.#draw();
   }
 
@@ -68,6 +78,21 @@ export class FluidBalance {
         this.#rechecking = false;
         this.#recheckShown.textContent = "rechecked";
         resolve();
+      };
+    });
+  }
+
+  measure(): number {
+    this.#measuredShown.textContent = "measured at " + String(this.#intake) + " ml";
+    return this.#intake;
+  }
+
+  recount(): Promise<number> {
+    this.#recountShown.textContent = "recounting";
+    return new Promise((resolve) => {
+      this.#finishRecount = () => {
+        this.#recountShown.textContent = "recounted at " + String(this.#intake) + " ml";
+        resolve(this.#intake);
       };
     });
   }

@@ -1,0 +1,24 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Measured before a step";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Measured before a step</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("assess", "Assess the intake measured first")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        var measured = balance.Measure();
+        balance.Intake.Set(999);
+        pipeline.When(balance.Intake.Gt(1000).Or(measured.Lt(500)))
+            .Then(under => under.Element("verdict").Text.Set("under 500 ml"))
+            .Else(over => over.Element("verdict").Text.Set("over 500 ml"));
+    }))
+
+@Html.RenderPlan(plan)

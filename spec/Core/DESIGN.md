@@ -317,7 +317,13 @@ Terms used throughout:
 - D4.6 A route value that reads nothing stops its request before it is sent, and its `Finally` runs. C# writes
   this as a guard before the send and the statement `stop(reason)` (Q19).
 - D4.7 A method called inside a condition runs only when its term is reached: `and`, `or` and `cond` evaluate
-  their terms in order and stop at the first that decides.
+  their terms in order and stop at the first that decides, and an `ElseIf`'s condition runs only when no branch
+  before it ran. C# writes a method's result as a `let` at its line (D5.11). A result called after the block's
+  previous step and read once by the next step, under the right term of `and` or `or`, is that term's own call: its
+  `let` binds with `binds: "read"`, and the call runs where its read is reached. An `ElseIf` is the `else` block of
+  the `if` before it, holding its condition's results at their lines and an `if` of its own, so its calls, awaited
+  ones included, run when it is reached (D8.6). An async method's result binds only at its line, so one called under
+  the right term of `and` or `or` is refused where the view renders (X8.16).
 - D4.9 A value JavaScript holds as `undefined` reads as nothing wherever it is read: a member that holds it, a
   method that returns it (`find` when no item matched). It never reaches a write as `undefined`; a write of
   nothing writes null (D4.5).
@@ -446,7 +452,9 @@ Terms used throughout:
   of the result reads that binding, so a later step that changes the object leaves the result as it was. Inside a
   list's lambda the call is the lambda's own and runs once for each item the operation reads, and inside a
   callback's answer it is the answer's own and runs on each call of the answer (D17.12). A method called in a
-  condition's term runs when its term is reached (D4.7). A method declared to return nothing is a `do` at its line;
+  condition's term runs when its term is reached (D4.7), and every other result binds at its line: a result called
+  before a step and read by a term, and one a term and its branch both read, are what the call returned at its line
+  (X8.15). A method declared to return nothing is a `do` at its line;
   written inside a list's lambda, which writes nothing, it is refused where the view renders. Each argument is read
   when its line runs, and one that reads nothing passes null (D7.6). A result is read in the block that called its
   method and in the blocks inside it (D8.8); a C# variable that carries it into another pipeline, or out of its
@@ -875,7 +883,11 @@ Terms used throughout:
   Main's second form, a payload and a path lambda (`When(args, x => x.IsExpanded)`), is refused, and
   `When(source)` carries it: the payload's member is a typed source (the owner, 2026-11-06).
 - D8.7 A branch (`Then`, `Else`) is a block: it holds any number of steps, written in one lambda, as a chain
-  or as statements in a `{}` body, and runs them in authored order.
+  or as statements in a `{}` body, and runs them in authored order. An `if` holds one condition, its `then` block
+  and its `else` block; an `ElseIf` is the `else` block of the `if` it continues, holding the results its condition
+  called, at their lines, and an `if` of its own, as C# and JavaScript nest an `else if`. An `ElseIf` or an `Else`
+  continues its `When` before any other step of the block, a method its condition does not read included (X8.9),
+  and an `Else` ends its `When` (X8.18).
 - D8.8 A block is a lexical scope, as a C# `{}` block is. A value a block binds is readable in that block and
   in the blocks inside it, and nowhere else. The values a block binds: its handler's event payload, a
   route's response body, an array operation's item, a method's result read in it, and a `Confirm`'s answer.
@@ -949,14 +961,31 @@ Terms used throughout:
   `d.Priority < 2`, as .NET's lifted operators decide (D8.9).
 - `X8.8` behavior: `or` keeps an item whose left term reads nothing when its right term holds, and `and` whose left
   term reads nothing and right term is false reads false, so `not` of it holds (D8.9).
-- `X8.9` refusal (D8.7): an `ElseIf` or `Else` written after another step of its block: "An ElseIf or an Else
-  continues the When it follows, before any other step of its block: write it in the same sentence."
+- `X8.9` refusal (D8.7): an `ElseIf` or `Else` written after another step of its block, or after a method its
+  condition does not read: "An ElseIf or an Else continues the When it follows, before any other step of its block:
+  write it in the same sentence."
 - `X8.10` refusal (N8.2): a pipeline condition that orders dates, orders flags or compares objects, each with the
   reason the lambda door gives for it.
 - `X8.11` behavior (D11.5): the steps after a branch that awaits run once its method settles, and at once when the
   branch is not taken.
 - `X8.12` behavior (D8.9): a branch whose condition orders a null runs none of its steps, where JavaScript's
   `null < 80` holds.
+- `X8.13` behavior (D4.7): a method called in the right term of `Or` runs only when the left term does not hold, and
+  in the right term of `And` only when the left term holds.
+- `X8.14` behavior (D4.7, D8.7): a method called in an `ElseIf`'s condition runs only when no branch before it ran,
+  so a second `ElseIf`'s does not run when the first holds; an async one is awaited there, and its branch runs once it
+  settles.
+- `X8.15` behavior (D5.11): a fluid balance measured, then set to 999 ml, and read in a term reached after the set,
+  is the 100 ml measured at its line; a result a term and its branch both read is the call at its line, so a branch
+  that sets 999 ml and then the result restores the 600 ml measured.
+- `X8.16` refusal (D4.7): an async method called under the right term of `And` or `Or`: "An async method is called in
+  a term of And or Or that runs only when it is reached, and the pipeline waits for an async method at its line:
+  call it in a When of its own, in the branch where its term is reached."
+- `X8.17` refusal (D8.8): a result called in an `ElseIf`'s condition, read after its `When`: "A method's result
+  called in an ElseIf's condition is read after its When, and the call runs only when the ElseIf is reached: call
+  the method before the When to read its result after it."
+- `X8.18` refusal (D8.7): a second `Else`, or an `ElseIf` after the `Else`, of one `When`: "An Else ends its When:
+  write each ElseIf before it, and every step of the remaining case in that one Else."
 
 ## Q9. The request
 
@@ -1353,7 +1382,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 
   The refusal is each handler's own: an await in one handler refuses no write in another. It follows the path
   the handler runs: a branch reads the state before its `if`, so an `Else` writes the payload in the vendor's turn
-  when its sibling `Then` awaits, and a step after the `if` reads the payload as awaited when any of its arms awaits.
+  when its sibling `Then` awaits, and a step after the `if` reads the payload as awaited when any of its branches
+  awaits. An `ElseIf`'s branch and the `Else` after it read the state after the conditions before them, so an
+  `Else` after an `ElseIf` whose condition awaits reads the payload as awaited (X11.13).
 - D11.5 The order is closed:
   - The steps after an awaited step run after it settles.
   - Two handlers of one event run in the order the plan subscribed them, each up to its first awaited
@@ -1463,7 +1494,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   method runs and a read of the alarm reads the bed the monitor moved it to; a handler written after one that
   awaits writes its own alarm before its own await.
 - `X11.12` behavior (D11.4): an alarm's `Else` writes `cancel` in the monitor's turn while its sibling `Then` awaits;
-  a write after an `if` whose arm awaits is refused with X11.1's message.
+  a write after an `if` whose branch awaits is refused with X11.1's message.
+- `X11.13` behavior (D11.4): an alarm's `Else` after an `ElseIf` writes `cancel` in the monitor's turn; after an
+  `ElseIf` whose condition awaits an async method, the write is refused with X11.1's message.
 
 ## Q12. Ownership
 
@@ -2495,7 +2528,6 @@ shapes, starts and the payload kind of each event.
 - `Schema.tla:PatternsAreLiterals`
 - `Schema.tla:NullableWrapsOnce`
 - `Schema.tla:SetsWriteAMember`
-- `Schema.tla:IfsHaveAnArm`
 - `Schema.tla:RefsReadTheirBlock`
 - `check:kinds`, which reads the grammar and `plan.schema.json` at 65fdf118d, schema.md's kinds table and Schema.tla's
   node set, and checks each today line holds its case.

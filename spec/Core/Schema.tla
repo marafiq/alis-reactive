@@ -4,7 +4,7 @@ EXTENDS Naturals, Sequences, FiniteSets
 CONSTANT Mutant
 
 Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARead", "AsOfAny", "PatternReadInBrowser",
-            "NullableOfNullable", "EmptySet", "IfWithoutArm", "BindingLeavesItsBlock"}
+            "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock"}
 
 ASSUME Mutant \in Mutants
 
@@ -116,7 +116,7 @@ Init ==
 
 Top == open[Len(open)]
 
-Entry(k, n, len, arms) == [k |-> k, b |-> Top, n |-> n, len |-> len, arms |-> arms]
+Entry(k, n, len) == [k |-> k, b |-> Top, n |-> n, len |-> len]
 
 InScope(name) == \E j \in DOMAIN log : log[j].k = "let" /\ log[j].n = name /\ \E i \in DOMAIN open : open[i] = log[j].b
 
@@ -126,25 +126,25 @@ Write(entry) == log' = Append(log, entry) /\ writes' = writes + 1
 
 CanWrite == plane = "statement" /\ writes < MaxWrites
 
-Let == CanWrite /\ Write(Entry("let", "a", 0, 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
+Let == CanWrite /\ Write(Entry("let", "a", 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
 
 Ref == CanWrite /\ (InScope("a") \/ (Mutant = "BindingLeavesItsBlock" /\ BoundAnywhere("a")))
-       /\ Write(Entry("ref", "a", 0, 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
+       /\ Write(Entry("ref", "a", 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
 
 Set == CanWrite /\ \E len \in IF Mutant = "EmptySet" THEN {0, 1} ELSE {1} :
-       Write(Entry("set", "-", len, 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
+       Write(Entry("set", "-", len)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
 
-OpenBlock(k, arms) ==
+OpenBlock(k) ==
     /\ CanWrite
     /\ Len(open) <= Depth
-    /\ Write(Entry(k, "-", 0, arms))
+    /\ Write(Entry(k, "-", 0))
     /\ parent' = Append(parent, Top)
     /\ open' = Append(open, Len(parent) + 1)
     /\ UNCHANGED <<plane, expr, shape>>
 
-OpenIf == \E arms \in IF Mutant = "IfWithoutArm" THEN {0, 1} ELSE {1} : OpenBlock("if", arms)
+OpenIf == OpenBlock("if")
 
-OpenAll == OpenBlock("all", 0)
+OpenAll == OpenBlock("all")
 
 Close == plane = "statement" /\ Len(open) > 1 /\ open' = SubSeq(open, 1, Len(open) - 1)
          /\ UNCHANGED <<plane, expr, shape, parent, log, writes>>
@@ -176,8 +176,6 @@ PatternsAreLiterals == \A n \in Nodes(expr) : (n.k = "op" /\ n.o = "matches") =>
 NullableWrapsOnce == \A n \in ShapeNodes(shape) : n.k = "nullable" => n.c[1].k # "nullable"
 
 SetsWriteAMember == \A i \in DOMAIN log : log[i].k = "set" => log[i].len >= 1
-
-IfsHaveAnArm == \A i \in DOMAIN log : log[i].k = "if" => log[i].arms >= 1
 
 RefsReadTheirBlock ==
     \A i \in DOMAIN log : log[i].k = "ref" =>

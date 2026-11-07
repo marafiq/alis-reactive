@@ -1,0 +1,21 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Recount in an Or";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Recount in an Or</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("flag", "Flag a high intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.Gt(500).Or(balance.Recount().Gt(50)))
+            .Then(high => high.Element("verdict").Text.Set("flagged"));
+    }))
+
+@Html.RenderPlan(plan)

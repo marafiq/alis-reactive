@@ -5,8 +5,16 @@ import { readData } from "./data";
 
 export interface Context {
   readonly plan: PlanDocument;
-  readonly scope: ReadonlyMap<string, Read>;
+  readonly scope: ReadonlyMap<string, Bound>;
   readonly locate: (id: string) => object;
+}
+
+export type Bound = Read | Deferred;
+
+interface Deferred {
+  readonly kind: "deferred";
+  readonly expression: Expression;
+  readonly context: Context;
 }
 
 export function evaluate(expression: Expression, context: Context): Read {
@@ -97,9 +105,9 @@ function invoke(call: CallExpression, context: Context): Read {
 }
 
 function bound(name: string, context: Context): Read {
-  const read = context.scope.get(name);
-  if (read === undefined) throw new Error("The plan reads the name '" + name + "', which no block binds.");
-  return read;
+  const held = context.scope.get(name);
+  if (held === undefined) throw new Error("The plan reads the name '" + name + "', which no block binds.");
+  return held.kind === "deferred" ? evaluate(held.expression, held.context) : held;
 }
 
 function callable(params: readonly string[], body: Expression, context: Context): (...args: unknown[]) => unknown {

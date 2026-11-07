@@ -1,5 +1,5 @@
 import type { CallExpression, DoStatement, IfStatement, LetStatement, SetStatement, Statement } from "./plan";
-import { called, evaluate, holderOf, methodName, walk, type Context } from "./evaluate";
+import { called, evaluate, holderOf, methodName, walk, type Bound, type Context } from "./evaluate";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 
 export type Run = { readonly kind: "finished" } | { readonly kind: "awaiting"; readonly settled: Promise<void> };
@@ -20,7 +20,7 @@ export function execute(statements: readonly Statement[], context: Context): Run
       return { kind: "awaiting", settled };
     }
     if (statement.kind === "if") {
-      const branch = execute(chosen(statement, current), current);
+      const branch = execute(holds(evaluate(statement.when, current)) ? statement.then : statement.else, current);
       if (branch.kind === "finished") continue;
       const rest = statements.slice(position + 1);
       const before = current;
@@ -29,11 +29,6 @@ export function execute(statements: readonly Statement[], context: Context): Run
     current = step(statement, current);
   }
   return finished;
-}
-
-function chosen(statement: IfStatement, context: Context): readonly Statement[] {
-  const arm = statement.arms.find((candidate) => holds(evaluate(candidate.when, context)));
-  return arm === undefined ? statement.else : arm.then;
 }
 
 function holds(read: Read): boolean {
@@ -75,13 +70,24 @@ function step(statement: Stepped, context: Context): Context {
       evaluate(statement.expr, context);
       return context;
     case "let":
-      return bound(context, statement.name, evaluate(statement.expr, context));
+      return bound(context, statement.name, atItsLine(statement, context));
     default:
       return assertNever(statement);
   }
 }
 
-function bound(context: Context, name: string, read: Read): Context {
+function atItsLine(statement: LetStatement, context: Context): Bound {
+  switch (statement.binds) {
+    case "line":
+      return evaluate(statement.expr, context);
+    case "read":
+      return { kind: "deferred", expression: statement.expr, context };
+    default:
+      return assertNever(statement.binds);
+  }
+}
+
+function bound(context: Context, name: string, read: Bound): Context {
   const scope = new Map(context.scope);
   scope.set(name, read);
   return { ...context, scope };

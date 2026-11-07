@@ -20,6 +20,10 @@ public sealed class FluidBalance : Component
     public ReadOnly<DateTime> RecordedAt => ReadOnly<DateTime>();
 
     public void Recheck() => MethodAsync();
+
+    public MethodResult<int> Measure() => Method<int>();
+
+    public MethodResult<int> Recount() => MethodAsync<int>();
 }
 
 public static class FluidBalanceHtml

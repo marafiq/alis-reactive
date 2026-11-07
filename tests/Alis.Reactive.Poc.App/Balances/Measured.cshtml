@@ -1,0 +1,30 @@
+@using Alis.Reactive.Poc.App.Balances
+@model BalancesPage
+@{
+    ViewData["Title"] = "Measured intake";
+    var plan = Html.ReactivePlan<BalancesPage>();
+}
+<h1>Measured intake</h1>
+
+@plan.FluidBalance("balance")
+
+<p>Verdict: <span id="verdict">unassessed</span></p>
+
+@(plan.Button("flag", "Flag a high intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.Gt(500).Or(balance.Measure().Gt(50)))
+            .Then(high => high.Element("verdict").Text.Set("flagged"));
+    }))
+
+@(plan.Button("confirm", "Confirm the intake")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var balance = pipeline.Component<FluidBalance>("balance");
+        pipeline.When(balance.Intake.Gt(0).And(balance.Measure().Gt(50)))
+            .Then(taken => taken.Element("verdict").Text.Set("confirmed"))
+            .Else(none => none.Element("verdict").Text.Set("nothing taken"));
+    }))
+
+@Html.RenderPlan(plan)

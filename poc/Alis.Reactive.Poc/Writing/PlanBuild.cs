@@ -19,6 +19,8 @@ internal sealed class PlanBuild
     private readonly List<Handler> _handlers = [];
     private readonly Stack<List<Statement>> _open = new();
     private readonly Dictionary<string, List<Statement>> _resultBlocks = new(StringComparer.Ordinal);
+    private readonly ResultLines _resultLines = new();
+    private readonly HashSet<string> _elseIfResults = new(StringComparer.Ordinal);
     private int _items;
     private int _results;
     private int _readingItems;
@@ -63,7 +65,9 @@ internal sealed class PlanBuild
                 "A step is written inside a pipeline, the callback a trigger runs: .Reactive(c => c.Click, p => ...).");
         }
 
-        _open.Peek().Add(statement);
+        var block = _open.Peek();
+        _resultLines.Written(statement, block);
+        block.Add(statement);
         var awaits = statement is DoStatement { Await: true } or LetStatement { Await: true };
         _handlerAwaited = _handlerAwaited || awaits;
     }
@@ -129,8 +133,15 @@ internal sealed class PlanBuild
 
     internal Expression InScope(Expression read)
     {
-        var readsAResult = read is RefExpression reference && _resultBlocks.TryGetValue(reference.Name, out var block) && !_open.Contains(block);
-        if (!readsAResult) return read;
+        if (read is not RefExpression reference) return read;
+        var readsAResultOutsideItsBlock = _resultBlocks.TryGetValue(reference.Name, out var block) && !_open.Contains(block);
+        if (!readsAResultOutsideItsBlock) return read;
+        if (_elseIfResults.Contains(reference.Name))
+        {
+            throw new InvalidOperationException(
+                "A method's result called in an ElseIf's condition is read after its When, and the call runs only when the ElseIf is reached: call the method before the When to read its result after it.");
+        }
+
         throw new InvalidOperationException(
             "A method's result is read outside the block that called the method. Call the method in the block that reads its result, or in a block around it.");
     }
@@ -138,36 +149,88 @@ internal sealed class PlanBuild
     internal Branching When(Expression condition, Action then)
     {
         var awaitedBefore = _handlerAwaited;
-        var block = Block(then);
-        var firstArmAwaited = _handlerAwaited;
-        var statement = new IfStatement(new Arm(condition, block));
-        _handlerAwaited = awaitedBefore;
-        Write(statement);
-        var branching = new Branching(statement, _open.Peek(), awaitedBefore, firstArmAwaited);
+        var (statement, armAwaited) = If(condition, then);
+        var branching = new Branching(statement, _open.Peek(), awaitedBefore, armAwaited);
         _handlerAwaited = branching.AwaitedAfter;
         return branching;
     }
 
     internal void ElseIf(Branching branching, Expression condition, Action then)
-        => branching.Statement.Add(new Arm(condition, Alternative(branching, then)));
-
-    internal void Else(Branching branching, Action otherwise)
-        => branching.Statement.Else = Alternative(branching, otherwise);
-
-    private List<Statement> Alternative(Branching branching, Action body)
     {
-        var continuesItsWhen = _open.Count > 0 && ReferenceEquals(_open.Peek(), branching.Block) && ReferenceEquals(branching.Block[^1], branching.Statement);
-        if (!continuesItsWhen)
+        var lets = ConditionLets(WrittenAfter(branching), condition);
+        var alternative = new List<Statement>();
+        foreach (var let in lets)
         {
-            throw new InvalidOperationException(
-                "An ElseIf or an Else continues the When it follows, before any other step of its block: write it in the same sentence.");
+            branching.Block.Remove(let);
+            alternative.Add(let);
+            _resultBlocks[let.Name] = alternative;
+            _elseIfResults.Add(let.Name);
         }
 
-        _handlerAwaited = branching.AwaitedBefore;
-        var block = Block(body);
-        branching.ArmAwaited(_handlerAwaited);
+        var entered = branching.ElseEntered || lets.Exists(let => let.Await);
+        _handlerAwaited = entered;
+        _open.Push(alternative);
+        try
+        {
+            var (statement, armAwaited) = If(condition, then);
+            branching.ElseIf(alternative, statement, entered, armAwaited);
+        }
+        finally
+        {
+            _open.Pop();
+        }
+
         _handlerAwaited = branching.AwaitedAfter;
-        return block;
+    }
+
+    internal void Else(Branching branching, Action otherwise)
+    {
+        if (WrittenAfter(branching).Count > 0) throw new InvalidOperationException(ContinuesItsWhen);
+        _handlerAwaited = branching.ElseEntered;
+        var block = Block(otherwise);
+        branching.Else(block, _handlerAwaited);
+        _handlerAwaited = branching.AwaitedAfter;
+    }
+
+    private const string ContinuesItsWhen =
+        "An ElseIf or an Else continues the When it follows, before any other step of its block: write it in the same sentence.";
+
+    private (IfStatement Statement, bool ArmAwaited) If(Expression condition, Action then)
+    {
+        var entered = _handlerAwaited;
+        var block = Block(then);
+        var armAwaited = _handlerAwaited;
+        var statement = new IfStatement(condition, block);
+        _handlerAwaited = entered;
+        Write(statement);
+        return (statement, armAwaited);
+    }
+
+    private List<Statement> WrittenAfter(Branching branching)
+    {
+        if (branching.Ended)
+        {
+            throw new InvalidOperationException(
+                "An Else ends its When: write each ElseIf before it, and every step of the remaining case in that one Else.");
+        }
+
+        var continuesItsBlock = _open.Count > 0 && ReferenceEquals(_open.Peek(), branching.Block);
+        if (!continuesItsBlock) throw new InvalidOperationException(ContinuesItsWhen);
+        var after = branching.Block.IndexOf(branching.Outer) + 1;
+        return branching.Block.GetRange(after, branching.Block.Count - after);
+    }
+
+    private static List<LetStatement> ConditionLets(List<Statement> written, Expression condition)
+    {
+        var lets = new List<LetStatement>();
+        foreach (var statement in written)
+        {
+            if (statement is not LetStatement let) throw new InvalidOperationException(ContinuesItsWhen);
+            lets.Add(let);
+        }
+
+        if (!ResultLines.AllReadBy(condition, lets)) throw new InvalidOperationException(ContinuesItsWhen);
+        return lets;
     }
 
     internal TRead Answering<TRead>(Func<TRead> answer)
@@ -238,23 +301,41 @@ internal sealed class PlanBuild
 
 internal sealed class Branching
 {
-    private bool _anyArmAwaited;
+    private bool _awaitedAfter;
 
-    internal Branching(IfStatement statement, List<Statement> block, bool awaitedBefore, bool firstArmAwaited)
+    internal Branching(IfStatement statement, List<Statement> block, bool awaitedBefore, bool armAwaited)
     {
-        Statement = statement;
+        Outer = statement;
+        Last = statement;
         Block = block;
-        AwaitedBefore = awaitedBefore;
-        _anyArmAwaited = firstArmAwaited;
+        ElseEntered = awaitedBefore;
+        _awaitedAfter = awaitedBefore || armAwaited;
     }
 
-    internal IfStatement Statement { get; }
+    internal IfStatement Outer { get; }
 
     internal List<Statement> Block { get; }
 
-    internal bool AwaitedBefore { get; }
+    internal IfStatement Last { get; private set; }
 
-    internal bool AwaitedAfter => AwaitedBefore || _anyArmAwaited;
+    internal bool ElseEntered { get; private set; }
 
-    internal void ArmAwaited(bool awaited) => _anyArmAwaited = _anyArmAwaited || awaited;
+    internal bool Ended { get; private set; }
+
+    internal bool AwaitedAfter => _awaitedAfter;
+
+    internal void ElseIf(List<Statement> alternative, IfStatement statement, bool entered, bool armAwaited)
+    {
+        Last.Else = alternative;
+        Last = statement;
+        ElseEntered = entered;
+        _awaitedAfter = _awaitedAfter || entered || armAwaited;
+    }
+
+    internal void Else(IReadOnlyList<Statement> otherwise, bool awaited)
+    {
+        Last.Else = otherwise;
+        Ended = true;
+        _awaitedAfter = _awaitedAfter || awaited;
+    }
 }

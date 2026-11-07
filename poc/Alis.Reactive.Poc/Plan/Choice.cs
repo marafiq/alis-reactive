@@ -63,6 +63,20 @@ internal sealed class Policy : IChoice
     public string Text { get; }
 }
 
+[JsonConverter(typeof(ChoiceConverter<LetBinding>))]
+internal sealed class LetBinding : IChoice
+{
+    internal static readonly LetBinding Line = new("line");
+    internal static readonly LetBinding Read = new("read");
+
+    private LetBinding(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
 [JsonConverter(typeof(ChoiceConverter<Operator>))]
 internal sealed class Operator : IChoice
 {

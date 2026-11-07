@@ -61,34 +61,22 @@ internal sealed class LetStatement : Statement
     public Expression Expr { get; }
 
     public bool Await { get; }
+
+    public LetBinding Binds { get; internal set; } = LetBinding.Line;
 }
 
 internal sealed class IfStatement : Statement
 {
-    private readonly List<Arm> _arms;
-
-    internal IfStatement(Arm first)
-    {
-        _arms = [first];
-        Else = [];
-    }
-
-    public IReadOnlyList<Arm> Arms => _arms;
-
-    public IReadOnlyList<Statement> Else { get; internal set; }
-
-    internal void Add(Arm arm) => _arms.Add(arm);
-}
-
-internal sealed class Arm
-{
-    internal Arm(Expression when, IReadOnlyList<Statement> then)
+    internal IfStatement(Expression when, IReadOnlyList<Statement> then)
     {
         When = when;
         Then = then;
+        Else = [];
     }
 
     public Expression When { get; }
 
     public IReadOnlyList<Statement> Then { get; }
+
+    public IReadOnlyList<Statement> Else { get; internal set; }
 }

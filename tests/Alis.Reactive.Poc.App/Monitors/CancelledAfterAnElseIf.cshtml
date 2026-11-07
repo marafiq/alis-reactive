@@ -1,0 +1,17 @@
+@using Alis.Reactive.Poc.App.Monitors
+@model MonitorsPage
+@{
+    ViewData["Title"] = "Cancelled after an ElseIf";
+    var plan = Html.ReactivePlan<MonitorsPage>();
+}
+<h1>Cancelled after an ElseIf</h1>
+
+@(plan.VitalsMonitor("monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+        pipeline.When(alarm.Note.Eq("after surgery"))
+            .Then(noted => noted.Component<VitalsMonitor>("monitor").Acknowledge())
+            .ElseIf(alarm.Bed.Eq("9"))
+            .Then(moved => alarm.Patient.Page())
+            .Else(unnoted => alarm.Cancel.Set(true))))
+
+@Html.RenderPlan(plan)
