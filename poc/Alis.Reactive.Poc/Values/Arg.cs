@@ -13,6 +13,18 @@ public abstract class Arg
     internal abstract Expression ExpressionIn(PlanBuild build);
 }
 
+internal sealed class WrittenArg : Arg
+{
+    private readonly Func<PlanBuild, Expression> _expression;
+
+    internal WrittenArg(Func<PlanBuild, Expression> expression)
+    {
+        _expression = expression;
+    }
+
+    internal override Expression ExpressionIn(PlanBuild build) => _expression(build);
+}
+
 public sealed class Arg<T> : Arg
 {
     private readonly Func<PlanBuild, Expression> _expression;

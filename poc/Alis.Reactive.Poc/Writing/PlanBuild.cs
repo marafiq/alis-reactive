@@ -22,6 +22,7 @@ internal sealed class PlanBuild
     private int _items;
     private int _results;
     private int _readingItems;
+    private int _answering;
     private bool _handlerAwaited;
 
     internal PlanBuild(string planId, JsonSerializerOptions values)
@@ -47,6 +48,12 @@ internal sealed class PlanBuild
         {
             throw new InvalidOperationException(
                 "A step is written inside a list's lambda, which reads each item and writes nothing. Write the step in the pipeline.");
+        }
+
+        if (_answering > 0)
+        {
+            throw new InvalidOperationException(
+                "A step is written inside a callback's answer, which answers its vendor with one value. Write the step in a pipeline.");
         }
 
         if (_open.Count == 0)
@@ -88,7 +95,7 @@ internal sealed class PlanBuild
 
     internal Expression Result(CallExpression call)
     {
-        if (_readingItems > 0) return call;
+        if (_readingItems > 0 || _answering > 0) return call;
         return Let(call, awaits: false);
     }
 
@@ -98,6 +105,12 @@ internal sealed class PlanBuild
         {
             throw new InvalidOperationException(
                 "An async method is called inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline and read its result in the lambda.");
+        }
+
+        if (_answering > 0)
+        {
+            throw new InvalidOperationException(
+                "A callback answers its vendor at once, so its answer cannot wait for an async method or a request.");
         }
 
         return Let(call, awaits: true);
@@ -117,6 +130,19 @@ internal sealed class PlanBuild
         if (!readsAResult) return read;
         throw new InvalidOperationException(
             "A method's result is read outside the block that called the method. Call the method in the block that reads its result, or in a block around it.");
+    }
+
+    internal TRead Answering<TRead>(Func<TRead> answer)
+    {
+        _answering++;
+        try
+        {
+            return answer();
+        }
+        finally
+        {
+            _answering--;
+        }
     }
 
     internal TRead ReadingItems<TRead>(Func<TRead> read)

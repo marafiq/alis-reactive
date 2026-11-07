@@ -70,6 +70,34 @@ internal static class Assign
     }
 }
 
+public sealed class Callback<TArgs, TResult>
+    where TArgs : JsObject, new()
+{
+    private readonly JsObject _owner;
+    private readonly PathStep _member;
+
+    internal Callback(JsObject owner, PathStep member)
+    {
+        _owner = owner;
+        _member = member;
+    }
+
+    public void Set(Func<TArgs, TypedSource<TResult>> answer) => Assign.Write(_owner, _member, Answers.Of(answer, _owner.Binding.Build));
+}
+
+internal static class Answers
+{
+    internal static FnExpression Of<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer, PlanBuild build)
+        where TArgs : JsObject, new()
+    {
+        var name = build.ItemName();
+        var args = JsObject.Bound<TArgs>(new Binding(new RefExpression(name), build, ReadPresence.Required));
+        var body = build.Answering(() => answer(args))
+            ?? throw new ArgumentException("A callback's answer reads its arguments, such as tick => tick.Label.", nameof(answer));
+        return new FnExpression([name], body.Expression);
+    }
+}
+
 public class Event<TArgs>
     where TArgs : JsObject, new()
 {

@@ -1,4 +1,5 @@
 import { CareBoardV1, CareBoardV2, type CareBoardHost } from "./CareBoard/care-board";
+import { DoseChart, type DoseChartHost } from "./DoseChart/dose-chart";
 import { DutyRoster, DutyRosterV2, type DutyRosterHost } from "./DutyRoster/duty-roster";
 import { CurrentInfusionPump, OlderInfusionPump, type InfusionPumpHost } from "./InfusionPump/infusion-pump";
 import { MedicationCart, type MedicationCartHost } from "./MedicationCart/medication-cart";
@@ -48,4 +49,8 @@ for (const host of document.querySelectorAll<HTMLElement>("[data-bed-board]")) {
 
 for (const host of document.querySelectorAll<MedicineSearchHost>("[data-medicine-search]")) {
   host.search = new MedicineSearch(host);
+}
+
+for (const host of document.querySelectorAll<DoseChartHost>("[data-dose-chart]")) {
+  host.chart = new DoseChart(host);
 }

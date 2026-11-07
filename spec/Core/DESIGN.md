@@ -444,7 +444,8 @@ Terms used throughout:
 - D5.11 A method's result (`Method<T>`, `ReturnedObject<T>`, `ReturnedObjects<T>`) is what the call returned when
   the pipeline reached the line that calls it. The plan binds it there with `let`; the call runs once, and every read
   of the result reads that binding, so a later step that changes the object leaves the result as it was. Inside a
-  list's lambda the call is the lambda's own and runs once for each item the operation reads. A method called in a
+  list's lambda the call is the lambda's own and runs once for each item the operation reads, and inside a
+  callback's answer it is the answer's own and runs on each call of the answer (D17.12). A method called in a
   condition's term runs when its term is reached (D4.7). A method declared to return nothing is a `do` at its line;
   written inside a list's lambda, which writes nothing, it is refused where the view renders. Each argument is read
   when its line runs, and one that reads nothing passes null (D7.6). A result is read in the block that called its
@@ -2199,9 +2200,15 @@ grammar gains no node (G2).
   property or an argument whose value is a function, `Callback<TArgs, TResult>`, and a view writes the answer as an
   expression over the callback's arguments: `chart.TickLabel.Set(tick => tick.Label)`. The plan writes a `fn` as
   the value; the browser assigns or passes the function, and each call evaluates its body with the arguments bound
-  and returns the result to the vendor in its turn. A body is an expression with no steps, so it cannot wait: an
-  awaited read inside it is refused where the view renders. A callback that only reacts is an event, listened to by
-  a method pair, an assignment or a returned unsubscriber (D17.3), and runs a pipeline as any handler does.
+  and returns the result to the vendor in its turn. A method that takes a callback declares the argument with
+  `Answer(key)`, so `chart.SortTicks(tick => tick.Doses)` passes the function the same way. A body is an expression
+  with no steps: a step written inside it is refused where the view renders, and so is an awaited read, since the
+  body cannot wait. A method's result read in a body is its call, run on each call of the body (D5.11). A body
+  that stops gives its vendor no value, so the stop is thrown to the vendor's call: a step whose write or call
+  made the vendor ask stops its pipeline there, and a vendor that asks in its own turn receives the stop as the
+  error its call throws. An event's listener owes its vendor nothing, so D4.8 keeps its stop from the vendor; an
+  answer owes it the value, and no value is the plan's to invent. A callback that only reacts is an event, listened
+  to by a method pair, an assignment or a returned unsubscriber (D17.3), and runs a pipeline as any handler does.
 
 **Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
 `handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
@@ -2224,7 +2231,8 @@ plans (Q19).
 - `N17.6` new: a vendor's lookup, a plugin called with the element, beside the path from the element (D17.3).
 - `N17.7` new: the listening kind whose subscribe method returns the function that removes the listener (D17.3).
 - `N17.8` new: `Argument<T>(n)`, and a payload method at a position (D17.4).
-- `N17.9` new: `Callback<TArgs, TResult>` and its `Set` from an expression (D17.12).
+- `N17.9` new: `Callback<TArgs, TResult>` and its `Set` from an expression, and `Answer`, an answer passed as a
+  method's argument (D17.12).
 - `N17.2` new: the vendor contract file and the analyzer that checks declarations against it (D17.5).
 - `N17.3` new: a condition over an awaited `MethodAsync<bool>` source, replacing `ConditionStart<TModel>.Confirm` and
   `ConditionExtensions.Confirm`; its form goes to gate 2.
@@ -2284,6 +2292,14 @@ plans (Q19).
 - `X17.15` behavior (D4.8, D17.4): an event declared with a payload that its vendor raises with no argument stops
   before its first step, and the vendor goes on after its listeners; an event declared with none runs its handler.
 - `X17.14` behavior: a vendor's label callback shows, for each label, the text the view's expression answers.
+- `X17.19` refusal (D17.12): a step written inside a callback's answer: "A step is written inside a callback's answer,
+  which answers its vendor with one value. Write the step in a pipeline."
+- `X17.20` behavior (D17.12): a callback's answer reads the page as it is on each call, a text box's value and a
+  method's result alike, and a method's argument written as an answer is the key the vendor sorts by.
+- `X17.21` behavior (D17.12): an answer that stops while a step's write made the vendor ask stops that pipeline
+  before its next step, and the vendor keeps what it drew before.
+- `X17.22` behavior (D17.12): an answer that stops when the vendor asks in its own turn fails the vendor's call,
+  and the vendor keeps what it drew before.
 
 ## Q18. Type knowledge without reflection
 

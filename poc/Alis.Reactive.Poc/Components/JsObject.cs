@@ -118,6 +118,14 @@ public abstract class JsObject
         Binding.Build.Write(new DoStatement(call, awaits: false));
     }
 
+    protected Callback<TArgs, TResult> Callback<TArgs, TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
+        where TArgs : JsObject, new()
+        => new(this, Member(name, declaredBy));
+
+    protected static Arg Answer<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer)
+        where TArgs : JsObject, new()
+        => new WrittenArg(build => Answers.Of(answer, build));
+
     protected static Arg Fixed<TValue>(TValue value)
         where TValue : notnull
         => (Arg<TValue>)value;
