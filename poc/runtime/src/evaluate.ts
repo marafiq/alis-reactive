@@ -64,17 +64,34 @@ function member(read: Read, step: PathStep, members: ReadPresence): Read {
   return value(held);
 }
 
-function invoke(call: CallExpression, context: Context): Read {
-  const last = call.path[call.path.length - 1];
-  if (last === undefined) throw new Error("The plan writes a call with no method to call.");
+export type Called = { readonly kind: "absent" } | { readonly kind: "returned"; readonly held: unknown };
+
+const notCalled: Called = { kind: "absent" };
+
+export function called(call: CallExpression, context: Context): Called {
+  const last = methodName(call);
   const holder = holderOf(walk(evaluate(call.target, context), call.path.slice(0, -1), call.members), last, call.members);
-  if (holder.kind === "absent") return nothing;
+  if (holder.kind === "absent") return notCalled;
   const method: unknown = Reflect.get(holder.object, last);
   if (typeof method !== "function") throw new Stop("The member '" + String(last) + "' is not a method.");
   const args = call.args.map((argument) => heldOrNull(evaluate(argument, context)));
-  const result: unknown = Reflect.apply(method, holder.object, args);
-  if (isPromise(result)) throw new Stop("The method '" + String(last) + "' returned a promise where a value was declared.");
-  return value(result);
+  return { kind: "returned", held: Reflect.apply(method, holder.object, args) };
+}
+
+export function methodName(call: CallExpression): PathStep {
+  const last = call.path[call.path.length - 1];
+  if (last === undefined) throw new Error("The plan writes a call with no method to call.");
+  return last;
+}
+
+function invoke(call: CallExpression, context: Context): Read {
+  const result = called(call, context);
+  if (result.kind === "absent") return nothing;
+  if (isPromise(result.held)) {
+    void result.held.catch(() => nothing);
+    throw new Stop("The method '" + String(methodName(call)) + "' returned a promise; a method that returns one is declared with MethodAsync.");
+  }
+  return value(result.held);
 }
 
 function bound(name: string, context: Context): Read {
@@ -91,6 +108,6 @@ function callable(params: readonly string[], body: Expression, context: Context)
   };
 }
 
-function isPromise(held: unknown): boolean {
+function isPromise(held: unknown): held is Promise<unknown> {
   return held instanceof Promise;
 }

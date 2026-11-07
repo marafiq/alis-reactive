@@ -1,0 +1,62 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Pump checks";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Pump checks</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+@plan.OlderInfusionPump("older-pump", "Bed 9 pump")
+
+@plan.StationCensus("census")
+
+<p>Status: <span id="check-status"></span></p>
+
+@(plan.Button("self-test", "Run the self-test")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("check-status").Text.Set("Testing");
+        pipeline.Component<InfusionPump>("pump").SelfTest();
+        pipeline.Element("check-status").Text.Set("Self-test passed");
+    }))
+
+@(plan.Button("measure", "Measure the volume")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("check-status").Text.Set("Measuring");
+        pipeline.Component<StationCensus>("census").Count.Set(pipeline.Component<InfusionPump>("pump").Volume());
+        pipeline.Element("check-status").Text.Set("Measured");
+    }))
+
+@(plan.Button("measure-older", "Measure the older pump's volume")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Component<StationCensus>("census").Count.Set(pipeline.Component<InfusionPump>("older-pump").Volume());
+        pipeline.Element("check-status").Text.Set("Older measured");
+    }))
+
+@(plan.Button("caption-check", "Caption with the last check")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.Caption(pump.LastCheck());
+    }))
+
+@(plan.Button("remote-limit", "Show the remote volume limit")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<InfusionPump>("pump").RemoteSettings().Read(settings => settings.Limit.Volume))))
+
+@(plan.Button("note-in-order", "Note both handlers")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.Note("first before");
+        pump.SelfTest();
+        pump.Note("first after");
+    })
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<InfusionPump>("pump").Note("second")))
+
+@Html.RenderPlan(plan)

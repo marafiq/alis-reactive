@@ -35,23 +35,29 @@ internal sealed class SetStatement : Statement
 
 internal sealed class DoStatement : Statement
 {
-    internal DoStatement(Expression expr)
+    internal DoStatement(Expression expr, bool awaits)
     {
         Expr = expr;
+        Await = awaits;
     }
 
     public Expression Expr { get; }
+
+    public bool Await { get; }
 }
 
 internal sealed class LetStatement : Statement
 {
-    internal LetStatement(string name, Expression expr)
+    internal LetStatement(string name, Expression expr, bool awaits)
     {
         Name = name;
         Expr = expr;
+        Await = awaits;
     }
 
     public string Name { get; }
 
     public Expression Expr { get; }
+
+    public bool Await { get; }
 }

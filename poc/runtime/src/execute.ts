@@ -1,10 +1,51 @@
-import type { LetStatement, SetStatement, Statement } from "./plan";
-import { evaluate, holderOf, walk, type Context } from "./evaluate";
-import { assertNever, heldOrNull, Stop } from "./read";
+import type { CallExpression, DoStatement, LetStatement, SetStatement, Statement } from "./plan";
+import { called, evaluate, holderOf, methodName, walk, type Context } from "./evaluate";
+import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 
-export function execute(statements: readonly Statement[], context: Context): void {
+export type Run = { readonly kind: "finished" } | { readonly kind: "awaiting"; readonly settled: Promise<void> };
+
+const finished: Run = { kind: "finished" };
+
+type Awaited = DoStatement | LetStatement;
+
+export function execute(statements: readonly Statement[], context: Context): Run {
   let current = context;
-  for (const statement of statements) current = step(statement, current);
+  for (const [position, statement] of statements.entries()) {
+    if (awaits(statement)) {
+      const rest = statements.slice(position + 1);
+      const before = current;
+      const settled = settle(statement, before).then((read) => carried(execute(rest, after(statement, before, read))));
+      return { kind: "awaiting", settled };
+    }
+    current = step(statement, current);
+  }
+  return finished;
+}
+
+function awaits(statement: Statement): statement is Awaited {
+  return (statement.kind === "do" || statement.kind === "let") && statement.await;
+}
+
+function settle(statement: Awaited, context: Context): Promise<Read> {
+  const expression = statement.expr;
+  if (expression.kind !== "call") return Promise.resolve(evaluate(expression, context));
+  const result = called(expression, context);
+  if (result.kind === "absent") return Promise.resolve(nothing);
+  return Promise.resolve(result.held).then(value, rejected(expression));
+}
+
+function rejected(call: CallExpression): (reason: unknown) => never {
+  return (reason) => {
+    throw new Stop("The method '" + String(methodName(call)) + "' rejected: " + (reason instanceof Error ? reason.message : String(reason)));
+  };
+}
+
+function after(statement: Awaited, context: Context, read: Read): Context {
+  return statement.kind === "let" ? bound(context, statement.name, read) : context;
+}
+
+function carried(run: Run): Promise<void> {
+  return run.kind === "finished" ? Promise.resolve() : run.settled;
 }
 
 function step(statement: Statement, context: Context): Context {
@@ -16,15 +57,15 @@ function step(statement: Statement, context: Context): Context {
       evaluate(statement.expr, context);
       return context;
     case "let":
-      return bind(statement, context);
+      return bound(context, statement.name, evaluate(statement.expr, context));
     default:
       return assertNever(statement);
   }
 }
 
-function bind(statement: LetStatement, context: Context): Context {
+function bound(context: Context, name: string, read: Read): Context {
   const scope = new Map(context.scope);
-  scope.set(statement.name, evaluate(statement.expr, context));
+  scope.set(name, read);
   return { ...context, scope };
 }
 

@@ -306,9 +306,13 @@ Terms used throughout:
   holds, of each item of a list it holds) and the field a find returns. A form's check reads the starts the endpoint
   that binds its body leaves, by host and format (D16.6); a data read follows the contract of the data.
 - D4.3 A read that yields a promise where a value is declared stops the pipeline. A method declared
-  `MethodAsync` is awaited, and its settled value is its result. A rejected promise stops the pipeline.
+  `MethodAsync` is awaited, and its settled value is its result. A rejected promise stops the pipeline. A
+  `MethodAsync` whose vendor returns a value that is not a promise is awaited as that value, since the declaration
+  decides (D11.3). The result binds at its line (D5.11); an async method called inside a list's lambda, whose
+  operation reads every item in one turn, is refused where the view renders (X4.12).
 - D4.4 A call of a method declared to return nothing that returns a promise stops the pipeline after the call,
-  naming `MethodAsync`. There is no call whose promise nobody awaits.
+  naming `MethodAsync`. There is no call whose promise nobody awaits: the stop follows it, and a later rejection of
+  that promise adds no second error.
 - D4.5 A missing value set as an element's text or HTML shows nothing; a missing class name changes no class.
 - D4.6 A route value that reads nothing stops its request before it is sent, and its `Finally` runs. C# writes
   this as a guard before the send and the statement `stop(reason)` (Q19).
@@ -353,8 +357,10 @@ Terms used throughout:
   (`Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:69-73`).
 
 **Defects.**
-- `X4.1` type: a method that returns a promise is declared apart from one that returns a value:
-  `MethodAsync<T>` returns a different source type than `Method<T>` (`Alis.Reactive/Components/JsObject.cs:252`).
+- `X4.1` type: a method that returns a promise is declared apart from one that returns a value: its declaration
+  names `MethodAsync`, never `Method` (`Alis.Reactive/Components/JsObject.cs:252`). Both results are a method's
+  result source, because the await happens at the result's line (D5.11) and the binding is a value after it; a
+  source type of its own would refuse nothing a list's lambda or a value position could not take.
 - `X4.2` behavior: a component that lacks a declared property stops the pipeline at the read, and the steps after
   it do not run.
 - `X4.3` behavior: an event payload that lacks a member its declaration names stops the pipeline (D4.1, D5.3), and a
@@ -373,6 +379,13 @@ Terms used throughout:
   that holds it reads on; a member a seal (no constructor the binding can use) or a polymorphic delivery lacks stops
   the pipeline; an on-call nurse whose pager line is a list where the declaration names an object stops a read of
   its number; a data member that holds a promise stops the pipeline (D4.2, D4.3).
+- `X4.11` behavior (D4.3, D11.1): the step after a `MethodAsync` runs only once its promise resolves, and never
+  when it rejects; a `MethodAsync<T>`'s result is the value its promise resolves to, a member of that data reads
+  past it, a resolution to nothing reaches a method as null, and an older pump whose method returns a plain value
+  is awaited as that value.
+- `X4.12` refusal (D4.3, D5.11): an async method's result read inside a list's lambda: "An async method is called
+  inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline
+  and read its result in the lambda."
 - `X4.10` behavior: in an app whose options set `RespectRequiredConstructorParameters`, a dose that lacks a
   constructor parameter (Heparin's omitted `ward`) stops a read through it, and a dose that holds every parameter
   reads the start of a member it lacks, 0 (D4.2).
@@ -434,7 +447,7 @@ Terms used throughout:
   written inside a list's lambda, which writes nothing, it is refused where the view renders. Each argument is read
   when its line runs, and one that reads nothing passes null (D7.6). A result is read in the block that called its
   method and in the blocks inside it (D8.8); a C# variable that carries it into another pipeline, or out of its
-  block, is refused where the view renders (X5.14).
+  block, is refused where the view renders (X5.14). A `MethodAsync<T>` result binds by `let` with `await` (D4.3).
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
@@ -1409,8 +1422,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   request, Confirm or async method."
 - `X11.2` behavior: a drawer whose close handler writes `Cancel` and then asks stays open while the dialog
   asks, and closes on yes.
-- `X11.3` behavior: a method declared with `Method` whose vendor returns a promise stops its pipeline with
-  one logged error, and the step after it does not run.
+- `X11.3` behavior: a method declared with `Method` whose vendor returns a promise stops its pipeline, and the
+  step after it does not run. The console holds the stop's one error (D11.3), which a test does not read
+  (`.claude/rules/tests.md`, rule 4).
 - `X11.4` behavior: a `MethodAsync` that rejects stops its pipeline, and its request's `Finally` hides the
   loader.
 - `X11.5` behavior: a slot unloaded while its request is in flight runs no route of that request, and the
@@ -1422,6 +1436,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   `UpdateData` with them, and the list shows the fetched items (`probe:ej2-filtering-args-members`).
 - `X11.9` behavior: after an awaited step, a write to a property of an object the payload holds changes that
   object.
+- `X11.10` behavior (D11.5): two handlers of one click run in the order the plan subscribed them, the first to its
+  awaited step and the second to its end, and the first goes on when its promise resolves.
 
 ## Q12. Ownership
 

@@ -29,6 +29,7 @@ export interface DataStep {
 export interface DoStatement {
   readonly kind: "do";
   readonly expr: Expression;
+  readonly await: boolean;
 }
 
 export interface ElementLocator {
@@ -65,6 +66,7 @@ export interface LetStatement {
   readonly kind: "let";
   readonly name: string;
   readonly expr: Expression;
+  readonly await: boolean;
 }
 
 export type Listening = MethodListening | AssignmentListening | ReturnedListening;

@@ -8,6 +8,12 @@ public sealed class PumpsController : Controller
 
     public IActionResult PausedInALambda() => View(new InfusionPage());
 
+    public IActionResult Checks() => View(new InfusionPage());
+
+    public IActionResult SelfCheckedInALambda() => View(new InfusionPage());
+
+    public IActionResult RecalibratedInALambda() => View(new InfusionPage());
+
     public IActionResult SummaryReadByAnotherPipeline() => View(new InfusionPage());
 
     public IActionResult ChannelReadByAnotherPipeline() => View(new InfusionPage());

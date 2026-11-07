@@ -72,9 +72,14 @@ function method(holder: object, name: string): (...args: unknown[]) => unknown {
 function run(context: Context, handler: Handler, args: unknown[]): void {
   const payload = walk(value(args), handler.payload, "optional");
   try {
-    execute(handler.do, { ...context, scope: new Map([["e", payload]]) });
+    const running = execute(handler.do, { ...context, scope: new Map([["e", payload]]) });
+    if (running.kind === "awaiting") running.settled.catch((stopped: unknown) => report(handler, stopped));
   } catch (stopped) {
-    if (!(stopped instanceof Stop)) throw stopped;
-    console.error("[alis] the pipeline of '" + handler.event + "' stopped: " + stopped.reason);
+    report(handler, stopped);
   }
+}
+
+function report(handler: Handler, stopped: unknown): void {
+  if (!(stopped instanceof Stop)) throw stopped;
+  console.error("[alis] the pipeline of '" + handler.event + "' stopped: " + stopped.reason);
 }

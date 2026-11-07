@@ -36,6 +36,16 @@ public sealed class InfusionPump : Component
 
     public MethodResult<decimal> Reading() => Method<decimal>();
 
+    public void SelfTest() => MethodAsync();
+
+    public MethodResult<int> Volume() => MethodAsync<int>();
+
+    public MethodResult<string?> LastCheck() => MethodAsync<string?>();
+
+    public MethodResult<PumpSettings> RemoteSettings() => MethodAsync<PumpSettings>();
+
+    public void Note(Arg<string> text) => Method([text]);
+
     public MethodResult<string?> LastAlarm() => Method<string?>();
 
     public MethodResult<PumpSettings> Settings() => Method<PumpSettings>();
@@ -54,6 +64,10 @@ public sealed class PumpChannel : JsObject
     public MethodResult<bool> IsRunning() => Method<bool>();
 
     public PumpChannel Partner() => ReturnedObject<PumpChannel>();
+
+    public MethodResult<bool> SelfCheck() => MethodAsync<bool>();
+
+    public void Recalibrate() => MethodAsync();
 }
 
 public sealed record PumpSettings(PumpLimit Limit, string? Note);

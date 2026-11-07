@@ -65,13 +65,25 @@ public abstract class JsObject
         => Method([], name, declaredBy);
 
     protected void Method(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
-        => Binding.Build.Write(new DoStatement(Call(arguments, name, declaredBy)));
+        => Binding.Build.Write(new DoStatement(Call(arguments, name, declaredBy), awaits: false));
 
     protected MethodResult<TResult> Method<TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
         => Method<TResult>([], name, declaredBy);
 
     protected MethodResult<TResult> Method<TResult>(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
         => new MethodResult<TResult>(Binding.Build.Result(Call(arguments, name, declaredBy)), Binding.Build);
+
+    protected void MethodAsync(string? name = null, [CallerMemberName] string declaredBy = "")
+        => MethodAsync([], name, declaredBy);
+
+    protected void MethodAsync(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
+        => Binding.Build.Write(new DoStatement(Call(arguments, name, declaredBy), awaits: true));
+
+    protected MethodResult<TResult> MethodAsync<TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
+        => MethodAsync<TResult>([], name, declaredBy);
+
+    protected MethodResult<TResult> MethodAsync<TResult>(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
+        => new(Binding.Build.AwaitedResult(Call(arguments, name, declaredBy)), Binding.Build);
 
     protected TObject ReturnedObject<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()

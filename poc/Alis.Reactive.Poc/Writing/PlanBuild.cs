@@ -74,8 +74,24 @@ internal sealed class PlanBuild
     internal Expression Result(CallExpression call)
     {
         if (_readingItems > 0) return call;
+        return Let(call, awaits: false);
+    }
+
+    internal Expression AwaitedResult(CallExpression call)
+    {
+        if (_readingItems > 0)
+        {
+            throw new InvalidOperationException(
+                "An async method is called inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline and read its result in the lambda.");
+        }
+
+        return Let(call, awaits: true);
+    }
+
+    private RefExpression Let(CallExpression call, bool awaits)
+    {
         var name = "result" + (++_results).ToString(CultureInfo.InvariantCulture);
-        Write(new LetStatement(name, call));
+        Write(new LetStatement(name, call, awaits));
         _resultBlocks[name] = _open.Peek();
         return new RefExpression(name);
     }

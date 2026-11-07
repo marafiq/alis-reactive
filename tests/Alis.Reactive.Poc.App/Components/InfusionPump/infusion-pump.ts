@@ -13,6 +13,10 @@ const channelSeeds: readonly ChannelSeed[] = [
   { label: "C", running: false },
 ];
 
+type Check = { readonly kind: "idle" } | { readonly kind: "waiting"; readonly finish: () => void; readonly fail: () => void };
+
+const idle: Check = { kind: "idle" };
+
 const ratesByMedicine: ReadonlyMap<string, number> = new Map([
   ["Heparin", 18],
   ["Insulin", 4],
@@ -63,6 +67,10 @@ export class InfusionPump {
   readonly #summaryCalls: HTMLParagraphElement;
   readonly #caption: HTMLParagraphElement;
   readonly #labels: HTMLParagraphElement;
+  readonly #check: HTMLParagraphElement;
+  readonly #notes: HTMLParagraphElement;
+  #pendingCheck: Check = idle;
+  #noted: readonly string[] = [];
   readonly #channels: readonly OlderPumpChannel[];
   #rateText = "none";
   #summaries = 0;
@@ -73,6 +81,10 @@ export class InfusionPump {
     this.#summaryCalls = lineOf("pump-summary-calls", "0");
     this.#caption = lineOf("pump-caption", host.dataset["caption"] ?? "");
     this.#labels = lineOf("pump-labels", "unshown");
+    this.#check = lineOf("pump-check", "idle");
+    this.#notes = lineOf("pump-notes", "");
+    const finish = buttonOf("Finish the check", () => this.#settle((check) => check.finish()));
+    const fail = buttonOf("Fail the check", () => this.#settle((check) => check.fail()));
     const list = document.createElement("ul");
     list.className = "pump-channels";
     this.#channels = channelSeeds.map((seed) => channelOf(seed, list));
@@ -80,7 +92,7 @@ export class InfusionPump {
       const partner = channels[(position + 2) % channels.length];
       if (partner !== undefined) channel.pairWith(partner);
     });
-    host.replaceChildren(this.#caption, this.#state, this.#rate, this.#summaryCalls, this.#labels, list);
+    host.replaceChildren(this.#caption, this.#state, this.#rate, this.#summaryCalls, this.#labels, this.#check, this.#notes, finish, fail, list);
   }
 
   start(): void {
@@ -118,6 +130,46 @@ export class InfusionPump {
     return { limit: { volume: 500 }, note: null };
   }
 
+  selfTest(): Promise<void> {
+    return this.checked(undefined);
+  }
+
+  lastCheck(): Promise<string | undefined> {
+    return Promise.resolve(undefined);
+  }
+
+  remoteSettings(): Promise<{ readonly limit: { readonly volume: number }; readonly note: string | null }> {
+    return Promise.resolve({ limit: { volume: 750 }, note: null });
+  }
+
+  note(text: string): void {
+    this.#noted = [...this.#noted, text];
+    this.#notes.textContent = this.#noted.join(", ");
+  }
+
+  protected checked<T>(settledWith: T): Promise<T> {
+    this.#check.textContent = "checking";
+    return new Promise<T>((resolve, reject) => {
+      this.#pendingCheck = {
+        kind: "waiting",
+        finish: () => {
+          this.#check.textContent = "passed";
+          resolve(settledWith);
+        },
+        fail: () => {
+          this.#check.textContent = "failed";
+          reject(new Error("occlusion detected"));
+        },
+      };
+    });
+  }
+
+  #settle(settle: (check: Extract<Check, { kind: "waiting" }>) => void): void {
+    const pending = this.#pendingCheck;
+    this.#pendingCheck = idle;
+    if (pending.kind === "waiting") settle(pending);
+  }
+
   calibrate(): Promise<void> {
     return Promise.resolve();
   }
@@ -147,12 +199,28 @@ export class CurrentInfusionPump extends InfusionPump {
   prime(): void {
     this.showState("primed");
   }
+
+  volume(): Promise<number> {
+    return this.checked(125);
+  }
 }
 
 export class OlderInfusionPump extends InfusionPump {
   constructor(host: HTMLElement) {
     super(host, (seed, list) => new OlderPumpChannel(seed, list));
   }
+
+  volume(): number {
+    return 90;
+  }
+}
+
+function buttonOf(text: string, clicked: () => void): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = text;
+  button.addEventListener("click", clicked);
+  return button;
 }
 
 function lineOf(className: string, text: string): HTMLParagraphElement {
