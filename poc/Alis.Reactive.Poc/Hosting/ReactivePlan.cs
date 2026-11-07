@@ -29,23 +29,23 @@ public sealed class ReactivePlan<TModel>
     internal PlanBuild Build { get; }
 
 #if NET48
-    public Rendered<TComponent> Render<TComponent>(string id, IHtmlString html)
+    public Rendered<TComponent, TModel> Render<TComponent>(string id, IHtmlString html)
 #else
-    public Rendered<TComponent> Render<TComponent>(string id, IHtmlContent html)
+    public Rendered<TComponent, TModel> Render<TComponent>(string id, IHtmlContent html)
 #endif
         where TComponent : Component, new()
     {
         if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("A component's element has the id the developer chose.", nameof(id));
-        return new Rendered<TComponent>(Build, id, html);
+        return new Rendered<TComponent, TModel>(Build, id, html);
     }
 
     internal string Json() => PlanJson.Write(Build.Document());
 }
 
 #if NET48
-public sealed class Rendered<TComponent> : IHtmlString
+public sealed class Rendered<TComponent, TModel> : IHtmlString
 #else
-public sealed class Rendered<TComponent> : IHtmlContent
+public sealed class Rendered<TComponent, TModel> : IHtmlContent
 #endif
     where TComponent : Component, new()
 {
@@ -66,13 +66,13 @@ public sealed class Rendered<TComponent> : IHtmlContent
         _html = html;
     }
 
-    public Rendered<TComponent> Reactive(Func<TComponent, Event> raised, Action<Pipeline> pipeline)
+    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline)
     {
-        Trigger.On<TComponent, NoPayload>(_build, _id, raised, [], (_, steps) => pipeline(steps));
+        Trigger.On<TModel, TComponent, NoPayload>(_build, _id, raised, [], (_, steps) => pipeline(steps));
         return this;
     }
 
-    public Rendered<TComponent> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline> pipeline)
+    public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
     {
         Trigger.On(_build, _id, raised, [PathStep.Index(0)], pipeline);

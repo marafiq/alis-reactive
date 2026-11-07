@@ -46,10 +46,10 @@ public sealed record AlarmReading(int Rate)
 
 public static class VitalsMonitorHtml
 {
-    public static Rendered<VitalsMonitor> VitalsMonitor<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<VitalsMonitor, TModel> VitalsMonitor<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<VitalsMonitor>(id, Monitor(id, "current"));
 
-    public static Rendered<VitalsMonitor> OlderVitalsMonitor<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<VitalsMonitor, TModel> OlderVitalsMonitor<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<VitalsMonitor>(id, Monitor(id, "older"));
 
     private static TagBuilder Monitor(string id, string build)

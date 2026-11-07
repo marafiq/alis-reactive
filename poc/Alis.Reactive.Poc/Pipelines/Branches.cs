@@ -5,7 +5,7 @@ using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Pipelines;
 
-public sealed class Guard
+public sealed class Guard<TModel>
 {
     private readonly PlanBuild _build;
     private readonly Expression _condition;
@@ -18,11 +18,11 @@ public sealed class Guard
         _arm = arm;
     }
 
-    public Branches Then(Action<Pipeline> branch)
-        => new(_build, _arm(_condition, () => branch(new Pipeline(_build))));
+    public Branches<TModel> Then(Action<Pipeline<TModel>> branch)
+        => new(_build, _arm(_condition, () => branch(new Pipeline<TModel>(_build))));
 }
 
-public sealed class Branches
+public sealed class Branches<TModel>
 {
     private readonly PlanBuild _build;
     private readonly Branching _branching;
@@ -33,13 +33,13 @@ public sealed class Branches
         _branching = branching;
     }
 
-    public Guard ElseIf(TypedSource<bool> condition)
+    public Guard<TModel> ElseIf(TypedSource<bool> condition)
         => new(_build, Sources.Of(condition).Expression, (expression, body) =>
         {
             _build.ElseIf(_branching, expression, body);
             return _branching;
         });
 
-    public void Else(Action<Pipeline> branch)
-        => _build.Else(_branching, () => branch(new Pipeline(_build)));
+    public void Else(Action<Pipeline<TModel>> branch)
+        => _build.Else(_branching, () => branch(new Pipeline<TModel>(_build)));
 }

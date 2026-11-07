@@ -137,7 +137,7 @@ public static class MedicationCartJson
 
 public static class MedicationCartHtml
 {
-    public static Rendered<MedicationCart> MedicationCart<TModel>(this ReactivePlan<TModel> plan, string id, IReadOnlyList<MedicationDose> doses)
+    public static Rendered<MedicationCart, TModel> MedicationCart<TModel>(this ReactivePlan<TModel> plan, string id, IReadOnlyList<MedicationDose> doses)
     {
         var cart = new TagBuilder("section");
         cart.Attributes["id"] = id;

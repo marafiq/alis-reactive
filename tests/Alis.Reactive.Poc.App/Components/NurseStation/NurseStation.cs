@@ -61,7 +61,7 @@ public sealed class StationBuild
 
 public static class NurseStationHtml
 {
-    public static Rendered<NurseStation> NurseStation<TModel>(this ReactivePlan<TModel> plan, string id, StationBuild build, IReadOnlyList<BedSeed> beds, StationSchedule? schedule)
+    public static Rendered<NurseStation, TModel> NurseStation<TModel>(this ReactivePlan<TModel> plan, string id, StationBuild build, IReadOnlyList<BedSeed> beds, StationSchedule? schedule)
     {
         var station = new TagBuilder("section");
         station.Attributes["id"] = id;

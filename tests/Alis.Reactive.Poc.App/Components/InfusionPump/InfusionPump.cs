@@ -76,10 +76,10 @@ public sealed record PumpLimit(int Volume);
 
 public static class InfusionPumpHtml
 {
-    public static Rendered<InfusionPump> InfusionPump<TModel>(this ReactivePlan<TModel> plan, string id, string caption)
+    public static Rendered<InfusionPump, TModel> InfusionPump<TModel>(this ReactivePlan<TModel> plan, string id, string caption)
         => plan.Render<InfusionPump>(id, Pump(id, "current", caption));
 
-    public static Rendered<InfusionPump> OlderInfusionPump<TModel>(this ReactivePlan<TModel> plan, string id, string caption)
+    public static Rendered<InfusionPump, TModel> OlderInfusionPump<TModel>(this ReactivePlan<TModel> plan, string id, string caption)
         => plan.Render<InfusionPump>(id, Pump(id, "older", caption));
 
     private static TagBuilder Pump(string id, string build, string caption)

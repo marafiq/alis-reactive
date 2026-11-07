@@ -30,7 +30,7 @@ public sealed class FluidBalance : Component
 
 public static class FluidBalanceHtml
 {
-    public static Rendered<FluidBalance> FluidBalance<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<FluidBalance, TModel> FluidBalance<TModel>(this ReactivePlan<TModel> plan, string id)
     {
         var balance = new TagBuilder("section");
         balance.Attributes["id"] = id;

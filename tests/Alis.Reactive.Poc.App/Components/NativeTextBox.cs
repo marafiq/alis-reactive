@@ -16,7 +16,7 @@ public sealed class NativeTextBox : Component
 
 public static class NativeTextBoxHtml
 {
-    public static Rendered<NativeTextBox> TextBox<TModel>(this ReactivePlan<TModel> plan, string id, string label, string value)
+    public static Rendered<NativeTextBox, TModel> TextBox<TModel>(this ReactivePlan<TModel> plan, string id, string label, string value)
     {
         var caption = new TagBuilder("label");
         caption.Attributes["for"] = id;

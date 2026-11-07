@@ -30,7 +30,7 @@ public sealed class StationCensus : Component
 
 public static class StationCensusHtml
 {
-    public static Rendered<StationCensus> StationCensus<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<StationCensus, TModel> StationCensus<TModel>(this ReactivePlan<TModel> plan, string id)
     {
         var census = new TagBuilder("section");
         census.Attributes["id"] = id;

@@ -47,24 +47,24 @@ public sealed record PagerLine(string Number);
 
 public static class DutyRosterHtml
 {
-    public static Rendered<DutyRoster> DutyRoster<TModel>(this ReactivePlan<TModel> plan, string id, int nursesRequired, string shift, string onCallName, string onCallRole, string? onCallPager)
+    public static Rendered<DutyRoster, TModel> DutyRoster<TModel>(this ReactivePlan<TModel> plan, string id, int nursesRequired, string shift, string onCallName, string onCallRole, string? onCallPager)
         => plan.Render<DutyRoster>(id, Roster(id, "1", nursesRequired, shift, onCallName, onCallRole, onCallPager));
 
-    public static Rendered<DutyRoster> DutyRosterAwaitingCallback<TModel>(this ReactivePlan<TModel> plan, string id, string onCallName)
+    public static Rendered<DutyRoster, TModel> DutyRosterAwaitingCallback<TModel>(this ReactivePlan<TModel> plan, string id, string onCallName)
     {
         var roster = Roster(id, "1", 0, "", onCallName, "", null);
         roster.Attributes["data-on-call-callback"] = "awaited";
         return plan.Render<DutyRoster>(id, roster);
     }
 
-    public static Rendered<DutyRoster> DutyRosterWithPagerLines<TModel>(this ReactivePlan<TModel> plan, string id, string onCallName, string onCallPager)
+    public static Rendered<DutyRoster, TModel> DutyRosterWithPagerLines<TModel>(this ReactivePlan<TModel> plan, string id, string onCallName, string onCallPager)
     {
         var roster = Roster(id, "1", 0, "", onCallName, "", null);
         roster.Attributes["data-on-call-pager-lines"] = onCallPager;
         return plan.Render<DutyRoster>(id, roster);
     }
 
-    public static Rendered<DutyRoster> DutyRosterVersion2<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<DutyRoster, TModel> DutyRosterVersion2<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<DutyRoster>(id, Roster(id, "2", 0, "", "", "", null));
 
     private static TagBuilder Roster(string id, string version, int nursesRequired, string shift, string onCallName, string onCallRole, string? onCallPager)

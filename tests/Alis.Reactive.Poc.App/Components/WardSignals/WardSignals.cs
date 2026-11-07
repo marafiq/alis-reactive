@@ -68,16 +68,16 @@ public sealed class SearchLoad : JsObject
 
 public static class WardSignalsHtml
 {
-    public static Rendered<CallBell> CallBell<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<CallBell, TModel> CallBell<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<CallBell>(id, Host(id, "data-call-bell"));
 
-    public static Rendered<WardFeed> WardFeed<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<WardFeed, TModel> WardFeed<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<WardFeed>(id, Host(id, "data-ward-feed"));
 
-    public static Rendered<BedBoard> BedBoard<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<BedBoard, TModel> BedBoard<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<BedBoard>(id, Host(id, "data-bed-board"));
 
-    public static Rendered<MedicineSearch> MedicineSearch<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<MedicineSearch, TModel> MedicineSearch<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<MedicineSearch>(id, Host(id, "data-medicine-search"));
 
     private static TagBuilder Host(string id, string marker)

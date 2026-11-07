@@ -26,5 +26,5 @@ public sealed class ClassList : JsObject
 
 public static class ElementSteps
 {
-    public static Element Element(this Pipeline pipeline, string id) => pipeline.Component<Element>(id);
+    public static Element Element<TModel>(this Pipeline<TModel> pipeline, string id) => pipeline.Component<Element>(id);
 }

@@ -13,7 +13,7 @@ public sealed class NativeButton : Component
 
 public static class NativeButtonHtml
 {
-    public static Rendered<NativeButton> Button<TModel>(this ReactivePlan<TModel> plan, string id, string text)
+    public static Rendered<NativeButton, TModel> Button<TModel>(this ReactivePlan<TModel> plan, string id, string text)
     {
         var button = new TagBuilder("button");
         button.Attributes["id"] = id;

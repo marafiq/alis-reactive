@@ -41,7 +41,7 @@ public sealed record TickData(string Label, int Doses);
 
 public static class DoseChartHtml
 {
-    public static Rendered<DoseChart> DoseChart<TModel>(this ReactivePlan<TModel> plan, string id)
+    public static Rendered<DoseChart, TModel> DoseChart<TModel>(this ReactivePlan<TModel> plan, string id)
     {
         var chart = new TagBuilder("section");
         chart.Attributes["id"] = id;

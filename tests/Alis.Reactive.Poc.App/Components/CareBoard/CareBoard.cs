@@ -19,10 +19,10 @@ public sealed class CareBoard : Component
 
 public static class CareBoardHtml
 {
-    public static Rendered<CareBoard> CareBoard<TModel>(this ReactivePlan<TModel> plan, string id, string title, string unlockCode)
+    public static Rendered<CareBoard, TModel> CareBoard<TModel>(this ReactivePlan<TModel> plan, string id, string title, string unlockCode)
         => plan.Render<CareBoard>(id, Board(id, "1", title, unlockCode));
 
-    public static Rendered<CareBoard> CareBoardVersion2<TModel>(this ReactivePlan<TModel> plan, string id, string title)
+    public static Rendered<CareBoard, TModel> CareBoardVersion2<TModel>(this ReactivePlan<TModel> plan, string id, string title)
         => plan.Render<CareBoard>(id, Board(id, "2", title, ""));
 
     private static TagBuilder Board(string id, string version, string title, string unlockCode)
