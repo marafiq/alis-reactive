@@ -148,6 +148,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   listen on a component reached by its element's id, and on one whose vendor names no element path. Whether a listen on
   a component reached by id becomes the door a slot's plan lacks for a page component (14a-i's gate 1 flag (3)) is
   the owner's.
+- Chosen within the owner's yes, 2026-11-07, unit 17a: a request is written with main's names, `pipeline.Get<TRequest>(url,
+  request => request.Set(r => r.Member, value or source))` and `.Response(response => response.OnSuccess<T>((body,
+  success) => ..).OnError<T>(status, (body, error) => ..).OnError(other => ..))`; the body is a source read through
+  the data path `MethodResult.Read` uses. The form is gate 2's.
 - Chosen within the owner's yes, 2026-11-07, unit 16a: a declaration's value type is checked against its vendor's
   TypeScript at build (ALIS025), the rule `spec/Core/DESIGN.md` states for a payload ("The member's C# type is the API's
   value type") and the analyzer checked only for null: a property's value, both ways, a method's result, awaited or
