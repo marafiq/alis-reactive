@@ -220,6 +220,19 @@ Terms used throughout:
     that zone for its own day, and a wall time a user picks becomes an instant at that zone's offset for
     that day. DateWire's offset per day is the zone's.
   - A `DateTime` is a wall time with no zone, so it is shown and sent as it is under any zone (D3.9).
+- D3.13 A value a step writes into a live object, a property's set and a method's argument, reaches it in the shape
+  of the type its declaration gives, so a date reaches the vendor as a JavaScript `Date`, as its typed API holds one
+  (D5.3).
+  - C# writes `as(value, shape)` where that type holds a date: `DateTime` is `date` and `DateTimeOffset` is
+    `instant`, each `nullable` when it is nullable, inside `object(fields)` that names only the members holding one,
+    and `array(item)`. A type that holds no date is written as the plan writes it, with no `as`.
+  - The shape comes from the app's contract (D18.1): a type test of the member's `JsonTypeInfo` against
+    `JsonTypeInfo<DateTime>` and its kin, its members and its item type, with no read of a `System.Type` member.
+  - Refused where the view renders: a dictionary whose values hold dates, since `object(fields)` names its members
+    ahead, and a type that holds itself and a date, since its shape would not end.
+  - Data a step sends to the server keeps the wire text (D3.8).
+  - The redesign wrote these shapes by reflection over the type (`Alis.Reactive/Components/ArgumentShape.cs`,
+    `ClrShape.SerializedProperties`); the contract carries the same feature.
 
 **Schema nodes.** `as`, the shapes of D3.1, `InputBinding.value`.
 
@@ -284,6 +297,15 @@ Terms used throughout:
 - `X3.9` behavior: a view rendered under the zone `America/New_York` shows a visit's `DateTimeOffset` at its New
   York wall time and offset in a browser whose clock is in another zone, and sends a picked time back with
   New York's offset for that day.
+- `X3.10` behavior (D3.13): a visit planner receives as a `Date` a date a step passes, one inside an object, each
+  date of a list, a date a step sets as its property and a date an event carries as text; it receives an instant as
+  that moment, and a nullable date's null as null.
+- `X3.11` refusal (D3.13): a dictionary of dates: "A value written into a live member is a dictionary whose values
+  hold dates. A date reaches a live member by its member's name: pass the entries as a list of objects that name each
+  key."
+- `X3.12` refusal (D3.13): a type that holds itself and a date: "A value written into a live member holds its own
+  type and a date in it. A date reaches a live member through a shape that ends: pass the dates as a list of their
+  own."
 
 ## Q4. Absence and promises
 

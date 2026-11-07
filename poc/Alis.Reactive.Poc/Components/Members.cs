@@ -33,9 +33,9 @@ public sealed class Property<TValue> : ReadOnly<TValue>
     {
     }
 
-    public void Set(TValue value) => Assign.Write(Owner, Member, Literal.Of(value, Owner.Binding.Build));
+    public void Set(TValue value) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build)));
 
-    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Sources.Of(source).Expression);
+    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
 }
 
 public sealed class WriteOnly<TValue>
@@ -49,9 +49,9 @@ public sealed class WriteOnly<TValue>
         _member = member;
     }
 
-    public void Set(TValue value) => Assign.Write(_owner, _member, Literal.Of(value, _owner.Binding.Build));
+    public void Set(TValue value) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, _owner.Binding.Build)));
 
-    public void Set(ITypedSource<TValue> source) => Assign.Write(_owner, _member, Sources.Of(source).Expression);
+    public void Set(ITypedSource<TValue> source) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
 }
 
 internal static class Assign

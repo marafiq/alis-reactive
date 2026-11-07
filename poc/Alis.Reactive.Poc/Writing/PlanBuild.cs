@@ -102,6 +102,9 @@ internal sealed class PlanBuild
         return block;
     }
 
+    internal Expression IntoLive<TValue>(Expression value)
+        => LiveShapes.Of(Values.GetTypeInfo(typeof(TValue)), Values) is ConvertedShape converted ? new AsExpression(value, converted.Shape) : value;
+
     internal string ItemName() => "item" + (++_items).ToString(CultureInfo.InvariantCulture);
 
     internal string AnswerArgumentsName() => ArgumentsName + (++_answers).ToString(CultureInfo.InvariantCulture);

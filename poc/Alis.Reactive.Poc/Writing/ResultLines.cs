@@ -166,6 +166,9 @@ internal static class References
             case OperatorExpression operation:
                 Operands(operation, whenReached, read);
                 return;
+            case AsExpression conversion:
+                Of(conversion.Expr, whenReached, read);
+                return;
             case LiteralExpression or ObjectExpression:
                 return;
             default:

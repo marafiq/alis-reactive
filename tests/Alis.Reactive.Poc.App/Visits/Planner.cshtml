@@ -1,0 +1,77 @@
+@using Alis.Reactive.Poc.App.Visits
+@model VisitsPage
+@{
+    ViewData["Title"] = "Visit planner";
+    var plan = Html.ReactivePlan<VisitsPage>();
+    plan.Plugin<VisitPlanner>().Reactive(planner => planner.Requested, (requested, pipeline) =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.Book(requested.Detail.Read(detail => detail!.At));
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    });
+}
+<h1>Visit planner</h1>
+
+<p>Booked: <span id="booked">none shown</span></p>
+<p>Next visit: <span id="next-day">none shown</span></p>
+
+@(plan.Button("book-saturday", "Book Saturday 08:00")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.Book(new DateTime(2026, 11, 7, 8, 0, 0));
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    }))
+
+@(plan.Button("book-helen", "Book Helen Park on Monday")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.BookVisit(new PlannedVisit("Helen Park", new DateTime(2026, 11, 9, 14, 30, 0)));
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    }))
+
+@(plan.Button("book-weekend", "Book the weekend")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.BookAll(new[] { new DateTime(2026, 11, 7, 8, 0, 0), new DateTime(2026, 11, 8, 9, 15, 0) });
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    }))
+
+@(plan.Button("book-moment", "Book 13:00 UTC")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.BookAt(new DateTimeOffset(2026, 11, 7, 13, 0, 0, TimeSpan.Zero));
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    }))
+
+@(plan.Button("reschedule-friday", "Reschedule to Friday 11:00")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.Reschedule(new DateTime(2026, 11, 13, 11, 0, 0));
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    }))
+
+@(plan.Button("unschedule", "Leave the visit unscheduled")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.Reschedule((DateTime?)null);
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    }))
+
+@(plan.Button("next-thursday", "Make Thursday 09:00 the next visit")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.Next.Set(new DateTime(2026, 11, 12, 9, 0, 0));
+        pipeline.Element("next-day").Text.Set(planner.NextDay);
+    }))
+
+@(plan.Button("request", "Request a visit")
+    .Reactive(button => button.Click, pipeline => pipeline.Plugin<VisitPlanner>().Request()))
+
+@Html.RenderPlan(plan)

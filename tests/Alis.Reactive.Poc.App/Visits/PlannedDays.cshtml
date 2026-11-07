@@ -1,0 +1,13 @@
+@using Alis.Reactive.Poc.App.Visits
+@model VisitsPage
+@{
+    ViewData["Title"] = "Planned days";
+    var plan = Html.ReactivePlan<VisitsPage>();
+}
+<h1>Planned days</h1>
+
+@(plan.Button("plan-days", "Plan the days")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Plugin<VisitPlanner>().PlanDays(new Dictionary<string, DateTime> { ["saturday"] = new DateTime(2026, 11, 7, 8, 0, 0) })))
+
+@Html.RenderPlan(plan)

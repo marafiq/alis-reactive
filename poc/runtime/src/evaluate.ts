@@ -2,6 +2,7 @@ import type { CallExpression, Expression, PathStep, PlanDocument, ReadPresence }
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 import { operate } from "./operators";
 import { readData } from "./data";
+import { converted } from "./shapes";
 
 export interface Context {
   readonly plan: PlanDocument;
@@ -37,6 +38,8 @@ export function evaluate(expression: Expression, context: Context): Read {
       return value(answer(expression.arguments, expression.body, context));
     case "op":
       return operate(expression, (argument) => evaluate(argument, context), context.plan.culture);
+    case "as":
+      return converted(evaluate(expression.expr, context), expression.shape);
     default:
       return assertNever(expression);
   }

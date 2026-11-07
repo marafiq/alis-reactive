@@ -38,5 +38,5 @@ public sealed class Arg<T> : Arg
 
     public static implicit operator Arg<T>(TypedSource<T> source) => new(_ => source.Expression);
 
-    internal override Expression ExpressionIn(PlanBuild build) => _expression(build);
+    internal override Expression ExpressionIn(PlanBuild build) => build.IntoLive<T>(_expression(build));
 }

@@ -8,6 +8,17 @@ export interface AnswerExpression {
   readonly body: Expression;
 }
 
+export interface ArrayShape {
+  readonly kind: "array";
+  readonly item: Shape;
+}
+
+export interface AsExpression {
+  readonly kind: "as";
+  readonly expr: Expression;
+  readonly shape: Shape;
+}
+
 export interface AssignmentListening {
   readonly kind: "assignment";
 }
@@ -32,6 +43,10 @@ export interface DataStep {
   readonly absent: Absence;
 }
 
+export interface DateShape {
+  readonly kind: "date";
+}
+
 export interface DoStatement {
   readonly kind: "do";
   readonly expr: Expression;
@@ -44,7 +59,7 @@ export interface ElementLocator {
   readonly vendor: string;
 }
 
-export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | DataExpression | CallExpression | FnExpression | AnswerExpression | OperatorExpression;
+export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | DataExpression | CallExpression | FnExpression | AnswerExpression | OperatorExpression | AsExpression;
 
 export interface FnExpression {
   readonly kind: "fn";
@@ -76,6 +91,10 @@ export interface IfStatement {
   readonly else: readonly Statement[];
 }
 
+export interface InstantShape {
+  readonly kind: "instant";
+}
+
 export type LetBinding = "line" | "read";
 
 export interface LetStatement {
@@ -105,9 +124,19 @@ export interface NothingAbsence {
   readonly kind: "nothing";
 }
 
+export interface NullableShape {
+  readonly kind: "nullable";
+  readonly inner: Shape;
+}
+
 export interface ObjectExpression {
   readonly kind: "obj";
   readonly id: string;
+}
+
+export interface ObjectShape {
+  readonly kind: "object";
+  readonly fields: { readonly [key: string]: Shape };
 }
 
 export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not" | "trim" | "trimStart" | "trimEnd" | "upperInvariant" | "lowerInvariant" | "upper" | "lower" | "upperTurkic" | "lowerTurkic" | "contains" | "startsWith" | "endsWith" | "nullOrEmpty" | "includes" | "sumInt" | "sumDouble" | "sumDecimal" | "compareNumbers" | "compareOrdinal" | "compareBooleans" | "compareCulture" | "coalesce" | "cond" | "nullableValue" | "matches";
@@ -162,6 +191,8 @@ export interface SetStatement {
   readonly members: Presence;
   readonly value: Expression;
 }
+
+export type Shape = DateShape | InstantShape | NullableShape | ArrayShape | ObjectShape;
 
 export interface StartAbsence {
   readonly kind: "start";

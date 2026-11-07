@@ -50,7 +50,7 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | date | itself |
 | instant | the same moment as a local date |
 | text `"yyyy-MM-dd"` naming a real calendar day | that day at local midnight |
-| text `"yyyy-MM-ddTHH:mm"`, `"yyyy-MM-ddTHH:mm:ss"` or `"yyyy-MM-ddTHH:mm:ss.fff"` | that local time |
+| text `"yyyy-MM-ddTHH:mm"`, `"yyyy-MM-ddTHH:mm:ss"`, or `"yyyy-MM-ddTHH:mm:ss"` with a fraction of one to seven digits | that local time, its fraction read to the millisecond, as System.Text.Json writes one to seven digits and a JavaScript `Date` holds milliseconds |
 | text of those forms with `"Z"` or `"+hh:mm"`/`"-hh:mm"` | that moment as a local date |
 
 ## instant
