@@ -1,0 +1,10 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CareCard
+@{
+    var plan = Html.ReactivePlan<CareCard>();
+    plan.Plugin<ShiftLog>().Reactive(log => log.Noted, (noted, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note(Model.Resident + "'s notes heard the note"));
+}
+<p>@Model.NotesTitle for @Model.Resident</p>
+
+@Html.RenderPlan(plan)

@@ -15,20 +15,43 @@ export function slot(key: string): object {
   };
 }
 
-function load(key: string, html: string): void {
-  const container = containerOf(key);
-  release(key);
-  container.innerHTML = html;
-  document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: container } }));
+export function slotOwner(key: string): Owner {
+  const held = owners.get(key);
+  if (held !== undefined) return held;
   const owner = new Owner();
   owners.set(key, owner);
-  startWithin(container, owner);
+  return owner;
+}
+
+function load(key: string, html: string): void {
+  const container = containerOf(key);
+  releaseWithin(container, key);
+  container.innerHTML = html;
+  document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: container } }));
+  startWithin(container, slotOwner(key));
 }
 
 function unload(key: string): void {
   const container = containerOf(key);
-  release(key);
+  releaseWithin(container, key);
   container.replaceChildren();
+}
+
+function releaseWithin(container: HTMLElement, key: string): void {
+  const inside = [...owners.keys()].filter((held) => held !== key && holds(container, held));
+  for (const held of inside.sort((one, other) => afterInTheDocument(one, other))) release(held);
+  release(key);
+}
+
+function holds(container: HTMLElement, key: string): boolean {
+  const element = document.getElementById(key);
+  return element !== null && container.contains(element);
+}
+
+function afterInTheDocument(one: string, other: string): number {
+  const first = containerOf(one);
+  const second = containerOf(other);
+  return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? 1 : -1;
 }
 
 function release(key: string): void {

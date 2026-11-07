@@ -11,4 +11,15 @@
 }
 <h2>@Model.Resident</h2>
 
+<section id="card-notes">
+    @if (Model.NotesOpen)
+    {
+        @await Html.PartialAsync("Notes", Model)
+    }
+</section>
+
+@(plan.Button("open-notes", "Open the notes")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Get("/Cards/Notes?resident=" + Uri.EscapeDataString(Model.Resident)).Into("card-notes")))
+
 @Html.RenderPlan(plan)

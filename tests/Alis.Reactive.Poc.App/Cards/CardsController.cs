@@ -19,8 +19,12 @@ public sealed class CardsController : Controller
     public IActionResult IntoTwice() => View(new CardsWard());
 
     public IActionResult Radios() => View(new CardsWard());
+
+    public IActionResult Admitted() => View(new CardsWard());
+
+    public IActionResult Notes(string resident) => PartialView(new CareCard(resident, NotesTitle: "Latest notes"));
 }
 
 public sealed record CardsWard;
 
-public sealed record CareCard(string Resident);
+public sealed record CareCard(string Resident, bool NotesOpen = false, string NotesTitle = "Notes");

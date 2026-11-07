@@ -1,8 +1,8 @@
 import { http } from "./http";
-import { page } from "./owners";
-import { startWithin } from "./plans";
+import { page, type Owner } from "./owners";
+import { plansWithin, slotsNamedBy, start } from "./plans";
 import { openRegistry } from "./plugins";
-import { slot } from "./slots";
+import { slot, slotOwner } from "./slots";
 
 function boot(): void {
   openRegistry(
@@ -12,8 +12,17 @@ function boot(): void {
     ]),
   );
   document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: document.body } }));
-  startWithin(document, page);
+  const found = plansWithin(document);
+  const slots = new Set(found.flatMap(({ plan }) => slotsNamedBy(plan)));
+  for (const { plan, script } of found) start(plan, ownerAtBoot(script, slots));
   document.documentElement.dataset["alisBooted"] = "true";
+}
+
+function ownerAtBoot(script: HTMLScriptElement, slots: ReadonlySet<string>): Owner {
+  for (let around = script.parentElement; around !== null; around = around.parentElement) {
+    if (slots.has(around.id)) return slotOwner(around.id);
+  }
+  return page;
 }
 
 function parsed(): boolean {

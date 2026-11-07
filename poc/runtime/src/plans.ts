@@ -5,13 +5,23 @@ import type { Owner } from "./owners";
 
 const planVersion = 8;
 
-export function startWithin(root: ParentNode, owner: Owner): void {
-  for (const script of root.querySelectorAll<HTMLScriptElement>('script[type="application/json"][data-alis-plan]')) {
-    start(JSON.parse(script.textContent) as PlanDocument, owner);
-  }
+export interface Found {
+  readonly plan: PlanDocument;
+  readonly script: HTMLScriptElement;
 }
 
-function start(plan: PlanDocument, owner: Owner): void {
+export function plansWithin(root: ParentNode): Found[] {
+  return [...root.querySelectorAll<HTMLScriptElement>('script[type="application/json"][data-alis-plan]')].map((script) => ({
+    plan: JSON.parse(script.textContent) as PlanDocument,
+    script,
+  }));
+}
+
+export function startWithin(root: ParentNode, owner: Owner): void {
+  for (const { plan } of plansWithin(root)) start(plan, owner);
+}
+
+export function start(plan: PlanDocument, owner: Owner): void {
   if (plan.version !== planVersion) {
     console.error("[alis] the plan '" + plan.planId + "' is version " + String(plan.version) + "; this runtime reads version " + String(planVersion) + ".");
     return;
@@ -25,4 +35,8 @@ function start(plan: PlanDocument, owner: Owner): void {
       console.error("[alis] the handler of '" + handler.event + "' did not start: " + stopped.reason);
     }
   }
+}
+
+export function slotsNamedBy(plan: PlanDocument): string[] {
+  return Object.values(plan.objects).flatMap((locator) => (locator.kind === "plugin" && locator.name === "alis.slot" ? [locator.key] : []));
 }
