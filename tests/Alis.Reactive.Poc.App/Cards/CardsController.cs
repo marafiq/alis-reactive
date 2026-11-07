@@ -22,6 +22,8 @@ public sealed class CardsController : Controller
 
     public IActionResult Admitted() => View(new CardsWard());
 
+    public IActionResult Bedside() => View(new CardsWard());
+
     public IActionResult Notes(string resident) => PartialView(new CareCard(resident, NotesTitle: "Latest notes"));
 }
 

@@ -18,6 +18,10 @@
     }
 </section>
 
+@(plan.BedsideMonitor("card-monitor", Model.Resident)
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note(Model.Resident + "'s monitor alarmed")))
+
 @(plan.Button("open-notes", "Open the notes")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Get("/Cards/Notes?resident=" + Uri.EscapeDataString(Model.Resident)).Into("card-notes")))

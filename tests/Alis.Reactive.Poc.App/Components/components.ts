@@ -15,7 +15,8 @@ import { OxygenGauges } from "./OxygenGauge/oxygen-gauge";
 import { VisitPlanner } from "./VisitPlanner/visit-planner";
 import { CallLog, type CallLogHost } from "./CallLog/call-log";
 import { WardRadio } from "./WardRadio/ward-radio";
-import { onMount, providePlugin } from "./mount";
+import { BedsideMonitor, type BedsideMonitorHost } from "./BedsideMonitor/bedside-monitor";
+import { onMount, onUnmount, providePlugin } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
   host.careBoard = host.dataset["careboard"] === "2" ? new CareBoardV2(host) : new CareBoardV1(host);
@@ -83,6 +84,14 @@ onMount<DoseCardHost>("[data-dose-card]", (host) => {
 
 onMount<CallLogHost>("[data-call-log]", (host) => {
   host.log = new CallLog(host);
+});
+
+onMount<BedsideMonitorHost>("[data-bedside-monitor]", (host) => {
+  host.monitor = new BedsideMonitor(host);
+});
+
+onUnmount<BedsideMonitorHost>("[data-bedside-monitor]", (host) => {
+  host.monitor?.destroy();
 });
 
 providePlugin("shift-log", new ShiftLog());

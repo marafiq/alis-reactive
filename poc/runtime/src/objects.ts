@@ -17,7 +17,7 @@ function locate(context: Context, id: string): unknown {
   if (locator === undefined) throw new Error("The plan reads the object '" + id + "', which it does not declare.");
   switch (locator.kind) {
     case "element":
-      return onElement(context, locator.id, locator.vendor);
+      return heldOn(context, elementOf(locator.id), locator.vendor);
     case "plugin":
       return plugin(locator.name, locator.key);
     default:
@@ -25,22 +25,57 @@ function locate(context: Context, id: string): unknown {
   }
 }
 
-function onElement(context: Context, id: string, vendorName: string): object {
+interface Source {
+  readonly object: unknown;
+  readonly stillHeld: () => boolean;
+}
+
+function sourceOf(context: Context, id: string): Source {
+  const locator = context.plan.objects[id];
+  if (locator === undefined) throw new Error("The plan listens on the object '" + id + "', which it does not declare.");
+  switch (locator.kind) {
+    case "element": {
+      const element = elementOf(locator.id);
+      const object = heldOn(context, element, locator.vendor);
+      return { object, stillHeld: () => holdsStill(context, element, locator.vendor, object) };
+    }
+    case "plugin":
+      return { object: plugin(locator.name, locator.key), stillHeld: () => true };
+    default:
+      return assertNever(locator);
+  }
+}
+
+function elementOf(id: string): HTMLElement {
   const element = document.getElementById(id);
   if (element === null) throw new Stop("No element has the id '" + id + "'.");
+  return element;
+}
+
+function heldOn(context: Context, element: HTMLElement, vendorName: string): object {
   const vendor = context.plan.vendors[vendorName];
   if (vendor === undefined) throw new Error("The plan names the vendor '" + vendorName + "', which it does not declare.");
   const find = evaluate(vendor.locate, context);
   if (find.kind === "nothing" || typeof find.value !== "function") throw new Error("The vendor '" + vendorName + "' locates its object by no function.");
   const found: unknown = Reflect.apply(find.value, undefined, [element]);
   if (found === null || found === undefined || (typeof found !== "object" && typeof found !== "function")) {
-    throw new Stop("The element '" + id + "' holds no object of the vendor '" + vendorName + "'.");
+    throw new Stop("The element '" + element.id + "' holds no object of the vendor '" + vendorName + "'.");
   }
   return found;
 }
 
+function holdsStill(context: Context, element: HTMLElement, vendorName: string, object: unknown): boolean {
+  try {
+    return heldOn(context, element, vendorName) === object;
+  } catch (stopped) {
+    if (stopped instanceof Stop) return false;
+    throw stopped;
+  }
+}
+
 export function listen(context: Context, handler: Handler, owner: Owner): void {
-  const raiser = walk(value(context.locate(handler.on)), handler.path, "required");
+  const source = sourceOf(context, handler.on);
+  const raiser = walk(value(source.object), handler.path, "required");
   if (raiser.kind === "nothing" || raiser.value === null || typeof raiser.value !== "object") {
     throw new Stop("The object that raises '" + handler.event + "' is not on the page.");
   }
@@ -49,7 +84,10 @@ export function listen(context: Context, handler: Handler, owner: Owner): void {
     if (!refused) run(context, handler, args);
   };
   try {
-    owner.holds(subscribe(raiser.value, listeningOf(context, handler.on), handler.event, listener));
+    const removal = subscribe(raiser.value, listeningOf(context, handler.on), handler.event, listener);
+    owner.holds(() => {
+      if (source.stillHeld()) removal();
+    });
   } catch (stopped) {
     refused = true;
     throw stopped;

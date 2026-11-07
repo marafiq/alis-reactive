@@ -121,6 +121,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - Chosen within the owner's yes, 2026-11-07: POC 14 builds one request, `Get(url).Into(container)`, since a slot
   loads only through a request (D10.11). The gate 1 flag that the approved list holds no request POC is amended to
   name it: a GET whose success body loads a slot, and nothing else of the HTTP module.
+- Chosen within the owner's yes, 2026-11-07, POC 14: a declaration's unsubscribe is looked up with its subscribe when
+  its handler starts, and a handler whose object lacks it, or whose returned subscribe gives back no remover, does not
+  start (the second's listener runs nothing), since no release could remove what it added. Plans start in the order
+  the page holds their scripts. A slot announces the unmount of its content whether or not a plan gave it an owner
+  (D12.3). `HttpSend` is a literal in the POC, which has no `record` node.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

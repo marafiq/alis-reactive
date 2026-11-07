@@ -10,6 +10,14 @@ export function onMount<THost extends HTMLElement>(selector: string, construct: 
   });
 }
 
+export function onUnmount<THost extends HTMLElement>(selector: string, destroy: (host: THost) => void): void {
+  document.addEventListener("alis:unmount", (event) => {
+    const { root } = (event as CustomEvent<MountDetail>).detail;
+    if (root.matches(selector)) destroy(root as THost);
+    for (const host of root.querySelectorAll<THost>(selector)) destroy(host);
+  });
+}
+
 interface ProvidedPlugin {
   readonly name: string;
   readonly instance: unknown;

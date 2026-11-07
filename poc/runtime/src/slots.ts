@@ -38,23 +38,17 @@ function unload(key: string): void {
 }
 
 function releaseWithin(container: HTMLElement, key: string): void {
-  const inside = [...owners.keys()].filter((held) => held !== key && holds(container, held));
-  for (const held of inside.sort((one, other) => afterInTheDocument(one, other))) release(held);
-  release(key);
+  const inside = [...owners.keys()].flatMap((held) => {
+    const element = document.getElementById(held);
+    return held !== key && element !== null && container.contains(element) ? [{ held, element }] : [];
+  });
+  inside.sort((one, other) => (one.element.compareDocumentPosition(other.element) & Node.DOCUMENT_POSITION_FOLLOWING ? 1 : -1));
+  for (const { held, element } of inside) release(held, element);
+  release(key, container);
 }
 
-function holds(container: HTMLElement, key: string): boolean {
-  const element = document.getElementById(key);
-  return element !== null && container.contains(element);
-}
-
-function afterInTheDocument(one: string, other: string): number {
-  const first = containerOf(one);
-  const second = containerOf(other);
-  return first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING ? 1 : -1;
-}
-
-function release(key: string): void {
+function release(key: string, container: HTMLElement): void {
+  document.dispatchEvent(new CustomEvent("alis:unmount", { detail: { root: container } }));
   const owner = owners.get(key);
   if (owner === undefined) return;
   owners.delete(key);
