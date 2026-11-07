@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Conditions;
@@ -18,10 +19,10 @@ internal static class ListOrder
 #endif
     ];
 
-    internal static Operator ComparisonOf<TKey>(LambdaExpression key, TKey? sample, JsonSerializerOptions values)
+    internal static Operator ComparisonOf<TKey>(LambdaExpression key, TKey? sample, JsonSerializerOptions values, CultureInfo culture)
     {
         if (DatesAndTimes.Contains(typeof(TKey))) throw Refused(key, "orders dates or times, whose text does not order as the instant does; order them on the server.", nameof(key));
-        if (typeof(TKey) == typeof(string)) throw Refused(key, "orders text by the culture in .NET, an order net48 and net10 do not share; pass StringComparer.Ordinal, such as OrderBy(d => d.Prescriber, StringComparer.Ordinal), or order on the server.", nameof(key));
+        if (typeof(TKey) == typeof(string)) return TextOrder(key, culture, nameof(key));
         var written = JsonSerializer.SerializeToElement(sample, values.GetTypeInfo(typeof(TKey)));
         return written.ValueKind switch
         {
@@ -33,10 +34,21 @@ internal static class ListOrder
         };
     }
 
-    internal static Operator OrdinalComparison(LambdaExpression key, StringComparer comparer)
+    internal static Operator TextComparison(LambdaExpression key, StringComparer comparer, CultureInfo culture)
     {
-        if (!ReferenceEquals(comparer, StringComparer.Ordinal)) throw Refused(key, "orders text by a comparer the browser does not have; pass StringComparer.Ordinal, or order on the server.", nameof(comparer));
-        return Operator.CompareOrdinal;
+        if (ReferenceEquals(comparer, StringComparer.Ordinal)) return Operator.CompareOrdinal;
+        var ordersByTheViewsCulture = comparer.Equals(StringComparer.Create(culture, ignoreCase: false));
+        if (ordersByTheViewsCulture) return TextOrder(key, culture, nameof(comparer));
+        throw Refused(key, "orders text by a comparer the browser does not have; pass StringComparer.Ordinal, or no comparer to order by the view's culture, or order on the server.", nameof(comparer));
+    }
+
+    private static Operator TextOrder(LambdaExpression key, CultureInfo culture, string argument)
+    {
+        var ordersByCodeUnit = culture.CompareInfo.Compare("a", "B", CompareOptions.None) > 0;
+        if (ordersByCodeUnit) return Operator.CompareOrdinal;
+        var sortsAlternately = !string.Equals(culture.CompareInfo.Name, culture.Name, StringComparison.Ordinal);
+        if (sortsAlternately) throw Refused(key, $"orders text by the alternate sort '{culture.CompareInfo.Name}', which the browser has no tag for; pass StringComparer.Ordinal, or order on the server.", argument);
+        return Operator.CompareCulture;
     }
 
     internal static Plan.Expression Sorted(Plan.Expression items, PlanBuild build, LambdaExpression key, Operator comparison, bool descending)

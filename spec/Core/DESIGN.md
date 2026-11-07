@@ -187,8 +187,9 @@ Terms used throughout:
   - The net48 door N10.6 writes System.Text.Json instead. A text no row of `spec/Core/conversions.md`
     converts to a date reads nothing.
 - D3.11 Culture is the server's, never the browser's (the owner, 2026-11-06). C# writes the view's culture
-  into the plan once: its name, its decimal separator and its group separator. Every culture-dependent
-  conversion in the browser uses it, and none reads the browser's locale:
+  into the plan once: its name, its decimal separator, its group separator and its collation, the tag the
+  browser's collator orders text by (the culture's name, `en` for the invariant culture, D6.13). Every
+  culture-dependent conversion and comparison in the browser uses it, and none reads the browser's locale:
   - An input's text converts to a number as the endpoint's host binds that number's .NET type under the
     view's culture. On net10, a decimal, double or float takes the group separator, an exponent and
     surrounding white space (`probe:core-form-decimal-group`). On net48, it takes `NumberStyles.Float`, which
@@ -585,10 +586,17 @@ Terms used throughout:
   the view renders: a key written as a JSON number compares as numbers (`compareNumbers`), a `bool` puts false first
   (`compareBooleans`), a `char` compares by its code unit (`compareOrdinal`), and null comes first, as
   `Comparer<T>.Default` puts it. A nullable value key binds the overload whose sample is the underlying type's value.
-  Text orders only through `OrderBy(key, StringComparer.Ordinal)`, by UTF-16 code unit as .NET's ordinal comparer
-  does. Text by the culture is refused (X6.27) until the owner decides: .NET's culture order differs between net48
-  (NLS word sort, `co-op` beside `coop`) and net10 (ICU), and between ICU builds on Han ideographs (`spec/NOTES.md`,
-  2026-11-06, Decision 3). A key member the item lacks reads its start first (D4.2), so `OrderBy(d => d.Refills)` sorts a dose the app
+  Text with no comparer, or with the comparer of the view's culture (`StringComparer.CurrentCulture`), orders by
+  the view's culture (Decision 3, a, the owner, 2026-11-06): `compareCulture`, the browser's `Intl.Collator` under
+  the plan's collation (D3.11). It matches .NET 10 on ICU on every word and every BMP character probed outside the
+  Han ideographs, whose order differs between ICU builds, and differs from net48's NLS word sort on hyphens,
+  apostrophes and ligatures (`co-op` beside `coop`) (`spec/NOTES.md`, 2026-11-06). C# reads the view's culture once,
+  where the view renders, and asks .NET how it compares: where .NET orders `"a"` after `"B"` (invariant
+  globalization mode) the text compares by code unit (`compareOrdinal`); a culture with an alternate sort
+  (`de-DE_phoneb`), whose tag the browser does not take on every host, is refused (X6.36). A culture the browser
+  has no collation for (`haw-US`) stops the pipeline at its first comparison, since the browser would otherwise
+  order by its own locale. `OrderBy(key, StringComparer.Ordinal)` orders by UTF-16 code unit, as .NET's ordinal
+  comparer does. A key member the item lacks reads its start first (D4.2), so `OrderBy(d => d.Refills)` sorts a dose the app
   omitted at 0 as 0. A key that reads nothing, past a holder that holds null, or holds a value its comparison does not
   compare, stops the pipeline.
 - D6.14 A list's lambda chooses between values as C# does, each term read only when it is reached (D4.7).
@@ -690,9 +698,11 @@ Terms used throughout:
 - `X6.26` behavior (D6.5): `wards.Contains(d.Ward)` over an array, an enum array written by name, a `List<T>` and
   an array typed as a sequence keeps the items the view lists; `d.Medicine.Contains('o')` finds a letter; a list's
   `Count` and an array's `Length` count their items.
-- `X6.27` refusal (D6.13): a text key with no comparer: "'{key}' orders text by the culture in .NET, an order net48 and
-  net10 do not share; pass StringComparer.Ordinal, such as OrderBy(d => d.Prescriber, StringComparer.Ordinal), or
-  order on the server."
+- `X6.27` behavior (D6.13): a text key with no comparer orders as .NET orders it under the view's culture: en-US and
+  the invariant culture list "DR İNCE" before "Dr Işık", tr-TR lists "Dr Işık" first; `OrderByDescending` reverses the
+  order; `StringComparer.CurrentCulture` orders as no comparer does; in invariant globalization mode the text orders
+  by code unit, as .NET compares it there; under `haw-US`, which the browser has no collation for, the sort and the
+  steps after it do not run.
 - `X6.28` refusal (D6.13): a key the app's JSON writes as text (an enum by name, a number written as text, a `Guid`,
   a `TimeSpan`): "'{key}' orders a value the app's JSON writes as text, which does not order as the value does in
   .NET; order by a member the JSON writes as a number, or order on the server."
@@ -700,8 +710,9 @@ Terms used throughout:
   instant does; order them on the server."
 - `X6.30` refusal (D6.13): an object key: "'{key}' orders objects, which the browser does not order; order by a
   member, such as OrderBy(d => d.Carer.Name, StringComparer.Ordinal)."
-- `X6.31` refusal (D6.13): a comparer other than `StringComparer.Ordinal`: "'{key}' orders text by a comparer the
-  browser does not have; pass StringComparer.Ordinal, or order on the server."
+- `X6.31` refusal (D6.13): a comparer other than `StringComparer.Ordinal` and the view's culture's: "'{key}' orders
+  text by a comparer the browser does not have; pass StringComparer.Ordinal, or no comparer to order by the view's
+  culture, or order on the server."
 - `X6.32` behavior (D6.13): `OrderBy` lists a number key smallest first, a nullable number with null first, a `bool`
   false first and text by code unit with `StringComparer.Ordinal`; `OrderByDescending` lists null last and keeps the
   list order of equal keys.
@@ -715,6 +726,9 @@ Terms used throughout:
   test holds, its second when the test fails or reads nothing, and never reads the branch it does not take.
 - `X6.35` behavior (D6.5): `Contains` over a list the view holds finds null in it, and an item that reads nothing
   reads nothing, so it is not found even in a list that holds null.
+- `X6.36` refusal (D6.13): text ordered by the culture under a culture with an alternate sort: "'{key}' orders text by
+  the alternate sort '{sort}', which the browser has no tag for; pass StringComparer.Ordinal, or order on the
+  server."
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 

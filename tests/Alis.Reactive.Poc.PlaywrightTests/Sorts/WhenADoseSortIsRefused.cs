@@ -4,12 +4,12 @@ namespace Alis.Reactive.Poc.PlaywrightTests.Sorts;
 public sealed class WhenADoseSortIsRefused : AppPageTest
 {
     [Test]
-    public async Task text_ordered_by_the_culture_is_refused_with_the_ordinal_door()
+    public async Task text_ordered_under_a_culture_with_an_alternate_sort_is_refused_with_the_ordinal_door()
     {
-        await Page.GotoAsync(BaseUrl + "/Doses/SortedByCulture");
+        await Page.GotoAsync(BaseUrl + "/Doses/SortedByCulture?culture=de-DE");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "ArgumentException: 'd.Prescriber' orders text by the culture in .NET, an order net48 and net10 do not share; pass StringComparer.Ordinal, such as OrderBy(d => d.Prescriber, StringComparer.Ordinal), or order on the server. (Parameter 'key')");
+            "ArgumentException: 'd.Prescriber' orders text by the alternate sort 'de-DE_phoneb', which the browser has no tag for; pass StringComparer.Ordinal, or order on the server. (Parameter 'key')");
     }
 
     [Test]
@@ -45,6 +45,6 @@ public sealed class WhenADoseSortIsRefused : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Doses/SortedIgnoringCase");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "ArgumentException: 'd.Prescriber' orders text by a comparer the browser does not have; pass StringComparer.Ordinal, or order on the server. (Parameter 'comparer')");
+            "ArgumentException: 'd.Prescriber' orders text by a comparer the browser does not have; pass StringComparer.Ordinal, or no comparer to order by the view's culture, or order on the server. (Parameter 'comparer')");
     }
 }

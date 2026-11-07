@@ -25,7 +25,7 @@ var app = builder.Build();
 
 RequireBuilt(Path.Combine(app.Environment.ContentRootPath, "wwwroot", "js", "alis-poc.js"));
 
-CultureInfo[] cultures = [CultureInfo.InvariantCulture, CultureInfo.GetCultureInfo("en-US"), CultureInfo.GetCultureInfo("tr-TR")];
+CultureInfo[] cultures = [CultureInfo.InvariantCulture, CultureInfo.GetCultureInfo("en-US"), CultureInfo.GetCultureInfo("tr-TR"), CultureInfo.GetCultureInfo("haw-US"), CultureInfo.GetCultureInfo("de-DE_phoneb")];
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(CultureInfo.InvariantCulture),

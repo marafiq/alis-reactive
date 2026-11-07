@@ -112,10 +112,10 @@ public static class DataLists
     }
 
     private static TypedSource<IReadOnlyList<TItem>> Ordered<TItem, TKey>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression key, TKey? sample, bool descending)
-        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListOrder.Sorted(items, build, key, ListOrder.ComparisonOf(key, sample, build.Values), descending));
+        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListOrder.Sorted(items, build, key, ListOrder.ComparisonOf(key, sample, build.Values, build.Culture), descending));
 
     private static TypedSource<IReadOnlyList<TItem>> OrderedText<TItem>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression key, StringComparer comparer, bool descending)
-        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListOrder.Sorted(items, build, key, ListOrder.OrdinalComparison(key, comparer), descending));
+        => Over<TItem, IReadOnlyList<TItem>>(list, (items, build) => ListOrder.Sorted(items, build, key, ListOrder.TextComparison(key, comparer, build.Culture), descending));
 
     private static FnExpression ItemRead(PlanBuild build, LambdaExpression read, string argument)
     {

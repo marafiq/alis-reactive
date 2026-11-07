@@ -4,9 +4,10 @@ namespace Alis.Reactive.Plan;
 
 internal sealed class PlanDocument
 {
-    internal PlanDocument(string planId, IReadOnlyDictionary<string, Vendor> vendors, IReadOnlyDictionary<string, Locator> objects, IReadOnlyList<Handler> handlers)
+    internal PlanDocument(string planId, PlanCulture culture, IReadOnlyDictionary<string, Vendor> vendors, IReadOnlyDictionary<string, Locator> objects, IReadOnlyList<Handler> handlers)
     {
         PlanId = planId;
+        Culture = culture;
         Vendors = vendors;
         Objects = objects;
         Handlers = handlers;
@@ -15,6 +16,8 @@ internal sealed class PlanDocument
     public int Version => 7;
 
     public string PlanId { get; }
+
+    public PlanCulture Culture { get; }
 
     public IReadOnlyDictionary<string, Vendor> Vendors { get; }
 

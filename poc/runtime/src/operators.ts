@@ -1,6 +1,6 @@
-import type { Expression, OperatorExpression } from "./plan";
+import type { Expression, OperatorExpression, PlanCulture } from "./plan";
 import { assertNever, nothing, value, type Read } from "./read";
-import { sortOrder } from "./orders";
+import { cultureOrder, sortOrder } from "./orders";
 import { decimalSum, doubleSum, intSum } from "./sums";
 import { lower, nullOrEmpty, tested, trimmed, upper } from "./text";
 
@@ -8,7 +8,7 @@ type Evaluate = (argument: Expression) => Read;
 
 type Ordered = number | string;
 
-export function operate(expression: OperatorExpression, evaluate: Evaluate): Read {
+export function operate(expression: OperatorExpression, evaluate: Evaluate, culture: PlanCulture): Read {
   const args = expression.args;
   switch (expression.op) {
     case "eq":
@@ -69,6 +69,8 @@ export function operate(expression: OperatorExpression, evaluate: Evaluate): Rea
       return sortOrder(evaluate(first(args)), evaluate(second(args)), "ordinal");
     case "compareBooleans":
       return sortOrder(evaluate(first(args)), evaluate(second(args)), "booleans");
+    case "compareCulture":
+      return cultureOrder(evaluate(first(args)), evaluate(second(args)), culture.collation);
     case "coalesce":
       return coalesced(args, evaluate);
     case "cond":

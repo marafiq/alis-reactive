@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using Alis.Reactive.Plan;
 using Alis.Reactive.Types;
@@ -22,6 +23,7 @@ internal sealed class PlanBuild
         values.MakeReadOnly(populateMissingResolver: true);
         Values = values;
         Starts = new DataStarts(values);
+        Culture = CultureInfo.CurrentCulture;
     }
 
     internal string PlanId { get; }
@@ -29,6 +31,8 @@ internal sealed class PlanBuild
     internal JsonSerializerOptions Values { get; }
 
     internal DataStarts Starts { get; }
+
+    internal CultureInfo Culture { get; }
 
     internal void Write(Statement statement)
     {
@@ -63,7 +67,7 @@ internal sealed class PlanBuild
         return block;
     }
 
-    internal string ItemName() => "item" + (++_items).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    internal string ItemName() => "item" + (++_items).ToString(CultureInfo.InvariantCulture);
 
     internal TRead ReadingItems<TRead>(Func<TRead> read)
     {
@@ -99,5 +103,11 @@ internal sealed class PlanBuild
 
     internal void Add(Handler handler) => _handlers.Add(handler);
 
-    internal PlanDocument Document() => new(PlanId, _vendors, _objects, _handlers);
+    internal PlanDocument Document() => new(PlanId, new PlanCulture(CollationOf(Culture)), _vendors, _objects, _handlers);
+
+    private static string CollationOf(CultureInfo culture)
+    {
+        var isTheInvariantCulture = culture.Name.Length == 0;
+        return isTheInvariantCulture ? "en" : culture.Name;
+    }
 }

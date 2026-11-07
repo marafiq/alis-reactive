@@ -80,7 +80,7 @@ export interface ObjectExpression {
   readonly id: string;
 }
 
-export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not" | "trim" | "trimStart" | "trimEnd" | "upperInvariant" | "lowerInvariant" | "upper" | "lower" | "upperTurkic" | "lowerTurkic" | "contains" | "startsWith" | "endsWith" | "nullOrEmpty" | "includes" | "sumInt" | "sumDouble" | "sumDecimal" | "compareNumbers" | "compareOrdinal" | "compareBooleans" | "coalesce" | "cond" | "nullableValue";
+export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not" | "trim" | "trimStart" | "trimEnd" | "upperInvariant" | "lowerInvariant" | "upper" | "lower" | "upperTurkic" | "lowerTurkic" | "contains" | "startsWith" | "endsWith" | "nullOrEmpty" | "includes" | "sumInt" | "sumDouble" | "sumDecimal" | "compareNumbers" | "compareOrdinal" | "compareBooleans" | "compareCulture" | "coalesce" | "cond" | "nullableValue";
 
 export interface OperatorExpression {
   readonly kind: "op";
@@ -90,9 +90,14 @@ export interface OperatorExpression {
 
 export type PathStep = string | number;
 
+export interface PlanCulture {
+  readonly collation: string;
+}
+
 export interface PlanDocument {
   readonly version: number;
   readonly planId: string;
+  readonly culture: PlanCulture;
   readonly vendors: { readonly [key: string]: Vendor };
   readonly objects: { readonly [key: string]: Locator };
   readonly handlers: readonly Handler[];

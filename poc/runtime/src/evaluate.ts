@@ -26,7 +26,7 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "fn":
       return value(callable(expression.params, expression.body, context));
     case "op":
-      return operate(expression, (argument) => evaluate(argument, context));
+      return operate(expression, (argument) => evaluate(argument, context), context.plan.culture);
     default:
       return assertNever(expression);
   }

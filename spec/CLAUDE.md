@@ -180,6 +180,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   with no public parameterless constructor (a positional record), so on net48 the browser reads a start that endpoint
   would not bind. One meaning on both hosts is the framework absorbing the host difference; a form's check still
   follows the endpoint that binds its body, by host (D16.6). The owner can overrule it.
+- Chosen within Decision 3 (a), 2026-11-06: the plan carries the collation once, in its culture (D3.11), and C# picks
+  each sort's comparison from how .NET compares under the view's culture: `"a"` after `"B"` is invariant globalization
+  mode, ordered by code unit; a culture whose sort is an alternate one ("de-DE_phoneb") is refused, because .NET's
+  order for it is not one order across hosts (on macOS .NET 10 orders it as "de-DE") and the browser's tag for it is
+  not certain; `StringComparer.CurrentCulture` orders as no comparer does. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
