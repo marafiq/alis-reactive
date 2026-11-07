@@ -349,14 +349,14 @@
         "Ownership": {
           "Ownership.cfg": {
             "green": true,
-            "hash": "2d249cdf2fec578585772682436e3195f2a77a8edfdcac917d1927fd1474a477",
+            "hash": "14dc837e878346328f16019ce7bc353ebabf2c72b65ff2b397d5a1bf9dd61926",
             "line": "Model checking completed. No error has been found.",
-            "states": "288 states generated, 94 distinct states found, 0 states left on queue.",
+            "states": "6425 states generated, 1300 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Ownership.violates.BootContentBelongsToItsSlot.cfg": {
             "green": false,
-            "hash": "d42c05fd452fc09b856e5a09088b27b7783766c3a475a4230e7e96ee158305bc",
+            "hash": "230571e283e0a0fbedc8df4c38c74c636f3363b584c299f6713054dab04de15e",
             "line": "violated: BootContentBelongsToItsSlot",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -365,7 +365,7 @@
           },
           "Ownership.violates.EveryLoadedFieldRegistered.cfg": {
             "green": false,
-            "hash": "037412e0d1491fba7331e026834ee7314dd3390d00ac4bc5e9a1de42e499253b",
+            "hash": "e4402c01e281aaf64fbdc51c50b764ae4b728befc0ae1a9aa95bea602b197f52",
             "line": "violated: EveryLoadedFieldRegistered",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -374,79 +374,124 @@
           },
           "Ownership.violates.HubKeptWhileHeld.cfg": {
             "green": false,
-            "hash": "34fa280f4bc66921d8accf2d376cedac21dfdf5ee6cf494ab2e0e3ab69fcbf1a",
+            "hash": "fd2039151f2c1ccd8ace8a273e77fe0caa5c2b8aba261390ed1e146bc744cccf",
             "line": "violated: HubKeptWhileHeld",
-            "states": "154 states generated, 77 distinct states found, 9 states left on queue.",
+            "states": "267 states generated, 155 distinct states found, 90 states left on queue.",
             "violated": [
               "HubKeptWhileHeld"
             ]
           },
+          "Ownership.violates.ListenLeavesWithItsOwner.cfg": {
+            "green": false,
+            "hash": "f9d029f7dcd9255395f3248fd1043a1a5a3e7f84883ed801d00b5225d8408e60",
+            "line": "violated: ListenLeavesWithItsOwner",
+            "states": "123 states generated, 95 distinct states found, 66 states left on queue.",
+            "violated": [
+              "ListenLeavesWithItsOwner"
+            ]
+          },
+          "Ownership.violates.ListenOncePerObject.cfg": {
+            "green": false,
+            "hash": "f8f774a26107f8eac47356d2c2454a51dd408919536979968e614d4949e442b5",
+            "line": "violated: ListenOncePerObject",
+            "states": "230 states generated, 143 distinct states found, 91 states left on queue.",
+            "violated": [
+              "ListenOncePerObject"
+            ]
+          },
           "Ownership.violates.ListenersDoNotAccumulate.cfg": {
             "green": false,
-            "hash": "a7fe8571b81f3dee0851cde1e56da4c6e6f1694a9a402dcce0f0e37d4cfd6559",
+            "hash": "f665bdcf9f3459b1e22d939af8b89625d3542e54ce9a8e0b1f63e2a30e3b2f62",
             "line": "violated: ListenersDoNotAccumulate",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
               "ListenersDoNotAccumulate"
             ]
           },
+          "Ownership.violates.NoRemoveOnCollected.cfg": {
+            "green": false,
+            "hash": "ade30ecc66952b0f1523ce1525cbbfc9659e45fe121dfa6ccc2d302da2b86b8b",
+            "line": "violated: NoRemoveOnCollected",
+            "states": "360 states generated, 189 distinct states found, 123 states left on queue.",
+            "violated": [
+              "NoRemoveOnCollected"
+            ]
+          },
           "Ownership.violates.NoSlotOutlivesItsContainer.cfg": {
             "green": false,
-            "hash": "8a3f8fbeee4d398b745084fc30e7938aa01a9bfb4b62b52c3489ec10cf82e7c2",
+            "hash": "b24a4f661595ee43ea965c508ea461bc8a9340e7349474b723e672b3ab16221c",
             "line": "violated: NoSlotOutlivesItsContainer",
-            "states": "110 states generated, 57 distinct states found, 4 states left on queue.",
+            "states": "247 states generated, 134 distinct states found, 73 states left on queue.",
             "violated": [
               "NoSlotOutlivesItsContainer"
             ]
           },
           "Ownership.violates.NoUnsubscribeOnDestroyed.cfg": {
             "green": false,
-            "hash": "4183fde177d26eeba8c911bc0815aa2e5c843670a91d3372f1b4ed5709274bc0",
+            "hash": "aba08cfeace63dc696d15a7d389c64220f872c72d936950688ed68f9a28ddc12",
             "line": "violated: NoUnsubscribeOnDestroyed",
-            "states": "143 states generated, 67 distinct states found, 7 states left on queue.",
+            "states": "268 states generated, 148 distinct states found, 85 states left on queue.",
             "violated": [
               "NoUnsubscribeOnDestroyed"
             ]
           },
           "Ownership.violates.OfferOnlyWhileHeld.cfg": {
             "green": false,
-            "hash": "7210b760411bc0a1627aea841ffff9f995d35be395646c2e06556582e8429abe",
+            "hash": "f0790ce3a97cfb4d759eb07822b29309a1684edb630f8328c747f1e18d436830",
             "line": "violated: OfferOnlyWhileHeld",
-            "states": "136 states generated, 89 distinct states found, 24 states left on queue.",
+            "states": "238 states generated, 154 distinct states found, 100 states left on queue.",
             "violated": [
               "OfferOnlyWhileHeld"
             ]
           },
+          "Ownership.violates.ReachCollectedWhileListened.cfg": {
+            "green": false,
+            "hash": "38b8015fead4d470171311c985931704ff8c736f07c50bb7e92805e53231c105",
+            "line": "violated: ReachCollectedWhileListened",
+            "states": "193 states generated, 118 distinct states found, 72 states left on queue.",
+            "violated": [
+              "ReachCollectedWhileListened"
+            ]
+          },
           "Ownership.violates.ReachDestroyedThenReleased.cfg": {
             "green": false,
-            "hash": "663600c570902cd5b134200bf87d0756cfd42d94ae97b6117ff9313c84fb0a8d",
+            "hash": "b31739135f2853889e163f80e41447ef00760dbe67bfd882ab12224bb6f32af0",
             "line": "violated: ReachDestroyedThenReleased",
-            "states": "184 states generated, 69 distinct states found, 0 states left on queue.",
+            "states": "462 states generated, 222 distinct states found, 133 states left on queue.",
             "violated": [
               "ReachDestroyedThenReleased"
             ]
           },
+          "Ownership.violates.ReachEachObjectListened.cfg": {
+            "green": false,
+            "hash": "d771dc619c8d7b67eccb8dca2b556c3718f729e09dee555346f1804e85bec38a",
+            "line": "violated: ReachEachObjectListened",
+            "states": "228 states generated, 131 distinct states found, 85 states left on queue.",
+            "violated": [
+              "ReachEachObjectListened"
+            ]
+          },
           "Ownership.violates.ReachNestedReleased.cfg": {
             "green": false,
-            "hash": "a94d38534bf9cd18478455a343c786f5b40960ed9011cc87f57fbc6ac55a8cb9",
+            "hash": "5c1643d98f99326208d9939aa3fe3f4fbc0b25a1b8761cfafe7a190b45ac9fa1",
             "line": "violated: ReachNestedReleased",
-            "states": "87 states generated, 52 distinct states found, 7 states left on queue.",
+            "states": "261 states generated, 144 distinct states found, 81 states left on queue.",
             "violated": [
               "ReachNestedReleased"
             ]
           },
           "Ownership.violates.ReachSharedHubOneReleased.cfg": {
             "green": false,
-            "hash": "27e38f5840f0e44ee1639013f56cfb40acdc2eff0149b7dd25b5e5f0bdeed013",
+            "hash": "ebd29b29eeaa4b49932309abb61c1aa7e83a081e3585b51615226265d3e0cc94",
             "line": "violated: ReachSharedHubOneReleased",
-            "states": "159 states generated, 78 distinct states found, 14 states left on queue.",
+            "states": "527 states generated, 232 distinct states found, 131 states left on queue.",
             "violated": [
               "ReachSharedHubOneReleased"
             ]
           },
           "Ownership.violates.RegistrationsDoNotAccumulate.cfg": {
             "green": false,
-            "hash": "4fcf5a81f64f153e681faa3275225f91ff0d5f2f14332ee33e8633d23e5cdc99",
+            "hash": "1ba4d571b38bc601f1a4fdb171cfbad4b0c033e7991d64f2334c07ae1be1eb27",
             "line": "violated: RegistrationsDoNotAccumulate",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -455,7 +500,7 @@
           },
           "Ownership.violates.RulesLeaveWithTheirOwner.cfg": {
             "green": false,
-            "hash": "7683a38e07197d76d9e9fe232d6895b9d7f12587e8b2c7d69835e7262cef7b41",
+            "hash": "1c45ceae08c052a2ad5f4729ed7f3c6cb15d8667820d6260161e43ef2415d436",
             "line": "violated: RulesLeaveWithTheirOwner",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -1121,14 +1166,14 @@
         "Ownership": {
           "Ownership.cfg": {
             "green": true,
-            "hash": "2d249cdf2fec578585772682436e3195f2a77a8edfdcac917d1927fd1474a477",
+            "hash": "14dc837e878346328f16019ce7bc353ebabf2c72b65ff2b397d5a1bf9dd61926",
             "line": "Model checking completed. No error has been found.",
-            "states": "288 states generated, 94 distinct states found, 0 states left on queue.",
+            "states": "6425 states generated, 1300 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Ownership.violates.BootContentBelongsToItsSlot.cfg": {
             "green": false,
-            "hash": "d42c05fd452fc09b856e5a09088b27b7783766c3a475a4230e7e96ee158305bc",
+            "hash": "230571e283e0a0fbedc8df4c38c74c636f3363b584c299f6713054dab04de15e",
             "line": "violated: BootContentBelongsToItsSlot",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -1137,7 +1182,7 @@
           },
           "Ownership.violates.EveryLoadedFieldRegistered.cfg": {
             "green": false,
-            "hash": "037412e0d1491fba7331e026834ee7314dd3390d00ac4bc5e9a1de42e499253b",
+            "hash": "e4402c01e281aaf64fbdc51c50b764ae4b728befc0ae1a9aa95bea602b197f52",
             "line": "violated: EveryLoadedFieldRegistered",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -1146,79 +1191,124 @@
           },
           "Ownership.violates.HubKeptWhileHeld.cfg": {
             "green": false,
-            "hash": "34fa280f4bc66921d8accf2d376cedac21dfdf5ee6cf494ab2e0e3ab69fcbf1a",
+            "hash": "fd2039151f2c1ccd8ace8a273e77fe0caa5c2b8aba261390ed1e146bc744cccf",
             "line": "violated: HubKeptWhileHeld",
-            "states": "154 states generated, 77 distinct states found, 9 states left on queue.",
+            "states": "267 states generated, 155 distinct states found, 90 states left on queue.",
             "violated": [
               "HubKeptWhileHeld"
             ]
           },
+          "Ownership.violates.ListenLeavesWithItsOwner.cfg": {
+            "green": false,
+            "hash": "f9d029f7dcd9255395f3248fd1043a1a5a3e7f84883ed801d00b5225d8408e60",
+            "line": "violated: ListenLeavesWithItsOwner",
+            "states": "123 states generated, 95 distinct states found, 66 states left on queue.",
+            "violated": [
+              "ListenLeavesWithItsOwner"
+            ]
+          },
+          "Ownership.violates.ListenOncePerObject.cfg": {
+            "green": false,
+            "hash": "f8f774a26107f8eac47356d2c2454a51dd408919536979968e614d4949e442b5",
+            "line": "violated: ListenOncePerObject",
+            "states": "230 states generated, 143 distinct states found, 91 states left on queue.",
+            "violated": [
+              "ListenOncePerObject"
+            ]
+          },
           "Ownership.violates.ListenersDoNotAccumulate.cfg": {
             "green": false,
-            "hash": "a7fe8571b81f3dee0851cde1e56da4c6e6f1694a9a402dcce0f0e37d4cfd6559",
+            "hash": "f665bdcf9f3459b1e22d939af8b89625d3542e54ce9a8e0b1f63e2a30e3b2f62",
             "line": "violated: ListenersDoNotAccumulate",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
               "ListenersDoNotAccumulate"
             ]
           },
+          "Ownership.violates.NoRemoveOnCollected.cfg": {
+            "green": false,
+            "hash": "ade30ecc66952b0f1523ce1525cbbfc9659e45fe121dfa6ccc2d302da2b86b8b",
+            "line": "violated: NoRemoveOnCollected",
+            "states": "360 states generated, 189 distinct states found, 123 states left on queue.",
+            "violated": [
+              "NoRemoveOnCollected"
+            ]
+          },
           "Ownership.violates.NoSlotOutlivesItsContainer.cfg": {
             "green": false,
-            "hash": "8a3f8fbeee4d398b745084fc30e7938aa01a9bfb4b62b52c3489ec10cf82e7c2",
+            "hash": "b24a4f661595ee43ea965c508ea461bc8a9340e7349474b723e672b3ab16221c",
             "line": "violated: NoSlotOutlivesItsContainer",
-            "states": "110 states generated, 57 distinct states found, 4 states left on queue.",
+            "states": "247 states generated, 134 distinct states found, 73 states left on queue.",
             "violated": [
               "NoSlotOutlivesItsContainer"
             ]
           },
           "Ownership.violates.NoUnsubscribeOnDestroyed.cfg": {
             "green": false,
-            "hash": "4183fde177d26eeba8c911bc0815aa2e5c843670a91d3372f1b4ed5709274bc0",
+            "hash": "aba08cfeace63dc696d15a7d389c64220f872c72d936950688ed68f9a28ddc12",
             "line": "violated: NoUnsubscribeOnDestroyed",
-            "states": "143 states generated, 67 distinct states found, 7 states left on queue.",
+            "states": "268 states generated, 148 distinct states found, 85 states left on queue.",
             "violated": [
               "NoUnsubscribeOnDestroyed"
             ]
           },
           "Ownership.violates.OfferOnlyWhileHeld.cfg": {
             "green": false,
-            "hash": "7210b760411bc0a1627aea841ffff9f995d35be395646c2e06556582e8429abe",
+            "hash": "f0790ce3a97cfb4d759eb07822b29309a1684edb630f8328c747f1e18d436830",
             "line": "violated: OfferOnlyWhileHeld",
-            "states": "136 states generated, 89 distinct states found, 24 states left on queue.",
+            "states": "238 states generated, 154 distinct states found, 100 states left on queue.",
             "violated": [
               "OfferOnlyWhileHeld"
             ]
           },
+          "Ownership.violates.ReachCollectedWhileListened.cfg": {
+            "green": false,
+            "hash": "38b8015fead4d470171311c985931704ff8c736f07c50bb7e92805e53231c105",
+            "line": "violated: ReachCollectedWhileListened",
+            "states": "193 states generated, 118 distinct states found, 72 states left on queue.",
+            "violated": [
+              "ReachCollectedWhileListened"
+            ]
+          },
           "Ownership.violates.ReachDestroyedThenReleased.cfg": {
             "green": false,
-            "hash": "663600c570902cd5b134200bf87d0756cfd42d94ae97b6117ff9313c84fb0a8d",
+            "hash": "b31739135f2853889e163f80e41447ef00760dbe67bfd882ab12224bb6f32af0",
             "line": "violated: ReachDestroyedThenReleased",
-            "states": "184 states generated, 69 distinct states found, 0 states left on queue.",
+            "states": "462 states generated, 222 distinct states found, 133 states left on queue.",
             "violated": [
               "ReachDestroyedThenReleased"
             ]
           },
+          "Ownership.violates.ReachEachObjectListened.cfg": {
+            "green": false,
+            "hash": "d771dc619c8d7b67eccb8dca2b556c3718f729e09dee555346f1804e85bec38a",
+            "line": "violated: ReachEachObjectListened",
+            "states": "228 states generated, 131 distinct states found, 85 states left on queue.",
+            "violated": [
+              "ReachEachObjectListened"
+            ]
+          },
           "Ownership.violates.ReachNestedReleased.cfg": {
             "green": false,
-            "hash": "a94d38534bf9cd18478455a343c786f5b40960ed9011cc87f57fbc6ac55a8cb9",
+            "hash": "5c1643d98f99326208d9939aa3fe3f4fbc0b25a1b8761cfafe7a190b45ac9fa1",
             "line": "violated: ReachNestedReleased",
-            "states": "87 states generated, 52 distinct states found, 7 states left on queue.",
+            "states": "261 states generated, 144 distinct states found, 81 states left on queue.",
             "violated": [
               "ReachNestedReleased"
             ]
           },
           "Ownership.violates.ReachSharedHubOneReleased.cfg": {
             "green": false,
-            "hash": "27e38f5840f0e44ee1639013f56cfb40acdc2eff0149b7dd25b5e5f0bdeed013",
+            "hash": "ebd29b29eeaa4b49932309abb61c1aa7e83a081e3585b51615226265d3e0cc94",
             "line": "violated: ReachSharedHubOneReleased",
-            "states": "159 states generated, 78 distinct states found, 14 states left on queue.",
+            "states": "527 states generated, 232 distinct states found, 131 states left on queue.",
             "violated": [
               "ReachSharedHubOneReleased"
             ]
           },
           "Ownership.violates.RegistrationsDoNotAccumulate.cfg": {
             "green": false,
-            "hash": "4fcf5a81f64f153e681faa3275225f91ff0d5f2f14332ee33e8633d23e5cdc99",
+            "hash": "1ba4d571b38bc601f1a4fdb171cfbad4b0c033e7991d64f2334c07ae1be1eb27",
             "line": "violated: RegistrationsDoNotAccumulate",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -1227,7 +1317,7 @@
           },
           "Ownership.violates.RulesLeaveWithTheirOwner.cfg": {
             "green": false,
-            "hash": "7683a38e07197d76d9e9fe232d6895b9d7f12587e8b2c7d69835e7262cef7b41",
+            "hash": "1c45ceae08c052a2ad5f4729ed7f3c6cb15d8667820d6260161e43ef2415d436",
             "line": "violated: RulesLeaveWithTheirOwner",
             "states": "2 states generated, 2 distinct states found, 0 states left on queue.",
             "violated": [
@@ -1777,7 +1867,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "4e7dddc24996b18a584928dae79a4cd114b2ddbb",
+  "read_at_head": "1efbc4709534d2e5ff5abd346332fbbfa5449a18",
   "step": {
     "failing": [
       "gate1"
