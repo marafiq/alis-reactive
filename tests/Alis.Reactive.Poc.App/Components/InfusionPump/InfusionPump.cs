@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Components;
 using Alis.Reactive.Hosting;
 using Alis.Reactive.Values;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/InfusionPump/infusion-pump", "CurrentInfusionPump")]
 public sealed class InfusionPump : Component
 {
     public static ComponentVendor PumpVendor { get; } = ComponentVendor.Define("pump", objectPath: "pump", subscribe: "addEventListener", unsubscribe: "removeEventListener");
@@ -16,8 +18,10 @@ public sealed class InfusionPump : Component
 
     public void Prime() => Method();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS017", Justification = "Drift on purpose: a_method_declared_to_return_nothing_that_returns_a_promise_stops_the_pipeline_before_its_next_step proves the browser stops on it.")]
     public void Calibrate() => Method();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS018", Justification = "Drift on purpose: a_declared_method_the_pump_holds_as_text_stops_the_pipeline_before_its_next_step proves the browser stops on it.")]
     public void Alarm() => Method();
 
     public void SetRate(Arg<decimal> volume, Arg<string> unit) => Method([volume, unit]);
@@ -34,6 +38,7 @@ public sealed class InfusionPump : Component
 
     public MethodResult<decimal> RateFor(Arg<string> medicine) => Method<decimal>([medicine]);
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS017", Justification = "Drift on purpose: a_method_declared_to_return_a_value_that_returns_a_promise_stops_the_pipeline_before_it_writes_the_value proves the browser stops on it.")]
     public MethodResult<decimal> Reading() => Method<decimal>();
 
     public void SelfTest() => MethodAsync();

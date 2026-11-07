@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/WardPicker/ward-picker", "WardPicker")]
 public sealed class WardPicker : Component
 {
     public static ComponentVendor PickerVendor { get; } = ComponentVendor.Define("ward", objectPath: "picker", subscribe: "addEventListener", unsubscribe: "removeEventListener");

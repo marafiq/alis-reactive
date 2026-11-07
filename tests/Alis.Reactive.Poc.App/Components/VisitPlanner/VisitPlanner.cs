@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Components;
 using Alis.Reactive.Values;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/VisitPlanner/visit-planner", "VisitPlanner")]
 public sealed class VisitPlanner : Plugin
 {
     public VisitPlanner()
@@ -34,8 +36,10 @@ public sealed class VisitPlanner : Plugin
 
     public MethodResult<PlannedVisit> Suggest() => Method<PlannedVisit>();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS016", Justification = "Drift on purpose: a_dictionary_of_dates_written_into_a_live_member_is_refused_where_the_view_renders refuses the call before the browser makes it.")]
     public void PlanDays(Arg<IReadOnlyDictionary<string, DateTime>> days) => Method([days]);
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS016", Justification = "Drift on purpose: a_value_holding_its_own_type_and_a_date_written_into_a_live_member_is_refused_where_the_view_renders refuses the call before the browser makes it.")]
     public void PlanFamily(Arg<FamilyVisit> visit) => Method([visit]);
 }
 

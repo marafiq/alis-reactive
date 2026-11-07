@@ -36,6 +36,8 @@ public sealed class Property<TValue> : ReadOnly<TValue>
     public void Set(TValue value) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build)));
 
     public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+
+    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
 }
 
 public sealed class WriteOnly<TValue>
@@ -52,6 +54,19 @@ public sealed class WriteOnly<TValue>
     public void Set(TValue value) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, _owner.Binding.Build)));
 
     public void Set(ITypedSource<TValue> source) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+
+    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+}
+
+public static class NullableWrites
+{
+    public static void Set<TValue>(this Property<TValue?> property, ITypedSource<TValue> source)
+        where TValue : struct
+        => property.Widen(source);
+
+    public static void Set<TValue>(this WriteOnly<TValue?> member, ITypedSource<TValue> source)
+        where TValue : struct
+        => member.Widen(source);
 }
 
 internal static class Assign

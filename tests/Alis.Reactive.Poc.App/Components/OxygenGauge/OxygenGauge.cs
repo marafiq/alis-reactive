@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/OxygenGauge/oxygen-gauge", "OxygenGauge")]
 public sealed class OxygenGauge : Component
 {
     public static ComponentVendor GaugeVendor { get; } = ComponentVendor.Define("oxygengauge", VendorLookup.ByPlugin("oxygen-gauges"), subscribe: "on", unsubscribe: "off");

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("lib.dom", "HTMLButtonElement")]
 public sealed class NativeButton : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;

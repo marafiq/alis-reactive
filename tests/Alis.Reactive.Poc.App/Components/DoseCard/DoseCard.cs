@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/DoseCard/dose-card", "DoseCard")]
 public sealed class DoseCard : Component
 {
     public static ComponentVendor CardVendor { get; } = ComponentVendor.Define("dose-card", objectPath: "card", subscribe: "addEventListener", unsubscribe: "removeEventListener");
 
     public override ComponentVendor Vendor => CardVendor;
 
-    public Property<decimal> Value => Property<decimal>();
+    public Property<decimal?> Value => Property<decimal?>();
 
     public Event Change => Event();
 }

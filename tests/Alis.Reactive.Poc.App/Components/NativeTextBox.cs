@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("lib.dom", "HTMLInputElement")]
 public sealed class NativeTextBox : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;

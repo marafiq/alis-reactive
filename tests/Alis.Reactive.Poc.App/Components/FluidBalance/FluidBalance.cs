@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/FluidBalance/fluid-balance", "FluidBalance")]
 public sealed class FluidBalance : Component
 {
     public static ComponentVendor BalanceVendor { get; } = ComponentVendor.Define("fluid", objectPath: "balance", subscribe: "addEventListener", unsubscribe: "removeEventListener");

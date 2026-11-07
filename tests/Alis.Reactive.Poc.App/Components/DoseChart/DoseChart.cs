@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/DoseChart/dose-chart", "DoseChart")]
 public sealed class DoseChart : Component
 {
     public static ComponentVendor ChartVendor { get; } = ComponentVendor.Define("dosechart", objectPath: "chart", subscribe: "on", unsubscribe: "off");

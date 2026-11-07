@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Components;
 using Alis.Reactive.Values;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/ShiftPlugins/shift-plugins", "ShiftLog")]
 public sealed class ShiftLog : Plugin
 {
     public ShiftLog()
@@ -30,6 +32,7 @@ public sealed class ShiftNoted : JsObject
 
 public sealed record NotedDetail(string Note, int Count);
 
+[Mirrors("Components/ShiftPlugins/shift-plugins", "initials")]
 public sealed class Initials : Plugin
 {
     public Initials()
@@ -40,6 +43,7 @@ public sealed class Initials : Plugin
     public MethodResult<string> Of(Arg<string> name) => CallItself<string>([name]);
 }
 
+[Mirrors("Components/ShiftPlugins/shift-plugins", "NightClock")]
 public sealed class NightClock : Plugin
 {
     public NightClock()
@@ -57,6 +61,7 @@ public sealed class ClockStruck : JsObject
     public ReadOnly<string> Hour => ReadOnly<string>();
 }
 
+[Mirrors("Components/ShiftPlugins/shift-plugins", "BedStore")]
 public sealed class BedStore : Plugin
 {
     public BedStore()
@@ -74,6 +79,7 @@ public sealed class BedTaken : JsObject
     public ReadOnly<string> Bed => ReadOnly<string>();
 }
 
+[Mirrors("Components/ShiftPlugins/shift-plugins", "VisitorBook")]
 public sealed class VisitorBook : Plugin
 {
     public VisitorBook()
@@ -95,6 +101,7 @@ public sealed class BookSigned : JsObject
 
 public sealed record SignedDetail(string Visitor);
 
+[SuppressMessage("Alis.Reactive.Contract", "ALIS014", Justification = "Drift on purpose: a_plugin_provided_as_a_number_stops_each_step_that_reads_a_member_a_number_lacks gives the page a number, which no TypeScript type declares.")]
 public sealed class WardLantern : Plugin
 {
     public WardLantern()
@@ -105,6 +112,7 @@ public sealed class WardLantern : Plugin
     public ReadOnly<string> Colour => ReadOnly<string>();
 }
 
+[SuppressMessage("Alis.Reactive.Contract", "ALIS014", Justification = "Drift on purpose: a_plugin_named_with_a_dot_is_refused_where_the_view_renders refuses it before any script could provide it.")]
 public sealed class DottedLog : Plugin
 {
     public DottedLog()

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/WardSignals/ward-signals", "CallBell")]
 public sealed class CallBell : Component
 {
     public static ComponentVendor BellVendor { get; } = ComponentVendor.DefineCallbackProperties("callbell", objectPath: "bell");
@@ -20,6 +21,7 @@ public sealed class BellRing : JsObject
     public ReadOnly<string> Room => ReadOnly<string>();
 }
 
+[Mirrors("Components/WardSignals/ward-signals", "WardFeed")]
 public sealed class WardFeed : Component
 {
     public static ComponentVendor FeedVendor { get; } = ComponentVendor.DefineReturnedUnsubscriber("wardfeed", objectPath: "feed", subscribe: "subscribe");
@@ -34,6 +36,7 @@ public sealed class FeedUpdate : JsObject
     public ReadOnly<string> Message => ReadOnly<string>();
 }
 
+[Mirrors("lib.dom", "HTMLElement")]
 public sealed class BedBoard : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;
@@ -48,6 +51,7 @@ public sealed class BedAssigned : JsObject
 
 public sealed record BedDetail(string Bed);
 
+[Mirrors("Components/WardSignals/ward-signals", "MedicineSearch")]
 public sealed class MedicineSearch : Component
 {
     public static ComponentVendor SearchVendor { get; } = ComponentVendor.Define("medsearch", objectPath: "search", subscribe: "on", unsubscribe: "off");

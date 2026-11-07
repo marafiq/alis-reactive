@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/VitalsMonitor/vitals-monitor", "VitalsMonitor")]
 public sealed class VitalsMonitor : Component
 {
     public static ComponentVendor MonitorVendor { get; } = ComponentVendor.Define("monitor", objectPath: "monitor", subscribe: "on", unsubscribe: "off");

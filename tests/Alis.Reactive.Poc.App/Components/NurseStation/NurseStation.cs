@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/NurseStation/nurse-station", "NurseStation")]
 public sealed class NurseStation : Component
 {
     public static ComponentVendor StationVendor { get; } = ComponentVendor.Define("station", objectPath: "station", subscribe: "addEventListener", unsubscribe: "removeEventListener");

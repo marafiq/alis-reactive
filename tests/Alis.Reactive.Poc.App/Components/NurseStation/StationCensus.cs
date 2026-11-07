@@ -5,27 +5,28 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/NurseStation/nurse-station", "StationCensus")]
 public sealed class StationCensus : Component
 {
     public static ComponentVendor CensusVendor { get; } = ComponentVendor.Define("census", objectPath: "census", subscribe: "addEventListener", unsubscribe: "removeEventListener");
 
     public override ComponentVendor Vendor => CensusVendor;
 
-    public Property<int> Count => Property<int>();
+    public Property<int?> Count => Property<int?>();
 
-    public Property<decimal> Charges => Property<decimal>();
+    public Property<decimal?> Charges => Property<decimal?>();
 
-    public Property<double> Volume => Property<double>();
+    public Property<double?> Volume => Property<double?>();
 
     public Property<IReadOnlyList<string>> Names => Property<IReadOnlyList<string>>();
 
     public Property<IReadOnlyList<int>> Counts => Property<IReadOnlyList<int>>();
 
-    public Property<bool> Answer => Property<bool>();
+    public Property<bool?> Answer => Property<bool?>();
 
-    public Property<string> Lead => Property<string>();
+    public Property<string?> Lead => Property<string?>();
 
-    public Property<CareRound> NextRound => Property<CareRound>();
+    public Property<CareRound?> NextRound => Property<CareRound?>();
 }
 
 public static class StationCensusHtml

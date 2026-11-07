@@ -199,6 +199,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   attempted value, MVC 5 converts one only by a `System.Type`, and a typed component shows what the server decided;
   a text box keeps MVC's attempted text (D17.13).
   The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: the vendor contract (D17.5) is a table of every type each module of the
+  app's TypeScript program declares, written by an MSBuild target into obj/ before CoreCompile and never committed,
+  because lib.dom alone holds 60,695 members and a stale committed copy could compile green. A component or plugin
+  declaration names its type with `[Mirrors(module, type)]`; nullability follows variance (what the member reads fits
+  the C# type, what the C# type writes fits the member); a drift a browser test arranges on purpose carries
+  `SuppressMessage` naming the test. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

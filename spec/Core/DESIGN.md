@@ -448,7 +448,8 @@ Terms used throughout:
     `ReadOnly<DateTime> DateOfBirth` and `ReadOnly<string?> BirthCountry`; a null country reads as null, and a text
     set from it shows nothing.
   - The vendor contract analyzer (D17.5) checks both marks against the API, a reference type's nullability by its
-    nullable annotation, so neither drifts from the vendor.
+    nullable annotation, so neither drifts from the vendor: nullability by variance (ALIS019), presence once N5.4
+    marks it.
   - Data the app types with its own C# type (a response body, a pushed message, the value past a declared member,
     the value a method returns) reads its start where a field is absent and null where the field holds null (D4.2);
     on an event's payload X4.3 states both.
@@ -542,7 +543,8 @@ Terms used throughout:
   run.
 - `X5.8` behavior: a payload's `string?` field holding null reads as null: the text it sets shows nothing, and the
   pipeline goes on.
-- `X5.9` analyzer: a declaration whose presence or nullability differs from its vendor's typed API: new:N17.2.
+- `X5.9` analyzer: a declaration whose presence or nullability differs from its vendor's typed API, nullability by
+  ALIS019 (POC 13a) and presence once N5.4 marks it (13c): new:N17.2.
 - `X5.10` behavior: a property of an object a live payload holds, written by the handler, changes that object as
   the page shows, and its method, called, runs.
 - `X5.11` behavior (D5.11): a pump's summary read twice calls `summary()` once, two calls of it run it twice, and a
@@ -841,9 +843,10 @@ Terms used throughout:
   method's `Arg<T>` only from a `TypedSource<T>`: it refuses a conversion from the covariant interface (CS0552), warns
   where only nullability differs (CS8620), has no conversion from a struct's source to its nullable's (CS1503), takes no
   conversion operator in an extension block (CS9282), and a second operator on `TypedSource<T>` makes the plain case
-  ambiguous (CS0457). So a source reaches its nullable, at an argument and at a struct's set or comparison, through
-  `OrNull()` (N7.5), which writes nothing of its own, and a narrower reference type reaches an argument through the
-  declaration's `Pass`, a door Q5 keeps for the component author.
+  ambiguous (CS0457). A struct's source reaches its nullable at a set as C# assignment widens it: `Set` on a
+  `Property<T?>` or `WriteOnly<T?>` takes a `T` source (N7.6). At an argument and in a comparison, where C# offers no
+  such overload, it goes through `OrNull()` (N7.5), which writes nothing of its own, and a narrower reference type
+  reaches an argument through the declaration's `Pass`, a door Q5 keeps for the component author.
 - D7.4 One builder makes an object from sources, member by typed member, and the dispatch payload, a method
   or plugin argument and a property write all use it. One door makes a list from sources.
 - D7.5 Every condition operator takes a source for each operand: the text tests, `MinLength`, `Between`,
@@ -872,6 +875,10 @@ Terms used throughout:
 - `N7.2` new: `p.List<T>([first, second])`, a `TypedSource<IReadOnlyList<T>>` built from sources.
 - `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between` and the
   membership tests in `ConditionOperators`.
+- `N7.6` new, POC 13a: `NullableWrites.Set` on `Property<T?>` and `WriteOnly<T?>` taking a source of `T`, an
+  extension in `Alis.Reactive.Components` beside the members it widens. The contract check made every member a vendor
+  types `number | null` a `T?` (Syncfusion's `value` members are), and 178 writes of the POC would each have needed
+  `OrNull()`. A view imports `Alis.Reactive.Components`.
 - `N7.5` new, its form gate 2's: `OrNull()` on a source of a struct or a reference type, returning the same read as
   a source of its nullable type (D7.3).
 - `N7.4` new, its form gate 2's: `IfNull` on a source of a nullable type, taking a literal or a source of the type
@@ -904,6 +911,8 @@ Terms used throughout:
   reads nothing leaves the card's class as it was, where `classList.add(null)` adds "null"; HTML set on an element
   shows its markup, and HTML from a value that reads nothing shows nothing, where `innerHTML = undefined` shows
   "undefined".
+- `X7.9` behavior (D7.3, N7.6): a census whose count is `int?`, as its TypeScript reads `number | null`, shows the
+  count a step writes from an `int` sum or count.
 - `X7.7` behavior (D7.3, N7.5): a fluid balance's intake widened to `int?` is written to its nullable target and
   ordered against it, over a 1000 ml target and within it, and an ordering with a null target does not hold, where
   JavaScript's `500 > null` does; a pump's summary widened to `string?` is passed as the caption's argument.
@@ -2286,13 +2295,28 @@ grammar gains no node (G2).
     name, and public members compose what it would do.
   - A method whose declared return is a `Promise` is declared with `MethodAsync`, and every other method with
     `Method` (Q4, Q11). FusionGrid's three exports drift today (B15).
-  - The check is an analyzer over a contract file. The TypeScript compiler reads the vendor's type declarations at
-    the pinned version and writes each public member, with its kind and whether it returns a promise, into a JSON
-    contract kept in the repo. The analyzer reads that contract as an additional file and fails a declaration that
-    differs from it. A developer who brings a component runs the same script on their vendor.
+  - The check is an analyzer over a contract table (`poc/tools/vendor-contract.mjs`, POC 13a). The TypeScript compiler
+    reads the app's TypeScript program (its own files, the packages it loads at their pinned versions, the libs its
+    tsconfig names) and writes one line per type each module declares and per own public member: its kind, whether
+    it returns a promise, whether it is optional, whether its read admits null or undefined, whether its write takes
+    null, whether it is callable, and the type's bases by name. TypeScript's `private` and `protected`, `#private` and
+    a JSDoc `@private` member are left out; a getter alone is read-only and a setter alone write-only.
+  - An MSBuild target (`poc/VendorContract.targets`) writes the table into obj/ before CoreCompile, incremental on the
+    TypeScript inputs, so no `dotnet build` reads a stale one, and it is not committed: lib.dom alone holds 60,695
+    members, and the table is a function of inputs review already reads. A developer who brings a component imports
+    the same target.
+  - A component or plugin declaration names the type it mirrors with `[Mirrors(module, type)]` (its form is gate 2's);
+    the module is a package's name, a lib's file name (`lib.dom`) or a file of the app's TypeScript project. The
+    analyzer reports a component or plugin that names none (ALIS014), a type the table lacks (ALIS015), a member the
+    type and its bases do not make public (ALIS016), `Method` against a promise and `MethodAsync` against none
+    (ALIS017), a door of the wrong kind (ALIS018), and nullability by variance (ALIS019): what the member reads fits
+    the C# type, so a read that admits null is `T?`, and what the C# type writes fits the member, so a `T?` write needs
+    a member that takes null. A live object's and a returned object's nullability wait for N5.4's presence mark (13c).
+  - A drift a browser test arranges on purpose carries `SuppressMessage` whose justification names the test, and
+    `WhenAContractDriftIsSuppressed` fails on a name no Playwright test declares.
 - D17.6 Every vendor package is pinned to one exact version, its sub-packages included, and its npm and NuGet
-  versions move together (B16). The contract file of D17.5 is written again at every upgrade, so a vendor's drift
-  fails the build at the upgrade.
+  versions move together (B16). The contract table of D17.5 is written by every build whose TypeScript inputs
+  changed, so a vendor's drift fails the build at the upgrade.
 - D17.7 A vendor's name is checked by its characters, a letter and then letters, digits, `_` or `-`, with no regular
   expression (D16.10).
 - D17.8 Two reference components prove the vendor contract on paper in step 8, FusionMultiSelect and a native
@@ -2394,7 +2418,8 @@ plans (Q19).
 - `N17.8` new: `Argument<T>(n)`, and a payload method at a position (D17.4).
 - `N17.9` new: `Callback<TArgs, TResult>` and its `Set` from an expression, and `Answer`, an answer passed as a
   method's argument (D17.12).
-- `N17.2` new: the vendor contract file and the analyzer that checks declarations against it (D17.5).
+- `N17.2` new: the vendor contract table and the analyzer that checks declarations against it (D17.5), built in POC 13a
+  as ALIS014 to ALIS019 with `[Mirrors(module, type)]`.
 - `N17.3` new: a condition over an awaited `MethodAsync<bool>` source, replacing `ConditionStart<TModel>.Confirm` and
   `ConditionExtensions.Confirm`; its form goes to gate 2.
 - `N17.4` new: `NativeConfirm` and `NativeToast` in Alis.Reactive.Native, each a declaration and a render helper.
@@ -2432,8 +2457,8 @@ plans (Q19).
   (`Alis.Reactive.Assets/components/fusion/confirm.ts:50`, `Alis.Reactive.Assets/components/fusion/confirm.ts:55`).
 
 **Defects.**
-- `X17.1` analyzer: a method declared with `Method` whose vendor contract returns a promise: new:N17.2.
-- `X17.2` analyzer: a declared member the vendor contract does not list as public: new:N17.2.
+- `X17.1` analyzer: ALIS017 reports a method declared with `Method` whose vendor contract returns a promise: new:N17.2.
+- `X17.2` analyzer: ALIS016 reports a declared member the vendor contract does not list as public: new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every

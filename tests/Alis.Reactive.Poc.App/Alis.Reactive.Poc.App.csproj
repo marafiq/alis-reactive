@@ -12,4 +12,14 @@
     <ProjectReference Include="..\..\poc\Alis.Reactive.Poc\Alis.Reactive.Poc.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <VendorContractTsConfig>$(MSBuildThisFileDirectory)tsconfig.json</VendorContractTsConfig>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <VendorContractInput Include="Components/**/*.ts" />
+  </ItemGroup>
+
+  <Import Project="../../poc/VendorContract.targets" />
+
 </Project>

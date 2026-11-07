@@ -22,4 +22,14 @@
     <AdditionalFiles Include="../BannedSymbols.txt" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <VendorContractTsConfig>$(MSBuildThisFileDirectory)../runtime/tsconfig.json</VendorContractTsConfig>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <VendorContractInput Include="../runtime/src/**/*.ts" />
+  </ItemGroup>
+
+  <Import Project="../VendorContract.targets" />
+
 </Project>

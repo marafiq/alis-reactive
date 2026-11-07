@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
 
+[Mirrors("Components/DutyRoster/duty-roster", "DutyRoster")]
 public sealed class DutyRoster : Component
 {
     public static ComponentVendor RosterVendor { get; } = ComponentVendor.Define("roster", objectPath: "instances.0", subscribe: "addEventListener", unsubscribe: "removeEventListener");
