@@ -744,9 +744,11 @@ Terms used throughout:
 - `N6.1` new: `LiveObjects<TItem>.Count()` and `LiveObjects<TItem>.Select(..)`, replacing `Count` and `Each`, beside
   `At(n)` and `Where(..)`; the same operations over a list of data are extension methods on
   `ITypedSource<IEnumerable<TItem>>` (`DataLists`, POC 4, D6.10).
-- `N6.4` new: `public interface ITypedSource<out T>`, which `TypedSource<T>` implements and nothing else in the
-  framework does; the list operations over data extend it (D6.10). A source the framework did not make is refused
-  where the view renders, and the analyzers of POC 13 refuse a class that implements it.
+- `N6.4` new, its analyzer built in POC 13h as ALIS028: `public interface ITypedSource<out T>`, which `TypedSource<T>`
+  implements and nothing else in the framework does; the list operations over data extend it (D6.10). A type outside
+  the framework's assembly that implements it, directly or through an interface of its own, is refused at build; the
+  framework's own sources are not. A source the build does not see, as a type a library generates when the app
+  runs, is refused where the view renders.
 - `N6.3` new, built in POC 13g as ALIS026 and ALIS027: `ReadsNothingSuppressor`, a `DiagnosticSuppressor` that
   suppresses CS8602, and CS8629 on a nullable's `.Value`, where a data lambda reads its item in the browser and a read
   past a holder that holds null reads nothing (D4.2, D6.14, D8.9). An expression tree refuses `?.` (CS8072), so
@@ -911,6 +913,9 @@ Terms used throughout:
 - `X6.48` refusal (D6.14): a value the view holds, null when the view renders, cast to its value: "'none' is null when
   the view renders, and the cast takes its value, which .NET refuses; compare the nullable itself, such as d =>
   d.Priority == limit."
+- `X6.52` analyzer: a class, a struct or an interface outside the framework that implements `ITypedSource<T>`, and a
+  class that implements it through an interface of its own, are each refused at build, and a type that only holds
+  the framework's sources is not: new:N6.4 (POC 13h, ALIS028).
 - `X6.49` refusal (D6.12): a comparison through a user-defined conversion: "'d.Seal' is converted by a
   user-defined conversion, which the browser does not have; compare a member it reads, such as d => d.Seal.Tag ==
   "S4", or move the work to the server."
