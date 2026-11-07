@@ -6,6 +6,10 @@ namespace Alis.Reactive.Poc.App.Admissions;
 public sealed class AdmissionsController : Controller
 {
     [HttpGet]
+    public IActionResult Finder() => View(new IntakeForm { ResidentName = "", NextOfKin = new IntakeForm.Kin { Name = "Sam Park" } });
+
+    public IActionResult ResidentName() => View(new IntakeForm { ResidentName = "Helen Park", NextOfKin = new IntakeForm.Kin { Name = "Sam Park" } });
+
     public IActionResult Intake() => View(new IntakeForm { ResidentName = "Helen Park", Ward = "South", NextOfKin = new IntakeForm.Kin { Name = "Sam Park" } });
 
     [HttpPost]

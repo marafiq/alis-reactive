@@ -19,6 +19,7 @@ import { BedsideMonitor, type BedsideMonitorHost } from "./BedsideMonitor/bedsid
 import { WardPager } from "./WardPager/ward-pager";
 import { MedicineRound, type MedicineRoundHost } from "./MedicineRound/medicine-round";
 import { DeskMonitor, MonitorDesk, type DeskMonitorHost, type MonitorDeskHost } from "./MonitorDesk/monitor-desk";
+import { ResidentFinder, type ResidentFinderHost } from "./ResidentFinder/resident-finder";
 import { onMount, onUnmount, providePlugin } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
@@ -107,6 +108,10 @@ onMount<DeskMonitorHost>("[data-desk-monitor]", (host) => {
 
 onMount<MonitorDeskHost>("[data-monitor-desk]", (host) => {
   host.desk = new MonitorDesk(host);
+});
+
+onMount<ResidentFinderHost>("[data-resident-finder]", (host) => {
+  new ResidentFinder(host);
 });
 
 providePlugin("shift-log", new ShiftLog());

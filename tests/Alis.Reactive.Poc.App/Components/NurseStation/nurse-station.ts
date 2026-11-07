@@ -82,6 +82,7 @@ export class NurseStation {
 
 interface RoundSeed {
   readonly time: string;
+  readonly [member: string]: unknown;
 }
 
 export class StationCensus {

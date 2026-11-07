@@ -31,7 +31,7 @@ public sealed class WhenAContractDriftIsSuppressed
             .Where(test => !tests.Contains(test))
             .ToList();
 
-        Assert.That(justifications, Has.Count.EqualTo(15), "The app suppresses each drift a browser test arranges on purpose, and no other.");
+        Assert.That(justifications, Has.Count.EqualTo(17), "The app suppresses each drift a browser test arranges on purpose, and no other.");
         Assert.That(unnamed, Is.Empty, "A suppression in the app says \"" + Purpose + "\" and then the test it serves.");
         Assert.That(missing, Is.Empty, "A suppression names a browser test the Playwright project declares.");
     }

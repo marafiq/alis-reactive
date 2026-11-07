@@ -280,6 +280,14 @@ const writeMembers = (module, typeName, members, typeOf) => {
   }
 };
 
+const writeIndex = (module, typeName, type) => {
+  const index = checker.getIndexInfosOfType(type).find((info) => (info.keyType.flags & ts.TypeFlags.String) !== 0);
+  if (index === undefined) return;
+  const flags = admitsNull(index.type) ? ["readsnull"] : [];
+  lines.push(["member", module, typeName, "[index]", index.isReadonly ? "readonly" : "property", flags.join(","), ""].join("\t"));
+  for (const held of heldsOf(index.type)) lines.push(["holds", module, typeName, "[index]", "value", ...held].join("\t"));
+};
+
 const baseNames = (declarations) =>
   declarations
     .flatMap((declaration) => declaration.heritageClauses ?? [])
@@ -303,6 +311,7 @@ const listType = (symbol, kind) => {
   lines.push(["type", module, name, kind, callFlags(callSignatures(type)).join(","), baseNames(declarations).join(","), shown].join("\t"));
   const members = kind === "alias" ? checker.getPropertiesOfType(type) : [...(symbol.members?.values() ?? [])];
   writeMembers(module, name, members, declaredTypeOf);
+  writeIndex(module, name, type);
 };
 
 const declaredBy = (statement) => {

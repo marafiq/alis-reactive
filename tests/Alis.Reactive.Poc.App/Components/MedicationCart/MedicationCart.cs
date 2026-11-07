@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Components;
@@ -16,10 +15,8 @@ public sealed class MedicationCart : Component
 
     public override ComponentVendor Vendor => CartVendor;
 
-    [SuppressMessage("Alis.Reactive.Contract", "ALIS025", Justification = "The doses are the MedicationDose JSON the render helper writes into the cart; its TypeScript seed names only the medicine the cart shows.")]
     public ReadOnly<List<MedicationDose>> Doses => ReadOnly<List<MedicationDose>>();
 
-    [SuppressMessage("Alis.Reactive.Contract", "ALIS025", Justification = "The featured dose is the MedicationDose JSON the render helper writes into the cart; its TypeScript seed names only the medicine the cart shows.")]
     public ReadOnly<MedicationDose> Featured => ReadOnly<MedicationDose>();
 }
 

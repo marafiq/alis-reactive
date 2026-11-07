@@ -131,7 +131,7 @@ internal sealed class HeldValues
         {
             var name = JsonName(property);
             var at = (path.Length == 0 ? Shown(data) : path) + "." + property.Name;
-            if (_contract.Member(type, name) is not { CanRead: true } member)
+            if (_contract.DataMember(type, name) is not { CanRead: true } member)
             {
                 return new Misfit("'" + at + "' reads '" + name + "', which '" + type.Shown + "' does not hold", "name it as '" + type.Shown + "' does");
             }

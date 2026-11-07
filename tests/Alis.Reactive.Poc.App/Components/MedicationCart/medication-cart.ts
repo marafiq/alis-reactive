@@ -4,6 +4,7 @@ export interface MedicationCartHost extends HTMLElement {
 
 interface DoseSeed {
   readonly medicine: string;
+  readonly [member: string]: unknown;
 }
 
 export class MedicationCart {

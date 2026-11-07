@@ -13,6 +13,24 @@ public sealed class NativeTextBox : Component
     public Property<string> Value => Property<string>();
 
     public Event Input => Event();
+
+    public Event<Changed> Change => Event<Changed>();
+
+    public Event<Left> Blur => Event<Left>();
+
+    public sealed class Changed : JsObject
+    {
+        public ReadOnly<string> Type => ReadOnly<string>();
+
+        public ReadOnly<bool> IsTrusted => ReadOnly<bool>();
+    }
+
+    public sealed class Left : JsObject
+    {
+        public ReadOnly<string> Type => ReadOnly<string>();
+
+        public ReadOnly<double> TimeStamp => ReadOnly<double>();
+    }
 }
 
 public static class NativeTextBoxHtml

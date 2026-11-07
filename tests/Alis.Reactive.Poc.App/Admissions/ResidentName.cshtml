@@ -1,0 +1,55 @@
+@using Alis.Reactive.Poc.App.Admissions
+@model IntakeForm
+@{
+    ViewData["Title"] = "Resident name";
+    var plan = Html.ReactivePlan<IntakeForm>();
+}
+<h1>Resident name</h1>
+
+@(Html.InputField(plan, m => m.ResidentName).TextBox("Resident name")
+    .Reactive(box => box.Input, pipeline =>
+    {
+        var name = pipeline.Input(m => m.ResidentName).Component<NativeTextBox>().Value;
+        pipeline.Element("door-card").Text.Set(name);
+        pipeline.When(name.Eq(""))
+            .Then(empty => empty.Element("name-hint").Text.Set("A resident needs a name"))
+            .Else(named => named.Element("name-hint").Text.Set("Name given"));
+    })
+    .Reactive(box => box.Change, (changed, pipeline) =>
+    {
+        pipeline.Element("last-commit").Text.Set(changed.Type);
+        pipeline.Element("committed-by").Text.Set(changed.IsTrusted.Choose("a person", "a script"));
+    })
+    .Reactive(box => box.Blur, (left, pipeline) =>
+        pipeline.Element("last-left").Text.Set(left.Type)))
+<p id="name-hint">Name given</p>
+
+<p>Door card: <strong id="door-card">@Model.ResidentName</strong></p>
+<p>Last commit: <strong id="last-commit">none yet</strong>, made by <strong id="committed-by">nobody yet</strong></p>
+<p>Last focus loss: <strong id="last-left">none yet</strong></p>
+
+@(plan.Button("clear-name", "Clear the name")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Input(m => m.ResidentName).Component<NativeTextBox>().Value.Set("");
+        pipeline.Element("door-card").Text.Set("");
+        pipeline.Element("name-hint").Text.Set("A resident needs a name");
+    }))
+
+@(plan.Button("restore-name", "Restore the name on record")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Input(m => m.ResidentName).Component<NativeTextBox>().Value.Set(Model.ResidentName);
+        pipeline.Element("door-card").Text.Set(Model.ResidentName);
+        pipeline.Element("name-hint").Text.Set("Name given");
+    }))
+
+<h2>Next of kin</h2>
+@Html.InputField(plan, m => m.NextOfKin.Name).TextBox("Next of kin")
+
+@(plan.Button("copy-name", "Copy the resident's name")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Input(m => m.NextOfKin.Name).Component<NativeTextBox>().Value.Set(
+            pipeline.Input(m => m.ResidentName).Component<NativeTextBox>().Value)))
+
+@Html.RenderPlan(plan)

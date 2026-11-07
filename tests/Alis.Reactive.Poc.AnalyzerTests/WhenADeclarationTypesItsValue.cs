@@ -53,6 +53,18 @@ public sealed class WhenADeclarationTypesItsValue
         holds	desk	Changed	source	value	object	desk	Box
         holds	desk	Changed	pending	value	object	lib.es5	Promise#1
         holds	desk	Box	value	value	other		string
+        type	desk	Seed	interface			
+        type	desk	Tally	interface			
+        member	desk	Desk	seed	readonly		
+        member	desk	Desk	tally	readonly		
+        member	desk	Seed	medicine	readonly		
+        member	desk	Seed	[index]	readonly		
+        member	desk	Tally	[index]	readonly		
+        holds	desk	Desk	seed	value	object	desk	Seed
+        holds	desk	Desk	tally	value	object	desk	Tally
+        holds	desk	Seed	medicine	value	other		string
+        holds	desk	Seed	[index]	value	other		unknown
+        holds	desk	Tally	[index]	value	other		number
         """;
 
     private static string Declaring(string members, string types = "") => $$"""
@@ -251,5 +263,23 @@ public sealed class WhenADeclarationTypesItsValue
                     public TextBox Source => LiveObject<TextBox>();
                 }
                 """),
+            Desk);
+
+    [Test]
+    public Task data_whose_members_its_vendor_type_takes_through_an_untyped_index_is_not_reported()
+        => Fixture.ReportsNothing<MirrorsAnalyzer>(
+            Declaring(
+                """    public ReadOnly<Dose> Seed => ReadOnly<Dose>();""",
+                """    public sealed record Dose(string Medicine, int? Priority, string Ward);"""),
+            Desk);
+
+    [Test]
+    public Task a_data_member_its_vendor_type_takes_through_an_index_is_checked_as_the_indexs_type()
+        => Fixture.Reports<MirrorsAnalyzer>(
+            "ALIS025",
+            "'FrontDesk.Tally' is declared with ReadOnly<Counts>, and 'Tally.beds' holds a number, and 'Counts.Beds' is 'string': declare it as a number type: int, long, decimal or double",
+            Declaring(
+                """    public ReadOnly<Counts> [|Tally|] => ReadOnly<Counts>();""",
+                """    public sealed record Counts(string Beds);"""),
             Desk);
 }

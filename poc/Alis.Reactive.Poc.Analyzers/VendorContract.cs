@@ -44,6 +44,8 @@ internal sealed class VendorContract
 
     public ContractType? Type(TypeKey key) => _types.TryGetValue(key, out var type) ? type : null;
 
+    public const string IndexMember = "[index]";
+
     public ContractMember? Member(ContractType type, string name)
     {
         foreach (var owner in WithBases(type))
@@ -53,6 +55,8 @@ internal sealed class VendorContract
 
         return null;
     }
+
+    public ContractMember? DataMember(ContractType type, string name) => Member(type, name) ?? Member(type, IndexMember);
 
     public bool Extends(ContractType type, TypeKey basis) => WithBases(type).Any(each => each.Key == basis);
 
