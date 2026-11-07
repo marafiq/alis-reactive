@@ -1,16 +1,15 @@
 using System;
-using Alis.Reactive.Plan;
 
 namespace Alis.Reactive.Components;
 
 public abstract class Plugin : JsObject
 {
     protected Plugin(string name)
-        : this(name, PluginEvents.EventTarget)
+        : this(name, EventListening.EventTarget)
     {
     }
 
-    protected Plugin(string name, PluginEvents events)
+    protected Plugin(string name, EventListening events)
     {
         Name = name;
         Events = events;
@@ -18,7 +17,7 @@ public abstract class Plugin : JsObject
 
     public string Name { get; }
 
-    internal PluginEvents Events { get; }
+    internal EventListening Events { get; }
 
     internal string CheckedName()
     {
@@ -30,24 +29,4 @@ public abstract class Plugin : JsObject
 
         return Name;
     }
-}
-
-public sealed class PluginEvents
-{
-    private PluginEvents(Listening listen)
-    {
-        Listen = listen;
-    }
-
-    public static PluginEvents EventTarget { get; } = new(MethodListening.EventTarget);
-
-    public static PluginEvents CallbackProperties { get; } = new(new AssignmentListening());
-
-    internal Listening Listen { get; }
-
-    public static PluginEvents Methods(string subscribe, string unsubscribe)
-        => new(new MethodListening(JavaScriptNames.Checked(subscribe), JavaScriptNames.Checked(unsubscribe)));
-
-    public static PluginEvents ReturnedUnsubscriber(string subscribe)
-        => new(new ReturnedListening(JavaScriptNames.Checked(subscribe)));
 }

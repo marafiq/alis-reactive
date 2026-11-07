@@ -1,6 +1,7 @@
 import type { CallExpression, DoStatement, IfStatement, LetStatement, PathStep, SetStatement, Statement } from "./plan";
 import { callee, called, evaluate, memberHolder, objectHolding, walk, type Bound, type Context } from "./evaluate";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
+import { listenTo } from "./objects";
 
 export type Run = { readonly kind: "finished" } | { readonly kind: "awaiting"; readonly settled: Promise<void> };
 
@@ -71,6 +72,9 @@ function step(statement: Stepped, context: Context): Context {
       return context;
     case "let":
       return bound(context, statement.name, atItsLine(statement, context));
+    case "listen":
+      listenTo(statement, context);
+      return context;
     default:
       return assertNever(statement);
   }

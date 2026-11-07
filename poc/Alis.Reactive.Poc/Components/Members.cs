@@ -79,18 +79,27 @@ public static class NullableWrites
 
 internal static class Assign
 {
+    private static void RequireTheVendorsTurn(PlanBuild build, string payload)
+    {
+        if (!build.IsOwnPayload(payload))
+        {
+            throw new InvalidOperationException(
+                "A write to the payload of the event around a Listen reaches no vendor: the vendor read it when its listener returned, before the listened object raised. Write it in the event's own pipeline, outside the Listen.");
+        }
+
+        if (build.HandlerAwaited)
+        {
+            throw new InvalidOperationException(
+                "A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.");
+        }
+    }
+
     internal static Expression Live<TValue>(PlanBuild build, IPlanSource source) => build.IntoLive<TValue>(source.Expression, source.Form);
 
     internal static void Write(JsObject owner, PathStep member, bool optional, Expression value)
     {
         var binding = owner.Binding;
-        var writesThePayloadAfterAnAwait = binding.Target is RefExpression { Name: PlanBuild.PayloadName } && binding.Build.HandlerAwaited;
-        if (writesThePayloadAfterAnAwait)
-        {
-            throw new InvalidOperationException(
-                "A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.");
-        }
-
+        if (binding.Target is RefExpression reference && binding.Build.IsPayload(reference.Name)) RequireTheVendorsTurn(binding.Build, reference.Name);
         binding.Build.Write(new SetStatement(binding.Target, [member], optional ? Presence.Optional : Presence.Required, value));
     }
 }

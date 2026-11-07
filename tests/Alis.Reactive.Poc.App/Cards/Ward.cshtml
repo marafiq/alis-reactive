@@ -5,6 +5,9 @@
     var plan = Html.ReactivePlan<CardsWard>();
     plan.Plugin<ShiftLog>().Reactive(log => log.Noted, (noted, pipeline) =>
         pipeline.Component<CallLog>("calls").Note("The ward heard the note"));
+    plan.Plugin<WardPager>().Reactive(pager => pager.Paged, (paged, pipeline) =>
+        pipeline.Listen(paged.Call, call => call.Answered, (answered, heard) =>
+            heard.Component<CallLog>("calls").Note("The ward heard a call answered")));
 }
 <h1>Care cards</h1>
 
@@ -78,6 +81,51 @@
     {
         pipeline.Plugin<BedStore>().Assign("14C");
         pipeline.Element("assigned").Text.Set("Assigned again");
+    }))
+
+<p>Paged: <span id="paged">nobody</span></p>
+<p>Answered: <span id="answered">nothing</span></p>
+
+@(plan.Button("page-12", "Page room 12")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Page("12");
+        pipeline.Element("paged").Text.Set("Paged room 12");
+    }))
+
+@(plan.Button("page-12-again", "Page room 12 again")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Page("12");
+        pipeline.Element("paged").Text.Set("Paged room 12 again");
+    }))
+
+@(plan.Button("page-14", "Page room 14")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Page("14");
+        pipeline.Element("paged").Text.Set("Paged room 14");
+    }))
+
+@(plan.Button("answer-12", "Answer room 12")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Answer("12", "Nurse Kim");
+        pipeline.Element("answered").Text.Set("Answered room 12");
+    }))
+
+@(plan.Button("answer-12-again", "Answer room 12 again")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Answer("12", "Nurse Lee");
+        pipeline.Element("answered").Text.Set("Answered room 12 again");
+    }))
+
+@(plan.Button("answer-14", "Answer room 14")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Answer("14", "Nurse Kim");
+        pipeline.Element("answered").Text.Set("Answered room 14");
     }))
 
 @Html.RenderPlan(plan)

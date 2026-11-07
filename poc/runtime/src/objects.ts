@@ -1,14 +1,32 @@
-import type { Handler, Listening, PlanDocument } from "./plan";
+import type { Handler, Listening, ListenStatement, PathStep, PlanDocument, ReadPresence, Statement } from "./plan";
 import { evaluate, walk, type Bound, type Context } from "./evaluate";
 import { execute } from "./execute";
 import { assertNever, Stop, value } from "./read";
-import type { Owner, Removal } from "./owners";
+import type { Owner } from "./owners";
 import { plugin } from "./plugins";
 
 type Listener = (...args: unknown[]) => void;
 
-export function contextOf(plan: PlanDocument): Context {
-  const context: Context = { plan, scope: new Map<string, Bound>(), locate: (id) => locate(context, id) };
+type Unsubscribe = (raiser: object, listener: Listener) => void;
+
+interface Raised {
+  readonly event: string;
+  readonly payload: readonly PathStep[];
+  readonly members: ReadPresence;
+  readonly do: readonly Statement[];
+}
+
+interface Names {
+  readonly payload: string;
+  readonly arguments: string;
+}
+
+const handlerNames: Names = { payload: "e", arguments: "arguments" };
+
+const listened = new WeakMap<ListenStatement, WeakSet<object>>();
+
+export function contextOf(plan: PlanDocument, owner: Owner): Context {
+  const context: Context = { plan, scope: new Map<string, Bound>(), locate: (id) => locate(context, id), owner };
   return context;
 }
 
@@ -73,25 +91,62 @@ function holdsStill(context: Context, element: HTMLElement, vendorName: string, 
   }
 }
 
-export function listen(context: Context, handler: Handler, owner: Owner): void {
+export function listen(context: Context, handler: Handler): void {
   const source = sourceOf(context, handler.on);
   const raiser = walk(value(source.object), handler.path, "required");
   if (raiser.kind === "nothing" || raiser.value === null || typeof raiser.value !== "object") {
     throw new Stop("The object that raises '" + handler.event + "' is not on the page.");
   }
+  const object = raiser.value;
   let refused = false;
   const listener: Listener = (...args) => {
-    if (!refused) run(context, handler, args);
+    if (!refused) run(context, handler, handlerNames, args);
   };
   try {
-    const removal = subscribe(raiser.value, listeningOf(context, handler.on), handler.event, listener);
-    owner.holds(() => {
-      if (source.stillHeld()) removal();
+    const unsubscribe = subscribe(object, listeningOf(context, handler.on), handler.event, listener);
+    context.owner.holds(() => {
+      if (source.stillHeld()) unsubscribe(object, listener);
     });
   } catch (stopped) {
     refused = true;
     throw stopped;
   }
+}
+
+export function listenTo(statement: ListenStatement, context: Context): void {
+  const raiser = evaluate(statement.object, context);
+  if (raiser.kind === "nothing" || raiser.value === null || typeof raiser.value !== "object") {
+    throw new Stop("The object that raises '" + statement.event + "' is not on the page.");
+  }
+  const object = raiser.value;
+  const heard = heardBy(statement);
+  if (heard.has(object)) return;
+  let refused = false;
+  const listener: Listener = (...args) => {
+    if (!refused) run(context, statement, { payload: statement.payloadName, arguments: statement.argumentsName }, args);
+  };
+  try {
+    const unsubscribe = subscribe(object, statement.listen, statement.event, listener);
+    const heldObject = new WeakRef(object);
+    const heldListener = new WeakRef(listener);
+    context.owner.holds(() => {
+      const living = heldObject.deref();
+      const subscribed = heldListener.deref();
+      if (living !== undefined && subscribed !== undefined) unsubscribe(living, subscribed);
+    });
+    heard.add(object);
+  } catch (stopped) {
+    refused = true;
+    throw stopped;
+  }
+}
+
+function heardBy(statement: ListenStatement): WeakSet<object> {
+  const known = listened.get(statement);
+  if (known !== undefined) return known;
+  const heard = new WeakSet<object>();
+  listened.set(statement, heard);
+  return heard;
 }
 
 function listeningOf(context: Context, id: string): Listening {
@@ -110,19 +165,19 @@ function listeningOf(context: Context, id: string): Listening {
   }
 }
 
-function subscribe(raiser: object, listening: Listening, event: string, listener: Listener): Removal {
+function subscribe(raiser: object, listening: Listening, event: string, listener: Listener): Unsubscribe {
   switch (listening.kind) {
     case "method": {
       const add = method(raiser, listening.subscribe);
       const remove = method(raiser, listening.unsubscribe);
       Reflect.apply(add, raiser, [event, listener]);
-      return () => Reflect.apply(remove, raiser, [event, listener]);
+      return (held, added) => Reflect.apply(remove, held, [event, added]);
     }
     case "assignment": {
       const replaced: unknown = Reflect.get(raiser, event);
       Reflect.set(raiser, event, listener);
-      return () => {
-        if (Reflect.get(raiser, event) === listener) Reflect.set(raiser, event, replaced);
+      return (held, added) => {
+        if (Reflect.get(held, event) === added) Reflect.set(held, event, replaced);
       };
     }
     case "returned": {
@@ -143,17 +198,19 @@ function method(holder: object, name: string): (...args: unknown[]) => unknown {
   return found as (...args: unknown[]) => unknown;
 }
 
-function run(context: Context, handler: Handler, args: unknown[]): void {
+function run(context: Context, raised: Raised, names: Names, args: unknown[]): void {
   try {
-    const payload = walk(value(args), handler.payload, handler.members);
-    const running = execute(handler.do, { ...context, scope: new Map([["e", payload], ["arguments", value(args)]]) });
-    if (running.kind === "awaiting") running.settled.catch((stopped: unknown) => report(handler, stopped));
+    const scope = new Map(context.scope);
+    scope.set(names.payload, walk(value(args), raised.payload, raised.members));
+    scope.set(names.arguments, value(args));
+    const running = execute(raised.do, { ...context, scope });
+    if (running.kind === "awaiting") running.settled.catch((stopped: unknown) => report(raised, stopped));
   } catch (stopped) {
-    report(handler, stopped);
+    report(raised, stopped);
   }
 }
 
-function report(handler: Handler, stopped: unknown): void {
+function report(raised: Raised, stopped: unknown): void {
   if (!(stopped instanceof Stop)) throw stopped;
-  console.error("[alis] the pipeline of '" + handler.event + "' stopped: " + stopped.reason);
+  console.error("[alis] the pipeline of '" + raised.event + "' stopped: " + stopped.reason);
 }

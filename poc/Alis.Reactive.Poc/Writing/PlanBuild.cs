@@ -20,6 +20,7 @@ internal sealed class PlanBuild
     private readonly HashSet<string> _rendered = new(StringComparer.Ordinal);
     private readonly List<Handler> _handlers = [];
     private readonly Stack<List<Statement>> _open = new();
+    private readonly Stack<string> _payloads = new();
     private readonly Dictionary<string, List<Statement>> _resultBlocks = new(StringComparer.Ordinal);
     private readonly ResultLines _resultLines = new();
     private readonly HashSet<string> _elseIfResults = new(StringComparer.Ordinal);
@@ -29,6 +30,7 @@ internal sealed class PlanBuild
     private int _readingItems;
     private int _answering;
     private int _answers;
+    private int _listens;
     private bool _handlerAwaited;
 
     internal PlanBuild(string planId, JsonSerializerOptions values, InputNames names)
@@ -86,7 +88,44 @@ internal sealed class PlanBuild
     internal IReadOnlyList<Statement> HandlerBlock(Action body)
     {
         _handlerAwaited = false;
-        return Block(body);
+        return PipelineBlock(PayloadName, body);
+    }
+
+    internal IReadOnlyList<Statement> ListenBlock(string payloadName, Action body)
+    {
+        var awaitedAround = _handlerAwaited;
+        _handlerAwaited = false;
+        try
+        {
+            return PipelineBlock(payloadName, body);
+        }
+        finally
+        {
+            _handlerAwaited = awaitedAround;
+        }
+    }
+
+    private List<Statement> PipelineBlock(string payloadName, Action body)
+    {
+        _payloads.Push(payloadName);
+        try
+        {
+            return Block(body);
+        }
+        finally
+        {
+            _payloads.Pop();
+        }
+    }
+
+    internal bool IsPayload(string name) => _payloads.Contains(name);
+
+    internal bool IsOwnPayload(string name) => _payloads.Count > 0 && _payloads.Peek() == name;
+
+    internal (string Payload, string Arguments) ListenNames()
+    {
+        var listen = (++_listens).ToString(CultureInfo.InvariantCulture);
+        return ("listened" + listen, "listenedArguments" + listen);
     }
 
     internal List<Statement> Block(Action body)

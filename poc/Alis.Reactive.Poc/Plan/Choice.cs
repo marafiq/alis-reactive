@@ -53,6 +53,8 @@ internal sealed class ReadPresence : IChoice
 
     public string Text { get; }
 
+    internal bool MayHoldNothing => _holderMayHoldNothing;
+
     internal ReadPresence MemberMayBeAbsent() => Of(_holderMayHoldNothing, memberMayBeAbsent: true);
 
     internal ReadPresence HolderMayHoldNothing() => Of(holderMayHoldNothing: true, _memberMayBeAbsent);

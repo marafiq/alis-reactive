@@ -8,8 +8,17 @@
         pipeline.Component<CallLog>("calls").Note(Model.Resident + " heard the hour"));
     plan.Plugin<BedStore>().Reactive(store => store.Assigned, (taken, pipeline) =>
         pipeline.Component<CallLog>("calls").Note(Model.Resident + " heard a bed assigned"));
+    plan.Plugin<WardPager>().Reactive(pager => pager.Paged, (paged, pipeline) =>
+        pipeline.Listen(paged.Call, call => call.Answered, (answered, heard) =>
+        {
+            heard.Component<CallLog>("calls").Note(Model.Resident + " heard a call answered");
+            heard.Element("card-call-room").Text.Set(paged.Room);
+            heard.Element("card-call-by").Text.Set(answered.By);
+        }));
 }
 <h2>@Model.Resident</h2>
+
+<p>Call: room <span id="card-call-room">none</span>, answered by <span id="card-call-by">nobody</span></p>
 
 <section id="card-notes">
     @if (Model.NotesOpen)

@@ -7,7 +7,7 @@ namespace Alis.Reactive.Poc.App.Components;
 public sealed class WardRadio : Plugin
 {
     public WardRadio()
-        : base("ward-radio", PluginEvents.Methods("listen", "unlisten"))
+        : base("ward-radio", EventListening.Methods("listen", "unlisten"))
     {
     }
 
@@ -20,7 +20,7 @@ public sealed class WardRadio : Plugin
 public sealed class NightRadio : Plugin
 {
     public NightRadio()
-        : base("night-radio", PluginEvents.ReturnedUnsubscriber("listen"))
+        : base("night-radio", EventListening.ReturnedUnsubscriber("listen"))
     {
     }
 

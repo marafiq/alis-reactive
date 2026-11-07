@@ -126,6 +126,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   start (the second's listener runs nothing), since no release could remove what it added. Plans start in the order
   the page holds their scripts. A slot announces the unmount of its content whether or not a plan gave it an owner
   (D12.3). `HttpSend` is a literal in the POC, which has no `record` node.
+- Chosen within the owner's yes, 2026-11-07, POC 14d: a `listen` block reads the bindings of the blocks around it, and binds
+  its payload and arguments under names of its own; a write to the payload of the event around it is refused where the
+  view renders, and so is a listen on an object declared optional or nullable. An object whose events a pipeline listens
+  to is an `EventedObject`, which takes its `EventListening` (once named PluginEvents: one name for one concept with two
+  holders), so a listen on an object that declares no listening does not compile. The forms are gate 2's.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

@@ -47,7 +47,7 @@ public sealed class Initials : Plugin
 public sealed class NightClock : Plugin
 {
     public NightClock()
-        : base("night-clock", PluginEvents.CallbackProperties)
+        : base("night-clock", EventListening.CallbackProperties)
     {
     }
 
@@ -65,7 +65,7 @@ public sealed class ClockStruck : JsObject
 public sealed class BedStore : Plugin
 {
     public BedStore()
-        : base("bed-store", PluginEvents.ReturnedUnsubscriber("subscribe"))
+        : base("bed-store", EventListening.ReturnedUnsubscriber("subscribe"))
     {
     }
 

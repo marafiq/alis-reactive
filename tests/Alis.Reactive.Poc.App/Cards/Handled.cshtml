@@ -1,0 +1,39 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    var plan = Html.ReactivePlan<CardsWard>();
+    plan.Plugin<WardPager>().Reactive(pager => pager.Paged, (paged, pipeline) =>
+    {
+        pipeline.Listen(paged.Call, call => call.Answered, (answered, heard) =>
+        {
+            paged.Call.Acknowledge();
+            heard.Component<CallLog>("calls").Note("The desk acknowledged the call");
+        });
+        paged.Handled.Set(true);
+    });
+    plan.Plugin<WardPager>().Reactive(pager => pager.Paged, (paged, pipeline) =>
+    {
+        paged.Call.Acknowledge();
+        pipeline.Listen(paged.Call, call => call.Answered, (answered, heard) => answered.Logged.Set(true));
+    });
+}
+<p>Handled: <span id="handled">not yet</span></p>
+<p>Logged by: <span id="logged">nobody</span></p>
+
+@plan.CallLog("calls")
+
+@(plan.Button("page-12", "Page room 12")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Page("12");
+        pipeline.Element("handled").Text.Set(pipeline.Plugin<WardPager>().LastHandled);
+    }))
+
+@(plan.Button("answer-12", "Answer room 12")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<WardPager>().Answer("12", "Nurse Kim");
+        pipeline.Element("logged").Text.Set(pipeline.Plugin<WardPager>().LastLogged);
+    }))
+
+@Html.RenderPlan(plan)

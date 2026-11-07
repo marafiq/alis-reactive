@@ -37,6 +37,11 @@ public sealed class Pipeline<TModel>
     public Request Get(string url) => new(Build, RequestUrls.Checked(url));
 
     public void Unload(string elementId) => Slots.Unload(Build, elementId);
+
+    public void Listen<TObject, TArgs>(TObject source, Func<TObject, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TObject : EventedObject
+        where TArgs : JsObject, new()
+        => Trigger.Listen(Build, source, raised, pipeline);
 }
 
 public sealed class BoundInput
@@ -96,6 +101,26 @@ internal static class Trigger
         var raised = select(declaration);
         var objectId = build.Plugin(declaration.CheckedName(), declaration.Events.Listen);
         Handle(build, objectId, declaration.Events.Listen, raised, payload, run);
+    }
+
+    internal static void Listen<TModel, TObject, TArgs>(PlanBuild build, TObject source, Func<TObject, Event<TArgs>> select, Action<TArgs, Pipeline<TModel>> run)
+        where TObject : EventedObject
+        where TArgs : JsObject, new()
+    {
+        var binding = source.Binding;
+        if (binding.Members.MayHoldNothing)
+        {
+            throw new InvalidOperationException(
+                "Listen reaches an object its declaration says may hold nothing (optional or nullable). A listen needs its object when the step runs: listen to an object declared present.");
+        }
+
+        var target = binding.Target;
+        var raised = select(source);
+        var (payloadName, argumentsName) = build.ListenNames();
+        var args = JsObject.Bound<TArgs>(new Binding(new RefExpression(payloadName), build, ReadPresence.Required, new ArgumentsAt(new RefExpression(argumentsName))));
+        var pipeline = new Pipeline<TModel>(build);
+        var body = build.ListenBlock(payloadName, () => run(args, pipeline));
+        build.Write(new ListenStatement(target, raised.Name, source.Listening.Listen, [PathStep.Index(0)], ReadPresence.Required, Policy.Overlap, payloadName, argumentsName, body));
     }
 
     private static void Handle<TModel, TArgs>(PlanBuild build, string objectId, Listening listening, Event<TArgs> raised, IReadOnlyList<PathStep> payload, Action<TArgs, Pipeline<TModel>> run)

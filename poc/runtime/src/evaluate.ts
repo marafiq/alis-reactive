@@ -3,11 +3,13 @@ import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read
 import { operate } from "./operators";
 import { readData } from "./data";
 import { converted } from "./shapes";
+import type { Owner } from "./owners";
 
 export interface Context {
   readonly plan: PlanDocument;
   readonly scope: ReadonlyMap<string, Bound>;
   readonly locate: (id: string) => unknown;
+  readonly owner: Owner;
 }
 
 export type Bound = Read | Deferred;

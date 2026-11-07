@@ -195,7 +195,7 @@ and in the blocks inside it, and nowhere else.
 | `if` | | `when`: an expression; `then`, `else`: blocks | run `then` when `when` holds, else the `else` block; an `ElseIf` is an `else` block holding its condition's results and an `if` (D8.7) |
 | `all` | | `blocks`: a list of blocks | run every block at once; the next statement runs after every block settled (D10.10) |
 | `try` | | `body`, `finally`: blocks | run the body; run `finally` once, however the body ends (D11.8) |
-| `listen` | `event`: the event's JavaScript name; `vendor`: a vendor name of `vendors`; `payload`: a path into the listener's arguments; `policy` | `object`: an expression; `do`: a block | listen to the event of the live object the expression reads, once per object and statement, for the owner of the plan; run the block on each raise (D12.8) |
+| `listen` | `event`: the event's JavaScript name; `listen`: a vendor listening (a payload's object has no element for a vendor's `locate`); `payload`: a path into the listener's arguments; `members`, as a handler's; `policy`; `payloadName`, `argumentsName`: the names the block binds them under | `object`: an expression; `do`: a block | listen to the event of the live object the expression reads, once per object and statement, for the owner of the plan; run the block on each raise, with the payload and the arguments bound under their names, in the scope of the block that holds the statement (D12.8) |
 | `stop` | `reason`: text C# wrote | | stop the pipeline: run none of its later statements, log the reason, run the `finally` of every `try` it is inside (D4.6, N4.1) |
 
 ## Expressions

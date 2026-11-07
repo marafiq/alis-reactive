@@ -3,7 +3,7 @@ import { contextOf, listen } from "./objects";
 import { Stop } from "./read";
 import type { Owner } from "./owners";
 
-const planVersion = 8;
+const planVersion = 9;
 
 export interface Found {
   readonly plan: PlanDocument;
@@ -26,10 +26,10 @@ export function start(plan: PlanDocument, owner: Owner): void {
     console.error("[alis] the plan '" + plan.planId + "' is version " + String(plan.version) + "; this runtime reads version " + String(planVersion) + ".");
     return;
   }
-  const context = contextOf(plan);
+  const context = contextOf(plan, owner);
   for (const handler of plan.handlers) {
     try {
-      listen(context, handler, owner);
+      listen(context, handler);
     } catch (stopped) {
       if (!(stopped instanceof Stop)) throw stopped;
       console.error("[alis] the handler of '" + handler.event + "' did not start: " + stopped.reason);

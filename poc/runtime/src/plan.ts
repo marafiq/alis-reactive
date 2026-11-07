@@ -124,6 +124,19 @@ export interface LetStatement {
   readonly binds: LetBinding;
 }
 
+export interface ListenStatement {
+  readonly kind: "listen";
+  readonly object: Expression;
+  readonly event: string;
+  readonly listen: Listening;
+  readonly payload: readonly PathStep[];
+  readonly members: ReadPresence;
+  readonly policy: Policy;
+  readonly payloadName: string;
+  readonly argumentsName: string;
+  readonly do: readonly Statement[];
+}
+
 export type Listening = MethodListening | AssignmentListening | ReturnedListening;
 
 export interface LiteralExpression {
@@ -219,7 +232,7 @@ export interface StartAbsence {
   readonly value: JsonValue;
 }
 
-export type Statement = SetStatement | DoStatement | LetStatement | IfStatement;
+export type Statement = SetStatement | DoStatement | LetStatement | IfStatement | ListenStatement;
 
 export interface UnboundAbsence {
   readonly kind: "unbound";

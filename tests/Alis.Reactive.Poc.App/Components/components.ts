@@ -16,6 +16,7 @@ import { VisitPlanner } from "./VisitPlanner/visit-planner";
 import { CallLog, type CallLogHost } from "./CallLog/call-log";
 import { WardRadio } from "./WardRadio/ward-radio";
 import { BedsideMonitor, type BedsideMonitorHost } from "./BedsideMonitor/bedside-monitor";
+import { WardPager } from "./WardPager/ward-pager";
 import { onMount, onUnmount, providePlugin } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
@@ -108,3 +109,4 @@ providePlugin("oxygen-gauges", (host: HTMLElement) => OxygenGauges.of(host));
 providePlugin("visit-planner", new VisitPlanner());
 providePlugin("ward-radio", new WardRadio());
 providePlugin("night-radio", new WardRadio());
+providePlugin("ward-pager", new WardPager());

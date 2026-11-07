@@ -1751,9 +1751,22 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   - belongs to the owner of the plan whose pipeline added it, and leaves at that owner's release (D12.5);
   - is added once per object and step: the same object reached again adds no second listener, and another
     object gets its own;
-  - holds its object weakly, so the object lives as long as its vendor keeps it: at release a living object's
-    listener is removed by its listening kind, and a collected object took its listener with it;
-  - runs its own pipeline, whose payload is its own listener's arguments.
+  - holds its object weakly, and its listener too, since the listener's scope can hold the payload that holds the
+    object: the object lives as long as its vendor keeps it, at release a living object's listener is removed by its
+    listening kind, and a collected object took its listener with it. A returned subscribe's remover is the vendor's
+    own function, held until release with whatever it holds;
+  - runs its own pipeline, whose payload is its own listener's arguments, bound under a name of its own, and
+    which reads the bindings of the blocks around the step, as any block inside another does (schema.md);
+  - is refused where the view renders for a write to the payload of the event around the step: the vendor read
+    that payload when its listener returned, before the listened object raised (D11.4). Its own pipeline starts
+    in the listened object's turn, so a write to its own payload before its own awaited step reaches its vendor,
+    whatever the pipeline around it awaited;
+  - is refused where the view renders on an object declared optional or nullable: a listen needs its object when
+    the step runs;
+  - stops the pipeline the step is in when its object lacks a listening member (a subscribe or an unsubscribe, or a
+    returned subscribe gives back no remover), as a member a declaration names must be there; the listener a
+    returned subscribe added runs nothing, as a handler's does (D17.3).
+  The object's declaration carries its listening, a vendor's listening kind (D17.3), as a plugin's does.
   Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
   mutant: one listener per object, gone at its owner's release, and nothing called on a collected object. The
   first two are X12.9 and X12.10; the third is a garbage collector's timing, which no browser test arranges.
@@ -1786,7 +1799,9 @@ plans name.
 - kept: `Into(element)`, `Unload(element)`, `Html.RenderPlan`, and the hub's and stream's triggers.
 - No door names an owner: a developer chooses where a plan renders, and ownership follows.
 - `N12.1` new: `listen`, the handler of an event of a live object a pipeline reaches (D12.8); its form goes to
-  gate 2. It replaces the refusal of an event declared on an object a method returns.
+  gate 2. It replaces the refusal of an event declared on an object a method returns. POC 14d's form:
+  `pipeline.Listen(object, o => o.Event, (args, p) => ..)` on an `EventedObject`, a `JsObject` whose constructor
+  takes its `EventListening`; a listen on an object whose declaration carries no listening does not compile.
 
 **Evidence.**
 - The redesign refuses an event declared on an object a method returns and states nothing for an object a payload
@@ -2571,7 +2586,7 @@ grammar gains no node (G2).
     `plan.Plugin<TPlugin>().Reactive(..)`, in every block a component's member is used in: a handler, a condition's
     term and its branches, and a callback's answer.
   - Its events listen by a vendor's listening kinds (D17.3): `EventTarget`, `addEventListener` and
-    `removeEventListener`, unless the declaration names another with `PluginEvents`. The plan's locator carries the
+    `removeEventListener`, unless the declaration names another with `EventListening`. The plan's locator carries the
     plugin's name and its listening, and its object id is `$plugin:` and its name, so no element id meets it.
   - A declaration calls the object itself with `CallItself`, a `call` with no path, applied with `this` undefined:
     the doors of a plugin that is a function (main's `Command()` and `Function<T>()`, the redesign's `name: ""`).
@@ -2623,8 +2638,8 @@ plans (Q19).
 - `N17.10` new: an input field's `ValueJson` and `Json(options)`, the starting value and options a render helper
   writes (D17.13); their names go to gate 2.
 - kept: `Plugin`, `Plugin.Name` and `Plugin(string name)` (both lines).
-- `N17.11` new: `Plugin(string name, PluginEvents events)` and `PluginEvents` (`EventTarget`, `CallbackProperties`,
-  `Methods`, `ReturnedUnsubscriber`), `p.Plugin<TPlugin>()`, `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`
+- `N17.11` new: `Plugin(string name, EventListening events)` and `EventListening` (`EventTarget`, `CallbackProperties`,
+  `Methods`, `ReturnedUnsubscriber`; `PluginEvents` until POC 14d gave it a second holder, `EventedObject`), `p.Plugin<TPlugin>()`, `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`
   (D17.14); their forms go to gate 2. They replace the redesign's `ReactivePlan.RegisterPlugin<TPlugin>()`, so a plugin
   registered twice on one plan is no longer representable, and carry main's string doors by the declaration
   vocabulary: `p.Plugin(name)` and `p.Plugin(name, member)` by a declaration's members, `Plugin.Command()` and

@@ -8,6 +8,7 @@ namespace Alis.Reactive.Plan;
 [JsonDerivedType(typeof(DoStatement), "do")]
 [JsonDerivedType(typeof(LetStatement), "let")]
 [JsonDerivedType(typeof(IfStatement), "if")]
+[JsonDerivedType(typeof(ListenStatement), "listen")]
 internal abstract class Statement
 {
     private protected Statement()
@@ -79,4 +80,38 @@ internal sealed class IfStatement : Statement
     public IReadOnlyList<Statement> Then { get; }
 
     public IReadOnlyList<Statement> Else { get; internal set; }
+}
+
+internal sealed class ListenStatement : Statement
+{
+    internal ListenStatement(Expression target, string @event, Listening listen, IReadOnlyList<PathStep> payload, ReadPresence members, Policy policy, string payloadName, string argumentsName, IReadOnlyList<Statement> body)
+    {
+        Object = target;
+        Event = @event;
+        Listen = listen;
+        Payload = payload;
+        Members = members;
+        Policy = policy;
+        PayloadName = payloadName;
+        ArgumentsName = argumentsName;
+        Do = body;
+    }
+
+    public Expression Object { get; }
+
+    public string Event { get; }
+
+    public Listening Listen { get; }
+
+    public IReadOnlyList<PathStep> Payload { get; }
+
+    public ReadPresence Members { get; }
+
+    public Policy Policy { get; }
+
+    public string PayloadName { get; }
+
+    public string ArgumentsName { get; }
+
+    public IReadOnlyList<Statement> Do { get; }
 }
