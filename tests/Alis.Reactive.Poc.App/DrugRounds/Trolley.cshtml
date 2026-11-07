@@ -1,0 +1,18 @@
+@using Alis.Reactive.Poc.App.DrugRounds
+@model DrugRound
+@{
+    ViewData["Title"] = "Drug trolley";
+    var plan = Html.ReactivePlan<DrugRound>();
+}
+<h1>Drug trolley</h1>
+
+@(plan.MedicineRound("round")
+    .Reactive(round => round.Started, (started, pipeline) =>
+    {
+        var chart = started.Chart();
+        pipeline.Component<MedicineRound>("round").Resident.Set(chart.Read(found => found.Resident));
+        started.Trolley.Label.Set("Morning");
+        started.Trolley.Signature.Set(dose => dose.Drug);
+    }))
+
+@Html.RenderPlan(plan)

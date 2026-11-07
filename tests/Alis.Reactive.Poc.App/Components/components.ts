@@ -17,6 +17,7 @@ import { CallLog, type CallLogHost } from "./CallLog/call-log";
 import { WardRadio } from "./WardRadio/ward-radio";
 import { BedsideMonitor, type BedsideMonitorHost } from "./BedsideMonitor/bedside-monitor";
 import { WardPager } from "./WardPager/ward-pager";
+import { MedicineRound, type MedicineRoundHost } from "./MedicineRound/medicine-round";
 import { onMount, onUnmount, providePlugin } from "./mount";
 
 onMount<CareBoardHost>("[data-careboard]", (host) => {
@@ -93,6 +94,10 @@ onMount<BedsideMonitorHost>("[data-bedside-monitor]", (host) => {
 
 onUnmount<BedsideMonitorHost>("[data-bedside-monitor]", (host) => {
   host.monitor?.destroy();
+});
+
+onMount<MedicineRoundHost>("[data-medicine-round]", (host) => {
+  host.round = new MedicineRound(host);
 });
 
 providePlugin("shift-log", new ShiftLog());
