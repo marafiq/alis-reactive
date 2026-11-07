@@ -27,6 +27,10 @@ internal sealed class Binding
     internal ReadPresence Members { get; }
 }
 
+internal sealed class ListenerArgumentsOf : JsObject
+{
+}
+
 public abstract class JsObject
 {
     private Binding? _binding;
@@ -101,6 +105,19 @@ public abstract class JsObject
         where TItem : JsObject, new()
         => new(Binding.Build.Result(Call(arguments, name, declaredBy)), Binding.Build, ReadPresence.Required);
 
+    protected ReadOnly<TValue> Argument<TValue>(int position)
+        => new(ListenerArguments(), ArgumentStep(position));
+
+    protected void MethodAt(int position)
+        => MethodAt(position, []);
+
+    protected void MethodAt(int position, IReadOnlyList<Arg> arguments)
+    {
+        var listener = ListenerArguments().Binding;
+        var call = new CallExpression(listener.Target, [ArgumentStep(position)], listener.Members, [.. arguments.Select(argument => argument.ExpressionIn(Binding.Build))]);
+        Binding.Build.Write(new DoStatement(call, awaits: false));
+    }
+
     protected static Arg Fixed<TValue>(TValue value)
         where TValue : notnull
         => (Arg<TValue>)value;
@@ -115,6 +132,24 @@ public abstract class JsObject
     protected Event<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TArgs : JsObject, new()
         => new(JavaScriptName(name, declaredBy));
+
+    private ListenerArgumentsOf ListenerArguments()
+    {
+        var declaresAPayload = Binding.Target is RefExpression { Name: PlanBuild.PayloadName };
+        if (!declaresAPayload)
+        {
+            throw new InvalidOperationException(
+                "An argument at a position is what an event's listener receives: declare it on the event's payload.");
+        }
+
+        return Bound<ListenerArgumentsOf>(new Binding(new RefExpression(PlanBuild.ArgumentsName), Binding.Build, ReadPresence.Required));
+    }
+
+    private static PathStep ArgumentStep(int position)
+    {
+        if (position < 0) throw new ArgumentOutOfRangeException(nameof(position), position, "An argument's position is zero or more.");
+        return PathStep.Index(position);
+    }
 
     private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, string declaredBy)
         => new(Binding.Target, [Member(name, declaredBy)], Binding.Members, [.. arguments.Select(argument => argument.ExpressionIn(Binding.Build))]);

@@ -85,7 +85,8 @@ the handler) (D20.7).
   or `skip` (D11.7, N11.1);
 - `do`: a list of statements, the handler's body block.
 
-The payload is bound as `e` in the body block.
+The payload is bound as `e` in the body block, and the listener's arguments as `arguments`, which a payload's
+`Argument<T>(n)` and `MethodAt(n, ..)` read (D17.4).
 
 `Vendor` carries `locate`, a `fn` of the element that returns the component's object: a `get` of a path below
 the element, or a `call` of the plugin the vendor registers as its lookup (D17.3); and `listen`, a vendor

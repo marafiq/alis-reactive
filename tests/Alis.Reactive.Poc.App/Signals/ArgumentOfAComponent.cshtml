@@ -1,0 +1,15 @@
+@using Alis.Reactive.Poc.App.Signals
+@model SignalsPage
+@{
+    ViewData["Title"] = "Argument of a component";
+    var plan = Html.ReactivePlan<SignalsPage>();
+}
+<h1>Argument of a component</h1>
+
+<p>First argument: <span id="first">unread</span></p>
+
+@(plan.MedicineSearch("search")
+    .Reactive(search => search.Load, (load, pipeline) =>
+        pipeline.Element("first").Text.Set(pipeline.Component<MedicineSearch>("search").FirstArgument)))
+
+@Html.RenderPlan(plan)

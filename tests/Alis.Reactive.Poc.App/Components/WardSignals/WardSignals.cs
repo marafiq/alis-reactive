@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using Alis.Reactive.Components;
 using Alis.Reactive.Hosting;
+using Alis.Reactive.Values;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Alis.Reactive.Poc.App.Components;
@@ -46,6 +48,24 @@ public sealed class BedAssigned : JsObject
 
 public sealed record BedDetail(string Bed);
 
+public sealed class MedicineSearch : Component
+{
+    public static ComponentVendor SearchVendor { get; } = ComponentVendor.Define("medsearch", objectPath: "search", subscribe: "on", unsubscribe: "off");
+
+    public override ComponentVendor Vendor => SearchVendor;
+
+    public Event<SearchLoad> Load => Event<SearchLoad>();
+
+    public ReadOnly<string> FirstArgument => Argument<string>(0);
+}
+
+public sealed class SearchLoad : JsObject
+{
+    public ReadOnly<string> Query => Argument<string>(0);
+
+    public void Answer(Arg<IReadOnlyList<string>> items) => MethodAt(1, [items]);
+}
+
 public static class WardSignalsHtml
 {
     public static Rendered<CallBell> CallBell<TModel>(this ReactivePlan<TModel> plan, string id)
@@ -56,6 +76,9 @@ public static class WardSignalsHtml
 
     public static Rendered<BedBoard> BedBoard<TModel>(this ReactivePlan<TModel> plan, string id)
         => plan.Render<BedBoard>(id, Host(id, "data-bed-board"));
+
+    public static Rendered<MedicineSearch> MedicineSearch<TModel>(this ReactivePlan<TModel> plan, string id)
+        => plan.Render<MedicineSearch>(id, Host(id, "data-medicine-search"));
 
     private static TagBuilder Host(string id, string marker)
     {

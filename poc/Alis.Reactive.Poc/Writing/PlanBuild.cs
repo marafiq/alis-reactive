@@ -11,6 +11,8 @@ internal sealed class PlanBuild
 {
     internal const string PayloadName = "e";
 
+    internal const string ArgumentsName = "arguments";
+
     private readonly Dictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
     private readonly Dictionary<string, Locator> _objects = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _vendorOfElement = new(StringComparer.Ordinal);

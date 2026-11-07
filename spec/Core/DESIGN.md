@@ -2155,7 +2155,10 @@ grammar gains no node (G2).
   and the runtime's `instanceof` reading of the payload (B12) leave. An `Event<TArgs>` reads its payload at `[0]` with
   its members required, since the declaration says the listener receives it; an `Event` with no payload reads none,
   `[]`, so a vendor that raises it with no argument runs its handler. The handler carries both, the path and its
-  presence, and the runtime writes neither.
+  presence, and the runtime writes neither. A payload declaration reads the argument at a position with
+  `Argument<T>(n)` and calls the function the vendor hands over at a position with `MethodAt(n, [..])`, as
+  `arguments[n](..)` calls it in JavaScript; the handler binds the listener's arguments beside the payload. Either
+  door on a declaration that is not an event's payload is refused where the view renders (X17.18).
 - D17.5 A declaration follows its vendor's public contract, and the build checks it:
   - A member is declared only when the vendor's type declarations make it public. A `@private` member is a gap to
     name, and public members compose what it would do.
@@ -2276,6 +2279,8 @@ plans (Q19).
   which holds one listener, so a second handler would replace the first. Write both pipelines in one handler."
 - `X17.17` behavior (D17.3): a call bell whose event is a callback property runs its handler with the ring's room,
   and a ward feed whose subscribe method returns its unsubscriber runs its handler with the update's message.
+- `X17.18` refusal (D17.4): an argument at a position read on a declaration that is not an event's payload: "An
+  argument at a position is what an event's listener receives: declare it on the event's payload."
 - `X17.15` behavior (D4.8, D17.4): an event declared with a payload that its vendor raises with no argument stops
   before its first step, and the vendor goes on after its listeners; an event declared with none runs its handler.
 - `X17.14` behavior: a vendor's label callback shows, for each label, the text the view's expression answers.

@@ -35,6 +35,39 @@ export class WardFeed {
   }
 }
 
+export interface MedicineSearchHost extends HTMLElement {
+  search?: MedicineSearch;
+}
+
+export class MedicineSearch {
+  readonly #listeners = new Map<string, Set<Listener>>();
+  readonly #results: HTMLParagraphElement;
+
+  constructor(host: HTMLElement) {
+    this.#results = document.createElement("p");
+    this.#results.className = "search-results";
+    this.#results.textContent = "no results";
+    host.replaceChildren(this.#results, buttonOf("Search for In", () => this.#load("In")));
+  }
+
+  on(event: string, listener: Listener): void {
+    const listening = this.#listeners.get(event) ?? new Set<Listener>();
+    listening.add(listener);
+    this.#listeners.set(event, listening);
+  }
+
+  off(event: string, listener: Listener): void {
+    this.#listeners.get(event)?.delete(listener);
+  }
+
+  #load(query: string): void {
+    const answer = (items: readonly string[]): void => {
+      this.#results.textContent = items.join(", ");
+    };
+    for (const listener of this.#listeners.get("load") ?? []) listener(query, answer);
+  }
+}
+
 export function mountBedBoard(host: HTMLElement): void {
   host.replaceChildren(
     buttonOf("Assign bed 7", () => host.dispatchEvent(new CustomEvent("bed-assigned", { detail: { bed: "7" } }))),
