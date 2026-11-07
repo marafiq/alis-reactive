@@ -63,27 +63,26 @@ public sealed class ReadsNothingSuppressor : DiagnosticSuppressor
         private static readonly ImmutableHashSet<string> ReadingNothing = ["Count", "Where", "Select", "Any", "All", "Find"];
         private static readonly ImmutableHashSet<string> Stopping = ["Sum", "OrderBy", "OrderByDescending"];
         private static readonly ImmutableHashSet<string> Predicates = ["Any", "All", "Count"];
+        private static readonly string[] PathReaders = ["Alis.Reactive.Components.ReadOnly`1", "Alis.Reactive.Components.MethodResult`1", "Alis.Reactive.Pipelines.ResponseBody`1"];
 
         private readonly INamedTypeSymbol _lists;
-        private readonly INamedTypeSymbol _readOnly;
-        private readonly INamedTypeSymbol _methodResult;
+        private readonly ImmutableArray<INamedTypeSymbol> _pathReaders;
         private readonly INamedTypeSymbol _enumerable;
 
-        private DataDoors(INamedTypeSymbol lists, INamedTypeSymbol readOnly, INamedTypeSymbol methodResult, INamedTypeSymbol enumerable)
+        private DataDoors(INamedTypeSymbol lists, ImmutableArray<INamedTypeSymbol> pathReaders, INamedTypeSymbol enumerable)
         {
             _lists = lists;
-            _readOnly = readOnly;
-            _methodResult = methodResult;
+            _pathReaders = pathReaders;
             _enumerable = enumerable;
         }
 
         public static DataDoors? Of(Compilation compilation)
         {
             var lists = compilation.GetTypeByMetadataName("Alis.Reactive.Lists.DataLists");
-            var readOnly = compilation.GetTypeByMetadataName("Alis.Reactive.Components.ReadOnly`1");
-            var methodResult = compilation.GetTypeByMetadataName("Alis.Reactive.Components.MethodResult`1");
+            var pathReaders = PathReaders.Select(compilation.GetTypeByMetadataName).ToList();
             var enumerable = compilation.GetTypeByMetadataName("System.Linq.Enumerable");
-            return lists is null || readOnly is null || methodResult is null || enumerable is null ? null : new DataDoors(lists, readOnly, methodResult, enumerable);
+            if (lists is null || enumerable is null || pathReaders.Any(reader => reader is null)) return null;
+            return new DataDoors(lists, [.. pathReaders.Select(reader => reader!)], enumerable);
         }
 
         public List<IParameterSymbol> ItemsAround(SyntaxNode held, SemanticModel model, CancellationToken cancellation)
@@ -117,7 +116,7 @@ public sealed class ReadsNothingSuppressor : DiagnosticSuppressor
             var method = (called.ReducedFrom ?? called).OriginalDefinition;
             var owner = method.ContainingType;
             if (SymbolEqualityComparer.Default.Equals(owner, _lists)) return ListDoor(method.Name);
-            var readsAPath = method.Name == "Read" && (SymbolEqualityComparer.Default.Equals(owner, _readOnly) || SymbolEqualityComparer.Default.Equals(owner, _methodResult));
+            var readsAPath = method.Name == "Read" && _pathReaders.Contains(owner, SymbolEqualityComparer.Default);
             if (readsAPath) return Door.ReadsNothing;
             var predicate = SymbolEqualityComparer.Default.Equals(owner, _enumerable) && Predicates.Contains(method.Name);
             return predicate ? Door.Predicate : Door.None;

@@ -1,0 +1,59 @@
+@using Alis.Reactive.Lists
+@using Alis.Reactive.Poc.App.Residents
+@model ResidentLookup
+@{
+    ViewData["Title"] = "Resident lookup";
+    var plan = Html.ReactivePlan<ResidentLookup>();
+}
+<h1>Resident lookup</h1>
+
+@(Html.InputField(plan, m => m.Ward).TextBox("Ward")
+    .Reactive(box => box.Blur, (_, pipeline) =>
+    {
+        var ward = pipeline.Input(m => m.Ward).Component<NativeTextBox>().Value;
+        pipeline.Get<WardQuery>("/Residents/Register/{ward}", request => request.Set(r => r.Ward, ward))
+            .Response(response => response.OnError(other => other.Element("register").Text.Set("The ward's register is offline")));
+        pipeline.Element("register-checked").Text.Set(ward);
+    }))
+<p>Register: <strong id="register">not checked</strong>, last checked for <strong id="register-checked">no ward yet</strong></p>
+
+@(Html.InputField(plan, m => m.Name).TextBox("Resident name")
+    .Reactive(box => box.Blur, (_, pipeline) =>
+    {
+        var name = pipeline.Input(m => m.Name).Component<NativeTextBox>().Value;
+        pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request
+                .Set(r => r.Name, name)
+                .Set(r => r.Ward, pipeline.Input(m => m.Ward).Component<NativeTextBox>().Value)
+                .Set(r => r.Home, "Maple Court"))
+            .Response(response => response
+                .OnSuccess<ResidentSummary>((summary, found) =>
+                {
+                    found.Element("lookup-status").Text.Set(summary.Read(s => s.Name));
+                    found.Element("lookup-route").Text.Set("On the register");
+                    found.Element("room").Text.Set(summary.Read(s => s.Room));
+                    found.Element("wing").Text.Set(summary.Read(s => s.Wing.Name));
+                    found.Element("asked-ward").Text.Set(summary.Read(s => s.Ward));
+                    found.Element("asked-home").Text.Set(summary.Read(s => s.Home));
+                    found.When(summary.Read(s => s.Wing.Floor).Gt(0))
+                        .Then(upstairs => upstairs.Element("access").Text.Set("Needs the lift"))
+                        .Else(ground => ground.Element("access").Text.Set("Step-free"));
+                    found.When(summary.Read(s => s.Medicines).Any(medicine => medicine.Controlled))
+                        .Then(controlled => controlled.Element("signing").Text.Set("A second nurse signs each round"))
+                        .Else(uncontrolled => uncontrolled.Element("signing").Text.Set("No second signature"));
+                })
+                .OnError<NoResident>(404, (missing, notFound) =>
+                {
+                    notFound.Element("lookup-route").Text.Set("Not on the register");
+                    notFound.Element("lookup-status").Text.Set(missing.Read(m => m.Reason));
+                })
+                .OnError(other => other.Element("lookup-status").Text.Set("The register could not answer")));
+        pipeline.Element("last-lookup").Text.Set(name);
+    }))
+
+<p>Lookup: <strong id="lookup-status">not looked up</strong> <strong id="lookup-route"></strong></p>
+<p>Last looked up: <strong id="last-lookup">nobody yet</strong></p>
+<p>Room <strong id="room">no resident yet</strong> in the <strong id="wing">no wing yet</strong> wing, <strong id="access">access unknown</strong></p>
+<p>Medicines: <strong id="signing">not read yet</strong></p>
+<p>Asked in <strong id="asked-ward">no ward yet</strong> at <strong id="asked-home">no home yet</strong></p>
+
+@Html.RenderPlan(plan)

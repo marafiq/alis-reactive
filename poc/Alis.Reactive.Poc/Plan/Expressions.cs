@@ -15,6 +15,8 @@ namespace Alis.Reactive.Plan;
 [JsonDerivedType(typeof(AnswerExpression), "answer")]
 [JsonDerivedType(typeof(OperatorExpression), "op")]
 [JsonDerivedType(typeof(AsExpression), "as")]
+[JsonDerivedType(typeof(RecordExpression), "record")]
+[JsonDerivedType(typeof(ListExpression), "list")]
 internal abstract class Expression
 {
     private protected Expression()
@@ -150,4 +152,37 @@ internal sealed class AsExpression : Expression
     public Expression Expr { get; }
 
     public Shape Shape { get; }
+}
+
+internal sealed class RecordExpression : Expression
+{
+    internal RecordExpression(IReadOnlyList<RecordField> fields)
+    {
+        Fields = fields;
+    }
+
+    public IReadOnlyList<RecordField> Fields { get; }
+}
+
+internal sealed class RecordField
+{
+    internal RecordField(string name, Expression value)
+    {
+        Name = name;
+        Value = value;
+    }
+
+    public string Name { get; }
+
+    public Expression Value { get; }
+}
+
+internal sealed class ListExpression : Expression
+{
+    internal ListExpression(IReadOnlyList<Expression> items)
+    {
+        Items = items;
+    }
+
+    public IReadOnlyList<Expression> Items { get; }
 }

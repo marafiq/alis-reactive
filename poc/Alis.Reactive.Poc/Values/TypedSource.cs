@@ -29,6 +29,12 @@ public abstract class TypedSource<T> : ITypedSource<T>, IPlanSource
 
     internal virtual HeldForm Form => Build.OptionsForm;
 
+    private protected TypedSource<TRead> DataPast<TRead>(System.Linq.Expressions.Expression<Func<T, TRead>> path, string argument)
+    {
+        var read = JsonPath.Of(path, Form, Build.Starts, argument);
+        return new DataRead<TRead>(new DataExpression(Expression, read.Steps), Build, read.Form);
+    }
+
     Expression IPlanSource.Expression => Expression;
 
     PlanBuild IPlanSource.Build => Build;

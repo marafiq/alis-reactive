@@ -172,6 +172,20 @@ internal static class References
             case AsExpression conversion:
                 Of(conversion.Expr, whenReached, read);
                 return;
+            case RecordExpression record:
+                foreach (var field in record.Fields)
+                {
+                    Of(field.Value, whenReached, read);
+                }
+
+                return;
+            case ListExpression list:
+                foreach (var item in list.Items)
+                {
+                    Of(item, whenReached, read);
+                }
+
+                return;
             case LiteralExpression or ObjectExpression:
                 return;
             default:

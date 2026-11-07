@@ -36,6 +36,9 @@ public sealed class Pipeline<TModel>
 
     public Request Get(string url) => new(Build, RequestUrls.Checked(url));
 
+    public SentRequest<TModel> Get<TRequest>(string url, Action<RequestMembers<TRequest>> request)
+        => SentRequest<TModel>.Get(Build, url, request);
+
     public void Unload(string elementId) => Slots.Unload(Build, elementId);
 
     public void Listen<TObject, TArgs>(TObject source, Func<TObject, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)

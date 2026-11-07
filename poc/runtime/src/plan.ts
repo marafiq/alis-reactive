@@ -23,7 +23,7 @@ export interface AssignmentListening {
   readonly kind: "assignment";
 }
 
-export type BodyKind = "html";
+export type BodyKind = "html" | "json";
 
 export interface CallExpression {
   readonly kind: "call";
@@ -61,7 +61,7 @@ export interface ElementLocator {
   readonly vendor: string;
 }
 
-export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | DataExpression | CallExpression | FnExpression | AnswerExpression | OperatorExpression | AsExpression;
+export type Expression = LiteralExpression | ObjectExpression | RefExpression | GetExpression | DataExpression | CallExpression | FnExpression | AnswerExpression | OperatorExpression | AsExpression | RecordExpression | ListExpression;
 
 export interface FnExpression {
   readonly kind: "fn";
@@ -105,7 +105,9 @@ export interface HttpResponse {
 
 export interface HttpSend {
   readonly method: HttpMethod;
-  readonly url: string;
+  readonly path: readonly PathPart[];
+  readonly search: string;
+  readonly query: readonly QueryField[];
   readonly success: BodyKind;
 }
 
@@ -128,6 +130,11 @@ export interface LetStatement {
   readonly expr: Expression;
   readonly await: boolean;
   readonly binds: LetBinding;
+}
+
+export interface ListExpression {
+  readonly kind: "list";
+  readonly items: readonly Expression[];
 }
 
 export interface ListenStatement {
@@ -190,6 +197,8 @@ export interface OperatorExpression {
   readonly args: readonly Expression[];
 }
 
+export type PathPart = TextPart | ValuePart;
+
 export type PathStep = string | number;
 
 export interface PlanCulture {
@@ -216,7 +225,23 @@ export type Policy = "overlap" | "replace" | "skip";
 
 export type Presence = "required" | "optional";
 
+export interface QueryField {
+  readonly name: string;
+  readonly value: JsonValue;
+  readonly whenNothing: WhenNothing;
+}
+
 export type ReadPresence = "required" | "optional" | "requiredIfHeld" | "optionalMember";
+
+export interface RecordExpression {
+  readonly kind: "record";
+  readonly fields: readonly RecordField[];
+}
+
+export interface RecordField {
+  readonly name: string;
+  readonly value: Expression;
+}
 
 export interface RefExpression {
   readonly kind: "ref";
@@ -248,11 +273,24 @@ export interface StartAbsence {
 
 export type Statement = SetStatement | DoStatement | LetStatement | IfStatement | ListenStatement;
 
+export interface TextPart {
+  readonly kind: "text";
+  readonly text: string;
+}
+
 export interface UnboundAbsence {
   readonly kind: "unbound";
+}
+
+export interface ValuePart {
+  readonly kind: "value";
+  readonly name: string;
+  readonly value: JsonValue;
 }
 
 export interface Vendor {
   readonly locate: Expression;
   readonly listen: Listening;
 }
+
+export type WhenNothing = "leave" | "empty";

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -5,18 +6,87 @@ namespace Alis.Reactive.Plan;
 
 internal sealed class HttpSend
 {
-    internal HttpSend(HttpMethod method, string url, BodyKind success)
+    internal HttpSend(HttpMethod method, IReadOnlyList<PathPart> path, string search, IReadOnlyList<QueryField> query, BodyKind success)
     {
         Method = method;
-        Url = url;
+        Path = path;
+        Search = search;
+        Query = query;
         Success = success;
     }
 
     public HttpMethod Method { get; }
 
-    public string Url { get; }
+    public IReadOnlyList<PathPart> Path { get; }
+
+    public string Search { get; }
+
+    public IReadOnlyList<QueryField> Query { get; }
 
     public BodyKind Success { get; }
+}
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+[JsonDerivedType(typeof(TextPart), "text")]
+[JsonDerivedType(typeof(ValuePart), "value")]
+internal abstract class PathPart
+{
+    private protected PathPart()
+    {
+    }
+}
+
+internal sealed class TextPart : PathPart
+{
+    internal TextPart(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
+internal sealed class ValuePart : PathPart
+{
+    internal ValuePart(string name, JsonElement value)
+    {
+        Name = name;
+        Value = value;
+    }
+
+    public string Name { get; }
+
+    public JsonElement Value { get; }
+}
+
+internal sealed class QueryField
+{
+    internal QueryField(string name, JsonElement value, WhenNothing whenNothing)
+    {
+        Name = name;
+        Value = value;
+        WhenNothing = whenNothing;
+    }
+
+    public string Name { get; }
+
+    public JsonElement Value { get; }
+
+    public WhenNothing WhenNothing { get; }
+}
+
+[JsonConverter(typeof(ChoiceConverter<WhenNothing>))]
+internal sealed class WhenNothing : IChoice
+{
+    internal static readonly WhenNothing Leave = new("leave");
+    internal static readonly WhenNothing Empty = new("empty");
+
+    private WhenNothing(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
 }
 
 internal sealed class HttpResponse
@@ -55,6 +125,7 @@ internal sealed class HttpMethod : IChoice
 internal sealed class BodyKind : IChoice
 {
     internal static readonly BodyKind Html = new("html");
+    internal static readonly BodyKind Json = new("json");
 
     private BodyKind(string text)
     {

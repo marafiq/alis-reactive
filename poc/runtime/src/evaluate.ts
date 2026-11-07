@@ -42,6 +42,10 @@ export function evaluate(expression: Expression, context: Context): Read {
       return operate(expression, (argument) => evaluate(argument, context), context.plan.culture);
     case "as":
       return converted(evaluate(expression.expr, context), expression.shape);
+    case "record":
+      return value(Object.fromEntries(expression.fields.map((field) => [field.name, heldOrNull(evaluate(field.value, context))])));
+    case "list":
+      return value(expression.items.map((item) => heldOrNull(evaluate(item, context))));
     default:
       return assertNever(expression);
   }

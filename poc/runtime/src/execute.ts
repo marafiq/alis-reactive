@@ -51,6 +51,7 @@ function settle(statement: Awaited, context: Context): Promise<Read> {
 
 function rejected(call: CallExpression): (reason: unknown) => never {
   return (reason) => {
+    if (reason instanceof Stop) throw reason;
     throw new Stop(callee(call) + " rejected: " + (reason instanceof Error ? reason.message : String(reason)));
   };
 }
