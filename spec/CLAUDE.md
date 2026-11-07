@@ -118,6 +118,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `Read`, and on a cast from a nullable there, which reads as its `Value` does (D6.14, POC 13g-ii). The warning stays
   where null stops the pipeline (a `Sum` term, an `OrderBy` key), on a value the view holds, and on an input's member
   path, which keeps the warning MVC's own helpers give (N6.3, POC 13g).
+- Chosen within the owner's yes, 2026-11-07: POC 14 builds one request, `Get(url).Into(container)`, since a slot
+  loads only through a request (D10.11). The gate 1 flag that the approved list holds no request POC is amended to
+  name it: a GET whose success body loads a slot, and nothing else of the HTTP module.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

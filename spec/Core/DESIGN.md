@@ -1754,7 +1754,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   - holds its object weakly, so the object lives as long as its vendor keeps it: at release a living object's
     listener is removed by its listening kind, and a collected object took its listener with it;
   - runs its own pipeline, whose payload is its own listener's arguments.
-  Ownership.tla gains the step and its invariants with POC 14, and each becomes a Playwright test.
+  Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
+  mutant: one listener per object, gone at its owner's release, and nothing called on a collected object. The
+  first two are X12.9 and X12.10; the third is a garbage collector's timing, which no browser test arranges.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
 the statement `listen`, and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
@@ -1770,6 +1772,9 @@ plans name.
 - `Ownership.tla:HubKeptWhileHeld`
 - `Ownership.tla:OfferOnlyWhileHeld`
 - `Ownership.tla:NoUnsubscribeOnDestroyed`
+- `Ownership.tla:ListenOncePerObject`
+- `Ownership.tla:ListenLeavesWithItsOwner`
+- `Ownership.tla:NoRemoveOnCollected`
 - `Lanes.tla:FinallyRunsBeforeRelease`
 - `probe:ej2-destroy-removes-instance`
 - `probe:ej2-destroy-sets-is-destroyed`
