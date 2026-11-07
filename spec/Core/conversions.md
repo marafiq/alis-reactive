@@ -71,13 +71,15 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 
 | Source | Result |
 |--------|--------|
-| a JavaScript array | each element converted to `item`; an element that converts to nothing stays nothing |
+| a JavaScript array whose elements each convert to themselves | the array itself |
+| any other JavaScript array | a new array, each element converted to `item`; an element that converts to nothing stays nothing |
 
 ## object(fields)
 
 | Source | Result |
 |--------|--------|
-| a plain object | each declared field converted to its shape; fields it does not declare stay as they are |
+| an object whose declared fields each convert to themselves | the object itself, its identity and prototype kept |
+| a plain object a declared field of which converts to another value | a copy, each declared field converted to its shape; fields it does not declare stay as they are |
 
 ## any
 

@@ -26,9 +26,9 @@ export function converted(read: Read, shape: Shape): Read {
     case "nullable":
       return typeof held === "string" && held.trim().length === 0 ? nothing : converted(read, shape.inner);
     case "array":
-      return Array.isArray(held) ? value(held.map((item: unknown) => heldOrNull(converted(value(item), shape.item)))) : nothing;
+      return Array.isArray(held) ? listOf(held, shape.item) : nothing;
     case "object":
-      return isPlainObject(held) ? value(withFields(held, shape.fields)) : nothing;
+      return typeof held === "object" && !Array.isArray(held) ? objectOf(held as Record<string, unknown>, shape.fields) : nothing;
     default:
       return assertNever(shape);
   }
@@ -41,12 +41,21 @@ function asDate(held: unknown): Read {
   return text === undefined ? nothing : value(dateOf(text));
 }
 
-function withFields(held: Record<string, unknown>, fields: { readonly [name: string]: Shape }): Record<string, unknown> {
-  const copy: Record<string, unknown> = { ...held };
+function listOf(held: readonly unknown[], item: Shape): Read {
+  const items = held.map((each: unknown) => heldOrNull(converted(value(each), item)));
+  return items.every((each, position) => each === held[position]) ? value(held) : value(items);
+}
+
+function objectOf(held: Record<string, unknown>, fields: { readonly [name: string]: Shape }): Read {
+  const changed: [string, unknown][] = [];
   for (const [name, shape] of Object.entries(fields)) {
-    if (name in held) copy[name] = heldOrNull(converted(value(held[name]), shape));
+    if (!(name in held)) continue;
+    const field = heldOrNull(converted(value(held[name]), shape));
+    if (field !== held[name]) changed.push([name, field]);
   }
-  return copy;
+  if (changed.length === 0) return value(held);
+  if (!isPlainObject(held)) return nothing;
+  return value({ ...held, ...Object.fromEntries(changed) });
 }
 
 function isPlainObject(held: unknown): held is Record<string, unknown> {

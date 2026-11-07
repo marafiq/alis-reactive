@@ -32,6 +32,8 @@ public sealed class VisitPlanner : Plugin
 
     public void Request() => Method();
 
+    public MethodResult<PlannedVisit> Suggest() => Method<PlannedVisit>();
+
     public void PlanDays(Arg<IReadOnlyDictionary<string, DateTime>> days) => Method([days]);
 
     public void PlanFamily(Arg<FamilyVisit> visit) => Method([visit]);

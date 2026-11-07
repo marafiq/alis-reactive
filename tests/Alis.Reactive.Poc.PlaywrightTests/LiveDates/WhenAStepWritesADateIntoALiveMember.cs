@@ -24,6 +24,16 @@ public sealed class WhenAStepWritesADateIntoALiveMember : AppPageTest
     }
 
     [Test]
+    public async Task an_object_a_live_method_returns_with_its_date_held_reaches_another_method_as_it_is()
+    {
+        await Open("/Visits/Planner");
+
+        await Button("Book the planner's suggestion").ClickAsync();
+
+        await Expect(Page.Locator("#booked")).ToHaveTextAsync("Sam Park, Sunday 16:45");
+    }
+
+    [Test]
     public async Task each_date_of_a_list_a_step_passes_reaches_the_method_as_a_date()
     {
         await Open("/Visits/Planner");

@@ -3,11 +3,14 @@
 @{
     ViewData["Title"] = "Visitor book";
     var plan = Html.ReactivePlan<ShiftsPage>();
+    plan.Plugin<VisitorBook>().Reactive(book => book.Signed, (signed, pipeline) =>
+        pipeline.Element("front-desk").Text.Set(signed.Detail.Read(detail => detail!.Visitor)));
 }
 <h1>Visitor book</h1>
 
 <p>Signing: <span id="sign-tried">not tried</span></p>
 <p>Signed by: <span id="signed">nobody</span></p>
+<p>Front desk told of: <span id="front-desk">no visitor</span></p>
 <p>Greeting: <span id="greeting">none</span></p>
 
 <button type="button" data-opens-visitor-book>Open the visitor book</button>

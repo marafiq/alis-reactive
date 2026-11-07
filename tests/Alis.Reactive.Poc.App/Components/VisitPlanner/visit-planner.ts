@@ -9,6 +9,13 @@ interface PlannedVisit {
   readonly at: Date;
 }
 
+class Suggestion implements PlannedVisit {
+  constructor(
+    readonly resident: string,
+    readonly at: Date,
+  ) {}
+}
+
 export class VisitPlanner extends EventTarget {
   booked = "nothing booked";
   next = new Date(2026, 10, 1, 9, 0, 0);
@@ -35,6 +42,10 @@ export class VisitPlanner extends EventTarget {
 
   reschedule(at: Date | null): void {
     this.booked = at === null ? "unscheduled" : shown(at);
+  }
+
+  suggest(): PlannedVisit {
+    return new Suggestion("Sam Park", new Date(2026, 10, 8, 16, 45, 0));
   }
 
   request(): void {

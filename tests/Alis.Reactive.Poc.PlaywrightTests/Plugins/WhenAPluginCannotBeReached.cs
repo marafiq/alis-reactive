@@ -28,6 +28,18 @@ public sealed class WhenAPluginCannotBeReached : AppPageTest
     }
 
     [Test]
+    public async Task a_plugin_a_script_provides_after_the_page_started_raises_events_no_handler_hears()
+    {
+        await Open("/Shifts/VisitorBook");
+
+        await Button("Open the visitor book").ClickAsync();
+        await Button("Sign the book").ClickAsync();
+
+        await Expect(Page.Locator("#signed")).ToHaveTextAsync("Ada Byron");
+        await Expect(Page.Locator("#front-desk")).ToHaveTextAsync("no visitor");
+    }
+
+    [Test]
     public async Task a_plugin_name_two_scripts_provide_stops_each_step_that_reaches_it()
     {
         await Open("/Shifts/LogTwice");

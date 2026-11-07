@@ -67,10 +67,15 @@ export class BedStore {
   }
 }
 
-export class VisitorBook {
+interface Signed {
+  readonly visitor: string;
+}
+
+export class VisitorBook extends EventTarget {
   lastVisitor = "";
 
   sign(visitor: string): void {
     this.lastVisitor = visitor;
+    this.dispatchEvent(new CustomEvent<Signed>("signed", { detail: { visitor } }));
   }
 }

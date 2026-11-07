@@ -230,6 +230,9 @@ Terms used throughout:
     `JsonTypeInfo<DateTime>` and its kin, its members and its item type, with no read of a `System.Type` member.
   - Refused where the view renders: a dictionary whose values hold dates, since `object(fields)` names its members
     ahead, and a type that holds itself and a date, since its shape would not end.
+  - A value whose dates are already `Date`s reaches the member as it is, so an object a live method returns, a class
+    instance, keeps its identity and prototype; only a plain object or array that holds a date as text is copied
+    with it converted (`spec/Core/conversions.md`).
   - Data a step sends to the server keeps the wire text (D3.8).
   - The redesign wrote these shapes by reflection over the type (`Alis.Reactive/Components/ArgumentShape.cs`,
     `ClrShape.SerializedProperties`); the contract carries the same feature.
@@ -299,7 +302,7 @@ Terms used throughout:
   New York's offset for that day.
 - `X3.10` behavior (D3.13): a visit planner receives as a `Date` a date a step passes, one inside an object, each
   date of a list, a date a step sets as its property and a date an event carries as text; it receives an instant as
-  that moment, and a nullable date's null as null.
+  that moment, a nullable date's null as null, and the suggestion its own method returns, a class instance, as it is.
 - `X3.11` refusal (D3.13): a dictionary of dates: "A value written into a live member is a dictionary whose values
   hold dates. A date reaches a live member by its member's name: pass the entries as a list of objects that name each
   key."
@@ -2356,6 +2359,9 @@ grammar gains no node (G2).
     `alis:mount`, and from then on the queue's push registers at once, so a plugin a script provides after the page
     started is found by the next step that reaches it. The redesign drops such a push with no word: it deletes the
     queue at boot (`Alis.Reactive.Assets/runtime/root.ts:44-45`).
+  - A plugin's handlers subscribe when their plan starts, as a component's do, so the events of a plugin provided
+    after the page started reach no handler, and each of its handlers is reported at start as one that did not start;
+    a step reaches its members once it is provided.
   - A step reaching a name no script provides stops its pipeline, naming the plugin. A name two scripts provide holds
     no plugin, and each step that reaches it stops from then on, so a plugin provided again after steps used it
     stops those steps from then on. The instance is any value, read as a required read reads any present value
@@ -2476,7 +2482,8 @@ plans (Q19).
   property and a bed store to a subscriber whose unsubscribe it returns; a plugin that is a function answers the
   resident's initials.
 - `X17.25` behavior (D17.14): a step reaching the visitor book before a script provides it stops its own pipeline and
-  the page's other pipelines run; once the page's code provides it, after the page started, the next step finds it.
+  the page's other pipelines run; once the page's code provides it, after the page started, the next step finds it,
+  and the book's signed event reaches no handler of the page.
 - `X17.26` behavior (D17.14): a shift log two scripts provide stops each step that reaches it, and a ward lantern
   provided as a number stops each step that reads a colour a number lacks; the page's other pipelines run.
 - `X17.27` refusal (D17.14): a plugin named with a dot: "Plugin name 'alis.log' must start with a letter and contain

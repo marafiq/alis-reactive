@@ -71,6 +71,14 @@
         pipeline.Element("next-day").Text.Set(planner.NextDay);
     }))
 
+@(plan.Button("book-suggestion", "Book the planner's suggestion")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var planner = pipeline.Plugin<VisitPlanner>();
+        planner.BookVisit(planner.Suggest());
+        pipeline.Element("booked").Text.Set(planner.Booked);
+    }))
+
 @(plan.Button("request", "Request a visit")
     .Reactive(button => button.Click, pipeline => pipeline.Plugin<VisitPlanner>().Request()))
 

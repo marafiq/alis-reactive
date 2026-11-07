@@ -83,8 +83,17 @@ public sealed class VisitorBook : Plugin
 
     public ReadOnly<string> LastVisitor => ReadOnly<string>();
 
+    public Event<BookSigned> Signed => Event<BookSigned>();
+
     public void Sign(Arg<string> visitor) => Method([visitor]);
 }
+
+public sealed class BookSigned : JsObject
+{
+    public ReadOnly<SignedDetail?> Detail => ReadOnly<SignedDetail?>();
+}
+
+public sealed record SignedDetail(string Visitor);
 
 public sealed class WardLantern : Plugin
 {
