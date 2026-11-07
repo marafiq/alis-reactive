@@ -443,8 +443,8 @@ Terms used throughout:
     its pipeline. An optional member is absent when its holder lacks it or holds it as undefined, since `?` admits
     both (a class field compiled to ES2022 holds undefined): it reads nothing, a call of it runs nothing and its
     result reads nothing, and a write to it sets it. The mark is the member's, not its holder's: an optional member
-    of a live object that holds nothing stops, as any member of it does, and the members of what an absent optional
-    member would hold or return read nothing.
+    of a live object declared neither optional nor nullable stops when that object holds nothing, as any member of it
+    does, and the members of a live object declared optional or nullable read nothing while it holds nothing.
   - Value. The member's C# type is the API's value type, nullable where the API's value is: `string | null` is
     `string?`, `number | null` is `decimal?`. Null is a value that data holds and a declaration states, never a
     state of the framework (the owner, 2026-11-06: "That is about the framework, not about the value"). A payload
