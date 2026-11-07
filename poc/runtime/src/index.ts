@@ -5,10 +5,16 @@ import { Stop } from "./read";
 const planVersion = 7;
 
 function boot(): void {
+  document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: document.body } }));
   for (const script of document.querySelectorAll<HTMLScriptElement>('script[type="application/json"][data-alis-plan]')) {
     start(JSON.parse(script.textContent) as PlanDocument);
   }
   document.documentElement.dataset["alisBooted"] = "true";
+}
+
+function parsed(): boolean {
+  const [navigation] = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+  return document.readyState === "complete" || (navigation !== undefined && navigation.domContentLoadedEventStart > 0);
 }
 
 function start(plan: PlanDocument): void {
@@ -27,4 +33,5 @@ function start(plan: PlanDocument): void {
   }
 }
 
-boot();
+if (parsed()) boot();
+else document.addEventListener("DOMContentLoaded", boot, { once: true });

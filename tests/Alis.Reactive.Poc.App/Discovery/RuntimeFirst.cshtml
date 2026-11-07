@@ -1,0 +1,17 @@
+@using Alis.Reactive.Poc.App.Discovery
+@model WardChoice
+@{
+    ViewData["Title"] = "Ward choice";
+    Layout = "_RuntimeFirstLayout";
+    var plan = Html.ReactivePlan<WardChoice>();
+    string[] wards = ["North", "South", "East"];
+}
+<h1>Ward choice</h1>
+
+@(Html.InputField(plan, m => m.Ward).WardPicker("Ward", wards)
+    .Reactive(picker => picker.Change, pipeline =>
+        pipeline.Element("chosen-ward").Text.Set(pipeline.Input(m => m.Ward).Component<WardPicker>().Selected)))
+
+<p>Chosen ward: <strong id="chosen-ward">not chosen yet</strong></p>
+
+@Html.RenderPlan(plan)

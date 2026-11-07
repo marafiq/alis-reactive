@@ -8,59 +8,60 @@ import { VitalsMonitor, type VitalsMonitorHost } from "./VitalsMonitor/vitals-mo
 import { CallBell, MedicineSearch, WardFeed, mountBedBoard, type CallBellHost, type MedicineSearchHost, type WardFeedHost } from "./WardSignals/ward-signals";
 import { NurseStation, StationCensus, type NurseStationHost, type StationCensusHost } from "./NurseStation/nurse-station";
 import { WardPicker, type WardPickerHost } from "./WardPicker/ward-picker";
+import { onMount } from "./mount";
 
-for (const host of document.querySelectorAll<CareBoardHost>("[data-careboard]")) {
+onMount<CareBoardHost>("[data-careboard]", (host) => {
   host.careBoard = host.dataset["careboard"] === "2" ? new CareBoardV2(host) : new CareBoardV1(host);
-}
+});
 
-for (const host of document.querySelectorAll<DutyRosterHost>("[data-duty-roster]")) {
+onMount<DutyRosterHost>("[data-duty-roster]", (host) => {
   host.instances = [host.dataset["dutyRoster"] === "2" ? new DutyRosterV2(host) : new DutyRoster(host)];
-}
+});
 
-for (const host of document.querySelectorAll<NurseStationHost>("[data-nurse-station]")) {
+onMount<NurseStationHost>("[data-nurse-station]", (host) => {
   host.station = new NurseStation(host);
-}
+});
 
-for (const host of document.querySelectorAll<StationCensusHost>("[data-station-census]")) {
+onMount<StationCensusHost>("[data-station-census]", (host) => {
   host.census = new StationCensus(host);
-}
+});
 
-for (const host of document.querySelectorAll<MedicationCartHost>("[data-medication-cart]")) {
+onMount<MedicationCartHost>("[data-medication-cart]", (host) => {
   host.cart = new MedicationCart(host);
-}
+});
 
-for (const host of document.querySelectorAll<InfusionPumpHost>("[data-infusion-pump]")) {
+onMount<InfusionPumpHost>("[data-infusion-pump]", (host) => {
   host.pump = host.dataset["infusionPump"] === "older" ? new OlderInfusionPump(host) : new CurrentInfusionPump(host);
-}
+});
 
-for (const host of document.querySelectorAll<VitalsMonitorHost>("[data-vitals-monitor]")) {
+onMount<VitalsMonitorHost>("[data-vitals-monitor]", (host) => {
   host.monitor = new VitalsMonitor(host, host.dataset["vitalsMonitor"] === "older");
-}
+});
 
-for (const host of document.querySelectorAll<CallBellHost>("[data-call-bell]")) {
+onMount<CallBellHost>("[data-call-bell]", (host) => {
   host.bell = new CallBell(host);
-}
+});
 
-for (const host of document.querySelectorAll<WardFeedHost>("[data-ward-feed]")) {
+onMount<WardFeedHost>("[data-ward-feed]", (host) => {
   host.feed = new WardFeed(host);
-}
+});
 
-for (const host of document.querySelectorAll<HTMLElement>("[data-bed-board]")) {
+onMount<HTMLElement>("[data-bed-board]", (host) => {
   mountBedBoard(host);
-}
+});
 
-for (const host of document.querySelectorAll<MedicineSearchHost>("[data-medicine-search]")) {
+onMount<MedicineSearchHost>("[data-medicine-search]", (host) => {
   host.search = new MedicineSearch(host);
-}
+});
 
-for (const host of document.querySelectorAll<DoseChartHost>("[data-dose-chart]")) {
+onMount<DoseChartHost>("[data-dose-chart]", (host) => {
   host.chart = new DoseChart(host);
-}
+});
 
-for (const host of document.querySelectorAll<FluidBalanceHost>("[data-fluid-balance]")) {
+onMount<FluidBalanceHost>("[data-fluid-balance]", (host) => {
   host.balance = new FluidBalance(host);
-}
+});
 
-for (const host of document.querySelectorAll<WardPickerHost>("[data-ward-picker]")) {
+onMount<WardPickerHost>("[data-ward-picker]", (host) => {
   host.picker = new WardPicker(host);
-}
+});
