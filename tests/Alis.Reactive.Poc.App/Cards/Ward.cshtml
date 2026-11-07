@@ -49,4 +49,35 @@
 @(plan.Button("note", "Note a fall")
     .Reactive(button => button.Click, pipeline => pipeline.Plugin<ShiftLog>().Add("A fall in room 12")))
 
+<p>Struck: <span id="struck">not yet</span></p>
+<p>Assigned: <span id="assigned">not yet</span></p>
+
+@(plan.Button("strike", "Strike the hour")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<NightClock>().Strike();
+        pipeline.Element("struck").Text.Set("Struck once");
+    }))
+
+@(plan.Button("strike-again", "Strike the hour again")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<NightClock>().Strike();
+        pipeline.Element("struck").Text.Set("Struck again");
+    }))
+
+@(plan.Button("assign", "Assign bed 12B")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<BedStore>().Assign("12B");
+        pipeline.Element("assigned").Text.Set("Assigned once");
+    }))
+
+@(plan.Button("assign-again", "Assign bed 14C")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Plugin<BedStore>().Assign("14C");
+        pipeline.Element("assigned").Text.Set("Assigned again");
+    }))
+
 @Html.RenderPlan(plan)

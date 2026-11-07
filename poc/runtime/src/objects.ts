@@ -44,7 +44,16 @@ export function listen(context: Context, handler: Handler, owner: Owner): void {
   if (raiser.kind === "nothing" || raiser.value === null || typeof raiser.value !== "object") {
     throw new Stop("The object that raises '" + handler.event + "' is not on the page.");
   }
-  owner.holds(subscribe(raiser.value, listeningOf(context, handler.on), handler.event, (...args) => run(context, handler, args)));
+  let refused = false;
+  const listener: Listener = (...args) => {
+    if (!refused) run(context, handler, args);
+  };
+  try {
+    owner.holds(subscribe(raiser.value, listeningOf(context, handler.on), handler.event, listener));
+  } catch (stopped) {
+    refused = true;
+    throw stopped;
+  }
 }
 
 function listeningOf(context: Context, id: string): Listening {

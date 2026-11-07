@@ -4,6 +4,10 @@
     var plan = Html.ReactivePlan<CareCard>();
     plan.Plugin<ShiftLog>().Reactive(log => log.Noted, (noted, pipeline) =>
         pipeline.Component<CallLog>("calls").Note(Model.Resident + " heard the note"));
+    plan.Plugin<NightClock>().Reactive(clock => clock.Struck, (struck, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note(Model.Resident + " heard the hour"));
+    plan.Plugin<BedStore>().Reactive(store => store.Assigned, (taken, pipeline) =>
+        pipeline.Component<CallLog>("calls").Note(Model.Resident + " heard a bed assigned"));
 }
 <h2>@Model.Resident</h2>
 

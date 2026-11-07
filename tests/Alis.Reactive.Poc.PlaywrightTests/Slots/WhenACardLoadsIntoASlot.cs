@@ -125,5 +125,55 @@ public sealed class WhenACardLoadsIntoASlot : AppPageTest
         await Expect(Page.Locator("#asked")).ToHaveTextAsync("Asked for the missing card");
     }
 
+    [Test]
+    public async Task a_closed_card_hears_no_more_hours()
+    {
+        await Open("/Cards/Ward");
+        await Click("Open Ada's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+        await Click("Strike the hour");
+        await Expect(Page.Locator("#calls li")).ToHaveTextAsync(["Ada Byron heard the hour"]);
+        await Click("Close the card");
+        await Expect(Page.Locator("#card")).ToBeEmptyAsync();
+
+        await Click("Strike the hour again");
+        await Expect(Page.Locator("#struck")).ToHaveTextAsync("Struck again");
+
+        await Expect(Page.Locator("#calls li")).ToHaveTextAsync(["Ada Byron heard the hour"]);
+    }
+
+    [Test]
+    public async Task a_card_loaded_three_times_hears_a_bed_assigned_once()
+    {
+        await Open("/Cards/Ward");
+        await Click("Open Ada's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+        await Click("Open Ben's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ben Okafor");
+        await Click("Open Ada's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+
+        await Click("Assign bed 12B");
+
+        await Expect(Page.Locator("#calls li")).ToHaveTextAsync(["Ada Byron heard a bed assigned"]);
+    }
+
+    [Test]
+    public async Task a_closed_card_hears_no_more_beds()
+    {
+        await Open("/Cards/Ward");
+        await Click("Open Ada's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+        await Click("Assign bed 12B");
+        await Expect(Page.Locator("#calls li")).ToHaveTextAsync(["Ada Byron heard a bed assigned"]);
+        await Click("Close the card");
+        await Expect(Page.Locator("#card")).ToBeEmptyAsync();
+
+        await Click("Assign bed 14C");
+        await Expect(Page.Locator("#assigned")).ToHaveTextAsync("Assigned again");
+
+        await Expect(Page.Locator("#calls li")).ToHaveTextAsync(["Ada Byron heard a bed assigned"]);
+    }
+
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();
 }

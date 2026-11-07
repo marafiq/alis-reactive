@@ -17,6 +17,8 @@ public sealed class CardsController : Controller
     public IActionResult IntoAfterAStep() => View(new CardsWard());
 
     public IActionResult IntoTwice() => View(new CardsWard());
+
+    public IActionResult Radios() => View(new CardsWard());
 }
 
 public sealed record CardsWard;
