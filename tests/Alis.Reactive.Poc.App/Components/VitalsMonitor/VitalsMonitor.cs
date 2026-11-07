@@ -13,11 +13,15 @@ public sealed class VitalsMonitor : Component
     public Event<MonitorAlarm> Alarm => Event<MonitorAlarm>();
 
     public Event Silenced => Event();
+
+    public void Acknowledge() => MethodAsync();
 }
 
 public sealed class MonitorAlarm : JsObject
 {
     public ReadOnly<string> Bed => ReadOnly<string>();
+
+    public Property<bool> Cancel => Property<bool>();
 
     public ReadOnly<string?> Note => ReadOnly<string?>();
 

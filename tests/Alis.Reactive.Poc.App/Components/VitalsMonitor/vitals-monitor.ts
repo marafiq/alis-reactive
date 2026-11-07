@@ -4,6 +4,15 @@ export interface VitalsMonitorHost extends HTMLElement {
 
 type Listener = (...args: unknown[]) => void;
 
+interface Alarm {
+  bed: string;
+  cancel: boolean;
+  readonly note: string | null;
+  readonly reading: { readonly rate: number };
+  readonly patient: AlarmPatient;
+  readonly silence: () => void;
+}
+
 class AlarmPatient {
   readonly #statusLine: HTMLParagraphElement;
   readonly #pagedLine: HTMLParagraphElement;
@@ -32,23 +41,27 @@ export class VitalsMonitor {
   readonly #listeners = new Map<string, Set<Listener>>();
   readonly #raised: HTMLParagraphElement;
   readonly #silencedLine: HTMLParagraphElement;
+  readonly #alarmLine: HTMLParagraphElement;
   readonly #patient: AlarmPatient;
+  #acknowledging: () => void = () => undefined;
 
   constructor(host: HTMLElement, older: boolean) {
     this.#raised = lineOf("monitor-raised", "quiet");
-    this.#silencedLine = lineOf("monitor-silenced", "sounding");
+    this.#silencedLine = lineOf("monitor-silenced", "not silenced");
+    this.#alarmLine = lineOf("monitor-alarm", "quiet");
     const statusLine = lineOf("monitor-patient", "resting");
     const pagedLine = lineOf("monitor-paged", "unpaged");
     this.#patient = new AlarmPatient(statusLine, pagedLine);
     const buttons = older
       ? [buttonOf("Raise an alarm", () => this.#raise("alarm", { bedNumber: "9", note: null, reading: { rate: 88 }, patient: this.#patient, silence: () => this.#silence() }))]
       : [
-          buttonOf("Raise a noted alarm", () => this.#raise("alarm", this.#alarm("after surgery"))),
-          buttonOf("Raise an unnoted alarm", () => this.#raise("alarm", this.#alarm(null))),
+          buttonOf("Raise a noted alarm", () => this.#sound(this.#alarm("after surgery"))),
+          buttonOf("Raise an unnoted alarm", () => this.#sound(this.#alarm(null))),
           buttonOf("Raise an empty alarm", () => this.#raise("alarm")),
           buttonOf("Silence the monitor", () => this.#raise("silenced")),
+          buttonOf("Confirm the acknowledgement", () => this.#acknowledging()),
         ];
-    host.replaceChildren(this.#raised, this.#silencedLine, statusLine, pagedLine, ...buttons);
+    host.replaceChildren(this.#raised, this.#alarmLine, this.#silencedLine, statusLine, pagedLine, ...buttons);
   }
 
   on(event: string, listener: Listener): void {
@@ -61,8 +74,20 @@ export class VitalsMonitor {
     this.#listeners.get(event)?.delete(listener);
   }
 
-  #alarm(note: string | null): object {
-    return { bed: "4", note, reading: { rate: 132 }, patient: this.#patient, silence: () => this.#silence() };
+  acknowledge(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.#acknowledging = resolve;
+    });
+  }
+
+  #alarm(note: string | null): Alarm {
+    return { bed: "4", cancel: false, note, reading: { rate: 132 }, patient: this.#patient, silence: () => this.#silence() };
+  }
+
+  #sound(alarm: Alarm): void {
+    this.#raise("alarm", alarm);
+    this.#alarmLine.textContent = alarm.cancel ? "cancelled" : "sounding";
+    alarm.bed = "4, moved to 6";
   }
 
   #silence(): void {

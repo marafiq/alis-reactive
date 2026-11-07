@@ -59,6 +59,13 @@ internal static class Assign
     internal static void Write(JsObject owner, PathStep member, Expression value)
     {
         var binding = owner.Binding;
+        var writesThePayloadAfterAnAwait = binding.Target is RefExpression { Name: PlanBuild.PayloadName } && binding.Build.HandlerAwaited;
+        if (writesThePayloadAfterAnAwait)
+        {
+            throw new InvalidOperationException(
+                "A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.");
+        }
+
         binding.Build.Write(new SetStatement(binding.Target, [member], Presence.Required, value));
     }
 }

@@ -9,6 +9,8 @@ namespace Alis.Reactive.Writing;
 
 internal sealed class PlanBuild
 {
+    internal const string PayloadName = "e";
+
     private readonly Dictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
     private readonly Dictionary<string, Locator> _objects = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> _vendorOfElement = new(StringComparer.Ordinal);
@@ -18,6 +20,7 @@ internal sealed class PlanBuild
     private int _items;
     private int _results;
     private int _readingItems;
+    private bool _handlerAwaited;
 
     internal PlanBuild(string planId, JsonSerializerOptions values)
     {
@@ -51,6 +54,16 @@ internal sealed class PlanBuild
         }
 
         _open.Peek().Add(statement);
+        var awaits = statement is DoStatement { Await: true } or LetStatement { Await: true };
+        _handlerAwaited = _handlerAwaited || awaits;
+    }
+
+    internal bool HandlerAwaited => _handlerAwaited;
+
+    internal IReadOnlyList<Statement> HandlerBlock(Action body)
+    {
+        _handlerAwaited = false;
+        return Block(body);
     }
 
     internal IReadOnlyList<Statement> Block(Action body)

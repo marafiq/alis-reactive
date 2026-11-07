@@ -1336,6 +1336,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     when its callback returned (`cancel`, `preventDefaultAction`). To keep a drawer open while the user
     decides, the handler writes `Cancel` first, then asks, then calls the drawer's close method on yes;
   - a write to a property of an object the payload holds is a write on that object, and runs.
+
+  The refusal is each handler's own: an await in one handler refuses no write in another.
 - D11.5 The order is closed:
   - The steps after an awaited step run after it settles.
   - Two handlers of one event run in the order the plan subscribed them, each up to its first awaited
@@ -1419,9 +1421,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   (`Alis.Reactive/PlanAuthoring/Events/AppEvent.cs:41-43`), so a dispatch is a trigger like any other (D11.6).
 
 **Defects.**
-- `X11.1` refusal: a handler that writes `Cancel` after a `Confirm` is refused where the view renders with
-  "A write to the event's payload after an awaited step reaches no vendor: write it before the first
-  request, Confirm or async method."
+- `X11.1` refusal: a handler that writes a property of its payload after an awaited step (an async method, a
+  request, a `Confirm`) is refused where the view renders with "A write to the event's payload after an awaited
+  step reaches no vendor: write it before the first request, Confirm or async method."
 - `X11.2` behavior: a drawer whose close handler writes `Cancel` and then asks stays open while the dialog
   asks, and closes on yes.
 - `X11.3` behavior: a method declared with `Method` whose vendor returns a promise stops its pipeline, and the
@@ -1440,6 +1442,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   object.
 - `X11.10` behavior (D11.5): two handlers of one click run in the order the plan subscribed them, the first to its
   awaited step and the second to its end, and the first goes on when its promise resolves.
+- `X11.11` behavior (D11.4): a monitor reads the `cancel` its alarm's handler wrote before its first await, and
+  sounds when the handler writes none; after the await, the patient the alarm holds is written, the alarm's own
+  method runs and a read of the alarm reads the bed the monitor moved it to; a handler written after one that
+  awaits writes its own alarm before its own await.
 
 ## Q12. Ownership
 

@@ -1,0 +1,31 @@
+@using Alis.Reactive.Poc.App.Monitors
+@model MonitorsPage
+@{
+    ViewData["Title"] = "Alarm acknowledgements";
+    var plan = Html.ReactivePlan<MonitorsPage>();
+}
+<h1>Alarm acknowledgements</h1>
+
+<p>Status: <span id="ack-status">waiting</span></p>
+<p>Bed: <span id="ack-bed">unread</span></p>
+
+@(plan.VitalsMonitor("monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+    {
+        alarm.Cancel.Set(true);
+        pipeline.Element("ack-status").Text.Set("Acknowledging");
+        pipeline.Component<VitalsMonitor>("monitor").Acknowledge();
+        alarm.Patient.Status.Set("acknowledged");
+        alarm.Silence();
+        pipeline.Element("ack-bed").Text.Set(alarm.Bed);
+        pipeline.Element("ack-status").Text.Set("Acknowledged");
+    }))
+
+@(plan.VitalsMonitor("second-monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+    {
+        alarm.Cancel.Set(true);
+        pipeline.Component<VitalsMonitor>("second-monitor").Acknowledge();
+    }))
+
+@Html.RenderPlan(plan)
