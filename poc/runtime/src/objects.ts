@@ -70,8 +70,8 @@ function method(holder: object, name: string): (...args: unknown[]) => unknown {
 }
 
 function run(context: Context, handler: Handler, args: unknown[]): void {
-  const payload = walk(value(args), handler.payload, "optional");
   try {
+    const payload = walk(value(args), handler.payload, handler.members);
     const running = execute(handler.do, { ...context, scope: new Map([["e", payload]]) });
     if (running.kind === "awaiting") running.settled.catch((stopped: unknown) => report(handler, stopped));
   } catch (stopped) {

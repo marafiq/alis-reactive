@@ -321,7 +321,9 @@ Terms used throughout:
 - D4.9 A value JavaScript holds as `undefined` reads as nothing wherever it is read: a member that holds it, a
   method that returns it (`find` when no item matched). It never reaches a write as `undefined`; a write of
   nothing writes null (D4.5).
-- D4.8 A stop ends its own handler only. Other handlers, and the other blocks of a `Parallel`, run on (Q10).
+- D4.8 A stop ends its own handler only. Other handlers, and the other blocks of a `Parallel`, run on (Q10). A stop
+  never reaches the vendor that raised the event: its listener returns, and the vendor goes on with the work it does
+  after its listeners.
 
 **Schema nodes.** `get`, `call`, `set` with `members`; `data` with its steps; `do` and `let` with `await`; `try`; `op`
 (`and`, `or`, `cond`, `coalesce`); the new statement `stop`.
@@ -2140,7 +2142,10 @@ grammar gains no node (G2).
   argument (Tom Select's `load(query, callback)`) is a method of the payload at its position, called as any method
   is. A `CustomEvent`'s `detail` is a member of the first argument. The plan carries a handler's payload as a path
   into its arguments, so the closed set of `argument`, `event` and `detail`, the `VendorEventPayload` enum (S8)
-  and the runtime's `instanceof` reading of the payload (B12) leave.
+  and the runtime's `instanceof` reading of the payload (B12) leave. An `Event<TArgs>` reads its payload at `[0]` with
+  its members required, since the declaration says the listener receives it; an `Event` with no payload reads none,
+  `[]`, so a vendor that raises it with no argument runs its handler. The handler carries both, the path and its
+  presence, and the runtime writes neither.
 - D17.5 A declaration follows its vendor's public contract, and the build checks it:
   - A member is declared only when the vendor's type declarations make it public. A `@private` member is a gap to
     name, and public members compose what it would do.
@@ -2257,6 +2262,8 @@ plans (Q19).
   with the page's items, and the component shows them.
 - `X17.13` refusal: an awaited read inside a callback's answer is refused where the view renders with "A callback
   answers its vendor at once, so its answer cannot wait for an async method or a request."
+- `X17.15` behavior (D4.8, D17.4): an event declared with a payload that its vendor raises with no argument stops
+  before its first step, and the vendor goes on after its listeners; an event declared with none runs its handler.
 - `X17.14` behavior: a vendor's label callback shows, for each label, the text the view's expression answers.
 
 ## Q18. Type knowledge without reflection

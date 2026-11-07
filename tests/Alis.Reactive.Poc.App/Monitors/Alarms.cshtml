@@ -1,0 +1,37 @@
+@using Alis.Reactive.Poc.App.Monitors
+@model MonitorsPage
+@{
+    ViewData["Title"] = "Monitor alarms";
+    var plan = Html.ReactivePlan<MonitorsPage>();
+}
+<h1>Monitor alarms</h1>
+
+<p>Status: <span id="alarm-status">waiting</span></p>
+<p>Bed: <span id="alarm-bed">unread</span></p>
+<p>Note: <span id="alarm-note">unread</span></p>
+<p>Unit: <span id="alarm-unit">unread</span></p>
+
+@(plan.VitalsMonitor("monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+    {
+        pipeline.Element("alarm-status").Text.Set("Reading");
+        pipeline.Element("alarm-bed").Text.Set(alarm.Bed);
+        pipeline.Element("alarm-note").Text.Set(alarm.Note);
+        pipeline.Element("alarm-unit").Text.Set(alarm.Reading.Read(reading => reading.Unit));
+        alarm.Patient.Status.Set("attending");
+        alarm.Patient.Page();
+        alarm.Silence();
+        pipeline.Element("alarm-status").Text.Set("Handled");
+    })
+    .Reactive(monitor => monitor.Silenced, pipeline =>
+        pipeline.Element("alarm-status").Text.Set("Silenced")))
+
+@(plan.OlderVitalsMonitor("older-monitor")
+    .Reactive(monitor => monitor.Alarm, (alarm, pipeline) =>
+    {
+        pipeline.Element("alarm-status").Text.Set("Reading");
+        pipeline.Element("alarm-bed").Text.Set(alarm.Bed);
+        pipeline.Element("alarm-status").Text.Set("Handled");
+    }))
+
+@Html.RenderPlan(plan)

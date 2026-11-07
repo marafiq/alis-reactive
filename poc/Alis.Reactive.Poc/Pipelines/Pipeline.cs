@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Alis.Reactive.Components;
 using Alis.Reactive.Plan;
 using Alis.Reactive.Writing;
@@ -27,7 +28,7 @@ public sealed class Pipeline
 
 internal static class Trigger
 {
-    internal static void On<TComponent, TArgs>(PlanBuild build, string elementId, Func<TComponent, Event<TArgs>> select, Action<TArgs, Pipeline> run)
+    internal static void On<TComponent, TArgs>(PlanBuild build, string elementId, Func<TComponent, Event<TArgs>> select, IReadOnlyList<PathStep> payload, Action<TArgs, Pipeline> run)
         where TComponent : Component, new()
         where TArgs : JsObject, new()
     {
@@ -37,6 +38,6 @@ internal static class Trigger
         var args = JsObject.Bound<TArgs>(new Binding(new RefExpression("e"), build, ReadPresence.Required));
         var pipeline = new Pipeline(build);
         var body = build.Block(() => run(args, pipeline));
-        build.Add(new Handler(objectId, [], raised.Name, [PathStep.Index(0)], Policy.Overlap, body));
+        build.Add(new Handler(objectId, [], raised.Name, payload, ReadPresence.Required, Policy.Overlap, body));
     }
 }

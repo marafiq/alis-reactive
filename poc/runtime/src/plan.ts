@@ -58,6 +58,7 @@ export interface Handler {
   readonly path: readonly PathStep[];
   readonly event: string;
   readonly payload: readonly PathStep[];
+  readonly members: ReadPresence;
   readonly policy: Policy;
   readonly do: readonly Statement[];
 }

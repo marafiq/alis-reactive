@@ -7,7 +7,7 @@ public sealed class Element : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;
 
-    public Property<string> Text => Property<string>(name: "textContent");
+    public Property<string?> Text => Property<string?>(name: "textContent");
 }
 
 public static class ElementSteps

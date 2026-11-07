@@ -77,8 +77,10 @@ the handler) (D20.7).
 - `path`: a path to the object that raises the event, below the located object;
 - `event`: the event's JavaScript name;
 - `payload`: a path into the listener's arguments, `[0]` unless the event's declaration names another position,
-  `[0, "detail"]` for a `CustomEvent` (D17.4), carried per handler since the vendors map is shared by name across
-  plans;
+  `[0, "detail"]` for a `CustomEvent` (D17.4), `[]` for an event declared with no payload, carried per handler since
+  the vendors map is shared by name across plans;
+- `members`: the presence the payload's path reads with, as `get` reads it; C# writes `required`, since a declared
+  payload is what the listener receives (D5.3, D17.4);
 - `policy`: what a trigger does while this handler's previous run is in flight, one of `overlap`, `replace`
   or `skip` (D11.7, N11.1);
 - `do`: a list of statements, the handler's body block.

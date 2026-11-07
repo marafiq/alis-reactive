@@ -68,14 +68,14 @@ public sealed class Rendered<TComponent> : IHtmlContent
 
     public Rendered<TComponent> Reactive(Func<TComponent, Event> raised, Action<Pipeline> pipeline)
     {
-        Trigger.On<TComponent, NoPayload>(_build, _id, raised, (_, steps) => pipeline(steps));
+        Trigger.On<TComponent, NoPayload>(_build, _id, raised, [], (_, steps) => pipeline(steps));
         return this;
     }
 
     public Rendered<TComponent> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline> pipeline)
         where TArgs : JsObject, new()
     {
-        Trigger.On(_build, _id, raised, pipeline);
+        Trigger.On(_build, _id, raised, [PathStep.Index(0)], pipeline);
         return this;
     }
 
