@@ -55,6 +55,7 @@ public sealed class InfusionPump : Component
 
     public MethodResult<PumpSettings> Settings() => Method<PumpSettings>();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS019", Justification = "Drift on purpose: a_returned_channel_that_reads_nothing_stops_the_pipeline_at_its_declared_member proves the browser stops on a channel the declaration requires and the pump returns as undefined.")]
     public PumpChannel Channel(Arg<int> position) => ReturnedObject<PumpChannel>([position]);
 
     public LiveObjects<PumpChannel> Channels() => ReturnedObjects<PumpChannel>();

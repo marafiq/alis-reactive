@@ -438,18 +438,23 @@ Terms used throughout:
   member the API lacks (D17.5), so the framework never calls one. Two marks come from that API, the same on every
   live object whatever holds it: a component, a plugin, a returned object, an item of a list, an event's payload,
   and every object reached from them.
-  - Presence. A member is required unless the API marks it optional (`?` in a TypeScript declaration). Reading,
-    writing or calling an absent required member stops its pipeline. An absent optional member reads nothing, a
-    call of it runs nothing and its result reads nothing, and a write to it sets it.
+  - Presence. A member is required unless the API marks it optional (`?` in a TypeScript declaration), and its
+    declaration says which with `optional: true` (N5.4). Reading, writing or calling an absent required member stops
+    its pipeline. An optional member is absent when its holder lacks it or holds it as undefined, since `?` admits
+    both (a class field compiled to ES2022 holds undefined): it reads nothing, a call of it runs nothing and its
+    result reads nothing, and a write to it sets it. The mark is the member's, not its holder's: an optional member
+    of a live object that holds nothing stops, as any member of it does, and the members of what an absent optional
+    member would hold or return read nothing.
   - Value. The member's C# type is the API's value type, nullable where the API's value is: `string | null` is
     `string?`, `number | null` is `decimal?`. Null is a value that data holds and a declaration states, never a
     state of the framework (the owner, 2026-11-06: "That is about the framework, not about the value"). A payload
     whose API is `{ name: string; dateOfBirth: Date; birthCountry: string | null }` declares `ReadOnly<string> Name`,
     `ReadOnly<DateTime> DateOfBirth` and `ReadOnly<string?> BirthCountry`; a null country reads as null, and a text
-    set from it shows nothing.
+    set from it shows nothing. A live object a member holds or a method returns, which the API types `T | null` or
+    `T | undefined`, is declared with `nullable: true`, and its members read nothing while it holds nothing.
   - The vendor contract analyzer (D17.5) checks both marks against the API, a reference type's nullability by its
-    nullable annotation, so neither drifts from the vendor: nullability by variance (ALIS019), presence once N5.4
-    marks it.
+    nullable annotation, so neither drifts from the vendor: nullability by variance (ALIS019), a live object's
+    `nullable: true` included, and presence both ways (ALIS022).
   - Data the app types with its own C# type (a response body, a pushed message, the value past a declared member,
     the value a method returns) reads its start where a field is absent and null where the field holds null (D4.2);
     on an event's payload X4.3 states both.
@@ -515,8 +520,9 @@ Terms used throughout:
   which reads non-public members to tell a property from a method; N5.2 carries the capability.
 - `N5.1` new: `ServerPushStream` and `SignalRHub` message triggers typed `Data<TMessage>`, replacing the
   `JsObject` with `ReadOnly<T>` members.
-- `N5.4` new: a member's presence mark on every declaration door, optional where the typed API marks `?` (D5.3);
-  its form goes to gate 2.
+- `N5.4` new: a member's presence mark on every declaration door, optional where the typed API marks `?` (D5.3),
+  and `nullable: true` on `LiveObject`, `LiveObjects`, `ReturnedObject` and `ReturnedObjects`; built in POC 13d as
+  named arguments, `Property<string>(optional: true)`, and their form goes to gate 2.
 - kept on a new holder: the whole declaration vocabulary on an event's payload, at any depth (D5.6), where the
   redesign's payload is already a `JsObject` (`Alis.Reactive/Components/Event.cs:14`).
 
@@ -544,7 +550,7 @@ Terms used throughout:
 - `X5.8` behavior: a payload's `string?` field holding null reads as null: the text it sets shows nothing, and the
   pipeline goes on.
 - `X5.9` analyzer: a declaration whose presence or nullability differs from its vendor's typed API, nullability by
-  ALIS019 (POC 13a) and presence once N5.4 marks it (13c): new:N17.2.
+  ALIS019 (POC 13a, a live object's in 13d) and presence by ALIS022 (13d): new:N17.2.
 - `X5.10` behavior: a property of an object a live payload holds, written by the handler, changes that object as
   the page shows, and its method, called, runs.
 - `X5.11` behavior (D5.11): a pump's summary read twice calls `summary()` once, two calls of it run it twice, and a

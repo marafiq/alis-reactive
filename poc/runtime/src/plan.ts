@@ -172,7 +172,7 @@ export type Policy = "overlap" | "replace" | "skip";
 
 export type Presence = "required" | "optional";
 
-export type ReadPresence = "required" | "optional" | "requiredIfHeld";
+export type ReadPresence = "required" | "optional" | "requiredIfHeld" | "optionalMember";
 
 export interface RefExpression {
   readonly kind: "ref";

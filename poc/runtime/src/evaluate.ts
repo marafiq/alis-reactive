@@ -58,15 +58,54 @@ export type Holder = { readonly kind: "found"; readonly object: object } | { rea
 
 const absent: Holder = { kind: "absent" };
 
-export function holderOf(read: Read, step: PathStep, members: ReadPresence): Holder {
-  if (read.kind === "nothing" || read.value === null || read.value === undefined) {
-    if (members === "required") throw new Stop("Nothing holds the member '" + String(step) + "'.");
-    return absent;
-  }
-  const object: object = Object(read.value);
-  if (step in object) return { kind: "found", object };
-  if (members === "optional") return absent;
+type HeldValue = { readonly kind: "value"; readonly value: NonNullable<unknown> };
+
+function holdsSomething(read: Read): read is HeldValue {
+  return read.kind === "value" && read.value !== null && read.value !== undefined;
+}
+
+export function objectHolding(read: Read, step: PathStep): object {
+  if (!holdsSomething(read)) throw new Stop("Nothing holds the member '" + String(step) + "'.");
+  return Object(read.value);
+}
+
+export function memberHolder(read: Read, step: PathStep): object {
+  const object = objectHolding(read, step);
+  if (step in object) return object;
   throw new Stop("The member '" + String(step) + "' is not on the value that should hold it.");
+}
+
+function holderOrAbsent(read: Read, step: PathStep): Holder {
+  const object = objectHolding(read, step);
+  return step in object ? { kind: "found", object } : absent;
+}
+
+export function holderOf(read: Read, step: PathStep, members: ReadPresence): Holder {
+  switch (members) {
+    case "required":
+      return { kind: "found", object: memberHolder(read, step) };
+    case "requiredIfHeld":
+      return holdsSomething(read) ? { kind: "found", object: memberHolder(read, step) } : absent;
+    case "optionalMember":
+      return holderOrAbsent(read, step);
+    case "optional":
+      return holdsSomething(read) ? holderOrAbsent(read, step) : absent;
+    default:
+      return assertNever(members);
+  }
+}
+
+function mayBeAbsent(members: ReadPresence): boolean {
+  switch (members) {
+    case "optional":
+    case "optionalMember":
+      return true;
+    case "required":
+    case "requiredIfHeld":
+      return false;
+    default:
+      return assertNever(members);
+  }
 }
 
 function member(read: Read, step: PathStep, members: ReadPresence): Read {
@@ -87,6 +126,7 @@ export function called(call: CallExpression, context: Context): Called {
   const holder = holderOf(walk(evaluate(call.target, context), call.path.slice(0, -1), call.members), last, call.members);
   if (holder.kind === "absent") return notCalled;
   const method: unknown = Reflect.get(holder.object, last);
+  if (method === undefined && mayBeAbsent(call.members)) return notCalled;
   if (typeof method !== "function") throw new Stop("The member '" + String(last) + "' is not a method.");
   const args = call.args.map((argument) => heldOrNull(evaluate(argument, context)));
   return { kind: "returned", held: Reflect.apply(method, holder.object, args) };

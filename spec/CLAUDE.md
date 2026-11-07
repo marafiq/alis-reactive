@@ -216,6 +216,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   browser test arranges it (an older build's bed or alarm). A positional door on a declaration no listener or callback
   hands is refused at the build, not first where the view renders (X17.30). Root checks stay live and reached checks
   run at the compilation's end. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: presence is the member's mark, not its holder's (D5.3). An optional member
+  that its holder lacks or holds as undefined is absent, since TypeScript's `?` admits both (a class field compiled to
+  ES2022 holds undefined): it reads nothing, a call of it runs nothing, and a write sets it. An optional member of a
+  live object that holds nothing stops, as any member of it does. The plan's read presence is two halves, the holder
+  and the member, so it gains `optionalMember` beside `optional`. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a live object a member holds or a method returns, which its API types
+  `T | null` or `T | undefined`, is declared `nullable: true`, and its members read nothing while it holds nothing.
+  ALIS019 refuses the declaration without it, by variance as a value's nullability (a `nullable: true` the API does not
+  need is allowed). `optional:` and `nullable:` are named arguments in the POC, and their form goes to gate 2 with
+  N5.4's. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

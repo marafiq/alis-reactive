@@ -1,0 +1,416 @@
+@using Alis.Reactive.Poc.App.Trays
+@model TraysPage
+@{
+    ViewData["Title"] = "Meal trays";
+    var plan = Html.ReactivePlan<TraysPage>();
+}
+<h1>Meal trays</h1>
+
+<h2>The current tray</h2>
+<p>Status: <span id="status">waiting</span></p>
+<p>Note: <span id="note">unread</span></p>
+<p>portion: <span id="portion">unread</span></p>
+<p>cover: <span id="cover">unread</span></p>
+<p>side: <span id="side">unread</span></p>
+<p>served: <span id="served">unread</span></p>
+<p>temperature: <span id="temperature">unread</span></p>
+<p>lid: <span id="lid">unread</span></p>
+<p>extra: <span id="extra">unread</span></p>
+<p>badge: <span id="badge">unread</span></p>
+<p>relief: <span id="relief">unread</span></p>
+<p>spare-lid: <span id="spare-lid">unread</span></p>
+<p>side-order: <span id="side-order">unread</span></p>
+<p>spare-side: <span id="spare-side">unread</span></p>
+
+@(plan.MealTray("tray")
+    .Reactive(tray => tray.Delivered, (delivery, pipeline) =>
+    {
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("note").Text.Set(delivery.Note);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("portion-button", "Read the portion")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("portion").Text.Set(tray.Portion);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("write-portion-button", "Write the portion")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        tray.Portion.Set("Large");
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("slip-button", "Write the slip")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        tray.Slip.Set("Diabetic");
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("cover-button", "Read the cover")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("cover").Text.Set(tray.Cover.Label);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("side-button", "Read the first side")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("side").Text.Set(tray.Sides.At(0).Name);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("warm-button", "Warm the tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        tray.Warm();
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("served-button", "Read when it was served")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("served").Text.Set(tray.LastServed());
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("reheat-button", "Reheat the tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        tray.Reheat();
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("temperature-button", "Read the temperature")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("temperature").Text.Set(tray.Temperature());
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("lid-button", "Read the lid")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("lid").Text.Set(tray.Lid().Label);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("extra-button", "Read the first extra")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("extra").Text.Set(tray.Extras().At(0).Name);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("garnish-button", "Answer the garnish")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        tray.Garnish.Set(dish => dish.Name);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("badge-button", "Read the server's badge")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("badge").Text.Set(tray.Server.Badge);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("relief-button", "Read the relief server's badge")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("relief").Text.Set(tray.Relief.Badge);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("spare-lid-button", "Read the spare lid")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("spare-lid").Text.Set(tray.SpareLid().Label);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("side-order-button", "Read the first side order")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("side-order").Text.Set(tray.SideOrders.At(0).Name);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+@(plan.Button("spare-side-button", "Read the first spare side")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("tray");
+        pipeline.Element("status").Text.Set("Reading");
+        pipeline.Element("spare-side").Text.Set(tray.SpareSides().At(0).Name);
+        pipeline.Element("status").Text.Set("Done");
+    }))
+
+<h2>The older tray</h2>
+<p>Status: <span id="older-status">waiting</span></p>
+<p>Note: <span id="older-note">unread</span></p>
+<p>portion: <span id="older-portion">unread</span></p>
+<p>cover: <span id="older-cover">unread</span></p>
+<p>side: <span id="older-side">unread</span></p>
+<p>served: <span id="older-served">unread</span></p>
+<p>temperature: <span id="older-temperature">unread</span></p>
+<p>lid: <span id="older-lid">unread</span></p>
+<p>extra: <span id="older-extra">unread</span></p>
+<p>badge: <span id="older-badge">unread</span></p>
+<p>relief: <span id="older-relief">unread</span></p>
+<p>spare-lid: <span id="older-spare-lid">unread</span></p>
+<p>side-order: <span id="older-side-order">unread</span></p>
+<p>spare-side: <span id="older-spare-side">unread</span></p>
+
+@(plan.OlderMealTray("older-tray")
+    .Reactive(tray => tray.Delivered, (delivery, pipeline) =>
+    {
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-note").Text.Set(delivery.Note);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-portion-button", "Read the portion on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-portion").Text.Set(tray.Portion);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-write-portion-button", "Write the portion on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        tray.Portion.Set("Large");
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-slip-button", "Write the slip on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        tray.Slip.Set("Diabetic");
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-cover-button", "Read the cover on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-cover").Text.Set(tray.Cover.Label);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-side-button", "Read the first side on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-side").Text.Set(tray.Sides.At(0).Name);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-warm-button", "Warm the tray on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        tray.Warm();
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-served-button", "Read when it was served on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-served").Text.Set(tray.LastServed());
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-reheat-button", "Reheat the tray on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        tray.Reheat();
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-temperature-button", "Read the temperature on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-temperature").Text.Set(tray.Temperature());
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-lid-button", "Read the lid on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-lid").Text.Set(tray.Lid().Label);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-extra-button", "Read the first extra on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-extra").Text.Set(tray.Extras().At(0).Name);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-garnish-button", "Answer the garnish on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        tray.Garnish.Set(dish => dish.Name);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-badge-button", "Read the server's badge on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-badge").Text.Set(tray.Server.Badge);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-relief-button", "Read the relief server's badge on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-relief").Text.Set(tray.Relief.Badge);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-spare-lid-button", "Read the spare lid on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-spare-lid").Text.Set(tray.SpareLid().Label);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-side-order-button", "Read the first side order on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-side-order").Text.Set(tray.SideOrders.At(0).Name);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+@(plan.Button("older-spare-side-button", "Read the first spare side on the older tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("older-tray");
+        pipeline.Element("older-status").Text.Set("Reading");
+        pipeline.Element("older-spare-side").Text.Set(tray.SpareSides().At(0).Name);
+        pipeline.Element("older-status").Text.Set("Done");
+    }))
+
+<h2>The tray whose optional members hold undefined</h2>
+<p>Status: <span id="unset-status">waiting</span></p>
+<p>served: <span id="unset-served">unread</span></p>
+<p>temperature: <span id="unset-temperature">unread</span></p>
+<p>lid: <span id="unset-lid">unread</span></p>
+
+@plan.UnsetMealTray("unset-tray")
+
+@(plan.Button("unset-warm-button", "Warm the tray on the unset tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("unset-tray");
+        pipeline.Element("unset-status").Text.Set("Reading");
+        tray.Warm();
+        pipeline.Element("unset-status").Text.Set("Done");
+    }))
+
+@(plan.Button("unset-served-button", "Read when it was served on the unset tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("unset-tray");
+        pipeline.Element("unset-status").Text.Set("Reading");
+        pipeline.Element("unset-served").Text.Set(tray.LastServed());
+        pipeline.Element("unset-status").Text.Set("Done");
+    }))
+
+@(plan.Button("unset-reheat-button", "Reheat the tray on the unset tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("unset-tray");
+        pipeline.Element("unset-status").Text.Set("Reading");
+        tray.Reheat();
+        pipeline.Element("unset-status").Text.Set("Done");
+    }))
+
+@(plan.Button("unset-temperature-button", "Read the temperature on the unset tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("unset-tray");
+        pipeline.Element("unset-status").Text.Set("Reading");
+        pipeline.Element("unset-temperature").Text.Set(tray.Temperature());
+        pipeline.Element("unset-status").Text.Set("Done");
+    }))
+
+@(plan.Button("unset-lid-button", "Read the lid on the unset tray")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var tray = pipeline.Component<MealTray>("unset-tray");
+        pipeline.Element("unset-status").Text.Set("Reading");
+        pipeline.Element("unset-lid").Text.Set(tray.Lid().Label);
+        pipeline.Element("unset-status").Text.Set("Done");
+    }))
+
+@Html.RenderPlan(plan)

@@ -3,6 +3,7 @@ import { DoseChart, type DoseChartHost } from "./DoseChart/dose-chart";
 import { FluidBalance, type FluidBalanceHost } from "./FluidBalance/fluid-balance";
 import { DutyRoster, DutyRosterV2, type DutyRosterHost } from "./DutyRoster/duty-roster";
 import { CurrentInfusionPump, OlderInfusionPump, type InfusionPumpHost } from "./InfusionPump/infusion-pump";
+import { MealTray, trayBuildOf, type MealTrayHost } from "./MealTray/meal-tray";
 import { MedicationCart, type MedicationCartHost } from "./MedicationCart/medication-cart";
 import { VitalsMonitor, type VitalsMonitorHost } from "./VitalsMonitor/vitals-monitor";
 import { CallBell, MedicineSearch, WardFeed, mountBedBoard, type CallBellHost, type MedicineSearchHost, type WardFeedHost } from "./WardSignals/ward-signals";
@@ -36,6 +37,10 @@ onMount<MedicationCartHost>("[data-medication-cart]", (host) => {
 
 onMount<InfusionPumpHost>("[data-infusion-pump]", (host) => {
   host.pump = host.dataset["infusionPump"] === "older" ? new OlderInfusionPump(host) : new CurrentInfusionPump(host);
+});
+
+onMount<MealTrayHost>("[data-meal-tray]", (host) => {
+  host.tray = new MealTray(host, trayBuildOf(host));
 });
 
 onMount<VitalsMonitorHost>("[data-vitals-monitor]", (host) => {

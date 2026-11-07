@@ -36,16 +36,34 @@ internal sealed class Presence : IChoice
 [JsonConverter(typeof(ChoiceConverter<ReadPresence>))]
 internal sealed class ReadPresence : IChoice
 {
-    internal static readonly ReadPresence Required = new("required");
-    internal static readonly ReadPresence Optional = new("optional");
-    internal static readonly ReadPresence RequiredIfHeld = new("requiredIfHeld");
+    internal static readonly ReadPresence Required = new("required", holderMayHoldNothing: false, memberMayBeAbsent: false);
+    internal static readonly ReadPresence Optional = new("optional", holderMayHoldNothing: true, memberMayBeAbsent: true);
+    internal static readonly ReadPresence RequiredIfHeld = new("requiredIfHeld", holderMayHoldNothing: true, memberMayBeAbsent: false);
+    internal static readonly ReadPresence OptionalMember = new("optionalMember", holderMayHoldNothing: false, memberMayBeAbsent: true);
 
-    private ReadPresence(string text)
+    private readonly bool _holderMayHoldNothing;
+    private readonly bool _memberMayBeAbsent;
+
+    private ReadPresence(string text, bool holderMayHoldNothing, bool memberMayBeAbsent)
     {
         Text = text;
+        _holderMayHoldNothing = holderMayHoldNothing;
+        _memberMayBeAbsent = memberMayBeAbsent;
     }
 
     public string Text { get; }
+
+    internal ReadPresence MemberMayBeAbsent() => Of(_holderMayHoldNothing, memberMayBeAbsent: true);
+
+    internal ReadPresence HolderMayHoldNothing() => Of(holderMayHoldNothing: true, _memberMayBeAbsent);
+
+    private static ReadPresence Of(bool holderMayHoldNothing, bool memberMayBeAbsent) => (holderMayHoldNothing, memberMayBeAbsent) switch
+    {
+        (false, false) => Required,
+        (true, false) => RequiredIfHeld,
+        (false, true) => OptionalMember,
+        (true, true) => Optional,
+    };
 }
 
 [JsonConverter(typeof(ChoiceConverter<Policy>))]

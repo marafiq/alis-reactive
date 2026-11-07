@@ -59,6 +59,10 @@ internal sealed class Binding
     internal ReadPresence Members { get; }
 
     internal Arguments Arguments { get; }
+
+    internal ReadPresence Read(bool optional) => optional ? Members.MemberMayBeAbsent() : Members;
+
+    internal ReadPresence Below(bool optional) => optional ? Members.HolderMayHoldNothing() : Members;
 }
 
 internal sealed class ListenerArgumentsOf : JsObject
@@ -82,62 +86,62 @@ public abstract class JsObject
         return bound;
     }
 
-    protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "")
-        => new(this, Member(name, declaredBy));
+    protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => new(this, Member(name, declaredBy), optional);
 
-    protected Property<TValue> Property<TValue>(string? name = null, [CallerMemberName] string declaredBy = "")
-        => new(this, Member(name, declaredBy));
+    protected Property<TValue> Property<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => new(this, Member(name, declaredBy), optional);
 
-    protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, [CallerMemberName] string declaredBy = "")
-        => new(this, Member(name, declaredBy));
+    protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => new(this, Member(name, declaredBy), optional);
 
-    protected TObject LiveObject<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
+    protected TObject LiveObject<TObject>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Members), Binding.Build, Binding.Members));
+        => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Read(optional)), Binding.Build, Binding.Below(optional || nullable)));
 
-    protected LiveObjects<TItem> LiveObjects<TItem>(string? name = null, [CallerMemberName] string declaredBy = "")
+    protected LiveObjects<TItem> LiveObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
-        => new(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Members), Binding.Build, Binding.Members);
+        => new(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Read(optional)), Binding.Build, Binding.Below(optional || nullable));
 
-    protected void Method(string? name = null, [CallerMemberName] string declaredBy = "")
-        => Method([], name, declaredBy);
+    protected void Method(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => Method([], name, optional, declaredBy);
 
-    protected void Method(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
-        => Binding.Build.Write(new DoStatement(Call(arguments, name, declaredBy), awaits: false));
+    protected void Method(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => Binding.Build.Write(new DoStatement(Call(arguments, name, optional, declaredBy), awaits: false));
 
-    protected MethodResult<TResult> Method<TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
-        => Method<TResult>([], name, declaredBy);
+    protected MethodResult<TResult> Method<TResult>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => Method<TResult>([], name, optional, declaredBy);
 
-    protected MethodResult<TResult> Method<TResult>(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
-        => new MethodResult<TResult>(Binding.Build.Result(Call(arguments, name, declaredBy)), Binding.Build);
+    protected MethodResult<TResult> Method<TResult>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => new MethodResult<TResult>(Binding.Build.Result(Call(arguments, name, optional, declaredBy)), Binding.Build);
 
-    protected void MethodAsync(string? name = null, [CallerMemberName] string declaredBy = "")
-        => MethodAsync([], name, declaredBy);
+    protected void MethodAsync(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => MethodAsync([], name, optional, declaredBy);
 
-    protected void MethodAsync(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
-        => Binding.Build.Write(new DoStatement(Call(arguments, name, declaredBy), awaits: true));
+    protected void MethodAsync(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => Binding.Build.Write(new DoStatement(Call(arguments, name, optional, declaredBy), awaits: true));
 
-    protected MethodResult<TResult> MethodAsync<TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
-        => MethodAsync<TResult>([], name, declaredBy);
+    protected MethodResult<TResult> MethodAsync<TResult>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => MethodAsync<TResult>([], name, optional, declaredBy);
 
-    protected MethodResult<TResult> MethodAsync<TResult>(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
-        => new(Binding.Build.AwaitedResult(Call(arguments, name, declaredBy)), Binding.Build);
+    protected MethodResult<TResult> MethodAsync<TResult>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
+        => new(Binding.Build.AwaitedResult(Call(arguments, name, optional, declaredBy)), Binding.Build);
 
-    protected TObject ReturnedObject<TObject>(string? name = null, [CallerMemberName] string declaredBy = "")
+    protected TObject ReturnedObject<TObject>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => ReturnedObject<TObject>([], name, declaredBy);
+        => ReturnedObject<TObject>([], name, optional, nullable, declaredBy);
 
-    protected TObject ReturnedObject<TObject>(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
+    protected TObject ReturnedObject<TObject>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => Bound<TObject>(new Binding(Binding.Build.Result(Call(arguments, name, declaredBy)), Binding.Build, ReadPresence.Required));
+        => Bound<TObject>(new Binding(Binding.Build.Result(Call(arguments, name, optional, declaredBy)), Binding.Build, Returned(optional || nullable)));
 
-    protected LiveObjects<TItem> ReturnedObjects<TItem>(string? name = null, [CallerMemberName] string declaredBy = "")
+    protected LiveObjects<TItem> ReturnedObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
-        => ReturnedObjects<TItem>([], name, declaredBy);
+        => ReturnedObjects<TItem>([], name, optional, nullable, declaredBy);
 
-    protected LiveObjects<TItem> ReturnedObjects<TItem>(IReadOnlyList<Arg> arguments, string? name = null, [CallerMemberName] string declaredBy = "")
+    protected LiveObjects<TItem> ReturnedObjects<TItem>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
-        => new(Binding.Build.Result(Call(arguments, name, declaredBy)), Binding.Build, ReadPresence.Required);
+        => new(Binding.Build.Result(Call(arguments, name, optional, declaredBy)), Binding.Build, Returned(optional || nullable));
 
     protected void CallItself()
         => CallItself([]);
@@ -149,7 +153,7 @@ public abstract class JsObject
         => new(Binding.Build.Result(Itself(arguments)), Binding.Build);
 
     protected ReadOnly<TValue> Argument<TValue>(int position)
-        => new(ListenerArguments(), ArgumentStep(position));
+        => new(ListenerArguments(), ArgumentStep(position), optional: false);
 
     protected void MethodAt(int position)
         => MethodAt(position, []);
@@ -161,9 +165,9 @@ public abstract class JsObject
         Binding.Build.Write(new DoStatement(call, awaits: false));
     }
 
-    protected Callback<TArgs, TResult> Callback<TArgs, TResult>(string? name = null, [CallerMemberName] string declaredBy = "")
+    protected Callback<TArgs, TResult> Callback<TArgs, TResult>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
         where TArgs : JsObject, new()
-        => new(this, Member(name, declaredBy));
+        => new(this, Member(name, declaredBy), optional);
 
     protected static Arg Answer<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer)
         where TArgs : JsObject, new()
@@ -209,8 +213,10 @@ public abstract class JsObject
     private CallExpression Itself(IReadOnlyList<Arg> arguments)
         => new(Binding.Target, [], Binding.Members, [.. arguments.Select(argument => argument.ExpressionIn(Binding.Build))]);
 
-    private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, string declaredBy)
-        => new(Binding.Target, [Member(name, declaredBy)], Binding.Members, [.. arguments.Select(argument => argument.ExpressionIn(Binding.Build))]);
+    private static ReadPresence Returned(bool mayHoldNothing) => mayHoldNothing ? ReadPresence.Required.HolderMayHoldNothing() : ReadPresence.Required;
+
+    private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)
+        => new(Binding.Target, [Member(name, declaredBy)], Binding.Read(optional), [.. arguments.Select(argument => argument.ExpressionIn(Binding.Build))]);
 
     private static PathStep Member(string? name, string declaredBy) => PathStep.Member(JavaScriptName(name, declaredBy));
 

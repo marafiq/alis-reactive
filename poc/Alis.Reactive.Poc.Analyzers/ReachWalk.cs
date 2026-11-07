@@ -90,7 +90,7 @@ internal sealed class ReachWalk
         {
             case Reach.One or Reach.Many:
                 if (_contract.Member(type, name) is not { } member || !Reaches(use, member)) return;
-                Bind(use, reached, member.Held("value"), use.Door.Reach == Reach.Many, where, type, null, "");
+                Bind(use, reached, member.Held(member.Kind != MemberKind.Method && use.Door.Shape == DoorShape.Call ? "returns" : "value"), use.Door.Reach == Reach.Many, where, type, null, "");
                 return;
             case Reach.Payload:
                 if (_contract.Payload(type, name) is not { } payload) return;

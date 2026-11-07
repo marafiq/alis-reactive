@@ -17,6 +17,8 @@ public sealed class WhenADeclarationReachesAnObject
         member	ward	Station	beds	readonly		
         member	ward	Station	lead	readonly		
         member	ward	Station	leadOrNone	readonly	readsnull	
+        member	ward	Station	bedsOrNone	readonly	readsnull	
+        member	ward	Station	findOrNone	method	callable,returnsnull	
         member	ward	Station	either	readonly		
         member	ward	Station	older	readonly		
         member	ward	Station	count	readonly		
@@ -37,6 +39,10 @@ public sealed class WhenADeclarationReachesAnObject
         holds	ward	Station	lead	value	object	ward	Bed
         holds	ward	Station	leadOrNone	value	null		
         holds	ward	Station	leadOrNone	value	object	ward	Bed
+        holds	ward	Station	bedsOrNone	value	items	ward	Bed
+        holds	ward	Station	bedsOrNone	value	null		
+        holds	ward	Station	findOrNone	value	null		
+        holds	ward	Station	findOrNone	value	object	ward	Bed
         holds	ward	Station	either	value	object	ward	Bed
         holds	ward	Station	either	value	object	ward	OlderBed
         holds	ward	Station	older	value	object	ward	OlderBed
@@ -130,7 +136,35 @@ public sealed class WhenADeclarationReachesAnObject
 
     [Test]
     public Task a_member_that_can_hold_nothing_reaches_the_object_it_holds_otherwise()
-        => Fixture.Reports<MirrorsAnalyzer>("ALIS016", FloorAtBed, Reaching("""    public FloorBed LeadOrNone => LiveObject<FloorBed>();""", BedFloor), Station);
+        => Fixture.Reports<MirrorsAnalyzer>("ALIS016", FloorAtBed, Reaching("""    public FloorBed LeadOrNone => LiveObject<FloorBed>(nullable: true);""", BedFloor), Station);
+
+    [Test]
+    public Task a_live_object_its_vendor_can_hold_as_null_is_reported_unless_declared_nullable()
+        => Fixture.Reports<MirrorsAnalyzer>(
+            "ALIS019",
+            "'WardStation.LeadOrNone' reaches 'WardBed', and 'Station.leadOrNone' can read null or undefined: declare it with nullable: true",
+            Reaching("""    public WardBed [|LeadOrNone|] => LiveObject<WardBed>();"""),
+            Station);
+
+    [Test]
+    public Task a_list_its_vendor_can_hold_as_null_is_reported_unless_declared_nullable()
+        => Fixture.Reports<MirrorsAnalyzer>(
+            "ALIS019",
+            "'WardStation.BedsOrNone' reaches 'WardBed', and 'Station.bedsOrNone' can read null or undefined: declare it with nullable: true",
+            Reaching("""    public LiveObjects<WardBed> [|BedsOrNone|] => LiveObjects<WardBed>();"""),
+            Station);
+
+    [Test]
+    public Task a_returned_object_its_vendor_can_return_as_null_is_reported_unless_declared_nullable()
+        => Fixture.Reports<MirrorsAnalyzer>(
+            "ALIS019",
+            "'WardStation.FindOrNone' reaches 'WardBed', and 'Station.findOrNone' can return null or undefined: declare it with nullable: true",
+            Reaching("""    public WardBed [|FindOrNone|]() => ReturnedObject<WardBed>();"""),
+            Station);
+
+    [Test]
+    public Task a_live_object_declared_nullable_where_its_vendor_holds_no_null_is_reported_by_none()
+        => Fixture.ReportsNothing<MirrorsAnalyzer>(Reaching("""    public WardBed Lead => LiveObject<WardBed>(nullable: true);"""), Station);
 
     [Test]
     public Task a_returned_object_is_checked_at_the_type_the_method_returns()

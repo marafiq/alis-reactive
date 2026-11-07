@@ -8,17 +8,20 @@ namespace Alis.Reactive.Components;
 
 public class ReadOnly<TValue> : TypedSource<TValue>
 {
-    internal ReadOnly(JsObject owner, PathStep member)
+    internal ReadOnly(JsObject owner, PathStep member, bool optional)
     {
         Owner = owner;
         Member = member;
+        Optional = optional;
     }
 
     internal JsObject Owner { get; }
 
     internal PathStep Member { get; }
 
-    internal override Expression Expression => new GetExpression(Owner.Binding.Target, [Member], Owner.Binding.Members);
+    internal bool Optional { get; }
+
+    internal override Expression Expression => new GetExpression(Owner.Binding.Target, [Member], Owner.Binding.Read(Optional));
 
     internal override PlanBuild Build => Owner.Binding.Build;
 
@@ -28,34 +31,36 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
 public sealed class Property<TValue> : ReadOnly<TValue>
 {
-    internal Property(JsObject owner, PathStep member)
-        : base(owner, member)
+    internal Property(JsObject owner, PathStep member, bool optional)
+        : base(owner, member, optional)
     {
     }
 
-    public void Set(TValue value) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build)));
+    public void Set(TValue value) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, Owner.Binding.Build)));
 
-    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    public void Set(ITypedSource<TValue> source) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
 
-    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(Owner, Member, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(Owner, Member, Optional, Owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
 }
 
 public sealed class WriteOnly<TValue>
 {
     private readonly JsObject _owner;
     private readonly PathStep _member;
+    private readonly bool _optional;
 
-    internal WriteOnly(JsObject owner, PathStep member)
+    internal WriteOnly(JsObject owner, PathStep member, bool optional)
     {
         _owner = owner;
         _member = member;
+        _optional = optional;
     }
 
-    public void Set(TValue value) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, _owner.Binding.Build)));
+    public void Set(TValue value) => Assign.Write(_owner, _member, _optional, _owner.Binding.Build.IntoLive<TValue>(Literal.Of(value, _owner.Binding.Build)));
 
-    public void Set(ITypedSource<TValue> source) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    public void Set(ITypedSource<TValue> source) => Assign.Write(_owner, _member, _optional, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
 
-    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(_owner, _member, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
+    internal void Widen<TSource>(ITypedSource<TSource> source) => Assign.Write(_owner, _member, _optional, _owner.Binding.Build.IntoLive<TValue>(Sources.Of(source).Expression));
 }
 
 public static class NullableWrites
@@ -71,7 +76,7 @@ public static class NullableWrites
 
 internal static class Assign
 {
-    internal static void Write(JsObject owner, PathStep member, Expression value)
+    internal static void Write(JsObject owner, PathStep member, bool optional, Expression value)
     {
         var binding = owner.Binding;
         var writesThePayloadAfterAnAwait = binding.Target is RefExpression { Name: PlanBuild.PayloadName } && binding.Build.HandlerAwaited;
@@ -81,7 +86,7 @@ internal static class Assign
                 "A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.");
         }
 
-        binding.Build.Write(new SetStatement(binding.Target, [member], Presence.Required, value));
+        binding.Build.Write(new SetStatement(binding.Target, [member], optional ? Presence.Optional : Presence.Required, value));
     }
 }
 
@@ -90,14 +95,16 @@ public sealed class Callback<TArgs, TResult>
 {
     private readonly JsObject _owner;
     private readonly PathStep _member;
+    private readonly bool _optional;
 
-    internal Callback(JsObject owner, PathStep member)
+    internal Callback(JsObject owner, PathStep member, bool optional)
     {
         _owner = owner;
         _member = member;
+        _optional = optional;
     }
 
-    public void Set(Func<TArgs, TypedSource<TResult>> answer) => Assign.Write(_owner, _member, Answers.Of(answer, _owner.Binding.Build));
+    public void Set(Func<TArgs, TypedSource<TResult>> answer) => Assign.Write(_owner, _member, _optional, Answers.Of(answer, _owner.Binding.Build));
 }
 
 internal static class Answers

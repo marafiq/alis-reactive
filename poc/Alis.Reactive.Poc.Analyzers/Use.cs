@@ -6,8 +6,10 @@ namespace Alis.Reactive.Poc.Analyzers;
 
 internal sealed class Use
 {
-    private Use(Door door, string? javaScriptName, Location location, string declared, int? position, INamedTypeSymbol? reached, Typed? value, Typed? answer)
+    private Use(Door door, string? javaScriptName, Location location, string declared, int? position, INamedTypeSymbol? reached, Typed? value, Typed? answer, bool? optional, bool? nullable)
     {
+        Optional = optional;
+        Nullable = nullable;
         Door = door;
         JavaScriptName = javaScriptName;
         Location = location;
@@ -34,6 +36,10 @@ internal sealed class Use
 
     public Typed? Answer { get; }
 
+    public bool? Optional { get; }
+
+    public bool? Nullable { get; }
+
     public static Use Of(IInvocationOperation invocation, Door door, ISymbol member, INamedTypeSymbol holder)
     {
         var method = invocation.TargetMethod;
@@ -41,7 +47,15 @@ internal sealed class Use
         var value = method.TypeArguments.Length == 1 && door.Reach == Reach.None ? Typed.Of(method, 0) : null;
         var answer = door.Reach == Reach.Callback && method.TypeArguments.Length == 2 ? Typed.Of(method, 1) : null;
         var position = door.Shape == DoorShape.Position ? Constant(invocation, "position") as int? : null;
-        return new Use(door, NameOf(invocation, member.Name), member.Locations[0], holder.Name + "." + member.Name, position, reached, value, answer);
+        return new Use(door, NameOf(invocation, member.Name), member.Locations[0], holder.Name + "." + member.Name, position, reached, value, answer, Marked(invocation, "optional"), Marked(invocation, "nullable"));
+    }
+
+    private static bool? Marked(IInvocationOperation invocation, string parameter)
+    {
+        var argument = invocation.Arguments.FirstOrDefault(each => each.Parameter?.Name == parameter);
+        if (argument is null) return null;
+        if (argument.ArgumentKind == ArgumentKind.DefaultValue) return false;
+        return argument.Value.ConstantValue is { HasValue: true, Value: bool marked } ? marked : null;
     }
 
     private static object? Constant(IInvocationOperation invocation, string parameter)

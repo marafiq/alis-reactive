@@ -173,7 +173,11 @@ const parameterHolds = (signature, prefix) =>
     return heldsOf(slotType).map((held) => [prefix + (rest ? "rest:" : "parameter:") + position, ...held]);
   });
 
-const callableHolds = (type) => callSignatures(type).flatMap((signature) => parameterHolds(signature, ""));
+const callableHolds = (signatures) =>
+  signatures.flatMap((signature) => [
+    ...parameterHolds(signature, ""),
+    ...heldsOf(awaited(signature.getReturnType())).map((held) => ["returns", ...held]),
+  ]);
 
 const eventsTaken = (parameter) => {
   const declared = checker.getTypeOfSymbol(parameter);
@@ -241,7 +245,7 @@ const memberLine = (symbol, typeOf) => {
       if (admitsNullIn(read)) flags.push("readsnull");
       flags.push(...callFlags(signaturesIn(read)));
       holds.push(...heldsIn(read).map((held) => ["value", ...held]));
-      holds.push(...signaturesIn(read).flatMap((signature) => parameterHolds(signature, "")));
+      holds.push(...callableHolds(signaturesIn(read)));
     }
     if (setter !== undefined && admitsNull(checker.getTypeAtLocation(setter.parameters[0]))) flags.push("writesnull");
     const kind = getter !== undefined && setter !== undefined ? "property" : getter !== undefined ? "readonly" : "writeonly";
@@ -261,7 +265,7 @@ const memberLine = (symbol, typeOf) => {
     if (admitsNullIn(type)) flags.push("readsnull");
     if (!readonly && admitsNullIn(type)) flags.push("writesnull");
     flags.push(...callFlags(signaturesIn(type)));
-    const holds = [...heldsIn(type).map((held) => ["value", ...held]), ...signaturesIn(type).flatMap((signature) => parameterHolds(signature, ""))];
+    const holds = [...heldsIn(type).map((held) => ["value", ...held]), ...callableHolds(signaturesIn(type))];
     return [readonly ? "readonly" : "property", flags, [], holds];
   }
   return undefined;

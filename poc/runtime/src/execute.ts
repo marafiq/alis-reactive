@@ -1,5 +1,5 @@
-import type { CallExpression, DoStatement, IfStatement, LetStatement, SetStatement, Statement } from "./plan";
-import { callee, called, evaluate, holderOf, walk, type Bound, type Context } from "./evaluate";
+import type { CallExpression, DoStatement, IfStatement, LetStatement, PathStep, SetStatement, Statement } from "./plan";
+import { callee, called, evaluate, memberHolder, objectHolding, walk, type Bound, type Context } from "./evaluate";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 
 export type Run = { readonly kind: "finished" } | { readonly kind: "awaiting"; readonly settled: Promise<void> };
@@ -96,9 +96,18 @@ function bound(context: Context, name: string, read: Bound): Context {
 function set(statement: SetStatement, context: Context): void {
   const last = statement.path[statement.path.length - 1];
   if (last === undefined) throw new Error("The plan writes a set with no member to write.");
-  const parent = walk(evaluate(statement.target, context), statement.path.slice(0, -1), statement.members);
-  const holder = holderOf(parent, last, statement.members);
-  if (holder.kind === "absent") return;
-  const written = Reflect.set(holder.object, last, heldOrNull(evaluate(statement.value, context)));
+  const parent = walk(evaluate(statement.target, context), statement.path.slice(0, -1), "required");
+  const written = Reflect.set(writtenTo(statement, parent, last), last, heldOrNull(evaluate(statement.value, context)));
   if (!written) throw new Stop("The member '" + String(last) + "' refused the write.");
+}
+
+function writtenTo(statement: SetStatement, parent: Read, last: PathStep): object {
+  switch (statement.members) {
+    case "required":
+      return memberHolder(parent, last);
+    case "optional":
+      return objectHolding(parent, last);
+    default:
+      return assertNever(statement.members);
+  }
 }

@@ -328,11 +328,14 @@ internal sealed class ContractMember
         ReadsNull = flags.Contains("readsnull");
         WritesNull = flags.Contains("writesnull");
         ReturnsNull = flags.Contains("returnsnull");
+        IsOptional = flags.Contains("optional");
     }
 
     public string Name { get; }
 
     public MemberKind Kind { get; }
+
+    public bool IsOptional { get; }
 
     public bool IsCallable { get; }
 

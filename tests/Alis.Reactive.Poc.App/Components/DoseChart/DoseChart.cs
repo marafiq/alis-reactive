@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Components;
 using Alis.Reactive.Hosting;
 using Alis.Reactive.Values;
@@ -26,6 +27,7 @@ public sealed class DoseChart : Component
 
 public sealed class ChartTick : JsObject
 {
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS022", Justification = "Drift on purpose: an_answer_that_stops_in_a_step_stops_the_pipeline_before_its_next_step proves the browser stops on a tick that lacks a label the declaration requires.")]
     public ReadOnly<string> Label => ReadOnly<string>();
 
     public ReadOnly<int> Doses => ReadOnly<int>();

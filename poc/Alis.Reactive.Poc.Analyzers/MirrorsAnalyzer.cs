@@ -81,6 +81,12 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
             }
         }
 
+        if (use.Optional is { } optional && optional != found.IsOptional)
+        {
+            report(Diagnostic.Create(optional ? rules.OptionalWhereRequired : rules.RequiredWhereOptional, use.Location, use.Declared, javaScriptName, vendorMember));
+            return;
+        }
+
         if (door.Reach == Reach.Callback)
         {
             CheckAnswer(report, rules, use, found, vendorMember);
@@ -206,6 +212,12 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
 
     private static void CheckNull(Action<Diagnostic> report, Rules rules, Use use, ContractMember found, string vendorMember)
     {
+        if (use.Nullable is false && use.Reached is { } reached)
+        {
+            CheckHeldNull(report, rules, use, found, vendorMember, reached);
+            return;
+        }
+
         if (!use.Door.ChecksNull || use.Value is not { } value) return;
 
         if (use.Door.Shape == DoorShape.Call)
@@ -224,6 +236,13 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
         {
             report(Diagnostic.Create(rules.WritesNull, use.Location, use.Declared, value.Shown, vendorMember));
         }
+    }
+
+    private static void CheckHeldNull(Action<Diagnostic> report, Rules rules, Use use, ContractMember found, string vendorMember, INamedTypeSymbol reached)
+    {
+        var returned = use.Door.Shape == DoorShape.Call;
+        if (returned ? !found.ReturnsNull : !found.ReadsNull) return;
+        report(Diagnostic.Create(returned ? rules.ReturnsNullObject : rules.HoldsNullObject, use.Location, use.Declared, reached.Name, vendorMember));
     }
 
     private static string? KindMismatch(Door door, ContractMember found)
