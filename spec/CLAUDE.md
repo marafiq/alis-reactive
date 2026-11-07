@@ -99,7 +99,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: "In the model, in the CSHTML, let's have a rule that both has to be same. Override cannot
   change it." An override keeps the JSON name and the write of the member it overrides. A read names the member as
   the class that declares it names it, and the class the read starts from must write that name. An override that
-  changes either is the analyzer's to refuse at build (N18.5, built in POC 13; not built yet) (D18.3). The owner
+  changes either is the analyzer's to refuse at build (N18.5, built in POC 13f as ALIS025) (D18.3). The owner
   approved the solution the same day.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties

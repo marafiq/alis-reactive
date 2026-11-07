@@ -2631,7 +2631,11 @@ plans (Q19).
     refused by System.Text.Json itself. A renamed override, and one that writes a member its declaration ignores,
     read correctly by the declaration's name but break the owner's rule, so the core's analyzer refuses both in the
     app's model at build time (N18.5). A model is a `.cs` file the build compiles on both hosts, so the analyzer
-    sees it on net48 too.
+    sees it on net48 too. The probe of POC 13f (net10, the reflection resolver) found more: an override with no
+    `JsonPropertyName` over a declaration that has one is written under both names (`{"p":"v","x":"v"}`), at every
+    link of a chain, and a `JsonIgnore` condition on the override alone changes when it is written. So ALIS025
+    refuses an override whose `JsonPropertyName` or `JsonIgnore`, its condition included, is not the one of the
+    member it overrides, each link checked against the member it overrides.
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
   lists at gate 1 (N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
   attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`, except the owner's exceptions D18.1
@@ -2664,7 +2668,7 @@ shapes, starts and the payload kind of each event.
 - `N18.3` new: a form typed by its model, and a request's `Form` that takes only a form of the request's model.
 - `N18.4` new: the typed doors of D18.5 for the button type, the text box type and the action link's attributes.
 - `N18.5` new: the override analyzer of D18.3: an override in an app's model carries the JSON name and the
-  `JsonIgnore` of the member it overrides. Built in POC 13, the contract analyzer.
+  `JsonIgnore` of the member it overrides. Built in POC 13f as ALIS025.
 
 **Evidence.**
 - Three item-type finders (`Alis.Reactive/Inputs/FieldReference.cs:50-58`, `Alis.Reactive/Members/ClrShape.cs:82-90`,
@@ -2698,7 +2702,7 @@ shapes, starts and the payload kind of each event.
   (`WhenARosterIsHandedOver`, POC 3).
 - `X18.8` refusal: a read of an override the app's JSON options ignore is refused with "'{lambda}' reads a member
   of '{type}' that the app's JSON options do not write, so the browser never holds it." (`WhenARosterReadIsRefused`).
-- `X18.9` analyzer: an override that renames, ignores or writes what its declaration does not: new:N18.5.
+- `X18.9` analyzer: an override that renames, ignores or writes what its declaration does not: new:N18.5 (POC 13f).
 
 ## Q19. The schema
 

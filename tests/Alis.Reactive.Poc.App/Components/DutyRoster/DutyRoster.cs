@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Components;
@@ -39,6 +40,7 @@ public sealed record OnCallNurse(string Name, [property: JsonPropertyName("pager
     public override string Role { get; init; } = "";
 
     [JsonIgnore]
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS025", Justification = "Drift on purpose: a_read_of_an_override_the_apps_json_options_ignore_is_refused_with_its_type proves the view refuses a read of an override its JSON options leave unwritten.")]
     public override string Station { get; init; } = "";
 
     public string Callback { get; init; } = "switchboard";
