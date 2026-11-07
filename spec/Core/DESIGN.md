@@ -802,8 +802,8 @@ Terms used throughout:
 ## Q7. Every value position takes every source
 
 **Decision.**
-- D7.1 The positions are closed: a property or write-only property set, an element's text, HTML, class and
-  attribute, both operands of every condition operator, a request member (which Q9 places in the route, the
+- D7.1 The positions are closed: a property or write-only property set, an element's text, HTML and class name,
+  both operands of every condition operator, a request member (which Q9 places in the route, the
   query, the body or a header), a header, a dispatch payload member, and a method's, plugin's or hub's argument.
 - D7.2 The sources are closed, each a `TypedSource<T>`: a component's or plugin's member, a method's result
   (`Method<T>`, `MethodAsync<T>`, a hub's `Invoke<T>`), a page URL member (`p.Url<TQuery>()`), a field of an event
@@ -826,7 +826,10 @@ Terms used throughout:
   where the view renders for the constructs JavaScript reads differently from .NET; a pattern read in the
   browser cannot be checked.
 - D7.6 A source that reads nothing writes `null` into a property, an argument and a payload member. At an
-  element's text and HTML it shows nothing, and at a class it changes nothing (D4.5). In a request it is
+  element's text and HTML it shows nothing, and at a class it changes nothing (D4.5): a class name is bound by a
+  `let`, and the element's `classList` method runs only where it holds a value, as the redesign's class change does
+  (`Alis.Reactive/PlanModel/Reactions/Steps.cs:133-140`). An element's attribute is no value position: neither line
+  writes one from a source; the redesign reads a child's attribute inside a lambda over the element's children. In a request it is
   decided by Q9.
 
 **Schema nodes.** `lit`, `obj`, `list`, `get`, `call`, `set`, `op`; the request argument's members (Q9).
@@ -872,6 +875,10 @@ Terms used throughout:
 - `X7.4` type: a pattern read in the browser cannot reach `Matches`: new:N7.3 gives `Matches` no source overload.
 - `X7.5` behavior: a property set from a payload field the payload lacks writes `null`, and the component
   shows its empty state.
+- `X7.8` behavior (D7.6): a pump card's class is added, removed, toggled on and toggled off, and a class name that
+  reads nothing leaves the card's class as it was, where `classList.add(null)` adds "null"; HTML set on an element
+  shows its markup, and HTML from a value that reads nothing shows nothing, where `innerHTML = undefined` shows
+  "undefined".
 - `X7.7` behavior (D7.3, N7.5): a fluid balance's intake widened to `int?` is written to its nullable target and
   ordered against it, over a 1000 ml target and within it, and an ordering with a null target does not hold, where
   JavaScript's `500 > null` does; a pump's summary widened to `string?` is passed as the caption's argument.

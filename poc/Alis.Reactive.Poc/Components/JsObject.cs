@@ -175,6 +175,15 @@ public abstract class JsObject
         where TArgs : JsObject, new()
         => new(JavaScriptName(name, declaredBy));
 
+    internal void MethodWhenHeld(Arg argument, string name)
+    {
+        var build = Binding.Build;
+        var held = build.Bind(argument.ExpressionIn(build));
+        var call = new CallExpression(Binding.Target, [PathStep.Member(name)], Binding.Members, [held]);
+        var holdsAValue = new OperatorExpression(Operator.Neq, [held, Literal.Of<string?>(null, build)]);
+        build.When(holdsAValue, () => build.Write(new DoStatement(call, awaits: false)));
+    }
+
     private ListenerArgumentsOf ListenerArguments() => Binding.Arguments switch
     {
         ArgumentsAt arguments => Bound<ListenerArgumentsOf>(new Binding(arguments.List, Binding.Build, ReadPresence.Required)),

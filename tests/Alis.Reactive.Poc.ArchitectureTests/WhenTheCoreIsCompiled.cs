@@ -21,7 +21,7 @@ public sealed class WhenTheCoreIsCompiled
         ["Lists"] = ["Plan", "Writing", "Values", "Types", "Conditions"],
         ["Components"] = ["Plan", "Writing", "Values", "Types", "Lists"],
         ["Pipelines"] = ["Plan", "Writing", "Values", "Components"],
-        ["Elements"] = ["Components", "Pipelines"],
+        ["Elements"] = ["Components", "Pipelines", "Values"],
         ["Hosting"] = ["Plan", "Writing", "Values", "Components", "Pipelines"],
     };
 

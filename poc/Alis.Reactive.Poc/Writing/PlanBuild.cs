@@ -23,6 +23,7 @@ internal sealed class PlanBuild
     private readonly HashSet<string> _elseIfResults = new(StringComparer.Ordinal);
     private int _items;
     private int _results;
+    private int _values;
     private int _readingItems;
     private int _answering;
     private int _answers;
@@ -128,6 +129,13 @@ internal sealed class PlanBuild
         var name = "result" + (++_results).ToString(CultureInfo.InvariantCulture);
         Write(new LetStatement(name, call, awaits));
         _resultBlocks[name] = _open.Peek();
+        return new RefExpression(name);
+    }
+
+    internal RefExpression Bind(Expression value)
+    {
+        var name = "value" + (++_values).ToString(CultureInfo.InvariantCulture);
+        Write(new LetStatement(name, value, awaits: false));
         return new RefExpression(name);
     }
 

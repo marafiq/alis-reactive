@@ -1,0 +1,38 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Pump card";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Pump card</h1>
+
+<section id="pump-card" class="pump-card">
+    @plan.InfusionPump("pump", "Bed 4 pump")
+</section>
+
+<p>Alarm: <span id="alarm">unread</span></p>
+
+@(plan.Button("mark", "Mark the pump as alarmed")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("pump-card").Classes.Add("alarmed")))
+
+@(plan.Button("mark-last", "Mark the pump by its last alarm")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-card").Classes.Add(pipeline.Component<InfusionPump>("pump").LastAlarm());
+        pipeline.Element("alarm").Text.Set("marked");
+    }))
+
+@(plan.Button("clear", "Clear the mark")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("pump-card").Classes.Remove("alarmed")))
+
+@(plan.Button("flip", "Flip the mark")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("pump-card").Classes.Toggle("alarmed")))
+
+@(plan.Button("bold", "Show the alarm in bold")
+    .Reactive(button => button.Click, pipeline => pipeline.Element("alarm").Html.Set("<strong>occlusion</strong>")))
+
+@(plan.Button("last", "Show the last alarm")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("alarm").Html.Set(pipeline.Component<InfusionPump>("pump").LastAlarm())))
+
+@Html.RenderPlan(plan)

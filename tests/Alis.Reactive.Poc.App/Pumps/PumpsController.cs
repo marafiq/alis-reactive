@@ -23,6 +23,8 @@ public sealed class PumpsController : Controller
     public IActionResult LastAlarmNoted() => View(new InfusionPage());
 
     public IActionResult CaptionedBySummary() => View(new InfusionPage());
+
+    public IActionResult PumpCard() => View(new InfusionPage());
 }
 
 public sealed record InfusionPage;
