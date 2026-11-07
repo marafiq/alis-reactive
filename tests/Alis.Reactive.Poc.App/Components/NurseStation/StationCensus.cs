@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Alis.Reactive.Components;
 using Alis.Reactive.Hosting;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,6 +27,7 @@ public sealed class StationCensus : Component
 
     public Property<string?> Lead => Property<string?>();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS025", Justification = "The round is the CareRound JSON the app writes into the census; its TypeScript seed names only the time the census shows.")]
     public Property<CareRound?> NextRound => Property<CareRound?>();
 }
 

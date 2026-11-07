@@ -17,6 +17,7 @@ internal sealed class Rules
     public const string PresenceId = "ALIS022";
     public const string BodyId = "ALIS023";
     public const string ConstantId = "ALIS024";
+    public const string HeldId = "ALIS025";
 
     private const string NullTitle = "A declaration's nullability fits its vendor's typed API";
     private const string KindTitle = "A member is declared with the door its kind takes";
@@ -56,8 +57,9 @@ internal sealed class Rules
         NoMember = Rule(BodyId, BodyTitle, "'{0}' calls {1} in {2}, which declares no JavaScript member: call it as the body of the property or method that declares one");
         NotTheBody = Rule(BodyId, BodyTitle, "'{0}' calls {1} inside its body: a declaration's body is the one door call that names its JavaScript member");
         NamedBy = Rule(BodyId, BodyTitle, "'{0}' passes declaredBy: to {1}: the member that calls it is the member it declares, and name: names a JavaScript member its C# name does not");
+        Held = Rule(HeldId, "A declaration's type is the type its vendor's typed API holds", "'{0}' is declared with {1}<{2}>, and {3}: {4}");
         NotConstant = Rule(ConstantId, "A declaration door's arguments are constants the build reads", "'{0}' passes {1} to {2} as a value the build cannot read: pass a constant");
-        All = [NoMember, NotTheBody, NamedBy, NotConstant, RequiredWhereOptional, OptionalWhereRequired, Unnamed, Unlisted, NotPublic, NoArgument, Promise, PromiseFromSome, ArgumentPromise, Kind, NotHanded, NotAFunction, ReadsNull, ReturnsNull, WritesNull, ArgumentNull, AnswersNull, HoldsNullObject, ReturnsNullObject, Undeclared, ReachesNoObject, ReachesNoList, ReachesAList];
+        All = [NoMember, NotTheBody, NamedBy, NotConstant, RequiredWhereOptional, OptionalWhereRequired, Unnamed, Unlisted, NotPublic, NoArgument, Promise, PromiseFromSome, ArgumentPromise, Kind, NotHanded, NotAFunction, ReadsNull, ReturnsNull, WritesNull, ArgumentNull, AnswersNull, HoldsNullObject, ReturnsNullObject, Undeclared, ReachesNoObject, ReachesNoList, ReachesAList, Held];
     }
 
     public DiagnosticDescriptor NoMember { get; }
@@ -113,6 +115,8 @@ internal sealed class Rules
     public DiagnosticDescriptor ReachesNoList { get; }
 
     public DiagnosticDescriptor ReachesAList { get; }
+
+    public DiagnosticDescriptor Held { get; }
 
     public ImmutableArray<DiagnosticDescriptor> All { get; }
 

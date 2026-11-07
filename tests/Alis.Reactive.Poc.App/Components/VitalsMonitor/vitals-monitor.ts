@@ -8,7 +8,7 @@ interface Alarm {
   bed: string;
   cancel: boolean;
   readonly note: string | null;
-  readonly reading: { readonly rate: number };
+  readonly reading: { readonly rate: number; readonly unit?: string };
   readonly patient: AlarmPatient;
   readonly silence: () => void;
 }
@@ -17,7 +17,7 @@ interface OlderAlarm {
   readonly bedNumber: string;
   cancel: boolean;
   readonly note: string | null;
-  readonly reading: { readonly rate: number };
+  readonly reading: { readonly rate: number; readonly unit?: string };
   readonly patient: AlarmPatient;
   readonly silence: () => void;
 }

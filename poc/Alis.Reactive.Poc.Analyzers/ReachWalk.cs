@@ -124,8 +124,20 @@ internal sealed class ReachWalk
         if (present.Count == 0) ReportReach(use, reached, many, where, "null or undefined");
         foreach (var each in present)
         {
+            if (HeldValues.IsPromise(_contract, each))
+            {
+                Report(Diagnostic.Create(_rules.Held, use.Location, use.Declared, use.Door.Name, reached.Name, where + " holds a promise", "no door awaits a promise a member holds, a gap to name"));
+                continue;
+            }
+
             if (Resolve(each, many, self) is { } type)
             {
+                if (MirrorsElsewhere(reached, type) is { } mirrored)
+                {
+                    ReportReach(use, reached, many, where, "'" + type.Shown + "', not '" + mirrored + "' that '" + reached.Name + "' mirrors");
+                    continue;
+                }
+
                 Enqueue(new Visit(reached, type, parameters, handedBy, live: false));
                 continue;
             }
@@ -146,6 +158,12 @@ internal sealed class ReachWalk
         if (!many && held.Shape == HeldShape.Self) return self;
         if (held.Shape != expected) return null;
         return _contract.Type(held.Key) is { IsDuplicate: false } type ? type : null;
+    }
+
+    private string? MirrorsElsewhere(INamedTypeSymbol reached, ContractType handed)
+    {
+        if (!_framework.IsRoot(reached) || MirrorsAnalyzer.Mirrored.Of(reached, _framework, _contract) is not { } mirror) return null;
+        return _contract.Extends(handed, mirror.Type.Key) ? null : mirror.Name;
     }
 
     private string Shown(TypeKey key) => _contract.Type(key)?.Shown ?? key.Name;

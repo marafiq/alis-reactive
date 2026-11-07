@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -52,6 +53,8 @@ internal sealed class VendorContract
 
         return null;
     }
+
+    public bool Extends(ContractType type, TypeKey basis) => WithBases(type).Any(each => each.Key == basis);
 
     public bool DeclaresEvent(ContractType type, string name)
     {

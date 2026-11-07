@@ -97,6 +97,17 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
         }
 
         CheckNull(report, rules, use, found, vendorMember);
+        CheckHeld(report, rules, contract, use, found, vendorMember);
+    }
+
+    private static void CheckHeld(Action<Diagnostic> report, Rules rules, VendorContract contract, Use use, ContractMember found, string vendorMember)
+    {
+        if (use.Value is not { } value) return;
+        var returned = use.Door.Shape == DoorShape.Call;
+        var held = found.Held(returned && found.Kind != MemberKind.Method ? "returns" : "value");
+        var misfit = returned || use.Door.Reads ? HeldValues.Read(contract, value.Type, held, vendorMember) : null;
+        if (misfit is null && use.Door.Writes) misfit = HeldValues.Write(contract, value.Type, held, vendorMember);
+        if (misfit is { } wrong) report(Diagnostic.Create(rules.Held, use.Location, use.Declared, use.Door.Name, value.Shown, wrong.Clause, wrong.Cure));
     }
 
     internal static void CheckPosition(Action<Diagnostic> report, Rules rules, Use use, string declaration, Parameters? parameters, string handedBy)

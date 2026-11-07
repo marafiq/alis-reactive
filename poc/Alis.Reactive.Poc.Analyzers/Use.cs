@@ -83,11 +83,14 @@ internal sealed class Use
 
 internal sealed class Typed
 {
-    private Typed(string shown, bool nullable)
+    private Typed(ITypeSymbol type, string shown, bool nullable)
     {
+        Type = type;
         Shown = shown;
         Nullable = nullable;
     }
+
+    public ITypeSymbol Type { get; }
 
     public string Shown { get; }
 
@@ -102,6 +105,6 @@ internal sealed class Typed
         var bare = type is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } wrapped
             ? wrapped.TypeArguments[0]
             : type.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-        return new Typed(bare.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat), nullable);
+        return new Typed(bare, bare.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat), nullable);
     }
 }

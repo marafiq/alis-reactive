@@ -16,6 +16,7 @@ public sealed class DutyRoster : Component
 
     public RosterShift Shift => LiveObject<RosterShift>();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS025", Justification = "Drift on purpose: a_list_where_the_data_declares_an_object_stops_a_read_of_a_member_of_it_and_the_steps_after_it proves the browser stops on the pager line a roster hands as a list.")]
     public ReadOnly<OnCallNurse> OnCall => ReadOnly<OnCallNurse>();
 
     public Property<string> Lead => Property<string>();

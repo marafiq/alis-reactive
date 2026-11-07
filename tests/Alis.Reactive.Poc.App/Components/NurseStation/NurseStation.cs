@@ -17,6 +17,7 @@ public sealed class NurseStation : Component
 
     public LiveObjects<StationBed> Beds => LiveObjects<StationBed>();
 
+    [SuppressMessage("Alis.Reactive.Contract", "ALIS025", Justification = "Drift on purpose: rounds_held_as_a_paged_result_instead_of_a_list_stop_the_count_and_the_steps_after_it proves the browser stops on the older station's paged rounds.")]
     public ReadOnly<StationSchedule> Schedule => ReadOnly<StationSchedule>();
 }
 
