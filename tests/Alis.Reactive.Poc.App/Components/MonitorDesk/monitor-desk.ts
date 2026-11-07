@@ -51,6 +51,10 @@ export class DeskMonitor {
     this.#pagedLine.textContent = this.resident + " paged";
   }
 
+  check(): Promise<string> {
+    return Promise.resolve(this.resident + " is steady");
+  }
+
   on(event: "alarm", listener: AlarmListener): void {
     if (event !== "alarm") throw new Error("A desk monitor raises 'alarm' only, not '" + event + "'.");
     this.#listeners.add(listener);

@@ -89,5 +89,17 @@ public sealed class WhenADeskHandsOverAMonitor : AppPageTest
         await Expect(Page.Locator("#ada-monitor .desk-monitor-paged")).ToHaveTextAsync("Ada not paged");
     }
 
+    [Test]
+    public async Task a_component_the_payload_is_takes_a_write_after_an_await()
+    {
+        await Open("/Desks/Check");
+
+        await Click("Pick ben-monitor");
+
+        await Expect(Page.Locator("#checked")).ToHaveTextAsync("Ben is steady");
+        await Expect(Page.Locator("#ben-monitor .desk-monitor-status")).ToHaveTextAsync("Ben: checked");
+        await Expect(Page.Locator("#ada-monitor .desk-monitor-status")).ToHaveTextAsync("Ada: idle");
+    }
+
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();
 }

@@ -123,7 +123,7 @@ internal static class Assign
     {
         var binding = owner.Binding;
         var target = binding.Target;
-        if (target is RefExpression reference && binding.Build.IsPayload(reference.Name)) RequireTheVendorsTurn(binding.Build, reference.Name);
+        if (target is RefExpression reference && binding.Build.IsPayload(reference.Name) && owner is not Component) RequireTheVendorsTurn(binding.Build, reference.Name);
         if (writes.Content && target is ObjectExpression element) binding.Build.ReplacesContentOf(element.Id, writes.Noun);
         binding.Build.Write(new SetStatement(target, [member], optional ? Presence.Optional : Presence.Required, value, writes.Content));
     }

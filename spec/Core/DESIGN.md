@@ -1588,6 +1588,11 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     decides, the handler writes `Cancel` first, then asks, then calls the drawer's close method on yes;
   - a write to a property of an object the payload holds is a write on that object, and runs.
 
+  A payload declared as a component (`Component`) is that component, not arguments its vendor reads when its
+  callback returns: its setter takes a write whenever the step runs, so a write to its own property runs after an
+  awaited step and inside a `listen` (D12.8). The meaning is the declaration's, never the expression's: a payload
+  declared any other way is refused as above.
+
   The refusal is each handler's own: an await in one handler refuses no write in another. It follows the path
   the handler runs: a branch reads the state before its `if`, so an `Else` writes the payload in the vendor's turn
   when its sibling `Then` awaits, and a step after the `if` reads the payload as awaited when any of its branches
@@ -1758,7 +1763,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   - runs its own pipeline, whose payload is its own listener's arguments, bound under a name of its own, and
     which reads the bindings of the blocks around the step, as any block inside another does (schema.md);
   - is refused where the view renders for a write to the payload of the event around the step: the vendor read
-    that payload when its listener returned, before the listened object raised (D11.4). Its own pipeline starts
+    that payload when its listener returned, before the listened object raised (D11.4). A payload that is a
+    component takes the write, as D11.4 states. Its own pipeline starts
     in the listened object's turn, so a write to its own payload before its own awaited step reaches its vendor,
     whatever the pipeline around it awaited;
   - is refused where the view renders on an object declared optional or nullable: a listen needs its object when

@@ -136,6 +136,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   plans the step stops in the browser, on a held slot's element or on an element that holds it. A slot is held while a
   live plan names it and while content a load or the server put in it has a live owner. An element's text and HTML
   mark their `set` as a content write.
+- Chosen within the owner's yes, 2026-11-07, POC 15b-ii: a payload declared as a `Component` is that component, whose
+  setter takes a write whenever the step runs, so D11.4's refusals (after an awaited step, and inside a `listen`) do
+  not apply to it. The meaning is keyed on the declaration, never on the expression's shape; every other payload is
+  refused as before.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

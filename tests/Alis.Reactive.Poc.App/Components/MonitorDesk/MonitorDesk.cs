@@ -19,6 +19,8 @@ public sealed class DeskMonitor : Component
 
     public void Page() => Method();
 
+    public MethodResult<string> Check() => MethodAsync<string>();
+
     public Event<DeskAlarm> Alarm => Event<DeskAlarm>();
 }
 
