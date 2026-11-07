@@ -35,7 +35,7 @@ public sealed class WhenAnAlarmIsAcknowledged : AppPageTest
     }
 
     [Test]
-    public async Task after_an_await_a_property_of_the_patient_the_alarm_holds_is_written_on_that_patient()
+    public async Task after_an_await_the_property_of_the_patient_the_alarm_holds_is_written_on_that_patient()
     {
         await Open("/Monitors/Acknowledgements");
 
@@ -48,7 +48,7 @@ public sealed class WhenAnAlarmIsAcknowledged : AppPageTest
     }
 
     [Test]
-    public async Task after_an_await_a_method_the_alarm_hands_over_runs()
+    public async Task after_an_await_the_method_the_alarm_hands_over_runs()
     {
         await Open("/Monitors/Acknowledgements");
 
