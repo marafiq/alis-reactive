@@ -8,23 +8,23 @@ namespace Alis.Reactive.Poc.AnalyzerTests;
 public sealed class WhenADeclarationMirrorsItsVendor
 {
     private const string Board = """
-        type	ward	Board	class		ward:Panel
-        type	ward	Panel	class		
-        type	ward	pager	function	callable	
-        type	ward	paging	function	callable,promise	
-        member	ward	Panel	heading	property	
-        member	ward	Board	title	property	
-        member	ward	Board	status	readonly	
-        member	ward	Board	pin	writeonly	
-        member	ward	Board	beds	property	readsnull,writesnull
-        member	ward	Board	census	property	readsnull
-        member	ward	Board	lead	property	readsnull
-        member	ward	Board	label	property	writesnull
-        member	ward	Board	refresh	method	callable
-        member	ward	Board	reload	method	callable,promise
-        member	ward	Board	sync	method	callable,mixed
-        member	ward	Board	nurse	method	callable,returnsnull
-        member	ward	Board	onring	property	readsnull,writesnull,callable
+        type	ward	Board	class		ward:Panel	
+        type	ward	Panel	class			
+        type	ward	pager	function	callable		
+        type	ward	paging	function	callable,promise		
+        member	ward	Panel	heading	property		
+        member	ward	Board	title	property		
+        member	ward	Board	status	readonly		
+        member	ward	Board	pin	writeonly		
+        member	ward	Board	beds	property	readsnull,writesnull	
+        member	ward	Board	census	property	readsnull	
+        member	ward	Board	lead	property	readsnull	
+        member	ward	Board	label	property	writesnull	
+        member	ward	Board	refresh	method	callable	
+        member	ward	Board	reload	method	callable,promise	
+        member	ward	Board	sync	method	callable,mixed	
+        member	ward	Board	nurse	method	callable,returnsnull	
+        member	ward	Board	onring	property	readsnull,writesnull,callable	
         """;
 
     private static string Declaring(string members, string mirrors = """[Mirrors("ward", "Board")]""") => $$"""
@@ -105,9 +105,9 @@ public sealed class WhenADeclarationMirrorsItsVendor
     public Task a_type_its_module_declares_twice_is_reported()
         => Fixture.Reports<MirrorsAnalyzer>(
             "ALIS015",
-            "'WardBoard' mirrors 'Board' of 'ward', which its module declares more than once",
+            "'WardBoard' mirrors 'Board' of 'ward', which the vendor contract lists more than once",
             Declaring("", """[[|Mirrors("ward", "Board")|]]"""),
-            "type\tward\tBoard\tduplicate\t\t\n");
+            "type\tward\tBoard\tduplicate\t\t\t\n");
 
     [Test]
     public Task a_build_with_no_contract_is_reported_with_the_targets_to_import()
@@ -398,5 +398,5 @@ public sealed class WhenADeclarationMirrorsItsVendor
             Declaring($$"""
                 public ReadOnly<string> {{member}} => ReadOnly<string>();
             """),
-            $"type\tward\tBoard\tclass\t\t\nmember\tward\tBoard\t{JsonNamingPolicy.CamelCase.ConvertName(member)}\treadonly\t\n");
+            $"type\tward\tBoard\tclass\t\t\t\nmember\tward\tBoard\t{JsonNamingPolicy.CamelCase.ConvertName(member)}\treadonly\t\t\n");
 }

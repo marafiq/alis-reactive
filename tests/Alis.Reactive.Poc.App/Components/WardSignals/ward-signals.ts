@@ -8,6 +8,12 @@ export interface WardFeedHost extends HTMLElement {
 
 type Listener = (...args: unknown[]) => void;
 
+declare global {
+  interface HTMLElementEventMap {
+    readonly "bed-assigned": CustomEvent<{ readonly bed: string }>;
+  }
+}
+
 export class CallBell {
   onring: Listener | null = null;
 
@@ -23,7 +29,7 @@ export class WardFeed {
     host.replaceChildren(buttonOf("Post an update", () => this.#post("update", { message: "Bed 3 is free" })));
   }
 
-  subscribe(event: string, listener: Listener): () => void {
+  subscribe(event: "update", listener: Listener): () => void {
     const listening = this.#listeners.get(event) ?? new Set<Listener>();
     listening.add(listener);
     this.#listeners.set(event, listening);
@@ -50,13 +56,13 @@ export class MedicineSearch {
     host.replaceChildren(this.#results, buttonOf("Search for In", () => this.#load("In")));
   }
 
-  on(event: string, listener: Listener): void {
+  on(event: "load", listener: Listener): void {
     const listening = this.#listeners.get(event) ?? new Set<Listener>();
     listening.add(listener);
     this.#listeners.set(event, listening);
   }
 
-  off(event: string, listener: Listener): void {
+  off(event: "load", listener: Listener): void {
     this.#listeners.get(event)?.delete(listener);
   }
 

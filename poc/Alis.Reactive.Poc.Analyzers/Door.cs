@@ -7,6 +7,7 @@ internal enum DoorShape
     Value,
     Call,
     Itself,
+    Event,
 }
 
 internal sealed class Door
@@ -52,6 +53,7 @@ internal sealed class Door
             "ReturnedObject" => new Door("ReturnedObject", DoorShape.Call, reads: false, writes: false, awaits: false, checksNull: false, "MethodAsync<TResult>, which reads what the promise resolves to as data; no door awaits a live object"),
             "ReturnedObjects" => new Door("ReturnedObjects", DoorShape.Call, reads: false, writes: false, awaits: false, checksNull: false, "MethodAsync<TResult>, which reads what the promise resolves to as data; no door awaits a live object"),
             "CallItself" => new Door("CallItself", DoorShape.Itself, reads: false, writes: false, awaits: false, checksNull: false, ""),
+            "Event" => new Door("Event", DoorShape.Event, reads: false, writes: false, awaits: false, checksNull: false, ""),
             _ => null,
         };
     }

@@ -876,9 +876,10 @@ Terms used throughout:
 - `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between` and the
   membership tests in `ConditionOperators`.
 - `N7.6` new, POC 13a: `NullableWrites.Set` on `Property<T?>` and `WriteOnly<T?>` taking a source of `T`, an
-  extension in `Alis.Reactive.Components` beside the members it widens. The contract check made every member a vendor
-  types `number | null` a `T?` (Syncfusion's `value` members are), and 178 writes of the POC would each have needed
-  `OrNull()`. A view imports `Alis.Reactive.Components`.
+  extension in `Alis.Reactive.Components` beside the members it widens. The contract check makes every member a vendor
+  types `T | null` a `T?` (Syncfusion's DropDownList types `value`, `text` and `index` so), and 178 writes of the POC
+  would each have needed `OrNull()`. A view imports `Alis.Reactive.Components`; one that does not meets a bare CS1503
+  that names no import.
 - `N7.5` new, its form gate 2's: `OrNull()` on a source of a struct or a reference type, returning the same read as
   a source of its nullable type (D7.3).
 - `N7.4` new, its form gate 2's: `IfNull` on a source of a nullable type, taking a literal or a source of the type
@@ -2314,6 +2315,16 @@ grammar gains no node (G2).
     a member that takes null. A live object's and a returned object's nullability wait for N5.4's presence mark (13c).
   - A drift a browser test arranges on purpose carries `SuppressMessage` whose justification names the test, and
     `WhenAContractDriftIsSuppressed` fails on a name no Playwright test declares.
+  - A declared event is one the type declares (ALIS020, POC 13b), read from the type alone: a property of the event's
+    name that holds a function (a callback property, Syncfusion's `EmitType<T>` members), or a literal a method takes as
+    its first parameter when its second is a function, as a literal union (`on(event: "alarm" | "silenced", ..)`) or the
+    keys of a map (`addEventListener<K extends keyof HTMLElementEventMap>`), the map's bases included. A `string` first
+    parameter names no event, so a vendor that dispatches events its types do not name is typed first: an event map
+    on an EventTarget, a literal union on its subscribe method, and `declare global { interface HTMLElementEventMap }`
+    for an element's own event. The contract writes each method's events by reference (`keys:lib.dom:HTMLElementEventMap`)
+    rather than expanded, which would add 33,725 lines. The C# vendor's listening is not read: a vendor a referenced
+    package defines is metadata to an analyzer, so its subscribe method is checked where a handler starts (D17.3).
+  - Every `vendor-contract.tsv` the build passes is read, and a type two of them list is listed twice (ALIS015).
 - D17.6 Every vendor package is pinned to one exact version, its sub-packages included, and its npm and NuGet
   versions move together (B16). The contract table of D17.5 is written by every build whose TypeScript inputs
   changed, so a vendor's drift fails the build at the upgrade.
@@ -2459,6 +2470,7 @@ plans (Q19).
 **Defects.**
 - `X17.1` analyzer: ALIS017 reports a method declared with `Method` whose vendor contract returns a promise: new:N17.2.
 - `X17.2` analyzer: ALIS016 reports a declared member the vendor contract does not list as public: new:N17.2.
+- `X17.28` analyzer: ALIS020 reports a declared event its vendor's typed API does not declare: new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every

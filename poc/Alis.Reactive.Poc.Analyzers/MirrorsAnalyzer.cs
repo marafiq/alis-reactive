@@ -17,6 +17,7 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
     public const string PromiseId = "ALIS017";
     public const string KindId = "ALIS018";
     public const string NullId = "ALIS019";
+    public const string EventId = "ALIS020";
 
     private static readonly DiagnosticDescriptor Unnamed = Rule(
         UnnamedId,
@@ -63,8 +64,13 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
         "A declaration's nullability fits its vendor's typed API",
         "'{0}' writes '{1}?', and '{2}' takes no null: declare '{1}'");
 
+    private static readonly DiagnosticDescriptor Undeclared = Rule(
+        EventId,
+        "A declared event is one its vendor's typed API declares",
+        "'{0}' declares the event '{1}', which '{2}' does not declare: a vendor types an event as a property of its name that holds a function, or as a literal its subscribe method takes, as lib.dom's addEventListener takes the keys of HTMLElementEventMap");
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(Unnamed, Unlisted, NotPublic, Promise, PromiseFromSome, Kind, ReadsNull, ReturnsNull, WritesNull);
+        ImmutableArray.Create(Unnamed, Unlisted, NotPublic, Promise, PromiseFromSome, Kind, ReadsNull, ReturnsNull, WritesNull, Undeclared);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -100,7 +106,7 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
             ? "and no vendor contract reached the build: import poc/VendorContract.targets"
             : contract.Type(module, name) is not { } found
                 ? "which the vendor contract does not list"
-                : found.IsDuplicate ? "which its module declares more than once" : null;
+                : found.IsDuplicate ? "which the vendor contract lists more than once" : null;
         if (problem is null) return;
         var location = attribute.ApplicationSyntaxReference?.GetSyntax(context.CancellationToken).GetLocation() ?? type.Locations[0];
         context.ReportDiagnostic(Diagnostic.Create(Unlisted, location, type.Name, name, module, problem));
@@ -127,6 +133,12 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
 
         var javaScriptName = JavaScriptName(invocation, member.Name);
         if (javaScriptName is null) return;
+        if (door.Shape == DoorShape.Event)
+        {
+            if (!contract.DeclaresEvent(mirror.Type, javaScriptName)) context.ReportDiagnostic(Diagnostic.Create(Undeclared, location, declared, javaScriptName, mirror.Name));
+            return;
+        }
+
         var found = contract.Member(mirror.Type, javaScriptName);
         var vendorMember = mirror.Name + "." + javaScriptName;
         if (found is null)

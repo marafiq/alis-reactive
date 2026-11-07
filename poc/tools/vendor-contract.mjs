@@ -56,6 +56,31 @@ const isHidden = (declaration) =>
 
 const typeOfDeclaration = (declaration, fallback) => (declaration.type !== undefined ? checker.getTypeFromTypeNode(declaration.type) : fallback);
 
+const typeKeyOf = (symbol) => moduleOf(symbol.getDeclarations()[0].getSourceFile()) + ":" + symbol.getName();
+
+const eventsTaken = (parameter) => {
+  const declared = checker.getTypeOfSymbol(parameter);
+  const constraint = declared.isTypeParameter() ? declared.getSymbol()?.getDeclarations()?.find(ts.isTypeParameterDeclaration)?.constraint : undefined;
+  if (constraint !== undefined && ts.isTypeOperatorNode(constraint) && constraint.operator === ts.SyntaxKind.KeyOfKeyword) {
+    const keyed = checker.getTypeFromTypeNode(constraint.type).getSymbol();
+    return keyed !== undefined && (keyed.getDeclarations() ?? []).length > 0 ? ["keys:" + typeKeyOf(keyed)] : [];
+  }
+  const taken = declared.isTypeParameter() ? (checker.getBaseConstraintOfType(declared) ?? declared) : declared;
+  const parts = taken.isUnion() ? taken.types : [taken];
+  return parts.every((part) => part.isStringLiteral()) ? parts.map((part) => "name:" + part.value) : [];
+};
+
+const eventsOf = (symbol) => {
+  const events = [];
+  for (const signature of callSignatures(checker.getTypeOfSymbol(symbol))) {
+    const [event, listener] = signature.getParameters();
+    if (event === undefined || listener === undefined) continue;
+    if (callSignatures(checker.getNonNullableType(checker.getTypeOfSymbol(listener))).length === 0) continue;
+    events.push(...eventsTaken(event));
+  }
+  return [...new Set(events)];
+};
+
 const memberLine = (symbol) => {
   const declarations = symbol.getDeclarations() ?? [];
   if (declarations.length === 0 || declarations.some(isHidden)) return undefined;
@@ -69,11 +94,11 @@ const memberLine = (symbol) => {
     if (setter !== undefined && admitsNull(checker.getTypeAtLocation(setter.parameters[0]))) flags.push("writesnull");
     if (getter !== undefined) flags.push(...callFlags(callSignatures(read)));
     const kind = getter !== undefined && setter !== undefined ? "property" : getter !== undefined ? "readonly" : "writeonly";
-    return [kind, flags];
+    return [kind, flags, []];
   }
   const declaration = declarations[0];
   if (ts.isMethodDeclaration(declaration) || ts.isMethodSignature(declaration)) {
-    return ["method", [...optional, ...callFlags(callSignatures(checker.getTypeOfSymbol(symbol)))]];
+    return ["method", [...optional, ...callFlags(callSignatures(checker.getTypeOfSymbol(symbol)))], eventsOf(symbol)];
   }
   if (ts.isPropertyDeclaration(declaration) || ts.isPropertySignature(declaration)) {
     const type = typeOfDeclaration(declaration, checker.getTypeOfSymbol(symbol));
@@ -82,7 +107,7 @@ const memberLine = (symbol) => {
     if (admitsNull(type)) flags.push("readsnull");
     if (!readonly && admitsNull(type)) flags.push("writesnull");
     flags.push(...callFlags(callSignatures(type)));
-    return [readonly ? "readonly" : "property", flags];
+    return [readonly ? "readonly" : "property", flags, []];
   }
   return undefined;
 };
@@ -98,7 +123,7 @@ const baseNames = (declarations) =>
     .flatMap((clause) => clause.types)
     .map((expression) => checker.getTypeAtLocation(expression).getSymbol())
     .filter((symbol) => symbol !== undefined && (symbol.getDeclarations() ?? []).length > 0)
-    .map((symbol) => moduleOf(symbol.getDeclarations()[0].getSourceFile()) + ":" + symbol.getName());
+    .map(typeKeyOf);
 
 const listType = (symbol, kind, sourceFile) => {
   if (listed.has(symbol)) return;
@@ -111,16 +136,16 @@ const listType = (symbol, kind, sourceFile) => {
     return;
   }
   if (kind === "function") {
-    keys.set(key, ["type", module, symbol.getName(), "function", callFlags(callSignatures(checker.getTypeOfSymbol(symbol))).join(","), ""].join("\t"));
+    keys.set(key, ["type", module, symbol.getName(), "function", callFlags(callSignatures(checker.getTypeOfSymbol(symbol))).join(","), "", ""].join("\t"));
     return;
   }
   const type = kind === "alias" ? checker.getTypeAtLocation(declarations[0].name) : checker.getDeclaredTypeOfSymbol(symbol);
-  keys.set(key, ["type", module, symbol.getName(), kind, callFlags(callSignatures(type)).join(","), baseNames(declarations).join(",")].join("\t"));
+  keys.set(key, ["type", module, symbol.getName(), kind, callFlags(callSignatures(type)).join(","), baseNames(declarations).join(","), ""].join("\t"));
   const members = kind === "alias" ? checker.getPropertiesOfType(type) : [...(symbol.members?.values() ?? [])];
   for (const member of members) {
     const line = memberLine(member);
     if (line === undefined) continue;
-    lines.push(["member", module, symbol.getName(), member.getName(), line[0], line[1].join(",")].join("\t"));
+    lines.push(["member", module, symbol.getName(), member.getName(), line[0], line[1].join(","), line[2].join(",")].join("\t"));
   }
 };
 
@@ -135,7 +160,7 @@ for (const sourceFile of program.getSourceFiles()) {
 
 for (const [key, line] of keys) {
   const [module, name] = key.split("\t");
-  lines.push(line === "duplicate" ? ["type", module, name, "duplicate", "", ""].join("\t") : line);
+  lines.push(line === "duplicate" ? ["type", module, name, "duplicate", "", "", ""].join("\t") : line);
 }
 
 const duplicates = new Set([...keys].filter(([, line]) => line === "duplicate").map(([key]) => key));

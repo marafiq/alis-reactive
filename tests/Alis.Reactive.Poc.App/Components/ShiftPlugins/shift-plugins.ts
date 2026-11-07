@@ -3,6 +3,15 @@ interface Noted {
   readonly count: number;
 }
 
+interface ShiftLogEvents {
+  readonly noted: CustomEvent<Noted>;
+}
+
+export interface ShiftLog {
+  addEventListener<K extends keyof ShiftLogEvents>(type: K, listener: (event: ShiftLogEvents[K]) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
+}
+
 export class ShiftLog extends EventTarget {
   readonly #notes: string[] = [];
   limit = 3;
@@ -56,7 +65,7 @@ type BedListener = (taken: Taken) => void;
 export class BedStore {
   readonly #listeners = new Set<BedListener>();
 
-  subscribe(event: string, listener: BedListener): () => void {
+  subscribe(event: "assigned", listener: BedListener): () => void {
     if (event !== "assigned") throw new Error("The bed store raises 'assigned' only, not '" + event + "'.");
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
@@ -69,6 +78,15 @@ export class BedStore {
 
 interface Signed {
   readonly visitor: string;
+}
+
+interface VisitorBookEvents {
+  readonly signed: CustomEvent<Signed>;
+}
+
+export interface VisitorBook {
+  addEventListener<K extends keyof VisitorBookEvents>(type: K, listener: (event: VisitorBookEvents[K]) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
 }
 
 export class VisitorBook extends EventTarget {

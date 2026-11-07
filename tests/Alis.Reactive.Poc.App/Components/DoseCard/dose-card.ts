@@ -10,6 +10,15 @@ interface DoseCardOptions {
   readonly times: readonly string[];
 }
 
+interface DoseCardEvents {
+  readonly change: Event;
+}
+
+export interface DoseCard {
+  addEventListener<K extends keyof DoseCardEvents>(type: K, listener: (event: DoseCardEvents[K]) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
+}
+
 export class DoseCard extends EventTarget {
   readonly #options: DoseCardOptions;
   readonly #separator: string;

@@ -205,6 +205,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   declaration names its type with `[Mirrors(module, type)]`; nullability follows variance (what the member reads fits
   the C# type, what the C# type writes fits the member); a drift a browser test arranges on purpose carries
   `SuppressMessage` naming the test. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07, reversing D7.3's `OrNull()` at a struct's set on a new fact (the contract
+  makes every `T | null` member a `T?`, and the POC's census broke 178 writes): a set on `Property<T?>` or
+  `WriteOnly<T?>` takes a `T` source as C# assignment does (`NullableWrites`, N7.6), a door added to the public surface.
+  Its cost: it is an extension in `Alis.Reactive.Components`, and a view that does not import it meets a bare CS1503.
+  The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

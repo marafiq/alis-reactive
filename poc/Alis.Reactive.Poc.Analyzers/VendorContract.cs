@@ -20,15 +20,21 @@ internal sealed class VendorContract
 
     public static VendorContract? Read(ImmutableArray<AdditionalText> files, CancellationToken cancellationToken)
     {
+        var types = new Dictionary<TypeKey, ContractType>();
+        var read = false;
         foreach (var file in files)
         {
             if (!file.Path.EndsWith(FileName, StringComparison.Ordinal)) continue;
             var text = file.GetText(cancellationToken);
             if (text is null) continue;
-            return Parsed(text.ToString());
+            read = true;
+            foreach (var type in Parsed(text.ToString()))
+            {
+                types[type.Key] = types.ContainsKey(type.Key) ? ContractType.Duplicate(type.Key) : type;
+            }
         }
 
-        return null;
+        return read ? new VendorContract(types) : null;
     }
 
     public ContractType? Type(string module, string name) => _types.TryGetValue(new TypeKey(module, name), out var type) ? type : null;
@@ -52,14 +58,49 @@ internal sealed class VendorContract
         return null;
     }
 
-    private static VendorContract Parsed(string text)
+    public bool DeclaresEvent(ContractType type, string name)
+    {
+        foreach (var owner in WithBases(type))
+        {
+            foreach (var member in owner.Members.Values)
+            {
+                if (member.Name == name && member.Kind != MemberKind.Method && member.IsCallable) return true;
+                if (member.EventNames.Contains(name)) return true;
+                foreach (var map in member.EventMaps)
+                {
+                    if (_types.TryGetValue(map, out var keys) && Member(keys, name) is not null) return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private IEnumerable<ContractType> WithBases(ContractType type)
+    {
+        var visited = new HashSet<TypeKey>();
+        var pending = new Stack<ContractType>();
+        pending.Push(type);
+        while (pending.Count > 0)
+        {
+            var current = pending.Pop();
+            if (!visited.Add(current.Key)) continue;
+            yield return current;
+            for (var position = current.Bases.Count - 1; position >= 0; position--)
+            {
+                if (_types.TryGetValue(current.Bases[position], out var basis)) pending.Push(basis);
+            }
+        }
+    }
+
+    private static Dictionary<TypeKey, ContractType>.ValueCollection Parsed(string text)
     {
         var types = new Dictionary<TypeKey, ContractType>();
         var members = new List<string[]>();
         foreach (var line in text.Split('\n'))
         {
             var columns = line.Split('\t');
-            if (columns.Length != 6) continue;
+            if (columns.Length != 7) continue;
             if (columns[0] == "type") types[new TypeKey(columns[1], columns[2])] = new ContractType(new TypeKey(columns[1], columns[2]), columns[3], Flags(columns[4]), Bases(columns[5]));
             else if (columns[0] == "member") members.Add(columns);
         }
@@ -67,10 +108,30 @@ internal sealed class VendorContract
         foreach (var columns in members)
         {
             if (!types.TryGetValue(new TypeKey(columns[1], columns[2]), out var owner)) continue;
-            owner.Members[columns[3]] = new ContractMember(columns[3], Kind(columns[4]), Flags(columns[5]));
+            owner.Members[columns[3]] = new ContractMember(columns[3], Kind(columns[4]), Flags(columns[5]), Events(columns[6]));
         }
 
-        return new VendorContract(types);
+        return types.Values;
+    }
+
+    private static (ImmutableHashSet<string> Names, List<TypeKey> Maps) Events(string column)
+    {
+        var names = ImmutableHashSet.CreateBuilder<string>(StringComparer.Ordinal);
+        var maps = new List<TypeKey>();
+        if (column.Length == 0) return (names.ToImmutable(), maps);
+        foreach (var entry in column.Split(','))
+        {
+            if (entry.StartsWith("name:", StringComparison.Ordinal)) names.Add(entry.Substring("name:".Length));
+            else if (entry.StartsWith("keys:", StringComparison.Ordinal)) maps.Add(Key(entry.Substring("keys:".Length)));
+        }
+
+        return (names.ToImmutable(), maps);
+    }
+
+    private static TypeKey Key(string reference)
+    {
+        var separator = reference.LastIndexOf(':');
+        return new TypeKey(reference.Substring(0, separator), reference.Substring(separator + 1));
     }
 
     private static ImmutableHashSet<string> Flags(string column)
@@ -82,8 +143,7 @@ internal sealed class VendorContract
         if (column.Length == 0) return bases;
         foreach (var basis in column.Split(','))
         {
-            var separator = basis.LastIndexOf(':');
-            bases.Add(new TypeKey(basis.Substring(0, separator), basis.Substring(separator + 1)));
+            bases.Add(Key(basis));
         }
 
         return bases;
@@ -122,6 +182,8 @@ internal sealed class ContractType
     public List<TypeKey> Bases { get; }
 
     public Dictionary<string, ContractMember> Members { get; } = new(StringComparer.Ordinal);
+
+    public static ContractType Duplicate(TypeKey key) => new(key, "duplicate", ImmutableHashSet<string>.Empty, []);
 }
 
 internal enum MemberKind
@@ -134,8 +196,10 @@ internal enum MemberKind
 
 internal sealed class ContractMember
 {
-    public ContractMember(string name, MemberKind kind, ImmutableHashSet<string> flags)
+    public ContractMember(string name, MemberKind kind, ImmutableHashSet<string> flags, (ImmutableHashSet<string> Names, List<TypeKey> Maps) events)
     {
+        EventNames = events.Names;
+        EventMaps = events.Maps;
         Name = name;
         Kind = kind;
         IsCallable = flags.Contains("callable");
@@ -161,6 +225,10 @@ internal sealed class ContractMember
     public bool WritesNull { get; }
 
     public bool ReturnsNull { get; }
+
+    public ImmutableHashSet<string> EventNames { get; }
+
+    public List<TypeKey> EventMaps { get; }
 
     public bool CanRead => Kind is MemberKind.Property or MemberKind.ReadOnly;
 

@@ -2,6 +2,15 @@ export interface WardPickerHost extends HTMLElement {
   picker?: WardPicker;
 }
 
+interface WardPickerEvents {
+  readonly change: Event;
+}
+
+export interface WardPicker {
+  addEventListener<K extends keyof WardPickerEvents>(type: K, listener: (event: WardPickerEvents[K]) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
+}
+
 export class WardPicker extends EventTarget {
   readonly #posted: HTMLInputElement;
   readonly #shown: HTMLParagraphElement;

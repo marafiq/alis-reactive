@@ -4,6 +4,8 @@ export interface VitalsMonitorHost extends HTMLElement {
 
 type Listener = (...args: unknown[]) => void;
 
+type MonitorEvent = "alarm" | "silenced";
+
 interface Alarm {
   bed: string;
   cancel: boolean;
@@ -64,13 +66,13 @@ export class VitalsMonitor {
     host.replaceChildren(this.#raised, this.#alarmLine, this.#silencedLine, statusLine, pagedLine, ...buttons);
   }
 
-  on(event: string, listener: Listener): void {
+  on(event: MonitorEvent, listener: Listener): void {
     const listening = this.#listeners.get(event) ?? new Set<Listener>();
     listening.add(listener);
     this.#listeners.set(event, listening);
   }
 
-  off(event: string, listener: Listener): void {
+  off(event: MonitorEvent, listener: Listener): void {
     this.#listeners.get(event)?.delete(listener);
   }
 
@@ -94,7 +96,7 @@ export class VitalsMonitor {
     this.#silencedLine.textContent = "silenced";
   }
 
-  #raise(event: string, ...args: unknown[]): void {
+  #raise(event: MonitorEvent, ...args: unknown[]): void {
     for (const listener of this.#listeners.get(event) ?? []) listener(...args);
     this.#raised.textContent = "raised " + event + (args.length === 0 ? " with nothing" : "");
   }

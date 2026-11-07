@@ -16,6 +16,15 @@ class Suggestion implements PlannedVisit {
   ) {}
 }
 
+interface VisitPlannerEvents {
+  readonly requested: CustomEvent<{ readonly at: string }>;
+}
+
+export interface VisitPlanner {
+  addEventListener<K extends keyof VisitPlannerEvents>(type: K, listener: (event: VisitPlannerEvents[K]) => void, options?: AddEventListenerOptions | boolean): void;
+  addEventListener(type: string, listener: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean): void;
+}
+
 export class VisitPlanner extends EventTarget {
   booked = "nothing booked";
   next = new Date(2026, 10, 1, 9, 0, 0);

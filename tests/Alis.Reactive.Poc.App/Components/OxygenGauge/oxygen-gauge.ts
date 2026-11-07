@@ -28,12 +28,12 @@ export class OxygenGauge {
     if (this.#saturation < this.alarmBelow) for (const listener of this.#listeners) listener({ message: "Saturation " + this.reading });
   }
 
-  on(event: string, listener: AlarmListener): void {
+  on(event: "alarm", listener: AlarmListener): void {
     if (event !== "alarm") throw new Error("The oxygen gauge raises 'alarm' only, not '" + event + "'.");
     this.#listeners.add(listener);
   }
 
-  off(event: string, listener: AlarmListener): void {
+  off(event: "alarm", listener: AlarmListener): void {
     if (event === "alarm") this.#listeners.delete(listener);
   }
 

@@ -15,28 +15,36 @@ internal static class Fixture
 
     private static readonly ImmutableArray<MetadataReference> References = [.. TrustedPlatformAssemblies()];
 
-    public static async Task Reports<TAnalyzer>(string id, string message, string markedSource, string? contract)
+    public static Task Reports<TAnalyzer>(string id, string message, string markedSource, string? contract)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        => ReportsWith<TAnalyzer>(id, message, markedSource, contract is null ? [] : [contract]);
+
+    public static Task ReportsNothing<TAnalyzer>(string source, string? contract)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+        => ReportsNothingWith<TAnalyzer>(source, contract is null ? [] : [contract]);
+
+    public static async Task ReportsWith<TAnalyzer>(string id, string message, string markedSource, string[] contracts)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
         var (source, span) = Unmark(markedSource);
-        var reported = await Analyze<TAnalyzer>(source, contract);
+        var reported = await Analyze<TAnalyzer>(source, contracts);
 
         Assert.That(
             reported.Select(diagnostic => Describe(diagnostic.Id, diagnostic.Location.SourceSpan, diagnostic.GetMessage(), source)),
             Is.EqualTo(new[] { Describe(id, span, message, source) }));
     }
 
-    public static async Task ReportsNothing<TAnalyzer>(string source, string? contract)
+    public static async Task ReportsNothingWith<TAnalyzer>(string source, string[] contracts)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
-        var reported = await Analyze<TAnalyzer>(source, contract);
+        var reported = await Analyze<TAnalyzer>(source, contracts);
 
         Assert.That(
             reported.Select(diagnostic => Describe(diagnostic.Id, diagnostic.Location.SourceSpan, diagnostic.GetMessage(), source)),
             Is.Empty);
     }
 
-    private static async Task<ImmutableArray<Diagnostic>> Analyze<TAnalyzer>(string source, string? contract)
+    private static async Task<ImmutableArray<Diagnostic>> Analyze<TAnalyzer>(string source, string[] contracts)
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
         var compilation = CSharpCompilation.Create(
@@ -48,7 +56,7 @@ internal static class Fixture
         var errors = compilation.GetDiagnostics().Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error).ToList();
         Assert.That(errors, Is.Empty, "The fixture must compile.\n" + string.Join("\n", errors));
 
-        var options = new AnalyzerOptions(contract is null ? [] : [new ContractText(ContractPath, contract)]);
+        var options = new AnalyzerOptions([.. contracts.Select((contract, position) => (AdditionalText)new ContractText($"obj/{position}/{ContractPath}", contract))]);
         return await compilation
             .WithAnalyzers([new TAnalyzer()], options)
             .GetAnalyzerDiagnosticsAsync();
