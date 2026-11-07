@@ -15,6 +15,7 @@ internal sealed class PlanBuild
     private readonly List<Handler> _handlers = [];
     private readonly Stack<List<Statement>> _open = new();
     private int _items;
+    private int _results;
     private int _readingItems;
 
     internal PlanBuild(string planId, JsonSerializerOptions values)
@@ -68,6 +69,14 @@ internal sealed class PlanBuild
     }
 
     internal string ItemName() => "item" + (++_items).ToString(CultureInfo.InvariantCulture);
+
+    internal Expression Result(CallExpression call)
+    {
+        if (_readingItems > 0) return call;
+        var name = "result" + (++_results).ToString(CultureInfo.InvariantCulture);
+        Write(new LetStatement(name, call));
+        return new RefExpression(name);
+    }
 
     internal TRead ReadingItems<TRead>(Func<TRead> read)
     {

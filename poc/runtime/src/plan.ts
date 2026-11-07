@@ -26,6 +26,11 @@ export interface DataStep {
   readonly absent: Absence;
 }
 
+export interface DoStatement {
+  readonly kind: "do";
+  readonly expr: Expression;
+}
+
 export interface ElementLocator {
   readonly kind: "element";
   readonly id: string;
@@ -54,6 +59,12 @@ export interface Handler {
   readonly payload: readonly PathStep[];
   readonly policy: Policy;
   readonly do: readonly Statement[];
+}
+
+export interface LetStatement {
+  readonly kind: "let";
+  readonly name: string;
+  readonly expr: Expression;
 }
 
 export type Listening = MethodListening | AssignmentListening | ReturnedListening;
@@ -132,7 +143,7 @@ export interface StartAbsence {
   readonly value: JsonValue;
 }
 
-export type Statement = SetStatement;
+export type Statement = SetStatement | DoStatement | LetStatement;
 
 export interface UnboundAbsence {
   readonly kind: "unbound";

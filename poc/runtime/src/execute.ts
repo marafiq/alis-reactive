@@ -1,18 +1,31 @@
-import type { SetStatement, Statement } from "./plan";
+import type { LetStatement, SetStatement, Statement } from "./plan";
 import { evaluate, holderOf, walk, type Context } from "./evaluate";
 import { assertNever, heldOrNull, Stop } from "./read";
 
 export function execute(statements: readonly Statement[], context: Context): void {
-  for (const statement of statements) step(statement, context);
+  let current = context;
+  for (const statement of statements) current = step(statement, current);
 }
 
-function step(statement: Statement, context: Context): void {
+function step(statement: Statement, context: Context): Context {
   switch (statement.kind) {
     case "set":
-      return set(statement, context);
+      set(statement, context);
+      return context;
+    case "do":
+      evaluate(statement.expr, context);
+      return context;
+    case "let":
+      return bind(statement, context);
     default:
-      return assertNever(statement.kind);
+      return assertNever(statement);
   }
+}
+
+function bind(statement: LetStatement, context: Context): Context {
+  const scope = new Map(context.scope);
+  scope.set(statement.name, evaluate(statement.expr, context));
+  return { ...context, scope };
 }
 
 function set(statement: SetStatement, context: Context): void {

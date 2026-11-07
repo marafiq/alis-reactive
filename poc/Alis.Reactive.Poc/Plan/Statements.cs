@@ -5,6 +5,8 @@ namespace Alis.Reactive.Plan;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
 [JsonDerivedType(typeof(SetStatement), "set")]
+[JsonDerivedType(typeof(DoStatement), "do")]
+[JsonDerivedType(typeof(LetStatement), "let")]
 internal abstract class Statement
 {
     private protected Statement()
@@ -29,4 +31,27 @@ internal sealed class SetStatement : Statement
     public Presence Members { get; }
 
     public Expression Value { get; }
+}
+
+internal sealed class DoStatement : Statement
+{
+    internal DoStatement(Expression expr)
+    {
+        Expr = expr;
+    }
+
+    public Expression Expr { get; }
+}
+
+internal sealed class LetStatement : Statement
+{
+    internal LetStatement(string name, Expression expr)
+    {
+        Name = name;
+        Expr = expr;
+    }
+
+    public string Name { get; }
+
+    public Expression Expr { get; }
 }

@@ -402,8 +402,9 @@ Terms used throughout:
     set from it shows nothing.
   - The vendor contract analyzer (D17.5) checks both marks against the API, a reference type's nullability by its
     nullable annotation, so neither drifts from the vendor.
-  - Data the app types with its own C# type (a response body, a pushed message, the value past a declared member)
-    reads nothing where a field is absent, and null where the field holds null.
+  - Data the app types with its own C# type (a response body, a pushed message, the value past a declared member,
+    the value a method returns) reads its start where a field is absent and null where the field holds null (D4.2);
+    on an event's payload X4.3 states both.
 
 - D5.4 A dotted member at any depth reads the declared steps as required and every step past the declared
   member as optional, as two nested `get`s split at the boundary.
@@ -425,6 +426,13 @@ Terms used throughout:
   C# signature keeps each argument typed (`Arg<string> position`).
 - D5.10 A read of data past a declared member, and of a member of `Data<T>`, is `Read(x => x.Pager.Number)`. `Get`
   names only the HTTP verb, which a view writes beside it, so one word never carries two concepts.
+- D5.11 A method's result (`Method<T>`, `ReturnedObject<T>`, `ReturnedObjects<T>`) is what the call returned when
+  the pipeline reached the line that calls it. The plan binds it there with `let`; the call runs once, and every read
+  of the result reads that binding, so a later step that changes the object leaves the result as it was. Inside a
+  list's lambda the call is the lambda's own and runs once for each item the operation reads. A method called in a
+  condition's term runs when its term is reached (D4.7). A method declared to return nothing is a `do` at its line;
+  written inside a list's lambda, which writes nothing, it is refused where the view renders. Each argument is read
+  when its line runs, and one that reads nothing passes null (D7.6).
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
@@ -485,6 +493,15 @@ Terms used throughout:
 - `X5.9` analyzer: a declaration whose presence or nullability differs from its vendor's typed API: new:N17.2.
 - `X5.10` behavior: a property of an object a live payload holds, written by the handler, changes that object as
   the page shows, and its method, called, runs.
+- `X5.11` behavior (D5.11): a pump's summary read twice calls `summary()` once, two calls of it run it twice, and a
+  summary read before a step that changes the rate still holds the rate it returned; the running channels counted in
+  a list's lambda call `isRunning()` on each channel as it is when the step runs.
+- `X5.12` behavior (D4.1, D4.3, D7.6): a method the older pump lacks, a member the pump holds as text and a method
+  declared to return a value that returns a promise each stop the pipeline at the call, and the step after it does
+  not run; a null literal, a null the returned data holds and a result that reads nothing each reach the method as
+  null.
+- `X5.13` refusal (D5.11): a method declared to return nothing, called inside a list's lambda: "A step is written
+  inside a list's lambda, which reads each item and writes nothing. Write the step in the pipeline."
 
 ## Q6. Arrays
 

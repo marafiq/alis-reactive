@@ -1,0 +1,177 @@
+@using Alis.Reactive.Poc.App.Pumps
+@model InfusionPage
+@{
+    ViewData["Title"] = "Infusion pumps";
+    var plan = Html.ReactivePlan<InfusionPage>();
+}
+<h1>Infusion pumps</h1>
+
+@plan.InfusionPump("pump", "Bed 4 pump")
+@plan.OlderInfusionPump("older-pump", "Bed 9 pump")
+
+@plan.StationCensus("census")
+
+@plan.TextBox("medicine", "Medicine", "")
+
+<p>Status: <span id="pump-status"></span></p>
+<p>Summary copy: <span id="summary-copy">unread</span></p>
+<p>Channel: <span id="channel-label">unread</span></p>
+
+@(plan.Button("start", "Start the pump")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Component<InfusionPump>("pump").Start();
+        pipeline.Element("pump-status").Text.Set("Started");
+    }))
+
+@(plan.Button("set-rate", "Set the rate")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Component<InfusionPump>("pump").SetRate(12.5m, "ml/h");
+        pipeline.Element("pump-status").Text.Set("Rate set");
+    }))
+
+@(plan.Button("set-rate-ml", "Set the rate to 8 ml/h")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<InfusionPump>("pump").SetRateInMillilitresPerHour(8m)))
+
+@(plan.Button("show-labels", "Show the channel labels")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.ShowLabels(pump.Channels().Select(channel => channel.Label));
+    }))
+
+@(plan.Button("rate-for", "Look up the medicine's rate")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Charges.Set(
+            pipeline.Component<InfusionPump>("pump").RateFor(pipeline.Component<NativeTextBox>("medicine").Value))))
+
+@(plan.Button("summary", "Show the summary")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var summary = pipeline.Component<InfusionPump>("pump").Summary();
+        pipeline.Component<StationCensus>("census").Lead.Set(summary);
+        pipeline.Element("summary-copy").Text.Set(summary);
+    }))
+
+@(plan.Button("summary-twice", "Show the summary twice")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pipeline.Component<StationCensus>("census").Lead.Set(pump.Summary());
+        pipeline.Element("summary-copy").Text.Set(pump.Summary());
+    }))
+
+@(plan.Button("summary-then-rate", "Read the summary, then change the rate")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        var summary = pump.Summary();
+        pump.SetRate(20m, "ml/h");
+        pipeline.Element("summary-copy").Text.Set(summary);
+    }))
+
+@(plan.Button("first-channel", "Show the first channel")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("channel-label").Text.Set(pipeline.Component<InfusionPump>("pump").Channel(0).Label)))
+
+@(plan.Button("first-partner", "Show the first channel's partner")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("channel-label").Text.Set(pipeline.Component<InfusionPump>("pump").Channel(0).Partner().Label)))
+
+@(plan.Button("partners", "Show each channel's partner")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.ShowLabels(pump.Channels().Select(channel => channel.Partner().Label));
+    }))
+
+@(plan.Button("pause-second", "Pause the second channel")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Component<InfusionPump>("pump").Channel(1).Pause();
+        pipeline.Element("pump-status").Text.Set("Paused");
+    }))
+
+@(plan.Button("count-running", "Count the running channels")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<InfusionPump>("pump").Channels().Count(channel => channel.IsRunning()))))
+
+@(plan.Button("volume-limit", "Show the volume limit")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<StationCensus>("census").Count.Set(
+            pipeline.Component<InfusionPump>("pump").Settings().Read(settings => settings.Limit.Volume))))
+
+@(plan.Button("caption-text", "Caption the pump")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<InfusionPump>("pump").Caption("Night infusion")))
+
+@(plan.Button("caption-null", "Clear the caption")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Component<InfusionPump>("pump").Caption((string?)null)))
+
+@(plan.Button("caption-alarm", "Caption with the last alarm")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.Caption(pump.LastAlarm());
+    }))
+
+@(plan.Button("caption-note", "Caption with the settings' note")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var pump = pipeline.Component<InfusionPump>("pump");
+        pump.Caption(pump.Settings().Read(settings => settings.Note));
+    }))
+
+@(plan.Button("prime", "Prime the pump")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-status").Text.Set("Calling");
+        pipeline.Component<InfusionPump>("pump").Prime();
+        pipeline.Element("pump-status").Text.Set("Primed");
+    }))
+
+@(plan.Button("prime-older", "Prime the older pump")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-status").Text.Set("Calling");
+        pipeline.Component<InfusionPump>("older-pump").Prime();
+        pipeline.Element("pump-status").Text.Set("Primed");
+    }))
+
+@(plan.Button("sound-alarm", "Sound the alarm")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-status").Text.Set("Calling");
+        pipeline.Component<InfusionPump>("pump").Alarm();
+        pipeline.Element("pump-status").Text.Set("Alarm sounded");
+    }))
+
+@(plan.Button("calibrate", "Calibrate the pump")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-status").Text.Set("Calling");
+        pipeline.Component<InfusionPump>("pump").Calibrate();
+        pipeline.Element("pump-status").Text.Set("Calibrated");
+    }))
+
+@(plan.Button("pause-older-second", "Pause the older pump's second channel")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-status").Text.Set("Calling");
+        pipeline.Component<InfusionPump>("older-pump").Channel(1).Pause();
+        pipeline.Element("pump-status").Text.Set("Paused");
+    }))
+
+@(plan.Button("eighth-channel", "Show the eighth channel")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Element("pump-status").Text.Set("Calling");
+        pipeline.Element("channel-label").Text.Set(pipeline.Component<InfusionPump>("pump").Channel(7).Label);
+        pipeline.Element("pump-status").Text.Set("Shown");
+    }))
+
+@Html.RenderPlan(plan)

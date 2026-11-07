@@ -1,5 +1,6 @@
 import { CareBoardV1, CareBoardV2, type CareBoardHost } from "./CareBoard/care-board";
 import { DutyRoster, DutyRosterV2, type DutyRosterHost } from "./DutyRoster/duty-roster";
+import { CurrentInfusionPump, OlderInfusionPump, type InfusionPumpHost } from "./InfusionPump/infusion-pump";
 import { MedicationCart, type MedicationCartHost } from "./MedicationCart/medication-cart";
 import { NurseStation, StationCensus, type NurseStationHost, type StationCensusHost } from "./NurseStation/nurse-station";
 
@@ -21,4 +22,8 @@ for (const host of document.querySelectorAll<StationCensusHost>("[data-station-c
 
 for (const host of document.querySelectorAll<MedicationCartHost>("[data-medication-cart]")) {
   host.cart = new MedicationCart(host);
+}
+
+for (const host of document.querySelectorAll<InfusionPumpHost>("[data-infusion-pump]")) {
+  host.pump = host.dataset["infusionPump"] === "older" ? new OlderInfusionPump(host) : new CurrentInfusionPump(host);
 }
