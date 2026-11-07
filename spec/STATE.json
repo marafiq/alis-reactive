@@ -1777,7 +1777,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "8bf27e7a07d13b8781b4059a166eed888f87fb0a",
+  "read_at_head": "7ac0300c932844f9fd60d57a7bb11c9eb96fa75f",
   "step": {
     "failing": [
       "gate1"
