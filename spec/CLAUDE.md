@@ -148,6 +148,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   listen on a component reached by its element's id, and on one whose vendor names no element path. Whether a listen on
   a component reached by id becomes the door a slot's plan lacks for a page component (14a-i's gate 1 flag (3)) is
   the owner's.
+- The owner, 2026-11-07, walking the SDK map and a native input: "please take my input about keeping the quality high, as we
+  have to onboard 100 of components". Onboarding is judged as one of hundreds: a rough edge in a declaration is
+  repeated in every component that meets it. Approved on the walk: a payload, and what it holds, nests in its component's
+  class as that event's own slice, and two events that hand the same shape each declare it ("as payloads grow in their
+  own way so duplication is fine there"); a component an event hands stays its own class. The walk's findings (where a
+  reached declaration's error lands, a handler's way to its own component, a text's length in a view, the id string a
+  view repeats, `name:`'s null) are in `spec/NOTES.md`, 2026-11-07, each for gate 2.
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's
