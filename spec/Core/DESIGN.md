@@ -737,9 +737,19 @@ Terms used throughout:
 - `N6.4` new: `public interface ITypedSource<out T>`, which `TypedSource<T>` implements and nothing else in the
   framework does; the list operations over data extend it (D6.10). A source the framework did not make is refused
   where the view renders, and the analyzers of POC 13 refuse a class that implements it.
-- `N6.3` new: a `DiagnosticSuppressor` that suppresses CS8602 inside the lambda of `Read`, `Where` and `Select`,
-  where a member read past a holder that holds null reads nothing (D4.2). An expression tree refuses `?.` (CS8072), so without it a
-  view writes `round.Carer!.Name`, a `!` that claims what the plan does not need. Built with the analyzers in POC 13.
+- `N6.3` new, built in POC 13g as ALIS026 and ALIS027: `ReadsNothingSuppressor`, a `DiagnosticSuppressor` that
+  suppresses CS8602, and CS8629 on a nullable's `.Value`, where a data lambda reads its item in the browser and a read
+  past a holder that holds null reads nothing (D4.2, D6.14, D8.9). An expression tree refuses `?.` (CS8072), so
+  without it a view writes `round.Carer!.Name`, a `!` that claims what the plan does not need. The doors are a closed
+  set, matched by the method's definition and never by its name alone: the predicate of `Count`, `Where`, `Any`, `All`
+  and `Find`, the field of `Select` and of `Find(predicate, field)` (D6.9), the path of `ReadOnly<T>.Read` and of
+  `MethodResult<T>.Read`, and an `Any`, `All` or `Count` predicate nested in any data lambda (D6.8). The warning is
+  suppressed only on an expression that reads an item, the split `LambdaCondition` reads by: a value the view holds
+  (`Model.Cover.Name`, a captured local) is read where the view renders and refused there when it is null (D6.7), so
+  its warning stays. It stays where null stops the pipeline: a `Sum` term (D6.11) and an `OrderBy` or
+  `OrderByDescending` key (D6.13). It stays on a cast, `(int)d.Priority`, on an argument (CS8604, `Contains(null)`
+  stops, X6.19), on a lambda over a list the server holds, and on an input named by a member path (`InputField`,
+  `pipeline.Input`), where MVC's own `TextBoxFor` warns the same in the same view.
 - `N6.2` new: `internal static class TranslatedMembers`, the closed table of D6.5.
 
 **Evidence.**
@@ -882,6 +892,10 @@ Terms used throughout:
   (`StartsWith`); `d.Charted == DoseStatus.Due` keeps the two doses that omit `Charted` at its default, read at its
   start in the converter's form; `Select(d => d.Copay).Sum(copay => copay)` adds the copays as the browser holds
   them, "0.3".
+- `X6.46` analyzer: a read past a nullable member in the predicate, field or path of a door that reads nothing past
+  null builds with no `!` under warnings as errors, and the same read in a `Sum` term, an `OrderBy` key, a cast, a
+  value the view holds, a lambda over a list the server holds or an input's member path still warns: new:N6.3
+  (POC 13g).
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 

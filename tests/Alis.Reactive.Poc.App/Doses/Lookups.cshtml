@@ -60,6 +60,6 @@
 @(plan.Button("count-ruth-or-no-carer", "Count doses given by Ruth or by no carer")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => ruthOrNoCarer.Contains(d.Carer!.Name)))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => ruthOrNoCarer.Contains(d.Carer.Name)))))
 
 @Html.RenderPlan(plan)

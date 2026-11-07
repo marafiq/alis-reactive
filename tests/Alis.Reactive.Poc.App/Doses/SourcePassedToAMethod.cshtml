@@ -21,7 +21,7 @@
     .Reactive(button => button.Click, pipeline =>
     {
         var cart = pipeline.Component<MedicationCart>("cart");
-        pipeline.Component<OxygenGauge>("gauge").Lower(cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Supply!.Vials));
+        pipeline.Component<OxygenGauge>("gauge").Lower(cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Supply.Vials));
     }))
 
 @Html.RenderPlan(plan)

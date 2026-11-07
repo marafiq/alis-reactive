@@ -19,12 +19,12 @@
 @(plan.Button("count-carer-without-grade", "Count doses whose carer has no grade")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !d.Carer!.Grade.HasValue))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !d.Carer.Grade.HasValue))))
 
 @(plan.Button("count-priority-value-not-two", "Count doses whose priority value is not 2")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority!.Value != 2))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Priority.Value != 2))))
 
 @(plan.Button("count-no-ward", "Count doses with no ward")
     .Reactive(button => button.Click, pipeline =>
@@ -39,12 +39,12 @@
 @(plan.Button("count-no-carer-named", "Count doses with no carer named")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Carer!.Name ?? "unassigned") == "unassigned"))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Carer.Name ?? "unassigned") == "unassigned"))))
 
 @(plan.Button("count-empty-note", "Count doses with an empty note")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Note ?? d.Batch!.Expiry) == ""))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Note ?? d.Batch.Expiry) == ""))))
 
 @(plan.Button("count-over-fifty-by-mouth", "Count doses over 50 mg by mouth")
     .Reactive(button => button.Click, pipeline =>
@@ -54,16 +54,16 @@
 @(plan.Button("count-not-given-by-ruth", "Count doses not given by Ruth")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Carer!.Name == "Ruth" ? 1 : 0) == 0))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Carer.Name == "Ruth" ? 1 : 0) == 0))))
 
 @(plan.Button("count-held-when-digoxin", "Count doses held as Digoxin")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Medicine == "Digoxin" ? "held" : d.Batch!.Expiry) == "held"))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Medicine == "Digoxin" ? "held" : d.Batch.Expiry) == "held"))))
 
 @(plan.Button("count-held-unless-not-digoxin", "Count doses held unless not Digoxin")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Medicine != "Digoxin" ? d.Batch!.Expiry : "held") == "held"))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => (d.Medicine != "Digoxin" ? d.Batch.Expiry : "held") == "held"))))
 
 @Html.RenderPlan(plan)

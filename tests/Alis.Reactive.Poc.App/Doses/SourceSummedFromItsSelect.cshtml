@@ -19,7 +19,7 @@
     .Reactive(button => button.Click, pipeline =>
     {
         var cart = pipeline.Component<MedicationCart>("cart");
-        pipeline.Component<StationCensus>("census").Count.Set(cart.Doses.Select(d => d.Supply!.Vials).Sum(vials => vials));
+        pipeline.Component<StationCensus>("census").Count.Set(cart.Doses.Select(d => d.Supply.Vials).Sum(vials => vials));
     }))
 
 @Html.RenderPlan(plan)

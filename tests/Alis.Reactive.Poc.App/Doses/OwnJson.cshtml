@@ -34,11 +34,11 @@
 @(plan.Button("count-two-vial-supplies", "Count the doses supplied in two vials")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply!.Vials == 2))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply.Vials == 2))))
 
 @(plan.Button("count-pharmacy-supplies", "Count the doses the pharmacy supplies")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply!.Source.StartsWith("pharm", StringComparison.Ordinal)))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply.Source.StartsWith("pharm", StringComparison.Ordinal)))))
 
 @Html.RenderPlan(plan)

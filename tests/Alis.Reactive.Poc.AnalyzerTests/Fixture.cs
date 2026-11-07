@@ -44,8 +44,36 @@ internal static class Fixture
             Is.Empty);
     }
 
-    private static async Task<ImmutableArray<Diagnostic>> Analyze<TAnalyzer>(string source, string[] contracts)
-        where TAnalyzer : DiagnosticAnalyzer, new()
+    public static Task Suppresses<TSuppressor>(string warning, string suppression, string markedSource)
+        where TSuppressor : DiagnosticSuppressor, new()
+        => Warns<TSuppressor>(warning, "suppressed by " + suppression, markedSource);
+
+    public static Task Keeps<TSuppressor>(string warning, string markedSource)
+        where TSuppressor : DiagnosticSuppressor, new()
+        => Warns<TSuppressor>(warning, "kept", markedSource);
+
+    private static async Task Warns<TSuppressor>(string warning, string outcome, string markedSource)
+        where TSuppressor : DiagnosticSuppressor, new()
+    {
+        var (source, span) = Unmark(markedSource);
+        var compilation = Compiled(source);
+        var options = new CompilationWithAnalyzersOptions(new AnalyzerOptions([]), onAnalyzerException: null, concurrentAnalysis: false, logAnalyzerExecutionTime: false, reportSuppressedDiagnostics: true);
+        var reported = await compilation.WithAnalyzers([new TSuppressor()], options).GetAllDiagnosticsAsync();
+        var nullWarnings = reported.Where(diagnostic => diagnostic.Id.StartsWith("CS86", StringComparison.Ordinal));
+
+        Assert.That(
+            nullWarnings.Select(diagnostic => Describe(diagnostic.Id, diagnostic.Location.SourceSpan, OutcomeOf(diagnostic, compilation), source)),
+            Is.EqualTo(new[] { Describe(warning, span, outcome, source) }));
+    }
+
+    private static string OutcomeOf(Diagnostic diagnostic, Compilation compilation)
+    {
+        if (!diagnostic.IsSuppressed) return "kept";
+        var suppressions = diagnostic.GetSuppressionInfo(compilation)?.ProgrammaticSuppressions ?? [];
+        return "suppressed by " + string.Join(", ", suppressions.Select(suppression => suppression.Descriptor.Id));
+    }
+
+    private static CSharpCompilation Compiled(string source)
     {
         var compilation = CSharpCompilation.Create(
             "Ward.Web",
@@ -55,7 +83,13 @@ internal static class Fixture
 
         var errors = compilation.GetDiagnostics().Where(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error).ToList();
         Assert.That(errors, Is.Empty, "The fixture must compile.\n" + string.Join("\n", errors));
+        return compilation;
+    }
 
+    private static async Task<ImmutableArray<Diagnostic>> Analyze<TAnalyzer>(string source, string[] contracts)
+        where TAnalyzer : DiagnosticAnalyzer, new()
+    {
+        var compilation = Compiled(source);
         var options = new AnalyzerOptions([.. contracts.Select((contract, position) => (AdditionalText)new ContractText($"obj/{position}/{ContractPath}", contract))]);
         return await compilation
             .WithAnalyzers([new TAnalyzer()], options)

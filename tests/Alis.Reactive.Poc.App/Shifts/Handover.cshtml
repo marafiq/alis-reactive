@@ -4,7 +4,7 @@
     ViewData["Title"] = "Handover";
     var plan = Html.ReactivePlan<ShiftsPage>();
     plan.Plugin<ShiftLog>().Reactive(log => log.Noted, (noted, pipeline) =>
-        pipeline.Element("noted").Text.Set(noted.Detail.Read(detail => detail!.Note)));
+        pipeline.Element("noted").Text.Set(noted.Detail.Read(detail => detail.Note)));
     plan.Plugin<NightClock>().Reactive(clock => clock.Struck, (struck, pipeline) =>
         pipeline.Element("hour").Text.Set(struck.Hour));
     plan.Plugin<BedStore>().Reactive(store => store.Assigned, (taken, pipeline) =>

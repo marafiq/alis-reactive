@@ -14,6 +14,6 @@
 @(plan.Button("count-doses", "Count doses")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply!.Vials > 1))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Supply.Vials > 1))))
 
 @Html.RenderPlan(plan)

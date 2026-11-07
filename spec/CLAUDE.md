@@ -112,6 +112,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   it (a condition's literal, `IfNull`'s fallback, `Choose`'s literal arm) is written in that form. A live object (a
   property set, an argument, a vendor's answer) refuses a source in its own form, because every literal set into a
   live object is written as the app's options write its type (D7.7, D8.10, POC 13f-iii).
+- Chosen within the owner's yes, 2026-11-07: a view reads past a nullable member in a data lambda with no `!` where
+  the browser reads nothing past null. CS8602, and CS8629 on `.Value`, are suppressed on an expression that reads the
+  item, in the predicate of `Count`, `Where`, `Any`, `All` and `Find`, the field of `Select` and `Find`, and the path of
+  `Read`. The warning stays where null stops the pipeline (a `Sum` term, an `OrderBy` key), on a value the view holds,
+  on a cast, and on an input's member path, which keeps the warning MVC's own helpers give (N6.3, POC 13g).
 - The owner, 2026-11-06: "You understand runtime reflection versus compile time reflection. So system.type is a
   reflection, but it is not a runtime reflection in a sense where you are getting a list of methods and properties
   and all kind of stuff. That is bad." The framework refuses run-time discovery and use of members; a type's

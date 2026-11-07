@@ -4,7 +4,7 @@
     ViewData["Title"] = "Visitor book";
     var plan = Html.ReactivePlan<ShiftsPage>();
     plan.Plugin<VisitorBook>().Reactive(book => book.Signed, (signed, pipeline) =>
-        pipeline.Element("front-desk").Text.Set(signed.Detail.Read(detail => detail!.Visitor)));
+        pipeline.Element("front-desk").Text.Set(signed.Detail.Read(detail => detail.Visitor)));
 }
 <h1>Visitor book</h1>
 

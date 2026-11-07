@@ -6,7 +6,7 @@
     plan.Plugin<VisitPlanner>().Reactive(planner => planner.Requested, (requested, pipeline) =>
     {
         var planner = pipeline.Plugin<VisitPlanner>();
-        planner.Book(requested.Detail.Read(detail => detail!.At));
+        planner.Book(requested.Detail.Read(detail => detail.At));
         pipeline.Element("booked").Text.Set(planner.Booked);
     });
 }

@@ -19,7 +19,7 @@
     .Reactive(button => button.Click, pipeline =>
     {
         var cart = pipeline.Component<MedicationCart>("cart");
-        pipeline.When(cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Supply!.Vials).Gt(1))
+        pipeline.When(cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Supply.Vials).Gt(1))
             .Then(given => given.Element("verdict").Text.Set("charted as given"))
             .Else(other => other.Element("verdict").Text.Set("not charted as given"));
     }))

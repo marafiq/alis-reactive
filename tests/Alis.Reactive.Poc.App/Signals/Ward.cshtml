@@ -22,7 +22,7 @@
 @(plan.BedBoard("board")
     .Reactive(board => board.Assigned, (assigned, pipeline) =>
     {
-        pipeline.Element("bed").Text.Set(assigned.Detail.Read(detail => detail!.Bed));
+        pipeline.Element("bed").Text.Set(assigned.Detail.Read(detail => detail.Bed));
         pipeline.Element("assignment").Text.Set("Assigned");
     }))
 

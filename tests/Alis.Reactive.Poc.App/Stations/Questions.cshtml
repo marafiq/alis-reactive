@@ -165,13 +165,13 @@
 @(plan.Button("carer-north-due", "Carer on next north round due")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Lead.Set(
-            pipeline.Component<NurseStation>("north-station").Schedule.Read(schedule => schedule.Rounds).Find(round => round.Due, round => round.Carer!.Name))))
+            pipeline.Component<NurseStation>("north-station").Schedule.Read(schedule => schedule.Rounds).Find(round => round.Due, round => round.Carer.Name))))
 
 @(plan.Button("carer-quiet-due", "Carer on next quiet round due")
     .Reactive(button => button.Click, pipeline =>
     {
         pipeline.Component<StationCensus>("census").Lead.Set(
-            pipeline.Component<NurseStation>("quiet-station").Schedule.Read(schedule => schedule.Rounds).Find(round => round.Due, round => round.Carer!.Name));
+            pipeline.Component<NurseStation>("quiet-station").Schedule.Read(schedule => schedule.Rounds).Find(round => round.Due, round => round.Carer.Name));
         pipeline.Element("station-status").Text.Set("Named quiet carer");
     }))
 

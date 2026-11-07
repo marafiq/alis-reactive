@@ -63,13 +63,13 @@
         pipeline.Component<StationCensus>("census").Names.Set(
             pipeline.Component<NurseStation>("north-station").Schedule.Read(schedule => schedule.Rounds)
                 .Where(round => round.Due)
-                .Select(round => round.Carer!.Name))))
+                .Select(round => round.Carer.Name))))
 
 @(plan.Button("list-west-carers", "List carers on west rounds")
     .Reactive(button => button.Click, pipeline =>
     {
         pipeline.Component<StationCensus>("census").Names.Set(
-            pipeline.Component<NurseStation>("west-station").Schedule.Read(schedule => schedule.Rounds).Select(round => round.Carer!.Name));
+            pipeline.Component<NurseStation>("west-station").Schedule.Read(schedule => schedule.Rounds).Select(round => round.Carer.Name));
         pipeline.Element("census-status").Text.Set("Listed west");
     }))
 

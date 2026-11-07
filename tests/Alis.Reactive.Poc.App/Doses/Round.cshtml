@@ -80,12 +80,12 @@
 @(plan.Button("count-witnessed-or-missed", "Count doses witnessed by Ruth or missed")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Witness!.Name == "Ruth" || d.Status == DoseStatus.Missed))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => d.Witness.Name == "Ruth" || d.Status == DoseStatus.Missed))))
 
 @(plan.Button("count-not-witnessed-given", "Count doses not both witnessed by Ruth and given")
     .Reactive(button => button.Click, pipeline =>
         pipeline.Component<StationCensus>("census").Count.Set(
-            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !(d.Witness!.Name == "Ruth" && d.Status == DoseStatus.Given)))))
+            pipeline.Component<MedicationCart>("cart").Doses.Count(d => !(d.Witness.Name == "Ruth" && d.Status == DoseStatus.Given)))))
 
 @(plan.Button("count-due-urgent", "Count due urgent doses")
     .Reactive(button => button.Click, pipeline =>
