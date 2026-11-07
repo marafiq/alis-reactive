@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 169,
+        "defects": 170,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -768,7 +768,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 187,
+        "defects": 188,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1777,7 +1777,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "31dd7c22402cd61aeaf6a21daf21014336b3f447",
+  "read_at_head": "4e7dddc24996b18a584928dae79a4cd114b2ddbb",
   "step": {
     "failing": [
       "gate1"
