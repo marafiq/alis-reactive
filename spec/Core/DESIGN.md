@@ -2610,7 +2610,12 @@ plans (Q19).
   - `JsonPropertyName` read from a member: the contract's JSON name, which also follows the app's naming policy;
   - the assembly scan of validator registration: refused (Q16), `Add<TValidator>()` per validator;
   - the member scan that confirms a declaration's caller (`JsObject`): an analyzer checks at build time that a
-    `Method`, `MethodAsync` or property declaration is called from the member it declares (N18.2);
+    `Method`, `MethodAsync` or property declaration is called from the member it declares (N18.2). Built in POC 13e:
+    a door is the body of the property or method it declares, never in a constructor, finalizer, setter, indexer,
+    event accessor or static member, nor inside a condition, a lambda, another door's arguments or a body with other
+    statements, and its `declaredBy:` is the compiler's (ALIS023); its `name:`, `optional:`, `nullable:` and
+    `position:` are constants the build reads (ALIS024). An explicit interface member declares the JavaScript member
+    of its simple name, as `[CallerMemberName]` names it;
   - the method scan for `PureMethodAttribute` and the `FlagsAttribute` read of `IsInEnum`: gate 1 decides each,
     as an owner-listed exception or a typed door;
   - `Expression.Compile` in validation (Q16) and in the template writer (Q15): gate 1 decides each.
@@ -2654,7 +2659,8 @@ shapes, starts and the payload kind of each event.
 - kept: `LiveObject<T>()` and `LiveObjects<T>()` (renamed by N5.5), `Method`, `MethodAsync` and the property
   declarations of `JsObject`; every door written over a generic type.
 - `N18.1` new: the reflection analyzer of D18.4, with the owner's exception list.
-- `N18.2` new: the declaration analyzer of D18.3, which replaces `JsObject`'s run-time member scan.
+- `N18.2` new: the declaration analyzer of D18.3, which replaces `JsObject`'s run-time member scan. Built in POC 13e
+  (ALIS023, ALIS024).
 - `N18.3` new: a form typed by its model, and a request's `Form` that takes only a form of the request's model.
 - `N18.4` new: the typed doors of D18.5 for the button type, the text box type and the action link's attributes.
 - `N18.5` new: the override analyzer of D18.3: an override in an app's model carries the JSON name and the
@@ -2681,7 +2687,7 @@ shapes, starts and the payload kind of each event.
 
 **Defects.**
 - `X18.1` analyzer: a `GetProperties` call in a shipped package outside the owner's list: new:N18.1.
-- `X18.2` analyzer: `Method()` called from a member other than the one it declares: new:N18.2.
+- `X18.2` analyzer: `Method()` called from a member other than the one it declares: new:N18.2 (POC 13e).
 - `X18.3` type: a request that sends a form of another model does not compile: new:N18.3.
 - `X18.4` type: a button's type written as text does not compile: new:N18.4.
 - `X18.5` behavior: with the app's JSON options naming members in snake case, a request's JSON body sends

@@ -15,12 +15,15 @@ internal sealed class Rules
     public const string EventId = "ALIS020";
     public const string ReachId = "ALIS021";
     public const string PresenceId = "ALIS022";
+    public const string BodyId = "ALIS023";
+    public const string ConstantId = "ALIS024";
 
     private const string NullTitle = "A declaration's nullability fits its vendor's typed API";
     private const string KindTitle = "A member is declared with the door its kind takes";
     private const string PromiseTitle = "A method that returns a promise is declared with MethodAsync";
     private const string ReachTitle = "A declaration reaches an object its vendor's typed API hands";
     private const string PresenceTitle = "A declaration's presence fits its vendor's typed API";
+    private const string BodyTitle = "A declaration door is the body of the member it declares";
 
     private readonly string[] _tags;
 
@@ -50,8 +53,20 @@ internal sealed class Rules
         ReachesAList = Rule(ReachId, ReachTitle, "'{0}' reaches one '{1}' at {2}, which the vendor's TypeScript types as a list of '{3}': declare it with {4}");
         RequiredWhereOptional = Rule(PresenceId, PresenceTitle, "'{0}' declares '{1}' required, and '{2}' is optional: declare it with optional: true");
         OptionalWhereRequired = Rule(PresenceId, PresenceTitle, "'{0}' declares '{1}' optional, and '{2}' is required: declare it without optional: true");
-        All = [RequiredWhereOptional, OptionalWhereRequired, Unnamed, Unlisted, NotPublic, NoArgument, Promise, PromiseFromSome, ArgumentPromise, Kind, NotHanded, NotAFunction, ReadsNull, ReturnsNull, WritesNull, ArgumentNull, AnswersNull, HoldsNullObject, ReturnsNullObject, Undeclared, ReachesNoObject, ReachesNoList, ReachesAList];
+        NoMember = Rule(BodyId, BodyTitle, "'{0}' calls {1} in {2}, which declares no JavaScript member: call it as the body of the property or method that declares one");
+        NotTheBody = Rule(BodyId, BodyTitle, "'{0}' calls {1} inside its body: a declaration's body is the one door call that names its JavaScript member");
+        NamedBy = Rule(BodyId, BodyTitle, "'{0}' passes declaredBy: to {1}: the member that calls it is the member it declares, and name: names a JavaScript member its C# name does not");
+        NotConstant = Rule(ConstantId, "A declaration door's arguments are constants the build reads", "'{0}' passes {1} to {2} as a value the build cannot read: pass a constant");
+        All = [NoMember, NotTheBody, NamedBy, NotConstant, RequiredWhereOptional, OptionalWhereRequired, Unnamed, Unlisted, NotPublic, NoArgument, Promise, PromiseFromSome, ArgumentPromise, Kind, NotHanded, NotAFunction, ReadsNull, ReturnsNull, WritesNull, ArgumentNull, AnswersNull, HoldsNullObject, ReturnsNullObject, Undeclared, ReachesNoObject, ReachesNoList, ReachesAList];
     }
+
+    public DiagnosticDescriptor NoMember { get; }
+
+    public DiagnosticDescriptor NotTheBody { get; }
+
+    public DiagnosticDescriptor NamedBy { get; }
+
+    public DiagnosticDescriptor NotConstant { get; }
 
     public DiagnosticDescriptor RequiredWhereOptional { get; }
 

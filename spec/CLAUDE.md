@@ -227,6 +227,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   ALIS019 refuses the declaration without it, by variance as a value's nullability (a `nullable: true` the API does not
   need is allowed). `optional:` and `nullable:` are named arguments in the POC, and their form goes to gate 2 with
   N5.4's. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a declaration door is the body of the property or method it declares
+  (ALIS023), and the arguments the build reads are constants (ALIS024). A public member that returns a private
+  member's door is not refused: the private member declares its own JavaScript name, which only the contract checks,
+  on roots and reached types, and ALIS016 then points at the private member. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

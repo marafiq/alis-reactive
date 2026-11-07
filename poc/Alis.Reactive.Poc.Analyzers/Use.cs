@@ -47,8 +47,16 @@ internal sealed class Use
         var value = method.TypeArguments.Length == 1 && door.Reach == Reach.None ? Typed.Of(method, 0) : null;
         var answer = door.Reach == Reach.Callback && method.TypeArguments.Length == 2 ? Typed.Of(method, 1) : null;
         var position = door.Shape == DoorShape.Position ? Constant(invocation, "position") as int? : null;
-        return new Use(door, NameOf(invocation, member.Name), member.Locations[0], holder.Name + "." + member.Name, position, reached, value, answer, Marked(invocation, "optional"), Marked(invocation, "nullable"));
+        var name = CallerName(member);
+        return new Use(door, NameOf(invocation, name), member.Locations[0], holder.Name + "." + name, position, reached, value, answer, Marked(invocation, "optional"), Marked(invocation, "nullable"));
     }
+
+    public static string CallerName(ISymbol member) => member switch
+    {
+        IMethodSymbol { ExplicitInterfaceImplementations: { Length: > 0 } implemented } => implemented[0].Name,
+        IPropertySymbol { ExplicitInterfaceImplementations: { Length: > 0 } implemented } => implemented[0].Name,
+        _ => member.Name,
+    };
 
     private static bool? Marked(IInvocationOperation invocation, string parameter)
     {
@@ -68,7 +76,8 @@ internal sealed class Use
     {
         var argument = invocation.Arguments.FirstOrDefault(each => each.Parameter?.Name == "name");
         if (argument is null || argument.ArgumentKind == ArgumentKind.DefaultValue) return CamelCase.Of(memberName);
-        return argument.Value.ConstantValue is { HasValue: true, Value: string name } ? name : null;
+        if (!argument.Value.ConstantValue.HasValue) return null;
+        return argument.Value.ConstantValue.Value as string ?? CamelCase.Of(memberName);
     }
 }
 

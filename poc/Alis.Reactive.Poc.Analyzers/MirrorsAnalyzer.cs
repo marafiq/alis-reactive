@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
@@ -14,6 +15,8 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
     private static readonly Rules Live = new(ended: false);
 
     private static readonly Rules Ended = new(ended: true);
+
+    private static readonly string[] ReadArguments = ["name", "optional", "nullable", "position"];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = Live.All.AddRange(Ended.All);
 
@@ -172,8 +175,10 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
         var invocation = (IInvocationOperation)context.Operation;
         var door = Door.Of(invocation.TargetMethod, framework);
         if (door is null) return;
-        var member = context.ContainingSymbol is IMethodSymbol { AssociatedSymbol: { } associated } ? associated : context.ContainingSymbol;
-        if (member.ContainingType is not { } holder || !framework.IsJsObject(holder)) return;
+        var containing = context.ContainingSymbol;
+        if (containing.ContainingType is not { } holder || !framework.IsJsObject(holder)) return;
+        var member = containing is IMethodSymbol { AssociatedSymbol: { } associated } ? associated : containing;
+        if (!Declares(context.ReportDiagnostic, invocation, door, containing, holder.Name + "." + Use.CallerName(member), holder.Name)) return;
         var use = Use.Of(invocation, door, member, holder);
         uses.GetOrAdd(holder, _ => []).Add(use);
         if (contract is null || !framework.IsRoot(holder)) return;
@@ -186,6 +191,65 @@ public sealed class MirrorsAnalyzer : DiagnosticAnalyzer
         }
 
         CheckMember(context.ReportDiagnostic, Live, contract, use, mirror.Type, mirror.Name);
+    }
+
+    private static bool Declares(Action<Diagnostic> report, IInvocationOperation invocation, Door door, ISymbol containing, string declared, string holder)
+    {
+        if (NoMember(containing) is { } where)
+        {
+            report(Diagnostic.Create(Live.NoMember, invocation.Syntax.GetLocation(), holder, door.Name, where));
+            return false;
+        }
+
+        if (!IsTheBody(invocation.Syntax))
+        {
+            report(Diagnostic.Create(Live.NotTheBody, invocation.Syntax.GetLocation(), declared, door.Name));
+            return false;
+        }
+
+        if (Written(invocation, "declaredBy") is { } named)
+        {
+            report(Diagnostic.Create(Live.NamedBy, named.Syntax.GetLocation(), declared, door.Name));
+            return false;
+        }
+
+        foreach (var parameter in ReadArguments)
+        {
+            if (Written(invocation, parameter) is { Value.ConstantValue.HasValue: false } unread)
+            {
+                report(Diagnostic.Create(Live.NotConstant, unread.Syntax.GetLocation(), declared, parameter + ":", door.Name));
+            }
+        }
+
+        return true;
+    }
+
+    private static IArgumentOperation? Written(IInvocationOperation invocation, string parameter)
+        => invocation.Arguments.FirstOrDefault(argument => argument.Parameter?.Name == parameter && argument.ArgumentKind == ArgumentKind.Explicit);
+
+    private static string? NoMember(ISymbol containing) => containing switch
+    {
+        IMethodSymbol { IsStatic: true } => "a static member",
+        IMethodSymbol { MethodKind: MethodKind.Ordinary or MethodKind.ExplicitInterfaceImplementation } => null,
+        IMethodSymbol { MethodKind: MethodKind.PropertyGet, AssociatedSymbol: IPropertySymbol { IsIndexer: true } } => "an indexer",
+        IMethodSymbol { MethodKind: MethodKind.PropertyGet } => null,
+        IMethodSymbol { MethodKind: MethodKind.PropertySet } => "a setter",
+        IMethodSymbol { MethodKind: MethodKind.Constructor } => "a constructor",
+        IMethodSymbol { MethodKind: MethodKind.EventAdd or MethodKind.EventRemove } => "an event accessor",
+        IMethodSymbol { MethodKind: MethodKind.Destructor } => "a finalizer",
+        _ => "'" + containing.Name + "'",
+    };
+
+    private static bool IsTheBody(SyntaxNode call)
+    {
+        var node = call;
+        while (node.Parent is ParenthesizedExpressionSyntax parenthesized) node = parenthesized;
+        return node.Parent switch
+        {
+            ArrowExpressionClauseSyntax { Parent: PropertyDeclarationSyntax or MethodDeclarationSyntax or AccessorDeclarationSyntax } => true,
+            ReturnStatementSyntax or ExpressionStatementSyntax => node.Parent.Parent is BlockSyntax { Statements.Count: 1, Parent: MethodDeclarationSyntax or AccessorDeclarationSyntax },
+            _ => false,
+        };
     }
 
     private static void CheckItself(Action<Diagnostic> report, Rules rules, Use use, ContractType type, string shown)

@@ -43,6 +43,14 @@ public sealed class WhenADeclarationMirrorsItsVendor
         """;
 
     [Test]
+    public Task a_name_passed_as_null_names_the_member_by_its_csharp_name()
+        => Fixture.Reports<MirrorsAnalyzer>(
+            "ALIS016",
+            "'WardBoard.Titled' declares 'titled', which 'Board' does not make public: declare only what the vendor's typed API makes public",
+            Declaring("""    public Property<string> [|Titled|] => Property<string>(name: null);"""),
+            Board);
+
+    [Test]
     public Task a_component_that_names_no_type_is_reported_with_the_door_that_names_one()
         => Fixture.Reports<MirrorsAnalyzer>(
             "ALIS014",
