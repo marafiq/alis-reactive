@@ -103,7 +103,7 @@ listening: `method`, `assignment` or `returned`. `Vendor.payload` of 65fdf118d l
 | Kind | Carries | Holds | Meaning |
 |------|---------|-------|---------|
 | `element` | `id`: an element id; `vendor`: a vendor name of `vendors` | | the component on that element at the vendor's object path. An element the page lacks, or one that holds no object at that path, stops the pipeline that reads it (D4.1). |
-| `plugin` | `name`: the plugin's name; `key`: text the plugin reads; `listen`: a vendor listening, how its events are listened to (D17.14) | `data`: plugin data | the plugin's object for that key. Its object id is `$plugin:` and its name, so no element id meets it. A name no script provides, or two scripts provide, stops the pipeline that reads it (D17.14). |
+| `plugin` | `name`: the plugin's name; `key`: text the plugin reads; `listen`: a vendor listening, how its events are listened to (D17.14) | `data`: plugin data | the plugin's object for that key. Its object id is `$plugin:` and its name for a plugin an app or a component brings, and for a core plugin that reads a key, `$`, the plugin's name after `alis.`, a colon and the key (`$slot:card`, as `Alis.Reactive/PlanModel/Writing/Scope.cs:234` writes it), so no element id meets it and each key is its own object. A name no script provides, or two scripts provide, stops the pipeline that reads it (D17.14). |
 
 The plugins the core's C# names are `alis.http`, `alis.form`, `alis.model`, `alis.slot`, `alis.hub`, `alis.stream`
 and `alis.document`, each provided by the core's own browser code. Any other name is a plugin an app or a component

@@ -1757,6 +1757,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
   mutant: one listener per object, gone at its owner's release, and nothing called on a collected object. The
   first two are X12.9 and X12.10; the third is a garbage collector's timing, which no browser test arranges.
+- D12.9 A slot's content is what its loads put there. A plan that sets the text or the HTML of an element a plan
+  loads into or unloads, among the plans one response renders, is refused where the view renders: what the slot
+  loaded would keep running under content it no longer shows. `Unload(element)` empties a slot.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
 the statement `listen`, and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
@@ -1780,7 +1783,7 @@ plans name.
 - `probe:ej2-destroy-sets-is-destroyed`
 
 **Doors.**
-- kept: `Into(element)` and the slot's load and unload, `Html.RenderPlan`, and the hub's and stream's triggers.
+- kept: `Into(element)`, `Unload(element)`, `Html.RenderPlan`, and the hub's and stream's triggers.
 - No door names an owner: a developer chooses where a plan renders, and ownership follows.
 - `N12.1` new: `listen`, the handler of an event of a live object a pipeline reaches (D12.8); its form goes to
   gate 2. It replaces the refusal of an event declared on an object a method returns.
@@ -1807,6 +1810,8 @@ plans name.
     (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:16-18`).
 - An owner runs its disposers in reverse and knows nothing of runs (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40`).
 - A slot announces the unmount of its content before replacing it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38`).
+- The redesign refuses a plan that sets a slot's text or HTML, across the plans one response renders
+  (`Alis.Reactive/Razor/RenderedPage.cs:70-87`, `Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:66-69`): D12.9.
 
 **Defects.**
 - `X12.1` behavior: after the outer slot unloads, a click on a page button that an inner slot's plan listened to
@@ -1824,6 +1829,10 @@ plans name.
   runs once per raise; handed over again, it still runs once per raise.
 - `X12.10` behavior: after the slot whose handler listened to a payload's object unloads, that object's event runs
   nothing.
+- `X12.11` refusal (D12.9): a plan that sets the text of the element another plan of the page loads into: "The plan
+  sets the text of element 'card', a slot a plan of this page loads or unloads, so what the slot loaded would keep
+  running under content it no longer shows. Empty the slot with Unload(\"card\"), and write the text into an element
+  beside it."
 
 ## Q13. Where state lives
 
