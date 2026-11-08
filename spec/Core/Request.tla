@@ -7,7 +7,7 @@ Mutants == {"none", "PlaceholderUnchecked", "DateInPath", "FileInJson", "NullFor
             "FailedCheckSends", "FinallyWithoutLoading", "CatchAllBeatsStatus", "FailureRunsSuccess",
             "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt",
             "FailedConditionSendsNothing", "ChainedIgnoresCondition", "CatchAllRunsOnSuccess",
-            "EmptyFieldForObject", "EmptyFieldForObjectItem"}
+            "EmptyFieldForObject", "EmptyFieldForObjectItem", "OneFlagForBothLayers", "HoldBeforeLoading"}
 
 ASSUME Mutant \in Mutants
 
@@ -30,12 +30,15 @@ Items == {"nullableItem", "valueItem", "objectItem"}
 
 VARIABLES part, config,
           checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
-          routeStops, chained, chainedWhen,
-          pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan
+          routeStops, chained, chainedWhen, takesDefaults, defaultLoadingStops,
+          pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan,
+          defaultLoadings, defaultFinallies, outerEntered, held, holds
 
 scenario == <<checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
-              routeStops, chained, chainedWhen>>
-run == <<pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan>>
+              routeStops, chained, chainedWhen, takesDefaults, defaultLoadingStops>>
+run == <<pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan,
+         defaultLoadings, defaultFinallies, outerEntered, held, holds>>
+layers == <<defaultLoadings, defaultFinallies, outerEntered, held, holds>>
 vars == <<part, config, scenario, run>>
 
 Unset == <<"unset", "unset">>
@@ -56,6 +59,11 @@ IdleRun ==
     /\ routeRan = Unset
     /\ chainedRan = FALSE
     /\ afterRan = FALSE
+    /\ defaultLoadings = 0
+    /\ defaultFinallies = 0
+    /\ outerEntered = FALSE
+    /\ held = FALSE
+    /\ holds = 0
 
 PlacementInit ==
     /\ part = "placement"
@@ -64,6 +72,7 @@ PlacementInit ==
     /\ policy = FALSE /\ outcomes = [i \in 1..MaxAttempts |-> "ok"] /\ successRoute = TRUE
     /\ reqRoutes = {} /\ defRoutes = {}
     /\ routeStops = FALSE /\ chained = FALSE /\ chainedWhen = TRUE
+    /\ takesDefaults = FALSE /\ defaultLoadingStops = FALSE
     /\ pc = "idle"
     /\ IdleRun
 
@@ -78,7 +87,9 @@ FlowInit ==
     /\ outcomes \in [1..MaxAttempts -> Outcomes]
     /\ successRoute \in BOOLEAN
     /\ reqRoutes \in SUBSET {"s404", "s503", "catchAll"}
-    /\ defRoutes \in SUBSET {"s503", "catchAll"}
+    /\ takesDefaults \in BOOLEAN
+    /\ defRoutes \in IF takesDefaults THEN SUBSET {"s503", "catchAll"} ELSE {{}}
+    /\ defaultLoadingStops \in IF takesDefaults THEN BOOLEAN ELSE {FALSE}
     /\ routeStops \in BOOLEAN
     /\ chained \in BOOLEAN
     /\ chainedWhen \in BOOLEAN
@@ -165,25 +176,38 @@ Limit == MaxAttempts + (IF Mutant = "RetryPastAttempts" THEN 1 ELSE 0)
 Check ==
     /\ pc = "check"
     /\ IF checkPasses \/ Mutant = "FailedCheckSends"
-         THEN pc' = "loading" /\ UNCHANGED stopped
+         THEN (pc' = IF takesDefaults THEN "defaultLoading" ELSE "loading") /\ UNCHANGED stopped
          ELSE pc' = "done" /\ stopped' = TRUE
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, final, routeRan, chainedRan, afterRan>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, final, routeRan, chainedRan, afterRan, layers>>
+
+DefaultLoading ==
+    /\ pc = "defaultLoading"
+    /\ defaultLoadings' = defaultLoadings + 1
+    /\ held' = (Mutant = "HoldBeforeLoading")
+    /\ holds' = holds + (IF Mutant = "HoldBeforeLoading" THEN 1 ELSE 0)
+    /\ IF defaultLoadingStops
+         THEN stopped' = TRUE /\ pc' = "done" /\ UNCHANGED outerEntered
+         ELSE outerEntered' = TRUE /\ pc' = "loading" /\ UNCHANGED stopped
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, final, routeRan, chainedRan, afterRan, defaultFinallies>>
 
 Loading ==
     /\ pc = "loading"
     /\ loadings' = loadings + 1
     /\ IF loadingStops
-         THEN stopped' = TRUE /\ pc' = IF Mutant = "FinallyWithoutLoading" THEN "finally" ELSE "done"
+         THEN stopped' = TRUE /\ pc' = IF Mutant = "FinallyWithoutLoading" THEN "finally" ELSE "defaultFinally"
          ELSE pc' = "guard" /\ UNCHANGED stopped
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, finallies, routes, entered, final, routeRan, chainedRan, afterRan>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, finallies, routes, entered, final, routeRan, chainedRan, afterRan, layers>>
 
 Guard ==
     /\ pc = "guard"
     /\ entered' = TRUE
+    /\ held' = (held \/ takesDefaults)
+    /\ holds' = holds + (IF takesDefaults /\ ~held THEN 1 ELSE 0)
     /\ IF guardOk
          THEN pc' = "attempt" /\ UNCHANGED stopped
          ELSE pc' = "finally" /\ stopped' = TRUE
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, final, routeRan, chainedRan, afterRan>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, final, routeRan, chainedRan, afterRan,
+                   defaultLoadings, defaultFinallies, outerEntered>>
 
 Attempt ==
     /\ pc = "attempt"
@@ -196,7 +220,7 @@ Attempt ==
            ELSE /\ final' = o
                 /\ pc' = "route"
                 /\ UNCHANGED <<attempt, loadings>>
-    /\ UNCHANGED <<part, config, scenario, finallies, routes, entered, stopped, routeRan, chainedRan, afterRan>>
+    /\ UNCHANGED <<part, config, scenario, finallies, routes, entered, stopped, routeRan, chainedRan, afterRan, layers>>
 
 Route ==
     /\ pc = "route"
@@ -204,30 +228,40 @@ Route ==
     /\ routeRan' = RouteFor(final)
     /\ stopped' = (routeStops /\ RouteFor(final) # NoRoute)
     /\ pc' = "finally"
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, entered, final, chainedRan, afterRan>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, entered, final, chainedRan, afterRan, layers>>
 
 Finally ==
     /\ pc = "finally"
     /\ finallies' = finallies + 1
+    /\ pc' = "defaultFinally"
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, routes, entered, stopped, final, routeRan, chainedRan, afterRan, layers>>
+
+OuterRuns == IF Mutant = "OneFlagForBothLayers" THEN entered ELSE outerEntered
+
+DefaultFinally ==
+    /\ pc = "defaultFinally"
+    /\ defaultFinallies' = defaultFinallies + (IF OuterRuns THEN 1 ELSE 0)
+    /\ held' = FALSE
     /\ pc' = IF stopped /\ Mutant # "StepsAfterStop" THEN "done"
              ELSE IF chained /\ ~stopped /\ (final = "ok" \/ Mutant = "ChainedAfterError")
                      /\ (chainedWhen \/ Mutant = "ChainedIgnoresCondition") THEN "chained"
              ELSE "after"
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, routes, entered, stopped, final, routeRan, chainedRan, afterRan>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan,
+                   defaultLoadings, outerEntered, holds>>
 
 Chained ==
     /\ pc = "chained"
     /\ chainedRan' = TRUE
     /\ pc' = "after"
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, afterRan>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, afterRan, layers>>
 
 After ==
     /\ pc = "after"
     /\ afterRan' = TRUE
     /\ pc' = "done"
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, layers>>
 
-Next == Check \/ Loading \/ Guard \/ Attempt \/ Route \/ Finally \/ Chained \/ After
+Next == Check \/ DefaultLoading \/ Loading \/ Guard \/ Attempt \/ Route \/ Finally \/ DefaultFinally \/ Chained \/ After
 
 Spec == Init /\ [][Next]_vars
 
@@ -253,9 +287,13 @@ FailedConditionLeavesThePartOut ==
 
 ChainedOnlyWhenItsConditionHolds == chainedRan => chainedWhen
 
-FailedCheckSendsNothing == (Flow /\ ~checkPasses) => (sends = 0 /\ loadings = 0 /\ finallies = 0 /\ ~afterRan)
+FailedCheckSendsNothing == (Flow /\ ~checkPasses) => (sends = 0 /\ loadings = 0 /\ finallies = 0 /\ defaultLoadings = 0 /\ ~afterRan)
 
 FinallyRunsWhenLoadingRan == (Flow /\ pc = "done") => ((finallies = 1) <=> entered)
+
+EachLayerPairs == (Flow /\ pc = "done") => ((defaultFinallies = 1) <=> outerEntered)
+
+HoldSpansTheSend == (held => entered) /\ ((Flow /\ pc = "done") => ~held) /\ holds <= 1
 
 OneRouteRuns == (Flow /\ pc = "done" /\ final \in {"ok"} \cup Statuses) =>
     (routes = 1 /\ routeRan = IF final = "ok" THEN SuccessRoute ELSE ForStatus(final))
@@ -273,13 +311,15 @@ RetriesOnlyWhatIsRetryable ==
 
 RetryStopsAtItsAttempts == sends <= MaxAttempts
 
-OneLifecycleAcrossAttempts == loadings <= 1 /\ finallies <= 1 /\ routes <= 1
+OneLifecycleAcrossAttempts == loadings <= 1 /\ finallies <= 1 /\ routes <= 1 /\ defaultLoadings <= 1 /\ defaultFinallies <= 1
 
 ReachRetriedThenSucceeded == ~(pc = "done" /\ sends = 2 /\ final = "ok" /\ routeRan = Success)
 
 ReachDefaultStatusRoute == ~(pc = "done" /\ routeRan = <<"default", "s503">>)
 
 ReachChained == ~(pc = "done" /\ chainedRan)
+
+ReachRequestLoadingStoppedUnderDefaults == ~(pc = "done" /\ outerEntered /\ ~entered /\ defaultFinallies = 1 /\ ~held)
 
 ReachSucceededPastACatchAll == ~(pc = "done" /\ final = "ok" /\ ~successRoute /\ "catchAll" \in reqRoutes /\ routeRan = NoRoute)
 

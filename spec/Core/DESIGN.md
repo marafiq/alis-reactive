@@ -1244,7 +1244,9 @@ Terms used throughout:
   (D10.5): a status the host writes picks its route, and a connection the host closes is a network failure, the
   catch-all's. The app sets the limit in its host's configuration.
 - D9.9 DELETE sends its body as POST and PUT do. A member that fills a placeholder is also sent in the body of a
-  POST, PUT or DELETE.
+  POST, PUT or DELETE: a route value binds into a member of a model bound from the form, but never into a
+  `[FromBody]` model (`probe:core-route-value-binds-member`), and on both hosts a value the body sends wins over the
+  route's (`probe:mvc5-value-provider-order`), so the body carries the same value the path does.
 - D9.10 A member that reads nothing is sent by this closed table, which C# writes into the plan:
 
   | The member's type | JSON body | Query or form data |
@@ -1349,15 +1351,22 @@ Terms used throughout:
   alone: net10 answers a multipart body to a URL-encoded action 415 (`probe:core-consumes-urlencoded`). Its fields are
   named and written as the query's (D9.13). A text body and a file body are one value each, read by the action
   from its body, since no binder on either host reads them.
-- D9.22 Antiforgery is a request default (D10.12). C# writes the token into the plan where the view renders, from the
-  host's own antiforgery (`IAntiforgery.GetAndStoreTokens` on net10, `AntiForgery.GetTokens` on net48), and every
-  POST, PUT and DELETE sends it; GET, HEAD and OPTIONS never do, as neither host asks a token of them
-  (`probe:core-antiforgery-safe-methods`). Its place is configured once:
+- D9.22 Antiforgery is configuration every unsafe request to the page's origin carries, not a default: a request that
+  takes no defaults (D10.12) still sends it, since the server refuses a POST without it. The app chooses its place, or
+  `NoAntiforgery()`, once; a view that renders a POST, PUT or DELETE in an app that made no choice is refused, naming
+  both doors. C# writes the token into the plan where the view renders, from the host's own antiforgery
+  (`IAntiforgery.GetAndStoreTokens` on net10, `AntiForgery.GetTokens` on net48), and every POST, PUT and DELETE to the
+  page's origin sends it, the same token on every attempt; GET, HEAD and OPTIONS never do, as neither host asks a
+  token of them (`probe:core-antiforgery-safe-methods`). A partial loaded into a slot carries the token its own GET was
+  rendered with, a new one that validates against the page's cookie as the first does
+  (`probe:core-antiforgery-later-token`). Its place:
   - the header `RequestVerificationToken`, which net10 reads before the form and with every body
     (`probe:core-antiforgery-names`, `probe:core-antiforgery-placement`);
   - or the field `__RequestVerificationToken` of a URL-encoded or multipart body, which both hosts read
     (`probe:mvc5-antiforgery-field-name`). A JSON, text or file body under the field place is refused where the view
-    renders, since no host reads a token there (`probe:core-antiforgery-placement`).
+    renders, since no host reads a token there (`probe:core-antiforgery-placement`). A request that sends no body
+    under the field place sends a URL-encoded body holding the field alone, which MVC 5 reads for PUT and DELETE as
+    for POST (`probe:mvc5-form-filled-any-method`).
   MVC 5's `[ValidateAntiForgeryToken]` reads the form alone (`probe:mvc5-antiforgery-reads-form-only`), so on net48 the
   header is read only by a filter that hands it to `AntiForgery.Validate(cookieToken, formToken)`
   (`probe:mvc5-antiforgery-validate-tokens`). Whether the framework ships that filter is the owner's; it goes to
@@ -1421,6 +1430,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `probe:mvc5-max-request-length`
 - `probe:mvc5-request-too-large-throws`
 - `probe:core-upload-over-limit`
+- `probe:core-route-value-binds-member`
+- `probe:mvc5-value-provider-order`
+- `probe:core-antiforgery-later-token`
+- `probe:mvc5-form-filled-any-method`
 **Doors.**
 - kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:58-62`), `Gather` and
   `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`, `Form()`,
@@ -1477,7 +1490,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - D10.2 A form check that fails shows its messages, sends nothing, runs neither `WhileLoading` nor `Finally`,
   and stops its pipeline: no step after the request runs.
 - D10.3 A `WhileLoading` that stops sends nothing, runs no `Finally` and stops its pipeline. `Finally` runs
-  exactly when `WhileLoading` ran, after every outcome, a stop inside a route included.
+  exactly when `WhileLoading` ran, after every outcome, a stop inside a route included. The defaults' layer wraps the
+  request's: each layer's `Finally` runs exactly when its own `WhileLoading` completed, the request's first, so a stop
+  in the request's `WhileLoading` still runs the defaults' `Finally` (`Request.tla:EachLayerPairs`).
 - D10.4 A request follows a redirect that ends on the page's own origin, and the response it ends at is the
   request's answer: its status and body pick the route (`probe:fetch-follows-relative-redirect`). A redirect
   that ends on another origin is refused.
@@ -1510,8 +1525,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   `*/*`, because net10 does not respect an `Accept` that holds `*/*` and answers a string action as JSON only to
   `application/json` (`probe:core-accept-weighted`): `application/json` for JSON, `text/*` for text, `text/html` for
   HTML, and `*/*` for a file and for none. A validation error body is `application/problem+json` under any `Accept`
-  (`probe:core-accept-weighted`). An error route reads its body as data: a body not of its kind reads nothing, and
-  the route runs.
+  (`probe:core-accept-weighted`). An error route declares its kind from the same set less a file: none, JSON, text or
+  HTML, so a 409's text and an invalid post's partial view are read as they are sent. It reads its body as data: a
+  body not of its kind reads nothing, and the route runs.
 - D10.7 On net48 the plan carries that a response's `X-Responded-JSON` status replaces its own, so Katana's
   answer to a request that sends `X-Requested-With` runs the route of the status it withheld.
 - D10.8 A server's validation errors have one body on both hosts, `{"errors": {"<binding name>": ["message"]}}`,
@@ -1529,8 +1545,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   to gate 2.
 - D10.11 `Into(element)` loads the success body's HTML into the element as a slot (Q12): what the element held
   unloads first.
-- D10.12 Request defaults are configured once in C# and hold headers (D9.12), the antiforgery place (D9.22), the busy
-  indicator and the notice (D10.21), `WhileLoading` steps, `Finally`
+- D10.12 Request defaults are configured once in C# and hold headers (D9.12), the busy indicator and the notice
+  (D10.21), the form's 400 route (D10.17), `WhileLoading` steps, `Finally`
   steps, error routes by status, a catch-all error route and a retry policy. C# composes them into every
   request where the view renders; the browser holds no defaults. A request's `WhileLoading` runs after the
   defaults', and its `Finally` before the defaults'. A request's retry policy replaces the defaults'. Success
@@ -1627,10 +1643,17 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   NativeLoader and NativeToast declaring them, and an app declares its own on the same public surface; the core
   depends on neither one's markup or CSS (the owner, 2026-11-08). The core counts the requests a busy indicator covers,
   across every pipeline of the page, and calls its show when the count leaves 0 and its hide when it returns to 0. A
-  request covers it once across its attempts (D10.15), from its defaults' `WhileLoading` to its defaults' `Finally`,
-  which ends it on every outcome, a replaced or unloaded run's included (Q11, Q12). A failed request whose route is a
+  request holds it once across its attempts (D10.15), from its guards, once both `WhileLoading` layers completed, to
+  the end of its defaults' `Finally`, on every outcome, a replaced or unloaded run's included (Q11, Q12). A failed
+  check or a stopped `WhileLoading` holds nothing (`Request.tla:HoldSpansTheSend`). A failed request whose route is a
   default shows one notice, after its last attempt; a replaced or unloaded request shows none. A request that takes
   no defaults covers no indicator and shows no default notice.
+- D10.22 The condensed body is multipart. Multipart binds with no attribute on both hosts and carries files, and where it
+  is wrong it fails loud: a `[FromBody]` action answers it 415, which runs the request's routes
+  (`probe:core-frombody-multipart`). JSON as the condensed body would fail silent: net10 answers a JSON body to an
+  action whose model is bound from the form 200, with nothing of the body bound (`probe:core-json-to-form-bound`). Main's
+  default is JSON (`Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:21` at 7b9e987cc); its feature is kept by
+  `Json(..)`, which a `[FromBody]` or `[ApiController]` endpoint takes.
 **Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
 `HttpSend` and its result, `HttpResponse`.
 
@@ -1655,6 +1678,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `Composition.tla:IndicatorNeverHidesEarly`
 - `Composition.tla:IndicatorNeverStaysShown`
 - `Composition.tla:NoticeOncePerFailure`
+- `Request.tla:EachLayerPairs`
+- `Request.tla:HoldSpansTheSend`
+- `probe:core-frombody-multipart`
+- `probe:core-json-to-form-bound`
 - `probe:core-string-result-media-type`
 - `probe:mvc5-string-result-content`
 - `probe:mvc5-content-type-kept-when-unset`
@@ -1677,6 +1704,67 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   through the one condition core; its door's form goes to gate 2.
 - `N10.5` new: the condensed request of D10.17, whose default parts read the request's own parts; its form goes
   to gate 2.
+- `N10.7` new, the HTTP surface chosen 2026-11-08 from two independent designs (verdicts per axis in `spec/NOTES.md`),
+  replacing N9.3, N9.7, N10.2 and N10.5's open forms:
+  - startup, once on each host: `services.AddReactiveRequests(requests => ..)` with `Antiforgery(AntiforgeryIn.Header)`,
+    `Antiforgery(AntiforgeryIn.FormField)` or `NoAntiforgery()`, `Header(name, value)`, `ShowBusy()`,
+    `ShowValidationErrors()`, `WhileLoading`, `Finally`, `OnError(status, ..)`, `OnError(..)` and `Retry(attempts,
+    firstWait)`; a defaults pipeline is `Pipeline<NoModel>`, so it names no view member. The call is required: a view
+    that renders a request in an app without it is refused, naming it.
+  - the verbs, extension methods on `Pipeline<TModel>` in the `Requests` module: `Get`, `Head`, `Options`, `Post`, `Put`
+    and `Delete`, each `(url)` or `<TRequest>(url, request => ..)`. The request lambda holds the HTTP parts: `Route(r =>
+    r.M, value)`, `Query(r => r.M, value)`, `Header(name, value)`, and on POST, PUT and DELETE one body door, `Json`,
+    `UrlEncoded`, `Multipart`, `Text` or `File`. A value is a literal or any source (Q7); a member lambda dot-walks
+    (`r => r.Handover.Round`). `Header` refuses `Content-Type`, `Accept`, the antiforgery header and the Fetch
+    Standard's forbidden request headers.
+  - staged by type: GET, HEAD and OPTIONS offer no body door; `Retry` and `NoRetry` exist on GET, HEAD, OPTIONS, PUT and
+    DELETE only (X10.9); HEAD offers no content reader; a file member exists only inside `Multipart` or as `File`.
+  - the routes, on the request: `OnSuccess(Content.<kind>, (reply, pipeline) => ..)`, `OnError(status, Content.<kind>,
+    (reply, pipeline) => ..)` and the catch-all `OnError((failed, pipeline) => ..)`, with the readers `Content.None`,
+    `Content.Json<T>()`, `Content.Text`, `Content.Html` and `Content.File` (D10.6). `OnSuccess<T>` returns a request that
+    carries `T`, so its `Chained((reply, next) => ..)` receives the typed reply by construction. `Validate<TValidator>()`
+    checks the form the request sends (Q16); `WhileLoading`, `Finally`, `NoDefaults()` and `NoValidation()` complete it.
+  - the objects, each a JS object whose members are sources: `Response<T>` (`Status`, `Headers.Get(name)`, `Body`, which
+    dot-walks, and `Request`), `Failure` (`Outcome`: status, network, redirect or content; `Status`; `Headers`),
+    `ResponseFile` (`Name`, `Size`, `Type`), `BrowserFile` (lib.dom `File`) and `pipeline.PageUrl<TPage>()` or
+    `PageUrl<TPage>(template)`, whose `Read(q => q.A.B)` reads a placeholder member from the path and any other from the
+    query by its C# path, as the action that rendered the page bound it, the member's start when the key is absent or
+    its text does not convert.
+  - the condensed doors, extension methods that write the plan the full form writes: `Set(r => r.M, value)`, placed by
+    D9.4, D9.6 and D9.9 into `Route`, `Query` or the body the request names, else multipart (D10.22); `Form(formId)`,
+    the form's inputs as multipart fields and file parts plus `Validate` for the validator registered for `TRequest`;
+    `OnSuccess(pipeline => ..)`, `OnSuccess<T>((reply, pipeline) => ..)`, `OnError<T>(status, ..)`, `Into(elementId)`
+    and `Download()`; and `Notice()` with `Success`, `Error`, `Warning` and `Info` over the notice contract (D10.21).
+  - `Parallel(params Action<Pipeline<TModel>>[] branches)`, each branch a pipeline, the steps after it its all-settled
+    block; `OnAllSettled` leaves (D10.10).
+  - net48 only: `[ValidateAntiForgeryHeader]`, a filter that reads the header, else the field, and hands it to
+    `AntiForgery.Validate(cookieToken, formToken)`; shipping it is the owner's (gate 1 flag, D9.22).
+
+  ```csharp illustration
+  pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
+          .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
+          .Form("intake"))
+      .OnSuccess<IntakeCreated>((created, done) => done.Notice().Success("Resident admitted"))
+      .Chained((created, next) => next
+          .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
+              .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
+          .Into("resident-summary"));
+
+  pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
+          .Route(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
+          .Multipart(body => body
+              .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
+              .Form("intake")))
+      .Validate<IntakeValidator>()
+      .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
+      .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.Form("intake").ShowErrors(refused.Body))
+      .Chained((created, next) => next
+          .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
+              .Route(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
+          .OnSuccess(Content.Html, (summary, loaded) => loaded.Into("resident-summary", summary.Body)));
+  ```
+  The first is the condensed form under defaults that hold `ShowBusy()`, `ShowValidationErrors()` and a catch-all notice;
+  the second writes the same plan less those defaults' parts, which both compose identically.
 - `N10.6` new: the net48 JSON response door, a result that writes its body through System.Text.Json under the
   options the app registers with the framework (D2.6, D2.9), so dates are ISO 8601 (D3.10) and names follow
   the app's naming on both hosts.

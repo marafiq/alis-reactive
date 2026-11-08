@@ -1520,6 +1520,60 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-accept-weighted: a string action with Accept text/plain, application/json;q=0.5, */*;q=0.1 answers text/plain; charset=utf-8; with application/json, */*;q=0.1 answers text/plain; charset=utf-8; with text/html, */*;q=0.1 answers text/plain; charset=utf-8; a 400 ValidationProblem with Accept text/plain, */*;q=0.1 answers 400 application/problem+json",
       "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-route-value-binds-member",
+      "statement": "On net10 a route value binds into a member of a model bound from the form, a value the body sends wins over it, and a [FromBody] model never takes it.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-route-value-binds-member: /h/r/North/intake with a multipart body lacking Ward binds 200 Ward North; with Ward=South in the body binds 200 Ward South; a [FromBody] model with {} binds 200 Ward null",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-frombody-multipart",
+      "statement": "On net10 a [FromBody] action answers a multipart or a URL-encoded body 415.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-multipart: a [FromBody] action answers a multipart body 415 and a URL-encoded body 415",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-json-to-form-bound",
+      "statement": "On net10 an action whose model is bound from the form answers a JSON body 200 with nothing of the body bound.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-to-form-bound: an action whose model is bound from the form answers a JSON body {\"ward\":\"South\"} 200 Ward North; the same action at /h/documents answers 200 Ward ; ; Photos ",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-antiforgery-later-token",
+      "statement": "On net10 a token issued by a later GET is a new token, and it and the first token both validate against the page's cookie.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-antiforgery-later-token: a token issued by a later GET, as a slot's partial gets one, is a new token and answers 200; the first token still answers 200",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "mvc5-value-provider-order",
+      "statement": "MVC 5 reads a model's members from the form, then a JSON body, then route values, then the query, so a value the body sends wins over a route value.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ValueProviderFactories.cs.txt",
+      "expect": "new RouteDataValueProviderFactory(),",
+      "source": "spec/probes/aspnetwebstack/ValueProviderFactories.cs.txt:13"
+    },
+    {
+      "id": "mvc5-form-filled-any-method",
+      "statement": "System.Web fills Request.Form from a URL-encoded or multipart body whatever the method, so a PUT's or a DELETE's form field reaches the antiforgery check.",
+      "host": "net48",
+      "oracle": "System.Web reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/HttpRequest.cs.txt",
+      "expect": "if (StringUtil.StringStartsWithIgnoreCase(contentType, \"application/x-www-form-urlencoded\")) {",
+      "source": "spec/probes/referencesource/HttpRequest.cs.txt:383"
     }
   ]
 }

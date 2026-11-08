@@ -54,6 +54,14 @@ static class HttpProbes
             using var bound = await client.PostAsync("/h/documents", raw);
             Console.WriteLine("core-multipart-utf8-file-name: a part whose filename is Résumé.pdf in UTF-8, as a browser writes it, binds " + await bound.Content.ReadAsStringAsync());
         }
+        var routeOnly = await PostBody(client, "/h/r/North/intake", Multipart(("Caption", "x")));
+        var routeAndBody = await PostBody(client, "/h/r/North/intake", Multipart(("Ward", "South")));
+        var routeIntoJson = await PostBody(client, "/h/r/North/intake-json", JsonBody("{}"));
+        Console.WriteLine("core-route-value-binds-member: /h/r/North/intake with a multipart body lacking Ward binds " + routeOnly + "; with Ward=South in the body binds " + routeAndBody + "; a [FromBody] model with {} binds " + routeIntoJson);
+        Console.WriteLine("core-json-to-form-bound: an action whose model is bound from the form answers a JSON body {\"ward\":\"South\"} " + await PostBody(client, "/h/r/North/intake", JsonBody("{\"ward\":\"South\"}")) + "; the same action at /h/documents answers " + await PostBody(client, "/h/documents", JsonBody("{\"ward\":\"South\"}")));
+        Console.WriteLine("core-frombody-multipart: a [FromBody] action answers a multipart body " + await Status(client, HttpMethod.Post, "/h/r/North/intake-json", Multipart(("Ward", "North")), null) + " and a URL-encoded body " + await Status(client, HttpMethod.Post, "/h/r/North/intake-json", FormBody("Ward=North"), null));
+        var later = await client.GetStringAsync("/h/token");
+        Console.WriteLine("core-antiforgery-later-token: a token issued by a later GET, as a slot's partial gets one, " + (later == token ? "is the same token" : "is a new token") + " and answers " + await Status(client, HttpMethod.Post, "/h/protected", JsonBody("{}"), later) + "; the first token still answers " + await Status(client, HttpMethod.Post, "/h/protected", JsonBody("{}"), token));
         Console.WriteLine("core-consumes-urlencoded: [Consumes(\"application/x-www-form-urlencoded\")] answers a URL-encoded body " + await Status(client, HttpMethod.Post, "/h/urlencoded", FormBody("Ward=North"), null) + " and a multipart body " + await Status(client, HttpMethod.Post, "/h/urlencoded", Multipart(("Ward", "North")), null));
         using (var large = new MultipartFormDataContent())
         {
@@ -106,6 +114,12 @@ static class HttpProbes
         if (origin != null) request.Headers.Add("Origin", origin);
         if (preflight) request.Headers.Add("Access-Control-Request-Method", "POST");
         return client.SendAsync(request);
+    }
+
+    static async Task<string> PostBody(HttpClient client, string path, HttpContent content)
+    {
+        using var response = await client.PostAsync(path, content);
+        return (int)response.StatusCode + " " + await response.Content.ReadAsStringAsync();
     }
 
     static async Task<string> MediaType(HttpClient client, string path, string? accept)
@@ -178,6 +192,12 @@ public sealed class HttpProbeController(IAntiforgery antiforgery) : Controller
     [HttpPost("documents")]
     public string Documents(ProbeIntake intake) =>
         "Ward " + intake.Ward + "; " + string.Join("; ", intake.Documents.Select(document => document.Caption + " " + (document.File?.FileName ?? "no file") + " " + (document.File?.Length ?? 0))) + "; Photos " + string.Join(",", intake.Photos.Select(photo => photo.FileName + " " + photo.Length));
+
+    [HttpPost("r/{ward}/intake")]
+    public string RouteIntake(ProbeIntake intake) => "Ward " + (intake.Ward ?? "null");
+
+    [HttpPost("r/{ward}/intake-json")]
+    public string RouteIntakeJson([FromBody] ProbeIntake intake) => "Ward " + (intake.Ward ?? "null");
 
     [HttpPost("urlencoded"), Consumes("application/x-www-form-urlencoded")]
     public string UrlEncoded(ProbeIntake intake) => "Ward " + intake.Ward;

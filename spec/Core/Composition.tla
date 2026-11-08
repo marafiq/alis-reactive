@@ -47,6 +47,13 @@ Begin(r) ==
     /\ shown' = (shown \/ takesDefaults[r])
     /\ UNCHANGED <<shape, takesDefaults, slot, outcome, notices>>
 
+Stop(r) ==
+    /\ pc[r] = "idle"
+    /\ r # "d"
+    /\ Starts(r)
+    /\ pc' = [pc EXCEPT ![r] = "stopped"]
+    /\ UNCHANGED <<shape, takesDefaults, slot, attempt, outcome, aborted, open, shown, notices>>
+
 Answer(r) ==
     /\ pc[r] = "sending"
     /\ \E answer \in {"ok", "fail", "retry"} :
@@ -84,7 +91,7 @@ Unload ==
     /\ aborted' = [r \in Requests |-> aborted[r] \/ (r \in Slot /\ pc[r] \in {"sending", "route"})]
     /\ UNCHANGED <<shape, takesDefaults, attempt, outcome, open, shown, notices>>
 
-Next == Unload \/ \E r \in Requests : Begin(r) \/ Answer(r) \/ Route(r) \/ Settle(r)
+Next == Unload \/ \E r \in Requests : Begin(r) \/ Stop(r) \/ Answer(r) \/ Route(r) \/ Settle(r)
 
 Spec == Init /\ [][Next]_vars
 
@@ -106,6 +113,8 @@ ReachUnloadedInFlightThenHidden ==
     ~(slot = "gone" /\ (\E r \in Slot : takesDefaults[r] /\ aborted[r] /\ pc[r] = "ended") /\ ~shown /\ Covered = {})
 
 ReachChainedCovered == ~(shape = "chained" /\ pc["a"] = "done" /\ "b" \in Covered /\ shown)
+
+ReachStoppedWhileAnotherHolds == ~(pc["c"] = "stopped" /\ "a" \in Covered /\ shown)
 
 ReachRetriedFailureNoticedOnce == ~(attempt["a"] = 2 /\ pc["a"] = "done" /\ outcome["a"] = "fail" /\ notices["a"] = 1)
 
