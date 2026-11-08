@@ -368,7 +368,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-07: "multi part body think in permtives, multiple files with other payload is right complexity".
   A multipart body is an ordered list of parts, each a name and either text or a file (its bytes, file name and media
   type); several files and fields go in one body, under one name or nested by C# path (`Documents[0].File` beside
-  `Documents[0].Title`). The host's file types (`IFormFile`, `HttpPostedFileBase` and their lists) only type the member.
+  `Documents[0].Title`). The host's file types (`IFormFile` on net10, MVC 5's posted-file base, and their lists) only type the
+  member.
 - The owner, 2026-11-08: the framework ships its spinner and toast, and the condensed form depends on contracts the core
   owns, a busy indicator and a notice, never on their CSS or markup; an app puts its own component behind either, and
   the full form takes full control. The core counts the requests a busy indicator covers and calls its show at the
