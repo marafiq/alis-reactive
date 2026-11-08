@@ -353,7 +353,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   or model of the binder without a reason the owner accepts.
 - The owner, 2026-11-07: a request is the HTTP message, and the core holds its parts: the method, the path, the query,
   the headers and a body with its media type, JSON and multipart form data (a form that uploads files among them);
-  the response's status and its body as JSON, text or HTML. The methods are GET, POST, PUT, DELETE and HEAD. PATCH is
+  the response's status and its body as JSON, text or HTML. The methods are GET, HEAD, OPTIONS, POST, PUT and DELETE (OPTIONS by the owner's "OPTIONS support is
+  required as well"). PATCH is
   not a method of 1.0, by the owner's leave: its two body standards (RFC 7396, RFC 6902) carry their own media types
   and give a member left out and a member sent as null different meanings, which D9.10's table does not state. Every
   part takes every source (Q7), and every response body is a source for the modules after it: the page's query read
@@ -364,6 +365,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   text and one file as the whole body. The response bodies are read as none, JSON, text, HTML or a file the browser saves.
   Text is decoded by its `charset` parameter, because fetch's `text()` decodes UTF-8 whatever the header says. Streams
   stay out by the owner's 2026-06-10 decision.
+- The owner, 2026-11-07: "multi part body think in permtives, multiple files with other payload is right complexity".
+  A multipart body is an ordered list of parts, each a name and either text or a file (its bytes, file name and media
+  type); several files and fields go in one body, under one name or nested by C# path (`Documents[0].File` beside
+  `Documents[0].Title`). The host's file types (`IFormFile`, `HttpPostedFileBase` and their lists) only type the member.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
