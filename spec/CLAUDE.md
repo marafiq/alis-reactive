@@ -310,6 +310,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   unit's report carries no "not exercised" line: what the spec decides for the unit's door is built and proven in that
   unit, or the unit is not reported done. 17a reported done with `Set` taking text only; unit 17b builds the members
   D9.6, D9.10, D9.19 and D9.4 decide. An environment the POC lacks (net48) is a work item with its unit, not a caveat.
+- The owner, 2026-11-07, on an object's field names in a query: "I would prefer source generated because that makes
+  the code more stable, internal, performant. ... If that goes beyond it, we can enforce a standard on the query string
+  itself ... Reflection is ... there to help you out to drive the quality of the framework. It's not to hinder your
+  progress." A request member that holds an object or a list of objects is keyed by its fields' C# names (D2.5) from a
+  table a source generator writes at build: for each complex parameter of a controller action and each type reachable
+  from it, typed member lambdas the core names by expression text and by `JsonPath`, with no run-time reflection. Views
+  are compiled by Razor's own generator, which no other generator sees, so the endpoint's parameter is the trigger.
+  The query standard (keys as the JSON names, read back on the server by the naming policy) is the fallback.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
