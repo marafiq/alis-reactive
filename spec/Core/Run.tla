@@ -45,7 +45,7 @@ FinallyRoles == {"finally", "defaultFinally"}
 FirstRole == IF Mutant = "DefaultFinallyFirst" THEN "defaultFinally" ELSE "finally"
 
 Frame(k, body, path, role, node, state) ==
-    [k |-> k, body |-> body, i |-> 1, path |-> path, role |-> role, state |-> state, stopping |-> FALSE, node |-> node,
+    [k |-> k, body |-> body, i |-> 1, path |-> path, role |-> role, state |-> state, abrupt |-> FALSE, node |-> node,
      loadedOwn |-> FALSE, loadedDefaults |-> FALSE, holds |-> FALSE]
 
 BlockFrame(body, path, role) == Frame("block", body, path, role, NoStmt, "none")
@@ -113,9 +113,9 @@ Top(h) == stack[h][Len(stack[h])]
 
 Below(h) == SubSeq(stack[h], 1, Len(stack[h]) - 1)
 
-Unwinding(s) == \E j \in 1..Len(s) : s[j].role \in FinallyRoles \/ s[j].stopping
+Unwinding(s) == \E j \in 1..Len(s) : s[j].role \in FinallyRoles \/ s[j].abrupt
 
-Stopping(s) == [j \in 1..Len(s) |-> IF s[j].k = "request" THEN [s[j] EXCEPT !.stopping = TRUE] ELSE s[j]]
+Abrupt(s) == [j \in 1..Len(s) |-> IF s[j].k = "request" THEN [s[j] EXCEPT !.abrupt = TRUE] ELSE s[j]]
 
 RECURSIVE Unwound(_, _)
 
@@ -123,11 +123,11 @@ Unwound(s, byAbort) ==
     IF s = <<>> THEN <<>>
     ELSE LET t == s[Len(s)]
              rest == SubSeq(s, 1, Len(s) - 1)
-             at(state) == Append(rest, [t EXCEPT !.state = state, !.stopping = TRUE])
+             at(state) == Append(rest, [t EXCEPT !.state = state, !.abrupt = TRUE])
          IN IF t.k = "block" \/ t.state = "defaultLoadingRunning" THEN Unwound(rest, byAbort)
             ELSE CASE t.state \in {"loadingRunning", "route", "routeRunning"} ->
                         IF Mutant = "StopSkipsFinally" /\ ~byAbort THEN at("after")
-                        ELSE Append(rest, [t EXCEPT !.state = "finally", !.stopping = TRUE,
+                        ELSE Append(rest, [t EXCEPT !.state = "finally", !.abrupt = TRUE,
                                               !.loadedOwn = @ \/ (byAbort /\ t.state = "loadingRunning"
                                                                    /\ Mutant = "AbortRunsUnloadedFinally")])
                    [] t.state = "finallyRunning" -> at(IF Mutant = "UnwindRestartsFinally" THEN "finally" ELSE "defaultFinally")
@@ -255,7 +255,7 @@ RequestStep(h) ==
             [] OTHER ->
                  /\ held' = [held EXCEPT ![h] = @ - (IF r.holds /\ ~(Mutant = "DisposeSkipsRelease" /\ aborted = "dispose")
                                                       THEN 1 ELSE 0)]
-                 /\ Settled(h, IF r.stopping THEN Unwound(below, FALSE) ELSE below)
+                 /\ Settled(h, IF r.abrupt THEN Unwound(below, FALSE) ELSE below)
                  /\ UNCHANGED <<awaitsRan, finallies, deepest, pending>>
        /\ UNCHANGED <<writes, stopped, loaded, cutDefaultFinally, innerStopped>>
 
@@ -335,7 +335,7 @@ Abort(cause) ==
            inFinally == t.k = "block" /\ t.role \in FinallyRoles
            keepsWaiting == inFinally /\ cause = "replace" /\ Mutant # "UnwindRestartsFinally"
            runsOn == ~inFinally /\ cause = "replace" /\ Mutant = "AbortRunsTheRoute"
-           next == IF keepsWaiting THEN Stopping(s) ELSE IF runsOn THEN s ELSE Unwound(s, TRUE)
+           next == IF keepsWaiting THEN Abrupt(s) ELSE IF runsOn THEN s ELSE Unwound(s, TRUE)
        IN /\ stack' = [stack EXCEPT ![1] = next]
           /\ status' = [status EXCEPT ![1] = IF keepsWaiting THEN "waiting" ELSE IF next = <<>> THEN "ended" ELSE "running"]
           /\ active' = IF keepsWaiting \/ next = <<>> THEN 0 ELSE 1

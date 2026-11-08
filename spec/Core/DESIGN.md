@@ -1771,8 +1771,9 @@ contract `HttpSend`, which is no node kind.
   `Json(..)`, which a `[FromBody]` or `[ApiController]` endpoint takes.
 - D10.23 A request is one statement of the plan, `request`, and one state machine, the one `spec/Core/Request.tla`
   checks and `spec/Core/Run.tla` runs as a frame (the owner, 2026-11-08: "treat request as a unit", "there is implicit
-  state machine here"). Its states are `check`, `defaultLoading`, `loading`, `guard`, `attempt`, `route`, `finally`,
-  `defaultFinally`, `chained`, `after` and `done`. The statement's executor holds the request's state (the argument it
+  state machine here"). It is `idle` until its statement runs, then in the states `check`, `defaultLoading`, `loading`,
+  `guard`, `attempt`, `route`, `finally`, `defaultFinally`, `chained` and `after`, and `done` however it ended, which
+  its completion tells (D11.12). The statement's executor holds the request's state (the argument it
   read, its attempt, the layers whose `WhileLoading` completed, the busy targets it holds), and no other code holds
   any of it. C# writes the statement whole, each part in its state whatever order the view wrote the parts in (D10.1).
 
@@ -2194,6 +2195,20 @@ and `notice` (D10.21).
   - an owner and its slot (Q12, `spec/Core/Ownership.tla`);
   - a connection (Q21, `spec/Core/Realtime.tla`);
   - a busy target's count (D10.21, `spec/Core/Composition.tla`).
+  Each machine's states have one set of names, which every spec and the runtime's types use:
+  - a run is `idle`, `running`, `waiting` or `ended`, and ends completed, stopped, replaced or disposed (D20.6); a
+    trigger the `skip` policy refuses leaves its run `idle` (D11.7);
+  - a request is `idle`, then in D10.23's states, and `done` however it ended;
+  - how a request's body ended is its completion, `completed`, `stopped` or `aborted`, as ECMA-262's completion record
+    carries how a `try` block ended into its `finally`. It is one closed value, carried by `finally`, `defaultFinally`
+    and `done` and read where they exit, never a boolean beside every state; an abort's reason, `replace` or
+    `dispose`, is its run's abort signal's (D11.7, D11.8);
+  - a spec that models part of a machine names the states it models by that machine's names and steps over the
+    states that change nothing it checks. So `Composition.tla`, `Realtime.tla` and `Ownership.tla` step from `idle`
+    to `attempt`, a run's wait at `attempt` is `Tracing.tla`'s `waiting`, and a route waiting on its tail is
+    `Lanes.tla`'s `route`. `Run.tla` names a layer's state whose block is open by the state and `Running`
+    (`routeRunning`) and keeps of a frame's completion the one fact its steps read, `abrupt`, a stop's or an abort's;
+    `Request.tla`, which models no abort, keeps `stopped`.
   Nothing else holds state across a turn: a step reads the page when it runs (D10.18), a listener is a removal its
   owner holds, a plan's boot is one pass, and the C# writer's position is its stack of open blocks, each with its stage
   and whether a step before it awaited (D11.4).

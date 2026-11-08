@@ -202,10 +202,10 @@ pageState == <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, register
                destroyed, threw, releasedDestroyed>>
 
 SendsSlotInput ==
-    /\ req # "sent"
+    /\ req # "attempt"
     /\ live["a"]
     /\ HasField(aContent)
-    /\ req' = "sent"
+    /\ req' = "attempt"
     /\ sentGen' = aGen
     /\ inline' = FALSE
     /\ inlineGen' = 0
@@ -214,8 +214,8 @@ SendsSlotInput ==
     /\ UNCHANGED listens
 
 ShowsFailures ==
-    /\ req = "sent"
-    /\ req' = "answered"
+    /\ req = "attempt"
+    /\ req' = "done"
     /\ LET here == live["a"] /\ HasField(aContent)
            at == IF Mutant = "InlineByName" THEN here ELSE here /\ aGen = sentGen IN
        /\ inline' = at
@@ -257,7 +257,7 @@ NoRemoveOnCollected == ~listenThrew
 
 NoRemoveOnDestroyedListened == ~listenOffGone
 
-FailureReachesSummary == req = "answered" => summarized
+FailureReachesSummary == req = "done" => summarized
 
 InlineOnlyAtTheSentInput == inline => inlineGen = sentGen
 
@@ -273,10 +273,10 @@ ReachCollectedWhileListened == ~(\E o \in Objects : listenOn[o] = 1 /\ o \notin 
 
 ReachDestroyedWhileListened == ~(\E o \in Objects : listenOn[o] = 1 /\ o \in alive /\ o \in gone)
 
-ReachAnsweredAfterUnload == ~(req = "answered" /\ ~live["a"] /\ summarized /\ ~inline)
+ReachAnsweredAfterUnload == ~(req = "done" /\ ~live["a"] /\ summarized /\ ~inline)
 
-ReachAnsweredAfterReload == ~(req = "answered" /\ live["a"] /\ aGen # sentGen /\ summarized /\ ~inline)
+ReachAnsweredAfterReload == ~(req = "done" /\ live["a"] /\ aGen # sentGen /\ summarized /\ ~inline)
 
-ReachInlineAtTheSentInput == ~(req = "answered" /\ inline /\ summarized)
+ReachInlineAtTheSentInput == ~(req = "done" /\ inline /\ summarized)
 
 ====

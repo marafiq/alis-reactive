@@ -9,7 +9,7 @@ ASSUME Mutant \in Mutants
 
 Streams == {"s", "t"}
 Requests == {"a", "m"}
-InFlight == {"sending", "settle"}
+Holding == {"attempt", "defaultFinally"}
 
 VARIABLES slot, state, takesDefaults, pc, open, shown, closedHeld, offered, releasedClosed, retriedBoth
 
@@ -45,24 +45,24 @@ Release(r) ==
 
 BeginPage ==
     /\ pc["a"] = "idle"
-    /\ pc' = [pc EXCEPT !["a"] = "sending"]
+    /\ pc' = [pc EXCEPT !["a"] = "attempt"]
     /\ Hold("a")
     /\ UNCHANGED <<slot, state, takesDefaults, closedHeld, offered, releasedClosed, retriedBoth>>
 
 Message ==
     /\ state["s"] = "open"
     /\ pc["m"] = "idle"
-    /\ pc' = [pc EXCEPT !["m"] = "sending"]
+    /\ pc' = [pc EXCEPT !["m"] = "attempt"]
     /\ Hold("m")
     /\ UNCHANGED <<slot, state, takesDefaults, closedHeld, offered, releasedClosed, retriedBoth>>
 
 Answer(r) ==
-    /\ pc[r] = "sending"
-    /\ pc' = [pc EXCEPT ![r] = "settle"]
+    /\ pc[r] = "attempt"
+    /\ pc' = [pc EXCEPT ![r] = "defaultFinally"]
     /\ UNCHANGED <<slot, state, takesDefaults, open, shown, closedHeld, offered, releasedClosed, retriedBoth>>
 
-Settle(r) ==
-    /\ pc[r] = "settle"
+DefaultFinally(r) ==
+    /\ pc[r] = "defaultFinally"
     /\ pc' = [pc EXCEPT ![r] = "done"]
     /\ Release(r)
     /\ UNCHANGED <<slot, state, takesDefaults, closedHeld, offered, releasedClosed, retriedBoth>>
@@ -129,12 +129,12 @@ Unload ==
 
 Next ==
     \/ BeginPage \/ Message \/ Retry \/ Unload
-    \/ \E r \in Requests : Answer(r) \/ Settle(r)
+    \/ \E r \in Requests : Answer(r) \/ DefaultFinally(r)
     \/ \E x \in Streams : Connect(x) \/ Drop(x) \/ Reconnected(x) \/ GiveUp(x)
 
 Spec == Init /\ [][Next]_vars
 
-Covered == {r \in Requests : takesDefaults[r] /\ pc[r] \in InFlight}
+Covered == {r \in Requests : takesDefaults[r] /\ pc[r] \in Holding}
 
 IndicatorNeverHidesEarly == Covered # {} => shown
 

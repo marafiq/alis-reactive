@@ -16,19 +16,20 @@ Children(s) == {c \in SpanNames : Parent(c) = s}
 
 AttemptName(n) == IF n = 1 THEN "attempt1" ELSE "attempt2"
 
-VARIABLES traceOn, origin, sinkFails, phase, attempts, spans, sent, outcome
+VARIABLES traceOn, origin, sinkFails, status, pc, attempts, spans, sent, outcome
 
-vars == <<traceOn, origin, sinkFails, phase, attempts, spans, sent, outcome>>
+vars == <<traceOn, origin, sinkFails, status, pc, attempts, spans, sent, outcome>>
 
 Init ==
     /\ traceOn \in BOOLEAN
     /\ origin \in {"own", "other"}
     /\ sinkFails \in BOOLEAN
-    /\ phase = "idle"
+    /\ status = "idle"
+    /\ pc = "idle"
     /\ attempts = 0
     /\ spans = [s \in SpanNames |-> "unstarted"]
     /\ sent = {}
-    /\ outcome = "running"
+    /\ outcome = "none"
 
 Records == traceOn \/ Mutant = "RecordsWhenOff"
 
@@ -49,61 +50,70 @@ Header(n) ==
 Resend(n) == IF Mutant = "ResendCountMissing" THEN 0 ELSE n - 1
 
 Trigger ==
-    /\ phase = "idle"
+    /\ status = "idle"
     /\ IF Records /\ sinkFails /\ Mutant = "SinkErrorStopsRun"
-       THEN phase' = "over" /\ outcome' = "sinkError" /\ UNCHANGED spans
-       ELSE phase' = "running" /\ spans' = Started("run") /\ UNCHANGED outcome
+       THEN status' = "ended" /\ outcome' = "sinkError" /\ UNCHANGED <<pc, spans>>
+       ELSE status' = "running" /\ pc' = "check" /\ spans' = Started("run") /\ UNCHANGED outcome
     /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent>>
 
 Send ==
-    /\ phase = "running"
-    /\ phase' = "sending"
+    /\ status = "running"
+    /\ pc = "check"
+    /\ pc' = "attempt"
     /\ spans' = Started("send")
-    /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent, outcome>>
+    /\ UNCHANGED <<traceOn, origin, sinkFails, status, attempts, sent, outcome>>
 
 Attempt ==
-    /\ phase = "sending"
+    /\ status = "running"
+    /\ pc = "attempt"
     /\ attempts < 2
     /\ LET n == attempts + 1 IN
         /\ attempts' = n
         /\ spans' = Started(AttemptName(n))
         /\ sent' = sent \cup {[n |-> n, to |-> origin, parent |-> Header(n), resend |-> Resend(n)]}
-    /\ phase' = "awaiting"
-    /\ UNCHANGED <<traceOn, origin, sinkFails, outcome>>
+    /\ status' = "waiting"
+    /\ UNCHANGED <<traceOn, origin, sinkFails, pc, outcome>>
 
 Respond ==
-    /\ phase = "awaiting"
+    /\ status = "waiting"
+    /\ pc = "attempt"
     /\ \E retry \in IF attempts < 2 THEN BOOLEAN ELSE {FALSE} :
         IF retry
         THEN /\ spans' = Ended(AttemptName(attempts))
-             /\ phase' = "sending"
+             /\ UNCHANGED pc
         ELSE /\ spans' = [Ended(AttemptName(attempts)) EXCEPT !["send"] = IF @ = "open" THEN "ended" ELSE @]
-             /\ phase' = "route"
+             /\ pc' = "route"
+    /\ status' = "running"
     /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent, outcome>>
 
 Route ==
-    /\ phase = "route"
+    /\ status = "running"
+    /\ pc = "route"
     /\ \E how \in {"completed", "stopped"} : outcome' = how
     /\ spans' = Ended("run")
-    /\ phase' = "over"
+    /\ pc' = "done"
+    /\ status' = "ended"
     /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent>>
 
 Abort ==
-    /\ phase \in {"running", "sending", "awaiting", "route"}
+    /\ status \in {"running", "waiting"}
+    /\ pc # "done"
+    /\ pc' = "done"
     /\ \E why \in {"replaced", "disposed"} :
         /\ outcome' = why
         /\ IF why = "replaced" /\ Mutant = "ReplacedRunLeftOpen"
-           THEN spans' = spans /\ phase' = "over"
+           THEN spans' = spans /\ status' = "ended"
            ELSE IF why = "disposed" /\ Mutant = "DisposeEndsRunFirst"
-           THEN spans' = Ended("run") /\ phase' = "ending"
-           ELSE spans' = EndAll /\ phase' = "over"
+           THEN spans' = Ended("run") /\ status' = "running"
+           ELSE spans' = EndAll /\ status' = "ended"
     /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent>>
 
 Finish ==
-    /\ phase = "ending"
+    /\ status = "running"
+    /\ pc = "done"
     /\ spans' = EndAll
-    /\ phase' = "over"
-    /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent, outcome>>
+    /\ status' = "ended"
+    /\ UNCHANGED <<traceOn, origin, sinkFails, pc, attempts, sent, outcome>>
 
 Next == Trigger \/ Send \/ Attempt \/ Respond \/ Route \/ Abort \/ Finish
 
@@ -111,7 +121,7 @@ Spec == Init /\ [][Next]_vars
 
 NothingRecordedWhenOff == ~traceOn => ((\A s \in SpanNames : spans[s] = "unstarted") /\ (\A r \in sent : r.n = 1 => r.parent = "none"))
 
-EveryStartedSpanEnds == phase = "over" => \A s \in SpanNames : spans[s] # "open"
+EveryStartedSpanEnds == status = "ended" => \A s \in SpanNames : spans[s] # "open"
 
 ChildEndsBeforeParent == \A s \in SpanNames : spans[s] = "ended" => \A c \in Children(s) : spans[c] # "open"
 
@@ -127,7 +137,7 @@ ResendCountSent == \A r \in sent : r.parent # "none" => r.resend = r.n - 1
 
 ReachRetriedAttemptTraced == ~(traceOn /\ ~sinkFails /\ spans["attempt2"] = "ended" /\ outcome = "completed")
 
-ReachDisposedInFlight == ~(traceOn /\ ~sinkFails /\ outcome = "disposed" /\ spans["attempt1"] = "ended" /\ phase = "over")
+ReachDisposedInFlight == ~(traceOn /\ ~sinkFails /\ outcome = "disposed" /\ spans["attempt1"] = "ended" /\ status = "ended")
 
 ReachRetryTracedWhileOff == ~(~traceOn /\ \E r \in sent : r.n = 2 /\ r.parent = "minted" /\ r.resend = 1)
 
