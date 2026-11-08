@@ -359,6 +359,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   part takes every source (Q7), and every response body is a source for the modules after it: the page's query read
   in a condition inside an event, a chained request's URL from the first response or the page's query. `Set` and the
   other condensed doors are extension methods that write the plan the full form writes, so they add no plan shape.
+- The owner, 2026-11-07: "You can only skip Patch", because a content type or a primitive done wrong breaks
+  encapsulation everywhere above it. The request bodies are the Fetch Standard's: none, JSON, URL-encoded, multipart,
+  text and one file as the whole body. The response bodies are read as none, JSON, text, HTML or a file the browser saves.
+  Text is decoded by its `charset` parameter, because fetch's `text()` decodes UTF-8 whatever the header says. Streams
+  stay out by the owner's 2026-06-10 decision.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
