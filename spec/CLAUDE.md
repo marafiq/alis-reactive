@@ -351,6 +351,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-07: "we really do not want take control mvc binding - must have solid reasons to do it". The framework
   writes the keys and values MVC's own binder reads, pinned by probes on both hosts, and adds no value provider, binder
   or model of the binder without a reason the owner accepts.
+- The owner, 2026-11-07: a request is the HTTP message, and the core holds its parts: the method, the path, the query,
+  the headers and a body with its media type, JSON and multipart form data (a form that uploads files among them);
+  the response's status and its body as JSON, text or HTML. The methods are GET, POST, PUT, DELETE and HEAD. PATCH is
+  not a method of 1.0, by the owner's leave: its two body standards (RFC 7396, RFC 6902) carry their own media types
+  and give a member left out and a member sent as null different meanings, which D9.10's table does not state. Every
+  part takes every source (Q7), and every response body is a source for the modules after it: the page's query read
+  in a condition inside an event, a chained request's URL from the first response or the page's query. `Set` and the
+  other condensed doors are extension methods that write the plan the full form writes, so they add no plan shape.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
