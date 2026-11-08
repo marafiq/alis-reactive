@@ -1683,6 +1683,10 @@ contract `HttpSend`, which is no node kind.
 - D10.18 What each step reads is stated by when it reads, and nothing is frozen.
   - A request's argument is read once, in the turn the request starts and before its check and its `WhileLoading`
     (D10.23), and serialized as it is sent, so the body is a snapshot by construction and the check reads that body.
+    Main checks a container's inputs before `WhileLoading` and gathers the body after it
+    (`Alis.Reactive.Assets/runtime/execution/requests/http.ts:40-48` at 7b9e987cc), so a `WhileLoading` that writes a
+    sent input sends what was not checked; the read moves first because the check reads the body it sends (D16.5), and a
+    value the request must send is one of its own parts (`Set`), which takes any source.
     A `Parallel`'s requests start in one turn and send what the page held then.
   - A response's data belongs to its run. The plan has no door that writes into it, and the generated contract types
     it read-only, so the runtime's own code cannot write into it either. A step that hands it, or any data value, to a
@@ -3639,8 +3643,8 @@ shapes, starts and the payload kind of each event.
 - `N18.9` new: ALIS032, the block analyzer: a step written on the pipeline of a block around its own (D11.10); a
   bound value carried out of its block through a variable declared outside it (D8.8, D5.11); an `ElseIf` or `Else`
   after another step, a second `Else` (D8.7); a result called in an `ElseIf`'s condition read after its `When`, and an
-  async method under a term reached later (D4.7); a write to the payload after an awaited step (D11.4) and inside a
-  `listen` (D12.8); a step or an awaited read inside a list's lambda or a callback's answer (D6.8, D17.12).
+  async method under a term reached later (D4.7); a write to the payload after an awaited step, a request's own
+  `WhileLoading` before its send and the rest of the request after it (D11.4), and inside a `listen` (D12.8); a step or an awaited read inside a list's lambda or a callback's answer (D6.8, D17.12).
 - `N18.10` new: ALIS033, the lambda analyzer: a member lambda that names the model (D2.5, D14.2); a dictionary of dates
   written into a live member (D3.13); in a list's lambda and a pipeline condition, a term outside the identity table
   (D6.5), a view value that computes (D6.7), and each comparison, ordering, cast, coalesce and lookup D6.12 to D6.14
