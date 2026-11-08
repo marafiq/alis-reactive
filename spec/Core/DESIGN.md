@@ -411,7 +411,8 @@ Terms used throughout:
   it do not run.
 - `X4.3` behavior: an event payload that lacks a member its declaration names stops the pipeline (D4.1, D5.3), and a
   field of data the payload holds that the data lacks reads its start (D4.2).
-- `X4.4` behavior: a route value that reads nothing sends no request, and the `Finally` hides the loader.
+- `X4.4` behavior: a route value that reads nothing sends no request, shows none of its busy targets, and runs its
+  `Finally`.
 - `X4.5` behavior: a `Method()` that returns a promise stops its pipeline after the call and names `MethodAsync`.
 - `X4.6` behavior: a dose that lacks `refills`, which the app omits at its default, reads 0; one that lacks `unit`,
   omitted when null, reads its initializer's "mg", and so does a find's field; an on-call nurse a component holds that
@@ -1552,7 +1553,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   (D10.21), the form's 400 route (D10.17), `WhileLoading` steps, `Finally`
   steps, error routes by status, a catch-all error route and a retry policy. C# composes them into every
   request where the view renders; the browser holds no defaults. A request's `WhileLoading` runs after the
-  defaults', and its `Finally` before the defaults'. A request's retry policy replaces the defaults'. Success
+  defaults', and its `Finally` before the defaults'. A request takes the defaults' retry policy or `NoRetry()`, and
+  sets no numbers of its own (D10.14). Success
   has no default: `OnSuccess` is the request's own. A request takes no defaults when it says so, whole.
 - D10.13 For an outcome that is not success, the route is the request's route for its status, else the
   defaults' route for its status, else the request's catch-all, else the defaults' catch-all, else none. So a
@@ -1670,6 +1672,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     an element step's pipeline. A target's element that leaves with its slot while held takes its `aria-busy` with it,
     and the core still calls `hide(target)` when the count returns to 0. `Busy` on a request with `NoDefaults()`, and a
     second `Busy` or `NoBusy` on one request, are refused where the view renders.
+  - A contract the defaults name and no script provides (`busy` under `ShowBusy()`, `notice` for a default route's
+    notice) is a plugin lookup that fails, so it stops the request before it sends and logs one error, as a plugin a
+    step names and no script provides stops its pipeline (D17.14); the missing component shows at the first request,
+    not at the first failure.
   - A request holds its targets once across its attempts (D10.15), from its guards, once both `WhileLoading` layers
     completed, to the end of its defaults' `Finally`, on every outcome, a replaced or unloaded run's included (Q11,
     Q12). A failed check or a stopped `WhileLoading` holds nothing (`Request.tla:HoldSpansTheSend`). A failed request
@@ -1683,7 +1689,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   default is JSON (`Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:21` at 7b9e987cc); its feature is kept by
   `Json(..)`, which a `[FromBody]` or `[ApiController]` endpoint takes.
 **Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
-`HttpSend` and its result, `HttpResponse`.
+`HttpSend` and its result, `HttpResponse`, with the fields `schema.md` lists for them, and the contract plugins `busy`
+and `notice` (D10.21).
 
 **Checker.**
 - `Request.tla:FailedCheckSendsNothing`
@@ -1867,11 +1874,12 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   runs the route for 401 on net10 (`probe:core-cookie-auth-ajax`) and on net48 under Katana
   (`probe:katana-ajax-redirect-is-200`). Without it the server redirects to its login page, and the request
   ends there: a route that declares JSON runs the catch-all, and a route with no body runs `OnSuccess`.
-- `X10.3` behavior: a network failure runs `OnError()` and its `Finally` hides the loader.
+- `X10.3` behavior: a network failure runs `OnError()`, then its `Finally`, and its busy targets hide after the
+  defaults' `Finally`.
 - `X10.4` behavior: a form check that fails sends nothing and runs no step after the request.
 - `X10.5` behavior: a server's validation errors show at the inputs whose binding names they key, on both hosts.
 - `X10.6` behavior: `OnAllSettled` runs once, after the slower of two parallel requests answers.
-- `X10.8` behavior: a GET whose policy retries 503 answers the second attempt's success, shows its loader once
+- `X10.8` behavior: a GET whose policy retries 503 answers the second attempt's success, shows its busy targets once
   and runs its `Finally` once.
 - `X10.9` type: a policy that retries a POST cannot be written: new:N10.3.
 - `X10.7` behavior: on net48 under IIS, a 400 with validation errors shows each message at its input; the
@@ -1893,11 +1901,13 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   indicator hides at 1 second while the second's stays to 5.
 - `X10.17` behavior: a request whose busy target is an element the page lacks stops before it sends, and the network
   log holds no request.
+- `X10.18` refusal: `Busy` on a request with `NoDefaults()`: "Busy says where the default busy indicator shows, and
+  this request takes no defaults; take out NoDefaults() or Busy."
 - `X10.19` behavior: two `Parallel` requests with no `Busy`, each success route setting one component from a JSON body:
   each component's element shows the indicator until its own request settles, and the page's indicator never shows; a
   route that writes inside a `When` only shows the page's.
-- `X10.18` refusal: `Busy` on a request with `NoDefaults()`: "Busy says where the default busy indicator shows, and
-  this request takes no defaults; take out NoDefaults() or Busy."
+- `X10.20` behavior: under `ShowBusy()` in an app whose page provides no `busy`, a request stops before it sends, the
+  network log holds no request, and the console one error.
 
 ## Q11. Lanes and time
 
@@ -1975,8 +1985,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     later, and its settling runs nothing.
   - No route and no step after runs for a disposed owner.
   - Every `Finally` runs before the owner releases its listeners, components and content, while its
-    elements are still on the page. So a `Finally` that hides the page's loader, or re-enables a button in
-    the slot, finds what it names. A `Finally`'s steps after its own first awaited step do not run for a
+    elements are still on the page. So a `Finally` that clears what its `WhileLoading` showed, or re-enables a
+    button in the slot, finds what it names. A `Finally`'s steps after its own first awaited step do not run for a
     disposed owner.
 - D11.9 No step waits for time. The only waits the core owns are a retry's delay and a `Retry-After`
   (D10.14). A component's own timers, such as a toast's or a loader's timeout, are its properties.
@@ -2036,10 +2046,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `X11.3` behavior: a method declared with `Method` whose vendor returns a promise stops its pipeline, and the
   step after it does not run. The console holds the stop's one error (D11.3), which a test does not read
   (`.claude/rules/tests.md`, rule 4).
-- `X11.4` behavior: a `MethodAsync` that rejects stops its pipeline, and its request's `Finally` hides the
-  loader.
-- `X11.5` behavior: a slot unloaded while its request is in flight runs no route of that request, and the
-  page's loader its `WhileLoading` showed is hidden.
+- `X11.4` behavior: a `MethodAsync` that rejects stops its pipeline, its request's `Finally` runs, and its busy
+  targets hide.
+- `X11.5` behavior: a slot unloaded while its request is in flight runs no route of that request, and its busy
+  targets hide.
 - `X11.6` behavior: under `replace`, a cascade whose first answer arrives after the second shows the
   second's items.
 - `X11.7` behavior: under `skip`, a save clicked twice while its request is in flight sends one request.
@@ -2231,7 +2241,7 @@ plans name.
   |---------|----------|
   | the table of inputs by element id, each entry under the owner that contributed it | the page |
   | a hub's or a stream's connection, by URL, with its holders (Q12) | the page |
-  | the app-level objects (loader, toast, confirm, drawer), by fixed id | the page |
+  | the contracts `busy`, `notice` and `reconnect`, by plugin name (D10.21, D21.11), and the app-level confirm and drawer, by fixed id | the page |
   | the one live-validation listener (D12.7) | the page |
   | the form's field registrations, by binding name, item fields by `[*]` | the form |
   | the inputs the form sends or checks: those inside its element at that moment | the form |
@@ -3479,7 +3489,9 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
     shown (`Realtime.tla:OfferNeverHidesEarly`, `Realtime.tla:OfferNeverStaysShown`).
   - An app that renders a stream or a hub chooses at startup, `ShowReconnect()` or `NoReconnectOffer()`, as it chooses
     antiforgery (D9.22). A view that names one in an app without the choice is refused, naming both, since a page whose
-    connection gave up, with no offer and no `closed` steps, goes stale and shows nothing.
+    connection gave up, with no offer and no `closed` steps, goes stale and shows nothing. Under `ShowReconnect()`, a
+    page whose scripts provide no `reconnect` stops the connection before it opens and logs one error, so the missing
+    offer shows at the first load, not at the first outage.
   - Main's one layout element, `alis-realtime-connection-retry-container`, whose click retries every dropped
     connection, is carried by this contract.
 - D21.12 A stream and a hub are JS objects, and every member is a source (Q7). Their state (connecting, open,
@@ -3491,8 +3503,9 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   fetch `ReadableStream`, an AI or chat stream) stays out by the owner's 2026-06-10 decision, so D10.6's closed set of
   response kinds holds no stream kind, and the two decisions do not overlap.
 
-**Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, `handler` for
-message and lifecycle triggers, and `call` for a hub's invoke and send.
+**Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, each carrying
+`offer` (D21.11), the contract plugin `reconnect`, `handler` for message and lifecycle triggers, and `call` for a hub's
+invoke and send.
 
 **Checker.**
 - `Ownership.tla:HubKeptWhileHeld`
@@ -3551,3 +3564,5 @@ message and lifecycle triggers, and `call` for a hub's invoke and send.
   shown.
 - `X21.11` refusal: a view that names a stream or a hub in an app with no reconnect choice: "A page that names a stream
   or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime."
+- `X21.12` behavior: under `ShowReconnect()`, a page that provides no `reconnect` opens no stream, and the console holds
+  one error.

@@ -374,14 +374,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   member.
 - The owner, 2026-11-08: the framework ships its spinner and toast, and the condensed form depends on contracts the core
   owns, a busy indicator and a notice, never on their CSS or markup; an app puts its own component behind either, and
-  the full form takes full control. The core counts the requests a busy indicator covers and calls its show at the
-  first and its hide at the last, so a component with a plain show and hide is correct under Parallel, two pipelines
-  at once, retry, replace and a slot's unload (`spec/Core/Composition.tla`).
+  the full form takes full control. The core counts each target's requests and calls its show at the first and its
+  hide at the last, so a component with a plain show and hide is correct under Parallel, two pipelines at once, retry,
+  replace and a slot's unload (`spec/Core/Composition.tla`).
 - The owner, 2026-11-08: the default loader shows on the target a request updates, right for parallel requests of 5
   and 1 seconds on one target or on two (verbatim in `spec/NOTES.md`). Busy is a state of a target, as WAI-ARIA's aria-busy is:
   the elements its success route writes outside a condition, the element it loads, the form it sends, or the elements
   `Busy` names in place of those, else the page; the C# derives them, the plan carries them, and the core counts each
   target on its own (D10.21).
+- The owner, 2026-11-08, on schema.md left behind the HTTP decisions and N10.7 drifted from D10.14's retry: a drift is a
+  big mistake, caught or not. A decision changes in one commit with every place that carries its meaning: its D and N
+  lines, its question's schema nodes, `spec/Core/schema.md`, the TLA+ specs, `spec/api` and this file; the unit's report
+  names each one it touched, and why each other one stands. A green check proves only what it compares.
 - The owner, 2026-11-08: every module works with every other, each HTTP thing is a typed JavaScript object whose members
   are sources and dot-walk (the response's status, headers and body, the page's URL, the request's fields), and main is
   the floor of features, never the bar of quality.

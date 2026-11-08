@@ -107,15 +107,19 @@ listening: `method`, `assignment` or `returned`. `Vendor.payload` of 65fdf118d l
 
 The plugins the core's C# names are `alis.http`, `alis.form`, `alis.model`, `alis.slot`, `alis.hub`, `alis.stream`
 and `alis.document`, each provided by the core's own browser code. Any other name is a plugin an app or a component
-brings. `alis.confirm` of 65fdf118d is Fusion's, so the core no longer names it (D17.9).
+brings. `alis.confirm` of 65fdf118d is Fusion's, so the core no longer names it (D17.9). The core also names three
+contracts a component provides and the core alone calls: `busy`, with `show(target)` and `hide(target)` (D10.21);
+`notice`, with `show(text, kind)` (D10.21); and `reconnect`, with `show(retry)` and `hide()` (D21.11). Each is reached
+as any plugin is: a contract the app's choices name and no script provides stops the request before it sends (D10.21),
+or the connection before it opens (D21.11).
 
 ## Plugin data
 
 | Kind | Carries | Holds | Meaning |
 |------|---------|-------|---------|
 | `none` | nothing | | the plugin contributes nothing to the owner: http, document, slot (its key is the container id, D12.1), an app's plugin |
-| `hub` | nothing | | the owner holds the hub's connection while it lives (D12.6) |
-| `stream` | nothing | | the owner holds the stream's connection while it lives, as a hub's (D21.6) |
+| `hub` | `offer`: whether the core shows the reconnect offer, the app's startup choice | | the owner holds the hub's connection while it lives (D12.6, D21.11) |
+| `stream` | `offer`: as a hub's | | the owner holds the stream's connection while it lives, as a hub's (D21.6, D21.11) |
 | `model` | `inputs`: a map from input id to `InputBinding` | | the inputs this plan renders, by id (D13.2, D14.3) |
 | `form` | `summary`: the summary element's id | `live`: `Live`; `registrations`: a list of `Registration` | this plan's rules for the form whose element id is the key (Q16) |
 
@@ -276,23 +280,30 @@ and nothing where it holds null (D6.14).
 ## Plugin arguments
 
 These are typed contracts, not node kinds (G2). S2 and S8 hold for them as for the grammar: every part is required, a
-part that can be absent is a closed union (`retry` is none or the standard policy, `body` is none, JSON or form data),
+part that can be absent is a closed union (`retry` is none or the standard policy, `body` is one of six formats),
 and a closed choice (`method`, `outcome`) is a sealed class. C# writes each as a `record` whose evaluated value is the contract;
 the contract's C# classes are generated into the plan's TypeScript beside the grammar, so the browser declares
 no argument type of its own (D9.1).
 
 - `HttpSend`, the argument of `alis.http`'s `send` (N9.1):
-  - `method`;
+  - `method`: GET, HEAD, OPTIONS, POST, PUT or DELETE (D9.3);
   - `url`, a page path or an absolute `http` or `https` URI, as path parts and the URL's own query (D9.13);
-  - `query`;
-  - `body`: none, JSON or form data, with the inputs of an element it sends (D9.6 to D9.10, D9.15);
+  - `query`, which a GET's `Form` fills with its form's inputs (N10.7);
+  - `body`: none, JSON, URL-encoded, multipart with its fields and file parts, text, or one file as the whole body,
+    with the inputs of an element it sends (D9.6 to D9.10, D9.15, D9.16, D9.21);
   - `headers` (D9.11, D9.12);
-  - `retry`: none, or the standard policy with its attempts and first wait (D10.14, N10.3);
+  - `antiforgery`: none, or the token C# wrote where the view rendered and its place, the header or the field, on a
+    POST, PUT or DELETE to the page's origin (D9.22);
+  - `retry`: none, or the standard policy with the attempts and first wait the defaults set, never a request's own
+    (D10.14, N10.3);
+  - `busy`: none, the page, or the element ids of its targets, as the C# derived them (D10.21);
   - `respondedJson`: true on net48 (D10.7);
-  - the body kind of each route (D10.6).
+  - the body kind of each route (D10.6): a success route's none, JSON, text, HTML or file, an error route's none,
+    JSON, text or HTML, and the `Accept` the success kind writes.
 
   A request's trace context is its run's and is not in `HttpSend` (D20.3).
-- `HttpResponse`, what `send` returns (N10.2): `ok`, `status`, `outcome` and `body`.
+- `HttpResponse`, what `send` returns (N10.2, N10.7): `ok`, `status`, `outcome`, `headers`, `request`, the members as
+  the request sent them, and `body`, absent for kind none and every HEAD route.
 - `FormCheck`, the argument of `alis.form`'s `validate`: the validator, the rule set and the sent body with its
   format (D16.5, N16.2).
 
@@ -383,4 +394,8 @@ The diff beyond the kinds, each with the decision that makes it:
 - the operator set loses four conversions (N3.1);
 - `let` gains `binds`, `line` or `read`, so a term's own method call runs where its read is reached (D4.7);
 - `if` holds one `when` and its `then` in place of `arms`, and an `ElseIf` nests in `else` with its condition's results
-  (D8.7), so `Arm` leaves.
+  (D8.7), so `Arm` leaves;
+- `HttpSend`'s methods become six and its bodies six formats, and it gains `antiforgery` and `busy`; its `retry`
+  takes the defaults' numbers only (D9.3, D9.21, D9.22, D10.14, D10.21);
+- `HttpResponse` gains `headers` and `request` (N10.7);
+- plugin data `hub` and `stream` gain `offer` (D21.11).
