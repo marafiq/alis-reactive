@@ -6,7 +6,8 @@ CONSTANT Mutant
 Mutants == {"none", "PlaceholderUnchecked", "DateInPath", "FileInJson", "NullForValueType",
             "FailedCheckSends", "FinallyWithoutLoading", "CatchAllBeatsStatus", "FailureRunsSuccess",
             "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt",
-            "FailedConditionSendsNothing", "ChainedIgnoresCondition", "CatchAllRunsOnSuccess"}
+            "FailedConditionSendsNothing", "ChainedIgnoresCondition", "CatchAllRunsOnSuccess",
+            "EmptyFieldForObject", "EmptyFieldForObjectItem"}
 
 ASSUME Mutant \in Mutants
 
@@ -20,6 +21,8 @@ Configs == [placeholder : {"filled", "unfilled"}, filler : {"scalar", "date", "l
             file : {"none", "set"}, method : {"GET", "POST"}, format : {"json", "form"}]
 Kinds == {"valueType", "list", "nullable"}
 Bodies == {"json", "form"}
+Hosts == {"net10", "net48"}
+Items == {"nullableItem", "valueItem", "objectItem"}
 
 VARIABLES part, config,
           checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
@@ -102,6 +105,32 @@ SentWhenItsConditionFails(kind, body) ==
     IF Mutant = "FailedConditionSendsNothing" THEN Sent(kind, body) ELSE "leftOut"
 
 Expected(kind) == IF kind = "nullable" THEN "null" ELSE "start"
+
+ObjectSent(body) ==
+    IF body = "json" THEN "null"
+    ELSE IF Mutant = "EmptyFieldForObject" THEN "emptyField"
+    ELSE "leftOut"
+
+ObjectBound(sent, host) ==
+    CASE sent = "leftOut" -> "start"
+      [] sent = "emptyField" /\ host = "net10" -> "start"
+      [] OTHER -> "null"
+
+ObjectExpected(body) == IF body = "json" THEN "null" ELSE "start"
+
+ItemSent(item) ==
+    CASE item = "nullableItem" -> "emptyField"
+      [] item = "objectItem" /\ Mutant = "EmptyFieldForObjectItem" -> "emptyField"
+      [] OTHER -> "stop"
+
+ItemBound(item, sent, host) ==
+    CASE sent = "stop" -> "noRequest"
+      [] item = "nullableItem" -> "nullItem"
+      [] item = "objectItem" /\ host = "net10" -> "listEnds"
+      [] item = "objectItem" -> "nullItem"
+      [] OTHER -> "modelError"
+
+ItemExpected(item) == IF item = "nullableItem" THEN "nullItem" ELSE "noRequest"
 
 CatchAll ==
     IF "catchAll" \in reqRoutes THEN <<"request", "catchAll">>
@@ -208,6 +237,12 @@ RouteHoldsScalarText == (Placement /\ Built(config) /\ config.placeholder = "fil
 FileOnlyInFormData == (Placement /\ Built(config) /\ config.file = "set") => (config.method # "GET" /\ config.format = "form")
 
 NothingBindsAsDeclared == Placement => \A kind \in Kinds, body \in Bodies : Bound(kind, body, Sent(kind, body)) = Expected(kind)
+
+ObjectNothingBindsAsDeclared ==
+    Placement => \A body \in Bodies, host \in Hosts : ObjectBound(ObjectSent(body), host) = ObjectExpected(body)
+
+ItemNothingBindsAsDeclared ==
+    Placement => \A item \in Items, host \in Hosts : ItemBound(item, ItemSent(item), host) = ItemExpected(item)
 
 FailedConditionLeavesThePartOut ==
     Placement => \A kind \in Kinds, body \in Bodies : Bound(kind, body, SentWhenItsConditionFails(kind, body)) = "start"

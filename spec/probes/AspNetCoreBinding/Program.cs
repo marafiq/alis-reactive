@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://127.0.0.1:0");
@@ -90,6 +91,23 @@ try
     {
         Console.WriteLine("core-frombody-no-body: a required body answers " + (int)strict.StatusCode + "; a nullable body answers " + (int)optional.StatusCode + " with " + await optional.Content.ReadAsStringAsync());
     }
+    Console.WriteLine("core-query-object-fields: Handover.Round=3&Handover.Lead=Ann&Handover.Named=Bo&Handover.Beds=1&Handover.Beds=2 binds " + await client.GetStringAsync("/q/handover?Handover.Round=3&Handover.Lead=Ann&Handover.Named=Bo&Handover.Beds=1&Handover.Beds=2"));
+    Console.WriteLine("core-query-object-json-name: Handover.leader=Bo binds " + await client.GetStringAsync("/q/handover?Handover.leader=Bo") + "; Handover.Round=3&Handover.leader=Bo binds " + await client.GetStringAsync("/q/handover?Handover.Round=3&Handover.leader=Bo"));
+    Console.WriteLine("core-query-object-empty-field: Handover= binds " + await client.GetStringAsync("/q/handover?Handover=") + " | Kept= binds " + await client.GetStringAsync("/q/handover?Kept=") + " | Handover.Lead= binds " + await client.GetStringAsync("/q/handover?Handover.Lead=") + " | nothing sent binds " + await client.GetStringAsync("/q/handover"));
+    Console.WriteLine("core-query-list-of-objects: Lines[0].Name=A&Lines[1].Name=B&Lines[1].Beds=1&Lines[1].Beds=2 binds " + await client.GetStringAsync("/q/lines?Lines%5B0%5D.Name=A&Lines%5B1%5D.Name=B&Lines%5B1%5D.Beds=1&Lines%5B1%5D.Beds=2"));
+    Console.WriteLine("core-query-list-of-objects-gap: Lines[0].Name=A&Lines[2].Name=C binds " + await client.GetStringAsync("/q/lines?Lines%5B0%5D.Name=A&Lines%5B2%5D.Name=C") + " | Lines[1].Name=B binds " + await client.GetStringAsync("/q/lines?Lines%5B1%5D.Name=B"));
+    Console.WriteLine("core-query-list-of-objects-empty-item: Lines[0].Name=A&Lines[1]=&Lines[2].Name=C binds " + await client.GetStringAsync("/q/lines?Lines%5B0%5D.Name=A&Lines%5B1%5D=&Lines%5B2%5D.Name=C"));
+    Console.WriteLine("core-query-read-only-lists: Held[0].Name=A&Bare=1&Bare=2&Handover.Beds=3 binds " + await client.GetStringAsync("/q/read-only?Held%5B0%5D.Name=A&Bare=1&Bare=2&Handover.Beds=3") + " | nothing sent binds " + await client.GetStringAsync("/q/read-only"));
+    var named = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
+    Console.WriteLine("core-query-enum-member-name: under a string converter System.Text.Json writes Night as " + System.Text.Json.JsonSerializer.Serialize(ProbeShift.Night, named) + "; Shift=Night binds " + await client.GetStringAsync("/q/shift?Shift=Night") + "; Shift=night-shift binds " + await client.GetStringAsync("/q/shift?Shift=night-shift") + "; Shift=night binds " + await client.GetStringAsync("/q/shift?Shift=night") + "; Shift=1 binds " + await client.GetStringAsync("/q/shift?Shift=1") + "; Shift=5 binds " + await client.GetStringAsync("/q/shift?Shift=5"));
+    Console.WriteLine("core-query-nullable-enum-items: Shifts=Day&Shifts=&Shifts=Night binds " + await client.GetStringAsync("/q/shift?Shifts=Day&Shifts=&Shifts=Night") + "; Shifts=Day&Shifts=night-shift binds " + await client.GetStringAsync("/q/shift?Shifts=Day&Shifts=night-shift"));
+    Console.WriteLine("core-query-flags-enum: System.Text.Json writes Mon|Tue as " + System.Text.Json.JsonSerializer.Serialize(ProbeDays.Mon | ProbeDays.Tue, named) + " under a string converter and " + System.Text.Json.JsonSerializer.Serialize(ProbeDays.Mon | ProbeDays.Tue) + " without; Days=Mon%2C%20Tue binds " + await client.GetStringAsync("/q/days?Days=Mon%2C%20Tue") + "; Days=Mon&Days=Tue binds " + await client.GetStringAsync("/q/days?Days=Mon&Days=Tue") + "; Days=3 binds " + await client.GetStringAsync("/q/days?Days=3"));
+    Console.WriteLine("core-query-member-names: Ward=W&Bed=B&Room=R&Never=N binds " + await client.GetStringAsync("/q/renamed?Ward=W&Bed=B&Room=R&Never=N") + " | w=W&b=B&r=R binds " + await client.GetStringAsync("/q/renamed?w=W&b=B&r=R"));
+    Console.WriteLine("core-query-bind-prefix: [Bind(Prefix = \"q\")] with Count=3 binds " + await client.GetStringAsync("/q/bind-prefix?Count=3") + "; with q.Count=3 binds " + await client.GetStringAsync("/q/bind-prefix?q.Count=3"));
+    Console.WriteLine("core-query-parameter-name: [FromQuery(Name = \"q\")] with Count=3 binds " + await client.GetStringAsync("/q/query-name?Count=3") + "; with q.Count=3 binds " + await client.GetStringAsync("/q/query-name?q.Count=3"));
+    Console.WriteLine("core-query-parameter-prefix: Count=3 binds " + await client.GetStringAsync("/q/plain?Count=3") + "; counts.Count=3 binds " + await client.GetStringAsync("/q/plain?counts.Count=3") + "; counts.Count=3&Count=4 binds " + await client.GetStringAsync("/q/plain?counts.Count=3&Count=4"));
+    Console.WriteLine("core-query-parameter-name-collision: Collide(ProbeSearch term) with Term=a&Count=3 binds " + await client.GetStringAsync("/q/collide?Term=a&Count=3") + "; with term.Term=a&term.Count=3 binds " + await client.GetStringAsync("/q/collide?term.Term=a&term.Count=3"));
+    Console.WriteLine("core-json-null-object: {\"kept\":null} binds " + await Json(client, "/q/handover-json", "{\"kept\":null}") + " | {} binds " + await Json(client, "/q/handover-json", "{}"));
 }
 finally
 {
@@ -193,6 +211,145 @@ public sealed class Ward
     public Lead? Deputy { get; set; }
 
     public List<Lead> Leads { get; set; } = [new() { Name = "seed" }];
+}
+
+public sealed class ProbeHandover
+{
+    public int Round { get; init; }
+
+    public DateTimeOffset StartsAt { get; init; }
+
+    public DateTimeOffset? EndsAt { get; init; }
+
+    public IReadOnlyList<int> Beds { get; init; } = [];
+
+    public string? Lead { get; init; }
+
+    [JsonPropertyName("leader")]
+    public string? Named { get; init; }
+
+    public int? Target { get; init; }
+}
+
+public sealed class ProbeLine
+{
+    public string? Name { get; set; }
+
+    public List<int> Beds { get; set; } = [];
+}
+
+public enum ProbeShift
+{
+    Day,
+    [JsonStringEnumMemberName("night-shift")]
+    Night,
+}
+
+[Flags]
+public enum ProbeDays
+{
+    None = 0,
+    Mon = 1,
+    Tue = 2,
+}
+
+public sealed class HandoverQuery
+{
+    public int Round { get; set; }
+
+    public ProbeHandover? Handover { get; set; }
+
+    public ProbeHandover Kept { get; set; } = new() { Lead = "start" };
+
+    public List<ProbeLine> Lines { get; set; } = [];
+
+    public IReadOnlyList<ProbeLine> Held { get; init; } = [];
+
+    public IReadOnlyList<int>? Bare { get; init; }
+
+    public ProbeShift Shift { get; set; }
+
+    public List<ProbeShift?> Shifts { get; set; } = [];
+
+    public ProbeDays Days { get; set; }
+}
+
+public sealed class ProbeRenamed
+{
+    [FromQuery(Name = "w")]
+    public string? Ward { get; set; }
+
+    [BindProperty(Name = "b")]
+    public string? Bed { get; set; }
+
+    [ModelBinder(Name = "r")]
+    public string? Room { get; set; }
+
+    [BindNever]
+    public string? Never { get; set; }
+}
+
+public sealed class ProbeSearch
+{
+    public string? Term { get; set; }
+
+    public int Count { get; set; } = 5;
+}
+
+public sealed class QueryProbeController : ControllerBase
+{
+    [HttpGet("/q/handover")]
+    public string Handover(HandoverQuery query) => HandoverText(query.Handover) + "; Kept " + HandoverText(query.Kept) + Errors();
+
+    [HttpPost("/q/handover-json")]
+    public string HandoverJson([FromBody] HandoverQuery query) => "Kept " + HandoverText(query.Kept) + Errors();
+
+    [HttpGet("/q/lines")]
+    public string Lines(HandoverQuery query) => "Lines=[" + string.Join(", ", query.Lines.Select(LineText)) + "]" + Errors();
+
+    [HttpGet("/q/read-only")]
+    public string ReadOnlyLists(HandoverQuery query)
+        => "Held=[" + string.Join(", ", query.Held.Select(LineText)) + "] Bare=" + (query.Bare is null ? "null" : "[" + string.Join(",", query.Bare) + "]")
+           + " Handover=" + HandoverText(query.Handover) + Errors();
+
+    [HttpGet("/q/shift")]
+    public string Shift(HandoverQuery query) => "Shift=" + query.Shift + " Shifts=[" + string.Join(",", query.Shifts.Select(shift => shift?.ToString() ?? "null")) + "]" + Errors();
+
+    [HttpGet("/q/days")]
+    public string Days(HandoverQuery query) => "Days=" + query.Days + Errors();
+
+    [HttpGet("/q/renamed")]
+    public string Renamed(ProbeRenamed renamed)
+        => "Ward=" + (renamed.Ward ?? "null") + " Bed=" + (renamed.Bed ?? "null") + " Room=" + (renamed.Room ?? "null") + " Never=" + (renamed.Never ?? "null") + Errors();
+
+    [HttpGet("/q/bind-prefix")]
+    public string BindPrefix([Bind(Prefix = "q")] Counts counts) => CountText(counts);
+
+    [HttpGet("/q/query-name")]
+    public string QueryName([FromQuery(Name = "q")] Counts counts) => CountText(counts);
+
+    [HttpGet("/q/plain")]
+    public string Plain(Counts counts) => CountText(counts);
+
+    [HttpGet("/q/collide")]
+    public string Collide(ProbeSearch term) => "Term=" + (term.Term ?? "null") + " Count=" + term.Count.ToString(CultureInfo.InvariantCulture) + Errors();
+
+    private string CountText(Counts counts) => "Count=" + counts.Count.ToString(CultureInfo.InvariantCulture) + Errors();
+
+    private static string HandoverText(ProbeHandover? handover)
+        => handover is null
+            ? "null"
+            : "Round=" + handover.Round.ToString(CultureInfo.InvariantCulture) + " Lead=" + (handover.Lead ?? "null") + " Named=" + (handover.Named ?? "null")
+              + " Beds=[" + string.Join(",", handover.Beds) + "]";
+
+    private static string LineText(ProbeLine? line)
+        => line is null ? "null" : (line.Name ?? "null") + (line.Beds.Count == 0 ? "" : " Beds=" + string.Join(",", line.Beds));
+
+    private string Errors()
+    {
+        var failed = ModelState.Where(entry => entry.Value!.Errors.Count > 0).Select(entry => entry.Key).Order(StringComparer.Ordinal).ToList();
+        return failed.Count == 0 ? "" : " (errors " + string.Join(",", failed) + ")";
+    }
 }
 
 [ApiController]

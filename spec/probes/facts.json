@@ -962,6 +962,285 @@
       "probe": "ej2-event-args.mjs",
       "expect": "ej2-filtering-args-members: preventDefaultAction, baseEventArgs, cancel, text, updateData()",
       "source": "spec/probes/ej2-event-args.mjs"
+    },
+    {
+      "id": "core-query-object-fields",
+      "statement": "A query binds an object member's fields from the member's C# name, a dot and each field's C# name; an IReadOnlyList field that starts as [] takes no item.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-object-fields: Handover.Round=3&Handover.Lead=Ann&Handover.Named=Bo&Handover.Beds=1&Handover.Beds=2 binds Round=3 Lead=Ann Named=Bo Beds=[]; Kept Round=0 Lead=start Named=null Beds=[]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-object-json-name",
+      "statement": "A query key that names an object's field by its JSON name binds nothing, and a key under the member that names no field makes no object.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-object-json-name: Handover.leader=Bo binds null; Kept Round=0 Lead=start Named=null Beds=[]; Handover.Round=3&Handover.leader=Bo binds Round=3 Lead=null Named=null Beds=[]; Kept Round=0 Lead=start Named=null Beds=[]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-object-empty-field",
+      "statement": "On net10 an empty query field for an object member keeps the member's start, null or an instance, and an empty field for one of its text fields makes the object.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-object-empty-field: Handover= binds null; Kept Round=0 Lead=start Named=null Beds=[] | Kept= binds null; Kept Round=0 Lead=start Named=null Beds=[] | Handover.Lead= binds Round=0 Lead=null Named=null Beds=[]; Kept Round=0 Lead=start Named=null Beds=[] | nothing sent binds null; Kept Round=0 Lead=start Named=null Beds=[]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-list-of-objects",
+      "statement": "A query binds a list of objects from Member[i].Field keys in index order, and a list of scalars inside an item from repeated keys.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-list-of-objects: Lines[0].Name=A&Lines[1].Name=B&Lines[1].Beds=1&Lines[1].Beds=2 binds Lines=[A, B Beds=1,2]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-list-of-objects-gap",
+      "statement": "A query's list of objects ends at the first missing index, and one whose first index is not 0 binds empty.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-list-of-objects-gap: Lines[0].Name=A&Lines[2].Name=C binds Lines=[A] | Lines[1].Name=B binds Lines=[]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-list-of-objects-empty-item",
+      "statement": "On net10 an empty query field for an item of a list of objects ends the list at that item.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-list-of-objects-empty-item: Lines[0].Name=A&Lines[1]=&Lines[2].Name=C binds Lines=[A]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-read-only-lists",
+      "statement": "A query binds an IReadOnlyList member that starts null, and binds nothing into one that starts as [], of objects or of scalars, inside an object too.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-read-only-lists: Held[0].Name=A&Bare=1&Bare=2&Handover.Beds=3 binds Held=[] Bare=[1,2] Handover=Round=0 Lead=null Named=null Beds=[] | nothing sent binds Held=[] Bare=null Handover=null",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-enum-member-name",
+      "statement": "A query binds an enum by its C# name ignoring case or by a defined number, and refuses the name JsonStringEnumMemberName gives it and an undefined number.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-enum-member-name: under a string converter System.Text.Json writes Night as \"night-shift\"; Shift=Night binds Shift=Night Shifts=[]; Shift=night-shift binds Shift=Day Shifts=[] (errors Shift); Shift=night binds Shift=Night Shifts=[]; Shift=1 binds Shift=Night Shifts=[]; Shift=5 binds Shift=Day Shifts=[] (errors Shift)",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-nullable-enum-items",
+      "statement": "A query binds an empty field in a list of nullable enums as a null item, and refuses an item named by JsonStringEnumMemberName.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-nullable-enum-items: Shifts=Day&Shifts=&Shifts=Night binds Shift=Day Shifts=[Day,null,Night]; Shifts=Day&Shifts=night-shift binds Shift=Day Shifts=[Day] (errors Shifts)",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-flags-enum",
+      "statement": "A query binds a flags enum from System.Text.Json's comma form, from repeated keys and from its number.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-flags-enum: System.Text.Json writes Mon|Tue as \"Mon, Tue\" under a string converter and 3 without; Days=Mon%2C%20Tue binds Days=Mon, Tue; Days=Mon&Days=Tue binds Days=Mon, Tue; Days=3 binds Days=Mon, Tue",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-member-names",
+      "statement": "A member declared [FromQuery(Name)], [BindProperty(Name)] or [ModelBinder(Name)] binds only under that name, not its C# name, and a [BindNever] member binds under neither.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-member-names: Ward=W&Bed=B&Room=R&Never=N binds Ward=null Bed=null Room=null Never=null | w=W&b=B&r=R binds Ward=W Bed=B Room=R Never=null",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-bind-prefix",
+      "statement": "On net10 a parameter declared [Bind(Prefix)] binds only the keys under that prefix.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-bind-prefix: [Bind(Prefix = \"q\")] with Count=3 binds Count=5; with q.Count=3 binds Count=3",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-parameter-name",
+      "statement": "On net10 a parameter declared [FromQuery(Name)] binds only the keys under that name.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-parameter-name: [FromQuery(Name = \"q\")] with Count=3 binds Count=5; with q.Count=3 binds Count=3",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-parameter-prefix",
+      "statement": "A parameter with no binding name binds the keys under its own name, else the unprefixed keys, and the prefixed keys win when both are sent.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-parameter-prefix: Count=3 binds Count=3; counts.Count=3 binds Count=3; counts.Count=3&Count=4 binds Count=3",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-parameter-name-collision",
+      "statement": "A key named like the parameter makes net10 read every key under the parameter's name, so a type with a member of the parameter's name binds none of its unprefixed keys.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-parameter-name-collision: Collide(ProbeSearch term) with Term=a&Count=3 binds Term=null Count=5; with term.Term=a&term.Count=3 binds Term=a Count=3",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-null-object",
+      "statement": "A JSON null for an object member binds null over its start, with net10's implicit required error for a non-nullable member.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-null-object: {\"kept\":null} binds Kept null (errors Kept) | {} binds Kept Round=0 Lead=start Named=null Beds=[]",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "mvc5-parameter-binding-name",
+      "statement": "MVC 5 binds a parameter under its [Bind(Prefix)], else under its own name.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ControllerActionInvoker.cs.txt",
+      "expect": "string parameterName = parameterDescriptor.BindingInfo.Prefix ?? parameterDescriptor.ParameterName;",
+      "source": "spec/probes/aspnetwebstack/ControllerActionInvoker.cs.txt:195"
+    },
+    {
+      "id": "mvc5-prefix-no-fallback",
+      "statement": "MVC 5 falls back to the unprefixed keys only for a parameter with no [Bind(Prefix)].",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ControllerActionInvoker.cs.txt",
+      "expect": "FallbackToEmptyPrefix = (parameterDescriptor.BindingInfo.Prefix == null)",
+      "source": "spec/probes/aspnetwebstack/ControllerActionInvoker.cs.txt:201"
+    },
+    {
+      "id": "mvc5-bind-include-exclude",
+      "statement": "MVC 5 binds only the members a parameter's [Bind] includes and does not exclude.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/BindAttribute.cs.txt",
+      "expect": "return includeProperty && !excludeProperty;",
+      "source": "spec/probes/aspnetwebstack/BindAttribute.cs.txt:46"
+    },
+    {
+      "id": "mvc5-prefix-exact-key",
+      "statement": "MVC 5 finds a prefix in a key equal to it ignoring case, so a key named like the parameter keeps every key under the parameter's name.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/PrefixContainer.cs.txt",
+      "expect": "return true; // exact match",
+      "source": "spec/probes/aspnetwebstack/PrefixContainer.cs.txt:184"
+    },
+    {
+      "id": "mvc5-member-key-clr-name",
+      "statement": "MVC 5 keys a member by its CLR name, and no attribute of MVC 5 renames it.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "string fullPropertyKey = CreateSubPropertyName(bindingContext.ModelName, propertyDescriptor.Name);",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:216"
+    },
+    {
+      "id": "mvc5-value-at-member-key-simple",
+      "statement": "MVC 5 binds a member as a single value whenever the request holds a value at its exact key, an object member included.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "return BindSimpleModel(controllerContext, bindingContext, valueProviderResult);",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:186"
+    },
+    {
+      "id": "mvc5-empty-value-converts-null",
+      "statement": "MVC 5 converts an empty or white-space value to null for any type before any converter runs.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt",
+      "expect": "if (valueAsString != null && String.IsNullOrWhiteSpace(valueAsString))",
+      "source": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:57"
+    },
+    {
+      "id": "mvc5-null-sets-reference-member",
+      "statement": "MVC 5 writes a null into a member whose type admits null, over its start.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "if (!propertyDescriptor.IsReadOnly && !isNullValueOnNonNullableType)",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:615"
+    },
+    {
+      "id": "mvc5-list-interfaces-created",
+      "statement": "MVC 5 creates a List for a member declared IEnumerable<>, ICollection<> or IList<>, and no other collection interface.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "genericTypeDefinition == typeof(IEnumerable<>) || genericTypeDefinition == typeof(ICollection<>) || genericTypeDefinition == typeof(IList<>)",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:391"
+    },
+    {
+      "id": "mvc5-repeated-keys-new-collection",
+      "statement": "MVC 5 binds repeated keys into a new collection it creates for the member's declared type.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "object modelCollection = CreateModel(controllerContext, bindingContext, bindingContext.ModelType);",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:299"
+    },
+    {
+      "id": "mvc5-list-cleared-and-refilled",
+      "statement": "MVC 5 clears the collection a list member starts with and adds the bound items to it, which an array refuses.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "collection.Clear();",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:829"
+    },
+    {
+      "id": "mvc5-list-ends-at-missing-index",
+      "statement": "MVC 5 ends a list at the first index the request holds no key under.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt",
+      "expect": "if (!bindingContext.ValueProvider.ContainsPrefix(subIndexKey))",
+      "source": "spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:683"
+    },
+    {
+      "id": "mvc5-empty-list-item-null",
+      "statement": "MVC 5 converts each repeated value of a list of scalars on its own, so an empty one is a null item.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt",
+      "expect": "converted[i] = ConvertSimpleType(culture, valueAsArray.GetValue(i), destinationElementType);",
+      "source": "spec/probes/aspnetwebstack/ValueProviderResult.cs.txt:156"
+    },
+    {
+      "id": "mvc5-enum-name-ignores-case",
+      "statement": "MVC 5 binds an enum from text by Enum.Parse ignoring case.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/EnumConverter.cs.txt",
+      "expect": "return Enum.Parse(type, strValue, true);",
+      "source": "spec/probes/referencesource/EnumConverter.cs.txt:129"
+    },
+    {
+      "id": "mvc5-enum-flags-comma",
+      "statement": "MVC 5 binds a flags enum from comma-separated names.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/EnumConverter.cs.txt",
+      "expect": "convertedValue |= Convert.ToInt64((Enum)Enum.Parse(type, v, true), culture);",
+      "source": "spec/probes/referencesource/EnumConverter.cs.txt:124"
     }
   ]
 }

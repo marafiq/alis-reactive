@@ -97,7 +97,11 @@ Terms used throughout:
     (`JsonPropertyName`, else the naming policy), read from `JsonSerializerOptions.GetTypeInfo`.
   - net48: the CLR name, which MVC 5's `JsonValueProviderFactory` and `DefaultModelBinder` match ignoring case.
 - D2.5 Form-data and query keys are binding names (CLR names) on both hosts, since MVC binds form and query
-  values by property name and ignores `JsonPropertyName`.
+  values by property name and ignores `JsonPropertyName` (`probe:core-query-object-json-name`). A member net10
+  binds under another name (`[FromQuery(Name)]`, `[BindProperty(Name)]`, `[ModelBinder(Name)]`) binds nothing
+  under its CLR name, and a `[BindNever]` member binds under none (`probe:core-query-member-names`); MVC 5 renames
+  no member (`probe:mvc5-member-key-clr-name`). So a key is the member's C# path on both hosts, and a request that
+  sends a member bound under another name is refused where the view renders (D9.20).
 - D2.6 A data member read from a response body or a pushed message is named as the endpoint writes it: the
   System.Text.Json contract name under the app's JSON options. On net10 those are MVC's `JsonOptions`. On
   net48 they are the options the app registers with the framework, which the framework's JSON door writes
@@ -1232,11 +1236,26 @@ Terms used throughout:
   |-------------------|-----------|--------------------|
   | a non-nullable value type | left out | left out |
   | a list | left out | left out |
-  | a nullable value type, text or a class | `null` | an empty field, `name=` |
+  | an object | `null` | left out |
+  | a nullable value type or text | `null` | an empty field, `name=` |
 
   A `DateTime` and a `DateTimeOffset` are value types, and their nullable forms nullable value types (D3.8).
   A member left out keeps its starting value; a JSON `null` for a non-nullable value type binds no instance
   at all, and an empty field for one is a model error (`probe:core-json-null-member`, `probe:core-form-empty-field`).
+  An object is left out of a query or form data because no field binds it as nothing on both hosts: MVC 5 binds a
+  value at the member's own key as one value and converts an empty one to null (`probe:mvc5-value-at-member-key-simple`,
+  `probe:mvc5-empty-value-converts-null`, `probe:mvc5-null-sets-reference-member`), while net10 keeps the member's
+  start, an instance included (`probe:core-query-object-empty-field`). Left out, it binds its start on both. A JSON
+  `null` binds null over the start (`probe:core-json-null-object`).
+
+  A list item that reads nothing, in a query or form data, is sent by this closed table, which C# writes into the
+  plan from the item type the generated table names (D9.20):
+
+  | The item's type | Query or form data |
+  |-----------------|--------------------|
+  | a nullable value type or text | an empty field, which binds a null item (`probe:core-query-nullable-enum-items`, `probe:mvc5-empty-list-item-null`) |
+  | a non-nullable value type | the request stops, since no field binds back as nothing |
+  | an object | the request stops: an empty field ends the list at that item on net10 (`probe:core-query-list-of-objects-empty-item`) and binds a null item on MVC 5, and an item left out ends the list there on both hosts (`probe:core-query-list-of-objects-gap`, `probe:mvc5-list-ends-at-missing-index`) |
 - D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
   header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, and `Content-Type` is
   refused because the body format owns it.
@@ -1246,8 +1265,13 @@ Terms used throughout:
   The browser adds no header but W3C Trace Context's `traceparent` and `tracestate` while the plan's trace is on
   (D20.3), and `traceparent` and `baggage` on a retry (D20.11), each to the page's own origin only.
 - D9.13 A literal member, `Set(member, value)`, is written where the view renders, encoded as the endpoint
-  binds it: an enum by the System.Text.Json contract under the endpoint's options on net10 and by its name on
-  net48 (Q18).
+  binds it. In a query or form data an enum is its C# name on both hosts, which net10 and MVC 5 bind ignoring case;
+  the name `JsonStringEnumMemberName` gives it binds nothing there (`probe:core-query-enum-member-name`,
+  `probe:mvc5-enum-name-ignores-case`). An enum a source holds is in its held form (D4.2): the form its member's own
+  `[JsonConverter]` writes, else the app's JSON options. So C# writes into the plan each value's held form beside its
+  C# name, from the values the generated table lists (D9.20), and the browser sends the C# name of the value whose form
+  it holds. A held form no value writes stops the request, naming the member; a flags combination is among them,
+  though both hosts bind its comma form (`probe:core-query-flags-enum`, `probe:mvc5-enum-flags-comma`), a gate 1 flag. In a JSON body an enum is its System.Text.Json form.
 - D9.14 A hidden input is an input: it binds by its binding name and shape, and a form sends it when the sent
   element holds it.
 - D9.15 What a request sends is closed: members it sets from sources (`Set`), the inputs of the form it checks
@@ -1261,9 +1285,48 @@ Terms used throughout:
   succeeds, and `Parallel` sends them at once.
 - D9.18 `p.Url<TQuery>()` reads the page's own URL. It is a source (Q7), not a part of the request.
 - D9.19 A member whose source holds an object or a list of objects is sent in a query or in form data as its
-  fields, each by its binding name (`Address.City`, `Lines[0].Name`), as the binder reads them
-  (`probe:core-form-binds-indexed-name`); in a JSON body it is nested (D9.7). A component's member, a method's
-  result, a page URL member, a hidden input and a literal fill a member the same way (Q7).
+  fields, each keyed by its C# path (`Address.City`, `Lines[0].Name`, and a list of scalars inside an item as the
+  repeated `Lines[0].Beds`) and read from the source by its JSON name (D2.6), as the binder reads them
+  (`probe:core-form-binds-indexed-name`, `probe:core-query-object-fields`, `probe:core-query-list-of-objects`,
+  `probe:mvc5-sub-property-name`, `probe:mvc5-sub-index-name`); in a JSON body it is nested (D9.7). A field that reads
+  nothing follows D9.10, and a list of objects is indexed from 0 with no gap. An object's fields are the members the
+  generated table lists (D9.20); a field the app's JSON options do not write is never in the browser and is left out,
+  so the endpoint binds its start. A type that holds itself, at any depth, is refused where the view renders, since
+  its keys have no bound. A component's member, a method's result, a page URL member, a hidden input and a literal
+  fill a member the same way (Q7).
+- D9.20 What an endpoint binds is read at build, never at run time (D18.1). A source generator in the analyzers
+  package walks the complex parameters of each controller action and every type reachable from them, and writes,
+  for each type, the members the binder fills by their C# name as typed lambdas, and for each enum its values. A
+  module initializer sets the tables before the first view renders. The actions are the public methods of a net10
+  `Microsoft.AspNetCore.Mvc.ControllerBase` and of a net48 `System.Web.Mvc.Controller`, less `[NonAction]`; a net10
+  parameter bound `[FromBody]`, `[FromServices]`, `[FromKeyedServices]` or `[FromHeader]` is not walked, nor a complex
+  parameter with no binding attribute under `[ApiController]` on its class, a base class or its assembly, which net10
+  infers `[FromBody]`. The core names each field by its lambda's expression text (D2.5) and reads it by `JsonPath`
+  (D2.6), and reads a list item's type from the lambda's type argument, never from a type's members.
+  - Two assemblies whose controllers reach one type each write its table. A second table is accepted when it lists the
+    same fields with the same marks, and any difference is refused where a view first reads the type, naming it.
+  - A request type with no table is refused where the view renders, and the message names both causes: no action
+    takes the type or a type that holds it, or the app's build did not run the generator. The generator refuses at
+    build a language version below C# 9, which a module initializer needs, and on net48 writes
+    `ModuleInitializerAttribute` only when the compilation can reach none; the analyzers package sets PolySharp's
+    `PolySharpExcludeGeneratedTypes` for it, since one generator does not see another's output.
+  - A list member is sent only when declared `List<T>`, the one declared type both binders fill whatever it starts
+    with: net10 binds nothing into a read-only list a member starts with (`probe:core-query-read-only-lists`), and
+    MVC 5 creates a `List<T>` only for `IEnumerable<>`, `ICollection<>` and `IList<>` and clears the collection a
+    member starts with, which an array refuses (`probe:mvc5-list-interfaces-created`,
+    `probe:mvc5-repeated-keys-new-collection`, `probe:mvc5-list-cleared-and-refilled`).
+  - The table marks a member of another list type, a member net10 binds under another name and a `[BindNever]`
+    member (`probe:core-query-member-names`). Refused where the view renders, each naming its cure: a request type
+    the table lacks (no action takes it or a type that holds it), a set of a marked member, and an object sent whose
+    type holds a marked list or a renamed member. A `[BindNever]` field of a sent object is left out, since the
+    endpoint binds it under no name.
+  - The keys carry no parameter prefix. A parameter with no binding name binds them when no key is named like it
+    (`probe:core-query-parameter-prefix`, `probe:mvc5-prefix-exact-key`); a parameter that names a prefix
+    (`[Bind(Prefix)]`, net10's `[FromQuery(Name)]`) binds only prefixed keys (`probe:core-query-bind-prefix`,
+    `probe:core-query-parameter-name`, `probe:mvc5-parameter-binding-name`, `probe:mvc5-prefix-no-fallback`), and a
+    parameter named like one of its type's members binds none of them (`probe:core-query-parameter-name-collision`).
+    Both are per action, and a view names its action only by URL text, so their refusal waits for a build check that
+    links a request to its action, which no unit has built; it goes to gate 1 as a flag.
 
 - D9.13 A request's URL, query and headers follow their standards, and C# writes each part where the view renders.
   - The URL is an RFC 3986 URI reference: a path on the page's origin, or an absolute `http` or `https` URI, split
@@ -1289,6 +1352,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `Request.tla:RouteHoldsScalarText`
 - `Request.tla:FileOnlyInFormData`
 - `Request.tla:NothingBindsAsDeclared`
+- `Request.tla:ObjectNothingBindsAsDeclared`
+- `Request.tla:ItemNothingBindsAsDeclared`
 - `probe:core-json-null-member`
 - `probe:core-form-empty-field`
 - `probe:core-frombody-no-body`

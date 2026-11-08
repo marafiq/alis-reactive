@@ -327,6 +327,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   from it, typed member lambdas the core names by expression text and by `JsonPath`, with no run-time reflection. Views
   are compiled by Razor's own generator, which no other generator sees, so the endpoint's parameter is the trigger.
   The query standard (keys as the JSON names, read back on the server by the naming policy) is the fallback.
+- Chosen within the owner's yes, 2026-11-07, 17b-ii's probe (31 facts, D9.10, D9.13, D9.19, D9.20): an object that reads
+  nothing is left out of a query or form data, since an empty field binds null on MVC 5 and keeps the start on net10; an
+  item of a list of objects that reads nothing stops the request; a list member is sent only when declared `List<T>`; a
+  member net10 binds under another name, a `[BindNever]` member and a member of another list type are marked in the
+  generated table and refused where a view sends them, never at build, so an app's endpoints no framework view sends still
+  build. A parameter prefix and a parameter named like its type's member wait for a request-to-action link (gate 1).
+  Request.tla checks the first two over both hosts. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
