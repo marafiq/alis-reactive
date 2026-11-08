@@ -348,6 +348,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   bring". A request sends each field the view names, typed by its member lambda (`r => r.Handover.Round`), keyed by the
   lambda's C# path; no generator, table or reflection serves requests. The validator generator and its startup call
   stay. D9.19 and D9.20 are rewritten once the owner has seen the complete example.
+- The owner, 2026-11-07: "we really do not want take control mvc binding - must have solid reasons to do it". The framework
+  writes the keys and values MVC's own binder reads, pinned by probes on both hosts, and adds no value provider, binder
+  or model of the binder without a reason the owner accepts.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
