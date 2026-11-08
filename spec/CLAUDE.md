@@ -386,6 +386,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   big mistake, caught or not. A decision changes in one commit with every place that carries its meaning: its D and N
   lines, its question's schema nodes, `spec/Core/schema.md`, the TLA+ specs, `spec/api` and this file; the unit's report
   names each one it touched, and why each other one stands. A green check proves only what it compares.
+- The owner, 2026-11-08: a page holds many forms or none, and a request works without a form on the full form's
+  parts; no door, default or check assumes one form per page or a form behind every request.
 - The owner, 2026-11-08: every module works with every other, each HTTP thing is a typed JavaScript object whose members
   are sources and dot-walk (the response's status, headers and body, the page's URL, the request's fields), and main is
   the floor of features, never the bar of quality.
