@@ -62,6 +62,7 @@ static class HttpProbes
         Console.WriteLine("core-frombody-multipart: a [FromBody] action answers a multipart body " + await Status(client, HttpMethod.Post, "/h/r/North/intake-json", Multipart(("Ward", "North")), null) + " and a URL-encoded body " + await Status(client, HttpMethod.Post, "/h/r/North/intake-json", FormBody("Ward=North"), null));
         var later = await client.GetStringAsync("/h/token");
         Console.WriteLine("core-antiforgery-later-token: a token issued by a later GET, as a slot's partial gets one, " + (later == token ? "is the same token" : "is a new token") + " and answers " + await Status(client, HttpMethod.Post, "/h/protected", JsonBody("{}"), later) + "; the first token still answers " + await Status(client, HttpMethod.Post, "/h/protected", JsonBody("{}"), token));
+        Console.WriteLine("core-query-key-case: ward=North&SHIFT=Night binds " + await client.GetStringAsync("/h/page?ward=North&SHIFT=Night"));
         Console.WriteLine("core-consumes-urlencoded: [Consumes(\"application/x-www-form-urlencoded\")] answers a URL-encoded body " + await Status(client, HttpMethod.Post, "/h/urlencoded", FormBody("Ward=North"), null) + " and a multipart body " + await Status(client, HttpMethod.Post, "/h/urlencoded", Multipart(("Ward", "North")), null));
         using (var large = new MultipartFormDataContent())
         {
@@ -199,6 +200,9 @@ public sealed class HttpProbeController(IAntiforgery antiforgery) : Controller
     [HttpPost("r/{ward}/intake-json")]
     public string RouteIntakeJson([FromBody] ProbeIntake intake) => "Ward " + (intake.Ward ?? "null");
 
+    [HttpGet("page")]
+    public string Page(ProbePage page) => "Ward=" + page.Ward + " Shift=" + page.Shift;
+
     [HttpPost("urlencoded"), Consumes("application/x-www-form-urlencoded")]
     public string UrlEncoded(ProbeIntake intake) => "Ward " + intake.Ward;
 
@@ -217,4 +221,10 @@ public sealed class ProbeDocument
 {
     public IFormFile? File { get; set; }
     public string? Caption { get; set; }
+}
+
+public sealed class ProbePage
+{
+    public string? Ward { get; set; }
+    public string? Shift { get; set; }
 }

@@ -1434,6 +1434,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `probe:mvc5-value-provider-order`
 - `probe:core-antiforgery-later-token`
 - `probe:mvc5-form-filled-any-method`
+- `probe:core-query-key-case`
+- `probe:mvc5-query-key-case`
+- `probe:js-query-get-case`
 **Doors.**
 - kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:58-62`), `Gather` and
   `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`, `Form()`,
@@ -1729,7 +1732,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     `ResponseFile` (`Name`, `Size`, `Type`), `BrowserFile` (lib.dom `File`) and `pipeline.PageUrl<TPage>()` or
     `PageUrl<TPage>(template)`, whose `Read(q => q.A.B)` reads a placeholder member from the path and any other from the
     query by its C# path, as the action that rendered the page bound it, the member's start when the key is absent or
-    its text does not convert.
+    its text does not convert. Keys are compared ignoring case, as both hosts bind them (`probe:core-query-key-case`,
+    `probe:mvc5-query-key-case`), which `URLSearchParams.get` does not (`probe:js-query-get-case`).
   - the condensed doors, extension methods that write the plan the full form writes: `Set(r => r.M, value)`, placed by
     D9.4, D9.6 and D9.9 into `Route`, `Query` or the body the request names, else multipart (D10.22); `Form(formId)`,
     the form's inputs as multipart fields and file parts plus `Validate` for the validator registered for `TRequest`;

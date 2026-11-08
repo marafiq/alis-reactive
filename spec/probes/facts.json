@@ -1574,6 +1574,33 @@
       "probe": "spec/probes/referencesource/HttpRequest.cs.txt",
       "expect": "if (StringUtil.StringStartsWithIgnoreCase(contentType, \"application/x-www-form-urlencoded\")) {",
       "source": "spec/probes/referencesource/HttpRequest.cs.txt:383"
+    },
+    {
+      "id": "core-query-key-case",
+      "statement": "On net10 a query key binds its member ignoring case.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-key-case: ward=North&SHIFT=Night binds Ward=North Shift=Night",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "js-query-get-case",
+      "statement": "URLSearchParams.get compares a key by its exact case, so a page-URL read that binds as MVC does compares keys ignoring case itself.",
+      "host": "node",
+      "oracle": "Node's URLSearchParams, the WHATWG URL Standard",
+      "probe": "fetch-bodies.mjs",
+      "expect": "js-query-get-case: URLSearchParams.get(\"Ward\") on ward=North reads null; get(\"ward\") reads \"North\"",
+      "source": "spec/probes/fetch-bodies.mjs"
+    },
+    {
+      "id": "mvc5-query-key-case",
+      "statement": "MVC 5 reads a query or form key ignoring case.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/NameValueCollectionValueProvider.cs.txt",
+      "expect": "new Dictionary<string, ValueProviderResultPlaceholder>(StringComparer.OrdinalIgnoreCase);",
+      "source": "spec/probes/aspnetwebstack/NameValueCollectionValueProvider.cs.txt:131"
     }
   ]
 }

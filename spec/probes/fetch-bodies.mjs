@@ -21,3 +21,6 @@ console.log("fetch-body-media-types: a string body is sent as " + text.headers.g
 
 const head = await new Response(null, { status: 200 }).text();
 console.log("fetch-null-body-reads-empty: a response with no body reads " + JSON.stringify(head));
+
+const query = new URLSearchParams("ward=North&Shift=Night");
+console.log("js-query-get-case: URLSearchParams.get(\"Ward\") on ward=North reads " + JSON.stringify(query.get("Ward")) + "; get(\"ward\") reads " + JSON.stringify(query.get("ward")));
