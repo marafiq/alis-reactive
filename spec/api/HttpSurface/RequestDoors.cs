@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.Elements;
 using Alis.Reactive.Pipelines;
 using Alis.Reactive.Requests;
@@ -17,7 +16,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, done) => done.Element("status").Text.Set(answered.Headers.Get("X-Status")))
@@ -30,7 +31,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body))
             .Chained((reply, next) => next.Notice().Info("Chained"));
@@ -50,7 +53,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry();
         sent.OnSuccess((reply, done) => done.Notice().Info(reply.Headers.Get("Content-Length")))
             .OnError(404, (missing, shown) => shown.Notice().Warning("No beds"))
@@ -60,7 +65,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .Chained((reply, next) => next.Notice().Info("Chained"));
         sent.OnSuccess(done => done.Notice().Info("Answered"));
@@ -77,7 +84,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, done) => done.Element("status").Text.Set(answered.Headers.Get("X-Status")))
@@ -90,7 +99,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body))
             .Chained((reply, next) => next.Notice().Info("Chained"));
@@ -110,6 +121,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, done) => done.Element("status").Text.Set(answered.Headers.Get("X-Status")))
             .Chained((answered, next) => next.Element("asked").Text.Set(answered.Request.Read(r => r.Ward)));
@@ -121,6 +135,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body))
             .Chained((reply, next) => next.Notice().Info("Chained"));
         sent.OnSuccess(done => done.Notice().Info("Answered"));
@@ -139,7 +156,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, done) => done.Element("status").Text.Set(answered.Headers.Get("X-Status")))
@@ -152,7 +171,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body))
             .Chained((reply, next) => next.Notice().Info("Chained"));
@@ -172,7 +193,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, done) => done.Element("status").Text.Set(answered.Headers.Get("X-Status")))
@@ -185,7 +208,9 @@ public static class RequestDoors
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
             .NoDefaults()
-            .Retry(2, TimeSpan.FromSeconds(1))
+            .Busy("beds", "bed-count")
+            .Busy()
+            .NoBusy()
             .NoRetry()
             .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body))
             .Chained((reply, next) => next.Notice().Info("Chained"));

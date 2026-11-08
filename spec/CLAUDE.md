@@ -377,6 +377,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the full form takes full control. The core counts the requests a busy indicator covers and calls its show at the
   first and its hide at the last, so a component with a plain show and hide is correct under Parallel, two pipelines
   at once, retry, replace and a slot's unload (`spec/Core/Composition.tla`).
+- The owner, 2026-11-08: the default loader shows on the target a request updates, right for parallel requests of 5
+  and 1 seconds on one target or on two (verbatim in `spec/NOTES.md`). Busy is a state of a target, as WAI-ARIA's aria-busy is:
+  the elements its success route writes outside a condition, the element it loads, the form it sends, or the elements
+  `Busy` names in place of those, else the page; the C# derives them, the plan carries them, and the core counts each
+  target on its own (D10.21).
 - The owner, 2026-11-08: every module works with every other, each HTTP thing is a typed JavaScript object whose members
   are sources and dot-walk (the response's status, headers and body, the page's URL, the request's fields), and main is
   the floor of features, never the bar of quality.

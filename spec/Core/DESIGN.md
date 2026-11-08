@@ -1570,8 +1570,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 
   Its numbers are .NET's standard resilience handler's: 3 retries after the first attempt, an exponential wait with
   jitter from 2 seconds, a 429's or 503's `Retry-After` in place of the wait, and 30 seconds in all, past which the
-  retries end. The app sets the attempts and the first wait once, in the defaults. Another policy is a later
-  extension, the owner's.
+  retries end. The app sets the attempts and the first wait once, in the defaults' `Retry(attempts, firstWait)`; a
+  request takes the policy or `NoRetry()`, and sets no numbers of its own. Another policy is a later extension, the
+  owner's.
   - `Retry-After` is the server's word when it sends one (RFC 9110, section 10.2.3): its seconds, or its HTTP date
     taken against the response's own `Date`, so the browser's clock does not enter. A wait that would pass the
     30 seconds ends the retries at once, and the error route runs. A value in neither form is the server's
@@ -1642,16 +1643,39 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   (`probe:core-file-disposition`); a response with neither is named by the last segment of the request's path, as a
   browser names a link's download.
 - D10.21 The defaults name a busy indicator and a notice, each a contract the core owns and a component fulfils: the
-  busy indicator is the plugin `busy`, with `show()` and `hide()`, which set a state and never hide by themselves; the
-  notice is the plugin `notice`, with `show(text, kind)`, its kind one of success, error, warning and info. The framework ships
-  NativeLoader and NativeToast declaring them, and an app registers its own object under the same name; the core
-  depends on neither one's markup or CSS (the owner, 2026-11-08). The core counts the requests a busy indicator covers,
-  across every pipeline of the page, and calls its show when the count leaves 0 and its hide when it returns to 0. A
-  request holds it once across its attempts (D10.15), from its guards, once both `WhileLoading` layers completed, to
-  the end of its defaults' `Finally`, on every outcome, a replaced or unloaded run's included (Q11, Q12). A failed
-  check or a stopped `WhileLoading` holds nothing (`Request.tla:HoldSpansTheSend`). A failed request whose route is a
-  default shows one notice, after its last attempt; a replaced or unloaded request shows none. A request that takes
-  no defaults covers no indicator and shows no default notice.
+  busy indicator is the plugin `busy`, with `show(target)` and `hide(target)`, which set a state on one target and never
+  hide by themselves; the notice is the plugin `notice`, with `show(text, kind)`, its kind one of success, error, warning
+  and info. The framework ships NativeLoader and NativeToast declaring them, and an app registers its own object under
+  the same name; the core depends on neither one's markup or CSS (the owner, 2026-11-08). The core alone calls their
+  members: their declarations give a pipeline no door to them, since a step's hide while a request holds the indicator
+  is the early hide `Composition.tla:IndicatorNeverHidesEarly` forbids.
+  - Busy is a state of what a request modifies, as WAI-ARIA's `aria-busy` is of an element being modified (the owner,
+    2026-11-08: the loader shows on the right target, parallel requests of 5 and 1 seconds updating one target or two).
+    A request holds the indicator on its targets, which the C# derives where the view renders and the plan carries, so
+    the browser infers nothing: each element and component its success route writes outside any condition (a text, an
+    HTML, a class, a component's member or method), the element its `Into(elementId)` loads and the form its
+    `Form(formId)` sends. A notice, a plugin, a dispatch and a step inside a branch add none, and a request whose route
+    writes nothing so holds the page's own target, an indicator with no element. On the full form `Busy(elementId, ..)`
+    names the targets in place of those, `Busy()` names the page, and `NoBusy()` holds none. The cost is said plainly: a
+    route that writes five elements marks five busy, as aria-busy means of each element being modified, and one
+    `Busy("panel")` replaces them. The two parallel requests that set one component each from a JSON body hold that
+    component's element by default, with no `Busy` written.
+  - The core counts each target across every pipeline of the page, calls `show(target)` when its count leaves 0 and
+    `hide(target)` when it returns to 0, `target` the element's id, and `show()` and `hide()` with no target for the
+    page, and sets `aria-busy="true"` on a target's element while its count is above 0.
+    Two requests on one target keep it shown until the later one settles, whichever is slower; on two targets each
+    hides when its own request settles; a request on two targets holds both (`Composition.tla:IndicatorNeverHidesEarly`,
+    `Composition.tla:IndicatorNeverStaysShown`, `Composition.tla:HoldOncePerRequest`).
+  - A target whose element the page lacks when the request starts stops it before it sends, as a missing element stops
+    an element step's pipeline. A target's element that leaves with its slot while held takes its `aria-busy` with it,
+    and the core still calls `hide(target)` when the count returns to 0. `Busy` on a request with `NoDefaults()`, and a
+    second `Busy` or `NoBusy` on one request, are refused where the view renders.
+  - A request holds its targets once across its attempts (D10.15), from its guards, once both `WhileLoading` layers
+    completed, to the end of its defaults' `Finally`, on every outcome, a replaced or unloaded run's included (Q11,
+    Q12). A failed check or a stopped `WhileLoading` holds nothing (`Request.tla:HoldSpansTheSend`). A failed request
+    whose route is a default shows one notice, after its last attempt; a replaced or unloaded request shows none. A
+    request that takes no defaults, or whose busy is `NoBusy()`, covers no indicator; one that takes no defaults shows no
+    default notice.
 - D10.22 The condensed body is multipart. Multipart binds with no attribute on both hosts and carries files, and where it
   is wrong it fails loud: a `[FromBody]` action answers it 415, which runs the request's routes
   (`probe:core-frombody-multipart`). JSON as the condensed body would fail silent: net10 answers a JSON body to an
@@ -1738,11 +1762,12 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     r.M, value)`, `Query(r => r.M, value)`, `Header(name, value)`, and on POST, PUT and DELETE one body door, `Json`,
     `UrlEncoded`, `Multipart`, `Text` or `File`, and on every method `Form(formId)`, a GET's inputs going to its query.
     Refused where the view renders, as no type stops them: a second body door, a `Set` after a `Text` or `File` body,
-    a second `Form` on a GET, HEAD or OPTIONS request, and a second `Chained`. A value is a literal or any source (Q7); a member lambda dot-walks
+    a second `Form` on a GET, HEAD or OPTIONS request, a second `Busy` or `NoBusy`, and a second `Chained`. A value is a literal or any source (Q7); a member lambda dot-walks
     (`r => r.Handover.Round`). `Header` refuses `Content-Type`, `Accept`, the antiforgery header and the Fetch
     Standard's forbidden request headers.
-  - staged by type: GET, HEAD and OPTIONS offer no body door; `Retry` and `NoRetry` exist on GET, HEAD, OPTIONS, PUT and
-    DELETE only (X10.9); HEAD offers no content reader; `File` exists only inside `Multipart` or as the whole body; a
+  - staged by type: GET, HEAD and OPTIONS offer no body door; `NoRetry()` exists on GET, HEAD, OPTIONS, PUT and DELETE
+    only, since the one policy (D10.14) never retries a POST (X10.9), and no request sets the policy's numbers, which
+    the defaults' `Retry(attempts, firstWait)` sets once (`RetryPerRequest`, `NoRetryOnPost` in `spec/api/refused.sh`); HEAD offers no content reader; `File` exists only inside `Multipart` or as the whole body; a
     success route returns the request carrying its reply's type, which offers no second success route and whose
     `Chained` receives that reply. A `Set` on a file member stays D9.16's analyzer, since `Set` takes a member of any
     type, and a file input a GET's `Form` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
@@ -1754,8 +1779,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     (reply, pipeline) => ..)` and the catch-all `OnError((failed, pipeline) => ..)`, with the readers `Content.None`,
     `Content.Json<T>()`, `Content.Text`, `Content.Html` and `Content.File` (D10.6). `OnSuccess<T>` returns a request that
     carries `T`, so its `Chained((reply, next) => ..)` receives the typed reply by construction. `Validate<TValidator>()`,
-    `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the form the request sends (Q16); `WhileLoading`,
-    `Finally`, `NoDefaults()` and `NoValidation()` complete it.
+    `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the form the request sends (Q16); `Busy(elementId, ..)`,
+    `Busy()` and `NoBusy()` say where its busy indicator shows (D10.21); `WhileLoading`, `Finally`, `NoDefaults()` and
+    `NoValidation()` complete it.
   - the objects, each a JS object whose members are sources: `Response<TRequest>` (`Status`, `Headers.Get(name)` and
     `Request`, the request's members as it sent them, read as `TRequest`, which a read of the input cannot give once the
     user edits it during the send), the reply of a route of kind none and of every HEAD route, and
@@ -1862,6 +1888,16 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   response the test app sends last.
 - `X10.15` behavior: a GET answered 500 runs its error route once, with no second attempt; a GET answered 503 and
   then 200 runs its success route.
+- `X10.16` behavior: two `Parallel` requests on one target, the test app answering one after 1 second and the other
+  after 5: the target's indicator and `aria-busy` stay until the second answers; on two targets, the first target's
+  indicator hides at 1 second while the second's stays to 5.
+- `X10.17` behavior: a request whose busy target is an element the page lacks stops before it sends, and the network
+  log holds no request.
+- `X10.19` behavior: two `Parallel` requests with no `Busy`, each success route setting one component from a JSON body:
+  each component's element shows the indicator until its own request settles, and the page's indicator never shows; a
+  route that writes inside a `When` only shows the page's.
+- `X10.18` refusal: `Busy` on a request with `NoDefaults()`: "Busy says where the default busy indicator shows, and
+  this request takes no defaults; take out NoDefaults() or Busy."
 
 ## Q11. Lanes and time
 
@@ -3424,8 +3460,36 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   message. Whether a hub invoke joins the server's hub activity depends on `@microsoft/signalr` carrying trace
   context, a fact the unit probes before it claims it.
 - D21.9 Proof:
-  - Playwright on net10 covers both transports, every lifecycle trigger and the holds.
+  - Playwright on net10 covers both transports, every lifecycle trigger, the holds, the reconnect offer and a
+    request a message's run sends under the defaults.
   - The verify-net48 run covers that a net48 view writing a realtime door does not compile.
+- D21.10 Realtime and the request defaults (Q10). A connection, its reconnection and its messages hold no busy indicator
+  and show no default notice: a connection lives as long as its holders, so an indicator that covered a reconnection
+  would show for the whole outage while the page stays usable; the connection's state is its own member and its
+  lifecycle triggers (D21.5). A message starts a run as any trigger does (D11.7), and a request that run sends takes the
+  request defaults and is counted with every other request of the page (`Realtime.tla:IndicatorNeverHidesEarly`,
+  `Realtime.tla:IndicatorNeverStaysShown`, over the page's target; `Composition.tla` counts each target). A hub's `invoke` and `send` are calls, not HTTP requests, and hold nothing.
+- D21.11 The reconnect offer is a contract the core owns and a component fulfils, as the busy indicator and the notice
+  are (D10.21): the plugin `reconnect`, with `show(retry)`, `retry` a function that reconnects every connection the page
+  holds that gave up, and `hide()`. The framework ships a Native component declaring it, and an app registers its own
+  under the same name; the core depends on neither's markup or CSS.
+  - The core counts the held connections that gave up or are retrying after one, across every plan of the page, and
+    calls show when the count leaves 0 and hide when it returns to 0. A connection leaves the count when it opens or its
+    last holder releases it (D12.6), so a retry keeps the offer until a connection opens, and a retry that fails keeps it
+    shown (`Realtime.tla:OfferNeverHidesEarly`, `Realtime.tla:OfferNeverStaysShown`).
+  - An app that renders a stream or a hub chooses at startup, `ShowReconnect()` or `NoReconnectOffer()`, as it chooses
+    antiforgery (D9.22). A view that names one in an app without the choice is refused, naming both, since a page whose
+    connection gave up, with no offer and no `closed` steps, goes stale and shows nothing.
+  - Main's one layout element, `alis-realtime-connection-retry-container`, whose click retries every dropped
+    connection, is carried by this contract.
+- D21.12 A stream and a hub are JS objects, and every member is a source (Q7). Their state (connecting, open,
+  reconnecting, closed) is a member a condition or a step reads; their lifecycle triggers are events (D21.5); each
+  declared message (D21.3) is an event whose payload's `Data` dot-walks (D21.4); a hub adds its declared methods,
+  `invoke`, whose result is a value read as a method's result is (a method that returns a promise, Q11), and `send`. A
+  message's data and an invoke's result feed every module: a condition, a request's route, query, header or body, an
+  element's text, a component's member and a dispatch. Server push is in 1.0; a response body read as a stream (a
+  fetch `ReadableStream`, an AI or chat stream) stays out by the owner's 2026-06-10 decision, so D10.6's closed set of
+  response kinds holds no stream kind, and the two decisions do not overlap.
 
 **Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, `handler` for
 message and lifecycle triggers, and `call` for a hub's invoke and send.
@@ -3435,6 +3499,10 @@ message and lifecycle triggers, and `call` for a hub's invoke and send.
 - `Ownership.tla:OfferOnlyWhileHeld`
 - `Lanes.tla:SkippedTriggerStartsNothing`
 - `Lanes.tla:ReplacedRunRunsNoRoute`
+- `Realtime.tla:IndicatorNeverHidesEarly`, killed by a message's request left out of the count
+- `Realtime.tla:IndicatorNeverStaysShown`, killed by a reconnection that holds the busy indicator
+- `Realtime.tla:OfferNeverHidesEarly`, killed by an offer that is a flag, not a count
+- `Realtime.tla:OfferNeverStaysShown`, killed by an unload that keeps the offer
 
 **Doors.**
 - kept: N5.1's message triggers typed `Data<TMessage>`, and the hub's `invoke` and `send` (Q11).
@@ -3445,6 +3513,11 @@ message and lifecycle triggers, and `call` for a hub's invoke and send.
 - `N21.3` new: the plugin data `stream` (D21.6).
 - `N21.4` new: the lifecycle triggers `reconnecting`, `reconnected` and `closed` on a stream and a hub (D21.5).
 - `N21.5` new: the hub's module as its own asset, linked when a plan names a hub (D21.1).
+- `N21.7` new: the reconnect contract, the plugin `reconnect` with `show(retry)` and `hide()`, a Native component
+  declaring it, and the startup choice on net10's realtime configuration, `services.AddReactiveRealtime(live =>
+  live.ShowReconnect())` or `NoReconnectOffer()`, a `Hosting` door beside `AddReactiveRequests` (D21.11).
+- `N21.8` new: a stream's and a hub's members as a JS object's, its state, its lifecycle and message events and a hub's
+  methods, each a source (D21.12); their form goes to gate 2.
 
 **Evidence.**
 - The core's browser code imports the SignalR client: `Alis.Reactive.Assets/runtime/realtime/hub.ts:1`, pinned at
@@ -3470,3 +3543,11 @@ message and lifecycle triggers, and `call` for a hub's invoke and send.
 - `X21.6` type: an endpoint and a view that name one server event differently, or give it two message types, do not
   compile: new:N21.1.
 - `X21.7` type: a net48 view that writes a stream, a hub or a message trigger does not compile: new:N21.6.
+- `X21.8` behavior: while a stream reconnects and no request is in flight, the page shows no busy indicator, and a
+  request a message's run sends shows it until that request settles.
+- `X21.9` behavior: with the page's stream and a slot's stream both given up, the reconnect offer shows once; unloading
+  the slot keeps it, and the page's stream opening hides it.
+- `X21.10` behavior: a retry keeps the reconnect offer shown until a connection opens, and a retry that fails keeps it
+  shown.
+- `X21.11` refusal: a view that names a stream or a hub in an app with no reconnect choice: "A page that names a stream
+  or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime."

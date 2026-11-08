@@ -5,9 +5,10 @@ using Alis.Reactive.Requests;
 
 namespace Intake;
 
-public static class RetryOnPost
+public static class NoRetryOnPostAfterSuccess
 {
     public static void Refused(Pipeline<IntakeView> pipeline)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form("intake"))
-            .Retry(3, TimeSpan.FromSeconds(2));
+            .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
+            .NoRetry();
 }

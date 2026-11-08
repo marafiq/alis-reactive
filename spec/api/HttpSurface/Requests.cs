@@ -42,7 +42,9 @@ public sealed class GetRequest<TModel, TRequest>
 
     public GetRequest<TModel, TRequest> NoDefaults() => throw new NotSupportedException();
 
-    public GetRequest<TModel, TRequest> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public GetRequest<TModel, TRequest> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public GetRequest<TModel, TRequest> NoBusy() => throw new NotSupportedException();
 
     public GetRequest<TModel, TRequest> NoRetry() => throw new NotSupportedException();
 }
@@ -76,7 +78,9 @@ public sealed class GetRequest<TModel, TRequest, TReply>
 
     public GetRequest<TModel, TRequest, TReply> NoDefaults() => throw new NotSupportedException();
 
-    public GetRequest<TModel, TRequest, TReply> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public GetRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public GetRequest<TModel, TRequest, TReply> NoBusy() => throw new NotSupportedException();
 
     public GetRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
@@ -108,7 +112,9 @@ public sealed class HeadRequest<TModel, TRequest>
 
     public HeadRequest<TModel, TRequest> NoDefaults() => throw new NotSupportedException();
 
-    public HeadRequest<TModel, TRequest> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public HeadRequest<TModel, TRequest> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public HeadRequest<TModel, TRequest> NoBusy() => throw new NotSupportedException();
 
     public HeadRequest<TModel, TRequest> NoRetry() => throw new NotSupportedException();
 }
@@ -135,7 +141,9 @@ public sealed class HeadRequest<TModel, TRequest, TReply>
 
     public HeadRequest<TModel, TRequest, TReply> NoDefaults() => throw new NotSupportedException();
 
-    public HeadRequest<TModel, TRequest, TReply> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public HeadRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public HeadRequest<TModel, TRequest, TReply> NoBusy() => throw new NotSupportedException();
 
     public HeadRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
@@ -180,7 +188,9 @@ public sealed class OptionsRequest<TModel, TRequest>
 
     public OptionsRequest<TModel, TRequest> NoDefaults() => throw new NotSupportedException();
 
-    public OptionsRequest<TModel, TRequest> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public OptionsRequest<TModel, TRequest> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public OptionsRequest<TModel, TRequest> NoBusy() => throw new NotSupportedException();
 
     public OptionsRequest<TModel, TRequest> NoRetry() => throw new NotSupportedException();
 }
@@ -214,7 +224,9 @@ public sealed class OptionsRequest<TModel, TRequest, TReply>
 
     public OptionsRequest<TModel, TRequest, TReply> NoDefaults() => throw new NotSupportedException();
 
-    public OptionsRequest<TModel, TRequest, TReply> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public OptionsRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public OptionsRequest<TModel, TRequest, TReply> NoBusy() => throw new NotSupportedException();
 
     public OptionsRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
@@ -258,6 +270,10 @@ public sealed class PostRequest<TModel, TRequest>
     public PostRequest<TModel, TRequest> Finally(Action<Pipeline<TModel>> pipeline) => throw new NotSupportedException();
 
     public PostRequest<TModel, TRequest> NoDefaults() => throw new NotSupportedException();
+
+    public PostRequest<TModel, TRequest> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public PostRequest<TModel, TRequest> NoBusy() => throw new NotSupportedException();
 }
 
 public sealed class PostRequest<TModel, TRequest, TReply>
@@ -288,6 +304,10 @@ public sealed class PostRequest<TModel, TRequest, TReply>
     public PostRequest<TModel, TRequest, TReply> Finally(Action<Pipeline<TModel>> pipeline) => throw new NotSupportedException();
 
     public PostRequest<TModel, TRequest, TReply> NoDefaults() => throw new NotSupportedException();
+
+    public PostRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public PostRequest<TModel, TRequest, TReply> NoBusy() => throw new NotSupportedException();
 
     public PostRequest<TModel, TRequest, TReply> Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
 }
@@ -330,7 +350,9 @@ public sealed class PutRequest<TModel, TRequest>
 
     public PutRequest<TModel, TRequest> NoDefaults() => throw new NotSupportedException();
 
-    public PutRequest<TModel, TRequest> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public PutRequest<TModel, TRequest> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public PutRequest<TModel, TRequest> NoBusy() => throw new NotSupportedException();
 
     public PutRequest<TModel, TRequest> NoRetry() => throw new NotSupportedException();
 }
@@ -364,7 +386,9 @@ public sealed class PutRequest<TModel, TRequest, TReply>
 
     public PutRequest<TModel, TRequest, TReply> NoDefaults() => throw new NotSupportedException();
 
-    public PutRequest<TModel, TRequest, TReply> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public PutRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public PutRequest<TModel, TRequest, TReply> NoBusy() => throw new NotSupportedException();
 
     public PutRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
@@ -409,7 +433,9 @@ public sealed class DeleteRequest<TModel, TRequest>
 
     public DeleteRequest<TModel, TRequest> NoDefaults() => throw new NotSupportedException();
 
-    public DeleteRequest<TModel, TRequest> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public DeleteRequest<TModel, TRequest> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public DeleteRequest<TModel, TRequest> NoBusy() => throw new NotSupportedException();
 
     public DeleteRequest<TModel, TRequest> NoRetry() => throw new NotSupportedException();
 }
@@ -443,7 +469,9 @@ public sealed class DeleteRequest<TModel, TRequest, TReply>
 
     public DeleteRequest<TModel, TRequest, TReply> NoDefaults() => throw new NotSupportedException();
 
-    public DeleteRequest<TModel, TRequest, TReply> Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
+    public DeleteRequest<TModel, TRequest, TReply> Busy(params string[] elementIds) => throw new NotSupportedException();
+
+    public DeleteRequest<TModel, TRequest, TReply> NoBusy() => throw new NotSupportedException();
 
     public DeleteRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 

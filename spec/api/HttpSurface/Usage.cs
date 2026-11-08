@@ -60,10 +60,19 @@ public static class Usage
         pipeline.Parallel(
             census => census
                 .Get<IntakeView, CensusQuery>("/Wards/{ward}/Census", query => query.Route(q => q.Ward, ward))
-                .OnSuccess(Content.Json<Census>(), (counted, filled) => filled.Component<CensusBoard>("census").Occupied.Set(counted.Body.Read(c => c.Occupied))),
+                .OnSuccess(Content.Json<Census>(), (counted, filled) => filled.Component<CensusBoard>("census").Occupied.Set(counted.Body.Read(c => c.Occupied)))
+                .Busy("ward-board"),
             roster => roster
                 .Get<IntakeView, RosterQuery>("/Wards/{ward}/Roster", query => query.Route(q => q.Ward, ward))
-                .OnSuccess(Content.Json<Roster>(), (rostered, filled) => filled.Component<StaffRoster>("roster").OnDuty.Set(rostered.Body.Read(r => r.OnDuty))));
+                .OnSuccess(Content.Json<Roster>(), (rostered, filled) => filled.Component<StaffRoster>("roster").OnDuty.Set(rostered.Body.Read(r => r.OnDuty)))
+                .Busy("ward-board", "roster"),
+            summary => summary
+                .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query.Route(q => q.ResidentId, 12))
+                .Into("resident-summary"),
+            refresh => refresh
+                .Post("/Wards/Census/Refresh")
+                .OnSuccess(done => done.Notice().Info("Census refreshed"))
+                .NoBusy());
         pipeline.Element("census-state").Text.Set("Loaded");
     }
 
@@ -77,8 +86,7 @@ public static class Usage
     public static void DocumentSize(Pipeline<IntakeView> pipeline)
         => pipeline.Head<IntakeView, DocumentQuery>("/Documents/{id}", query => query.Route(d => d.Id, 7))
             .OnSuccess((document, shown) => shown.Element("document-size").Text.Set(document.Headers.Get("Content-Length")))
-            .OnError(404, (missing, shown) => shown.Element("document-size").Text.Set("No such document"))
-            .Retry(2, TimeSpan.FromSeconds(1));
+            .OnError(404, (missing, shown) => shown.Element("document-size").Text.Set("No such document"));
 
     public static void AllowedMethods(Pipeline<IntakeView> pipeline)
         => pipeline.Options("/Documents")
@@ -96,8 +104,7 @@ public static class Usage
             .OnSuccess(Content.None, (saved, done) => done.Element("saved-ward").Text.Set(saved.Request.Read(r => r.Ward)))
             .OnError(409, Content.Text, (conflict, shown) => shown.Element("intake-conflict").Text.Set(conflict.Body))
             .OnError(400, Content.Html, (invalid, shown) => shown.Into("intake", invalid.Body))
-            .OnError((failed, shown) => shown.Element("intake-conflict").Text.Set("The intake was not saved"))
-            .Retry(2, TimeSpan.FromSeconds(1));
+            .OnError((failed, shown) => shown.Element("intake-conflict").Text.Set("The intake was not saved"));
 
     public static void UploadScan(Pipeline<IntakeView> pipeline)
     {
