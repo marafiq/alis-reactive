@@ -339,6 +339,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   C# 9 (no module initializer); generated code is written in C# 7.3 syntax, which compiles in an app left at the default.
 - The owner, 2026-11-07: "yeah one call is fine". An app hands the generated request tables to the framework with one
   startup call, the same on both hosts (net48 `Application_Start`, net10 `Program.cs`); no host registers by itself.
+- The owner, 2026-11-07, on the generators: "I think for validators it does make sense. Compile time JSOn i would defer
+  it". A generator writes the app's validator list in the validation unit, replacing `Add<TValidator>()` per validator
+  (D16's gate 1 exception); compile-time plan JSON is deferred, so 17b-ii measures no render-cost baseline for it.
+  On `Set`: "Ok if Set is better than keep it. I will work with u on one example when ready"; the name stays until then.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
