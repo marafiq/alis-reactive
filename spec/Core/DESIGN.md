@@ -1448,7 +1448,7 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `N9.2` new: the staged builder: a GET builder with no body format, and `Form()` only on a request that checks.
 - `N9.3` new: named inputs typed one by one, `Field(m => m.Member)`, replacing
   `Form(params Expression<Func<TModel, object?>>[])` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`).
-- `N9.4` new: analyzer ALIS016, a file-shaped set member in a GET or a JSON body.
+- `N9.4` new: analyzer ALIS029, a file-shaped set member in a GET or a JSON body.
 - `N9.5` new: ALIS008's corrected message
   (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`).
 - `N9.6` new: the request defaults of D9.12 and D10.12, configured once in C#; their door's form goes to gate 2.
@@ -1755,7 +1755,9 @@ and `notice` (D10.21).
     (`Post<IntakeView, IntakeRequest>`, as `spec/api/HttpSurface` writes) and fails CS1501 without it; a C# 14 extension
     block fails CS1061 (`spec/api/refused.sh`: `VerbAsExtension`, `VerbAsExtensionBlock`, `PageUrlAsExtension`, on SDK
     10.0.101; the block form also on 11.0.100-rc.1). An instance member binds it
-    (`poc/Alis.Reactive.Poc/Pipelines/Pipeline.cs:39`). So a door the view calls with one type
+    (`poc/Alis.Reactive.Poc/Pipelines/Pipeline.cs:39`), and the stub's `PipelineVerbs<TModel>`, which stands in for
+    `Pipeline<TModel>` since the POC's is sealed, compiles every verb and `PageUrl` so, each checked against the classic
+    form's types in `VerbsAgree`. So a door the view calls with one type
     argument is an instance member of the type it is called on: the verbs and `PageUrl<TPage>()` on `Pipeline<TModel>`,
     `OnSuccess<T>` and `OnError<T>` on the request types. A condensed door with no type argument (`Set`, `Form`,
     `OnSuccess(pipeline => ..)`, `Into`, `Download`, `Notice`) is an extension method over them. The modules: the verbs,
