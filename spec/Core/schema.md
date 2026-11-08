@@ -287,7 +287,7 @@ no argument type of its own (D9.1).
 
 - `HttpSend`, the argument of `alis.http`'s `send` (N9.1):
   - `method`: GET, HEAD, OPTIONS, POST, PUT or DELETE (D9.3);
-  - `url`, a page path or an absolute `http` or `https` URI, as path parts and the URL's own query (D9.13);
+  - `url`, a page path or an absolute `http` or `https` URI, as path parts and the URL's own query (D9.23);
   - `query`, which a GET's `Form` fills with its form's inputs (N10.7);
   - `body`: none, JSON, URL-encoded, multipart with its fields and file parts, text, or one file as the whole body,
     with the inputs of an element it sends (D9.6 to D9.10, D9.15, D9.16, D9.21);

@@ -1350,7 +1350,7 @@ Terms used throughout:
   `text/plain;charset=UTF-8` from a string and a file's own type from a `Blob` (`probe:fetch-body-media-types`). A
   URL-encoded body binds as multipart does on both hosts, and an action under `[Consumes]` takes its own format
   alone: net10 answers a multipart body to a URL-encoded action 415 (`probe:core-consumes-urlencoded`). Its fields are
-  named and written as the query's (D9.13). A text body and a file body are one value each, read by the action
+  named and written as the query's (D9.23). A text body and a file body are one value each, read by the action
   from its body, since no binder on either host reads them.
 - D9.22 Antiforgery is configuration every unsafe request to the page's origin carries, not a default: a request that
   takes no defaults (D10.12) still sends it, since the server refuses a POST without it. The app chooses its place, or
@@ -1372,7 +1372,7 @@ Terms used throughout:
   header is read only by a filter that hands it to `AntiForgery.Validate(cookieToken, formToken)`
   (`probe:mvc5-antiforgery-validate-tokens`). Whether the framework ships that filter is the owner's; it goes to
   gate 1 as a flag.
-- D9.13 A request's URL, query and headers follow their standards, and C# writes each part where the view renders.
+- D9.23 A request's URL, query and headers follow their standards, and C# writes each part where the view renders.
   - The URL is an RFC 3986 URI reference: a path on the page's origin, or an absolute `http` or `https` URI, split
     into the parts of RFC 3986, section 3. Its path is segments, its query is the query, and a fragment is refused
     (D9.4).
@@ -3264,8 +3264,9 @@ shapes, starts and the payload kind of each event.
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
   `spec/NOTES.md`).
-- D19.2 The set is closed at 49 kinds: today's 33, and `stop`, `listen`, `data`, `start`, `nothing`, `unbound`,
-  `signal`, `answer`, `file`, `each`, `returned`, `stream`, `clock`, `zone`, `off` and `on`. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+- D19.2 The set is closed at 51 kinds: today's 33, and `stop`, `listen`, `data`, `start`, `nothing`, `unbound`,
+  `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `stream`, `clock`, `zone`, `off` and `on`, the 18
+  `spec/Core/schema.md` marks added and `spec/Core/Schema.tla` checks. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case.
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).
