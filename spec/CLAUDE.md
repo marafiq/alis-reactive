@@ -369,6 +369,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   A multipart body is an ordered list of parts, each a name and either text or a file (its bytes, file name and media
   type); several files and fields go in one body, under one name or nested by C# path (`Documents[0].File` beside
   `Documents[0].Title`). The host's file types (`IFormFile`, `HttpPostedFileBase` and their lists) only type the member.
+- The owner, 2026-11-08: the framework ships its spinner and toast, and the condensed form depends on contracts the core
+  owns, a busy indicator and a notice, never on their CSS or markup; an app puts its own component behind either, and
+  the full form takes full control. The core counts the requests a busy indicator covers and calls its show at the
+  first and its hide at the last, so a component with a plain show and hide is correct under Parallel, two pipelines
+  at once, retry, replace and a slot's unload (`spec/Core/Composition.tla`).
+- The owner, 2026-11-08: every module works with every other, each HTTP thing is a typed JavaScript object whose members
+  are sources and dot-walk (the response's status, headers and body, the page's URL, the request's fields), and main is
+  the floor of features, never the bar of quality.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

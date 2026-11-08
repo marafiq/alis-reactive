@@ -46,6 +46,7 @@ TLC_SPECS = {
     "ValidationToday": {"question": "Q16 at bff9eb6c0", "step": 5, "expect": "counterexamples", "gaps": 4},
     "Validation": {"question": "Q16", "step": 5, "expect": "green"},
     "Tracing": {"question": "Q20", "step": 5, "expect": "green"},
+    "Composition": {"question": "Q10 with Q11 and Q12", "step": 5, "expect": "green"},
 }
 PLUGIN_DATA_DISPATCH = "pluginNamed(locator.name).contribute"
 HEDGES = [
