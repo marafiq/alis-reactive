@@ -1,0 +1,119 @@
+@model IntakeView
+@{
+    var plan = Html.ReactivePlan<IntakeView>();
+    var residents = new[] { new ResidentRow { Id = 1, Name = "Ann", Ward = "north" }, new ResidentRow { Id = 2, Name = "Bo", Ward = "respite" } };
+}
+<div id="census"></div>
+@(plan.Render<CensusBoard>("census", Html.Raw("<div></div>"))
+    .Reactive(b => b.Counted, (counted, handled) =>
+    {
+        var intake = handled.Container<IntakeView, IntakeRequest>("intake");
+        handled.Element("status").Text.Set(counted.Ward);
+        foreach (var ward in new[] { "north", "south" })
+        {
+            handled.Element(ward).Classes.Remove("current");
+        }
+
+        handled.When(counted.Ward.Eq("north"))
+            .Then(north =>
+            {
+                north.Element("north").Classes.Add("current");
+                north.Notice().Info(counted.Ward);
+            })
+            .Else(other =>
+            {
+                other.Element("north").Classes.Remove("current");
+                other.Validate(intake);
+            });
+        handled.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake).Set(r => r.Ward, counted.Ward))
+            .WhileLoading(loading =>
+            {
+                loading.Element("status").Text.Set("Sending");
+                loading.Element("save").Classes.Add("pending");
+            })
+            .Finally(done =>
+            {
+                done.Element("save").Classes.Remove("pending");
+                done.Element("status").Text.Set("Sent");
+            })
+            .OnError<ValidationProblem>(400, (refused, shown) =>
+            {
+                shown.ShowErrors(refused.Body);
+                shown.Element("status").Text.Set(refused.Headers.Get("X-Reason"));
+            })
+            .OnSuccess<IntakeCreated>((created, done) =>
+            {
+                done.Element("admitted").Text.Set(created.Request.Read(r => r.Name));
+                done.When(created.Status.Eq(201))
+                    .Then(admitted =>
+                    {
+                        admitted.Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                                .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
+                            .OnSuccess<ResidentSummary>((summary, shown) =>
+                            {
+                                shown.When(summary.Body.Read(s => s.Ward.Name).Eq(created.Request.Read(r => r.Ward)))
+                                    .Then(same =>
+                                    {
+                                        same.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name));
+                                        same.Element("ward").Classes.Add("confirmed");
+                                    });
+                                shown.Element("summary").Classes.Add("loaded");
+                            });
+                        admitted.Element("status").Text.Set("Admitted");
+                    });
+                done.Notice().Success("Resident admitted");
+            })
+            .Chained((created, next) =>
+            {
+                next.Element("status").Text.Set("Handing over");
+                next.Post<IntakeView, HandoverRequest>("/Handovers", request => request
+                        .Set(h => h.ResidentId, created.Body.Read(c => c.Resident.Id))
+                        .Set(h => h.Ward, created.Request.Read(r => r.Ward)))
+                    .OnSuccess(done => done.Notice().Success("Handed over"));
+                next.Element("handover").Classes.Add("sent");
+            });
+        handled.Parallel(
+            first =>
+            {
+                first.Element("left").Text.Set(counted.Ward);
+                first.Element("left").Classes.Add("loaded");
+            },
+            second =>
+            {
+                second.Element("right").Text.Set(counted.Ward);
+                second.Element("right").Classes.Add("loaded");
+            });
+    }))
+@{
+    var rows = plan.Rows<IntakeView, ResidentRow>("residents");
+    var open = rows.NativeActionLink((activated, pipeline) =>
+    {
+        pipeline.Element("resident-detail").Classes.Add("loading");
+        pipeline.Get<IntakeView, ResidentQuery>("/Residents/{residentId}", query => query
+                .Set(q => q.ResidentId, activated.Row.Read(r => r.Id)))
+            .OnSuccess(Content.Html, (loaded, done) =>
+            {
+                done.Into("resident-detail", loaded.Body);
+                done.Element("resident-detail").Classes.Remove("loading");
+            });
+    });
+    var discharge = rows.NativeActionButton((activated, pipeline) =>
+    {
+        pipeline.Element("census-note").Text.Set(activated.Row.Read(r => r.Name));
+        pipeline.Post<IntakeView, DischargeRequest>("/Residents/{residentId}/Discharge", request => request
+                .Set(r => r.ResidentId, activated.Row.Read(r => r.Id)))
+            .OnSuccess<CensusCount>((census, done) =>
+            {
+                done.Element("occupied").Text.Set(census.Body.Read(c => c.Occupied));
+                activated.Element.Text.Set("Discharged");
+            });
+    });
+}
+<table>
+    @foreach (var resident in residents)
+    {
+        <tr><td>@open.Render(resident, resident.Name)</td><td>@discharge.Render(resident, "Discharge")</td></tr>
+    }
+</table>
+<div id="resident-detail"></div>
+@Html.RenderPlan(plan)

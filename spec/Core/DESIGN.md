@@ -1320,7 +1320,8 @@ Terms used throughout:
     summary is where the request's failures show (D16.13). The types hold it: the full form's body door takes the
     container as its first argument (`Json(container, body => ..)`, `UrlEncoded(form, body => ..)`), a GET's and the
     condensed `Form` and `Inputs` return a stage that offers no second, and no body offers either
-    (`SecondContainerOnABody`, `SecondContainerOnGet`, `ContainerInsideABody` in `spec/api/refused.sh`). A container is typed by its model, and a request takes
+    (`SecondContainerOnABody`, `SecondContainerOnGet`, `ContainerInsideABody` in `spec/api/refused.sh`), in the chain; a
+    parts object two statements write is ALIS030's (N18.7). A container is typed by its model, and a request takes
     only a container of its own model (N18.3).
   - When an input and a set member send the same binding name, the input's value is sent, as the body the check
     reads (Q16); two inputs that send one scalar binding name are D13.4's.
@@ -1854,7 +1855,9 @@ and `notice` (D10.21).
     `Text` or `File` body one that offers no `Set` and a `Set` one that offers no whole body (`SetAfterAWholeBody`,
     `AWholeBodyAfterSet`), the full form's body door takes the container (`ContainerInsideABody`), a GET's and the
     condensed `Form` and `Inputs` return a stage that offers no second (`SecondContainerOnGet`,
-    `SecondContainerOnABody`), and `Chained` ends the sentence (`SecondChained`), each in `spec/api/refused.sh`.
+    `SecondContainerOnABody`), and `Chained` ends the sentence (`SecondChained`), each in `spec/api/refused.sh`. A stage
+    holds in the chain; a staged value used twice, a parts object two statements write or a request held in a variable
+    and written twice, is ALIS030's, so a request's parts are one chain (N18.7).
     ALIS030 refuses what no type stages: a second `Busy` or `NoBusy`, `Busy` beside `NoDefaults()`, a status outside
     300 to 599, a second route for one status and a second catch-all (N18.7). A `Set` on a file member stays D9.16's analyzer, since `Set` takes a member of any
     type, and a file input a GET's `Form` or `Inputs` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
@@ -1993,19 +1996,21 @@ and `notice` (D10.21).
 - `X10.20` behavior: under `ShowBusy()` in an app whose page provides no `busy`, a request stops before it sends, the
   network log holds no request, and the console one error.
 - `X10.21` type (N10.7): a second body door does not compile:
-  `spec/api/HttpSurface/refused/SecondBodyDoor.CS1061.cs.txt:12`.
+  `spec/api/HttpSurface/refused/SecondBodyDoor.CS1061.cs.txt:12`. The chain does not compile; a staged value used twice is ALIS030's: new:N18.7.
 - `X10.22` type (N10.7): a `Set` after a `Text` body and a `Text` after a `Set` do not compile:
   `spec/api/HttpSurface/refused/SetAfterAWholeBody.CS1061.cs.txt:10`,
-  `spec/api/HttpSurface/refused/AWholeBodyAfterSet.CS1061.cs.txt:10`.
+  `spec/api/HttpSurface/refused/AWholeBodyAfterSet.CS1061.cs.txt:10`. The chain does not compile; a staged value used twice is ALIS030's: new:N18.7.
 - `X10.23` type (D9.15): a second container on a body or a GET, and a container inside a body, do not compile:
   `spec/api/HttpSurface/refused/SecondContainerOnABody.CS1929.cs.txt:10`,
   `spec/api/HttpSurface/refused/SecondContainerOnGet.CS1929.cs.txt:10`,
-  `spec/api/HttpSurface/refused/ContainerInsideABody.CS1929.cs.txt:10`.
-- `X10.24` type (N10.7): a second `Chained` does not compile: `spec/api/HttpSurface/refused/SecondChained.CS0023.cs.txt:13`.
+  `spec/api/HttpSurface/refused/ContainerInsideABody.CS1929.cs.txt:10`. The chain does not compile; a staged value used twice is ALIS030's: new:N18.7.
+- `X10.24` type (N10.7): a second `Chained` does not compile: `spec/api/HttpSurface/refused/SecondChained.CS0023.cs.txt:13`. The chain does not compile; a staged value used twice is ALIS030's: new:N18.7.
 - `X10.25` analyzer (D10.21, D10.13): a second `Busy` or `NoBusy`, a status outside 300 to 599, a second route for
   one status and a second catch-all: new:N18.7.
 - `X10.26` analyzer (D9.17): a second request in one block, at its own level, in every stage and file: ALIS008,
   new:N9.5.
+- `X10.27` analyzer (N10.7): a request's parts object written by two statements, and a request held in a variable and
+  written twice (a second `Chained` among them), each of which compiles: new:N18.7.
 
 ## Q11. Lanes and time
 
@@ -2110,6 +2115,9 @@ and `notice` (D10.21).
   - Proof: `spec/api/HttpSurface/EveryStage.cs` writes every module in every stage, and `ManyStatementsInEveryStage`
     writes several statements in each, a request with steps after it in a handler, a route and a `Chained` block, a
     condition inside a route inside a condition, and an inner block reading the outer reply.
+    `spec/api/CshtmlStages/Views/Stages/Index.cshtml` writes the same stages and a row action's loop in an ASP.NET Core
+    MVC view the Razor SDK compiles at build, and `spec/api/CshtmlStages/Program.cs` the defaults' blocks in a startup
+    file; an MVC 5 view is compiled where it first renders, so it stays the verify-net48 run's.
 
 **Schema nodes.** `do` and `let` with `await`, `all`, `try`, and the handler's policy, a field of `handler`
 (Q19). The abort signal is the run's, not the plan's: `HttpSend` carries none.
@@ -3327,8 +3335,8 @@ plans (Q19).
   with the page's items, and the component shows them.
 - `X17.13` analyzer: an awaited read inside a callback's answer is refused where the view renders with "A callback
   answers its vendor at once, so its answer cannot wait for an async method or a request." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
-- `X17.16` refusal (D17.3): a second handler of one object's callback property: "'{event}' is a callback property,
-  which holds one listener, so a second handler would replace the first. Write both pipelines in one handler."
+- `X17.16` analyzer (D17.3): a second handler of one object's callback property: "'{event}' is a callback property,
+  which holds one listener, so a second handler would replace the first. Write both pipelines in one handler." In one view by ALIS003, and where the view renders for handlers across views (D18.6): new:N18.14.
 - `X17.17` behavior (D17.3): a call bell whose event is a callback property runs its handler with the ring's room,
   and a ward feed whose subscribe method returns its unsubscriber runs its handler with the update's message.
 - `X17.18` analyzer (D17.4): an argument at a position read on a declaration that is neither an event's payload nor a
@@ -3471,21 +3479,23 @@ plans (Q19).
     X3.11, X4.12, X6.2, X6.6, X6.10, X6.11, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.29, X6.30,
     X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
     X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
-    N18.13).
+    N18.13), new beside the moved ones; ALIS003, a callback property's second handler in one view (X17.16; N18.14).
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
     X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X7.10, X7.11, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
-    URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5, X17.16). A plan's version
+    URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5, and X17.16's handlers across views). A plan's version
     is the browser's, at boot (X19.3).
   - Every analyzer of both lines has its verdict. ALIS001, a `When` given no `Then`: kept, retargeted to the
     conditions of `Pipeline<TModel>` in every block and file. ALIS002, main's one request per action link: kept as
     ALIS008 on the action's block, since an action's handler is a block (D11.10). ALIS003, a second `Reactive` for
-    one event: leaves, since two handlers of one event are D11.5's meaning, each with its own policy
-    (`tests/Alis.Reactive.Poc.PlaywrightTests/Events/WhenAnAlarmIsAcknowledged.cs:18`). ALIS004: kept, retargeted
+    one event: kept, narrowed to an event its vendor delivers through a callback property, which holds one listener
+    (X17.16 in one view, N18.14); two handlers of an event its vendor lets many hear are D11.5's meaning, each with its
+    own policy (`tests/Alis.Reactive.Poc.PlaywrightTests/Events/WhenAnAlarmIsAcknowledged.cs:18`). ALIS004: kept, retargeted
     (N18.6). ALIS005, a rule only the server runs, reported as information: kept on `ReactiveValidator<T>`, so the
     developer sees where each rule runs. ALIS006, main's warning on a condition with no browser form: kept, an error
-    (N18.11). ALIS007, a second `Chained`: gives way to the type, since `Chained` ends the request's sentence
-    (`SecondChained` in `spec/api/refused.sh`). ALIS008: kept, retargeted (D9.17, N9.5). ALIS009: kept (D18.5).
+    (N18.11). ALIS007, a second `Chained`: the chain does not compile, since `Chained` ends the request's sentence
+    (`SecondChained` in `spec/api/refused.sh`), and a request held and written twice is ALIS030's single use, which
+    carries it (N18.7). ALIS008: kept, retargeted (D9.17, N9.5). ALIS009: kept (D18.5).
     ALIS010 to ALIS013, the slice tree (a use of a slice above, a namespace other than the folder's, a public type
     left unsealed, a table that disagrees with its package): kept for each package built on the core, since a module
     is a namespace and a folder (the owner, 2026-11-06). ALIS014 to ALIS029 are the POC's, each at its own line.
@@ -3521,7 +3531,9 @@ shapes, starts and the payload kind of each event.
   `traceparent` and the Fetch Standard's forbidden request headers, and on a constant value one outside RFC 9110's
   field value (D9.23); a JSON body member under a number-keyed dictionary (D14.5); a second `Busy` or `NoBusy`,
   `Busy` beside `NoDefaults()` (D10.21), a status outside 300 to 599, a second route for one status and a second
-  catch-all (D10.13).
+  catch-all (D10.13); a staged value used more than once, a request's parts object written by two statements or a
+  request held in a variable and written twice, so a door a stage removes cannot come back through a second use, which
+  carries ALIS007's second `Chained` (N10.7).
 - `N18.8` new: ALIS031, `ShowErrors` in a block that no route encloses (D16.13).
 - `N18.9` new: ALIS032, the block analyzer: a step written on the pipeline of a block around its own (D11.10); a
   bound value carried out of its block through a variable declared outside it (D8.8, D5.11); an `ElseIf` or `Else`
@@ -3538,6 +3550,8 @@ shapes, starts and the payload kind of each event.
 - `N18.13` new: ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no
   GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
   `Inputs`, `Input` or a header (D17.15).
+- `N18.14` new: ALIS003 narrowed and retargeted: a second handler, in one view, of an event its vendor delivers through
+  a callback property (D17.3), on `Reactive` of every component and plugin, in every file.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), and an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4).
