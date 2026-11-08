@@ -306,6 +306,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   (ALIS023), and the arguments the build reads are constants (ALIS024). A public member that returns a private
   member's door is not refused: the private member declares its own JavaScript name, which only the contract checks,
   on roots and reached types, and ALIS016 then points at the private member. The owner can overrule it.
+- The owner, 2026-11-07, on 17a's report: "when you say not exercise, this is a hatchword to make mistakes or drift". A
+  unit's report carries no "not exercised" line: what the spec decides for the unit's door is built and proven in that
+  unit, or the unit is not reported done. 17a reported done with `Set` taking text only; unit 17b builds the members
+  D9.6, D9.10, D9.19 and D9.4 decide. An environment the POC lacks (net48) is a work item with its unit, not a caveat.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
