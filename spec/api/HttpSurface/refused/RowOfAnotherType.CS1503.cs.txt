@@ -1,0 +1,14 @@
+using Alis.Reactive.Elements;
+using Alis.Reactive.Hosting;
+using Alis.Reactive.Native;
+
+namespace Intake;
+
+public static class RowOfAnotherType
+{
+    public static RowControl Refused(ReactivePlan<IntakeView> plan, IntakeRequest intake)
+    {
+        var open = plan.Rows<IntakeView, ResidentRow>("residents").NativeActionLink((activated, pipeline) => pipeline.Element("detail").Classes.Add("open"));
+        return open.Render(intake, intake.Name);
+    }
+}

@@ -407,6 +407,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   Conditions, the page's URL, every reply's status, headers and body, and the request as sent dot-walk in each, and a
   chained request reads every reply and request around it. A step that waits holds what follows it, a route's tail
   included (D11.10, D11.5, `spec/Core/Lanes.tla`).
+- Chosen within the owner's yes, 2026-11-08: a row action is one handler per action and one entry per rendered
+  control, and the entry holds only the row members the action's block reads; a button takes any block and a link a
+  block whose one request is a GET, its href; the handler's policy spans the action's rows, and a link reads nothing
+  another script did with the click (D17.15). Both lines write a whole plan per link. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

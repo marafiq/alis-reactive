@@ -208,7 +208,7 @@ def check_inventory():
 RUNGS = {"type", "analyzer", "refusal", "behavior"}
 CITE = re.compile(r"([A-Za-z0-9_.\-/]+\.(?:cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|cshtml|js|sh|yml)):(\d+)(?:-(\d+))?")
 CHECKER = re.compile(r"`(?:([A-Za-z]+)\.tla:(\w+)|probe:([\w.\-]+)|check:(\w+))`")
-DEFECT = re.compile(r"^- `?(X\d+\.\d+)`? (type|analyzer|refusal|behavior): (.+)$")
+DEFECT = re.compile(r"^- `?(X\d+\.\d+)`? (type|analyzer|refusal|behavior)(?: \([^)]*\))?: (.+)$")
 NEW_DOOR = re.compile(r"`?(N\d+\.\d+)`?")
 EVIDENCE_IDS = [f"G{n}" for n in range(1, 11)] + [f"B{n}" for n in range(1, 17)] + [f"P{n}" for n in range(1, 6)]
 _line_counts = {}

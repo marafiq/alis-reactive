@@ -1718,7 +1718,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     2026-11-08: the loader shows on the right target, parallel requests of 5 and 1 seconds updating one target or two).
     A request holds the indicator on its targets, which the C# derives where the view renders and the plan carries, so
     the browser infers nothing: each element and component its success route writes outside any condition (a text, an
-    HTML, a class, a component's member or method), the element its `Into(elementId)` loads and the element of the
+    HTML, a class, a component's member or method, a component a payload holds among them, such as a row action's
+    control, read when the request starts), the element its `Into(elementId)` loads and the element of the
     container its `Form` or `Inputs` sends. An `Input`, a notice, a plugin, a dispatch and a step inside a branch add
     none, and a request whose route
     writes nothing so holds the page's own target, an indicator with no element. On the full form `Busy(elementId, ..)`
@@ -3174,6 +3175,40 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     (D4.1). The redesign stops the whole page for a name provided twice or a value that is no object
     (`Alis.Reactive.Assets/runtime/objects/plugins.ts:23-36`); here a plugin's fault stops only the pipelines that
     reach it, as an element's does (D4.1).
+- D17.15 A row action serves any grid-like list, never one vendor's (the owner, 2026-11-08): it is declared once,
+  outside its rows, and each row renders it with its own values.
+  - The core's door is `plan.Rows<TRow>(rowsId)`, an instance member of the plan, since a call that names only its own
+    type argument binds no extension (N10.7). A render helper built on it declares each action once, in declaration
+    order, as a block (D11.10) whose payload is `RowActivated<TRow>`: `Row`, the row it was rendered with, read as data
+    (D4.2), and `Element`, the control the user activated, a component (D11.4). Every module works in that block.
+  - `Render(row, text)` writes the control with the id `{rowsId}-{position}-{n}`, n counting that action's renders
+    from 0, and records one entry: the id and the values of the row's members the action's block reads, written by
+    the plan's literal writer under the app's JSON options. The entries are one literal at the plan's end (D14.7), so
+    the plan grows by one entry per control and holds no member the block does not read. The handler is written once
+    per action, where both lines write a whole plan per link.
+  - The action's handler starts on load (D11.6), calls its helper's plugin with the entries, and listens to the one
+    object it returns (D12.8): one listen per action, released with its plan's owner, so rows in a slot leave with
+    it. Its policy is the handler's across its rows (D11.7): `overlap` by default, `replace` so the row clicked last
+    wins, `skip` so one run holds every row.
+  - Native's helpers (D17.10): `NativeActionButton(action)` renders `<button type="button">` for any block;
+    `NativeActionLink(action)` renders `<a href>` for a block whose one request at its own level is a GET. Its href is
+    that GET's URL, filled in C# from the row's and the view's values by the encoding the request sends (D9.4,
+    D9.23), so a new tab, a middle click or a copied link opens what the click loads. An unmodified primary click
+    raises the action and prevents the navigation; a modified or middle click stays the browser's. What another
+    script did with the click is not read (`defaultPrevented`), since the runtime infers no intent from the page.
+  - Native's browser code, the plugin `native-row-actions`, finds each control by `getElementById` and raises
+    `activated` with its entry's row and its element. The core reads no data attribute and walks no DOM.
+  - Compiler rules: a row of another type does not compile (`RowOfAnotherType` in `spec/api/refused.sh`), nor a render
+    outside the plan's block (N14.2); ALIS008 holds one request per block at its own level; ALIS035 refuses a link
+    whose block's one request is no GET, whose route or query value is neither a C# value nor its row's member, or
+    that sends a container, an input or a header, since a navigation carries none of them (N18.13). Refused where the
+    view renders, by what only the render sees: an id two controls render (D14.6) and D9.4's checks on a URL the view
+    computes.
+  - A component grid whose vendor raises a command declares the event's payload with its row as `ReadOnly<TRow>`
+    (D17.4) and handles it with `Reactive`, every module in the block; `Rows` serves markup the view writes.
+  - A gap, named: a response loaded into the activated row (`Into` the row's own element). A slot is keyed by text C#
+    writes (D12) and an entry's element is the row's control, not its row; the use case is a row re-rendered from the
+    response's partial. Until it has a door, a view reloads the list with a chained GET `Into` its container.
 
 **Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
 `handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
@@ -3209,6 +3244,10 @@ plans (Q19).
 - `N17.10` new: an input field's `ValueJson` and `Json(options)`, the starting value and options a render helper
   writes (D17.13); their names go to gate 2.
 - kept: `Plugin`, `Plugin.Name` and `Plugin(string name)` (both lines).
+- `N17.12` new: `plan.Rows<TRow>(rowsId)` and `Rows<TModel, TRow>` in the core; `RowActivated<TRow>`, `RowAction<TModel,
+  TRow>.Render(row, text)`, `NativeActionButton(action)` and `NativeActionLink(action)` in Alis.Reactive.Native, with
+  the plugin `native-row-actions` (D17.15). They replace main's `NativeActionLink` with its serializer and id generator,
+  and the redesign's `NativeActionLink`, `NativeActionLinkRequest` and `NativeActionLinkConfirm`; their forms go to gate 2.
 - `N17.11` new: `Plugin(string name, EventListening events)` and `EventListening` (`EventTarget`, `CallbackProperties`,
   `Methods`, `ReturnedUnsubscriber`; `PluginEvents` until POC 14d gave it a second holder, `EventedObject`), `p.Plugin<TPlugin>()`, `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`
   (D17.14); their forms go to gate 2. They replace the redesign's `ReactivePlan.RegisterPlugin<TPlugin>()`, so a plugin
@@ -3231,6 +3270,25 @@ plans (Q19).
 - B16: only the meta-package is exact (`Alis.Reactive.SandboxApp/package.json:25`); its sub-packages follow tilde
   ranges (`package-lock.json:1717-1726`), so `ej2-base` resolves to 33.1.45 under 33.1.47.
 - A regular expression checks a vendor's name (`Alis.Reactive/Vendors/ComponentVendor.cs:10-11`).
+- Both lines write a whole plan for each action link: main serializes the plan into each anchor's payload
+  (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:45`), and the redesign renders a plan per
+  link (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:108`). Main refuses validation, Parallel,
+  chained requests, route values and IncludeAll in a link
+  (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:32`,
+  `Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:82`,
+  `Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:94`,
+  `Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:115`,
+  `Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:120`), finds the link by a document
+  listener and `closest()` (`Alis.Reactive.Assets/runtime/components/native/native-action-link.ts:23`,
+  `Alis.Reactive.Assets/runtime/components/native/native-action-link.ts:37`) and counts ids on the HTTP request
+  (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkIdGenerator.cs:20-31`). The redesign repeats the
+  pipeline's verbs on the link (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkRequest.cs:29-38`) and
+  reads `DefaultPrevented` in its guard (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:113-121`).
+  Verdicts (D17.15): the plan per link is refused for its size; validation, Parallel, `Chained`, route values and
+  containers are lifted, since an action is a block, a link's containers staying ALIS035's; the document listener,
+  `closest()` and `DefaultPrevented` leave; the id counter on the HTTP request is refused by D14.1; the link's own
+  verbs and `Component` are refused as parallel names; its confirm is NativeConfirm's `Ask` in a `When` (D17.10);
+  `LinkRequestCount` gives way to ALIS008 at build; the click guard moves into Native's plugin.
 
 - The core writes a call to a plugin only Fusion provides: `Alis.Reactive/PlanModel/Conditions/Condition.cs:504`,
   `Alis.Reactive/PlanModel/Writing/Scope.cs:209`, `Alis.Reactive.Assets/components/fusion/confirm.ts:94`.
@@ -3300,6 +3358,21 @@ plans (Q19).
   provided as a number stops each step that reads a colour a number lacks; the page's other pipelines run.
 - `X17.27` analyzer (D17.14): a plugin named with a dot: "Plugin name 'alis.log' must start with a letter and contain
   only ASCII letters, digits, underscore, or hyphen. A name with a dot is the framework's own." At build by ALIS034, and where the view renders on code it does not follow (D18.6): new:N18.12.
+- `X17.31` type (D17.15): a row of another type rendered by an action does not compile:
+  `spec/api/HttpSurface/refused/RowOfAnotherType.CS1503.cs.txt:12`.
+- `X17.32` analyzer (D17.15): a link whose block's one request is no GET, whose route or query value is neither a C#
+  value nor its row's member, or that sends a container, an input or a header: new:N18.13.
+- `X17.33` behavior (D17.15): a list of rows with three actions; a click on one row's Discharge posts that row's id,
+  and its control shows Discharged while the other rows' controls are unchanged.
+- `X17.34` behavior (D17.15): an unmodified click on a row's link loads its panel and the address bar stays; a
+  modified or middle click sends no request and opens the link's page in a new tab.
+- `X17.35` behavior (D17.15, D9.4): a link's href and the URL its click requests are equal for a key holding a space,
+  `+`, `'`, `(`, `~` and "é".
+- `X17.36` behavior (D17.15, D11.7): under `replace`, row A's link and then row B's are clicked while A's request is in
+  flight: the panel shows row B.
+- `X17.37` behavior (D17.15, D12.8): rows rendered in a slot; after the slot reloads, one click on a row's control
+  sends one request.
+- `X17.38` behavior (D17.15, D10.21): a row's control shows busy while its request runs, and only that row's.
 
 ## Q18. Type knowledge without reflection
 
@@ -3397,7 +3470,8 @@ plans (Q19).
     X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,
     X3.11, X4.12, X6.2, X6.6, X6.10, X6.11, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.29, X6.30,
     X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
-    X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12).
+    X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
+    N18.13).
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
     X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X7.10, X7.11, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
@@ -3461,6 +3535,9 @@ shapes, starts and the payload kind of each event.
 - `N18.11` new: ALIS006 kept as an error, the validator analyzer: a condition with no browser form outside
   `WhenOnServer` and `UnlessOnServer`, a constant pattern outside D16.11's closed set or with an option other than
   `CultureInvariant`, and on net48 a model type with no public parameterless constructor (D16.6, D16.11).
+- `N18.13` new: ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no
+  GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
+  `Inputs`, `Input` or a header (D17.15).
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), and an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4).

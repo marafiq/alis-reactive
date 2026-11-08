@@ -303,7 +303,8 @@ no argument type of its own (D9.1).
     POST, PUT or DELETE to the page's origin (D9.22);
   - `retry`: none, or the standard policy with the attempts and first wait the defaults set, never a request's own
     (D10.14, N10.3);
-  - `busy`: none, the page, or the element ids of its targets, as the C# derived them (D10.21);
+  - `busy`: none, the page, or its targets as the C# derived them, each an element id or an expression that reads a
+    component a payload holds, such as a row action's control, resolved when the request starts (D10.21, D17.15);
   - `respondedJson`: true on net48 (D10.7);
   - the body kind of each route (D10.6): a success route's none, JSON, text, HTML or file, an error route's none,
     JSON, text or HTML, and the `Accept` the success kind writes.
