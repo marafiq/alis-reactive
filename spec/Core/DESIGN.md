@@ -1296,8 +1296,9 @@ Terms used throughout:
   fill a member the same way (Q7).
 - D9.20 What an endpoint binds is read at build, never at run time (D18.1). A source generator in the analyzers
   package walks the complex parameters of each controller action and every type reachable from them, and writes,
-  for each type, the members the binder fills by their C# name as typed lambdas, and for each enum its values. A
-  module initializer sets the tables before the first view renders. The actions are the public methods of a net10
+  for each type, the members the binder fills by their C# name as typed lambdas, and for each enum its values, in C#
+  7.3 syntax, so it compiles in an MVC 5 app at any language version the owner assumes (C# 8). How the app hands the
+  tables to the framework at startup is the owner's open question. The actions are the public methods of a net10
   `Microsoft.AspNetCore.Mvc.ControllerBase` and of a net48 `System.Web.Mvc.Controller`, less `[NonAction]`; a net10
   parameter bound `[FromBody]`, `[FromServices]`, `[FromKeyedServices]` or `[FromHeader]` is not walked, nor a complex
   parameter with no binding attribute under `[ApiController]` on its class, a base class or its assembly, which net10
@@ -1305,11 +1306,7 @@ Terms used throughout:
   (D2.6), and reads a list item's type from the lambda's type argument, never from a type's members.
   - Two assemblies whose controllers reach one type each write its table. A second table is accepted when it lists the
     same fields with the same marks, and any difference is refused where a view first reads the type, naming it.
-  - A request type with no table is refused where the view renders, and the message names both causes: no action
-    takes the type or a type that holds it, or the app's build did not run the generator. The generator refuses at
-    build a language version below C# 9, which a module initializer needs, and on net48 writes
-    `ModuleInitializerAttribute` only when the compilation can reach none; the analyzers package sets PolySharp's
-    `PolySharpExcludeGeneratedTypes` for it, since one generator does not see another's output.
+  - A request type with no table is refused where the view renders, naming its cause and cure.
   - A list member is sent only when declared `List<T>`, the one declared type both binders fill whatever it starts
     with: net10 binds nothing into a read-only list a member starts with (`probe:core-query-read-only-lists`), and
     MVC 5 creates a `List<T>` only for `IEnumerable<>`, `ICollection<>` and `IList<>` and clears the collection a
