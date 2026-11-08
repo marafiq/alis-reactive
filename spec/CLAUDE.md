@@ -306,6 +306,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   (ALIS023), and the arguments the build reads are constants (ALIS024). A public member that returns a private
   member's door is not refused: the private member declares its own JavaScript name, which only the contract checks,
   on roots and reached types, and ALIS016 then points at the private member. The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a date or an instant that reads nothing writes no text, and a request sends
+  it by D9.10's table: a `DateTimeOffset` is left out and binds its start, a `DateTimeOffset?` binds `null` (D3.8,
+  `spec/Core/DateWire.tla` NothingWritesNoText). The redesign's earliest moment was the start of a non-nullable member with no
+  initializer, which leaving it out binds; sent always, it bound a nullable as that moment and overrode an initializer.
+  The owner can overrule it.
 - The owner, 2026-11-07, on 17a's report: "when you say not exercise, this is a hatchword to make mistakes or drift". A
   unit's report carries no "not exercised" line: what the spec decides for the unit's door is built and proven in that
   unit, or the unit is not reported done. 17a reported done with `Set` taking text only; unit 17b builds the members

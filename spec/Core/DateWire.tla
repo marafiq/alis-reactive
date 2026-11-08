@@ -3,7 +3,7 @@ EXTENDS Integers
 
 CONSTANT Mutant
 
-Mutants == {"none", "DateSentWithOffset", "MidnightWritesTime", "PageDayOffset", "EmptyInstantSentAsNull"}
+Mutants == {"none", "DateSentWithOffset", "MidnightWritesTime", "PageDayOffset", "EmptyInstantSentAsEarliest"}
 
 ASSUME Mutant \in Mutants
 
@@ -44,9 +44,7 @@ InstantText ==
 
 Sent ==
     IF ~present
-      THEN IF kind = "instant"
-             THEN IF Mutant = "EmptyInstantSentAsNull" THEN Text("null", 0, 0, FALSE, FALSE, 0) ELSE Earliest
-             ELSE Text("nothing", 0, 0, FALSE, FALSE, 0)
+      THEN IF kind = "instant" /\ Mutant = "EmptyInstantSentAsEarliest" THEN Earliest ELSE Text("nothing", 0, 0, FALSE, FALSE, 0)
       ELSE IF kind = "date" THEN DateText ELSE InstantText
 
 ParsedUtc(text) == text.day * 1440 + text.minute - text.zone
@@ -65,8 +63,7 @@ InstantCarriesItsClockOffset ==
         /\ Sent.minute = minute
         /\ ParsedUtc(Sent) = Utc
 
-InstantNothingSentAsEarliest ==
-    (~present /\ kind = "instant") => Sent = Earliest
+NothingWritesNoText == ~present => Sent.form = "nothing"
 
 ReachOffsetChangesBetweenDays == ~(present /\ kind = "instant" /\ day # PageDay /\ offset[day] # offset[PageDay])
 

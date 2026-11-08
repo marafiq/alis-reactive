@@ -6,7 +6,7 @@ CONSTANT Mutant
 Mutants == {"none", "PlaceholderUnchecked", "DateInPath", "FileInJson", "NullForValueType",
             "FailedCheckSends", "FinallyWithoutLoading", "CatchAllBeatsStatus", "FailureRunsSuccess",
             "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt",
-            "FailedConditionSendsNothing", "ChainedIgnoresCondition"}
+            "FailedConditionSendsNothing", "ChainedIgnoresCondition", "CatchAllRunsOnSuccess"}
 
 ASSUME Mutant \in Mutants
 
@@ -22,11 +22,11 @@ Kinds == {"valueType", "list", "nullable"}
 Bodies == {"json", "form"}
 
 VARIABLES part, config,
-          checkPasses, loadingStops, guardOk, method, policy, outcomes, reqRoutes, defRoutes,
+          checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
           routeStops, chained, chainedWhen,
           pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan
 
-scenario == <<checkPasses, loadingStops, guardOk, method, policy, outcomes, reqRoutes, defRoutes,
+scenario == <<checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
               routeStops, chained, chainedWhen>>
 run == <<pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan>>
 vars == <<part, config, scenario, run>>
@@ -34,6 +34,8 @@ vars == <<part, config, scenario, run>>
 Unset == <<"unset", "unset">>
 Success == <<"success", "ok">>
 NoRoute == <<"none", "none">>
+
+SuccessRoute == IF successRoute THEN Success ELSE NoRoute
 
 IdleRun ==
     /\ attempt = 1
@@ -52,7 +54,8 @@ PlacementInit ==
     /\ part = "placement"
     /\ config \in Configs
     /\ checkPasses = TRUE /\ loadingStops = FALSE /\ guardOk = TRUE /\ method = "GET"
-    /\ policy = FALSE /\ outcomes = [i \in 1..MaxAttempts |-> "ok"] /\ reqRoutes = {} /\ defRoutes = {}
+    /\ policy = FALSE /\ outcomes = [i \in 1..MaxAttempts |-> "ok"] /\ successRoute = TRUE
+    /\ reqRoutes = {} /\ defRoutes = {}
     /\ routeStops = FALSE /\ chained = FALSE /\ chainedWhen = TRUE
     /\ pc = "idle"
     /\ IdleRun
@@ -66,6 +69,7 @@ FlowInit ==
     /\ method \in {"GET", "POST"}
     /\ policy \in BOOLEAN
     /\ outcomes \in [1..MaxAttempts -> Outcomes]
+    /\ successRoute \in BOOLEAN
     /\ reqRoutes \in SUBSET {"s404", "s503", "catchAll"}
     /\ defRoutes \in SUBSET {"s503", "catchAll"}
     /\ routeStops \in BOOLEAN
@@ -115,7 +119,7 @@ CatchAllFirst(o) ==
     ELSE ForStatus(o)
 
 RouteFor(o) ==
-    CASE o = "ok" -> Success
+    CASE o = "ok" -> IF ~successRoute /\ Mutant = "CatchAllRunsOnSuccess" THEN CatchAll ELSE SuccessRoute
       [] o \in Statuses -> IF Mutant = "CatchAllBeatsStatus" THEN CatchAllFirst(o) ELSE ForStatus(o)
       [] OTHER -> IF Mutant = "FailureRunsSuccess" /\ o = "mismatch" THEN Success ELSE CatchAll
 
@@ -215,11 +219,13 @@ FailedCheckSendsNothing == (Flow /\ ~checkPasses) => (sends = 0 /\ loadings = 0 
 FinallyRunsWhenLoadingRan == (Flow /\ pc = "done") => ((finallies = 1) <=> entered)
 
 OneRouteRuns == (Flow /\ pc = "done" /\ final \in {"ok"} \cup Statuses) =>
-    (routes = 1 /\ routeRan = IF final = "ok" THEN Success ELSE ForStatus(final))
+    (routes = 1 /\ routeRan = IF final = "ok" THEN SuccessRoute ELSE ForStatus(final))
+
+SuccessWithNoRouteRunsNone == (Flow /\ final = "ok" /\ ~successRoute /\ routes = 1) => routeRan = NoRoute
 
 FailureRunsTheCatchAll == (Flow /\ pc = "done" /\ final \in Failures) => (routes = 1 /\ routeRan = CatchAll)
 
-ChainedOnlyAfterSuccess == chainedRan => (final = "ok" /\ routeRan = Success /\ finallies = 1)
+ChainedOnlyAfterSuccess == chainedRan => (final = "ok" /\ routeRan = SuccessRoute /\ finallies = 1)
 
 StepsAfterRunUnlessStopped == (Flow /\ pc = "done") => (afterRan <=> ~stopped)
 
@@ -235,5 +241,7 @@ ReachRetriedThenSucceeded == ~(pc = "done" /\ sends = 2 /\ final = "ok" /\ route
 ReachDefaultStatusRoute == ~(pc = "done" /\ routeRan = <<"default", "s503">>)
 
 ReachChained == ~(pc = "done" /\ chainedRan)
+
+ReachSucceededPastACatchAll == ~(pc = "done" /\ final = "ok" /\ ~successRoute /\ "catchAll" \in reqRoutes /\ routeRan = NoRoute)
 
 ====

@@ -168,7 +168,9 @@ Terms used throughout:
   hosts bind form values under the request's culture. Into the query and the route it goes as its invariant
   text, because both hosts bind those under the invariant culture.
 - D3.8 A date and an instant are shown and sent as `spec/Core/DateWire.tla` states (`yyyy-MM-dd`, the time
-  when not midnight, an instant's clock offset, `0001-01-01T00:00:00Z` for an instant that reads nothing).
+  when not midnight, an instant's clock offset). A date or an instant that reads nothing writes no text: a request
+  sends it by D9.10's table, so a `DateTimeOffset` is left out and binds its start, and a `DateTimeOffset?` binds
+  `null`.
 - D3.9 Every date text is ISO 8601-1:2019's extended format, and an instant's is the RFC 3339 profile of it
   (the owner, 2026-11-06: dates to the standards).
   - A `DateTime` is a local date and time with no offset. Both hosts bind that text as an Unspecified
@@ -243,6 +245,7 @@ Terms used throughout:
 - `Absence.tla:FailedConversionReadsNothing`
 - `DateWire.tla:DateTimeCarriesNoOffset`
 - `DateWire.tla:InstantCarriesItsClockOffset`
+- `DateWire.tla:NothingWritesNoText`
 - `probe:core-form-decimal-culture`
 - `probe:core-query-decimal-invariant`
 - `probe:mvc5-form-current-culture`
@@ -1231,6 +1234,7 @@ Terms used throughout:
   | a list | left out | left out |
   | a nullable value type, text or a class | `null` | an empty field, `name=` |
 
+  A `DateTime` and a `DateTimeOffset` are value types, and their nullable forms nullable value types (D3.8).
   A member left out keeps its starting value; a JSON `null` for a non-nullable value type binds no instance
   at all, and an empty field for one is a model error (`probe:core-json-null-member`, `probe:core-form-empty-field`).
 - D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
@@ -1480,6 +1484,7 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `Request.tla:FailedCheckSendsNothing`
 - `Request.tla:FinallyRunsWhenLoadingRan`
 - `Request.tla:OneRouteRuns`
+- `Request.tla:SuccessWithNoRouteRunsNone`
 - `Request.tla:FailureRunsTheCatchAll`
 - `Request.tla:ChainedOnlyAfterSuccess`
 - `Request.tla:StepsAfterRunUnlessStopped`
