@@ -343,6 +343,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   it". A generator writes the app's validator list in the validation unit, replacing `Add<TValidator>()` per validator
   (D16's gate 1 exception); compile-time plan JSON is deferred, so 17b-ii measures no render-cost baseline for it.
   On `Set`: "Ok if Set is better than keep it. I will work with u on one example when ready"; the name stays until then.
+- The owner, 2026-11-07, on sending an object in a query: "instead of making it complex ... burden is on the dev to know what
+  query string name is and what type of value", then "I am fine for lambda, but you have to evaluate the value it is
+  bring". A request sends each field the view names, typed by its member lambda (`r => r.Handover.Round`), keyed by the
+  lambda's C# path; no generator, table or reflection serves requests. The validator generator and its startup call
+  stay. D9.19 and D9.20 are rewritten once the owner has seen the complete example.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
