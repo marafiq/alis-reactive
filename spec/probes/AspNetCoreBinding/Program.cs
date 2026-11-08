@@ -14,6 +14,7 @@ builder.Logging.ClearProviders();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddAuthorization();
+builder.Services.AddCors(cors => cors.AddDefaultPolicy(policy => policy.WithOrigins("http://elsewhere.test").AllowAnyMethod()));
 var app = builder.Build();
 var german = new CultureInfo("de-DE");
 app.UseRequestLocalization(new RequestLocalizationOptions
@@ -22,6 +23,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedCultures = [german],
     SupportedUICultures = [german],
 });
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -108,6 +110,7 @@ try
     Console.WriteLine("core-query-parameter-prefix: Count=3 binds " + await client.GetStringAsync("/q/plain?Count=3") + "; counts.Count=3 binds " + await client.GetStringAsync("/q/plain?counts.Count=3") + "; counts.Count=3&Count=4 binds " + await client.GetStringAsync("/q/plain?counts.Count=3&Count=4"));
     Console.WriteLine("core-query-parameter-name-collision: Collide(ProbeSearch term) with Term=a&Count=3 binds " + await client.GetStringAsync("/q/collide?Term=a&Count=3") + "; with term.Term=a&term.Count=3 binds " + await client.GetStringAsync("/q/collide?term.Term=a&term.Count=3"));
     Console.WriteLine("core-json-null-object: {\"kept\":null} binds " + await Json(client, "/q/handover-json", "{\"kept\":null}") + " | {} binds " + await Json(client, "/q/handover-json", "{}"));
+    await HttpProbes.Run(new Uri(app.Urls.First()));
 }
 finally
 {

@@ -1241,6 +1241,276 @@
       "probe": "spec/probes/referencesource/EnumConverter.cs.txt",
       "expect": "convertedValue |= Convert.ToInt64((Enum)Enum.Parse(type, v, true), culture);",
       "source": "spec/probes/referencesource/EnumConverter.cs.txt:124"
+    },
+    {
+      "id": "core-antiforgery-names",
+      "statement": "On net10 the antiforgery token is read from the header RequestVerificationToken and the form field __RequestVerificationToken by default.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-antiforgery-names: header RequestVerificationToken, form field __RequestVerificationToken",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-antiforgery-placement",
+      "statement": "On net10 [ValidateAntiForgeryToken] accepts the token in the header with any body, or in the field of a URL-encoded or multipart body; a JSON member carrying it is not read.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-antiforgery-placement: [ValidateAntiForgeryToken] answers a JSON body with the token in the header 200; a URL-encoded body with it in its field 200; a multipart body with it in its field 200; a JSON body with it in a member 400; no token 400",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-antiforgery-safe-methods",
+      "statement": "On net10 [AutoValidateAntiforgeryToken] asks no token of GET, HEAD and OPTIONS, and asks it of POST, PUT and DELETE.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-antiforgery-safe-methods: [AutoValidateAntiforgeryToken] with no token answers GET 200, HEAD 200, OPTIONS 200, POST 400, PUT 400, DELETE 400",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-head-on-get-action",
+      "statement": "On net10 an [HttpGet] action does not answer HEAD (405); an [HttpHead] action does.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-head-on-get-action: HEAD to an [HttpGet] action answers 405; HEAD to an [HttpHead] action answers 200",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-options-reaches-action",
+      "statement": "On net10 an app's OPTIONS request reaches an [HttpOptions] action and reads its Allow header; only a preflight, which carries Access-Control-Request-Method, is answered by the CORS middleware.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-options-reaches-action: OPTIONS with its own Origin to an [HttpOptions] action answers 204 Allow GET,POST; to an [HttpGet] action answers 405 Allow GET; a preflight under the CORS default policy answers 204 from the CORS middleware",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-string-result-media-type",
+      "statement": "On net10 a string action answers text/plain, and with Accept application/json the same action answers the JSON string, so the Accept a request sends changes the body it gets.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-string-result-media-type: a string action answers text/plain; charset=utf-8; with Accept application/json application/json; charset=utf-8 \"Ann\"; with Accept text/html text/plain; charset=utf-8; Content(text) answers text/plain; charset=utf-8",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-file-disposition",
+      "statement": "On net10 File(bytes, type, name) with a non-ASCII name writes an ASCII filename with underscores and the RFC 5987 filename* in UTF-8.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-file-disposition: File(bytes, \"application/pdf\", \"Résumé.pdf\") answers application/pdf with Content-Disposition attachment; filename=R_sum_.pdf; filename*=UTF-8''R%C3%A9sum%C3%A9.pdf",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-multipart-files-and-fields",
+      "statement": "On net10 one multipart body binds fields, files nested in a list of objects by C# path, and several files under one name.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-multipart-files-and-fields: Ward North; Front a.pdf 4; Back b.pdf 6; Photos p1.png 1,p2.png 2",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-multipart-utf8-file-name",
+      "statement": "On net10 a multipart file name in raw UTF-8, as a browser writes it, binds as written.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-multipart-utf8-file-name: a part whose filename is Résumé.pdf in UTF-8, as a browser writes it, binds Ward ; ; Photos Résumé.pdf 4",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-consumes-urlencoded",
+      "statement": "On net10 an action with [Consumes(\"application/x-www-form-urlencoded\")] refuses a multipart body with 415.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-consumes-urlencoded: [Consumes(\"application/x-www-form-urlencoded\")] answers a URL-encoded body 200 and a multipart body 415",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "core-upload-over-limit",
+      "statement": "On net10 a body past Kestrel's default 30,000,000-byte limit gets no response a client can read: HttpClient's send fails.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-upload-over-limit: a 31,000,000-byte file under Kestrel's default body limit answers no response: Unknown",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
+    },
+    {
+      "id": "fetch-text-ignores-charset",
+      "statement": "fetch's text() decodes UTF-8 whatever charset the Content-Type names; TextDecoder decodes by the label.",
+      "host": "node",
+      "oracle": "Node's fetch (undici), the WHATWG Fetch Standard",
+      "probe": "fetch-bodies.mjs",
+      "expect": "fetch-text-ignores-charset: text() reads caf\\ufffd; TextDecoder(\"windows-1252\") reads caf\\u00e9",
+      "source": "spec/probes/fetch-bodies.mjs"
+    },
+    {
+      "id": "fetch-multipart-file-name",
+      "statement": "fetch writes a multipart file name in UTF-8 and percent-encodes a double quote in it.",
+      "host": "node",
+      "oracle": "Node's fetch (undici), the WHATWG Fetch Standard",
+      "probe": "fetch-bodies.mjs",
+      "expect": "fetch-multipart-file-name: a File named R\\u00e9sum\\u00e9 \"a\".pdf is written Content-Disposition: form-data; name=\"Documents[0].File\"; filename=\"R\\u00e9sum\\u00e9 %22a%22.pdf\"",
+      "source": "spec/probes/fetch-bodies.mjs"
+    },
+    {
+      "id": "fetch-urlencoded-body",
+      "statement": "A URLSearchParams body is sent as application/x-www-form-urlencoded in UTF-8, with + for a space and %2B for a plus.",
+      "host": "node",
+      "oracle": "Node's fetch (undici), the WHATWG Fetch Standard",
+      "probe": "fetch-bodies.mjs",
+      "expect": "fetch-urlencoded-body: a URLSearchParams body is sent as application/x-www-form-urlencoded;charset=UTF-8 with Ward=North+1%2B2&__RequestVerificationToken=t%2Fk%3D",
+      "source": "spec/probes/fetch-bodies.mjs"
+    },
+    {
+      "id": "fetch-body-media-types",
+      "statement": "A string body is sent as text/plain in UTF-8 and a Blob body under its own type.",
+      "host": "node",
+      "oracle": "Node's fetch (undici), the WHATWG Fetch Standard",
+      "probe": "fetch-bodies.mjs",
+      "expect": "fetch-body-media-types: a string body is sent as text/plain;charset=UTF-8; a Blob body as application/pdf",
+      "source": "spec/probes/fetch-bodies.mjs"
+    },
+    {
+      "id": "fetch-null-body-reads-empty",
+      "statement": "A response with no body, as HEAD answers, reads as empty text.",
+      "host": "node",
+      "oracle": "Node's fetch (undici), the WHATWG Fetch Standard",
+      "probe": "fetch-bodies.mjs",
+      "expect": "fetch-null-body-reads-empty: a response with no body reads \"\"",
+      "source": "spec/probes/fetch-bodies.mjs"
+    },
+    {
+      "id": "mvc5-antiforgery-reads-form-only",
+      "statement": "MVC 5's stock antiforgery check reads the token from the form only, so a JSON body or a header carries none to it.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/AntiForgeryTokenStore.cs.txt",
+      "expect": "string value = httpContext.Request.Form[_config.FormFieldName];",
+      "source": "spec/probes/aspnetwebstack/AntiForgeryTokenStore.cs.txt:36"
+    },
+    {
+      "id": "mvc5-antiforgery-field-name",
+      "statement": "MVC 5 names the antiforgery form field __RequestVerificationToken.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/AntiForgeryConfig.cs.txt",
+      "expect": "internal const string AntiForgeryTokenFieldName = \"__RequestVerificationToken\";",
+      "source": "spec/probes/aspnetwebstack/AntiForgeryConfig.cs.txt:14"
+    },
+    {
+      "id": "mvc5-antiforgery-validate-tokens",
+      "statement": "MVC 5 offers a public check of a cookie token and a request token given by the caller, the door a header-reading filter uses.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/AntiForgery.cs.txt",
+      "expect": "public static void Validate(string cookieToken, string formToken)",
+      "source": "spec/probes/aspnetwebstack/AntiForgery.cs.txt:136"
+    },
+    {
+      "id": "mvc5-httpget-get-only",
+      "statement": "MVC 5's [HttpGet] accepts the GET verb only.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/HttpGetAttribute.cs.txt",
+      "expect": "new AcceptVerbsAttribute(HttpVerbs.Get)",
+      "source": "spec/probes/aspnetwebstack/HttpGetAttribute.cs.txt:11"
+    },
+    {
+      "id": "mvc5-accept-verbs-exact",
+      "statement": "MVC 5 selects an action by its verbs compared ignoring case, so HEAD does not select a GET action.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/AcceptVerbsAttribute.cs.txt",
+      "expect": "return Verbs.Contains(incomingVerb, StringComparer.OrdinalIgnoreCase);",
+      "source": "spec/probes/aspnetwebstack/AcceptVerbsAttribute.cs.txt:66"
+    },
+    {
+      "id": "mvc5-http-head-attribute",
+      "statement": "MVC 5 has [HttpHead].",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/HttpHeadAttribute.cs.txt",
+      "expect": "new AcceptVerbsAttribute(HttpVerbs.Head)",
+      "source": "spec/probes/aspnetwebstack/HttpHeadAttribute.cs.txt:11"
+    },
+    {
+      "id": "mvc5-http-options-attribute",
+      "statement": "MVC 5 has [HttpOptions].",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/HttpOptionsAttribute.cs.txt",
+      "expect": "new AcceptVerbsAttribute(HttpVerbs.Options)",
+      "source": "spec/probes/aspnetwebstack/HttpOptionsAttribute.cs.txt:11"
+    },
+    {
+      "id": "mvc5-string-result-content",
+      "statement": "MVC 5 answers an action that returns a string with a ContentResult that names no content type.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ControllerActionInvoker.cs.txt",
+      "expect": "new ContentResult { Content = Convert.ToString(actionReturnValue, CultureInfo.InvariantCulture) };",
+      "source": "spec/probes/aspnetwebstack/ControllerActionInvoker.cs.txt:81"
+    },
+    {
+      "id": "mvc5-content-type-kept-when-unset",
+      "statement": "MVC 5's ContentResult sets a content type only when one is named.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/ContentResult.cs.txt",
+      "expect": "if (!String.IsNullOrEmpty(ContentType))",
+      "source": "spec/probes/aspnetwebstack/ContentResult.cs.txt:25"
+    },
+    {
+      "id": "mvc5-response-default-text-html",
+      "statement": "System.Web's response is text/html until something names another type, so Content(text) and a string action answer text/html on net48.",
+      "host": "net48",
+      "oracle": "System.Web reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/HttpResponse.cs.txt",
+      "expect": "private String      _contentType = \"text/html\";",
+      "source": "spec/probes/referencesource/HttpResponse.cs.txt:64"
+    },
+    {
+      "id": "mvc5-file-name-rfc2231",
+      "statement": "MVC 5 writes a non-ASCII download name as filename* in UTF-8 only, with no ASCII filename beside it.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/FileResult.cs.txt",
+      "expect": "StringBuilder builder = new StringBuilder(\"attachment; filename*=UTF-8''\");",
+      "source": "spec/probes/aspnetwebstack/FileResult.cs.txt:78"
+    },
+    {
+      "id": "mvc5-files-keyed-by-part-name",
+      "statement": "MVC 5 keys each posted file by its part's name, several files under one name among them.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/HttpFileCollectionValueProvider.cs.txt",
+      "expect": "mapping.Add(new KeyValuePair<string, HttpPostedFileBase>(key, file));",
+      "source": "spec/probes/aspnetwebstack/HttpFileCollectionValueProvider.cs.txt:38"
+    },
+    {
+      "id": "mvc5-max-request-length",
+      "statement": "System.Web refuses a request body past 4 MB by default (maxRequestLength 4096 KB).",
+      "host": "net48",
+      "oracle": "System.Web reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/HttpRuntimeSection.cs.txt",
+      "expect": "internal const int DefaultMaxRequestLength = 4096 * 1024;  // 4MB",
+      "source": "spec/probes/referencesource/HttpRuntimeSection.cs.txt:31"
+    },
+    {
+      "id": "mvc5-request-too-large-throws",
+      "statement": "System.Web throws, before MVC runs, on a body past maxRequestLength.",
+      "host": "net48",
+      "oracle": "System.Web reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/HttpRequest.cs.txt",
+      "expect": "throw new HttpException(SR.GetString(SR.Max_request_length_exceeded),",
+      "source": "spec/probes/referencesource/HttpRequest.cs.txt:978"
     }
   ]
 }
