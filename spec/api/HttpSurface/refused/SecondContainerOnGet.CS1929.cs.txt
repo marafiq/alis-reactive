@@ -1,0 +1,11 @@
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class SecondContainerOnGet
+{
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<BedQuery> search, RequestContainer<BedQuery> filters)
+        => pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query.Form(search).Inputs(filters));
+}

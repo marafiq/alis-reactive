@@ -149,8 +149,8 @@ Terms used throughout:
   bound.
 - `X2.4` behavior: an input a partial renders under the prefix `Kin` has an id, a name, a body path and an error
   key that agree, so the server's message for `Kin.Name` shows at that input.
-- `X2.5` refusal: a member lambda that names the model itself: "m => m names the model, not a member of it; name
-  the member the input binds, as m => m.Name."
+- `X2.5` analyzer: a member lambda that names the model itself: "m => m names the model, not a member of it; name
+  the member the input binds, as m => m.Name." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 
 ## Q3. Shapes and conversion
 
@@ -310,9 +310,9 @@ Terms used throughout:
 - `X3.10` behavior (D3.13): a visit planner receives as a `Date` a date a step passes, one inside an object, each
   date of a list, a date a step sets as its property and a date an event carries as text; it receives an instant as
   that moment, a nullable date's null as null, and the suggestion its own method returns, a class instance, as it is.
-- `X3.11` refusal (D3.13): a dictionary of dates: "A value written into a live member is a dictionary whose values
+- `X3.11` analyzer (D3.13): a dictionary of dates: "A value written into a live member is a dictionary whose values
   hold dates. A date reaches a live member by its member's name: pass the entries as a list of objects that name each
-  key."
+  key." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X3.12` refusal (D3.13): a type that holds itself and a date: "A value written into a live member holds its own
   type and a date in it. A date reaches a live member through a shape that ends: pass the dates as a list of their
   own."
@@ -430,9 +430,9 @@ Terms used throughout:
   when it rejects; a `MethodAsync<T>`'s result is the value its promise resolves to, a member of that data reads
   past it, a resolution to nothing reaches a method as null, and an older pump whose method returns a plain value
   is awaited as that value.
-- `X4.12` refusal (D4.3, D5.11): an async method's result read inside a list's lambda: "An async method is called
+- `X4.12` analyzer (D4.3, D5.11): an async method's result read inside a list's lambda: "An async method is called
   inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline
-  and read its result in the lambda."
+  and read its result in the lambda." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X4.13` refusal (D4.2): a path past a member its own converter writes, or past a list's item its converter writes
   (`Select(d => d.Charter).Count(c => c.Name == "Ruth")`), in a list's lambda and in a `Find`'s field:
   "'{path}' reads past '{member}', which its own JSON converter writes, so the browser holds what the converter
@@ -577,11 +577,11 @@ Terms used throughout:
   method declared to return nothing and one declared to return a value, each of which returns a promise, stop the
   pipeline at the call, and the step after it does not run; a null literal, a null the returned data holds and a
   result that reads nothing each reach the method as null.
-- `X5.13` refusal (D5.11): a method declared to return nothing, called inside a list's lambda: "A step is written
-  inside a list's lambda, which reads each item and writes nothing. Write the step in the pipeline."
-- `X5.14` refusal (D5.11): a result, a returned object or a returned list that a C# variable carries into another
+- `X5.13` analyzer (D5.11): a method declared to return nothing, called inside a list's lambda: "A step is written
+  inside a list's lambda, which reads each item and writes nothing. Write the step in the pipeline." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
+- `X5.14` analyzer (D5.11): a result, a returned object or a returned list that a C# variable carries into another
   pipeline: "A method's result is read outside the block that called the method. Call the method in the block that
-  reads its result, or in a block around it."
+  reads its result, or in a block around it." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 
 ## Q6. Arrays
 
@@ -781,8 +781,8 @@ Terms used throughout:
 
 **Defects.**
 - `X6.1` type: a list cannot be counted two ways: new:N6.1 leaves one `Count()`.
-- `X6.2` refusal: a list's lambda that calls a member outside the table: "'{term}' has no browser form in a
-  list's lambda; use a member the framework translates, or move the work to the server."
+- `X6.2` analyzer: a list's lambda that calls a member outside the table: "'{term}' has no browser form in a
+  list's lambda; use a member the framework translates, or move the work to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name`, whose start is null,
   reads that item's test as nothing, so the item is not kept (D4.2, D6.4).
 - `X6.4` behavior: `Any()` over a list that reads nothing does not satisfy `When(list.Any())`.
@@ -791,35 +791,35 @@ Terms used throughout:
   total past 2,147,483,647 stops the pipeline and the step after it does not run, though the terms after it bring the
   total back into range; over `decimal` a total past `decimal.MaxValue` stops the same way; over a list with no item
   it reads 0.
-- `X6.8` refusal: a step written inside a list's lambda: "A step is written inside a list's lambda, which reads
-  each item and writes nothing. Write the step in the pipeline."
+- `X6.8` analyzer: a step written inside a list's lambda: "A step is written inside a list's lambda, which reads
+  each item and writes nothing. Write the step in the pipeline." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X6.5` behavior: `Where(r => r.Ward == Model.Ward)` keeps the items of the ward the view's model names, and a
   local the lambda captures is read the same way.
-- `X6.6` refusal (D6.7): a view value that calls a method or computes inside an
+- `X6.6` analyzer (D6.7): a view value that calls a method or computes inside an
   array lambda: "'{value}' computes a value
-  inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();."
-- `X6.10` refusal (D6.12): a comparison of objects: "'{term}' compares objects, and the browser compares objects by
-  reference; compare a member of each, such as d => d.Carer.Name == lead."
-- `X6.11` refusal (D6.12): a date or a time in a comparison: "'{term}' compares dates or times, whose text neither
-  orders nor equals as the instant does; compare them on the server."
+  inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.10` analyzer (D6.12): a comparison of objects: "'{term}' compares objects, and the browser compares objects by
+  reference; compare a member of each, such as d => d.Carer.Name == lead." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.11` analyzer (D6.12): a date or a time in a comparison: "'{term}' compares dates or times, whose text neither
+  orders nor equals as the instant does; compare them on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.12` refusal (D6.12): an ordering against a value the app's JSON writes as text: "'{term}' orders a value the
   app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on
   the server."
-- `X6.13` refusal (D6.12): an ordering of two members outside numbers and `char`: "'{term}' orders values the browser
-  cannot order as .NET does; order numbers or a char, or order on the server."
-- `X6.14` refusal (D6.12): a cast that narrows: "'{term}' casts a number to a narrower one, which changes the value as
-  C# computes it and not as the browser does; compare the member itself."
+- `X6.13` analyzer (D6.12): an ordering of two members outside numbers and `char`: "'{term}' orders values the browser
+  cannot order as .NET does; order numbers or a char, or order on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.14` analyzer (D6.12): a cast that narrows: "'{term}' casts a number to a narrower one, which changes the value as
+  C# computes it and not as the browser does; compare the member itself." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.15` refusal (D6.7): a view value read through a null: "'{value}' reads a member of a value that is null when the
   view renders."
 - `X6.16` behavior (D6.12): `d.Status == DoseStatus.Due` keeps the due doses when the app writes enums by name, and
   `d.Route == 'I'` keeps the injected ones. `d.Status == d.Planned` keeps the doses whose two members hold one value,
   `d.Milligrams > d.Priority` orders two numbers and leaves out a dose whose priority is null, and `d.Route < 'L'`
   orders a `char` as .NET does.
-- `X6.17` refusal (D6.5): `StartsWith(text)` or `EndsWith(text)`, which compare by the culture in .NET: "'{term}'
+- `X6.17` analyzer (D6.5): `StartsWith(text)` or `EndsWith(text)`, which compare by the culture in .NET: "'{term}'
   compares by the culture in .NET, which the browser cannot match; pass StringComparison.Ordinal, such as
-  d.Ward.StartsWith(\"N\", StringComparison.Ordinal)."
-- `X6.18` refusal (D6.5): a `StringComparison` other than `Ordinal`: "'{term}' compares text by {comparison}; a
-  list's lambda compares text by StringComparison.Ordinal."
+  d.Ward.StartsWith(\"N\", StringComparison.Ordinal)." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.18` analyzer (D6.5): a `StringComparison` other than `Ordinal`: "'{term}' compares text by {comparison}; a
+  list's lambda compares text by StringComparison.Ordinal." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.19` behavior (D6.5): the text members agree with .NET where JavaScript's own methods do not: `Trim()` removes
   U+0085 and keeps U+FEFF, `ToUpperInvariant()` keeps `ß` and `ı` and maps U+1FB3 to U+1FBC, `ToLowerInvariant()`
   lowers a final `Σ` to `σ` and keeps `İ`, `string.IsNullOrEmpty` holds on a text that reads nothing, and
@@ -828,18 +828,18 @@ Terms used throughout:
 - `X6.20` behavior (D6.5, D6.8): `d => d.Carer != null && d.Checks.Any(c => c.Name == d.Carer.Name)` keeps the doses
   their carer also checked, the inner lambda reading its own item and the outer one; `Any()`, `All`, `Count()` and
   `Count(predicate)` over a list an item holds count as .NET counts them, `All` holding on an empty list.
-- `X6.21` refusal (D6.5): `Enumerable.Contains` over a collection that is not an array, and a `HashSet<T>`'s own
+- `X6.21` analyzer (D6.5): `Enumerable.Contains` over a collection that is not an array, and a `HashSet<T>`'s own
   `Contains`: "'{term}' looks in a
   collection that can compare by its own rules, as a HashSet's comparer does; copy it into an array before the
-  lambda, such as var wards = Model.Wards.ToArray();."
-- `X6.22` refusal (D6.5): `Contains` over a list the item holds: "'{term}' looks for a value in a list the item
-  holds; use Any, such as d.Hours.Any(hour => hour == 8)."
-- `X6.23` refusal (D6.5): `Contains` of an object: "'{term}' looks for an object, and the browser compares objects
-  by reference; look for a member, such as names.Contains(d.Carer.Name)."
+  lambda, such as var wards = Model.Wards.ToArray();." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.22` analyzer (D6.5): `Contains` over a list the item holds: "'{term}' looks for a value in a list the item
+  holds; use Any, such as d.Hours.Any(hour => hour == 8)." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.23` analyzer (D6.5): `Contains` of an object: "'{term}' looks for an object, and the browser compares objects
+  by reference; look for a member, such as names.Contains(d.Carer.Name)." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.24` refusal (D6.5): `Contains` over a list that is null when the view renders: "'{term}' looks in a list that
   is null when the view renders."
-- `X6.25` refusal (D6.5): `Contains` with an equality comparer: "'{term}' passes an equality comparer, which the
-  browser does not have; look up without it, or move the work to the server."
+- `X6.25` analyzer (D6.5): `Contains` with an equality comparer: "'{term}' passes an equality comparer, which the
+  browser does not have; look up without it, or move the work to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.26` behavior (D6.5): `wards.Contains(d.Ward)` over an array, an enum array written by name, a `List<T>` and
   an array typed as a sequence keeps the items the view lists; `d.Medicine.Contains('o')` finds a letter; a list's
   `Count` and an array's `Length` count their items.
@@ -851,19 +851,19 @@ Terms used throughout:
 - `X6.28` refusal (D6.13): a key the app's JSON writes as text (an enum by name, a number written as text, a `Guid`,
   a `TimeSpan`): "'{key}' orders a value the app's JSON writes as text, which does not order as the value does in
   .NET; order by a member the JSON writes as a number, or order on the server."
-- `X6.29` refusal (D6.13): a date or a time key: "'{key}' orders dates or times, whose text does not order as the
-  instant does; order them on the server."
-- `X6.30` refusal (D6.13): an object key: "'{key}' orders objects, which the browser does not order; order by a
-  member, such as OrderBy(d => d.Carer.Name, StringComparer.Ordinal)."
-- `X6.31` refusal (D6.13): a comparer other than `StringComparer.Ordinal` and the view's culture's: "'{key}' orders
+- `X6.29` analyzer (D6.13): a date or a time key: "'{key}' orders dates or times, whose text does not order as the
+  instant does; order them on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.30` analyzer (D6.13): an object key: "'{key}' orders objects, which the browser does not order; order by a
+  member, such as OrderBy(d => d.Carer.Name, StringComparer.Ordinal)." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.31` analyzer (D6.13): a comparer other than `StringComparer.Ordinal` and the view's culture's: "'{key}' orders
   text by a comparer the browser does not have; pass StringComparer.Ordinal, or no comparer to order by the view's
-  culture, or order on the server."
+  culture, or order on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.32` behavior (D6.13): `OrderBy` lists a number key smallest first, a nullable number with null first, a `bool`
   false first and text by code unit with `StringComparer.Ordinal`; `OrderByDescending` lists null last and keeps the
   list order of equal keys.
-- `X6.33` refusal (D6.14): a `??` whose left side the compiler converts by a user-defined conversion: "'{term}'
+- `X6.33` analyzer (D6.14): a `??` whose left side the compiler converts by a user-defined conversion: "'{term}'
   converts its left side by a user-defined conversion, which the browser does not have; coalesce values of one
-  type, or move the work to the server."
+  type, or move the work to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.34` behavior (D6.14): `HasValue` holds for a number and fails for null, and reads nothing past a carer that is
   null; `Value` of a priority that holds null reads nothing, so `d.Priority.Value != 2` drops it where
   `d.Priority != 2` keeps it; `??` reads its right side for a ward the dose omits at null, a priority that holds null
@@ -875,7 +875,7 @@ Terms used throughout:
   ends in a line break as .NET's `$` does, and not one that ends in two; `\$` matches the character; a pattern the
   view holds in a local matches as one written in place; a lookbehind matches as .NET reads it; `CultureInvariant`
   matches as no option does; a note that holds null reads nothing.
-- `X6.38` refusal (D6.15, D16.11): each construct outside D16.11's closed set, with its message: "'{term}' holds
+- `X6.38` analyzer (D6.15, D16.11): each construct outside D16.11's closed set, with its message: "'{term}' holds
   '{construct}', which .NET and the browser read differently; write {spelling}." for `\d`, `\D`, `\w`, `\W`, `\s`,
   `\S`, `\A`, `\Z` and `.`, and for `\d`, `\w` and `\s` inside a class; "'{term}' holds '{construct}', which the
   browser does not read as .NET does; move the work to the server." for every other letter escape and every group
@@ -884,7 +884,7 @@ Terms used throughout:
   range, a class or a group left open, a `)` or a `]` that closes nothing, a quantifier or a count with nothing to
   repeat, a `{` that is no count and a count whose least is above its most, each naming the escape that writes it;
   `IgnoreCase`, naming the spelled cases; any other option but `CultureInvariant`; a pattern read from the item; a
-  pattern that is null when the view renders.
+  pattern that is null when the view renders. At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.36` refusal (D6.13): text ordered by the culture under a culture with an alternate sort: "'{key}' orders text by
   the alternate sort '{sort}', which the browser has no tag for; pass StringComparer.Ordinal, or order on the
   server."
@@ -924,12 +924,12 @@ Terms used throughout:
 - `X6.52` analyzer: a class, a struct or an interface outside the framework that implements `ITypedSource<T>`, and a
   class that implements it through an interface of its own, are each refused at build, and a type that only holds
   the framework's sources is not: new:N6.4 (POC 13h, ALIS028).
-- `X6.49` refusal (D6.12): a comparison through a user-defined conversion: "'d.Seal' is converted by a
+- `X6.49` analyzer (D6.12): a comparison through a user-defined conversion: "'d.Seal' is converted by a
   user-defined conversion, which the browser does not have; compare a member it reads, such as d => d.Seal.Tag ==
-  "S4", or move the work to the server."
-- `X6.50` refusal (D6.12): a cast between `decimal` and a binary fraction: "'d.Volume' is cast to or from decimal,
+  "S4", or move the work to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.50` analyzer (D6.12): a cast between `decimal` and a binary fraction: "'d.Volume' is cast to or from decimal,
   which rounds as C# computes it and not as the browser does; keep the member's own type, or move the work to the
-  server."
+  server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.51` behavior (D6.12): `d.Charge > freeCharge`, a `decimal` member and a view's `int`, counts the two charged
   doses through `decimal`'s own conversion from `int`.
 - `X6.46` analyzer: a read past a nullable member in the predicate, field or path of a door that reads nothing past
@@ -1081,17 +1081,22 @@ Terms used throughout:
   where the source is any typed source of Q7, an event payload's member included (`When(args.ClosedBy)`).
   Main's second form, a payload and a path lambda (`When(args, x => x.IsExpanded)`), is refused, and
   `When(source)` carries it: the payload's member is a typed source (the owner, 2026-11-06).
-- D8.7 A branch (`Then`, `Else`) is a block: it holds any number of steps, written in one lambda, as a chain
-  or as statements in a `{}` body, and runs them in authored order. An `if` holds one condition, its `then` block
+- D8.7 A branch (`Then`, `Else`) is a block, as every stage is (D11.10): it holds any number of steps, written in one
+  lambda, as a chain or as statements in a `{}` body, and runs them in authored order. An `if` holds one condition, its `then` block
   and its `else` block; an `ElseIf` is the `else` block of the `if` it continues, holding the results its condition
   called, at their lines, and an `if` of its own, as C# and JavaScript nest an `else if`. An `ElseIf` or an `Else`
   continues its `When` before any other step of the block, a method its condition does not read included (X8.9),
   and an `Else` ends its `When` (X8.18).
 - D8.8 A block is a lexical scope, as a C# `{}` block is. A value a block binds is readable in that block and
   in the blocks inside it, and nowhere else. The values a block binds: its handler's event payload, a
-  route's response body, an array operation's item, a method's result read in it, and a `Confirm`'s answer.
-  A read of a bound value outside its block is refused where the view renders, naming the value and the
-  block that binds it. That one rule covers today's two refusals of this kind, an array item and a response
+  route's reply (its status, its headers, its body and the request as it was sent), the reply the block `Chained`
+  runs receives, an array operation's item, a method's result read in it, and a `Confirm`'s answer. A block inside a
+  route or a `Chained` block reads every reply around it, so a chained request sends the first reply's body and the
+  first request's members (`spec/api/HttpSurface/EveryStage.cs`). A read outside its block does not compile where it
+  names the block's parameter (CS0103, `ReplyOutsideItsRoute` in `spec/api/refused.sh`); a bound value carried out
+  through a variable declared outside its block is the block analyzer's (N18.9); one carried out any other way (a
+  field, a collection, a helper that stores it) is refused where the view renders, naming the value and the block
+  that binds it, since only the render sees where it went. That one rule covers today's two refusals of this kind, an array item and a response
   read outside their blocks. The browser runs each block in a child scope, so a value bound inside a branch
   never reaches the steps after it.
 - D8.9 One meaning of comparison and logic, which every condition reads (D8.1). A comparison (`eq`, `neq`, `lt`,
@@ -1147,14 +1152,14 @@ Terms used throughout:
 **Defects.**
 - `X8.1` type: a condition on an operand of the wrong type does not compile: the operator is generic over
   the source's type (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
-- `X8.2` refusal: an array predicate with a term the lambda door cannot translate: "{term} has no browser form
-  in an array predicate; use a member the framework translates, or move the test to the server."
+- `X8.2` analyzer: an array predicate with a term the lambda door cannot translate: "{term} has no browser form
+  in an array predicate; use a member the framework translates, or move the test to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X8.3` behavior: a validator condition with a term the lambda door cannot translate gates its rules on the
   server only; the browser sends the request and shows the server's message.
 - `X8.4` behavior: `When(a).ElseIf(b).Else()` runs the first branch whose condition holds and no other.
-- `X8.5` refusal: a response body captured in a C# variable inside `OnSuccess` and read after the request is
+- `X8.5` analyzer: a response body captured in a C# variable inside `OnSuccess` and read after the request is
   refused with "The response body of the request to {url} is read outside the block that binds it: read it
-  inside that request's routes or the blocks they hold."
+  inside that request's routes or the blocks they hold." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X8.6` behavior: a branch with three steps in a `{}` body runs all three, in order, and none when its
   condition does not hold.
 - `X8.7` behavior: over a dose that lacks `ward`, whose start is null, `d.Ward != "North"` and `!(d.Ward == "North")`
@@ -1163,11 +1168,11 @@ Terms used throughout:
   `d.Priority < 2`, as .NET's lifted operators decide (D8.9).
 - `X8.8` behavior: `or` keeps an item whose left term reads nothing when its right term holds, and `and` whose left
   term reads nothing and right term is false reads false, so `not` of it holds (D8.9).
-- `X8.9` refusal (D8.7): an `ElseIf` or `Else` written after another step of its block, or after a method its
+- `X8.9` analyzer (D8.7): an `ElseIf` or `Else` written after another step of its block, or after a method its
   condition does not read: "An ElseIf or an Else continues the When it follows, before any other step of its block:
-  write it in the same sentence."
-- `X8.10` refusal (N8.2): a pipeline condition that orders dates, orders flags or compares objects, each with the
-  reason the lambda door gives for it.
+  write it in the same sentence." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
+- `X8.10` analyzer (N8.2): a pipeline condition that orders dates, orders flags or compares objects, each with the
+  reason the lambda door gives for it. At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X8.11` behavior (D11.5): the steps after a branch that awaits run once its method settles, and at once when the
   branch is not taken.
 - `X8.12` behavior (D8.9): a branch whose condition orders a null runs none of its steps, where JavaScript's
@@ -1180,15 +1185,15 @@ Terms used throughout:
 - `X8.15` behavior (D5.11): a fluid balance measured, then set to 999 ml, and read in a term reached after the set,
   is the 100 ml measured at its line; a result a term and its branch both read is the call at its line, so a branch
   that sets 999 ml and then the result restores the 600 ml measured.
-- `X8.16` refusal (D4.7): an async method called under a term reached later, the right term of `Or` or the fallback
+- `X8.16` analyzer (D4.7): an async method called under a term reached later, the right term of `Or` or the fallback
   of `IfNull`: "An async method is called in a term that runs only when it is reached (the right term of And, Or or
   IfNull, or a branch of Choose), and the pipeline waits for an async method at its line: call it in a When of its
-  own, in the branch where its term is reached."
-- `X8.17` refusal (D8.8): a result called in an `ElseIf`'s condition, read after its `When`: "A method's result
+  own, in the branch where its term is reached." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
+- `X8.17` analyzer (D8.8): a result called in an `ElseIf`'s condition, read after its `When`: "A method's result
   called in an ElseIf's condition is read after its When, and the call runs only when the ElseIf is reached: call
-  the method before the When to read its result after it."
-- `X8.18` refusal (D8.7): a second `Else`, or an `ElseIf` after the `Else`, of one `When`: "An Else ends its When:
-  write each ElseIf before it, and every step of the remaining case in that one Else."
+  the method before the When to read its result after it." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
+- `X8.18` analyzer (D8.7): a second `Else`, or an `ElseIf` after the `Else`, of one `When`: "An Else ends its When:
+  write each ElseIf before it, and every step of the remaining case in that one Else." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X8.19` refusal (D8.10): an ordering of a source in its own form: "A condition orders '{read}', which {cause} writes
   unlike the app's options, so the browser does not order it as .NET does; order it on the server."
 - `X8.20` refusal (D8.10): a source of a type that is not a scalar, in its own converter's form, compared with a
@@ -1202,6 +1207,10 @@ Terms used throughout:
   compare it on the server."
 - `X8.23` behavior (D8.10): a found chart and a component's data read to `Charted` equal `DoseStatus.Given` as the
   member's own converter writes it, "Given" where the app writes "given".
+- `X8.24` type (D8.8): a route's reply read after its request, outside the route, does not compile:
+  `spec/api/HttpSurface/refused/ReplyOutsideItsRoute.CS0103.cs.txt:13`.
+- `X8.25` analyzer (D11.10, D8.8): a step written on the pipeline of a block around its own, and a bound value
+  carried out of its block through a variable declared outside it: new:N18.9.
 
 ## Q9. The request
 
@@ -1299,13 +1308,19 @@ Terms used throughout:
     hand-written inputs and file inputs among them, each under its `name`. It is sent only as form data
     (URL-encoded or multipart) or as a GET's query, since a submission set is form data. In form-field mode the
     framework's antiforgery field replaces any the form holds (`FormData.set`, D9.22), so the endpoint reads one.
+    Each framework input the form owns replaces its name's entries with its wire form (`FormData.set`), so the body
+    the check reads is the body sent; a hand-written control is sent as the browser holds it, and its failures show
+    in the container's summary only (D10.18).
   - `Inputs(container)`: the framework inputs inside one element of any kind (a form, a fieldset, a table row, a
     drawer's body), rendered by any plan, nested elements included, each under its binding name, in any body.
   - `Input(r => r.Member, pipeline.Input(m => m.Member))`: one input of the request's own view, wherever it sits,
     sent under the request member's binding name. The value type both lambdas share makes a member of another type
     not compile (X9.3).
   - A request sends at most one container, through `Form` or `Inputs`, and that container is the request's: its
-    summary is where the request's failures show (D16.13). A container is typed by its model, and a request takes
+    summary is where the request's failures show (D16.13). The types hold it: the full form's body door takes the
+    container as its first argument (`Json(container, body => ..)`, `UrlEncoded(form, body => ..)`), a GET's and the
+    condensed `Form` and `Inputs` return a stage that offers no second, and no body offers either
+    (`SecondContainerOnABody`, `SecondContainerOnGet`, `ContainerInsideABody` in `spec/api/refused.sh`). A container is typed by its model, and a request takes
     only a container of its own model (N18.3).
   - When an input and a set member send the same binding name, the input's value is sent, as the body the check
     reads (Q16); two inputs that send one scalar binding name are D13.4's.
@@ -1314,9 +1329,12 @@ Terms used throughout:
 - D9.16 A file is the shape `file`, sent only in form data or as the whole body. A set member of file shape in a
   request with no body, a JSON, URL-encoded or text body
   is refused by an analyzer; a file input a request sends in a GET or a JSON body stops the request when it is sent.
-- D9.17 Requests in one pipeline run one after another, each after the one before it settles. ALIS008 keeps
-  refusing a second request in one pipeline, with its reason corrected: `Chained` runs a request after another
-  succeeds, and `Parallel` sends them at once.
+- D9.17 A block holds one request at its own level. A request in a block inside it (a branch, a route, `Finally`,
+  a `Parallel` branch) is that block's, and requests in nested blocks run one after another, each after the one
+  before it settles (D11.5). ALIS008 keeps refusing a second request in one block, retargeted to the verbs of
+  `Pipeline<TModel>` in every stage, both lambda forms and every file (N9.5), with its reason corrected: `Chained`
+  runs a request after another succeeds, `Parallel` sends them at once, and a request in `Finally` runs after every
+  outcome.
 - D9.18 `p.Url<TQuery>()` reads the page's own URL. It is a source (Q7), not a part of the request.
 - D9.19 A member whose source holds an object or a list of objects is sent in a query or in form data as its
   fields, each keyed by its C# path (`Address.City`, `Lines[0].Name`, and a list of scalars inside an item as the
@@ -1472,7 +1490,11 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   name, the one that joined the page last, leaves for `Inputs(container)` (D13.3).
 - `N9.4` new: analyzer ALIS029, a file-shaped set member in a GET or a JSON body.
 - `N9.5` new: ALIS008's corrected message
-  (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`).
+  (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`), retargeted from
+  `PipelineBuilder` and `RequestExtensions` (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:37-40`)
+  in the block lambdas of Razor files only (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:59`)
+  to the verbs of `Pipeline<TModel>` in every block, expression and `{}` lambdas both, in every file, since the
+  defaults live in a startup file.
 - `N9.6` new: the request defaults of D9.12 and D10.12, configured once in C#; their door's form goes to gate 2.
 - `N9.7` new: `Query<TQuery>(q => q.Set(x => x.Member, value or source))` on POST, PUT and DELETE.
 
@@ -1494,18 +1516,19 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   form: new:N9.2.
 - `X9.3` type: a named input whose type the request member does not hold does not compile: new:N9.3.
 - `X9.4` analyzer: a file-shaped set member in a GET or a JSON body: new:N9.4.
-- `X9.5` refusal: a placeholder no member fills: "The URL '{url}' has the placeholder {name}, and the request has no
-  member named {name}; add the member, or take the placeholder out of the URL."
-- `X9.6` refusal: a date in a placeholder: "{member} is a date, and a date cannot fill the placeholder {name}: IIS
-  refuses a time in a path segment. Name the member so it goes in the query."
-- `X9.7` refusal: `Content-Type` as a header: "Content-Type is set by the body format; use AsJson() or AsFormData()."
+- `X9.5` analyzer: a placeholder no member fills: "The URL '{url}' has the placeholder {name}, and the request has no
+  member named {name}; add the member, or take the placeholder out of the URL." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
+- `X9.6` analyzer: a date in a placeholder: "{member} is a date, and a date cannot fill the placeholder {name}: IIS
+  refuses a time in a path segment. Name the member so it goes in the query." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
+- `X9.7` analyzer: `Content-Type` as a header: "Content-Type is set by the body door; write Json, UrlEncoded, Multipart,
+  Text or File." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X9.8` behavior: a non-nullable member that reads nothing is left out of the JSON body, and the endpoint binds
   its starting value with no model error.
 - `X9.9` behavior: a route value that reads nothing sends no request, runs its `Finally`, and runs no step after it.
 - `X9.10` behavior: a route value read as "a/b" sends no request and runs its `Finally`.
 - `X9.11` behavior: a query member read as "a b+c&d" reaches the endpoint as "a b+c&d".
-- `X9.12` refusal: a fixed header value with a line break: "The header {name} holds a line break, which HTTP does
-  not carry in a field value; send it in the body."
+- `X9.12` analyzer: a fixed header value with a line break: "The header {name} holds a line break, which HTTP does
+  not carry in a field value; send it in the body." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X9.13` behavior: a header read as text past US-ASCII sends no request, and the console names the header.
 - `X9.14` type: `Form` inside a JSON body does not compile: new:N9.2.
 - `X9.15` behavior: a native form's `<select form="intake">` outside the form's element is sent with the form's other
@@ -1526,7 +1549,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - D10.3 A `WhileLoading` that stops sends nothing, runs no `Finally` and stops its pipeline. `Finally` runs
   exactly when `WhileLoading` ran, after every outcome, a stop inside a route included. The defaults' layer wraps the
   request's: each layer's `Finally` runs exactly when its own `WhileLoading` completed, the request's first, so a stop
-  in the request's `WhileLoading` still runs the defaults' `Finally` (`Request.tla:EachLayerPairs`).
+  in the request's `WhileLoading` still runs the defaults' `Finally` (`Request.tla:EachLayerPairs`). `Finally` runs
+  after its route's whole block, the awaited steps in it included, and a request that block sends is the block's own:
+  an abort or a dispose while it is in flight runs its `Finally` before the enclosing request's, each once
+  (`Lanes.tla:TheRouteTailBeforeWhatFollows`, `Lanes.tla:InnerFinallyFirst`).
 - D10.4 A request follows a redirect that ends on the page's own origin, and the response it ends at is the
   request's answer: its status and body pick the route (`probe:fetch-follows-relative-redirect`). A redirect
   that ends on another origin is refused.
@@ -1585,7 +1611,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   request where the view renders; the browser holds no defaults. A request's `WhileLoading` runs after the
   defaults', and its `Finally` before the defaults'. A request takes the defaults' retry policy or `NoRetry()`, and
   sets no numbers of its own (D10.14). Success
-  has no default: `OnSuccess` is the request's own. A request takes no defaults when it says so, whole.
+  has no default: `OnSuccess` is the request's own. A request takes no defaults when it says so, whole. A request a
+  default's block sends (a 401 route that renews a session) takes no defaults, so a default never wraps the request
+  it sends.
 - D10.13 For an outcome that is not success, the route is the request's route for its status, else the
   defaults' route for its status, else the request's catch-all, else the defaults' catch-all, else none. So a
   request routes only the statuses it cares about.
@@ -1814,16 +1842,20 @@ and `notice` (D10.21).
     r.M, value)`, `Query(r => r.M, value)`, `Header(name, value)`, and on POST, PUT and DELETE one body door, `Json`,
     `UrlEncoded`, `Multipart`, `Text` or `File`. The doors that send inputs (D9.15) are `Inputs(container)` and
     `Input(r => r.M, input)` in every body and on a GET, and `Form(form)` in a URL-encoded or multipart body and on a
-    GET; a GET's inputs go to its query. Refused where the view renders, as no type stops them: a second body door, a
-    `Set` after a `Text` or `File` body, a second container (`Form` or `Inputs`) on one request, a second `Busy` or
-    `NoBusy`, and a second `Chained`. A value is a literal or any source (Q7); a member lambda dot-walks
+    GET; a GET's inputs go to its query. A value is a literal or any source (Q7); a member lambda dot-walks
     (`r => r.Handover.Round`). `Header` refuses `Content-Type`, `Accept`, the antiforgery header and the Fetch
     Standard's forbidden request headers.
   - staged by type: GET, HEAD and OPTIONS offer no body door; `NoRetry()` exists on GET, HEAD, OPTIONS, PUT and DELETE
     only, since the one policy (D10.14) never retries a POST (X10.9), and no request sets the policy's numbers, which
     the defaults' `Retry(attempts, firstWait)` sets once (`RetryPerRequest`, `NoRetryOnPost` in `spec/api/refused.sh`); HEAD offers no content reader; `File` exists only inside `Multipart` or as the whole body; a
     success route returns the request carrying its reply's type, which offers no second success route and whose
-    `Chained` receives that reply. A `Set` on a file member stays D9.16's analyzer, since `Set` takes a member of any
+    `Chained` receives that reply. A body door returns a stage that offers no second body door (`SecondBodyDoor`), a
+    `Text` or `File` body one that offers no `Set` and a `Set` one that offers no whole body (`SetAfterAWholeBody`,
+    `AWholeBodyAfterSet`), the full form's body door takes the container (`ContainerInsideABody`), a GET's and the
+    condensed `Form` and `Inputs` return a stage that offers no second (`SecondContainerOnGet`,
+    `SecondContainerOnABody`), and `Chained` ends the sentence (`SecondChained`), each in `spec/api/refused.sh`.
+    ALIS030 refuses what no type stages: a second `Busy` or `NoBusy`, `Busy` beside `NoDefaults()`, a status outside
+    300 to 599, a second route for one status and a second catch-all (N18.7). A `Set` on a file member stays D9.16's analyzer, since `Set` takes a member of any
     type, and a file input a GET's `Form` or `Inputs` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
     or a list of it on net10 and MVC 5's posted-file base or a list of it on net48, behind `#if NET48`. A request
     `Header(name, source)` whose source's wire form is a list or an object is refused where the view renders, as the
@@ -1836,8 +1868,8 @@ and `notice` (D10.21).
     `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the body the request sends (Q16); `Busy(elementId, ..)`,
     `Busy()` and `NoBusy()` say where its busy indicator shows (D10.21); `WhileLoading`, `Finally`, `NoDefaults()` and
     `NoValidation()` complete it. `ShowErrors(problem)` is a step of a route's pipeline that shows any
-    `ValidationProblem` source, a 400's body or another route's, as the request's failures (D16.13), refused where the
-    view renders on a pipeline that is no request's route.
+    `ValidationProblem` source, a 400's body or another route's, as the request's failures (D16.13), refused by ALIS031
+    in a block no route encloses (N18.8).
   - the objects, each a JS object whose members are sources: `Response<TRequest>` (`Status`, `Headers.Get(name)` and
     `Request`, the request's members as it sent them, read as `TRequest`, which a read of the input cannot give once the
     user edits it during the send), the reply of a route of kind none and of every HEAD route, and
@@ -1870,8 +1902,8 @@ and `notice` (D10.21).
     reads it. `SentRequest.Response(routes)` gives way to the routes on the request, so its one `Response` and its same
     sentence hold by construction. `Routes.OnSuccess` becomes `OnSuccess(Content.<kind>, ..)` and `OnSuccess<T>`, one
     by type; `Routes.OnError(status, ..)` becomes `OnError(status, Content.<kind>, ..)` and `OnError<T>(status, ..)`,
-    keeping a status from 300 to 599 and one route a status, refused where the view renders; `Routes.OnError(otherwise)`
-    becomes `OnError((failed, pipeline) => ..)` with `Failure`, keeping one, refused where the view renders.
+    keeping a status from 300 to 599 and one route a status, ALIS030's (N18.7); `Routes.OnError(otherwise)`
+    becomes `OnError((failed, pipeline) => ..)` with `Failure`, keeping one, ALIS030's.
     `ResponseBody<TBody>.Read(path)` becomes `Body.Read(path)`, data that reads as nothing when absent. The POC's kinds by
     door (HTML for `Get(url)`, JSON for `Get<TRequest>`) become the kind each route names.
 
@@ -1952,13 +1984,27 @@ and `notice` (D10.21).
   indicator hides at 1 second while the second's stays to 5.
 - `X10.17` behavior: a request whose busy target is an element the page lacks stops before it sends, and the network
   log holds no request.
-- `X10.18` refusal: `Busy` on a request with `NoDefaults()`: "Busy says where the default busy indicator shows, and
-  this request takes no defaults; take out NoDefaults() or Busy."
+- `X10.18` analyzer: `Busy` on a request with `NoDefaults()`: "Busy says where the default busy indicator shows, and
+  this request takes no defaults; take out NoDefaults() or Busy." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X10.19` behavior: two `Parallel` requests with no `Busy`, each success route setting one component from a JSON body:
   each component's element shows the indicator until its own request settles, and the page's indicator never shows; a
   route that writes inside a `When` only shows the page's.
 - `X10.20` behavior: under `ShowBusy()` in an app whose page provides no `busy`, a request stops before it sends, the
   network log holds no request, and the console one error.
+- `X10.21` type (N10.7): a second body door does not compile:
+  `spec/api/HttpSurface/refused/SecondBodyDoor.CS1061.cs.txt:12`.
+- `X10.22` type (N10.7): a `Set` after a `Text` body and a `Text` after a `Set` do not compile:
+  `spec/api/HttpSurface/refused/SetAfterAWholeBody.CS1061.cs.txt:10`,
+  `spec/api/HttpSurface/refused/AWholeBodyAfterSet.CS1061.cs.txt:10`.
+- `X10.23` type (D9.15): a second container on a body or a GET, and a container inside a body, do not compile:
+  `spec/api/HttpSurface/refused/SecondContainerOnABody.CS1929.cs.txt:10`,
+  `spec/api/HttpSurface/refused/SecondContainerOnGet.CS1929.cs.txt:10`,
+  `spec/api/HttpSurface/refused/ContainerInsideABody.CS1929.cs.txt:10`.
+- `X10.24` type (N10.7): a second `Chained` does not compile: `spec/api/HttpSurface/refused/SecondChained.CS0023.cs.txt:13`.
+- `X10.25` analyzer (D10.21, D10.13): a second `Busy` or `NoBusy`, a status outside 300 to 599, a second route for
+  one status and a second catch-all: new:N18.7.
+- `X10.26` analyzer (D9.17): a second request in one block, at its own level, in every stage and file: ALIS008,
+  new:N9.5.
 
 ## Q11. Lanes and time
 
@@ -2014,11 +2060,14 @@ and `notice` (D10.21).
   - `Parallel` starts its branches in authored order in one turn, each up to its first awaited step. The
     steps after `Parallel` run once, after every branch settled, and a stop in a branch ends only that
     branch (D10.10).
-- D11.6 A request is a step, so it runs wherever a step runs:
-  - in a handler of any trigger: on load, an element's or a component's event, a declared app event, a
-    dispatch, a server push, a hub message;
-  - in a route, a `Confirm` branch, the block `Chained` runs, a `Parallel` branch, `WhileLoading` and
-    `Finally`.
+  - A step settles when every block it ran settles. A branch, a route, `WhileLoading`, `Finally`, the block
+    `Chained` runs and a `Parallel` branch hold awaited steps of their own, so the steps after an `if`, a request's
+    `Finally` and `Chained`, the steps after the request and the steps after `Parallel` wait for the whole of each
+    block they follow (`Lanes.tla:TheRouteTailBeforeWhatFollows`, `Lanes.tla:JoinAfterEveryBranchTail`; one level is
+    proven at `tests/Alis.Reactive.Poc.PlaywrightTests/Conditions/WhenAPipelineBranches.cs:77`). A run is in flight
+    until its last block settles, so `replace`, `skip` (D11.7) and dispose (D11.8) meet a route's awaited tail as in
+    flight.
+- D11.6 A request is a step, so it runs in every block (D11.10), one at each block's own level (D9.17).
 
   A run belongs to the owner of the handler that started it: the page, or the slot whose plan holds the
   handler (Q12). A plugin's member is read, written and called in the same blocks, the request's included,
@@ -2041,6 +2090,25 @@ and `notice` (D10.21).
     disposed owner.
 - D11.9 No step waits for time. The only waits the core owns are a retry's delay and a `Retry-After`
   (D10.14). A component's own timers, such as a toast's or a loader's timeout, are its properties.
+- D11.10 Every stage is a block, as D8.7 and D8.8 state, on every view kind, MVC 5 and ASP.NET Core MVC (the owner,
+  2026-11-08). The stages are closed: a handler of any trigger (on load, an element's or a component's event, a
+  declared app event, a dispatch, a server push, a hub message), each branch (`Then`, an `ElseIf`'s, `Else`), each
+  `Parallel` branch, a request's `WhileLoading`, `Finally`, each route (`OnSuccess`, `OnError` by status, the
+  catch-all) and the block `Chained` runs, a `listen` (D12.8), and each block of the request defaults
+  (`WhileLoading`, `Finally`, each error route). Each is a `Pipeline<TModel>`, the defaults' a `Pipeline<NoModel>`.
+  - A block holds any number of steps of every module: a set, a call, an element's text, HTML and classes, a
+    condition, a request, `Parallel`, `Confirm`, `Into`, `Unload`, `Validate`, a dispatch, a notice, and in a route
+    `ShowErrors`. They are written as a chain or as statements in a `{}` body and run in authored order (D11.1,
+    D11.5), and each reads every value the blocks around it bind (D8.8).
+  - A block's C# runs once, where the view renders: a statement writes a step, and a loop over the view's data
+    writes a step for each item. C#'s own branching (`if`, `switch`, `?:`, a switch expression, `try`, `throw`,
+    `return`, `goto`, `lock`, `using`) is refused by ALIS004, since it reads like a browser condition and runs once at
+    render; `When` is the door (N18.6).
+  - A step is written on its own block's pipeline. A step on the pipeline of a block around it is the block
+    analyzer's (N18.9); a read of that pipeline's sources (`PageUrl`, an element's text) stays free.
+  - Proof: `spec/api/HttpSurface/EveryStage.cs` writes every module in every stage, and `ManyStatementsInEveryStage`
+    writes several statements in each, a request with steps after it in a handler, a route and a `Chained` block, a
+    condition inside a route inside a condition, and an inner block reading the outer reply.
 
 **Schema nodes.** `do` and `let` with `await`, `all`, `try`, and the handler's policy, a field of `handler`
 (Q19). The abort signal is the run's, not the plan's: `HttpSend` carries none.
@@ -2055,6 +2123,9 @@ and `notice` (D10.21).
 - `Lanes.tla:AllSettledAfterEveryRequest`
 - `Lanes.tla:BranchStopEndsOnlyItself`
 - `Lanes.tla:PayloadWritesInTheVendorsTurn`
+- `Lanes.tla:TheRouteTailBeforeWhatFollows`
+- `Lanes.tla:InnerFinallyFirst`
+- `Lanes.tla:JoinAfterEveryBranchTail`
 - `Absence.tla:UnawaitedPromiseStops`
 - `Absence.tla:PromiseWhereValueStops`
 - `Absence.tla:StopEndsOnlyItsHandler`
@@ -2089,9 +2160,9 @@ and `notice` (D10.21).
   (`Alis.Reactive/PlanAuthoring/Events/AppEvent.cs:41-43`), so a dispatch is a trigger like any other (D11.6).
 
 **Defects.**
-- `X11.1` refusal: a handler that writes a property of its payload after an awaited step (an async method, a
+- `X11.1` analyzer: a handler that writes a property of its payload after an awaited step (an async method, a
   request, a `Confirm`) is refused where the view renders with "A write to the event's payload after an awaited
-  step reaches no vendor: write it before the first request, Confirm or async method."
+  step reaches no vendor: write it before the first request, Confirm or async method." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X11.2` behavior: a drawer whose close handler writes `Cancel` and then asks stays open while the dialog
   asks, and closes on yes.
 - `X11.3` behavior: a method declared with `Method` whose vendor returns a promise stops its pipeline, and the
@@ -2118,6 +2189,16 @@ and `notice` (D10.21).
   a write after an `if` whose branch awaits is refused with X11.1's message.
 - `X11.13` behavior (D11.4): an alarm's `Else` after an `ElseIf` writes `cancel` in the monitor's turn; after an
   `ElseIf` whose condition awaits an async method, the write is refused with X11.1's message.
+- `X11.14` behavior (D11.5, D10.3): a success route that writes, sends a second request and writes again: the
+  request's `Finally`, its `Chained` and the step after the request run after the second request settles and the
+  route's last write shows (`Lanes.tla:TheRouteTailBeforeWhatFollows`).
+- `X11.15` behavior (D10.3, D11.7): a second click under `replace` while a route's own request is in flight: that
+  request is aborted, its `Finally` runs and then the outer `Finally`, once each, and no step of the route runs after
+  (`Lanes.tla:InnerFinallyFirst`).
+- `X11.16` behavior (D11.5): `Parallel` whose first branch's route sends a request: the steps after `Parallel` run
+  after that request settles (`Lanes.tla:JoinAfterEveryBranchTail`).
+- `X11.17` analyzer (D11.10): C#'s own branching (`if`, `?:`, `switch`, `try`, `return`) in any block: ALIS004,
+  new:N18.6.
 
 ## Q12. Ownership
 
@@ -2504,16 +2585,16 @@ and `request` state, which the schema does not hold: a request's state is its ru
 - `X14.1` type: an input outside its plan's block does not compile: new:N14.2.
 - `X14.2` type: a partial for a member takes the member as a typed lambda, so no prefix is written as text:
   new:N14.1.
-- `X14.3` refusal: an input bound to `m => m` is refused with "Input 'm => m' names no member of {model}: bind
-  a member of the view's model, or render the member with Html.EditorFor from the view that holds it."
+- `X14.3` analyzer: an input bound to `m => m` is refused with "Input 'm => m' names no member of {model}: bind
+  a member of the view's model, or render the member with Html.EditorFor from the view that holds it." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X14.4` refusal: an input after the view's prefix moved is refused with "The field prefix of {view} changed
   from {old} to {new} after its plan started, so input '{name}' would post under a name its plan does not send
   or check."
 - `X14.5` refusal: an id rendered twice by one plan is refused with "Input '{name}' renders element id '{id}' a
   second time in this plan: render the field once, or each copy for its own member with Html.PartialFor."
-- `X14.6` refusal: a JSON request over a number-keyed dictionary entry is refused with "{member} sits under
+- `X14.6` analyzer: a JSON request over a number-keyed dictionary entry is refused with "{member} sits under
   '{prefix}', a dictionary entry keyed by a number, which JSON reads as a list position: send this request
-  with AsFormData()."
+  with AsFormData()." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X14.7` behavior: a slot's content that renders an input id the page holds runs none of its handlers, and the
   console names the id and both views.
 - `X14.8` behavior: an `EditorFor` template's input of `NextOfKin.Name` shows the page's server message for
@@ -2873,16 +2954,15 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   fails both.
 - `X16.10` behavior: a `Matches(@"^[0-9]+$")` on a single-line input refuses Arabic-Indic digits in the browser and on
   the server alike.
-- `X16.11` refusal: a pattern with `IgnoreCase` and no `CultureInvariant`: "The pattern '{pattern}' ignores case by
-  the view's culture, which the browser cannot follow; add RegexOptions.CultureInvariant, or mark the rule
-  .ServerOnly()."
-- `X16.12` refusal: a pattern with a construct the engines read differently: "The pattern '{pattern}' uses
-  {construct}, which .NET and the browser read differently; write {same} instead, or mark the rule .ServerOnly()."
-- `X16.13` refusal: a condition with no browser form: "The condition '{condition}' has no browser form. Write it as
+- `X16.11` analyzer: a pattern with `IgnoreCase` (D16.11): "The pattern '{pattern}' ignores case, which no browser flag
+  folds as .NET does; spell both cases, as [Aa]spirin, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.12` analyzer: a pattern with a construct the engines read differently: "The pattern '{pattern}' uses
+  {construct}, which .NET and the browser read differently; write {same} instead, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.13` analyzer: a condition with no browser form: "The condition '{condition}' has no browser form. Write it as
   tests of model members against fixed values or other members, or declare that the server alone decides it:
-  WhenOnServer or UnlessOnServer."
-- `X16.14` refusal: on net48, a start the binder cannot create: "{Type} has no public parameterless constructor, so
-  the endpoint cannot bind it; give {Type} a public parameterless constructor."
+  WhenOnServer or UnlessOnServer." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.14` analyzer: on net48, a start the binder cannot create: "{Type} has no public parameterless constructor, so
+  the endpoint cannot bind it; give {Type} a public parameterless constructor." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
 - `X16.15` behavior: a request that sends only set members, on a page with no form, shows "Ward is required." in
   the notice and sends nothing.
 - `X16.16` behavior: an `Input` of the request's view outside every container, sent under `r => r.Ward`, shows the
@@ -2895,8 +2975,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   shows in the page container's summary and not at the reloaded input.
 - `X16.20` behavior: a live fieldset container inside a live form container: blurring the empty name both hold
   shows "Name is required." once.
-- `X16.21` refusal: `ShowErrors` on a pipeline that is no request's route: "ShowErrors shows a request's failures,
-  and this pipeline is no request's route; call it inside OnError or OnSuccess."
+- `X16.21` analyzer: `ShowErrors` on a pipeline that is no request's route: "ShowErrors shows a request's failures,
+  and this pipeline is no request's route; call it inside OnError or OnSuccess." At build by ALIS031, and where the view renders on code it does not follow (D18.6): new:N18.8.
 
 ## Q17. Vendors and inversion
 
@@ -3170,8 +3250,8 @@ plans (Q19).
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every
   step kind (a read, a write, a call, an event) with no change to the framework.
-- `X17.5` refusal: a vendor name outside its characters: "Vendor name '{name}' must start with a letter and contain
-  only ASCII letters, digits, underscore, or hyphen."
+- `X17.5` analyzer: a vendor name outside its characters: "Vendor name '{name}' must start with a letter and contain
+  only ASCII letters, digits, underscore, or hyphen." At build by ALIS034, and where the view renders on code it does not follow (D18.6): new:N18.12.
 - `X17.6` behavior: a page that loads no Fusion asset asks NativeConfirm in a `When`; the branch runs on OK and
   not on Cancel.
 - `X17.7` behavior: Escape in a confirm opened over a drawer answers false, and the drawer stays open.
@@ -3187,20 +3267,20 @@ plans (Q19).
   that function, and the event runs nothing after.
 - `X17.12` behavior: a listener of two arguments reads the first and calls the second, the vendor's continuation,
   with the page's items, and the component shows them.
-- `X17.13` refusal: an awaited read inside a callback's answer is refused where the view renders with "A callback
-  answers its vendor at once, so its answer cannot wait for an async method or a request."
+- `X17.13` analyzer: an awaited read inside a callback's answer is refused where the view renders with "A callback
+  answers its vendor at once, so its answer cannot wait for an async method or a request." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X17.16` refusal (D17.3): a second handler of one object's callback property: "'{event}' is a callback property,
   which holds one listener, so a second handler would replace the first. Write both pipelines in one handler."
 - `X17.17` behavior (D17.3): a call bell whose event is a callback property runs its handler with the ring's room,
   and a ward feed whose subscribe method returns its unsubscriber runs its handler with the update's message.
-- `X17.18` refusal (D17.4): an argument at a position read on a declaration that is neither an event's payload nor a
+- `X17.18` analyzer (D17.4): an argument at a position read on a declaration that is neither an event's payload nor a
   callback's arguments: "An argument at a position is what a listener or a callback receives: declare it on an
-  event's payload or a callback's arguments."
+  event's payload or a callback's arguments." At build by ALIS034, and where the view renders on code it does not follow (D18.6): new:N18.12.
 - `X17.15` behavior (D4.8, D17.4): an event declared with a payload that its vendor raises with no argument stops
   before its first step, and the vendor goes on after its listeners; an event declared with none runs its handler.
 - `X17.14` behavior: a vendor's label callback shows, for each label, the text the view's expression answers.
-- `X17.19` refusal (D17.12): a step written inside a callback's answer: "A step is written inside a callback's answer,
-  which answers its vendor with one value. Write the step in a pipeline."
+- `X17.19` analyzer (D17.12): a step written inside a callback's answer: "A step is written inside a callback's answer,
+  which answers its vendor with one value. Write the step in a pipeline." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X17.20` behavior (D17.12): a callback's answer reads the page as it is on each call, a text box's value and a
   method's result alike, and a method's argument written as an answer is the key the vendor sorts by.
 - `X17.21` behavior (D17.12): an answer that stops while a step's write made the vendor ask stops that pipeline
@@ -3218,8 +3298,8 @@ plans (Q19).
   and the book's signed event reaches no handler of the page.
 - `X17.26` behavior (D17.14): a shift log two scripts provide stops each step that reaches it, and a ward lantern
   provided as a number stops each step that reads a colour a number lacks; the page's other pipelines run.
-- `X17.27` refusal (D17.14): a plugin named with a dot: "Plugin name 'alis.log' must start with a letter and contain
-  only ASCII letters, digits, underscore, or hyphen. A name with a dot is the framework's own."
+- `X17.27` analyzer (D17.14): a plugin named with a dot: "Plugin name 'alis.log' must start with a letter and contain
+  only ASCII letters, digits, underscore, or hyphen. A name with a dot is the framework's own." At build by ALIS034, and where the view renders on code it does not follow (D18.6): new:N18.12.
 
 ## Q18. Type knowledge without reflection
 
@@ -3305,6 +3385,36 @@ plans (Q19).
   - an action link's attribute is a typed name, with `data-` and `aria-` attributes by their own doors.
 
   Their forms go to gate 2.
+- D18.6 A rule the source states sits on its highest rung (the owner, 2026-11-08): a type stages the door, else an
+  analyzer refuses it at build, else it is refused where the view renders. The render takes only what the build
+  cannot see, a closed set: the app's options (its JSON options, its culture, its startup choices), a value the view
+  holds when it renders, and the plan as the render composes it (partials, slots, ids, handlers across views). Each
+  analyzer runs the same check, with the same message, that the render keeps for code the analyzer does not follow
+  (a helper method a block calls); a line of this design that says a rule the build sees is refused where the view
+  renders means both.
+  - Moved to an analyzer, by family: ALIS030, the request (X9.5, X9.6, X9.7, X9.12, X10.18, X10.25, X14.6, X20.6;
+    N18.7); ALIS031, `ShowErrors` outside a route (X16.21; N18.8); ALIS032, blocks (X5.13, X5.14, X6.8, X8.5, X8.9,
+    X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,
+    X3.11, X4.12, X6.2, X6.6, X6.10, X6.11, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.29, X6.30,
+    X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
+    X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12).
+  - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
+    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X7.10, X7.11, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
+    (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
+    URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5, X17.16). A plan's version
+    is the browser's, at boot (X19.3).
+  - Every analyzer of both lines has its verdict. ALIS001, a `When` given no `Then`: kept, retargeted to the
+    conditions of `Pipeline<TModel>` in every block and file. ALIS002, main's one request per action link: kept as
+    ALIS008 on the action's block, since an action's handler is a block (D11.10). ALIS003, a second `Reactive` for
+    one event: leaves, since two handlers of one event are D11.5's meaning, each with its own policy
+    (`tests/Alis.Reactive.Poc.PlaywrightTests/Events/WhenAnAlarmIsAcknowledged.cs:18`). ALIS004: kept, retargeted
+    (N18.6). ALIS005, a rule only the server runs, reported as information: kept on `ReactiveValidator<T>`, so the
+    developer sees where each rule runs. ALIS006, main's warning on a condition with no browser form: kept, an error
+    (N18.11). ALIS007, a second `Chained`: gives way to the type, since `Chained` ends the request's sentence
+    (`SecondChained` in `spec/api/refused.sh`). ALIS008: kept, retargeted (D9.17, N9.5). ALIS009: kept (D18.5).
+    ALIS010 to ALIS013, the slice tree (a use of a slice above, a namespace other than the folder's, a public type
+    left unsealed, a table that disagrees with its package): kept for each package built on the core, since a module
+    is a namespace and a folder (the owner, 2026-11-06). ALIS014 to ALIS029 are the POC's, each at its own line.
 
 **Schema nodes.** None: type knowledge lives in C#, and the plan carries only what it decides: JSON names,
 shapes, starts and the payload kind of each event.
@@ -3327,6 +3437,33 @@ shapes, starts and the payload kind of each event.
 - `N18.4` new: the typed doors of D18.5 for the button type, the text box type and the action link's attributes.
 - `N18.5` new: the override analyzer of D18.3: an override in an app's model carries the JSON name and the
   `JsonIgnore` of the member it overrides. Built in POC 13f as ALIS025.
+- `N18.6` new: ALIS004 retargeted from `PipelineBuilder` and `TriggerBuilder` lambdas in Razor files
+  (`Alis.Reactive.Analyzers/ControlFlow/ControlFlowInReactiveCallbackAnalyzer.cs:98`) to every block of
+  `Pipeline<TModel>` (D11.10), expression and `{}` lambdas both, in every file, keeping its allowed statements (a
+  block, an expression, a local, a local function and the loops) and its refused ones.
+- `N18.7` new: ALIS030, the request analyzer: on a constant URL, a fragment, a brace without its pair, a placeholder no
+  member fills and a URL neither a page path nor an http or https URI (D9.4); a list, an object, a file, a date or an
+  instant member in a placeholder; on a constant header name, `Content-Type`, `Accept`, the antiforgery header,
+  `traceparent` and the Fetch Standard's forbidden request headers, and on a constant value one outside RFC 9110's
+  field value (D9.23); a JSON body member under a number-keyed dictionary (D14.5); a second `Busy` or `NoBusy`,
+  `Busy` beside `NoDefaults()` (D10.21), a status outside 300 to 599, a second route for one status and a second
+  catch-all (D10.13).
+- `N18.8` new: ALIS031, `ShowErrors` in a block that no route encloses (D16.13).
+- `N18.9` new: ALIS032, the block analyzer: a step written on the pipeline of a block around its own (D11.10); a
+  bound value carried out of its block through a variable declared outside it (D8.8, D5.11); an `ElseIf` or `Else`
+  after another step, a second `Else` (D8.7); a result called in an `ElseIf`'s condition read after its `When`, and an
+  async method under a term reached later (D4.7); a write to the payload after an awaited step (D11.4) and inside a
+  `listen` (D12.8); a step or an awaited read inside a list's lambda or a callback's answer (D6.8, D17.12).
+- `N18.10` new: ALIS033, the lambda analyzer: a member lambda that names the model (D2.5, D14.2); a dictionary of dates
+  written into a live member (D3.13); in a list's lambda and a pipeline condition, a term outside the identity table
+  (D6.5), a view value that computes (D6.7), and each comparison, ordering, cast, coalesce and lookup D6.12 to D6.14
+  and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15).
+- `N18.11` new: ALIS006 kept as an error, the validator analyzer: a condition with no browser form outside
+  `WhenOnServer` and `UnlessOnServer`, a constant pattern outside D16.11's closed set or with an option other than
+  `CultureInvariant`, and on net48 a model type with no public parameterless constructor (D16.6, D16.11).
+- `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
+  dot (D17.3, D17.14), and an argument at a position on a declaration that is neither an event's payload nor a
+  callback's arguments (D17.4).
 
 **Evidence.**
 - Three item-type finders (`Alis.Reactive/Inputs/FieldReference.cs:50-58`, `Alis.Reactive/Members/ClrShape.cs:82-90`,
@@ -3532,8 +3669,8 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - `X20.7` behavior: with the trace off, a GET retried after a 503 reaches the endpoint the second time with a sampled
   `traceparent` and `baggage` holding `http.request.resend_count=1`, which the endpoint echoes, and the first time with
   neither.
-- `X20.6` refusal: a request header named `traceparent` is refused where the view renders with "The traceparent header
-  belongs to tracing: remove it from this request's headers."
+- `X20.6` analyzer: a request header named `traceparent` is refused where the view renders with "The traceparent header
+  belongs to tracing: remove it from this request's headers." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 
 ## Q21. Realtime: server-sent events and SignalR
 

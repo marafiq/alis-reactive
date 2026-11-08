@@ -8,5 +8,5 @@ public static class FormOfContainer
 {
     public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
-            .Multipart(body => body.Form(intake)));
+            .Form(intake));
 }

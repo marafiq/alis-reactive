@@ -84,7 +84,7 @@ public sealed class GetRequest<TModel, TRequest, TReply>
 
     public GetRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
-    public GetRequest<TModel, TRequest, TReply> Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
+    public void Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
 }
 
 public sealed class HeadRequest<TModel, TRequest>
@@ -147,7 +147,7 @@ public sealed class HeadRequest<TModel, TRequest, TReply>
 
     public HeadRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
-    public HeadRequest<TModel, TRequest, TReply> Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
+    public void Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
 }
 
 public sealed class OptionsRequest<TModel, TRequest>
@@ -230,7 +230,7 @@ public sealed class OptionsRequest<TModel, TRequest, TReply>
 
     public OptionsRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
-    public OptionsRequest<TModel, TRequest, TReply> Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
+    public void Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
 }
 
 public sealed class PostRequest<TModel, TRequest>
@@ -309,7 +309,7 @@ public sealed class PostRequest<TModel, TRequest, TReply>
 
     public PostRequest<TModel, TRequest, TReply> NoBusy() => throw new NotSupportedException();
 
-    public PostRequest<TModel, TRequest, TReply> Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
+    public void Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
 }
 
 public sealed class PutRequest<TModel, TRequest>
@@ -392,7 +392,7 @@ public sealed class PutRequest<TModel, TRequest, TReply>
 
     public PutRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
-    public PutRequest<TModel, TRequest, TReply> Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
+    public void Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
 }
 
 public sealed class DeleteRequest<TModel, TRequest>
@@ -475,5 +475,5 @@ public sealed class DeleteRequest<TModel, TRequest, TReply>
 
     public DeleteRequest<TModel, TRequest, TReply> NoRetry() => throw new NotSupportedException();
 
-    public DeleteRequest<TModel, TRequest, TReply> Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
+    public void Chained(Action<TReply, Pipeline<TModel>> chained) => throw new NotSupportedException();
 }

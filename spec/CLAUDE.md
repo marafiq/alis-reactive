@@ -391,9 +391,22 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-08: forms nest, sit out of band, or are containers of any kind; the concept is the request
   container, and no type is named PageForm. The native `<form>` stays the browser's way to send a form's body (`Form`), and the core
   sends any container's framework inputs (`Inputs`) and the view's own input (`Input`) beside it, losing no feature.
+- The owner, 2026-11-08: a rule the source states is the compiler's. A type stages the door; where no type can, an
+  analyzer refuses it; a refusal where the view renders names what only the render knows (the app's options, a value
+  read at run time, another view). Every compiler rule of both lines carries a verdict in the core design.
+- The owner, 2026-11-08: parallel names are prohibited. One concept has one door, and a slice's door that repeats a
+  core door (a link's own `Post` beside the pipeline's) is refused.
+- The owner, 2026-11-08: row actions serve any grid-like component, never one vendor's. An action is declared once,
+  outside its rows, as one request in the condensed form with a payload of any type, and each row renders it with its
+  own values; declared once is no license for a weaker design (types, one request module, every module, no guessing).
 - The owner, 2026-11-08: every module works with every other, each HTTP thing is a typed JavaScript object whose members
   are sources and dot-walk (the response's status, headers and body, the page's URL, the request's fields), and main is
   the floor of features, never the bar of quality.
+- The owner, 2026-11-08: every stage is a pipeline, and each holds several statements of every module: a handler, each
+  branch, each route, `WhileLoading`, `Finally`, the block `Chained` runs, each `Parallel` branch and the defaults' blocks.
+  Conditions, the page's URL, every reply's status, headers and body, and the request as sent dot-walk in each, and a
+  chained request reads every reply and request around it. A step that waits holds what follows it, a route's tail
+  included (D11.10, D11.5, `spec/Core/Lanes.tla`).
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

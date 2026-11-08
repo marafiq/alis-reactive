@@ -32,8 +32,8 @@ public static class Usage
 
     public static void CondensedIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
-                .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
-                .Form(intake))
+                .Form(intake)
+                .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward)))
             .OnSuccess<IntakeCreated>((created, done) => done.Notice().Success("Resident admitted"))
             .Chained((created, next) => next
                 .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
@@ -43,9 +43,8 @@ public static class Usage
     public static void FullIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
                 .Route(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
-                .Multipart(body => body
-                    .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
-                    .Form(intake)))
+                .Multipart(intake, body => body
+                    .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))))
             .Validate<IntakeValidator>()
             .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
             .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))
@@ -100,7 +99,7 @@ public static class Usage
     public static void SaveIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Put<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
                 .Route(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
-                .UrlEncoded(body => body.Form(intake)))
+                .UrlEncoded(intake, body => body.Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))))
             .OnSuccess(Content.None, (saved, done) => done.Element("saved-ward").Text.Set(saved.Request.Read(r => r.Ward)))
             .OnError(409, Content.Text, (conflict, shown) => shown.Element("intake-conflict").Text.Set(conflict.Body))
             .OnError(400, Content.Html, (invalid, shown) => shown.Into("intake", invalid.Body))
@@ -188,47 +187,40 @@ public static class Usage
                 .Route(r => r.Unit, note)
                 .Route(r => r.Room, floor)
                 .Query(r => r.Reason, "held")
-                .Query(r => r.Floor, floor)
-                .Set(r => r.Note, note)
-                .Set(r => r.Floor, floor))
+                .Query(r => r.Floor, floor))
             .OnSuccess(Content.Text, (held, done) => done.Notice().Success(held.Body))
             .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Set(r => r.Ward, "north")
                 .Set(r => r.Floor, floor)
                 .Set(r => r.Note, note)
-                .Text(note)
                 .Set(r => r.Bed, 4))
             .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body))
             .OnSuccess(done => done.Notice().Success("Bed held"));
         pipeline.Put<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Route(r => r.Ward, "north")
-                .Json(body => body
+                .Json(beds, body => body
                     .Set(r => r.Ward, "north")
                     .Set(r => r.Floor, floor)
                     .Set(r => r.Bed, 4)
-                    .Inputs(beds)
                     .Input(r => r.Note, pipeline.Input(v => v.Resident)))
                 .Set(r => r.Wing, "east"))
             .OnSuccess(Content.Json<Census>(), (counted, done) => done.When(counted.Status.Eq(201)).Then(created => created.Notice().Success("Bed created")))
             .OnError((failed, shown) => shown.Notice().Error(failed.Headers.Get("X-Error")));
         pipeline.Delete<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Route(r => r.Ward, "north")
-                .UrlEncoded(body => body
+                .UrlEncoded(bedForm, body => body
                     .Set(r => r.Note, note)
                     .Set(r => r.Ward, "north")
-                    .Set(r => r.Floor, floor)
                     .Set(r => r.Bed, 4)
-                    .Form(bedForm)
                     .Input(r => r.Floor, pipeline.Input(v => v.Floor))))
             .OnSuccess(Content.None, (removed, done) => done.Notice().Info("Bed released"));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Route(r => r.Ward, "north")
-                .Multipart(body => body
+                .Multipart(beds, body => body
                     .Set(r => r.Ward, "north")
                     .Set(r => r.Floor, floor)
                     .Set(r => r.Bed, 4)
-                    .Inputs(beds)
                     .Input(r => r.Note, pipeline.Input(v => v.Resident))))
             .OnSuccess(Content.None, (held, done) => done.Notice().Info("Bed held"));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
@@ -252,7 +244,7 @@ public static class Usage
         pipeline.Validate(pipeline.Container<IntakeView, BedRequest>("beds"));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Route(r => r.Ward, "north")
-                .Json(body => body.Inputs(pipeline.Container<IntakeView, BedRequest>("beds"))))
+                .Json(pipeline.Container<IntakeView, BedRequest>("beds"), body => body.Set(r => r.Bed, 4)))
             .OnSuccess(done => done.Notice().Success("Bed held"));
     }
 
@@ -376,6 +368,10 @@ public sealed class CensusBoard : Component
     public override ComponentVendor Vendor => BoardVendor;
 
     public Property<int> Occupied => Property<int>();
+
+    public Property<string?> Note => Property<string?>();
+
+    public Event<CensusCounted> Counted => Event<CensusCounted>();
 }
 
 public sealed class StaffRoster : Component

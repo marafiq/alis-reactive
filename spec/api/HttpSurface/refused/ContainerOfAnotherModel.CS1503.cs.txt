@@ -8,5 +8,5 @@ public static class ContainerOfAnotherModel
 {
     public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<BedRequest> beds)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
-            .Json(body => body.Inputs(beds)));
+            .Json(beds, body => body.Set(r => r.Name, "Ann")));
 }

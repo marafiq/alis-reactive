@@ -1,0 +1,15 @@
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class ReplyOutsideItsRoute
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+    {
+        pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Set(r => r.Name, "Ann"))
+            .OnSuccess<IntakeCreated>((created, done) => done.Notice().Success("Admitted"));
+        pipeline.Element("admitted").Text.Set(created.Request.Read(r => r.Name));
+    }
+}

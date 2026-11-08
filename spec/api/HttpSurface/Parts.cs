@@ -63,15 +63,79 @@ public sealed class BodyParts<TRequest>
 
     public BodiedParts<TRequest> Json(Action<JsonBody<TRequest>> body) => throw new NotSupportedException();
 
+    public BodiedParts<TRequest> Json(RequestContainer<TRequest> container, Action<JsonBody<TRequest>> body) => throw new NotSupportedException();
+
     public BodiedParts<TRequest> UrlEncoded(Action<UrlEncodedBody<TRequest>> body) => throw new NotSupportedException();
+
+    public BodiedParts<TRequest> UrlEncoded(RequestForm<TRequest> form, Action<UrlEncodedBody<TRequest>> body) => throw new NotSupportedException();
+
+    public BodiedParts<TRequest> UrlEncoded(RequestContainer<TRequest> container, Action<UrlEncodedBody<TRequest>> body) => throw new NotSupportedException();
 
     public BodiedParts<TRequest> Multipart(Action<MultipartBody<TRequest>> body) => throw new NotSupportedException();
 
-    public BodiedParts<TRequest> Text(string text) => throw new NotSupportedException();
+    public BodiedParts<TRequest> Multipart(RequestForm<TRequest> form, Action<MultipartBody<TRequest>> body) => throw new NotSupportedException();
 
-    public BodiedParts<TRequest> Text(ITypedSource<string?> text) => throw new NotSupportedException();
+    public BodiedParts<TRequest> Multipart(RequestContainer<TRequest> container, Action<MultipartBody<TRequest>> body) => throw new NotSupportedException();
 
-    public BodiedParts<TRequest> File(BrowserFile file) => throw new NotSupportedException();
+    public WholeBodyParts<TRequest> Text(string text) => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Text(ITypedSource<string?> text) => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> File(BrowserFile file) => throw new NotSupportedException();
+}
+
+public sealed class QueriedParts<TRequest>
+{
+    private QueriedParts()
+    {
+    }
+
+    public QueriedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+
+    public QueriedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+
+    public QueriedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+        where TValue : struct
+        => throw new NotSupportedException();
+
+    public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+
+    public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+
+    public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+        where TValue : struct
+        => throw new NotSupportedException();
+
+    public QueriedParts<TRequest> Header(string name, string value) => throw new NotSupportedException();
+
+    public QueriedParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value) => throw new NotSupportedException();
+}
+
+public sealed class WholeBodyParts<TRequest>
+{
+    private WholeBodyParts()
+    {
+    }
+
+    public WholeBodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+        where TValue : struct
+        => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+        where TValue : struct
+        => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Header(string name, string value) => throw new NotSupportedException();
+
+    public WholeBodyParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value) => throw new NotSupportedException();
 }
 
 public sealed class BodiedParts<TRequest>
@@ -115,8 +179,6 @@ public sealed class JsonBody<TRequest>
         where TValue : struct
         => throw new NotSupportedException();
 
-    public JsonBody<TRequest> Inputs(RequestContainer<TRequest> container) => throw new NotSupportedException();
-
     public JsonBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
         => throw new NotSupportedException();
@@ -139,10 +201,6 @@ public sealed class UrlEncodedBody<TRequest>
     public UrlEncodedBody<TRequest> Set<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => throw new NotSupportedException();
-
-    public UrlEncodedBody<TRequest> Form(RequestForm<TRequest> form) => throw new NotSupportedException();
-
-    public UrlEncodedBody<TRequest> Inputs(RequestContainer<TRequest> container) => throw new NotSupportedException();
 
     public UrlEncodedBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
@@ -170,10 +228,6 @@ public sealed class MultipartBody<TRequest>
     public MultipartBody<TRequest> File(Expression<Func<TRequest, IFormFile?>> member, BrowserFile file) => throw new NotSupportedException();
 
     public MultipartBody<TRequest> File(Expression<Func<TRequest, List<IFormFile>>> member, LiveObjects<BrowserFile> files) => throw new NotSupportedException();
-
-    public MultipartBody<TRequest> Form(RequestForm<TRequest> form) => throw new NotSupportedException();
-
-    public MultipartBody<TRequest> Inputs(RequestContainer<TRequest> container) => throw new NotSupportedException();
 
     public MultipartBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
