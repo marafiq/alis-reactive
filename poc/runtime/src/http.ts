@@ -1,5 +1,6 @@
-import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, QueryField } from "./plan";
+import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, QueryField, ValuePart } from "./plan";
 import { assertNever, Stop } from "./read";
+import { wireTexts } from "./wire";
 
 export const http = { send };
 
@@ -36,23 +37,24 @@ function segment(part: PathPart): string {
     case "text":
       return part.text;
     case "value":
-      return encodeURIComponent(routeText(part.name, part.value));
+      return encodeURIComponent(routeText(part));
     default:
       return assertNever(part);
   }
 }
 
-function routeText(name: string, value: JsonValue): string {
-  if (value === null) throw new Stop("The route value '" + name + "' reads nothing, so the request is not sent.");
-  const text = String(value);
-  if (text === "") throw new Stop("The route value '" + name + "' is empty, so the request is not sent.");
-  if (text.includes("/")) throw new Stop("The route value '" + name + "' holds '/', which no endpoint reads back as it was, so the request is not sent.");
+function routeText(part: ValuePart): string {
+  const [text] = wireTexts(part.name, part.value, part.form) ?? [];
+  if (text === undefined) throw new Stop("The route value '" + part.name + "' reads nothing, so the request is not sent.");
+  if (text === "") throw new Stop("The route value '" + part.name + "' is empty, so the request is not sent.");
+  if (text.includes("/")) throw new Stop("The route value '" + part.name + "' holds '/', which no endpoint reads back as it was, so the request is not sent.");
   return text;
 }
 
 function append(query: URLSearchParams, field: QueryField): void {
-  if (field.value !== null) {
-    query.append(field.name, String(field.value));
+  const texts = wireTexts(field.name, field.value, field.form);
+  if (texts !== undefined) {
+    for (const text of texts) query.append(field.name, text);
     return;
   }
   switch (field.whenNothing) {

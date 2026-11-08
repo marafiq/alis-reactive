@@ -52,23 +52,27 @@ internal sealed class TextPart : PathPart
 
 internal sealed class ValuePart : PathPart
 {
-    internal ValuePart(string name, JsonElement value)
+    internal ValuePart(string name, JsonElement value, WireForm form)
     {
         Name = name;
         Value = value;
+        Form = form;
     }
 
     public string Name { get; }
 
     public JsonElement Value { get; }
+
+    public WireForm Form { get; }
 }
 
 internal sealed class QueryField
 {
-    internal QueryField(string name, JsonElement value, WhenNothing whenNothing)
+    internal QueryField(string name, JsonElement value, WireForm form, WhenNothing whenNothing)
     {
         Name = name;
         Value = value;
+        Form = form;
         WhenNothing = whenNothing;
     }
 
@@ -76,7 +80,118 @@ internal sealed class QueryField
 
     public JsonElement Value { get; }
 
+    public WireForm Form { get; }
+
     public WhenNothing WhenNothing { get; }
+}
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+[JsonDerivedType(typeof(TextForm), "text")]
+[JsonDerivedType(typeof(NumberForm), "number")]
+[JsonDerivedType(typeof(BooleanForm), "boolean")]
+[JsonDerivedType(typeof(DateForm), "date")]
+[JsonDerivedType(typeof(InstantForm), "instant")]
+[JsonDerivedType(typeof(WrittenForm), "written")]
+[JsonDerivedType(typeof(ListForm), "list")]
+internal abstract class WireForm
+{
+    internal static readonly WireForm Text = new TextForm();
+    internal static readonly WireForm Number = new NumberForm();
+    internal static readonly WireForm Boolean = new BooleanForm();
+    internal static readonly WireForm Date = new DateForm();
+    internal static readonly WireForm Instant = new InstantForm();
+    internal static readonly WireForm Written = new WrittenForm();
+
+    private protected WireForm()
+    {
+    }
+}
+
+internal sealed class TextForm : WireForm
+{
+    internal TextForm()
+    {
+    }
+}
+
+internal sealed class NumberForm : WireForm
+{
+    internal NumberForm()
+    {
+    }
+}
+
+internal sealed class BooleanForm : WireForm
+{
+    internal BooleanForm()
+    {
+    }
+}
+
+internal sealed class DateForm : WireForm
+{
+    internal DateForm()
+    {
+    }
+}
+
+internal sealed class InstantForm : WireForm
+{
+    internal InstantForm()
+    {
+    }
+}
+
+internal sealed class WrittenForm : WireForm
+{
+    internal WrittenForm()
+    {
+    }
+}
+
+internal sealed class ListForm : WireForm
+{
+    internal ListForm(ScalarKind item, ItemWhenNothing itemWhenNothing)
+    {
+        Item = item;
+        ItemWhenNothing = itemWhenNothing;
+    }
+
+    public ScalarKind Item { get; }
+
+    public ItemWhenNothing ItemWhenNothing { get; }
+}
+
+[JsonConverter(typeof(ChoiceConverter<ItemWhenNothing>))]
+internal sealed class ItemWhenNothing : IChoice
+{
+    internal static readonly ItemWhenNothing Empty = new("empty");
+    internal static readonly ItemWhenNothing Stop = new("stop");
+
+    private ItemWhenNothing(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
+[JsonConverter(typeof(ChoiceConverter<ScalarKind>))]
+internal sealed class ScalarKind : IChoice
+{
+    internal static readonly ScalarKind PlainText = new("text");
+    internal static readonly ScalarKind Number = new("number");
+    internal static readonly ScalarKind Boolean = new("boolean");
+    internal static readonly ScalarKind Date = new("date");
+    internal static readonly ScalarKind Instant = new("instant");
+    internal static readonly ScalarKind Written = new("written");
+
+    private ScalarKind(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
 }
 
 [JsonConverter(typeof(ChoiceConverter<WhenNothing>))]

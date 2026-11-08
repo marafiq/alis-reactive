@@ -25,6 +25,10 @@ export interface AssignmentListening {
 
 export type BodyKind = "html" | "json";
 
+export interface BooleanForm {
+  readonly kind: "boolean";
+}
+
 export interface CallExpression {
   readonly kind: "call";
   readonly target: Expression;
@@ -43,6 +47,10 @@ export interface DataStep {
   readonly name: string;
   readonly requires: readonly string[];
   readonly absent: Absence;
+}
+
+export interface DateForm {
+  readonly kind: "date";
 }
 
 export interface DateShape {
@@ -118,9 +126,15 @@ export interface IfStatement {
   readonly else: readonly Statement[];
 }
 
+export interface InstantForm {
+  readonly kind: "instant";
+}
+
 export interface InstantShape {
   readonly kind: "instant";
 }
+
+export type ItemWhenNothing = "empty" | "stop";
 
 export type LetBinding = "line" | "read";
 
@@ -135,6 +149,12 @@ export interface LetStatement {
 export interface ListExpression {
   readonly kind: "list";
   readonly items: readonly Expression[];
+}
+
+export interface ListForm {
+  readonly kind: "list";
+  readonly item: ScalarKind;
+  readonly itemWhenNothing: ItemWhenNothing;
 }
 
 export interface ListenStatement {
@@ -177,6 +197,10 @@ export interface NothingAbsence {
 export interface NullableShape {
   readonly kind: "nullable";
   readonly inner: Shape;
+}
+
+export interface NumberForm {
+  readonly kind: "number";
 }
 
 export interface ObjectExpression {
@@ -228,6 +252,7 @@ export type Presence = "required" | "optional";
 export interface QueryField {
   readonly name: string;
   readonly value: JsonValue;
+  readonly form: WireForm;
   readonly whenNothing: WhenNothing;
 }
 
@@ -255,6 +280,8 @@ export interface ReturnedListening {
   readonly subscribe: string;
 }
 
+export type ScalarKind = "text" | "number" | "boolean" | "date" | "instant" | "written";
+
 export interface SetStatement {
   readonly kind: "set";
   readonly target: Expression;
@@ -273,6 +300,10 @@ export interface StartAbsence {
 
 export type Statement = SetStatement | DoStatement | LetStatement | IfStatement | ListenStatement;
 
+export interface TextForm {
+  readonly kind: "text";
+}
+
 export interface TextPart {
   readonly kind: "text";
   readonly text: string;
@@ -286,6 +317,7 @@ export interface ValuePart {
   readonly kind: "value";
   readonly name: string;
   readonly value: JsonValue;
+  readonly form: WireForm;
 }
 
 export interface Vendor {
@@ -294,3 +326,9 @@ export interface Vendor {
 }
 
 export type WhenNothing = "leave" | "empty";
+
+export type WireForm = TextForm | NumberForm | BooleanForm | DateForm | InstantForm | WrittenForm | ListForm;
+
+export interface WrittenForm {
+  readonly kind: "written";
+}

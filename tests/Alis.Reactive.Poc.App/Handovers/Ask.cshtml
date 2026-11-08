@@ -1,0 +1,79 @@
+@using Alis.Reactive.Poc.App.Handovers
+@model HandoverPage
+@{
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<HandoverPage>();
+}
+<h1>Shift handover</h1>
+
+@plan.HandoverBoard("board")
+
+@(plan.Button("ask-register", "Ask the register")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var board = pipeline.Component<HandoverBoard>("board");
+        pipeline.Get<RegisterQuery>("/Handovers/Register", request => request
+                .Set(r => r.Round, board.Round)
+                .Set(r => r.Dose, board.Dose)
+                .Set(r => r.Rate, board.Rate)
+                .Set(r => r.Due, board.Due)
+                .Set(r => r.Ward, board.Ward)
+                .Set(r => r.PlannedFor, board.PlannedFor)
+                .Set(r => r.StartsAt, board.StartsAt)
+                .Set(r => r.Beds, board.Beds)
+                .Set(r => r.Late, board.Late)
+                .Set(r => r.Waiting, board.Waiting)
+                .Set(r => r.Leads, board.Leads)
+                .Set(r => r.Shift, board.Shift)
+                .Set(r => r.Cover, Shift.Twilight)
+                .Set(r => r.Target, board.Round))
+            .Response(response => response.OnSuccess<RegisterAnswer>((answer, recorded) =>
+                recorded.Element("register-answer").Text.Set(answer.Read(a => a.Recorded))));
+        pipeline.Element("register-asked").Text.Set(board.Ward);
+    }))
+<p>Register: <strong id="register-answer">not asked yet</strong>, last asked for the <strong id="register-asked">no ward yet</strong> ward</p>
+
+@(plan.Button("open-round", "Open the round")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var board = pipeline.Component<HandoverBoard>("board");
+        pipeline.Get<RoundQuery>("/Handovers/Round/{round}/{due}/{shift}", request => request
+                .Set(r => r.Round, board.Round)
+                .Set(r => r.Due, board.Due)
+                .Set(r => r.Shift, board.Shift))
+            .Response(response => response.OnSuccess<RegisterAnswer>((answer, opened) =>
+                opened.Element("round-answer").Text.Set(answer.Read(a => a.Recorded))));
+    }))
+<p>Round: <strong id="round-answer">not opened yet</strong></p>
+
+@(plan.Button("check-handover", "Check the handover")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        var current = pipeline.Component<HandoverBoard>("board").Current;
+        pipeline.Get<HandoverCheck>("/Handovers/Check", request => request
+                .Set(r => r.Round, current.Read(h => h!.Round))
+                .Set(r => r.StartsAt, current.Read(h => h!.StartsAt))
+                .Set(r => r.EndsAt, current.Read(h => h!.EndsAt))
+                .Set(r => r.Beds, current.Read(h => h!.Beds))
+                .Set(r => r.Lead, current.Read(h => h!.Lead))
+                .Set(r => r.Target, current.Read(h => h!.Target)))
+            .Response(response => response.OnSuccess<HandoverChecked>((check, checkedIn) =>
+            {
+                checkedIn.Element("checked-round").Text.Set(check.Read(c => c.Round));
+                checkedIn.Element("checked-starts").Text.Set(check.Read(c => c.StartsAt));
+                checkedIn.Element("checked-ends").Text.Set(check.Read(c => c.EndsAt));
+                checkedIn.Element("checked-beds").Text.Set(check.Read(c => c.Beds));
+                checkedIn.Element("checked-lead").Text.Set(check.Read(c => c.Lead));
+                checkedIn.Element("checked-target").Text.Set(check.Read(c => c.Target));
+                checkedIn.Element("checked-problems").Text.Set(check.Read(c => c.Problems));
+            }));
+    }))
+<section>
+    <h2>Handover on record</h2>
+    <p>Round <strong id="checked-round">not checked</strong>, beds <strong id="checked-beds">not checked</strong></p>
+    <p>From <strong id="checked-starts">not checked</strong> to <strong id="checked-ends">not checked</strong></p>
+    <p>Lead <strong id="checked-lead">not checked</strong>, fluid target <strong id="checked-target">not checked</strong> ml</p>
+    <p>Fields the register could not read: <strong id="checked-problems">not checked</strong></p>
+</section>
+
+@Html.RenderPlan(plan)

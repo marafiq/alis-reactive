@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Types;
 using Alis.Reactive.Values;
 using Alis.Reactive.Writing;
 
@@ -138,13 +139,20 @@ public sealed class RequestMembers<TRequest>
 
     internal IReadOnlyList<SentMember> Members => _members;
 
-    public RequestMembers<TRequest> Set(Expression<Func<TRequest, string>> member, ITypedSource<string> value)
-        => Add(member, Sources.Of(value).Expression);
+    public RequestMembers<TRequest> Set<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
+        => Add(member, WireForms.Of<TValue>(_build.Values, member.ToString()), Sources.Of(value).Expression);
 
-    public RequestMembers<TRequest> Set(Expression<Func<TRequest, string>> member, string value)
-        => Add(member, Literal.Of(value, _build));
+    public RequestMembers<TRequest> Set<TValue>(Expression<Func<TRequest, TValue>> member, TValue value)
+        => Add(member, WireForms.Of<TValue>(_build.Values, member.ToString()), LiteralOf(value));
 
-    private RequestMembers<TRequest> Add(Expression<Func<TRequest, string>> member, Plan.Expression value)
+    public RequestMembers<TRequest> Set<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+        where TValue : struct
+        => Add(member, WireForms.Of<TValue?>(_build.Values, member.ToString()), Sources.Of(value).Expression);
+
+    private LiteralExpression LiteralOf<TValue>(TValue value)
+        => value is Enum named ? Literal.Of(named.ToString(), _build) : Literal.Of(value, _build);
+
+    private RequestMembers<TRequest> Add(LambdaExpression member, SentForm form, Plan.Expression value)
     {
         var name = TopLevelName(member);
         if (_members.Any(each => string.Equals(each.Name, name, StringComparison.OrdinalIgnoreCase)))
@@ -152,11 +160,11 @@ public sealed class RequestMembers<TRequest>
             throw new ArgumentException($"The request sets '{name}' twice; set each member once.", nameof(member));
         }
 
-        _members.Add(new SentMember(name, value));
+        _members.Add(new SentMember(name, value, form));
         return this;
     }
 
-    private static string TopLevelName(Expression<Func<TRequest, string>> member)
+    private static string TopLevelName(LambdaExpression member)
     {
         var readsTheRequest = member.Body is MemberExpression { Expression: ParameterExpression };
         if (!readsTheRequest) throw new ArgumentException($"'{member}' is not a member of the request itself; a request sets its own members, as r => r.Name.", nameof(member));
@@ -166,15 +174,18 @@ public sealed class RequestMembers<TRequest>
 
 internal sealed class SentMember
 {
-    internal SentMember(string name, Plan.Expression value)
+    internal SentMember(string name, Plan.Expression value, SentForm form)
     {
         Name = name;
         Value = value;
+        Form = form;
     }
 
     internal string Name { get; }
 
     internal Plan.Expression Value { get; }
+
+    internal SentForm Form { get; }
 }
 
 public sealed class SentRequest<TModel>
@@ -221,13 +232,19 @@ public sealed class SentRequest<TModel>
             }
         }
 
+        foreach (var member in set.Members.Where(member => placeholders.Any(placeholder => string.Equals(placeholder.Text, member.Name, StringComparison.OrdinalIgnoreCase))))
+        {
+            if (!WireForms.FillsAPathSegment(member.Form.Form)) throw HeldOutOfThePath(url, member);
+        }
+
         var parts = pieces.Select(piece => piece.Placeholder ? ValuePart(piece.Text, set.Members, build) : TextPart(piece.Text, build)).ToList<Plan.Expression>();
         var query = set.Members
             .Where(member => !placeholders.Any(placeholder => string.Equals(placeholder.Text, member.Name, StringComparison.OrdinalIgnoreCase)))
             .Select(member => Record(
                 (nameof(QueryField.Name), Literal.Of(member.Name, build)),
                 (nameof(QueryField.Value), member.Value),
-                (nameof(QueryField.WhenNothing), Literal.Of(WhenNothing.Empty.Text, build))))
+                (nameof(QueryField.Form), FormOf(member.Form.Form)),
+                (nameof(QueryField.WhenNothing), Literal.Of(member.Form.WhenNothing.Text, build))))
             .ToList<Plan.Expression>();
         var send = Record(
             (nameof(HttpSend.Method), Literal.Of(HttpMethod.Get.Text, build)),
@@ -242,7 +259,21 @@ public sealed class SentRequest<TModel>
     private static RecordExpression ValuePart(string placeholder, IReadOnlyList<SentMember> members, PlanBuild build)
     {
         var member = members.First(each => string.Equals(each.Name, placeholder, StringComparison.OrdinalIgnoreCase));
-        return Kind(PathPart.ValueKind, (nameof(Plan.ValuePart.Name), Literal.Of(member.Name, build)), (nameof(Plan.ValuePart.Value), member.Value));
+        return Kind(
+            PathPart.ValueKind,
+            (nameof(Plan.ValuePart.Name), Literal.Of(member.Name, build)),
+            (nameof(Plan.ValuePart.Value), member.Value),
+            (nameof(Plan.ValuePart.Form), FormOf(member.Form.Form)));
+    }
+
+    private static LiteralExpression FormOf(WireForm form) => new(JsonSerializer.SerializeToElement(form, PlanJson.Options));
+
+    private static ArgumentException HeldOutOfThePath(string url, SentMember member)
+    {
+        var why = member.Form.Form is ListForm
+            ? "which one path segment cannot hold; take it out of the URL, and the request sends each item in the query"
+            : "which a URL's path does not carry, since IIS on .NET Framework refuses a time in a path segment; take it out of the URL, and the request sends it in the query";
+        return new ArgumentException($"The URL '{url}' fills its placeholder {member.Name} with {WireForms.Noun(member.Form.Form)}, {why}.", nameof(url));
     }
 
     private static RecordExpression TextPart(string text, PlanBuild build)

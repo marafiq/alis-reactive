@@ -1,6 +1,7 @@
 import { CareBoardV1, CareBoardV2, type CareBoardHost } from "./CareBoard/care-board";
 import { DoseChart, type DoseChartHost } from "./DoseChart/dose-chart";
 import { FluidBalance, type FluidBalanceHost } from "./FluidBalance/fluid-balance";
+import { HandoverBoard, type HandoverBoardHost } from "./HandoverBoard/handover-board";
 import { DutyRoster, DutyRosterV2, type DutyRosterHost } from "./DutyRoster/duty-roster";
 import { CurrentInfusionPump, OlderInfusionPump, type InfusionPumpHost } from "./InfusionPump/infusion-pump";
 import { MealTray, trayBuildOf, type MealTrayHost } from "./MealTray/meal-tray";
@@ -76,6 +77,10 @@ onMount<DoseChartHost>("[data-dose-chart]", (host) => {
 
 onMount<FluidBalanceHost>("[data-fluid-balance]", (host) => {
   host.balance = new FluidBalance(host);
+});
+
+onMount<HandoverBoardHost>("[data-handover-board]", (host) => {
+  host.board = new HandoverBoard(host);
 });
 
 onMount<WardPickerHost>("[data-ward-picker]", (host) => {

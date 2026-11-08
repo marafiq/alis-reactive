@@ -311,6 +311,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `spec/Core/DateWire.tla` NothingWritesNoText). The redesign's earliest moment was the start of a non-nullable member with no
   initializer, which leaving it out binds; sent always, it bound a nullable as that moment and overrode an initializer.
   The owner can overrule it.
+- Chosen within the owner's yes, 2026-11-07: a list item that reads nothing is sent as an empty field when its type admits
+  nothing (`string`, a nullable scalar) and stops the request otherwise, decided by a closed set of types, never by a
+  type's members (`ComparedTypes.AdmitsNothing`). A present value not in its member's form stops the request. The owner
+  can overrule it.
 - The owner, 2026-11-07, on 17a's report: "when you say not exercise, this is a hatchword to make mistakes or drift". A
   unit's report carries no "not exercised" line: what the spec decides for the unit's door is built and proven in that
   unit, or the unit is not reported done. 17a reported done with `Set` taking text only; unit 17b builds the members

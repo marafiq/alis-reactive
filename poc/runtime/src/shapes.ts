@@ -1,7 +1,7 @@
 import type { Shape } from "./plan";
 import { assertNever, heldOrNull, nothing, value, type Read } from "./read";
 
-interface DateText {
+export interface DateText {
   readonly year: number;
   readonly month: number;
   readonly day: number;
@@ -64,7 +64,7 @@ function isPlainObject(held: unknown): held is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
-function dateOf(text: DateText): Date {
+export function dateOf(text: DateText): Date {
   if (text.offset.kind === "none") {
     const local = new Date(2000, 0, 1, text.hour, text.minute, text.second, text.millisecond);
     local.setFullYear(text.year, text.month - 1, text.day);
@@ -76,7 +76,7 @@ function dateOf(text: DateText): Date {
   return new Date(moment.getTime() - text.offset.east * 60_000);
 }
 
-function dateText(text: string): DateText | undefined {
+export function dateText(text: string): DateText | undefined {
   const year = digits(text, 0, 4);
   const month = digits(text, 5, 2);
   const day = digits(text, 8, 2);

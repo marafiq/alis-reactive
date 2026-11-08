@@ -1,0 +1,20 @@
+@using Alis.Reactive.Poc.App.Handovers
+@model HandoverPage
+@{
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<HandoverPage>();
+}
+<h1>Shift handover</h1>
+
+@plan.HandoverBoard("board")
+
+@(plan.Button("ask-register", "Ask the register")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Get<RegisterQuery>("/Handovers/Register", request => request.Set(r => r.Bays, new List<List<int>> { new() { 1, 2 } }))
+            .Response(response => response.OnSuccess<RegisterAnswer>((answer, recorded) =>
+                recorded.Element("register-answer").Text.Set(answer.Read(a => a.Recorded))));
+    }))
+<p>Register: <strong id="register-answer">not asked yet</strong></p>
+
+@Html.RenderPlan(plan)

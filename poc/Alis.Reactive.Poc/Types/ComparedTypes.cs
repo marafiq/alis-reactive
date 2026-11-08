@@ -36,6 +36,16 @@ internal static class ComparedTypes
 
     private static readonly HashSet<Type> OtherScalars = [typeof(string), typeof(bool), typeof(bool?), typeof(Guid), typeof(Guid?)];
 
+    private static readonly HashSet<Type> Booleans = [typeof(bool), typeof(bool?)];
+
+    private static readonly HashSet<Type> Texts =
+    [
+        typeof(string), typeof(char), typeof(char?), typeof(Guid), typeof(Guid?), typeof(TimeSpan), typeof(TimeSpan?),
+#if NET
+        typeof(DateOnly), typeof(DateOnly?), typeof(TimeOnly), typeof(TimeOnly?),
+#endif
+    ];
+
     private static readonly HashSet<Type> DatesAndTimes =
     [
         typeof(DateTime), typeof(DateTime?), typeof(DateTimeOffset), typeof(DateTimeOffset?), typeof(TimeSpan), typeof(TimeSpan?),
@@ -44,7 +54,23 @@ internal static class ComparedTypes
 #endif
     ];
 
+    private static readonly HashSet<Type> ScalarsThatAdmitNothing =
+    [
+        typeof(string), typeof(sbyte?), typeof(byte?), typeof(short?), typeof(ushort?), typeof(int?), typeof(uint?),
+        typeof(long?), typeof(ulong?), typeof(float?), typeof(double?), typeof(decimal?), typeof(bool?), typeof(char?),
+        typeof(Guid?), typeof(TimeSpan?), typeof(DateTime?), typeof(DateTimeOffset?),
+#if NET
+        typeof(DateOnly?), typeof(TimeOnly?),
+#endif
+    ];
+
     internal static bool IsChar(Type type) => Chars.Contains(type);
+
+    internal static bool AdmitsNothing(Type type) => ScalarsThatAdmitNothing.Contains(type);
+
+    internal static bool IsBoolean(Type type) => Booleans.Contains(type);
+
+    internal static bool IsText(Type type) => Texts.Contains(type);
 
     internal static bool IsDecimal(Type type) => Decimals.Contains(type);
 

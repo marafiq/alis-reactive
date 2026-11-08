@@ -56,6 +56,12 @@ function decimalTerm(term: unknown): Decimal {
   throw new Stop("A sum's term is not a number.");
 }
 
+export function invariantText(held: number): string {
+  if (!Number.isFinite(held)) return String(held);
+  const exact = decimalOf(String(held));
+  return placed(exact.digits, exact.scale);
+}
+
 function decimalOf(text: string): Decimal {
   const [mantissa = "", exponent = "0"] = text.split("e");
   const negative = mantissa.startsWith("-");
