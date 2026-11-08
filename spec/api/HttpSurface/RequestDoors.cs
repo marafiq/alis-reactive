@@ -8,7 +8,7 @@ public static class RequestDoors
 {
     public static void EveryGetDoor(Pipeline<IntakeView> pipeline)
     {
-        var sent = pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", request => request.Route(r => r.Ward, "north"))
+        var sent = pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
             .OnError(409, Content.Text, (conflict, shown) => shown.Notice().Warning(conflict.Body))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
             .Validate<BedQueryValidator>()
@@ -45,7 +45,7 @@ public static class RequestDoors
 
     public static void EveryHeadDoor(Pipeline<IntakeView> pipeline)
     {
-        var sent = pipeline.Head<IntakeView, BedQuery>("/Wards/{ward}/Beds", request => request.Route(r => r.Ward, "north"))
+        var sent = pipeline.Head<IntakeView, BedQuery>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
             .OnError(404, (missing, shown) => shown.Notice().Warning("No beds"))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
             .Validate<BedQueryValidator>()
@@ -76,7 +76,7 @@ public static class RequestDoors
 
     public static void EveryOptionsDoor(Pipeline<IntakeView> pipeline)
     {
-        var sent = pipeline.Options<IntakeView, BedQuery>("/Wards/{ward}/Beds", request => request.Route(r => r.Ward, "north"))
+        var sent = pipeline.Options<IntakeView, BedQuery>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
             .OnError(409, Content.Text, (conflict, shown) => shown.Notice().Warning(conflict.Body))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
             .Validate<BedQueryValidator>()
@@ -113,7 +113,7 @@ public static class RequestDoors
 
     public static void EveryPostDoor(Pipeline<IntakeView> pipeline)
     {
-        var sent = pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request.Route(r => r.Ward, "north"))
+        var sent = pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
             .OnError(409, Content.Text, (conflict, shown) => shown.Notice().Warning(conflict.Body))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
             .Validate<BedValidator>()
@@ -148,7 +148,7 @@ public static class RequestDoors
 
     public static void EveryPutDoor(Pipeline<IntakeView> pipeline)
     {
-        var sent = pipeline.Put<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request.Route(r => r.Ward, "north"))
+        var sent = pipeline.Put<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
             .OnError(409, Content.Text, (conflict, shown) => shown.Notice().Warning(conflict.Body))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
             .Validate<BedValidator>()
@@ -185,7 +185,7 @@ public static class RequestDoors
 
     public static void EveryDeleteDoor(Pipeline<IntakeView> pipeline)
     {
-        var sent = pipeline.Delete<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request.Route(r => r.Ward, "north"))
+        var sent = pipeline.Delete<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
             .OnError(409, Content.Text, (conflict, shown) => shown.Notice().Warning(conflict.Body))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
             .Validate<BedValidator>()

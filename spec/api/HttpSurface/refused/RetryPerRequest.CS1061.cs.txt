@@ -8,7 +8,7 @@ namespace Intake;
 public static class RetryPerRequest
 {
     public static void Refused(Pipeline<IntakeView> pipeline)
-        => pipeline.Get<IntakeView, CensusQuery>("/Wards/{ward}/Census", query => query.Route(q => q.Ward, "north"))
+        => pipeline.Get<IntakeView, CensusQuery>("/Wards/{ward}/Census", query => query.Path(q => q.Ward, "north"))
             .OnSuccess(Content.Json<Census>(), (counted, done) => done.Notice().Info("Counted"))
             .Retry(5, TimeSpan.FromSeconds(1));
 }

@@ -856,12 +856,12 @@
       "source": "spec/probes/ej2-template.mjs"
     },
     {
-      "id": "js-route-segment-encoding",
+      "id": "js-path-segment-encoding",
       "statement": "encodeURIComponent percent-encodes a slash, a space, a plus, a question mark and non-ASCII as UTF-8.",
       "host": "node",
       "oracle": "node's encodeURIComponent, URLSearchParams and Headers",
       "probe": "js-url-parts.mjs",
-      "expect": "js-route-segment-encoding: encodeURIComponent writes \"a/b c+d?é\" as a%2Fb%20c%2Bd%3F%C3%A9",
+      "expect": "js-path-segment-encoding: encodeURIComponent writes \"a/b c+d?é\" as a%2Fb%20c%2Bd%3F%C3%A9",
       "source": "spec/probes/js-url-parts.mjs"
     },
     {

@@ -14,11 +14,11 @@ public sealed class QueryParts<TRequest>
     {
     }
 
-    public QueryParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
 
-    public QueryParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
 
-    public QueryParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => throw new NotSupportedException();
 
@@ -41,11 +41,11 @@ public sealed class BodyParts<TRequest>
     {
     }
 
-    public BodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+    public BodyParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
 
-    public BodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+    public BodyParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
 
-    public BodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+    public BodyParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => throw new NotSupportedException();
 
@@ -90,11 +90,11 @@ public sealed class QueriedParts<TRequest>
     {
     }
 
-    public QueriedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+    public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
 
-    public QueriedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+    public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
 
-    public QueriedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+    public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => throw new NotSupportedException();
 
@@ -117,11 +117,11 @@ public sealed class WholeBodyParts<TRequest>
     {
     }
 
-    public WholeBodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+    public WholeBodyParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
 
-    public WholeBodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+    public WholeBodyParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
 
-    public WholeBodyParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+    public WholeBodyParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => throw new NotSupportedException();
 
@@ -144,11 +144,11 @@ public sealed class BodiedParts<TRequest>
     {
     }
 
-    public BodiedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
+    public BodiedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
 
-    public BodiedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
+    public BodiedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
 
-    public BodiedParts<TRequest> Route<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+    public BodiedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
         => throw new NotSupportedException();
 

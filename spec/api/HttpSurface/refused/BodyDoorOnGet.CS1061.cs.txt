@@ -9,6 +9,6 @@ public static class BodyDoorOnGet
 {
     public static void Refused(Pipeline<IntakeView> pipeline)
         => pipeline.Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
-            .Route(q => q.ResidentId, 12)
+            .Path(q => q.ResidentId, 12)
             .Json(body => body.Set(q => q.ResidentId, 12)));
 }

@@ -8,6 +8,6 @@ namespace Intake;
 public static class ContentReaderOnHead
 {
     public static void Refused(Pipeline<IntakeView> pipeline)
-        => pipeline.Head<IntakeView, DocumentQuery>("/Documents/{id}", query => query.Route(d => d.Id, 7))
+        => pipeline.Head<IntakeView, DocumentQuery>("/Documents/{id}", query => query.Path(d => d.Id, 7))
             .OnSuccess(Content.None, (document, shown) => shown.Element("document-size").Text.Set(document.Headers.Get("Content-Length")));
 }

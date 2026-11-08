@@ -352,7 +352,7 @@ Terms used throughout:
   naming `MethodAsync`. There is no call whose promise nobody awaits: the stop follows it, and a later rejection of
   that promise adds no second error.
 - D4.5 A missing value set as an element's text or HTML shows nothing; a missing class name changes no class.
-- D4.6 A route value that reads nothing stops its request before it is sent, and its `Finally` runs: the request's
+- D4.6 A path value that reads nothing stops its request before it is sent, and its `Finally` runs: the request's
   `guard` state stops it on what its `check` state read (D10.23).
 - D4.7 A method called inside a condition runs only when its term is reached: `and`, `or` and `cond` evaluate
   their terms in order and stop at the first that decides, and an `ElseIf`'s condition runs only when no branch
@@ -382,7 +382,7 @@ Terms used throughout:
 - `Absence.tla:UnawaitedPromiseStops`
 - `Absence.tla:MissingTextShowsNothing`
 - `Absence.tla:MissingClassChangesNothing`
-- `Absence.tla:MissingRouteStopsAndFinallyRuns`
+- `Absence.tla:MissingPathValueStopsAndFinallyRuns`
 - `Absence.tla:StopEndsOnlyItsHandler`
 - `Absence.tla:ConditionTermsLazy`
 
@@ -399,7 +399,7 @@ Terms used throughout:
 - G6: a missing text shows `coalesce(v, "")` (`Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:104`) and a
   missing class name changes nothing (`Alis.Reactive/PlanModel/Reactions/Steps.cs:139-140`).
 - B12: an unawaited promise's rejection is logged and the pipeline goes on
-  (`Alis.Reactive.Assets/runtime/grammar/execute.ts:42-48`); a missing route value throws inside the plugin
+  (`Alis.Reactive.Assets/runtime/grammar/execute.ts:42-48`); a missing path value throws inside the plugin
   (`Alis.Reactive.Assets/runtime/plugins/http.ts:83`), stated only by `Finally`'s doc
   (`Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:69-73`).
 
@@ -412,7 +412,7 @@ Terms used throughout:
   it do not run.
 - `X4.3` behavior: an event payload that lacks a member its declaration names stops the pipeline (D4.1, D5.3), and a
   field of data the payload holds that the data lacks reads its start (D4.2).
-- `X4.4` behavior: a route value that reads nothing sends no request, shows none of its busy targets, and runs its
+- `X4.4` behavior: a path value that reads nothing sends no request, shows none of its busy targets, and runs its
   `Finally`.
 - `X4.5` behavior: a `Method()` that returns a promise stops its pipeline after the call and names `MethodAsync`.
 - `X4.6` behavior: a dose that lacks `refills`, which the app omits at its default, reads 0; one that lacks `unit`,
@@ -1234,8 +1234,8 @@ Terms used throughout:
   its pair, or a placeholder no member fills is refused where the view renders. A placeholder is filled by
   the top-level member of the same name of the request or of its query, compared ignoring case. A list, an object, a file, a date
   or an instant in a placeholder is refused, on both hosts, because IIS refuses a time in a path segment on
-  net48 (#237). A route value is sent as its invariant text, encoded as one path segment.
-- D9.5 A route value that reads nothing or reads empty text stops its request before it is sent (D4.6).
+  net48 (#237). A path value is sent as its invariant text, encoded as one path segment.
+- D9.5 A path value that reads nothing or reads empty text stops its request before it is sent (D4.6).
 - D9.6 Every method sends a query. A request with no body sends there every member that fills no placeholder;
   POST, PUT and DELETE send there the members of a typed query, `Query<TQuery>(q => q.Set(..))`, beside the body.
   A member is static (a literal) or read from a source. The URL's own query text is kept, and C# appends the
@@ -1257,7 +1257,7 @@ Terms used throughout:
   (D10.5): a status the host writes picks its route, and a connection the host closes is a network failure, the
   catch-all's. The app sets the limit in its host's configuration.
 - D9.9 DELETE sends its body as POST and PUT do. A member that fills a placeholder is also sent in the body of a
-  POST, PUT or DELETE: a route value binds into a member of a model bound from the form, but never into a
+  POST, PUT or DELETE: a path value binds into a member of a model bound from the form, but never into a
   `[FromBody]` model (`probe:core-route-value-binds-member`), and on both hosts a value the body sends wins over the
   route's (`probe:mvc5-value-provider-order`), so the body carries the same value the path does.
 - D9.10 A member that reads nothing is sent by this closed table, which C# writes into the plan:
@@ -1413,8 +1413,8 @@ Terms used throughout:
   - The URL is an RFC 3986 URI reference: a path on the page's origin, or an absolute `http` or `https` URI, split
     into the parts of RFC 3986, section 3. Its path is segments, its query is the query, and a fragment is refused
     (D9.4).
-  - A route value fills one path segment, percent-encoded as UTF-8 outside RFC 3986's unreserved characters
-    (`probe:js-route-segment-encoding`). A route value whose text holds `/` stops its request, as one that reads
+  - A path value fills one path segment, percent-encoded as UTF-8 outside RFC 3986's unreserved characters
+    (`probe:js-path-segment-encoding`). A path value whose text holds `/` stops its request, as one that reads
     nothing does (D9.5): net10 hands the action `%2F` still encoded (`probe:core-route-segment-decoding`), so the
     value cannot reach the endpoint as it was.
   - The query is `application/x-www-form-urlencoded` by the URL Standard, written by the browser's
@@ -1430,7 +1430,7 @@ contract `HttpSend`, which is no node kind.
 
 **Checker.**
 - `Request.tla:EveryPlaceholderFilled`
-- `Request.tla:RouteHoldsScalarText`
+- `Request.tla:PathHoldsScalarText`
 - `Request.tla:FileOnlyInFormData`
 - `Request.tla:NothingBindsAsDeclared`
 - `Request.tla:ObjectNothingBindsAsDeclared`
@@ -1440,7 +1440,7 @@ contract `HttpSend`, which is no node kind.
 - `probe:core-frombody-no-body`
 - `probe:core-frombody-binds-json-name`
 
-- `probe:js-route-segment-encoding`
+- `probe:js-path-segment-encoding`
 - `probe:core-route-segment-decoding`
 - `probe:js-query-encoding`
 - `probe:core-query-decoding`
@@ -1506,7 +1506,7 @@ contract `HttpSend`, which is no node kind.
 - B6: the request is a record of string-named fields (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:101`) typed by
   hand in the browser (`Alis.Reactive.Assets/runtime/plugins/http.ts:10-18`).
 - B10: a named input's type is erased (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`).
-- B12: a missing route value throws inside the plugin (`Alis.Reactive.Assets/runtime/plugins/http.ts:83`).
+- B12: a missing path value throws inside the plugin (`Alis.Reactive.Assets/runtime/plugins/http.ts:83`).
 - B14: a request member is written with its CLR name (`Alis.Reactive/Members/ExpressionPathHelper.cs:105`), and a net10
   `[FromBody]` endpoint does not bind a `[JsonPropertyName]` member by its CLR name (`probe:core-frombody-ignores-clr-name`).
   ALIS008 says "only the last request survives" (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`),
@@ -1528,8 +1528,8 @@ contract `HttpSend`, which is no node kind.
   Text or File." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X9.8` behavior: a non-nullable member that reads nothing is left out of the JSON body, and the endpoint binds
   its starting value with no model error.
-- `X9.9` behavior: a route value that reads nothing sends no request, runs its `Finally`, and runs no step after it.
-- `X9.10` behavior: a route value read as "a/b" sends no request and runs its `Finally`.
+- `X9.9` behavior: a path value that reads nothing sends no request, runs its `Finally`, and runs no step after it.
+- `X9.10` behavior: a path value read as "a/b" sends no request and runs its `Finally`.
 - `X9.11` behavior: a query member read as "a b+c&d" reaches the endpoint as "a b+c&d".
 - `X9.12` analyzer: a fixed header value with a line break: "The header {name} holds a line break, which HTTP does
   not carry in a field value; send it in the body." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
@@ -1546,7 +1546,7 @@ contract `HttpSend`, which is no node kind.
 
 **Decision.**
 - D10.1 A request runs in this closed order, the states of D10.23: the read of its argument and its check; the
-  defaults' `WhileLoading`, then its own; its guards (route values, the container it sends, its `Input`s, its busy
+  defaults' `WhileLoading`, then its own; its guards (path values, the container it sends, its `Input`s, its busy
   targets' elements, the contracts the defaults name), the send and one response route; its own `Finally`, then the
   defaults', each when its `WhileLoading` completed; then `Chained`; then the steps after the request.
 - D10.2 A check that fails shows its failures (D16.13), sends nothing, runs neither `WhileLoading` nor `Finally`,
@@ -1779,7 +1779,7 @@ contract `HttpSend`, which is no node kind.
 
   | State | Runs | Then | A stop | An abort |
   |-------|------|------|--------|----------|
-  | `check` | reads the request's argument once (D10.18), recording a route value that reads nothing, a container, an input or a busy target's element the page lacks; then its check, on the body it read (D10.2, D16.5) | `defaultLoading`, or `loading` for a request that takes no defaults | a source that stops when read (D4.1), or a failed check, whose failures show: nothing is held and no layer runs | none: the state holds no await |
+  | `check` | reads the request's argument once (D10.18), recording a path value that reads nothing, a container, an input or a busy target's element the page lacks; then its check, on the body it read (D10.2, D16.5) | `defaultLoading`, or `loading` for a request that takes no defaults | a source that stops when read (D4.1), or a failed check, whose failures show: nothing is held and no layer runs | none: the state holds no await |
   | `defaultLoading` | the defaults' `WhileLoading` | `loading` | the pipeline stops; neither `Finally` runs (D10.3) | as a stop |
   | `loading` | the request's `WhileLoading` | `guard` | the defaults' `Finally` runs, then the pipeline stops | as a stop: the request's own `Finally` does not run, since its `WhileLoading` did not complete |
   | `guard` | checks what the read recorded (D4.6, D9.5, D9.15) and the contracts `HttpSend` names (D10.21); then holds its busy targets | `attempt` | nothing is held; `finally` and `defaultFinally` run, then the pipeline stops, its error naming the guard and the part | none: the state holds no await |
@@ -1889,7 +1889,7 @@ and `notice` (D10.21).
     the net48 filter are `Hosting`'s. `Hosting` depends on `Pipelines`, `Pipelines` on `Requests`, and none returns
     (`spec/api/HttpSurface` builds with each type in its module's namespace).
   - the verbs, instance members of `Pipeline<TModel>`: `Get`, `Head`, `Options`, `Post`, `Put`
-    and `Delete`, each `(url)` or `<TRequest>(url, request => ..)`. The request lambda holds the HTTP parts: `Route(r =>
+    and `Delete`, each `(url)` or `<TRequest>(url, request => ..)`. The request lambda holds the HTTP parts: `Path(r =>
     r.M, value)`, `Query(r => r.M, value)`, `Header(name, value)`, and on POST, PUT and DELETE one body door, `Json`,
     `UrlEncoded`, `Multipart`, `Text` or `File`. The doors that send inputs (D9.15) are `Inputs(container)` and
     `Input(r => r.M, input)` in every body and on a GET, and `Form(form)` in a URL-encoded or multipart body and on a
@@ -1935,7 +1935,7 @@ and `notice` (D10.21).
     its text does not convert. Keys are compared ignoring case, as both hosts bind them (`probe:core-query-key-case`,
     `probe:mvc5-query-key-case`), which `URLSearchParams.get` does not (`probe:js-query-get-case`).
   - the condensed doors, which write the plan the full form writes: `Set(r => r.M, value)`, placed by
-    D9.4, D9.6 and D9.9 into `Route`, `Query` or the body the request names, else multipart (D10.22); `Form(form)` and
+    D9.4, D9.6 and D9.9 into `Path`, `Query` or the body the request names, else multipart (D10.22); `Form(form)` and
     `Inputs(container)`, sent as multipart fields and file parts, a GET's into its query; `Input(r => r.M, input)`,
     placed as `Set` is. Every request is checked by the validator registered for `TRequest` (D16.2), whatever it sends;
     `OnSuccess(pipeline => ..)` of kind none, `OnSuccess<T>((reply, pipeline) => ..)` and `OnError<T>(status, ..)` of kind
@@ -1971,7 +1971,7 @@ and `notice` (D10.21).
           .Into("resident-summary"));
 
   pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
-          .Route(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
+          .Path(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
           .Multipart(body => body
               .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
               .Form(intake)))
@@ -1980,7 +1980,7 @@ and `notice` (D10.21).
       .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))
       .Chained((created, next) => next
           .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
-              .Route(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
+              .Path(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
           .OnSuccess(Content.Html, (summary, loaded) => loaded.Into("resident-summary", summary.Body)));
   ```
   The first is the condensed form under defaults that hold `ShowBusy()`, `ShowValidationErrors()` and a catch-all notice;
@@ -3401,7 +3401,7 @@ plans (Q19).
 - Both lines write a whole plan for each action link: main serializes the plan into each anchor's payload
   (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:45`), and the redesign renders a plan per
   link (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:108`). Main refuses validation, Parallel,
-  chained requests, route values and IncludeAll in a link
+  chained requests, path values and IncludeAll in a link
   (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:32`,
   `Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:82`,
   `Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:94`,
@@ -3412,7 +3412,7 @@ plans (Q19).
   (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkIdGenerator.cs:20-31`). The redesign repeats the
   pipeline's verbs on the link (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkRequest.cs:29-38`) and
   reads `DefaultPrevented` in its guard (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:113-121`).
-  Verdicts (D17.15): the plan per link is refused for its size; validation, Parallel, `Chained`, route values and
+  Verdicts (D17.15): the plan per link is refused for its size; validation, Parallel, `Chained`, path values and
   containers are lifted, since an action is a block, a link's containers staying ALIS035's; the document listener,
   `closest()` and `DefaultPrevented` leave; the id counter on the HTTP request is refused by D14.1; the link's own
   verbs and `Component` are refused as parallel names; its confirm is NativeConfirm's `Ask` in a `When` (D17.10);
@@ -3816,7 +3816,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   that holds them. An attempt follows OpenTelemetry's HTTP client conventions: the method, the status, the resend count
   and the URL as its route template.
 - D20.5 No value is recorded. A span records ids, kinds, member wire names, event names, the route template, the status,
-  the attempt and the outcome, never an input's text, a body, a payload, a query value or a route value, so the app's
+  the attempt and the outcome, never an input's text, a body, a payload, a query value or a path value, so the app's
   data stays out of its telemetry.
 - D20.6 Every span ends exactly once and after its children, however its run ends: completed, stopped, replaced (D11.7)
   or disposed (D12.4). A sink's error is the one error the port catches: it logs it once as an error and the run goes

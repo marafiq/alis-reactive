@@ -42,7 +42,7 @@ public static class Usage
 
     public static void FullIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
-                .Route(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
+                .Path(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
                 .Multipart(intake, body => body
                     .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))))
             .Validate<IntakeValidator>()
@@ -50,7 +50,7 @@ public static class Usage
             .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))
             .Chained((created, next) => next
                 .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
-                    .Route(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
+                    .Path(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
                 .OnSuccess(Content.Html, (summary, loaded) => loaded.Into("resident-summary", summary.Body)));
 
     public static void WardCensus(Pipeline<IntakeView> pipeline)
@@ -58,15 +58,15 @@ public static class Usage
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.Parallel(
             census => census
-                .Get<IntakeView, CensusQuery>("/Wards/{ward}/Census", query => query.Route(q => q.Ward, ward))
+                .Get<IntakeView, CensusQuery>("/Wards/{ward}/Census", query => query.Path(q => q.Ward, ward))
                 .OnSuccess(Content.Json<Census>(), (counted, filled) => filled.Component<CensusBoard>("census").Occupied.Set(counted.Body.Read(c => c.Occupied)))
                 .Busy("ward-board"),
             roster => roster
-                .Get<IntakeView, RosterQuery>("/Wards/{ward}/Roster", query => query.Route(q => q.Ward, ward))
+                .Get<IntakeView, RosterQuery>("/Wards/{ward}/Roster", query => query.Path(q => q.Ward, ward))
                 .OnSuccess(Content.Json<Roster>(), (rostered, filled) => filled.Component<StaffRoster>("roster").OnDuty.Set(rostered.Body.Read(r => r.OnDuty)))
                 .Busy("ward-board", "roster"),
             summary => summary
-                .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query.Route(q => q.ResidentId, 12))
+                .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query.Path(q => q.ResidentId, 12))
                 .Into("resident-summary"),
             refresh => refresh
                 .Post("/Wards/Census/Refresh")
@@ -83,7 +83,7 @@ public static class Usage
             .Download();
 
     public static void DocumentSize(Pipeline<IntakeView> pipeline)
-        => pipeline.Head<IntakeView, DocumentQuery>("/Documents/{id}", query => query.Route(d => d.Id, 7))
+        => pipeline.Head<IntakeView, DocumentQuery>("/Documents/{id}", query => query.Path(d => d.Id, 7))
             .OnSuccess((document, shown) => shown.Element("document-size").Text.Set(document.Headers.Get("Content-Length")))
             .OnError(404, (missing, shown) => shown.Element("document-size").Text.Set("No such document"));
 
@@ -98,7 +98,7 @@ public static class Usage
 
     public static void SaveIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Put<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
-                .Route(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
+                .Path(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
                 .UrlEncoded(intake, body => body.Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))))
             .OnSuccess(Content.None, (saved, done) => done.Element("saved-ward").Text.Set(saved.Request.Read(r => r.Ward)))
             .OnError(409, Content.Text, (conflict, shown) => shown.Element("intake-conflict").Text.Set(conflict.Body))
@@ -109,7 +109,7 @@ public static class Usage
     {
         var scan = pipeline.Component<FileInput>("scan");
         pipeline.Post<IntakeView, ScanUpload>("/Residents/{residentId}/Scans", request => request
-                .Route(r => r.ResidentId, 12)
+                .Path(r => r.ResidentId, 12)
                 .Multipart(body => body
                     .Set(r => r.ResidentId, 12)
                     .Set(r => r.Caption, "Admission scan")
@@ -117,13 +117,13 @@ public static class Usage
                     .File(r => r.Pages, scan.Files)))
             .OnSuccess(done => done.Notice().Success("Scan uploaded"));
         pipeline.Put<IntakeView, DocumentQuery>("/Documents/{id}/Content", request => request
-                .Route(d => d.Id, 7)
+                .Path(d => d.Id, 7)
                 .File(scan.Files.At(0)))
             .OnSuccess(done => done.Notice().Success("Document replaced"));
     }
 
     public static void RemoveResident(Pipeline<IntakeView> pipeline)
-        => pipeline.Delete<IntakeView, SummaryQuery>("/Residents/{residentId}", request => request.Route(r => r.ResidentId, 12))
+        => pipeline.Delete<IntakeView, SummaryQuery>("/Residents/{residentId}", request => request.Path(r => r.ResidentId, 12))
             .NoDefaults()
             .WhileLoading(loading => loading.Element("remove-state").Text.Set("Removing"))
             .Finally(done => done.Element("remove-state").Text.Set(""))
@@ -135,8 +135,8 @@ public static class Usage
         var floor = pipeline.Component<CensusBoard>("census").Occupied;
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.Options<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
-                .Route(q => q.Ward, ward)
-                .Route(q => q.Room, floor)
+                .Path(q => q.Ward, ward)
+                .Path(q => q.Room, floor)
                 .Query(q => q.Unit, ward)
                 .Query(q => q.Floor, floor)
                 .Query(q => q.Wing, "east")
@@ -146,14 +146,14 @@ public static class Usage
             .OnSuccess(Content.None, (allowed, shown) => shown.Element("allowed").Text.Set(allowed.Headers.Get("Allow")))
             .NoValidation();
         pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
-                .Route(q => q.Ward, "north")
+                .Path(q => q.Ward, "north")
                 .Set(q => q.Floor, floor)
                 .Set(q => q.Wing, ward)
                 .Set(q => q.Bed, 4))
             .OnSuccess<Census>((counted, shown) => shown.Element("beds").Text.Set(counted.Request.Read(q => q.Ward)))
             .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body));
         pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
-                .Route(q => q.Ward, "north")
+                .Path(q => q.Ward, "north")
                 .Form(bedSearch))
             .Validate<BedQueryValidator>()
             .Into("beds");
@@ -171,21 +171,21 @@ public static class Usage
         var floor = pipeline.Component<CensusBoard>("census").Occupied;
         var note = pipeline.Element("note").Text;
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
-                .Route(r => r.Ward, "north")
-                .Route(r => r.Bed, 4)
-                .Route(r => r.Unit, note)
-                .Route(r => r.Room, floor)
+                .Path(r => r.Ward, "north")
+                .Path(r => r.Bed, 4)
+                .Path(r => r.Unit, note)
+                .Path(r => r.Room, floor)
                 .Query(r => r.Reason, "intake")
                 .Query(r => r.Floor, floor)
                 .Header("X-Ward", "north")
                 .Header("X-Census", floor)
                 .Text("Bed held for intake")
-                .Route(r => r.Wing, "east")
+                .Path(r => r.Wing, "east")
                 .Query(r => r.Note, note)
                 .Header("X-Note", note)
                 .Header("X-Source", "intake")
-                .Route(r => r.Unit, note)
-                .Route(r => r.Room, floor)
+                .Path(r => r.Unit, note)
+                .Path(r => r.Room, floor)
                 .Query(r => r.Reason, "held")
                 .Query(r => r.Floor, floor))
             .OnSuccess(Content.Text, (held, done) => done.Notice().Success(held.Body))
@@ -198,7 +198,7 @@ public static class Usage
             .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body))
             .OnSuccess(done => done.Notice().Success("Bed held"));
         pipeline.Put<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
-                .Route(r => r.Ward, "north")
+                .Path(r => r.Ward, "north")
                 .Json(beds, body => body
                     .Set(r => r.Ward, "north")
                     .Set(r => r.Floor, floor)
@@ -208,7 +208,7 @@ public static class Usage
             .OnSuccess(Content.Json<Census>(), (counted, done) => done.When(counted.Status.Eq(201)).Then(created => created.Notice().Success("Bed created")))
             .OnError((failed, shown) => shown.Notice().Error(failed.Headers.Get("X-Error")));
         pipeline.Delete<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
-                .Route(r => r.Ward, "north")
+                .Path(r => r.Ward, "north")
                 .UrlEncoded(bedForm, body => body
                     .Set(r => r.Note, note)
                     .Set(r => r.Ward, "north")
@@ -216,7 +216,7 @@ public static class Usage
                     .Input(r => r.Floor, pipeline.Input(v => v.Floor))))
             .OnSuccess(Content.None, (removed, done) => done.Notice().Info("Bed released"));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
-                .Route(r => r.Ward, "north")
+                .Path(r => r.Ward, "north")
                 .Multipart(beds, body => body
                     .Set(r => r.Ward, "north")
                     .Set(r => r.Floor, floor)
@@ -243,7 +243,7 @@ public static class Usage
         pipeline.Validate(intake);
         pipeline.Validate(pipeline.Container<IntakeView, BedRequest>("beds"));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
-                .Route(r => r.Ward, "north")
+                .Path(r => r.Ward, "north")
                 .Json(pipeline.Container<IntakeView, BedRequest>("beds"), body => body.Set(r => r.Bed, 4)))
             .OnSuccess(done => done.Notice().Success("Bed held"));
     }

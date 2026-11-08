@@ -274,7 +274,7 @@ Flow == part = "flow"
 
 EveryPlaceholderFilled == (Placement /\ Built(config)) => config.placeholder = "filled"
 
-RouteHoldsScalarText == (Placement /\ Built(config) /\ config.placeholder = "filled") => config.filler = "scalar"
+PathHoldsScalarText == (Placement /\ Built(config) /\ config.placeholder = "filled") => config.filler = "scalar"
 
 FileOnlyInFormData == (Placement /\ Built(config) /\ config.file = "set") => (config.method \notin Bodiless /\ config.format \in FileBodies)
 

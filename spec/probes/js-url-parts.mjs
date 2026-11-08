@@ -1,5 +1,5 @@
 const value = "a/b c+d?é";
-console.log("js-route-segment-encoding: encodeURIComponent writes " + JSON.stringify(value) + " as " + encodeURIComponent(value));
+console.log("js-path-segment-encoding: encodeURIComponent writes " + JSON.stringify(value) + " as " + encodeURIComponent(value));
 console.log("js-query-encoding: URLSearchParams writes q=" + JSON.stringify("a b+c&d") + " as " + new URLSearchParams([["q", "a b+c&d"]]).toString());
 const outcomes = ["a\nb", " padded ", "é", "€"].map(text => {
   try {

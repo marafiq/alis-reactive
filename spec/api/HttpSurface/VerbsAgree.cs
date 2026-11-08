@@ -7,8 +7,8 @@ public static class VerbsAgree
 {
     public static void EachVerbNamesOnlyItsOwnTypeArgument(Pipeline<IntakeView> pipeline, PipelineVerbs<IntakeView> verbs)
     {
-        var query = (QueryParts<BedQuery> parts) => { parts.Route(q => q.Ward, "north"); };
-        var body = (BodyParts<BedRequest> parts) => { parts.Route(r => r.Ward, "north"); };
+        var query = (QueryParts<BedQuery> parts) => { parts.Path(q => q.Ward, "north"); };
+        var body = (BodyParts<BedRequest> parts) => { parts.Path(r => r.Ward, "north"); };
 
         Agree<GetRequest<IntakeView, NoModel>>(RequestVerbs.Get(pipeline, "/Wards"), verbs.Get("/Wards"));
         Agree<GetRequest<IntakeView, BedQuery>>(

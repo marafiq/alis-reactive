@@ -35,17 +35,17 @@ function segment(part: PathPart): string {
     case "text":
       return part.text;
     case "value":
-      return encodeURIComponent(routeText(part));
+      return encodeURIComponent(pathText(part));
     default:
       return assertNever(part);
   }
 }
 
-function routeText(part: ValuePart): string {
+function pathText(part: ValuePart): string {
   const [text] = wireTexts(part.name, part.value, part.form) ?? [];
-  if (text === undefined) throw new Stop("The route value '" + part.name + "' reads nothing, so the request is not sent.");
-  if (text === "") throw new Stop("The route value '" + part.name + "' is empty, so the request is not sent.");
-  if (text.includes("/")) throw new Stop("The route value '" + part.name + "' holds '/', which no endpoint reads back as it was, so the request is not sent.");
+  if (text === undefined) throw new Stop("The path value '" + part.name + "' reads nothing, so the request is not sent.");
+  if (text === "") throw new Stop("The path value '" + part.name + "' is empty, so the request is not sent.");
+  if (text.includes("/")) throw new Stop("The path value '" + part.name + "' holds '/', which no endpoint reads back as it was, so the request is not sent.");
   return text;
 }
 

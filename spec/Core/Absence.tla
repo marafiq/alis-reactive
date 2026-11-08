@@ -17,11 +17,11 @@ Last == Len(Program) + 1
 Reads == {"live", "data", "past", "as", "any"}
 
 VARIABLES liveMember, readKind, dataMember, absence, required, holder, textValue, className, methodReturns, op, term1,
-          convertible, list, route, propertyValue,
+          convertible, list, pathValue, propertyValue,
           pcA, stoppedA, stopAt, result, shown, classes, written, called, sent, finallyRan, pcB, stoppedB
 
 page == <<liveMember, readKind, dataMember, absence, required, holder, textValue, className, methodReturns, op, term1,
-          convertible, list, route, propertyValue>>
+          convertible, list, pathValue, propertyValue>>
 outcome == <<result, shown, classes, written, called, sent, finallyRan>>
 vars == <<page, outcome, pcA, stoppedA, stopAt, pcB, stoppedB>>
 
@@ -39,7 +39,7 @@ Init ==
     /\ term1 \in BOOLEAN
     /\ convertible \in BOOLEAN
     /\ list \in {"nothing", "empty", "items"}
-    /\ route \in {"value", "nothing"}
+    /\ pathValue \in {"value", "nothing"}
     /\ propertyValue \in {"value", "nothing"}
     /\ pcA = 1
     /\ stoppedA = FALSE
@@ -162,7 +162,7 @@ Any ==
 
 Request ==
     /\ At("Request")
-    /\ IF route = "nothing"
+    /\ IF pathValue = "nothing"
          THEN /\ Stop("Request")
               /\ sent' = FALSE
               /\ finallyRan' = (Mutant # "StopSkipsFinally")
@@ -215,9 +215,9 @@ FailedConversionReadsNothing == Ran("Convert") => result["as"] = IF convertible 
 
 MissingListReadsNothing == (Ran("Any") /\ list = "nothing") => result["any"] = "nothing"
 
-MissingRouteStopsAndFinallyRuns ==
-    /\ (route = "nothing" /\ StoppedAt("Request")) => (~sent /\ finallyRan)
-    /\ route = "nothing" => ~Ran("Request")
+MissingPathValueStopsAndFinallyRuns ==
+    /\ (pathValue = "nothing" /\ StoppedAt("Request")) => (~sent /\ finallyRan)
+    /\ pathValue = "nothing" => ~Ran("Request")
     /\ Ran("Request") => (sent /\ finallyRan)
 
 StopEndsOnlyItsHandler == ~stoppedB
@@ -226,6 +226,6 @@ MissingValueWritesNull == Ran("SetProperty") => written = IF propertyValue = "va
 
 ReachCompleted == ~(pcA = Last /\ pcB = 2)
 
-ReachRouteStopRunsFinally == ~(StoppedAt("Request") /\ finallyRan /\ pcB = 2)
+ReachPathValueStopRunsFinally == ~(StoppedAt("Request") /\ finallyRan /\ pcB = 2)
 
 ====
