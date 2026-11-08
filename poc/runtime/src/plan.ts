@@ -115,7 +115,8 @@ export interface HttpSend {
   readonly method: HttpMethod;
   readonly path: readonly PathPart[];
   readonly search: string;
-  readonly query: readonly QueryField[];
+  readonly query: readonly SentField[];
+  readonly headers: readonly SentHeader[];
   readonly success: BodyKind;
 }
 
@@ -249,13 +250,6 @@ export type Policy = "overlap" | "replace" | "skip";
 
 export type Presence = "required" | "optional";
 
-export interface QueryField {
-  readonly name: string;
-  readonly value: JsonValue;
-  readonly form: WireForm;
-  readonly whenNothing: WhenNothing;
-}
-
 export type ReadPresence = "required" | "optional" | "requiredIfHeld" | "optionalMember";
 
 export interface RecordExpression {
@@ -294,6 +288,19 @@ export interface Route {
 }
 
 export type ScalarKind = "text" | "number" | "boolean" | "date" | "instant" | "written";
+
+export interface SentField {
+  readonly name: string;
+  readonly value: JsonValue;
+  readonly form: WireForm;
+  readonly whenNothing: WhenNothing;
+}
+
+export interface SentHeader {
+  readonly name: string;
+  readonly value: JsonValue;
+  readonly form: WireForm;
+}
 
 export interface SetStatement {
   readonly kind: "set";

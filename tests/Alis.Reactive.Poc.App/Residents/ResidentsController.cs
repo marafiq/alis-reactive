@@ -32,6 +32,11 @@ public sealed class ResidentsController : Controller
         return Answer(new ResidentQuery { Name = name, Ward = "Moved" });
     }
 
+    [HttpGet("/Residents/Kin/{name}")]
+    public IActionResult Kin(ResidentQuery query) => Json(new KinAnswer(query.Name, query.NextOfKin.Name));
+
+    public IActionResult NextOfKin() => View(new ResidentLookup());
+
     [HttpGet("/Residents/Register/{ward}")]
     public IActionResult Register(WardQuery query)
         => query.Ward == "Annex" ? StatusCode(StatusCodes.Status500InternalServerError) : Json(new RegisterOpen(query.Ward));
@@ -44,7 +49,15 @@ public sealed class ResidentsController : Controller
 
     public IActionResult MemberSetTwice() => View(new ResidentLookup());
 
-    public IActionResult NestedMember() => View(new ResidentLookup());
+    public IActionResult PathWithNoPlaceholder() => View(new ResidentLookup());
+
+    public IActionResult PathOfANestedMember() => View(new ResidentLookup());
+
+    public IActionResult QueryOfAPlaceholder() => View(new ResidentLookup());
+
+    public IActionResult MemberNotAPath() => View(new ResidentLookup());
+
+    public IActionResult HeaderNamed(string name, string value) => View(new HeaderAsk { Name = name, Value = value });
 
     public IActionResult ResponseAfterAStep() => View(new ResidentLookup());
 
@@ -82,6 +95,15 @@ public sealed class ResidentLookup
     public string Name { get; set; } = "";
 
     public string Ward { get; set; } = "";
+
+    public string NextOfKin { get; set; } = "";
+}
+
+public sealed class HeaderAsk
+{
+    public string Name { get; set; } = "";
+
+    public string Value { get; set; } = "";
 }
 
 public sealed class ResidentQuery
@@ -114,3 +136,5 @@ public sealed record Medicine(string Name, bool Controlled);
 public sealed record NoResident(string Reason);
 
 public sealed record RegisterOpen(string Ward);
+
+public sealed record KinAnswer(string Name, string Kin);

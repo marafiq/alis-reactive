@@ -1,0 +1,28 @@
+@using Alis.Reactive.Poc.App.Residents
+@model ResidentLookup
+@{
+    ViewData["Title"] = "Next of kin";
+    var plan = Html.ReactivePlan<ResidentLookup>();
+}
+<h1>Next of kin</h1>
+
+@(Html.InputField(plan, m => m.Name).TextBox("Resident name")
+    .Reactive(box => box.Blur, (_, pipeline) =>
+    {
+        var name = pipeline.Input(m => m.Name).Component<NativeTextBox>().Value;
+        pipeline.Get<ResidentQuery>("/Residents/Kin/{name}", request => request.Set(r => r.Name, name).Set(r => r.NextOfKin.Name, "Sam Park"))
+            .Response(response => response.OnSuccess<KinAnswer>((answer, found) => found.Element("kin-set").Text.Set(answer.Read(a => a.Kin))));
+    }))
+<p>Next of kin on record: <strong id="kin-set">not asked</strong></p>
+
+@(Html.InputField(plan, m => m.NextOfKin).TextBox("Next of kin")
+    .Reactive(box => box.Blur, (_, pipeline) =>
+    {
+        pipeline.Get<ResidentQuery>("/Residents/Kin/{name}", request => request
+                .Path(r => r.Name, pipeline.Input(m => m.Name).Component<NativeTextBox>().Value)
+                .Query(r => r.NextOfKin.Name, pipeline.Input(m => m.NextOfKin).Component<NativeTextBox>().Value))
+            .Response(response => response.OnSuccess<KinAnswer>((answer, found) => found.Element("kin-asked").Text.Set(answer.Read(a => a.Kin))));
+    }))
+<p>Next of kin asked about: <strong id="kin-asked">not asked</strong></p>
+
+@Html.RenderPlan(plan)

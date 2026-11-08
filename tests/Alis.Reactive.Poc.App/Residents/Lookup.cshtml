@@ -22,9 +22,11 @@
     {
         var name = pipeline.Input(m => m.Name).Component<NativeTextBox>().Value;
         pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request
-                .Set(r => r.Name, name)
-                .Set(r => r.Ward, pipeline.Input(m => m.Ward).Component<NativeTextBox>().Value)
-                .Set(r => r.Home, "Maple Court"))
+                .Path(r => r.Name, name)
+                .Query(r => r.Ward, pipeline.Input(m => m.Ward).Component<NativeTextBox>().Value)
+                .Query(r => r.Home, "Maple Court")
+                .Header("X-Desk", "Front desk")
+                .Header("X-Asked-For", name))
             .Response(response => response
                 .OnSuccess<ResidentSummary>((summary, found) =>
                 {

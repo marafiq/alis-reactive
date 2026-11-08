@@ -27,7 +27,7 @@ public sealed class Request
                 $"The URL '{url}' has the placeholder {placeholder.Text}, which a request that sets no members cannot fill; take the placeholder out of the URL.", nameof(url));
         }
 
-        var send = new HttpSend(HttpMethod.Get, [new TextPart(path)], search, [], BodyKind.Html);
+        var send = new HttpSend(HttpMethod.Get, [new TextPart(path)], search, [], [], BodyKind.Html);
         var argument = new LiteralExpression(JsonSerializer.SerializeToElement(send, PlanJson.Options));
         _request = build.Request(argument);
     }
@@ -131,49 +131,181 @@ internal sealed class UrlPiece
     internal bool Placeholder { get; }
 }
 
-public sealed class RequestMembers<TRequest>
+public sealed class QueryParts<TRequest>
 {
-    private readonly PlanBuild _build;
-    private readonly List<SentMember> _members = [];
+    private readonly string _url;
+    private readonly IReadOnlyList<UrlPiece> _pieces;
+    private readonly List<SentMember> _path = [];
+    private readonly HashSet<string> _placedBySet = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<SentMember> _query = [];
+    private readonly List<SentMember> _headers = [];
 
-    internal RequestMembers(PlanBuild build)
+    internal QueryParts(PlanBuild build, string url, IReadOnlyList<UrlPiece> pieces)
     {
-        _build = build;
+        Build = build;
+        _url = url;
+        _pieces = pieces;
     }
 
-    internal IReadOnlyList<SentMember> Members => _members;
+    internal PlanBuild Build { get; }
 
-    public RequestMembers<TRequest> Set<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
-        => Add(member, WireForms.Of<TValue>(_build.Values, member.ToString()), Sources.Of(value).Expression);
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
+        => InPath(member, Form<TValue>(member), Sources.Of(value).Expression);
 
-    public RequestMembers<TRequest> Set<TValue>(Expression<Func<TRequest, TValue>> member, TValue value)
-        => Add(member, WireForms.Of<TValue>(_build.Values, member.ToString()), LiteralOf(value));
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value)
+        => InPath(member, Form<TValue>(member), LiteralOf(value));
 
-    public RequestMembers<TRequest> Set<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => Add(member, WireForms.Of<TValue?>(_build.Values, member.ToString()), Sources.Of(value).Expression);
+        => InPath(member, Form<TValue?>(member), Sources.Of(value).Expression);
 
-    private LiteralExpression LiteralOf<TValue>(TValue value)
-        => value is Enum named ? Literal.Of(named.ToString(), _build) : Literal.Of(value, _build);
+    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
+        => InQuery(member, Form<TValue>(member), Sources.Of(value).Expression);
 
-    private RequestMembers<TRequest> Add(LambdaExpression member, SentForm form, Plan.Expression value)
+    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value)
+        => InQuery(member, Form<TValue>(member), LiteralOf(value));
+
+    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+        where TValue : struct
+        => InQuery(member, Form<TValue?>(member), Sources.Of(value).Expression);
+
+    public QueryParts<TRequest> Header(string name, string value)
     {
-        var name = TopLevelName(member);
-        if (_members.Any(each => string.Equals(each.Name, name, StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new ArgumentException($"The request sets '{name}' twice; set each member once.", nameof(member));
-        }
-
-        _members.Add(new SentMember(name, value, form));
+        RequestHeaders.RequireANewName(name, _headers);
+        _headers.Add(new SentMember(name, Literal.Of(RequestHeaders.FixedValue(name, value), Build), new SentForm(WireForm.Text, WhenNothing.Leave)));
         return this;
     }
 
-    private static string TopLevelName(LambdaExpression member)
+    public QueryParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value)
     {
-        var readsTheRequest = member.Body is MemberExpression { Expression: ParameterExpression };
-        if (!readsTheRequest) throw new ArgumentException($"'{member}' is not a member of the request itself; a request sets its own members, as r => r.Name.", nameof(member));
+        RequestHeaders.RequireANewName(name, _headers);
+        var form = WireForms.Of<TValue>(Build.Values, name);
+        if (form.Form is ListForm) throw new ArgumentException($"The header {name} reads a list, which a header does not carry as one value; send it in the query.", nameof(value));
+        _headers.Add(new SentMember(name, Sources.Of(value).Expression, form));
+        return this;
+    }
+
+    internal QueryParts<TRequest> Placed(LambdaExpression member, SentForm form, Plan.Expression value)
+    {
+        var key = MemberKey(member);
+        var fillsAPlaceholder = !key.Contains('.') && PlaceholderNamed(key) is not null;
+        if (!fillsAPlaceholder) return InQuery(member, form, value);
+        _placedBySet.Add(key);
+        return InPath(member, form, value);
+    }
+
+    internal SentForm Form<TValue>(LambdaExpression member) => WireForms.Of<TValue>(Build.Values, member.ToString());
+
+    internal LiteralExpression LiteralOf<TValue>(TValue value)
+        => value is Enum named ? Literal.Of(named.ToString(), Build) : Literal.Of(value, Build);
+
+    internal RecordExpression Sent(string url, string search)
+    {
+        foreach (var placeholder in _pieces.Where(piece => piece.Placeholder))
+        {
+            if (Named(_path, placeholder.Text) is not null) continue;
+            if (Named(_query, placeholder.Text) is { } queried)
+            {
+                throw new ArgumentException(
+                    $"The URL '{url}' has the placeholder {placeholder.Text}, which Query does not fill; fill it with Path(r => r.{queried.Name}, value).", nameof(url));
+            }
+
+            throw new ArgumentException(
+                $"The URL '{url}' has the placeholder {placeholder.Text}, and the request has no member named {placeholder.Text}; add the member, or take the placeholder out of the URL.", nameof(url));
+        }
+
+        foreach (var member in _path.Where(member => !WireForms.FillsAPathSegment(member.Form.Form)))
+        {
+            throw HeldOutOfThePath(url, member, _placedBySet.Contains(member.Name));
+        }
+
+        var path = _pieces.Select(piece => piece.Placeholder ? ValueRecord(Named(_path, piece.Text)!) : SentRecords.TextPart(piece.Text, Build)).ToList<Plan.Expression>();
+        return SentRecords.Record(
+            (nameof(HttpSend.Method), Literal.Of(HttpMethod.Get.Text, Build)),
+            (nameof(HttpSend.Path), new ListExpression(path)),
+            (nameof(HttpSend.Search), Literal.Of(search, Build)),
+            (nameof(HttpSend.Query), new ListExpression([.. _query.Select(FieldRecord)])),
+            (nameof(HttpSend.Headers), new ListExpression([.. _headers.Select(HeaderRecord)])),
+            (nameof(HttpSend.Success), Literal.Of(BodyKind.Json.Text, Build)));
+    }
+
+    private QueryParts<TRequest> InPath(LambdaExpression member, SentForm form, Plan.Expression value)
+    {
+        var key = MemberKey(member);
+        if (key.Contains('.'))
+        {
+            throw new ArgumentException(
+                $"'{member}' fills a placeholder, which only a member of the request itself fills, as r => r.Name; send {key} with Query.", nameof(member));
+        }
+
+        if (PlaceholderNamed(key) is null) throw new ArgumentException($"The URL '{_url}' has no placeholder {key}; add {{{key}}} to the URL, or send {key} with Query.", nameof(member));
+        return Add(_path, new SentMember(key, value, form));
+    }
+
+    private QueryParts<TRequest> InQuery(LambdaExpression member, SentForm form, Plan.Expression value)
+        => Add(_query, new SentMember(MemberKey(member), value, form));
+
+    private QueryParts<TRequest> Add(List<SentMember> part, SentMember member)
+    {
+        if (Named(_path, member.Name) is not null || Named(_query, member.Name) is not null)
+        {
+            throw new ArgumentException($"The request sets '{member.Name}' twice; set each member once.", nameof(member));
+        }
+
+        part.Add(member);
+        return this;
+    }
+
+    private UrlPiece? PlaceholderNamed(string key)
+        => _pieces.FirstOrDefault(piece => piece.Placeholder && string.Equals(piece.Text, key, StringComparison.OrdinalIgnoreCase));
+
+    private static SentMember? Named(List<SentMember> part, string key)
+        => part.FirstOrDefault(member => string.Equals(member.Name, key, StringComparison.OrdinalIgnoreCase));
+
+    private static string MemberKey(LambdaExpression member)
+    {
+        var node = member.Body;
+        while (node is MemberExpression { Expression: { } holder }) node = holder;
+        var readsTheRequest = member.Body is MemberExpression && node == member.Parameters[0];
+        if (!readsTheRequest)
+        {
+            throw new ArgumentException(
+                $"'{member}' is not a member path of the request; a request sends its members, as r => r.Name or r => r.NextOfKin.Name.", nameof(member));
+        }
+
         return member.Body.ToString().Substring(member.Parameters[0].Name!.Length + 1);
     }
+
+    private static ArgumentException HeldOutOfThePath(string url, SentMember member, bool placedBySet)
+    {
+        var why = member.Form.Form is ListForm
+            ? "which one path segment cannot hold"
+            : "which a URL's path does not carry, since IIS on .NET Framework refuses a time in a path segment";
+        var cure = placedBySet
+            ? member.Form.Form is ListForm ? "take it out of the URL, and the request sends each item in the query" : "take it out of the URL, and the request sends it in the query"
+            : $"take it out of the URL and send {member.Name} with Query";
+        return new ArgumentException($"The URL '{url}' fills its placeholder {member.Name} with {WireForms.Noun(member.Form.Form)}, {why}; {cure}.", nameof(url));
+    }
+
+    private RecordExpression ValueRecord(SentMember member)
+        => SentRecords.Kind(
+            PathPart.ValueKind,
+            (nameof(Plan.ValuePart.Name), Literal.Of(member.Name, Build)),
+            (nameof(Plan.ValuePart.Value), member.Value),
+            (nameof(Plan.ValuePart.Form), SentRecords.FormOf(member.Form.Form)));
+
+    private RecordExpression FieldRecord(SentMember member)
+        => SentRecords.Record(
+            (nameof(SentField.Name), Literal.Of(member.Name, Build)),
+            (nameof(SentField.Value), member.Value),
+            (nameof(SentField.Form), SentRecords.FormOf(member.Form.Form)),
+            (nameof(SentField.WhenNothing), Literal.Of(member.Form.WhenNothing.Text, Build)));
+
+    private RecordExpression HeaderRecord(SentMember header)
+        => SentRecords.Record(
+            (nameof(SentHeader.Name), Literal.Of(header.Name, Build)),
+            (nameof(SentHeader.Value), header.Value),
+            (nameof(SentHeader.Form), SentRecords.FormOf(header.Form.Form)));
 }
 
 internal sealed class SentMember
@@ -219,73 +351,26 @@ public sealed class SentRequest<TModel>
         declared.Write();
     }
 
-    internal static SentRequest<TModel> Get<TRequest>(PlanBuild build, string url, Action<RequestMembers<TRequest>> members)
+    internal static SentRequest<TModel> Get<TRequest>(PlanBuild build, string url, Action<QueryParts<TRequest>> request)
     {
         var (path, search) = RequestUrls.Split(RequestUrls.Checked(url));
-        var set = new RequestMembers<TRequest>(build);
-        members(set);
-        var pieces = RequestUrls.Pieces(path, nameof(url));
-        var placeholders = pieces.Where(piece => piece.Placeholder).ToList();
-        foreach (var placeholder in placeholders)
-        {
-            var filled = set.Members.Any(member => string.Equals(member.Name, placeholder.Text, StringComparison.OrdinalIgnoreCase));
-            if (!filled)
-            {
-                throw new ArgumentException(
-                    $"The URL '{url}' has the placeholder {placeholder.Text}, and the request has no member named {placeholder.Text}; add the member, or take the placeholder out of the URL.", nameof(url));
-            }
-        }
-
-        foreach (var member in set.Members.Where(member => placeholders.Any(placeholder => string.Equals(placeholder.Text, member.Name, StringComparison.OrdinalIgnoreCase))))
-        {
-            if (!WireForms.FillsAPathSegment(member.Form.Form)) throw HeldOutOfThePath(url, member);
-        }
-
-        var parts = pieces.Select(piece => piece.Placeholder ? ValuePart(piece.Text, set.Members, build) : TextPart(piece.Text, build)).ToList<Plan.Expression>();
-        var query = set.Members
-            .Where(member => !placeholders.Any(placeholder => string.Equals(placeholder.Text, member.Name, StringComparison.OrdinalIgnoreCase)))
-            .Select(member => Record(
-                (nameof(QueryField.Name), Literal.Of(member.Name, build)),
-                (nameof(QueryField.Value), member.Value),
-                (nameof(QueryField.Form), FormOf(member.Form.Form)),
-                (nameof(QueryField.WhenNothing), Literal.Of(member.Form.WhenNothing.Text, build))))
-            .ToList<Plan.Expression>();
-        var send = Record(
-            (nameof(HttpSend.Method), Literal.Of(HttpMethod.Get.Text, build)),
-            (nameof(HttpSend.Path), new ListExpression(parts)),
-            (nameof(HttpSend.Search), Literal.Of(search, build)),
-            (nameof(HttpSend.Query), new ListExpression(query)),
-            (nameof(HttpSend.Success), Literal.Of(BodyKind.Json.Text, build)));
-        return new SentRequest<TModel>(build, build.Request(send));
+        var parts = new QueryParts<TRequest>(build, url, RequestUrls.Pieces(path, nameof(url)));
+        request(parts);
+        return new SentRequest<TModel>(build, build.Request(parts.Sent(url, search)));
     }
+}
 
-    private static RecordExpression ValuePart(string placeholder, IReadOnlyList<SentMember> members, PlanBuild build)
-    {
-        var member = members.First(each => string.Equals(each.Name, placeholder, StringComparison.OrdinalIgnoreCase));
-        return Kind(
-            PathPart.ValueKind,
-            (nameof(Plan.ValuePart.Name), Literal.Of(member.Name, build)),
-            (nameof(Plan.ValuePart.Value), member.Value),
-            (nameof(Plan.ValuePart.Form), FormOf(member.Form.Form)));
-    }
-
-    private static LiteralExpression FormOf(WireForm form) => new(JsonSerializer.SerializeToElement(form, PlanJson.Options));
-
-    private static ArgumentException HeldOutOfThePath(string url, SentMember member)
-    {
-        var why = member.Form.Form is ListForm
-            ? "which one path segment cannot hold; take it out of the URL, and the request sends each item in the query"
-            : "which a URL's path does not carry, since IIS on .NET Framework refuses a time in a path segment; take it out of the URL, and the request sends it in the query";
-        return new ArgumentException($"The URL '{url}' fills its placeholder {member.Name} with {WireForms.Noun(member.Form.Form)}, {why}.", nameof(url));
-    }
-
-    private static RecordExpression TextPart(string text, PlanBuild build)
+internal static class SentRecords
+{
+    internal static RecordExpression TextPart(string text, PlanBuild build)
         => Kind(PathPart.TextKind, (nameof(Plan.TextPart.Text), Literal.Of(text, build)));
 
-    private static RecordExpression Kind(string kind, params (string Member, Plan.Expression Value)[] fields)
+    internal static LiteralExpression FormOf(WireForm form) => new(JsonSerializer.SerializeToElement(form, PlanJson.Options));
+
+    internal static RecordExpression Kind(string kind, params (string Member, Plan.Expression Value)[] fields)
         => new([new RecordField(PathPart.Discriminator, new LiteralExpression(JsonSerializer.SerializeToElement(kind))), .. Fields(fields)]);
 
-    private static RecordExpression Record(params (string Member, Plan.Expression Value)[] fields) => new(Fields(fields));
+    internal static RecordExpression Record(params (string Member, Plan.Expression Value)[] fields) => new(Fields(fields));
 
     private static List<RecordField> Fields((string Member, Plan.Expression Value)[] fields)
         => [.. fields.Select(field => new RecordField(PlanJson.Name(field.Member), field.Value))];

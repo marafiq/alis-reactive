@@ -1,4 +1,4 @@
-import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, QueryField, ValuePart } from "./plan";
+import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, SentField, SentHeader, ValuePart } from "./plan";
 import { assertNever, Stop } from "./read";
 import { wireTexts } from "./wire";
 
@@ -6,9 +6,10 @@ type Decoded = { readonly kind: "decoded"; readonly body: JsonValue } | { readon
 
 export async function send(request: HttpSend): Promise<HttpResponse> {
   const url = composed(request);
+  const headers = headersOf(request.headers);
   let response: Response;
   try {
-    response = await fetch(url, { method: request.method });
+    response = await fetch(url, { method: request.method, headers });
   } catch (failed) {
     return unanswered(request, url, "network", false, 0, "the network failed: " + String(failed));
   }
@@ -42,15 +43,15 @@ function segment(part: PathPart): string {
 }
 
 function pathText(part: ValuePart): string {
-  const [text] = wireTexts(part.name, part.value, part.form) ?? [];
+  const [text] = wireTexts("request member '" + part.name + "'", part.value, part.form) ?? [];
   if (text === undefined) throw new Stop("The path value '" + part.name + "' reads nothing, so the request is not sent.");
   if (text === "") throw new Stop("The path value '" + part.name + "' is empty, so the request is not sent.");
   if (text.includes("/")) throw new Stop("The path value '" + part.name + "' holds '/', which no endpoint reads back as it was, so the request is not sent.");
   return text;
 }
 
-function append(query: URLSearchParams, field: QueryField): void {
-  const texts = wireTexts(field.name, field.value, field.form);
+function append(query: URLSearchParams, field: SentField): void {
+  const texts = wireTexts("request member '" + field.name + "'", field.value, field.form);
   if (texts !== undefined) {
     for (const text of texts) query.append(field.name, text);
     return;
@@ -64,6 +65,21 @@ function append(query: URLSearchParams, field: QueryField): void {
     default:
       assertNever(field.whenNothing);
   }
+}
+
+function headersOf(sent: readonly SentHeader[]): Headers {
+  const headers = new Headers();
+  for (const header of sent) {
+    const [text] = wireTexts("header '" + header.name + "'", header.value, header.form) ?? [];
+    if (text === undefined) continue;
+    if (!carriedInAHeader(text)) throw new Stop("The header '" + header.name + "' holds a line break or a character past US-ASCII, which a header does not carry, so the request is not sent.");
+    headers.append(header.name, text);
+  }
+  return headers;
+}
+
+function carriedInAHeader(text: string): boolean {
+  return [...text].every((character) => character === "\t" || (character >= " " && character <= "~"));
 }
 
 async function decode(response: Response, kind: BodyKind): Promise<Decoded> {

@@ -1,0 +1,20 @@
+@using Alis.Reactive.Poc.App.Residents
+@model HeaderAsk
+@{
+    ViewData["Title"] = "Resident lookup";
+    var plan = Html.ReactivePlan<HeaderAsk>();
+}
+<h1>Resident lookup</h1>
+
+@(plan.Button("look-up", "Look up Helen Park")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request
+                .Path(r => r.Name, "Helen Park")
+                .Header("X-Desk", "Front desk")
+                .Header(Model.Name, Model.Value))
+            .Response(response => response.OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Read(s => s.Name))));
+    }))
+<p>Lookup: <strong id="lookup-status">not looked up</strong></p>
+
+@Html.RenderPlan(plan)

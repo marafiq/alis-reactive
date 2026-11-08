@@ -26,7 +26,9 @@
                 .Set(r => r.Leads, board.Leads)
                 .Set(r => r.Shift, board.Shift)
                 .Set(r => r.Cover, Shift.Twilight)
-                .Set(r => r.Target, board.Round))
+                .Set(r => r.Target, board.Round)
+                .Header("X-Round", board.Round)
+                .Header("X-Lead", board.Current.Read(h => h!.Lead)))
             .Response(response => response.OnSuccess<RegisterAnswer>((answer, recorded) =>
                 recorded.Element("register-answer").Text.Set(answer.Read(a => a.Recorded))));
         pipeline.Element("register-asked").Text.Set(board.Ward);

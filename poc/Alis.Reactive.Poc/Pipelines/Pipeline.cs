@@ -36,7 +36,7 @@ public sealed class Pipeline<TModel>
 
     public Request Get(string url) => new(Build, RequestUrls.Checked(url));
 
-    public SentRequest<TModel> Get<TRequest>(string url, Action<RequestMembers<TRequest>> request)
+    public SentRequest<TModel> Get<TRequest>(string url, Action<QueryParts<TRequest>> request)
         => SentRequest<TModel>.Get(Build, url, request);
 
     public void Unload(string elementId) => Slots.Unload(Build, elementId);

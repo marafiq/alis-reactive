@@ -63,7 +63,7 @@ internal static class WireForms
             JsonTypeInfoKind.Dictionary => throw new ArgumentException(
                 $"'{member}' holds a dictionary, which a request does not send in its query; send each entry the endpoint reads as a member of its own.", nameof(member)),
             _ => throw new ArgumentException(
-                $"'{member}' holds an object, and a request sends only text, numbers, booleans, dates, instants and lists of them.", nameof(member)),
+                $"'{member}' holds an object, which a request sends field by field: send each field the endpoint reads as a member of its own, as r => r.Handover.Round.", nameof(member)),
         };
     }
 

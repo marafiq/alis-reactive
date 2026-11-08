@@ -36,7 +36,25 @@ public sealed class WhenAHandoverRequestIsRefused : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Handovers/ObjectMember");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "ArgumentException: 'r => r.Handover' holds an object, and a request sends only text, numbers, booleans, dates, instants and lists of them. (Parameter 'member')");
+            "ArgumentException: 'r => r.Handover' holds an object, which a request sends field by field: send each field the endpoint reads as a member of its own, as r => r.Handover.Round. (Parameter 'member')");
+    }
+
+    [Test]
+    public async Task a_day_given_to_a_placeholder_by_path_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Handovers/DateFillsAPath");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: The URL '/Handovers/Planned/{plannedFor}' fills its placeholder PlannedFor with a date, which a URL's path does not carry, since IIS on .NET Framework refuses a time in a path segment; take it out of the URL and send PlannedFor with Query. (Parameter 'url')");
+    }
+
+    [Test]
+    public async Task a_header_reading_a_list_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Handovers/HeaderOfAList");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: The header X-Beds reads a list, which a header does not carry as one value; send it in the query. (Parameter 'value')");
     }
 
     [Test]

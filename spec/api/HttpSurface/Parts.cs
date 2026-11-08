@@ -8,33 +8,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace Alis.Reactive.Pipelines;
 
-public sealed class QueryParts<TRequest>
-{
-    private QueryParts()
-    {
-    }
-
-    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
-
-    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
-
-    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
-        where TValue : struct
-        => throw new NotSupportedException();
-
-    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotSupportedException();
-
-    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotSupportedException();
-
-    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
-        where TValue : struct
-        => throw new NotSupportedException();
-
-    public QueryParts<TRequest> Header(string name, string value) => throw new NotSupportedException();
-
-    public QueryParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value) => throw new NotSupportedException();
-}
-
 public sealed class BodyParts<TRequest>
 {
     private BodyParts()

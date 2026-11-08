@@ -10,7 +10,7 @@
     .Reactive(box => box.Blur, (_, pipeline) =>
     {
         var name = pipeline.Input(m => m.Name).Component<NativeTextBox>().Value;
-        pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request.Set(r => r.Name, name).Set(r => r.NextOfKin.Name, "Sam Park"))
+        pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request.Path(r => r.Name, name).Path(r => r.Ward, "South"))
             .Response(response => response.OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Read(s => s.Name))));
     }))
 <p>Lookup: <strong id="lookup-status">not looked up</strong></p>

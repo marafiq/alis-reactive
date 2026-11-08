@@ -220,6 +220,40 @@ public sealed class WhenTheRegisterIsAsked : AppPageTest
         Assert.That(first.Url, Is.EqualTo(BaseUrl + "/Residents/Summary/Helen%20Park?Ward=South&Home=Maple+Court"));
     }
 
+    [Test]
+    public async Task a_header_of_fixed_text_is_sent()
+    {
+        await Open("/Residents/Lookup");
+
+        var asked = await Page.RunAndWaitForRequestAsync(() => LookUp("Helen Park"), Summaries);
+
+        Assert.That(await asked.HeaderValueAsync("X-Desk"), Is.EqualTo("Front desk"));
+    }
+
+    [Test]
+    public async Task a_header_read_from_an_input_is_sent_as_its_text()
+    {
+        await Open("/Residents/Lookup");
+
+        var asked = await Page.RunAndWaitForRequestAsync(() => LookUp("Helen Park"), Summaries);
+
+        Assert.That(await asked.HeaderValueAsync("X-Asked-For"), Is.EqualTo("Helen Park"));
+    }
+
+    [Test]
+    public async Task a_header_read_past_us_ascii_sends_no_request()
+    {
+        await Open("/Residents/Lookup");
+
+        var first = await Page.RunAndWaitForRequestAsync(async () =>
+        {
+            await LookUp("Zoë Park");
+            await LookUp("Helen Park");
+        }, Summaries);
+
+        Assert.That(first.Url, Is.EqualTo(BaseUrl + "/Residents/Summary/Helen%20Park?Ward=South&Home=Maple+Court"));
+    }
+
     private async Task LookUp(string name)
     {
         await Page.GetByLabel("Resident name").FillAsync(name);

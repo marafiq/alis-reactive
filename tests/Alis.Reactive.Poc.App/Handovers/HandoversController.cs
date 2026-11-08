@@ -36,6 +36,10 @@ public sealed class HandoversController : Controller
 
     public IActionResult ListOfLists() => View(new HandoverPage());
 
+    public IActionResult HeaderOfAList() => View(new HandoverPage());
+
+    public IActionResult DateFillsAPath() => View(new HandoverPage());
+
     private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
     private static string Moment(DateTimeOffset moment) => moment.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture);

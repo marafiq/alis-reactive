@@ -1234,7 +1234,11 @@ Terms used throughout:
   its pair, or a placeholder no member fills is refused where the view renders. A placeholder is filled by
   the top-level member of the same name of the request or of its query, compared ignoring case. A list, an object, a file, a date
   or an instant in a placeholder is refused, on both hosts, because IIS refuses a time in a path segment on
-  net48 (#237). A path value is sent as its invariant text, encoded as one path segment.
+  net48 (#237). A path value is sent as its invariant text, encoded as one path segment. `Path` names its placeholder
+  by its member, so a `Path` whose member names no placeholder or belongs to an object the request holds, and a
+  placeholder that only `Query` names, are refused where the view renders. `Query` and `Set` take any member path,
+  `r => r.NextOfKin.Name`, keyed by its C# path, and `Set` places a member of the request itself named like a
+  placeholder in the path, every other in the query; a member lambda that is not a member path is refused.
 - D9.5 A path value that reads nothing or reads empty text stops its request before it is sent (D4.6).
 - D9.6 Every method sends a query. A request with no body sends there every member that fills no placeholder;
   POST, PUT and DELETE send there the members of a typed query, `Query<TQuery>(q => q.Set(..))`, beside the body.
@@ -1289,6 +1293,11 @@ Terms used throughout:
 - D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
   header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, `Content-Type` is
   refused because the body format owns it, and `Accept` is refused because the success route's kind owns it (D10.6).
+  The headers the framework writes are refused too: `RequestVerificationToken` (D9.22) and `traceparent`, `tracestate`
+  and `baggage` (D9.12, D20.11). So are the Fetch Standard's forbidden request headers, which fetch drops without a
+  word: its named list, any name under `Proxy-` or `Sec-`, and `X-HTTP-Method`, `X-HTTP-Method-Override` and
+  `X-Method-Override`, which the Standard forbids when they name CONNECT, TRACE or TRACK and which the request's verb
+  makes needless whatever they name. Each is refused where the view renders, a list or an object source too.
 - D9.12 The headers every request sends are configured once in C#, and C# writes them into each request's
   `HttpSend` where the view renders; a request's own header of the same name, compared ignoring case, replaces
   the configured one. An app that sends `X-Requested-With: XMLHttpRequest` on every request configures it there.
@@ -1894,8 +1903,9 @@ and `notice` (D10.21).
     `UrlEncoded`, `Multipart`, `Text` or `File`. The doors that send inputs (D9.15) are `Inputs(container)` and
     `Input(r => r.M, input)` in every body and on a GET, and `Form(form)` in a URL-encoded or multipart body and on a
     GET; a GET's inputs go to its query. A value is a literal or any source (Q7); a member lambda dot-walks
-    (`r => r.Handover.Round`). `Header` refuses `Content-Type`, `Accept`, the antiforgery header and the Fetch
-    Standard's forbidden request headers.
+    (`r => r.Handover.Round`) in `Query` and `Set`, while `Path` takes a member of the request itself (D9.4). `Header`
+    refuses `Content-Type`, `Accept`, the headers the framework writes and the Fetch Standard's forbidden request
+    headers (D9.11).
   - staged by type: GET, HEAD and OPTIONS offer no body door; `NoRetry()` exists on GET, HEAD, OPTIONS, PUT and DELETE
     only, since the one policy (D10.14) never retries a POST (X10.9), and no request sets the policy's numbers, which
     the defaults' `Retry(attempts, firstWait)` sets once (`RetryPerRequest`, `NoRetryOnPost` in `spec/api/refused.sh`); HEAD offers no content reader; `File` exists only inside `Multipart` or as the whole body; a
@@ -3647,9 +3657,11 @@ shapes, starts and the payload kind of each event.
   block, an expression, a local, a local function and the loops) and its refused ones.
 - `N18.7` new: ALIS030, the request analyzer: on a constant URL, a fragment, a brace without its pair, a placeholder no
   member fills and a URL neither a page path nor an http or https URI (D9.4); a list, an object, a file, a date or an
-  instant member in a placeholder; on a constant header name, `Content-Type`, `Accept`, the antiforgery header,
-  `traceparent` and the Fetch Standard's forbidden request headers, and on a constant value one outside RFC 9110's
-  field value (D9.23); a JSON body member under a number-keyed dictionary (D14.5); a second `Busy` or `NoBusy`,
+  instant member in a placeholder; a `Path` whose member names no placeholder or belongs to an object the request
+  holds, a placeholder only `Query` names, and a member lambda that is not a member path (D9.4); on a constant header
+  name, one that is no token, one given twice, `Content-Type`, `Accept`, the antiforgery header, `traceparent`,
+  `tracestate`, `baggage`, the Fetch Standard's forbidden request headers and the method overrides (D9.11), and on a
+  constant value one outside RFC 9110's field value (D9.23); a JSON body member under a number-keyed dictionary (D14.5); a second `Busy` or `NoBusy`,
   `Busy` beside `NoDefaults()` (D10.21), a status outside 300 to 599, a second route for one status and a second
   catch-all (D10.13); a staged value used more than once, a request's parts object written by two statements or a
   request held in a variable and written twice, so a door a stage removes cannot come back through a second use, which

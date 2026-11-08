@@ -6,12 +6,13 @@ namespace Alis.Reactive.Plan;
 
 internal sealed class HttpSend
 {
-    internal HttpSend(HttpMethod method, IReadOnlyList<PathPart> path, string search, IReadOnlyList<QueryField> query, BodyKind success)
+    internal HttpSend(HttpMethod method, IReadOnlyList<PathPart> path, string search, IReadOnlyList<SentField> query, IReadOnlyList<SentHeader> headers, BodyKind success)
     {
         Method = method;
         Path = path;
         Search = search;
         Query = query;
+        Headers = headers;
         Success = success;
     }
 
@@ -21,7 +22,9 @@ internal sealed class HttpSend
 
     public string Search { get; }
 
-    public IReadOnlyList<QueryField> Query { get; }
+    public IReadOnlyList<SentField> Query { get; }
+
+    public IReadOnlyList<SentHeader> Headers { get; }
 
     public BodyKind Success { get; }
 }
@@ -66,9 +69,9 @@ internal sealed class ValuePart : PathPart
     public WireForm Form { get; }
 }
 
-internal sealed class QueryField
+internal sealed class SentField
 {
-    internal QueryField(string name, JsonElement value, WireForm form, WhenNothing whenNothing)
+    internal SentField(string name, JsonElement value, WireForm form, WhenNothing whenNothing)
     {
         Name = name;
         Value = value;
@@ -83,6 +86,22 @@ internal sealed class QueryField
     public WireForm Form { get; }
 
     public WhenNothing WhenNothing { get; }
+}
+
+internal sealed class SentHeader
+{
+    internal SentHeader(string name, JsonElement value, WireForm form)
+    {
+        Name = name;
+        Value = value;
+        Form = form;
+    }
+
+    public string Name { get; }
+
+    public JsonElement Value { get; }
+
+    public WireForm Form { get; }
 }
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]

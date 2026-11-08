@@ -49,12 +49,39 @@ public sealed class WhenARegisterRequestIsRefused : AppPageTest
     }
 
     [Test]
-    public async Task a_member_of_an_object_the_request_holds_is_refused_where_the_view_renders()
+    public async Task a_path_value_naming_no_placeholder_is_refused_where_the_view_renders()
     {
-        await Page.GotoAsync(BaseUrl + "/Residents/NestedMember");
+        await Page.GotoAsync(BaseUrl + "/Residents/PathWithNoPlaceholder");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "ArgumentException: 'r => r.NextOfKin.Name' is not a member of the request itself; a request sets its own members, as r => r.Name. (Parameter 'member')");
+            "ArgumentException: The URL '/Residents/Summary/{name}' has no placeholder Ward; add {Ward} to the URL, or send Ward with Query. (Parameter 'member')");
+    }
+
+    [Test]
+    public async Task a_member_of_an_object_in_the_path_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/PathOfANestedMember");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: 'r => r.NextOfKin.Name' fills a placeholder, which only a member of the request itself fills, as r => r.Name; send NextOfKin.Name with Query. (Parameter 'member')");
+    }
+
+    [Test]
+    public async Task a_placeholder_sent_in_the_query_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/QueryOfAPlaceholder");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: The URL '/Residents/Summary/{name}' has the placeholder name, which Query does not fill; fill it with Path(r => r.Name, value). (Parameter 'url')");
+    }
+
+    [Test]
+    public async Task a_member_lambda_that_reads_past_the_members_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/MemberNotAPath");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: 'r => r.Ward.Trim()' is not a member path of the request; a request sends its members, as r => r.Name or r => r.NextOfKin.Name. (Parameter 'member')");
     }
 
     [Test]

@@ -5,18 +5,8 @@ using Alis.Reactive.Values;
 
 namespace Alis.Reactive.Pipelines;
 
-public static class CondensedRequests
+public static class CondensedStandIns
 {
-    public static QueryParts<TRequest> Set<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
-        => throw new NotSupportedException();
-
-    public static QueryParts<TRequest> Set<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue>> member, TValue value)
-        => throw new NotSupportedException();
-
-    public static QueryParts<TRequest> Set<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
-        where TValue : struct
-        => throw new NotSupportedException();
-
     public static QueriedParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, RequestForm<TRequest> form) => throw new NotSupportedException();
 
     public static QueriedParts<TRequest> Inputs<TRequest>(this QueryParts<TRequest> request, RequestContainer<TRequest> container) => throw new NotSupportedException();

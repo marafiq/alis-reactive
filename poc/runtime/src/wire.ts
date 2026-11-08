@@ -3,16 +3,16 @@ import { assertNever, Stop } from "./read";
 import { dateOf, dateText, type DateText } from "./shapes";
 import { invariantText } from "./sums";
 
-export function wireTexts(member: string, held: unknown, form: WireForm): readonly string[] | undefined {
+export function wireTexts(sent: string, held: unknown, form: WireForm): readonly string[] | undefined {
   if (held === null || held === undefined) return undefined;
-  const place = "The request member '" + member + "'";
+  const place = "The " + sent;
   if (form.kind !== "list") return [scalarText(place, held, form.kind)];
   if (!Array.isArray(held)) throw notInItsForm(place, "a list", held);
-  return held.map((item: unknown, index: number) => itemText(member, item, index, form));
+  return held.map((item: unknown, index: number) => itemText(sent, item, index, form));
 }
 
-function itemText(member: string, item: unknown, index: number, form: ListForm): string {
-  const place = "Item " + String(index + 1) + " of the request member '" + member + "'";
+function itemText(sent: string, item: unknown, index: number, form: ListForm): string {
+  const place = "Item " + String(index + 1) + " of the " + sent;
   if (item !== null && item !== undefined) return scalarText(place, item, form.item);
   switch (form.itemWhenNothing) {
     case "empty":

@@ -159,6 +159,37 @@ public sealed class WhenTheRegisterIsAskedAboutAHandover : AppPageTest
     }
 
     [Test]
+    public async Task a_number_read_into_a_header_is_sent_as_its_invariant_text()
+    {
+        await Open("/Handovers/Ask");
+
+        var asked = await Page.RunAndWaitForRequestAsync(AskTheRegister, Register);
+
+        Assert.That(await asked.HeaderValueAsync("X-Round"), Is.EqualTo("3"));
+    }
+
+    [Test]
+    public async Task a_header_that_reads_nothing_is_not_sent()
+    {
+        await Open("/Handovers/Ask");
+
+        var asked = await Page.RunAndWaitForRequestAsync(AskTheRegister, Register);
+
+        Assert.That(await asked.HeaderValueAsync("X-Lead"), Is.Null);
+    }
+
+    [Test]
+    public async Task a_header_read_from_a_handover_that_started_is_sent()
+    {
+        await Open("/Handovers/Ask");
+        await Press("Start the handover");
+
+        var asked = await Page.RunAndWaitForRequestAsync(AskTheRegister, Register);
+
+        Assert.That(await asked.HeaderValueAsync("X-Lead"), Is.EqualTo("Ana"));
+    }
+
+    [Test]
     public async Task a_number_a_yes_or_no_and_a_shift_fill_the_path()
     {
         await Open("/Handovers/Ask");
